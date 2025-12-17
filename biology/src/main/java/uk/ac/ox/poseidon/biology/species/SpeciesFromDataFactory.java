@@ -26,35 +26,27 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.List;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SpeciesFromDataFactory extends GlobalScopeFactory<List<Species>> {
 
-    private Factory<? extends Table> data;
+    private GlobalScopeFactory<? extends Table> data;
     private String speciesCodeColumn;
     private String speciesNameColumn;
     private String lifeStageColumn;
 
-    public SpeciesFromDataFactory(
-        final Factory<? extends Table> data,
-        final String speciesCodeColumn,
-        final String speciesNameColumn
-    ) {
-        this(data, speciesCodeColumn, speciesNameColumn, null);
-    }
-
     @Override
-    protected List<Species> newInstance(final Simulation simulation) {
-        return data.get(simulation)
+    protected List<Species> newInstance() {
+        return data.get()
             .stream()
             .map(row ->
                 new Species(

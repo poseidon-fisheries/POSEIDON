@@ -22,22 +22,25 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
-import lombok.*;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.time.MonthDayFactory;
 
 import java.time.MonthDay;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BetweenYearlyDatesFactory extends GlobalScopeFactory<BetweenYearlyDates> {
 
-    private Factory<? extends MonthDay> start;
-    private Factory<? extends MonthDay> end;
+    private GlobalScopeFactory<? extends MonthDay> start;
+    private GlobalScopeFactory<? extends MonthDay> end;
 
     public static BetweenYearlyDatesFactory parse(
         final CharSequence start,
@@ -50,10 +53,10 @@ public class BetweenYearlyDatesFactory extends GlobalScopeFactory<BetweenYearlyD
     }
 
     @Override
-    protected BetweenYearlyDates newInstance(final @NonNull Simulation simulation) {
+    protected BetweenYearlyDates newInstance() {
         return new BetweenYearlyDates(
-            start.get(simulation),
-            end.get(simulation)
+            start.get(),
+            end.get()
         );
     }
 }

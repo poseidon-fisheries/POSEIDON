@@ -22,31 +22,36 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.portrayal.SimplePortrayal2D;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.simple.OrientedPortrayal2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import static java.awt.Color.LIGHT_GRAY;
 import static sim.portrayal.simple.OrientedPortrayal2D.SHAPE_COMPASS;
 
 @Getter
 @Setter
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class VesselFieldPortrayalFactory extends SimulationScopeFactory<ContinuousPortrayal2D> {
 
     private static final double SCALE = 0.5;
-    private Factory<? extends VesselField> vesselField;
+    private Factory<? super SimulationScope, ? extends VesselField> vesselField;
 
     @Override
-    protected ContinuousPortrayal2D newInstance(final @NonNull Simulation simulation) {
+    protected ContinuousPortrayal2D newInstance(final SimulationScope scope) {
         final ContinuousPortrayal2D continuousPortrayal2D = new ContinuousPortrayal2D();
-        continuousPortrayal2D.setField(vesselField.get(simulation).getField());
+        continuousPortrayal2D.setField(vesselField.get(scope).getField());
         continuousPortrayal2D.setPortrayalForAll(
             new OrientedPortrayal2D(
                 new SimplePortrayal2D(),

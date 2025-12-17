@@ -22,32 +22,37 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 @Getter
 @Setter
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class BiomassGridFactory extends SimulationScopeFactory<BiomassGrid> {
 
-    private Factory<? extends ModelGrid> modelGrid;
-    private Factory<? extends Species> species;
-    private Factory<? extends BiomassAllocator> biomassAllocator;
+    private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
+    private Factory<? super SimulationScope, ? extends Species> species;
+    private Factory<? super SimulationScope, ? extends BiomassAllocator> biomassAllocator;
 
     @Override
-    protected BiomassGrid newInstance(final @NonNull Simulation simulation) {
-        final BiomassAllocator biomassAllocator = this.biomassAllocator.get(simulation);
-        final ModelGrid modelGrid = this.modelGrid.get(simulation);
+    protected BiomassGrid newInstance(final SimulationScope scope) {
+        final BiomassAllocator biomassAllocator = this.biomassAllocator.get(scope);
+        final ModelGrid modelGrid = this.modelGrid.get(scope);
         final double[][] biomassArray = modelGrid.makeDoubleArray();
         modelGrid.getAllCells().forEach(cell ->
             biomassArray[cell.x][cell.y] = biomassAllocator.applyAsDouble(cell)
         );
-        return new DefaultBiomassGrid(modelGrid, species.get(simulation), biomassArray);
+        return new DefaultBiomassGrid(modelGrid, species.get(scope), biomassArray);
     }
 
 }

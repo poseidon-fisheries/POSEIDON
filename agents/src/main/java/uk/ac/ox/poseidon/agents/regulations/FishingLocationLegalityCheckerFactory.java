@@ -26,36 +26,35 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FishingLocationLegalityCheckerFactory
     extends VesselScopeFactory<FishingLocationLegalityChecker> {
 
-    private Factory<? extends Regulations<Vessel>> regulations;
-    private Factory<? extends GridPathFinder> pathFinder;
-    private Factory<? extends DistanceCalculator> distance;
+    private Factory<? super VesselScope, ? extends Regulations<Vessel>> regulations;
+    private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
+    private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
 
     @Override
-    protected FishingLocationLegalityChecker newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected FishingLocationLegalityChecker newInstance(final VesselScope scope) {
         return new FishingLocationLegalityChecker(
-            regulations.get(simulation),
-            pathFinder.get(simulation),
-            distance.get(simulation),
-            () -> simulation.getTemporalSchedule().getDateTime(),
-            vessel
+            regulations.get(scope),
+            pathFinder.get(scope),
+            distance.get(scope),
+            () -> scope.getSimulation().getTemporalSchedule().getDateTime(),
+            scope.getVessel()
         );
     }
 }

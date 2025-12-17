@@ -26,11 +26,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 import java.util.function.IntSupplier;
@@ -38,27 +38,25 @@ import java.util.function.Predicate;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class NeighbourhoodGridExplorerFactory extends VesselScopeFactory<NeighbourhoodCellPicker> {
 
-    private VesselScopeFactory<? extends OptionValues<Int2D>> optionValues;
-    private VesselScopeFactory<? extends Predicate<Int2D>> cellPredicate;
-    private Factory<? extends GridPathFinder> pathFinder;
-    private Factory<? extends IntSupplier> neighbourhoodSizeSupplier;
+    private Factory<? super VesselScope, ? extends OptionValues<Int2D>> optionValues;
+    private Factory<? super VesselScope, ? extends Predicate<Int2D>> cellPredicate;
+    private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
+    private Factory<? super VesselScope, ? extends IntSupplier> neighbourhoodSizeSupplier;
 
     @Override
-    protected NeighbourhoodCellPicker newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected NeighbourhoodCellPicker newInstance(final VesselScope scope) {
         return new NeighbourhoodCellPicker(
-            vessel,
-            optionValues.get(simulation, vessel),
-            cellPredicate.get(simulation, vessel),
-            pathFinder.get(simulation),
-            neighbourhoodSizeSupplier.get(simulation),
-            simulation.random
+            scope.getVessel(),
+            optionValues.get(scope),
+            cellPredicate.get(scope),
+            pathFinder.get(scope),
+            neighbourhoodSizeSupplier.get(scope),
+            scope.getSimulation().random
         );
     }
 }

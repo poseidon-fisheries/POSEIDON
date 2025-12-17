@@ -23,10 +23,9 @@
 package uk.ac.ox.poseidon.geography.bathymetry;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -35,19 +34,19 @@ import java.util.Map;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class BathymetricGridFactory extends GlobalScopeFactory<BathymetricGrid> {
-    @NonNull private Factory<? extends ModelGrid> modelGrid;
-    @NonNull private Factory<? extends Aggregator> aggregator;
+    @NonNull private GlobalScopeFactory<? extends ModelGrid> modelGrid;
+    @NonNull private GlobalScopeFactory<? extends Aggregator> aggregator;
     private boolean inverted = false;
 
     @Override
-    protected BathymetricGrid newInstance(final @NonNull Simulation simulation) {
-        final ModelGrid modelGrid = this.modelGrid.get(simulation);
-        final Aggregator aggregator = this.aggregator.get(simulation);
-        final Map<Int2D, Collection<Double>> elevationValues =
-            readElevationValues(simulation, modelGrid);
+    protected BathymetricGrid newInstance() {
+        final ModelGrid modelGrid = this.modelGrid.get();
+        final Aggregator aggregator = this.aggregator.get();
+        final Map<Int2D, Collection<Double>> elevationValues = readElevationValues(modelGrid);
         final double[][] array = modelGrid.makeDoubleArray();
         modelGrid.getAllCells().forEach(int2D ->
             array[int2D.x][int2D.y] = aggregator.apply(elevationValues.get(int2D)).orElse(0)
@@ -56,7 +55,6 @@ public abstract class BathymetricGridFactory extends GlobalScopeFactory<Bathymet
     }
 
     protected abstract Map<Int2D, Collection<Double>> readElevationValues(
-        final Simulation simulation,
         ModelGrid modelGrid
     );
 }

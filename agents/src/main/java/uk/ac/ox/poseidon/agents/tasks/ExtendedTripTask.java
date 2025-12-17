@@ -24,20 +24,21 @@ package uk.ac.ox.poseidon.agents.tasks;
 
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.trips.Trip;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.time.LocalDateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Getter
-public abstract class ExtendedTripTask extends ExtendedTask {
+public abstract class ExtendedTripTask extends ExtendedTask<Vessel> {
 
     private Trip trip;
     private LocalDateTime startDateTime;
 
     @Override
     public void start() {
-        trip = checkNotNull(getVessel().getCurrentTrip());
-        startDateTime = getVessel().getSchedule().getDateTime();
+        trip = checkNotNull(getAgent().getCurrentTrip());
+        startDateTime = getAgent().getSchedule().getDateTime();
     }
 }

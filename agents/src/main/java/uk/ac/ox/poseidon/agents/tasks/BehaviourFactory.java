@@ -27,23 +27,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.Factory;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BehaviourFactory extends VesselScopeFactory<Behaviour<Vessel>> {
 
-    private VesselScopeFactory<? extends Task<Vessel>> rootTask;
+    private Factory<? super VesselScope, ? extends Task<Vessel>> rootTask;
 
     @Override
-    protected Behaviour<Vessel> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new ActiveBehaviour<>(rootTask.get(simulation, vessel), vessel);
+    protected Behaviour<Vessel> newInstance(final VesselScope scope) {
+        return new ActiveBehaviour<>(rootTask.get(scope), scope.getVessel());
     }
 }

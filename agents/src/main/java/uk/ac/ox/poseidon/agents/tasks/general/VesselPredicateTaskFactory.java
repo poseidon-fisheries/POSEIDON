@@ -26,27 +26,26 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.function.Predicate;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class VesselPredicateTaskFactory extends TaskFactory<VesselPredicateTask> {
+public class VesselPredicateTaskFactory
+    extends VesselTaskFactory<AgentPredicateTask<Vessel>> {
 
-    private Factory<? extends Predicate<Vessel>> predicate;
+    private Factory<? super VesselScope, ? extends Predicate<Vessel>> predicate;
 
     @Override
-    protected VesselPredicateTask newTask(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new VesselPredicateTask(predicate.get(simulation));
+    protected AgentPredicateTask<Vessel> newTask(final VesselScope scope) {
+        return new AgentPredicateTask<>(predicate.get(scope));
     }
-
 }

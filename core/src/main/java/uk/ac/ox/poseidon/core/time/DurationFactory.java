@@ -22,14 +22,18 @@
 
 package uk.ac.ox.poseidon.core.time;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.Duration;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DurationFactory extends GlobalScopeFactory<Duration> {
@@ -51,7 +55,7 @@ public class DurationFactory extends GlobalScopeFactory<Duration> {
     }
 
     @Override
-    protected Duration newInstance(final @NonNull Simulation simulation) {
+    protected Duration newInstance() {
         return Duration.ofDays(days).plusHours(hours).plusMinutes(minutes).plusSeconds(seconds);
     }
 }

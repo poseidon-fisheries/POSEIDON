@@ -26,29 +26,28 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.Factory;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class GearSpecificFishingLocationLegalityCheckerFactory
     extends VesselScopeFactory<GearSpecificFishingLocationLegalityChecker> {
 
-    private VesselScopeFactory<? extends Gear> fishingGear;
-    private VesselScopeFactory<? extends FishingLocationLegalityChecker> delegateChecker;
+    private Factory<? super VesselScope, ? extends Gear> fishingGear;
+    private Factory<? super VesselScope, ? extends FishingLocationLegalityChecker> delegateChecker;
 
     @Override
-    protected GearSpecificFishingLocationLegalityChecker newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected GearSpecificFishingLocationLegalityChecker newInstance(final VesselScope scope) {
         return new GearSpecificFishingLocationLegalityChecker(
-            fishingGear.get(simulation, vessel),
-            delegateChecker.get(simulation, vessel)
+            fishingGear.get(scope),
+            delegateChecker.get(scope)
         );
     }
 }

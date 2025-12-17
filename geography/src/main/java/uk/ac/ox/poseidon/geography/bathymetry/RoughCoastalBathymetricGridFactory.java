@@ -24,10 +24,11 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 
 import ec.util.MersenneTwisterFast;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -38,12 +39,13 @@ import static java.util.stream.Collectors.toMap;
 
 @Getter
 @Setter
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoughCoastalBathymetricGridFactory
     extends SimulationScopeFactory<BathymetricGrid> {
 
-    @NonNull private Factory<? extends ModelGrid> modelGrid;
+    @NonNull private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
     private int coastalRoughness;
     private int smoothingIterations;
     private double smoothingStrength;
@@ -53,12 +55,12 @@ public class RoughCoastalBathymetricGridFactory
     private double probabilityOfFlippingLandToWater;
 
     @Override
-    protected BathymetricGrid newInstance(final @NonNull Simulation simulation) {
+    protected BathymetricGrid newInstance(final SimulationScope scope) {
         checkState(minimumElevation < 0);
         checkState(maximumElevation > 0);
 
-        final ModelGrid modelGrid = this.modelGrid.get(simulation);
-        final MersenneTwisterFast rng = simulation.random;
+        final ModelGrid modelGrid = this.modelGrid.get(scope);
+        final MersenneTwisterFast rng = scope.getSimulation().random;
         final DoubleGrid2D doubleGrid2D = new DoubleGrid2D(
             modelGrid.getGridWidth(),
             modelGrid.getGridHeight()

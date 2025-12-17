@@ -26,12 +26,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.LocalDate;
 
 @Data
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
@@ -41,7 +42,7 @@ public class DateFactory extends GlobalScopeFactory<LocalDate> {
     private Integer month = LocalDate.now().getMonthValue();
     private Integer day = LocalDate.now().getDayOfMonth();
 
-    protected LocalDate newInstance(final Simulation simulation) {
+    protected LocalDate newInstance() {
         return LocalDate.of(year, month, day);
     }
 

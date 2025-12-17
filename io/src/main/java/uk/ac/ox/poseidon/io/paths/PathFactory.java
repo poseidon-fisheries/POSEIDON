@@ -23,10 +23,11 @@
 package uk.ac.ox.poseidon.io.paths;
 
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 
-public interface PathFactory extends Factory<Path> {
+public interface PathFactory<S extends Scope> extends Factory<S, Path> {
 
     private static String pathToString(final Path path) {
         return path.toString().replace("\\", "/");

@@ -32,6 +32,7 @@ import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.io.Serial;
 import java.text.MessageFormat;
@@ -58,12 +59,15 @@ public class Simulation extends SimState {
         final long seed,
         final TemporalSchedule schedule,
         final UUID simulationId,
-        final Stream<? extends Factory<?>> components
+        final Stream<? extends Factory<? super SimulationScope, ?>> components
     ) {
         final Simulation simulation = new Simulation(seed, schedule, simulationId);
         simulation.start();
+        final SimulationScope simulationScope = new SimulationScope(simulation);
         simulation.components =
-            components.map(factory -> factory.get(simulation)).toList();
+            components.map(factory ->
+                factory.get(simulationScope)
+            ).toList();
         return simulation;
     }
 

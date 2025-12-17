@@ -26,27 +26,24 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Speed;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SimpleEngineFactory extends VesselScopeFactory<Engine> {
+public class SimpleEngineFactory extends GlobalScopeFactory<Engine> {
 
-    private Factory<? extends Quantity<Speed>> speed;
+    private GlobalScopeFactory<? extends Quantity<Speed>> speed;
 
     @Override
-    protected Engine newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new SimpleEngine(speed.get(simulation));
+    protected Engine newInstance() {
+        return new SimpleEngine(speed.get());
     }
+    
 }

@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.tables;
 
 import lombok.Getter;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
 @Getter
@@ -33,8 +33,7 @@ public class FishingEventListenerTableFactory
     extends SimulationEventListenerFactory<FishingEventListenerTable> {
 
     @Override
-    protected FishingEventListenerTable newListener(final Simulation simulation) {
+    protected FishingEventListenerTable newListener(final SimulationScope scope) {
         return new FishingEventListenerTable();
     }
-
 }

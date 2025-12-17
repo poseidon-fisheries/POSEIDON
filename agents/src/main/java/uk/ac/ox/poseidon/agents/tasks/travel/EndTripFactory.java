@@ -22,16 +22,15 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 
-public class EndTripFactory extends VesselScopeFactory<EndTrip> {
+@SuperBuilder
+public class EndTripFactory extends VesselTaskFactory<EndTrip> {
+
     @Override
-    protected EndTrip newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected EndTrip newTask(final VesselScope scope) {
         return new EndTrip();
     }
 }

@@ -26,23 +26,20 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InactiveGearFactory extends VesselScopeFactory<InactiveGear> {
+public class InactiveGearFactory extends GlobalScopeFactory<InactiveGear> {
 
     private String code;
 
     @Override
-    protected InactiveGear newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected InactiveGear newInstance() {
         return new InactiveGear(code);
     }
 

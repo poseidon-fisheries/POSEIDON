@@ -26,23 +26,22 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExponentialMovingAverageOptionValuesFactory<O> extends VesselScopeFactory<MutableOptionValues<O>> {
+public class ExponentialMovingAverageOptionValuesFactory<O>
+    extends VesselScopeFactory<MutableOptionValues<O>> {
 
     private double alpha;
 
     @Override
-    protected MutableOptionValues<O> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected MutableOptionValues<O> newInstance(final VesselScope scope) {
         return new ExponentialMovingAverageOptionValues<>(alpha);
     }
 }

@@ -22,13 +22,13 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
-import lombok.NonNull;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
+@SuperBuilder
 public class SumFactory extends GlobalScopeFactory<Sum> {
     @Override
-    protected Sum newInstance(final @NonNull Simulation simulation) {
+    protected Sum newInstance() {
         return new Sum();
     }
 }

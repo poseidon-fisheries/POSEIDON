@@ -26,22 +26,22 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DateTimeIsBeforeFactory extends GlobalScopeFactory<DateTimeIsBefore> {
 
-    private Factory<? extends LocalDateTime> referenceDateTime;
+    private GlobalScopeFactory<? extends LocalDateTime> referenceDateTime;
 
     @Override
-    protected DateTimeIsBefore newInstance(final Simulation simulation) {
-        return new DateTimeIsBefore(referenceDateTime.get(simulation));
+    protected DateTimeIsBefore newInstance() {
+        return new DateTimeIsBefore(referenceDateTime.get());
     }
 }

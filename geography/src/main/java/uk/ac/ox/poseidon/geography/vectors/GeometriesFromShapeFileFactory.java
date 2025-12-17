@@ -24,14 +24,13 @@ package uk.ac.ox.poseidon.geography.vectors;
 
 import com.google.common.collect.ImmutableList;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.locationtech.jts.geom.Geometry;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.io.IOException;
 import java.net.URL;
@@ -42,16 +41,17 @@ import java.util.Map;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class GeometriesFromShapeFileFactory extends GlobalScopeFactory<Collection<Geometry>> {
 
     @NonNull
-    private Factory<? extends Path> path;
+    private GlobalScopeFactory<? extends Path> path;
 
     @Override
-    protected List<Geometry> newInstance(final @NonNull Simulation simulation) {
-        final Path filePath = this.path.get(simulation);
+    protected List<Geometry> newInstance() {
+        final Path filePath = this.path.get();
         return readShapeFile(filePath);
     }
 

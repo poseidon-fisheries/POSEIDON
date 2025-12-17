@@ -22,23 +22,26 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import lombok.*;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.function.Predicate;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotFactory<T> extends GlobalScopeFactory<Not<T>> {
 
-    private Factory<? extends Predicate<T>> predicate;
+    private GlobalScopeFactory<? extends Predicate<T>> predicate;
 
     @Override
-    protected Not<T> newInstance(final @NonNull Simulation simulation) {
-        return new Not<>(predicate.get(simulation));
+    protected Not<T> newInstance() {
+        return new Not<>(predicate.get());
     }
 }

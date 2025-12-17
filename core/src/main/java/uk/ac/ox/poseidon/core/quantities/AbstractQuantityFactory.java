@@ -22,13 +22,16 @@
 
 package uk.ac.ox.poseidon.core.quantities;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import si.uom.NonSI;
 import tech.units.indriya.format.SimpleQuantityFormat;
 import tech.units.indriya.format.SimpleUnitFormat;
 import tech.units.indriya.quantity.Quantities;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
@@ -38,6 +41,7 @@ import static java.util.Map.entry;
 
 @Getter
 @Setter
+@SuperBuilder
 @RequiredArgsConstructor
 @AllArgsConstructor
 public abstract class AbstractQuantityFactory<Q extends Quantity<Q>>
@@ -66,7 +70,7 @@ public abstract class AbstractQuantityFactory<Q extends Quantity<Q>>
     }
 
     @Override
-    protected Quantity<Q> newInstance(final @NonNull Simulation simulation) {
+    protected Quantity<Q> newInstance() {
         final Unit<Q> unit = SimpleUnitFormat.getInstance().parse(unitString).asType(type);
         return Quantities.getQuantity(value, unit);
     }

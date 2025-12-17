@@ -23,11 +23,12 @@
 package uk.ac.ox.poseidon.geography.grids;
 
 import com.google.common.collect.ImmutableSet;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -37,12 +38,12 @@ import java.nio.file.Path;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CellSetFromGridFileFactory extends GlobalScopeFactory<ImmutableSet<Int2D>> {
-    private Factory<? extends Path> path;
+    private GlobalScopeFactory<? extends Path> path;
     private double includedValue;
 
     @Override
-    protected ImmutableSet<Int2D> newInstance(final @NonNull Simulation simulation) {
-        final File gridFile = path.get(simulation).toFile();
+    protected ImmutableSet<Int2D> newInstance() {
+        final File gridFile = path.get().toFile();
         if (!gridFile.isFile()) {
             throw new RuntimeException(gridFile + " does not point to a file.");
         }

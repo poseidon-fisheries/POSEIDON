@@ -22,14 +22,18 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.io.File;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModelGridWithActiveCellsFromGridFile
@@ -38,14 +42,14 @@ public class ModelGridWithActiveCellsFromGridFile
     CellSetFromGridFileFactory cellSetFromGridFile;
 
     @Override
-    protected ModelGrid newInstance(final @NonNull Simulation simulation) {
-        final File gridFile = cellSetFromGridFile.getPath().get(simulation).toFile();
+    protected ModelGrid newInstance() {
+        final File gridFile = cellSetFromGridFile.getPath().get().toFile();
         final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
         return ModelGrid.withActiveCells(
             coverageWrapper.getGridWidth(),
             coverageWrapper.getGridHeight(),
             coverageWrapper.makeEnvelope(),
-            cellSetFromGridFile.get(simulation)
+            cellSetFromGridFile.get()
         );
     }
 

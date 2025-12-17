@@ -26,9 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.util.function.Predicate;
@@ -39,11 +37,11 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 public class ActionCoordinatePredicateFactory extends GlobalScopeFactory<ActionCoordinatePredicate> {
 
-    private Factory<? extends Predicate<Coordinate>> coordinatePredicate;
+    private GlobalScopeFactory<? extends Predicate<Coordinate>> coordinatePredicate;
 
     @Override
-    protected ActionCoordinatePredicate newInstance(final Simulation simulation) {
-        return new ActionCoordinatePredicate(coordinatePredicate.get(simulation));
+    protected ActionCoordinatePredicate newInstance() {
+        return new ActionCoordinatePredicate(coordinatePredicate.get());
     }
 
 }

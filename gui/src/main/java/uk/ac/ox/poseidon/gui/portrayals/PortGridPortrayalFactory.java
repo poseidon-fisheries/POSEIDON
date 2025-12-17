@@ -22,25 +22,30 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.portrayal.grid.SparseGridPortrayal2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 @Getter
 @Setter
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public final class PortGridPortrayalFactory extends SimulationScopeFactory<SparseGridPortrayal2D> {
 
-    private Factory<? extends PortGrid> portGrid;
+    private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
 
     @Override
-    protected SparseGridPortrayal2D newInstance(final @NonNull Simulation simulation) {
+    protected SparseGridPortrayal2D newInstance(final SimulationScope scope) {
         final SparseGridPortrayal2D sparseGridPortrayal2D = new SparseGridPortrayal2D();
-        sparseGridPortrayal2D.setField(portGrid.get(simulation).getField());
+        sparseGridPortrayal2D.setField(portGrid.get(scope).getField());
         sparseGridPortrayal2D.setPortrayalForAll(
             SvgPortrayal.from(getClass().getResourceAsStream("/images/port.svg"))
         );

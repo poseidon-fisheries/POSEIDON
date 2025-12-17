@@ -23,8 +23,8 @@
 package uk.ac.ox.poseidon.agents.tasks.general;
 
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.tasks.VesselTask;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.Agent;
+import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 
 import java.util.function.Predicate;
 
@@ -32,13 +32,13 @@ import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 @RequiredArgsConstructor
-public class VesselPredicateTask extends VesselTask {
+public class AgentPredicateTask<A extends Agent<A>> extends AgentTask<A> {
 
-    private final Predicate<Vessel> predicate;
+    private final Predicate<? super A> predicate;
 
     @Override
     public Status execute() {
-        return predicate.test(getVessel()) ? SUCCEEDED : FAILED;
+        return predicate.test(getAgent()) ? SUCCEEDED : FAILED;
     }
 
 }

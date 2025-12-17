@@ -26,31 +26,30 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.registers.Register;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.function.Supplier;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BestOptionsSupplierFactory<O>
     extends VesselScopeFactory<Supplier<OptionValues<O>>> {
 
-    Factory<? extends Register<? extends OptionValues<O>>> optionValuesRegister;
+    Factory<? super VesselScope, ? extends Register<? extends OptionValues<O>>>
+        optionValuesRegister;
 
     @Override
-    protected Supplier<OptionValues<O>> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected Supplier<OptionValues<O>> newInstance(final VesselScope scope) {
         return new BestOptionsSupplier<>(
-            vessel,
-            optionValuesRegister.get(simulation)
+            scope.getVessel(),
+            optionValuesRegister.get(scope)
         );
     }
 }

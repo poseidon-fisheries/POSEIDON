@@ -26,21 +26,21 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UniformCatchCategoriserFactory
     extends GlobalScopeFactory<CatchCategoriser> {
 
-    private Factory<? extends CatchCategory> catchCategory;
+    private GlobalScopeFactory<? extends CatchCategory> catchCategory;
 
     @Override
-    protected CatchCategoriser newInstance(final Simulation simulation) {
-        return new UniformCatchCategoriser(catchCategory.get(simulation));
+    protected CatchCategoriser newInstance() {
+        return new UniformCatchCategoriser(catchCategory.get());
     }
 }

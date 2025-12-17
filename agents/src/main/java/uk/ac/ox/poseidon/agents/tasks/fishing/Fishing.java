@@ -48,7 +48,7 @@ public class Fishing extends ExtendedTripTask {
     @Override
     public void start() {
         super.start();
-        action = new FishingAction(getVessel());
+        action = new FishingAction(getAgent());
     }
 
     @Override
@@ -59,8 +59,8 @@ public class Fishing extends ExtendedTripTask {
     @Override
     protected Status complete() {
         final Fisheable fisheable = fisheableSupplier.get();
-        final Bucket grossCatch = getVessel().getGear().fish(fisheable);
-        final Hold hold = getVessel().getHold();
+        final Bucket grossCatch = getAgent().getGear().fish(fisheable);
+        final Hold hold = getAgent().getHold();
         final Disposition disposition =
             dispositionProcess.partition(grossCatch, hold.getAvailableCapacityInKg());
         hold.addContent(disposition.getRetained());

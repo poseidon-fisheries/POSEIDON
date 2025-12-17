@@ -22,13 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
 public class FishingEventAccumulatorFactory
     extends SimulationEventListenerFactory<FishingEventAccumulator> {
+
     @Override
-    protected FishingEventAccumulator newListener(final Simulation simulation) {
+    protected FishingEventAccumulator newListener(final SimulationScope scope) {
         return new FishingEventAccumulator();
     }
 }

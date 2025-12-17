@@ -22,10 +22,12 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import lombok.*;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -34,24 +36,25 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AllOfFactory<T> extends GlobalScopeFactory<AllOf<T>> {
 
-    private List<Factory<? extends Predicate<? super T>>> predicates;
+    private List<GlobalScopeFactory<? extends Predicate<? super T>>> predicates;
 
     @SafeVarargs
     @SuppressWarnings("varargs")
-    public AllOfFactory(final Factory<? extends Predicate<? super T>>... predicates) {
+    public AllOfFactory(final GlobalScopeFactory<? extends Predicate<? super T>>... predicates) {
         this(List.of(predicates));
     }
 
     @Override
-    protected AllOf<T> newInstance(final @NonNull Simulation simulation) {
+    protected AllOf<T> newInstance() {
         return new AllOf<>(
             predicates
                 .stream()
-                .map(p -> p.get(simulation))
+                .map(GlobalScopeFactory::get)
                 .collect(toImmutableList())
         );
     }

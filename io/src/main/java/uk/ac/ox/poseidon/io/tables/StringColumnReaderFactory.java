@@ -26,28 +26,28 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.nio.file.Path;
 import java.util.List;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class StringColumnReaderFactory extends GlobalScopeFactory<List<String>> {
 
-    private Factory<? extends Path> path;
+    private GlobalScopeFactory<? extends Path> path;
     private String columnName;
 
     @Override
-    protected List<String> newInstance(final Simulation simulation) {
+    protected List<String> newInstance() {
         return Table
             .read()
-            .csv(path.get(simulation).toFile())
+            .csv(path.get().toFile())
             .stream()
             .map(row -> row.getString(columnName))
             .toList();

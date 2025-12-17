@@ -22,20 +22,19 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import lombok.NonNull;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.events.Listener;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 public abstract class SimulationEventListenerFactory<T extends Listener<?>>
     extends SimulationScopeFactory<T> {
 
-    protected abstract T newListener(final Simulation simulation);
+    protected abstract T newListener(final SimulationScope scope);
 
     @Override
-    protected final T newInstance(final @NonNull Simulation simulation) {
-        final T listener = newListener(simulation);
-        simulation.getEventManager().addListener(listener);
+    protected final T newInstance(final SimulationScope scope) {
+        final T listener = newListener(scope);
+        scope.getSimulation().getEventManager().addListener(listener);
         return listener;
     }
 }

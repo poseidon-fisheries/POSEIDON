@@ -23,27 +23,27 @@
 package uk.ac.ox.poseidon.core.time;
 
 import lombok.*;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 
 @Data
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 abstract class RelativeDateTimeFactory extends GlobalScopeFactory<LocalDateTime> {
 
-    @NonNull private Factory<? extends LocalDateTime> referenceDateTime;
-    @NonNull private Factory<? extends TemporalAmount> temporalAmount;
+    @NonNull private GlobalScopeFactory<? extends LocalDateTime> referenceDateTime;
+    @NonNull private GlobalScopeFactory<? extends TemporalAmount> temporalAmount;
 
     @Override
-    protected LocalDateTime newInstance(final @NonNull Simulation simulation) {
+    protected LocalDateTime newInstance() {
         return operation(
-            referenceDateTime.get(simulation),
-            temporalAmount.get(simulation)
+            referenceDateTime.get(),
+            temporalAmount.get()
         );
     }
 

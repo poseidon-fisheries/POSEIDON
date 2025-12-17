@@ -132,7 +132,7 @@ public class PortGrid extends ObjectGrid<Port> {
         );
     }
 
-    public Port createPort(
+    Port createPort(
         final String portCode,
         final String portName,
         final Coordinate coordinate
@@ -140,7 +140,7 @@ public class PortGrid extends ObjectGrid<Port> {
         return createPort(portCode, portName, getModelGrid().toCell(coordinate));
     }
 
-    public Port createPort(
+    Port createPort(
         final String portCode,
         final String portName,
         final Int2D cell

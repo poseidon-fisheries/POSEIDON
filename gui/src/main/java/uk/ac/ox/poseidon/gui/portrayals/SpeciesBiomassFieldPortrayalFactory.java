@@ -26,28 +26,30 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SpeciesBiomassFieldPortrayalFactory extends GlobalScopeFactory<NamedPortrayal> {
+public class SpeciesBiomassFieldPortrayalFactory extends SimulationScopeFactory<NamedPortrayal> {
 
-    private Factory<? extends BiomassGrid> biomassGrid;
-    private Factory<? extends CarryingCapacityGrid> carryingCapacityGrid;
+    private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;
+    private Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid;
     private boolean visible;
 
     @Override
-    protected NamedPortrayal newInstance(final Simulation simulation) {
-        final Species species = biomassGrid.get(simulation).getSpecies();
+    protected NamedPortrayal newInstance(final SimulationScope scope) {
+        final Species species = biomassGrid.get(scope).getSpecies();
         final String name =
             species.getName() +
                 (species.getLifeStage() != null ? " " + species.getLifeStage() : "") +
@@ -60,7 +62,7 @@ public class SpeciesBiomassFieldPortrayalFactory extends GlobalScopeFactory<Name
                 false,
                 this.biomassGrid,
                 this.carryingCapacityGrid
-            ).get(simulation),
+            ).get(scope),
             visible
         );
     }

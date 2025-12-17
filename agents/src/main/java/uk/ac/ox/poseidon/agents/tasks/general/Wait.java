@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.agents.tasks.general;
 
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTask;
 
 import java.time.Duration;
@@ -31,7 +32,7 @@ import java.util.function.Supplier;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 @RequiredArgsConstructor
-public class Wait extends ExtendedTask {
+public class Wait<A extends Agent<A>> extends ExtendedTask<A> {
 
     final Supplier<Duration> durationSupplier;
 

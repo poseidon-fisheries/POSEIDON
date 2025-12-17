@@ -26,11 +26,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConstantFactory<T> extends GlobalScopeFactory<T> {
@@ -38,7 +39,7 @@ public class ConstantFactory<T> extends GlobalScopeFactory<T> {
     private T value;
 
     @Override
-    protected T newInstance(final Simulation simulation) {
+    protected T newInstance() {
         return value;
     }
 

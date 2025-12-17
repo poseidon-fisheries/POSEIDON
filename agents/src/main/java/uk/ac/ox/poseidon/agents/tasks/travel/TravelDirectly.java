@@ -42,8 +42,8 @@ public class TravelDirectly extends ExtendedTripTask {
     @Override
     public void start() {
         super.start();
-        origin = getVessel().getCell();
-        destination = getVessel().getCurrentTrip().getDestination();
+        origin = getAgent().getCell();
+        destination = getAgent().getCurrentTrip().getDestination();
     }
 
     @Override
@@ -51,17 +51,17 @@ public class TravelDirectly extends ExtendedTripTask {
         return distanceCalculator.travelDuration(
             origin,
             destination,
-            getVessel().getEngine().getCruisingSpeed()
+            getAgent().getEngine().getCruisingSpeed()
         );
     }
 
     @Override
     protected Status complete() {
-        getVessel().setCurrentCell(getVessel().getCurrentTrip().getDestination());
+        getAgent().setCurrentCell(getAgent().getCurrentTrip().getDestination());
         getTrip().getEventManager().broadcast(new TravelEvent(
-            getVessel(),
+            getAgent(),
             getStartDateTime(),
-            getVessel().getSchedule().getDateTime(),
+            getAgent().getSchedule().getDateTime(),
             origin,
             destination
         ));

@@ -22,25 +22,29 @@
 
 package uk.ac.ox.poseidon.core;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
-import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
-public abstract class GlobalScopeFactory<C> extends AbstractFactory<C> {
+import static uk.ac.ox.poseidon.core.scopes.GlobalScope.GLOBAL_SCOPE;
 
-    // needs to be transient for SnakeYAML not to be confused
-    // when there are no other properties to serialize
-    private final transient Cache<Integer, C> cache =
-        CacheBuilder.newBuilder().build();
+public abstract class GlobalScopeFactory<C>
+    extends AbstractFactory<GlobalScope, C>
+    implements Supplier<C> {
 
-    @Override
-    public final C get(final Simulation simulation) {
-        try {
-            return cache.get(makeKey(simulation), () -> newInstance(simulation));
-        } catch (final ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+    protected GlobalScopeFactory() {
+        super(GlobalScope.class);
     }
 
+    @Override
+    public final C get() {
+        return super.get(GLOBAL_SCOPE);
+    }
+
+    protected abstract C newInstance();
+
+    @Override
+    protected final C newInstance(final GlobalScope scope) {
+        return newInstance();
+    }
 }

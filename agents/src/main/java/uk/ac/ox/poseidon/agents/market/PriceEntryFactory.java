@@ -26,27 +26,28 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PriceEntryFactory extends GlobalScopeFactory<PriceEntry> {
-    private Factory<? extends CatchCategory> catchCategory;
-    private Factory<? extends Species> species;
-    private Factory<? extends Price> price;
+
+    private GlobalScopeFactory<? extends CatchCategory> catchCategory;
+    private GlobalScopeFactory<? extends Species> species;
+    private GlobalScopeFactory<? extends Price> price;
 
     @Override
-    protected PriceEntry newInstance(final Simulation simulation) {
+    protected PriceEntry newInstance() {
         return new PriceEntry(
-            catchCategory.get(simulation),
-            species.get(simulation),
-            price.get(simulation)
+            catchCategory.get(),
+            species.get(),
+            price.get()
         );
     }
 }

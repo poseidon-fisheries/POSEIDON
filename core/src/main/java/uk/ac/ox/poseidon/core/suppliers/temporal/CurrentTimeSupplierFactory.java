@@ -22,12 +22,15 @@
 
 package uk.ac.ox.poseidon.core.suppliers.temporal;
 
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-public class CurrentTimeSupplierFactory extends GlobalScopeFactory<CurrentTimeSupplier> {
+@SuperBuilder
+public class CurrentTimeSupplierFactory extends SimulationScopeFactory<CurrentTimeSupplier> {
+
     @Override
-    protected CurrentTimeSupplier newInstance(final Simulation simulation) {
-        return new CurrentTimeSupplier(simulation.getTemporalSchedule());
+    protected CurrentTimeSupplier newInstance(final SimulationScope scope) {
+        return new CurrentTimeSupplier(scope.getSimulation().getTemporalSchedule());
     }
 }

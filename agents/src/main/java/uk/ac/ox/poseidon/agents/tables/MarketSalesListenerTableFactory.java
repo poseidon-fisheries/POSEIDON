@@ -22,13 +22,15 @@
 
 package uk.ac.ox.poseidon.agents.tables;
 
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
 public class MarketSalesListenerTableFactory
     extends SimulationEventListenerFactory<MarketSalesListenerTable> {
+
     @Override
-    protected MarketSalesListenerTable newListener(Simulation simulation) {
+    protected MarketSalesListenerTable newListener(final SimulationScope scope) {
         return new MarketSalesListenerTable();
     }
+
 }

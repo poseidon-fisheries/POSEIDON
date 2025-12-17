@@ -22,24 +22,27 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.locationtech.jts.geom.Geometry;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.Collection;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class InGeometriesFactory extends GlobalScopeFactory<InGeometries> {
 
-    private Factory<? extends Collection<? extends Geometry>> geometries;
+    private GlobalScopeFactory<? extends Collection<? extends Geometry>> geometries;
 
     @Override
-    protected InGeometries newInstance(final @NonNull Simulation simulation) {
-        return new InGeometries(geometries.get(simulation));
+    protected InGeometries newInstance() {
+        return new InGeometries(geometries.get());
     }
 }

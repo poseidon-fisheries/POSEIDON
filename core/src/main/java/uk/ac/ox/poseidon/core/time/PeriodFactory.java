@@ -22,15 +22,19 @@
 
 package uk.ac.ox.poseidon.core.time;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.LocalDate;
 import java.time.Period;
 
 @Getter
 @Setter
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class PeriodFactory extends GlobalScopeFactory<Period> {
@@ -51,7 +55,7 @@ public class PeriodFactory extends GlobalScopeFactory<Period> {
     }
 
     @Override
-    protected Period newInstance(final @NonNull Simulation simulation) {
+    protected Period newInstance() {
         return Period.of(year, month, day);
     }
 }

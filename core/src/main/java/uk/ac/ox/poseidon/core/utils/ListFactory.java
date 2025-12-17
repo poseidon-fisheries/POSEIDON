@@ -26,13 +26,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.List;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ListFactory<C> extends GlobalScopeFactory<List<C>> {
@@ -45,7 +46,7 @@ public class ListFactory<C> extends GlobalScopeFactory<List<C>> {
     }
 
     @Override
-    protected List<C> newInstance(final Simulation simulation) {
+    protected List<C> newInstance() {
         return values;
     }
 }

@@ -26,14 +26,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.core.utils.Measurements;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -53,6 +54,7 @@ import static java.util.stream.Collectors.groupingBy;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BiomassMarketGridFromPriceTableFactory
@@ -61,7 +63,7 @@ public class BiomassMarketGridFromPriceTableFactory
     private static final System.Logger logger =
         System.getLogger(BiomassMarketGridFromPriceTableFactory.class.getName());
 
-    private Factory<? extends Table> data;
+    private Factory<? super SimulationScope, ? extends Table> data;
 
     private String dateColumn;
     private String portCodeColumn;
@@ -71,23 +73,23 @@ public class BiomassMarketGridFromPriceTableFactory
     private String currencyColumn;
     private String measurementUnitColumn;
 
-    private Factory<? extends PortGrid> portGrid;
-    private Factory<? extends Iterable<? extends Species>> species;
+    private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+    private Factory<? super SimulationScope, ? extends Iterable<? extends Species>> species;
 
     @Override
-    protected BiomassMarketGrid newInstance(final Simulation simulation) {
+    protected BiomassMarketGrid newInstance(final SimulationScope scope) {
 
         final Map<String, List<Species>> speciesByCode =
-            stream(this.species.get(simulation))
+            stream(this.species.get(scope))
                 .collect(groupingBy(Species::getCode));
 
-        final PortGrid portGrid = this.portGrid.get(simulation);
+        final PortGrid portGrid = this.portGrid.get(scope);
         final Map<String, BiomassMarket> markets = new HashMap<>();
         final BiomassMarketGrid marketGrid = new BiomassMarketGrid(portGrid);
         final Map<String, CatchCategory> catchCategories = new HashMap<>();
 
         final List<Entry<LocalDateTime, PriceUpdate>> priceUpdatesByDate =
-            data.get(simulation)
+            data.get(scope)
                 .stream()
                 .flatMap(row -> {
                         final BiomassMarket biomassMarket = markets.computeIfAbsent(
@@ -102,7 +104,7 @@ public class BiomassMarketGridFromPriceTableFactory
                                     port,
                                     portCode,
                                     Map.of(),
-                                    simulation.getEventManager()
+                                    scope.getSimulation().getEventManager()
                                 );
                                 marketGrid.addMarket(market, port);
                                 return market;
@@ -147,7 +149,7 @@ public class BiomassMarketGridFromPriceTableFactory
                             );
                     }
                 ).toList();
-        simulation.getTemporalSchedule().scheduleByDateTime(priceUpdatesByDate);
+        scope.getSimulation().getTemporalSchedule().scheduleByDateTime(priceUpdatesByDate);
 
         return marketGrid;
     }

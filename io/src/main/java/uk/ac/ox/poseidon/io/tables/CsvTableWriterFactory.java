@@ -22,31 +22,36 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CsvTableWriterFactory extends SimulationScopeFactory<CsvTableWriter> {
 
-    private Factory<? extends Supplier<Table>> tableSupplier;
-    private Factory<? extends Path> path;
+    private Factory<? super SimulationScope, ? extends Supplier<Table>> tableSupplier;
+    private Factory<? super SimulationScope, ? extends Path> path;
     private boolean append;
     private boolean clearAfterWriting;
 
     @Override
-    protected CsvTableWriter newInstance(final @NonNull Simulation simulation) {
+    protected CsvTableWriter newInstance(final SimulationScope scope) {
         return new CsvTableWriter(
-            tableSupplier.get(simulation),
-            path.get(simulation),
+            tableSupplier.get(scope),
+            path.get(scope),
             append,
             clearAfterWriting
         );

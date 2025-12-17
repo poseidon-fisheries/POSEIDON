@@ -28,10 +28,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import tech.tablesaw.api.Table;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -42,19 +42,20 @@ import java.util.Map;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 public class BathymetricGridFromLongFormatDataFactory extends BathymetricGridFactory {
 
-    private Factory<? extends Table> data;
+    private GlobalScopeFactory<? extends Table> data;
 
     @NonNull private String longitudeColumn;
     @NonNull private String latitudeColumn;
     @NonNull private String depthColumn;
 
     public BathymetricGridFromLongFormatDataFactory(
-        @NonNull final Factory<? extends Path> path,
-        @NonNull final Factory<? extends ModelGrid> modelGrid,
-        @NonNull final Factory<? extends Aggregator> aggregator,
+        @NonNull final GlobalScopeFactory<? extends Path> path,
+        @NonNull final GlobalScopeFactory<? extends ModelGrid> modelGrid,
+        @NonNull final GlobalScopeFactory<? extends Aggregator> aggregator,
         final boolean inverted,
         @NonNull final String longitudeColumn,
         @NonNull final String latitudeColumn,
@@ -68,11 +69,10 @@ public class BathymetricGridFromLongFormatDataFactory extends BathymetricGridFac
 
     @Override
     protected Map<Int2D, Collection<Double>> readElevationValues(
-        final Simulation simulation,
         final ModelGrid modelGrid
     ) {
         final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
-        data.get(simulation).forEach(row -> {
+        data.get().forEach(row -> {
             final Int2D cell =
                 modelGrid.toCell(new Coordinate(
                     row.getDouble(longitudeColumn),

@@ -23,6 +23,11 @@
 package uk.ac.ox.poseidon.core;
 
 import com.google.common.base.Suppliers;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.LoadingCache;
+import lombok.Getter;
+import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -33,10 +38,35 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import static com.google.common.cache.CacheLoader.from;
 import static java.beans.Introspector.getBeanInfo;
 import static java.util.Comparator.comparing;
 
-public abstract class AbstractFactory<C> implements Factory<C> {
+@SuperBuilder
+public abstract class AbstractFactory<S, C> implements Factory<S, C> {
+
+    // needs to be transient for SnakeYAML not to be confused
+    // when there are no other properties to serialize
+    private final transient LoadingCache<S, LoadingCache<Integer, C>> cache =
+        CacheBuilder.newBuilder()
+            .weakKeys()
+            .build(from(scope ->
+                CacheBuilder.newBuilder()
+                    .build(from(() -> newInstance(scope)))
+            ));
+
+    @Getter
+    @Accessors(makeFinal = true)
+    private final Class<? extends S> scopeClass;
+
+    protected AbstractFactory(final Class<? extends S> scopeClass) {this.scopeClass = scopeClass;}
+
+    @Override
+    public final C get(final S scope) {
+        return cache
+            .getUnchecked(scope)
+            .getUnchecked(makeKey(scope));
+    }
 
     private final transient Supplier<List<Method>> readMethods =
         Suppliers.memoize(() -> readMethods(this));
@@ -56,10 +86,9 @@ public abstract class AbstractFactory<C> implements Factory<C> {
             .toList();
     }
 
-    protected abstract C newInstance(Simulation simulation);
+    protected abstract C newInstance(S scope);
 
-    @Override
-    public int makeKey(final Simulation simulation) {
+    public final int makeKey(final S scope) {
         synchronized (this) {
             return readMethods
                 .get()
@@ -74,7 +103,9 @@ public abstract class AbstractFactory<C> implements Factory<C> {
                 .map(o ->
                     switch (o) {
                         case null -> null;
-                        case final Factory<?> factory -> factory.get(simulation);
+                        // noinspection rawtypes
+                        case final Factory factory -> // noinspection unchecked
+                            factory.get(factory.getScopeClass().cast(scope));
                         default -> o;
                     }
                 )

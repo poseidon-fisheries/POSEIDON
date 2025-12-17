@@ -24,18 +24,20 @@ package uk.ac.ox.poseidon.core.time;
 
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 
+@SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class DateTimeBeforeFactory extends RelativeDateTimeFactory {
 
     public DateTimeBeforeFactory(
-        final Factory<? extends LocalDateTime> referenceDateTimeFactory,
-        final Factory<? extends TemporalAmount> temporalAmountFactory
+        final GlobalScopeFactory<? extends LocalDateTime> referenceDateTimeFactory,
+        final GlobalScopeFactory<? extends TemporalAmount> temporalAmountFactory
     ) {
         super(referenceDateTimeFactory, temporalAmountFactory);
     }

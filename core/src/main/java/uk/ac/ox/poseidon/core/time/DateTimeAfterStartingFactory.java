@@ -26,23 +26,29 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DateTimeAfterStartingFactory extends SimulationScopeFactory<LocalDateTime> {
 
-    Factory<? extends TemporalAmount> offset;
+    Factory<? super SimulationScope, ? extends TemporalAmount> offset;
 
     @Override
-    protected LocalDateTime newInstance(final Simulation simulation) {
-        return simulation.getTemporalSchedule().getStartingDateTime().plus(offset.get(simulation));
+    protected LocalDateTime newInstance(final SimulationScope scope) {
+        return scope
+            .getSimulation()
+            .getTemporalSchedule()
+            .getStartingDateTime()
+            .plus(offset.get(scope));
     }
 }

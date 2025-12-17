@@ -27,20 +27,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventClearerFactory extends GlobalScopeFactory<EventClearer> {
+public class EventClearerFactory extends SimulationScopeFactory<EventClearer> {
 
-    private Factory<? extends EventAccumulator<?>> eventAccumulator;
+    private Factory<? super SimulationScope, ? extends EventAccumulator<?>> eventAccumulator;
 
     @Override
-    protected EventClearer newInstance(final Simulation simulation) {
-        return new EventClearer(eventAccumulator.get(simulation));
+    protected EventClearer newInstance(final SimulationScope scope) {
+        return new EventClearer(eventAccumulator.get(scope));
     }
-    
+
 }

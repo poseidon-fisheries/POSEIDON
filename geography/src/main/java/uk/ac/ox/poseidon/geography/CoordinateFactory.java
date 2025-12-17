@@ -26,11 +26,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CoordinateFactory extends GlobalScopeFactory<Coordinate> {
@@ -38,7 +39,7 @@ public class CoordinateFactory extends GlobalScopeFactory<Coordinate> {
     private double latitude;
 
     @Override
-    protected Coordinate newInstance(final Simulation simulation) {
+    protected Coordinate newInstance() {
         return new Coordinate(longitude, latitude);
     }
 }

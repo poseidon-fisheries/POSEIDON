@@ -26,11 +26,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CatchCategoryFactory extends GlobalScopeFactory<CatchCategory> {
@@ -38,7 +39,7 @@ public class CatchCategoryFactory extends GlobalScopeFactory<CatchCategory> {
     private String code;
 
     @Override
-    protected CatchCategory newInstance(final Simulation simulation) {
+    protected CatchCategory newInstance() {
         return new CatchCategory(code);
     }
 }

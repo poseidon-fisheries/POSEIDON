@@ -27,25 +27,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
-import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StartTripFactory extends TaskFactory<StartTrip> {
+public class StartTripFactory extends VesselTaskFactory<StartTrip> {
 
-    private VesselScopeFactory<? extends DestinationSupplier> destinationSupplier;
+    private Factory<? super VesselScope, ? extends DestinationSupplier> destinationSupplier;
 
     @Override
-    protected StartTrip newTask(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new StartTrip(destinationSupplier.get(simulation, vessel));
+    protected StartTrip newTask(final VesselScope scope) {
+        return new StartTrip(destinationSupplier.get(scope));
     }
-
 }

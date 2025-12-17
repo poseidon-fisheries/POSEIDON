@@ -26,22 +26,21 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.LocalTime;
 
 @Getter
 @Setter
+@SuppressWarnings()
 @NoArgsConstructor
 @AllArgsConstructor
 public class TimeIsAfterFactory extends GlobalScopeFactory<TimeIsAfter> {
 
-    private Factory<? extends LocalTime> referenceTime;
+    private GlobalScopeFactory<? extends LocalTime> referenceTime;
 
     @Override
-    protected TimeIsAfter newInstance(final Simulation simulation) {
-        return new TimeIsAfter(referenceTime.get(simulation));
+    protected TimeIsAfter newInstance() {
+        return new TimeIsAfter(referenceTime.get());
     }
 }

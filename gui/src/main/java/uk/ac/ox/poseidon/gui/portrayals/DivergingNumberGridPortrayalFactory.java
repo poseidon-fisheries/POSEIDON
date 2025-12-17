@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sim.util.gui.ColorMap;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.NumberGrid;
 import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 
@@ -45,14 +45,14 @@ public class DivergingNumberGridPortrayalFactory extends NumberGridPortrayalFact
         final String paletteName,
         final String valueName,
         final boolean immutableField,
-        final Factory<? extends NumberGrid<?, ?>> grid
+        final Factory<? super SimulationScope, ? extends NumberGrid<?, ?>> grid
     ) {
         super(paletteName, valueName, immutableField, grid);
     }
 
     @Override
-    protected ColorMap newColorMap(final Simulation simulation) {
-        final NumberGrid<?, ?> grid = getGrid().get(simulation);
+    protected ColorMap newColorMap(final SimulationScope scope) {
+        final NumberGrid<?, ?> grid = getGrid().get(scope);
         final DoubleSummaryStatistics stats =
             grid
                 .getModelGrid()

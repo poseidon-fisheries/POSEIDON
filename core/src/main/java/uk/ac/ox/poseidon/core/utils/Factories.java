@@ -26,28 +26,30 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Factories<C> extends GlobalScopeFactory<List<C>> {
+public class Factories<C> extends SimulationScopeFactory<List<C>> {
 
-    private List<Factory<? extends C>> factories;
+    private List<Factory<? super SimulationScope, ? extends C>> factories;
 
     @SafeVarargs
-    public Factories(final Factory<? extends C>... factories) {
+    public Factories(final Factory<? super SimulationScope, ? extends C>... factories) {
         this.factories = Arrays.asList(factories);
     }
 
     @Override
-    protected List<C> newInstance(final Simulation simulation) {
-        return factories.stream().map(f -> (C) f.get(simulation)).toList();
+    protected List<C> newInstance(final SimulationScope scope) {
+        return factories.stream().map(f -> (C) f.get(scope)).toList();
     }
 }

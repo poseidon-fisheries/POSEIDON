@@ -26,25 +26,25 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.Collection;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SelectedSpeciesRetentionFactory
     extends GlobalScopeFactory<SelectedSpeciesRetention> {
 
-    private Factory<? extends Collection<? extends Species>> selectedSpecies;
+    private GlobalScopeFactory<? extends Collection<? extends Species>> selectedSpecies;
 
     @Override
-    protected SelectedSpeciesRetention newInstance(final Simulation simulation) {
-        return new SelectedSpeciesRetention(selectedSpecies.get(simulation));
+    protected SelectedSpeciesRetention newInstance() {
+        return new SelectedSpeciesRetention(selectedSpecies.get());
     }
 
 }

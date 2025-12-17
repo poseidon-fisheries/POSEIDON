@@ -26,11 +26,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.util.List;
@@ -42,26 +43,27 @@ import static java.util.stream.Collectors.toMap;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BiomassMarketFactory extends SimulationScopeFactory<BiomassMarket> {
 
-    private Factory<? extends BiomassMarketGrid> marketGrid;
-    private Factory<? extends Port> port;
+    private Factory<? super SimulationScope, ? extends BiomassMarketGrid> marketGrid;
+    private Factory<? super SimulationScope, ? extends Port> port;
     private String marketCode;
-    private Factory<? extends List<PriceEntry>> pricesEntries;
+    private Factory<? super SimulationScope, ? extends List<PriceEntry>> pricesEntries;
 
     @Override
-    protected BiomassMarket newInstance(final Simulation simulation) {
+    protected BiomassMarket newInstance(final SimulationScope scope) {
         checkNotNull(marketGrid, "marketGrid must not be null");
         checkNotNull(port, "port must not be null");
         checkNotNull(pricesEntries, "pricesEntries must not be null");
-        final Port port = this.port.get(simulation);
+        final Port port = this.port.get(scope);
         final String marketCode = this.marketCode != null ? this.marketCode : port.getCode();
-        final BiomassMarketGrid marketGrid = this.marketGrid.get(simulation);
+        final BiomassMarketGrid marketGrid = this.marketGrid.get(scope);
         final Map<CatchCategory, Map<Species, Price>> prices =
             pricesEntries
-                .get(simulation)
+                .get(scope)
                 .stream()
                 .collect(
                     groupingBy(
@@ -77,7 +79,7 @@ public class BiomassMarketFactory extends SimulationScopeFactory<BiomassMarket> 
                 port,
                 marketCode,
                 prices,
-                simulation.getEventManager()
+                scope.getSimulation().getEventManager()
             );
         marketGrid.addMarket(biomassMarket, port);
         return biomassMarket;

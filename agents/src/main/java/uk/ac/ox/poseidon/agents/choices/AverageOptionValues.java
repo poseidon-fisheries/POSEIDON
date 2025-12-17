@@ -30,7 +30,7 @@ import java.util.Map;
 import static lombok.AccessLevel.PACKAGE;
 
 @NoArgsConstructor(access = PACKAGE)
-class AverageOptionValues<T> extends HashMapBasedOptionValues<T> {
+public class AverageOptionValues<T> extends HashMapBasedOptionValues<T> {
 
     private final Map<T, Integer> counts = new HashMap<>();
 

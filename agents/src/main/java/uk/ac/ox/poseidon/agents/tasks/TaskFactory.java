@@ -23,45 +23,35 @@
 package uk.ac.ox.poseidon.agents.tasks;
 
 import com.badlogic.gdx.ai.btree.Task;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.agents.Agent;
+import uk.ac.ox.poseidon.agents.AgentScope;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
 
 @Getter
 @Setter
 @SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-public abstract class TaskFactory<T extends Task<Vessel>> extends VesselScopeFactory<T> {
+public abstract class TaskFactory<A extends Agent<A>, S extends AgentScope<A>, T extends Task<A>>
+    extends AbstractFactory<S, T> {
 
-    /*
-        TODO: there is no reason that task factories have to be _vessel_ scope instead of
-         some other object scope, besides the fact that ObjectScopeFactory is currently
-         abstract. If I was to fix this, we could make the whole "task factory" class
-         hierarchy more generic, but there is no immediate benefit since vessels are currently
-         the only agents in POSEIDON. Still, it would be a lot cleaner and open up nice
-         new possibilities if I could get around to it... -- NP 2025-10-31.
-     */
+    private Factory<? super S, ? extends Task<A>> guard;
 
-    private VesselScopeFactory<? extends Task<Vessel>> guard;
+    protected TaskFactory(final Class<? extends S> scopeClass) {
+        super(scopeClass);
+    }
 
     protected abstract T newTask(
-        final Simulation simulation,
-        final Vessel vessel
+        final S scope
     );
 
     @Override
-    protected T newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        final T task = newTask(simulation, vessel);
-        if (guard != null) task.setGuard(guard.get(simulation, vessel));
+    protected T newInstance(final S scope) {
+        final T task = newTask(scope);
+        if (guard != null) task.setGuard(guard.get(scope));
         return task;
     }
+
 }

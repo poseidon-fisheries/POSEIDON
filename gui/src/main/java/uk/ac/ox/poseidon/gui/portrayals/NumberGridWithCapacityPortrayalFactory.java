@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sim.util.gui.ColorMap;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.NumberGrid;
 import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 
@@ -36,25 +36,25 @@ import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 @NoArgsConstructor
 public class NumberGridWithCapacityPortrayalFactory extends NumberGridPortrayalFactory {
 
-    private Factory<? extends NumberGrid<?, ?>> capacityGrid;
+    private Factory<? super SimulationScope, ? extends NumberGrid<?, ?>> capacityGrid;
 
     public NumberGridWithCapacityPortrayalFactory(
         final String paletteName,
         final String valueName,
         final boolean immutableField,
-        final Factory<? extends NumberGrid<?, ?>> grid,
-        final Factory<? extends NumberGrid<?, ?>> capacityGrid
+        final Factory<? super SimulationScope, ? extends NumberGrid<?, ?>> grid,
+        final Factory<? super SimulationScope, ? extends NumberGrid<?, ?>> capacityGrid
     ) {
         super(paletteName, valueName, immutableField, grid);
         this.capacityGrid = capacityGrid;
     }
 
     @Override
-    protected ColorMap newColorMap(final Simulation simulation) {
+    protected ColorMap newColorMap(final SimulationScope scope) {
         return new PaletteColorMap(
             getPaletteName(),
             0,
-            this.capacityGrid.get(simulation).getMaximumValue().doubleValue()
+            this.capacityGrid.get(scope).getMaximumValue().doubleValue()
         );
     }
 }

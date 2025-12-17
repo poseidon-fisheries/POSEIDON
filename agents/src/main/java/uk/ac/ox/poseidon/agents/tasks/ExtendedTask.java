@@ -23,20 +23,21 @@
 package uk.ac.ox.poseidon.agents.tasks;
 
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.Agent;
 
 import java.time.Duration;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 
 @RequiredArgsConstructor
-public abstract class ExtendedTask extends VesselTask {
+public abstract class ExtendedTask<A extends Agent<A>> extends AgentTask<A> {
 
     @Override
     public Status execute() {
         if (getStatus() == RUNNING)
             return complete();
         else {
-            getObject().setTaskDuration(getDuration());
+            getAgent().setTaskDuration(getDuration());
             return RUNNING;
         }
     }

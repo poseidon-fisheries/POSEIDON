@@ -22,10 +22,12 @@
 
 package uk.ac.ox.poseidon.core;
 
-public interface Factory<C> {
+public interface Factory<S, C> {
 
-    C get(final Simulation simulation);
+    C get(final S scope);
 
-    int makeKey(Simulation simulation);
+    int makeKey(S scope);
+
+    Class<? extends S> getScopeClass();
 
 }

@@ -26,28 +26,26 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.Duration;
 import java.util.function.Supplier;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WaitFactory extends TaskFactory<Wait> {
+public class WaitFactory extends VesselTaskFactory<Wait<Vessel>> {
 
-    private Factory<? extends Supplier<Duration>> durationSupplier;
+    private Factory<? super VesselScope, ? extends Supplier<Duration>> durationSupplier;
 
     @Override
-    protected Wait newTask(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new Wait(durationSupplier.get(simulation));
+    protected Wait<Vessel> newTask(final VesselScope scope) {
+        return new Wait<>(durationSupplier.get(scope));
     }
-
 }

@@ -22,14 +22,18 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.function.BooleanSupplier;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConstantBooleanSupplierFactory extends GlobalScopeFactory<BooleanSupplier> {
@@ -43,7 +47,7 @@ public class ConstantBooleanSupplierFactory extends GlobalScopeFactory<BooleanSu
     private boolean value;
 
     @Override
-    protected BooleanSupplier newInstance(final @NonNull Simulation simulation) {
+    protected BooleanSupplier newInstance() {
         return () -> value;
     }
 }

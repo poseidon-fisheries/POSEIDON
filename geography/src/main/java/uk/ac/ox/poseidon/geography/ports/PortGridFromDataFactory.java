@@ -26,12 +26,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -44,6 +45,7 @@ import static java.util.Comparator.comparingDouble;
 
 @Getter
 @Setter
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class PortGridFromDataFactory extends SimulationScopeFactory<PortGrid> {
@@ -51,26 +53,25 @@ public class PortGridFromDataFactory extends SimulationScopeFactory<PortGrid> {
     private static final System.Logger logger =
         System.getLogger(PortGridFromDataFactory.class.getName());
 
-    private Factory<? extends Table> data;
-
-    private Factory<? extends BathymetricGrid> bathymetricGrid;
-    private Factory<? extends DistanceCalculator> distanceCalculator;
+    private Factory<? super SimulationScope, ? extends Table> data;
+    private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? super SimulationScope, ? extends DistanceCalculator> distanceCalculator;
     private String portCodeColumn;
     private String nameColumn;
     private String longitudeColumn;
     private String latitudeColumn;
 
     @Override
-    protected PortGrid newInstance(final Simulation simulation) {
-        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(simulation);
-        final DistanceCalculator distanceCalculator = this.distanceCalculator.get(simulation);
+    protected PortGrid newInstance(final SimulationScope scope) {
+        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
+        final DistanceCalculator distanceCalculator = this.distanceCalculator.get(scope);
         final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
         final SparseGrid2D sparseGrid2D =
             new SparseGrid2D(
                 modelGrid.getGridWidth(),
                 modelGrid.getGridHeight()
             );
-        data.get(simulation).forEach(row -> {
+        data.get(scope).forEach(row -> {
             final String portCode = row.getString(portCodeColumn);
             final String portName = row.getString(nameColumn);
             final Coordinate coordinate = new Coordinate(

@@ -26,30 +26,33 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FleetFactory extends SimulationScopeFactory<Fleet> {
-    private Factory<? extends VesselField> vesselField;
-    private Factory<? extends PortGrid> portGrid;
-    private Factory<? extends MarketGrid> marketGrid;
+    
+    private Factory<? super SimulationScope, ? extends VesselField> vesselField;
+    private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+    private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;
 
     @Override
-    protected Fleet newInstance(final Simulation simulation) {
+    protected Fleet newInstance(final SimulationScope scope) {
         return new Fleet(
-            simulation.getTemporalSchedule(),
-            simulation.getEventManager(),
-            vesselField.get(simulation),
-            portGrid.get(simulation),
-            marketGrid.get(simulation)
+            scope.getSimulation().getTemporalSchedule(),
+            scope.getSimulation().getEventManager(),
+            vesselField.get(scope),
+            portGrid.get(scope),
+            marketGrid.get(scope)
         );
     }
 }

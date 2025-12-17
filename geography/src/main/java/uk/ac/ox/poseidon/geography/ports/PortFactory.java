@@ -26,26 +26,28 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PortFactory extends GlobalScopeFactory<Port> {
+public class PortFactory extends SimulationScopeFactory<Port> {
 
-    private Factory<? extends PortGrid> portGrid;
+    private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
     private String code;
     private String name;
-    private Factory<? extends Coordinate> coordinateFactory;
+    private Factory<? super SimulationScope, ? extends Coordinate> coordinateFactory;
 
     @Override
-    protected Port newInstance(final Simulation simulation) {
-        return this.portGrid.get(simulation).createPort(
-            code, name, coordinateFactory.get(simulation)
+    protected Port newInstance(final SimulationScope scope) {
+        return this.portGrid.get(scope).createPort(
+            code, name, coordinateFactory.get(scope)
         );
     }
 }

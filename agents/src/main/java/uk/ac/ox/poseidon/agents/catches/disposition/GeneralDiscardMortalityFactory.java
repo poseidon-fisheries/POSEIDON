@@ -26,23 +26,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.function.DoubleSupplier;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class GeneralDiscardMortalityFactory
     extends GlobalScopeFactory<GeneralDiscardMortality> {
 
-    private Factory<? extends DoubleSupplier> mortalityRateSupplier;
+    private GlobalScopeFactory<? extends DoubleSupplier> mortalityRateSupplier;
 
     @Override
-    protected GeneralDiscardMortality newInstance(final Simulation simulation) {
-        return new GeneralDiscardMortality(mortalityRateSupplier.get(simulation));
+    protected GeneralDiscardMortality newInstance() {
+        return new GeneralDiscardMortality(mortalityRateSupplier.get());
     }
 }

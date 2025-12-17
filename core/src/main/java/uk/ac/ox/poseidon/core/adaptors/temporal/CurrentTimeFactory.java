@@ -22,12 +22,12 @@
 
 package uk.ac.ox.poseidon.core.adaptors.temporal;
 
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-public class CurrentTimeFactory extends GlobalScopeFactory<CurrentTime> {
+public class CurrentTimeFactory extends SimulationScopeFactory<CurrentTime> {
     @Override
-    protected CurrentTime newInstance(final Simulation simulation) {
-        return new CurrentTime(simulation.getTemporalSchedule());
+    protected CurrentTime newInstance(final SimulationScope scope) {
+        return new CurrentTime(scope.getSimulation().getTemporalSchedule());
     }
 }

@@ -26,33 +26,31 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 import java.util.function.Predicate;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RandomGridExplorerFactory extends VesselScopeFactory<Picker<Int2D>> {
 
-    private Factory<? extends GridPathFinder> pathFinder;
-    private VesselScopeFactory<? extends Predicate<Int2D>> cellPredicate;
+    private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
+    private Factory<? super VesselScope, ? extends Predicate<Int2D>> cellPredicate;
 
     @Override
-    protected Picker<Int2D> newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected Picker<Int2D> newInstance(final VesselScope scope) {
         return new RandomPicker<>(
-            pathFinder.get(simulation).getAccessibleWaterCells(vessel.getCell()),
-            cellPredicate.get(simulation, vessel),
-            simulation.random
+            pathFinder.get(scope).getAccessibleWaterCells(scope.getVessel().getCell()),
+            cellPredicate.get(scope),
+            scope.getSimulation().random
         );
     }
 }

@@ -22,15 +22,20 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.util.distribution.Poisson;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.function.IntSupplier;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PoissonIntSupplierFactory extends SimulationScopeFactory<IntSupplier> {
@@ -38,8 +43,8 @@ public class PoissonIntSupplierFactory extends SimulationScopeFactory<IntSupplie
     private double mean;
 
     @Override
-    protected IntSupplier newInstance(final @NonNull Simulation simulation) {
-        final Poisson poisson = new Poisson(mean, simulation.random);
+    protected IntSupplier newInstance(final SimulationScope scope) {
+        final Poisson poisson = new Poisson(mean, scope.getSimulation().random);
         return poisson::nextInt;
     }
 }

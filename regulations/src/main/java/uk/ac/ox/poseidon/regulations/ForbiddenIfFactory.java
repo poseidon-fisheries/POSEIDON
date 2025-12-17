@@ -23,13 +23,14 @@
 package uk.ac.ox.poseidon.regulations;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.function.Predicate;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ForbiddenIfFactory<A> extends GlobalScopeFactory<ForbiddenIf<A>> {
@@ -37,7 +38,7 @@ public class ForbiddenIfFactory<A> extends GlobalScopeFactory<ForbiddenIf<A>> {
     @NonNull private GlobalScopeFactory<? extends Predicate<? super Action<A>>> actionPredicate;
 
     @Override
-    protected ForbiddenIf<A> newInstance(final @NonNull Simulation simulation) {
-        return new ForbiddenIf<>(actionPredicate.get(simulation));
+    protected ForbiddenIf<A> newInstance() {
+        return new ForbiddenIf<>(actionPredicate.get());
     }
 }

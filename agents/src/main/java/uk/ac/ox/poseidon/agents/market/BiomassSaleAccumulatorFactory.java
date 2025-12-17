@@ -22,13 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
 public class BiomassSaleAccumulatorFactory
     extends SimulationEventListenerFactory<BiomassSaleAccumulator> {
+
     @Override
-    protected BiomassSaleAccumulator newListener(final Simulation simulation) {
+    protected BiomassSaleAccumulator newListener(final SimulationScope scope) {
         return new BiomassSaleAccumulator();
     }
 }

@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,18 +46,18 @@ public final class Scenario {
 
     private Date startingDateTime = new Date();
 
-    private Map<String, ? extends Factory<?>> components = new HashMap<>();
+    private Map<String, ? extends Factory<? super SimulationScope, ?>> components = new HashMap<>();
 
     public Scenario(
         final LocalDateTime startingDateTime,
-        final Map<String, ? extends Factory<?>> components
+        final Map<String, ? extends Factory<? super SimulationScope, ?>> components
     ) {
         this(Date.from(startingDateTime.atZone(UTC).toInstant()), components);
     }
 
     public Scenario(
         final LocalDate startingDate,
-        final Map<String, ? extends Factory<?>> components
+        final Map<String, ? extends Factory<? super SimulationScope, ?>> components
     ) {
         this(startingDate.atStartOfDay(), components);
     }
@@ -84,14 +85,14 @@ public final class Scenario {
     }
 
     @SuppressWarnings("unchecked")
-    public <C> Factory<? extends C> component(
+    public <C> Factory<? super SimulationScope, ? extends C> component(
         final String componentName
     ) {
-        final Factory<?> factory = components.get(componentName);
+        final Factory<? super SimulationScope, ?> factory = components.get(componentName);
         if (factory == null) {
             throw new IllegalArgumentException("Component not found: " + componentName);
         }
-        return (Factory<? extends C>) factory;
+        return (Factory<? super SimulationScope, ? extends C>) factory;
     }
 
 }

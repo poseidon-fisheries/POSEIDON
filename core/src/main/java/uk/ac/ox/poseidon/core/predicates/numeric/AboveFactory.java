@@ -22,12 +22,16 @@
 
 package uk.ac.ox.poseidon.core.predicates.numeric;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AboveFactory extends GlobalScopeFactory<Above> {
@@ -35,7 +39,7 @@ public class AboveFactory extends GlobalScopeFactory<Above> {
     private double threshold;
 
     @Override
-    protected Above newInstance(final @NonNull Simulation simulation) {
+    protected Above newInstance() {
         return new Above(threshold);
     }
 }

@@ -26,9 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.LocalTime;
 
@@ -38,10 +36,10 @@ import java.time.LocalTime;
 @AllArgsConstructor
 public class TimeIsBeforeFactory extends GlobalScopeFactory<TimeIsBefore> {
 
-    private Factory<? extends LocalTime> referenceTime;
+    private GlobalScopeFactory<? extends LocalTime> referenceTime;
 
     @Override
-    protected TimeIsBefore newInstance(final Simulation simulation) {
-        return new TimeIsBefore(referenceTime.get(simulation));
+    protected TimeIsBefore newInstance() {
+        return new TimeIsBefore(referenceTime.get());
     }
 }

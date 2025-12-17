@@ -28,8 +28,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.temporal.Temporal;
 
@@ -39,18 +39,22 @@ import java.time.temporal.Temporal;
 @EqualsAndHashCode(callSuper = false)
 public class ScheduledOnceFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
-    private Factory<? extends Temporal> dateTime;
-    private Factory<? extends C> steppable;
+    private Factory<? super SimulationScope, ? extends Temporal> dateTime;
+    private Factory<? super SimulationScope, ? extends C> steppable;
     private int ordering;
 
     @Override
-    protected C newInstance(final Simulation simulation) {
-        final C steppableObject = steppable.get(simulation);
-        simulation.getTemporalSchedule().scheduleOnce(
-            dateTime.get(null),
-            ordering,
-            steppableObject
-        );
+    protected C newInstance(final SimulationScope scope) {
+        final C steppableObject = steppable.get(scope);
+        // TODO: this shouldn't get scheduled on construction
+        scope
+            .getSimulation()
+            .getTemporalSchedule()
+            .scheduleOnce(
+                dateTime.get(null),
+                ordering,
+                steppableObject
+            );
         return steppableObject;
     }
 }

@@ -26,9 +26,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 import java.nio.file.Path;
 
@@ -36,16 +36,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Getter
 @Setter
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RelativePathFactory extends GlobalScopeFactory<Path> implements PathFactory {
+public class RelativePathFactory extends GlobalScopeFactory<Path>
+    implements PathFactory<GlobalScope> {
 
-    private Factory<? extends Path> parent;
+    private GlobalScopeFactory<? extends Path> parent;
     private String path;
 
     @Override
-    protected Path newInstance(final Simulation simulation) {
-        return checkNotNull(parent).get(simulation).resolve(path);
+    protected Path newInstance() {
+        return checkNotNull(parent).get().resolve(path);
     }
 
 }

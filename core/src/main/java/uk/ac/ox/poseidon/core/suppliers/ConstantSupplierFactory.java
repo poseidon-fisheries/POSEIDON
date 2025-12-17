@@ -22,21 +22,24 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import lombok.*;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConstantSupplierFactory<T> extends GlobalScopeFactory<ConstantSupplier<T>> {
 
-    private Factory<T> value;
+    private GlobalScopeFactory<T> value;
 
     @Override
-    protected ConstantSupplier<T> newInstance(final @NonNull Simulation simulation) {
-        return new ConstantSupplier<>(value.get(simulation));
+    protected ConstantSupplier<T> newInstance() {
+        return new ConstantSupplier<>(value.get());
     }
 }

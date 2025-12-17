@@ -22,14 +22,18 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.function.IntSupplier;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConstantIntSupplierFactory extends GlobalScopeFactory<IntSupplier> {
@@ -37,7 +41,7 @@ public class ConstantIntSupplierFactory extends GlobalScopeFactory<IntSupplier> 
     private int value;
 
     @Override
-    protected IntSupplier newInstance(final @NonNull Simulation simulation) {
+    protected IntSupplier newInstance() {
         return () -> value;
     }
 }

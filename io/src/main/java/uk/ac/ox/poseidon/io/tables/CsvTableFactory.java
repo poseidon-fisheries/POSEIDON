@@ -26,11 +26,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.io.paths.PathFactory;
 import uk.ac.ox.poseidon.io.sources.DataSource;
 import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
@@ -41,6 +40,7 @@ import java.nio.file.Path;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CsvTableFactory extends GlobalScopeFactory<Table> {
@@ -50,7 +50,7 @@ public class CsvTableFactory extends GlobalScopeFactory<Table> {
     }
 
     public static CsvTableFactory fromFile(
-        final PathFactory pathFactory
+        final GlobalScopeFactory<Path> pathFactory
     ) {
         return new CsvTableFactory(new FileDataSourceFactory(pathFactory));
     }
@@ -66,11 +66,11 @@ public class CsvTableFactory extends GlobalScopeFactory<Table> {
         return fromFile(PathFactory.of(path));
     }
 
-    private Factory<? extends DataSource> dataSource;
+    private GlobalScopeFactory<? extends DataSource> dataSource;
 
     @Override
-    protected Table newInstance(final Simulation simulation) {
-        final Reader reader = dataSource.get(simulation).getReader();
+    protected Table newInstance() {
+        final Reader reader = dataSource.get().getReader();
         return Table
             .read()
             .usingOptions(CsvReadOptions.builder(reader).sample(false));

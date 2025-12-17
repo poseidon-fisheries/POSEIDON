@@ -22,23 +22,26 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import lombok.*;
-import uk.ac.ox.poseidon.core.Factory;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class HaversineDistanceCalculatorFactory extends GlobalScopeFactory<HaversineDistanceCalculator> {
 
-    private Factory<? extends ModelGrid> modelGrid;
+    private GlobalScopeFactory<? extends ModelGrid> modelGrid;
 
     @Override
-    protected HaversineDistanceCalculator newInstance(final @NonNull Simulation simulation) {
-        return new HaversineDistanceCalculator(modelGrid.get(simulation));
+    protected HaversineDistanceCalculator newInstance() {
+        return new HaversineDistanceCalculator(modelGrid.get());
     }
 
 }

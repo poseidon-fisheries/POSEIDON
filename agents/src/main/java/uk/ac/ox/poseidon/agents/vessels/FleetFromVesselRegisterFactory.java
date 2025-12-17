@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.apache.commons.beanutils.PropertyUtils;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
@@ -33,8 +34,8 @@ import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
@@ -52,13 +53,13 @@ import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.*;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet> {
 
-    private Factory<? extends Table> data;
-    private Factory<? extends Fleet> fleet;
+    private Factory<? super SimulationScope, ? extends Table> data;
+    private Factory<? super SimulationScope, ? extends Fleet> fleet;
 
     @Builder.Default private String vesselIdColumn = "cfr";
     @Builder.Default private String vesselNameColumn = "name_of_vessel";
@@ -74,10 +75,10 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
     @Builder.Default private List<String> modificationEventCodes =
         List.of("MOD");
 
-    private VesselScopeFactory<? extends Behaviour<Vessel>> behaviour;
-    private VesselScopeFactory<? extends Hold> hold;
-    private VesselScopeFactory<? extends Gear> gear;
-    private VesselScopeFactory<? extends Engine> engine;
+    private Factory<? super VesselScope, ? extends Behaviour<Vessel>> behaviour;
+    private Factory<? super VesselScope, ? extends Hold> hold;
+    private Factory<? super VesselScope, ? extends Gear> gear;
+    private Factory<? super VesselScope, ? extends Engine> engine;
 
     @Singular
     private Map<String, String> dataMappings;
@@ -96,28 +97,28 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
     }
 
     @Override
-    protected Fleet newInstance(final Simulation simulation) {
-        final Fleet fleet = this.fleet.get(simulation);
+    protected Fleet newInstance(final SimulationScope scope) {
+        final Fleet fleet = this.fleet.get(scope);
         final List<Entry<LocalDateTime, FleetEvent>> eventByDateTime =
-            data.get(simulation)
+            data.get(scope)
                 .stream()
                 .map(row -> {
                     final LocalDateTime dateTime = row.getDate(eventDateColumn).atStartOfDay();
                     return entry(
                         dateTime,
-                        makeUpdate(simulation, dateTime, row, fleet)
+                        makeUpdate(scope, dateTime, row, fleet)
                     );
                 })
                 .toList();
-        simulation.getTemporalSchedule().scheduleByDateTime(eventByDateTime);
+        scope.getSimulation().getTemporalSchedule().scheduleByDateTime(eventByDateTime);
         return fleet;
     }
 
     <C> Function<Vessel, C> makeFactoryFunction(
-        final Simulation simulation,
+        final SimulationScope scope,
         final Map<String, Object> valuesFromRow,
         final ImmutableMap<String, String> mappings,
-        final VesselScopeFactory<? extends C> factory
+        final Factory<? super VesselScope, ? extends C> factory
     ) {
         if (factory == null) {
             return __ -> null;
@@ -127,14 +128,14 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
                     mappings.forEach((propertyName, columnName) ->
                         setProperty(propertyName, valuesFromRow.get(columnName))
                     );
-                    return factory.get(simulation, vessel);
+                    return factory.get(new VesselScope(scope.getSimulation(), vessel));
                 }
             };
         }
     }
 
     private FleetEvent makeUpdate(
-        final Simulation simulation,
+        final SimulationScope scope,
         final LocalDateTime dateTime,
         final Row row,
         final Fleet fleet
@@ -155,10 +156,10 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
             row.getString(vesselNameColumn),
             row.getString(portCodeColumn),
             makeTags(row),
-            makeFactoryFunction(simulation, valuesFromRow, dataMappings, behaviour),
-            makeFactoryFunction(simulation, valuesFromRow, dataMappings, hold),
-            makeFactoryFunction(simulation, valuesFromRow, dataMappings, gear),
-            makeFactoryFunction(simulation, valuesFromRow, dataMappings, engine)
+            makeFactoryFunction(scope, valuesFromRow, dataMappings, behaviour),
+            makeFactoryFunction(scope, valuesFromRow, dataMappings, hold),
+            makeFactoryFunction(scope, valuesFromRow, dataMappings, gear),
+            makeFactoryFunction(scope, valuesFromRow, dataMappings, engine)
         );
     }
 

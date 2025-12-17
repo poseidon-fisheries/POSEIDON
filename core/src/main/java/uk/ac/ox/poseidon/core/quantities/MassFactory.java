@@ -22,10 +22,13 @@
 
 package uk.ac.ox.poseidon.core.quantities;
 
+import lombok.experimental.SuperBuilder;
+
 import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
 
+@SuperBuilder
 public class MassFactory extends AbstractQuantityFactory<Mass> {
 
     public MassFactory() {

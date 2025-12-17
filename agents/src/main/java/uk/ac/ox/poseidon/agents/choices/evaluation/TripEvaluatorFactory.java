@@ -26,30 +26,29 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.Factory;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TripEvaluatorFactory extends VesselScopeFactory<TripEvaluator> {
 
-    private VesselScopeFactory<? extends MutableOptionValues<Int2D>> optionValues;
-    private VesselScopeFactory<? extends EvaluationProvider<Int2D>> evaluationProvider;
+    private Factory<? super VesselScope, ? extends MutableOptionValues<Int2D>> optionValues;
+    private Factory<? super VesselScope, ? extends EvaluationProvider<Int2D>> evaluationProvider;
 
     @Override
-    protected TripEvaluator newInstance(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected TripEvaluator newInstance(final VesselScope scope) {
         return new TripEvaluator(
-            vessel.getEventManager(),
-            optionValues.get(simulation, vessel),
-            evaluationProvider.get(simulation, vessel)
+            scope.getVessel().getEventManager(),
+            optionValues.get(scope),
+            evaluationProvider.get(scope)
         );
     }
 }

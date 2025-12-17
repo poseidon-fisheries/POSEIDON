@@ -22,18 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
-import com.badlogic.gdx.ai.btree.LeafTask;
-import com.badlogic.gdx.ai.btree.Task;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 
-public abstract class VesselTask extends LeafTask<Vessel> {
-
-    public Vessel getVessel() {
-        return getObject();
-    }
-
-    @Override
-    protected Task<Vessel> copyTo(final Task<Vessel> task) {
-        throw new UnsupportedOperationException();
+@SuperBuilder
+public abstract class VesselTaskFactory<T extends AgentTask<Vessel>>
+    extends TaskFactory<Vessel, VesselScope, T> {
+    protected VesselTaskFactory() {
+        super(VesselScope.class);
     }
 }

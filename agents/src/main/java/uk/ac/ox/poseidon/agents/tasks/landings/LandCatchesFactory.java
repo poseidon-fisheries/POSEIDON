@@ -26,27 +26,25 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.Duration;
 import java.util.function.Supplier;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LandCatchesFactory extends TaskFactory<LandCatches> {
+public class LandCatchesFactory extends VesselTaskFactory<LandCatches> {
 
-    private Factory<? extends Supplier<Duration>> durationSupplier;
+    private Factory<? super VesselScope, ? extends Supplier<Duration>> durationSupplier;
 
     @Override
-    protected LandCatches newTask(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return new LandCatches(durationSupplier.get(simulation));
+    protected LandCatches newTask(final VesselScope scope) {
+        return new LandCatches(durationSupplier.get(scope));
     }
 }

@@ -26,13 +26,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.LocalTime;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TimeFactory extends GlobalScopeFactory<LocalTime> {
@@ -42,7 +43,7 @@ public class TimeFactory extends GlobalScopeFactory<LocalTime> {
     private int second;
 
     @Override
-    protected LocalTime newInstance(final Simulation simulation) {
+    protected LocalTime newInstance() {
         return LocalTime.of(hour, minute, second);
     }
 }

@@ -27,7 +27,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.function.Predicate;
 
@@ -39,8 +38,8 @@ public class PermittedIfFactory<A> extends GlobalScopeFactory<PermittedIf<A>> {
     @NonNull private GlobalScopeFactory<? extends Predicate<? super Action<A>>> actionPredicate;
 
     @Override
-    protected PermittedIf<A> newInstance(final @NonNull Simulation simulation) {
-        return new PermittedIf<>(actionPredicate.get(simulation));
+    protected PermittedIf<A> newInstance() {
+        return new PermittedIf<>(actionPredicate.get());
     }
 
     public void setActionPredicate(
