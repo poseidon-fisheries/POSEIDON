@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -41,10 +40,8 @@ class InYearFactoryTest {
         final int year = 2023;
         final InYearFactory factory = new InYearFactory(year);
 
-        final Simulation simulation = new Simulation();
-
         // Act
-        final InYear result = factory.newInstance(simulation);
+        final InYear result = factory.get();
 
         // Assert
         assertEquals(year, result.getYear());

@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 
+@SuperBuilder
+@NoArgsConstructor
 public abstract class VesselScopeFactory<C> extends AbstractFactory<VesselScope, C> {
-
-    protected VesselScopeFactory() {
-        super(VesselScope.class);
-    }
-    
 }

@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
@@ -30,13 +31,13 @@ import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
 public class BathymetryFieldPortrayalFactory extends SimpleFieldPortrayalFactory {
 
     public BathymetryFieldPortrayalFactory(
-        final Factory<? extends BathymetricGrid> bathymetricGrid
+        final Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid
     ) {
         this(bathymetricGrid, true);
     }
 
     public BathymetryFieldPortrayalFactory(
-        final Factory<? extends BathymetricGrid> bathymetricGrid,
+        final Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid,
         final boolean visible
     ) {
         super(

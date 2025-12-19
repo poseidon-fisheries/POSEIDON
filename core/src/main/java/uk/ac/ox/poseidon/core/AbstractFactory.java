@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.core;
 import com.google.common.base.Suppliers;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
-import lombok.Getter;
-import lombok.experimental.Accessors;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -43,7 +43,8 @@ import static java.beans.Introspector.getBeanInfo;
 import static java.util.Comparator.comparing;
 
 @SuperBuilder
-public abstract class AbstractFactory<S, C> implements Factory<S, C> {
+@NoArgsConstructor
+public abstract class AbstractFactory<S extends Scope, C> implements Factory<S, C> {
 
     // needs to be transient for SnakeYAML not to be confused
     // when there are no other properties to serialize
@@ -54,12 +55,6 @@ public abstract class AbstractFactory<S, C> implements Factory<S, C> {
                 CacheBuilder.newBuilder()
                     .build(from(() -> newInstance(scope)))
             ));
-
-    @Getter
-    @Accessors(makeFinal = true)
-    private final Class<? extends S> scopeClass;
-
-    protected AbstractFactory(final Class<? extends S> scopeClass) {this.scopeClass = scopeClass;}
 
     @Override
     public final C get(final S scope) {
@@ -88,7 +83,8 @@ public abstract class AbstractFactory<S, C> implements Factory<S, C> {
 
     protected abstract C newInstance(S scope);
 
-    public final int makeKey(final S scope) {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public int makeKey(final S scope) {
         synchronized (this) {
             return readMethods
                 .get()
@@ -103,9 +99,7 @@ public abstract class AbstractFactory<S, C> implements Factory<S, C> {
                 .map(o ->
                     switch (o) {
                         case null -> null;
-                        // noinspection rawtypes
-                        case final Factory factory -> // noinspection unchecked
-                            factory.get(factory.getScopeClass().cast(scope));
+                        case final Factory factory -> factory.get(scope);
                         default -> o;
                     }
                 )

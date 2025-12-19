@@ -40,7 +40,7 @@ import java.util.Map;
 public abstract class BathymetricGridFactory extends GlobalScopeFactory<BathymetricGrid> {
     @NonNull private GlobalScopeFactory<? extends ModelGrid> modelGrid;
     @NonNull private GlobalScopeFactory<? extends Aggregator> aggregator;
-    private boolean inverted = false;
+    @Builder.Default private boolean inverted = false;
 
     @Override
     protected BathymetricGrid newInstance() {

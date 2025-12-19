@@ -27,8 +27,9 @@ import com.badlogic.gdx.ai.btree.branch.Parallel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.List;
 
@@ -37,23 +38,20 @@ import java.util.List;
 public class ParallelTaskFactory extends BranchTaskFactory<Parallel<Vessel>> {
 
     public ParallelTaskFactory(
-        final List<? extends VesselScopeFactory<? extends Task<Vessel>>> children
+        final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
     ) {
         super(children);
     }
 
     public ParallelTaskFactory(
         final VesselScopeFactory<? extends Task<Vessel>> guard,
-        final List<? extends VesselScopeFactory<? extends Task<Vessel>>> children
+        final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
     ) {
         super(guard, children);
     }
 
     @Override
-    protected Parallel<Vessel> newTask(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected Parallel<Vessel> newTask(final VesselScope scope) {
         return new Parallel<>();
     }
 }

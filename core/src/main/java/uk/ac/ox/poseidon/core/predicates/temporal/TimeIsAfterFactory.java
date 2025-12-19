@@ -26,13 +26,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 
 import java.time.LocalTime;
 
 @Getter
 @Setter
-@SuppressWarnings()
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TimeIsAfterFactory extends GlobalScopeFactory<TimeIsAfter> {

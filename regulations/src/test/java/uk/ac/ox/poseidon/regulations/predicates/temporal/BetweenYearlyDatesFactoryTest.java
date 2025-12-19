@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.time.MonthDayFactory;
 
@@ -50,11 +50,11 @@ class BetweenYearlyDatesFactoryTest {
         final MonthDay startDate = MonthDay.of(5, 1);
         final MonthDay endDate = MonthDay.of(10, 1);
 
-        final Factory<MonthDay> startFactory = mock(Factory.class);
-        final Factory<MonthDay> endFactory = mock(Factory.class);
+        final GlobalScopeFactory<MonthDay> startFactory = mock(GlobalScopeFactory.class);
+        final GlobalScopeFactory<MonthDay> endFactory = mock(GlobalScopeFactory.class);
 
-        when(startFactory.get(simulation)).thenReturn(startDate);
-        when(endFactory.get(simulation)).thenReturn(endDate);
+        when(startFactory.get()).thenReturn(startDate);
+        when(endFactory.get()).thenReturn(endDate);
 
         final BetweenYearlyDatesFactory factory = new BetweenYearlyDatesFactory(
             startFactory,
@@ -62,7 +62,7 @@ class BetweenYearlyDatesFactoryTest {
         );
 
         // Act
-        final BetweenYearlyDates result = factory.newInstance(simulation);
+        final BetweenYearlyDates result = factory.get();
 
         // Assert
         assertEquals(startDate, result.getStart());
@@ -76,11 +76,11 @@ class BetweenYearlyDatesFactoryTest {
         final MonthDay startDate = MonthDay.of(11, 1);
         final MonthDay endDate = MonthDay.of(2, 28);
 
-        final Factory<MonthDay> startFactory = mock(Factory.class);
-        final Factory<MonthDay> endFactory = mock(Factory.class);
+        final GlobalScopeFactory<MonthDay> startFactory = mock(GlobalScopeFactory.class);
+        final GlobalScopeFactory<MonthDay> endFactory = mock(GlobalScopeFactory.class);
 
-        when(startFactory.get(simulation)).thenReturn(startDate);
-        when(endFactory.get(simulation)).thenReturn(endDate);
+        when(startFactory.get()).thenReturn(startDate);
+        when(endFactory.get()).thenReturn(endDate);
 
         final BetweenYearlyDatesFactory factory = new BetweenYearlyDatesFactory(
             startFactory,
@@ -88,7 +88,7 @@ class BetweenYearlyDatesFactoryTest {
         );
 
         // Act
-        final BetweenYearlyDates result = factory.newInstance(simulation);
+        final BetweenYearlyDates result = factory.get();
 
         // Assert
         assertEquals(startDate, result.getStart());
@@ -101,11 +101,11 @@ class BetweenYearlyDatesFactoryTest {
         final Simulation simulation = mock(Simulation.class);
         final MonthDay sameDate = MonthDay.of(12, 25);
 
-        final Factory<MonthDay> startFactory = mock(Factory.class);
-        final Factory<MonthDay> endFactory = mock(Factory.class);
+        final GlobalScopeFactory<MonthDay> startFactory = mock(GlobalScopeFactory.class);
+        final GlobalScopeFactory<MonthDay> endFactory = mock(GlobalScopeFactory.class);
 
-        when(startFactory.get(simulation)).thenReturn(sameDate);
-        when(endFactory.get(simulation)).thenReturn(sameDate);
+        when(startFactory.get()).thenReturn(sameDate);
+        when(endFactory.get()).thenReturn(sameDate);
 
         final BetweenYearlyDatesFactory factory = new BetweenYearlyDatesFactory(
             startFactory,
@@ -113,7 +113,7 @@ class BetweenYearlyDatesFactoryTest {
         );
 
         // Act
-        final BetweenYearlyDates result = factory.newInstance(simulation);
+        final BetweenYearlyDates result = factory.get();
 
         // Assert
         assertEquals(sameDate, result.getStart());
@@ -134,8 +134,8 @@ class BetweenYearlyDatesFactoryTest {
         assertInstanceOf(MonthDayFactory.class, factory.getStart());
         assertInstanceOf(MonthDayFactory.class, factory.getEnd());
         final Simulation simulation = mock(Simulation.class);
-        final MonthDay startDate = ((MonthDayFactory) factory.getStart()).get(simulation);
-        final MonthDay endDate = ((MonthDayFactory) factory.getEnd()).get(simulation);
+        final MonthDay startDate = ((MonthDayFactory) factory.getStart()).get();
+        final MonthDay endDate = ((MonthDayFactory) factory.getEnd()).get();
 
         assertEquals(MonthDay.parse(start), startDate);
         assertEquals(MonthDay.parse(end), endDate);
@@ -183,7 +183,7 @@ class BetweenYearlyDatesFactoryTest {
     @Test
     void testSetStart() {
         // Arrange
-        final Factory<MonthDay> newStartFactory = mock(Factory.class);
+        final GlobalScopeFactory<MonthDay> newStartFactory = mock(GlobalScopeFactory.class);
         final BetweenYearlyDatesFactory factory = new BetweenYearlyDatesFactory();
 
         // Act
@@ -196,7 +196,7 @@ class BetweenYearlyDatesFactoryTest {
     @Test
     void testSetEnd() {
         // Arrange
-        final Factory<MonthDay> newEndFactory = mock(Factory.class);
+        final GlobalScopeFactory<MonthDay> newEndFactory = mock(GlobalScopeFactory.class);
         final BetweenYearlyDatesFactory factory = new BetweenYearlyDatesFactory();
 
         // Act
@@ -209,7 +209,7 @@ class BetweenYearlyDatesFactoryTest {
     @Test
     void testGetStart() {
         // Arrange
-        final Factory<MonthDay> startFactory = mock(Factory.class);
+        final GlobalScopeFactory<MonthDay> startFactory = mock(GlobalScopeFactory.class);
         final BetweenYearlyDatesFactory factory = new BetweenYearlyDatesFactory();
         factory.setStart(startFactory);
 
@@ -220,7 +220,7 @@ class BetweenYearlyDatesFactoryTest {
     @Test
     void testGetEnd() {
         // Arrange
-        final Factory<MonthDay> endFactory = mock(Factory.class);
+        final GlobalScopeFactory<MonthDay> endFactory = mock(GlobalScopeFactory.class);
         final BetweenYearlyDatesFactory factory = new BetweenYearlyDatesFactory();
         factory.setEnd(endFactory);
 

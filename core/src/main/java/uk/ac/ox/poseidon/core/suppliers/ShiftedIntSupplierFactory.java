@@ -27,7 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.IntSupplier;
 
@@ -36,14 +38,14 @@ import java.util.function.IntSupplier;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShiftedIntSupplierFactory extends GlobalScopeFactory<IntSupplier> {
+public class ShiftedIntSupplierFactory<S extends Scope> extends AbstractFactory<S, IntSupplier> {
 
-    private GlobalScopeFactory<? extends IntSupplier> intSupplier;
+    private Factory<? super S, ? extends IntSupplier> intSupplier;
     private int shift;
 
     @Override
-    protected IntSupplier newInstance() {
-        final IntSupplier intSupplier = this.intSupplier.get();
+    protected IntSupplier newInstance(final S scope) {
+        final IntSupplier intSupplier = this.intSupplier.get(scope);
         return () -> intSupplier.getAsInt() + shift;
     }
 }

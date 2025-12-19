@@ -26,15 +26,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class RootPathFactory extends GlobalScopeFactory<Path>
-    implements PathFactory<GlobalScope> {
+public class RootPathFactory
+    extends GlobalScopeFactory<Path>
+    implements PathFactory<Scope> {
 
     public RootPathFactory(final String path) {
         this.path = path.replace("\\", "/");

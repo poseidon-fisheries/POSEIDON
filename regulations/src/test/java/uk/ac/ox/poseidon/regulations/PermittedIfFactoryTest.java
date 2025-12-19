@@ -52,14 +52,14 @@ class PermittedIfFactoryTest {
 
         // Mock the returned predicate
         final Predicate<Action<Object>> mockedPredicate = Mockito.mock(Predicate.class);
-        when(mockedActionPredicateFactory.get(simulation)).thenReturn(mockedPredicate);
+        when(mockedActionPredicateFactory.get()).thenReturn(mockedPredicate);
 
         // Create an instance of PermittedIfFactory with the mocked action predicate factory
         final PermittedIfFactory<Object> factory =
             new PermittedIfFactory<>(mockedActionPredicateFactory);
 
         // Call the newInstance method
-        final PermittedIf<Object> permittedIf = factory.newInstance(simulation);
+        final PermittedIf<Object> permittedIf = factory.get();
 
         // Verify output
         assertNotNull(permittedIf, "PermittedIf instance should not be null");
@@ -74,14 +74,14 @@ class PermittedIfFactoryTest {
 
         // Mock a different predicate
         final Predicate<Action<Object>> anotherMockedPredicate = Mockito.mock(Predicate.class);
-        when(anotherMockedActionPredicateFactory.get(simulation)).thenReturn(anotherMockedPredicate);
+        when(anotherMockedActionPredicateFactory.get()).thenReturn(anotherMockedPredicate);
 
         // Create a new PermittedIfFactory instance with the different factory
         final PermittedIfFactory<Object> factory =
             new PermittedIfFactory<>(anotherMockedActionPredicateFactory);
 
         // Call the newInstance method
-        final PermittedIf<Object> permittedIf = factory.newInstance(simulation);
+        final PermittedIf<Object> permittedIf = factory.get();
 
         // Verify
         assertNotNull(permittedIf, "PermittedIf instance should not be null");

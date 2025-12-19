@@ -22,10 +22,7 @@
 
 package uk.ac.ox.poseidon.core.time;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 
@@ -38,9 +35,9 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = false)
 public class DateFactory extends GlobalScopeFactory<LocalDate> {
 
-    private Integer year = LocalDate.now().getYear();
-    private Integer month = LocalDate.now().getMonthValue();
-    private Integer day = LocalDate.now().getDayOfMonth();
+    @Builder.Default private Integer year = LocalDate.now().getYear();
+    @Builder.Default private Integer month = LocalDate.now().getMonthValue();
+    @Builder.Default private Integer day = LocalDate.now().getDayOfMonth();
 
     protected LocalDate newInstance() {
         return LocalDate.of(year, month, day);

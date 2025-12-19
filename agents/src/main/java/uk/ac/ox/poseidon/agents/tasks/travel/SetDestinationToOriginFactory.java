@@ -24,18 +24,14 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import lombok.Getter;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 
 @Getter
 @Setter
-public class SetDestinationToOriginFactory extends TaskFactory<SetDestinationToOrigin> {
+public class SetDestinationToOriginFactory extends VesselTaskFactory<SetDestinationToOrigin> {
     @Override
-    protected SetDestinationToOrigin newTask(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected SetDestinationToOrigin newTask(final VesselScope scope) {
         return new SetDestinationToOrigin();
     }
 }

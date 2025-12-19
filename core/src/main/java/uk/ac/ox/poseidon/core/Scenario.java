@@ -22,17 +22,14 @@
 
 package uk.ac.ox.poseidon.core;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,13 +37,14 @@ import static java.time.ZoneOffset.UTC;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public final class Scenario {
 
-    private Date startingDateTime = new Date();
+    @Builder.Default private Date startingDateTime = new Date();
 
-    private Map<String, ? extends Factory<? super SimulationScope, ?>> components = new HashMap<>();
+    @Singular private Map<String, ? extends Factory<? super SimulationScope, ?>> components;
 
     public Scenario(
         final LocalDateTime startingDateTime,
@@ -93,6 +91,30 @@ public final class Scenario {
             throw new IllegalArgumentException("Component not found: " + componentName);
         }
         return (Factory<? super SimulationScope, ? extends C>) factory;
+    }
+
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+    public static class ScenarioBuilder {
+
+        private Date startingDateTime;
+
+        public ScenarioBuilder startingDateTime(final Date startingDateTime) {
+            this.startingDateTime = startingDateTime;
+            return this;
+        }
+
+        public ScenarioBuilder startingDateTime(final LocalDate startingDate) {
+            return startingDateTime(startingDate.atStartOfDay());
+        }
+
+        public ScenarioBuilder startingDateTime(final LocalDateTime startingDateTime) {
+            return startingDateTime(startingDateTime.atZone(UTC));
+        }
+
+        public ScenarioBuilder startingDateTime(final ZonedDateTime zonedDateTime) {
+            return startingDateTime(Date.from(zonedDateTime.toInstant()));
+        }
+
     }
 
 }

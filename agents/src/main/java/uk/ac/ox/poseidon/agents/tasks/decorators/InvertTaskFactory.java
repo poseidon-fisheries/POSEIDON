@@ -27,29 +27,26 @@ import com.badlogic.gdx.ai.btree.decorator.Invert;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
 @NoArgsConstructor
 @SuperBuilder
 public class InvertTaskFactory extends DecoratorTaskFactory<Invert<Vessel>> {
 
-    public InvertTaskFactory(final VesselScopeFactory<? extends Task<Vessel>> child) {
+    public InvertTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> child) {
         super(child);
     }
 
     public InvertTaskFactory(
-        final VesselScopeFactory<? extends Task<Vessel>> guard,
-        final VesselScopeFactory<? extends Task<Vessel>> child
+        final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
+        final Factory<? super VesselScope, ? extends Task<Vessel>> child
     ) {
         super(guard, child);
     }
 
     @Override
-    protected Invert<Vessel> newTask(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        return null;
+    protected Invert<Vessel> newTask(final VesselScope scope) {
+        return new Invert<>();
     }
 }

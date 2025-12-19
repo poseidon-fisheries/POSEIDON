@@ -27,7 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -37,7 +39,7 @@ import java.util.function.Predicate;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnyOfFactory<T> extends GlobalScopeFactory<AnyOf<T>> {
+public class AnyOfFactory<S extends Scope, T> extends AbstractFactory<S, AnyOf<T>> {
 
     List<GlobalScopeFactory<? extends Predicate<? super T>>> predicates;
 
@@ -48,7 +50,7 @@ public class AnyOfFactory<T> extends GlobalScopeFactory<AnyOf<T>> {
     }
 
     @Override
-    protected AnyOf<T> newInstance() {
+    protected AnyOf<T> newInstance(final S scope) {
         return new AnyOf<>(
             predicates
                 .stream()

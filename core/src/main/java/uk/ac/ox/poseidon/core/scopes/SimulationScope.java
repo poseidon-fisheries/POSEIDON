@@ -23,14 +23,12 @@
 package uk.ac.ox.poseidon.core.scopes;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.Simulation;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor()
-public class SimulationScope extends GlobalScope {
+public class SimulationScope implements Scope {
 
     private final Simulation simulation;
 

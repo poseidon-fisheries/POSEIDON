@@ -22,10 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 
 @SuperBuilder
+@NoArgsConstructor
 public class ProportionallyLimitingBiomassToHoldFactory
     extends GlobalScopeFactory<ProportionallyLimitingBiomassToHold> {
     @Override

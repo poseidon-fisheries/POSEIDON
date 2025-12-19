@@ -29,7 +29,9 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.io.paths.PathFactory;
 import uk.ac.ox.poseidon.io.sources.DataSource;
 import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
@@ -50,7 +52,7 @@ public class CsvTableFactory extends GlobalScopeFactory<Table> {
     }
 
     public static CsvTableFactory fromFile(
-        final GlobalScopeFactory<Path> pathFactory
+        final Factory<Scope, ? extends Path> pathFactory
     ) {
         return new CsvTableFactory(new FileDataSourceFactory(pathFactory));
     }

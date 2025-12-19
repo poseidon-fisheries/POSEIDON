@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.core.predicates.numeric;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -42,10 +41,9 @@ class BelowFactoryTest {
         // Arrange
         final double threshold = 10.5;
         final BelowFactory factory = new BelowFactory(threshold);
-        final Simulation simulation = new Simulation(); // Dummy object as it's not directly used.
 
         // Act
-        final Below result = factory.newInstance(simulation);
+        final Below result = factory.newInstance();
 
         // Assert
         assertNotNull(result, "The result should not be null");
@@ -60,10 +58,9 @@ class BelowFactoryTest {
         // Arrange
         final double threshold = 0.0;
         final BelowFactory factory = new BelowFactory(threshold);
-        final Simulation simulation = new Simulation();
 
         // Act
-        final Below result = factory.newInstance(simulation);
+        final Below result = factory.newInstance();
 
         // Assert
         assertNotNull(result, "The result should not be null");
@@ -78,10 +75,9 @@ class BelowFactoryTest {
         // Arrange
         final double threshold = -5.0;
         final BelowFactory factory = new BelowFactory(threshold);
-        final Simulation simulation = new Simulation();
 
         // Act
-        final Below result = factory.newInstance(simulation);
+        final Below result = factory.newInstance();
 
         // Assert
         assertNotNull(result, "The result should not be null");

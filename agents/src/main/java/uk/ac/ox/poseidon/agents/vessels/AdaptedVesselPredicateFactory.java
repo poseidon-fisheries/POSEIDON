@@ -27,8 +27,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.predicates.AdaptedPredicate;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -38,16 +40,17 @@ import java.util.function.Predicate;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdaptedVesselPredicateFactory<T> extends GlobalScopeFactory<Predicate<? super Vessel>> {
+public class AdaptedVesselPredicateFactory<S extends Scope, T>
+    extends AbstractFactory<S, Predicate<? super Vessel>> {
 
-    private GlobalScopeFactory<? extends Function<? super Vessel, T>> adaptor;
-    private GlobalScopeFactory<? extends Predicate<? super T>> predicate;
+    private Factory<? super S, ? extends Function<? super Vessel, T>> adaptor;
+    private Factory<? super S, ? extends Predicate<? super T>> predicate;
 
     @Override
-    protected Predicate<? super Vessel> newInstance() {
+    protected Predicate<? super Vessel> newInstance(final S scope) {
         return new AdaptedPredicate<>(
-            adaptor.get(),
-            predicate.get()
+            adaptor.get(scope),
+            predicate.get(scope)
         );
     }
 }

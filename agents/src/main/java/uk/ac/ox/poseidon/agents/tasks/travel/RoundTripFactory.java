@@ -25,32 +25,30 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.branch.Sequence;
 import lombok.*;
-import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoundTripFactory extends TaskFactory<Sequence<Vessel>> {
+public class RoundTripFactory extends VesselTaskFactory<Sequence<Vessel>> {
 
-    private TaskFactory<?> startTripTask;
-    private TaskFactory<?> travelTask;
-    private TaskFactory<?> fishingTask;
-    private TaskFactory<?> landingTask;
+    private Factory<? super VesselScope, ? extends Task<Vessel>> startTripTask;
+    private Factory<? super VesselScope, ? extends Task<Vessel>> travelTask;
+    private Factory<? super VesselScope, ? extends Task<Vessel>> fishingTask;
+    private Factory<? super VesselScope, ? extends Task<Vessel>> landingTask;
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Sequence<Vessel> newTask(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
-        final Task<Vessel> startTripTask = this.startTripTask.get(simulation, vessel);
-        final Task<Vessel> travelTask = this.travelTask.get(simulation, vessel);
-        final Task<Vessel> fishingTask = this.fishingTask.get(simulation, vessel);
-        final Task<Vessel> landingTask = this.landingTask.get(simulation, vessel);
+    protected Sequence<Vessel> newTask(final VesselScope scope) {
+        final Task<Vessel> startTripTask = this.startTripTask.get(scope);
+        final Task<Vessel> travelTask = this.travelTask.get(scope);
+        final Task<Vessel> fishingTask = this.fishingTask.get(scope);
+        final Task<Vessel> landingTask = this.landingTask.get(scope);
         return new Sequence<>(
             startTripTask,
             travelTask,

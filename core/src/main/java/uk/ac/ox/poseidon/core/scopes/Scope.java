@@ -23,4 +23,5 @@
 package uk.ac.ox.poseidon.core.scopes;
 
 public interface Scope {
+    Scope GLOBAL_SCOPE = new Scope() {};
 }

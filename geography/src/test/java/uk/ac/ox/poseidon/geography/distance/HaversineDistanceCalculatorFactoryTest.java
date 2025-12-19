@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.geography.distance;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -43,20 +43,20 @@ class HaversineDistanceCalculatorFactoryTest {
     void testNewInstance_createsHaversineDistanceCalculatorWithValidModelGrid() {
         // Arrange
         final ModelGrid mockedModelGrid = mock(ModelGrid.class);
-        @SuppressWarnings("unchecked") final Factory<ModelGrid> modelGridFactory =
-            mock(Factory.class);
+        @SuppressWarnings("unchecked") final GlobalScopeFactory<ModelGrid> modelGridFactory =
+            mock(GlobalScopeFactory.class);
         final Simulation simulation = mock(Simulation.class);
 
-        when(modelGridFactory.get(simulation)).thenReturn(mockedModelGrid);
+        when(modelGridFactory.get()).thenReturn(mockedModelGrid);
 
         final HaversineDistanceCalculatorFactory factory = new HaversineDistanceCalculatorFactory();
         factory.setModelGrid(modelGridFactory);
 
         // Act
-        final HaversineDistanceCalculator result = factory.newInstance(simulation);
+        final HaversineDistanceCalculator result = factory.get();
 
         // Assert
         assertNotNull(result);
-        verify(modelGridFactory, times(1)).get(simulation);
+        verify(modelGridFactory, times(1)).get();
     }
 }

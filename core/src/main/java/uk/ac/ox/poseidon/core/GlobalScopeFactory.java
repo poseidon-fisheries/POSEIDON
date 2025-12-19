@@ -22,19 +22,19 @@
 
 package uk.ac.ox.poseidon.core;
 
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Supplier;
 
-import static uk.ac.ox.poseidon.core.scopes.GlobalScope.GLOBAL_SCOPE;
+import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 
+@SuperBuilder
+@NoArgsConstructor
 public abstract class GlobalScopeFactory<C>
-    extends AbstractFactory<GlobalScope, C>
+    extends AbstractFactory<Scope, C>
     implements Supplier<C> {
-
-    protected GlobalScopeFactory() {
-        super(GlobalScope.class);
-    }
 
     @Override
     public final C get() {
@@ -44,7 +44,7 @@ public abstract class GlobalScopeFactory<C>
     protected abstract C newInstance();
 
     @Override
-    protected final C newInstance(final GlobalScope scope) {
+    protected final C newInstance(final Scope scope) {
         return newInstance();
     }
 }

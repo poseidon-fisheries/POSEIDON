@@ -31,6 +31,8 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 
 import java.io.File;
 
+import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
+
 @Getter
 @Setter
 @SuperBuilder
@@ -43,7 +45,7 @@ public class ModelGridWithActiveCellsFromGridFile
 
     @Override
     protected ModelGrid newInstance() {
-        final File gridFile = cellSetFromGridFile.getPath().get().toFile();
+        final File gridFile = cellSetFromGridFile.getPath().get(GLOBAL_SCOPE).toFile();
         final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
         return ModelGrid.withActiveCells(
             coverageWrapper.getGridWidth(),

@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.geography.distance;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -45,16 +45,16 @@ class EquirectangularDistanceCalculatorFactoryTest {
     @Test
     void testNewInstanceCreatesEquirectangularDistanceCalculator() {
         // Arrange
-        final Factory<ModelGrid> mockedModelGridFactory = mock(Factory.class);
+        final GlobalScopeFactory<ModelGrid> mockedModelGridFactory = mock(GlobalScopeFactory.class);
         final Simulation simulation = mock(Simulation.class);
         final ModelGrid mockedModelGrid = mock(ModelGrid.class);
-        when(mockedModelGridFactory.get(simulation)).thenReturn(mockedModelGrid);
+        when(mockedModelGridFactory.get()).thenReturn(mockedModelGrid);
 
         final EquirectangularDistanceCalculatorFactory factory =
             new EquirectangularDistanceCalculatorFactory(mockedModelGridFactory);
 
         // Act
-        final EquirectangularDistanceCalculator result = factory.newInstance(simulation);
+        final EquirectangularDistanceCalculator result = factory.get();
 
         // Assert
         assertNotNull(

@@ -23,10 +23,10 @@
 package uk.ac.ox.poseidon.geography;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 
 class EnvelopeFactoryTest {
 
@@ -44,10 +44,9 @@ class EnvelopeFactoryTest {
         final double minY = 2.0;
         final double maxY = 6.0;
         final EnvelopeFactory factory = new EnvelopeFactory(minX, maxX, minY, maxY);
-        final Simulation simulation = new Simulation();
 
         // Call the method under test
-        final Envelope envelope = factory.newInstance(simulation);
+        final Envelope envelope = factory.get(GLOBAL_SCOPE);
 
         // Verify results
         assertNotNull(envelope, "Expected an instance of Envelope to be created.");
@@ -81,10 +80,9 @@ class EnvelopeFactoryTest {
         final double minY = 6.0;
         final double maxY = 2.0; // unordered values
         final EnvelopeFactory factory = new EnvelopeFactory(minX, maxX, minY, maxY);
-        final Simulation simulation = new Simulation();
 
         // Call the method under test
-        final Envelope envelope = factory.newInstance(simulation);
+        final Envelope envelope = factory.get(GLOBAL_SCOPE);
 
         // Verify results
         assertNotNull(envelope, "Expected an instance of Envelope to be created.");
@@ -114,10 +112,9 @@ class EnvelopeFactoryTest {
     void testNewInstance_CreatesEnvelopeWithZeroedBoundsWhenFactoryNotInitialized() {
         // Prepare an uninitialized factory
         final EnvelopeFactory factory = new EnvelopeFactory();
-        final Simulation simulation = new Simulation();
 
         // Call the method under test
-        final Envelope envelope = factory.newInstance(simulation);
+        final Envelope envelope = factory.get(GLOBAL_SCOPE);
 
         // Verify results
         assertNotNull(envelope, "Expected an instance of Envelope to be created.");

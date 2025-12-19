@@ -27,6 +27,7 @@ import sim.display.Display2D;
 import sim.display.GUIState;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.gui.portrayals.NamedPortrayal;
 
 import javax.swing.*;
@@ -43,14 +44,14 @@ public class DisplayWrapper2D extends DisplayWrapper<Display2D> {
 
     private static final int DEFAULT_STEP_INTERVAL = 64;
 
-    private final List<Factory<?>> fieldPortrayalFactories;
+    private final List<Factory<? super SimulationScope, ?>> fieldPortrayalFactories;
     private final double width;
     private final double height;
     private final Paint backDrop;
 
     public DisplayWrapper2D(
         final String title,
-        final List<Factory<?>> fieldPortrayalFactories,
+        final List<Factory<? super SimulationScope, ?>> fieldPortrayalFactories,
         final double width,
         final double height,
         final Paint backDrop
@@ -80,12 +81,13 @@ public class DisplayWrapper2D extends DisplayWrapper<Display2D> {
 
     @Override
     void setupPortrayals(final Simulation simulation) {
+        final SimulationScope scope = new SimulationScope(simulation);
         display.detachAll();
         fieldPortrayalFactories
             .stream()
             .flatMap(factory -> {
-                final Object o = factory.get(simulation);
-                return factory.get(simulation) instanceof final Collection<?> os
+                final Object o = factory.get(scope);
+                return factory.get(scope) instanceof final Collection<?> os
                     ? os.stream()
                     : Stream.of(o);
             })

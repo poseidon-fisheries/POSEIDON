@@ -24,12 +24,13 @@ package uk.ac.ox.poseidon.regulations;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
+import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 
 @SuppressWarnings("unchecked")
 class ForbiddenIfFactoryTest {
@@ -45,21 +46,20 @@ class ForbiddenIfFactoryTest {
     @Test
     void testNewInstanceCreatesForbiddenIfObject() {
         // Arrange
-        final Simulation mockSimulation = mock(Simulation.class);
         final Predicate<Action<?>> mockActionPredicate = mock(Predicate.class);
         @SuppressWarnings("unchecked") final GlobalScopeFactory<Predicate<Action<?>>>
             mockActionPredicateFactory =
             (GlobalScopeFactory<Predicate<Action<?>>>) mock(GlobalScopeFactory.class);
-        when(mockActionPredicateFactory.get(mockSimulation)).thenReturn(mockActionPredicate);
+        when(mockActionPredicateFactory.get()).thenReturn(mockActionPredicate);
 
-        final ForbiddenIfFactory<Object> forbiddenIfFactory =
+        final ForbiddenIfFactory<Scope, Object> forbiddenIfFactory =
             new ForbiddenIfFactory<>(mockActionPredicateFactory);
 
         // Act
-        final ForbiddenIf<Object> result = forbiddenIfFactory.newInstance(mockSimulation);
+        final ForbiddenIf<Object> result = forbiddenIfFactory.get(GLOBAL_SCOPE);
 
         // Assert
         assertNotNull(result);
-        verify(mockActionPredicateFactory, times(1)).get(mockSimulation);
+        verify(mockActionPredicateFactory, times(1)).get();
     }
 }

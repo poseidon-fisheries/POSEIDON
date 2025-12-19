@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 
 import java.time.LocalDate;
@@ -54,12 +54,11 @@ class BetweenDatesFactoryTest {
         final LocalDate startDateStub = LocalDate.of(2023, 1, 1);
         final LocalDate endDateStub = LocalDate.of(2023, 12, 31);
 
-        final Factory<LocalDate> startDateFactory = mock(Factory.class);
-        final Factory<LocalDate> endDateFactory = mock(Factory.class);
-        final Simulation mockSimulation = mock(Simulation.class);
+        final GlobalScopeFactory<LocalDate> startDateFactory = mock(GlobalScopeFactory.class);
+        final GlobalScopeFactory<LocalDate> endDateFactory = mock(GlobalScopeFactory.class);
 
-        when(startDateFactory.get(mockSimulation)).thenReturn(startDateStub);
-        when(endDateFactory.get(mockSimulation)).thenReturn(endDateStub);
+        when(startDateFactory.get()).thenReturn(startDateStub);
+        when(endDateFactory.get()).thenReturn(endDateStub);
 
         final BetweenDatesFactory factory = new BetweenDatesFactory(
             startDateFactory,
@@ -67,7 +66,7 @@ class BetweenDatesFactoryTest {
         );
 
         // Act
-        final BetweenDates result = factory.newInstance(mockSimulation);
+        final BetweenDates result = factory.get();
 
         // Assert
         assertEquals(
@@ -86,12 +85,12 @@ class BetweenDatesFactoryTest {
         // Arrange
         final LocalDate endDateStub = LocalDate.of(2023, 12, 31);
 
-        final Factory<LocalDate> startDateFactory = mock(Factory.class);
-        final Factory<LocalDate> endDateFactory = mock(Factory.class);
+        final GlobalScopeFactory<LocalDate> startDateFactory = mock(GlobalScopeFactory.class);
+        final GlobalScopeFactory<LocalDate> endDateFactory = mock(GlobalScopeFactory.class);
         final Simulation mockSimulation = mock(Simulation.class);
 
-        when(startDateFactory.get(mockSimulation)).thenReturn(null);
-        when(endDateFactory.get(mockSimulation)).thenReturn(endDateStub);
+        when(startDateFactory.get()).thenReturn(null);
+        when(endDateFactory.get()).thenReturn(endDateStub);
 
         final BetweenDatesFactory factory = new BetweenDatesFactory(
             startDateFactory,
@@ -99,7 +98,7 @@ class BetweenDatesFactoryTest {
         );
 
         // Act & Assert
-        assertThrows(NullPointerException.class, () -> factory.newInstance(mockSimulation));
+        assertThrows(NullPointerException.class, factory::get);
 
     }
 
@@ -111,12 +110,12 @@ class BetweenDatesFactoryTest {
         // Arrange
         final LocalDate startDateStub = LocalDate.of(2023, 1, 1);
 
-        final Factory<LocalDate> startDateFactory = mock(Factory.class);
-        final Factory<LocalDate> endDateFactory = mock(Factory.class);
+        final GlobalScopeFactory<LocalDate> startDateFactory = mock(GlobalScopeFactory.class);
+        final GlobalScopeFactory<LocalDate> endDateFactory = mock(GlobalScopeFactory.class);
         final Simulation mockSimulation = mock(Simulation.class);
 
-        when(startDateFactory.get(mockSimulation)).thenReturn(startDateStub);
-        when(endDateFactory.get(mockSimulation)).thenReturn(null);
+        when(startDateFactory.get()).thenReturn(startDateStub);
+        when(endDateFactory.get()).thenReturn(null);
 
         final BetweenDatesFactory factory = new BetweenDatesFactory(
             startDateFactory,
@@ -124,7 +123,7 @@ class BetweenDatesFactoryTest {
         );
 
         // Act & Assert
-        assertThrows(NullPointerException.class, () -> factory.newInstance(mockSimulation));
+        assertThrows(NullPointerException.class, factory::get);
     }
 
     /**
@@ -134,9 +133,9 @@ class BetweenDatesFactoryTest {
     @Test
     void testNewInstance_callsGetOnFactories() {
         // Arrange
-        final Factory<LocalDate> startDateFactory = mock(Factory.class);
+        final GlobalScopeFactory<LocalDate> startDateFactory = mock(GlobalScopeFactory.class);
         when(startDateFactory.get(Mockito.any())).thenReturn(LocalDate.now());
-        final Factory<LocalDate> endDateFactory = mock(Factory.class);
+        final GlobalScopeFactory<LocalDate> endDateFactory = mock(GlobalScopeFactory.class);
         when(endDateFactory.get(Mockito.any())).thenReturn(LocalDate.now());
         final Simulation mockSimulation = mock(Simulation.class);
 
@@ -146,10 +145,10 @@ class BetweenDatesFactoryTest {
         );
 
         // Act
-        factory.newInstance(mockSimulation);
+        factory.get();
 
         // Assert
-        Mockito.verify(startDateFactory).get(mockSimulation);
-        Mockito.verify(endDateFactory).get(mockSimulation);
+        Mockito.verify(startDateFactory).get();
+        Mockito.verify(endDateFactory).get();
     }
 }

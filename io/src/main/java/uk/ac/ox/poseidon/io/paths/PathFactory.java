@@ -44,19 +44,15 @@ public interface PathFactory<S extends Scope> extends Factory<S, Path> {
         return of(Path.of(first, more));
     }
 
-    default RelativePathFactory plus(final Path path) {
-        return new RelativePathFactory(this, pathToString(path));
+    default RelativePathFactory<S> plus(final Path path) {
+        return new RelativePathFactory<>(this, pathToString(path));
     }
 
-    default RelativePathFactory plus(
+    default RelativePathFactory<S> plus(
         final String first,
         final String... more
     ) {
         return plus(Path.of(first, more));
-    }
-
-    default SimulationFolderFactory simulationFolder() {
-        return new SimulationFolderFactory(this);
     }
 
 }

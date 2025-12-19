@@ -27,7 +27,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
@@ -35,17 +37,18 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class SpeciesByCodeFactory extends GlobalScopeFactory<List<? extends Species>> {
+public class SpeciesByCodeFactory<S extends Scope>
+    extends AbstractFactory<S, List<? extends Species>> {
 
-    private GlobalScopeFactory<? extends List<? extends String>> speciesCodes;
-    private GlobalScopeFactory<? extends List<? extends Species>> speciesList;
+    private Factory<? super S, ? extends List<? extends String>> speciesCodes;
+    private Factory<? super S, ? extends List<? extends Species>> speciesList;
 
     @Override
-    protected List<? extends Species> newInstance() {
+    protected List<? extends Species> newInstance(final S scope) {
         final ImmutableSet<String> speciesCodes =
-            ImmutableSet.copyOf(this.speciesCodes.get());
+            ImmutableSet.copyOf(this.speciesCodes.get(scope));
         return speciesList
-            .get()
+            .get(scope)
             .stream()
             .filter(s -> speciesCodes.contains(s.getCode()))
             .toList();

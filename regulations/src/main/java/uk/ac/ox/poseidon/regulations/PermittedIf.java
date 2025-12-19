@@ -30,10 +30,10 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class PermittedIf<A> implements Regulations<A> {
 
-    @NonNull private final Predicate<? super Action<A>> actionPredicate;
+    @NonNull private final Predicate<? super Action<? super A>> actionPredicate;
 
     @Override
-    public boolean isPermitted(final Action<A> action) {
+    public boolean isPermitted(final Action<? super A> action) {
         return actionPredicate.test(action);
     }
 }

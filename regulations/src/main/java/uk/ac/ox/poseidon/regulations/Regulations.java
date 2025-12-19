@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.regulations;
 @FunctionalInterface
 public interface Regulations<A> {
 
-    boolean isPermitted(Action<A> action);
+    boolean isPermitted(Action<? super A> action);
 
-    default boolean isForbidden(final Action<A> action) {
+    default boolean isForbidden(final Action<? super A> action) {
         return !isPermitted(action);
     }
 

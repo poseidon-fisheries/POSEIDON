@@ -134,7 +134,7 @@ class ModelGridTest {
         final ModelGrid modelGrid =
             new ModelGridFactory(
                 1.0, -171, -70, -50, 50
-            ).get(simulation);
+            ).get();
         final Envelope envelope = modelGrid.getEnvelope();
         final List<Coordinate> coordinates =
             range((int) envelope.getMinX(), (int) envelope.getMaxX() - 1)

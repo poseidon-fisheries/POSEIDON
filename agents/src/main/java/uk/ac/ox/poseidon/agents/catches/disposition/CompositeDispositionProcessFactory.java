@@ -26,7 +26,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
@@ -36,25 +38,25 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompositeDispositionProcessFactory
-    extends GlobalScopeFactory<CompositeDispositionProcess> {
+public class CompositeDispositionProcessFactory<S extends Scope>
+    extends AbstractFactory<S, CompositeDispositionProcess> {
 
-    private List<GlobalScopeFactory<? extends DispositionProcess>> dispositionStrategies;
+    private List<Factory<? super S, ? extends DispositionProcess>> dispositionStrategies;
 
     @SafeVarargs
     @SuppressWarnings("varargs")
     public CompositeDispositionProcessFactory(
-        final GlobalScopeFactory<? extends DispositionProcess>... dispositionStrategies
+        final Factory<? super S, ? extends DispositionProcess>... dispositionStrategies
     ) {
         this(List.of(dispositionStrategies));
     }
 
     @Override
-    protected CompositeDispositionProcess newInstance() {
+    protected CompositeDispositionProcess newInstance(final S scope) {
         return new CompositeDispositionProcess(
             dispositionStrategies
                 .stream()
-                .map(GlobalScopeFactory::get)
+                .map(f -> f.get(scope))
                 .collect(toImmutableList())
         );
     }

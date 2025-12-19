@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -39,22 +38,22 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AllOfFactory<T> extends GlobalScopeFactory<AllOf<T>> {
+public class AllOfFactory<S extends Scope, T> extends AbstractFactory<S, AllOf<T>> {
 
-    private List<GlobalScopeFactory<? extends Predicate<? super T>>> predicates;
+    @Singular private List<Factory<? super S, ? extends Predicate<? super T>>> predicates;
 
     @SafeVarargs
     @SuppressWarnings("varargs")
-    public AllOfFactory(final GlobalScopeFactory<? extends Predicate<? super T>>... predicates) {
+    public AllOfFactory(final Factory<? super S, ? extends Predicate<? super T>>... predicates) {
         this(List.of(predicates));
     }
 
     @Override
-    protected AllOf<T> newInstance() {
+    protected AllOf<T> newInstance(final S scope) {
         return new AllOf<>(
             predicates
                 .stream()
-                .map(GlobalScopeFactory::get)
+                .map(f -> f.get(scope))
                 .collect(toImmutableList())
         );
     }

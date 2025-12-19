@@ -31,8 +31,10 @@ import lombok.experimental.SuperBuilder;
 import org.geotools.api.referencing.operation.MathTransform2D;
 import org.geotools.api.referencing.operation.TransformException;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.CoverageWrapper;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -43,16 +45,18 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
+import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
+
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 public class BathymetricGridFromGridFileFactory extends BathymetricGridFactory {
 
-    private GlobalScopeFactory<? extends Path> path;
+    private Factory<Scope, ? extends Path> path;
 
     public BathymetricGridFromGridFileFactory(
-        final GlobalScopeFactory<? extends Path> path,
+        final Factory<Scope, ? extends Path> path,
         final GlobalScopeFactory<? extends ModelGrid> modelGrid,
         final GlobalScopeFactory<? extends Aggregator> aggregator,
         final boolean inverted
@@ -65,7 +69,7 @@ public class BathymetricGridFromGridFileFactory extends BathymetricGridFactory {
     protected Map<Int2D, Collection<Double>> readElevationValues(
         final ModelGrid modelGrid
     ) {
-        final File gridFile = path.get().toFile();
+        final File gridFile = path.get(GLOBAL_SCOPE).toFile();
         final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
         final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
         final MathTransform2D gridToCRS2D =

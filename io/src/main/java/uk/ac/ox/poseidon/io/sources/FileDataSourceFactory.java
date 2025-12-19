@@ -24,12 +24,15 @@ package uk.ac.ox.poseidon.io.sources;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 
 @Getter
 @Setter
@@ -38,16 +41,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @AllArgsConstructor
 public class FileDataSourceFactory extends GlobalScopeFactory<FileDataSource> {
 
-    private GlobalScopeFactory<? extends Path> path;
+    private Factory<Scope, ? extends Path> path;
     @Builder.Default private String encoding = UTF_8.name();
 
-    public FileDataSourceFactory(final GlobalScopeFactory<? extends Path> path) {
+    public FileDataSourceFactory(final Factory<Scope, ? extends Path> path) {
         this.path = path;
     }
 
     @Override
     protected FileDataSource newInstance() {
-        return new FileDataSource(path.get().toFile(), Charset.forName(encoding));
+        return new FileDataSource(path.get(GLOBAL_SCOPE).toFile(), Charset.forName(encoding));
     }
 
 }

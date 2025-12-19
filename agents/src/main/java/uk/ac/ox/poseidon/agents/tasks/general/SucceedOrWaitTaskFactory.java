@@ -22,33 +22,32 @@
 
 package uk.ac.ox.poseidon.agents.tasks.general;
 
+import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.branch.Selector;
 import com.badlogic.gdx.ai.btree.decorator.AlwaysFail;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SucceedOrWaitTaskFactory extends TaskFactory<Selector<Vessel>> {
+public class SucceedOrWaitTaskFactory extends VesselTaskFactory<Selector<Vessel>> {
 
-    TaskFactory<?> mainTask;
-    TaskFactory<?> waitTask;
+    private Factory<? super VesselScope, ? extends Task<Vessel>> mainTask;
+    private Factory<? super VesselScope, ? extends Task<Vessel>> waitTask;
 
     @Override
-    protected Selector<Vessel> newTask(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected Selector<Vessel> newTask(final VesselScope scope) {
         final Selector<Vessel> selector = new Selector<>();
-        selector.addChild(mainTask.get(simulation, vessel));
-        selector.addChild(new AlwaysFail<>(waitTask.get(simulation, vessel)));
+        selector.addChild(mainTask.get(scope));
+        selector.addChild(new AlwaysFail<>(waitTask.get(scope)));
         return selector;
     }
 }

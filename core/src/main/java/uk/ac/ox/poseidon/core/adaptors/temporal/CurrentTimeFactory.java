@@ -22,9 +22,13 @@
 
 package uk.ac.ox.poseidon.core.adaptors.temporal;
 
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+@SuperBuilder
+@NoArgsConstructor
 public class CurrentTimeFactory extends SimulationScopeFactory<CurrentTime> {
     @Override
     protected CurrentTime newInstance(final SimulationScope scope) {

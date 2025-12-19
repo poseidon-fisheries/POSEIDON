@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.apache.commons.beanutils.PropertyUtils;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,18 +37,19 @@ import static java.util.stream.IntStream.range;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MappedFactory<C> extends GlobalScopeFactory<List<C>> {
+public class MappedFactory<S extends Scope, C> extends AbstractFactory<S, List<C>> {
 
-    private Factory<C> factory;
-    private List<String> propertyNames;
-    private List<Factory<? extends List<?>>> componentListFactories;
+    private Factory<S, C> factory;
+    @Singular private List<String> propertyNames;
+    @Singular private List<Factory<? super S, ? extends List<?>>> componentListFactories;
 
     public MappedFactory(
-        final Factory<C> factory,
+        final Factory<S, C> factory,
         final String propertyName,
-        final Factory<? extends List<?>> componentListFactory
+        final Factory<? super S, ? extends List<?>> componentListFactory
     ) {
         this.factory = factory;
         this.propertyNames = List.of(propertyName);
@@ -57,7 +57,7 @@ public class MappedFactory<C> extends GlobalScopeFactory<List<C>> {
     }
 
     @Override
-    protected List<C> newInstance(final Simulation simulation) {
+    protected List<C> newInstance(final S scope) {
 
         checkNotNull(componentListFactories);
         checkState(!componentListFactories.isEmpty());
@@ -69,7 +69,7 @@ public class MappedFactory<C> extends GlobalScopeFactory<List<C>> {
             "There must be as many are property value lists as there property names."
         );
 
-        final List<? extends List<?>> componentLists = getComponentLists(simulation);
+        final List<? extends List<?>> componentLists = getComponentLists(scope);
 
         checkState(!componentLists.getFirst().isEmpty());
         final int targetSize = componentLists.getFirst().size();
@@ -79,7 +79,7 @@ public class MappedFactory<C> extends GlobalScopeFactory<List<C>> {
             "All property value lists must be the same size."
         );
 
-        final Factory<C> factory = this.factory;
+        final Factory<S, C> factory = this.factory;
         synchronized (factory) {
             return range(0, targetSize).mapToObj(componentIndex -> {
                     range(0, propertyNames.size()).forEach(propertyIndex -> {
@@ -92,27 +92,26 @@ public class MappedFactory<C> extends GlobalScopeFactory<List<C>> {
                                 case final Boolean b -> b;
                                 case final String s -> s;
                                 case final Number n -> n;
-                                case final Factory<?> f -> f;
-                                case final ObjectScopeFactory<?, ?> asf -> asf;
+                                case final Factory<?, ?> f -> f;
                                 default -> new ConstantFactory<>(o);
                             }
                         );
                     });
-                    return factory.get(simulation);
+                    return factory.get(scope);
                 })
                 .toList();
         }
     }
 
-    private List<? extends List<?>> getComponentLists(final Simulation simulation) {
+    private List<? extends List<?>> getComponentLists(final S scope) {
         return componentListFactories
             .stream()
-            .map(f -> f.get(simulation))
+            .map(f -> f.get(scope))
             .toList();
     }
 
     private void setProperty(
-        final Factory<C> targetFactory,
+        final Factory<S, C> targetFactory,
         final String propertyName,
         final Object component
     ) {
@@ -131,14 +130,14 @@ public class MappedFactory<C> extends GlobalScopeFactory<List<C>> {
     }
 
     @Override
-    public int makeKey(final Simulation simulation) {
+    public int makeKey(final S scope) {
         // We override makeKey here because we want to use the properties of the target
         // factory as part of our own key instead of the object that it would instantiate
         // (or more likely die trying) if its get method gets called.
         return List.of(
             propertyNames,
-            getComponentLists(simulation),
-            factory.makeKey(simulation)
+            getComponentLists(scope),
+            factory.makeKey(scope)
         ).hashCode();
     }
 }

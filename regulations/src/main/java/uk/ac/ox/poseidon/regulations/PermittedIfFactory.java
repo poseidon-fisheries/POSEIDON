@@ -35,7 +35,8 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 public class PermittedIfFactory<A> extends GlobalScopeFactory<PermittedIf<A>> {
 
-    @NonNull private GlobalScopeFactory<? extends Predicate<? super Action<A>>> actionPredicate;
+    @NonNull private GlobalScopeFactory<? extends Predicate<? super Action<? super A>>>
+        actionPredicate;
 
     @Override
     protected PermittedIf<A> newInstance() {
@@ -43,7 +44,7 @@ public class PermittedIfFactory<A> extends GlobalScopeFactory<PermittedIf<A>> {
     }
 
     public void setActionPredicate(
-        @NonNull final GlobalScopeFactory<? extends Predicate<Action<A>>> actionPredicate
+        @NonNull final GlobalScopeFactory<? extends Predicate<Action<? super A>>> actionPredicate
     ) {
         this.actionPredicate = actionPredicate;
     }

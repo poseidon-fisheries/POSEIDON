@@ -23,7 +23,9 @@
 package uk.ac.ox.poseidon.agents.tasks;
 
 import com.badlogic.gdx.ai.btree.Task;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.Agent;
@@ -34,14 +36,12 @@ import uk.ac.ox.poseidon.core.Factory;
 @Getter
 @Setter
 @SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class TaskFactory<A extends Agent<A>, S extends AgentScope<A>, T extends Task<A>>
     extends AbstractFactory<S, T> {
 
     private Factory<? super S, ? extends Task<A>> guard;
-
-    protected TaskFactory(final Class<? extends S> scopeClass) {
-        super(scopeClass);
-    }
 
     protected abstract T newTask(
         final S scope

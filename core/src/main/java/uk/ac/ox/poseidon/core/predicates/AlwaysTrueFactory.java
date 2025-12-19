@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.predicates;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
@@ -30,6 +31,7 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 @Getter
 @Setter
 @SuperBuilder
+@NoArgsConstructor
 public class AlwaysTrueFactory extends GlobalScopeFactory<AlwaysTrue> {
     @Override
     protected AlwaysTrue newInstance() {

@@ -22,11 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 
 @SuperBuilder
+@NoArgsConstructor
 public class InactiveBehaviourFactory extends GlobalScopeFactory<InactiveBehaviour<Vessel>> {
     @Override
     protected InactiveBehaviour<Vessel> newInstance() {

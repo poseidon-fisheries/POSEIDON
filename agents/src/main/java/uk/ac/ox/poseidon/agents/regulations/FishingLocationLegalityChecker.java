@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.agents.regulations;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.regulations.Regulations;
@@ -33,12 +32,13 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static lombok.AccessLevel.PACKAGE;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class FishingLocationLegalityChecker {
+public class FishingLocationLegalityChecker implements Predicate<Int2D> {
 
     private final Regulations<Vessel> regulations;
     private final GridPathFinder pathFinder;
@@ -46,16 +46,15 @@ public class FishingLocationLegalityChecker {
     private final Supplier<LocalDateTime> currenDateTimeSupplier;
     private final Vessel vessel;
 
+    @Override
     public boolean test(
-        final Int2D fishingLocation,
-        final Gear gear
+        final Int2D fishingLocation
     ) {
-        return regulations.isPermitted(makeAction(fishingLocation, gear));
+        return regulations.isPermitted(makeAction(fishingLocation));
     }
 
     private FishingAction makeAction(
-        final Int2D fishingLocation,
-        final Gear gear
+        final Int2D fishingLocation
     ) {
         final List<Int2D> pathToFishingLocation =
             pathFinder.getPath(

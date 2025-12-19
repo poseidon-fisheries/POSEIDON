@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.core.predicates;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,10 +40,9 @@ class AlwaysTrueFactoryTest {
     void newInstance_shouldReturnNonNullAlwaysTrueInstance() {
         // Arrange
         final AlwaysTrueFactory factory = new AlwaysTrueFactory();
-        final Simulation simulation = new Simulation();
 
         // Act
-        final AlwaysTrue result = factory.newInstance(simulation);
+        final AlwaysTrue result = factory.newInstance();
 
         // Assert
         assertNotNull(result, "newInstance should return a non-null AlwaysTrue instance");

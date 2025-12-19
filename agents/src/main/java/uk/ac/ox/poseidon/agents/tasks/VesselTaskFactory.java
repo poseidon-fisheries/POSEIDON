@@ -22,14 +22,18 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
+import com.badlogic.gdx.ai.btree.Task;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
 @SuperBuilder
-public abstract class VesselTaskFactory<T extends AgentTask<Vessel>>
+@NoArgsConstructor
+public abstract class VesselTaskFactory<T extends Task<Vessel>>
     extends TaskFactory<Vessel, VesselScope, T> {
-    protected VesselTaskFactory() {
-        super(VesselScope.class);
+    public VesselTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> guard) {
+        super(guard);
     }
 }

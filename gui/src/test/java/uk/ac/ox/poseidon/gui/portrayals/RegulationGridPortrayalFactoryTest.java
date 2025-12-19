@@ -25,15 +25,13 @@ package uk.ac.ox.poseidon.gui.portrayals;
 import org.junit.jupiter.api.Test;
 import sim.field.grid.DoubleGrid2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
+import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.regulations.Regulations;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -51,41 +49,38 @@ class RegulationGridPortrayalFactoryTest {
     @Test
     void testNewInstance_CreatesNonNullPortrayal() {
         // Arrange
-        final Simulation mockSimulation = mock(Simulation.class);
-        final TemporalSchedule mockSchedule = mock(TemporalSchedule.class);
-        when(mockSimulation.getTemporalSchedule()).thenReturn(mockSchedule);
-
+        final SimulationScope scope = mock(SimulationScope.class);
         final Regulations<Vessel> mockRegulations = mock(Regulations.class);
-        final List<Vessel> mockVessels = mock(List.class);
+        final VesselField mockVesselField = mock(VesselField.class);
         final BathymetricGrid mockBathymetricGrid = mock(BathymetricGrid.class);
 
-        final Factory<Regulations<Vessel>> regulationsFactory = mock(Factory.class);
-        when(regulationsFactory.get(mockSimulation)).thenReturn(mockRegulations);
+        final Factory<SimulationScope, Regulations<Vessel>> regulationsFactory =
+            mock(Factory.class);
+        when(regulationsFactory.get(scope)).thenReturn(mockRegulations);
 
-        final Factory<List<Vessel>> vesselsFactory = mock(Factory.class);
-        when(vesselsFactory.get(mockSimulation)).thenReturn(mockVessels);
+        final Factory<SimulationScope, VesselField> vesselsFactory = mock(Factory.class);
+        when(vesselsFactory.get(scope)).thenReturn(mockVesselField);
 
         final DoubleGrid2D mockField = new DoubleGrid2D(10, 20);
         when(mockBathymetricGrid.getField()).thenReturn(mockField);
 
-        final Factory<BathymetricGrid> bathymetricFactory = mock(Factory.class);
-        when(bathymetricFactory.get(mockSimulation)).thenReturn(mockBathymetricGrid);
+        final Factory<SimulationScope, BathymetricGrid> bathymetricFactory = mock(Factory.class);
+        when(bathymetricFactory.get(scope)).thenReturn(mockBathymetricGrid);
 
-        final Factory<Gear> gearFactory = mock(Factory.class);
+        final Factory<SimulationScope, Gear> gearFactory = mock(Factory.class);
         final Gear mockGear = mock(Gear.class);
-        when(gearFactory.get(mockSimulation)).thenReturn(mockGear);
+        when(gearFactory.get(scope)).thenReturn(mockGear);
 
         final RegulationGridPortrayalFactory factory = new RegulationGridPortrayalFactory(
             regulationsFactory,
             vesselsFactory,
             bathymetricFactory,
-            gearFactory,
             800,
             600
         );
 
         // Act
-        final ObjectGridPortrayal2D portrayal = factory.newInstance(mockSimulation);
+        final ObjectGridPortrayal2D portrayal = factory.newInstance(scope);
 
         // Assert
         assertNotNull(portrayal, "The newInstance method should return a non-null instance.");

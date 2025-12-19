@@ -27,10 +27,10 @@ import com.badlogic.gdx.ai.btree.Task;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.List;
 
@@ -39,30 +39,27 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends TaskFactory<T> {
+public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends VesselTaskFactory<T> {
 
     @Singular
     @SuppressFBWarnings(value = "EI_EXPOSE_REP")
-    private List<? extends VesselScopeFactory<? extends Task<Vessel>>> children;
+    private List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children;
 
     public BranchTaskFactory(
-        final VesselScopeFactory<? extends Task<Vessel>> guard,
-        final List<? extends VesselScopeFactory<? extends Task<Vessel>>> children
+        final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
+        final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
     ) {
         super(guard);
         this.children = children;
     }
 
     @Override
-    protected T newInstance(
-        final Simulation simulation,
-        final Vessel object
-    ) {
-        final T task = super.newInstance(simulation, object);
+    protected T newTask(final VesselScope scope) {
+        final T task = super.newInstance(scope);
         if (children != null) {
             this.children
                 .stream()
-                .map(t -> t.get(simulation, object))
+                .map(t -> t.get(scope))
                 .forEach(task::addChild);
         }
         return task;

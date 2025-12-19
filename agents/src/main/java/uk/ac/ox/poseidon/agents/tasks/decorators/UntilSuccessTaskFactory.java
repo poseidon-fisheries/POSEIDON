@@ -27,29 +27,26 @@ import com.badlogic.gdx.ai.btree.decorator.UntilSuccess;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
 @NoArgsConstructor
 @SuperBuilder
 public class UntilSuccessTaskFactory extends DecoratorTaskFactory<UntilSuccess<Vessel>> {
 
-    public UntilSuccessTaskFactory(final VesselScopeFactory<? extends Task<Vessel>> child) {
+    public UntilSuccessTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> child) {
         super(child);
     }
 
     public UntilSuccessTaskFactory(
-        final VesselScopeFactory<? extends Task<Vessel>> guard,
-        final VesselScopeFactory<? extends Task<Vessel>> child
+        final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
+        final Factory<? super VesselScope, ? extends Task<Vessel>> child
     ) {
         super(guard, child);
     }
 
     @Override
-    protected UntilSuccess<Vessel> newTask(
-        final Simulation simulation,
-        final Vessel vessel
-    ) {
+    protected UntilSuccess<Vessel> newTask(final VesselScope scope) {
         return new UntilSuccess<>();
     }
 }

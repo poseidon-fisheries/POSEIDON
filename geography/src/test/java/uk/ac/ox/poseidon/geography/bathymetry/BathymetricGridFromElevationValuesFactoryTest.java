@@ -52,7 +52,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
     void elevationsValuesMustNotBeNull() {
         assertThrows(
             NullPointerException.class,
-            () -> factory.newInstance(simulation)
+            factory::get
         );
     }
 
@@ -65,7 +65,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
                 factory.setElevationValues(List.of(0.0, 0.0, 0.0));
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> factory.newInstance(simulation)
+                    factory::get
                 );
             });
     }
@@ -73,7 +73,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
     @Test
     void correctNumberOfElevationValuesSucceeds() {
         factory.setElevationValues(List.of(0.0, 0.0, 0.0, 0.0));
-        factory.newInstance(simulation);
+        factory.get();
     }
 
     @Test
@@ -82,7 +82,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
             0.0, 1.0,
             2.0, 3.0
         ));
-        final BathymetricGrid bathymetricGrid = factory.newInstance(simulation);
+        final BathymetricGrid bathymetricGrid = factory.get();
         assertEquals(0.0, bathymetricGrid.getElevation(new Int2D(0, 0)));
         assertEquals(1.0, bathymetricGrid.getElevation(new Int2D(1, 0)));
         assertEquals(2.0, bathymetricGrid.getElevation(new Int2D(0, 1)));

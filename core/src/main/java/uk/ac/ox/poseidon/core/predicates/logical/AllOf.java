@@ -51,4 +51,5 @@ public class AllOf<T> implements Predicate<T> {
         }
         return true;
     }
+
 }
