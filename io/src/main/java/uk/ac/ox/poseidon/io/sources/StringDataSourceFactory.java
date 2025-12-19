@@ -27,19 +27,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StringDataSourceFactory extends GlobalScopeFactory<StringDataSource> {
+public class StringDataSourceFactory extends AbstractFactory<Scope, StringDataSource> {
 
     private String data;
 
     @Override
-    protected StringDataSource newInstance() {
+    protected StringDataSource newInstance(final Scope scope) {
         return new StringDataSource(data);
     }
 

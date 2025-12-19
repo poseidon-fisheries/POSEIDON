@@ -29,8 +29,8 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
+import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.io.paths.PathFactory;
 import uk.ac.ox.poseidon.io.sources.DataSource;
@@ -45,34 +45,34 @@ import java.nio.file.Path;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CsvTableFactory extends GlobalScopeFactory<Table> {
+public class CsvTableFactory<S extends Scope> extends AbstractFactory<S, Table> {
 
-    public static CsvTableFactory fromString(final String data) {
-        return new CsvTableFactory(new StringDataSourceFactory(data));
+    private Factory<? super S, ? extends DataSource> dataSource;
+
+    public static CsvTableFactory<Scope> fromString(final String data) {
+        return new CsvTableFactory<>(new StringDataSourceFactory(data));
     }
 
-    public static CsvTableFactory fromFile(
-        final Factory<Scope, ? extends Path> pathFactory
+    public static <S extends Scope> CsvTableFactory<S> fromFile(
+        final Factory<S, ? extends Path> pathFactory
     ) {
-        return new CsvTableFactory(new FileDataSourceFactory(pathFactory));
+        return new CsvTableFactory<>(new FileDataSourceFactory<>(pathFactory));
     }
 
-    public static CsvTableFactory fromFile(
+    public static CsvTableFactory<Scope> fromFile(
         final String first,
         final String... more
     ) {
         return fromFile(PathFactory.of(first, more));
     }
 
-    public static CsvTableFactory fromFile(final Path path) {
+    public static CsvTableFactory<Scope> fromFile(final Path path) {
         return fromFile(PathFactory.of(path));
     }
 
-    private GlobalScopeFactory<? extends DataSource> dataSource;
-
     @Override
-    protected Table newInstance() {
-        final Reader reader = dataSource.get().getReader();
+    protected Table newInstance(final S scope) {
+        final Reader reader = dataSource.get(scope).getReader();
         return Table
             .read()
             .usingOptions(CsvReadOptions.builder(reader).sample(false));

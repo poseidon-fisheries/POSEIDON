@@ -27,19 +27,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogisticGrowthRuleFactory extends GlobalScopeFactory<LogisticGrowthRule> {
+public class LogisticGrowthRuleFactory extends AbstractFactory<Scope, LogisticGrowthRule> {
 
     private double growthRate;
 
     @Override
-    protected LogisticGrowthRule newInstance() {
+    protected LogisticGrowthRule newInstance(final Scope scope) {
         return new LogisticGrowthRule(growthRate);
     }
 

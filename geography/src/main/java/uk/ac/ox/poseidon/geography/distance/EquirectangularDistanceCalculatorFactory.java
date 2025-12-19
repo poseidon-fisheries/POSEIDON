@@ -27,7 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 @Getter
@@ -35,12 +37,13 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EquirectangularDistanceCalculatorFactory extends GlobalScopeFactory<EquirectangularDistanceCalculator> {
+public class EquirectangularDistanceCalculatorFactory<S extends Scope>
+    extends AbstractFactory<S, EquirectangularDistanceCalculator> {
 
-    private GlobalScopeFactory<? extends ModelGrid> modelGrid;
+    private Factory<? super S, ? extends ModelGrid> modelGrid;
 
     @Override
-    protected EquirectangularDistanceCalculator newInstance() {
-        return new EquirectangularDistanceCalculator(modelGrid.get());
+    protected EquirectangularDistanceCalculator newInstance(final S scope) {
+        return new EquirectangularDistanceCalculator(modelGrid.get(scope));
     }
 }

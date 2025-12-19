@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.predicates.numeric;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -43,7 +44,7 @@ class BelowFactoryTest {
         final BelowFactory factory = new BelowFactory(threshold);
 
         // Act
-        final Below result = factory.newInstance();
+        final Below result = factory.newInstance(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertNotNull(result, "The result should not be null");
@@ -60,7 +61,7 @@ class BelowFactoryTest {
         final BelowFactory factory = new BelowFactory(threshold);
 
         // Act
-        final Below result = factory.newInstance();
+        final Below result = factory.newInstance(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertNotNull(result, "The result should not be null");
@@ -77,7 +78,7 @@ class BelowFactoryTest {
         final BelowFactory factory = new BelowFactory(threshold);
 
         // Act
-        final Below result = factory.newInstance();
+        final Below result = factory.newInstance(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertNotNull(result, "The result should not be null");

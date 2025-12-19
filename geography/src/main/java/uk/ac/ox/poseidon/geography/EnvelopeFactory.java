@@ -27,14 +27,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EnvelopeFactory extends GlobalScopeFactory<Envelope> {
+public class EnvelopeFactory extends AbstractFactory<Scope, Envelope> {
 
     private double minX;
     private double maxX;
@@ -42,7 +43,7 @@ public class EnvelopeFactory extends GlobalScopeFactory<Envelope> {
     private double maxY;
 
     @Override
-    protected Envelope newInstance() {
+    protected Envelope newInstance(final Scope scope) {
         return new Envelope(minX, maxX, minY, maxY);
     }
 }

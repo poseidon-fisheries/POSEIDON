@@ -27,31 +27,31 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.io.File;
-
-import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModelGridWithActiveCellsFromGridFile
-    extends GlobalScopeFactory<ModelGrid> {
+public class ModelGridWithActiveCellsFromGridFile<S extends Scope>
+    extends AbstractFactory<S, ModelGrid> {
 
-    CellSetFromGridFileFactory cellSetFromGridFile;
+    CellSetFromGridFileFactory<? super S> cellSetFromGridFile;
 
     @Override
-    protected ModelGrid newInstance() {
-        final File gridFile = cellSetFromGridFile.getPath().get(GLOBAL_SCOPE).toFile();
+    protected ModelGrid newInstance(final S scope) {
+        // FIXME: relying on cellSetFromGridFile.getPath() feels very hackish.
+        final File gridFile = cellSetFromGridFile.getPath().get(scope).toFile();
         final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
         return ModelGrid.withActiveCells(
             coverageWrapper.getGridWidth(),
             coverageWrapper.getGridHeight(),
             coverageWrapper.makeEnvelope(),
-            cellSetFromGridFile.get()
+            cellSetFromGridFile.get(scope)
         );
     }
 

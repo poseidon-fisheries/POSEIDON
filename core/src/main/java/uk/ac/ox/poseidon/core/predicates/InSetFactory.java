@@ -28,7 +28,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.util.Collection;
@@ -38,9 +40,9 @@ import java.util.Collection;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InSetFactory<T> extends GlobalScopeFactory<InSet<T>> {
+public class InSetFactory<T, S extends Scope> extends AbstractFactory<S, InSet<T>> {
 
-    private GlobalScopeFactory<? extends Collection<? extends T>> values;
+    private Factory<? super S, ? extends Collection<? extends T>> values;
 
     @SafeVarargs
     public InSetFactory(final T... values) {
@@ -48,7 +50,7 @@ public class InSetFactory<T> extends GlobalScopeFactory<InSet<T>> {
     }
 
     @Override
-    protected InSet<T> newInstance() {
-        return new InSet<>(values.get());
+    protected InSet<T> newInstance(final S scope) {
+        return new InSet<>(values.get(scope));
     }
 }

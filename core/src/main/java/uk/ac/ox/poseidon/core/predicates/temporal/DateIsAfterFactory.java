@@ -27,7 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDate;
 
@@ -36,11 +38,13 @@ import java.time.LocalDate;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DateIsAfterFactory extends GlobalScopeFactory<DateIsAfter> {
-    private GlobalScopeFactory<? extends LocalDate> referenceDate;
+public class DateIsAfterFactory<S extends Scope> extends AbstractFactory<S, DateIsAfter> {
+
+    private Factory<? super S, ? extends LocalDate> referenceDate;
 
     @Override
-    protected DateIsAfter newInstance() {
-        return new DateIsAfter(referenceDate.get());
+    protected DateIsAfter newInstance(final S scope) {
+        return new DateIsAfter(referenceDate.get(scope));
     }
+    
 }

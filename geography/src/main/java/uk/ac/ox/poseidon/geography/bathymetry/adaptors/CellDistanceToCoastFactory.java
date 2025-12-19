@@ -26,7 +26,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
@@ -34,16 +36,17 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CellDistanceToCoastFactory extends GlobalScopeFactory<CellDistanceToCoast> {
+public class CellDistanceToCoastFactory<S extends Scope>
+    extends AbstractFactory<S, CellDistanceToCoast> {
 
-    private GlobalScopeFactory<? extends BathymetricGrid> bathymetricGrid;
-    private GlobalScopeFactory<? extends DistanceCalculator> distanceCalculator;
+    private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? super S, ? extends DistanceCalculator> distanceCalculator;
 
     @Override
-    protected CellDistanceToCoast newInstance() {
+    protected CellDistanceToCoast newInstance(final S scope) {
         return new CellDistanceToCoast(
-            bathymetricGrid.get(),
-            distanceCalculator.get()
+            bathymetricGrid.get(scope),
+            distanceCalculator.get(scope)
         );
     }
 }

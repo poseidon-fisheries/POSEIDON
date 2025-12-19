@@ -27,19 +27,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InactiveGearFactory extends GlobalScopeFactory<InactiveGear> {
+public class InactiveGearFactory extends AbstractFactory<Scope, InactiveGear> {
 
     private String code;
 
     @Override
-    protected InactiveGear newInstance() {
+    protected InactiveGear newInstance(final Scope scope) {
         return new InactiveGear(code);
     }
 

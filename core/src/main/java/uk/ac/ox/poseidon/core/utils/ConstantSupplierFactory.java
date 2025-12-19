@@ -27,7 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Supplier;
 
@@ -36,12 +38,12 @@ import java.util.function.Supplier;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ConstantSupplierFactory<T> extends GlobalScopeFactory<Supplier<T>> {
+public class ConstantSupplierFactory<S extends Scope, T> extends AbstractFactory<S, Supplier<T>> {
 
-    GlobalScopeFactory<? extends T> object;
+    Factory<? super S, ? extends T> object;
 
     @Override
-    protected Supplier<T> newInstance() {
-        return () -> object.get();
+    protected Supplier<T> newInstance(final S scope) {
+        return () -> object.get(scope);
     }
 }

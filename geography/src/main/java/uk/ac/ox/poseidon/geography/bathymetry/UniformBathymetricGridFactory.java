@@ -24,7 +24,9 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 @Getter
@@ -32,13 +34,14 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UniformBathymetricGridFactory extends GlobalScopeFactory<BathymetricGrid> {
+public class UniformBathymetricGridFactory<S extends Scope>
+    extends AbstractFactory<S, BathymetricGrid> {
 
-    @NonNull private GlobalScopeFactory<? extends ModelGrid> modelGrid;
+    @NonNull private Factory<? super S, ? extends ModelGrid> modelGrid;
     private double depth;
 
     @Override
-    protected BathymetricGrid newInstance() {
-        return new DefaultBathymetricGrid(modelGrid.get(), depth);
+    protected BathymetricGrid newInstance(final S scope) {
+        return new DefaultBathymetricGrid(modelGrid.get(scope), depth);
     }
 }

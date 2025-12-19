@@ -22,11 +22,12 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-public class MaxFactory extends GlobalScopeFactory<Max> {
+public class MaxFactory extends AbstractFactory<Scope, Max> {
     @Override
-    protected Max newInstance() {
+    protected Max newInstance(final Scope scope) {
         return new Max();
     }
 }

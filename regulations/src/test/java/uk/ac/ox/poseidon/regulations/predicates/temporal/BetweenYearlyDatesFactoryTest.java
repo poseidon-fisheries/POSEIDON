@@ -23,8 +23,8 @@
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.time.MonthDayFactory;
 
 import java.time.MonthDay;
@@ -56,13 +56,13 @@ class BetweenYearlyDatesFactoryTest {
         when(startFactory.get()).thenReturn(startDate);
         when(endFactory.get()).thenReturn(endDate);
 
-        final BetweenYearlyDatesFactory factory = new BetweenYearlyDatesFactory(
+        final BetweenYearlyDatesFactory<Scope> factory = new BetweenYearlyDatesFactory<>(
             startFactory,
             endFactory
         );
 
         // Act
-        final BetweenYearlyDates result = factory.get();
+        final BetweenYearlyDates result = factory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertEquals(startDate, result.getStart());
@@ -82,13 +82,13 @@ class BetweenYearlyDatesFactoryTest {
         when(startFactory.get()).thenReturn(startDate);
         when(endFactory.get()).thenReturn(endDate);
 
-        final BetweenYearlyDatesFactory factory = new BetweenYearlyDatesFactory(
+        final BetweenYearlyDatesFactory<Scope> factory = new BetweenYearlyDatesFactory<>(
             startFactory,
             endFactory
         );
 
         // Act
-        final BetweenYearlyDates result = factory.get();
+        final BetweenYearlyDates result = factory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertEquals(startDate, result.getStart());
@@ -107,13 +107,13 @@ class BetweenYearlyDatesFactoryTest {
         when(startFactory.get()).thenReturn(sameDate);
         when(endFactory.get()).thenReturn(sameDate);
 
-        final BetweenYearlyDatesFactory factory = new BetweenYearlyDatesFactory(
+        final BetweenYearlyDatesFactory<Scope> factory = new BetweenYearlyDatesFactory<>(
             startFactory,
             endFactory
         );
 
         // Act
-        final BetweenYearlyDates result = factory.get();
+        final BetweenYearlyDates result = factory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertEquals(sameDate, result.getStart());
@@ -134,8 +134,8 @@ class BetweenYearlyDatesFactoryTest {
         assertInstanceOf(MonthDayFactory.class, factory.getStart());
         assertInstanceOf(MonthDayFactory.class, factory.getEnd());
         final Simulation simulation = mock(Simulation.class);
-        final MonthDay startDate = ((MonthDayFactory) factory.getStart()).get();
-        final MonthDay endDate = ((MonthDayFactory) factory.getEnd()).get();
+        final MonthDay startDate = ((MonthDayFactory) factory.getStart()).get(Scope.GLOBAL_SCOPE);
+        final MonthDay endDate = ((MonthDayFactory) factory.getEnd()).get(Scope.GLOBAL_SCOPE);
 
         assertEquals(MonthDay.parse(start), startDate);
         assertEquals(MonthDay.parse(end), endDate);

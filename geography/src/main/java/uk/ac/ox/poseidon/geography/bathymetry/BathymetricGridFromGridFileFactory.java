@@ -32,7 +32,6 @@ import org.geotools.api.referencing.operation.MathTransform2D;
 import org.geotools.api.referencing.operation.TransformException;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -45,20 +44,19 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
-import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
-
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class BathymetricGridFromGridFileFactory extends BathymetricGridFactory {
+public class BathymetricGridFromGridFileFactory<S extends Scope>
+    extends BathymetricGridFactory<S> {
 
-    private Factory<Scope, ? extends Path> path;
+    private Factory<? super S, ? extends Path> path;
 
     public BathymetricGridFromGridFileFactory(
-        final Factory<Scope, ? extends Path> path,
-        final GlobalScopeFactory<? extends ModelGrid> modelGrid,
-        final GlobalScopeFactory<? extends Aggregator> aggregator,
+        final Factory<? super S, ? extends Path> path,
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends Aggregator> aggregator,
         final boolean inverted
     ) {
         super(modelGrid, aggregator, inverted);
@@ -67,9 +65,10 @@ public class BathymetricGridFromGridFileFactory extends BathymetricGridFactory {
 
     @Override
     protected Map<Int2D, Collection<Double>> readElevationValues(
-        final ModelGrid modelGrid
+        final ModelGrid modelGrid,
+        final S scope
     ) {
-        final File gridFile = path.get(GLOBAL_SCOPE).toFile();
+        final File gridFile = path.get(scope).toFile();
         final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
         final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
         final MathTransform2D gridToCRS2D =

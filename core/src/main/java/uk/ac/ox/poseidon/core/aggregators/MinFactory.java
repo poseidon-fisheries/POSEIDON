@@ -23,12 +23,13 @@
 package uk.ac.ox.poseidon.core.aggregators;
 
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @SuperBuilder
-public class MinFactory extends GlobalScopeFactory<Min> {
+public class MinFactory extends AbstractFactory<Scope, Min> {
     @Override
-    protected Min newInstance() {
+    protected Min newInstance(final Scope scope) {
         return new Min();
     }
 }

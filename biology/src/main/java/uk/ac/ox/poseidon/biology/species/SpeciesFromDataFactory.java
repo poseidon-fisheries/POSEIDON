@@ -28,7 +28,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
@@ -37,16 +39,17 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SpeciesFromDataFactory extends GlobalScopeFactory<List<Species>> {
+public class SpeciesFromDataFactory<S extends Scope>
+    extends AbstractFactory<S, List<Species>> {
 
-    private GlobalScopeFactory<? extends Table> data;
+    private Factory<? super S, ? extends Table> data;
     private String speciesCodeColumn;
     private String speciesNameColumn;
     private String lifeStageColumn;
 
     @Override
-    protected List<Species> newInstance() {
-        return data.get()
+    protected List<Species> newInstance(final S scope) {
+        return data.get(scope)
             .stream()
             .map(row ->
                 new Species(

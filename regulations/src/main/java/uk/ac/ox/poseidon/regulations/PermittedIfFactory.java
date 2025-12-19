@@ -22,30 +22,26 @@
 
 package uk.ac.ox.poseidon.regulations;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import lombok.*;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Predicate;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PermittedIfFactory<A> extends GlobalScopeFactory<PermittedIf<A>> {
+public class PermittedIfFactory<S extends Scope, A>
+    extends AbstractFactory<S, PermittedIf<A>> {
 
-    @NonNull private GlobalScopeFactory<? extends Predicate<? super Action<? super A>>>
+    @NonNull private Factory<? super S, ? extends Predicate<? super Action<? super A>>>
         actionPredicate;
 
     @Override
-    protected PermittedIf<A> newInstance() {
-        return new PermittedIf<>(actionPredicate.get());
+    protected PermittedIf<A> newInstance(final S scope) {
+        return new PermittedIf<>(actionPredicate.get(scope));
     }
 
-    public void setActionPredicate(
-        @NonNull final GlobalScopeFactory<? extends Predicate<Action<? super A>>> actionPredicate
-    ) {
-        this.actionPredicate = actionPredicate;
-    }
 }

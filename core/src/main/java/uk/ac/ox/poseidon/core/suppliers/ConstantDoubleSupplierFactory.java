@@ -27,19 +27,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConstantDoubleSupplierFactory extends GlobalScopeFactory<ConstantDoubleSupplier> {
+public class ConstantDoubleSupplierFactory
+    extends AbstractFactory<Scope, ConstantDoubleSupplier> {
 
     private double value;
 
     @Override
-    protected ConstantDoubleSupplier newInstance() {
+    protected ConstantDoubleSupplier newInstance(final Scope scope) {
         return new ConstantDoubleSupplier(value);
     }
 

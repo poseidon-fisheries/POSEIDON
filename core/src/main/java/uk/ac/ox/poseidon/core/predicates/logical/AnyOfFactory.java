@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
@@ -41,11 +41,11 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 public class AnyOfFactory<S extends Scope, T> extends AbstractFactory<S, AnyOf<T>> {
 
-    List<GlobalScopeFactory<? extends Predicate<? super T>>> predicates;
+    List<Factory<? super S, ? extends Predicate<? super T>>> predicates;
 
     @SafeVarargs
     @SuppressWarnings("varargs")
-    public AnyOfFactory(final GlobalScopeFactory<? extends Predicate<? super T>>... predicates) {
+    public AnyOfFactory(final Factory<? super S, ? extends Predicate<? super T>>... predicates) {
         this(List.of(predicates));
     }
 
@@ -54,7 +54,7 @@ public class AnyOfFactory<S extends Scope, T> extends AbstractFactory<S, AnyOf<T
         return new AnyOf<>(
             predicates
                 .stream()
-                .map(GlobalScopeFactory::get)
+                .map(f -> f.get(scope))
                 .toList()
         );
     }

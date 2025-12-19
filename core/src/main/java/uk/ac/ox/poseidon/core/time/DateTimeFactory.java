@@ -24,7 +24,8 @@ package uk.ac.ox.poseidon.core.time;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,13 +35,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class DateTimeFactory extends GlobalScopeFactory<LocalDateTime> {
+public class DateTimeFactory extends AbstractFactory<Scope, LocalDateTime> {
 
     @Builder.Default private Integer year = LocalDate.now().getYear();
     @Builder.Default private Integer month = LocalDate.now().getMonthValue();
     @Builder.Default private Integer day = LocalDate.now().getDayOfMonth();
 
-    protected LocalDateTime newInstance() {
+    protected LocalDateTime newInstance(final Scope scope) {
         return LocalDate.of(year, month, day).atStartOfDay();
     }
 

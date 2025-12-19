@@ -25,8 +25,10 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.Collection;
@@ -37,16 +39,21 @@ import java.util.Map;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class BathymetricGridFactory extends GlobalScopeFactory<BathymetricGrid> {
-    @NonNull private GlobalScopeFactory<? extends ModelGrid> modelGrid;
-    @NonNull private GlobalScopeFactory<? extends Aggregator> aggregator;
+public abstract class BathymetricGridFactory<S extends Scope>
+    extends AbstractFactory<S, BathymetricGrid> {
+
+    @NonNull private Factory<? super S, ? extends ModelGrid> modelGrid;
+    @NonNull private Factory<? super S, ? extends Aggregator> aggregator;
     @Builder.Default private boolean inverted = false;
 
     @Override
-    protected BathymetricGrid newInstance() {
-        final ModelGrid modelGrid = this.modelGrid.get();
-        final Aggregator aggregator = this.aggregator.get();
-        final Map<Int2D, Collection<Double>> elevationValues = readElevationValues(modelGrid);
+    protected BathymetricGrid newInstance(final S scope) {
+        final ModelGrid modelGrid = this.modelGrid.get(scope);
+        final Aggregator aggregator = this.aggregator.get(scope);
+        final Map<Int2D, Collection<Double>> elevationValues = readElevationValues(
+            modelGrid,
+            scope
+        );
         final double[][] array = modelGrid.makeDoubleArray();
         modelGrid.getAllCells().forEach(int2D ->
             array[int2D.x][int2D.y] = aggregator.apply(elevationValues.get(int2D)).orElse(0)
@@ -55,6 +62,7 @@ public abstract class BathymetricGridFactory extends GlobalScopeFactory<Bathymet
     }
 
     protected abstract Map<Int2D, Collection<Double>> readElevationValues(
-        ModelGrid modelGrid
+        ModelGrid modelGrid,
+        S scope
     );
 }

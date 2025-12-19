@@ -25,8 +25,8 @@ package uk.ac.ox.poseidon.geography.predicates;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -50,11 +50,11 @@ class InRectangularAreaPredicateFactoryTest {
 
         when(mockFactory.get()).thenReturn(mockEnvelope);
 
-        final InRectangularAreaPredicateFactory factory = new InRectangularAreaPredicateFactory(
-            mockFactory);
+        final InRectangularAreaPredicateFactory<Scope> factory =
+            new InRectangularAreaPredicateFactory<>(mockFactory);
 
         // Act
-        final InRectangularAreaPredicate predicate = factory.get();
+        final InRectangularAreaPredicate predicate = factory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertNotNull(predicate, "The newInstance method should return a non-null predicate.");

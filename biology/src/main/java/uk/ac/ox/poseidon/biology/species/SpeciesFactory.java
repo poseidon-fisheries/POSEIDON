@@ -27,7 +27,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SpeciesFactory extends GlobalScopeFactory<Species> {
+public class SpeciesFactory extends AbstractFactory<Scope, Species> {
 
     private static final String PREFIX = "Species";
 
@@ -49,7 +50,7 @@ public class SpeciesFactory extends GlobalScopeFactory<Species> {
     }
 
     @Override
-    protected Species newInstance() {
+    protected Species newInstance(final Scope scope) {
         return new Species(
             checkNotNull(code),
             name != null ? name : PREFIX + " " + code,

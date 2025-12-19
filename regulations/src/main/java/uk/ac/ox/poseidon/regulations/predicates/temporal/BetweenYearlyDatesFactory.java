@@ -27,7 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.time.MonthDayFactory;
 
 import java.time.MonthDay;
@@ -37,26 +39,27 @@ import java.time.MonthDay;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BetweenYearlyDatesFactory extends GlobalScopeFactory<BetweenYearlyDates> {
+public class BetweenYearlyDatesFactory<S extends Scope>
+    extends AbstractFactory<S, BetweenYearlyDates> {
 
-    private GlobalScopeFactory<? extends MonthDay> start;
-    private GlobalScopeFactory<? extends MonthDay> end;
+    private Factory<? super S, ? extends MonthDay> start;
+    private Factory<? super S, ? extends MonthDay> end;
 
-    public static BetweenYearlyDatesFactory parse(
+    public static BetweenYearlyDatesFactory<Scope> parse(
         final CharSequence start,
         final CharSequence end
     ) {
-        return new BetweenYearlyDatesFactory(
+        return new BetweenYearlyDatesFactory<>(
             MonthDayFactory.parse(start),
             MonthDayFactory.parse(end)
         );
     }
 
     @Override
-    protected BetweenYearlyDates newInstance() {
+    protected BetweenYearlyDates newInstance(final S scope) {
         return new BetweenYearlyDates(
-            start.get(),
-            end.get()
+            start.get(scope),
+            end.get(scope)
         );
     }
 }

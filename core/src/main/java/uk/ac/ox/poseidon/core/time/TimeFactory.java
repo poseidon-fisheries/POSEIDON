@@ -27,7 +27,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalTime;
 
@@ -36,14 +37,14 @@ import java.time.LocalTime;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TimeFactory extends GlobalScopeFactory<LocalTime> {
+public class TimeFactory extends AbstractFactory<Scope, LocalTime> {
 
     private int hour;
     private int minute;
     private int second;
 
     @Override
-    protected LocalTime newInstance() {
+    protected LocalTime newInstance(final Scope scope) {
         return LocalTime.of(hour, minute, second);
     }
 }

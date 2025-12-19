@@ -27,7 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.List;
@@ -40,14 +42,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BathymetricGridFromElevationValuesFactory extends GlobalScopeFactory<BathymetricGrid> {
+public class BathymetricGridFromElevationValuesFactory<S extends Scope>
+    extends AbstractFactory<S, BathymetricGrid> {
 
-    private GlobalScopeFactory<? extends ModelGrid> modelGrid;
+    private Factory<? super S, ? extends ModelGrid> modelGrid;
     private List<Number> elevationValues;
 
     @Override
-    protected BathymetricGrid newInstance() {
-        final ModelGrid modelGrid = checkNotNull(this.modelGrid).get();
+    protected BathymetricGrid newInstance(final S scope) {
+        final ModelGrid modelGrid = checkNotNull(this.modelGrid).get(scope);
         final List<Number> elevationValues = checkNotNull(this.elevationValues);
         final int height = modelGrid.getGridHeight();
         final int width = modelGrid.getGridWidth();

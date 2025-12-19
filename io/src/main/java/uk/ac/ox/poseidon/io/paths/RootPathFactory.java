@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.io.paths;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
@@ -34,7 +34,7 @@ import java.nio.file.Path;
 @Setter
 @NoArgsConstructor
 public class RootPathFactory
-    extends GlobalScopeFactory<Path>
+    extends AbstractFactory<Scope, Path>
     implements PathFactory<Scope> {
 
     public RootPathFactory(final String path) {
@@ -44,7 +44,7 @@ public class RootPathFactory
     private String path;
 
     @Override
-    protected Path newInstance() {
+    protected Path newInstance(final Scope scope) {
         return Path.of(path);
     }
 }

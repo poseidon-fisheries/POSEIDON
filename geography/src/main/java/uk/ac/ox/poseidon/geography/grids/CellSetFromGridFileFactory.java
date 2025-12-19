@@ -28,26 +28,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.io.File;
 import java.nio.file.Path;
 
-import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CellSetFromGridFileFactory extends GlobalScopeFactory<ImmutableSet<Int2D>> {
-    private Factory<Scope, ? extends Path> path;
+public class CellSetFromGridFileFactory<S extends Scope>
+    extends AbstractFactory<S, ImmutableSet<Int2D>> {
+
+    private Factory<? super S, ? extends Path> path;
     private double includedValue;
 
     @Override
-    protected ImmutableSet<Int2D> newInstance() {
-        final File gridFile = path.get(GLOBAL_SCOPE).toFile();
+    protected ImmutableSet<Int2D> newInstance(final S scope) {
+        final File gridFile = path.get(scope).toFile();
         if (!gridFile.isFile()) {
             throw new RuntimeException(gridFile + " does not point to a file.");
         }

@@ -28,7 +28,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -38,16 +40,17 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StringColumnReaderFactory extends GlobalScopeFactory<List<String>> {
+public class StringColumnReaderFactory<S extends Scope>
+    extends AbstractFactory<S, List<String>> {
 
-    private GlobalScopeFactory<? extends Path> path;
+    private Factory<? super S, ? extends Path> path;
     private String columnName;
 
     @Override
-    protected List<String> newInstance() {
+    protected List<String> newInstance(final S scope) {
         return Table
             .read()
-            .csv(path.get().toFile())
+            .csv(path.get(scope).toFile())
             .stream()
             .map(row -> row.getString(columnName))
             .toList();

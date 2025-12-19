@@ -28,7 +28,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.locationtech.jts.geom.Geometry;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.Collection;
 
@@ -37,12 +39,13 @@ import java.util.Collection;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InGeometriesFactory extends GlobalScopeFactory<InGeometries> {
+public class InGeometriesFactory<S extends Scope>
+    extends AbstractFactory<S, InGeometries> {
 
-    private GlobalScopeFactory<? extends Collection<? extends Geometry>> geometries;
+    private Factory<? super S, ? extends Collection<? extends Geometry>> geometries;
 
     @Override
-    protected InGeometries newInstance() {
-        return new InGeometries(geometries.get());
+    protected InGeometries newInstance(final S scope) {
+        return new InGeometries(geometries.get(scope));
     }
 }

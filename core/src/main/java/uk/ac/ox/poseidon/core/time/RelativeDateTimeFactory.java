@@ -24,7 +24,9 @@ package uk.ac.ox.poseidon.core.time;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
@@ -34,16 +36,17 @@ import java.time.temporal.TemporalAmount;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-abstract class RelativeDateTimeFactory extends GlobalScopeFactory<LocalDateTime> {
+abstract class RelativeDateTimeFactory<S extends Scope>
+    extends AbstractFactory<S, LocalDateTime> {
 
-    @NonNull private GlobalScopeFactory<? extends LocalDateTime> referenceDateTime;
-    @NonNull private GlobalScopeFactory<? extends TemporalAmount> temporalAmount;
+    @NonNull private Factory<? super S, ? extends LocalDateTime> referenceDateTime;
+    @NonNull private Factory<? super S, ? extends TemporalAmount> temporalAmount;
 
     @Override
-    protected LocalDateTime newInstance() {
+    protected LocalDateTime newInstance(final S scope) {
         return operation(
-            referenceDateTime.get(),
-            temporalAmount.get()
+            referenceDateTime.get(scope),
+            temporalAmount.get(scope)
         );
     }
 

@@ -23,13 +23,14 @@
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 public class TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory
-    extends GlobalScopeFactory<EvaluationProvider<Int2D>> {
+    extends AbstractFactory<Scope, EvaluationProvider<Int2D>> {
 
     @Override
-    protected EvaluationProvider<Int2D> newInstance() {
+    protected EvaluationProvider<Int2D> newInstance(final Scope scope) {
         return new TotalBiomassCaughtPerHourDestinationEvaluationProvider();
     }
 

@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.regulations;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Predicate;

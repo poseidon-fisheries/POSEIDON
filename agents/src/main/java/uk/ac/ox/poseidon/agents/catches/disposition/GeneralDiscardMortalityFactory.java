@@ -27,7 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.DoubleSupplier;
 
@@ -36,13 +38,13 @@ import java.util.function.DoubleSupplier;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GeneralDiscardMortalityFactory
-    extends GlobalScopeFactory<GeneralDiscardMortality> {
+public class GeneralDiscardMortalityFactory<S extends Scope>
+    extends AbstractFactory<S, GeneralDiscardMortality> {
 
-    private GlobalScopeFactory<? extends DoubleSupplier> mortalityRateSupplier;
+    private Factory<? super S, ? extends DoubleSupplier> mortalityRateSupplier;
 
     @Override
-    protected GeneralDiscardMortality newInstance() {
-        return new GeneralDiscardMortality(mortalityRateSupplier.get());
+    protected GeneralDiscardMortality newInstance(final S scope) {
+        return new GeneralDiscardMortality(mortalityRateSupplier.get(scope));
     }
 }

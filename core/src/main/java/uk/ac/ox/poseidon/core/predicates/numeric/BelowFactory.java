@@ -27,19 +27,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BelowFactory extends GlobalScopeFactory<Below> {
+public class BelowFactory extends AbstractFactory<Scope, Below> {
 
     private double threshold;
 
     @Override
-    protected Below newInstance() {
+    protected Below newInstance(final Scope scope) {
         return new Below(threshold);
     }
 }

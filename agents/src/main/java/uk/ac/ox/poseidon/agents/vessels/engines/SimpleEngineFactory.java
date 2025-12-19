@@ -27,7 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Speed;
@@ -37,13 +39,13 @@ import javax.measure.quantity.Speed;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SimpleEngineFactory extends GlobalScopeFactory<Engine> {
+public class SimpleEngineFactory<S extends Scope> extends AbstractFactory<S, Engine> {
 
-    private GlobalScopeFactory<? extends Quantity<Speed>> speed;
+    private Factory<? super S, ? extends Quantity<Speed>> speed;
 
     @Override
-    protected Engine newInstance() {
-        return new SimpleEngine(speed.get());
+    protected Engine newInstance(final S scope) {
+        return new SimpleEngine(speed.get(scope));
     }
-    
+
 }

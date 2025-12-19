@@ -27,7 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 @Getter
@@ -35,13 +37,14 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HaversineDistanceCalculatorFactory extends GlobalScopeFactory<HaversineDistanceCalculator> {
+public class HaversineDistanceCalculatorFactory<S extends Scope>
+    extends AbstractFactory<S, HaversineDistanceCalculator> {
 
-    private GlobalScopeFactory<? extends ModelGrid> modelGrid;
+    private Factory<? super S, ? extends ModelGrid> modelGrid;
 
     @Override
-    protected HaversineDistanceCalculator newInstance() {
-        return new HaversineDistanceCalculator(modelGrid.get());
+    protected HaversineDistanceCalculator newInstance(final S scope) {
+        return new HaversineDistanceCalculator(modelGrid.get(scope));
     }
 
 }

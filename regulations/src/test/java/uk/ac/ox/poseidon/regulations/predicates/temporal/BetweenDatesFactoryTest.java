@@ -24,8 +24,8 @@ package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDate;
 
@@ -60,13 +60,13 @@ class BetweenDatesFactoryTest {
         when(startDateFactory.get()).thenReturn(startDateStub);
         when(endDateFactory.get()).thenReturn(endDateStub);
 
-        final BetweenDatesFactory factory = new BetweenDatesFactory(
+        final BetweenDatesFactory<Scope> factory = new BetweenDatesFactory<>(
             startDateFactory,
             endDateFactory
         );
 
         // Act
-        final BetweenDates result = factory.get();
+        final BetweenDates result = factory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertEquals(
@@ -87,7 +87,6 @@ class BetweenDatesFactoryTest {
 
         final GlobalScopeFactory<LocalDate> startDateFactory = mock(GlobalScopeFactory.class);
         final GlobalScopeFactory<LocalDate> endDateFactory = mock(GlobalScopeFactory.class);
-        final Simulation mockSimulation = mock(Simulation.class);
 
         when(startDateFactory.get()).thenReturn(null);
         when(endDateFactory.get()).thenReturn(endDateStub);
@@ -98,7 +97,7 @@ class BetweenDatesFactoryTest {
         );
 
         // Act & Assert
-        assertThrows(NullPointerException.class, factory::get);
+        assertThrows(NullPointerException.class, () -> factory.get(Scope.GLOBAL_SCOPE));
 
     }
 
@@ -123,7 +122,7 @@ class BetweenDatesFactoryTest {
         );
 
         // Act & Assert
-        assertThrows(NullPointerException.class, factory::get);
+        assertThrows(NullPointerException.class, () -> factory.get(Scope.GLOBAL_SCOPE));
     }
 
     /**
@@ -145,7 +144,7 @@ class BetweenDatesFactoryTest {
         );
 
         // Act
-        factory.get();
+        factory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         Mockito.verify(startDateFactory).get();

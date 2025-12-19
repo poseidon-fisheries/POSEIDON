@@ -26,15 +26,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class AlwaysTrueFactory extends GlobalScopeFactory<AlwaysTrue> {
+public class AlwaysTrueFactory extends AbstractFactory<Scope, AlwaysTrue> {
     @Override
-    protected AlwaysTrue newInstance() {
+    protected AlwaysTrue newInstance(final Scope scope) {
         return new AlwaysTrue();
     }
 }

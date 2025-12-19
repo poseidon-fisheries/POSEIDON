@@ -27,19 +27,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CatchCategoryFactory extends GlobalScopeFactory<CatchCategory> {
+public class CatchCategoryFactory extends AbstractFactory<Scope, CatchCategory> {
 
     private String code;
 
     @Override
-    protected CatchCategory newInstance() {
+    protected CatchCategory newInstance(final Scope scope) {
         return new CatchCategory(code);
     }
 }

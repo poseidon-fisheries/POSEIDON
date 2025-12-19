@@ -23,12 +23,13 @@
 package uk.ac.ox.poseidon.core.aggregators;
 
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @SuperBuilder
-public class SumFactory extends GlobalScopeFactory<Sum> {
+public class SumFactory extends AbstractFactory<Scope, Sum> {
     @Override
-    protected Sum newInstance() {
+    protected Sum newInstance(final Scope scope) {
         return new Sum();
     }
 }

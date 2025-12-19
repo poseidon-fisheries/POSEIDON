@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -41,7 +42,7 @@ class InYearFactoryTest {
         final InYearFactory factory = new InYearFactory(year);
 
         // Act
-        final InYear result = factory.get();
+        final InYear result = factory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertEquals(year, result.getYear());

@@ -27,9 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -39,22 +39,28 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DefaultPathFinderFactory extends SimulationScopeFactory<GridPathFinder> {
+public class DefaultPathFinderFactory<S extends Scope>
+    extends AbstractFactory<S, GridPathFinder> {
 
     /* TODO: the DefaultPathFinderFactory currently needs to be SimulationScope because
         it relies on the port grid, which is currently also simulation-scope (because of
         random port locations, and also because we currently allow adding ports after the
         creation of the grid. This is not great because it prevents us from being to share
-        the cache from the AStarPathfinder accross simulation. I need to think about some
+        the cache from the AStarPathfinder across simulations. I need to think about some
         way of making an immutable port grid that can be shared across simulations, or
         to make the path finder not depend on the port grid at all.
+        ...
+        Update: I think that with the setup that we now have, this can be resolved statically:
+        If we pass a simulation scope port grid (like the random one), this will automatically
+        be simulation scope (as it should) but if we pass a global scope port grid, it can
+        be global scope and we get the caching.
      */
-    private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid;
-    private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
-    private Factory<? super SimulationScope, ? extends DistanceCalculator> distance;
+    private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? super S, ? extends PortGrid> portGrid;
+    private Factory<? super S, ? extends DistanceCalculator> distance;
 
     @Override
-    protected GridPathFinder newInstance(final SimulationScope scope) {
+    protected GridPathFinder newInstance(final S scope) {
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
         final PortGrid portGrid = this.portGrid.get(scope);
         return new CachingGridPathFinder(

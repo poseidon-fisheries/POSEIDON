@@ -27,7 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDate;
 
@@ -36,13 +38,13 @@ import java.time.LocalDate;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BetweenDatesFactory extends GlobalScopeFactory<BetweenDates> {
+public class BetweenDatesFactory<S extends Scope> extends AbstractFactory<S, BetweenDates> {
 
-    GlobalScopeFactory<? extends LocalDate> startDate;
-    GlobalScopeFactory<? extends LocalDate> endDate;
+    Factory<? super S, ? extends LocalDate> startDate;
+    Factory<? super S, ? extends LocalDate> endDate;
 
     @Override
-    protected BetweenDates newInstance() {
-        return new BetweenDates(startDate.get(), endDate.get());
+    protected BetweenDates newInstance(final S scope) {
+        return new BetweenDates(startDate.get(scope), endDate.get(scope));
     }
 }

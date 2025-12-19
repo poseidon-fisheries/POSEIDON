@@ -27,7 +27,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ListFactory<C> extends GlobalScopeFactory<List<C>> {
+public class ListFactory<C> extends AbstractFactory<Scope, List<C>> {
 
     private List<C> values;
 
@@ -46,7 +47,7 @@ public class ListFactory<C> extends GlobalScopeFactory<List<C>> {
     }
 
     @Override
-    protected List<C> newInstance() {
+    protected List<C> newInstance(final Scope scope) {
         return values;
     }
 }

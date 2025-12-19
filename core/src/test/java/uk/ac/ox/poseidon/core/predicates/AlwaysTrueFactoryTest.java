@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.predicates;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -42,7 +43,7 @@ class AlwaysTrueFactoryTest {
         final AlwaysTrueFactory factory = new AlwaysTrueFactory();
 
         // Act
-        final AlwaysTrue result = factory.newInstance();
+        final AlwaysTrue result = factory.newInstance(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertNotNull(result, "newInstance should return a non-null AlwaysTrue instance");

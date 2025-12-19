@@ -27,7 +27,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.BooleanSupplier;
 
@@ -36,7 +37,7 @@ import java.util.function.BooleanSupplier;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConstantBooleanSupplierFactory extends GlobalScopeFactory<BooleanSupplier> {
+public class ConstantBooleanSupplierFactory extends AbstractFactory<Scope, BooleanSupplier> {
 
     public static final ConstantBooleanSupplierFactory ALWAYS_TRUE =
         new ConstantBooleanSupplierFactory(true);
@@ -47,7 +48,7 @@ public class ConstantBooleanSupplierFactory extends GlobalScopeFactory<BooleanSu
     private boolean value;
 
     @Override
-    protected BooleanSupplier newInstance() {
+    protected BooleanSupplier newInstance(final Scope scope) {
         return () -> value;
     }
 }

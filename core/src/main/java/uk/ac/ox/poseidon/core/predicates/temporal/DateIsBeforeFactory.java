@@ -26,7 +26,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDate;
 
@@ -34,12 +36,12 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DateIsBeforeFactory extends GlobalScopeFactory<DateIsBefore> {
+public class DateIsBeforeFactory<S extends Scope> extends AbstractFactory<S, DateIsBefore> {
 
-    private GlobalScopeFactory<? extends LocalDate> referenceDate;
+    private Factory<? super S, ? extends LocalDate> referenceDate;
 
     @Override
-    protected DateIsBefore newInstance() {
-        return new DateIsBefore(referenceDate.get());
+    protected DateIsBefore newInstance(final S scope) {
+        return new DateIsBefore(referenceDate.get(scope));
     }
 }

@@ -23,12 +23,13 @@
 package uk.ac.ox.poseidon.core.aggregators;
 
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @SuperBuilder
-public class MeanFactory extends GlobalScopeFactory<Mean> {
+public class MeanFactory extends AbstractFactory<Scope, Mean> {
     @Override
-    protected Mean newInstance() {
+    protected Mean newInstance(final Scope scope) {
         return new Mean();
     }
 }

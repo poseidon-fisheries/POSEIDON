@@ -23,12 +23,13 @@
 package uk.ac.ox.poseidon.core.aggregators;
 
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @SuperBuilder
-public class MedianFactory extends GlobalScopeFactory<Median> {
+public class MedianFactory extends AbstractFactory<Scope, Median> {
     @Override
-    protected Median newInstance() {
+    protected Median newInstance(final Scope scope) {
         return new Median();
     }
 }

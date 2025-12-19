@@ -30,7 +30,9 @@ import org.geotools.api.data.DataStoreFinder;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.locationtech.jts.geom.Geometry;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.io.IOException;
 import java.net.URL;
@@ -44,14 +46,15 @@ import java.util.Map;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GeometriesFromShapeFileFactory extends GlobalScopeFactory<Collection<Geometry>> {
+public class GeometriesFromShapeFileFactory<S extends Scope>
+    extends AbstractFactory<S, Collection<Geometry>> {
 
     @NonNull
-    private GlobalScopeFactory<? extends Path> path;
+    private Factory<? super S, ? extends Path> path;
 
     @Override
-    protected List<Geometry> newInstance() {
-        final Path filePath = this.path.get();
+    protected List<Geometry> newInstance(final S scope) {
+        final Path filePath = this.path.get(scope);
         return readShapeFile(filePath);
     }
 

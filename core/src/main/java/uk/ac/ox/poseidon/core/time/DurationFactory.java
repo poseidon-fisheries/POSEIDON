@@ -27,7 +27,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.Duration;
 
@@ -36,7 +37,7 @@ import java.time.Duration;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DurationFactory extends GlobalScopeFactory<Duration> {
+public class DurationFactory extends AbstractFactory<Scope, Duration> {
 
     public static final DurationFactory ONE_HOUR = new DurationFactory("PT1H");
     public static final DurationFactory ONE_DAY = new DurationFactory("P1D");
@@ -55,7 +56,7 @@ public class DurationFactory extends GlobalScopeFactory<Duration> {
     }
 
     @Override
-    protected Duration newInstance() {
+    protected Duration newInstance(final Scope scope) {
         return Duration.ofDays(days).plusHours(hours).plusMinutes(minutes).plusSeconds(seconds);
     }
 }
