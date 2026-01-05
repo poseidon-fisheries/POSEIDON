@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography.ports;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class PortGridFactory extends SimulationScopeFactory<PortGrid> {
 
     private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid;

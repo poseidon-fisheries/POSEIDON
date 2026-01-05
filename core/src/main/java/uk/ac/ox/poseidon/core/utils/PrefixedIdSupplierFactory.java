@@ -29,11 +29,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class PrefixedIdSupplierFactory extends SimulationScopeFactory<PrefixedIdSupplier> {
 
     @NonNull private String prefix;

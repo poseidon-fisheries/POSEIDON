@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
@@ -33,11 +33,11 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class TripEvaluatorFactory extends VesselScopeFactory<TripEvaluator> {
 
     private Factory<? super VesselScope, ? extends MutableOptionValues<Int2D>> optionValues;

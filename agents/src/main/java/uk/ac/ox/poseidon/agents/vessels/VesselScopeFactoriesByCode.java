@@ -31,11 +31,11 @@ import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
 
     @Singular private Map<String, ? extends Factory<? super VesselScope, ? extends C>> factories;

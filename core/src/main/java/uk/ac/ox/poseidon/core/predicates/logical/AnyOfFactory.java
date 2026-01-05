@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.predicates.logical;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.util.List;
 import java.util.function.Predicate;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class AnyOfFactory<S extends Scope, T> extends AbstractFactory<S, AnyOf<T>> {
 
     List<Factory<? super S, ? extends Predicate<? super T>>> predicates;

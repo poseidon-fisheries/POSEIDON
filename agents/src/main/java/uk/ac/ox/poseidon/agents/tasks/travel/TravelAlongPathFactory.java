@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class TravelAlongPathFactory
     extends VesselTaskFactory<TravelAlongPath> {
 

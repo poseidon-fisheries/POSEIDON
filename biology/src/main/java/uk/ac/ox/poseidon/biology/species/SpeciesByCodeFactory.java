@@ -24,19 +24,21 @@ package uk.ac.ox.poseidon.biology.species;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
 public class SpeciesByCodeFactory<S extends Scope>
     extends AbstractFactory<S, List<? extends Species>> {
 

@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.quantities;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import si.uom.NonSI;
 import tech.units.indriya.format.SimpleQuantityFormat;
@@ -40,11 +40,11 @@ import java.util.Map.Entry;
 
 import static java.util.Map.entry;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @RequiredArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class AbstractQuantityFactory<Q extends Quantity<Q>>
     extends AbstractFactory<Scope, Quantity<Q>> {
 

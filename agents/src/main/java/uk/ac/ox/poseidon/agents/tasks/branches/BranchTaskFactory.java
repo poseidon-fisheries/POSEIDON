@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends VesselTaskFactory<T> {
 
     @Singular

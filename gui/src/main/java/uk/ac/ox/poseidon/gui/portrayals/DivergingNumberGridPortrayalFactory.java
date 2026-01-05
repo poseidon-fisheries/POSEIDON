@@ -22,9 +22,10 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.util.gui.ColorMap;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -36,9 +37,10 @@ import java.util.DoubleSummaryStatistics;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class DivergingNumberGridPortrayalFactory extends NumberGridPortrayalFactory {
 
     public DivergingNumberGridPortrayalFactory(

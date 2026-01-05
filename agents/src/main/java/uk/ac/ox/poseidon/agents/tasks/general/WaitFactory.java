@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.tasks.general;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -35,11 +35,11 @@ import uk.ac.ox.poseidon.core.Factory;
 import java.time.Duration;
 import java.util.function.Supplier;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class WaitFactory extends VesselTaskFactory<Wait<Vessel>> {
 
     private Factory<? super VesselScope, ? extends Supplier<Duration>> durationSupplier;

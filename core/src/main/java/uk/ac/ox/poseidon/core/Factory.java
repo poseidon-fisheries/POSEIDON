@@ -28,6 +28,4 @@ public interface Factory<S extends Scope, C> {
 
     C get(final S scope);
 
-    int makeKey(S scope);
-
 }

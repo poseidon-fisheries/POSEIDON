@@ -22,11 +22,17 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+@Data
 @SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class MedianFactory extends AbstractFactory<Scope, Median> {
     @Override
     protected Median newInstance(final Scope scope) {

@@ -22,17 +22,17 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class AlwaysFalseFactory extends AbstractFactory<Scope, AlwaysFalse> {
     @Override
     protected AlwaysFalse newInstance(final Scope scope) {

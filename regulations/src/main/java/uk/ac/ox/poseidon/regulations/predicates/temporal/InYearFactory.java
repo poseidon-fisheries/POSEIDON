@@ -23,18 +23,18 @@
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class InYearFactory extends AbstractFactory<Scope, InYear> {
     private int year;
 

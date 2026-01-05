@@ -33,11 +33,11 @@ import java.util.function.Predicate;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class AllOfFactory<S extends Scope, T> extends AbstractFactory<S, AllOf<T>> {
 
     @Singular private List<Factory<? super S, ? extends Predicate<? super T>>> predicates;

@@ -26,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -34,9 +35,10 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import java.time.temporal.Temporal;
 
 @Data
-@AllArgsConstructor
+@SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ScheduledOnceFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
     private Factory<? super SimulationScope, ? extends Temporal> dateTime;

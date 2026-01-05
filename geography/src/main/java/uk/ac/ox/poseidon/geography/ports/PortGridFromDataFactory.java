@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography.ports;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
@@ -43,11 +43,11 @@ import java.util.Optional;
 import static java.text.MessageFormat.format;
 import static java.util.Comparator.comparingDouble;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class PortGridFromDataFactory extends SimulationScopeFactory<PortGrid> {
 
     private static final System.Logger logger =

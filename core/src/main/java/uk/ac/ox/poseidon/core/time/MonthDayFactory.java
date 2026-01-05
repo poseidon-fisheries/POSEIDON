@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.time;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -33,11 +33,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.time.Month;
 import java.time.MonthDay;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class MonthDayFactory extends AbstractFactory<Scope, MonthDay> {
 
     private int month;

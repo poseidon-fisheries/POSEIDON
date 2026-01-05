@@ -37,11 +37,11 @@ import static java.lang.Math.min;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class RoughCoastalBathymetricGridFactory
     extends SimulationScopeFactory<BathymetricGrid> {
 

@@ -31,9 +31,9 @@ import java.time.LocalDate;
 
 @Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class DateFactory extends AbstractFactory<Scope, LocalDate> {
 
     @Builder.Default private Integer year = LocalDate.now().getYear();

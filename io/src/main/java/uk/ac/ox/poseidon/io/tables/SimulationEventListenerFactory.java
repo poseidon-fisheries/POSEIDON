@@ -22,10 +22,18 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SimulationEventListenerFactory<T extends Listener<?>>
     extends SimulationScopeFactory<T> {
 

@@ -22,7 +22,11 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.LocationWrapper;
 import sim.portrayal.SimplePortrayal2D;
@@ -35,11 +39,15 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.text.DecimalFormat;
 
-@RequiredArgsConstructor
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class CoordinatesPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
-    private final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
-    private final DecimalFormat decimalFormat;
+    private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
+    private DecimalFormat decimalFormat;
 
     public CoordinatesPortrayalFactory(
         final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid,

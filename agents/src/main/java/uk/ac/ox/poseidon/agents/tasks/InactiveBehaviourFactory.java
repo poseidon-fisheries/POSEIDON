@@ -22,14 +22,18 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+@Data
 @SuperBuilder
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class InactiveBehaviourFactory extends AbstractFactory<Scope, InactiveBehaviour<Vessel>> {
     @Override
     protected InactiveBehaviour<Vessel> newInstance(final Scope scope) {

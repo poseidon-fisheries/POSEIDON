@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.time;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class DateTimeAfterStartingFactory extends SimulationScopeFactory<LocalDateTime> {
 
     Factory<? super SimulationScope, ? extends TemporalAmount> offset;

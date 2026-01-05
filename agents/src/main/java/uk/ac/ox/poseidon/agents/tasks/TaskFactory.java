@@ -24,20 +24,20 @@ package uk.ac.ox.poseidon.agents.tasks;
 
 import com.badlogic.gdx.ai.btree.Task;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.AgentScope;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class TaskFactory<A extends Agent<A>, S extends AgentScope<A>, T extends Task<A>>
     extends AbstractFactory<S, T> {
 

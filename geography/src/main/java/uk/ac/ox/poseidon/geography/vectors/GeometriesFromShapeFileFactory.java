@@ -41,11 +41,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class GeometriesFromShapeFileFactory<S extends Scope>
     extends AbstractFactory<S, Collection<Geometry>> {
 

@@ -22,13 +22,17 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SetDestinationToOriginFactory extends VesselTaskFactory<SetDestinationToOrigin> {
     @Override
     protected SetDestinationToOrigin newTask(final VesselScope scope) {

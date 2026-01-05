@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.biology.species;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.AbstractFactory;
@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SpeciesFromDataFactory<S extends Scope>
     extends AbstractFactory<S, List<Species>> {
 

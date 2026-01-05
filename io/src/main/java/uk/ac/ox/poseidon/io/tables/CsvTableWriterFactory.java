@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.io.tables;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
@@ -35,11 +35,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class CsvTableWriterFactory extends SimulationScopeFactory<CsvTableWriter> {
 
     private Factory<? super SimulationScope, ? extends Supplier<Table>> tableSupplier;

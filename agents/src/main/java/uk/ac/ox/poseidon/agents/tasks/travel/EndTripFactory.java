@@ -22,13 +22,17 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 
+@Data
 @SuperBuilder
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class EndTripFactory extends VesselTaskFactory<EndTrip> {
 
     @Override

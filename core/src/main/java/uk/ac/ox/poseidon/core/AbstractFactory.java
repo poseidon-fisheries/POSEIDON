@@ -22,32 +22,23 @@
 
 package uk.ac.ox.poseidon.core;
 
-import com.google.common.base.Suppliers;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Supplier;
-
 import static com.google.common.cache.CacheLoader.from;
-import static java.beans.Introspector.getBeanInfo;
-import static java.util.Comparator.comparing;
 
 @SuperBuilder
 @NoArgsConstructor
+@EqualsAndHashCode()
 public abstract class AbstractFactory<S extends Scope, C> implements Factory<S, C> {
 
     // needs to be transient for SnakeYAML not to be confused
-    // when there are no other properties to serialize
+    // when there are no other properties to serialize and to
+    // ensure it's not included in the equals and hashCode implementations
     private final transient LoadingCache<S, LoadingCache<Integer, C>> cache =
         CacheBuilder.newBuilder()
             .weakKeys()
@@ -60,51 +51,9 @@ public abstract class AbstractFactory<S extends Scope, C> implements Factory<S, 
     public final C get(final S scope) {
         return cache
             .getUnchecked(scope)
-            .getUnchecked(makeKey(scope));
-    }
-
-    private final transient Supplier<List<Method>> readMethods =
-        Suppliers.memoize(() -> readMethods(this));
-
-    public static List<Method> readMethods(final Object object) {
-        final PropertyDescriptor[] props;
-        try {
-            props = getBeanInfo(object.getClass(), Object.class).getPropertyDescriptors();
-        } catch (final IntrospectionException e) {
-            throw new RuntimeException(e);
-        }
-        Arrays.sort(props, comparing(PropertyDescriptor::getName));
-        return Arrays
-            .stream(props)
-            .map(PropertyDescriptor::getReadMethod)
-            .filter(Objects::nonNull)
-            .toList();
+            .getUnchecked(hashCode());
     }
 
     protected abstract C newInstance(S scope);
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public int makeKey(final S scope) {
-        synchronized (this) {
-            return readMethods
-                .get()
-                .stream()
-                .map(readMethod -> {
-                    try {
-                        return readMethod.invoke(this);
-                    } catch (final IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .map(o ->
-                    switch (o) {
-                        case null -> null;
-                        case final Factory factory -> factory.get(scope);
-                        default -> o;
-                    }
-                )
-                .toList()
-                .hashCode();
-        }
-    }
 }

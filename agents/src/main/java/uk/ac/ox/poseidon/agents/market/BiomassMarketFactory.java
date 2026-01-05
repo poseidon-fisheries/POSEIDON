@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.market;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -41,11 +41,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class BiomassMarketFactory extends SimulationScopeFactory<BiomassMarket> {
 
     private Factory<? super SimulationScope, ? extends BiomassMarketGrid> marketGrid;

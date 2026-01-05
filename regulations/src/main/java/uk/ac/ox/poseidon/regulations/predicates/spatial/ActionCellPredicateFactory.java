@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.AbstractFactory;
@@ -35,11 +35,11 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.function.Predicate;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ActionCellPredicateFactory<S extends Scope>
     extends AbstractFactory<S, ActionCellPredicate> {
 

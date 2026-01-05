@@ -30,11 +30,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.time.LocalDate;
 import java.time.Period;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class PeriodFactory extends AbstractFactory<Scope, Period> {
 
     public static final PeriodFactory DAILY = new PeriodFactory("P1D");

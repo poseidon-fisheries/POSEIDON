@@ -23,9 +23,10 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -34,10 +35,11 @@ import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class CompositeDispositionProcessFactory<S extends Scope>
     extends AbstractFactory<S, CompositeDispositionProcess> {
 

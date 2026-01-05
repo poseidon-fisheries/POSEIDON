@@ -26,18 +26,20 @@ import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.branch.Selector;
 import com.badlogic.gdx.ai.btree.decorator.AlwaysFail;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SucceedOrWaitTaskFactory extends VesselTaskFactory<Selector<Vessel>> {
 
     private Factory<? super VesselScope, ? extends Task<Vessel>> mainTask;

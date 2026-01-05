@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -31,6 +32,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)

@@ -24,10 +24,7 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import tech.tablesaw.api.Table;
@@ -41,10 +38,11 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class BathymetricGridFromLongFormatDataFactory<S extends Scope>
     extends BathymetricGridFactory<S> {
 

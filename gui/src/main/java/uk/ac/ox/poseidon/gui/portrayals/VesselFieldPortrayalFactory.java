@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sim.portrayal.SimplePortrayal2D;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
@@ -38,11 +38,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import static java.awt.Color.LIGHT_GRAY;
 import static sim.portrayal.simple.OrientedPortrayal2D.SHAPE_COMPASS;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class VesselFieldPortrayalFactory extends SimulationScopeFactory<ContinuousPortrayal2D> {
 
     private static final double SCALE = 0.5;

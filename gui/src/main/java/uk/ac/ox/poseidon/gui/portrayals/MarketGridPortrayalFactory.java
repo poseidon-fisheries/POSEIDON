@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sim.portrayal.grid.SparseGridPortrayal2D;
 import sim.portrayal.simple.OvalPortrayal2D;
@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public final class MarketGridPortrayalFactory extends SimulationScopeFactory<SparseGridPortrayal2D> {
 
     private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;

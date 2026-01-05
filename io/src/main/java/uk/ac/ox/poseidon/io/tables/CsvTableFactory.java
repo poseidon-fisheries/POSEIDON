@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.io.tables;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
@@ -40,11 +40,11 @@ import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
 import java.io.Reader;
 import java.nio.file.Path;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class CsvTableFactory<S extends Scope> extends AbstractFactory<S, Table> {
 
     private Factory<? super S, ? extends DataSource> dataSource;

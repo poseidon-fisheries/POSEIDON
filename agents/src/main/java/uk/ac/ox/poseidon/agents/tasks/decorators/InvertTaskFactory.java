@@ -24,14 +24,18 @@ package uk.ac.ox.poseidon.agents.tasks.decorators;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.decorator.Invert;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
-@NoArgsConstructor
+@Data
 @SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class InvertTaskFactory extends DecoratorTaskFactory<Invert<Vessel>> {
 
     public InvertTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> child) {

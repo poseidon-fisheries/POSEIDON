@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.registers;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -38,11 +38,11 @@ import java.util.List;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ImmutableRegisterFactory<T> extends SimulationScopeFactory<ImmutableRegister<T>> {
 
     private Factory<? super SimulationScope, ? extends List<Vessel>> vessels;

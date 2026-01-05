@@ -129,20 +129,20 @@ public class Simulation extends SimState {
     }
 
     public <T> Set<T> getComponents(final Class<T> componentClass) {
-        return getComponents(components, componentClass).collect(toImmutableSet());
+        final Set<T> components =
+            getComponents(this.components, componentClass).collect(toImmutableSet());
+        if (components.isEmpty()) {
+            throw new NoSuchElementException(
+                "No components of class %s found in simulation.".formatted(componentClass.getName())
+            );
+        }
+        return components;
     }
 
     public <T> T getComponent(
         final Class<T> componentClass
     ) {
         final Set<T> components = getComponents(componentClass);
-        if (components.isEmpty()) {
-            throw new NoSuchElementException(
-                "Component of class " +
-                    componentClass.getName() +
-                    " not found in simulation."
-            );
-        }
         if (components.size() > 1) {
             throw new IllegalStateException(
                 "More than one component of class " +

@@ -24,9 +24,10 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
@@ -35,10 +36,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.io.File;
 import java.nio.file.Path;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class CellSetFromGridFileFactory<S extends Scope>
     extends AbstractFactory<S, ImmutableSet<Int2D>> {
 

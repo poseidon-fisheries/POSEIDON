@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.core.predicates;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
@@ -35,11 +35,11 @@ import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.util.Collection;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class InSetFactory<T, S extends Scope> extends AbstractFactory<S, InSet<T>> {
 
     private Factory<? super S, ? extends Collection<? extends T>> values;

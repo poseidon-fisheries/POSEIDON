@@ -23,18 +23,18 @@
 package uk.ac.ox.poseidon.core;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class FinalProcessFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
     private Factory<? super SimulationScope, C> process;

@@ -51,11 +51,11 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.*;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet> {
 
     private Factory<? super SimulationScope, ? extends Table> data;

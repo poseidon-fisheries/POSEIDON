@@ -23,16 +23,18 @@
 package uk.ac.ox.poseidon.regulations;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Predicate;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class PermittedIfFactory<S extends Scope, A>
     extends AbstractFactory<S, PermittedIf<A>> {
 

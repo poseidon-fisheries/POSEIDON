@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
@@ -41,11 +41,11 @@ import java.util.Map.Entry;
 
 import static java.util.stream.Collectors.toMap;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class VesselActivationFactory extends SimulationScopeFactory<FleetEvent> {
 
     private Factory<? super SimulationScope, ? extends Fleet> fleet;

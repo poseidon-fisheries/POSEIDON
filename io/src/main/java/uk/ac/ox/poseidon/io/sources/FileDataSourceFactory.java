@@ -33,11 +33,11 @@ import java.nio.file.Path;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class FileDataSourceFactory<S extends Scope> extends AbstractFactory<S, FileDataSource> {
 
     private Factory<? super S, ? extends Path> path;

@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.market;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class BiomassMarketGridFactory extends SimulationScopeFactory<BiomassMarketGrid> {
 
     private Factory<? super SimulationScope, ? extends PortGrid> portGrid;

@@ -50,11 +50,11 @@ import static java.time.temporal.ChronoField.*;
 import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
 import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_MONTH;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class RegulationGridPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
     private Factory<? super SimulationScope, ? extends Regulations<Vessel>> regulations;

@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import java.util.Collection;
 import java.util.Map;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class BathymetricGridFactory<S extends Scope>
     extends AbstractFactory<S, BathymetricGrid> {
 

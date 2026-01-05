@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.schedule;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sim.engine.RandomSequence;
 import sim.engine.Steppable;
@@ -35,11 +35,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.Collection;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SteppableRandomSequenceFactory extends SimulationScopeFactory<RandomSequence> {
 
     private Factory<? super SimulationScope, ? extends Collection<? extends Steppable>> steppables;

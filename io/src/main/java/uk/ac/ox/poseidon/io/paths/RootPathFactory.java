@@ -22,17 +22,19 @@
 
 package uk.ac.ox.poseidon.io.paths;
 
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class RootPathFactory
     extends AbstractFactory<Scope, Path>
     implements PathFactory<Scope> {

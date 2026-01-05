@@ -37,9 +37,9 @@ import java.time.temporal.TemporalAmount;
 
 @Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ScheduledRepeatingFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
     private Factory<? super SimulationScope, ? extends Temporal> startingDateTime;

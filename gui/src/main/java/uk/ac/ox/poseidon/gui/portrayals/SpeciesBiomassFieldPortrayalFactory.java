@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
@@ -36,11 +36,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SpeciesBiomassFieldPortrayalFactory extends SimulationScopeFactory<NamedPortrayal> {
 
     private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;

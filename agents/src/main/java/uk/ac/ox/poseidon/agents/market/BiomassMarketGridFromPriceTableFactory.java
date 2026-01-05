@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.market;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -52,11 +52,11 @@ import static java.math.RoundingMode.HALF_EVEN;
 import static java.util.Map.entry;
 import static java.util.stream.Collectors.groupingBy;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class BiomassMarketGridFromPriceTableFactory
     extends SimulationScopeFactory<BiomassMarketGrid> {
 

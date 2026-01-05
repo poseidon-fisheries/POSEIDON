@@ -22,13 +22,17 @@
 
 package uk.ac.ox.poseidon.core.adaptors.temporal;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+@Data
 @SuperBuilder
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class CurrentDayOfWeekFactory extends SimulationScopeFactory<CurrentDayOfWeek> {
 
     @Override

@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography.ports;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
@@ -44,11 +44,11 @@ import java.util.Random;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.stream.Collectors.toCollection;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortGrid> {
 
     private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid;

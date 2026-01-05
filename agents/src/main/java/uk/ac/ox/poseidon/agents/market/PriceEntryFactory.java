@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.market;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -33,11 +33,11 @@ import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class PriceEntryFactory<S extends Scope> extends AbstractFactory<S, PriceEntry> {
 
     private Factory<? super S, ? extends CatchCategory> catchCategory;

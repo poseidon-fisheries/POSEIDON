@@ -22,12 +22,20 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class BathymetryFieldPortrayalFactory extends SimpleFieldPortrayalFactory {
 
     public BathymetryFieldPortrayalFactory(

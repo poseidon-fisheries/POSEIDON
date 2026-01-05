@@ -24,9 +24,10 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.geotools.api.referencing.operation.MathTransform2D;
 import org.geotools.api.referencing.operation.TransformException;
@@ -44,10 +45,11 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class BathymetricGridFromGridFileFactory<S extends Scope>
     extends BathymetricGridFactory<S> {
 

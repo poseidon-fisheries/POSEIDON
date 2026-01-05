@@ -22,7 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -32,11 +36,11 @@ import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Supplier;
 
-@Getter
-@Setter
-@Builder
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class FishingFactory extends VesselTaskFactory<Fishing> {
 
     private VesselScopeFactory<? extends Supplier<Fisheable>> fisheableSupplier;

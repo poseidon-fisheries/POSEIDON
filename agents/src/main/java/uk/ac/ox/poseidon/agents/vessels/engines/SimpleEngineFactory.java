@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import javax.measure.Quantity;
 import javax.measure.quantity.Speed;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SimpleEngineFactory<S extends Scope> extends AbstractFactory<S, Engine> {
 
     private Factory<? super S, ? extends Quantity<Speed>> speed;

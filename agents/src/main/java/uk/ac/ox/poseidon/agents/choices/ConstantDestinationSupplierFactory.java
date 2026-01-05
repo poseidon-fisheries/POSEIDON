@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -33,11 +33,11 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ConstantDestinationSupplierFactory extends VesselScopeFactory<DestinationSupplier> {
 
     private Factory<? super VesselScope, ? extends ModelGrid> modelGrid;

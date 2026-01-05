@@ -23,19 +23,19 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class FullBiomassAllocatorFactory extends SimulationScopeFactory<BiomassAllocator> {
 
     private Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid;

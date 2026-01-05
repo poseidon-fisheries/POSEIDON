@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.io;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.nio.file.Path;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class DirectoryRemoverFactory extends SimulationScopeFactory<Steppable> {
 
     private Factory<? super SimulationScope, ? extends Path> target;

@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography.predicates;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.locationtech.jts.geom.Geometry;
 import uk.ac.ox.poseidon.core.AbstractFactory;
@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.Collection;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class InGeometriesFactory<S extends Scope>
     extends AbstractFactory<S, InGeometries> {
 

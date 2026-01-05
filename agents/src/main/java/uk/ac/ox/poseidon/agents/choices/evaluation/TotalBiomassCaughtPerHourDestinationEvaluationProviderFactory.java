@@ -22,10 +22,18 @@
 
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory
     extends AbstractFactory<Scope, EvaluationProvider<Int2D>> {
 

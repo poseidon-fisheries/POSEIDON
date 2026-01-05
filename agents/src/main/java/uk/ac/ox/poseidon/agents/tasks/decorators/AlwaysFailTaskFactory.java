@@ -24,14 +24,18 @@ package uk.ac.ox.poseidon.agents.tasks.decorators;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.decorator.AlwaysFail;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
-@NoArgsConstructor
+@Data
 @SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class AlwaysFailTaskFactory extends DecoratorTaskFactory<AlwaysFail<Vessel>> {
 
     public AlwaysFailTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> child) {

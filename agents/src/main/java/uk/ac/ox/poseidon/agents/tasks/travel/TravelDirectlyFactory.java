@@ -23,20 +23,20 @@
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class TravelDirectlyFactory extends VesselTaskFactory<TravelDirectly> {
 
     private Factory<? super VesselScope, ? extends DistanceCalculator> distance;

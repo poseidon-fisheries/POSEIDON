@@ -29,11 +29,11 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class UniformBathymetricGridFactory<S extends Scope>
     extends AbstractFactory<S, BathymetricGrid> {
 

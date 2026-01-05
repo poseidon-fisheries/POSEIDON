@@ -35,11 +35,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.stream.IntStream.range;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class MappedFactory<S extends Scope, C> extends AbstractFactory<S, List<C>> {
 
     private Factory<S, C> factory;
@@ -129,15 +129,4 @@ public class MappedFactory<S extends Scope, C> extends AbstractFactory<S, List<C
         }
     }
 
-    @Override
-    public int makeKey(final S scope) {
-        // We override makeKey here because we want to use the properties of the target
-        // factory as part of our own key instead of the object that it would instantiate
-        // (or more likely die trying) if its get method gets called.
-        return List.of(
-            propertyNames,
-            getComponentLists(scope),
-            factory.makeKey(scope)
-        ).hashCode();
-    }
 }

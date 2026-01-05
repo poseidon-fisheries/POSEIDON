@@ -22,18 +22,22 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import sim.util.gui.ColorMap;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.NumberGrid;
 import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 
-@Getter
-@Setter
+@Data
+@SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class NumberGridWithCapacityPortrayalFactory extends NumberGridPortrayalFactory {
 
     private Factory<? super SimulationScope, ? extends NumberGrid<?, ?>> capacityGrid;

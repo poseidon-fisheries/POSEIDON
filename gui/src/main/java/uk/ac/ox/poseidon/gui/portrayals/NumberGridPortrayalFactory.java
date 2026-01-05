@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import sim.portrayal.LocationWrapper;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
@@ -38,11 +38,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.NumberGrid;
 import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class NumberGridPortrayalFactory
     extends SimulationScopeFactory<FastValueGridPortrayal2D> {
 

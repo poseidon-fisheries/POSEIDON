@@ -33,9 +33,9 @@ import java.time.temporal.TemporalAmount;
 
 @Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 abstract class RelativeDateTimeFactory<S extends Scope>
     extends AbstractFactory<S, LocalDateTime> {
 

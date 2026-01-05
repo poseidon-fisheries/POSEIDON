@@ -30,11 +30,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Predicate;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ForbiddenIfFactory<S extends Scope, A> extends AbstractFactory<S, ForbiddenIf<A>> {
 
     @NonNull private Factory<? super S, ? extends Predicate<? super Action<? super A>>>
