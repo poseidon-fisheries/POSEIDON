@@ -23,13 +23,32 @@
 package uk.ac.ox.poseidon.core.scopes;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.EqualsAndHashCode;
 import uk.ac.ox.poseidon.core.Simulation;
 
-@Data
-@RequiredArgsConstructor()
-public class SimulationScope implements Scope {
+import java.lang.ref.WeakReference;
 
-    private final Simulation simulation;
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class SimulationScope extends ScenarioScope {
+
+    private final WeakReference<Simulation> simulation;
+
+    public SimulationScope(final SimulationScope simulationScope) {
+        super(simulationScope);
+        this.simulation = simulationScope.simulation;
+    }
+
+    public SimulationScope(
+        final ScenarioScope scenarioScope,
+        final Simulation simulation
+    ) {
+        super(scenarioScope);
+        this.simulation = new WeakReference<>(simulation);
+    }
+
+    public Simulation getSimulation() {
+        return simulation.get();
+    }
 
 }

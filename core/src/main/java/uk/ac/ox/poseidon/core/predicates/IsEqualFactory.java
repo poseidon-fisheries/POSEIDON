@@ -27,7 +27,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class IsEqualFactory<T> extends AbstractFactory<Scope, IsEqual<T>> {
+public class IsEqualFactory<T> extends Factory<Scope, IsEqual<T>> {
 
     private T value;
 

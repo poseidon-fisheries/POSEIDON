@@ -31,7 +31,6 @@ import sim.portrayal.DrawInfo2D;
 import sim.portrayal.LocationWrapper;
 import sim.portrayal.SimplePortrayal2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -76,7 +75,7 @@ public class CoordinatesPortrayalFactory extends SimulationScopeFactory<ObjectGr
                 @Override
                 public String getName(final LocationWrapper wrapper) {
                     final Coordinate coordinate = (Coordinate) wrapper.getObject();
-                    return "Coordinates: %.3f, %.3f".formatted(coordinate.lon, coordinate.lat);
+                    return "Coordinates: %.3f, %.3f" .formatted(coordinate.lon, coordinate.lat);
                 }
             }
         );

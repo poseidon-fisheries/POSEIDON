@@ -26,7 +26,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.ScenarioScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
@@ -36,7 +37,7 @@ import java.nio.file.Path;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class RootPathFactory
-    extends AbstractFactory<Scope, Path>
+    extends ScenarioScopeFactory<Path>
     implements PathFactory<Scope> {
 
     public RootPathFactory(final String path) {
@@ -46,7 +47,7 @@ public class RootPathFactory
     private String path;
 
     @Override
-    protected Path newInstance(final Scope scope) {
+    protected Path newInstance(final ScenarioScope scope) {
         return Path.of(path);
     }
 }

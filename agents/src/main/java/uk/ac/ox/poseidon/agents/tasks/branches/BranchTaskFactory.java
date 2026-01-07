@@ -30,7 +30,6 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.List;
 
@@ -55,7 +54,7 @@ public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends Ve
 
     @Override
     protected T newTask(final VesselScope scope) {
-        final T task = super.newInstance(scope);
+        final T task = newTask();
         if (children != null) {
             this.children
                 .stream()
@@ -64,4 +63,6 @@ public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends Ve
         }
         return task;
     }
+
+    protected abstract T newTask();
 }

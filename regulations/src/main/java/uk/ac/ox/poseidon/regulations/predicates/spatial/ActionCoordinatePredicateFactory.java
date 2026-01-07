@@ -27,7 +27,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -40,7 +39,7 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ActionCoordinatePredicateFactory<S extends Scope>
-    extends AbstractFactory<S, ActionCoordinatePredicate> {
+    extends Factory<S, ActionCoordinatePredicate> {
 
     private Factory<? super S, ? extends Predicate<Coordinate>> coordinatePredicate;
 

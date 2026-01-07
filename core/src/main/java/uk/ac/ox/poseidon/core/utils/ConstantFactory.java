@@ -27,20 +27,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.ScenarioScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantFactory<T> extends AbstractFactory<Scope, T> {
+public class ConstantFactory<T> extends ScenarioScopeFactory<T> {
 
     private T value;
 
     @Override
-    protected T newInstance(final Scope scope) {
+    protected T newInstance(final ScenarioScope scope) {
         return value;
     }
 

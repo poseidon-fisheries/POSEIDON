@@ -26,14 +26,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AlwaysTrueFactory extends AbstractFactory<Scope, AlwaysTrue> {
+public class AlwaysTrueFactory extends Factory<Scope, AlwaysTrue> {
     @Override
     protected AlwaysTrue newInstance(final Scope scope) {
         return new AlwaysTrue();

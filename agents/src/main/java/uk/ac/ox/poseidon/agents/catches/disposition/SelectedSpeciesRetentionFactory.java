@@ -28,7 +28,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -40,7 +39,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SelectedSpeciesRetentionFactory<S extends Scope>
-    extends AbstractFactory<S, SelectedSpeciesRetention> {
+    extends Factory<S, SelectedSpeciesRetention> {
 
     private Factory<? super S, ? extends Collection<? extends Species>> selectedSpecies;
 

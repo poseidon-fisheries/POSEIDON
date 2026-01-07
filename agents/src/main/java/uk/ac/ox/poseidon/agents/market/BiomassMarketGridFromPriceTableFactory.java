@@ -32,7 +32,6 @@ import org.joda.money.Money;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.core.utils.Measurements;

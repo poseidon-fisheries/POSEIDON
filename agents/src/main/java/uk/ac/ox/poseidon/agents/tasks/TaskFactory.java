@@ -30,7 +30,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.AgentScope;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 @Data
@@ -39,7 +38,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class TaskFactory<A extends Agent<A>, S extends AgentScope<A>, T extends Task<A>>
-    extends AbstractFactory<S, T> {
+    extends Factory<S, T> {
 
     private Factory<? super S, ? extends Task<A>> guard;
 

@@ -32,7 +32,6 @@ import lombok.experimental.SuperBuilder;
 import org.geotools.api.referencing.operation.MathTransform2D;
 import org.geotools.api.referencing.operation.TransformException;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;

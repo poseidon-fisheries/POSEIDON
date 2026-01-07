@@ -40,7 +40,7 @@ import static java.util.stream.IntStream.range;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MappedFactory<S extends Scope, C> extends AbstractFactory<S, List<C>> {
+public class MappedFactory<S extends Scope, C> extends Factory<S, List<C>> {
 
     private Factory<S, C> factory;
     @Singular private List<String> propertyNames;

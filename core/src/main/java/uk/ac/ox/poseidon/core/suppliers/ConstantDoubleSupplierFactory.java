@@ -27,8 +27,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.ScenarioScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
 
 @Data
 @SuperBuilder
@@ -36,12 +36,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ConstantDoubleSupplierFactory
-    extends AbstractFactory<Scope, ConstantDoubleSupplier> {
+    extends ScenarioScopeFactory<ConstantDoubleSupplier> {
 
     private double value;
 
     @Override
-    protected ConstantDoubleSupplier newInstance(final Scope scope) {
+    protected ConstantDoubleSupplier newInstance(final ScenarioScope scope) {
         return new ConstantDoubleSupplier(value);
     }
 

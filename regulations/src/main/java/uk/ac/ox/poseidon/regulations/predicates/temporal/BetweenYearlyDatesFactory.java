@@ -27,7 +27,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.time.MonthDayFactory;
@@ -40,7 +39,7 @@ import java.time.MonthDay;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class BetweenYearlyDatesFactory<S extends Scope>
-    extends AbstractFactory<S, BetweenYearlyDates> {
+    extends Factory<S, BetweenYearlyDates> {
 
     private Factory<? super S, ? extends MonthDay> start;
     private Factory<? super S, ? extends MonthDay> end;

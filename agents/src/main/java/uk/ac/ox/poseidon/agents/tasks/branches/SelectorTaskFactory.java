@@ -31,7 +31,6 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.List;
 
@@ -55,7 +54,7 @@ public class SelectorTaskFactory extends BranchTaskFactory<Selector<Vessel>> {
     }
 
     @Override
-    protected Selector<Vessel> newTask(final VesselScope scope) {
+    protected Selector<Vessel> newTask() {
         return new Selector<>();
     }
 }

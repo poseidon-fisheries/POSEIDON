@@ -27,8 +27,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Supplier;
@@ -38,7 +38,8 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantSupplierFactory<S extends Scope, T> extends AbstractFactory<S, Supplier<T>> {
+public class ConstantSupplierFactory<S extends Scope, T>
+    extends RelativeScopeFactory<S, Supplier<T>> {
 
     Factory<? super S, ? extends T> object;
 
@@ -46,4 +47,5 @@ public class ConstantSupplierFactory<S extends Scope, T> extends AbstractFactory
     protected Supplier<T> newInstance(final S scope) {
         return () -> object.get(scope);
     }
+
 }

@@ -27,20 +27,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.ScenarioScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class InactiveGearFactory extends AbstractFactory<Scope, InactiveGear> {
+public class InactiveGearFactory extends ScenarioScopeFactory<InactiveGear> {
 
     private String code;
 
     @Override
-    protected InactiveGear newInstance(final Scope scope) {
+    protected InactiveGear newInstance(final ScenarioScope scope) {
         return new InactiveGear(code);
     }
 

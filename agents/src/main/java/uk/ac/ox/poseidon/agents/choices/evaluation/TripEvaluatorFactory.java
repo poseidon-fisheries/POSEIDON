@@ -31,7 +31,6 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
 
 @Data
 @SuperBuilder

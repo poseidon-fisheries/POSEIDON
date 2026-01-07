@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.gui;
 import com.google.common.collect.ImmutableList;
 import sim.display.Display2D;
 import sim.display.GUIState;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.gui.portrayals.NamedPortrayal;

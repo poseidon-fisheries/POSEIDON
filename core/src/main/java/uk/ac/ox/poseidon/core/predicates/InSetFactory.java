@@ -28,8 +28,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
@@ -40,7 +40,7 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class InSetFactory<T, S extends Scope> extends AbstractFactory<S, InSet<T>> {
+public class InSetFactory<S extends Scope, T> extends RelativeScopeFactory<S, InSet<T>> {
 
     private Factory<? super S, ? extends Collection<? extends T>> values;
 
@@ -53,4 +53,5 @@ public class InSetFactory<T, S extends Scope> extends AbstractFactory<S, InSet<T
     protected InSet<T> newInstance(final S scope) {
         return new InSet<>(values.get(scope));
     }
+
 }

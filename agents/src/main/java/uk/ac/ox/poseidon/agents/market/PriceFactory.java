@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.Measurements;
 
@@ -41,7 +41,7 @@ import static java.math.RoundingMode.HALF_EVEN;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PriceFactory extends AbstractFactory<Scope, Price> {
+public class PriceFactory extends Factory<Scope, Price> {
 
     private double amount;
     private String currencyUnit;

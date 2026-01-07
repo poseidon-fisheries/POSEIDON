@@ -27,7 +27,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -37,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SpeciesFactory extends AbstractFactory<Scope, Species> {
+public class SpeciesFactory extends Factory<Scope, Species> {
 
     private static final String PREFIX = "Species";
 

@@ -27,7 +27,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -37,7 +36,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ConstantSupplierFactory<S extends Scope, T>
-    extends AbstractFactory<S, ConstantSupplier<T>> {
+    extends Factory<S, ConstantSupplier<T>> {
 
     private Factory<? super S, T> value;
 

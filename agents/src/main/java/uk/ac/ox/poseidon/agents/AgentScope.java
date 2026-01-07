@@ -24,20 +24,31 @@ package uk.ac.ox.poseidon.agents;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+
+import java.lang.ref.WeakReference;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class AgentScope<A extends Agent<A>> extends SimulationScope {
 
-    private final A agent;
+    private final WeakReference<A> agent;
+
+    public AgentScope(final AgentScope<A> agentScope) {
+        super(agentScope);
+        this.agent = agentScope.agent;
+    }
 
     public AgentScope(
-        final Simulation simulation,
+        final SimulationScope simulationScope,
         final A agent
     ) {
-        super(simulation);
-        this.agent = agent;
+        super(simulationScope);
+        this.agent = new WeakReference<>(agent);
     }
+
+    public A getAgent() {
+        return agent.get();
+    }
+
 }

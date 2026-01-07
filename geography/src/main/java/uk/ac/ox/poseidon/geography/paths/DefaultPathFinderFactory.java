@@ -27,7 +27,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
@@ -40,7 +39,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class DefaultPathFinderFactory<S extends Scope>
-    extends AbstractFactory<S, GridPathFinder> {
+    extends Factory<S, GridPathFinder> {
 
     /* TODO: the DefaultPathFinderFactory currently needs to be SimulationScope because
         it relies on the port grid, which is currently also simulation-scope (because of

@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.time.DurationFactory;
 import uk.ac.ox.poseidon.core.utils.ConstantSupplierFactory;

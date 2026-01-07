@@ -26,14 +26,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MaxFactory extends AbstractFactory<Scope, Max> {
+public class MaxFactory extends Factory<Scope, Max> {
     @Override
     protected Max newInstance(final Scope scope) {
         return new Max();

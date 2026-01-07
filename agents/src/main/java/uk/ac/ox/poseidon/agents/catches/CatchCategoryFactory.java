@@ -27,20 +27,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.ScenarioScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CatchCategoryFactory extends AbstractFactory<Scope, CatchCategory> {
+public class CatchCategoryFactory extends ScenarioScopeFactory<CatchCategory> {
 
     private String code;
 
     @Override
-    protected CatchCategory newInstance(final Scope scope) {
+    protected CatchCategory newInstance(final ScenarioScope scope) {
         return new CatchCategory(code);
     }
 }

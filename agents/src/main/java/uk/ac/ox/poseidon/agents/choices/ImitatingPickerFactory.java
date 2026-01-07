@@ -29,7 +29,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Predicate;
 import java.util.function.Supplier;

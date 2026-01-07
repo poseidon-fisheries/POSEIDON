@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.regulations;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -36,7 +35,7 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class PermittedIfFactory<S extends Scope, A>
-    extends AbstractFactory<S, PermittedIf<A>> {
+    extends Factory<S, PermittedIf<A>> {
 
     @NonNull private Factory<? super S, ? extends Predicate<? super Action<? super A>>>
         actionPredicate;

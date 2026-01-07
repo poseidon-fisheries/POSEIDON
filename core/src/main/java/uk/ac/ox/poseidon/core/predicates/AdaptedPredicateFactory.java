@@ -27,7 +27,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -40,7 +39,7 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class AdaptedPredicateFactory<S extends Scope, T, U>
-    extends AbstractFactory<S, AdaptedPredicate<T, U>> {
+    extends Factory<S, AdaptedPredicate<T, U>> {
 
     private Factory<? super S, ? extends Function<? super T, U>> adaptor;
     private Factory<? super S, ? extends Predicate<? super U>> predicate;

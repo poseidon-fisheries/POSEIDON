@@ -27,7 +27,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.BooleanSupplier;
@@ -37,7 +37,7 @@ import java.util.function.BooleanSupplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantBooleanSupplierFactory extends AbstractFactory<Scope, BooleanSupplier> {
+public class ConstantBooleanSupplierFactory extends Factory<Scope, BooleanSupplier> {
 
     public static final ConstantBooleanSupplierFactory ALWAYS_TRUE =
         new ConstantBooleanSupplierFactory(true);

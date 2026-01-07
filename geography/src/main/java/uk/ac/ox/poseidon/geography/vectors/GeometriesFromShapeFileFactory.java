@@ -30,7 +30,6 @@ import org.geotools.api.data.DataStoreFinder;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.locationtech.jts.geom.Geometry;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -47,7 +46,7 @@ import java.util.Map;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class GeometriesFromShapeFileFactory<S extends Scope>
-    extends AbstractFactory<S, Collection<Geometry>> {
+    extends Factory<S, Collection<Geometry>> {
 
     @NonNull
     private Factory<? super S, ? extends Path> path;

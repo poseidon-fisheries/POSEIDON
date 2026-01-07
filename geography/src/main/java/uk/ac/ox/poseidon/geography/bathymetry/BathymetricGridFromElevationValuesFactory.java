@@ -27,8 +27,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class BathymetricGridFromElevationValuesFactory<S extends Scope>
-    extends AbstractFactory<S, BathymetricGrid> {
+    extends RelativeScopeFactory<S, BathymetricGrid> {
 
     private Factory<? super S, ? extends ModelGrid> modelGrid;
     private List<Number> elevationValues;

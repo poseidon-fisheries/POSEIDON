@@ -27,7 +27,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.io.File;
@@ -38,7 +38,7 @@ import java.io.File;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ModelGridWithActiveCellsFromGridFile<S extends Scope>
-    extends AbstractFactory<S, ModelGrid> {
+    extends RelativeScopeFactory<S, ModelGrid> {
 
     CellSetFromGridFileFactory<? super S> cellSetFromGridFile;
 

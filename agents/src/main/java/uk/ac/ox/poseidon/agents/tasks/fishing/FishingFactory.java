@@ -32,7 +32,6 @@ import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.biology.Fisheable;
-import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Supplier;
 

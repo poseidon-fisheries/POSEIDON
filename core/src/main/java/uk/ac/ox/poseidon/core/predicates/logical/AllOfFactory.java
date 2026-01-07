@@ -24,8 +24,8 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
@@ -38,7 +38,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AllOfFactory<S extends Scope, T> extends AbstractFactory<S, AllOf<T>> {
+public class AllOfFactory<S extends Scope, T> extends RelativeScopeFactory<S, AllOf<T>> {
 
     @Singular private List<Factory<? super S, ? extends Predicate<? super T>>> predicates;
 

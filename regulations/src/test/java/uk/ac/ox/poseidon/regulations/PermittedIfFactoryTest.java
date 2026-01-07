@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.regulations;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 

@@ -26,16 +26,16 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.ScenarioScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MeanFactory extends AbstractFactory<Scope, Mean> {
+public class MeanFactory extends ScenarioScopeFactory<Mean> {
     @Override
-    protected Mean newInstance(final Scope scope) {
+    protected Mean newInstance(final ScenarioScope scope) {
         return new Mean();
     }
 }

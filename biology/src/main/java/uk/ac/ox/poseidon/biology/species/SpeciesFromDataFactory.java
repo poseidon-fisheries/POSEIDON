@@ -28,8 +28,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
@@ -40,7 +40,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SpeciesFromDataFactory<S extends Scope>
-    extends AbstractFactory<S, List<Species>> {
+    extends RelativeScopeFactory<S, List<Species>> {
 
     private Factory<? super S, ? extends Table> data;
     private String speciesCodeColumn;
@@ -60,4 +60,5 @@ public class SpeciesFromDataFactory<S extends Scope>
             )
             .toList();
     }
+
 }

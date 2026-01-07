@@ -27,8 +27,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.ScenarioScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
 
 import java.time.LocalTime;
 
@@ -37,14 +37,14 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TimeFactory extends AbstractFactory<Scope, LocalTime> {
+public class TimeFactory extends ScenarioScopeFactory<LocalTime> {
 
     private int hour;
     private int minute;
     private int second;
 
     @Override
-    protected LocalTime newInstance(final Scope scope) {
+    protected LocalTime newInstance(final ScenarioScope scope) {
         return LocalTime.of(hour, minute, second);
     }
 }

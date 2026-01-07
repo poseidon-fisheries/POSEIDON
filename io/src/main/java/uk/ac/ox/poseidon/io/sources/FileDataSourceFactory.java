@@ -24,8 +24,8 @@ package uk.ac.ox.poseidon.io.sources;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.charset.Charset;
@@ -38,12 +38,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FileDataSourceFactory<S extends Scope> extends AbstractFactory<S, FileDataSource> {
+public class FileDataSourceFactory<S extends Scope>
+    extends RelativeScopeFactory<S, FileDataSource> {
 
-    private Factory<? super S, ? extends Path> path;
+    private Factory<Scope, ? extends Path> path;
     @Builder.Default private String encoding = UTF_8.name();
 
-    public FileDataSourceFactory(final Factory<? super S, ? extends Path> path) {
+    public FileDataSourceFactory(final Factory<Scope, ? extends Path> path) {
         this.path = path;
     }
 

@@ -25,17 +25,21 @@ package uk.ac.ox.poseidon.agents.vessels;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import uk.ac.ox.poseidon.agents.AgentScope;
-import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class VesselScope extends AgentScope<Vessel> {
 
+    public VesselScope(final VesselScope vesselScope) {
+        super(vesselScope);
+    }
+
     public VesselScope(
-        final Simulation simulation,
+        final SimulationScope simulationScope,
         final Vessel vessel
     ) {
-        super(simulation, vessel);
+        super(new AgentScope<>(simulationScope, vessel));
     }
 
     public Vessel getVessel() {

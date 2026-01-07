@@ -27,8 +27,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
@@ -41,7 +41,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class CompositeDispositionProcessFactory<S extends Scope>
-    extends AbstractFactory<S, CompositeDispositionProcess> {
+    extends RelativeScopeFactory<S, CompositeDispositionProcess> {
 
     private List<Factory<? super S, ? extends DispositionProcess>> dispositionStrategies;
 
@@ -62,4 +62,5 @@ public class CompositeDispositionProcessFactory<S extends Scope>
                 .collect(toImmutableList())
         );
     }
+
 }

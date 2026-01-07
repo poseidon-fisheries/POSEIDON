@@ -27,7 +27,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -39,7 +38,7 @@ import javax.measure.quantity.Speed;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SimpleEngineFactory<S extends Scope> extends AbstractFactory<S, Engine> {
+public class SimpleEngineFactory<S extends Scope> extends Factory<S, Engine> {
 
     private Factory<? super S, ? extends Quantity<Speed>> speed;
 

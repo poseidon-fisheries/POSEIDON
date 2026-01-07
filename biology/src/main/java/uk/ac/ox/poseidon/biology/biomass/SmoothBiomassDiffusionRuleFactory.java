@@ -27,16 +27,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.ScenarioScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SmoothBiomassDiffusionRuleFactory
-    extends AbstractFactory<Scope, SmoothBiomassDiffusionRule> {
+public class SmoothBiomassDiffusionRuleFactory extends ScenarioScopeFactory<SmoothBiomassDiffusionRule> {
 
     /**
      * how much of the differential do you want to move
@@ -49,7 +48,7 @@ public class SmoothBiomassDiffusionRuleFactory
     private double percentageLimitOnDailyMovement;
 
     @Override
-    protected SmoothBiomassDiffusionRule newInstance(final Scope scope) {
+    protected SmoothBiomassDiffusionRule newInstance(final ScenarioScope scope) {
         return new SmoothBiomassDiffusionRule(
             differentialPercentageToMove,
             percentageLimitOnDailyMovement

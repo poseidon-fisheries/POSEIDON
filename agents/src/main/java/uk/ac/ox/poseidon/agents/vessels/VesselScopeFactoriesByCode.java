@@ -57,7 +57,7 @@ public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
                     .map(factory -> factory.get(scope))
             )
             .orElseThrow(() -> new IllegalArgumentException(
-                "No factory found for code %s and no default factory provided.".formatted(code)
+                "No factory found for code %s and no default factory provided." .formatted(code)
             ));
     }
 }

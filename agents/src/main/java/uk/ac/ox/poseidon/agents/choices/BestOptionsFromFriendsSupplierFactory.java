@@ -30,7 +30,6 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.registers.Register;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Supplier;
 

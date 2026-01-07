@@ -27,7 +27,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -37,7 +36,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class UniformCatchCategoriserFactory<S extends Scope>
-    extends AbstractFactory<S, CatchCategoriser> {
+    extends Factory<S, CatchCategoriser> {
 
     private Factory<? super S, ? extends CatchCategory> catchCategory;
 

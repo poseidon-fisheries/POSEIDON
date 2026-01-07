@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.core.time;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -37,7 +36,7 @@ import java.time.temporal.TemporalAmount;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 abstract class RelativeDateTimeFactory<S extends Scope>
-    extends AbstractFactory<S, LocalDateTime> {
+    extends Factory<S, LocalDateTime> {
 
     @NonNull private Factory<? super S, ? extends LocalDateTime> referenceDateTime;
     @NonNull private Factory<? super S, ? extends TemporalAmount> temporalAmount;

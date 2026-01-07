@@ -24,8 +24,8 @@ package uk.ac.ox.poseidon.geography.predicates;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 
@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.geography.Envelope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class InRectangularAreaPredicateFactory<S extends Scope>
-    extends AbstractFactory<S, InRectangularAreaPredicate> {
+    extends RelativeScopeFactory<S, InRectangularAreaPredicate> {
 
     @NonNull private Factory<? super S, ? extends Envelope> envelope;
 

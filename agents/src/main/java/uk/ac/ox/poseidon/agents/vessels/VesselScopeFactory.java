@@ -26,11 +26,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class VesselScopeFactory<C> extends AbstractFactory<VesselScope, C> {
+public abstract class VesselScopeFactory<C> extends Factory<VesselScope, C> {
+    @Override
+    protected Object getKey(final VesselScope scope) {
+        return scope.getVessel();
+    }
 }
