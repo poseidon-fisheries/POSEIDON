@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.DoubleSupplier;
@@ -38,7 +39,7 @@ import java.util.function.DoubleSupplier;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class GeneralDiscardMortalityFactory<S extends Scope>
-    extends Factory<S, GeneralDiscardMortality> {
+    extends RelativeScopeFactory<S, GeneralDiscardMortality> {
 
     private Factory<? super S, ? extends DoubleSupplier> mortalityRateSupplier;
 

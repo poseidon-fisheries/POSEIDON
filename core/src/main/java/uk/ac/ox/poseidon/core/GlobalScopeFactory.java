@@ -22,11 +22,15 @@
 
 package uk.ac.ox.poseidon.core;
 
-import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
-public abstract class ScenarioScopeFactory<C> extends Factory<ScenarioScope, C> {
+@SuperBuilder
+@NoArgsConstructor
+public abstract class GlobalScopeFactory<C> extends AbstractFactory<GlobalScope, C> {
     @Override
-    protected Object getKey(final ScenarioScope scope) {
-        return scope.getScenario();
+    protected Object makeKey(final GlobalScope scope) {
+        return GlobalScope.INSTANCE;
     }
 }

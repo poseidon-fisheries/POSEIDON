@@ -23,10 +23,11 @@
 package uk.ac.ox.poseidon.geography;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
+import static org.mockito.Mockito.mock;
 
 class EnvelopeFactoryTest {
 
@@ -46,7 +47,7 @@ class EnvelopeFactoryTest {
         final EnvelopeFactory factory = new EnvelopeFactory(minX, maxX, minY, maxY);
 
         // Call the method under test
-        final Envelope envelope = factory.get(GLOBAL_SCOPE);
+        final Envelope envelope = factory.get(mock(GlobalScope.class));
 
         // Verify results
         assertNotNull(envelope, "Expected an instance of Envelope to be created.");
@@ -82,7 +83,7 @@ class EnvelopeFactoryTest {
         final EnvelopeFactory factory = new EnvelopeFactory(minX, maxX, minY, maxY);
 
         // Call the method under test
-        final Envelope envelope = factory.get(GLOBAL_SCOPE);
+        final Envelope envelope = factory.get(mock(GlobalScope.class));
 
         // Verify results
         assertNotNull(envelope, "Expected an instance of Envelope to be created.");
@@ -114,7 +115,7 @@ class EnvelopeFactoryTest {
         final EnvelopeFactory factory = new EnvelopeFactory();
 
         // Call the method under test
-        final Envelope envelope = factory.get(GLOBAL_SCOPE);
+        final Envelope envelope = factory.get(mock(GlobalScope.class));
 
         // Verify results
         assertNotNull(envelope, "Expected an instance of Envelope to be created.");

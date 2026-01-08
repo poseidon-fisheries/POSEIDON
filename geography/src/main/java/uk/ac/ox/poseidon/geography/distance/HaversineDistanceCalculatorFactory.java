@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -37,7 +38,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class HaversineDistanceCalculatorFactory<S extends Scope>
-    extends Factory<S, HaversineDistanceCalculator> {
+    extends RelativeScopeFactory<S, HaversineDistanceCalculator> {
 
     private Factory<? super S, ? extends ModelGrid> modelGrid;
 

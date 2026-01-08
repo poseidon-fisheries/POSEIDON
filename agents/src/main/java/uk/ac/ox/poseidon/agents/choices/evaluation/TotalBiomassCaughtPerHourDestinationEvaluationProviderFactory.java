@@ -27,18 +27,18 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.ScenarioScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory
-    extends ScenarioScopeFactory<EvaluationProvider<Int2D>> {
+    extends GlobalScopeFactory<EvaluationProvider<Int2D>> {
 
     @Override
-    protected EvaluationProvider<Int2D> newInstance(final ScenarioScope scope) {
+    protected EvaluationProvider<Int2D> newInstance(final GlobalScope scope) {
         return new TotalBiomassCaughtPerHourDestinationEvaluationProvider();
     }
 

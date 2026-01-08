@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Predicate;
@@ -37,7 +38,7 @@ import java.util.function.Predicate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class NotFactory<S extends Scope, T> extends Factory<S, Not<T>> {
+public class NotFactory<S extends Scope, T> extends RelativeScopeFactory<S, Not<T>> {
 
     private Factory<? super S, ? extends Predicate<? super T>> predicate;
 

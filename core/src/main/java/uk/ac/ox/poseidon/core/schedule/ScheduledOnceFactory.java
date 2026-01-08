@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import sim.engine.Steppable;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -47,7 +48,6 @@ public class ScheduledOnceFactory<C extends Steppable> extends SimulationScopeFa
     @Override
     protected C newInstance(final SimulationScope scope) {
         final C steppableObject = steppable.get(scope);
-        // TODO: this shouldn't get scheduled on construction
         scope
             .getSimulation()
             .getTemporalSchedule()

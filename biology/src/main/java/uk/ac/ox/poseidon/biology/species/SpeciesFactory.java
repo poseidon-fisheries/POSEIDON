@@ -27,8 +27,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -37,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SpeciesFactory extends Factory<Scope, Species> {
+public class SpeciesFactory extends GlobalScopeFactory<Species> {
 
     private static final String PREFIX = "Species";
 
@@ -50,7 +50,7 @@ public class SpeciesFactory extends Factory<Scope, Species> {
     }
 
     @Override
-    protected Species newInstance(final Scope scope) {
+    protected Species newInstance(final GlobalScope scope) {
         return new Species(
             checkNotNull(code),
             name != null ? name : PREFIX + " " + code,

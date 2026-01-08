@@ -30,6 +30,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
@@ -45,8 +46,8 @@ public class InSetFactory<S extends Scope, T> extends RelativeScopeFactory<S, In
     private Factory<? super S, ? extends Collection<? extends T>> values;
 
     @SafeVarargs
-    public InSetFactory(final T... values) {
-        this.values = new ConstantFactory<>(ImmutableSet.copyOf(values));
+    public static <T> InSetFactory<GlobalScope, T> of(final T... values) {
+        return new InSetFactory<>(new ConstantFactory<>(ImmutableSet.copyOf(values)));
     }
 
     @Override

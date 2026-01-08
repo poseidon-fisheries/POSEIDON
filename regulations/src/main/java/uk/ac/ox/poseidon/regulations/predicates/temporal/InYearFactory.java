@@ -27,19 +27,21 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class InYearFactory extends Factory<Scope, InYear> {
+public class InYearFactory extends GlobalScopeFactory<InYear> {
+
     private int year;
 
     @Override
-    protected InYear newInstance(final Scope scope) {
+    protected InYear newInstance(final GlobalScope scope) {
         return new InYear(year);
     }
+
 }

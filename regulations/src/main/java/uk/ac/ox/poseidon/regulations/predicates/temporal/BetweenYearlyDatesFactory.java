@@ -28,6 +28,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.time.MonthDayFactory;
 
@@ -39,12 +41,12 @@ import java.time.MonthDay;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class BetweenYearlyDatesFactory<S extends Scope>
-    extends Factory<S, BetweenYearlyDates> {
+    extends RelativeScopeFactory<S, BetweenYearlyDates> {
 
     private Factory<? super S, ? extends MonthDay> start;
     private Factory<? super S, ? extends MonthDay> end;
 
-    public static BetweenYearlyDatesFactory<Scope> parse(
+    public static BetweenYearlyDatesFactory<GlobalScope> parse(
         final CharSequence start,
         final CharSequence end
     ) {

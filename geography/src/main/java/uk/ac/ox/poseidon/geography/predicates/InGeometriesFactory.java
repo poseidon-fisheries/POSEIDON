@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.locationtech.jts.geom.Geometry;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.Collection;
@@ -39,7 +40,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class InGeometriesFactory<S extends Scope>
-    extends Factory<S, InGeometries> {
+    extends RelativeScopeFactory<S, InGeometries> {
 
     private Factory<? super S, ? extends Collection<? extends Geometry>> geometries;
 

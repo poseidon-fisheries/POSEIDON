@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -40,7 +41,7 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ActionCellPredicateFactory<S extends Scope>
-    extends Factory<S, ActionCellPredicate> {
+    extends RelativeScopeFactory<S, ActionCellPredicate> {
 
     private Factory<? super S, ? extends ModelGrid> modelGrid;
     private Factory<? super S, ? extends Predicate<Int2D>> cellPredicate;

@@ -29,8 +29,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.ScenarioScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
@@ -40,14 +39,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SpeciesByCodeFactory
-    extends ScenarioScopeFactory<List<? extends Species>> {
+public class SpeciesByCodeFactory<S extends Scope>
+    extends RelativeScopeFactory<S, List<? extends Species>> {
 
-    private Factory<Scope, ? extends List<? extends String>> speciesCodes;
-    private Factory<Scope, ? extends List<? extends Species>> speciesList;
+    private Factory<? super S, ? extends List<? extends String>> speciesCodes;
+    private Factory<? super S, ? extends List<? extends Species>> speciesList;
 
     @Override
-    protected List<? extends Species> newInstance(final ScenarioScope scope) {
+    protected List<? extends Species> newInstance(final S scope) {
         final ImmutableSet<String> speciesCodes =
             ImmutableSet.copyOf(this.speciesCodes.get(scope));
         return speciesList

@@ -30,20 +30,17 @@ import java.lang.ref.WeakReference;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SimulationScope extends ScenarioScope {
+public class SimulationScope extends GlobalScope {
 
     private final WeakReference<Simulation> simulation;
 
     public SimulationScope(final SimulationScope simulationScope) {
-        super(simulationScope);
         this.simulation = simulationScope.simulation;
     }
 
     public SimulationScope(
-        final ScenarioScope scenarioScope,
         final Simulation simulation
     ) {
-        super(scenarioScope);
         this.simulation = new WeakReference<>(simulation);
     }
 

@@ -31,8 +31,8 @@ import si.uom.NonSI;
 import tech.units.indriya.format.SimpleQuantityFormat;
 import tech.units.indriya.format.SimpleUnitFormat;
 import tech.units.indriya.quantity.Quantities;
-import uk.ac.ox.poseidon.core.ScenarioScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
@@ -46,7 +46,7 @@ import static java.util.Map.entry;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractQuantityFactory<Q extends Quantity<Q>>
-    extends ScenarioScopeFactory<Quantity<Q>> {
+    extends GlobalScopeFactory<Quantity<Q>> {
 
     static {
         // We need to trigger static initialization of the NonSI class
@@ -71,7 +71,7 @@ public abstract class AbstractQuantityFactory<Q extends Quantity<Q>>
     }
 
     @Override
-    protected Quantity<Q> newInstance(final ScenarioScope scope) {
+    protected Quantity<Q> newInstance(final GlobalScope scope) {
         final Unit<Q> unit = SimpleUnitFormat.getInstance().parse(unitString).asType(type);
         return Quantities.getQuantity(value, unit);
     }

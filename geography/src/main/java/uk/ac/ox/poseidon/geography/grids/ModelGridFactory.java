@@ -27,8 +27,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.ScenarioScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.ScenarioScope;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -39,7 +39,7 @@ import static com.google.common.math.DoubleMath.isMathematicalInteger;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ModelGridFactory extends ScenarioScopeFactory<ModelGrid> {
+public class ModelGridFactory extends GlobalScopeFactory<ModelGrid> {
 
     private double resolutionInDegrees;
     private double westLongitude;
@@ -48,7 +48,7 @@ public class ModelGridFactory extends ScenarioScopeFactory<ModelGrid> {
     private double northLatitude;
 
     @Override
-    protected ModelGrid newInstance(final ScenarioScope scope) {
+    protected ModelGrid newInstance(final GlobalScope scope) {
         final double widthInDegrees = eastLongitude - westLongitude;
         final double heightInDegrees = northLatitude - southLatitude;
         final int gridWidth = validateDimension("Width", widthInDegrees, resolutionInDegrees);

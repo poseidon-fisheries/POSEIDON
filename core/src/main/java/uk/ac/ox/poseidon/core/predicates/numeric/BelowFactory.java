@@ -27,20 +27,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BelowFactory extends Factory<Scope, Below> {
+public class BelowFactory extends GlobalScopeFactory<Below> {
 
     private double threshold;
 
     @Override
-    protected Below newInstance(final Scope scope) {
+    protected Below newInstance(final GlobalScope scope) {
         return new Below(threshold);
     }
 }

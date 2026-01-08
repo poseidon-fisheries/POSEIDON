@@ -24,13 +24,13 @@ package uk.ac.ox.poseidon.io;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.io.paths.PathFactory;
 
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
+import static org.mockito.Mockito.mock;
 
 @SuppressFBWarnings("DMI")
 class PathFactoryTest {
@@ -40,20 +40,20 @@ class PathFactoryTest {
 
     @Test
     void newInstanceSimpleFile() {
-        final PathFactory<Scope> pathFactory = PathFactory.of(FILENAME);
-        assertEquals(Path.of(FILENAME), pathFactory.get(GLOBAL_SCOPE));
+        final PathFactory<GlobalScope> pathFactory = PathFactory.of(FILENAME);
+        assertEquals(Path.of(FILENAME), pathFactory.get(mock(GlobalScope.class)));
     }
 
     @Test
     void newInstanceFileInFolder() {
-        final PathFactory<Scope> pathFactory = PathFactory.of(FOLDERS + FILENAME);
-        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(GLOBAL_SCOPE));
+        final PathFactory<GlobalScope> pathFactory = PathFactory.of(FOLDERS + FILENAME);
+        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(mock(GlobalScope.class)));
     }
 
     @Test
     void newInstanceWithParent() {
-        final PathFactory<Scope> pathFactory = PathFactory.of(FOLDERS).plus(FILENAME);
-        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(GLOBAL_SCOPE));
+        final PathFactory<GlobalScope> pathFactory = PathFactory.of(FOLDERS).plus(FILENAME);
+        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(mock(GlobalScope.class)));
     }
 
 }

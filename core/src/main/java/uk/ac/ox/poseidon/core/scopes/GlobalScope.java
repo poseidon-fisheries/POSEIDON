@@ -23,24 +23,13 @@
 package uk.ac.ox.poseidon.core.scopes;
 
 import lombok.Data;
-import uk.ac.ox.poseidon.core.Scenario;
-
-import java.lang.ref.WeakReference;
 
 @Data
-public class ScenarioScope implements Scope {
+public class GlobalScope implements Scope {
 
-    private final WeakReference<Scenario> scenario;
+    public static final GlobalScope INSTANCE = new GlobalScope();
 
-    public ScenarioScope(final ScenarioScope scenarioScope) {
-        this.scenario = scenarioScope.scenario;
+    GlobalScope() {
     }
 
-    public ScenarioScope(final Scenario scenario) {
-        this.scenario = new WeakReference<>(scenario);
-    }
-
-    public Scenario getScenario() {
-        return scenario.get();
-    }
 }

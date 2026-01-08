@@ -26,16 +26,16 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MedianFactory extends Factory<Scope, Median> {
+public class MedianFactory extends GlobalScopeFactory<Median> {
     @Override
-    protected Median newInstance(final Scope scope) {
+    protected Median newInstance(final GlobalScope scope) {
         return new Median();
     }
 }

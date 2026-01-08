@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.biology.biomass;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFactory;
 
@@ -32,7 +33,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
+import static org.mockito.Mockito.mock;
 
 class CarryingCapacityGridTest {
 
@@ -42,7 +43,7 @@ class CarryingCapacityGridTest {
     void setUp() {
         final ModelGrid modelGrid =
             new ModelGridFactory(1.0, -1.5, 1.5, -1.5, 1.5)
-                .get(GLOBAL_SCOPE);
+                .get(mock(GlobalScope.class));
         grid = new CarryingCapacityGrid(
             modelGrid,
             new double[][]{

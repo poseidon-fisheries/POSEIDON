@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.IntSupplier;
@@ -37,7 +38,8 @@ import java.util.function.IntSupplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ShiftedIntSupplierFactory<S extends Scope> extends Factory<S, IntSupplier> {
+public class ShiftedIntSupplierFactory<S extends Scope>
+    extends RelativeScopeFactory<S, IntSupplier> {
 
     private Factory<? super S, ? extends IntSupplier> intSupplier;
     private int shift;

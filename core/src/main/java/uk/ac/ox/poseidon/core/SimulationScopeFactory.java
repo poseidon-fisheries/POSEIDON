@@ -29,9 +29,9 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @SuperBuilder
 @NoArgsConstructor
 public abstract class SimulationScopeFactory<C>
-    extends Factory<SimulationScope, C> {
+    extends AbstractFactory<SimulationScope, C> {
     @Override
-    protected Object getKey(final SimulationScope scope) {
+    protected Object makeKey(final SimulationScope scope) {
         return scope.getSimulation();
     }
 }

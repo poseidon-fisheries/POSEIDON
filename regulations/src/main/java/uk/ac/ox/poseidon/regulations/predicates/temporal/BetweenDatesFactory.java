@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDate;
@@ -37,7 +38,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BetweenDatesFactory<S extends Scope> extends Factory<S, BetweenDates> {
+public class BetweenDatesFactory<S extends Scope> extends RelativeScopeFactory<S, BetweenDates> {
 
     Factory<? super S, ? extends LocalDate> startDate;
     Factory<? super S, ? extends LocalDate> endDate;

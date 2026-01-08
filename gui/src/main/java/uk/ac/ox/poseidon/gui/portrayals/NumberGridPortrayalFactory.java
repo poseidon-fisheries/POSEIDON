@@ -32,6 +32,7 @@ import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.portrayal.grid.ValueGridPortrayal2D;
 import sim.portrayal.simple.ValuePortrayal2D;
 import sim.util.gui.ColorMap;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.NumberGrid;

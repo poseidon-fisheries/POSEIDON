@@ -28,8 +28,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
@@ -39,15 +40,16 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CsvTableWriterFactory extends SimulationScopeFactory<CsvTableWriter> {
+public class CsvTableWriterFactory<S extends Scope>
+    extends RelativeScopeFactory<S, CsvTableWriter> {
 
-    private Factory<? super SimulationScope, ? extends Supplier<Table>> tableSupplier;
-    private Factory<? super SimulationScope, ? extends Path> path;
+    private Factory<? super S, ? extends Supplier<Table>> tableSupplier;
+    private Factory<? super S, ? extends Path> path;
     private boolean append;
     private boolean clearAfterWriting;
 
     @Override
-    protected CsvTableWriter newInstance(final SimulationScope scope) {
+    protected CsvTableWriter newInstance(final S scope) {
         return new CsvTableWriter(
             tableSupplier.get(scope),
             path.get(scope),

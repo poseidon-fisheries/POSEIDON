@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.predicates.AdaptedPredicate;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -40,7 +41,7 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class AdaptedVesselPredicateFactory<S extends Scope, T>
-    extends Factory<S, Predicate<? super Vessel>> {
+    extends RelativeScopeFactory<S, Predicate<? super Vessel>> {
 
     private Factory<? super S, ? extends Function<? super Vessel, T>> adaptor;
     private Factory<? super S, ? extends Predicate<? super T>> predicate;

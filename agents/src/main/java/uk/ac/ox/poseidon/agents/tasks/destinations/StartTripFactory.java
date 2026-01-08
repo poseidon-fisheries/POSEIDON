@@ -30,6 +30,7 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
 @Data
 @SuperBuilder

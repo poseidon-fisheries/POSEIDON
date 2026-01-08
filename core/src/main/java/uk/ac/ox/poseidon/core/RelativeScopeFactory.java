@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.core;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.beans.IntrospectionException;
@@ -35,12 +39,28 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.beans.Introspector.getBeanInfo;
 import static java.util.stream.Collectors.toSet;
 
-public abstract class RelativeScopeFactory<S extends Scope, C> extends Factory<S, C> {
+@SuperBuilder
+@NoArgsConstructor
+public abstract class RelativeScopeFactory<S extends Scope, C> extends AbstractFactory<S, C> {
+
+    private final transient Supplier<List<Method>> readMethods = Suppliers.memoize(() -> {
+        final PropertyDescriptor[] props;
+        try {
+            props = getBeanInfo(this.getClass(), Object.class).getPropertyDescriptors();
+        } catch (final IntrospectionException e) {
+            throw new IllegalStateException(e);
+        }
+        return Arrays
+            .stream(props)
+            .map(PropertyDescriptor::getReadMethod)
+            .filter(Objects::nonNull)
+            .toList();
+    });
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
-    protected Object getKey(final S scope) {
-        final Collection<Factory> delegates = getDelegates();
+    protected Object makeKey(final S scope) {
+        final Collection<AbstractFactory> delegates = delegateFactories();
         final Set<? extends Class<?>> classes =
             delegates.stream().map(Object::getClass).collect(toSet());
         checkState(
@@ -66,45 +86,32 @@ public abstract class RelativeScopeFactory<S extends Scope, C> extends Factory<S
             .stream()
             .filter(d -> leafClasses.getFirst().isAssignableFrom(d.getClass()))
             .findFirst()
-            .map(f -> f.getKey(scope))
+            .map(f -> f.makeKey(scope))
             .orElseThrow();
     }
 
-    private Stream<Method> readMethods() {
-        final PropertyDescriptor[] props;
-        try {
-            props = getBeanInfo(this.getClass(), Object.class).getPropertyDescriptors();
-        } catch (final IntrospectionException e) {
-            throw new IllegalStateException(e);
-        }
-        return Arrays
-            .stream(props)
-            .map(PropertyDescriptor::getReadMethod)
-            .filter(Objects::nonNull);
-    }
-
     @SuppressWarnings("rawtypes")
-    protected List<Factory> getDelegates() {
-        synchronized (this) {
-            return readMethods()
-                .map(readMethod -> {
-                    try {
-                        return readMethod.invoke(this);
-                    } catch (final IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .flatMap(o ->
-                    switch (o) {
-                        case final Map<?, ?> map -> map.values().stream();
-                        case final Collection<?> collection -> collection.stream();
-                        default -> Stream.of(o);
-                    }
-                )
-                .filter(Factory.class::isInstance)
-                .map(Factory.class::cast)
-                .toList();
-        }
+    synchronized protected List<AbstractFactory> delegateFactories() {
+        return readMethods
+            .get()
+            .stream()
+            .map(readMethod -> {
+                try {
+                    return readMethod.invoke(this);
+                } catch (final IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .flatMap(o ->
+                switch (o) {
+                    case final Map<?, ?> map -> map.values().stream();
+                    case final Collection<?> collection -> collection.stream();
+                    default -> Stream.of(o);
+                }
+            )
+            .filter(AbstractFactory.class::isInstance)
+            .map(AbstractFactory.class::cast)
+            .toList();
     }
 
 }

@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -52,7 +53,7 @@ public class ImmutableRegisterFactory<T> extends SimulationScopeFactory<Immutabl
         return new ImmutableRegister<>(
             vessels.get(scope).stream().collect(toImmutableMap(
                 identity(),
-                vessel -> vesselScopeFactory.get(new VesselScope(scope.getSimulation(), vessel))
+                vessel -> vesselScopeFactory.get(new VesselScope(scope, vessel))
             ))
         );
     }

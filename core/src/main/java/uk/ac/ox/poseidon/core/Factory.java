@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,43 +22,8 @@
 
 package uk.ac.ox.poseidon.core;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.LoadingCache;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.concurrent.ExecutionException;
-
-import static com.google.common.cache.CacheLoader.from;
-
-@SuperBuilder
-@NoArgsConstructor
-@EqualsAndHashCode()
-public abstract class Factory<S extends Scope, C> {
-
-    // needs to be transient for SnakeYAML not to be confused
-    // when there are no other properties to serialize and to
-    // ensure it's not included in the equals and hashCode implementations
-    private final transient LoadingCache<Object, Cache<Integer, C>> cache =
-        CacheBuilder.newBuilder()
-            .weakKeys()
-            .build(from(object -> CacheBuilder.newBuilder().build()));
-
-    public final C get(final S scope) {
-        try {
-            return cache
-                .getUnchecked(getKey(scope))
-                .get(hashCode(), () -> newInstance(scope));
-        } catch (final ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    protected abstract Object getKey(S scope);
-
-    protected abstract C newInstance(S scope);
-
+public interface Factory<S extends Scope, C> {
+    C get(S scope);
 }

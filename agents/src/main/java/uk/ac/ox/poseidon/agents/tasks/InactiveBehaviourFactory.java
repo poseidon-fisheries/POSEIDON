@@ -27,16 +27,16 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class InactiveBehaviourFactory extends Factory<Scope, InactiveBehaviour<Vessel>> {
+public class InactiveBehaviourFactory extends GlobalScopeFactory<InactiveBehaviour<Vessel>> {
     @Override
-    protected InactiveBehaviour<Vessel> newInstance(final Scope scope) {
+    protected InactiveBehaviour<Vessel> newInstance(final GlobalScope scope) {
         return new InactiveBehaviour<>();
     }
 }

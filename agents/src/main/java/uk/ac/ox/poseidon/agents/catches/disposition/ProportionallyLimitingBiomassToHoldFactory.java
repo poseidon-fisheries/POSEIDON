@@ -26,17 +26,17 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ProportionallyLimitingBiomassToHoldFactory
-    extends Factory<Scope, ProportionallyLimitingBiomassToHold> {
+    extends GlobalScopeFactory<ProportionallyLimitingBiomassToHold> {
     @Override
-    protected ProportionallyLimitingBiomassToHold newInstance(final Scope scope) {
+    protected ProportionallyLimitingBiomassToHold newInstance(final GlobalScope scope) {
         return new ProportionallyLimitingBiomassToHold();
     }
 }

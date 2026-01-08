@@ -27,20 +27,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CoordinateFactory extends Factory<Scope, Coordinate> {
+public class CoordinateFactory extends GlobalScopeFactory<Coordinate> {
+
     private double longitude;
     private double latitude;
 
     @Override
-    protected Coordinate newInstance(final Scope scope) {
+    protected Coordinate newInstance(final GlobalScope scope) {
         return new Coordinate(longitude, latitude);
     }
+
 }

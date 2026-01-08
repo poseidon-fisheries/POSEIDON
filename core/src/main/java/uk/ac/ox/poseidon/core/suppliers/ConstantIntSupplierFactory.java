@@ -27,8 +27,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
 import java.util.function.IntSupplier;
 
@@ -37,12 +37,12 @@ import java.util.function.IntSupplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantIntSupplierFactory extends Factory<Scope, IntSupplier> {
+public class ConstantIntSupplierFactory extends GlobalScopeFactory<IntSupplier> {
 
     private int value;
 
     @Override
-    protected IntSupplier newInstance(final Scope scope) {
+    protected IntSupplier newInstance(final GlobalScope scope) {
         return () -> value;
     }
 }

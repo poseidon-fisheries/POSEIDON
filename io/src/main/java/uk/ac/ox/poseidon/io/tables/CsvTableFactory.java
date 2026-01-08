@@ -30,6 +30,8 @@ import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.io.paths.PathFactory;
 import uk.ac.ox.poseidon.io.sources.DataSource;
@@ -44,11 +46,11 @@ import java.nio.file.Path;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CsvTableFactory<S extends Scope> extends Factory<S, Table> {
+public class CsvTableFactory<S extends Scope> extends RelativeScopeFactory<S, Table> {
 
     private Factory<? super S, ? extends DataSource> dataSource;
 
-    public static CsvTableFactory<Scope> fromString(final String data) {
+    public static CsvTableFactory<GlobalScope> fromString(final String data) {
         return new CsvTableFactory<>(new StringDataSourceFactory(data));
     }
 
@@ -58,14 +60,14 @@ public class CsvTableFactory<S extends Scope> extends Factory<S, Table> {
         return new CsvTableFactory<>(new FileDataSourceFactory<>(pathFactory));
     }
 
-    public static CsvTableFactory<Scope> fromFile(
+    public static CsvTableFactory<GlobalScope> fromFile(
         final String first,
         final String... more
     ) {
         return fromFile(PathFactory.of(first, more));
     }
 
-    public static CsvTableFactory<Scope> fromFile(final Path path) {
+    public static CsvTableFactory<GlobalScope> fromFile(final Path path) {
         return fromFile(PathFactory.of(path));
     }
 

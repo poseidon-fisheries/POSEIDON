@@ -30,8 +30,8 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.biology.Fisheable;
+import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Supplier;
 
@@ -42,7 +42,7 @@ import java.util.function.Supplier;
 @EqualsAndHashCode(callSuper = true)
 public class FishingFactory extends VesselTaskFactory<Fishing> {
 
-    private VesselScopeFactory<? extends Supplier<Fisheable>> fisheableSupplier;
+    private Factory<? super VesselScope, ? extends Supplier<Fisheable>> fisheableSupplier;
     private Factory<? super VesselScope, ? extends DispositionProcess> dispositionProcess;
 
     @Override

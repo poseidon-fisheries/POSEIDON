@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -38,7 +39,7 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class CellDistanceToCoastFactory<S extends Scope>
-    extends Factory<S, CellDistanceToCoast> {
+    extends RelativeScopeFactory<S, CellDistanceToCoast> {
 
     private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
     private Factory<? super S, ? extends DistanceCalculator> distanceCalculator;

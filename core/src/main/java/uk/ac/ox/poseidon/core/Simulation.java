@@ -62,8 +62,8 @@ public class Simulation extends SimState {
         final Stream<? extends Factory<? super SimulationScope, ?>> components
     ) {
         final Simulation simulation = new Simulation(seed, schedule, simulationId);
-        simulation.start();
         final SimulationScope simulationScope = new SimulationScope(simulation);
+        simulation.start();
         simulation.components =
             components.map(factory ->
                 factory.get(simulationScope)

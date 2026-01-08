@@ -39,7 +39,7 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 @EqualsAndHashCode(callSuper = true)
 public class CellElevationFactory<S extends Scope> extends RelativeScopeFactory<S, CellElevation> {
 
-    private Factory<Scope, ? extends BathymetricGrid> bathymetricGrid;
+    private Factory<S, ? extends BathymetricGrid> bathymetricGrid;
 
     @Override
     protected CellElevation newInstance(final S scope) {

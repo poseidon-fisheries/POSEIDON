@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import sim.engine.Sequence;
 import sim.engine.Steppable;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.core.utils.Factories;
@@ -45,7 +46,9 @@ public class SteppableSequenceFactory extends SimulationScopeFactory<Steppable> 
     private Factory<? super SimulationScope, ? extends List<? extends Steppable>> steppables;
 
     @SafeVarargs
-    public SteppableSequenceFactory(final Factory<? super SimulationScope, ? extends Steppable>... steppables) {
+    public SteppableSequenceFactory(
+        final Factory<? super SimulationScope, ? extends Steppable>... steppables
+    ) {
         this.steppables = new Factories<>(steppables);
     }
 

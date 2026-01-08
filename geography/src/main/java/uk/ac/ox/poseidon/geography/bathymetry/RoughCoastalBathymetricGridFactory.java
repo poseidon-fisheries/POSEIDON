@@ -26,6 +26,7 @@ import ec.util.MersenneTwisterFast;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.DoubleGrid2D;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;

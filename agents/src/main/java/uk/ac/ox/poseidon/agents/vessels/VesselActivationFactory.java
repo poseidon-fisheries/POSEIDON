@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -76,10 +77,10 @@ public class VesselActivationFactory extends SimulationScopeFactory<FleetEvent> 
             name,
             portCode,
             tags,
-            vessel -> behaviour.get(new VesselScope(simulation, vessel)),
-            vessel -> hold.get(new VesselScope(simulation, vessel)),
-            vessel -> gear.get(new VesselScope(simulation, vessel)),
-            vessel -> engine.get(new VesselScope(simulation, vessel))
+            vessel -> behaviour.get(new VesselScope(scope, vessel)),
+            vessel -> hold.get(new VesselScope(scope, vessel)),
+            vessel -> gear.get(new VesselScope(scope, vessel)),
+            vessel -> engine.get(new VesselScope(scope, vessel))
         );
         // TODO: figure out scheduling
         simulation.getTemporalSchedule().scheduleOnce(fleetEvent);

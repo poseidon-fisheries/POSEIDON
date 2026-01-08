@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalTime;
@@ -37,7 +38,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TimeIsAfterFactory<S extends Scope> extends Factory<S, TimeIsAfter> {
+public class TimeIsAfterFactory<S extends Scope> extends RelativeScopeFactory<S, TimeIsAfter> {
 
     private Factory<? super S, ? extends LocalTime> referenceTime;
 
