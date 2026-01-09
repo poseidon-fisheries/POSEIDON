@@ -33,4 +33,9 @@ public abstract class GlobalScopeFactory<C> extends AbstractFactory<GlobalScope,
     protected Object makeKey(final GlobalScope scope) {
         return GlobalScope.INSTANCE;
     }
+
+    @Override
+    protected Class<GlobalScope> scopeClass() {
+        return GlobalScope.class;
+    }
 }

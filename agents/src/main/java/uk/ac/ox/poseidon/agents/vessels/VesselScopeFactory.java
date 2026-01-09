@@ -37,4 +37,9 @@ public abstract class VesselScopeFactory<C> extends AbstractFactory<VesselScope,
     protected Object makeKey(final VesselScope scope) {
         return scope.getVessel();
     }
+
+    @Override
+    protected Class<VesselScope> scopeClass() {
+        return VesselScope.class;
+    }
 }

@@ -33,11 +33,12 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.beans.Introspector.getBeanInfo;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toMap;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -60,58 +61,81 @@ public abstract class RelativeScopeFactory<S extends Scope, C> extends AbstractF
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     protected Object makeKey(final S scope) {
-        final Collection<AbstractFactory> delegates = delegateFactories();
-        final Set<? extends Class<?>> classes =
-            delegates.stream().map(Object::getClass).collect(toSet());
+
+        final Map<AbstractFactory, Class> scopesByFactory =
+            memberFactories().collect(toMap(
+                Function.identity(),
+                AbstractFactory::scopeClass
+            ));
+
+        final Set<Class> scopeClasses = Set.copyOf(scopesByFactory.values());
+
         checkState(
-            !classes.isEmpty(),
+            !scopeClasses.isEmpty(),
             "No delegate factories found for delegate scope factory %s",
             this
         );
-        final List<? extends Class<?>> leafClasses =
-            classes
+
+        final List<Class> leafScopes =
+            scopeClasses
                 .stream()
                 .filter(c ->
-                    classes
+                    scopeClasses
                         .stream()
                         .noneMatch(d -> c != d && c.isAssignableFrom(d))
                 )
                 .toList();
+
         checkState(
-            leafClasses.size() == 1,
-            "More than one leaf factory classes found amongst delegates: %s",
-            leafClasses
+            leafScopes.size() == 1,
+            "More than one leaf scope classes found amongst member factories: %s",
+            leafScopes
         );
-        return delegates
+
+        final Class leafScope = leafScopes.getFirst();
+        return scopesByFactory
+            .entrySet()
             .stream()
-            .filter(d -> leafClasses.getFirst().isAssignableFrom(d.getClass()))
+            .filter(e -> e.getValue().equals(leafScope))
             .findFirst()
-            .map(f -> f.makeKey(scope))
+            .map(Map.Entry::getKey)
+            .map(af -> af.makeKey(scope))
             .orElseThrow();
     }
 
+    @Override
+    protected Class<S> scopeClass() {
+        throw new UnsupportedOperationException(
+            "Relative scope factories do not provide a scope class");
+    }
+
     @SuppressWarnings("rawtypes")
-    synchronized protected List<AbstractFactory> delegateFactories() {
-        return readMethods
-            .get()
-            .stream()
-            .map(readMethod -> {
-                try {
-                    return readMethod.invoke(this);
-                } catch (final IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
-            })
-            .flatMap(o ->
-                switch (o) {
-                    case final Map<?, ?> map -> map.values().stream();
-                    case final Collection<?> collection -> collection.stream();
-                    default -> Stream.of(o);
-                }
-            )
-            .filter(AbstractFactory.class::isInstance)
-            .map(AbstractFactory.class::cast)
-            .toList();
+    synchronized protected Stream<AbstractFactory> memberFactories() {
+        return leafFactories(
+            readMethods
+                .get()
+                .stream()
+                .map(readMethod -> {
+                    try {
+                        return readMethod.invoke(this);
+                    } catch (final IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+        ).distinct();
+    }
+
+    @SuppressWarnings("rawtypes")
+    private <T> Stream<AbstractFactory> leafFactories(final Stream<T> objects) {
+        return objects.flatMap(o ->
+            switch (o) {
+                case final Map<?, ?> map -> leafFactories(map.values().stream());
+                case final Collection<?> collection -> leafFactories(collection.stream());
+                case final RelativeScopeFactory<?, ?> factory -> factory.memberFactories();
+                case final AbstractFactory factory -> Stream.of(factory);
+                case null, default -> Stream.empty();
+            }
+        );
     }
 
 }

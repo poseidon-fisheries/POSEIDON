@@ -42,7 +42,7 @@ import static java.time.ZoneOffset.UTC;
 @AllArgsConstructor
 public final class Scenario {
 
-    @Builder.Default private Date startingDateTime = new Date();
+    private Date startingDateTime;
 
     @Singular private Map<String, ? extends Factory<? super SimulationScope, ?>> components;
 
@@ -68,18 +68,16 @@ public final class Scenario {
         return startNewSimulation(System.currentTimeMillis(), simulationId);
     }
 
-    public Simulation startNewSimulation(
+    synchronized public Simulation startNewSimulation(
         final long seed,
         final UUID simulationId
     ) {
-        synchronized (this) {
-            return Simulation.startNewSimulation(
-                seed,
-                new TemporalSchedule(startingDateTime.toInstant().atZone(UTC).toLocalDateTime()),
-                simulationId,
-                getComponents().values().stream()
-            );
-        }
+        return Simulation.startNewSimulation(
+            seed,
+            new TemporalSchedule(startingDateTime.toInstant().atZone(UTC).toLocalDateTime()),
+            simulationId,
+            getComponents().values().stream()
+        );
     }
 
     @SuppressWarnings("unchecked")

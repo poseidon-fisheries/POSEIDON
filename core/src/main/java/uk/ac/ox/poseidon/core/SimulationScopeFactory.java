@@ -34,4 +34,9 @@ public abstract class SimulationScopeFactory<C>
     protected Object makeKey(final SimulationScope scope) {
         return scope.getSimulation();
     }
+
+    @Override
+    protected Class<SimulationScope> scopeClass() {
+        return SimulationScope.class;
+    }
 }

@@ -24,10 +24,15 @@ package uk.ac.ox.poseidon.core.scopes;
 
 import lombok.Data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Data
 public class GlobalScope implements Scope {
 
     public static final GlobalScope INSTANCE = new GlobalScope();
+
+    protected static final Map<Class<? extends Scope>, Scope> SCOPES = new HashMap<>();
 
     GlobalScope() {
     }

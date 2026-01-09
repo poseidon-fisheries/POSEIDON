@@ -40,4 +40,9 @@ public abstract class VesselTaskFactory<T extends Task<Vessel>>
     public VesselTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> guard) {
         super(guard);
     }
+
+    @Override
+    protected Class<VesselScope> scopeClass() {
+        return VesselScope.class;
+    }
 }

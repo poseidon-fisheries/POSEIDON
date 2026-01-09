@@ -41,11 +41,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class FileDataSourceFactory<S extends Scope>
     extends RelativeScopeFactory<S, FileDataSource> {
 
+    private static final String DEFAULT_ENCODING = UTF_8.name();
+
     private Factory<S, ? extends Path> path;
-    @Builder.Default private String encoding = UTF_8.name();
+    @Builder.Default private String encoding = DEFAULT_ENCODING;
 
     public FileDataSourceFactory(final Factory<S, ? extends Path> path) {
         this.path = path;
+        this.encoding = DEFAULT_ENCODING;
     }
 
     @Override

@@ -62,4 +62,6 @@ public abstract class AbstractFactory<S extends Scope, C> implements Factory<S, 
 
     protected abstract C newInstance(S scope);
 
+    protected abstract Class<S> scopeClass();
+
 }
