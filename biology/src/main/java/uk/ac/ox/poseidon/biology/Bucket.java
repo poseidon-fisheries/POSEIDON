@@ -29,9 +29,11 @@ import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
@@ -82,7 +84,15 @@ public final class Bucket {
     }
 
     public Bucket add(final Bucket other) {
-        return toBuilder().add(other).build();
+        return new Bucket(
+            Stream
+                .concat(getMap().entrySet().stream(), other.getMap().entrySet().stream())
+                .collect(toImmutableMap(
+                    Entry::getKey,
+                    Entry::getValue,
+                    Content::add
+                ))
+        );
     }
 
     public Bucket subtract(final Bucket other) {
@@ -198,7 +208,7 @@ public final class Bucket {
                 .entrySet()
                 .stream()
                 .filter(entry -> !entry.getValue().isEmpty())
-                .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(toImmutableMap(Entry::getKey, Entry::getValue));
             return new Bucket(newMap);
         }
 
