@@ -34,6 +34,7 @@ import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -56,6 +57,7 @@ public class FleetEvent implements Steppable {
     @NonNull Function<Vessel, Hold> holdFactoryFunction;
     @NonNull Function<Vessel, Gear> gearFactoryFunction;
     @NonNull Function<Vessel, Engine> engineFactoryFunction;
+    @NonNull List<Function<Vessel, ?>> extraFactoryFunctions;
 
     @Override
     public void step(final SimState simState) {
@@ -81,7 +83,7 @@ public class FleetEvent implements Steppable {
         vessel.setHold(holdFactoryFunction.apply(vessel));
         vessel.setGear(gearFactoryFunction.apply(vessel));
         vessel.setEngine(engineFactoryFunction.apply(vessel));
-
+        extraFactoryFunctions.forEach(factory -> factory.apply(vessel));
         switch (eventType) {
             case ACTIVATION -> vessel.setActiveInRegister(true);
             case DEACTIVATION -> vessel.setActiveInRegister(false);

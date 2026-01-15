@@ -36,6 +36,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -80,7 +81,8 @@ public class VesselActivationFactory extends SimulationScopeFactory<FleetEvent> 
             vessel -> behaviour.get(new VesselScope(scope, vessel)),
             vessel -> hold.get(new VesselScope(scope, vessel)),
             vessel -> gear.get(new VesselScope(scope, vessel)),
-            vessel -> engine.get(new VesselScope(scope, vessel))
+            vessel -> engine.get(new VesselScope(scope, vessel)),
+            List.of()
         );
         // TODO: figure out scheduling
         simulation.getTemporalSchedule().scheduleOnce(fleetEvent);

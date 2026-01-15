@@ -47,8 +47,7 @@ import java.util.stream.Stream;
 import static java.util.Map.entry;
 import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.*;
 import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.*;
 
 @Data
@@ -79,6 +78,9 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
     private Factory<? super VesselScope, ? extends Hold> hold;
     private Factory<? super VesselScope, ? extends Gear> gear;
     private Factory<? super VesselScope, ? extends Engine> engine;
+
+    @Singular
+    private List<Factory<? super VesselScope, ?>> extraFactories;
 
     @Singular
     private Map<String, String> dataMappings;
@@ -159,7 +161,12 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
             makeFactoryFunction(scope, valuesFromRow, dataMappings, behaviour),
             makeFactoryFunction(scope, valuesFromRow, dataMappings, hold),
             makeFactoryFunction(scope, valuesFromRow, dataMappings, gear),
-            makeFactoryFunction(scope, valuesFromRow, dataMappings, engine)
+            makeFactoryFunction(scope, valuesFromRow, dataMappings, engine),
+            extraFactories.stream()
+                .map(f ->
+                    makeFactoryFunction(scope, valuesFromRow, dataMappings, f)
+                )
+                .collect(toList())
         );
     }
 
