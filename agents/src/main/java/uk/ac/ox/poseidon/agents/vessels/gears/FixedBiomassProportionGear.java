@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
@@ -34,6 +35,7 @@ import java.util.function.Supplier;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @Getter
+@ToString
 public class FixedBiomassProportionGear implements Gear {
 
     private final String code;
