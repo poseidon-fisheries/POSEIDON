@@ -20,14 +20,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology;
+package uk.ac.ox.poseidon.biology.buckets;
 
 import com.google.common.collect.ImmutableMap;
+import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.UnaryOperator;
 
@@ -59,6 +61,10 @@ public interface Bucket {
 
     Optional<Content> getContent(Species species);
 
+    default double getKg(final Species species) {
+        return getContent(species).map(Content::asKg).orElse(0.0);
+    }
+
     Bucket add(Bucket other);
 
     Bucket subtract(Bucket other);
@@ -79,6 +85,10 @@ public interface Bucket {
     Biomass getTotalBiomass();
 
     ImmutableMap<Species, Content> getMap();
+
+    default Set<Species> getSpecies() {
+        return getMap().keySet();
+    }
 
     BucketBuilder toBuilder();
 }

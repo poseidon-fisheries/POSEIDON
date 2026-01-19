@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
-import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.Collection;

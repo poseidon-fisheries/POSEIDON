@@ -22,38 +22,16 @@
 
 package uk.ac.ox.poseidon.biology;
 
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.biology.buckets.ImmutableMapBucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.Map;
 
-public interface BucketBuilder {
+class ImmutableMapBucketTest extends BucketTest {
 
-    BucketBuilder put(Bucket bucket);
-
-    BucketBuilder put(Map<Species, Content> map);
-
-    BucketBuilder put(
-        Species species,
-        Content newContent
-    );
-
-    BucketBuilder add(Bucket bucket);
-
-    BucketBuilder add(Map<Species, Content> map);
-
-    BucketBuilder add(
-        Species species,
-        Content content
-    );
-
-    BucketBuilder subtract(Bucket bucket);
-
-    BucketBuilder subtract(Map<Species, Content> map);
-
-    BucketBuilder subtract(
-        Species species,
-        Content content
-    );
-
-    Bucket build();
+    @Override
+    Bucket newBucket(final Map<Species, Double> map) {
+        return ImmutableMapBucket.ofBiomassMap(map);
+    }
 }

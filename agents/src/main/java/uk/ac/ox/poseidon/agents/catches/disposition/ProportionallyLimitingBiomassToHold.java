@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 import static lombok.AccessLevel.PACKAGE;
 

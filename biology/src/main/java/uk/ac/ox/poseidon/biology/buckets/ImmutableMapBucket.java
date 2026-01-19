@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,10 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology;
+package uk.ac.ox.poseidon.biology.buckets;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import lombok.Data;
+import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
@@ -50,8 +52,23 @@ public final class ImmutableMapBucket implements Bucket {
         return new Builder();
     }
 
+    public static ImmutableMapBucket copyOf(final Bucket bucket) {
+        return switch (bucket) {
+            case final ImmutableMapBucket immutableMapBucket -> immutableMapBucket;
+            default -> newBuilder().put(bucket).build();
+        };
+    }
+
     private ImmutableMapBucket(final ImmutableMap<Species, Content> map) {
         this.map = map;
+    }
+
+    public static Bucket ofContentMap(final Map<Species, Content> map) {
+        return Bucket.newBuilder().put(map).build();
+    }
+
+    public static Bucket ofBiomassMap(final Map<Species, Double> map) {
+        return ofContentMap(Maps.transformValues(map, Biomass::ofKg));
     }
 
     public BucketBuilder toBuilder() {
@@ -196,7 +213,7 @@ public final class ImmutableMapBucket implements Bucket {
         }
 
         @Override
-        public Bucket build() {
+        public ImmutableMapBucket build() {
 
             if (map.isEmpty())
                 return ImmutableMapBucket.empty();

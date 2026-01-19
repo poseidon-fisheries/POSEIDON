@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks.fishing;
 
 import lombok.Value;
 import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
-import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 @Value
 public class FishingOutcome {

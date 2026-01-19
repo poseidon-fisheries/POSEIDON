@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.biology;
 
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
+
 public interface Fisheable {
 
     Bucket availableFish();

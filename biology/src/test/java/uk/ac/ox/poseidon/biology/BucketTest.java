@@ -23,10 +23,64 @@
 package uk.ac.ox.poseidon.biology;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.biology.species.Species;
 
-class BucketTest {
+import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+abstract class BucketTest {
+
+    abstract Bucket newBucket(Map<Species, Double> map);
+
+    private final Species a = new Species("A", "A", null);
+    private final Species bA = new Species("B", "B", "adult");
+    private final Species bJ = new Species("B", "B", "juvenile");
+    private final Species c = new Species("C", "C", null);
+    private final Species d = new Species("D", "D", null);
 
     @Test
-    void empty() {
+    void simpleBucketCreation() {
+        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
+        assertThat(bucket.getContent(a)).contains(Biomass.ofKg(100.0));
+        assertThat(bucket.getContent(bA)).contains(Biomass.ofKg(200.0));
+        assertThat(bucket.getContent(bJ)).contains(Biomass.ofKg(300.0));
+        assertThat(bucket.getContent(c)).contains(Biomass.ofKg(400.0));
+        assertThat(bucket.getContent(d)).isEmpty();
+    }
+
+    @Test
+    void simpleAddition() {
+        final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
+        final Bucket bucket2 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
+        final Bucket bucket3 = bucket1.add(bucket2);
+        assertThat(bucket3.getContent(a)).contains(Biomass.ofKg(200.0));
+        assertThat(bucket3.getContent(bA)).contains(Biomass.ofKg(400.0));
+        assertThat(bucket3.getContent(bJ)).contains(Biomass.ofKg(600.0));
+        assertThat(bucket3.getContent(c)).contains(Biomass.ofKg(800.0));
+    }
+
+    @Test
+    void additionOfBucketsWithDifferentSpecies() {
+        final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
+        final Bucket bucket2 = newBucket(Map.of(bA, 200.0, bJ, 300.0));
+        final Bucket bucket3 = bucket1.add(bucket2);
+        assertThat(bucket3.getContent(a)).contains(Biomass.ofKg(100.0));
+        assertThat(bucket3.getContent(bA)).contains(Biomass.ofKg(400.0));
+        assertThat(bucket3.getContent(bJ)).contains(Biomass.ofKg(300.0));
+    }
+
+    @Test
+    void subtraction() {
+        final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
+        final Bucket bucket2 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
+        final Bucket bucket3 = bucket1.subtract(bucket2);
+        assertThat(bucket3.getContent(a)).isEmpty();
+        assertThat(bucket3.getContent(bA)).isEmpty();
+        assertThat(bucket3.getContent(bJ)).isEmpty();
+        assertThat(bucket3.getContent(c)).isEmpty();
+        assertThat(bucket3.getTotalBiomass()).isEqualTo(Biomass.ZERO);
     }
 }

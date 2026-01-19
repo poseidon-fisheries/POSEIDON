@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 import java.util.function.DoubleSupplier;
 

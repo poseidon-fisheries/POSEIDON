@@ -24,10 +24,10 @@ package uk.ac.ox.poseidon.biology.biomass;
 
 import com.google.common.collect.ImmutableMap;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.BucketBuilder;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.biology.buckets.BucketBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.Collection;

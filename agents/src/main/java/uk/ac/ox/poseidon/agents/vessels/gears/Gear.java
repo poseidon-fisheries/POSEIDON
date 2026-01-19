@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
-import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Fisheable;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 import java.time.Duration;
 import java.util.function.Supplier;

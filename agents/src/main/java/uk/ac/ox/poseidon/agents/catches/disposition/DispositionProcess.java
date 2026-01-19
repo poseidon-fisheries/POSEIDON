@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
-import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 public interface DispositionProcess {
 

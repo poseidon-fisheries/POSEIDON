@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import lombok.Value;
-import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 @Value
 public class Disposition {

@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.catches;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.Value;
-import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 @Value
 public class UniformCatchCategoriser implements CatchCategoriser {

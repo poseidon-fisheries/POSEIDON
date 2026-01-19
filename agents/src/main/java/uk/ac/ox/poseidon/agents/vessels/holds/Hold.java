@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.agents.vessels.holds;
 
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
-import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 public interface Hold {
 

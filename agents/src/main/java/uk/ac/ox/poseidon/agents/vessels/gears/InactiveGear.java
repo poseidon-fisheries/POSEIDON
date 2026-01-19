@@ -24,8 +24,8 @@ package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.biology.Bucket;
 import uk.ac.ox.poseidon.biology.Fisheable;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 import java.time.Duration;
 import java.util.function.Supplier;
@@ -50,5 +50,5 @@ public class InactiveGear implements Gear {
     public boolean isActive() {
         return false;
     }
-    
+
 }

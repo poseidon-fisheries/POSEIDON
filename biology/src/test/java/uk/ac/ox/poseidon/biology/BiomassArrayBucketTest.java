@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,12 +20,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.catches;
+package uk.ac.ox.poseidon.biology;
 
+import uk.ac.ox.poseidon.biology.buckets.BiomassArrayBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.biology.species.Species;
 
-import java.util.function.Function;
+import java.util.Map;
 
-public interface CatchCategoriser
-    extends Function<Bucket, CategorisedCatch> {
+class BiomassArrayBucketTest extends BucketTest {
+
+    @Override
+    Bucket newBucket(final Map<Species, Double> map) {
+        return BiomassArrayBucket.ofBiomassMap(map);
+    }
 }
