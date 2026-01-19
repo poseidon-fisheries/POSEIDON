@@ -1,0 +1,214 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024-2025, University of Oxford.
+ *
+ * University of Oxford means the Chancellor, Masters and Scholars of the
+ * University of Oxford, having an administrative office at Wellington
+ * Square, Oxford OX1 2JD, UK.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package uk.ac.ox.poseidon.biology;
+
+import com.google.common.collect.ImmutableMap;
+import lombok.Data;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
+import uk.ac.ox.poseidon.biology.species.Species;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.function.BiPredicate;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
+
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+
+@Data
+public final class ImmutableMapBucket implements Bucket {
+
+    private final ImmutableMap<Species, Content> map;
+
+    public static ImmutableMapBucket empty() {
+        return new ImmutableMapBucket(ImmutableMap.of());
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    private ImmutableMapBucket(final ImmutableMap<Species, Content> map) {
+        this.map = map;
+    }
+
+    public BucketBuilder toBuilder() {
+        return Bucket.newBuilder().put(this);
+    }
+
+    @Override
+    public Optional<Content> getContent(final Species species) {
+        return Optional.ofNullable(getMap().get(species));
+    }
+
+    @Override
+    public ImmutableMapBucket add(final Bucket other) {
+        return new ImmutableMapBucket(
+            Stream
+                .concat(getMap().entrySet().stream(), other.getMap().entrySet().stream())
+                .collect(toImmutableMap(
+                    Entry::getKey,
+                    Entry::getValue,
+                    Content::add
+                ))
+        );
+    }
+
+    @Override
+    public Bucket subtract(final Bucket other) {
+        return toBuilder().subtract(other).build();
+    }
+
+    @Override
+    public Bucket replaceContent(
+        final Species species,
+        final Content newContent
+    ) {
+        return toBuilder()
+            .put(species, newContent)
+            .build();
+    }
+
+    @Override
+    public Bucket mapContent(final UnaryOperator<Content> mapper) {
+        final BucketBuilder builder = toBuilder();
+        getMap().forEach((species, c) -> builder.put(species, mapper.apply(c)));
+        return builder.build();
+    }
+
+    @Override
+    public Map<Boolean, Bucket> partitionBy(
+        final BiPredicate<Species, Content> predicate
+    ) {
+        final Builder b1 = newBuilder();
+        final Builder b2 = newBuilder();
+        getMap().forEach((species, content) ->
+            (predicate.test(species, content) ? b1 : b2).put(species, content)
+        );
+        return Map.of(true, b1.build(), false, b2.build());
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return getMap().values().stream().allMatch(Content::isEmpty);
+    }
+
+    @Override
+    public Biomass getTotalBiomass() {
+        return getMap()
+            .values()
+            .stream()
+            .map(Content::asBiomass)
+            .reduce(Biomass::add)
+            .orElse(Biomass.ZERO);
+    }
+
+    public static class Builder implements BucketBuilder {
+        private final Map<Species, Content> map = new HashMap<>();
+
+        private Builder() {
+        }
+
+        @Override
+        public Builder put(
+            final Bucket bucket
+        ) {
+            return put(bucket.getMap());
+        }
+
+        @Override
+        public Builder put(
+            final Map<Species, Content> map
+        ) {
+            this.map.putAll(map);
+            return this;
+        }
+
+        @Override
+        public Builder put(
+            final Species species,
+            final Content newContent
+        ) {
+            map.put(species, newContent);
+            return this;
+        }
+
+        @Override
+        public Builder add(final Bucket bucket) {
+            return add(bucket.getMap());
+        }
+
+        @Override
+        public Builder add(final Map<Species, Content> map) {
+            map.forEach(this::add);
+            return this;
+        }
+
+        @Override
+        public Builder add(
+            final Species species,
+            final Content content
+        ) {
+            map.merge(species, content, Content::add);
+            return this;
+        }
+
+        @Override
+        public Builder subtract(final Bucket bucket) {
+            return subtract(bucket.getMap());
+        }
+
+        @Override
+        public Builder subtract(final Map<Species, Content> map) {
+            map.forEach(this::subtract);
+            return this;
+        }
+
+        @Override
+        public Builder subtract(
+            final Species species,
+            final Content content
+        ) {
+            map.merge(species, content, Content::subtract);
+            return this;
+        }
+
+        @Override
+        public Bucket build() {
+
+            if (map.isEmpty())
+                return ImmutableMapBucket.empty();
+
+            final ImmutableMap<Species, Content> newMap = this.map
+                .entrySet()
+                .stream()
+                .filter(entry -> !entry.getValue().isEmpty())
+                .collect(toImmutableMap(Entry::getKey, Entry::getValue));
+            return new ImmutableMapBucket(newMap);
+        }
+
+    }
+
+}

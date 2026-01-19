@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.biology.biomass;
 import com.google.common.collect.ImmutableMap;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.Bucket;
+import uk.ac.ox.poseidon.biology.BucketBuilder;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -94,8 +95,8 @@ public class BiomassGrids implements FisheableGrid {
 
         @Override
         public Bucket extract(final Bucket fishToExtract) {
-            final Bucket.Builder fishExtractedSoFar = Bucket.newBuilder();
-            final Bucket.Builder fishRemainingToExtract = fishToExtract.toBuilder();
+            final BucketBuilder fishExtractedSoFar = Bucket.newBuilder();
+            final BucketBuilder fishRemainingToExtract = fishToExtract.toBuilder();
             for (final Fisheable fisheable : fisheables.values()) {
                 final Bucket fishExtracted =
                     fisheable.extract(fishRemainingToExtract.build());

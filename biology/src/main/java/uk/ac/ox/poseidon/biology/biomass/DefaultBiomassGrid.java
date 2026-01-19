@@ -27,10 +27,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.biology.Bucket;
-import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.biology.Fisheable;
-import uk.ac.ox.poseidon.biology.FisheableGrid;
+import uk.ac.ox.poseidon.biology.*;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableDoubleGrid;
@@ -118,7 +115,7 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
 
         @Override
         public Bucket extract(final Bucket fishToExtract) {
-            final Bucket.Builder fishExtracted = Bucket.newBuilder();
+            final BucketBuilder fishExtracted = Bucket.newBuilder();
             fishToExtract
                 .getContent(species)
                 .map(Content::asKg)
