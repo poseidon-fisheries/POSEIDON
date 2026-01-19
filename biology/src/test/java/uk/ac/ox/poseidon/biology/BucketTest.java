@@ -52,6 +52,17 @@ abstract class BucketTest {
     }
 
     @Test
+    void bucketCreationWithAZeroBiomassSpecies() {
+        final Bucket bucket = newBucket(Map.of(a, 0.0, bA, 100.0, bJ, 200.0));
+        assertThat(bucket.getContent(a)).isEmpty();
+        assertThat(bucket.getContent(bA)).contains(Biomass.ofKg(100.0));
+        assertThat(bucket.getContent(bJ)).contains(Biomass.ofKg(200.0));
+        assertThat(bucket.getKg(a)).isEqualTo(0);
+        assertThat(bucket.getKg(bA)).isEqualTo(100.0);
+        assertThat(bucket.getKg(bJ)).isEqualTo(200.0);
+    }
+
+    @Test
     void simpleAddition() {
         final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
         final Bucket bucket2 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
