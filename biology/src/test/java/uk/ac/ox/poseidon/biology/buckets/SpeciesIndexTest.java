@@ -36,23 +36,23 @@ class SpeciesIndexTest {
     @Test
     void makeSpeciesIndices() {
         final Set<Species> species = Set.of(
-            new Species("S1", "Species 1", null),
-            new Species("S2", "Species 2", "Adult"),
-            new Species("S3", "Species 3", "Juvenile")
+            new Species("S1", null, "Species 1"),
+            new Species("S2", "Adult", "Species 2"),
+            new Species("S3", "Juvenile", "Species 3")
         );
         final BiMap<Species, Integer> speciesIndices = SpeciesIndex.of(species).getMap();
         assertEquals(3, speciesIndices.size());
-        assertEquals(0, speciesIndices.get(new Species("S1", "Species 1", null)));
-        assertEquals(1, speciesIndices.get(new Species("S2", "Species 2", "Adult")));
-        assertEquals(2, speciesIndices.get(new Species("S3", "Species 3", "Juvenile")));
+        assertEquals(0, speciesIndices.get(new Species("S1", null, "Species 1")));
+        assertEquals(1, speciesIndices.get(new Species("S2", "Adult", "Species 2")));
+        assertEquals(2, speciesIndices.get(new Species("S3", "Juvenile", "Species 3")));
     }
 
     @Test
     void makeSpeciesIndicesWithDuplicateKeys() {
         final Set<Species> species = Set.of(
-            new Species("S1", "Species 1 (juvenile)", "Adult"), // deliberately inconsistent
-            new Species("S1", "Species 1 (adult)", "Adult"),
-            new Species("S3", "Species 3", "Juvenile")
+            new Species("S1", "Adult", "Species 1 (juvenile)"), // deliberately inconsistent
+            new Species("S1", "Adult", "Species 1 (adult)"),
+            new Species("S3", "Juvenile", "Species 3")
         );
         assertThrows(
             IllegalArgumentException.class,

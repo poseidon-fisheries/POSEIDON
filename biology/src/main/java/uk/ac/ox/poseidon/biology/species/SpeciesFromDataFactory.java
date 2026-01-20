@@ -54,8 +54,8 @@ public class SpeciesFromDataFactory<S extends Scope>
             .map(row ->
                 new Species(
                     row.getString(speciesCodeColumn),
-                    row.getString(speciesNameColumn),
-                    lifeStageColumn == null ? null : row.getString(lifeStageColumn)
+                    lifeStageColumn == null ? null : row.getString(lifeStageColumn),
+                    row.getString(speciesNameColumn)
                 )
             )
             .toList();

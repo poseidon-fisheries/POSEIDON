@@ -36,11 +36,11 @@ abstract class BucketTest {
 
     abstract Bucket newBucket(Map<Species, Double> map);
 
-    private final Species a = new Species("A", "A", null);
-    private final Species bA = new Species("B", "B", "adult");
-    private final Species bJ = new Species("B", "B", "juvenile");
-    private final Species c = new Species("C", "C", null);
-    private final Species d = new Species("D", "D", null);
+    private final Species a = new Species("A", null, "A");
+    private final Species bA = new Species("B", "adult", "B");
+    private final Species bJ = new Species("B", "juvenile", "B");
+    private final Species c = new Species("C", null, "C");
+    private final Species d = new Species("D", null, "D");
 
     @Test
     void simpleBucketCreation() {

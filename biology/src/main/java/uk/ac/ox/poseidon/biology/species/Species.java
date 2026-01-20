@@ -24,20 +24,22 @@ package uk.ac.ox.poseidon.biology.species;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Species {
 
-    private final String code;
+    @EqualsAndHashCode.Include private final String code;
+    @EqualsAndHashCode.Include private final String lifeStage;
     private final String name;
-    private final String lifeStage;
 
     public Species(
         final String code,
         final String name
     ) {
-        this(code, name, null);
+        this(code, null, name);
     }
 
     /**

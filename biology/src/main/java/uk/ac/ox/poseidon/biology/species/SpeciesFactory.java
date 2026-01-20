@@ -53,8 +53,8 @@ public class SpeciesFactory extends GlobalScopeFactory<Species> {
     protected Species newInstance(final GlobalScope scope) {
         return new Species(
             checkNotNull(code),
-            name != null ? name : PREFIX + " " + code,
-            lifeStage != null ? lifeStage : null
+            lifeStage != null ? lifeStage : null,
+            name != null ? name : PREFIX + " " + code
         );
     }
 }
