@@ -20,18 +20,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology;
+package uk.ac.ox.poseidon.biology.buckets;
 
-import uk.ac.ox.poseidon.biology.buckets.Bucket;
-import uk.ac.ox.poseidon.biology.buckets.ImmutableMapBucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.Map;
 
-class ImmutableMapBucketTest extends BucketTest {
+class BiomassArrayBucketTest extends BucketTest {
 
     @Override
     Bucket newBucket(final Map<Species, Double> map) {
-        return ImmutableMapBucket.ofBiomassMap(map);
+        return BiomassArrayBucket.ofBiomassMap(map);
     }
 }

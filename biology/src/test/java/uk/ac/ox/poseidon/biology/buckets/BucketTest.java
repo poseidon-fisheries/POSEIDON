@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,14 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology;
+package uk.ac.ox.poseidon.biology.buckets;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
-import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -93,5 +94,70 @@ abstract class BucketTest {
         assertThat(bucket3.getContent(bJ)).isEmpty();
         assertThat(bucket3.getContent(c)).isEmpty();
         assertThat(bucket3.getTotalBiomass()).isEqualTo(Biomass.ZERO);
+    }
+
+    @Test
+    void replaceContent() {
+        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
+        final Bucket newBucket = bucket.replaceContent(a, Biomass.ofKg(50.0));
+        assertThat(bucket.getContent(a)).contains(Biomass.ofKg(100.0));
+        assertThat(newBucket.getContent(a)).contains(Biomass.ofKg(50.0));
+    }
+
+    @Test
+    void mapContent() {
+        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
+        final var newBucket = bucket.mapContent(content -> content.multiply(2.0));
+        assertThat(newBucket.getContent(a)).contains(Biomass.ofKg(200.0));
+        assertThat(newBucket.getContent(bA)).contains(Biomass.ofKg(400.0));
+        assertThat(newBucket.getContent(bJ)).contains(Biomass.ofKg(600.0));
+        assertThat(newBucket.getContent(c)).contains(Biomass.ofKg(800.0));
+    }
+
+    @Test
+    void partitionBy() {
+        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
+        final Map<Boolean, Bucket> result =
+            bucket.partitionBy((species, content) -> species.getLifeStage() == null);
+        assertThat(result.get(true).getSpecies()).isEqualTo(Set.of(a, c));
+        assertThat(result.get(false).getSpecies()).isEqualTo(Set.of(bA, bJ));
+    }
+
+    @Test
+    void isEmpty() {
+        final Bucket b1 = newBucket(Map.of());
+        assertThat(b1.isEmpty()).isTrue();
+        final Bucket b2 = newBucket(Map.of(a, 0.0));
+        assertThat(b2.isEmpty()).isTrue();
+        final Bucket b3 = newBucket(Map.of(a, 100.0));
+        assertThat(b3.isEmpty()).isFalse();
+    }
+
+    @Test
+    void getTotalBiomass() {
+        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
+        assertThat(bucket.getTotalBiomass()).isEqualTo(Biomass.ofKg(1000.0));
+    }
+
+    @Test
+    void getMap() {
+        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
+        final Map<Species, Content> map = bucket.getMap();
+        assertThat(map).isEqualTo(
+            Map.of(
+                a, Biomass.ofKg(100.0),
+                bA, Biomass.ofKg(200.0),
+                bJ, Biomass.ofKg(300.0),
+                c, Biomass.ofKg(400.0)
+            )
+        );
+    }
+
+    @Test
+    void getSpecies() {
+        final Bucket b1 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
+        assertThat(b1.getSpecies()).isEqualTo(Set.of(a, bA, bJ, c));
+        final Bucket b2 = newBucket(Map.of(a, 100.0, c, 400.0));
+        assertThat(b2.getSpecies()).isEqualTo(Set.of(a, c));
     }
 }
