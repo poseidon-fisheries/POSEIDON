@@ -82,21 +82,21 @@ public class SpeciesIndex {
         );
         return Streams
             .mapWithIndex(
-                species.stream().sorted(Comparator.comparing(Species::getCode)),
+                species.stream().sorted(Comparator.comparing(SpeciesIndex::speciesKey)),
                 (s, index) -> entry(s, toIntExact(index))
             )
             .collect(toImmutableBiMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    double[] newBiomassArray() {
+    public double[] newBiomassArray() {
         return new double[map.size()];
     }
 
-    Optional<Integer> indexOf(final Species species) {
+    public Optional<Integer> indexOf(final Species species) {
         return Optional.ofNullable(map.get(species));
     }
 
-    Optional<Species> speciesAt(final int index) {
+    public Optional<Species> speciesAt(final int index) {
         return Optional.ofNullable(map.inverse().get(index));
     }
 

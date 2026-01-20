@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,31 +20,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.biomass;
+package uk.ac.ox.poseidon.biology.buckets;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.biology.species.Species;
 
-import java.util.List;
+import java.util.Map;
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class BiomassGridsFactory extends SimulationScopeFactory<BiomassGrids> {
-
-    private Factory<? super SimulationScope, ? extends List<? extends BiomassGrid>> biomassGrids;
+class BiomassBucketTest extends BucketTest {
 
     @Override
-    protected BiomassGrids newInstance(final SimulationScope scope) {
-        return new BiomassGrids(biomassGrids.get(scope));
+    Bucket newBucket(final Map<Species, Double> map) {
+        return BiomassBucket.ofBiomassMap(map);
     }
-
 }

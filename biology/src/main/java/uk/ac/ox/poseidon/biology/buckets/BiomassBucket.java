@@ -48,10 +48,10 @@ import static lombok.AccessLevel.PRIVATE;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = PRIVATE)
-public class BiomassArrayBucket implements Bucket {
+public class BiomassBucket implements Bucket {
 
     private final double[] biomasses;
-    private final SpeciesIndex speciesIndex;
+    @Getter private final SpeciesIndex speciesIndex;
 
     @Getter(lazy = true)
     private final ImmutableMap<Species, Content> map =
@@ -64,12 +64,12 @@ public class BiomassArrayBucket implements Bucket {
                 entry -> Biomass.ofKg(biomasses[entry.getValue()])
             ));
 
-    public static BiomassArrayBucket ofContentMap(final Map<Species, Content> map) {
+    public static BiomassBucket ofContentMap(final Map<Species, Content> map) {
         return ofBiomassMap(Maps.transformValues(map, Content::asKg));
     }
 
     @SuppressWarnings("DataFlowIssue")
-    public static BiomassArrayBucket ofBiomassMap(final Map<Species, Double> map) {
+    public static BiomassBucket ofBiomassMap(final Map<Species, Double> map) {
         final SpeciesIndex speciesIndex = SpeciesIndex.of(map.keySet());
         final double[] biomasses = speciesIndex.newBiomassArray();
         final ImmutableBiMap<Species, Integer> speciesIndexMap = speciesIndex.getMap();
@@ -77,10 +77,10 @@ public class BiomassArrayBucket implements Bucket {
             final int index = speciesIndexMap.get(entry.getKey());
             biomasses[index] = entry.getValue();
         }
-        return new BiomassArrayBucket(biomasses, speciesIndex);
+        return new BiomassBucket(biomasses, speciesIndex);
     }
 
-    public static BiomassArrayBucket of(
+    public static BiomassBucket of(
         final double[] biomasses,
         final SpeciesIndex speciesIndex
     ) {
@@ -96,7 +96,7 @@ public class BiomassArrayBucket implements Bucket {
                 );
             }
         }
-        return new BiomassArrayBucket(biomasses.clone(), speciesIndex);
+        return new BiomassBucket(biomasses.clone(), speciesIndex);
     }
 
     @Override
@@ -111,22 +111,22 @@ public class BiomassArrayBucket implements Bucket {
     @Override
     public Bucket add(final Bucket other) {
         return switch (other) {
-            case final BiomassArrayBucket otherBucket when sameIndex(otherBucket) ->
+            case final BiomassBucket otherBucket when sameIndex(otherBucket) ->
                 addBiomassArrayBucket(otherBucket);
             default -> addOtherBucket(other);
         };
     }
 
-    private boolean sameIndex(final BiomassArrayBucket other) {
+    private boolean sameIndex(final BiomassBucket other) {
         return speciesIndex.equals(other.speciesIndex);
     }
 
-    private Bucket addBiomassArrayBucket(final BiomassArrayBucket other) {
+    private Bucket addBiomassArrayBucket(final BiomassBucket other) {
         final double[] newBiomasses = new double[biomasses.length];
         for (int i = 0; i < biomasses.length; i++) {
             newBiomasses[i] = biomasses[i] + other.biomasses[i];
         }
-        return new BiomassArrayBucket(newBiomasses, speciesIndex);
+        return new BiomassBucket(newBiomasses, speciesIndex);
     }
 
     private Bucket addOtherBucket(final Bucket other) {
@@ -139,26 +139,26 @@ public class BiomassArrayBucket implements Bucket {
             newBiomasses[index] = this.getKg(species) + other.getKg(species)
         );
 
-        return new BiomassArrayBucket(newBiomasses, speciesIndex);
+        return new BiomassBucket(newBiomasses, speciesIndex);
     }
 
     @Override
     public Bucket subtract(final Bucket other) {
         return switch (other) {
-            case final BiomassArrayBucket otherBucket when sameIndex(otherBucket) ->
+            case final BiomassBucket otherBucket when sameIndex(otherBucket) ->
                 subtractBiomassArrayBucket(otherBucket);
             default -> subtractOtherBucket(other);
         };
     }
 
-    private Bucket subtractBiomassArrayBucket(final BiomassArrayBucket other) {
+    private Bucket subtractBiomassArrayBucket(final BiomassBucket other) {
         final double[] newBiomasses = new double[biomasses.length];
         for (int i = 0; i < biomasses.length; i++) {
             final double otherBiomass = other.biomasses[i];
             newBiomasses[i] = biomasses[i] - other.biomasses[i];
             checkBiomassNonNegativeWhenSubtracting(newBiomasses[i], otherBiomass, i);
         }
-        return new BiomassArrayBucket(newBiomasses, speciesIndex);
+        return new BiomassBucket(newBiomasses, speciesIndex);
     }
 
     private Bucket subtractOtherBucket(final Bucket other) {
@@ -170,7 +170,7 @@ public class BiomassArrayBucket implements Bucket {
             newBiomasses[i] = biomasses[i] - otherBiomass;
             checkBiomassNonNegativeWhenSubtracting(newBiomasses[i], otherBiomass, i);
         }
-        return new BiomassArrayBucket(newBiomasses, speciesIndex);
+        return new BiomassBucket(newBiomasses, speciesIndex);
     }
 
     private void checkBiomassNonNegativeWhenSubtracting(
@@ -195,7 +195,7 @@ public class BiomassArrayBucket implements Bucket {
             .map(i -> {
                 final double[] newBiomasses = biomasses.clone();
                 newBiomasses[i] = newContent.asKg();
-                return (Bucket) new BiomassArrayBucket(newBiomasses, speciesIndex);
+                return (Bucket) new BiomassBucket(newBiomasses, speciesIndex);
             })
             .orElse(toBuilder().put(species, newContent).build());
     }
@@ -206,7 +206,7 @@ public class BiomassArrayBucket implements Bucket {
         for (int i = 0; i < biomasses.length; i++) {
             newBiomasses[i] = mapper.apply(Biomass.ofKg(biomasses[i])).asKg();
         }
-        return new BiomassArrayBucket(newBiomasses, speciesIndex);
+        return new BiomassBucket(newBiomasses, speciesIndex);
     }
 
     @Override
@@ -217,6 +217,10 @@ public class BiomassArrayBucket implements Bucket {
     @Override
     public boolean isEmpty() {
         return Arrays.stream(biomasses).sum() == 0;
+    }
+
+    public double getDouble(final int index) {
+        return biomasses[index];
     }
 
     @Override
