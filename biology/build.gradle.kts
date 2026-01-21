@@ -27,4 +27,5 @@ plugins {
 dependencies {
     api(project(":geography"))
     implementation(libs.tablesaw.core)
+    implementation(libs.fastutil.core)
 }

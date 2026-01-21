@@ -70,7 +70,7 @@ public class FisheableBiomassGrids implements FisheableGrid {
         );
         this.speciesIndex = SpeciesIndex.of(gridMap.keySet());
         this.grids = new BiomassGrid[gridMap.size()];
-        speciesIndex.getMap().forEach((species, index) ->
+        speciesIndex.asMap().forEach((species, index) ->
             this.grids[index] = gridMap.get(species)
         );
     }
@@ -84,6 +84,39 @@ public class FisheableBiomassGrids implements FisheableGrid {
     class FisheableCell implements Fisheable {
 
         private final Int2D cell;
+
+        private boolean sameIndex(final BiomassBucket other) {
+            return speciesIndex.equals(other.getSpeciesIndex());
+        }
+
+        @Override
+        public Bucket extract(final Bucket fishToExtract) {
+            final double[] biomassExtracted = speciesIndex.newBiomassArray();
+            switch (fishToExtract) {
+                case final BiomassBucket biomassBucket when sameIndex(biomassBucket) -> {
+                    for (int i = 0; i < speciesIndex.size(); i++) {
+                        extractBiomass(i, biomassBucket.getDouble(i), biomassExtracted);
+                    }
+                }
+                default -> fishToExtract.getMap().forEach((species, content) -> {
+                    final int i = speciesIndex.indexOf(species);
+                    if (i != -1) extractBiomass(i, content.asKg(), biomassExtracted);
+                });
+            }
+            return BiomassBucket.of(biomassExtracted, speciesIndex);
+        }
+
+        private void extractBiomass(
+            final int gridIndex,
+            final double biomassToExtract,
+            final double[] biomassExtracted
+        ) {
+            final BiomassGrid grid = grids[gridIndex];
+            final double currentBiomass = grid.getDouble(cell);
+            final double extractedBiomass = Math.min(biomassToExtract, currentBiomass);
+            biomassExtracted[gridIndex] = extractedBiomass;
+            grid.setBiomass(cell, currentBiomass - extractedBiomass);
+        }
 
         @Override
         public Bucket availableFish() {
@@ -103,57 +136,15 @@ public class FisheableBiomassGrids implements FisheableGrid {
                         grid.setBiomass(cell, grid.getDouble(cell) + biomassBucket.getDouble(i));
                     }
                 }
-                default -> fishToRelease
-                    .getMap()
-                    .forEach((species, content) ->
-                        speciesIndex.indexOf(species).ifPresentOrElse(
-                            index -> {
-                                final BiomassGrid grid = grids[index];
-                                grid.setBiomass(cell, grid.getDouble(cell) + content.asKg());
-                            },
-                            () -> {
-                                throw new IllegalArgumentException(
-                                    "No grid available to release %s.".formatted(species)
-                                );
-                            }
-                        ));
+                default -> fishToRelease.getMap().forEach((species, content) -> {
+                    final int i = speciesIndex.indexOf(species);
+                    if (i == -1) throw new IllegalArgumentException(
+                        "No grid available to release %s.".formatted(species)
+                    );
+                    final BiomassGrid grid = grids[i];
+                    grid.setBiomass(cell, grid.getDouble(cell) + content.asKg());
+                });
             }
-        }
-
-        private boolean sameIndex(final BiomassBucket other) {
-            return speciesIndex.equals(other.getSpeciesIndex());
-        }
-
-        @Override
-        public Bucket extract(final Bucket fishToExtract) {
-            final double[] biomassExtracted = speciesIndex.newBiomassArray();
-
-            switch (fishToExtract) {
-                case final BiomassBucket biomassBucket when sameIndex(biomassBucket) -> {
-                    for (int i = 0; i < speciesIndex.size(); i++) {
-                        extractBiomass(i, biomassBucket.getDouble(i), biomassExtracted);
-                    }
-                }
-                default -> fishToExtract.getMap().forEach((species, content) ->
-                    speciesIndex.indexOf(species).ifPresent(i ->
-                        extractBiomass(i, content.asKg(), biomassExtracted)
-                    )
-                );
-            }
-            return BiomassBucket.of(biomassExtracted, speciesIndex);
-        }
-
-        private void extractBiomass(
-            final int gridIndex,
-            final double biomassToExtract,
-            final double[] biomassExtracted
-        ) {
-            final BiomassGrid grid = grids[gridIndex];
-            final double currentBiomass = grid.getDouble(cell);
-            final double extractedBiomass = Math.min(biomassToExtract, currentBiomass);
-            biomassExtracted[gridIndex] = extractedBiomass;
-            grid.setBiomass(cell, currentBiomass - extractedBiomass);
         }
     }
-
 }

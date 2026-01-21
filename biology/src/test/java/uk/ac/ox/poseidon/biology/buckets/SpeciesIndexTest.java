@@ -40,7 +40,7 @@ class SpeciesIndexTest {
             new Species("S2", "Adult", "Species 2"),
             new Species("S3", "Juvenile", "Species 3")
         );
-        final BiMap<Species, Integer> speciesIndices = SpeciesIndex.of(species).getMap();
+        final BiMap<Species, Integer> speciesIndices = SpeciesIndex.of(species).asMap();
         assertEquals(3, speciesIndices.size());
         assertEquals(0, speciesIndices.get(new Species("S1", null, "Species 1")));
         assertEquals(1, speciesIndices.get(new Species("S2", "Adult", "Species 2")));

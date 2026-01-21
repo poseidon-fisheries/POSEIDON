@@ -25,11 +25,14 @@ package uk.ac.ox.poseidon.biology.species;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Comparator;
 
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Species {
+public class Species implements Comparable<Species> {
 
     @EqualsAndHashCode.Include private final String code;
     @EqualsAndHashCode.Include private final String lifeStage;
@@ -69,5 +72,13 @@ public class Species {
             sb.append(" (").append(this.lifeStage).append(")");
         }
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(final @NonNull Species o) {
+        return Comparator
+            .comparing(Species::getCode)
+            .thenComparing(Species::getLifeStage)
+            .compare(this, o);
     }
 }

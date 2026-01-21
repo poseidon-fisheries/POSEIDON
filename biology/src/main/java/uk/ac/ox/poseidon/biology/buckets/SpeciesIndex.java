@@ -22,26 +22,18 @@
 
 package uk.ac.ox.poseidon.biology.buckets;
 
-import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import com.google.common.collect.Streams;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.biology.species.Species;
 
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
-import static java.lang.Math.toIntExact;
-import static java.util.Map.entry;
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
 import static lombok.AccessLevel.PRIVATE;
 
 @Data
@@ -50,7 +42,8 @@ public class SpeciesIndex {
 
     private static final Interner<SpeciesIndex> interner = Interners.newWeakInterner();
 
-    private final ImmutableBiMap<Species, Integer> map;
+    private final Object2IntOpenHashMap<Species> indices;
+    private final Species[] speciesArray;
 
     private static String speciesKey(final Species species) {
         return String.join(
@@ -61,46 +54,57 @@ public class SpeciesIndex {
     }
 
     public static SpeciesIndex of(final Set<Species> species) {
-        return interner.intern(new SpeciesIndex(makeIndices(species)));
+        return interner.intern(new SpeciesIndex(species));
     }
 
-    private static ImmutableBiMap<Species, Integer> makeIndices(final Set<Species> species) {
-        final Set<String> speciesKeys =
-            species.stream().map(SpeciesIndex::speciesKey).collect(Collectors.toSet());
-        if (speciesKeys.size() != species.size()) throw new IllegalArgumentException(
-            "Duplicate species codes %s found in species set: %s".formatted(
-                species.stream()
-                    .map(SpeciesIndex::speciesKey)
-                    .collect(groupingBy(Function.identity(), counting()))
-                    .entrySet()
-                    .stream()
-                    .filter(e -> e.getValue() > 1)
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toSet()),
-                species
-            )
-        );
-        return Streams
-            .mapWithIndex(
-                species.stream().sorted(Comparator.comparing(SpeciesIndex::speciesKey)),
-                (s, index) -> entry(s, toIntExact(index))
-            )
-            .collect(toImmutableBiMap(Map.Entry::getKey, Map.Entry::getValue));
+    private SpeciesIndex(final Set<Species> speciesSet) {
+        this.speciesArray = new Species[speciesSet.size()];
+        this.indices = new Object2IntOpenHashMap<>(speciesSet.size());
+        indices.defaultReturnValue(-1);
+        Streams
+            .mapWithIndex(speciesSet.stream().sorted(), Map::entry)
+            .forEach(entry -> {
+                final int i = entry.getValue().intValue();
+                final Species species = entry.getKey();
+                indices.put(species, i);
+                speciesArray[i] = species;
+            });
     }
 
     public double[] newBiomassArray() {
-        return new double[map.size()];
+        return new double[speciesArray.length];
     }
 
-    public Optional<Integer> indexOf(final Species species) {
-        return Optional.ofNullable(map.get(species));
+    /**
+     * Retrieves the index of the specified {@code Species} in this {@code SpeciesIndex}. If the
+     * species is not found, the method returns -1.
+     *
+     * @param species the {@code Species} whose index is to be retrieved
+     * @return the index of the specified {@code Species}, or -1 if not found
+     */
+    public int indexOf(final Species species) {
+        return indices.getInt(species);
     }
 
-    public Optional<Species> speciesAt(final int index) {
-        return Optional.ofNullable(map.inverse().get(index));
+    /**
+     * Retrieves the {@code Species} object at the specified index in the {@code SpeciesIndex}'s
+     * internal array. If the index is out of bounds, the method returns {@code null}.
+     *
+     * @param index the index of the {@code Species} object to retrieve
+     * @return the {@code Species} object at the specified index, or {@code null} if the index is
+     * out of bounds
+     */
+    public Species speciesAt(final int index) {
+        return (index < 0 || index >= speciesArray.length)
+            ? null
+            : speciesArray[index];
     }
 
     public int size() {
-        return getMap().size();
+        return speciesArray.length;
+    }
+
+    public Map<Species, Integer> asMap() {
+        return Collections.unmodifiableMap(indices);
     }
 }

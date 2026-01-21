@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.biology.buckets;
 
-import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -56,7 +55,7 @@ public class BiomassBucket implements Bucket {
     @Getter(lazy = true)
     private final ImmutableMap<Species, Content> map =
         speciesIndex
-            .getMap()
+            .asMap()
             .entrySet()
             .stream()
             .collect(toImmutableMap(
@@ -68,11 +67,10 @@ public class BiomassBucket implements Bucket {
         return ofBiomassMap(Maps.transformValues(map, Content::asKg));
     }
 
-    @SuppressWarnings("DataFlowIssue")
     public static BiomassBucket ofBiomassMap(final Map<Species, Double> map) {
         final SpeciesIndex speciesIndex = SpeciesIndex.of(map.keySet());
         final double[] biomasses = speciesIndex.newBiomassArray();
-        final ImmutableBiMap<Species, Integer> speciesIndexMap = speciesIndex.getMap();
+        final Map<Species, Integer> speciesIndexMap = speciesIndex.asMap();
         for (final Entry<Species, Double> entry : map.entrySet()) {
             final int index = speciesIndexMap.get(entry.getKey());
             biomasses[index] = entry.getValue();
@@ -101,11 +99,11 @@ public class BiomassBucket implements Bucket {
 
     @Override
     public Optional<Content> getContent(final Species species) {
-        return speciesIndex
-            .indexOf(species)
-            .map(i -> biomasses[i])
-            .filter(kg -> kg > 0)
-            .map(Biomass::ofKg);
+        final int i = speciesIndex.indexOf(species);
+        if (i == -1) return Optional.empty();
+        final double biomass = biomasses[i];
+        if (biomass == 0) return Optional.empty();
+        return Optional.of(Biomass.ofKg(biomass));
     }
 
     @Override
@@ -135,7 +133,7 @@ public class BiomassBucket implements Bucket {
 
         final double[] newBiomasses = speciesIndex.newBiomassArray();
 
-        speciesIndex.getMap().forEach((species, index) ->
+        speciesIndex.asMap().forEach((species, index) ->
             newBiomasses[index] = this.getKg(species) + other.getKg(species)
         );
 
@@ -162,10 +160,9 @@ public class BiomassBucket implements Bucket {
     }
 
     private Bucket subtractOtherBucket(final Bucket other) {
-        final double[] newBiomasses = new double[biomasses.length];
-        final ImmutableBiMap<Integer, Species> speciesByIndex = speciesIndex.getMap().inverse();
-        for (int i = 0; i < biomasses.length; i++) {
-            final Species species = speciesByIndex.get(i);
+        final double[] newBiomasses = speciesIndex.newBiomassArray();
+        for (int i = 0; i < speciesIndex.size(); i++) {
+            final Species species = speciesIndex.speciesAt(i);
             final double otherBiomass = other.getContent(species).map(Content::asKg).orElse(0.0);
             newBiomasses[i] = biomasses[i] - otherBiomass;
             checkBiomassNonNegativeWhenSubtracting(newBiomasses[i], otherBiomass, i);
@@ -180,7 +177,7 @@ public class BiomassBucket implements Bucket {
     ) {
         if (newBiomass < 0) throw new IllegalStateException(
             "Subtracting " + otherBiomass + " kg from " + biomasses[i] +
-                " kg for species " + speciesIndex.getMap().inverse().get(i) +
+                " kg for species " + speciesIndex.speciesAt(i) +
                 " results in negative biomass " + newBiomass
         );
     }
@@ -190,14 +187,11 @@ public class BiomassBucket implements Bucket {
         final Species species,
         final Content newContent
     ) {
-        return speciesIndex
-            .indexOf(species)
-            .map(i -> {
-                final double[] newBiomasses = biomasses.clone();
-                newBiomasses[i] = newContent.asKg();
-                return (Bucket) new BiomassBucket(newBiomasses, speciesIndex);
-            })
-            .orElse(toBuilder().put(species, newContent).build());
+        final int i = speciesIndex.indexOf(species);
+        if (i == -1) return toBuilder().put(species, newContent).build();
+        final double[] newBiomasses = biomasses.clone();
+        newBiomasses[i] = newContent.asKg();
+        return new BiomassBucket(newBiomasses, speciesIndex);
     }
 
     @Override
