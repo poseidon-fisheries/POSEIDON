@@ -90,5 +90,7 @@ public interface Bucket {
         return getMap().keySet();
     }
 
-    BucketBuilder toBuilder();
+    default BucketBuilder toBuilder() {
+        return newBuilder().put(this);
+    }
 }

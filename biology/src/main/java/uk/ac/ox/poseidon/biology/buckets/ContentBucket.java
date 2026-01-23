@@ -77,10 +77,6 @@ public final class ContentBucket implements Bucket {
         );
     }
 
-    public BucketBuilder toBuilder() {
-        return Bucket.newBuilder().put(this);
-    }
-
     @Override
     public Optional<Content> getContent(final Species species) {
         return Optional.ofNullable(getMap().get(species));

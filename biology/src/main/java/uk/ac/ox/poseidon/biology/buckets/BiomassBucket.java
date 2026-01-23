@@ -234,9 +234,5 @@ public class BiomassBucket implements Bucket {
     public Biomass getTotalBiomass() {
         return Biomass.ofKg(Arrays.stream(biomasses).sum());
     }
-
-    @Override
-    public BucketBuilder toBuilder() {
-        return Bucket.newBuilder().add(this);
-    }
+    
 }
