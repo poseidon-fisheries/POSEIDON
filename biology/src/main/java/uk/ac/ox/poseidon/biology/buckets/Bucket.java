@@ -36,11 +36,11 @@ import java.util.function.UnaryOperator;
 public interface Bucket {
 
     static Bucket empty() {
-        return ImmutableMapBucket.empty();
+        return EmptyBucket.INSTANCE;
     }
 
     static BucketBuilder newBuilder() {
-        return ImmutableMapBucket.newBuilder();
+        return new AdaptiveBucketBuilder();
     }
 
     static Bucket of(

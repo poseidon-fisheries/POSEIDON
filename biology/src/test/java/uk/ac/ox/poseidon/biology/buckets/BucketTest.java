@@ -30,6 +30,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import java.util.Map;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 abstract class BucketTest {
@@ -85,6 +86,37 @@ abstract class BucketTest {
     }
 
     @Test
+    void additionIsCommutative() {
+        final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
+        final Bucket bucket2 = newBucket(Map.of(bA, 50.0, c, 300.0));
+        assertThat(bucket1.add(bucket2).getMap()).isEqualTo(bucket2.add(bucket1).getMap());
+    }
+
+    @Test
+    void additionIsAssociative() {
+        final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
+        final Bucket bucket2 = newBucket(Map.of(bA, 50.0, c, 300.0));
+        final Bucket bucket3 = newBucket(Map.of(a, 25.0, d, 75.0));
+        assertThat(bucket1.add(bucket2).add(bucket3).getMap())
+            .isEqualTo(bucket1.add(bucket2.add(bucket3)).getMap());
+    }
+
+    @Test
+    void addingEmptyBucketIsNoOp() {
+        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0));
+        assertThat(bucket.add(Bucket.empty()).getMap()).isEqualTo(bucket.getMap());
+    }
+
+    @Test
+    void missingSpeciesRemainsEmptyAfterAddition() {
+        final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
+        final Bucket bucket2 = newBucket(Map.of(bA, 200.0, bJ, 300.0));
+        final Bucket bucket3 = bucket1.add(bucket2);
+        assertThat(bucket3.getContent(d)).isEmpty();
+        assertThat(bucket3.getKg(d)).isEqualTo(0.0);
+    }
+
+    @Test
     void subtraction() {
         final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
         final Bucket bucket2 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
@@ -94,6 +126,20 @@ abstract class BucketTest {
         assertThat(bucket3.getContent(bJ)).isEmpty();
         assertThat(bucket3.getContent(c)).isEmpty();
         assertThat(bucket3.getTotalBiomass()).isEqualTo(Biomass.ZERO);
+    }
+
+    @Test
+    void subtractingEmptyBucketIsNoOp() {
+        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0));
+        assertThat(bucket.subtract(Bucket.empty()).getMap()).isEqualTo(bucket.getMap());
+    }
+
+    @Test
+    void subtractingMoreThanAvailableThrows() {
+        final Bucket bucket1 = newBucket(Map.of(a, 100.0));
+        final Bucket bucket2 = newBucket(Map.of(a, 200.0));
+        assertThatThrownBy(() -> bucket1.subtract(bucket2))
+            .isInstanceOfAny(IllegalStateException.class, IllegalArgumentException.class);
     }
 
     @Test

@@ -26,8 +26,8 @@ public class DummySpecies {
 
     private DummySpecies() {}
 
-    public static final Species A = new Species("A", "Species A");
-    public static final Species B = new Species("B", "Species B");
-    public static final Species C = new Species("C", "Species C");
+    public static final Species A = new Species("A", "Species A", null);
+    public static final Species B = new Species("B", "Species B", null);
+    public static final Species C = new Species("C", "Species C", null);
 
 }

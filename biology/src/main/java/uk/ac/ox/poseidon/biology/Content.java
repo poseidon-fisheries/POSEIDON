@@ -28,6 +28,9 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
 
+/**
+ * Represents quantitative content; implementations are expected to be immutable.
+ */
 public interface Content {
 
     default Content add(final Content content) {

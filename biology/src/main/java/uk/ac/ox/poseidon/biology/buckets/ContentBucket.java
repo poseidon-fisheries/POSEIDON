@@ -23,13 +23,11 @@
 package uk.ac.ox.poseidon.biology.buckets;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import lombok.Data;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -40,35 +38,43 @@ import java.util.stream.Stream;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 @Data
-public final class ImmutableMapBucket implements Bucket {
+public final class ContentBucket implements Bucket {
 
     private final ImmutableMap<Species, Content> map;
 
-    public static ImmutableMapBucket empty() {
-        return new ImmutableMapBucket(ImmutableMap.of());
-    }
-
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
-    public static ImmutableMapBucket copyOf(final Bucket bucket) {
+    public static ContentBucket copyOf(final Bucket bucket) {
         return switch (bucket) {
-            case final ImmutableMapBucket immutableMapBucket -> immutableMapBucket;
-            default -> newBuilder().put(bucket).build();
+            case final ContentBucket contentBucket -> contentBucket;
+            default -> ofContentMap(bucket.getMap());
         };
     }
 
-    private ImmutableMapBucket(final ImmutableMap<Species, Content> map) {
+    private ContentBucket(final ImmutableMap<Species, Content> map) {
         this.map = map;
     }
 
-    public static Bucket ofContentMap(final Map<Species, Content> map) {
-        return Bucket.newBuilder().put(map).build();
+    public static ContentBucket ofContentMap(final Map<Species, Content> map) {
+        return new ContentBucket(
+            map
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue() != null && e.getValue().asKg() > 0.0)
+                .collect(toImmutableMap(Entry::getKey, Entry::getValue))
+        );
     }
 
     public static Bucket ofBiomassMap(final Map<Species, Double> map) {
-        return ofContentMap(Maps.transformValues(map, Biomass::ofKg));
+        return new ContentBucket(
+            map
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue() != null && e.getValue() > 0.0)
+                .collect(toImmutableMap(
+                        Entry::getKey,
+                        e -> Biomass.ofKg(e.getValue())
+                    )
+                )
+        );
     }
 
     public BucketBuilder toBuilder() {
@@ -81,8 +87,8 @@ public final class ImmutableMapBucket implements Bucket {
     }
 
     @Override
-    public ImmutableMapBucket add(final Bucket other) {
-        return new ImmutableMapBucket(
+    public ContentBucket add(final Bucket other) {
+        return new ContentBucket(
             Stream
                 .concat(getMap().entrySet().stream(), other.getMap().entrySet().stream())
                 .collect(toImmutableMap(
@@ -119,8 +125,8 @@ public final class ImmutableMapBucket implements Bucket {
     public Map<Boolean, Bucket> partitionBy(
         final BiPredicate<Species, Content> predicate
     ) {
-        final Builder b1 = newBuilder();
-        final Builder b2 = newBuilder();
+        final BucketBuilder b1 = Bucket.newBuilder();
+        final BucketBuilder b2 = Bucket.newBuilder();
         getMap().forEach((species, content) ->
             (predicate.test(species, content) ? b1 : b2).put(species, content)
         );
@@ -140,92 +146,6 @@ public final class ImmutableMapBucket implements Bucket {
             .map(Content::asBiomass)
             .reduce(Biomass::add)
             .orElse(Biomass.ZERO);
-    }
-
-    public static class Builder implements BucketBuilder {
-        private final Map<Species, Content> map = new HashMap<>();
-
-        private Builder() {
-        }
-
-        @Override
-        public Builder put(
-            final Bucket bucket
-        ) {
-            return put(bucket.getMap());
-        }
-
-        @Override
-        public Builder put(
-            final Map<Species, Content> map
-        ) {
-            this.map.putAll(map);
-            return this;
-        }
-
-        @Override
-        public Builder put(
-            final Species species,
-            final Content newContent
-        ) {
-            map.put(species, newContent);
-            return this;
-        }
-
-        @Override
-        public Builder add(final Bucket bucket) {
-            return add(bucket.getMap());
-        }
-
-        @Override
-        public Builder add(final Map<Species, Content> map) {
-            map.forEach(this::add);
-            return this;
-        }
-
-        @Override
-        public Builder add(
-            final Species species,
-            final Content content
-        ) {
-            map.merge(species, content, Content::add);
-            return this;
-        }
-
-        @Override
-        public Builder subtract(final Bucket bucket) {
-            return subtract(bucket.getMap());
-        }
-
-        @Override
-        public Builder subtract(final Map<Species, Content> map) {
-            map.forEach(this::subtract);
-            return this;
-        }
-
-        @Override
-        public Builder subtract(
-            final Species species,
-            final Content content
-        ) {
-            map.merge(species, content, Content::subtract);
-            return this;
-        }
-
-        @Override
-        public ImmutableMapBucket build() {
-
-            if (map.isEmpty())
-                return ImmutableMapBucket.empty();
-
-            final ImmutableMap<Species, Content> newMap = this.map
-                .entrySet()
-                .stream()
-                .filter(entry -> !entry.getValue().isEmpty())
-                .collect(toImmutableMap(Entry::getKey, Entry::getValue));
-            return new ImmutableMapBucket(newMap);
-        }
-
     }
 
 }

@@ -22,21 +22,22 @@
 
 package uk.ac.ox.poseidon.biology.buckets;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
-import com.google.common.collect.Streams;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.biology.species.Species;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
 import static lombok.AccessLevel.PRIVATE;
 
-@Data
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = PRIVATE)
 public class SpeciesIndex {
 
@@ -44,31 +45,25 @@ public class SpeciesIndex {
 
     private final Object2IntOpenHashMap<Species> indices;
     private final Species[] speciesArray;
-
-    private static String speciesKey(final Species species) {
-        return String.join(
-            ";",
-            species.getCode(),
-            species.getLifeStage() == null ? "" : species.getLifeStage()
-        );
-    }
+    private transient volatile Map<Species, Integer> cachedMap;
 
     public static SpeciesIndex of(final Set<Species> species) {
         return interner.intern(new SpeciesIndex(species));
     }
 
-    private SpeciesIndex(final Set<Species> speciesSet) {
-        this.speciesArray = new Species[speciesSet.size()];
-        this.indices = new Object2IntOpenHashMap<>(speciesSet.size());
+    private SpeciesIndex(@NonNull final Set<Species> speciesSet) {
+        this.speciesArray = speciesSet.toArray(new Species[0]);
+        this.indices = new Object2IntOpenHashMap<>(speciesArray.length);
         indices.defaultReturnValue(-1);
-        Streams
-            .mapWithIndex(speciesSet.stream().sorted(), Map::entry)
-            .forEach(entry -> {
-                final int i = entry.getValue().intValue();
-                final Species species = entry.getKey();
-                indices.put(species, i);
-                speciesArray[i] = species;
-            });
+        for (final Species species : speciesArray) {
+            if (species == null) {
+                throw new NullPointerException("Species set must not contain null entries.");
+            }
+        }
+        Arrays.sort(this.speciesArray);
+        for (int i = 0; i < speciesArray.length; i++) {
+            indices.put(speciesArray[i], i);
+        }
     }
 
     public double[] newBiomassArray() {
@@ -105,6 +100,16 @@ public class SpeciesIndex {
     }
 
     public Map<Species, Integer> asMap() {
-        return Collections.unmodifiableMap(indices);
+        Map<Species, Integer> map = cachedMap;
+        if (map == null) {
+            final ImmutableMap.Builder<Species, Integer> builder =
+                ImmutableMap.builderWithExpectedSize(indices.size());
+            indices.object2IntEntrySet().forEach(entry ->
+                builder.put(entry.getKey(), entry.getIntValue())
+            );
+            map = builder.build();
+            cachedMap = map;
+        }
+        return map;
     }
 }

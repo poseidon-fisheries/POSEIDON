@@ -29,21 +29,21 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Comparator;
 
+import static java.util.Comparator.nullsFirst;
+
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Species implements Comparable<Species> {
 
-    @EqualsAndHashCode.Include private final String code;
-    @EqualsAndHashCode.Include private final String lifeStage;
-    private final String name;
+    @EqualsAndHashCode.Include
+    @NonNull
+    private final String code;
 
-    public Species(
-        final String code,
-        final String name
-    ) {
-        this(code, null, name);
-    }
+    @EqualsAndHashCode.Include
+    private final String lifeStage;
+
+    private final String name;
 
     /**
      * Returns true if a species "covers" another species, i.e., if it's the same according to its
@@ -78,7 +78,7 @@ public class Species implements Comparable<Species> {
     public int compareTo(final @NonNull Species o) {
         return Comparator
             .comparing(Species::getCode)
-            .thenComparing(Species::getLifeStage)
+            .thenComparing(Species::getLifeStage, nullsFirst(String::compareTo))
             .compare(this, o);
     }
 }

@@ -58,6 +58,7 @@ public class BiomassBucket implements Bucket {
             .asMap()
             .entrySet()
             .stream()
+            .filter(entry -> biomasses[entry.getValue()] > 0)
             .collect(toImmutableMap(
                 Entry::getKey,
                 entry -> Biomass.ofKg(biomasses[entry.getValue()])
@@ -205,7 +206,19 @@ public class BiomassBucket implements Bucket {
 
     @Override
     public Map<Boolean, Bucket> partitionBy(final BiPredicate<Species, Content> predicate) {
-        return ImmutableMapBucket.copyOf(this).partitionBy(predicate);
+
+        final double[] t = speciesIndex.newBiomassArray();
+        final double[] f = speciesIndex.newBiomassArray();
+
+        for (int i = 0; i < speciesIndex.size(); i++) {
+            final boolean b = predicate.test(speciesIndex.speciesAt(i), Biomass.ofKg(biomasses[i]));
+            (b ? t : f)[i] = biomasses[i];
+        }
+        return Map.of(
+            true, BiomassBucket.of(t, speciesIndex),
+            false, BiomassBucket.of(f, speciesIndex)
+        );
+
     }
 
     @Override

@@ -26,10 +26,10 @@ import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.Map;
 
-class ImmutableMapBucketTest extends BucketTest {
+class ContentBucketTest extends BucketTest {
 
     @Override
     Bucket newBucket(final Map<Species, Double> map) {
-        return ImmutableMapBucket.ofBiomassMap(map);
+        return ContentBucket.ofBiomassMap(map);
     }
 }
