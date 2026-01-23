@@ -98,9 +98,9 @@ public class FisheableBiomassGrids implements FisheableGrid {
                         extractBiomass(i, biomassBucket.getDouble(i), biomassExtracted);
                     }
                 }
-                default -> fishToExtract.getMap().forEach((species, content) -> {
+                default -> fishToExtract.forEachBiomassValue((species, biomass) -> {
                     final int i = speciesIndex.indexOf(species);
-                    if (i != -1) extractBiomass(i, content.asKg(), biomassExtracted);
+                    if (i != -1) extractBiomass(i, biomass, biomassExtracted);
                 });
             }
             return BiomassBucket.of(biomassExtracted, speciesIndex);
@@ -136,13 +136,13 @@ public class FisheableBiomassGrids implements FisheableGrid {
                         grid.setBiomass(cell, grid.getDouble(cell) + biomassBucket.getDouble(i));
                     }
                 }
-                default -> fishToRelease.getMap().forEach((species, content) -> {
+                default -> fishToRelease.forEachBiomassValue((species, biomass) -> {
                     final int i = speciesIndex.indexOf(species);
                     if (i == -1) throw new IllegalArgumentException(
                         "No grid available to release %s.".formatted(species)
                     );
                     final BiomassGrid grid = grids[i];
-                    grid.setBiomass(cell, grid.getDouble(cell) + content.asKg());
+                    grid.setBiomass(cell, grid.getDouble(cell) + biomass);
                 });
             }
         }

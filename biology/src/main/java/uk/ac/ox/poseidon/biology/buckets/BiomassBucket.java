@@ -33,11 +33,11 @@ import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.ObjDoubleConsumer;
 import java.util.function.UnaryOperator;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -129,16 +129,36 @@ public class BiomassBucket implements Bucket {
     }
 
     private Bucket addOtherBucket(final Bucket other) {
-        final var speciesIndex =
-            SpeciesIndex.of(Sets.union(this.getSpecies(), other.getSpecies()));
-
+        final SpeciesIndex speciesIndex = commonIndex(other);
         final double[] newBiomasses = speciesIndex.newBiomassArray();
 
-        speciesIndex.asMap().forEach((species, index) ->
-            newBiomasses[index] = this.getKg(species) + other.getKg(species)
-        );
+        for (final var entry : speciesIndex.asMap().entrySet()) {
+            final var species = entry.getKey();
+            final int index = entry.getValue();
+            newBiomasses[index] = this.getKg(species) + other.getKg(species);
+        }
 
         return new BiomassBucket(newBiomasses, speciesIndex);
+    }
+
+    private SpeciesIndex commonIndex(final Bucket other) {
+        if (containsAll(speciesIndex, other.getSpecies())) return speciesIndex;
+        if (other instanceof final BiomassBucket otherBucket &&
+            containsAll(otherBucket.speciesIndex, this.getSpecies())) {
+            return otherBucket.speciesIndex;
+        }
+        return SpeciesIndex.of(Sets.union(this.getSpecies(), other.getSpecies()));
+    }
+
+    private static boolean containsAll(
+        final SpeciesIndex index,
+        final Set<Species> species
+    ) {
+        if (species.size() > index.size()) return false;
+        for (final Species s : species) {
+            if (index.indexOf(s) == -1) return false;
+        }
+        return true;
     }
 
     @Override
@@ -222,6 +242,20 @@ public class BiomassBucket implements Bucket {
     }
 
     @Override
+    public void forEach(final BiConsumer<Species, Content> action) {
+        for (int i = 0; i < biomasses.length; i++) {
+            action.accept(speciesIndex.speciesAt(i), Biomass.ofKg(biomasses[i]));
+        }
+    }
+
+    @Override
+    public void forEachBiomassValue(final ObjDoubleConsumer<Species> action) {
+        for (int i = 0; i < biomasses.length; i++) {
+            action.accept(speciesIndex.speciesAt(i), biomasses[i]);
+        }
+    }
+
+    @Override
     public boolean isEmpty() {
         return Arrays.stream(biomasses).sum() == 0;
     }
@@ -234,5 +268,14 @@ public class BiomassBucket implements Bucket {
     public Biomass getTotalBiomass() {
         return Biomass.ofKg(Arrays.stream(biomasses).sum());
     }
-    
+
+    @Override
+    public Set<Species> getSpecies() {
+        final HashSet<Species> species = new HashSet<>();
+        for (int i = 0; i < biomasses.length; i++) {
+            if (biomasses[i] > 0) species.add(speciesIndex.speciesAt(i));
+        }
+        return species;
+    }
+
 }

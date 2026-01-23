@@ -87,8 +87,8 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
         );
         final Table<Species, String, Double> table = HashBasedTable.create();
         buckets.forEach((columnName, bucket) ->
-            bucket.getMap().forEach((species, content) ->
-                table.put(species, columnName, content.asBiomass().asKg())
+            bucket.forEachBiomassValue((species, biomass) ->
+                table.put(species, columnName, biomass)
             )
         );
         table.rowKeySet().forEach(species -> {

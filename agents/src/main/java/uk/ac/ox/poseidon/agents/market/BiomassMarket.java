@@ -75,7 +75,7 @@ public class BiomassMarket implements Market {
             if (prices.get(catchCategory) == null) {
                 unsoldCatch.add(new CategorisedCatch(Map.of(catchCategory, bucket)));
             } else {
-                bucket.getMap().forEach((species, biomass) -> {
+                bucket.forEach((species, biomass) -> {
                     getPrice(catchCategory, species).ifPresentOrElse(
                         price -> {
                             final Money salePrice =

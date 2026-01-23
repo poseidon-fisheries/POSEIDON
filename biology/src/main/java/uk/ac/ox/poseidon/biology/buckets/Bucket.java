@@ -30,7 +30,9 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.ObjDoubleConsumer;
 import java.util.function.UnaryOperator;
 
 public interface Bucket {
@@ -93,4 +95,13 @@ public interface Bucket {
     default BucketBuilder toBuilder() {
         return newBuilder().put(this);
     }
+
+    default void forEach(final BiConsumer<Species, Content> action) {
+        getMap().forEach(action);
+    }
+
+    default void forEachBiomassValue(final ObjDoubleConsumer<Species> action) {
+        forEach((species, content) -> action.accept(species, content.asKg()));
+    }
+
 }
