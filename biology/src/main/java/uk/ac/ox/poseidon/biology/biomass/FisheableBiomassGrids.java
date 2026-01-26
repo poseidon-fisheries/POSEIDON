@@ -30,8 +30,8 @@ import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
-import uk.ac.ox.poseidon.biology.buckets.SpeciesIndex;
 import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 
 import java.util.Collection;
 import java.util.Map;

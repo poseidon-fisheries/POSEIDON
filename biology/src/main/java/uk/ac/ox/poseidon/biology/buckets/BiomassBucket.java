@@ -32,6 +32,7 @@ import lombok.ToString;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 
 import java.util.*;
 import java.util.Map.Entry;

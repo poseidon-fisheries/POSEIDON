@@ -20,10 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.buckets;
+package uk.ac.ox.poseidon.biology.species;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -83,7 +82,11 @@ class SpeciesIndexTest {
         ));
         final SpeciesIndex index = SpeciesIndex.of(species);
         assertThat(index.speciesAt(0)).isEqualTo(new Species("S1", null, "Species 1"));
-        assertThat(index.speciesAt(1)).isEqualTo(new Species("S1", "Juvenile", "Species 1 (juvenile)"));
+        assertThat(index.speciesAt(1)).isEqualTo(new Species(
+            "S1",
+            "Juvenile",
+            "Species 1 (juvenile)"
+        ));
         assertThat(index.speciesAt(2)).isEqualTo(new Species("S2", "Adult", "Species 2"));
     }
 

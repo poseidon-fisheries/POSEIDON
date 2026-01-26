@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.buckets;
+package uk.ac.ox.poseidon.biology.species;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Interner;
@@ -29,7 +29,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.Arrays;
 import java.util.Map;
