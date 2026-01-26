@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.Duration;
@@ -39,15 +39,15 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FixedBiomassProportionGearFactory
-    extends SimulationScopeFactory<FixedBiomassProportionGear> {
+public class FixedBiomassProportionGearFactory<S extends SimulationScope>
+    extends RelativeScopeFactory<S, FixedBiomassProportionGear> {
 
     private String code;
     private double proportion;
-    private Factory<? super SimulationScope, ? extends Supplier<Duration>> durationSupplier;
+    private Factory<? super S, ? extends Supplier<Duration>> durationSupplier;
 
     @Override
-    protected FixedBiomassProportionGear newInstance(final SimulationScope scope) {
+    protected FixedBiomassProportionGear newInstance(final S scope) {
         return new FixedBiomassProportionGear(code, proportion, durationSupplier.get(scope));
     }
 

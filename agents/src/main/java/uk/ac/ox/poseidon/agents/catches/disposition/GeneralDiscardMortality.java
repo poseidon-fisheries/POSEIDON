@@ -43,7 +43,7 @@ public class GeneralDiscardMortality implements DispositionProcess {
         final Bucket newlyDead =
             currentDisposition
                 .getDiscardedAlive()
-                .mapContent(biomass ->
+                .map((species, biomass) ->
                     biomass.multiply(
                         checkUnitRange(
                             mortalityRateSupplier.getAsDouble(),

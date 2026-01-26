@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,7 +32,6 @@ import java.util.Comparator;
 import static java.util.Comparator.nullsFirst;
 
 @Data
-@AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Species implements Comparable<Species> {
 
@@ -48,6 +46,16 @@ public class Species implements Comparable<Species> {
 
     @Getter(lazy = true)
     private final String key = code + (lifeStage == null ? "" : (";" + lifeStage));
+
+    public Species(
+        @NonNull final String code,
+        final String lifeStage,
+        final String name
+    ) {
+        this.code = code;
+        this.lifeStage = lifeStage != null && lifeStage.trim().isEmpty() ? null : lifeStage;
+        this.name = name != null && name.trim().isEmpty() ? null : name;
+    }
 
     /**
      * Returns true if a species "covers" another species, i.e., if it's the same according to its

@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.BiPredicate;
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -108,13 +107,6 @@ public final class ContentBucket implements Bucket {
         return toBuilder()
             .put(species, newContent)
             .build();
-    }
-
-    @Override
-    public Bucket mapContent(final UnaryOperator<Content> mapper) {
-        final BucketBuilder builder = toBuilder();
-        getMap().forEach((species, c) -> builder.put(species, mapper.apply(c)));
-        return builder.build();
     }
 
     @Override

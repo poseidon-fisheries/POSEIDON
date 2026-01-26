@@ -33,13 +33,14 @@ import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
+import uk.ac.ox.poseidon.core.utils.DoubleIntToDoubleFunction;
+import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.ObjDoubleConsumer;
-import java.util.function.UnaryOperator;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -216,11 +217,19 @@ public class BiomassBucket implements Bucket {
         return new BiomassBucket(newBiomasses, speciesIndex);
     }
 
-    @Override
-    public Bucket mapContent(final UnaryOperator<Content> mapper) {
+    public Bucket mapBiomassValueWithIndex(final DoubleIntToDoubleFunction mapper) {
         final double[] newBiomasses = biomasses.clone();
         for (int i = 0; i < biomasses.length; i++) {
-            newBiomasses[i] = mapper.apply(Biomass.ofKg(biomasses[i])).asKg();
+            newBiomasses[i] = mapper.applyAsDouble(biomasses[i], i);
+        }
+        return new BiomassBucket(newBiomasses, speciesIndex);
+    }
+
+    @Override
+    public Bucket mapBiomassValue(final ObjDoubleToDoubleFunction<Species> mapper) {
+        final double[] newBiomasses = biomasses.clone();
+        for (int i = 0; i < biomasses.length; i++) {
+            newBiomasses[i] = mapper.applyAsDouble(speciesIndex.speciesAt(i), biomasses[i]);
         }
         return new BiomassBucket(newBiomasses, speciesIndex);
     }

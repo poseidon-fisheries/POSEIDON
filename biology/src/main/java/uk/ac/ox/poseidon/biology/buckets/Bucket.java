@@ -26,14 +26,15 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.ObjDoubleConsumer;
-import java.util.function.UnaryOperator;
 
 public interface Bucket {
 
@@ -76,7 +77,24 @@ public interface Bucket {
         Content newContent
     );
 
-    Bucket mapContent(UnaryOperator<Content> mapper);
+    default Bucket map(final BiFunction<Species, Content, Content> mapper) {
+        final BucketBuilder bucketBuilder = Bucket.newBuilder();
+        forEach((species, content) ->
+            bucketBuilder.put(species, mapper.apply(species, content))
+        );
+        return bucketBuilder.build();
+    }
+
+    default Bucket mapBiomassValue(final ObjDoubleToDoubleFunction<Species> mapper) {
+        final BucketBuilder bucketBuilder = newBuilder();
+        getMap().forEach((species, content) ->
+            bucketBuilder.put(
+                species,
+                Biomass.ofKg(mapper.applyAsDouble(species, content.asKg()))
+            )
+        );
+        return bucketBuilder.build();
+    }
 
     Map<Boolean, Bucket> partitionBy(
         BiPredicate<Species, Content> predicate
@@ -86,7 +104,7 @@ public interface Bucket {
 
     Biomass getTotalBiomass();
 
-    ImmutableMap<Species, Content> getMap();
+    Map<Species, Content> getMap();
 
     default Set<Species> getSpecies() {
         return getMap().keySet();

@@ -30,8 +30,10 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-import java.util.function.UnaryOperator;
+import java.util.function.ObjDoubleConsumer;
 
 public enum EmptyBucket implements Bucket {
 
@@ -70,7 +72,7 @@ public enum EmptyBucket implements Bucket {
     }
 
     @Override
-    public Bucket mapContent(final UnaryOperator<Content> mapper) {
+    public Bucket map(final BiFunction<Species, Content, Content> mapper) {
         return this;
     }
 
@@ -102,5 +104,15 @@ public enum EmptyBucket implements Bucket {
     @Override
     public BucketBuilder toBuilder() {
         return Bucket.newBuilder();
+    }
+
+    @Override
+    public void forEach(final BiConsumer<Species, Content> action) {
+        // noop
+    }
+
+    @Override
+    public void forEachBiomassValue(final ObjDoubleConsumer<Species> action) {
+        // noop
     }
 }
