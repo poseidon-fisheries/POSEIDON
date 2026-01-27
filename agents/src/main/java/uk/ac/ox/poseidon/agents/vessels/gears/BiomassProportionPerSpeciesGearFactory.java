@@ -34,13 +34,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.function.UnaryOperator.identity;
-import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @Data
@@ -60,10 +61,14 @@ public class BiomassProportionPerSpeciesGearFactory<S extends Scope>
 
     @Override
     protected BiomassProportionPerSpeciesGear newInstance(final S scope) {
+        checkNotNull(proportions, "proportions should not be null");
         final HashSet<Species> species = new HashSet<>(this.species.get(scope));
         final SpeciesIndex speciesIndex = SpeciesIndex.of(species);
         final Map<String, Species> speciesByKey =
-            species.stream().collect(toMap(Species::getKey, identity()));
+            species.stream().collect(java.util.stream.Collectors.toMap(
+                Species::getKey,
+                identity()
+            ));
 
         final double[] proportionArray = new double[speciesIndex.size()];
         proportions.forEach((speciesKey, proportion) -> {
@@ -94,21 +99,21 @@ public class BiomassProportionPerSpeciesGearFactory<S extends Scope>
         final Factory<? super S, ? extends Collection<? extends Species>> species,
         final double defaultProportion
     ) {
-        final Map<String, Double> proportions = Table
-            .read()
-            .csv(speciesFilePath.toFile())
-            .stream()
-            .collect(
-                toMap(
-                    row ->
-                        new Species(
-                            row.getString(codeColumnName),
-                            row.getString(lifeStageColumnName),
-                            null
-                        ).getKey(),
-                    row -> defaultProportion
-                )
-            );
+        checkUnitRange(defaultProportion, "defaultProportion");
+        final Map<String, Double> proportions = new HashMap<>();
+        Table.read().csv(speciesFilePath.toFile()).stream().forEach(row -> {
+            final String speciesKey =
+                new Species(
+                    row.getString(codeColumnName),
+                    row.getString(lifeStageColumnName),
+                    null
+                ).getKey();
+            if (proportions.putIfAbsent(speciesKey, defaultProportion) != null) {
+                throw new IllegalArgumentException(
+                    "Duplicate species key '%s' in species file".formatted(speciesKey)
+                );
+            }
+        });
         return new BiomassProportionPerSpeciesGearFactory<>(
             code,
             durationSupplier,
