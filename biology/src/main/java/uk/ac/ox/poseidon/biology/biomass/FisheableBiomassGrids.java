@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import com.google.common.collect.ImmutableMap;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
@@ -32,6 +33,7 @@ import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndexed;
 
 import java.util.Collection;
 import java.util.Map;
@@ -43,8 +45,9 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
-public class FisheableBiomassGrids implements FisheableGrid {
+public class FisheableBiomassGrids implements FisheableGrid, SpeciesIndexed {
 
+    @Getter
     private final SpeciesIndex speciesIndex;
     private final BiomassGrid[] grids;
 
@@ -84,10 +87,6 @@ public class FisheableBiomassGrids implements FisheableGrid {
     class FisheableCell implements Fisheable {
 
         private final Int2D cell;
-
-        private boolean sameIndex(final BiomassBucket other) {
-            return speciesIndex.equals(other.getSpeciesIndex());
-        }
 
         @Override
         public Bucket extract(final Bucket fishToExtract) {

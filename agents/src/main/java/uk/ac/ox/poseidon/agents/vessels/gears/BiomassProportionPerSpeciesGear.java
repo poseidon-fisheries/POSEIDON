@@ -30,6 +30,7 @@ import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -43,8 +44,7 @@ public class BiomassProportionPerSpeciesGear implements Gear {
 
     @NonNull private final String code;
 
-    @NonNull private final SpeciesIndex speciesIndex;
-    private final double @NonNull [] proportions;
+    private final SpeciesIndexedDoubleArray proportions;
 
     @NonNull private final Supplier<Duration> durationSupplier;
     @Setter private boolean active = true;
@@ -55,11 +55,9 @@ public class BiomassProportionPerSpeciesGear implements Gear {
         final double @NonNull [] proportions,
         @NonNull final Supplier<Duration> durationSupplier
     ) {
-        checkArgument(proportions.length == speciesIndex.size());
         checkArgument(Arrays.stream(proportions).allMatch(p -> p >= 0 && p <= 1));
         this.code = code;
-        this.speciesIndex = speciesIndex;
-        this.proportions = proportions.clone();
+        this.proportions = new SpeciesIndexedDoubleArray(proportions, speciesIndex);
         this.durationSupplier = durationSupplier;
     }
 
@@ -67,16 +65,14 @@ public class BiomassProportionPerSpeciesGear implements Gear {
     public Bucket fish(final Fisheable fisheable) {
         final Bucket fishToCatch =
             switch (fisheable.availableFish()) {
-                case final BiomassBucket availableFish
-                    when availableFish.getSpeciesIndex().equals(speciesIndex) ->
-                    availableFish.mapBiomassValueWithIndex((biomass, index) ->
-                        proportions[index] * biomass
+                case final BiomassBucket availableFish when proportions.sameIndex(availableFish) ->
+                    availableFish.mapBiomassValueWithIndex((biomass, i) ->
+                        proportions.get(i) * biomass
                     );
                 case final Bucket availableFish ->
-                    availableFish.mapBiomassValue((species, biomass) -> {
-                        final int i = speciesIndex.indexOf(species);
-                        return i == -1 ? 0 : proportions[i] * biomass;
-                    });
+                    availableFish.mapBiomassValue((species, biomass) ->
+                        proportions.getOrDefault(species, 0) * biomass
+                    );
             };
         return fisheable.extract(fishToCatch);
     }

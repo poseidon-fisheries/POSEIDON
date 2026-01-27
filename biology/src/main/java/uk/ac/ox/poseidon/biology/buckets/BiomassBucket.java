@@ -33,6 +33,7 @@ import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndexed;
 import uk.ac.ox.poseidon.core.utils.DoubleIntToDoubleFunction;
 import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
@@ -49,7 +50,7 @@ import static lombok.AccessLevel.PRIVATE;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = PRIVATE)
-public class BiomassBucket implements Bucket {
+public class BiomassBucket implements Bucket, SpeciesIndexed {
 
     private final double[] biomasses;
     @Getter private final SpeciesIndex speciesIndex;
@@ -116,10 +117,6 @@ public class BiomassBucket implements Bucket {
                 addBiomassArrayBucket(otherBucket);
             default -> addOtherBucket(other);
         };
-    }
-
-    private boolean sameIndex(final BiomassBucket other) {
-        return speciesIndex.equals(other.speciesIndex);
     }
 
     private Bucket addBiomassArrayBucket(final BiomassBucket other) {
