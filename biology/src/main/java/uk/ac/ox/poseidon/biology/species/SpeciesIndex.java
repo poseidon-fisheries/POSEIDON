@@ -50,6 +50,10 @@ public class SpeciesIndex {
         return interner.intern(new SpeciesIndex(species));
     }
 
+    public static SpeciesIndex of(final Species... species) {
+        return interner.intern(new SpeciesIndex(Set.of(species)));
+    }
+
     private SpeciesIndex(@NonNull final Set<Species> speciesSet) {
         this.speciesArray = speciesSet.toArray(new Species[0]);
         this.indices = new Object2IntOpenHashMap<>(speciesArray.length);

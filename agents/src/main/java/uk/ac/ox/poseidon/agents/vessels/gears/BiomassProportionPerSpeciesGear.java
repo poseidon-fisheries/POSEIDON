@@ -44,7 +44,7 @@ public class BiomassProportionPerSpeciesGear implements Gear {
     @NonNull private final String code;
 
     @NonNull private final SpeciesIndex speciesIndex;
-    private final double[] proportions;
+    private final double @NonNull [] proportions;
 
     @NonNull private final Supplier<Duration> durationSupplier;
     @Setter private boolean active = true;
@@ -52,7 +52,7 @@ public class BiomassProportionPerSpeciesGear implements Gear {
     public BiomassProportionPerSpeciesGear(
         @NonNull final String code,
         @NonNull final SpeciesIndex speciesIndex,
-        final double[] proportions,
+        final double @NonNull [] proportions,
         @NonNull final Supplier<Duration> durationSupplier
     ) {
         checkArgument(proportions.length == speciesIndex.size());
@@ -78,8 +78,6 @@ public class BiomassProportionPerSpeciesGear implements Gear {
                         return i == -1 ? 0 : proportions[i] * biomass;
                     });
             };
-        final Bucket fishExtracted = fisheable.extract(fishToCatch);
-        assert fishExtracted.equals(fishToCatch);
-        return fishExtracted;
+        return fisheable.extract(fishToCatch);
     }
 }

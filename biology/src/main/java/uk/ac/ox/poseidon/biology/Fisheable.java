@@ -32,11 +32,11 @@ public interface Fisheable {
 
     /**
      * Mutates the fisheable by removing the content of the provided bucket and returns another
-     * bucket containing the rest of the fish from the original bucket that could not be removed
-     * from the fisheable.
+     * bucket containing the fish that were actually removed. The returned bucket may contain less
+     * than requested if the fisheable does not have enough available.
      *
-     * @param bucket the fish the remove from the fisheable
-     * @return the fish that could not be removed from the fisheable
+     * @param bucket the fish to remove from the fisheable
+     * @return the fish that were removed from the fisheable
      */
     Bucket extract(Bucket bucket);
 
