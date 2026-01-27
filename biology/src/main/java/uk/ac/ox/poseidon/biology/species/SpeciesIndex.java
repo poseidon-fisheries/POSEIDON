@@ -69,7 +69,7 @@ public class SpeciesIndex {
         }
     }
 
-    public double[] newBiomassArray() {
+    public double[] newDoubleArray() {
         return new double[speciesArray.length];
     }
 

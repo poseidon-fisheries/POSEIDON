@@ -73,7 +73,7 @@ public class BiomassBucket implements Bucket, SpeciesIndexed {
 
     public static BiomassBucket ofBiomassMap(final Map<Species, Double> map) {
         final SpeciesIndex speciesIndex = SpeciesIndex.of(map.keySet());
-        final double[] biomasses = speciesIndex.newBiomassArray();
+        final double[] biomasses = speciesIndex.newDoubleArray();
         final Map<Species, Integer> speciesIndexMap = speciesIndex.asMap();
         for (final Entry<Species, Double> entry : map.entrySet()) {
             final int index = speciesIndexMap.get(entry.getKey());
@@ -129,7 +129,7 @@ public class BiomassBucket implements Bucket, SpeciesIndexed {
 
     private Bucket addOtherBucket(final Bucket other) {
         final SpeciesIndex speciesIndex = commonIndex(other);
-        final double[] newBiomasses = speciesIndex.newBiomassArray();
+        final double[] newBiomasses = speciesIndex.newDoubleArray();
 
         for (final var entry : speciesIndex.asMap().entrySet()) {
             final var species = entry.getKey();
@@ -180,7 +180,7 @@ public class BiomassBucket implements Bucket, SpeciesIndexed {
     }
 
     private Bucket subtractOtherBucket(final Bucket other) {
-        final double[] newBiomasses = speciesIndex.newBiomassArray();
+        final double[] newBiomasses = speciesIndex.newDoubleArray();
         for (int i = 0; i < speciesIndex.size(); i++) {
             final Species species = speciesIndex.speciesAt(i);
             final double otherBiomass = other.getContent(species).map(Content::asKg).orElse(0.0);
@@ -234,8 +234,8 @@ public class BiomassBucket implements Bucket, SpeciesIndexed {
     @Override
     public Map<Boolean, Bucket> partitionBy(final BiPredicate<Species, Content> predicate) {
 
-        final double[] t = speciesIndex.newBiomassArray();
-        final double[] f = speciesIndex.newBiomassArray();
+        final double[] t = speciesIndex.newDoubleArray();
+        final double[] f = speciesIndex.newDoubleArray();
 
         for (int i = 0; i < speciesIndex.size(); i++) {
             final boolean b = predicate.test(speciesIndex.speciesAt(i), Biomass.ofKg(biomasses[i]));

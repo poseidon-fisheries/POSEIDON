@@ -90,7 +90,7 @@ public class FisheableBiomassGrids implements FisheableGrid, SpeciesIndexed {
 
         @Override
         public Bucket extract(final Bucket fishToExtract) {
-            final double[] biomassExtracted = speciesIndex.newBiomassArray();
+            final double[] biomassExtracted = speciesIndex.newDoubleArray();
             switch (fishToExtract) {
                 case final BiomassBucket biomassBucket when sameIndex(biomassBucket) -> {
                     for (int i = 0; i < speciesIndex.size(); i++) {
