@@ -59,7 +59,7 @@ class SpeciesIndexTest {
 
     @Test
     void nullSpeciesSetIsRejected() {
-        assertThatThrownBy(() -> SpeciesIndex.of(null))
+        assertThatThrownBy(() -> SpeciesIndex.of((Set<Species>) null))
             .isInstanceOf(NullPointerException.class);
     }
 
