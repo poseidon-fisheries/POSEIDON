@@ -39,6 +39,7 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static lombok.AccessLevel.PACKAGE;
+import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 
 @RequiredArgsConstructor(access = PACKAGE)
 public class TravelAlongPath extends AgentTask<Vessel> {
@@ -51,6 +52,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
     private LocalDateTime startDateTime;
     private Int2D origin;
     private Int2D destination;
+    private double cruisingSpeedInKph;
 
     @Override
     public void resetTask() {
@@ -60,21 +62,28 @@ public class TravelAlongPath extends AgentTask<Vessel> {
 
     @Override
     public void start() {
-        trip = checkNotNull(getAgent().getCurrentTrip());
-        startDateTime = getAgent().getSchedule().getDateTime();
-        origin = getAgent().getCell();
-        destination = checkNotNull(getAgent().getCurrentTrip().getDestination());
+        final Vessel vessel = getAgent();
+        trip = checkNotNull(vessel.getCurrentTrip());
+        startDateTime = vessel.getSchedule().getDateTime();
+        origin = vessel.getCell();
+        destination = checkNotNull(vessel.getCurrentTrip().getDestination());
         currentPath =
             pathFinder
-                .getPath(getAgent().getCell(), destination)
+                .getPath(vessel.getCell(), destination)
                 .orElseThrow(() -> new IllegalStateException(
                     MessageFormat.format(
                         "No path found from {0} to {1} for vessel {2}.",
-                        getAgent().getCell(),
+                        vessel.getCell(),
                         destination,
-                        getAgent()
+                        vessel
                     )
                 ));
+        cruisingSpeedInKph =
+            vessel.getEngine()
+                .getCruisingSpeed()
+                .to(KILOMETRE_PER_HOUR)
+                .getValue()
+                .doubleValue();
         super.start();
     }
 
@@ -107,9 +116,8 @@ public class TravelAlongPath extends AgentTask<Vessel> {
             vessel.setHeadingTowards(nextCell);
             vessel.setTaskDuration(
                 distanceCalculator.travelDuration(
-                    vessel.getCell(),
-                    nextCell,
-                    vessel.getEngine().getCruisingSpeed()
+                    List.of(vessel.getCell(), nextCell),
+                    cruisingSpeedInKph
                 )
             );
             return RUNNING;
