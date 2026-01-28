@@ -65,10 +65,7 @@ public enum EmptyBucket implements Bucket {
         final Species species,
         final Content newContent
     ) {
-        final Map<Species, Content> map = Map.of(species, newContent);
-        return newContent instanceof Biomass
-            ? BiomassBucket.ofContentMap(map)
-            : ContentBucket.ofContentMap(map);
+        return Bucket.newBuilder().put(species, newContent).build();
     }
 
     @Override

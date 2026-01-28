@@ -41,18 +41,11 @@ public final class ContentBucket implements Bucket {
 
     private final ImmutableMap<Species, Content> map;
 
-    public static ContentBucket copyOf(final Bucket bucket) {
-        return switch (bucket) {
-            case final ContentBucket contentBucket -> contentBucket;
-            default -> ofContentMap(bucket.getMap());
-        };
-    }
-
     private ContentBucket(final ImmutableMap<Species, Content> map) {
         this.map = map;
     }
 
-    public static ContentBucket ofContentMap(final Map<Species, Content> map) {
+    static ContentBucket ofContentMap(final Map<Species, Content> map) {
         return new ContentBucket(
             map
                 .entrySet()
@@ -62,7 +55,7 @@ public final class ContentBucket implements Bucket {
         );
     }
 
-    public static Bucket ofBiomassMap(final Map<Species, Double> map) {
+    static Bucket ofBiomassMap(final Map<Species, Double> map) {
         return new ContentBucket(
             map
                 .entrySet()
