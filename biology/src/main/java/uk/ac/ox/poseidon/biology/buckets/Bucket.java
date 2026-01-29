@@ -77,7 +77,7 @@ public interface Bucket {
         Content newContent
     );
 
-    default Bucket map(final BiFunction<Species, Content, Content> mapper) {
+    default Bucket mapContent(final BiFunction<Species, Content, Content> mapper) {
         final BucketBuilder bucketBuilder = Bucket.newBuilder();
         forEach((species, content) ->
             bucketBuilder.put(species, mapper.apply(species, content))

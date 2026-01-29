@@ -40,20 +40,14 @@ public class GeneralDiscardMortality implements DispositionProcess {
         final Disposition currentDisposition,
         final double availableCapacityInKg
     ) {
+        final Bucket discardedAlive = currentDisposition.getDiscardedAlive();
         final Bucket newlyDead =
-            currentDisposition
-                .getDiscardedAlive()
-                .map((species, biomass) ->
-                    biomass.multiply(
-                        checkUnitRange(
-                            mortalityRateSupplier.getAsDouble(),
-                            "Mortality"
-                        )
-                    )
-                );
+            discardedAlive.mapBiomassValue((species, biomass) ->
+                biomass * checkUnitRange(mortalityRateSupplier.getAsDouble(), "Mortality")
+            );
         return new Disposition(
             currentDisposition.getRetained(),
-            currentDisposition.getDiscardedAlive().subtract(newlyDead),
+            discardedAlive.subtract(newlyDead),
             currentDisposition.getDiscardedDead().add(newlyDead)
         );
     }

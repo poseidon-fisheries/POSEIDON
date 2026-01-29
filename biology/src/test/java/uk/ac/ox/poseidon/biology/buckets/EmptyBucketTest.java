@@ -75,9 +75,9 @@ class EmptyBucketTest {
     }
 
     @Test
-    void mapIsNoOp() {
+    void mapContentIsNoOp() {
         final Bucket empty = EmptyBucket.INSTANCE;
-        assertThat(empty.map((species, content) -> content.multiply(2.0))).isSameAs(empty);
+        assertThat(empty.mapContent((species, content) -> content.multiply(2.0))).isSameAs(empty);
     }
 
     @Test

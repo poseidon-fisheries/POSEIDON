@@ -69,7 +69,7 @@ public enum EmptyBucket implements Bucket {
     }
 
     @Override
-    public Bucket map(final BiFunction<Species, Content, Content> mapper) {
+    public Bucket mapContent(final BiFunction<Species, Content, Content> mapper) {
         return this;
     }
 

@@ -57,7 +57,7 @@ public class BiomassProportionPerSpeciesGear implements Gear {
     ) {
         checkArgument(Arrays.stream(proportions).allMatch(p -> p >= 0 && p <= 1));
         this.code = code;
-        this.proportions = new SpeciesIndexedDoubleArray(proportions, speciesIndex);
+        this.proportions = SpeciesIndexedDoubleArray.of(proportions, speciesIndex);
         this.durationSupplier = durationSupplier;
     }
 
@@ -66,12 +66,12 @@ public class BiomassProportionPerSpeciesGear implements Gear {
         final Bucket fishToCatch =
             switch (fisheable.availableFish()) {
                 case final BiomassBucket availableFish when proportions.sameIndex(availableFish) ->
-                    availableFish.mapBiomassValueWithIndex((biomass, i) ->
+                    availableFish.mapWithIndex((biomass, i) ->
                         proportions.getDouble(i) * biomass
                     );
                 case final Bucket availableFish ->
                     availableFish.mapBiomassValue((species, biomass) ->
-                        proportions.getOrDefault(species, 0) * biomass
+                        proportions.getDoubleOrDefault(species, 0) * biomass
                     );
             };
         return fisheable.extract(fishToCatch);

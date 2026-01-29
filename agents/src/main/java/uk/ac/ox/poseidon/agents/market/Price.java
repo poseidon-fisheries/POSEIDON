@@ -22,17 +22,44 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
 import org.joda.money.Money;
+import uk.ac.ox.poseidon.biology.Content;
 
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
 
+import static java.math.RoundingMode.HALF_EVEN;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+
 @Value
 public class Price {
+    
     @NonNull Money amount;
     @NonNull Unit<Mass> biomassUnit;
+
+    @Getter(AccessLevel.NONE)
+    double amountPerKg;
+
+    public Price(
+        final @NonNull Money amount,
+        final @NonNull Unit<Mass> biomassUnit
+    ) {
+        this.amount = amount;
+        this.biomassUnit = biomassUnit;
+        final double kgPerUnit =
+            getQuantity(1, biomassUnit).to(KILOGRAM).getValue().doubleValue();
+        this.amountPerKg = amount.getAmount().doubleValue() / kgPerUnit;
+    }
+
+    public Money valueFor(final Content content) {
+        final double value = amountPerKg * content.asKg();
+        return Money.of(amount.getCurrencyUnit(), value, HALF_EVEN);
+    }
 
     @java.lang.Override
     public String toString() {

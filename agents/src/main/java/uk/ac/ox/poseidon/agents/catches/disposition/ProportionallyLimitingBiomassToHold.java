@@ -43,7 +43,7 @@ public class ProportionallyLimitingBiomassToHold
         } else {
             final double proportionToKeep = availableCapacityInKg / currentlyRetainedInKg;
             final Bucket updatedRetained =
-                currentDisposition.getRetained().map((species, biomass) ->
+                currentDisposition.getRetained().mapContent((species, biomass) ->
                     biomass.multiply(proportionToKeep)
                 );
             final Bucket newlyDiscarded =

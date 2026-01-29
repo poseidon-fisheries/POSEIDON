@@ -151,9 +151,9 @@ abstract class BucketTest {
     }
 
     @Test
-    void map() {
+    void mapContent() {
         final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        final var newBucket = bucket.map((species, content) -> content.multiply(2.0));
+        final var newBucket = bucket.mapContent((species, content) -> content.multiply(2.0));
         assertThat(newBucket.getContent(a)).contains(Biomass.ofKg(200.0));
         assertThat(newBucket.getContent(bA)).contains(Biomass.ofKg(400.0));
         assertThat(newBucket.getContent(bJ)).contains(Biomass.ofKg(600.0));

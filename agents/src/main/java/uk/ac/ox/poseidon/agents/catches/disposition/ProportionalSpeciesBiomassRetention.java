@@ -56,12 +56,15 @@ public class ProportionalSpeciesBiomassRetention implements DispositionProcess {
             switch (currentDisposition.getRetained()) {
                 case final BiomassBucket currentlyRetained
                     when currentlyRetained.sameIndex(proportionsToDiscard) ->
-                    currentlyRetained.mapBiomassValueWithIndex((biomass, index) ->
+                    currentlyRetained.mapWithIndex((biomass, index) ->
                         proportionsToDiscard.getDouble(index) * biomass
                     );
-                case final Bucket currentlyRetained -> currentlyRetained.map((species, content) ->
-                    Biomass.ofKg(proportionsToDiscard.getOrDefault(species, 0) * content.asKg())
-                );
+                case final Bucket currentlyRetained ->
+                    currentlyRetained.mapContent((species, content) ->
+                        Biomass.ofKg(
+                            proportionsToDiscard.getDoubleOrDefault(species, 0) * content.asKg()
+                        )
+                    );
             };
         return new Disposition(
             currentDisposition.getRetained().subtract(discarded),

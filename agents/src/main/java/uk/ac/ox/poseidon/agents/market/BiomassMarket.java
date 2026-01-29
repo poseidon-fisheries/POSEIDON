@@ -35,7 +35,6 @@ import uk.ac.ox.poseidon.core.utils.IdSupplier;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplier;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -78,11 +77,7 @@ public class BiomassMarket implements Market {
                 bucket.forEach((species, biomass) -> {
                     getPrice(catchCategory, species).ifPresentOrElse(
                         price -> {
-                            final Money salePrice =
-                                price.getAmount().multipliedBy(
-                                    biomass.as(price.getBiomassUnit()),
-                                    RoundingMode.DOWN
-                                );
+                            final Money salePrice = price.valueFor(biomass);
                             soldItems.add(new Sale.Item(
                                 catchCategory,
                                 species,

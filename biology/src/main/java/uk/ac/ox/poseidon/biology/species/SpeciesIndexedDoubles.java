@@ -30,7 +30,7 @@ import java.util.function.DoubleConsumer;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.ObjDoubleConsumer;
 
-public interface SpeciesIndexedDoubles<T extends SpeciesIndexedDoubles<T>> extends SpeciesIndexed {
+public interface SpeciesIndexedDoubles<S extends SpeciesIndexedDoubles<S>> extends SpeciesIndexed {
 
     /**
      * Returns the value at a valid index for {@link #getSpeciesIndex()}.
@@ -40,13 +40,13 @@ public interface SpeciesIndexedDoubles<T extends SpeciesIndexedDoubles<T>> exten
     /**
      * Creates a new instance with the same {@link SpeciesIndex} as this object.
      * <p>
-     * Intended for internal use by default methods; callers should prefer
-     * implementation-specific factories (for example, {@code SpeciesIndexedDoubleArray.of}).
+     * Intended for internal use by default methods; callers should prefer implementation-specific
+     * factories (for example, {@code SpeciesIndexedDoubleArray.of}).
      *
      * @param values array aligned with {@link #getSpeciesIndex()}
      * @return a new instance backed by the provided values
      */
-    T newInstance(double[] values);
+    S newInstance(double[] values);
 
     /**
      * Executes an action for each value.
@@ -81,7 +81,7 @@ public interface SpeciesIndexedDoubles<T extends SpeciesIndexedDoubles<T>> exten
     /**
      * Returns a mapped copy based on each value.
      */
-    default T mapValue(final DoubleUnaryOperator mapper) {
+    default S mapValue(final DoubleUnaryOperator mapper) {
         final SpeciesIndex speciesIndex = getSpeciesIndex();
         final double[] mapped = new double[speciesIndex.size()];
         forEachWithIndex((value, index) -> mapped[index] = mapper.applyAsDouble(value));
@@ -91,7 +91,7 @@ public interface SpeciesIndexedDoubles<T extends SpeciesIndexedDoubles<T>> exten
     /**
      * Returns a mapped copy based on each value/index pair.
      */
-    default T mapWithIndex(final DoubleIntToDoubleFunction mapper) {
+    default S mapWithIndex(final DoubleIntToDoubleFunction mapper) {
         final SpeciesIndex speciesIndex = getSpeciesIndex();
         final double[] mapped = new double[speciesIndex.size()];
         forEachWithIndex((value, index) -> mapped[index] = mapper.applyAsDouble(value, index));
@@ -101,7 +101,7 @@ public interface SpeciesIndexedDoubles<T extends SpeciesIndexedDoubles<T>> exten
     /**
      * Returns a mapped copy based on each species/value pair.
      */
-    default T mapEntry(final ObjDoubleToDoubleFunction<Species> mapper) {
+    default S mapEntry(final ObjDoubleToDoubleFunction<Species> mapper) {
         final SpeciesIndex speciesIndex = getSpeciesIndex();
         final double[] mapped = new double[speciesIndex.size()];
         forEachWithIndex((value, index) ->
