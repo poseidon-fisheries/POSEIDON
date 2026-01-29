@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
-import uk.ac.ox.poseidon.biology.species.SpeciesIndexed;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndexedObjects;
 
 import java.util.Collection;
 import java.util.Map;
@@ -41,11 +41,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
-public class FisheableBiomassGrids implements FisheableGrid, SpeciesIndexed {
+public class FisheableBiomassGrids
+    implements FisheableGrid, SpeciesIndexedObjects<BiomassGrid, FisheableBiomassGrids> {
 
     @Getter
     private final SpeciesIndex speciesIndex;
@@ -76,6 +78,18 @@ public class FisheableBiomassGrids implements FisheableGrid, SpeciesIndexed {
         speciesIndex.asMap().forEach((species, index) ->
             this.grids[index] = gridMap.get(species)
         );
+    }
+
+    private FisheableBiomassGrids(
+        final BiomassGrid[] grids,
+        final SpeciesIndex speciesIndex
+    ) {
+        checkArgument(
+            grids.length == speciesIndex.size(),
+            "Grid array length must match species index size"
+        );
+        this.speciesIndex = speciesIndex;
+        this.grids = grids;
     }
 
     @Override
@@ -145,5 +159,20 @@ public class FisheableBiomassGrids implements FisheableGrid, SpeciesIndexed {
                 });
             }
         }
+    }
+
+    @Override
+    public BiomassGrid get(final int index) {
+        return grids[index];
+    }
+
+    @Override
+    public FisheableBiomassGrids newInstance(final BiomassGrid[] values) {
+        return new FisheableBiomassGrids(values, speciesIndex);
+    }
+
+    @Override
+    public BiomassGrid[] newArray(final int size) {
+        return new BiomassGrid[size];
     }
 }

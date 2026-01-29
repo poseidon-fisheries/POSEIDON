@@ -67,7 +67,7 @@ public class BiomassProportionPerSpeciesGear implements Gear {
             switch (fisheable.availableFish()) {
                 case final BiomassBucket availableFish when proportions.sameIndex(availableFish) ->
                     availableFish.mapBiomassValueWithIndex((biomass, i) ->
-                        proportions.get(i) * biomass
+                        proportions.getDouble(i) * biomass
                     );
                 case final Bucket availableFish ->
                     availableFish.mapBiomassValue((species, biomass) ->

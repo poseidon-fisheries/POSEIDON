@@ -41,45 +41,45 @@ class SpeciesIndexedDoubleArrayTest {
     void constructor_rejectsMismatchedArrayLength() {
         final SpeciesIndex index = SpeciesIndex.of(Set.of(SPECIES_A, SPECIES_B));
 
-        assertThatThrownBy(() -> new SpeciesIndexedDoubleArray(
+        assertThatThrownBy(() -> SpeciesIndexedDoubleArray.of(
             new double[]{1.0},
             index
         )).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void get_returnsValueForSpeciesInIndex() {
+    void get_Double_returnsValueForSpeciesInIndex() {
         final SpeciesIndex index = SpeciesIndex.of(Set.of(SPECIES_A, SPECIES_B));
         final double[] values = new double[index.size()];
         values[index.indexOf(SPECIES_A)] = 1.5;
         values[index.indexOf(SPECIES_B)] = 2.5;
-        final SpeciesIndexedDoubleArray array = new SpeciesIndexedDoubleArray(values, index);
+        final SpeciesIndexedDoubleArray array = SpeciesIndexedDoubleArray.of(values, index);
 
-        assertThat(array.get(SPECIES_A)).isEqualTo(1.5);
-        assertThat(array.get(SPECIES_B)).isEqualTo(2.5);
+        assertThat(array.getDouble(SPECIES_A)).isEqualTo(1.5);
+        assertThat(array.getDouble(SPECIES_B)).isEqualTo(2.5);
     }
 
     @Test
-    void getOrDefault_returnsDefaultForMissingSpecies() {
+    void getDoubleOrDefault_returnsDefaultForMissingSpecies() {
         final SpeciesIndex index = SpeciesIndex.of(Set.of(SPECIES_A));
         final double[] values = new double[index.size()];
         values[index.indexOf(SPECIES_A)] = 3.0;
-        final SpeciesIndexedDoubleArray array = new SpeciesIndexedDoubleArray(values, index);
+        final SpeciesIndexedDoubleArray array = SpeciesIndexedDoubleArray.of(values, index);
 
-        assertThat(array.getOrDefault(SPECIES_A, 1.0)).isEqualTo(3.0);
-        assertThat(array.getOrDefault(SPECIES_C, 1.0)).isEqualTo(1.0);
+        assertThat(array.getDoubleOrDefault(SPECIES_A, 1.0)).isEqualTo(3.0);
+        assertThat(array.getDoubleOrDefault(SPECIES_C, 1.0)).isEqualTo(1.0);
     }
 
     @Test
-    void get_returnsValueForIndex() {
+    void get_Double_returnsValueForIndex() {
         final SpeciesIndex index = SpeciesIndex.of(Set.of(SPECIES_A, SPECIES_B));
         final double[] values = new double[index.size()];
         values[0] = 4.0;
         values[1] = 6.0;
-        final SpeciesIndexedDoubleArray array = new SpeciesIndexedDoubleArray(values, index);
+        final SpeciesIndexedDoubleArray array = SpeciesIndexedDoubleArray.of(values, index);
 
-        assertThat(array.get(0)).isEqualTo(4.0);
-        assertThat(array.get(1)).isEqualTo(6.0);
+        assertThat(array.getDouble(0)).isEqualTo(4.0);
+        assertThat(array.getDouble(1)).isEqualTo(6.0);
     }
 
     @Test
@@ -88,11 +88,11 @@ class SpeciesIndexedDoubleArrayTest {
         final double[] values = new double[index.size()];
         values[index.indexOf(SPECIES_A)] = 2.0;
         values[index.indexOf(SPECIES_B)] = 5.0;
-        final SpeciesIndexedDoubleArray array = new SpeciesIndexedDoubleArray(values, index);
+        final SpeciesIndexedDoubleArray array = SpeciesIndexedDoubleArray.of(values, index);
 
         final List<String> speciesKeys = new ArrayList<>();
         final List<Double> observedValues = new ArrayList<>();
-        array.forEach((species, value) -> {
+        array.forEachEntry((species, value) -> {
             speciesKeys.add(species.getKey());
             observedValues.add(value);
         });
@@ -108,12 +108,16 @@ class SpeciesIndexedDoubleArrayTest {
         assertThat(sum[0]).isEqualTo(7.0);
 
         final List<Integer> indices = new ArrayList<>();
-        array.forEachValueWithIndex((value, idx) -> indices.add(idx));
+        array.forEachWithIndex((value, idx) -> indices.add(idx));
         assertThat(indices).containsExactly(0, 1);
 
-        assertThat(array.mapValue(value -> value + 1).get(0)).isEqualTo(3.0);
-        assertThat(array.mapValueWithIndex((value, idx) -> value + idx).get(1)).isEqualTo(6.0);
-        assertThat(array.map((species, value) -> species.equals(SPECIES_A) ? 9.0 : value).get(0))
+        assertThat(array.mapValue(value -> value + 1).getDouble(0)).isEqualTo(3.0);
+        assertThat(array
+            .mapWithIndex((value, idx) -> value + idx)
+            .getDouble(1)).isEqualTo(6.0);
+        assertThat(array
+            .mapEntry((species, value) -> species.equals(SPECIES_A) ? 9.0 : value)
+            .getDouble(0))
             .isEqualTo(9.0);
     }
 }

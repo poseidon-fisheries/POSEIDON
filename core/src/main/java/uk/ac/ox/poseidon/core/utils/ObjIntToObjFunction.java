@@ -20,20 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.species;
+package uk.ac.ox.poseidon.core.utils;
 
-public interface SpeciesIndexed {
+@FunctionalInterface
+public interface ObjIntToObjFunction<T, R> {
 
-    /**
-     * Returns the index that defines the ordering for this instance.
-     */
-    SpeciesIndex getSpeciesIndex();
-
-    /**
-     * Returns {@code true} if both instances share the same {@link SpeciesIndex}.
-     */
-    default boolean sameIndex(final SpeciesIndexed other) {
-        return getSpeciesIndex().equals(other.getSpeciesIndex());
-    }
+    R apply(T value, int index);
 
 }

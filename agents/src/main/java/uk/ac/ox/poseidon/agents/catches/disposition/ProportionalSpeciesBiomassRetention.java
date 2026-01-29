@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 /**
- * Applies per-species discard proportions without enforcing capacity limits.
- * Compose with {@code ProportionallyLimitingBiomassToHold} if capacity limiting is required.
+ * Applies per-species discard proportions without enforcing capacity limits. Compose with
+ * {@code ProportionallyLimitingBiomassToHold} if capacity limiting is required.
  */
 public class ProportionalSpeciesBiomassRetention implements DispositionProcess {
 
@@ -57,7 +57,7 @@ public class ProportionalSpeciesBiomassRetention implements DispositionProcess {
                 case final BiomassBucket currentlyRetained
                     when currentlyRetained.sameIndex(proportionsToDiscard) ->
                     currentlyRetained.mapBiomassValueWithIndex((biomass, index) ->
-                        proportionsToDiscard.get(index) * biomass
+                        proportionsToDiscard.getDouble(index) * biomass
                     );
                 case final Bucket currentlyRetained -> currentlyRetained.map((species, content) ->
                     Biomass.ofKg(proportionsToDiscard.getOrDefault(species, 0) * content.asKg())

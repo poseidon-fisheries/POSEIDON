@@ -33,8 +33,7 @@ import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
-import uk.ac.ox.poseidon.biology.species.SpeciesIndexed;
-import uk.ac.ox.poseidon.core.utils.DoubleIntToDoubleFunction;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubles;
 import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
 import java.util.*;
@@ -50,7 +49,7 @@ import static lombok.AccessLevel.PRIVATE;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = PRIVATE)
-public class BiomassBucket implements Bucket, SpeciesIndexed {
+public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
 
     private final double[] biomasses;
     @Getter private final SpeciesIndex speciesIndex;
@@ -214,21 +213,9 @@ public class BiomassBucket implements Bucket, SpeciesIndexed {
         return new BiomassBucket(newBiomasses, speciesIndex);
     }
 
-    public Bucket mapBiomassValueWithIndex(final DoubleIntToDoubleFunction mapper) {
-        final double[] newBiomasses = biomasses.clone();
-        for (int i = 0; i < biomasses.length; i++) {
-            newBiomasses[i] = mapper.applyAsDouble(biomasses[i], i);
-        }
-        return new BiomassBucket(newBiomasses, speciesIndex);
-    }
-
     @Override
     public Bucket mapBiomassValue(final ObjDoubleToDoubleFunction<Species> mapper) {
-        final double[] newBiomasses = biomasses.clone();
-        for (int i = 0; i < biomasses.length; i++) {
-            newBiomasses[i] = mapper.applyAsDouble(speciesIndex.speciesAt(i), biomasses[i]);
-        }
-        return new BiomassBucket(newBiomasses, speciesIndex);
+        return mapEntry(mapper);
     }
 
     @Override
@@ -267,8 +254,14 @@ public class BiomassBucket implements Bucket, SpeciesIndexed {
         return Arrays.stream(biomasses).sum() == 0;
     }
 
+    @Override
     public double getDouble(final int index) {
         return biomasses[index];
+    }
+
+    @Override
+    public BiomassBucket newInstance(final double[] values) {
+        return new BiomassBucket(values, speciesIndex);
     }
 
     @Override

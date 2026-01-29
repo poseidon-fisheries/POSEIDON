@@ -24,20 +24,12 @@ package uk.ac.ox.poseidon.biology.species;
 
 import lombok.Getter;
 import lombok.NonNull;
-import uk.ac.ox.poseidon.core.utils.DoubleIntConsumer;
-import uk.ac.ox.poseidon.core.utils.DoubleIntToDoubleFunction;
-import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
-
-import java.util.function.DoubleConsumer;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.ObjDoubleConsumer;
-
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Lightweight array-backed implementation indexed by {@link SpeciesIndex}.
  */
-public class SpeciesIndexedDoubleArray implements SpeciesIndexed {
+public class SpeciesIndexedDoubleArray implements SpeciesIndexedDoubles<SpeciesIndexedDoubleArray> {
 
     private final double @NonNull [] a;
 
@@ -47,7 +39,15 @@ public class SpeciesIndexedDoubleArray implements SpeciesIndexed {
     /**
      * The array must be aligned with {@code speciesIndex} (same size and ordering).
      */
-    public SpeciesIndexedDoubleArray(
+    private SpeciesIndexedDoubleArray(
+        final double @NonNull [] a,
+        @NonNull final SpeciesIndex speciesIndex
+    ) {
+        this.a = a;
+        this.speciesIndex = speciesIndex;
+    }
+
+    public static SpeciesIndexedDoubleArray of(
         final double @NonNull [] a,
         @NonNull final SpeciesIndex speciesIndex
     ) {
@@ -55,89 +55,20 @@ public class SpeciesIndexedDoubleArray implements SpeciesIndexed {
             a.length == speciesIndex.size(),
             "Array length must match species index size"
         );
-        this.a = a.clone();
-        this.speciesIndex = speciesIndex;
-    }
-
-    /**
-     * Returns the value for a species already present in {@code speciesIndex}.
-     */
-    public double get(final Species species) {
-        return a[speciesIndex.indexOf(species)];
-    }
-
-    /**
-     * Executes an action for each species/value pair.
-     */
-    public void forEach(final ObjDoubleConsumer<Species> consumer) {
-        forEachValueWithIndex((value, index) ->
-            consumer.accept(speciesIndex.speciesAt(index), value)
-        );
-    }
-
-    /**
-     * Executes an action for each value.
-     */
-    public void forEachValue(final DoubleConsumer consumer) {
-        for (final double value : a) {
-            consumer.accept(value);
-        }
-    }
-
-    /**
-     * Executes an action for each value/index pair.
-     */
-    public void forEachValueWithIndex(final DoubleIntConsumer consumer) {
-        for (int i = 0; i < a.length; i++) {
-            consumer.accept(a[i], i);
-        }
-    }
-
-    /**
-     * Returns a mapped copy based on each species/value pair.
-     */
-    public SpeciesIndexedDoubleArray map(final ObjDoubleToDoubleFunction<Species> mapper) {
-        final double[] mapped = new double[a.length];
-        forEachValueWithIndex((value, index) ->
-            mapped[index] = mapper.applyAsDouble(speciesIndex.speciesAt(index), value)
-        );
-        return new SpeciesIndexedDoubleArray(mapped, speciesIndex);
-    }
-
-    /**
-     * Returns a mapped copy based on each value.
-     */
-    public SpeciesIndexedDoubleArray mapValue(final DoubleUnaryOperator mapper) {
-        final double[] mapped = new double[a.length];
-        forEachValueWithIndex((value, index) -> mapped[index] = mapper.applyAsDouble(value));
-        return new SpeciesIndexedDoubleArray(mapped, speciesIndex);
-    }
-
-    /**
-     * Returns a mapped copy based on each value/index pair.
-     */
-    public SpeciesIndexedDoubleArray mapValueWithIndex(final DoubleIntToDoubleFunction mapper) {
-        final double[] mapped = new double[a.length];
-        forEachValueWithIndex((value, index) -> mapped[index] = mapper.applyAsDouble(value, index));
-        return new SpeciesIndexedDoubleArray(mapped, speciesIndex);
-    }
-
-    /**
-     * Returns a default if the species is not in {@code speciesIndex}.
-     */
-    public double getOrDefault(
-        final Species species,
-        final double defaultValue
-    ) {
-        final int i = speciesIndex.indexOf(species);
-        return i == -1 ? defaultValue : get(i);
+        return new SpeciesIndexedDoubleArray(a.clone(), speciesIndex);
     }
 
     /**
      * Returns the value at a valid index for {@code speciesIndex}.
      */
-    public double get(final int i) {
+    @Override
+    public double getDouble(final int i) {
         return a[i];
+    }
+
+    @Override
+    public SpeciesIndexedDoubleArray newInstance(final double[] values) {
+        return new SpeciesIndexedDoubleArray(values, speciesIndex);
     }
 
 }
