@@ -75,8 +75,8 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
             categoryCode.append(item.getCategory().getCode());
             speciesCode.append(item.getSpecies().getCode());
             biomassSold.append(item.getContent().asBiomass().asKg());
-            saleValue.append(item.getPrice().getAmount().doubleValue());
-            currency.append(item.getPrice().getCurrencyUnit().getCode());
+            saleValue.append(item.getSaleValue().getAmount().doubleValue());
+            currency.append(item.getSaleValue().getCurrencyUnit().getCode());
         });
     }
 }

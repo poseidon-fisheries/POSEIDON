@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.agents.market;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.Value;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -33,11 +34,11 @@ import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
+import static java.math.RoundingMode.HALF_EVEN;
 
 @Data
 public class Sale {
@@ -49,14 +50,18 @@ public class Sale {
     private final CategorisedCatch unsold;
 
     public Map<CurrencyUnit, Money> summary() {
-        return items
-            .stream()
-            .map(Item::getPrice)
-            .collect(toMap(
-                Money::getCurrencyUnit,
-                identity(),
-                Money::plus
-            ));
+        final Map<CurrencyUnit, Double> totals = new HashMap<>();
+        for (final Item item : items) {
+            final CurrencyUnit currency = item.getPrice().getAmount().getCurrencyUnit();
+            final double value =
+                item.getPrice().valueForKgDouble(item.getContent().asKg());
+            totals.merge(currency, value, Double::sum);
+        }
+        final Map<CurrencyUnit, Money> result = new HashMap<>();
+        totals.forEach((currency, total) ->
+            result.put(currency, Money.of(currency, total, HALF_EVEN))
+        );
+        return result;
     }
 
     @Value
@@ -64,6 +69,9 @@ public class Sale {
         CatchCategory category;
         Species species;
         Content content;
-        Money price;
+        Price price;
+
+        @Getter(lazy = true)
+        Money saleValue = price.valueFor(content);
     }
 }

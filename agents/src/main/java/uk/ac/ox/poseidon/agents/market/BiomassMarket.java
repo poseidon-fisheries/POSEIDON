@@ -77,12 +77,11 @@ public class BiomassMarket implements Market {
                 bucket.forEach((species, biomass) -> {
                     getPrice(catchCategory, species).ifPresentOrElse(
                         price -> {
-                            final Money salePrice = price.valueFor(biomass);
                             soldItems.add(new Sale.Item(
                                 catchCategory,
                                 species,
                                 biomass,
-                                salePrice
+                                price
                             ));
                         },
                         () -> unsoldCatch.add(new CategorisedCatch(Map.of(

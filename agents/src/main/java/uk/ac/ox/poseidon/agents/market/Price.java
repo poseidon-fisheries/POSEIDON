@@ -61,6 +61,10 @@ public class Price {
         return Money.of(amount.getCurrencyUnit(), value, HALF_EVEN);
     }
 
+    public double valueForKgDouble(final double kg) {
+        return amountPerKg * kg;
+    }
+
     @java.lang.Override
     public String toString() {
         return amount + " / " + biomassUnit;
