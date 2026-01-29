@@ -29,6 +29,7 @@ import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.biology.buckets.BucketBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.utils.IdSupplier;
@@ -80,11 +81,13 @@ public class BiomassMarket implements Market {
         final LocalDateTime dateTime
     ) {
         final List<Sale.Item> soldItems = new ArrayList<>();
-        final List<CategorisedCatch> unsoldCatch = new ArrayList<>();
+        final Map<CatchCategory, BucketBuilder> unsoldByCategory = new HashMap<>();
 
         categorisedCatch.getBuckets().forEach((catchCategory, bucket) -> {
             if (prices.get(catchCategory) == null) {
-                unsoldCatch.add(new CategorisedCatch(Map.of(catchCategory, bucket)));
+                unsoldByCategory
+                    .computeIfAbsent(catchCategory, key -> Bucket.newBuilder())
+                    .add(bucket);
             } else {
                 bucket.forEach((species, biomass) -> {
                     getPrice(catchCategory, species).ifPresentOrElse(
@@ -96,21 +99,31 @@ public class BiomassMarket implements Market {
                                 price
                             ));
                         },
-                        () -> unsoldCatch.add(new CategorisedCatch(Map.of(
-                            catchCategory,
-                            Bucket.of(species, biomass)
-                        )))
+                        () -> unsoldByCategory
+                            .computeIfAbsent(catchCategory, key -> Bucket.newBuilder())
+                            .add(species, biomass)
                     );
                 });
             }
         });
+        final CategorisedCatch unsold = unsoldByCategory.isEmpty()
+            ? CategorisedCatch.empty()
+            : new CategorisedCatch(
+                unsoldByCategory
+                    .entrySet()
+                    .stream()
+                    .collect(toMap(
+                        Entry::getKey,
+                        entry -> entry.getValue().build()
+                    ))
+            );
         final Sale sale = new Sale(
             dateTime,
             saleIdSupplier.nextId(),
             this,
             vessel,
             soldItems,
-            unsoldCatch.stream().reduce(CategorisedCatch::add).orElse(CategorisedCatch.empty())
+            unsold
         );
         eventManager.broadcast(sale);
         return sale;
