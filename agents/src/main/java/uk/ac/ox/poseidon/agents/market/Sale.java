@@ -50,6 +50,7 @@ public class Sale {
     private final CategorisedCatch unsold;
 
     public Map<CurrencyUnit, Money> summary() {
+        // Aggregate as doubles to avoid per-item Money creation; round once per currency.
         final Map<CurrencyUnit, Double> totals = new HashMap<>();
         for (final Item item : items) {
             final CurrencyUnit currency = item.getPrice().getAmount().getCurrencyUnit();

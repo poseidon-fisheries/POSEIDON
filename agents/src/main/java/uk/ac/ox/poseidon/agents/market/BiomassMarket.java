@@ -22,9 +22,9 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.ToString;
-import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -37,6 +37,9 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.Map.Entry;
+
+import static java.util.stream.Collectors.toMap;
 
 @Getter
 @ToString
@@ -44,7 +47,10 @@ public class BiomassMarket implements Market {
 
     private final Port port;
     private final String code;
+    @Getter(AccessLevel.NONE)
     private final Map<CatchCategory, Map<Species, Price>> prices;
+    // Cache resolved prices (including misses) to avoid repeated covers() scans.
+    private final Map<CatchCategory, Map<Species, Optional<Price>>> priceCache = new HashMap<>();
     private final IdSupplier saleIdSupplier;
     private final EventManager eventManager;
 
@@ -56,7 +62,13 @@ public class BiomassMarket implements Market {
     ) {
         this.port = port;
         this.code = code;
-        this.prices = new HashMap<>(prices);
+        this.prices = prices
+            .entrySet()
+            .stream()
+            .collect(toMap(
+                Entry::getKey,
+                entry -> new HashMap<>(entry.getValue())
+            ));
         this.saleIdSupplier = new PrefixedIdSupplier(code);
         this.eventManager = eventManager;
     }
@@ -104,24 +116,31 @@ public class BiomassMarket implements Market {
         return sale;
     }
 
+    /**
+     * Iterates prices without exposing the mutable backing maps.
+     */
+    public void forEachPrice(final PriceConsumer consumer) {
+        prices.forEach((catchCategory, pricePerSpecies) ->
+            pricePerSpecies.forEach((species, price) ->
+                consumer.accept(catchCategory, species, price)
+            )
+        );
+    }
+
     public Optional<Price> getPrice(
         final CatchCategory catchCategory,
         final Species species
     ) {
-        return Optional
-            .ofNullable(prices.get(catchCategory))
-            .flatMap(pricePerSpecies ->
-                Optional
-                    .ofNullable(pricePerSpecies.get(species))
-                    .or(() ->
-                        pricePerSpecies
-                            .entrySet()
-                            .stream()
-                            .filter(entry -> entry.getKey().covers(species))
-                            .map(Map.Entry::getValue)
-                            .findFirst()
-                    )
-            );
+        final Map<Species, Price> pricePerSpecies = prices.get(catchCategory);
+        if (pricePerSpecies == null) {
+            return Optional.empty();
+        }
+        final Map<Species, Optional<Price>> priceCacheBySpecies =
+            priceCache.computeIfAbsent(catchCategory, key -> new HashMap<>());
+        return priceCacheBySpecies.computeIfAbsent(
+            species,
+            key -> resolvePrice(pricePerSpecies, key)
+        );
     }
 
     public void setPrice(
@@ -132,6 +151,33 @@ public class BiomassMarket implements Market {
         prices
             .computeIfAbsent(catchCategory, k -> new HashMap<>())
             .put(species, price);
+        priceCache.remove(catchCategory);
+    }
+
+    private Optional<Price> resolvePrice(
+        final Map<Species, Price> pricePerSpecies,
+        final Species species
+    ) {
+        // Try direct match first, then fall back to a covers() scan.
+        final Price directMatch = pricePerSpecies.get(species);
+        if (directMatch != null) {
+            return Optional.of(directMatch);
+        }
+        for (final Entry<Species, Price> entry : pricePerSpecies.entrySet()) {
+            if (entry.getKey().covers(species)) {
+                return Optional.of(entry.getValue());
+            }
+        }
+        return Optional.empty();
+    }
+
+    @FunctionalInterface
+    public interface PriceConsumer {
+        void accept(
+            CatchCategory catchCategory,
+            Species species,
+            Price price
+        );
     }
 
 }
