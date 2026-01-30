@@ -39,7 +39,6 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static lombok.AccessLevel.PACKAGE;
-import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 
 @RequiredArgsConstructor(access = PACKAGE)
 public class TravelAlongPath extends AgentTask<Vessel> {
@@ -78,12 +77,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
                         vessel
                     )
                 ));
-        cruisingSpeedInKph =
-            vessel.getEngine()
-                .getCruisingSpeed()
-                .to(KILOMETRE_PER_HOUR)
-                .getValue()
-                .doubleValue();
+        cruisingSpeedInKph = vessel.getEngine().getCruisingSpeedInKph();
         super.start();
     }
 

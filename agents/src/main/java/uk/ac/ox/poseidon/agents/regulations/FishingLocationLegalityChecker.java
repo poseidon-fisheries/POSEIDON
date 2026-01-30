@@ -69,7 +69,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
         final Duration travelDuration =
             distanceCalculator.travelDuration(
                 pathToFishingLocation,
-                vessel.getEngine().getCruisingSpeed()
+                vessel.getEngine().getCruisingSpeedInKph()
             );
 
         return new FishingAction(
