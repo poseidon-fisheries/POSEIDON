@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,31 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.registers;
+package uk.ac.ox.poseidon.agents.components;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+/**
+ * Creates a simulation-scoped {@link ComponentRegister} instance.
+ */
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DynamicRegisterFactory<T> extends SimulationScopeFactory<Register<T>> {
-
-    private Factory<? super VesselScope, ? extends T> vesselScopeFactory;
-
+public class ComponentRegisterFactory<C> extends SimulationScopeFactory<ComponentRegister<C>> {
     @Override
-    protected Register<T> newInstance(final SimulationScope scope) {
-        return new DynamicRegister<>(
-            vessel -> vesselScopeFactory.get(new VesselScope(scope, vessel))
-        );
+    protected ComponentRegister<C> newInstance(final SimulationScope scope) {
+        return new ComponentRegister<>();
     }
 }

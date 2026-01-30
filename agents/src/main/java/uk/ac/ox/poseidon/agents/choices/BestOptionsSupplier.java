@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.registers.Register;
+import uk.ac.ox.poseidon.agents.components.ComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.util.Map;
@@ -36,13 +36,14 @@ import static lombok.AccessLevel.PACKAGE;
 public class BestOptionsSupplier<O> implements Supplier<OptionValues<O>> {
 
     private final Vessel vessel;
-    private final Register<? extends OptionValues<O>> optionValuesRegister;
+    private final ComponentRegister<? extends OptionValues<O>> optionValuesComponentRegister;
 
     @Override
     public OptionValues<O> get() {
         return new ImmutableOptionValues<>(
-            optionValuesRegister
+            optionValuesComponentRegister
                 .getOtherEntries(vessel)
+                .filter(entry -> entry.getKey().isActive())
                 .map(Map.Entry::getValue)
                 .flatMap(optionValues -> optionValues.getBestEntries().stream())
                 .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue, Math::max))

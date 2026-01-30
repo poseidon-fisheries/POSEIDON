@@ -20,38 +20,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.registers;
+package uk.ac.ox.poseidon.agents.components;
 
-import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.WeakHashMap;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static lombok.AccessLevel.PACKAGE;
+/**
+ * Stores per-vessel components for a simulation so other systems can query them by vessel.
+ */
+public class ComponentRegister<C> {
 
-@RequiredArgsConstructor(access = PACKAGE)
-public class DynamicRegister<T> implements Register<T> {
+    private final Map<Vessel, C> map = new HashMap<>();
 
-    private final WeakHashMap<Vessel, T> map = new WeakHashMap<>();
-    private final Function<Vessel, T> mappingFunction;
-
-    @Override
-    public Optional<T> get(final Vessel vessel) {
-        return Optional.ofNullable(map.computeIfAbsent(vessel, mappingFunction));
+    /**
+     * Associates the given component with the vessel.
+     */
+    public void putComponent(
+        final Vessel vessel,
+        final C component
+    ) {
+        map.put(vessel, component);
     }
 
-    @Override
+    /**
+     * Retrieves the component for the vessel, if available.
+     */
+    public Optional<C> getComponent(final Vessel vessel) {
+        return Optional.ofNullable(map.get(vessel));
+    }
+
+    /**
+     * Returns a stream of vessels currently in the register.
+     */
     public Stream<Vessel> getVessels() {
         return map.keySet().stream();
     }
 
-    @Override
-    public Stream<Map.Entry<Vessel, T>> getAllEntries() {
+    /**
+     * Returns a stream of all vessel/component entries.
+     */
+    public Stream<Map.Entry<Vessel, C>> getAllEntries() {
         return map.entrySet().stream();
+    }
+
+    /**
+     * Returns a stream of entries excluding the provided vessel.
+     */
+    public Stream<Entry<Vessel, C>> getOtherEntries(final Vessel vessel) {
+        return getAllEntries().filter(entry -> !entry.getKey().equals(vessel));
     }
 
 }

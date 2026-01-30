@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.registers.Register;
+import uk.ac.ox.poseidon.agents.components.ComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.util.HashMap;
@@ -42,7 +42,7 @@ class BestOptionsFromFriendsSupplier<O> implements Supplier<OptionValues<O>> {
 
     private final Vessel vessel;
     private final int maxNumberOfFriends;
-    private final Register<? extends OptionValues<O>> optionValuesRegister;
+    private final ComponentRegister<? extends OptionValues<O>> optionValuesRegister;
     private final MersenneTwisterFast rng;
 
     private final @Getter(lazy = true) ImmutableList<Vessel> friends = chooseFriends();
@@ -54,6 +54,7 @@ class BestOptionsFromFriendsSupplier<O> implements Supplier<OptionValues<O>> {
             maxNumberOfFriends,
             optionValuesRegister
                 .getVessels()
+                .filter(Vessel::isActive)
                 .filter(vessel -> vessel.getHomePort() == this.vessel.getHomePort())
                 .filter(vessel -> vessel != this.vessel)
                 .toList(),
@@ -68,13 +69,15 @@ class BestOptionsFromFriendsSupplier<O> implements Supplier<OptionValues<O>> {
         // ImmutableOptionValues copy it into an ImmutableMap
         final Map<O, Double> aggregatedValues = new HashMap<>();
         for (final Vessel friend : getFriends()) {
-            optionValuesRegister
-                .get(friend)
-                .ifPresent(values -> {
-                    for (final Entry<O, Double> entry : values.getBestEntries()) {
-                        aggregatedValues.merge(entry.getKey(), entry.getValue(), Math::max);
-                    }
-                });
+            if (friend.isActive()) {
+                optionValuesRegister
+                    .getComponent(friend)
+                    .ifPresent(values -> {
+                        for (final Entry<O, Double> entry : values.getBestEntries()) {
+                            aggregatedValues.merge(entry.getKey(), entry.getValue(), Math::max);
+                        }
+                    });
+            }
         }
         return new ImmutableOptionValues<>(aggregatedValues);
     }

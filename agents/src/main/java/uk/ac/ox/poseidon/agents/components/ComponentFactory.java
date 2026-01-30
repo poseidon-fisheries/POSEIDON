@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,42 +20,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.registers;
+package uk.ac.ox.poseidon.agents.components;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import java.util.List;
-
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-
+/**
+ * Creates per-vessel components and registers them in a shared component register.
+ */
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ImmutableRegisterFactory<T> extends SimulationScopeFactory<ImmutableRegister<T>> {
+public class ComponentFactory<C> extends VesselScopeFactory<C> {
 
-    private Factory<? super SimulationScope, ? extends List<Vessel>> vessels;
-    private Factory<? super VesselScope, T> vesselScopeFactory;
+    private Factory<? super VesselScope, ? extends C> componentFactory;
+    private Factory<? super VesselScope, ? extends ComponentRegister<C>> componentRegister;
 
     @Override
-    protected ImmutableRegister<T> newInstance(final SimulationScope scope) {
-        return new ImmutableRegister<>(
-            vessels.get(scope).stream().collect(toImmutableMap(
-                identity(),
-                vessel -> vesselScopeFactory.get(new VesselScope(scope, vessel))
-            ))
-        );
+    protected C newInstance(final VesselScope scope) {
+        final C component = componentFactory.get(scope);
+        final ComponentRegister<C> componentRegister = this.componentRegister.get(scope);
+        componentRegister.putComponent(scope.getVessel(), component);
+        return component;
     }
-
 }
