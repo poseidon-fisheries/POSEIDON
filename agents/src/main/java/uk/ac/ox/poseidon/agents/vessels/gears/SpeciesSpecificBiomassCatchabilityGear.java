@@ -40,7 +40,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 @Getter
 @ToString
-public class BiomassProportionPerSpeciesGear implements Gear {
+public class SpeciesSpecificBiomassCatchabilityGear implements Gear {
 
     @NonNull private final String code;
 
@@ -49,7 +49,7 @@ public class BiomassProportionPerSpeciesGear implements Gear {
     @NonNull private final Supplier<Duration> durationSupplier;
     @Setter private boolean active = true;
 
-    public BiomassProportionPerSpeciesGear(
+    public SpeciesSpecificBiomassCatchabilityGear(
         @NonNull final String code,
         @NonNull final SpeciesIndex speciesIndex,
         final double @NonNull [] proportions,

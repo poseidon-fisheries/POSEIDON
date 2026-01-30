@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
+import uk.ac.ox.poseidon.agents.utils.SpeciesSpecificRateFactorySupport;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -34,7 +34,6 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -49,8 +48,8 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BiomassProportionPerSpeciesGearFactory<S extends Scope>
-    extends RelativeScopeFactory<S, BiomassProportionPerSpeciesGear> {
+public class SpeciesSpecificBiomassCatchabilityGearFactory<S extends Scope>
+    extends RelativeScopeFactory<S, SpeciesSpecificBiomassCatchabilityGear> {
 
     private String code;
     private Factory<? super S, ? extends Supplier<Duration>> durationSupplier;
@@ -60,7 +59,7 @@ public class BiomassProportionPerSpeciesGearFactory<S extends Scope>
     private Map<String, Double> proportions;
 
     @Override
-    protected BiomassProportionPerSpeciesGear newInstance(final S scope) {
+    protected SpeciesSpecificBiomassCatchabilityGear newInstance(final S scope) {
         checkNotNull(proportions, "proportions should not be null");
         final HashSet<Species> species = new HashSet<>(this.species.get(scope));
         final SpeciesIndex speciesIndex = SpeciesIndex.of(species);
@@ -82,7 +81,7 @@ public class BiomassProportionPerSpeciesGearFactory<S extends Scope>
                 checkUnitRange(proportion, "proportion");
         });
 
-        return new BiomassProportionPerSpeciesGear(
+        return new SpeciesSpecificBiomassCatchabilityGear(
             code,
             speciesIndex,
             proportionArray,
@@ -90,7 +89,7 @@ public class BiomassProportionPerSpeciesGearFactory<S extends Scope>
         );
     }
 
-    public static <S extends Scope> BiomassProportionPerSpeciesGearFactory<S> fromFile(
+    public static <S extends Scope> SpeciesSpecificBiomassCatchabilityGearFactory<S> fromFile(
         final Path speciesFilePath,
         final String codeColumnName,
         final String lifeStageColumnName,
@@ -100,21 +99,14 @@ public class BiomassProportionPerSpeciesGearFactory<S extends Scope>
         final double defaultProportion
     ) {
         checkUnitRange(defaultProportion, "defaultProportion");
-        final Map<String, Double> proportions = new HashMap<>();
-        Table.read().csv(speciesFilePath.toFile()).stream().forEach(row -> {
-            final String speciesKey =
-                new Species(
-                    row.getString(codeColumnName),
-                    row.getString(lifeStageColumnName),
-                    null
-                ).getKey();
-            if (proportions.putIfAbsent(speciesKey, defaultProportion) != null) {
-                throw new IllegalArgumentException(
-                    "Duplicate species key '%s' in species file".formatted(speciesKey)
-                );
-            }
-        });
-        return new BiomassProportionPerSpeciesGearFactory<>(
+        final Map<String, Double> proportions =
+            SpeciesSpecificRateFactorySupport.readRatesByKeyFromFile(
+                speciesFilePath,
+                codeColumnName,
+                lifeStageColumnName,
+                defaultProportion
+            );
+        return new SpeciesSpecificBiomassCatchabilityGearFactory<>(
             code,
             durationSupplier,
             species,

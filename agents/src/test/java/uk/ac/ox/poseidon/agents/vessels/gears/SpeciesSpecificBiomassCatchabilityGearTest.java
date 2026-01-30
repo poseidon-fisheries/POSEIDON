@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.data.Offset.offset;
 
-class BiomassProportionPerSpeciesGearTest {
+class SpeciesSpecificBiomassCatchabilityGearTest {
 
     private static final double EPSILON = 1e-9;
     private static final Supplier<Duration> DURATION = () -> Duration.ofHours(1);
@@ -49,8 +49,8 @@ class BiomassProportionPerSpeciesGearTest {
     @Test
     void fish_sameSpeciesIndex_scalesByIndexPosition() {
         final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
-        final BiomassProportionPerSpeciesGear gear =
-            new BiomassProportionPerSpeciesGear(
+        final SpeciesSpecificBiomassCatchabilityGear gear =
+            new SpeciesSpecificBiomassCatchabilityGear(
                 "G1",
                 speciesIndex,
                 new double[]{0.2, 0.6},
@@ -69,8 +69,8 @@ class BiomassProportionPerSpeciesGearTest {
     @Test
     void fish_differentSpeciesIndex_ignoresMissingSpecies() {
         final SpeciesIndex gearIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
-        final BiomassProportionPerSpeciesGear gear =
-            new BiomassProportionPerSpeciesGear(
+        final SpeciesSpecificBiomassCatchabilityGear gear =
+            new SpeciesSpecificBiomassCatchabilityGear(
                 "G1",
                 gearIndex,
                 new double[]{0.1, 0.5},
@@ -90,7 +90,7 @@ class BiomassProportionPerSpeciesGearTest {
     void constructor_rejectsMismatchedProportionsLength() {
         final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
 
-        assertThatThrownBy(() -> new BiomassProportionPerSpeciesGear(
+        assertThatThrownBy(() -> new SpeciesSpecificBiomassCatchabilityGear(
             "G1",
             speciesIndex,
             new double[]{0.4},
@@ -102,7 +102,7 @@ class BiomassProportionPerSpeciesGearTest {
     void constructor_rejectsOutOfRangeProportions() {
         final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
 
-        assertThatThrownBy(() -> new BiomassProportionPerSpeciesGear(
+        assertThatThrownBy(() -> new SpeciesSpecificBiomassCatchabilityGear(
             "G1",
             speciesIndex,
             new double[]{0.3, 1.2},
@@ -115,7 +115,7 @@ class BiomassProportionPerSpeciesGearTest {
     void constructor_rejectsNullProportions() {
         final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
 
-        assertThatThrownBy(() -> new BiomassProportionPerSpeciesGear(
+        assertThatThrownBy(() -> new SpeciesSpecificBiomassCatchabilityGear(
             "G1",
             speciesIndex,
             null,

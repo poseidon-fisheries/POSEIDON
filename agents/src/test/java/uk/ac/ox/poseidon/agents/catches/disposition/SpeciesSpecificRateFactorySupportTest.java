@@ -20,46 +20,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.gears;
+package uk.ac.ox.poseidon.agents.catches.disposition;
+
+import uk.ac.ox.poseidon.agents.utils.SpeciesSpecificRateFactorySupport;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Supplier;
+import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class BiomassProportionPerSpeciesGearFactoryTest {
+class SpeciesSpecificRateFactorySupportTest {
 
     @Test
-    void fromFile_rejectsDuplicateSpeciesKeys() throws Exception {
+    void readRatesByKeyFromFileAppliesDefaultRate() throws Exception {
         final Path csvPath = Files.createTempFile("species", ".csv");
         Files.writeString(
             csvPath,
-            "code,lifeStage\nCOD,adult\nCOD,adult\n"
+            "code,stage\nA,adult\nB,juvenile\n"
         );
 
-        final Factory<Scope, Supplier<Duration>> durationSupplier =
-            scope -> () -> Duration.ofHours(1);
-        final Factory<Scope, Collection<? extends Species>> species =
-            scope -> List.of(new Species("COD", "adult", "Cod"));
+        final Map<String, Double> rates =
+            SpeciesSpecificRateFactorySupport.readRatesByKeyFromFile(
+                csvPath,
+                "code",
+                "stage",
+                0.2
+            );
 
-        assertThatThrownBy(() -> BiomassProportionPerSpeciesGearFactory.fromFile(
+        assertThat(rates)
+            .containsEntry("A;adult", 0.2)
+            .containsEntry("B;juvenile", 0.2);
+    }
+
+    @Test
+    void readRatesByKeyFromFileRejectsDuplicateKeys() throws Exception {
+        final Path csvPath = Files.createTempFile("species", ".csv");
+        Files.writeString(
             csvPath,
-            "code",
-            "lifeStage",
-            "G1",
-            durationSupplier,
-            species,
-            0.5
-        )).isInstanceOf(IllegalArgumentException.class)
+            "code,stage\nCOD,adult\nCOD,adult\n"
+        );
+
+        assertThatThrownBy(() ->
+            SpeciesSpecificRateFactorySupport.readRatesByKeyFromFile(
+                csvPath,
+                "code",
+                "stage",
+                0.1
+            )
+        ).isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Duplicate species key 'COD;adult'");
     }
 }
