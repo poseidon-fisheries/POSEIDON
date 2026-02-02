@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,26 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.market;
+package uk.ac.ox.poseidon.geography.grids;
 
-import sim.field.grid.SparseGrid2D;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-import uk.ac.ox.poseidon.geography.grids.MutableGrid;
-import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
+import sim.field.grid.Grid2D;
 
-public class MarketGrid extends ObjectGrid<Market> implements MutableGrid<SparseGrid2D> {
+public interface MutableGrid<F extends Grid2D> extends Grid {
 
-    MarketGrid(final ModelGrid modelGrid) {
-        super(modelGrid);
-    }
+    F getField();
 
-    @Override
-    protected String getObjectId(final Market market) {
-        return market.getCode();
-    }
-
-    @Override
-    public SparseGrid2D getField() {
-        return field;
-    }
 }

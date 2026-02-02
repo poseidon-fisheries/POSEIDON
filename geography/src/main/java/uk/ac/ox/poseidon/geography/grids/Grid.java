@@ -22,12 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import sim.field.grid.Grid2D;
-
-public interface Grid<F extends Grid2D> {
+public interface Grid {
 
     ModelGrid getModelGrid();
-
-    F getField();
 
 }

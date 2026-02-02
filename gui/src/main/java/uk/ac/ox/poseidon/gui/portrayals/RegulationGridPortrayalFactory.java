@@ -122,8 +122,8 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
             this.regulations = regulations;
             this.vesselField = vesselField;
             this.bathymetricGrid = bathymetricGrid;
-            final int gridWidth = bathymetricGrid.getField().width;
-            final int gridHeight = bathymetricGrid.getField().height;
+            final int gridWidth = bathymetricGrid.getModelGrid().getGridWidth();
+            final int gridHeight = bathymetricGrid.getModelGrid().getGridHeight();
             this.grid = new ObjectGrid2D(gridWidth, gridHeight);
             this.schedule = schedule;
             this.updateFrequency = updateFrequency;

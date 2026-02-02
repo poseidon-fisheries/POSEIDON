@@ -47,14 +47,14 @@ public class DivergingNumberGridPortrayalFactory extends NumberGridPortrayalFact
         final String paletteName,
         final String valueName,
         final boolean immutableField,
-        final Factory<? super SimulationScope, ? extends NumberGrid<?, ?>> grid
+        final Factory<? super SimulationScope, ? extends NumberGrid<?>> grid
     ) {
         super(paletteName, valueName, immutableField, grid);
     }
 
     @Override
     protected ColorMap newColorMap(final SimulationScope scope) {
-        final NumberGrid<?, ?> grid = getGrid().get(scope);
+        final NumberGrid<?> grid = getGrid().get(scope);
         final DoubleSummaryStatistics stats =
             grid
                 .getModelGrid()

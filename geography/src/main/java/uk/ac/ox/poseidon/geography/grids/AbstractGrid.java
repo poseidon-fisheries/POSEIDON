@@ -22,14 +22,12 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import lombok.Getter;
 import sim.field.grid.Grid2D;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Getter
-public abstract class AbstractGrid<F extends Grid2D> implements Grid<F> {
+public abstract class AbstractGrid<F extends Grid2D> implements Grid {
 
     protected final F field;
     private final ModelGrid modelGrid;
@@ -46,5 +44,10 @@ public abstract class AbstractGrid<F extends Grid2D> implements Grid<F> {
         checkArgument(modelGrid.getGridHeight() == field.getHeight());
         this.modelGrid = modelGrid;
         this.field = field;
+    }
+
+    @Override
+    public ModelGrid getModelGrid() {
+        return modelGrid;
     }
 }

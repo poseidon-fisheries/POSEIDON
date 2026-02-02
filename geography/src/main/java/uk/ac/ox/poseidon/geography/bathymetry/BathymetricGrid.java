@@ -28,7 +28,7 @@ import uk.ac.ox.poseidon.geography.grids.NumberGrid;
 
 import java.util.stream.Stream;
 
-public interface BathymetricGrid extends NumberGrid<Double, DoubleGrid2D> {
+public interface BathymetricGrid extends NumberGrid<Double> {
 
     default Stream<Int2D> getActiveWaterCells() {
         return getWaterCells().filter(getModelGrid()::isActive);

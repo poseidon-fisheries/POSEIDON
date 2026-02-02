@@ -28,7 +28,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 public class DoubleGrid extends AbstractGrid<DoubleGrid2D>
-    implements NumberGrid<Double, DoubleGrid2D> {
+    implements NumberGrid<Double> {
 
     protected final DoubleGrid2D doubleGrid2D;
 

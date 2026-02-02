@@ -40,14 +40,14 @@ import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 @EqualsAndHashCode(callSuper = true)
 public class NumberGridWithCapacityPortrayalFactory extends NumberGridPortrayalFactory {
 
-    private Factory<? super SimulationScope, ? extends NumberGrid<?, ?>> capacityGrid;
+    private Factory<? super SimulationScope, ? extends NumberGrid<?>> capacityGrid;
 
     public NumberGridWithCapacityPortrayalFactory(
         final String paletteName,
         final String valueName,
         final boolean immutableField,
-        final Factory<? super SimulationScope, ? extends NumberGrid<?, ?>> grid,
-        final Factory<? super SimulationScope, ? extends NumberGrid<?, ?>> capacityGrid
+        final Factory<? super SimulationScope, ? extends NumberGrid<?>> grid,
+        final Factory<? super SimulationScope, ? extends NumberGrid<?>> capacityGrid
     ) {
         super(paletteName, valueName, immutableField, grid);
         this.capacityGrid = capacityGrid;

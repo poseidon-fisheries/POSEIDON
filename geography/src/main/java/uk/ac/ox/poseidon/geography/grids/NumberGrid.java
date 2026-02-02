@@ -22,10 +22,9 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import sim.field.grid.Grid2D;
 import sim.util.Int2D;
 
-public interface NumberGrid<N extends Number, G extends Grid2D> extends Grid<G> {
+public interface NumberGrid<N extends Number> extends Grid {
 
     N getValue(final Int2D cell);
 

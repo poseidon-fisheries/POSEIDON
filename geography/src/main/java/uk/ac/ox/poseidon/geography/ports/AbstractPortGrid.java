@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,26 +20,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.market;
+package uk.ac.ox.poseidon.geography.ports;
 
+import lombok.Getter;
+import lombok.NonNull;
 import sim.field.grid.SparseGrid2D;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-import uk.ac.ox.poseidon.geography.grids.MutableGrid;
 import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
 
-public class MarketGrid extends ObjectGrid<Market> implements MutableGrid<SparseGrid2D> {
+import java.util.stream.Stream;
 
-    MarketGrid(final ModelGrid modelGrid) {
-        super(modelGrid);
+import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
+
+@Getter
+public abstract class AbstractPortGrid extends ObjectGrid<Port> implements PortGrid {
+
+    @NonNull
+    protected final BathymetricGrid bathymetricGrid;
+
+    public AbstractPortGrid(
+        final ModelGrid modelGrid,
+        final SparseGrid2D field,
+        final @NonNull BathymetricGrid bathymetricGrid
+    ) {
+        super(modelGrid, field);
+        this.bathymetricGrid = bathymetricGrid;
     }
 
     @Override
-    protected String getObjectId(final Market market) {
-        return market.getCode();
+    public String getObjectId(final Port port) {
+        return port.getCode();
     }
 
     @Override
-    public SparseGrid2D getField() {
-        return field;
+    public Stream<Port> getPorts() {
+        return bagToStream(field.getAllObjects());
     }
+
 }

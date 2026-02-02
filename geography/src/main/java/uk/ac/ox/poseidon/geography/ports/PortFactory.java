@@ -39,7 +39,7 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 @EqualsAndHashCode(callSuper = true)
 public class PortFactory extends SimulationScopeFactory<Port> {
 
-    private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+    private Factory<? super SimulationScope, ? extends MutablePortGrid> portGrid;
     private String code;
     private String name;
     private Factory<? super SimulationScope, ? extends Coordinate> coordinateFactory;

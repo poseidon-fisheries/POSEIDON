@@ -26,10 +26,11 @@ import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.geography.grids.MutableGrid;
 import uk.ac.ox.poseidon.geography.grids.NumberGrid;
 
 public interface BiomassGrid
-    extends NumberGrid<Double, DoubleGrid2D>, FisheableGrid {
+    extends NumberGrid<Double>, MutableGrid<DoubleGrid2D>, FisheableGrid {
 
     Species getSpecies();
 

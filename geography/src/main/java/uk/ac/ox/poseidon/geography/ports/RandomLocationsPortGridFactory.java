@@ -86,7 +86,7 @@ public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortG
                 modelGrid.getGridWidth(),
                 modelGrid.getGridHeight()
             );
-        final PortGrid portGrid = new PortGrid(bathymetricGrid, sparseGrid2D);
+        final MutablePortGrid portGrid = new MutablePortGrid(bathymetricGrid, sparseGrid2D);
         final IdSupplier idSupplier = this.idSupplier.get(scope);
         suitableTiles
             .stream()

@@ -25,7 +25,8 @@ package uk.ac.ox.poseidon.geography.grids;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 
-public class MutableDoubleGrid extends DoubleGrid {
+public class MutableDoubleGrid extends DoubleGrid
+    implements MutableGrid<DoubleGrid2D> {
     public MutableDoubleGrid(final ModelGrid modelGrid) {
         super(modelGrid);
     }
@@ -56,5 +57,10 @@ public class MutableDoubleGrid extends DoubleGrid {
         final double value
     ) {
         this.doubleGrid2D.set(cell.x, cell.y, value);
+    }
+
+    @Override
+    public DoubleGrid2D getField() {
+        return field;
     }
 }

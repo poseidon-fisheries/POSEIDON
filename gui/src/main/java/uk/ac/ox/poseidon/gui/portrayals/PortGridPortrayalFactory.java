@@ -31,6 +31,7 @@ import sim.portrayal.grid.SparseGridPortrayal2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.geography.ports.MutablePortGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 @Data
@@ -45,7 +46,8 @@ public final class PortGridPortrayalFactory extends SimulationScopeFactory<Spars
     @Override
     protected SparseGridPortrayal2D newInstance(final SimulationScope scope) {
         final SparseGridPortrayal2D sparseGridPortrayal2D = new SparseGridPortrayal2D();
-        sparseGridPortrayal2D.setField(portGrid.get(scope).getField());
+        final PortGrid grid = portGrid.get(scope);
+        sparseGridPortrayal2D.setField(MutablePortGrid.copyOf(grid).getField());
         sparseGridPortrayal2D.setPortrayalForAll(
             SvgPortrayal.from(getClass().getResourceAsStream("/images/port.svg"))
         );

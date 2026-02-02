@@ -26,6 +26,9 @@ import com.google.common.collect.Streams;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.MasonUtils;
+import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
@@ -33,12 +36,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
 
 public abstract class ObjectGrid<T>
     extends AbstractGrid<SparseGrid2D>
-    implements Grid<SparseGrid2D>, Iterable<T> {
+    implements Iterable<T> {
 
     protected ObjectGrid(
         final ModelGrid modelGrid
@@ -79,6 +83,37 @@ public abstract class ObjectGrid<T>
 
     public Stream<T> stream() {
         return Streams.stream(iterator());
+    }
+
+    protected static SparseGrid2D makeField(
+        final BathymetricGrid bathymetricGrid,
+        final Map<? extends Port, ? extends Coordinate> portCoordinates
+    ) {
+        final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
+        final SparseGrid2D grid = new SparseGrid2D(
+            modelGrid.getGridWidth(),
+            modelGrid.getGridHeight()
+        );
+        portCoordinates.forEach((port, coordinate) -> {
+            final Int2D cell = modelGrid.toCell(coordinate);
+            checkArgument(
+                bathymetricGrid.isLand(cell),
+                "Port %s at coordinate %s is on water.",
+                port.getName(),
+                coordinate
+            );
+            checkArgument(
+                modelGrid
+                    .getActiveNeighbours(cell)
+                    .stream()
+                    .anyMatch(bathymetricGrid::isWater),
+                "Port %s at coordinate %s is not adjacent to an active water cell.",
+                port.getName(),
+                coordinate
+            );
+            grid.setObjectLocation(port, cell);
+        });
+        return grid;
     }
 
     protected abstract String getObjectId(T object);

@@ -39,12 +39,12 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PortGridFactory extends SimulationScopeFactory<PortGrid> {
+public class MutablePortGridFactory extends SimulationScopeFactory<MutablePortGrid> {
 
     private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid;
 
     @Override
-    protected PortGrid newInstance(final SimulationScope scope) {
+    protected MutablePortGrid newInstance(final SimulationScope scope) {
         final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
         final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
         final SparseGrid2D sparseGrid2D =
@@ -52,7 +52,7 @@ public class PortGridFactory extends SimulationScopeFactory<PortGrid> {
                 modelGrid.getGridWidth(),
                 modelGrid.getGridHeight()
             );
-        return new PortGrid(bathymetricGrid, sparseGrid2D);
+        return new MutablePortGrid(bathymetricGrid, sparseGrid2D);
     }
 
 }
