@@ -55,7 +55,7 @@ public class VesselActivationFactory extends SimulationScopeFactory<FleetEvent> 
     private String name;
     private String portCode;
     private Map<String, Factory<? super SimulationScope, ?>> tags;
-    private Factory<? super VesselScope, ? extends Behaviour<Vessel>> behaviour;
+    private Factory<? super VesselScope, ? extends Behaviour> behaviour;
     private Factory<? super VesselScope, ? extends Hold> hold;
     private Factory<? super VesselScope, ? extends Gear> gear;
     private Factory<? super VesselScope, ? extends Engine> engine;

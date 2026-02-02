@@ -47,7 +47,7 @@ public class Agent<A extends Agent<A>> implements Steppable {
     private final @NonNull TemporalSchedule schedule;
     private final @NonNull EventManager eventManager;
 
-    private @NonNull Behaviour<A> behaviour = new InactiveBehaviour<>();
+    private @NonNull Behaviour behaviour = new InactiveBehaviour();
 
     @Getter(NONE)
     private final Queue<Runnable> mutationQueue = new LinkedList<>();
@@ -57,7 +57,7 @@ public class Agent<A extends Agent<A>> implements Steppable {
     public Agent(
         @NonNull final TemporalSchedule schedule,
         @NonNull final EventManager eventManager,
-        @NonNull final Behaviour<A> behaviour
+        @NonNull final Behaviour behaviour
     ) {
         this.schedule = schedule;
         this.eventManager = eventManager;
@@ -106,7 +106,7 @@ public class Agent<A extends Agent<A>> implements Steppable {
         }
     }
 
-    public void setBehaviour(final Behaviour<A> behaviour) {
+    public void setBehaviour(final Behaviour behaviour) {
         mutate(() -> this.behaviour = behaviour);
     }
 }

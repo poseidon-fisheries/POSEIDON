@@ -38,12 +38,12 @@ import uk.ac.ox.poseidon.core.Factory;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BehaviourFactory extends VesselScopeFactory<Behaviour<Vessel>> {
+public class BehaviourFactory extends VesselScopeFactory<Behaviour> {
 
     private Factory<? super VesselScope, ? extends Task<Vessel>> rootTask;
 
     @Override
-    protected Behaviour<Vessel> newInstance(final VesselScope scope) {
+    protected Behaviour newInstance(final VesselScope scope) {
         return new ActiveBehaviour<>(rootTask.get(scope), scope.getVessel());
     }
 }

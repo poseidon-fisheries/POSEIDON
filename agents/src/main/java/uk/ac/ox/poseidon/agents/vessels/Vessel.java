@@ -64,7 +64,7 @@ public class Vessel extends Agent<Vessel> implements Oriented2D {
     public Vessel(
         @NonNull final TemporalSchedule schedule,
         @NonNull final EventManager eventManager,
-        @NonNull final Behaviour<Vessel> nextBehaviour,
+        @NonNull final Behaviour nextBehaviour,
         @NonNull final String id,
         @NonNull final Account account,
         @NonNull final VesselField vesselField,

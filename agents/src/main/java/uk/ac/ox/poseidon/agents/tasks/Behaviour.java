@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
-public interface Behaviour<A> {
+public interface Behaviour {
 
     boolean isActive();
 

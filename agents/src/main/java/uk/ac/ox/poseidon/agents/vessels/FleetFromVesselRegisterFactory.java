@@ -74,7 +74,7 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
     @Builder.Default private List<String> modificationEventCodes =
         List.of("MOD");
 
-    private Factory<? super VesselScope, ? extends Behaviour<Vessel>> behaviour;
+    private Factory<? super VesselScope, ? extends Behaviour> behaviour;
     private Factory<? super VesselScope, ? extends Hold> hold;
     private Factory<? super VesselScope, ? extends Gear> gear;
     private Factory<? super VesselScope, ? extends Engine> engine;

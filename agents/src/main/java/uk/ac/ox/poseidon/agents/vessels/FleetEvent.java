@@ -53,7 +53,7 @@ public class FleetEvent implements Steppable {
     @NonNull String vesselName;
     @NonNull String portCode;
     @NonNull Map<String, Object> tags;
-    @NonNull Function<Vessel, Behaviour<Vessel>> behaviourFactoryFunction;
+    @NonNull Function<Vessel, Behaviour> behaviourFactoryFunction;
     @NonNull Function<Vessel, Hold> holdFactoryFunction;
     @NonNull Function<Vessel, Gear> gearFactoryFunction;
     @NonNull Function<Vessel, Engine> engineFactoryFunction;
