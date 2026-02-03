@@ -80,6 +80,8 @@ class FleetFromVesselRegisterFactoryTest {
 
         g1 = mock(Gear.class);
         g2 = mock(Gear.class);
+        when(g1.isActive()).thenReturn(true);
+        when(g2.isActive()).thenReturn(true);
         h1 = mock(Hold.class);
 
         simulation =
@@ -134,7 +136,7 @@ class FleetFromVesselRegisterFactoryTest {
             V2,Vee Dos,P2,MOD,2001-01-02,G1,4,d
             """
         );
-        simulation.stepFor(Duration.ofDays(1));
+        simulation.stepFor(Duration.ofDays(1).plusMinutes(1));
         final Vessel v1 = fleet.getVessel("V1").orElseThrow();
         assertThat(v1.getName()).isEqualTo("Vee Uno");
         assertThat(v1.getHomePort()).isEqualTo(p1);
@@ -166,6 +168,10 @@ class FleetFromVesselRegisterFactoryTest {
         final Vessel v2 = fleet.getVessel("V2").orElseThrow();
         assertThat(v1.isActive()).isTrue();
         assertThat(v2.isActive()).isTrue();
+
+        // Step by a minute to offset the schedule from midnight
+        // and give the vessels a chance to apply mutations
+        simulation.stepFor(Duration.ofMinutes(1));
 
         // Only v1 is deactivated
         simulation.stepFor(Duration.ofDays(1));
