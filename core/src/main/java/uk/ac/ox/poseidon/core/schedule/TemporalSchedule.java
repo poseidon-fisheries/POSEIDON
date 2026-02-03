@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.schedule;
 
+import com.google.common.collect.Streams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import sim.engine.*;
@@ -32,16 +33,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.stream.Collectors.*;
 
+@SuppressWarnings("rawtypes")
 @Getter
 @RequiredArgsConstructor
 public class TemporalSchedule extends Schedule {
@@ -265,4 +266,55 @@ public class TemporalSchedule extends Schedule {
         }
 
     }
+
+    /**
+     * This is a very ugly method meant to package the schedule in a slightly more easily
+     * interpretable way for human _debugging_ and should not under any circumstances be used in
+     * actual simulation code. -- NP 2026-02-03.
+     */
+    private List<?> asMap() {
+        record K(
+            LocalDateTime dateTime, int ordering, int sequence, Object steppable
+        ) {}
+        final Comparable[] keys = queue.getKeys();
+        final Object[] objects = queue.getObjects();
+        return IntStream
+            .range(0, this.queue.size())
+            .mapToObj(i -> {
+                final Schedule.Key key = (Key) keys[i];
+                final LocalDateTime dateTime = toDateTime(key.getTime());
+                final int ordering = key.getOrdering();
+                final Object obj = objects[i];
+                return switch (obj) {
+                    case final Sequence s -> Streams.mapWithIndex(
+                        sequenceSteps(s).stream(),
+                        (from, index) -> new K(dateTime, ordering, (int) index, from)
+                    );
+                    case final Object s -> Stream.of(new K(dateTime, ordering, 0, obj));
+                };
+            })
+            .flatMap(x -> x)
+            .sorted((o1, o2) -> Comparator
+                .comparing(K::dateTime)
+                .thenComparingInt(K::ordering)
+                .thenComparingInt(K::sequence)
+                .compare(o1, o2)
+            )
+            .toList();
+    }
+
+    private static List<Object> sequenceSteps(final Sequence sequence) {
+        try {
+            final var field = Sequence.class.getDeclaredField("steps");
+            field.setAccessible(true);
+            final Object raw = field.get(sequence);
+            if (raw instanceof final Object[] array) {
+                return Arrays.stream(array).toList();
+            }
+            return List.of(raw);
+        } catch (final ReflectiveOperationException | SecurityException e) {
+            return List.of(sequence);
+        }
+    }
+
 }
