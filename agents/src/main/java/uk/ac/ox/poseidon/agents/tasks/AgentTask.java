@@ -26,7 +26,7 @@ import com.badlogic.gdx.ai.btree.LeafTask;
 import com.badlogic.gdx.ai.btree.Task;
 import uk.ac.ox.poseidon.agents.Agent;
 
-public abstract class AgentTask<A extends Agent<A>> extends LeafTask<A> {
+public abstract class AgentTask<A extends Agent> extends LeafTask<A> {
 
     public A getAgent() {
         return getObject();

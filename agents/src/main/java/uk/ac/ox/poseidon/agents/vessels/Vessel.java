@@ -53,7 +53,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Getter
 @SuppressFBWarnings(value = "EI_EXPOSE_REP")
-public class Vessel extends Agent<Vessel> implements Oriented2D {
+public class Vessel extends Agent implements Oriented2D {
 
     private final @NonNull String id;
     private final @NonNull Account account;

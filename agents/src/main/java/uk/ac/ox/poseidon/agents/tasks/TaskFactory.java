@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class TaskFactory<A extends Agent<A>, S extends AgentScope<A>, T extends Task<A>>
+public abstract class TaskFactory<A extends Agent, S extends AgentScope<A>, T extends Task<A>>
     extends AbstractFactory<S, T> {
 
     private Factory<? super S, ? extends Task<A>> guard;

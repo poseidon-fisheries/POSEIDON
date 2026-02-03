@@ -28,7 +28,6 @@ import lombok.Setter;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.tasks.Behaviour;
-import uk.ac.ox.poseidon.agents.tasks.InactiveBehaviour;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
@@ -40,14 +39,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static lombok.AccessLevel.NONE;
 
 @Getter
-public class Agent<A extends Agent<A>> implements Steppable {
+public class Agent implements Steppable {
 
     private static final int AGENT_BEHAVIOUR_ORDERING = 1;
 
     private final @NonNull TemporalSchedule schedule;
     private final @NonNull EventManager eventManager;
 
-    private @NonNull Behaviour behaviour = new InactiveBehaviour();
+    private @NonNull Behaviour behaviour;
 
     @Getter(NONE)
     private final Queue<Runnable> mutationQueue = new LinkedList<>();

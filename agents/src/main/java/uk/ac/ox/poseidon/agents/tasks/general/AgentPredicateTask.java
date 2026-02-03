@@ -32,7 +32,7 @@ import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 @RequiredArgsConstructor
-public class AgentPredicateTask<A extends Agent<A>> extends AgentTask<A> {
+public class AgentPredicateTask<A extends Agent> extends AgentTask<A> {
 
     private final Predicate<? super A> predicate;
 
