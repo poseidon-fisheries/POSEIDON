@@ -20,7 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-tasks.register("test") {
+plugins {
+    base
+}
+
+tasks.named("check") {
     dependsOn(subprojects.map { it.tasks.named("test") })
 }
 
