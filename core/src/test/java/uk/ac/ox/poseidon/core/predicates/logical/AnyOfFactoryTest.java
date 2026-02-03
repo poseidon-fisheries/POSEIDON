@@ -23,47 +23,43 @@
 package uk.ac.ox.poseidon.core.predicates.logical;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings("unchecked")
 class AnyOfFactoryTest {
 
     /**
      * Tests the `get` method of the AnyOfFactory class. Verifies that the method creates an `AnyOf`
-     * instance correctly when a valid list of factories for `Predicate<Object>` is provided.
+     * instance correctly when a valid list of factories for `Predicate<Object>` is provided and
+     * preserves predicate order.
      */
     @Test
     void testGetWithValidPredicateFactories() {
         // Arrange
-        final GlobalScopeFactory<Predicate<Object>> mockFactory1 =
-            mock(GlobalScopeFactory.class);
-        final GlobalScopeFactory<Predicate<Object>> mockFactory2 =
-            mock(GlobalScopeFactory.class);
-        final Predicate<Object> mockPredicate1 = mock(Predicate.class);
-        final Predicate<Object> mockPredicate2 = mock(Predicate.class);
-
-        when(mockFactory1.get(Mockito.any())).thenReturn(mockPredicate1);
-        when(mockFactory2.get(Mockito.any())).thenReturn(mockPredicate2);
+        final Predicate<Object> predicate1 = value -> true;
+        final Predicate<Object> predicate2 = value -> false;
+        final ConstantFactory<Predicate<Object>> factory1 = new ConstantFactory<>(predicate1);
+        final ConstantFactory<Predicate<Object>> factory2 = new ConstantFactory<>(predicate2);
 
         final AnyOfFactory<GlobalScope, Object> anyOfFactory =
-            new AnyOfFactory<>(List.of(mockFactory1, mockFactory2));
+            new AnyOfFactory<>(List.of(factory1, factory2));
 
         // Act
-        final AnyOf<Object> result = anyOfFactory.get(mock(GlobalScope.class));
+        final AnyOf<Object> result = anyOfFactory.get(GlobalScope.INSTANCE);
 
         // Assert
-        assertNotNull(result, "The resulting AnyOf instance should not be null.");
+        assertThat(result.getPredicates().toList())
+            .as("Predicates should be preserved in the factory order")
+            .containsExactly(predicate1, predicate2);
     }
 
     /**
@@ -77,13 +73,15 @@ class AnyOfFactoryTest {
             new AnyOfFactory<>(Collections.emptyList());
 
         // Act
-        final AnyOf<Object> result = anyOfFactory.get(mock(GlobalScope.class));
+        final AnyOf<Object> result = anyOfFactory.get(GlobalScope.INSTANCE);
 
         // Assert
-        assertNotNull(
-            result,
-            "The resulting AnyOf instance should not be null even with empty list."
-        );
+        assertThat(result)
+            .as("The resulting AnyOf instance should not be null even with empty list.")
+            .isNotNull();
+        assertThat(result.test("value"))
+            .as("AnyOf with no predicates should return false")
+            .isFalse();
     }
 
     /**
@@ -93,52 +91,42 @@ class AnyOfFactoryTest {
     @Test
     void testGetWithNullPredicateThrowsException() {
         // Arrange
-        final GlobalScopeFactory<Predicate<Object>> mockFactory =
-            mock(GlobalScopeFactory.class);
-        when(mockFactory.get(Mockito.any())).thenReturn(null);
+        final Factory<GlobalScope, Predicate<Object>> nullFactory = scope -> null;
 
         final AnyOfFactory<GlobalScope, Object> anyOfFactory =
-            new AnyOfFactory<>(List.of(mockFactory));
+            new AnyOfFactory<>(List.of(nullFactory));
 
         // Act & Assert
-        assertThrows(
-            NullPointerException.class, () -> anyOfFactory.get(mock(GlobalScope.class)),
-            "Expected AnyOf to throw NullPointerException when a predicate is null."
-        );
+        final AnyOf<Object> result = anyOfFactory.get(GlobalScope.INSTANCE);
+        assertThatThrownBy(() -> result.test("value"))
+            .isInstanceOf(NullPointerException.class)
+            .as("Expected AnyOf to throw NullPointerException when a predicate is null.");
     }
 
     /**
-     * Tests the `get` method with multiple valid predicate factories to ensure all predicates are
-     * properly instantiated and combined into an AnyOf instance.
+     * Tests the `get` method with multiple valid predicate factories to ensure AnyOf returns true
+     * when at least one predicate matches.
      */
     @Test
     void testGetWithMultipleValidFactories() {
         // Arrange
-        final GlobalScopeFactory<Predicate<Object>> mockFactory1 =
-            mock(GlobalScopeFactory.class);
-        final GlobalScopeFactory<Predicate<Object>> mockFactory2 =
-            mock(GlobalScopeFactory.class);
-        final GlobalScopeFactory<Predicate<Object>> mockFactory3 =
-            mock(GlobalScopeFactory.class);
-        final Predicate<Object> mockPredicate1 = mock(Predicate.class);
-        final Predicate<Object> mockPredicate2 = mock(Predicate.class);
-        final Predicate<Object> mockPredicate3 = mock(Predicate.class);
+        final ConstantFactory<Predicate<String>> factory1 =
+            new ConstantFactory<>(value -> false);
+        final ConstantFactory<Predicate<String>> factory2 =
+            new ConstantFactory<>(value -> true);
+        final ConstantFactory<Predicate<String>> factory3 =
+            new ConstantFactory<>(value -> false);
 
-        when(mockFactory1.get(Mockito.any())).thenReturn(mockPredicate1);
-        when(mockFactory2.get(Mockito.any())).thenReturn(mockPredicate2);
-        when(mockFactory3.get(Mockito.any())).thenReturn(mockPredicate3);
-
-        final AnyOfFactory<GlobalScope, Object> anyOfFactory =
-            new AnyOfFactory<>(List.of(mockFactory1, mockFactory2, mockFactory3));
+        final AnyOfFactory<GlobalScope, String> anyOfFactory =
+            new AnyOfFactory<>(List.of(factory1, factory2, factory3));
 
         // Act
-        final AnyOf<Object> result = anyOfFactory.get(mock(GlobalScope.class));
+        final AnyOf<String> result = anyOfFactory.get(GlobalScope.INSTANCE);
 
         // Assert
-        assertNotNull(
-            result,
-            "The resulting AnyOf instance should not be null with multiple factories."
-        );
+        assertThat(result.test("value"))
+            .as("AnyOf should return true when any predicate is true")
+            .isTrue();
     }
 
 }
