@@ -169,24 +169,32 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
     }
 
     private Bucket subtractBiomassArrayBucket(final BiomassBucket other) {
+        boolean allZero = true;
         final double[] newBiomasses = new double[biomasses.length];
         for (int i = 0; i < biomasses.length; i++) {
             final double otherBiomass = other.biomasses[i];
             newBiomasses[i] = biomasses[i] - other.biomasses[i];
+            if (newBiomasses[i] != 0) allZero = false;
             checkBiomassNonNegativeWhenSubtracting(newBiomasses[i], otherBiomass, i);
         }
-        return new BiomassBucket(newBiomasses, speciesIndex);
+        return allZero
+            ? Bucket.empty()
+            : new BiomassBucket(newBiomasses, speciesIndex);
     }
 
     private Bucket subtractOtherBucket(final Bucket other) {
+        boolean allZero = true;
         final double[] newBiomasses = speciesIndex.newDoubleArray();
         for (int i = 0; i < speciesIndex.size(); i++) {
             final Species species = speciesIndex.speciesAt(i);
             final double otherBiomass = other.getContent(species).map(Content::asKg).orElse(0.0);
             newBiomasses[i] = biomasses[i] - otherBiomass;
+            if (newBiomasses[i] != 0) allZero = false;
             checkBiomassNonNegativeWhenSubtracting(newBiomasses[i], otherBiomass, i);
         }
-        return new BiomassBucket(newBiomasses, speciesIndex);
+        return allZero
+            ? Bucket.empty()
+            : new BiomassBucket(newBiomasses, speciesIndex);
     }
 
     private void checkBiomassNonNegativeWhenSubtracting(
