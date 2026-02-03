@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,7 +42,7 @@ class SpeciesSpecificDiscardRatesTest {
     void discardsPerSpeciesRatesFromRetained() {
         final Species a = new Species("A", null, null);
         final Species b = new Species("B", null, null);
-        final SpeciesIndex index = SpeciesIndex.of(List.of(a, b));
+        final SpeciesIndex index = SpeciesIndex.of(a, b);
         final Bucket retained = BiomassBucket.of(new double[]{10.0, 20.0}, index);
         final SpeciesIndexedDoubleArray rates =
             SpeciesIndexedDoubleArray.of(new double[]{0.5, 0.0}, index);
@@ -62,7 +62,7 @@ class SpeciesSpecificDiscardRatesTest {
     void appliesMortalityRatesToDiscardedAlive() {
         final Species a = new Species("A", null, null);
         final Species b = new Species("B", null, null);
-        final SpeciesIndex index = SpeciesIndex.of(List.of(a, b));
+        final SpeciesIndex index = SpeciesIndex.of(a, b);
         final Bucket discardedAlive = BiomassBucket.of(new double[]{10.0, 20.0}, index);
         final SpeciesIndexedDoubleArray rates =
             SpeciesIndexedDoubleArray.of(new double[]{0.1, 0.0}, index);
@@ -83,7 +83,7 @@ class SpeciesSpecificDiscardRatesTest {
     void factoryAppliesRatesBySpeciesKey() {
         final Species adult = new Species("A", "adult", null);
         final Species juvenile = new Species("A", "juvenile", null);
-        final List<Species> species = List.of(adult, juvenile);
+        final Set<Species> species = Set.of(adult, juvenile);
 
         final SpeciesSpecificDiscardRatesFactory<GlobalScope> factory =
             new SpeciesSpecificDiscardRatesFactory<>(

@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.DummySpecies;
@@ -48,7 +47,7 @@ class ProportionalSpeciesBiomassRetentionTest {
         proportions[speciesIndex.indexOf(DummySpecies.A)] = 0.2;
         proportions[speciesIndex.indexOf(DummySpecies.B)] = 0.6;
         final SpeciesIndexedDoubleArray proportionsToDiscard =
-            new SpeciesIndexedDoubleArray(proportions, speciesIndex);
+            SpeciesIndexedDoubleArray.of(proportions, speciesIndex);
         final ProportionalSpeciesBiomassRetention retention =
             new ProportionalSpeciesBiomassRetention(proportionsToDiscard);
 
@@ -80,7 +79,7 @@ class ProportionalSpeciesBiomassRetentionTest {
         proportions[speciesIndex.indexOf(DummySpecies.A)] = 0.5;
         proportions[speciesIndex.indexOf(DummySpecies.B)] = 0.2;
         final SpeciesIndexedDoubleArray proportionsToDiscard =
-            new SpeciesIndexedDoubleArray(proportions, speciesIndex);
+            SpeciesIndexedDoubleArray.of(proportions, speciesIndex);
         final ProportionalSpeciesBiomassRetention retention =
             new ProportionalSpeciesBiomassRetention(proportionsToDiscard);
 
@@ -108,7 +107,7 @@ class ProportionalSpeciesBiomassRetentionTest {
     void constructor_rejectsOutOfRangeProportions() {
         final SpeciesIndex speciesIndex = SpeciesIndex.of(Set.of(DummySpecies.A));
         final SpeciesIndexedDoubleArray proportionsToDiscard =
-            new SpeciesIndexedDoubleArray(new double[]{1.2}, speciesIndex);
+            SpeciesIndexedDoubleArray.of(new double[]{1.2}, speciesIndex);
 
         assertThatThrownBy(() -> new ProportionalSpeciesBiomassRetention(proportionsToDiscard))
             .isInstanceOf(IllegalArgumentException.class);
