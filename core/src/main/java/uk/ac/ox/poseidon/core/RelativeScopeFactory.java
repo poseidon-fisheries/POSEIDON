@@ -26,6 +26,7 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.beans.IntrospectionException;
@@ -68,13 +69,11 @@ public abstract class RelativeScopeFactory<S extends Scope, C> extends AbstractF
                 AbstractFactory::scopeClass
             ));
 
-        final Set<Class> scopeClasses = Set.copyOf(scopesByFactory.values());
+        if (scopesByFactory.isEmpty()) {
+            return GlobalScope.INSTANCE;
+        }
 
-        checkState(
-            !scopeClasses.isEmpty(),
-            "No delegate factories found for delegate scope factory %s",
-            this
-        );
+        final Set<Class> scopeClasses = Set.copyOf(scopesByFactory.values());
 
         final List<Class> leafScopes =
             scopeClasses
