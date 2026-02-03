@@ -61,7 +61,6 @@ public class FleetEvent implements Steppable {
 
     @Override
     public void step(final SimState simState) {
-
         final Vessel vessel = fleet
             .getVessel(vesselId)
             .orElseGet(() -> {

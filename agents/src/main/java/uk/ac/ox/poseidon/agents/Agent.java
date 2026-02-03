@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -53,6 +54,10 @@ public class Agent implements Steppable {
 
     @Setter private Duration taskDuration;
 
+    @SuppressFBWarnings(
+        value = "EI2",
+        justification = "Agent keeps references to mutable schedule/event manager by design."
+    )
     public Agent(
         @NonNull final TemporalSchedule schedule,
         @NonNull final EventManager eventManager,
@@ -95,11 +100,12 @@ public class Agent implements Steppable {
      * the agent, in which case we schedule it to be stepped again.
      */
     protected void mutate(final Runnable mutation) {
-        if (isActive()) {
+        if (behaviour.isRunning()) {
             mutationQueue.add(mutation);
         } else {
+            final boolean wasActive = isActive();
             mutation.run();
-            if (isActive()) {
+            if (!wasActive && isActive()) {
                 schedule.scheduleOnce(this, AGENT_BEHAVIOUR_ORDERING);
             }
         }

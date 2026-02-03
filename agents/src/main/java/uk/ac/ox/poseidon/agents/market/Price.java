@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -45,6 +46,10 @@ public class Price {
     @Getter(AccessLevel.NONE)
     double amountPerKg;
 
+    @SuppressFBWarnings(
+        value = "EI2",
+        justification = "Price stores Money/Unit references by design; they are treated as value objects."
+    )
     public Price(
         final @NonNull Money amount,
         final @NonNull Unit<Mass> biomassUnit
