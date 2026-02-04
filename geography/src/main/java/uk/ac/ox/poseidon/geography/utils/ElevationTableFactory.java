@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,47 +20,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.grids;
+package uk.ac.ox.poseidon.geography.utils;
 
-import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
+import tech.tablesaw.api.Table;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.io.File;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ModelGridWithActiveCellsFromGridFile<S extends Scope>
-    extends RelativeScopeFactory<S, ModelGrid> {
+public class ElevationTableFactory<S extends Scope>
+    extends RelativeScopeFactory<S, ElevationTable> {
 
-    CellSetFromGridFileFactory<? super S> cellSetFromGridFile;
-
-    /* TODO: the logic in this class should be replaced by having a separate
-     *   `ModelGridWithActiveCellFilterFactory` that acts as a decorator,
-     *   taking an existing model grid factory, adding a filter for active cells,
-     *   and returning a new ModelGridWithInactiveCells based on the original grid.
-     */
+    private Factory<? super S, ? extends Table> table;
+    private String longitudeColumnName;
+    private String latitudeColumnName;
+    private String elevationColumnName;
 
     @Override
-    protected ModelGrid newInstance(final S scope) {
-        // FIXME: relying on cellSetFromGridFile.getPath() feels very hackish.
-        final File gridFile = cellSetFromGridFile.getPath().get(scope).toFile();
-        final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
-        final ImmutableSet<Int2D> activeCells = cellSetFromGridFile.get(scope);
-        return ModelGrid.withInactiveCells(
-            coverageWrapper.getGridWidth(),
-            coverageWrapper.getGridHeight(),
-            coverageWrapper.makeEnvelope(),
-            activeCells::contains
+    protected ElevationTable newInstance(final S scope) {
+        return new ElevationTable(
+            table.get(scope),
+            longitudeColumnName,
+            latitudeColumnName,
+            elevationColumnName
         );
     }
 

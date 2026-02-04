@@ -27,14 +27,12 @@ import com.google.common.collect.Multimap;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
-import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.utils.ElevationTable;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
@@ -43,28 +41,19 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BathymetricGridFromLongFormatDataFactory<S extends Scope>
+public class BathymetricGridFromElevationTable<S extends Scope>
     extends BathymetricGridFactory<S> {
 
-    private Factory<? super S, ? extends Table> data;
+    private Factory<? super S, ? extends ElevationTable> elevationTable;
 
-    @NonNull private String longitudeColumn;
-    @NonNull private String latitudeColumn;
-    @NonNull private String depthColumn;
-
-    public BathymetricGridFromLongFormatDataFactory(
-        @NonNull final Factory<? super S, ? extends Path> path,
+    public BathymetricGridFromElevationTable(
+        @NonNull final Factory<? super S, ? extends ElevationTable> elevationTable,
         @NonNull final Factory<? super S, ? extends ModelGrid> modelGrid,
         @NonNull final Factory<? super S, ? extends Aggregator> aggregator,
-        final boolean inverted,
-        @NonNull final String longitudeColumn,
-        @NonNull final String latitudeColumn,
-        @NonNull final String depthColumn
+        final boolean inverted
     ) {
         super(modelGrid, aggregator, inverted);
-        this.longitudeColumn = longitudeColumn;
-        this.latitudeColumn = latitudeColumn;
-        this.depthColumn = depthColumn;
+        this.elevationTable = elevationTable;
     }
 
     @Override
@@ -73,13 +62,9 @@ public class BathymetricGridFromLongFormatDataFactory<S extends Scope>
         final S scope
     ) {
         final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
-        data.get(scope).forEach(row -> {
-            final Int2D cell =
-                modelGrid.toCell(new Coordinate(
-                    row.getDouble(longitudeColumn),
-                    row.getDouble(latitudeColumn)
-                ));
-            final double value = row.getDouble(depthColumn);
+        elevationTable.get(scope).entryStream().forEach(entry -> {
+            final Int2D cell = modelGrid.toCell(entry.getCoordinate());
+            final double value = entry.getElevation();
             elevationValues.put(cell, isInverted() ? -value : value);
         });
         return elevationValues.asMap();
