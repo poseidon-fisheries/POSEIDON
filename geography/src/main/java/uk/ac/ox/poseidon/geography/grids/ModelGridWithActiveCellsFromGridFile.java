@@ -22,11 +22,13 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -47,11 +49,12 @@ public class ModelGridWithActiveCellsFromGridFile<S extends Scope>
         // FIXME: relying on cellSetFromGridFile.getPath() feels very hackish.
         final File gridFile = cellSetFromGridFile.getPath().get(scope).toFile();
         final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
-        return ModelGrid.withActiveCells(
+        final ImmutableSet<Int2D> activeCells = cellSetFromGridFile.get(scope);
+        return ModelGrid.withInactiveCells(
             coverageWrapper.getGridWidth(),
             coverageWrapper.getGridHeight(),
             coverageWrapper.makeEnvelope(),
-            cellSetFromGridFile.get(scope)
+            activeCells::contains
         );
     }
 
