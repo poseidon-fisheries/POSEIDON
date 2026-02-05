@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.biology.biomass;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.Fisheable;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.geography.Envelope;
@@ -69,7 +68,7 @@ class DefaultBiomassGridExtractTest {
 
     private DefaultBiomassGrid newGrid(final double initialValue) {
         return new DefaultBiomassGrid(
-            ModelGrid.withAllCellsActive(1, 1, new Envelope(0, 1, 0, 1)),
+            ModelGrid.create(1, 1, new Envelope(0, 1, 0, 1)),
             SPECIES,
             initialValue
         );

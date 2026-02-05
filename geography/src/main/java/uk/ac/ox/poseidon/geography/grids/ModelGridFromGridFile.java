@@ -22,45 +22,36 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.io.File;
+import java.nio.file.Path;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ModelGridWithActiveCellsFromGridFile<S extends Scope>
+public class ModelGridFromGridFile<S extends Scope>
     extends RelativeScopeFactory<S, ModelGrid> {
 
-    CellSetFromGridFileFactory<? super S> cellSetFromGridFile;
-
-    /* TODO: the logic in this class should be replaced by having a separate
-     *   `ModelGridWithActiveCellFilterFactory` that acts as a decorator,
-     *   taking an existing model grid factory, adding a filter for active cells,
-     *   and returning a new ModelGridWithInactiveCells based on the original grid.
-     */
+    private Factory<? super S, ? extends Path> gridFilePath;
 
     @Override
     protected ModelGrid newInstance(final S scope) {
-        // FIXME: relying on cellSetFromGridFile.getPath() feels very hackish.
-        final File gridFile = cellSetFromGridFile.getPath().get(scope).toFile();
+        final File gridFile = gridFilePath.get(scope).toFile();
         final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
-        final ImmutableSet<Int2D> activeCells = cellSetFromGridFile.get(scope);
-        return ModelGrid.withInactiveCells(
+        return ModelGrid.create(
             coverageWrapper.getGridWidth(),
             coverageWrapper.getGridHeight(),
-            coverageWrapper.makeEnvelope(),
-            activeCells::contains
+            coverageWrapper.makeEnvelope()
         );
     }
 

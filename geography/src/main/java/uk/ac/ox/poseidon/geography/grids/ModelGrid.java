@@ -29,15 +29,16 @@ import sim.util.Number2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 public interface ModelGrid {
 
-    static ModelGrid withAllCellsActive(
+    static ModelGrid create(
         final int gridWidth,
         final int gridHeight,
         final Envelope envelope
@@ -49,18 +50,16 @@ public interface ModelGrid {
         );
     }
 
-    static ModelGrid withInactiveCells(
-        final int gridWidth,
-        final int gridHeight,
-        final Envelope envelope,
-        final Predicate<Int2D> activePredicate
-    ) {
-        return new ModelGridWithInactiveCells(
-            gridWidth,
-            gridHeight,
-            envelope,
-            activePredicate
-        );
+    default ModelGrid withActiveCells(final Collection<Int2D> activeCells) {
+        final Set<Int2D> activeCellSet = Set.copyOf(activeCells);
+        return getAllCells().allMatch(activeCellSet::contains)
+            ? create(getGridWidth(), getGridHeight(), getEnvelope())
+            : new ModelGridWithSomeCellsActive(
+                getGridWidth(),
+                getGridHeight(),
+                getEnvelope(),
+                activeCellSet::contains
+            );
     }
 
     Stream<Int2D> getAllCells();

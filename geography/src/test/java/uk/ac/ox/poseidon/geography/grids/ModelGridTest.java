@@ -40,7 +40,7 @@ import static org.mockito.Mockito.mock;
 class ModelGridTest {
 
     private final ModelGrid modelGrid =
-        ModelGrid.withAllCellsActive(
+        ModelGrid.create(
             10,
             10,
             new Envelope(-5, 5, -5, 5)

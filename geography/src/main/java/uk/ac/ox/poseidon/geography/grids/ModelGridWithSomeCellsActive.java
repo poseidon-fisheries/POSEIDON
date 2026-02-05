@@ -33,14 +33,14 @@ import java.util.function.Predicate;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
-class ModelGridWithInactiveCells extends AbstractModelGrid {
+class ModelGridWithSomeCellsActive extends AbstractModelGrid {
 
     // Using ImmutableSet here as it should provide fast lookup _and_ iteration
     @ToString.Exclude
     @Getter
     private final ImmutableSet<Int2D> activeCells;
 
-    ModelGridWithInactiveCells(
+    ModelGridWithSomeCellsActive(
         final int gridWidth,
         final int gridHeight,
         final Envelope envelope,
@@ -55,7 +55,7 @@ class ModelGridWithInactiveCells extends AbstractModelGrid {
         );
     }
 
-    private ModelGridWithInactiveCells(
+    private ModelGridWithSomeCellsActive(
         final int gridWidth,
         final int gridHeight,
         final Envelope envelope,
@@ -71,7 +71,7 @@ class ModelGridWithInactiveCells extends AbstractModelGrid {
         );
     }
 
-    private ModelGridWithInactiveCells(
+    private ModelGridWithSomeCellsActive(
         final int gridWidth,
         final int gridHeight,
         final Envelope envelope,

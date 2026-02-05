@@ -53,7 +53,7 @@ public class ModelGridFactory extends GlobalScopeFactory<ModelGrid> {
         final double heightInDegrees = northLatitude - southLatitude;
         final int gridWidth = validateDimension("Width", widthInDegrees, resolutionInDegrees);
         final int gridHeight = validateDimension("Height", heightInDegrees, resolutionInDegrees);
-        return ModelGrid.withAllCellsActive(
+        return ModelGrid.create(
             gridWidth,
             gridHeight,
             new Envelope(
