@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -35,6 +36,7 @@ import java.util.function.Predicate;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Double.isNaN;
 
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
