@@ -27,6 +27,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -68,10 +69,12 @@ abstract class AbstractModelGrid implements ModelGrid {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @Getter(AccessLevel.PRIVATE)
     private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> mooreNeighbourhoods =
         CacheBuilder.newBuilder().build(CacheLoader.from(this::computeMooreNeighbourhood));
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @Getter(AccessLevel.PRIVATE)
     private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> activeMooreNeighbourhoods =
         CacheBuilder.newBuilder().build(CacheLoader.from(this::computeActiveMooreNeighbourhood));
     private final ObjectGrid2D coordinatesGrid;

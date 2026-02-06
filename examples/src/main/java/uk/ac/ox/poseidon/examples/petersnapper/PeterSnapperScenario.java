@@ -27,7 +27,7 @@ import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.MeanFactory;
 import uk.ac.ox.poseidon.core.quantities.MassFactory;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTable;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableFactory;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
 import uk.ac.ox.poseidon.geography.utils.ElevationTableFactory;
 import uk.ac.ox.poseidon.io.paths.PathFactory;
@@ -37,7 +37,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.function.Supplier;
 
-import static tech.units.indriya.unit.Units.KILOGRAM;
+import static si.uom.NonSI.TONNE;
 
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
@@ -68,7 +68,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             new ModelGridFromLonLatTableFactory<>(elevationTable, 70, 0.000001);
 
         final var bathymetricGrid =
-            new BathymetricGridFromElevationTable<>(
+            new BathymetricGridFromElevationTableFactory<>(
                 elevationTable,
                 modelGrid,
                 new MeanFactory(),
@@ -79,7 +79,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             CarryingCapacityGridFactory.ofTotalCapacity(
                 modelGrid,
                 bathymetricGrid,
-                MassFactory.of(500_000_000, KILOGRAM)
+                MassFactory.of(500_000, TONNE)
             );
 
         return builder

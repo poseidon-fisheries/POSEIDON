@@ -22,7 +22,9 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
+import sim.field.grid.ObjectGrid2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import sim.util.Number2D;
@@ -174,11 +176,7 @@ public interface ModelGrid {
 
     double getCellHeight();
 
-    com.google.common.cache.LoadingCache<java.util.Map.Entry<Int2D, Integer>, List<Int2D>> getMooreNeighbourhoods();
+    ImmutableSet<Int2D> getActiveCells();
 
-    com.google.common.cache.LoadingCache<java.util.Map.Entry<Int2D, Integer>, List<Int2D>> getActiveMooreNeighbourhoods();
-
-    com.google.common.collect.ImmutableSet<Int2D> getActiveCells();
-
-    sim.field.grid.ObjectGrid2D getCoordinatesGrid();
+    ObjectGrid2D getCoordinatesGrid();
 }

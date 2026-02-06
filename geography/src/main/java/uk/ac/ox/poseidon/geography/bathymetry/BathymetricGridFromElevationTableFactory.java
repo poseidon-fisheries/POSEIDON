@@ -41,12 +41,12 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BathymetricGridFromElevationTable<S extends Scope>
+public class BathymetricGridFromElevationTableFactory<S extends Scope>
     extends BathymetricGridFactory<S> {
 
     private Factory<? super S, ? extends ElevationTable> elevationTable;
 
-    public BathymetricGridFromElevationTable(
+    public BathymetricGridFromElevationTableFactory(
         @NonNull final Factory<? super S, ? extends ElevationTable> elevationTable,
         @NonNull final Factory<? super S, ? extends ModelGrid> modelGrid,
         @NonNull final Factory<? super S, ? extends Aggregator> aggregator,

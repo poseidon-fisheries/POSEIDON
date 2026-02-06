@@ -31,7 +31,7 @@ components:
       modelGrid: *id003
       totalValue: !!uk.ac.ox.poseidon.core.quantities.KilogramsFactory
         mass: !!uk.ac.ox.poseidon.core.quantities.MassFactory {
-          unitString: kg,
-          value: 5.0E8
+          unitString: t,
+          value: 500000.0
         }
 startingDateTime: 2026-02-06T00:00:00Z
