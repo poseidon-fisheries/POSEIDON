@@ -68,4 +68,19 @@ public class CarryingCapacityGridFactory<S extends Scope>
             )
         );
     }
+
+    public static <S extends Scope> CarryingCapacityGridFactory<S> ofTotalCapacity(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
+        final Factory<? super S, ? extends Quantity<Mass>> carryingCapacity
+    ) {
+        return new CarryingCapacityGridFactory<>(
+            new DoubleGridFromAllocatorFactory<>(
+                modelGrid,
+                new ConstantMassAllocatorFactory<>(carryingCapacity),
+                new ActiveWaterCellPredicateFactory<>(bathymetricGrid)
+            )
+        );
+    }
+
 }
