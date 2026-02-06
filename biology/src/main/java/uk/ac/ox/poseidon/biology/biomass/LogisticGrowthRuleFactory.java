@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
 @SuperBuilder
@@ -40,7 +40,7 @@ public class LogisticGrowthRuleFactory extends GlobalScopeFactory<LogisticGrowth
     private double growthRate;
 
     @Override
-    protected LogisticGrowthRule newInstance(final GlobalScope scope) {
+    protected LogisticGrowthRule newInstance(final Scope scope) {
         return new LogisticGrowthRule(growthRate);
     }
 

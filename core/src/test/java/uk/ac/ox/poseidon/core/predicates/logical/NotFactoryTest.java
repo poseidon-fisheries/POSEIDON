@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.util.function.Predicate;
@@ -47,10 +47,10 @@ class NotFactoryTest {
         final Predicate<Object> predicate = value -> true;
         final ConstantFactory<Predicate<Object>> factory = new ConstantFactory<>(predicate);
 
-        final NotFactory<GlobalScope, Object> notFactory = new NotFactory<>(factory);
+        final NotFactory<Scope, Object> notFactory = new NotFactory<>(factory);
 
         // Act
-        final Not<Object> result = notFactory.get(GlobalScope.INSTANCE);
+        final Not<Object> result = notFactory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertThat(result.test("value"))
@@ -65,12 +65,12 @@ class NotFactoryTest {
     @Test
     void testNewInstanceWithNullPredicateThrowsException() {
         // Arrange
-        final Factory<GlobalScope, Predicate<Object>> nullFactory = scope -> null;
+        final Factory<Scope, Predicate<Object>> nullFactory = scope -> null;
 
-        final NotFactory<GlobalScope, Object> notFactory = new NotFactory<>(nullFactory);
+        final NotFactory<Scope, Object> notFactory = new NotFactory<>(nullFactory);
 
         // Act & Assert
-        assertThatThrownBy(() -> notFactory.get(GlobalScope.INSTANCE))
+        assertThatThrownBy(() -> notFactory.get(Scope.GLOBAL_SCOPE))
             .isInstanceOf(UncheckedExecutionException.class)
             .hasCauseInstanceOf(NullPointerException.class)
             .as("Expected Not to fail when the predicate factory returns null.");

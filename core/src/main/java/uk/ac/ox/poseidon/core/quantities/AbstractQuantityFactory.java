@@ -32,7 +32,7 @@ import tech.units.indriya.format.SimpleQuantityFormat;
 import tech.units.indriya.format.SimpleUnitFormat;
 import tech.units.indriya.quantity.Quantities;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
@@ -71,7 +71,7 @@ public abstract class AbstractQuantityFactory<Q extends Quantity<Q>>
     }
 
     @Override
-    protected Quantity<Q> newInstance(final GlobalScope scope) {
+    protected Quantity<Q> newInstance(final Scope scope) {
         final Unit<Q> unit = SimpleUnitFormat.getInstance().parse(unitString).asType(type);
         return Quantities.getQuantity(value, unit);
     }

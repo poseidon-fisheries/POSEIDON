@@ -30,7 +30,7 @@ import java.lang.ref.WeakReference;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SimulationScope extends GlobalScope {
+public class SimulationScope extends Scope {
 
     private final WeakReference<Simulation> simulation;
 

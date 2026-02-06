@@ -28,7 +28,7 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.util.Map;
@@ -85,7 +85,7 @@ class SpeciesSpecificDiscardRatesTest {
         final Species juvenile = new Species("A", "juvenile", null);
         final Set<Species> species = Set.of(adult, juvenile);
 
-        final SpeciesSpecificDiscardRatesFactory<GlobalScope> factory =
+        final SpeciesSpecificDiscardRatesFactory<Scope> factory =
             new SpeciesSpecificDiscardRatesFactory<>(
                 new ConstantFactory<>(species),
                 Map.of(
@@ -94,7 +94,7 @@ class SpeciesSpecificDiscardRatesTest {
                 )
             );
 
-        final SpeciesSpecificDiscardRates process = factory.get(GlobalScope.INSTANCE);
+        final SpeciesSpecificDiscardRates process = factory.get(Scope.GLOBAL_SCOPE);
         final SpeciesIndex index = SpeciesIndex.of(species);
         final Bucket retained = BiomassBucket.of(new double[]{8.0, 4.0}, index);
         final Disposition disposition =

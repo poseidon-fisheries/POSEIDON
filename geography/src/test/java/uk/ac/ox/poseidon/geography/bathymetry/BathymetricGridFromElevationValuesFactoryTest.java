@@ -27,21 +27,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFactory;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 class BathymetricGridFromElevationValuesFactoryTest {
 
     final Simulation simulation = mock(Simulation.class);
-    BathymetricGridFromElevationValuesFactory<GlobalScope> factory;
+    BathymetricGridFromElevationValuesFactory<Scope> factory;
 
     @BeforeEach
     void setUp() {
@@ -55,7 +53,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
     void elevationsValuesMustNotBeNull() {
         final UncheckedExecutionException error = assertThrows(
             UncheckedExecutionException.class,
-            () -> factory.get(GlobalScope.INSTANCE)
+            () -> factory.get(Scope.GLOBAL_SCOPE)
         );
         assertInstanceOf(NullPointerException.class, error.getCause());
     }
@@ -69,7 +67,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
                 factory.setElevationValues(List.of(0.0, 0.0, 0.0));
                 final UncheckedExecutionException error = assertThrows(
                     UncheckedExecutionException.class,
-                    () -> factory.get(GlobalScope.INSTANCE)
+                    () -> factory.get(Scope.GLOBAL_SCOPE)
                 );
                 assertInstanceOf(IllegalArgumentException.class, error.getCause());
             });
@@ -78,7 +76,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
     @Test
     void correctNumberOfElevationValuesSucceeds() {
         factory.setElevationValues(List.of(0.0, 0.0, 0.0, 0.0));
-        factory.get(GlobalScope.INSTANCE);
+        factory.get(Scope.GLOBAL_SCOPE);
     }
 
     @Test
@@ -87,7 +85,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
             0.0, 1.0,
             2.0, 3.0
         ));
-        final BathymetricGrid bathymetricGrid = factory.get(GlobalScope.INSTANCE);
+        final BathymetricGrid bathymetricGrid = factory.get(Scope.GLOBAL_SCOPE);
         assertEquals(0.0, bathymetricGrid.getElevation(new Int2D(0, 0)));
         assertEquals(1.0, bathymetricGrid.getElevation(new Int2D(1, 0)));
         assertEquals(2.0, bathymetricGrid.getElevation(new Int2D(0, 1)));

@@ -27,7 +27,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 
@@ -37,7 +37,7 @@ import java.nio.file.Path;
 @EqualsAndHashCode(callSuper = true)
 public class RootPathFactory
     extends GlobalScopeFactory<Path>
-    implements PathFactory<GlobalScope> {
+    implements PathFactory<Scope> {
 
     public RootPathFactory(final String path) {
         this.path = path.replace("\\", "/");
@@ -46,7 +46,7 @@ public class RootPathFactory
     private String path;
 
     @Override
-    protected Path newInstance(final GlobalScope scope) {
+    protected Path newInstance(final Scope scope) {
         return Path.of(path);
     }
 }

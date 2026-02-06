@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.util.Collections;
@@ -50,11 +50,11 @@ class AnyOfFactoryTest {
         final ConstantFactory<Predicate<Object>> factory1 = new ConstantFactory<>(predicate1);
         final ConstantFactory<Predicate<Object>> factory2 = new ConstantFactory<>(predicate2);
 
-        final AnyOfFactory<GlobalScope, Object> anyOfFactory =
+        final AnyOfFactory<Scope, Object> anyOfFactory =
             new AnyOfFactory<>(List.of(factory1, factory2));
 
         // Act
-        final AnyOf<Object> result = anyOfFactory.get(GlobalScope.INSTANCE);
+        final AnyOf<Object> result = anyOfFactory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertThat(result.getPredicates().toList())
@@ -69,11 +69,11 @@ class AnyOfFactoryTest {
     @Test
     void testGetWithEmptyFactoryList() {
         // Arrange
-        final AnyOfFactory<GlobalScope, Object> anyOfFactory =
+        final AnyOfFactory<Scope, Object> anyOfFactory =
             new AnyOfFactory<>(Collections.emptyList());
 
         // Act
-        final AnyOf<Object> result = anyOfFactory.get(GlobalScope.INSTANCE);
+        final AnyOf<Object> result = anyOfFactory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertThat(result)
@@ -91,13 +91,13 @@ class AnyOfFactoryTest {
     @Test
     void testGetWithNullPredicateThrowsException() {
         // Arrange
-        final Factory<GlobalScope, Predicate<Object>> nullFactory = scope -> null;
+        final Factory<Scope, Predicate<Object>> nullFactory = scope -> null;
 
-        final AnyOfFactory<GlobalScope, Object> anyOfFactory =
+        final AnyOfFactory<Scope, Object> anyOfFactory =
             new AnyOfFactory<>(List.of(nullFactory));
 
         // Act & Assert
-        final AnyOf<Object> result = anyOfFactory.get(GlobalScope.INSTANCE);
+        final AnyOf<Object> result = anyOfFactory.get(Scope.GLOBAL_SCOPE);
         assertThatThrownBy(() -> result.test("value"))
             .isInstanceOf(NullPointerException.class)
             .as("Expected AnyOf to throw NullPointerException when a predicate is null.");
@@ -117,11 +117,11 @@ class AnyOfFactoryTest {
         final ConstantFactory<Predicate<String>> factory3 =
             new ConstantFactory<>(value -> false);
 
-        final AnyOfFactory<GlobalScope, String> anyOfFactory =
+        final AnyOfFactory<Scope, String> anyOfFactory =
             new AnyOfFactory<>(List.of(factory1, factory2, factory3));
 
         // Act
-        final AnyOf<String> result = anyOfFactory.get(GlobalScope.INSTANCE);
+        final AnyOf<String> result = anyOfFactory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertThat(result.test("value"))

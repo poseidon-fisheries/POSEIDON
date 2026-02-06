@@ -26,7 +26,6 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.beans.IntrospectionException;
@@ -70,7 +69,7 @@ public abstract class RelativeScopeFactory<S extends Scope, C> extends AbstractF
             ));
 
         if (scopesByFactory.isEmpty()) {
-            return GlobalScope.INSTANCE;
+            return Scope.GLOBAL_SCOPE;
         }
 
         final Set<Class> scopeClasses = Set.copyOf(scopesByFactory.values());

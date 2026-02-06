@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.core.time;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -53,7 +53,7 @@ public class PeriodFactory extends GlobalScopeFactory<Period> {
     }
 
     @Override
-    protected Period newInstance(final GlobalScope scope) {
+    protected Period newInstance(final Scope scope) {
         return Period.of(year, month, day);
     }
 }

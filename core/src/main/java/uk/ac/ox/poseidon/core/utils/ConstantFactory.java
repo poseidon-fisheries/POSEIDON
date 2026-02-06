@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
 @SuperBuilder
@@ -40,7 +40,7 @@ public class ConstantFactory<C> extends GlobalScopeFactory<C> {
     private C value;
 
     @Override
-    protected C newInstance(final GlobalScope scope) {
+    protected C newInstance(final Scope scope) {
         return value;
     }
 

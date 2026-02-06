@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
 @SuperBuilder
@@ -40,7 +40,7 @@ public class InactiveGearFactory extends GlobalScopeFactory<InactiveGear> {
     private String code;
 
     @Override
-    protected InactiveGear newInstance(final GlobalScope scope) {
+    protected InactiveGear newInstance(final Scope scope) {
         return new InactiveGear(code);
     }
 

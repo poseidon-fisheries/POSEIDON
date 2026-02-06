@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.Month;
 import java.time.MonthDay;
@@ -56,7 +56,7 @@ public class MonthDayFactory extends GlobalScopeFactory<MonthDay> {
     }
 
     @Override
-    protected MonthDay newInstance(final GlobalScope scope) {
+    protected MonthDay newInstance(final Scope scope) {
         return MonthDay.of(month, dayOfMonth);
     }
 }

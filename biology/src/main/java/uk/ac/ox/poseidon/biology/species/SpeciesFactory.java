@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -50,7 +50,7 @@ public class SpeciesFactory extends GlobalScopeFactory<Species> {
     }
 
     @Override
-    protected Species newInstance(final GlobalScope scope) {
+    protected Species newInstance(final Scope scope) {
         return new Species(
             checkNotNull(code),
             lifeStage != null ? lifeStage : null,

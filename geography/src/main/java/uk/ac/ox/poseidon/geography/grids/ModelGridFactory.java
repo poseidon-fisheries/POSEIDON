@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -48,7 +48,7 @@ public class ModelGridFactory extends GlobalScopeFactory<ModelGrid> {
     private double northLatitude;
 
     @Override
-    protected ModelGrid newInstance(final GlobalScope scope) {
+    protected ModelGrid newInstance(final Scope scope) {
         final double widthInDegrees = eastLongitude - westLongitude;
         final double heightInDegrees = northLatitude - southLatitude;
         final int gridWidth = validateDimension("Width", widthInDegrees, resolutionInDegrees);

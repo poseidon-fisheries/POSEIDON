@@ -27,7 +27,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
 @SuperBuilder
@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 @EqualsAndHashCode(callSuper = true)
 public class MaxFactory extends GlobalScopeFactory<Max> {
     @Override
-    protected Max newInstance(final GlobalScope scope) {
+    protected Max newInstance(final Scope scope) {
         return new Max();
     }
 }

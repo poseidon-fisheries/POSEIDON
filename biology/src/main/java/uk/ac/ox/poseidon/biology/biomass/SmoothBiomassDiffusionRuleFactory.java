@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
 @SuperBuilder
@@ -48,7 +48,7 @@ public class SmoothBiomassDiffusionRuleFactory extends GlobalScopeFactory<Smooth
     private double percentageLimitOnDailyMovement;
 
     @Override
-    protected SmoothBiomassDiffusionRule newInstance(final GlobalScope scope) {
+    protected SmoothBiomassDiffusionRule newInstance(final Scope scope) {
         return new SmoothBiomassDiffusionRule(
             differentialPercentageToMove,
             percentageLimitOnDailyMovement

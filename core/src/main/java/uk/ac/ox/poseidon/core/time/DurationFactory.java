@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.Duration;
 
@@ -56,7 +56,7 @@ public class DurationFactory extends GlobalScopeFactory<Duration> {
     }
 
     @Override
-    protected Duration newInstance(final GlobalScope scope) {
+    protected Duration newInstance(final Scope scope) {
         return Duration.ofDays(days).plusHours(hours).plusMinutes(minutes).plusSeconds(seconds);
     }
 }

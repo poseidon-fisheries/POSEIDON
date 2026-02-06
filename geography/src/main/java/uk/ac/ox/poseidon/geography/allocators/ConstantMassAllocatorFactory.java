@@ -29,7 +29,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
@@ -58,7 +57,7 @@ public class ConstantMassAllocatorFactory<S extends Scope>
         return new ConstantAllocator(valueInKg);
     }
 
-    public static ConstantMassAllocatorFactory<GlobalScope> of(final Quantity<Mass> mass) {
+    public static ConstantMassAllocatorFactory<Scope> of(final Quantity<Mass> mass) {
         return new ConstantMassAllocatorFactory<>(ConstantFactory.of(mass));
     }
 

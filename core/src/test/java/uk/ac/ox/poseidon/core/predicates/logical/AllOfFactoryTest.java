@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.util.Collections;
@@ -50,11 +50,11 @@ class AllOfFactoryTest {
         final ConstantFactory<Predicate<Object>> factory1 = new ConstantFactory<>(predicate1);
         final ConstantFactory<Predicate<Object>> factory2 = new ConstantFactory<>(predicate2);
 
-        final AllOfFactory<GlobalScope, Object> allOfFactory =
+        final AllOfFactory<Scope, Object> allOfFactory =
             new AllOfFactory<>(List.of(factory1, factory2));
 
         // Act
-        final AllOf<Object> result = allOfFactory.get(GlobalScope.INSTANCE);
+        final AllOf<Object> result = allOfFactory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertThat(result.getPredicates().toList())
@@ -69,11 +69,11 @@ class AllOfFactoryTest {
     @Test
     void getWithEmptyFactoryListCreatesAllOfInstance() {
         // Arrange
-        final AllOfFactory<GlobalScope, Object> allOfFactory =
+        final AllOfFactory<Scope, Object> allOfFactory =
             new AllOfFactory<>(Collections.emptyList());
 
         // Act
-        final AllOf<Object> result = allOfFactory.get(GlobalScope.INSTANCE);
+        final AllOf<Object> result = allOfFactory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertThat(result)
@@ -92,11 +92,11 @@ class AllOfFactoryTest {
         final ConstantFactory<Predicate<String>> factory2 =
             new ConstantFactory<>(value -> false);
 
-        final AllOfFactory<GlobalScope, String> allOfFactory =
+        final AllOfFactory<Scope, String> allOfFactory =
             new AllOfFactory<>(List.of(factory1, factory2));
 
         // Act
-        final AllOf<String> result = allOfFactory.get(GlobalScope.INSTANCE);
+        final AllOf<String> result = allOfFactory.get(Scope.GLOBAL_SCOPE);
 
         // Assert
         assertThat(result.test("value"))
@@ -111,13 +111,13 @@ class AllOfFactoryTest {
     @Test
     void getWithNullPredicateThrowsNullPointerException() {
         // Arrange
-        final Factory<GlobalScope, Predicate<Object>> nullFactory = scope -> null;
+        final Factory<Scope, Predicate<Object>> nullFactory = scope -> null;
 
-        final AllOfFactory<GlobalScope, Object> allOfFactory =
+        final AllOfFactory<Scope, Object> allOfFactory =
             new AllOfFactory<>(List.of(nullFactory));
 
         // Act & Assert
-        assertThatThrownBy(() -> allOfFactory.get(GlobalScope.INSTANCE))
+        assertThatThrownBy(() -> allOfFactory.get(Scope.GLOBAL_SCOPE))
             .isInstanceOf(UncheckedExecutionException.class)
             .hasCauseInstanceOf(NullPointerException.class)
             .as("Expected AllOf to fail when a predicate factory returns null");

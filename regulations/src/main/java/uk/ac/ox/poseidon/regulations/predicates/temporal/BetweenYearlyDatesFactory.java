@@ -29,7 +29,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.time.MonthDayFactory;
 
@@ -46,7 +45,7 @@ public class BetweenYearlyDatesFactory<S extends Scope>
     private Factory<? super S, ? extends MonthDay> start;
     private Factory<? super S, ? extends MonthDay> end;
 
-    public static BetweenYearlyDatesFactory<GlobalScope> parse(
+    public static BetweenYearlyDatesFactory<Scope> parse(
         final CharSequence start,
         final CharSequence end
     ) {

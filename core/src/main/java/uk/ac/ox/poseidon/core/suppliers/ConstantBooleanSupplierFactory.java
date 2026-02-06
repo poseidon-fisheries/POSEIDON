@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.BooleanSupplier;
 
@@ -48,7 +48,7 @@ public class ConstantBooleanSupplierFactory extends GlobalScopeFactory<BooleanSu
     private boolean value;
 
     @Override
-    protected BooleanSupplier newInstance(final GlobalScope scope) {
+    protected BooleanSupplier newInstance(final Scope scope) {
         return () -> value;
     }
 }

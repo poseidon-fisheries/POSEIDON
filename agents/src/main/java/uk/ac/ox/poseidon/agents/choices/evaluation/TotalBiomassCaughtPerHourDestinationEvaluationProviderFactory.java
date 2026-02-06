@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
 @SuperBuilder
@@ -38,7 +38,7 @@ public class TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory
     extends GlobalScopeFactory<EvaluationProvider<Int2D>> {
 
     @Override
-    protected EvaluationProvider<Int2D> newInstance(final GlobalScope scope) {
+    protected EvaluationProvider<Int2D> newInstance(final Scope scope) {
         return new TotalBiomassCaughtPerHourDestinationEvaluationProvider();
     }
 

@@ -30,7 +30,7 @@ import lombok.experimental.SuperBuilder;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.Measurements;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -48,7 +48,7 @@ public class PriceFactory extends GlobalScopeFactory<Price> {
     private String massUnit;
 
     @Override
-    protected Price newInstance(final GlobalScope scope) {
+    protected Price newInstance(final Scope scope) {
         checkNotNull(currencyUnit, "currencyUnit must not be null");
         checkNotNull(massUnit, "massUnit must not be null");
         return new Price(

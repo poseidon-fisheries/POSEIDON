@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
 @SuperBuilder
@@ -40,7 +40,7 @@ public class CatchCategoryFactory extends GlobalScopeFactory<CatchCategory> {
     private String code;
 
     @Override
-    protected CatchCategory newInstance(final GlobalScope scope) {
+    protected CatchCategory newInstance(final Scope scope) {
         return new CatchCategory(code);
     }
 }

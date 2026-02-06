@@ -24,18 +24,18 @@ package uk.ac.ox.poseidon.core;
 
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @SuperBuilder
 @NoArgsConstructor
-public abstract class GlobalScopeFactory<C> extends AbstractFactory<GlobalScope, C> {
+public abstract class GlobalScopeFactory<C> extends AbstractFactory<Scope, C> {
     @Override
-    protected Object makeKey(final GlobalScope scope) {
-        return GlobalScope.INSTANCE;
+    protected Object makeKey(final Scope scope) {
+        return Scope.GLOBAL_SCOPE;
     }
 
     @Override
-    protected Class<GlobalScope> scopeClass() {
-        return GlobalScope.class;
+    protected Class<Scope> scopeClass() {
+        return Scope.class;
     }
 }
