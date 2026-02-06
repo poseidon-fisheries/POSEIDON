@@ -38,8 +38,8 @@ import sim.util.gui.ColorMap;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableGrid;
-import uk.ac.ox.poseidon.geography.grids.NumberGrid;
 import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 
 @Data
@@ -53,7 +53,7 @@ public class NumberGridPortrayalFactory
     private String paletteName;
     private String valueName;
     private boolean immutableField;
-    private Factory<? super SimulationScope, ? extends NumberGrid<?>> grid;
+    private Factory<? super SimulationScope, ? extends DoubleGrid> grid;
 
     @Override
     protected FastValueGridPortrayal2D newInstance(final SimulationScope scope) {
@@ -66,8 +66,8 @@ public class NumberGridPortrayalFactory
                 return portrayal.getValueName() + ": " + wrapper.getObject();
             }
         });
-        final NumberGrid<?> numberGrid = grid.get(scope);
-        portrayal.setField(toField(numberGrid));
+        final DoubleGrid doubleGrid = grid.get(scope);
+        portrayal.setField(toField(doubleGrid));
         portrayal.setMap(newColorMap(scope));
         return portrayal;
     }
@@ -76,13 +76,13 @@ public class NumberGridPortrayalFactory
         return new PaletteColorMap(
             paletteName,
             0,
-            grid.get(scope).getMaximumValue().doubleValue()
+            grid.get(scope).getMaximumValue()
         );
     }
 
-    private static Grid2D toField(final NumberGrid<?> grid) {
-        if (grid instanceof MutableGrid<?> mutableGrid) {
-            final Grid2D field = ((MutableGrid<?>) mutableGrid).getField();
+    private static Grid2D toField(final DoubleGrid grid) {
+        if (grid instanceof final MutableGrid<?> mutableGrid) {
+            final Grid2D field = mutableGrid.getField();
             if (field instanceof DoubleGrid2D) return field;
         }
         final int width = grid.getModelGrid().getGridWidth();
@@ -90,7 +90,7 @@ public class NumberGridPortrayalFactory
         final DoubleGrid2D copy = new DoubleGrid2D(width, height);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                copy.set(x, y, grid.getValue(new Int2D(x, y)).doubleValue());
+                copy.set(x, y, grid.getValue(new Int2D(x, y)));
             }
         }
         return copy;

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,33 +20,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.biomass;
+package uk.ac.ox.poseidon.geography.predicates;
 
-import sim.field.grid.DoubleGrid2D;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.biology.FisheableGrid;
-import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-import uk.ac.ox.poseidon.geography.grids.MutableGrid;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
-public interface BiomassGrid
-    extends DoubleGrid, MutableGrid<DoubleGrid2D>, FisheableGrid {
+import java.util.function.Predicate;
 
-    Species getSpecies();
+@RequiredArgsConstructor
+public class ActiveWaterCellPredicate implements Predicate<Int2D> {
 
-    default Biomass getBiomass(final Int2D cell) {
-        return Biomass.ofKg(getValue(cell));
+    @NonNull
+    private final BathymetricGrid bathymetricGrid;
+
+    @Override
+    public boolean test(final Int2D cell) {
+        return bathymetricGrid.isActiveWater(cell);
     }
-
-    default void setBiomass(
-        final Int2D cell,
-        final Biomass biomass
-    ) {
-        setBiomass(cell, biomass.asKg());
-    }
-
-    void setBiomass(
-        final Int2D cell,
-        final double value
-    );
 }

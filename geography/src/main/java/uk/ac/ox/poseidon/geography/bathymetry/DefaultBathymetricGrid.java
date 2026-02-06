@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 import lombok.Getter;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
+import uk.ac.ox.poseidon.geography.grids.BaseDoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.Arrays;
@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 
 import static lombok.AccessLevel.PRIVATE;
 
-public class DefaultBathymetricGrid extends DoubleGrid implements BathymetricGrid {
+public class DefaultBathymetricGrid extends BaseDoubleGrid implements BathymetricGrid {
 
     @Getter(value = PRIVATE, lazy = true)
     private final Int2D[] landCellsArray =
@@ -93,7 +93,7 @@ public class DefaultBathymetricGrid extends DoubleGrid implements BathymetricGri
 
     @Override
     public double getElevation(final Int2D cell) {
-        return getDouble(cell);
+        return getValue(cell);
     }
 
 }

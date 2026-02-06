@@ -22,85 +22,14 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.geography.Envelope;
 
-public class DoubleGrid extends AbstractGrid<DoubleGrid2D>
-    implements NumberGrid<Double> {
+public interface DoubleGrid extends Grid {
 
-    protected final DoubleGrid2D doubleGrid2D;
+    double getValue(final Int2D cell);
 
-    public DoubleGrid(final ModelGrid modelGrid) {
-        this(modelGrid, 0.0);
-    }
+    double getMinimumValue();
 
-    public DoubleGrid(
-        final ModelGrid modelGrid,
-        final double initialValue
-    ) {
-        this(
-            modelGrid,
-            new DoubleGrid2D(modelGrid.getGridWidth(), modelGrid.getGridHeight(), initialValue)
-        );
-    }
-
-    public DoubleGrid(
-        final double[][] values
-    ) {
-        this(new DoubleGrid2D(values));
-    }
-
-    public DoubleGrid(final DoubleGrid2D grid2D) {
-        this(
-            ModelGrid.create(
-                grid2D.width,
-                grid2D.height,
-                new Envelope(
-                    0, grid2D.width,
-                    0, grid2D.height
-                )
-            ),
-            grid2D
-        );
-    }
-
-    public DoubleGrid(
-        final ModelGrid modelGrid,
-        final double[][] values
-    ) {
-        this(modelGrid, new DoubleGrid2D(values));
-    }
-
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public DoubleGrid(
-        final ModelGrid modelGrid,
-        final DoubleGrid2D grid
-    ) {
-        super(modelGrid, grid);
-        this.doubleGrid2D = grid;
-    }
-
-    @Override
-    public Double getValue(final Int2D cell) {
-        return getDouble(cell);
-    }
-
-    @Override
-    public Double getMinimumValue() {
-        return doubleGrid2D.min();
-    }
-
-    @Override
-    public Double getMaximumValue() {
-        return doubleGrid2D.max();
-    }
-
-    public double getDouble(
-        final Int2D cell
-    ) {
-        return this.doubleGrid2D.get(cell.x, cell.y);
-    }
+    double getMaximumValue();
 
 }

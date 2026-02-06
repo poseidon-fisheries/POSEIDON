@@ -40,8 +40,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
@@ -125,7 +125,7 @@ public class FisheableBiomassGrids
             final double[] biomassExtracted
         ) {
             final BiomassGrid grid = grids[gridIndex];
-            final double currentBiomass = grid.getDouble(cell);
+            final double currentBiomass = grid.getValue(cell);
             final double extractedBiomass = Math.min(biomassToExtract, currentBiomass);
             biomassExtracted[gridIndex] = extractedBiomass;
             grid.setBiomass(cell, currentBiomass - extractedBiomass);
@@ -135,7 +135,7 @@ public class FisheableBiomassGrids
         public Bucket availableFish() {
             final double[] biomasses = new double[speciesIndex.size()];
             for (int i = 0; i < grids.length; i++) {
-                biomasses[i] = grids[i].getDouble(cell);
+                biomasses[i] = grids[i].getValue(cell);
             }
             return BiomassBucket.of(biomasses, speciesIndex);
         }
@@ -146,7 +146,7 @@ public class FisheableBiomassGrids
                 case final BiomassBucket biomassBucket when sameIndex(biomassBucket) -> {
                     for (int i = 0; i < speciesIndex.size(); i++) {
                         final BiomassGrid grid = grids[i];
-                        grid.setBiomass(cell, grid.getDouble(cell) + biomassBucket.getDouble(i));
+                        grid.setBiomass(cell, grid.getValue(cell) + biomassBucket.getDouble(i));
                     }
                 }
                 default -> fishToRelease.forEachBiomassValue((species, biomass) -> {
@@ -155,7 +155,7 @@ public class FisheableBiomassGrids
                         "No grid available to release %s.".formatted(species)
                     );
                     final BiomassGrid grid = grids[i];
-                    grid.setBiomass(cell, grid.getDouble(cell) + biomass);
+                    grid.setBiomass(cell, grid.getValue(cell) + biomass);
                 });
             }
         }

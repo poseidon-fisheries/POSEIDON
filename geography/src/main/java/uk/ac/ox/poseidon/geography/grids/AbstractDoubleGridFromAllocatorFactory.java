@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,40 +20,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.biomass;
+package uk.ac.ox.poseidon.geography.grids;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.biology.species.Species;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+
+import java.util.function.Predicate;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BiomassGridFactory extends SimulationScopeFactory<BiomassGrid> {
+abstract class AbstractDoubleGridFromAllocatorFactory<S extends Scope, G extends DoubleGrid>
+    extends RelativeScopeFactory<S, G> {
 
-    private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
-    private Factory<? super SimulationScope, ? extends Species> species;
-    private Factory<? super SimulationScope, ? extends Allocator> biomassAllocator;
+    private Factory<? super S, ? extends ModelGrid> modelGrid;
+    private Factory<? super S, ? extends Allocator> allocator;
+    private Factory<? super S, ? extends Predicate<Int2D>> cellPredicate;
 
     @Override
-    protected BiomassGrid newInstance(final SimulationScope scope) {
-        final Allocator biomassAllocator = this.biomassAllocator.get(scope);
+    protected G newInstance(final S scope) {
         final ModelGrid modelGrid = this.modelGrid.get(scope);
-        final double[][] biomassArray = modelGrid.makeDoubleArray();
+        final Allocator allocator = this.allocator.get(scope);
+        final Predicate<Int2D> cellPredicate = this.cellPredicate.get(scope);
+        final double[][] values = modelGrid.makeDoubleArray();
         modelGrid.getAllCells().forEach(cell ->
-            biomassArray[cell.x][cell.y] = biomassAllocator.applyAsDouble(cell)
+            values[cell.x][cell.y] = cellPredicate.test(cell)
+                ? allocator.applyAsDouble(cell)
+                : Double.NaN
         );
-        return new DefaultBiomassGrid(modelGrid, species.get(scope), biomassArray);
+        return makeGrid(modelGrid, values);
     }
 
+    abstract G makeGrid(
+        final ModelGrid modelGrid,
+        final double[][] values
+    );
 }

@@ -29,7 +29,7 @@ import lombok.experimental.SuperBuilder;
 import sim.util.gui.ColorMap;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.geography.grids.NumberGrid;
+import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 
 import java.util.DoubleSummaryStatistics;
@@ -47,19 +47,19 @@ public class DivergingNumberGridPortrayalFactory extends NumberGridPortrayalFact
         final String paletteName,
         final String valueName,
         final boolean immutableField,
-        final Factory<? super SimulationScope, ? extends NumberGrid<?>> grid
+        final Factory<? super SimulationScope, ? extends DoubleGrid> grid
     ) {
         super(paletteName, valueName, immutableField, grid);
     }
 
     @Override
     protected ColorMap newColorMap(final SimulationScope scope) {
-        final NumberGrid<?> grid = getGrid().get(scope);
+        final DoubleGrid grid = getGrid().get(scope);
         final DoubleSummaryStatistics stats =
             grid
                 .getModelGrid()
                 .getAllCells()
-                .mapToDouble(cell -> grid.getValue(cell).doubleValue())
+                .mapToDouble(grid::getValue)
                 .summaryStatistics();
         final double absMax = max(abs(stats.getMin()), abs(stats.getMax()));
         return new PaletteColorMap(getPaletteName(), -absMax, absMax);

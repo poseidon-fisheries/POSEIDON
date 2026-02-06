@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,23 +20,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.biomass;
+package uk.ac.ox.poseidon.geography.allocators;
 
 import ec.util.MersenneTwisterFast;
-import lombok.Data;
+import lombok.NonNull;
 import sim.util.Int2D;
 
-@Data
-public class RandomBiomassAllocator implements BiomassAllocator {
+import static com.google.common.base.Preconditions.checkArgument;
 
-    private final MersenneTwisterFast rng;
-    private final CarryingCapacityGrid carryingCapacityGrid;
+public class RandomUniformAllocator implements Allocator {
+
+    private final @NonNull MersenneTwisterFast rng;
+    private final double minimum;
+    private final double maximum;
+
+    public RandomUniformAllocator(
+        final @NonNull MersenneTwisterFast rng,
+        final double minimum,
+        final double maximum
+    ) {
+        checkArgument(
+            minimum < maximum,
+            "minimum must be less than maximum"
+        );
+        this.rng = rng;
+        this.minimum = minimum;
+        this.maximum = maximum;
+    }
 
     @Override
     public double applyAsDouble(final Int2D cell) {
-        final double carryingCapacity = carryingCapacityGrid.getDouble(cell);
-        return carryingCapacity > 0
-            ? rng.nextDouble() * carryingCapacity
-            : Double.NaN;
+        return minimum + rng.nextDouble() * (maximum - minimum);
     }
 }

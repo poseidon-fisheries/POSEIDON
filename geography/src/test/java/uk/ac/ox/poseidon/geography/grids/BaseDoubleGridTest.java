@@ -31,10 +31,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DoubleGridTest {
+class BaseDoubleGridTest {
 
-    private final DoubleGrid grid =
-        new DoubleGrid(new double[][]{
+    private final BaseDoubleGrid grid =
+        new BaseDoubleGrid(new double[][]{
             {1d, 2d, 3d},
             {4d, 5d, 6d},
             {7d, 8d, 9d},

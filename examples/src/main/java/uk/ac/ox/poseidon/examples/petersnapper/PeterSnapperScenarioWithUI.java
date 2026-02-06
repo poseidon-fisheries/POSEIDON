@@ -26,10 +26,13 @@ import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.gui.DisplayWrapper2D;
 import uk.ac.ox.poseidon.gui.ScenarioWithUI;
 import uk.ac.ox.poseidon.gui.portrayals.BathymetryFieldPortrayalFactory;
+import uk.ac.ox.poseidon.gui.portrayals.NumberGridPortrayalFactory;
+import uk.ac.ox.poseidon.gui.portrayals.SimpleFieldPortrayalFactory;
 
 import java.util.List;
 
 import static java.awt.Color.WHITE;
+import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.IMOLA;
 
 public class PeterSnapperScenarioWithUI extends ScenarioWithUI {
 
@@ -40,10 +43,20 @@ public class PeterSnapperScenarioWithUI extends ScenarioWithUI {
             scenario,
             List.of(
                 new DisplayWrapper2D(
-                    "Ocean",
+                    "The Peter Snapper Fishery",
                     List.of(
                         new BathymetryFieldPortrayalFactory(
                             scenario.component("bathymetricGrid")
+                        ),
+                        new SimpleFieldPortrayalFactory(
+                            "Carrying capacity",
+                            new NumberGridPortrayalFactory(
+                                IMOLA,
+                                "Carrying capacity",
+                                true,
+                                scenario.component("carryingCapacityGrid")
+                            ),
+                            false
                         )
                     ),
                     700,

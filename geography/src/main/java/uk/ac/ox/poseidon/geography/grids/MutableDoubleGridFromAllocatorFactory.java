@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,45 +20,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.gui.portrayals;
+package uk.ac.ox.poseidon.geography.grids;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import sim.util.gui.ColorMap;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.geography.allocators.Allocator;
+
+import java.util.function.Predicate;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class NumberGridWithCapacityPortrayalFactory extends NumberGridPortrayalFactory {
+public class MutableDoubleGridFromAllocatorFactory<S extends Scope>
+    extends AbstractDoubleGridFromAllocatorFactory<S, MutableDoubleGrid> {
 
-    private Factory<? super SimulationScope, ? extends DoubleGrid> capacityGrid;
-
-    public NumberGridWithCapacityPortrayalFactory(
-        final String paletteName,
-        final String valueName,
-        final boolean immutableField,
-        final Factory<? super SimulationScope, ? extends DoubleGrid> grid,
-        final Factory<? super SimulationScope, ? extends DoubleGrid> capacityGrid
+    public MutableDoubleGridFromAllocatorFactory(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends Allocator> allocator,
+        final Factory<? super S, ? extends Predicate<Int2D>> cellPredicate
     ) {
-        super(paletteName, valueName, immutableField, grid);
-        this.capacityGrid = capacityGrid;
+        super(modelGrid, allocator, cellPredicate);
     }
 
     @Override
-    protected ColorMap newColorMap(final SimulationScope scope) {
-        return new PaletteColorMap(
-            getPaletteName(),
-            0,
-            this.capacityGrid.get(scope).getMaximumValue()
-        );
+    MutableDoubleGrid makeGrid(
+        final ModelGrid modelGrid,
+        final double[][] values
+    ) {
+        return new MutableDoubleGrid(modelGrid, values);
     }
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,13 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.biomass;
+package uk.ac.ox.poseidon.biology.allocators;
 
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
+import uk.ac.ox.poseidon.geography.allocators.Allocator;
 
 @RequiredArgsConstructor
-public class FullBiomassAllocator implements BiomassAllocator {
+public class FullAllocator implements Allocator {
 
     private final CarryingCapacityGrid carryingCapacityGrid;
 

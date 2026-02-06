@@ -23,14 +23,13 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import lombok.Getter;
-import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.grids.DoubleGridWrapper;
 
 import java.util.List;
 
-public class CarryingCapacityGrid extends DoubleGrid {
+public class CarryingCapacityGrid extends DoubleGridWrapper {
 
     @Getter(lazy = true)
     private final List<Int2D> habitableCells =
@@ -40,32 +39,12 @@ public class CarryingCapacityGrid extends DoubleGrid {
             .filter(cell -> getCarryingCapacity(cell) > 0)
             .toList();
 
-    public CarryingCapacityGrid(final ModelGrid modelGrid) {
-        super(modelGrid);
-    }
-
-    public CarryingCapacityGrid(
-        final ModelGrid modelGrid,
-        final double initialValue
-    ) {
-        super(modelGrid, initialValue);
-    }
-
-    public CarryingCapacityGrid(
-        final ModelGrid modelGrid,
-        final double[][] values
-    ) {
-        super(modelGrid, values);
-    }
-
-    public CarryingCapacityGrid(
-        final ModelGrid modelGrid,
-        final DoubleGrid2D grid
-    ) {
-        super(modelGrid, grid);
+    public CarryingCapacityGrid(final DoubleGrid grid) {
+        super(grid);
     }
 
     public double getCarryingCapacity(final Int2D cell) {
-        return getDouble(cell);
+        return grid.getValue(cell);
     }
+
 }

@@ -35,13 +35,17 @@ import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantFactory<T> extends GlobalScopeFactory<T> {
+public class ConstantFactory<C> extends GlobalScopeFactory<C> {
 
-    private T value;
+    private C value;
 
     @Override
-    protected T newInstance(final GlobalScope scope) {
+    protected C newInstance(final GlobalScope scope) {
         return value;
+    }
+
+    public static <C> ConstantFactory<C> of(final C value) {
+        return new ConstantFactory<>(value);
     }
 
 }

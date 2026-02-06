@@ -71,9 +71,16 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 false
             );
 
+//         final var carryingCapacity =
+//             new UniformCarryingCapacityGridFactory(
+//                 bathymetricGrid,
+//                 MassFactory.of(500_000_000, KILOGRAM)
+//             );
+
         return builder
             .startingDateTime(LocalDate.now())
             .component("bathymetricGrid", bathymetricGrid)
+//             .component("carryingCapacityGrid", carryingCapacity)
             .build();
     }
 }

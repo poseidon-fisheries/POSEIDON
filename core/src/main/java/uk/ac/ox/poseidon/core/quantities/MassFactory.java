@@ -46,15 +46,15 @@ public class MassFactory extends AbstractQuantityFactory<Mass> {
         super(Mass.class, value, unitString);
     }
 
-    public MassFactory(
+    public static MassFactory of(
         final double value,
         final Unit<Mass> unit
     ) {
-        super(Mass.class, value, unit.toString());
+        return new MassFactory(value, unit.toString());
     }
 
     public static MassFactory of(final Quantity<Mass> quantity) {
-        return new MassFactory(quantity.getValue().doubleValue(), quantity.getUnit().toString());
+        return MassFactory.of(quantity.getValue().doubleValue(), quantity.getUnit());
     }
 
     public static MassFactory of(final String quantity) {

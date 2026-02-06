@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,16 +20,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.grids;
+package uk.ac.ox.poseidon.geography.allocators;
 
-import sim.util.Int2D;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.GlobalScope;
 
-public interface NumberGrid<N extends Number> extends Grid {
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class ConstantAllocatorFactory extends GlobalScopeFactory<ConstantAllocator> {
 
-    N getValue(final Int2D cell);
+    private double value;
 
-    N getMinimumValue();
-
-    N getMaximumValue();
-
+    @Override
+    protected ConstantAllocator newInstance(final GlobalScope scope) {
+        return new ConstantAllocator(value);
+    }
 }

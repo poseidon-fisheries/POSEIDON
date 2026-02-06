@@ -43,7 +43,7 @@ public class BiomassGrower implements Steppable {
             biomassGrid.setBiomass(
                 location,
                 biomassGrowthRule.newBiomass(
-                    biomassGrid.getDouble(location),
+                    biomassGrid.getValue(location),
                     carryingCapacityGrid.getCarryingCapacity(location)
                 )
             )

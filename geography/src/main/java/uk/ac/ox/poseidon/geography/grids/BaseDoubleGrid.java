@@ -24,43 +24,74 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.Envelope;
 
-public class MutableDoubleGrid extends BaseDoubleGrid
-    implements MutableGrid<DoubleGrid2D> {
-    public MutableDoubleGrid(final ModelGrid modelGrid) {
-        super(modelGrid);
+public class BaseDoubleGrid extends AbstractGrid<DoubleGrid2D>
+    implements DoubleGrid {
+
+    public BaseDoubleGrid(final ModelGrid modelGrid) {
+        this(modelGrid, 0.0);
     }
 
-    public MutableDoubleGrid(
+    public BaseDoubleGrid(
         final ModelGrid modelGrid,
         final double initialValue
     ) {
-        super(modelGrid, initialValue);
+        this(
+            modelGrid,
+            new DoubleGrid2D(modelGrid.getGridWidth(), modelGrid.getGridHeight(), initialValue)
+        );
     }
 
-    public MutableDoubleGrid(
+    public BaseDoubleGrid(
+        final double[][] values
+    ) {
+        this(new DoubleGrid2D(values));
+    }
+
+    public BaseDoubleGrid(final DoubleGrid2D grid2D) {
+        this(
+            ModelGrid.create(
+                grid2D.width,
+                grid2D.height,
+                new Envelope(
+                    0, grid2D.width,
+                    0, grid2D.height
+                )
+            ),
+            grid2D
+        );
+    }
+
+    public BaseDoubleGrid(
         final ModelGrid modelGrid,
         final double[][] values
     ) {
-        super(modelGrid, values);
+        this(modelGrid, new DoubleGrid2D(values));
     }
 
-    public MutableDoubleGrid(
+    public BaseDoubleGrid(
         final ModelGrid modelGrid,
         final DoubleGrid2D grid
     ) {
-        super(modelGrid, grid);
-    }
-
-    protected void setValue(
-        final Int2D cell,
-        final double value
-    ) {
-        this.field.set(cell.x, cell.y, value);
+        super(modelGrid, new DoubleGrid2D(grid));
     }
 
     @Override
-    public DoubleGrid2D getField() {
-        return field;
+    public double getMinimumValue() {
+        return field.min();
     }
+
+    @Override
+    public double getMaximumValue() {
+        return field.max();
+    }
+
+    @Override
+    public double getValue(
+        final Int2D cell
+    ) {
+        return field.get(cell.x, cell.y);
+    }
+
 }

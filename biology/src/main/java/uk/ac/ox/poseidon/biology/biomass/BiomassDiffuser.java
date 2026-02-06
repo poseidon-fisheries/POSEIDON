@@ -92,9 +92,9 @@ public class BiomassDiffuser implements Steppable {
             neighbours.forEach(neighbour -> {
                 final Double2D updatedBiomasses =
                     biomassDiffusionRule.updatedBiomasses(
-                        biomassGrid.getDouble(location),
+                        biomassGrid.getValue(location),
                         carryingCapacityGrid.getCarryingCapacity(location),
-                        biomassGrid.getDouble(neighbour),
+                        biomassGrid.getValue(neighbour),
                         carryingCapacityGrid.getCarryingCapacity(neighbour)
                     );
                 biomassGrid.setBiomass(location, updatedBiomasses.x);

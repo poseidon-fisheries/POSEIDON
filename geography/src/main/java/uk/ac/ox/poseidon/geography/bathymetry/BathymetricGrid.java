@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
-import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.geography.grids.NumberGrid;
+import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 import java.util.stream.Stream;
 
-public interface BathymetricGrid extends NumberGrid<Double> {
+public interface BathymetricGrid extends DoubleGrid {
 
     default Stream<Int2D> getActiveWaterCells() {
         return getWaterCells().filter(getModelGrid()::isActive);

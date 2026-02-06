@@ -78,7 +78,7 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
 
     @Override
     public Biomass getBiomass(final Int2D cell) {
-        return Biomass.ofKg(getDouble(cell));
+        return Biomass.ofKg(getValue(cell));
     }
 
     @Override

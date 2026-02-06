@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,45 +20,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.gui.portrayals;
+package uk.ac.ox.poseidon.biology.allocators;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import sim.util.gui.ColorMap;
+import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
+import uk.ac.ox.poseidon.geography.allocators.Allocator;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class NumberGridWithCapacityPortrayalFactory extends NumberGridPortrayalFactory {
+public class FullBiomassAllocatorFactory extends SimulationScopeFactory<Allocator> {
 
-    private Factory<? super SimulationScope, ? extends DoubleGrid> capacityGrid;
-
-    public NumberGridWithCapacityPortrayalFactory(
-        final String paletteName,
-        final String valueName,
-        final boolean immutableField,
-        final Factory<? super SimulationScope, ? extends DoubleGrid> grid,
-        final Factory<? super SimulationScope, ? extends DoubleGrid> capacityGrid
-    ) {
-        super(paletteName, valueName, immutableField, grid);
-        this.capacityGrid = capacityGrid;
-    }
+    private Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid;
 
     @Override
-    protected ColorMap newColorMap(final SimulationScope scope) {
-        return new PaletteColorMap(
-            getPaletteName(),
-            0,
-            this.capacityGrid.get(scope).getMaximumValue()
+    protected Allocator newInstance(final SimulationScope scope) {
+        return new FullAllocator(
+            carryingCapacityGrid.get(scope)
         );
     }
 }

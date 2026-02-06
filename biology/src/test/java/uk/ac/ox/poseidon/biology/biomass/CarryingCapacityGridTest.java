@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.scopes.GlobalScope;
+import uk.ac.ox.poseidon.geography.grids.BaseDoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFactory;
 
@@ -45,12 +46,14 @@ class CarryingCapacityGridTest {
             new ModelGridFactory(1.0, -1.5, 1.5, -1.5, 1.5)
                 .get(mock(GlobalScope.class));
         grid = new CarryingCapacityGrid(
-            modelGrid,
-            new double[][]{
-                {0, 0, 1},
-                {0, 0, 1},
-                {0, 0, 1}
-            }
+            new BaseDoubleGrid(
+                modelGrid,
+                new double[][]{
+                    {0, 0, 1},
+                    {0, 0, 1},
+                    {0, 0, 1}
+                }
+            )
         );
     }
 
