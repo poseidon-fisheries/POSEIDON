@@ -28,6 +28,7 @@ import uk.ac.ox.poseidon.gui.ScenarioWithUI;
 import uk.ac.ox.poseidon.gui.portrayals.BathymetryFieldPortrayalFactory;
 import uk.ac.ox.poseidon.gui.portrayals.NumberGridPortrayalFactory;
 import uk.ac.ox.poseidon.gui.portrayals.SimpleFieldPortrayalFactory;
+import uk.ac.ox.poseidon.gui.portrayals.SpeciesBiomassFieldPortrayalFactory;
 
 import java.util.List;
 
@@ -56,6 +57,11 @@ public class PeterSnapperScenarioWithUI extends ScenarioWithUI {
                                 true,
                                 scenario.component("carryingCapacityGrid")
                             ),
+                            false
+                        ),
+                        new SpeciesBiomassFieldPortrayalFactory(
+                            scenario.component("biomassGrid"),
+                            scenario.component("carryingCapacityGrid"),
                             false
                         )
                     ),
