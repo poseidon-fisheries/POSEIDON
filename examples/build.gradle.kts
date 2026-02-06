@@ -40,3 +40,13 @@ tasks.shadowJar {
         exclude("META-INF/services/javax.imageio.spi.*")
     }
 }
+
+val writePeterSnapperScenario = tasks.register("writePeterSnapperScenario", JavaExec::class) {
+    dependsOn("classes")
+    mainClass.set("uk.ac.ox.poseidon.io.ScenarioWriter")
+    classpath = sourceSets["main"].runtimeClasspath
+    args(
+        "-c", "uk.ac.ox.poseidon.examples.petersnapper.PeterSnapperScenario",
+        "-s", "inputs/peter_snapper/scenario.yaml"
+    )
+}

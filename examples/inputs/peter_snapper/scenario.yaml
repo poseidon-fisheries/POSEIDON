@@ -1,0 +1,37 @@
+!!uk.ac.ox.poseidon.core.Scenario
+components:
+  bathymetricGrid: &id002 !!uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTable
+    aggregator: !!uk.ac.ox.poseidon.core.aggregators.MeanFactory {
+      }
+    elevationTable: &id001 !!uk.ac.ox.poseidon.geography.utils.ElevationTableFactory
+      elevationColumnName: elevation
+      latitudeColumnName: lat
+      longitudeColumnName: lon
+      table: !!uk.ac.ox.poseidon.io.tables.CsvTableFactory
+        dataSource: !!uk.ac.ox.poseidon.io.sources.FileDataSourceFactory
+          encoding: UTF-8
+          path: !!uk.ac.ox.poseidon.io.paths.RelativePathFactory
+            parent: !!uk.ac.ox.poseidon.io.paths.RootPathFactory {
+              path: inputs/peter_snapper
+            }
+            path: elevations.csv
+    inverted: false
+    modelGrid: &id003 !!uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory
+      gridWidthInCells: 70
+      lonLatTable: *id001
+      mapPaddingInDegrees: 1.0E-6
+  carryingCapacityGrid: !!uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGridFactory
+    grid: !!uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory
+      allocator: !!uk.ac.ox.poseidon.geography.allocators.ConstantAllocatorFactory
+        value: !!uk.ac.ox.poseidon.core.utils.ConstantFactory {
+          value: 1.0
+        }
+      cellPredicate: !!uk.ac.ox.poseidon.geography.predicates.ActiveWaterCellPredicateFactory
+        bathymetricGrid: *id002
+      modelGrid: *id003
+      totalValue: !!uk.ac.ox.poseidon.core.quantities.KilogramsFactory
+        mass: !!uk.ac.ox.poseidon.core.quantities.MassFactory {
+          unitString: kg,
+          value: 5.0E8
+        }
+startingDateTime: 2026-02-06T00:00:00Z
