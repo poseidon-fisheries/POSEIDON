@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,8 +35,6 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
 
 import java.util.function.Predicate;
-
-import com.google.common.util.concurrent.AtomicDouble;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Double.NaN;
@@ -68,10 +67,11 @@ abstract class AbstractDoubleGridFromAllocatorFactory<S extends Scope, G extends
             }
             values[cell.x][cell.y] = isNaN(value) ? NaN : value;
         });
-        return makeGrid(modelGrid, postProcess(values, sum.doubleValue()));
+        return makeGrid(modelGrid, postProcess(scope, values, sum.doubleValue()));
     }
 
     protected double[][] postProcess(
+        final S scope,
         final double[][] values,
         final double sum
     ) {

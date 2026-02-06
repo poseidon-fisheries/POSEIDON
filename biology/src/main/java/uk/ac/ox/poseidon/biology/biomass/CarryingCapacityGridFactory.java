@@ -29,12 +29,15 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.quantities.KilogramsFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.allocators.ConstantMassAllocatorFactory;
+import uk.ac.ox.poseidon.core.utils.ConstantFactory;
+import uk.ac.ox.poseidon.geography.allocators.ConstantAllocatorFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGridFromAllocatorFactory;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
 import uk.ac.ox.poseidon.geography.predicates.ActiveWaterCellPredicateFactory;
 
 import javax.measure.Quantity;
@@ -63,7 +66,7 @@ public class CarryingCapacityGridFactory<S extends Scope>
         return new CarryingCapacityGridFactory<>(
             new DoubleGridFromAllocatorFactory<>(
                 modelGrid,
-                new ConstantMassAllocatorFactory<>(carryingCapacity),
+                new ConstantAllocatorFactory<>(new KilogramsFactory<>(carryingCapacity)),
                 new ActiveWaterCellPredicateFactory<>(bathymetricGrid)
             )
         );
@@ -72,13 +75,14 @@ public class CarryingCapacityGridFactory<S extends Scope>
     public static <S extends Scope> CarryingCapacityGridFactory<S> ofTotalCapacity(
         final Factory<? super S, ? extends ModelGrid> modelGrid,
         final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
-        final Factory<? super S, ? extends Quantity<Mass>> carryingCapacity
+        final Factory<? super S, ? extends Quantity<Mass>> totalCarryingCapacity
     ) {
         return new CarryingCapacityGridFactory<>(
-            new DoubleGridFromAllocatorFactory<>(
+            new NormalisedDoubleGridFromAllocatorFactory<>(
                 modelGrid,
-                new ConstantMassAllocatorFactory<>(carryingCapacity),
-                new ActiveWaterCellPredicateFactory<>(bathymetricGrid)
+                new ConstantAllocatorFactory<>(ConstantFactory.of(1.0)),
+                new ActiveWaterCellPredicateFactory<>(bathymetricGrid),
+                new KilogramsFactory<>(totalCarryingCapacity)
             )
         );
     }

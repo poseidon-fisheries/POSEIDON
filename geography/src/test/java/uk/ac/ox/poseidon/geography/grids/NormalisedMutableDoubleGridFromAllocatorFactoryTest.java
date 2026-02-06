@@ -41,7 +41,7 @@ class NormalisedMutableDoubleGridFromAllocatorFactoryTest {
                 scope -> modelGrid,
                 scope -> cell -> 2.0,
                 scope -> cell -> !(cell.x == 0 && cell.y == 1),
-                12.0
+                scope -> 12.0
             );
 
         final MutableDoubleGrid grid = factory.get(Scope.GLOBAL_SCOPE);

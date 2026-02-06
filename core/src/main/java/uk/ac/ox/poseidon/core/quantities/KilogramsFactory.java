@@ -20,17 +20,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.allocators;
+package uk.ac.ox.poseidon.core.quantities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -39,26 +38,18 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 
 @Data
 @SuperBuilder
-@NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantMassAllocatorFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ConstantAllocator> {
+public class KilogramsFactory<S extends Scope> extends RelativeScopeFactory<S, Number> {
 
     private Factory<? super S, ? extends Quantity<Mass>> mass;
 
     @Override
-    protected ConstantAllocator newInstance(final S scope) {
-        final double valueInKg =
-            mass.get(scope)
-                .to(KILOGRAM)
-                .getValue()
-                .doubleValue();
-        return new ConstantAllocator(valueInKg);
-    }
-
-    public static ConstantMassAllocatorFactory<Scope> of(final Quantity<Mass> mass) {
-        return new ConstantMassAllocatorFactory<>(ConstantFactory.of(mass));
+    protected Number newInstance(final S scope) {
+        return mass.get(scope)
+            .to(KILOGRAM)
+            .getValue();
     }
 
 }

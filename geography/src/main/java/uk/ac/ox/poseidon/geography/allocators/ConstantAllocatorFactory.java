@@ -27,7 +27,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
@@ -35,12 +36,13 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantAllocatorFactory extends GlobalScopeFactory<ConstantAllocator> {
+public class ConstantAllocatorFactory<S extends Scope>
+    extends RelativeScopeFactory<S, ConstantAllocator> {
 
-    private double value;
+    private Factory<? super S, ? extends Number> value;
 
     @Override
-    protected ConstantAllocator newInstance(final Scope scope) {
-        return new ConstantAllocator(value);
+    protected ConstantAllocator newInstance(final S scope) {
+        return new ConstantAllocator(value.get(scope).doubleValue());
     }
 }

@@ -40,7 +40,7 @@ class NormalisedDoubleGridFromAllocatorFactoryTest {
                 scope -> modelGrid,
                 scope -> cell -> 1.0,
                 scope -> cell -> !(cell.x == 0 && cell.y == 0),
-                12.0
+                scope -> 12.0
             );
 
         final BaseDoubleGrid grid = factory.get(Scope.GLOBAL_SCOPE);
@@ -68,7 +68,7 @@ class NormalisedDoubleGridFromAllocatorFactoryTest {
                 scope -> modelGrid,
                 scope -> cell -> cell.x == 1 ? -1.0 : 1.0,
                 scope -> cell -> true,
-                4.0
+                scope -> 4.0
             );
 
         assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))

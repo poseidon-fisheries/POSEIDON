@@ -42,13 +42,13 @@ abstract class AbstractNormalisedDoubleGridFromAllocatorFactory<
     S extends Scope, G extends DoubleGrid
     > extends AbstractDoubleGridFromAllocatorFactory<S, G> {
 
-    private double totalValue;
+    private Factory<? super S, ? extends Number> totalValue;
 
     protected AbstractNormalisedDoubleGridFromAllocatorFactory(
         final Factory<? super S, ? extends ModelGrid> modelGrid,
         final Factory<? super S, ? extends Allocator> allocator,
         final Factory<? super S, ? extends Predicate<Int2D>> cellPredicate,
-        final double totalValue
+        final Factory<? super S, ? extends Number> totalValue
     ) {
         super(modelGrid, allocator, cellPredicate);
         this.totalValue = totalValue;
@@ -56,9 +56,11 @@ abstract class AbstractNormalisedDoubleGridFromAllocatorFactory<
 
     @Override
     protected double[][] postProcess(
+        final S scope,
         final double[][] values,
         final double sum
     ) {
+        final double totalValue = this.totalValue.get(scope).doubleValue();
         checkArgument(totalValue > 0, "Total value must be positive");
         checkArgument(sum > 0, "Sum of values must be positive");
         final double scale = totalValue / sum;

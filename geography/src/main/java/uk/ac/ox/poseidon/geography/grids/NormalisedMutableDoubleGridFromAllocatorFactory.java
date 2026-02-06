@@ -44,7 +44,7 @@ public class NormalisedMutableDoubleGridFromAllocatorFactory<S extends Scope>
         final Factory<? super S, ? extends ModelGrid> modelGrid,
         final Factory<? super S, ? extends Allocator> allocator,
         final Factory<? super S, ? extends Predicate<Int2D>> cellPredicate,
-        final double totalValue
+        final Factory<? super S, ? extends Number> totalValue
     ) {
         super(modelGrid, allocator, cellPredicate, totalValue);
     }

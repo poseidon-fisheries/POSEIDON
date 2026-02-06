@@ -76,7 +76,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             );
 
         final var carryingCapacityGrid =
-            CarryingCapacityGridFactory.ofUniformCapacity(
+            CarryingCapacityGridFactory.ofTotalCapacity(
                 modelGrid,
                 bathymetricGrid,
                 MassFactory.of(500_000_000, KILOGRAM)
