@@ -30,7 +30,15 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.geography.allocators.ConstantMassAllocatorFactory;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
+import uk.ac.ox.poseidon.geography.grids.DoubleGridFromAllocatorFactory;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.predicates.ActiveWaterCellPredicateFactory;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
 
 @Data
 @SuperBuilder
@@ -47,4 +55,17 @@ public class CarryingCapacityGridFactory<S extends Scope>
         return new CarryingCapacityGrid(grid.get(scope));
     }
 
+    public static <S extends Scope> CarryingCapacityGridFactory<S> ofUniformCapacity(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
+        final Factory<? super S, ? extends Quantity<Mass>> carryingCapacity
+    ) {
+        return new CarryingCapacityGridFactory<>(
+            new DoubleGridFromAllocatorFactory<>(
+                modelGrid,
+                new ConstantMassAllocatorFactory<>(carryingCapacity),
+                new ActiveWaterCellPredicateFactory<>(bathymetricGrid)
+            )
+        );
+    }
 }

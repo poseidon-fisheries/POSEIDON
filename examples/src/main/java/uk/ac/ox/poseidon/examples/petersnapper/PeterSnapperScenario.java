@@ -22,9 +22,11 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
+import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGridFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.MeanFactory;
+import uk.ac.ox.poseidon.core.quantities.MassFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTable;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
 import uk.ac.ox.poseidon.geography.utils.ElevationTableFactory;
@@ -34,6 +36,8 @@ import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.function.Supplier;
+
+import static tech.units.indriya.unit.Units.KILOGRAM;
 
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
@@ -71,16 +75,17 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 false
             );
 
-//         final var carryingCapacity =
-//             new UniformCarryingCapacityGridFactory(
-//                 bathymetricGrid,
-//                 MassFactory.of(500_000_000, KILOGRAM)
-//             );
+        final var carryingCapacityGrid =
+            CarryingCapacityGridFactory.ofUniformCapacity(
+                modelGrid,
+                bathymetricGrid,
+                MassFactory.of(500_000_000, KILOGRAM)
+            );
 
         return builder
             .startingDateTime(LocalDate.now())
             .component("bathymetricGrid", bathymetricGrid)
-//             .component("carryingCapacityGrid", carryingCapacity)
+            .component("carryingCapacityGrid", carryingCapacityGrid)
             .build();
     }
 }

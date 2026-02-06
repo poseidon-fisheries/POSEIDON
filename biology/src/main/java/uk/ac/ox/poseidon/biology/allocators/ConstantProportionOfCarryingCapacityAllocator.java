@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,18 +22,27 @@
 
 package uk.ac.ox.poseidon.biology.allocators;
 
-import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
 
-@RequiredArgsConstructor
-public class FullAllocator implements Allocator {
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
+
+public class ConstantProportionOfCarryingCapacityAllocator implements Allocator {
 
     private final CarryingCapacityGrid carryingCapacityGrid;
+    private final double proportion;
+
+    public ConstantProportionOfCarryingCapacityAllocator(
+        final CarryingCapacityGrid carryingCapacityGrid,
+        final double proportion
+    ) {
+        this.carryingCapacityGrid = carryingCapacityGrid;
+        this.proportion = checkUnitRange(proportion, "proportion of carrying capacity");
+    }
 
     @Override
     public double applyAsDouble(final Int2D cell) {
-        return carryingCapacityGrid.getCarryingCapacity(cell);
+        return proportion * carryingCapacityGrid.getCarryingCapacity(cell);
     }
 }
