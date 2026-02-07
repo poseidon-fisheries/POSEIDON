@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,39 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
+package uk.ac.ox.poseidon.core.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MutablePortGridFactory extends SimulationScopeFactory<MutablePortGrid> {
+public class PairFactory<S extends Scope, A, B> extends RelativeScopeFactory<S, Pair<A, B>> {
 
-    private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? super S, ? extends A> first;
+    private Factory<? super S, ? extends B> second;
 
     @Override
-    protected MutablePortGrid newInstance(final SimulationScope scope) {
-        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
-        final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
-        final SparseGrid2D sparseGrid2D =
-            new SparseGrid2D(
-                modelGrid.getGridWidth(),
-                modelGrid.getGridHeight()
-            );
-        return new MutablePortGrid(bathymetricGrid, sparseGrid2D);
+    protected Pair<A, B> newInstance(final S scope) {
+        return new Pair<>(first.get(scope), second.get(scope));
     }
-
 }

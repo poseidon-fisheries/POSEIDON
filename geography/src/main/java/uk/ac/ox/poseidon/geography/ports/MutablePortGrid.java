@@ -83,7 +83,7 @@ public class MutablePortGrid extends AbstractPortGrid implements MutableGrid<Spa
             "Port code %s already exists", portCode
         );
         validateLocation(cell);
-        final Port port = new Port(portCode, portName, cell);
+        final Port port = new Port(portCode, portName);
         field.setObjectLocation(port, cell);
         return port;
     }

@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.geography.ports;
 
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.DefaultBathymetricGrid;
 
@@ -44,8 +43,8 @@ class MutablePortGridTest {
                 {+1d, +1d, -1d},
                 {-1d, -1d, -1d},
             });
-        final Port portA = new Port("PA", "Port A", new Int2D(0, 0));
-        final Port portB = new Port("PB", "Port B", new Int2D(1, 1));
+        final Port portA = new Port("PA", "Port A");
+        final Port portB = new Port("PB", "Port B");
         final MutablePortGrid source = new MutablePortGrid(
             bathymetricGrid,
             Map.of(

@@ -29,15 +29,16 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
-import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.utils.Pair;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+import java.util.List;
 import java.util.Optional;
 
 import static java.text.MessageFormat.format;
@@ -48,19 +49,15 @@ import static java.util.Comparator.comparingDouble;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ImmutablePortGridFromDataFactory<S extends Scope>
+public class PortGridFactory<S extends Scope>
     extends RelativeScopeFactory<S, ImmutablePortGrid> {
 
     private static final System.Logger logger =
-        System.getLogger(ImmutablePortGridFromDataFactory.class.getName());
+        System.getLogger(PortGridFactory.class.getName());
 
-    private Factory<? super S, ? extends Table> data;
+    private Factory<? super S, ? extends List<Pair<Port, Coordinate>>> ports;
     private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
     private Factory<? super S, ? extends DistanceCalculator> distanceCalculator;
-    private String portCodeColumn;
-    private String nameColumn;
-    private String longitudeColumn;
-    private String latitudeColumn;
 
     @Override
     protected ImmutablePortGrid newInstance(final S scope) {
@@ -72,22 +69,17 @@ public class ImmutablePortGridFromDataFactory<S extends Scope>
                 modelGrid.getGridWidth(),
                 modelGrid.getGridHeight()
             );
-        data.get(scope).forEach(row -> {
-            final String portCode = row.getString(portCodeColumn);
-            final String portName = row.getString(nameColumn);
-            final Coordinate coordinate = new Coordinate(
-                row.getDouble(longitudeColumn),
-                row.getDouble(latitudeColumn)
-            );
+        ports.get(scope).forEach(pair -> {
+            final Port port = pair.getFirst();
+            final Coordinate coordinate = pair.getSecond();
             final Int2D cell = coordinateToCell(
                 bathymetricGrid,
                 coordinate,
                 distanceCalculator
             ).orElseThrow(() -> new RuntimeException(format(
-                "No suitable land cell found for port {0} ({1}) near {2}",
-                portName, portCode, coordinate
+                "No suitable land cell found for port {0} near {1}",
+                port, coordinate
             )));
-            final Port port = new Port(portCode, portName, cell);
             sparseGrid2D.setObjectLocation(port, cell);
         });
         return new ImmutablePortGrid(sparseGrid2D, bathymetricGrid);

@@ -27,27 +27,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PortFactory extends SimulationScopeFactory<Port> {
+public class PortFactory extends GlobalScopeFactory<Port> {
 
-    private Factory<? super SimulationScope, ? extends MutablePortGrid> portGrid;
     private String code;
     private String name;
-    private Factory<? super SimulationScope, ? extends Coordinate> coordinateFactory;
 
     @Override
-    protected Port newInstance(final SimulationScope scope) {
-        return this.portGrid.get(scope).createPort(
-            code, name, coordinateFactory.get(scope)
-        );
+    protected Port newInstance(final Scope scope) {
+        return new Port(code, name);
     }
+
 }

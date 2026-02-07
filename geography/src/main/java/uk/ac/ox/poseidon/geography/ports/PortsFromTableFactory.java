@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,13 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.utils;
+package uk.ac.ox.poseidon.geography.ports;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.utils.Pair;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.util.List;
 
@@ -35,16 +41,30 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ListFactory<S extends Scope, C> extends RelativeScopeFactory<S, List<C>> {
+public class PortsFromTableFactory<S extends Scope>
+    extends RelativeScopeFactory<S, List<Pair<Port, Coordinate>>> {
 
-    @Singular
-    private List<Factory<? super S, ? extends C>> factories;
+    Factory<? super S, Table> table;
+    String portCodeColumnName;
+    String portNameColumnName;
+    String longitudeColumnName;
+    String latitudeColumnName;
 
     @Override
-    protected List<C> newInstance(final S scope) {
-        return factories
+    protected List<Pair<Port, Coordinate>> newInstance(final S scope) {
+        return table
+            .get(scope)
             .stream()
-            .map(f -> (C) f.get(scope))
+            .map(row -> Pair.of(
+                new Port(
+                    row.getString(portCodeColumnName),
+                    row.getString(portNameColumnName)
+                ),
+                new Coordinate(
+                    row.getNumber(longitudeColumnName),
+                    row.getNumber(latitudeColumnName)
+                )
+            ))
             .toList();
     }
 }

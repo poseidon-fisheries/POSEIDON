@@ -1,9 +1,8 @@
 !!uk.ac.ox.poseidon.core.Scenario
 components:
-  bathymetricGrid: &id002 !!uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableFactory
-    aggregator: !!uk.ac.ox.poseidon.core.aggregators.MeanFactory {
-      }
-    elevationTable: &id001 !!uk.ac.ox.poseidon.geography.utils.ElevationTableFactory
+  modelGrid: &id002 !!uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory
+    gridWidthInCells: 70
+    lonLatTable: &id001 !!uk.ac.ox.poseidon.geography.utils.ElevationTableFactory
       elevationColumnName: elevation
       latitudeColumnName: lat
       longitudeColumnName: lon
@@ -15,11 +14,13 @@ components:
               path: inputs/peter_snapper
             }
             path: elevations.csv
+    mapPaddingInDegrees: 1.0E-6
+  bathymetricGrid: &id003 !!uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableFactory
+    aggregator: !!uk.ac.ox.poseidon.core.aggregators.MeanFactory {
+      }
+    elevationTable: *id001
     inverted: false
-    modelGrid: &id003 !!uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory
-      gridWidthInCells: 70
-      lonLatTable: *id001
-      mapPaddingInDegrees: 1.0E-6
+    modelGrid: *id002
   carryingCapacityGrid: &id004 !!uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGridFactory
     grid: !!uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory
       allocator: !!uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory
@@ -28,8 +29,8 @@ components:
             value: 1.0
           }
       cellPredicate: !!uk.ac.ox.poseidon.geography.predicates.ActiveWaterCellPredicateFactory
-        bathymetricGrid: *id002
-      modelGrid: *id003
+        bathymetricGrid: *id003
+      modelGrid: *id002
       totalValue: !!uk.ac.ox.poseidon.core.quantities.KilogramsFactory
         mass: !!uk.ac.ox.poseidon.core.quantities.MassFactory {
           unitString: t,
@@ -42,7 +43,7 @@ components:
         maximum: 1.0,
         minimum: 0.0
       }
-    modelGrid: *id003
+    modelGrid: *id002
     species: !!uk.ac.ox.poseidon.biology.species.SpeciesFactory {
       code: PS,
       lifeStage: null,
@@ -77,4 +78,28 @@ components:
             growthRate: 0.5
           }
           carryingCapacityGrid: *id004
+  portGrid: !!uk.ac.ox.poseidon.geography.ports.PortGridFactory
+    bathymetricGrid: *id003
+    distanceCalculator: !!uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory
+      modelGrid: *id002
+    ports: !!uk.ac.ox.poseidon.core.utils.ListFactory
+      factories:
+      - !!uk.ac.ox.poseidon.core.utils.PairFactory
+        first: !!uk.ac.ox.poseidon.geography.ports.PortFactory {
+          code: P1,
+          name: Benoa
+        }
+        second: !!uk.ac.ox.poseidon.geography.CoordinateFactory {
+          latitude: -8.799605,
+          longitude: 115.238843
+        }
+      - !!uk.ac.ox.poseidon.core.utils.PairFactory
+        first: !!uk.ac.ox.poseidon.geography.ports.PortFactory {
+          code: P2,
+          name: Kupang
+        }
+        second: !!uk.ac.ox.poseidon.geography.CoordinateFactory {
+          latitude: -10.148044,
+          longitude: 123.586249
+        }
 startingDateTime: 2026-02-07T00:00:00Z

@@ -32,8 +32,14 @@ import uk.ac.ox.poseidon.core.quantities.MassFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
+import uk.ac.ox.poseidon.core.utils.ListFactory;
+import uk.ac.ox.poseidon.core.utils.PairFactory;
+import uk.ac.ox.poseidon.geography.CoordinateFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableFactory;
+import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
+import uk.ac.ox.poseidon.geography.ports.PortFactory;
+import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
 import uk.ac.ox.poseidon.geography.utils.ElevationTableFactory;
 import uk.ac.ox.poseidon.io.paths.PathFactory;
 import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
@@ -41,6 +47,7 @@ import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static si.uom.NonSI.TONNE;
@@ -123,12 +130,34 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 0
             );
 
+        final var distance =
+            new HaversineDistanceCalculatorFactory<>(modelGrid);
+        final var portGrid =
+            new PortGridFactory<>(
+                new ListFactory<>(
+                    List.of(
+                        new PairFactory<>(
+                            new PortFactory("P1", "Benoa"),
+                            new CoordinateFactory(115.238843, -8.799605)
+                        ),
+                        new PairFactory<>(
+                            new PortFactory("P2", "Kupang"),
+                            new CoordinateFactory(123.586249, -10.148044)
+                        )
+                    )
+                ),
+                bathymetricGrid,
+                distance
+            );
+
         return builder
             .startingDateTime(startingDateTime)
+            .component("modelGrid", modelGrid)
             .component("bathymetricGrid", bathymetricGrid)
             .component("carryingCapacityGrid", carryingCapacityGrid)
             .component("biomassGrid", biomassGrid)
             .component("biologicalProcesses", biologicalProcesses)
+            .component("portGrid", portGrid)
             .build();
     }
 }
