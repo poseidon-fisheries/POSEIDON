@@ -23,25 +23,32 @@ components:
     modelGrid: *id002
   carryingCapacityGrid: &id004 !!uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGridFactory
     grid: !!uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory
-      allocator: !!uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory
-        doubleSupplier: !!uk.ac.ox.poseidon.core.suppliers.ConstantDoubleSupplierFactory
-          value: !!uk.ac.ox.poseidon.core.utils.ConstantFactory {
-            value: 1.0
-          }
-      cellPredicate: !!uk.ac.ox.poseidon.geography.predicates.ActiveWaterCellPredicateFactory
-        bathymetricGrid: *id003
+      allocator: !!uk.ac.ox.poseidon.geography.allocators.FilteredAllocatorFactory
+        cellPredicate: !!uk.ac.ox.poseidon.core.predicates.logical.AllOfFactory
+          predicates:
+          - !!uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory
+            bathymetricGrid: *id003
+          - !!uk.ac.ox.poseidon.geography.predicates.IsInDepthRangeFactory
+            bathymetricGrid: *id003
+            maximumDepth: 800.0
+            minimumDepth: 30.0
+        delegateAllocator: !!uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory
+          doubleSupplier: !!uk.ac.ox.poseidon.core.suppliers.ConstantDoubleSupplierFactory
+            value: !!uk.ac.ox.poseidon.core.utils.ConstantFactory {
+              value: 1.0
+            }
       modelGrid: *id002
       totalValue: !!uk.ac.ox.poseidon.core.quantities.KilogramsFactory
         mass: !!uk.ac.ox.poseidon.core.quantities.MassFactory {
-          unitString: t,
-          value: 500000.0
+          unitString: kg,
+          value: 1.10749315E8
         }
   biomassGrid: &id005 !!uk.ac.ox.poseidon.biology.biomass.BiomassGridFactory
     biomassAllocator: !!uk.ac.ox.poseidon.biology.allocators.ProportionOfCarryingCapacityAllocatorFactory
       carryingCapacityGrid: *id004
       proportionSupplier: !!uk.ac.ox.poseidon.core.suppliers.RandomDoubleSupplierFactory {
-        maximum: 1.0,
-        minimum: 0.0
+        maximum: 0.8,
+        minimum: 0.7
       }
     modelGrid: *id002
     species: !!uk.ac.ox.poseidon.biology.species.SpeciesFactory {
@@ -75,7 +82,7 @@ components:
         - !!uk.ac.ox.poseidon.biology.biomass.BiomassGrowerFactory
           biomassGrid: *id005
           biomassGrowthRule: !!uk.ac.ox.poseidon.biology.biomass.LogisticGrowthRuleFactory {
-            growthRate: 0.5
+            growthRate: 0.372
           }
           carryingCapacityGrid: *id004
   portGrid: !!uk.ac.ox.poseidon.geography.ports.PortGridFactory

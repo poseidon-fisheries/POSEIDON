@@ -123,6 +123,10 @@ public interface BathymetricGrid extends DoubleGrid {
 
     double getElevation(final Int2D cell);
 
+    default double getDepth(final Int2D cell) {
+        return -getElevation(cell);
+    }
+
     default boolean isActiveWater(final Int2D cell) {
         return isWater(cell) && getModelGrid().isActive(cell);
     }

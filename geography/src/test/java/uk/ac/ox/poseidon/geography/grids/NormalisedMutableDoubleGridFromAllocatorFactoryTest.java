@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.allocators.FilteredAllocator;
 
 import static java.lang.Double.isNaN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,8 +40,11 @@ class NormalisedMutableDoubleGridFromAllocatorFactoryTest {
         final NormalisedMutableDoubleGridFromAllocatorFactory<Scope> factory =
             new NormalisedMutableDoubleGridFromAllocatorFactory<>(
                 scope -> modelGrid,
-                scope -> cell -> 2.0,
-                scope -> cell -> !(cell.x == 0 && cell.y == 1),
+                scope ->
+                    new FilteredAllocator(
+                        cell -> 2.0,
+                        cell -> !(cell.x == 0 && cell.y == 1)
+                    ),
                 scope -> 12.0
             );
 

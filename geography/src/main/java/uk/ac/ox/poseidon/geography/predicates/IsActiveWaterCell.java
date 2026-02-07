@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,30 +22,19 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import org.locationtech.jts.geom.Geometry;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
-import java.util.Collection;
+@RequiredArgsConstructor
+public class IsActiveWaterCell implements CellPredicate {
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class InGeometriesFactory<S extends Scope>
-    extends RelativeScopeFactory<S, InGeometries> {
-
-    private Factory<? super S, ? extends Collection<? extends Geometry>> geometries;
+    @NonNull
+    private final BathymetricGrid bathymetricGrid;
 
     @Override
-    protected InGeometries newInstance(final S scope) {
-        return new InGeometries(geometries.get(scope));
+    public boolean test(final Int2D cell) {
+        return bathymetricGrid.isActiveWater(cell);
     }
 }

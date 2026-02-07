@@ -31,13 +31,14 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.quantities.KilogramsFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.geography.allocators.FilteredAllocatorFactory;
 import uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGridFromAllocatorFactory;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
-import uk.ac.ox.poseidon.geography.predicates.ActiveWaterCellPredicateFactory;
+import uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -67,10 +68,12 @@ public class CarryingCapacityGridFactory<S extends Scope>
         return new CarryingCapacityGridFactory<>(
             new DoubleGridFromAllocatorFactory<>(
                 modelGrid,
-                new SupplierAllocatorFactory<>(
-                    constantDouble(new KilogramsFactory<>(carryingCapacity))
-                ),
-                new ActiveWaterCellPredicateFactory<>(bathymetricGrid)
+                new FilteredAllocatorFactory<>(
+                    new SupplierAllocatorFactory<>(
+                        constantDouble(new KilogramsFactory<>(carryingCapacity))
+                    ),
+                    new IsActiveWaterCellFactory<>(bathymetricGrid)
+                )
             )
         );
     }
@@ -83,8 +86,10 @@ public class CarryingCapacityGridFactory<S extends Scope>
         return new CarryingCapacityGridFactory<>(
             new NormalisedDoubleGridFromAllocatorFactory<>(
                 modelGrid,
-                new SupplierAllocatorFactory<>(constantDouble(1.0)),
-                new ActiveWaterCellPredicateFactory<>(bathymetricGrid),
+                new FilteredAllocatorFactory<>(
+                    new SupplierAllocatorFactory<>(constantDouble(1.0)),
+                    new IsActiveWaterCellFactory<>(bathymetricGrid)
+                ),
                 new KilogramsFactory<>(totalCarryingCapacity)
             )
         );

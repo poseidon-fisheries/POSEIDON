@@ -20,35 +20,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.grids;
+package uk.ac.ox.poseidon.geography.allocators;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.allocators.Allocator;
+
+import java.util.function.Predicate;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DoubleGridFromAllocatorFactory<S extends Scope>
-    extends AbstractDoubleGridFromAllocatorFactory<S, BaseDoubleGrid> {
+public class FilteredAllocatorFactory<S extends Scope>
+    extends RelativeScopeFactory<S, FilteredAllocator> {
 
-    public DoubleGridFromAllocatorFactory(
-        final Factory<? super S, ? extends ModelGrid> modelGrid,
-        final Factory<? super S, ? extends Allocator> allocator
-    ) {
-        super(modelGrid, allocator);
-    }
+    private Factory<? super S, ? extends Allocator> delegateAllocator;
+    private Factory<? super S, ? extends Predicate<? super Int2D>> cellPredicate;
 
     @Override
-    BaseDoubleGrid makeGrid(
-        final ModelGrid modelGrid,
-        final double[][] values
-    ) {
-        return new BaseDoubleGrid(modelGrid, values);
+    protected FilteredAllocator newInstance(final S scope) {
+        return new FilteredAllocator(delegateAllocator.get(scope), cellPredicate.get(scope));
     }
 }

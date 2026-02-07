@@ -26,12 +26,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
-
-import java.util.function.Predicate;
 
 @Data
 @SuperBuilder
@@ -42,10 +39,9 @@ public class MutableDoubleGridFromAllocatorFactory<S extends Scope>
 
     public MutableDoubleGridFromAllocatorFactory(
         final Factory<? super S, ? extends ModelGrid> modelGrid,
-        final Factory<? super S, ? extends Allocator> allocator,
-        final Factory<? super S, ? extends Predicate<Int2D>> cellPredicate
+        final Factory<? super S, ? extends Allocator> allocator
     ) {
-        super(modelGrid, allocator, cellPredicate);
+        super(modelGrid, allocator);
     }
 
     @Override

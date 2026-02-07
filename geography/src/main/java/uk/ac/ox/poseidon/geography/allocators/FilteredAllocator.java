@@ -20,35 +20,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.grids;
+package uk.ac.ox.poseidon.geography.allocators;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.allocators.Allocator;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import sim.util.Int2D;
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class DoubleGridFromAllocatorFactory<S extends Scope>
-    extends AbstractDoubleGridFromAllocatorFactory<S, BaseDoubleGrid> {
+import java.util.function.Predicate;
 
-    public DoubleGridFromAllocatorFactory(
-        final Factory<? super S, ? extends ModelGrid> modelGrid,
-        final Factory<? super S, ? extends Allocator> allocator
-    ) {
-        super(modelGrid, allocator);
-    }
+@RequiredArgsConstructor
+public class FilteredAllocator implements Allocator {
+
+    @NonNull private final Allocator delegateAllocator;
+    @NonNull private final Predicate<? super Int2D> predicate;
 
     @Override
-    BaseDoubleGrid makeGrid(
-        final ModelGrid modelGrid,
-        final double[][] values
-    ) {
-        return new BaseDoubleGrid(modelGrid, values);
+    public double applyAsDouble(final Int2D cell) {
+        return predicate.test(cell) ? delegateAllocator.applyAsDouble(cell) : Double.NaN;
     }
+
 }

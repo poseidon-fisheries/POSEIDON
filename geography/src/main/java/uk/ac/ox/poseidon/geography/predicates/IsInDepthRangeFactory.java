@@ -37,13 +37,15 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ActiveWaterCellPredicateFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ActiveWaterCellPredicate> {
+public class IsInDepthRangeFactory<S extends Scope>
+    extends RelativeScopeFactory<S, IsInDepthRange> {
 
     private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+    private double minimumDepth;
+    private double maximumDepth;
 
     @Override
-    protected ActiveWaterCellPredicate newInstance(final S scope) {
-        return new ActiveWaterCellPredicate(bathymetricGrid.get(scope));
+    protected IsInDepthRange newInstance(final S scope) {
+        return new IsInDepthRange(bathymetricGrid.get(scope), minimumDepth, maximumDepth);
     }
 }

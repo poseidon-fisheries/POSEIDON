@@ -28,16 +28,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
 
-import java.util.function.Predicate;
-
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.lang.Double.NaN;
 import static java.lang.Double.isNaN;
 
 @Data
@@ -50,22 +46,20 @@ abstract class AbstractDoubleGridFromAllocatorFactory<S extends Scope, G extends
 
     private Factory<? super S, ? extends ModelGrid> modelGrid;
     private Factory<? super S, ? extends Allocator> allocator;
-    private Factory<? super S, ? extends Predicate<Int2D>> cellPredicate;
 
     @Override
     protected G newInstance(final S scope) {
         final ModelGrid modelGrid = this.modelGrid.get(scope);
         final Allocator allocator = this.allocator.get(scope);
-        final Predicate<Int2D> cellPredicate = this.cellPredicate.get(scope);
         final double[][] values = modelGrid.makeDoubleArray();
         final AtomicDouble sum = new AtomicDouble(0);
         modelGrid.getAllCells().forEach(cell -> {
-            final double value = cellPredicate.test(cell) ? allocator.applyAsDouble(cell) : NaN;
+            final double value = allocator.applyAsDouble(cell);
             if (!isNaN(value)) {
                 checkArgument(value >= 0, "Allocator returned negative value at %s", cell);
                 sum.addAndGet(value);
             }
-            values[cell.x][cell.y] = isNaN(value) ? NaN : value;
+            values[cell.x][cell.y] = value;
         });
         return makeGrid(modelGrid, postProcess(scope, values, sum.doubleValue()));
     }

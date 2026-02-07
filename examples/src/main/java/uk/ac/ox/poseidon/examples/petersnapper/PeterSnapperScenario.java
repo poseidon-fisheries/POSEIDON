@@ -28,6 +28,8 @@ import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.MeanFactory;
+import uk.ac.ox.poseidon.core.predicates.logical.AllOfFactory;
+import uk.ac.ox.poseidon.core.quantities.KilogramsFactory;
 import uk.ac.ox.poseidon.core.quantities.MassFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
@@ -35,11 +37,16 @@ import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 import uk.ac.ox.poseidon.core.utils.ListFactory;
 import uk.ac.ox.poseidon.core.utils.PairFactory;
 import uk.ac.ox.poseidon.geography.CoordinateFactory;
+import uk.ac.ox.poseidon.geography.allocators.FilteredAllocatorFactory;
+import uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableFactory;
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
+import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
 import uk.ac.ox.poseidon.geography.ports.PortFactory;
 import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
+import uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory;
+import uk.ac.ox.poseidon.geography.predicates.IsInDepthRangeFactory;
 import uk.ac.ox.poseidon.geography.utils.ElevationTableFactory;
 import uk.ac.ox.poseidon.io.paths.PathFactory;
 import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
@@ -50,7 +57,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static si.uom.NonSI.TONNE;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.poseidon.core.suppliers.SupplierFactories.constantDouble;
 import static uk.ac.ox.poseidon.core.suppliers.SupplierFactories.randomDouble;
 import static uk.ac.ox.poseidon.core.time.DurationFactory.ONE_DAY;
 
@@ -92,10 +100,22 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             );
 
         final var carryingCapacityGrid =
-            CarryingCapacityGridFactory.ofTotalCapacity(
-                modelGrid,
-                bathymetricGrid,
-                MassFactory.of(500_000, TONNE)
+            new CarryingCapacityGridFactory<>(
+                new NormalisedDoubleGridFromAllocatorFactory<>(
+                    modelGrid,
+                    new FilteredAllocatorFactory<>(
+                        new SupplierAllocatorFactory<>(constantDouble(1.0)),
+                        new AllOfFactory<>(
+                            new IsActiveWaterCellFactory<>(bathymetricGrid),
+                            new IsInDepthRangeFactory<>(
+                                bathymetricGrid,
+                                30,
+                                800
+                            )
+                        )
+                    ),
+                    new KilogramsFactory<>(MassFactory.of(110_749_315, KILOGRAM))
+                )
             );
 
         final var biomassGrid =
@@ -104,7 +124,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 new SpeciesFactory("PS", "Peter Snapper", null),
                 new ProportionOfCarryingCapacityAllocatorFactory<>(
                     carryingCapacityGrid,
-                    randomDouble(0, 1)
+                    randomDouble(0.7, 0.8)
                 )
             );
 
@@ -124,7 +144,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     new BiomassGrowerFactory(
                         biomassGrid,
                         carryingCapacityGrid,
-                        new LogisticGrowthRuleFactory(0.5)
+                        new LogisticGrowthRuleFactory(0.372)
                     )
                 ),
                 0

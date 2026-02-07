@@ -31,7 +31,7 @@ import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
-public class InRectangularAreaPredicate implements Predicate<Coordinate> {
+public class IsInRectangularArea implements Predicate<Coordinate> {
 
     private final Envelope envelope;
 

@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.allocators.FilteredAllocator;
 
 import static java.lang.Double.isNaN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,8 +40,10 @@ class DoubleGridFromAllocatorFactoryTest {
         final DoubleGridFromAllocatorFactory<Scope> factory =
             new DoubleGridFromAllocatorFactory<>(
                 scope -> modelGrid,
-                scope -> cell -> cell.x + cell.y,
-                scope -> cell -> !(cell.x == 1 && cell.y == 0)
+                scope -> new FilteredAllocator(
+                    cell -> cell.x + cell.y,
+                    cell -> !(cell.x == 1 && cell.y == 0)
+                )
             );
 
         final BaseDoubleGrid grid = factory.get(Scope.GLOBAL_SCOPE);
@@ -56,10 +59,8 @@ class DoubleGridFromAllocatorFactoryTest {
         final DoubleGridFromAllocatorFactory<Scope> factory =
             new DoubleGridFromAllocatorFactory<>(
                 scope -> modelGrid,
-                scope -> cell -> cell.x == 1 ? -1.0 : 1.0,
-                scope -> cell -> true
+                scope -> cell -> cell.x == 1 ? -1.0 : 1.0
             );
-
         assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
             .hasRootCauseInstanceOf(IllegalArgumentException.class);
     }

@@ -22,25 +22,30 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.locationtech.jts.geom.Geometry;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.Envelope;
+
+import java.util.Collection;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class InRectangularAreaPredicateFactory<S extends Scope>
-    extends RelativeScopeFactory<S, InRectangularAreaPredicate> {
+public class IsInGeometriesFactory<S extends Scope>
+    extends RelativeScopeFactory<S, IsInGeometries> {
 
-    @NonNull private Factory<? super S, ? extends Envelope> envelope;
+    private Factory<? super S, ? extends Collection<? extends Geometry>> geometries;
 
     @Override
-    protected InRectangularAreaPredicate newInstance(final S scope) {
-        return new InRectangularAreaPredicate(envelope.get(scope));
+    protected IsInGeometries newInstance(final S scope) {
+        return new IsInGeometries(geometries.get(scope));
     }
 }

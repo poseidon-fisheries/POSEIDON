@@ -23,20 +23,40 @@
 package uk.ac.ox.poseidon.geography.predicates;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
-import java.util.function.Predicate;
+import static com.google.common.base.Preconditions.checkArgument;
 
-@RequiredArgsConstructor
-public class ActiveWaterCellPredicate implements Predicate<Int2D> {
+public class IsInDepthRange implements CellPredicate {
 
-    @NonNull
-    private final BathymetricGrid bathymetricGrid;
+    @NonNull private final BathymetricGrid bathymetricGrid;
+    private final double minimumDepth;
+    private final double maximumDepth;
+
+    public IsInDepthRange(
+        @NonNull final BathymetricGrid bathymetricGrid,
+        final double minimumDepth,
+        final double maximumDepth
+    ) {
+        checkArgument(
+            minimumDepth >= 0,
+            "Minimum depth must be non-negative"
+        );
+        checkArgument(
+            maximumDepth >= minimumDepth,
+            "Maximum depth must be greater than or equal to minimum depth"
+        );
+
+        this.bathymetricGrid = bathymetricGrid;
+        this.minimumDepth = minimumDepth;
+        this.maximumDepth = maximumDepth;
+    }
 
     @Override
     public boolean test(final Int2D cell) {
-        return bathymetricGrid.isActiveWater(cell);
+        final double depth = bathymetricGrid.getDepth(cell);
+        return depth >= minimumDepth && depth <= maximumDepth;
     }
+
 }
