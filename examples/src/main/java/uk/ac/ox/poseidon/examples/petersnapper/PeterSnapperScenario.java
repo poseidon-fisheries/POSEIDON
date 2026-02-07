@@ -23,13 +23,15 @@
 package uk.ac.ox.poseidon.examples.petersnapper;
 
 import uk.ac.ox.poseidon.biology.allocators.ProportionOfCarryingCapacityAllocatorFactory;
-import uk.ac.ox.poseidon.biology.biomass.BiomassGridFactory;
-import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGridFactory;
+import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.MeanFactory;
 import uk.ac.ox.poseidon.core.quantities.MassFactory;
+import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
+import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
+import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableFactory;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
 import uk.ac.ox.poseidon.geography.utils.ElevationTableFactory;
@@ -38,10 +40,12 @@ import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
 import static si.uom.NonSI.TONNE;
 import static uk.ac.ox.poseidon.core.suppliers.SupplierFactories.randomDouble;
+import static uk.ac.ox.poseidon.core.time.DurationFactory.ONE_DAY;
 
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
@@ -59,6 +63,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final Scenario.ScenarioBuilder builder = Scenario.builder();
 
         final var inputPath = PathFactory.of(INPUT_PATH);
+        final LocalDateTime startingDateTime = LocalDate.now().atStartOfDay();
 
         final var elevationTable =
             new ElevationTableFactory<>(
@@ -96,11 +101,34 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 )
             );
 
+        final var biologicalProcesses =
+            new ScheduledRepeatingFactory<>(
+                DateTimeFactory.of(startingDateTime),
+                ONE_DAY,
+                new SteppableSequenceFactory(
+                    new BiomassDiffuserFactory(
+                        biomassGrid,
+                        carryingCapacityGrid,
+                        new SmoothBiomassDiffusionRuleFactory(
+                            0.001,
+                            0.01
+                        )
+                    ),
+                    new BiomassGrowerFactory(
+                        biomassGrid,
+                        carryingCapacityGrid,
+                        new LogisticGrowthRuleFactory(0.5)
+                    )
+                ),
+                0
+            );
+
         return builder
-            .startingDateTime(LocalDate.now())
+            .startingDateTime(startingDateTime)
             .component("bathymetricGrid", bathymetricGrid)
             .component("carryingCapacityGrid", carryingCapacityGrid)
             .component("biomassGrid", biomassGrid)
+            .component("biologicalProcesses", biologicalProcesses)
             .build();
     }
 }

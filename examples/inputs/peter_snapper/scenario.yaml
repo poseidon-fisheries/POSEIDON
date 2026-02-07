@@ -22,10 +22,11 @@ components:
       mapPaddingInDegrees: 1.0E-6
   carryingCapacityGrid: &id004 !!uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGridFactory
     grid: !!uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory
-      allocator: !!uk.ac.ox.poseidon.geography.allocators.ConstantAllocatorFactory
-        value: !!uk.ac.ox.poseidon.core.utils.ConstantFactory {
-          value: 1.0
-        }
+      allocator: !!uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory
+        doubleSupplier: !!uk.ac.ox.poseidon.core.suppliers.ConstantDoubleSupplierFactory
+          value: !!uk.ac.ox.poseidon.core.utils.ConstantFactory {
+            value: 1.0
+          }
       cellPredicate: !!uk.ac.ox.poseidon.geography.predicates.ActiveWaterCellPredicateFactory
         bathymetricGrid: *id002
       modelGrid: *id003
@@ -34,7 +35,7 @@ components:
           unitString: t,
           value: 500000.0
         }
-  biomassGrid: !!uk.ac.ox.poseidon.biology.biomass.BiomassGridFactory
+  biomassGrid: &id005 !!uk.ac.ox.poseidon.biology.biomass.BiomassGridFactory
     biomassAllocator: !!uk.ac.ox.poseidon.biology.allocators.ProportionOfCarryingCapacityAllocatorFactory
       carryingCapacityGrid: *id004
       proportionSupplier: !!uk.ac.ox.poseidon.core.suppliers.RandomDoubleSupplierFactory {
@@ -47,4 +48,33 @@ components:
       lifeStage: null,
       name: Peter Snapper
     }
+  biologicalProcesses: !!uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory
+    interval: !!uk.ac.ox.poseidon.core.time.DurationFactory {
+      days: 1,
+      hours: 0,
+      minutes: 0,
+      seconds: 0
+    }
+    ordering: 0
+    startingDateTime: !!uk.ac.ox.poseidon.core.time.DateTimeFactory {
+      day: 7,
+      month: 2,
+      year: 2026
+    }
+    steppable: !!uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory
+      steppables: !!uk.ac.ox.poseidon.core.utils.Factories
+        factories:
+        - !!uk.ac.ox.poseidon.biology.biomass.BiomassDiffuserFactory
+          biomassDiffusionRule: !!uk.ac.ox.poseidon.biology.biomass.SmoothBiomassDiffusionRuleFactory {
+            differentialPercentageToMove: 0.001,
+            percentageLimitOnDailyMovement: 0.01
+          }
+          biomassGrid: *id005
+          carryingCapacityGrid: *id004
+        - !!uk.ac.ox.poseidon.biology.biomass.BiomassGrowerFactory
+          biomassGrid: *id005
+          biomassGrowthRule: !!uk.ac.ox.poseidon.biology.biomass.LogisticGrowthRuleFactory {
+            growthRate: 0.5
+          }
+          carryingCapacityGrid: *id004
 startingDateTime: 2026-02-07T00:00:00Z

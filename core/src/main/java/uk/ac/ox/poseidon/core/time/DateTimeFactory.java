@@ -45,4 +45,12 @@ public class DateTimeFactory extends GlobalScopeFactory<LocalDateTime> {
         return LocalDate.of(year, month, day).atStartOfDay();
     }
 
+    public static DateTimeFactory of(final LocalDateTime dateTime) {
+        return new DateTimeFactory(
+            dateTime.getYear(),
+            dateTime.getMonthValue(),
+            dateTime.getDayOfMonth()
+        );
+    }
+
 }
