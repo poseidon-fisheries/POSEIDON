@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.allocators;
+package uk.ac.ox.poseidon.core.suppliers;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,15 +35,14 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class RandomUniformAllocatorFactory
-    extends SimulationScopeFactory<RandomUniformAllocator> {
+public class RandomDoubleSupplierFactory
+    extends SimulationScopeFactory<RandomDoubleSupplier> {
 
     private double minimum;
     private double maximum;
 
     @Override
-    protected RandomUniformAllocator newInstance(final SimulationScope scope) {
-        return new RandomUniformAllocator(scope.getSimulation().random, minimum, maximum);
+    protected RandomDoubleSupplier newInstance(final SimulationScope scope) {
+        return new RandomDoubleSupplier(scope.getSimulation().random, minimum, maximum);
     }
-
 }

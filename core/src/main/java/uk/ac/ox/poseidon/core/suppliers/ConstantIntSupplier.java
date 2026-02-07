@@ -20,36 +20,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.allocators;
+package uk.ac.ox.poseidon.core.suppliers;
 
-import ec.util.MersenneTwisterFast;
-import lombok.NonNull;
-import sim.util.Int2D;
+import lombok.RequiredArgsConstructor;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import java.util.function.IntSupplier;
 
-public class RandomUniformAllocator implements Allocator {
+@RequiredArgsConstructor
+public class ConstantIntSupplier implements IntSupplier {
 
-    private final @NonNull MersenneTwisterFast rng;
-    private final double minimum;
-    private final double maximum;
-
-    public RandomUniformAllocator(
-        final @NonNull MersenneTwisterFast rng,
-        final double minimum,
-        final double maximum
-    ) {
-        checkArgument(
-            minimum < maximum,
-            "minimum must be less than maximum"
-        );
-        this.rng = rng;
-        this.minimum = minimum;
-        this.maximum = maximum;
-    }
+    private final int value;
 
     @Override
-    public double applyAsDouble(final Int2D cell) {
-        return minimum + rng.nextDouble() * (maximum - minimum);
+    public int getAsInt() {
+        return value;
     }
+    
 }

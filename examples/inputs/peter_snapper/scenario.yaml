@@ -1,6 +1,6 @@
 !!uk.ac.ox.poseidon.core.Scenario
 components:
-  bathymetricGrid: &id002 !!uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTable
+  bathymetricGrid: &id002 !!uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableFactory
     aggregator: !!uk.ac.ox.poseidon.core.aggregators.MeanFactory {
       }
     elevationTable: &id001 !!uk.ac.ox.poseidon.geography.utils.ElevationTableFactory
@@ -20,7 +20,7 @@ components:
       gridWidthInCells: 70
       lonLatTable: *id001
       mapPaddingInDegrees: 1.0E-6
-  carryingCapacityGrid: !!uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGridFactory
+  carryingCapacityGrid: &id004 !!uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGridFactory
     grid: !!uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory
       allocator: !!uk.ac.ox.poseidon.geography.allocators.ConstantAllocatorFactory
         value: !!uk.ac.ox.poseidon.core.utils.ConstantFactory {
@@ -34,4 +34,17 @@ components:
           unitString: t,
           value: 500000.0
         }
-startingDateTime: 2026-02-06T00:00:00Z
+  biomassGrid: !!uk.ac.ox.poseidon.biology.biomass.BiomassGridFactory
+    biomassAllocator: !!uk.ac.ox.poseidon.biology.allocators.ProportionOfCarryingCapacityAllocatorFactory
+      carryingCapacityGrid: *id004
+      proportionSupplier: !!uk.ac.ox.poseidon.core.suppliers.RandomDoubleSupplierFactory {
+        maximum: 1.0,
+        minimum: 0.0
+      }
+    modelGrid: *id003
+    species: !!uk.ac.ox.poseidon.biology.species.SpeciesFactory {
+      code: PS,
+      lifeStage: null,
+      name: Peter Snapper
+    }
+startingDateTime: 2026-02-07T00:00:00Z

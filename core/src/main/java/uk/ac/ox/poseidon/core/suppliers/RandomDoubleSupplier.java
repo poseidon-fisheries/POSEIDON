@@ -20,29 +20,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.allocators;
+package uk.ac.ox.poseidon.core.suppliers;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import ec.util.MersenneTwisterFast;
+import lombok.NonNull;
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class ConstantAllocatorFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ConstantAllocator> {
+import java.util.function.DoubleSupplier;
 
-    private Factory<? super S, ? extends Number> value;
+import static com.google.common.base.Preconditions.checkArgument;
+
+public class RandomDoubleSupplier implements DoubleSupplier {
+
+    private final MersenneTwisterFast rng;
+    private final double minimum;
+    private final double maximum;
+
+    public RandomDoubleSupplier(
+        final @NonNull MersenneTwisterFast rng,
+        final double minimum,
+        final double maximum
+    ) {
+        checkArgument(
+            minimum < maximum,
+            "minimum must be less than maximum"
+        );
+        this.rng = rng;
+        this.minimum = minimum;
+        this.maximum = maximum;
+    }
 
     @Override
-    protected ConstantAllocator newInstance(final S scope) {
-        return new ConstantAllocator(value.get(scope).doubleValue());
+    public double getAsDouble() {
+        return minimum + rng.nextDouble() * (maximum - minimum);
     }
 }

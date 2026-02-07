@@ -31,8 +31,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.quantities.KilogramsFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
-import uk.ac.ox.poseidon.geography.allocators.ConstantAllocatorFactory;
+import uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGridFromAllocatorFactory;
@@ -42,6 +41,8 @@ import uk.ac.ox.poseidon.geography.predicates.ActiveWaterCellPredicateFactory;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
+
+import static uk.ac.ox.poseidon.core.suppliers.SupplierFactories.constantDouble;
 
 @Data
 @SuperBuilder
@@ -66,7 +67,9 @@ public class CarryingCapacityGridFactory<S extends Scope>
         return new CarryingCapacityGridFactory<>(
             new DoubleGridFromAllocatorFactory<>(
                 modelGrid,
-                new ConstantAllocatorFactory<>(new KilogramsFactory<>(carryingCapacity)),
+                new SupplierAllocatorFactory<>(
+                    constantDouble(new KilogramsFactory<>(carryingCapacity))
+                ),
                 new ActiveWaterCellPredicateFactory<>(bathymetricGrid)
             )
         );
@@ -80,7 +83,7 @@ public class CarryingCapacityGridFactory<S extends Scope>
         return new CarryingCapacityGridFactory<>(
             new NormalisedDoubleGridFromAllocatorFactory<>(
                 modelGrid,
-                new ConstantAllocatorFactory<>(ConstantFactory.of(1.0)),
+                new SupplierAllocatorFactory<>(constantDouble(1.0)),
                 new ActiveWaterCellPredicateFactory<>(bathymetricGrid),
                 new KilogramsFactory<>(totalCarryingCapacity)
             )

@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
-import uk.ac.ox.poseidon.biology.allocators.ConstantProportionOfCarryingCapacityAllocatorFactory;
+import uk.ac.ox.poseidon.biology.allocators.ProportionOfCarryingCapacityAllocatorFactory;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGridFactory;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGridFactory;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
@@ -41,6 +41,7 @@ import java.time.LocalDate;
 import java.util.function.Supplier;
 
 import static si.uom.NonSI.TONNE;
+import static uk.ac.ox.poseidon.core.suppliers.SupplierFactories.randomDouble;
 
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
@@ -89,10 +90,9 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             new BiomassGridFactory(
                 modelGrid,
                 new SpeciesFactory("PS", "Peter Snapper", null),
-                // TODO: it should be random proportion, not constant
-                new ConstantProportionOfCarryingCapacityAllocatorFactory<>(
+                new ProportionOfCarryingCapacityAllocatorFactory<>(
                     carryingCapacityGrid,
-                    1.0
+                    randomDouble(0, 1)
                 )
             );
 

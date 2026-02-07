@@ -22,17 +22,20 @@
 
 package uk.ac.ox.poseidon.geography.allocators;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 
-@RequiredArgsConstructor
-public class ConstantAllocator implements Allocator {
+import java.util.function.DoubleSupplier;
 
-    private final double value;
+@RequiredArgsConstructor
+public class SupplierAllocator implements Allocator {
+
+    @NonNull private final DoubleSupplier supplier;
 
     @Override
     public double applyAsDouble(final Int2D cell) {
-        return value;
+        return supplier.getAsDouble();
     }
-
+    
 }

@@ -22,27 +22,25 @@
 
 package uk.ac.ox.poseidon.biology.allocators;
 
+import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
 
+import java.util.function.DoubleSupplier;
+
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
-public class ConstantProportionOfCarryingCapacityAllocator implements Allocator {
+@RequiredArgsConstructor
+public class ProportionOfCarryingCapacityAllocator implements Allocator {
 
     private final CarryingCapacityGrid carryingCapacityGrid;
-    private final double proportion;
-
-    public ConstantProportionOfCarryingCapacityAllocator(
-        final CarryingCapacityGrid carryingCapacityGrid,
-        final double proportion
-    ) {
-        this.carryingCapacityGrid = carryingCapacityGrid;
-        this.proportion = checkUnitRange(proportion, "proportion of carrying capacity");
-    }
+    private final DoubleSupplier proportionSupplier;
 
     @Override
     public double applyAsDouble(final Int2D cell) {
+        final double proportion = proportionSupplier.getAsDouble();
+        checkUnitRange(proportion, "proportion of carrying capacity");
         return proportion * carryingCapacityGrid.getCarryingCapacity(cell);
     }
 }

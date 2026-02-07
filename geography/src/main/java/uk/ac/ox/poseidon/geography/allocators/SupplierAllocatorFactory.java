@@ -20,44 +20,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.allocators;
+package uk.ac.ox.poseidon.geography.allocators;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+
+import java.util.function.DoubleSupplier;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantProportionOfCarryingCapacityAllocatorFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ConstantProportionOfCarryingCapacityAllocator> {
+public class SupplierAllocatorFactory<S extends Scope>
+    extends RelativeScopeFactory<S, SupplierAllocator> {
 
-    private Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid;
-    private double proportion;
+    private Factory<? super S, ? extends DoubleSupplier> doubleSupplier;
 
     @Override
-    protected ConstantProportionOfCarryingCapacityAllocator newInstance(final S scope) {
-        return new ConstantProportionOfCarryingCapacityAllocator(
-            carryingCapacityGrid.get(scope),
-            proportion
-        );
+    protected SupplierAllocator newInstance(final S scope) {
+        return new SupplierAllocator(doubleSupplier.get(scope));
     }
-
-    public static <S extends Scope> ConstantProportionOfCarryingCapacityAllocatorFactory<S> fullCarryingCapacityAllocator(
-        final Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid
-    ) {
-        return ConstantProportionOfCarryingCapacityAllocatorFactory.<S>builder()
-            .proportion(1.0)
-            .carryingCapacityGrid(carryingCapacityGrid)
-            .build();
-    }
-
 }
