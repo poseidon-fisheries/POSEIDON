@@ -82,8 +82,6 @@ import uk.ac.ox.poseidon.io.paths.PathFactory;
 import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
 
 import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -109,8 +107,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final Scenario.ScenarioBuilder builder = Scenario.builder();
 
         final var inputPath = PathFactory.of(INPUT_PATH);
-        final LocalDateTime startingDateTime = LocalDate.now().atStartOfDay();
-
+        final var startingDateTime = DateTimeFactory.ofToday();
         final var elevationTable =
             new ElevationTableFactory<>(
                 CsvTableFactory.fromFile(inputPath.plus("elevations.csv")),
@@ -162,7 +159,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
         final var biologicalProcesses =
             new ScheduledRepeatingFactory<>(
-                DateTimeFactory.of(startingDateTime),
+                startingDateTime,
                 ONE_DAY,
                 new SteppableSequenceFactory(
                     new BiomassDiffuserFactory(
@@ -258,7 +255,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
         final var agentCreators =
             new ScheduledOnceFactory<>(
-                DateTimeFactory.of(startingDateTime),
+                startingDateTime,
                 new SteppableSequenceFactory(
                     new MappedFactory<>(
                         new VesselCreatorFactory(

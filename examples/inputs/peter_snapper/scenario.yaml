@@ -64,9 +64,12 @@ components:
       seconds: 0
     }
     ordering: 0
-    startingDateTime: !!uk.ac.ox.poseidon.core.time.DateTimeFactory {
+    startingDateTime: &id008 !!uk.ac.ox.poseidon.core.time.DateTimeFactory {
       day: 8,
+      hour: 0,
+      minute: 0,
       month: 2,
+      second: 0,
       year: 2026
     }
     steppable: !!uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory
@@ -92,7 +95,7 @@ components:
     ports: !!uk.ac.ox.poseidon.core.utils.ListFactory
       factories:
       - !!uk.ac.ox.poseidon.core.utils.PairFactory
-        first: &id011 !!uk.ac.ox.poseidon.geography.ports.PortFactory {
+        first: &id012 !!uk.ac.ox.poseidon.geography.ports.PortFactory {
           code: P1,
           name: Benoa
         }
@@ -101,7 +104,7 @@ components:
           longitude: 115.238843
         }
       - !!uk.ac.ox.poseidon.core.utils.PairFactory
-        first: &id012 !!uk.ac.ox.poseidon.geography.ports.PortFactory {
+        first: &id013 !!uk.ac.ox.poseidon.geography.ports.PortFactory {
           code: P2,
           name: Kupang
         }
@@ -109,13 +112,13 @@ components:
           latitude: -10.148044,
           longitude: 123.586249
         }
-  marketGrid: &id009 !!uk.ac.ox.poseidon.agents.market.MarketGridFactory
+  marketGrid: &id010 !!uk.ac.ox.poseidon.agents.market.MarketGridFactory
     markets: !!uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory
       portGrid: *id006
       pricesEntries: !!uk.ac.ox.poseidon.core.utils.ListFactory
         factories:
         - !!uk.ac.ox.poseidon.agents.market.PriceEntryFactory
-          catchCategory: &id008 !!uk.ac.ox.poseidon.agents.catches.UncategorisedCatchCategoryFactory {
+          catchCategory: &id009 !!uk.ac.ox.poseidon.agents.catches.UncategorisedCatchCategoryFactory {
             }
           price: !!uk.ac.ox.poseidon.agents.market.PriceFactory {
             amount: 40000.0,
@@ -124,14 +127,10 @@ components:
           }
           species: *id007
     portGrid: *id006
-  vesselField: &id010 !!uk.ac.ox.poseidon.agents.fields.VesselFieldFactory
+  vesselField: &id011 !!uk.ac.ox.poseidon.agents.fields.VesselFieldFactory
     modelGrid: *id002
   agentCreators: !!uk.ac.ox.poseidon.core.schedule.ScheduledOnceFactory
-    dateTime: !!uk.ac.ox.poseidon.core.time.DateTimeFactory {
-      day: 8,
-      month: 2,
-      year: 2026
-    }
+    dateTime: *id008
     ordering: 0
     steppable: !!uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory
       steppables: !!uk.ac.ox.poseidon.core.MappedFactory
@@ -157,27 +156,27 @@ components:
             proportion: 0.25
           hold: !!uk.ac.ox.poseidon.agents.vessels.holds.InfiniteBiomassHoldFactory
             catchCategoriser: !!uk.ac.ox.poseidon.agents.catches.UniformCatchCategoriserFactory
-              catchCategory: *id008
+              catchCategory: *id009
           homePort: null
-          marketGrid: *id009
+          marketGrid: *id010
           name: !!uk.ac.ox.poseidon.agents.vessels.PrefixedIdFactory {
             prefix: 'Vessel '
           }
           numberOfVesselsToCreate: 0
           portGrid: *id006
-          vesselField: *id010
+          vesselField: *id011
           vesselIdSupplierFactory: !!uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory {
             prefix: V
           }
         mappedProperties:
+          homePort: !!uk.ac.ox.poseidon.core.utils.ListFactory
+            factories:
+            - *id012
+            - *id013
           numberOfVesselsToCreate: !!uk.ac.ox.poseidon.core.utils.ConstantFactory
             value: [
               25,
               50
             ]
             
-          homePort: !!uk.ac.ox.poseidon.core.utils.ListFactory
-            factories:
-            - *id011
-            - *id012
-startingDateTime: 2026-02-08T00:00:00Z
+startingDateTime: *id008

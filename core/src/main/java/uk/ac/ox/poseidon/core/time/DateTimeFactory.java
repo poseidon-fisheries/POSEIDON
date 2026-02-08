@@ -40,16 +40,34 @@ public class DateTimeFactory extends GlobalScopeFactory<LocalDateTime> {
     @Builder.Default private Integer year = LocalDate.now().getYear();
     @Builder.Default private Integer month = LocalDate.now().getMonthValue();
     @Builder.Default private Integer day = LocalDate.now().getDayOfMonth();
+    @Builder.Default private Integer hour = 0;
+    @Builder.Default private Integer minute = 0;
+    @Builder.Default private Integer second = 0;
 
     protected LocalDateTime newInstance(final Scope scope) {
-        return LocalDate.of(year, month, day).atStartOfDay();
+        return LocalDateTime.of(year, month, day, hour, minute, second);
+    }
+
+    public static DateTimeFactory ofToday() {
+        return of(LocalDate.now());
+    }
+
+    public static DateTimeFactory ofNow() {
+        return of(LocalDateTime.now());
+    }
+
+    public static DateTimeFactory of(final LocalDate date) {
+        return of(date.atStartOfDay());
     }
 
     public static DateTimeFactory of(final LocalDateTime dateTime) {
         return new DateTimeFactory(
             dateTime.getYear(),
             dateTime.getMonthValue(),
-            dateTime.getDayOfMonth()
+            dateTime.getDayOfMonth(),
+            dateTime.getHour(),
+            dateTime.getMinute(),
+            dateTime.getSecond()
         );
     }
 

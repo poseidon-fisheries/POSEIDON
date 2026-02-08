@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.core;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.time.DateTimeFactory;
+import uk.ac.ox.poseidon.core.time.DateFactory;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -38,12 +38,12 @@ class MappedFactoryTest {
     void canUseZippedFactoryToGenerateDates() {
         assertEquals(
             List.of(
-                LocalDate.of(2000, 1, 21).atStartOfDay(),
-                LocalDate.of(2000, 2, 22).atStartOfDay(),
-                LocalDate.of(2000, 3, 23).atStartOfDay()
+                LocalDate.of(2000, 1, 21),
+                LocalDate.of(2000, 2, 22),
+                LocalDate.of(2000, 3, 23)
             ),
             new MappedFactory<>(
-                new DateTimeFactory(2000, null, null),
+                new DateFactory(2000, null, null),
                 Map.of(
                     "month", Factory.of(1, 2, 3),
                     "day", Factory.of(21, 22, 23)

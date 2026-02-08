@@ -24,16 +24,16 @@ package uk.ac.ox.poseidon.core;
 
 import lombok.*;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
-import static java.time.ZoneOffset.UTC;
+import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 
 @Getter
 @Setter
@@ -42,7 +42,7 @@ import static java.time.ZoneOffset.UTC;
 @AllArgsConstructor
 public final class Scenario {
 
-    private Date startingDateTime;
+    private Factory<Scope, LocalDateTime> startingDateTime;
 
     @Singular private Map<String, ? extends Factory<? super SimulationScope, ?>> components;
 
@@ -50,7 +50,7 @@ public final class Scenario {
         final LocalDateTime startingDateTime,
         final Map<String, ? extends Factory<? super SimulationScope, ?>> components
     ) {
-        this(Date.from(startingDateTime.atZone(UTC).toInstant()), components);
+        this(DateTimeFactory.of(startingDateTime), components);
     }
 
     public Scenario(
@@ -72,8 +72,7 @@ public final class Scenario {
         final long seed,
         final UUID simulationId
     ) {
-        final LocalDateTime localDateTime =
-            startingDateTime.toInstant().atZone(UTC).toLocalDateTime();
+        final LocalDateTime localDateTime = startingDateTime.get(GLOBAL_SCOPE);
         final TemporalSchedule schedule = new TemporalSchedule(localDateTime);
         final Simulation simulation = new Simulation(seed, schedule, simulationId);
         final SimulationScope simulationScope = new SimulationScope(simulation);
@@ -96,30 +95,6 @@ public final class Scenario {
             throw new IllegalArgumentException("Component not found: " + componentName);
         }
         return (Factory<? super SimulationScope, ? extends C>) factory;
-    }
-
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
-    public static class ScenarioBuilder {
-
-        private Date startingDateTime;
-
-        public ScenarioBuilder startingDateTime(final Date startingDateTime) {
-            this.startingDateTime = startingDateTime;
-            return this;
-        }
-
-        public ScenarioBuilder startingDateTime(final LocalDate startingDate) {
-            return startingDateTime(startingDate.atStartOfDay());
-        }
-
-        public ScenarioBuilder startingDateTime(final LocalDateTime startingDateTime) {
-            return startingDateTime(startingDateTime.atZone(UTC));
-        }
-
-        public ScenarioBuilder startingDateTime(final ZonedDateTime zonedDateTime) {
-            return startingDateTime(Date.from(zonedDateTime.toInstant()));
-        }
-
     }
 
 }
