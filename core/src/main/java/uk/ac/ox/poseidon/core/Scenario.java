@@ -72,12 +72,19 @@ public final class Scenario {
         final long seed,
         final UUID simulationId
     ) {
-        return Simulation.startNewSimulation(
-            seed,
-            new TemporalSchedule(startingDateTime.toInstant().atZone(UTC).toLocalDateTime()),
-            simulationId,
-            getComponents().values().stream()
-        );
+        final LocalDateTime localDateTime =
+            startingDateTime.toInstant().atZone(UTC).toLocalDateTime();
+        final TemporalSchedule schedule = new TemporalSchedule(localDateTime);
+        final Simulation simulation = new Simulation(seed, schedule, simulationId);
+        final SimulationScope simulationScope = new SimulationScope(simulation);
+        simulation.start();
+        simulation.components =
+            getComponents()
+                .values()
+                .stream()
+                .map(factory -> factory.get(simulationScope))
+                .toList();
+        return simulation;
     }
 
     @SuppressWarnings("unchecked")

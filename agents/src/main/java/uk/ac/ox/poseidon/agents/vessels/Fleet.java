@@ -72,13 +72,13 @@ public class Fleet {
         final Vessel vessel = new Vessel(
             schedule,
             new ForwardingEventManager(eventManager),
-            new InactiveBehaviour(),
+            InactiveBehaviour.INSTANCE,
             vesselId,
-            new Account(),
             vesselField,
             portGrid,
             marketGrid
         );
+        vessel.setAccount(new Account());
         vesselsById.put(vesselId, vessel);
         return vessel;
     }

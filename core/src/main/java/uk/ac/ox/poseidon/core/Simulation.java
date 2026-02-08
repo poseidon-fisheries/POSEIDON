@@ -32,7 +32,6 @@ import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.io.Serial;
 import java.text.MessageFormat;
@@ -53,26 +52,10 @@ public class Simulation extends SimState {
     private final UUID id;
     private final List<Steppable> finalProcesses = new ArrayList<>();
     private boolean started = false;
-    private List<?> components;
-
-    static Simulation startNewSimulation(
-        final long seed,
-        final TemporalSchedule schedule,
-        final UUID simulationId,
-        final Stream<? extends Factory<? super SimulationScope, ?>> components
-    ) {
-        final Simulation simulation = new Simulation(seed, schedule, simulationId);
-        final SimulationScope simulationScope = new SimulationScope(simulation);
-        simulation.start();
-        simulation.components =
-            components.map(factory ->
-                factory.get(simulationScope)
-            ).toList();
-        return simulation;
-    }
+    List<?> components;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    private Simulation(
+    Simulation(
         final long seed,
         final TemporalSchedule schedule,
         final UUID simulationId

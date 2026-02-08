@@ -26,13 +26,15 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.beanutils.PropertyUtils;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
 
 @Data
@@ -43,81 +45,80 @@ import static java.util.stream.IntStream.range;
 public class MappedFactory<S extends Scope, C> extends RelativeScopeFactory<S, List<C>> {
 
     private Factory<S, C> factory;
-    @Singular private List<String> propertyNames;
-    @Singular private List<Factory<? super S, ? extends List<?>>> componentListFactories;
-
-    public MappedFactory(
-        final Factory<S, C> factory,
-        final String propertyName,
-        final Factory<? super S, ? extends List<?>> componentListFactory
-    ) {
-        this.factory = factory;
-        this.propertyNames = List.of(propertyName);
-        this.componentListFactories = List.of(componentListFactory);
-    }
+    @Singular private Map<String, Factory<? super S, ? extends List<?>>> mappedProperties;
 
     @Override
     protected List<C> newInstance(final S scope) {
 
-        checkNotNull(componentListFactories);
-        checkState(!componentListFactories.isEmpty());
-        checkNotNull(propertyNames);
-        checkState(!propertyNames.isEmpty());
+        checkNotNull(factory);
+        checkNotNull(mappedProperties);
+        checkState(!mappedProperties.isEmpty());
 
+        final Map<String, ? extends List<?>> componentLists =
+            mappedProperties.entrySet().stream().collect(toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().get(scope)
+            ));
+
+        final int targetSize = componentLists.values().iterator().next().size();
         checkState(
-            componentListFactories.size() == propertyNames.size(),
-            "There must be as many are property value lists as there property names."
-        );
-
-        final List<? extends List<?>> componentLists = getComponentLists(scope);
-
-        checkState(!componentLists.getFirst().isEmpty());
-        final int targetSize = componentLists.getFirst().size();
-
-        checkState(
-            componentLists.stream().map(List::size).allMatch(n -> n == targetSize),
+            componentLists.values().stream().map(List::size).allMatch(n -> n == targetSize),
             "All property value lists must be the same size."
         );
 
-        final Factory<S, C> factory = this.factory;
-        synchronized (factory) {
-            return range(0, targetSize).mapToObj(componentIndex -> {
-                    range(0, propertyNames.size()).forEach(propertyIndex -> {
-                        final Object o = componentLists.get(propertyIndex).get(componentIndex);
+        final Map<String, Object> originalPropertyValues = new HashMap<>();
+        mappedProperties.keySet().forEach(propertyName ->
+            originalPropertyValues.put(propertyName, getProperty(propertyName))
+        );
+
+        try {
+            return range(0, targetSize)
+                .mapToObj(componentIndex -> {
+                    componentLists.forEach((propertyName, components) ->
                         setProperty(
-                            factory,
-                            propertyNames.get(propertyIndex),
-                            switch (o) {
+                            propertyName,
+                            switch (components.get(componentIndex)) {
                                 case null -> null;
                                 case final Boolean b -> b;
-                                case final String s -> s;
+                                case final Character c -> c;
                                 case final Number n -> n;
+                                case final String s -> s;
                                 case final Factory<?, ?> f -> f;
-                                default -> new ConstantFactory<>(o);
+                                case final Object o -> Factory.of(o);
                             }
-                        );
-                    });
+                        ));
                     return factory.get(scope);
                 })
                 .toList();
+        } finally {
+            originalPropertyValues.forEach(this::setProperty);
         }
     }
 
-    private List<? extends List<?>> getComponentLists(final S scope) {
-        return componentListFactories
-            .stream()
-            .map(f -> f.get(scope))
-            .toList();
+    private Object getProperty(
+        final String propertyName
+    ) {
+        try {
+            return PropertyUtils.getProperty(factory, propertyName);
+        } catch (
+            final IllegalAccessException | InvocationTargetException |
+                  NoSuchMethodException e
+        ) {
+            throw new RuntimeException(
+                "Failed to read property '" + propertyName + "' on factory " + factory +
+                    " (mapped properties: " + mappedPropertyKeys() + ")",
+                e
+            );
+        }
     }
 
     private void setProperty(
-        final Factory<S, C> targetFactory,
         final String propertyName,
         final Object component
     ) {
         try {
             PropertyUtils.setProperty(
-                targetFactory,
+                factory,
                 propertyName,
                 component
             );
@@ -125,8 +126,16 @@ public class MappedFactory<S extends Scope, C> extends RelativeScopeFactory<S, L
             final IllegalAccessException | InvocationTargetException |
                   NoSuchMethodException e
         ) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(
+                "Failed to set property '" + propertyName + "' on factory " + factory +
+                    " (mapped properties: " + mappedPropertyKeys() + ")",
+                e
+            );
         }
+    }
+
+    private String mappedPropertyKeys() {
+        return mappedProperties == null ? "<null>" : mappedProperties.keySet().toString();
     }
 
 }

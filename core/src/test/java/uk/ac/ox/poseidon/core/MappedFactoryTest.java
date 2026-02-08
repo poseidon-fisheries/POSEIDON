@@ -24,12 +24,13 @@ package uk.ac.ox.poseidon.core;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 
 class MappedFactoryTest {
 
@@ -43,12 +44,11 @@ class MappedFactoryTest {
             ),
             new MappedFactory<>(
                 new DateTimeFactory(2000, null, null),
-                List.of("month", "day"),
-                List.of(
-                    new ConstantFactory<>(List.of(1, 2, 3)),
-                    new ConstantFactory<>(List.of(21, 22, 23))
+                Map.of(
+                    "month", Factory.of(1, 2, 3),
+                    "day", Factory.of(21, 22, 23)
                 )
-            ).get(null)
+            ).get(GLOBAL_SCOPE)
         );
     }
 }

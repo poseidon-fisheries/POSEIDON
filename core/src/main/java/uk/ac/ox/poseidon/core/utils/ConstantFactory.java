@@ -44,8 +44,4 @@ public class ConstantFactory<C> extends GlobalScopeFactory<C> {
         return value;
     }
 
-    public static <C> ConstantFactory<C> of(final C value) {
-        return new ConstantFactory<>(value);
-    }
-
 }

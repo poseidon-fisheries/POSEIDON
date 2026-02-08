@@ -1,0 +1,90 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2026, University of Oxford.
+ *
+ * University of Oxford means the Chancellor, Masters and Scholars of the
+ * University of Oxford, having an administrative office at Wellington
+ * Square, Oxford OX1 2JD, UK.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package uk.ac.ox.poseidon.agents.vessels;
+
+import lombok.RequiredArgsConstructor;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import uk.ac.ox.poseidon.agents.fields.VesselField;
+import uk.ac.ox.poseidon.agents.market.MarketGrid;
+import uk.ac.ox.poseidon.agents.tasks.Behaviour;
+import uk.ac.ox.poseidon.agents.tasks.InactiveBehaviour;
+import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
+import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.geography.ports.Port;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
+
+import java.util.function.Supplier;
+
+@RequiredArgsConstructor
+public class VesselCreator implements Steppable {
+
+    private final EventManager eventManager;
+    private final VesselField vesselField;
+    private final PortGrid portGrid;
+    private final MarketGrid marketGrid;
+    private final Supplier<String> vesselIdSupplier;
+
+    private final VesselScopeFactory<? extends String> name;
+    private final VesselScopeFactory<? extends Account> account;
+    private final VesselScopeFactory<? extends Port> homePort;
+    private final VesselScopeFactory<? extends Hold> hold;
+    private final VesselScopeFactory<? extends Gear> gear;
+    private final VesselScopeFactory<? extends Engine> engine;
+    private final VesselScopeFactory<? extends Behaviour> behaviour;
+
+    private final int numberOfVesselsToCreate;
+
+    @Override
+    public void step(final SimState simState) {
+        final Simulation simulation = (Simulation) simState;
+        final SimulationScope simulationScope = new SimulationScope(simulation);
+        final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
+        for (int i = 0; i < numberOfVesselsToCreate; i++) {
+            final Vessel vessel = new Vessel(
+                temporalSchedule,
+                eventManager,
+                InactiveBehaviour.INSTANCE,
+                vesselIdSupplier.get(),
+                vesselField,
+                portGrid,
+                marketGrid
+            );
+            final VesselScope vesselScope = new VesselScope(simulationScope, vessel);
+            vessel.setAccount(account.get(vesselScope));
+            vessel.setGear(gear.get(vesselScope));
+            vessel.setEngine(engine.get(vesselScope));
+            vessel.setBehaviour(behaviour.get(vesselScope));
+            vessel.setHold(hold.get(vesselScope));
+            vessel.setName(name.get(vesselScope));
+            vessel.setHomePort(homePort.get(vesselScope));
+            vessel.setRegisteredAsActive(true);
+        }
+    }
+}

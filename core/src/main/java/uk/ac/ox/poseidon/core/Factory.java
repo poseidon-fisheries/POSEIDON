@@ -22,8 +22,31 @@
 
 package uk.ac.ox.poseidon.core;
 
+import lombok.NonNull;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.utils.ConstantFactory;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 public interface Factory<S extends Scope, C> {
     C get(S scope);
+
+    static <C> ConstantFactory<C> of(@NonNull final C value) {
+        return new ConstantFactory<>(value);
+    }
+
+    static <C> ConstantFactory<List<C>> of(@NonNull final Stream<C> values) {
+        return new ConstantFactory<>(values.toList());
+    }
+
+    @SafeVarargs
+    static <C> ConstantFactory<List<C>> of(
+        @NonNull final C value,
+        @NonNull final C... values
+    ) {
+        return new ConstantFactory<>(
+            Stream.concat(Stream.of(value), Stream.of(values)).toList()
+        );
+    }
 }

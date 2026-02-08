@@ -84,8 +84,8 @@ public class FleetEvent implements Steppable {
         vessel.setEngine(engineFactoryFunction.apply(vessel));
         extraFactoryFunctions.forEach(factory -> factory.apply(vessel));
         switch (eventType) {
-            case ACTIVATION -> vessel.setActiveInRegister(true);
-            case DEACTIVATION -> vessel.setActiveInRegister(false);
+            case ACTIVATION -> vessel.setRegisteredAsActive(true);
+            case DEACTIVATION -> vessel.setRegisteredAsActive(false);
             default -> {} // modification events don't change active status
         }
     }

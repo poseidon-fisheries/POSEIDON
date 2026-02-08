@@ -56,7 +56,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Vessel extends Agent implements Oriented2D {
 
     private final @NonNull String id;
-    private final @NonNull Account account;
     private final @NonNull VesselField vesselField;
     private final @NonNull PortGrid portGrid;
     private final @NonNull MarketGrid marketGrid;
@@ -66,14 +65,12 @@ public class Vessel extends Agent implements Oriented2D {
         @NonNull final EventManager eventManager,
         @NonNull final Behaviour nextBehaviour,
         @NonNull final String id,
-        @NonNull final Account account,
         @NonNull final VesselField vesselField,
         @NonNull final PortGrid portGrid,
         @NonNull final MarketGrid marketGrid
     ) {
         super(schedule, eventManager, nextBehaviour);
         this.id = id;
-        this.account = account;
         this.vesselField = vesselField;
         this.portGrid = portGrid;
         this.marketGrid = marketGrid;
@@ -88,12 +85,13 @@ public class Vessel extends Agent implements Oriented2D {
 
     // Modifiable characteristics
     @Setter private String name;
+    @Setter private Account account;
     private Port homePort;
     private Hold hold;
     private Gear gear;
     private Engine engine;
 
-    private boolean activeInRegister;
+    private boolean registeredAsActive;
 
     // Current state variables
     private double heading;
@@ -102,7 +100,7 @@ public class Vessel extends Agent implements Oriented2D {
     @Override
     public boolean isActive() {
         return super.isActive() &&
-            activeInRegister &&
+            registeredAsActive &&
             gear.isActive() &&
             homePort != null;
     }
@@ -130,8 +128,8 @@ public class Vessel extends Agent implements Oriented2D {
         mutate(() -> this.engine = engine);
     }
 
-    public void setActiveInRegister(final boolean activeInRegister) {
-        mutate(() -> this.activeInRegister = activeInRegister);
+    public void setRegisteredAsActive(final boolean registeredAsActive) {
+        mutate(() -> this.registeredAsActive = registeredAsActive);
     }
 
     @Override

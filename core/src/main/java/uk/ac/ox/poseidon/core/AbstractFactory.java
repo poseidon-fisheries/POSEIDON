@@ -27,6 +27,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -48,7 +49,7 @@ public abstract class AbstractFactory<S extends Scope, C> implements Factory<S, 
             .build(from(object -> CacheBuilder.newBuilder().build()));
 
     @Override
-    synchronized public final C get(final S scope) {
+    synchronized public final C get(@NonNull final S scope) {
         try {
             return cache
                 .getUnchecked(makeKey(scope))

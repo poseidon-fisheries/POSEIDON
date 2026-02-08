@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.core.suppliers;
 
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
 
 public final class SupplierFactories {
     private SupplierFactories() {
@@ -38,11 +37,11 @@ public final class SupplierFactories {
     }
 
     public static ConstantDoubleSupplierFactory<Scope> constantDouble(final double value) {
-        return new ConstantDoubleSupplierFactory<>(ConstantFactory.of(value));
+        return new ConstantDoubleSupplierFactory<>(Factory.of(value));
     }
 
     public static ConstantIntSupplierFactory<Scope> constantInt(final int value) {
-        return new ConstantIntSupplierFactory<>(ConstantFactory.of(value));
+        return new ConstantIntSupplierFactory<>(Factory.of(value));
     }
 
     public static <S extends Scope> ConstantIntSupplierFactory<S> constantInt(
