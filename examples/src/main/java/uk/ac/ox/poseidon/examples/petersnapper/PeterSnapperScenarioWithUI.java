@@ -76,6 +76,13 @@ public class PeterSnapperScenarioWithUI extends ScenarioWithUI {
                             true
                         ),
                         new SimpleFieldPortrayalFactory(
+                            "Vessels",
+                            new VesselFieldPortrayalFactory(
+                                scenario.component("vesselField")
+                            ),
+                            true
+                        ),
+                        new SimpleFieldPortrayalFactory(
                             "Coordinates",
                             new CoordinatesPortrayalFactory(
                                 scenario.component("modelGrid"),

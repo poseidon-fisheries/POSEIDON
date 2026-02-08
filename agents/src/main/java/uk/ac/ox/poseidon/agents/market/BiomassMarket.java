@@ -32,13 +32,13 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.buckets.BucketBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.events.EventManager;
-import uk.ac.ox.poseidon.core.utils.IdSupplier;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplier;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -52,7 +52,7 @@ public class BiomassMarket implements Market {
     // Cache resolved prices (including misses) to avoid repeated covers() scans.
     @Getter(AccessLevel.NONE)
     private final Map<CatchCategory, Map<Species, Optional<Price>>> priceCache = new HashMap<>();
-    private final IdSupplier saleIdSupplier;
+    private final Supplier<String> saleIdSupplier;
     private final EventManager eventManager;
 
     BiomassMarket(
@@ -119,7 +119,7 @@ public class BiomassMarket implements Market {
             );
         final Sale sale = new Sale(
             dateTime,
-            saleIdSupplier.nextId(),
+            saleIdSupplier.get(),
             this,
             vessel,
             soldItems,

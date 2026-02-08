@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,8 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.utils;
+package uk.ac.ox.poseidon.agents.vessels;
 
-public interface IdSupplier {
-    String nextId();
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+/**
+ * Used to generate simple vessel names by prepending a prefix to the vessel id.
+ */
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class PrefixedIdFactory extends VesselScopeFactory<String> {
+
+    private String prefix;
+
+    @Override
+    protected String newInstance(final VesselScope scope) {
+        return prefix + scope.getVessel().getId();
+    }
+
 }

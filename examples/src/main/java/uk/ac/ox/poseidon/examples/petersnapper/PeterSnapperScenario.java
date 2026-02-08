@@ -23,24 +23,48 @@
 package uk.ac.ox.poseidon.examples.petersnapper;
 
 import uk.ac.ox.poseidon.agents.catches.UncategorisedCatchCategoryFactory;
+import uk.ac.ox.poseidon.agents.catches.UniformCatchCategoriserFactory;
+import uk.ac.ox.poseidon.agents.catches.disposition.ProportionallyLimitingBiomassToHoldFactory;
+import uk.ac.ox.poseidon.agents.choices.ConstantDestinationSupplierFactory;
+import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
+import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
 import uk.ac.ox.poseidon.agents.market.MarketGridFactory;
 import uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory;
 import uk.ac.ox.poseidon.agents.market.PriceEntryFactory;
 import uk.ac.ox.poseidon.agents.market.PriceFactory;
+import uk.ac.ox.poseidon.agents.tasks.BehaviourFactory;
+import uk.ac.ox.poseidon.agents.tasks.InactiveBehaviourFactory;
+import uk.ac.ox.poseidon.agents.tasks.branches.SequenceTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.destinations.StartTripFactory;
+import uk.ac.ox.poseidon.agents.tasks.fishing.FishingFactory;
+import uk.ac.ox.poseidon.agents.tasks.landings.LandCatchesFactory;
+import uk.ac.ox.poseidon.agents.tasks.travel.RoundTripFactory;
+import uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory;
+import uk.ac.ox.poseidon.agents.vessels.PrefixedIdFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory;
+import uk.ac.ox.poseidon.agents.vessels.accounts.AccountFactory;
+import uk.ac.ox.poseidon.agents.vessels.engines.SimpleEngineFactory;
+import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
+import uk.ac.ox.poseidon.agents.vessels.holds.InfiniteBiomassHoldFactory;
 import uk.ac.ox.poseidon.biology.allocators.ProportionOfCarryingCapacityAllocatorFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappedFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.MeanFactory;
 import uk.ac.ox.poseidon.core.predicates.logical.AllOfFactory;
 import uk.ac.ox.poseidon.core.quantities.KilogramsFactory;
 import uk.ac.ox.poseidon.core.quantities.MassFactory;
+import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
+import uk.ac.ox.poseidon.core.schedule.ScheduledOnceFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 import uk.ac.ox.poseidon.core.utils.ListFactory;
 import uk.ac.ox.poseidon.core.utils.PairFactory;
+import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.CoordinateFactory;
 import uk.ac.ox.poseidon.geography.allocators.FilteredAllocatorFactory;
 import uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory;
@@ -48,6 +72,7 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableF
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
 import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
+import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
 import uk.ac.ox.poseidon.geography.ports.PortFactory;
 import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
 import uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory;
@@ -59,9 +84,11 @@ import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOUR_DURATION_SUPPLIER;
 import static uk.ac.ox.poseidon.core.suppliers.SupplierFactories.constantDouble;
 import static uk.ac.ox.poseidon.core.suppliers.SupplierFactories.randomDouble;
 import static uk.ac.ox.poseidon.core.time.DurationFactory.ONE_DAY;
@@ -157,35 +184,107 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
         final var distance =
             new HaversineDistanceCalculatorFactory<>(modelGrid);
+        final PortFactory benoa = new PortFactory("P1", "Benoa");
+        final PortFactory kupang = new PortFactory("P2", "Kupang");
         final var portGrid =
             new PortGridFactory<>(
                 ListFactory.from(
-                    new PairFactory<>(
-                        new PortFactory("P1", "Benoa"),
-                        new CoordinateFactory(115.238843, -8.799605)
-                    ),
-                    new PairFactory<>(
-                        new PortFactory("P2", "Kupang"),
-                        new CoordinateFactory(123.586249, -10.148044)
-                    )
+                    new PairFactory<>(benoa, new CoordinateFactory(115.238843, -8.799605)),
+                    new PairFactory<>(kupang, new CoordinateFactory(123.586249, -10.148044))
                 ),
                 bathymetricGrid,
                 distance
             );
 
+        final UncategorisedCatchCategoryFactory catchCategory =
+            new UncategorisedCatchCategoryFactory();
         final var marketGrid = new MarketGridFactory<>(
             portGrid,
             new OneBiomassMarketPerPortFactory(
                 portGrid,
                 ListFactory.from(
                     new PriceEntryFactory<>(
-                        new UncategorisedCatchCategoryFactory(),
+                        catchCategory,
                         species,
                         new PriceFactory(40000.0, "IDR", "kg")
                     )
                 )
             )
         );
+
+        final var vesselField = new VesselFieldFactory(modelGrid);
+
+        final var pathFinder =
+            new DefaultPathFinderFactory<>(
+                bathymetricGrid,
+                portGrid,
+                distance
+            );
+
+        final var gear =
+            new FixedBiomassProportionGearFactory<>(
+                "FGL", // droplines count as "fixed gears and lines"
+                0.25,
+                ONE_HOUR_DURATION_SUPPLIER
+            );
+
+        final var behaviour =
+            new BehaviourFactory(
+                SequenceTaskFactory
+                    .builder()
+                    .child(
+                        new RoundTripFactory(
+                            new StartTripFactory(
+                                new ConstantDestinationSupplierFactory(
+                                    modelGrid,
+                                    new CoordinateFactory()
+                                )
+                            ),
+                            new TravelAlongPathFactory(
+                                pathFinder,
+                                distance
+                            ),
+                            new FishingFactory(
+                                new CurrentCellFisheableFactory(biomassGrid),
+                                new ProportionallyLimitingBiomassToHoldFactory()
+                            ),
+                            new LandCatchesFactory(
+                                ONE_HOUR_DURATION_SUPPLIER
+                            )
+                        )
+                    )
+                    .build()
+            );
+
+        final var agentCreators =
+            new ScheduledOnceFactory<>(
+                DateTimeFactory.of(startingDateTime),
+                new SteppableSequenceFactory(
+                    new MappedFactory<>(
+                        new VesselCreatorFactory(
+                            vesselField,
+                            portGrid,
+                            marketGrid,
+                            new PrefixedIdSupplierFactory("V"),
+                            new PrefixedIdFactory("Vessel "),
+                            new AccountFactory(),
+                            null, // mapped over
+                            new InfiniteBiomassHoldFactory(
+                                new UniformCatchCategoriserFactory<>(catchCategory)
+                            ),
+                            gear,
+                            new SimpleEngineFactory<>(SpeedFactory.of("10 kn")),
+                            new InactiveBehaviourFactory(),
+                            0 // mapped over
+                        ),
+                        Map.of(
+                            "homePort", ListFactory.from(benoa, kupang),
+                            "numberOfVesselsToCreate", Factory.of(25, 50)
+                        )
+                    )
+                ),
+                0
+            );
 
         return builder
             .startingDateTime(startingDateTime)
@@ -196,6 +295,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             .component("biologicalProcesses", biologicalProcesses)
             .component("portGrid", portGrid)
             .component("marketGrid", marketGrid)
+            .component("vesselField", vesselField)
+            .component("agentCreators", agentCreators)
             .build();
     }
 }

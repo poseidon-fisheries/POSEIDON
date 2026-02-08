@@ -26,22 +26,23 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
-public class PrefixedIdSupplier implements IdSupplier {
+public class PrefixedIdSupplier implements Supplier<String> {
 
     @Getter
     private final String prefix;
 
     private final AtomicLong counter;
 
-    public PrefixedIdSupplier(String prefix) {
+    public PrefixedIdSupplier(final String prefix) {
         this.prefix = prefix;
         this.counter = new AtomicLong();
     }
 
     @Override
-    public String nextId() {
-        return prefix + " " + counter.getAndIncrement();
+    public String get() {
+        return prefix + counter.getAndIncrement();
     }
 }

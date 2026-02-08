@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks;
 
 public enum InactiveBehaviour implements Behaviour {
 
-    INSTANCE;
+    INACTIVE_BEHAVIOUR;
 
     @Override
     public boolean isActive() {

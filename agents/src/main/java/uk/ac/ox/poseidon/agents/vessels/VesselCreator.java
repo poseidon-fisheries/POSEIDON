@@ -33,6 +33,7 @@ import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -51,13 +52,13 @@ public class VesselCreator implements Steppable {
     private final MarketGrid marketGrid;
     private final Supplier<String> vesselIdSupplier;
 
-    private final VesselScopeFactory<? extends String> name;
-    private final VesselScopeFactory<? extends Account> account;
-    private final VesselScopeFactory<? extends Port> homePort;
-    private final VesselScopeFactory<? extends Hold> hold;
-    private final VesselScopeFactory<? extends Gear> gear;
-    private final VesselScopeFactory<? extends Engine> engine;
-    private final VesselScopeFactory<? extends Behaviour> behaviour;
+    private final Factory<? super VesselScope, ? extends String> name;
+    private final Factory<? super VesselScope, ? extends Account> account;
+    private final Factory<? super VesselScope, ? extends Port> homePort;
+    private final Factory<? super VesselScope, ? extends Hold> hold;
+    private final Factory<? super VesselScope, ? extends Gear> gear;
+    private final Factory<? super VesselScope, ? extends Engine> engine;
+    private final Factory<? super VesselScope, ? extends Behaviour> behaviour;
 
     private final int numberOfVesselsToCreate;
 
@@ -70,7 +71,7 @@ public class VesselCreator implements Steppable {
             final Vessel vessel = new Vessel(
                 temporalSchedule,
                 eventManager,
-                InactiveBehaviour.INSTANCE,
+                InactiveBehaviour.INACTIVE_BEHAVIOUR,
                 vesselIdSupplier.get(),
                 vesselField,
                 portGrid,

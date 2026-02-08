@@ -72,7 +72,7 @@ public class Fleet {
         final Vessel vessel = new Vessel(
             schedule,
             new ForwardingEventManager(eventManager),
-            InactiveBehaviour.INSTANCE,
+            InactiveBehaviour.INACTIVE_BEHAVIOUR,
             vesselId,
             vesselField,
             portGrid,

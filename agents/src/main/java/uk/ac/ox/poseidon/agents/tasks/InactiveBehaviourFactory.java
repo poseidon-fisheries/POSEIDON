@@ -36,6 +36,6 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 public class InactiveBehaviourFactory extends GlobalScopeFactory<InactiveBehaviour> {
     @Override
     protected InactiveBehaviour newInstance(final Scope scope) {
-        return InactiveBehaviour.INSTANCE;
+        return InactiveBehaviour.INACTIVE_BEHAVIOUR;
     }
 }

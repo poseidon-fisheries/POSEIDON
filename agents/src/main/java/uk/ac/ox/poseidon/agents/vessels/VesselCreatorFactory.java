@@ -42,25 +42,27 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.function.Supplier;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class VesselCreatorFactory extends SimulationScopeFactory<VesselCreator> {
-    
+
     private Factory<? super SimulationScope, ? extends VesselField> vesselField;
     private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
     private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;
     private Factory<? super SimulationScope, ? extends Supplier<String>> vesselIdSupplierFactory;
 
-    private VesselScopeFactory<? extends String> name;
-    private VesselScopeFactory<? extends Account> account;
-    private VesselScopeFactory<? extends Port> homePort;
-    private VesselScopeFactory<? extends Hold> hold;
-    private VesselScopeFactory<? extends Gear> gear;
-    private VesselScopeFactory<? extends Engine> engine;
-    private VesselScopeFactory<? extends Behaviour> behaviour;
+    private Factory<? super VesselScope, ? extends String> name;
+    private Factory<? super VesselScope, ? extends Account> account;
+    private Factory<? super VesselScope, ? extends Port> homePort;
+    private Factory<? super VesselScope, ? extends Hold> hold;
+    private Factory<? super VesselScope, ? extends Gear> gear;
+    private Factory<? super VesselScope, ? extends Engine> engine;
+    private Factory<? super VesselScope, ? extends Behaviour> behaviour;
 
     private int numberOfVesselsToCreate;
 
@@ -68,17 +70,17 @@ public class VesselCreatorFactory extends SimulationScopeFactory<VesselCreator> 
     protected VesselCreator newInstance(final SimulationScope scope) {
         return new VesselCreator(
             scope.getSimulation().getEventManager(),
-            vesselField.get(scope),
-            portGrid.get(scope),
-            marketGrid.get(scope),
-            vesselIdSupplierFactory.get(scope),
-            name,
-            account,
-            homePort,
-            hold,
-            gear,
-            engine,
-            behaviour,
+            checkNotNull(vesselField).get(scope),
+            checkNotNull(portGrid).get(scope),
+            checkNotNull(marketGrid).get(scope),
+            checkNotNull(vesselIdSupplierFactory).get(scope),
+            checkNotNull(name),
+            checkNotNull(account),
+            checkNotNull(homePort),
+            checkNotNull(hold),
+            checkNotNull(gear),
+            checkNotNull(engine),
+            checkNotNull(behaviour),
             numberOfVesselsToCreate
         );
     }

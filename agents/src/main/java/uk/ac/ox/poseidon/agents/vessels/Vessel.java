@@ -49,8 +49,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 @Getter
 @SuppressFBWarnings(value = "EI_EXPOSE_REP")
 public class Vessel extends Agent implements Oriented2D {
@@ -113,18 +111,15 @@ public class Vessel extends Agent implements Oriented2D {
         });
     }
 
-    public void setHold(final Hold hold) {
-        checkNotNull(hold);
+    public void setHold(final @NonNull Hold hold) {
         mutate(() -> this.hold = hold);
     }
 
-    public void setGear(final Gear gear) {
-        checkNotNull(gear);
+    public void setGear(final @NonNull Gear gear) {
         mutate(() -> this.gear = gear);
     }
 
-    public void setEngine(final Engine engine) {
-        checkNotNull(engine);
+    public void setEngine(final @NonNull Engine engine) {
         mutate(() -> this.engine = engine);
     }
 
