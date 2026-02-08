@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
-import uk.ac.ox.poseidon.agents.catches.CatchCategory;
+import uk.ac.ox.poseidon.agents.catches.UncategorisedCatchCategoryFactory;
 import uk.ac.ox.poseidon.agents.market.MarketGridFactory;
 import uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory;
 import uk.ac.ox.poseidon.agents.market.PriceEntryFactory;
@@ -30,7 +30,6 @@ import uk.ac.ox.poseidon.agents.market.PriceFactory;
 import uk.ac.ox.poseidon.biology.allocators.ProportionOfCarryingCapacityAllocatorFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.MeanFactory;
@@ -180,7 +179,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 portGrid,
                 ListFactory.from(
                     new PriceEntryFactory<>(
-                        Factory.of(CatchCategory.UNCATEGORISED),
+                        new UncategorisedCatchCategoryFactory(),
                         species,
                         new PriceFactory(40000.0, "IDR", "kg")
                     )

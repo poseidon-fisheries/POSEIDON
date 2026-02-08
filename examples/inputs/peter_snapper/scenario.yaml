@@ -51,7 +51,7 @@ components:
         minimum: 0.7
       }
     modelGrid: *id002
-    species: !!uk.ac.ox.poseidon.biology.species.SpeciesFactory {
+    species: &id007 !!uk.ac.ox.poseidon.biology.species.SpeciesFactory {
       code: PS,
       lifeStage: null,
       name: Peter Snapper
@@ -65,7 +65,7 @@ components:
     }
     ordering: 0
     startingDateTime: !!uk.ac.ox.poseidon.core.time.DateTimeFactory {
-      day: 7,
+      day: 8,
       month: 2,
       year: 2026
     }
@@ -85,7 +85,7 @@ components:
             growthRate: 0.372
           }
           carryingCapacityGrid: *id004
-  portGrid: !!uk.ac.ox.poseidon.geography.ports.PortGridFactory
+  portGrid: &id006 !!uk.ac.ox.poseidon.geography.ports.PortGridFactory
     bathymetricGrid: *id003
     distanceCalculator: !!uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory
       modelGrid: *id002
@@ -109,4 +109,19 @@ components:
           latitude: -10.148044,
           longitude: 123.586249
         }
-startingDateTime: 2026-02-07T00:00:00Z
+  marketGrid: !!uk.ac.ox.poseidon.agents.market.MarketGridFactory
+    markets: !!uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory
+      portGrid: *id006
+      pricesEntries: !!uk.ac.ox.poseidon.core.utils.ListFactory
+        factories:
+        - !!uk.ac.ox.poseidon.agents.market.PriceEntryFactory
+          catchCategory: !!uk.ac.ox.poseidon.agents.catches.UncategorisedCatchCategoryFactory {
+            }
+          price: !!uk.ac.ox.poseidon.agents.market.PriceFactory {
+            amount: 40000.0,
+            currencyUnit: IDR,
+            massUnit: kg
+          }
+          species: *id007
+    portGrid: *id006
+startingDateTime: 2026-02-08T00:00:00Z
