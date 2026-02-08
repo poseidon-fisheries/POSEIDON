@@ -60,7 +60,6 @@ import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.function.Supplier;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
@@ -161,16 +160,14 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             new HaversineDistanceCalculatorFactory<>(modelGrid);
         final var portGrid =
             new PortGridFactory<>(
-                new ListFactory<>(
-                    List.of(
-                        new PairFactory<>(
-                            new PortFactory("P1", "Benoa"),
-                            new CoordinateFactory(115.238843, -8.799605)
-                        ),
-                        new PairFactory<>(
-                            new PortFactory("P2", "Kupang"),
-                            new CoordinateFactory(123.586249, -10.148044)
-                        )
+                ListFactory.from(
+                    new PairFactory<>(
+                        new PortFactory("P1", "Benoa"),
+                        new CoordinateFactory(115.238843, -8.799605)
+                    ),
+                    new PairFactory<>(
+                        new PortFactory("P2", "Kupang"),
+                        new CoordinateFactory(123.586249, -10.148044)
                     )
                 ),
                 bathymetricGrid,
@@ -181,13 +178,11 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             portGrid,
             new OneBiomassMarketPerPortFactory(
                 portGrid,
-                new ListFactory<>(
-                    List.of(
-                        new PriceEntryFactory<>(
-                            Factory.of(CatchCategory.UNCATEGORISED),
-                            species,
-                            new PriceFactory(40000.0, "IDR", "kg")
-                        )
+                ListFactory.from(
+                    new PriceEntryFactory<>(
+                        Factory.of(CatchCategory.UNCATEGORISED),
+                        species,
+                        new PriceFactory(40000.0, "IDR", "kg")
                     )
                 )
             )
