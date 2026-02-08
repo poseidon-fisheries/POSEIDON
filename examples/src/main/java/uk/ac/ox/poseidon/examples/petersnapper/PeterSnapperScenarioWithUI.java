@@ -62,6 +62,13 @@ public class PeterSnapperScenarioWithUI extends ScenarioWithUI {
                             false
                         ),
                         new SimpleFieldPortrayalFactory(
+                            "Markets",
+                            new MarketGridPortrayalFactory(
+                                scenario.component("marketGrid")
+                            ),
+                            true
+                        ),
+                        new SimpleFieldPortrayalFactory(
                             "Ports",
                             new PortGridPortrayalFactory(
                                 scenario.component("portGrid")

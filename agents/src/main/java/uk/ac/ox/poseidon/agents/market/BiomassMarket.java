@@ -48,9 +48,9 @@ public class BiomassMarket implements Market {
 
     private final Port port;
     private final String code;
-    @Getter(AccessLevel.NONE)
     private final Map<CatchCategory, Map<Species, Price>> prices;
     // Cache resolved prices (including misses) to avoid repeated covers() scans.
+    @Getter(AccessLevel.NONE)
     private final Map<CatchCategory, Map<Species, Optional<Price>>> priceCache = new HashMap<>();
     private final IdSupplier saleIdSupplier;
     private final EventManager eventManager;

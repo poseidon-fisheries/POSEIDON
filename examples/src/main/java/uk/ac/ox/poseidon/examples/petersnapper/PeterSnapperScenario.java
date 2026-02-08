@@ -22,9 +22,15 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
+import uk.ac.ox.poseidon.agents.catches.CatchCategory;
+import uk.ac.ox.poseidon.agents.market.MarketGridFactory;
+import uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory;
+import uk.ac.ox.poseidon.agents.market.PriceEntryFactory;
+import uk.ac.ox.poseidon.agents.market.PriceFactory;
 import uk.ac.ox.poseidon.biology.allocators.ProportionOfCarryingCapacityAllocatorFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.MeanFactory;
@@ -118,10 +124,11 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 )
             );
 
+        final SpeciesFactory species = new SpeciesFactory("PS", "Peter Snapper", null);
         final var biomassGrid =
             new BiomassGridFactory(
                 modelGrid,
-                new SpeciesFactory("PS", "Peter Snapper", null),
+                species,
                 new ProportionOfCarryingCapacityAllocatorFactory<>(
                     carryingCapacityGrid,
                     randomDouble(0.7, 0.8)
@@ -170,6 +177,22 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 distance
             );
 
+        final var marketGrid = new MarketGridFactory<>(
+            portGrid,
+            new OneBiomassMarketPerPortFactory(
+                portGrid,
+                new ListFactory<>(
+                    List.of(
+                        new PriceEntryFactory<>(
+                            Factory.of(CatchCategory.UNCATEGORISED),
+                            species,
+                            new PriceFactory(40000.0, "IDR", "kg")
+                        )
+                    )
+                )
+            )
+        );
+
         return builder
             .startingDateTime(startingDateTime)
             .component("modelGrid", modelGrid)
@@ -178,6 +201,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             .component("biomassGrid", biomassGrid)
             .component("biologicalProcesses", biologicalProcesses)
             .component("portGrid", portGrid)
+            .component("marketGrid", marketGrid)
             .build();
     }
 }
