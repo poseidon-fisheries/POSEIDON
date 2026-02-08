@@ -26,9 +26,33 @@ import lombok.Value;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
 
+import java.util.Collection;
+import java.util.Map;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
+
 @Value
 public class PriceEntry {
+
     CatchCategory catchCategory;
     Species species;
     Price price;
+
+    static Map<CatchCategory, Map<Species, Price>> groupByCategoryAndSpecies(
+        final Collection<PriceEntry> pricesEntries
+    ) {
+        return pricesEntries
+            .stream()
+            .collect(
+                groupingBy(
+                    PriceEntry::getCatchCategory,
+                    toMap(
+                        PriceEntry::getSpecies,
+                        PriceEntry::getPrice
+                    )
+                )
+            );
+    }
+
 }

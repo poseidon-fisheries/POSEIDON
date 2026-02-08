@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -28,24 +28,35 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.List;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BiomassMarketGridFactory extends SimulationScopeFactory<BiomassMarketGrid> {
+public class MarketGridFactory<S extends Scope>
+    extends RelativeScopeFactory<S, MarketGrid> {
 
-    private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+    private Factory<? super S, ? extends PortGrid> portGrid;
+    private Factory<? super S, ? extends List<? extends Market>> markets;
 
     @Override
-    protected BiomassMarketGrid newInstance(final SimulationScope scope) {
-        checkNotNull(portGrid, "portGrid must not be null");
-        return new BiomassMarketGrid(portGrid.get(scope));
+    protected MarketGrid newInstance(final S scope) {
+        final PortGrid portGrid = this.portGrid.get(scope);
+        return new ImmutableMarketGrid(
+            portGrid.getModelGrid(),
+            markets.get(scope).stream().collect(toMap(
+                identity(),
+                market -> portGrid.getLocation(market.getPort())
+            ))
+        );
     }
 }

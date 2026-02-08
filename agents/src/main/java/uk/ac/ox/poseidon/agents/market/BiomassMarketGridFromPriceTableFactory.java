@@ -50,7 +50,9 @@ import java.util.Map.Entry;
 import static com.google.common.collect.Streams.stream;
 import static java.math.RoundingMode.HALF_EVEN;
 import static java.util.Map.entry;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 
 @Data
 @SuperBuilder
@@ -58,7 +60,7 @@ import static java.util.stream.Collectors.groupingBy;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class BiomassMarketGridFromPriceTableFactory
-    extends SimulationScopeFactory<BiomassMarketGrid> {
+    extends SimulationScopeFactory<MarketGrid> {
 
     private static final System.Logger logger =
         System.getLogger(BiomassMarketGridFromPriceTableFactory.class.getName());
@@ -77,7 +79,7 @@ public class BiomassMarketGridFromPriceTableFactory
     private Factory<? super SimulationScope, ? extends Iterable<? extends Species>> species;
 
     @Override
-    protected BiomassMarketGrid newInstance(final SimulationScope scope) {
+    protected MarketGrid newInstance(final SimulationScope scope) {
 
         final Map<String, List<Species>> speciesByCode =
             stream(this.species.get(scope))
@@ -85,7 +87,6 @@ public class BiomassMarketGridFromPriceTableFactory
 
         final PortGrid portGrid = this.portGrid.get(scope);
         final Map<String, BiomassMarket> markets = new HashMap<>();
-        final BiomassMarketGrid marketGrid = new BiomassMarketGrid(portGrid);
         final Map<String, CatchCategory> catchCategories = new HashMap<>();
 
         final List<Entry<LocalDateTime, PriceUpdate>> priceUpdatesByDate =
@@ -93,21 +94,20 @@ public class BiomassMarketGridFromPriceTableFactory
                 .stream()
                 .flatMap(row -> {
                         final BiomassMarket biomassMarket = markets.computeIfAbsent(
-                            row.getString(portCodeColumn), portCode -> {
+                            row.getString(portCodeColumn),
+                            portCode -> {
                                 final Port port =
                                     portGrid.getObject(portCode).orElseThrow(() ->
                                         new RuntimeException(
                                             "Port " + portCode + " not found in port grid."
                                         )
                                     );
-                                final BiomassMarket market = new BiomassMarket(
+                                return new BiomassMarket(
                                     port,
                                     portCode,
                                     Map.of(),
                                     scope.getSimulation().getEventManager()
                                 );
-                                marketGrid.addMarket(market, port);
-                                return market;
                             }
                         );
                         final String speciesCode = row.getString(speciesCodeColumn);
@@ -151,7 +151,13 @@ public class BiomassMarketGridFromPriceTableFactory
                 ).toList();
         scope.getSimulation().getTemporalSchedule().scheduleByDateTime(priceUpdatesByDate);
 
-        return marketGrid;
+        return new ImmutableMarketGrid(
+            portGrid.getModelGrid(),
+            markets.values().stream().collect(toMap(
+                identity(),
+                market -> portGrid.getLocation(market.getPort())
+            ))
+        );
     }
 
 }

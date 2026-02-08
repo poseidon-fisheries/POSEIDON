@@ -27,19 +27,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.catches.CatchCategory;
-import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
+import static uk.ac.ox.poseidon.agents.market.PriceEntry.groupByCategoryAndSpecies;
 
 @Data
 @SuperBuilder
@@ -48,40 +44,21 @@ import static java.util.stream.Collectors.toMap;
 @EqualsAndHashCode(callSuper = true)
 public class BiomassMarketFactory extends SimulationScopeFactory<BiomassMarket> {
 
-    private Factory<? super SimulationScope, ? extends BiomassMarketGrid> marketGrid;
     private Factory<? super SimulationScope, ? extends Port> port;
     private String marketCode;
     private Factory<? super SimulationScope, ? extends List<PriceEntry>> pricesEntries;
 
     @Override
     protected BiomassMarket newInstance(final SimulationScope scope) {
-        checkNotNull(marketGrid, "marketGrid must not be null");
         checkNotNull(port, "port must not be null");
         checkNotNull(pricesEntries, "pricesEntries must not be null");
         final Port port = this.port.get(scope);
         final String marketCode = this.marketCode != null ? this.marketCode : port.getCode();
-        final BiomassMarketGrid marketGrid = this.marketGrid.get(scope);
-        final Map<CatchCategory, Map<Species, Price>> prices =
-            pricesEntries
-                .get(scope)
-                .stream()
-                .collect(
-                    groupingBy(
-                        PriceEntry::getCatchCategory,
-                        toMap(
-                            PriceEntry::getSpecies,
-                            PriceEntry::getPrice
-                        )
-                    )
-                );
-        final BiomassMarket biomassMarket =
-            new BiomassMarket(
-                port,
-                marketCode,
-                prices,
-                scope.getSimulation().getEventManager()
-            );
-        marketGrid.addMarket(biomassMarket, port);
-        return biomassMarket;
+        return new BiomassMarket(
+            port,
+            marketCode,
+            groupByCategoryAndSpecies(pricesEntries.get(scope)),
+            scope.getSimulation().getEventManager()
+        );
     }
 }

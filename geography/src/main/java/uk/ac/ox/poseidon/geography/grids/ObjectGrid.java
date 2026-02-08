@@ -126,4 +126,8 @@ public abstract class ObjectGrid<T>
         return Optional.ofNullable(getObjectsById().get(id));
     }
 
+    public SparseGrid2D copyOfField() {
+        return new SparseGrid2D(field);
+    }
+
 }

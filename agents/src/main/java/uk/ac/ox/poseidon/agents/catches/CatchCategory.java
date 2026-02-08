@@ -26,5 +26,6 @@ import lombok.Value;
 
 @Value
 public class CatchCategory {
+    public static final CatchCategory UNCATEGORISED = new CatchCategory("NA");
     String code;
 }
