@@ -40,12 +40,12 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class WaitFactory extends VesselTaskFactory<Wait<Vessel>> {
+public class WaitForFactory extends VesselTaskFactory<WaitFor<Vessel>> {
 
     private Factory<? super VesselScope, ? extends Supplier<Duration>> durationSupplier;
 
     @Override
-    protected Wait<Vessel> newTask(final VesselScope scope) {
-        return new Wait<>(durationSupplier.get(scope));
+    protected WaitFor<Vessel> newTask(final VesselScope scope) {
+        return new WaitFor<>(durationSupplier.get(scope));
     }
 }

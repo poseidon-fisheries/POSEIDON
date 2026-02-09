@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 @RequiredArgsConstructor
-public class Wait<A extends Agent> extends ExtendedTask<A> {
+public class WaitFor<A extends Agent> extends ExtendedTask<A> {
 
     final Supplier<Duration> durationSupplier;
 
