@@ -22,18 +22,26 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.function.Predicate;
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class EqualFactory<T> extends GlobalScopeFactory<Equal<T>> {
 
-@RequiredArgsConstructor
-public class IsEqual<T> implements Predicate<T> {
-
-    private final T value;
+    private T value;
 
     @Override
-    public boolean test(final T t) {
-        return this.value.equals(t);
+    protected Equal<T> newInstance(final Scope scope) {
+        return new Equal<>(value);
     }
 
 }

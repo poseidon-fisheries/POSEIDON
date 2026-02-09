@@ -30,12 +30,12 @@ import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
-public class Above implements Predicate<Double> {
+public class Above implements Predicate<Number> {
 
     private final double threshold;
 
     @Override
-    public boolean test(@NonNull final Double value) {
-        return value > threshold;
+    public boolean test(@NonNull final Number number) {
+        return number.doubleValue() > threshold;
     }
 }

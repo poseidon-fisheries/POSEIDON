@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,34 +22,42 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class AnyOfFactory<S extends Scope, T> extends RelativeScopeFactory<S, AnyOf<T>> {
+@SuppressWarnings("Convert2Diamond")
+public class Factories {
+    private Factories() {
+    }
 
-    List<Factory<? super S, ? extends Predicate<? super T>>> predicates;
+    @SafeVarargs
+    public static <S extends Scope, T> AllOfFactory<S, T> allOf(
+        final Factory<? super S, ? extends Predicate<? super T>>... predicates
+    ) {
+        return new AllOfFactory<S, T>(List.of(predicates));
+    }
 
-    @Override
-    protected AnyOf<T> newInstance(final S scope) {
-        return new AnyOf<>(
-            predicates
-                .stream()
-                .map(f -> f.get(scope))
-                .toList()
-        );
+    @SafeVarargs
+    public static <S extends Scope, T> AnyOfFactory<S, T> anyOf(
+        final Factory<? super S, ? extends Predicate<? super T>>... predicates
+    ) {
+        return new AnyOfFactory<S, T>(List.of(predicates));
+    }
+
+    public static <S extends Scope, T> NotFactory<S, T> not(
+        final Factory<? super S, ? extends Predicate<? super T>> predicate
+    ) {
+        return new NotFactory<S, T>(predicate);
+    }
+
+    public static AlwaysTrueFactory alwaysTrue() {
+        return new AlwaysTrueFactory();
+    }
+
+    public static AlwaysFalseFactory alwaysFalse() {
+        return new AlwaysFalseFactory();
     }
 }

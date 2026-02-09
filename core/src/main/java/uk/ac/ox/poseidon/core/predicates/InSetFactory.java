@@ -31,7 +31,7 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
+import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 import java.util.Collection;
 
@@ -46,7 +46,7 @@ public class InSetFactory<S extends Scope, T> extends RelativeScopeFactory<S, In
 
     @SafeVarargs
     public static <T> InSetFactory<Scope, T> of(final T... values) {
-        return new InSetFactory<>(new ConstantFactory<>(ImmutableSet.copyOf(values)));
+        return new InSetFactory<>(new ObjectFactory<>(ImmutableSet.copyOf(values)));
     }
 
     @Override

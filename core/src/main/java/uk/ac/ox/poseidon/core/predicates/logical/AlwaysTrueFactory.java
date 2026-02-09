@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,30 +20,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.predicates.logical.AlwaysTrue;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-class AlwaysTrueTest {
-
-    /**
-     * The AlwaysTrue class implements a Predicate that always returns true when its test method is
-     * called, regardless of the provided input.
-     */
-
-    @Test
-    void testAlwaysReturnsTrueForAnyAction() {
-        // Arrange
-        final AlwaysTrue alwaysTrue = new AlwaysTrue();
-        final Object o = new Object();
-
-        // Act
-        final boolean result = alwaysTrue.test(o);
-
-        // Assert
-        assertTrue(result, "AlwaysTrue should always return true for any Action input.");
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class AlwaysTrueFactory extends GlobalScopeFactory<AlwaysTrue> {
+    @Override
+    protected AlwaysTrue newInstance(final Scope scope) {
+        return new AlwaysTrue();
     }
 }

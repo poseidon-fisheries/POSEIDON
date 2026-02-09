@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,28 +22,28 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.predicates.logical.AlwaysTrue;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Collection;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
-class AlwaysTrueTest {
+public class Factories {
 
-    /**
-     * The AlwaysTrue class implements a Predicate that always returns true when its test method is
-     * called, regardless of the provided input.
-     */
+    private Factories() {}
 
-    @Test
-    void testAlwaysReturnsTrueForAnyAction() {
-        // Arrange
-        final AlwaysTrue alwaysTrue = new AlwaysTrue();
-        final Object o = new Object();
-
-        // Act
-        final boolean result = alwaysTrue.test(o);
-
-        // Assert
-        assertTrue(result, "AlwaysTrue should always return true for any Action input.");
+    public static <S extends Scope, T, U> AdaptedPredicateFactory<S, T, U> adaptedPredicate(
+        final Factory<? super S, ? extends Function<? super T, U>> adaptor,
+        final Factory<? super S, ? extends Predicate<? super U>> predicate
+    ) {
+        return new AdaptedPredicateFactory<>(adaptor, predicate);
     }
+
+    public static <S extends Scope, T> InSetFactory<S, T> in(
+        final Factory<? super S, ? extends Collection<? extends T>> values
+    ) {
+        return new InSetFactory<>(values);
+    }
+
 }

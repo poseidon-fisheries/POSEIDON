@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,28 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import lombok.NonNull;
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class IsEqualFactory<T> extends GlobalScopeFactory<IsEqual<T>> {
+import java.util.function.Predicate;
 
-    private T value;
-
+public class AlwaysTrue implements Predicate<Object> {
     @Override
-    protected IsEqual<T> newInstance(final Scope scope) {
-        return new IsEqual<>(value);
+    public boolean test(@NonNull final Object o) {
+        return true;
     }
-
 }

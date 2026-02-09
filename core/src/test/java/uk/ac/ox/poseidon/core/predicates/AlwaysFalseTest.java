@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.predicates;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.predicates.logical.AlwaysFalse;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 

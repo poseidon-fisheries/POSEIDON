@@ -42,12 +42,6 @@ public class AllOfFactory<S extends Scope, T> extends RelativeScopeFactory<S, Al
 
     @Singular private List<Factory<? super S, ? extends Predicate<? super T>>> predicates;
 
-    @SafeVarargs
-    @SuppressWarnings("varargs")
-    public AllOfFactory(final Factory<? super S, ? extends Predicate<? super T>>... predicates) {
-        this(List.of(predicates));
-    }
-
     @Override
     protected AllOf<T> newInstance(final S scope) {
         return new AllOf<>(
