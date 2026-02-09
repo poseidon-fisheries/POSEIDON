@@ -42,7 +42,7 @@ public class NeighbourhoodCellPicker implements Picker<Int2D> {
 
     private final Vessel vessel;
     private final OptionValues<Int2D> optionValues;
-    private final Predicate<Int2D> optionPredicate;
+    private final Predicate<? super Int2D> optionPredicate;
     private final GridPathFinder pathFinder;
     private final IntSupplier neighbourhoodSizeSupplier;
     private final MersenneTwisterFast rng;

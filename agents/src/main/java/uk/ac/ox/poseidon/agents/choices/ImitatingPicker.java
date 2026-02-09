@@ -49,7 +49,7 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 public class ImitatingPicker<O> implements Picker<O> {
 
     private final OptionValues<O> optionValues;
-    private final Predicate<O> optionPredicate;
+    private final Predicate<? super O> optionPredicate;
     private final Supplier<OptionValues<O>> candidatesSupplier;
     private final MersenneTwisterFast rng;
 

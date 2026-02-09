@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
 import java.util.Map;
@@ -44,6 +45,15 @@ public interface Bucket {
 
     static BucketBuilder newBuilder() {
         return new AdaptiveBucketBuilder();
+    }
+
+    static Bucket of(
+        final Species species,
+        final double biomassInKg
+    ) {
+        return Double.isNaN(biomassInKg)
+            ? Bucket.empty()
+            : BiomassBucket.of(new double[]{biomassInKg}, SpeciesIndex.of(species));
     }
 
     static Bucket of(

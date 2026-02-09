@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,38 +20,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices;
+package uk.ac.ox.poseidon.core.suppliers;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
-
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ImitatingPickerFactory<O> extends VesselScopeFactory<ImitatingPicker<O>> {
+public class RandomIntSupplierFactory extends SimulationScopeFactory<RandomIntSupplier> {
 
-    private Factory<? super VesselScope, ? extends OptionValues<O>> optionValues;
-    private Factory<? super VesselScope, ? extends Predicate<? super O>> optionPredicate;
-    private Factory<? super VesselScope, ? extends Supplier<OptionValues<O>>> optionValuesSupplier;
+    private int minimum;
+    private int maximum;
 
     @Override
-    protected ImitatingPicker<O> newInstance(final VesselScope scope) {
-        return new ImitatingPicker<>(
-            optionValues.get(scope),
-            optionPredicate.get(scope),
-            optionValuesSupplier.get(scope),
-            scope.getSimulation().random
-        );
+    protected RandomIntSupplier newInstance(final SimulationScope scope) {
+        return new RandomIntSupplier(scope.getSimulation().random, minimum, maximum);
     }
 }

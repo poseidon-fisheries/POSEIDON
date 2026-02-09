@@ -22,10 +22,13 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.catches.UncategorisedCatchCategoryFactory;
 import uk.ac.ox.poseidon.agents.catches.UniformCatchCategoriserFactory;
 import uk.ac.ox.poseidon.agents.catches.disposition.ProportionallyLimitingBiomassToHoldFactory;
-import uk.ac.ox.poseidon.agents.choices.ConstantDestinationSupplierFactory;
+import uk.ac.ox.poseidon.agents.choices.*;
+import uk.ac.ox.poseidon.agents.components.ComponentFactory;
+import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
 import uk.ac.ox.poseidon.agents.market.MarketGridFactory;
@@ -33,7 +36,6 @@ import uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory;
 import uk.ac.ox.poseidon.agents.market.PriceEntryFactory;
 import uk.ac.ox.poseidon.agents.market.PriceFactory;
 import uk.ac.ox.poseidon.agents.tasks.BehaviourFactory;
-import uk.ac.ox.poseidon.agents.tasks.InactiveBehaviourFactory;
 import uk.ac.ox.poseidon.agents.tasks.branches.SequenceTaskFactory;
 import uk.ac.ox.poseidon.agents.tasks.destinations.StartTripFactory;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingFactory;
@@ -54,6 +56,7 @@ import uk.ac.ox.poseidon.core.MappedFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.MeanFactory;
+import uk.ac.ox.poseidon.core.predicates.AlwaysTrueFactory;
 import uk.ac.ox.poseidon.core.predicates.logical.AllOfFactory;
 import uk.ac.ox.poseidon.core.quantities.KilogramsFactory;
 import uk.ac.ox.poseidon.core.quantities.MassFactory;
@@ -61,6 +64,7 @@ import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledOnceFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
+import uk.ac.ox.poseidon.core.suppliers.RandomIntSupplierFactory;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 import uk.ac.ox.poseidon.core.utils.ListFactory;
 import uk.ac.ox.poseidon.core.utils.PairFactory;
@@ -82,6 +86,7 @@ import uk.ac.ox.poseidon.io.paths.PathFactory;
 import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
 
 import java.nio.file.Path;
+import java.time.Period;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -93,15 +98,23 @@ import static uk.ac.ox.poseidon.core.time.DurationFactory.ONE_DAY;
 
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
+    private static final Path INPUT_PATH =
+        Path.of("POSEIDON", "examples", "inputs", "peter_snapper");
+
+    private static final double LEARNING_ALPHA = 1;
+    private static final double EXPLORATION_PROBABILITY = 0.2;
+    private static final int MEAN_EXPLORATION_RADIUS = 1;
+
     public static void main(final String[] args) {
-        final Scenario scenario = new PeterSnapperScenario().get();
-        final Simulation simulation = scenario.startNewSimulation();
-        System.out.println(simulation.getTemporalSchedule().getDateTime());
+        final Simulation simulation =
+            new PeterSnapperScenario().get().startNewSimulation();
+        simulation
+            .getTemporalSchedule()
+            .stepFor(simulation, Period.ofYears(10));
+        simulation.finish();
     }
 
-    private static final Path INPUT_PATH =
-        Path.of("inputs", "peter_snapper");
-
+    @SuppressWarnings("ExtractMethodRecommender")
     @Override
     public Scenario get() {
         final Scenario.ScenarioBuilder builder = Scenario.builder();
@@ -179,8 +192,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 0
             );
 
-        final var distance =
-            new HaversineDistanceCalculatorFactory<>(modelGrid);
+        final var distance = new HaversineDistanceCalculatorFactory<>(modelGrid);
         final PortFactory benoa = new PortFactory("P1", "Benoa");
         final PortFactory kupang = new PortFactory("P2", "Kupang");
         final var portGrid =
@@ -225,18 +237,43 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 ONE_HOUR_DURATION_SUPPLIER
             );
 
+        final var optionValuesRegister =
+            new ComponentRegisterFactory<MutableOptionValues<Int2D>>();
+
+        final var optionValues =
+            new ComponentFactory<>(
+                new ExponentialMovingAverageOptionValuesFactory<>(LEARNING_ALPHA),
+                optionValuesRegister
+            );
+
+        final var startTrip =
+            new StartTripFactory(
+                new EpsilonGreedyDestinationSupplierFactory(
+                    EXPLORATION_PROBABILITY,
+                    new NeighbourhoodGridExplorerFactory(
+                        optionValues,
+                        new AlwaysTrueFactory(),
+                        pathFinder,
+                        new RandomIntSupplierFactory(1, 10)
+                    ),
+                    new ImitatingPickerFactory<>(
+                        optionValues,
+                        new AlwaysTrueFactory(),
+                        new BestOptionsFromFriendsSupplierFactory<>(
+                            5,
+                            optionValuesRegister
+                        )
+                    )
+                )
+            );
+
         final var behaviour =
             new BehaviourFactory(
                 SequenceTaskFactory
                     .builder()
                     .child(
                         new RoundTripFactory(
-                            new StartTripFactory(
-                                new ConstantDestinationSupplierFactory(
-                                    modelGrid,
-                                    new CoordinateFactory()
-                                )
-                            ),
+                            startTrip,
                             new TravelAlongPathFactory(
                                 pathFinder,
                                 distance
@@ -271,7 +308,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             ),
                             gear,
                             new SimpleEngineFactory<>(SpeedFactory.of("10 kn")),
-                            new InactiveBehaviourFactory(),
+                            behaviour, // new InactiveBehaviourFactory(),
                             0 // mapped over
                         ),
                         Map.of(

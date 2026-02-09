@@ -44,7 +44,7 @@ import java.util.function.Predicate;
 public class NeighbourhoodGridExplorerFactory extends VesselScopeFactory<NeighbourhoodCellPicker> {
 
     private Factory<? super VesselScope, ? extends OptionValues<Int2D>> optionValues;
-    private Factory<? super VesselScope, ? extends Predicate<Int2D>> cellPredicate;
+    private Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate;
     private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
     private Factory<? super VesselScope, ? extends IntSupplier> neighbourhoodSizeSupplier;
 

@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import sim.field.grid.DoubleGrid2D;
@@ -101,7 +100,7 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
 
         @Override
         public Bucket availableFish() {
-            return Bucket.of(ImmutableMap.of(species, getBiomass(cell)));
+            return Bucket.of(species, getValue(cell));
         }
 
         @Override

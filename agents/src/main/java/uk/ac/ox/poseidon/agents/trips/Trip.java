@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.trips;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -36,18 +37,20 @@ import java.time.LocalDateTime;
 @SuppressFBWarnings(value = "EI_EXPOSE_REP")
 public class Trip {
 
-    private final Vessel vessel;
-    private final EventManager eventManager;
-    private final Int2D origin;
-    private final LocalDateTime startDateTime;
-    @Setter private Int2D destination;
+    private final @NonNull Vessel vessel;
+    private final @NonNull EventManager eventManager;
+    private final @NonNull Int2D origin;
+    private final @NonNull LocalDateTime startDateTime;
+    @Setter
+    private @NonNull Int2D destination;
     private LocalDateTime endDateTime;
 
     public Trip(
-        final Vessel vessel,
-        final Int2D destination
+        final @NonNull Vessel vessel,
+        final @NonNull Int2D destination
     ) {
         this.vessel = vessel;
+        this.vessel.getVesselField().getModelGrid().checkIsInGrid(destination);
         this.destination = destination;
         this.eventManager = new ForwardingEventManager(vessel.getEventManager());
         this.origin = vessel.getCell();

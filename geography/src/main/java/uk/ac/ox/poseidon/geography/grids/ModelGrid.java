@@ -144,6 +144,14 @@ public interface ModelGrid {
         );
     }
 
+    default void checkIsInGrid(final Int2D cell) {
+        checkArgument(
+            isInGrid(cell),
+            "Cell %s is outside of grid (max x: %s, max y: %s)",
+            cell, getGridWidth() - 1, getGridHeight() - 1
+        );
+    }
+
     default boolean isInGrid(final Coordinate coordinate) {
         return getEnvelope().intersects(coordinate);
     }

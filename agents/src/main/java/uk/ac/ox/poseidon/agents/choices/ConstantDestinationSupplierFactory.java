@@ -45,8 +45,9 @@ public class ConstantDestinationSupplierFactory extends VesselScopeFactory<Desti
 
     @Override
     protected DestinationSupplier newInstance(final VesselScope scope) {
-        return new ConstantDestinationSupplier(
-            modelGrid.get(scope).toCell(coordinate.get(scope))
-        );
+        final ModelGrid modelGrid = this.modelGrid.get(scope);
+        final Coordinate coordinate = this.coordinate.get(scope);
+        modelGrid.checkIsInGrid(coordinate);
+        return new ConstantDestinationSupplier(modelGrid.toCell(coordinate));
     }
 }
