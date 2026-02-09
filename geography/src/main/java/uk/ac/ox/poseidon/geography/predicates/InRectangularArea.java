@@ -20,22 +20,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.bathymetry.adaptors;
+package uk.ac.ox.poseidon.geography.predicates;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.Envelope;
 
-import java.util.function.Function;
+import java.util.function.Predicate;
 
+@Getter
 @RequiredArgsConstructor
-public class CellElevation implements Function<Int2D, Double> {
+public class InRectangularArea implements Predicate<Coordinate> {
 
-    private final BathymetricGrid bathymetricGrid;
+    private final Envelope envelope;
 
     @Override
-    public Double apply(final Int2D cell) {
-        return bathymetricGrid.getElevation(cell);
+    public boolean test(final Coordinate coordinate) {
+        return envelope.contains(coordinate);
     }
-
 }

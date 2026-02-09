@@ -20,30 +20,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.bathymetry.adaptors;
+package uk.ac.ox.poseidon.geography.predicates;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.Envelope;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CellElevationFactory<S extends Scope> extends RelativeScopeFactory<S, CellElevation> {
+public class InRectangularAreaFactory<S extends Scope>
+    extends RelativeScopeFactory<S, InRectangularArea> {
 
-    private Factory<S, ? extends BathymetricGrid> bathymetricGrid;
+    @NonNull private Factory<? super S, ? extends Envelope> envelope;
 
     @Override
-    protected CellElevation newInstance(final S scope) {
-        return new CellElevation(bathymetricGrid.get(scope));
+    protected InRectangularArea newInstance(final S scope) {
+        return new InRectangularArea(envelope.get(scope));
     }
-
 }

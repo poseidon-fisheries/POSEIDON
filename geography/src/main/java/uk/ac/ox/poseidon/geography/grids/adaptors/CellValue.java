@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,23 +20,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.predicates;
+package uk.ac.ox.poseidon.geography.grids.adaptors;
 
-import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.Envelope;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
-import java.util.function.Predicate;
+import java.util.function.Function;
 
-@Getter
 @RequiredArgsConstructor
-public class IsInRectangularArea implements Predicate<Coordinate> {
+public class CellValue implements Function<Int2D, Number> {
 
-    private final Envelope envelope;
+    private final @NonNull DoubleGrid grid;
 
     @Override
-    public boolean test(final Coordinate coordinate) {
-        return envelope.contains(coordinate);
+    public Number apply(final Int2D int2D) {
+        return grid.getValue(int2D);
     }
+    
 }

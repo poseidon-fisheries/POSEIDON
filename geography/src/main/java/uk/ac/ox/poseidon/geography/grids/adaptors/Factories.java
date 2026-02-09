@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,27 +20,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.predicates;
+package uk.ac.ox.poseidon.geography.grids.adaptors;
 
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.NonNull;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class IsInRectangularAreaFactory<S extends Scope>
-    extends RelativeScopeFactory<S, IsInRectangularArea> {
+public class Factories {
 
-    @NonNull private Factory<? super S, ? extends Envelope> envelope;
-
-    @Override
-    protected IsInRectangularArea newInstance(final S scope) {
-        return new IsInRectangularArea(envelope.get(scope));
+    private Factories() {
     }
+
+    public static <S extends Scope> CellValueFactory<S> cellValue(
+        @NonNull final Factory<S, ? extends DoubleGrid> grid
+    ) {
+        return new CellValueFactory<>(grid);
+    }
+
 }

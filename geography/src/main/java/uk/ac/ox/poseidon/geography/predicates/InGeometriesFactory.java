@@ -39,13 +39,13 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class IsInGeometriesFactory<S extends Scope>
-    extends RelativeScopeFactory<S, IsInGeometries> {
+public class InGeometriesFactory<S extends Scope>
+    extends RelativeScopeFactory<S, InGeometries> {
 
     private Factory<? super S, ? extends Collection<? extends Geometry>> geometries;
 
     @Override
-    protected IsInGeometries newInstance(final S scope) {
-        return new IsInGeometries(geometries.get(scope));
+    protected InGeometries newInstance(final S scope) {
+        return new InGeometries(geometries.get(scope));
     }
 }

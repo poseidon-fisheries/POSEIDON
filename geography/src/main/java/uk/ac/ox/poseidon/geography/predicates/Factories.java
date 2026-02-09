@@ -22,30 +22,36 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class IsInDepthRangeFactory<S extends Scope>
-    extends RelativeScopeFactory<S, IsInDepthRange> {
+import java.util.function.Predicate;
 
-    private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
-    private double minimumDepth;
-    private double maximumDepth;
+import static uk.ac.ox.poseidon.core.predicates.Factories.adaptedPredicate;
+import static uk.ac.ox.poseidon.core.predicates.numeric.Factories.between;
+import static uk.ac.ox.poseidon.geography.grids.adaptors.Factories.cellValue;
 
-    @Override
-    protected IsInDepthRange newInstance(final S scope) {
-        return new IsInDepthRange(bathymetricGrid.get(scope), minimumDepth, maximumDepth);
+public class Factories {
+    private Factories() {
     }
+
+    public static <S extends Scope> IsActiveWaterCellFactory<S> isActiveWaterCell(
+        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid
+    ) {
+        return new IsActiveWaterCellFactory<>(bathymetricGrid);
+    }
+
+    public static <S extends Scope> Factory<S, ? extends Predicate<Int2D>> inDepthRange(
+        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
+        final double minimumDepth,
+        final double maximumDepth
+    ) {
+        return adaptedPredicate(
+            cellValue(bathymetricGrid),
+            between(-maximumDepth, -minimumDepth)
+        );
+    }
+
 }

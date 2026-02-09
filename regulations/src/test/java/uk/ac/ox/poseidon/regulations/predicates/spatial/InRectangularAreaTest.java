@@ -25,14 +25,14 @@ package uk.ac.ox.poseidon.regulations.predicates.spatial;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
-import uk.ac.ox.poseidon.geography.predicates.IsInRectangularArea;
+import uk.ac.ox.poseidon.geography.predicates.InRectangularArea;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class IsInRectangularAreaTest {
+class InRectangularAreaTest {
 
     /**
      * Tests the {@code InRectangularAreaPredicate.test(Coordinate)} method. The method checks if a
@@ -46,7 +46,7 @@ class IsInRectangularAreaTest {
         final Coordinate coordinate = new Coordinate(1.0, 1.0);
         when(envelope.contains(coordinate)).thenReturn(true);
 
-        final IsInRectangularArea predicate = new IsInRectangularArea(envelope);
+        final InRectangularArea predicate = new InRectangularArea(envelope);
 
         // Act
         final boolean result = predicate.test(coordinate);
@@ -62,7 +62,7 @@ class IsInRectangularAreaTest {
         final Coordinate coordinate = new Coordinate(2.0, 2.0);
         when(envelope.contains(coordinate)).thenReturn(false);
 
-        final IsInRectangularArea predicate = new IsInRectangularArea(envelope);
+        final InRectangularArea predicate = new InRectangularArea(envelope);
 
         // Act
         final boolean result = predicate.test(coordinate);
@@ -77,7 +77,7 @@ class IsInRectangularAreaTest {
         final Envelope envelope = mock(Envelope.class);
         final Coordinate coordinate = null;
 
-        final IsInRectangularArea predicate = new IsInRectangularArea(envelope);
+        final InRectangularArea predicate = new InRectangularArea(envelope);
 
         // Act
         final boolean result = predicate.test(coordinate);

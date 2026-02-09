@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,33 +20,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.predicates;
+package uk.ac.ox.poseidon.geography.grids.adaptors;
 
-import lombok.NonNull;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
-import uk.ac.ox.poseidon.geography.Coordinate;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
-import java.util.Collection;
-import java.util.function.Predicate;
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class CellValueFactory<S extends Scope> extends RelativeScopeFactory<S, CellValue> {
 
-public class IsInGeometries implements Predicate<Coordinate> {
-
-    private final Geometry[] geometries;
-
-    public IsInGeometries(@NonNull final Collection<? extends Geometry> geometries) {
-        this.geometries = geometries.toArray(Geometry[]::new);
-    }
+    private Factory<? super S, ? extends DoubleGrid> grid;
 
     @Override
-    public boolean test(final Coordinate coordinate) {
-        for (final Geometry geometry : geometries) {
-            final Point point = geometry.getFactory().createPoint(coordinate.toJTS());
-            if (geometry.contains(point)) {
-                return true;
-            }
-        }
-        return false;
+    protected CellValue newInstance(final S scope) {
+        return new CellValue(grid.get(scope));
     }
 
 }
