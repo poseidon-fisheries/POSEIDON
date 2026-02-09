@@ -29,7 +29,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
+import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 import java.util.Map;
 import java.util.Set;
@@ -87,7 +87,7 @@ class SpeciesSpecificDiscardRatesTest {
 
         final SpeciesSpecificDiscardRatesFactory<Scope> factory =
             new SpeciesSpecificDiscardRatesFactory<>(
-                new ConstantFactory<>(species),
+                new ObjectFactory<>(species),
                 Map.of(
                     adult.getKey(), 0.25,
                     juvenile.getKey(), 0.25

@@ -26,7 +26,7 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
+import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,8 +47,8 @@ class AllOfFactoryTest {
         // Arrange
         final Predicate<Object> predicate1 = value -> true;
         final Predicate<Object> predicate2 = value -> false;
-        final ConstantFactory<Predicate<Object>> factory1 = new ConstantFactory<>(predicate1);
-        final ConstantFactory<Predicate<Object>> factory2 = new ConstantFactory<>(predicate2);
+        final ObjectFactory<Predicate<Object>> factory1 = new ObjectFactory<>(predicate1);
+        final ObjectFactory<Predicate<Object>> factory2 = new ObjectFactory<>(predicate2);
 
         final AllOfFactory<Scope, Object> allOfFactory =
             new AllOfFactory<>(List.of(factory1, factory2));
@@ -87,10 +87,10 @@ class AllOfFactoryTest {
     @Test
     void getWithPredicateFactoriesCombinesPredicates() {
         // Arrange
-        final ConstantFactory<Predicate<String>> factory1 =
-            new ConstantFactory<>(value -> true);
-        final ConstantFactory<Predicate<String>> factory2 =
-            new ConstantFactory<>(value -> false);
+        final ObjectFactory<Predicate<String>> factory1 =
+            new ObjectFactory<>(value -> true);
+        final ObjectFactory<Predicate<String>> factory2 =
+            new ObjectFactory<>(value -> false);
 
         final AllOfFactory<Scope, String> allOfFactory =
             new AllOfFactory<>(List.of(factory1, factory2));

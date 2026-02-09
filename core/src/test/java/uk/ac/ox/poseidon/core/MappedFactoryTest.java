@@ -31,6 +31,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
+import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
 
 class MappedFactoryTest {
 
@@ -45,8 +46,8 @@ class MappedFactoryTest {
             new MappedFactory<>(
                 new DateFactory(2000, null, null),
                 Map.of(
-                    "month", Factory.of(1, 2, 3),
-                    "day", Factory.of(21, 22, 23)
+                    "month", listOf(1, 2, 3),
+                    "day", listOf(21, 22, 23)
                 )
             ).get(GLOBAL_SCOPE)
         );

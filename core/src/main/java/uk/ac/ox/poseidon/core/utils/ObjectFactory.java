@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantFactory<C> extends GlobalScopeFactory<C> {
+public class ObjectFactory<C> extends GlobalScopeFactory<C> {
 
     private C value;
 

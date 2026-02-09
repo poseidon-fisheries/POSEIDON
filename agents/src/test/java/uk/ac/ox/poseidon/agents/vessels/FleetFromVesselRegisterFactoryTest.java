@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
+import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
@@ -90,20 +90,20 @@ class FleetFromVesselRegisterFactoryTest {
                 Map.of(
                     "fleet", FleetFromVesselRegisterFactory.builder()
                         .fleet(new FleetFactory(
-                            new ConstantFactory<>(mock(VesselField.class)),
-                            new ConstantFactory<>(portGrid),
-                            new ConstantFactory<>(marketGrid)
+                            new ObjectFactory<>(mock(VesselField.class)),
+                            new ObjectFactory<>(portGrid),
+                            new ObjectFactory<>(marketGrid)
                         ))
                         .data(CsvTableFactory.fromString(initialData + extraData))
-                        .hold(new ConstantFactory<>(h1))
+                        .hold(new ObjectFactory<>(h1))
                         .gear(
                             VesselScopeFactoriesByCode.<Gear>builder()
-                                .factory("G1", new ConstantFactory<>(g1))
-                                .factory("G2", new ConstantFactory<>(g2))
+                                .factory("G1", new ObjectFactory<>(g1))
+                                .factory("G2", new ObjectFactory<>(g2))
                                 .build()
                         )
                         .dataMapping("gear.code", "gear")
-                        .engine(new ConstantFactory<>(mock(Engine.class)))
+                        .engine(new ObjectFactory<>(mock(Engine.class)))
                         .behaviour(new BehaviourFactory(new WaitFactory(ONE_DAY_DURATION_SUPPLIER)))
                         .build()
                 )

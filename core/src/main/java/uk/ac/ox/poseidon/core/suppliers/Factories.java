@@ -25,8 +25,10 @@ package uk.ac.ox.poseidon.core.suppliers;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-public final class SupplierFactories {
-    private SupplierFactories() {
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
+
+public final class Factories {
+    private Factories() {
         throw new IllegalStateException("Utility class");
     }
 
@@ -37,11 +39,11 @@ public final class SupplierFactories {
     }
 
     public static ConstantDoubleSupplierFactory<Scope> constantDouble(final double value) {
-        return new ConstantDoubleSupplierFactory<>(Factory.of(value));
+        return new ConstantDoubleSupplierFactory<>(object(value));
     }
 
     public static ConstantIntSupplierFactory<Scope> constantInt(final int value) {
-        return new ConstantIntSupplierFactory<>(Factory.of(value));
+        return new ConstantIntSupplierFactory<>(object(value));
     }
 
     public static <S extends Scope> ConstantIntSupplierFactory<S> constantInt(

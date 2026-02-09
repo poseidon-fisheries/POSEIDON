@@ -34,7 +34,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.DoubleSupplier;
 
-import static uk.ac.ox.poseidon.core.suppliers.SupplierFactories.constantDouble;
+import static uk.ac.ox.poseidon.core.suppliers.Factories.constantDouble;
 
 @Data
 @SuperBuilder

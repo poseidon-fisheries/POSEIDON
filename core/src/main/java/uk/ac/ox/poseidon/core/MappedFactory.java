@@ -36,6 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 @Data
 @SuperBuilder
@@ -84,7 +85,7 @@ public class MappedFactory<S extends Scope, C> extends RelativeScopeFactory<S, L
                                 case final Number n -> n;
                                 case final String s -> s;
                                 case final Factory<?, ?> f -> f;
-                                case final Object o -> Factory.of(o);
+                                case final Object o -> object(o);
                             }
                         ));
                     return factory.get(scope);

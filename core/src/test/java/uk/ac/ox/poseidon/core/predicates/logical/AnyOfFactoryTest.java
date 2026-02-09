@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
+import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,8 +47,8 @@ class AnyOfFactoryTest {
         // Arrange
         final Predicate<Object> predicate1 = value -> true;
         final Predicate<Object> predicate2 = value -> false;
-        final ConstantFactory<Predicate<Object>> factory1 = new ConstantFactory<>(predicate1);
-        final ConstantFactory<Predicate<Object>> factory2 = new ConstantFactory<>(predicate2);
+        final ObjectFactory<Predicate<Object>> factory1 = new ObjectFactory<>(predicate1);
+        final ObjectFactory<Predicate<Object>> factory2 = new ObjectFactory<>(predicate2);
 
         final AnyOfFactory<Scope, Object> anyOfFactory =
             new AnyOfFactory<>(List.of(factory1, factory2));
@@ -110,12 +110,12 @@ class AnyOfFactoryTest {
     @Test
     void testGetWithMultipleValidFactories() {
         // Arrange
-        final ConstantFactory<Predicate<String>> factory1 =
-            new ConstantFactory<>(value -> false);
-        final ConstantFactory<Predicate<String>> factory2 =
-            new ConstantFactory<>(value -> true);
-        final ConstantFactory<Predicate<String>> factory3 =
-            new ConstantFactory<>(value -> false);
+        final ObjectFactory<Predicate<String>> factory1 =
+            new ObjectFactory<>(value -> false);
+        final ObjectFactory<Predicate<String>> factory2 =
+            new ObjectFactory<>(value -> true);
+        final ObjectFactory<Predicate<String>> factory3 =
+            new ObjectFactory<>(value -> false);
 
         final AnyOfFactory<Scope, String> anyOfFactory =
             new AnyOfFactory<>(List.of(factory1, factory2, factory3));

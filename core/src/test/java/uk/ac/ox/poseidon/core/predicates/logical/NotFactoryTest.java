@@ -26,7 +26,7 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.utils.ConstantFactory;
+import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 import java.util.function.Predicate;
 
@@ -45,7 +45,7 @@ class NotFactoryTest {
     void testNewInstanceWithValidPredicateFactory() {
         // Arrange
         final Predicate<Object> predicate = value -> true;
-        final ConstantFactory<Predicate<Object>> factory = new ConstantFactory<>(predicate);
+        final ObjectFactory<Predicate<Object>> factory = new ObjectFactory<>(predicate);
 
         final NotFactory<Scope, Object> notFactory = new NotFactory<>(factory);
 

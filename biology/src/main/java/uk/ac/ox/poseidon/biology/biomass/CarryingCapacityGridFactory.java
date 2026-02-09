@@ -43,7 +43,7 @@ import uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 
-import static uk.ac.ox.poseidon.core.suppliers.SupplierFactories.constantDouble;
+import static uk.ac.ox.poseidon.core.suppliers.Factories.constantDouble;
 
 @Data
 @SuperBuilder

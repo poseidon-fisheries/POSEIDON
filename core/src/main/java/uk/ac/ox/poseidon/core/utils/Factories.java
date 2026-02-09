@@ -22,34 +22,36 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class Factories<C> extends SimulationScopeFactory<List<C>> {
+public class Factories {
 
-    private List<Factory<? super SimulationScope, ? extends C>> factories;
+    private Factories() {
+    }
+
+    public static <T> ObjectFactory<T> object(final T value) {
+        return new ObjectFactory<>(value);
+    }
 
     @SafeVarargs
-    public Factories(final Factory<? super SimulationScope, ? extends C>... factories) {
-        this.factories = Arrays.asList(factories);
+    public static <T> ObjectFactory<List<T>> listOf(final T... values) {
+        return new ObjectFactory<>(List.of(values));
     }
 
-    @Override
-    protected List<C> newInstance(final SimulationScope scope) {
-        return factories.stream().map(f -> (C) f.get(scope)).toList();
+    public static <T> ObjectFactory<List<T>> listOf(final Stream<T> values) {
+        return new ObjectFactory<>(values.toList());
     }
+
+    @SafeVarargs
+    public static <T> ObjectFactory<Set<T>> setOf(final T... values) {
+        return new ObjectFactory<>(Set.of(values));
+    }
+
+    public static <T> ObjectFactory<Set<T>> setOf(final Stream<T> values) {
+        return new ObjectFactory<>(values.collect(Collectors.toUnmodifiableSet()));
+    }
+
 }
