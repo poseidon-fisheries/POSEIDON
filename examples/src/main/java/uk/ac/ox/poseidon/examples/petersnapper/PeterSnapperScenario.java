@@ -36,11 +36,11 @@ import uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory;
 import uk.ac.ox.poseidon.agents.market.PriceEntryFactory;
 import uk.ac.ox.poseidon.agents.market.PriceFactory;
 import uk.ac.ox.poseidon.agents.tasks.BehaviourFactory;
-import uk.ac.ox.poseidon.agents.tasks.branches.SequenceTaskFactory;
 import uk.ac.ox.poseidon.agents.tasks.destinations.StartTripFactory;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingFactory;
 import uk.ac.ox.poseidon.agents.tasks.landings.LandCatchesFactory;
-import uk.ac.ox.poseidon.agents.tasks.travel.RoundTripFactory;
+import uk.ac.ox.poseidon.agents.tasks.travel.EndTripFactory;
+import uk.ac.ox.poseidon.agents.tasks.travel.SetDestinationToOriginFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory;
 import uk.ac.ox.poseidon.agents.vessels.PrefixedIdFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory;
@@ -54,9 +54,6 @@ import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.MappedFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.aggregators.MeanFactory;
-import uk.ac.ox.poseidon.core.quantities.KilogramsFactory;
-import uk.ac.ox.poseidon.core.quantities.MassFactory;
 import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledOnceFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
@@ -85,15 +82,18 @@ import java.time.Period;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.poseidon.agents.tasks.branches.Factories.sequenceTask;
+import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
+import static uk.ac.ox.poseidon.core.aggregators.Factories.mean;
 import static uk.ac.ox.poseidon.core.predicates.Factories.adaptedPredicate;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.alwaysTrue;
 import static uk.ac.ox.poseidon.core.predicates.numeric.Factories.above;
+import static uk.ac.ox.poseidon.core.quantities.Factories.kilograms;
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOUR_DURATION_SUPPLIER;
-import static uk.ac.ox.poseidon.core.suppliers.Factories.constantDouble;
-import static uk.ac.ox.poseidon.core.suppliers.Factories.randomDouble;
+import static uk.ac.ox.poseidon.core.suppliers.Factories.*;
 import static uk.ac.ox.poseidon.core.time.DurationFactory.ONE_DAY;
+import static uk.ac.ox.poseidon.core.time.Factories.hours;
 import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
 import static uk.ac.ox.poseidon.geography.grids.adaptors.Factories.cellValue;
 import static uk.ac.ox.poseidon.geography.predicates.Factories.inDepthRange;
@@ -137,7 +137,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             new BathymetricGridFromElevationTableFactory<>(
                 elevationTable,
                 modelGrid,
-                new MeanFactory(),
+                mean(),
                 false
             );
 
@@ -152,7 +152,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             inDepthRange(bathymetricGrid, 30, 800)
                         )
                     ),
-                    new KilogramsFactory<>(MassFactory.of(110_749_315, KILOGRAM))
+                    kilograms(110_749_315)
                 )
             );
 
@@ -269,25 +269,19 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
         final var behaviour =
             new BehaviourFactory(
-                SequenceTaskFactory
-                    .builder()
-                    .child(
-                        new RoundTripFactory(
-                            startTrip,
-                            new TravelAlongPathFactory(
-                                pathFinder,
-                                distance
-                            ),
-                            new FishingFactory(
-                                new CurrentCellFisheableFactory(biomassGrid),
-                                new ProportionallyLimitingBiomassToHoldFactory()
-                            ),
-                            new LandCatchesFactory(
-                                ONE_HOUR_DURATION_SUPPLIER
-                            )
-                        )
-                    )
-                    .build()
+                sequenceTask(
+                    startTrip,
+                    new TravelAlongPathFactory(pathFinder, distance),
+                    new FishingFactory(
+                        new CurrentCellFisheableFactory(biomassGrid),
+                        new ProportionallyLimitingBiomassToHoldFactory()
+                    ),
+                    new SetDestinationToOriginFactory(),
+                    new TravelAlongPathFactory(pathFinder, distance),
+                    new LandCatchesFactory(ONE_HOUR_DURATION_SUPPLIER),
+                    new EndTripFactory(),
+                    waitFor(constant(hours(12)))
+                )
             );
 
         final var agentCreators =

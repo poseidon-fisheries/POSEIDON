@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,28 +20,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.quantities;
+package uk.ac.ox.poseidon.agents.tasks.general;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
-import javax.measure.quantity.Mass;
+import java.time.Duration;
+import java.util.function.Supplier;
 
-@Data
-@SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-public class MassFactory extends AbstractQuantityFactory<Mass> {
+public class Factories {
 
-    public MassFactory() {
-        super(Mass.class);
+    private Factories() {
     }
 
-    public MassFactory(
-        final double value,
-        final String unitString
+    public static WaitForFactory waitFor(
+        final Factory<? super VesselScope, ? extends Supplier<Duration>> durationSupplier
     ) {
-        super(Mass.class, value, unitString);
+        return new WaitForFactory(durationSupplier);
     }
 
 }
