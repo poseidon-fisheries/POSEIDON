@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -31,18 +31,21 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+import java.util.function.Supplier;
+
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ConstantSupplierFactory<S extends Scope, T>
-    extends RelativeScopeFactory<S, ConstantSupplier<T>> {
+    extends RelativeScopeFactory<S, Supplier<T>> {
 
-    private Factory<? super S, T> value;
+    Factory<? super S, ? extends T> object;
 
     @Override
-    protected ConstantSupplier<T> newInstance(final S scope) {
-        return new ConstantSupplier<>(value.get(scope));
+    protected Supplier<T> newInstance(final S scope) {
+        return () -> object.get(scope);
     }
+
 }
