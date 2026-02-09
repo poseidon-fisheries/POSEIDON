@@ -51,13 +51,10 @@ import uk.ac.ox.poseidon.agents.vessels.holds.InfiniteBiomassHoldFactory;
 import uk.ac.ox.poseidon.biology.allocators.ProportionOfCarryingCapacityAllocatorFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappedFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.aggregators.MeanFactory;
-import uk.ac.ox.poseidon.core.predicates.AlwaysTrueFactory;
-import uk.ac.ox.poseidon.core.predicates.logical.AllOfFactory;
 import uk.ac.ox.poseidon.core.quantities.KilogramsFactory;
 import uk.ac.ox.poseidon.core.quantities.MassFactory;
 import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
@@ -79,8 +76,6 @@ import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactor
 import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
 import uk.ac.ox.poseidon.geography.ports.PortFactory;
 import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
-import uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory;
-import uk.ac.ox.poseidon.geography.predicates.IsInDepthRangeFactory;
 import uk.ac.ox.poseidon.geography.utils.ElevationTableFactory;
 import uk.ac.ox.poseidon.io.paths.PathFactory;
 import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
@@ -91,10 +86,18 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.poseidon.core.predicates.Factories.adaptedPredicate;
+import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
+import static uk.ac.ox.poseidon.core.predicates.logical.Factories.alwaysTrue;
+import static uk.ac.ox.poseidon.core.predicates.numeric.Factories.above;
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOUR_DURATION_SUPPLIER;
-import static uk.ac.ox.poseidon.core.suppliers.SupplierFactories.constantDouble;
-import static uk.ac.ox.poseidon.core.suppliers.SupplierFactories.randomDouble;
+import static uk.ac.ox.poseidon.core.suppliers.Factories.constantDouble;
+import static uk.ac.ox.poseidon.core.suppliers.Factories.randomDouble;
 import static uk.ac.ox.poseidon.core.time.DurationFactory.ONE_DAY;
+import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
+import static uk.ac.ox.poseidon.geography.grids.adaptors.Factories.cellValue;
+import static uk.ac.ox.poseidon.geography.predicates.Factories.inDepthRange;
+import static uk.ac.ox.poseidon.geography.predicates.Factories.isActiveWaterCell;
 
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
@@ -103,7 +106,6 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     private static final double LEARNING_ALPHA = 1;
     private static final double EXPLORATION_PROBABILITY = 0.2;
-    private static final int MEAN_EXPLORATION_RADIUS = 1;
 
     public static void main(final String[] args) {
         final Simulation simulation =
@@ -114,7 +116,6 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         simulation.finish();
     }
 
-    @SuppressWarnings("ExtractMethodRecommender")
     @Override
     public Scenario get() {
         final Scenario.ScenarioBuilder builder = Scenario.builder();
@@ -146,13 +147,9 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     modelGrid,
                     new FilteredAllocatorFactory<>(
                         new SupplierAllocatorFactory<>(constantDouble(1.0)),
-                        new AllOfFactory<>(
-                            new IsActiveWaterCellFactory<>(bathymetricGrid),
-                            new IsInDepthRangeFactory<>(
-                                bathymetricGrid,
-                                30,
-                                800
-                            )
+                        allOf(
+                            isActiveWaterCell(bathymetricGrid),
+                            inDepthRange(bathymetricGrid, 30, 800)
                         )
                     ),
                     new KilogramsFactory<>(MassFactory.of(110_749_315, KILOGRAM))
@@ -252,13 +249,16 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     EXPLORATION_PROBABILITY,
                     new NeighbourhoodGridExplorerFactory(
                         optionValues,
-                        new AlwaysTrueFactory(),
+                        adaptedPredicate(
+                            cellValue(carryingCapacityGrid),
+                            above(0)
+                        ),
                         pathFinder,
                         new RandomIntSupplierFactory(1, 10)
                     ),
                     new ImitatingPickerFactory<>(
                         optionValues,
-                        new AlwaysTrueFactory(),
+                        alwaysTrue(),
                         new BestOptionsFromFriendsSupplierFactory<>(
                             5,
                             optionValuesRegister
@@ -313,7 +313,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                         ),
                         Map.of(
                             "homePort", ListFactory.from(benoa, kupang),
-                            "numberOfVesselsToCreate", Factory.of(25, 50)
+                            "numberOfVesselsToCreate", listOf(25, 50)
                         )
                     )
                 ),
