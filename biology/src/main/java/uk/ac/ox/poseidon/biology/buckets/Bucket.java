@@ -114,6 +114,10 @@ public interface Bucket {
 
     Biomass getTotalBiomass();
 
+    default double getTotalBiomassInKg() {
+        return getTotalBiomass().asKg();
+    }
+
     Map<Species, Content> getMap();
 
     default Set<Species> getSpecies() {

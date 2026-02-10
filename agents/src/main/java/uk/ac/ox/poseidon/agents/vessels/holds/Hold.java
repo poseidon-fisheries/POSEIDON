@@ -66,7 +66,7 @@ public interface Hold {
     double getTotalCapacityInKg();
 
     default double getAvailableCapacityInKg() {
-        return getTotalCapacityInKg() - getContent().getTotalBiomass().asKg();
+        return getTotalCapacityInKg() - getContent().getTotalBiomassInKg();
     }
 
 }

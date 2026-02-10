@@ -45,13 +45,13 @@ public class StandardBiomassHold extends BiomassHold {
     @Override
     public void addContent(final CategorisedCatch categorisedCatch) {
         final CategorisedCatch newContent = content.add(categorisedCatch);
-        if (newContent.getTotalBiomass().asKg() <= totalCapacityInKg + toleranceInKg) {
+        if (newContent.getTotalBiomassInKg() <= totalCapacityInKg + toleranceInKg) {
             content = newContent;
         } else {
             throw new IllegalStateException(
                 "Trying to store %f kg in the hold, but only %f kg of capacity available."
                     .formatted(
-                        categorisedCatch.getTotalBiomass().asKg(),
+                        categorisedCatch.getTotalBiomassInKg(),
                         getAvailableCapacityInKg()
                     )
             );

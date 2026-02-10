@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.agents.catches;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.Value;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 import java.util.Map;
@@ -65,12 +64,12 @@ public class CategorisedCatch {
         return buckets.values().stream().allMatch(Bucket::isEmpty);
     }
 
-    public Biomass getTotalBiomass() {
+    public double getTotalBiomassInKg() {
         return buckets
             .values()
             .stream()
-            .map(Bucket::getTotalBiomass)
-            .reduce(Biomass::add)
-            .orElse(Biomass.ZERO);
+            .mapToDouble(Bucket::getTotalBiomassInKg)
+            .sum();
     }
+
 }

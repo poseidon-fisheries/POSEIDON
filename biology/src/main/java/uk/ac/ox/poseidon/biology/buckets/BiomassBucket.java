@@ -274,7 +274,14 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
 
     @Override
     public Biomass getTotalBiomass() {
-        return Biomass.ofKg(Arrays.stream(biomasses).sum());
+        return Biomass.ofKg(getTotalBiomassInKg());
+    }
+
+    @Override
+    public double getTotalBiomassInKg() {
+        double sum = 0.0;
+        for (final double biomass : biomasses) {sum += biomass;}
+        return sum;
     }
 
     @Override
