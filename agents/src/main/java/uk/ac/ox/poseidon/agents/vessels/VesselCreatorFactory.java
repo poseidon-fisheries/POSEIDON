@@ -54,7 +54,7 @@ public class VesselCreatorFactory extends SimulationScopeFactory<VesselCreator> 
     private Factory<? super SimulationScope, ? extends VesselField> vesselField;
     private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
     private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;
-    private Factory<? super SimulationScope, ? extends Supplier<String>> vesselIdSupplierFactory;
+    private Factory<? super SimulationScope, ? extends Supplier<String>> vesselIdSupplier;
 
     private Factory<? super VesselScope, ? extends String> name;
     private Factory<? super VesselScope, ? extends Account> account;
@@ -73,7 +73,7 @@ public class VesselCreatorFactory extends SimulationScopeFactory<VesselCreator> 
             checkNotNull(vesselField).get(scope),
             checkNotNull(portGrid).get(scope),
             checkNotNull(marketGrid).get(scope),
-            checkNotNull(vesselIdSupplierFactory).get(scope),
+            checkNotNull(vesselIdSupplier).get(scope),
             checkNotNull(name),
             checkNotNull(account),
             checkNotNull(homePort),
