@@ -53,7 +53,7 @@ public abstract class DecoratorTaskFactory<T extends Decorator<Vessel>>
     }
 
     @Override
-    protected T newTask(final VesselScope scope) {
+    protected T newInstance(final VesselScope scope) {
         final T task = super.newInstance(scope);
         task.addChild(child.get(scope));
         return task;

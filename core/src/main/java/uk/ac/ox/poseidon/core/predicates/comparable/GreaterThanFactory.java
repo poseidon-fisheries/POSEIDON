@@ -20,26 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.comparable;
 
-public class Factories {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-    private Factories() {
-    }
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class GreaterThanFactory<S extends Scope, T> extends RelativeScopeFactory<S, GreaterThan<T>> {
 
-    public static GreaterThanFactory greaterThan(final double threshold) {
-        return new GreaterThanFactory(threshold);
-    }
+    private Factory<? super S, ? extends T> value;
 
-    public static BelowFactory below(final double threshold) {
-        return new BelowFactory(threshold);
-    }
-
-    public static BetweenFactory between(
-        final double minimum,
-        final double maximum
-    ) {
-        return new BetweenFactory(minimum, maximum);
+    @Override
+    protected GreaterThan<T> newInstance(final S scope) {
+        return new GreaterThan<>(value.get(scope));
     }
 
 }

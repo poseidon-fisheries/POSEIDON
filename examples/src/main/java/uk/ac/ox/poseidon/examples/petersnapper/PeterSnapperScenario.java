@@ -81,20 +81,21 @@ import static uk.ac.ox.poseidon.agents.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.agents.tasks.decorators.Factories.untilFail;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.checkThat;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
-import static uk.ac.ox.poseidon.agents.vessels.adaptors.Factories.availableHoldCapacityInKg;
+import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.availableHoldCapacityInKg;
+import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.currentTripDuration;
 import static uk.ac.ox.poseidon.core.aggregators.Factories.mean;
-import static uk.ac.ox.poseidon.core.predicates.Factories.adaptedPredicate;
+import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
+import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.alwaysTrue;
-import static uk.ac.ox.poseidon.core.predicates.numeric.Factories.above;
+import static uk.ac.ox.poseidon.core.predicates.numeric.Factories.greaterThan;
 import static uk.ac.ox.poseidon.core.quantities.Factories.kilograms;
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOUR_DURATION_SUPPLIER;
 import static uk.ac.ox.poseidon.core.suppliers.Factories.*;
 import static uk.ac.ox.poseidon.core.time.DurationFactory.ONE_DAY;
-import static uk.ac.ox.poseidon.core.time.Factories.hours;
-import static uk.ac.ox.poseidon.core.time.Factories.startOfToday;
+import static uk.ac.ox.poseidon.core.time.Factories.*;
 import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
-import static uk.ac.ox.poseidon.geography.grids.adaptors.Factories.cellValue;
+import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
 import static uk.ac.ox.poseidon.geography.predicates.Factories.inDepthRange;
 import static uk.ac.ox.poseidon.geography.predicates.Factories.isActiveWaterCell;
 import static uk.ac.ox.poseidon.geography.utils.Factories.elevationTable;
@@ -250,9 +251,9 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 EXPLORATION_PROBABILITY,
                 new NeighbourhoodGridExplorerFactory(
                     optionValues,
-                    adaptedPredicate(
+                    condition(
                         cellValue(carryingCapacityGrid),
-                        above(0)
+                        greaterThan(0)
                     ),
                     pathFinder,
                     randomInt(1, 10)
@@ -278,7 +279,12 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                                 new CurrentCellFisheableFactory(biomassGrid),
                                 new ProportionallyLimitingBiomassToHoldFactory()
                             ),
-                            checkThat(availableHoldCapacityInKg(), above(1))
+                            checkThat(
+                                allOf(
+                                    condition(availableHoldCapacityInKg(), greaterThan(1)),
+                                    condition(currentTripDuration(), lessThan(days(10)))
+                                )
+                            )
                         )
                     ),
                     new SetDestinationToOriginFactory(),

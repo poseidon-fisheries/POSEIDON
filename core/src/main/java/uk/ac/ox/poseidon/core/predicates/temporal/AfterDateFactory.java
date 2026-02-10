@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,26 +20,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.temporal;
 
-public class Factories {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-    private Factories() {
-    }
+import java.time.LocalDate;
 
-    public static GreaterThanFactory greaterThan(final double threshold) {
-        return new GreaterThanFactory(threshold);
-    }
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class AfterDateFactory<S extends Scope> extends RelativeScopeFactory<S, AfterDate> {
 
-    public static BelowFactory below(final double threshold) {
-        return new BelowFactory(threshold);
-    }
+    private Factory<? super S, ? extends LocalDate> referenceDate;
 
-    public static BetweenFactory between(
-        final double minimum,
-        final double maximum
-    ) {
-        return new BetweenFactory(minimum, maximum);
+    @Override
+    protected AfterDate newInstance(final S scope) {
+        return new AfterDate(referenceDate.get(scope));
     }
 
 }

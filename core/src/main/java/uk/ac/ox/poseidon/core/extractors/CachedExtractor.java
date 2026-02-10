@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,26 +20,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.numeric;
+package uk.ac.ox.poseidon.core.extractors;
 
-public class Factories {
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
-    private Factories() {
+import java.util.function.Function;
+
+public abstract class CachedExtractor<T, R> implements Function<T, R> {
+
+    private final LoadingCache<T, R> cache =
+        CacheBuilder.newBuilder().build(CacheLoader.from(this::extract));
+
+    protected abstract R extract(T t);
+
+    @Override
+    public R apply(final T t) {
+        return cache.getUnchecked(t);
     }
-
-    public static GreaterThanFactory greaterThan(final double threshold) {
-        return new GreaterThanFactory(threshold);
-    }
-
-    public static BelowFactory below(final double threshold) {
-        return new BelowFactory(threshold);
-    }
-
-    public static BetweenFactory between(
-        final double minimum,
-        final double maximum
-    ) {
-        return new BetweenFactory(minimum, maximum);
-    }
-
 }

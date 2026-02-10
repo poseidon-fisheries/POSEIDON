@@ -20,26 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.comparable;
 
-public class Factories {
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-    private Factories() {
-    }
+import java.util.function.Predicate;
 
-    public static GreaterThanFactory greaterThan(final double threshold) {
-        return new GreaterThanFactory(threshold);
-    }
+@RequiredArgsConstructor
+public class LessThan<T> implements Predicate<Comparable<T>> {
 
-    public static BelowFactory below(final double threshold) {
-        return new BelowFactory(threshold);
-    }
+    private final @NonNull T value;
 
-    public static BetweenFactory between(
-        final double minimum,
-        final double maximum
-    ) {
-        return new BetweenFactory(minimum, maximum);
+    @Override
+    public boolean test(final @NonNull Comparable<T> other) {
+        return other.compareTo(value) < 0;
     }
 
 }

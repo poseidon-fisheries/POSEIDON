@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,26 +20,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.temporal;
 
-public class Factories {
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-    private Factories() {
+import java.time.LocalTime;
+import java.util.function.Predicate;
+
+@Getter
+@RequiredArgsConstructor
+public class AfterTime implements Predicate<LocalTime> {
+
+    private final LocalTime referenceTime;
+
+    @Override
+    public boolean test(final LocalTime localTime) {
+        return localTime.isAfter(referenceTime);
     }
-
-    public static GreaterThanFactory greaterThan(final double threshold) {
-        return new GreaterThanFactory(threshold);
-    }
-
-    public static BelowFactory below(final double threshold) {
-        return new BelowFactory(threshold);
-    }
-
-    public static BetweenFactory between(
-        final double minimum,
-        final double maximum
-    ) {
-        return new BetweenFactory(minimum, maximum);
-    }
-
 }

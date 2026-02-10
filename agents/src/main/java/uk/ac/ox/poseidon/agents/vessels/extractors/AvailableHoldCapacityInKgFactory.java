@@ -20,26 +20,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.numeric;
+package uk.ac.ox.poseidon.agents.vessels.extractors;
 
-public class Factories {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-    private Factories() {
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class AvailableHoldCapacityInKgFactory extends GlobalScopeFactory<AvailableHoldCapacityInKg> {
+    @Override
+    protected AvailableHoldCapacityInKg newInstance(final Scope scope) {
+        return new AvailableHoldCapacityInKg();
     }
-
-    public static GreaterThanFactory greaterThan(final double threshold) {
-        return new GreaterThanFactory(threshold);
-    }
-
-    public static BelowFactory below(final double threshold) {
-        return new BelowFactory(threshold);
-    }
-
-    public static BetweenFactory between(
-        final double minimum,
-        final double maximum
-    ) {
-        return new BetweenFactory(minimum, maximum);
-    }
-
 }

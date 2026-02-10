@@ -29,7 +29,7 @@ components:
           - !!uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory
             bathymetricGrid: *id003
           - !!uk.ac.ox.poseidon.core.predicates.AdaptedPredicateFactory
-            adaptor: !!uk.ac.ox.poseidon.geography.grids.adaptors.CellValueFactory
+            adaptor: !!uk.ac.ox.poseidon.geography.grids.extractors.CellValueFactory
               grid: *id003
             predicate: !!uk.ac.ox.poseidon.core.predicates.numeric.BetweenFactory {
               maximum: -30.0,
@@ -160,7 +160,7 @@ components:
                       optionValuesRegister: *id009
                   explorer: !!uk.ac.ox.poseidon.agents.choices.NeighbourhoodGridExplorerFactory
                     cellPredicate: !!uk.ac.ox.poseidon.core.predicates.AdaptedPredicateFactory
-                      adaptor: !!uk.ac.ox.poseidon.geography.grids.adaptors.CellValueFactory
+                      adaptor: !!uk.ac.ox.poseidon.geography.grids.extractors.CellValueFactory
                         grid: *id004
                       predicate: !!uk.ac.ox.poseidon.core.predicates.numeric.AboveFactory {
                         threshold: 0.0

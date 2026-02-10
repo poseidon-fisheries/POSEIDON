@@ -31,7 +31,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static uk.ac.ox.poseidon.core.predicates.Factories.adaptedPredicate;
+import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
 
 public class Factories {
 
@@ -45,10 +45,10 @@ public class Factories {
     }
 
     public static <T> VesselPredicateTaskFactory checkThat(
-        final Factory<? super VesselScope, ? extends Function<? super Vessel, T>> adaptor,
+        final Factory<? super VesselScope, ? extends Function<? super Vessel, T>> extractor,
         final Factory<? super VesselScope, ? extends Predicate<? super T>> predicate
     ) {
-        return checkThat(adaptedPredicate(adaptor, predicate));
+        return checkThat(condition(extractor, predicate));
     }
 
     public static WaitForFactory waitFor(

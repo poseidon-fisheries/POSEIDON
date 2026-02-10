@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,38 +20,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.predicates;
+package uk.ac.ox.poseidon.geography.bathymetry.extractors;
 
-import sim.util.Int2D;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
-import java.util.function.Predicate;
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class CellDistanceToCoastFactory<S extends Scope>
+    extends RelativeScopeFactory<S, CellDistanceToCoast> {
 
-import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
-import static uk.ac.ox.poseidon.core.predicates.numeric.Factories.between;
-import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
+    private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? super S, ? extends DistanceCalculator> distanceCalculator;
 
-public class Factories {
-    private Factories() {
-    }
-
-    public static <S extends Scope> IsActiveWaterCellFactory<S> isActiveWaterCell(
-        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid
-    ) {
-        return new IsActiveWaterCellFactory<>(bathymetricGrid);
-    }
-
-    public static <S extends Scope> Factory<S, ? extends Predicate<Int2D>> inDepthRange(
-        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
-        final double minimumDepth,
-        final double maximumDepth
-    ) {
-        return condition(
-            cellValue(bathymetricGrid),
-            between(-maximumDepth, -minimumDepth)
+    @Override
+    protected CellDistanceToCoast newInstance(final S scope) {
+        return new CellDistanceToCoast(
+            bathymetricGrid.get(scope),
+            distanceCalculator.get(scope)
         );
     }
-
 }

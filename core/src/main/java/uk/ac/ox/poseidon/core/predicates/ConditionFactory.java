@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,33 +20,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.temporal;
+package uk.ac.ox.poseidon.core.predicates;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
-public class Factories {
-    private Factories() {}
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class ConditionFactory<S extends Scope, T, U>
+    extends RelativeScopeFactory<S, Condition<T, U>> {
 
-    public static <S extends Scope> AfterTimeFactory<S> afterTime(
-        final Factory<? super S, ? extends LocalTime> referenceTime
-    ) {
-        return new AfterTimeFactory<>(referenceTime);
-    }
+    private Factory<? super S, ? extends Function<? super T, U>> extractor;
+    private Factory<? super S, ? extends Predicate<? super U>> predicate;
 
-    public static <S extends Scope> AfterDateFactory<S> afterDate(
-        final Factory<? super S, ? extends LocalDate> referenceDate
-    ) {
-        return new AfterDateFactory<>(referenceDate);
-    }
-
-    public static <S extends Scope> AfterDateTimeFactory<S> afterDateTime(
-        final Factory<? super S, ? extends LocalDateTime> referenceDateTime
-    ) {
-        return new AfterDateTimeFactory<>(referenceDateTime);
+    @Override
+    protected Condition<T, U> newInstance(final S scope) {
+        return new Condition<>(
+            extractor.get(scope),
+            predicate.get(scope)
+        );
     }
 }

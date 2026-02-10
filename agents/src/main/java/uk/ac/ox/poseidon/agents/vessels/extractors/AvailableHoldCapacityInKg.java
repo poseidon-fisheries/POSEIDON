@@ -20,26 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.numeric;
+package uk.ac.ox.poseidon.agents.vessels.extractors;
 
-public class Factories {
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-    private Factories() {
+import java.util.function.Function;
+
+public class AvailableHoldCapacityInKg implements Function<Vessel, Double> {
+    @Override
+    public Double apply(final Vessel vessel) {
+        return vessel.getHold().getAvailableCapacityInKg();
     }
-
-    public static GreaterThanFactory greaterThan(final double threshold) {
-        return new GreaterThanFactory(threshold);
-    }
-
-    public static BelowFactory below(final double threshold) {
-        return new BelowFactory(threshold);
-    }
-
-    public static BetweenFactory between(
-        final double minimum,
-        final double maximum
-    ) {
-        return new BetweenFactory(minimum, maximum);
-    }
-
 }

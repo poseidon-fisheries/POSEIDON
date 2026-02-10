@@ -33,11 +33,11 @@ public class Factories {
 
     private Factories() {}
 
-    public static <S extends Scope, T, U> AdaptedPredicateFactory<S, T, U> adaptedPredicate(
-        final Factory<? super S, ? extends Function<? super T, U>> adaptor,
+    public static <S extends Scope, T, U> ConditionFactory<S, T, U> condition(
+        final Factory<? super S, ? extends Function<? super T, U>> extractor,
         final Factory<? super S, ? extends Predicate<? super U>> predicate
     ) {
-        return new AdaptedPredicateFactory<>(adaptor, predicate);
+        return new ConditionFactory<>(extractor, predicate);
     }
 
     public static <S extends Scope, T> InSetFactory<S, T> in(

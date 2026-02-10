@@ -20,26 +20,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.numeric;
+package uk.ac.ox.poseidon.agents.vessels.extractors;
 
 public class Factories {
 
-    private Factories() {
+    private Factories() {}
+
+    public static AvailableHoldCapacityInKgFactory availableHoldCapacityInKg() {
+        return new AvailableHoldCapacityInKgFactory();
     }
 
-    public static GreaterThanFactory greaterThan(final double threshold) {
-        return new GreaterThanFactory(threshold);
-    }
-
-    public static BelowFactory below(final double threshold) {
-        return new BelowFactory(threshold);
-    }
-
-    public static BetweenFactory between(
-        final double minimum,
-        final double maximum
-    ) {
-        return new BetweenFactory(minimum, maximum);
+    public static CurrentTripDurationFactory currentTripDuration() {
+        return new CurrentTripDurationFactory();
     }
 
 }

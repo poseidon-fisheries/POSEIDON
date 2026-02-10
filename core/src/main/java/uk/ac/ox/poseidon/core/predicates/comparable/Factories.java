@@ -20,38 +20,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.predicates;
+package uk.ac.ox.poseidon.core.predicates.comparable;
 
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-
-import java.util.function.Predicate;
-
-import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
-import static uk.ac.ox.poseidon.core.predicates.numeric.Factories.between;
-import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
 
 public class Factories {
-    private Factories() {
-    }
+    private Factories() {}
 
-    public static <S extends Scope> IsActiveWaterCellFactory<S> isActiveWaterCell(
-        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid
+    public static <S extends Scope, T> LessThanFactory<S, T> lessThan(
+        final Factory<? super S, ? extends T> value
     ) {
-        return new IsActiveWaterCellFactory<>(bathymetricGrid);
+        return new LessThanFactory<>(value);
     }
 
-    public static <S extends Scope> Factory<S, ? extends Predicate<Int2D>> inDepthRange(
-        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
-        final double minimumDepth,
-        final double maximumDepth
+    public static <S extends Scope, T> GreaterThanFactory<S, T> greaterThan(
+        final Factory<? super S, ? extends T> value
     ) {
-        return condition(
-            cellValue(bathymetricGrid),
-            between(-maximumDepth, -minimumDepth)
-        );
+        return new GreaterThanFactory<>(value);
     }
-
+    
 }

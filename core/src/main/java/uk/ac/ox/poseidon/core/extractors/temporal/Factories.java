@@ -20,26 +20,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.numeric;
+package uk.ac.ox.poseidon.core.extractors.temporal;
 
 public class Factories {
+    private Factories() {}
 
-    private Factories() {
+    public static CurrentDayOfWeekFactory currentDayOfWeek() {
+        return new CurrentDayOfWeekFactory();
     }
 
-    public static GreaterThanFactory greaterThan(final double threshold) {
-        return new GreaterThanFactory(threshold);
+    public static CurrentTimeFactory currentTime() {
+        return new CurrentTimeFactory();
     }
-
-    public static BelowFactory below(final double threshold) {
-        return new BelowFactory(threshold);
-    }
-
-    public static BetweenFactory between(
-        final double minimum,
-        final double maximum
-    ) {
-        return new BetweenFactory(minimum, maximum);
-    }
-
+    
 }
