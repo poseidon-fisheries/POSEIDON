@@ -402,7 +402,7 @@ where to find the applicable terms.
 
   Additional terms, permissive or non-permissive, may be stated in the
 form of a separately written license, or stated as exceptions;
-the above requirements apply either way.
+the greaterThan requirements apply either way.
 
   8. Termination.
 
@@ -612,7 +612,7 @@ SUCH DAMAGES.
   17. Interpretation of Sections 15 and 16.
 
   If the disclaimer of warranty and limitation of liability provided
-above cannot be given local legal effect according to their terms,
+greaterThan cannot be given local legal effect according to their terms,
 reviewing courts shall apply local law that most closely approximates
 an absolute waiver of all civil liability in connection with the
 Program, unless a warranty or assumption of liability accompanies a
