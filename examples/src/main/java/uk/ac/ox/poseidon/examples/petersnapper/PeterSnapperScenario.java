@@ -47,7 +47,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory;
 import uk.ac.ox.poseidon.agents.vessels.accounts.AccountFactory;
 import uk.ac.ox.poseidon.agents.vessels.engines.SimpleEngineFactory;
 import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
-import uk.ac.ox.poseidon.agents.vessels.holds.InfiniteBiomassHoldFactory;
+import uk.ac.ox.poseidon.agents.vessels.holds.StandardBiomassHoldFactory;
 import uk.ac.ox.poseidon.biology.allocators.ProportionOfCarryingCapacityAllocatorFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
@@ -55,8 +55,6 @@ import uk.ac.ox.poseidon.core.MappedFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
-import uk.ac.ox.poseidon.core.schedule.ScheduledOnceFactory;
-import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.utils.ListFactory;
 import uk.ac.ox.poseidon.core.utils.PairFactory;
@@ -73,10 +71,12 @@ import uk.ac.ox.poseidon.geography.ports.PortFactory;
 import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
 
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.time.Period;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.agents.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.agents.tasks.decorators.Factories.untilFail;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.checkThat;
@@ -90,9 +90,10 @@ import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.alwaysTrue;
 import static uk.ac.ox.poseidon.core.predicates.numeric.Factories.greaterThan;
 import static uk.ac.ox.poseidon.core.quantities.Factories.kilograms;
-import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOUR_DURATION_SUPPLIER;
+import static uk.ac.ox.poseidon.core.quantities.Factories.massOf;
+import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledOnceAtStart;
+import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledRepeating;
 import static uk.ac.ox.poseidon.core.suppliers.Factories.*;
-import static uk.ac.ox.poseidon.core.time.DurationFactory.ONE_DAY;
 import static uk.ac.ox.poseidon.core.time.Factories.*;
 import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
 import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
@@ -124,7 +125,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final Scenario.ScenarioBuilder builder = Scenario.builder();
 
         final var inputPath = path(INPUT_PATH);
-        final var startingDateTime = startOfToday();
+        final var startingDateTime = startOf(LocalDate.of(2026, 1, 1));
         final var elevationTable =
             elevationTable(
                 csvTableFromFile(inputPath.plus("elevations.csv")),
@@ -170,24 +171,30 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 )
             );
 
-        final var biologicalProcesses =
-            new ScheduledRepeatingFactory<>(
-                startingDateTime,
-                ONE_DAY,
-                new SteppableSequenceFactory(
-                    new BiomassDiffuserFactory(
-                        biomassGrid,
-                        carryingCapacityGrid,
-                        new SmoothBiomassDiffusionRuleFactory(
-                            0.001,
-                            0.01
-                        )
-                    ),
-                    new BiomassGrowerFactory(
-                        biomassGrid,
-                        carryingCapacityGrid,
-                        new LogisticGrowthRuleFactory(0.372)
+        final var biomassDiffuser =
+            scheduledRepeating(
+                dateTimeAfterStarting(ONE_DAY_PERIOD),
+                DAILY,
+                new BiomassDiffuserFactory(
+                    biomassGrid,
+                    carryingCapacityGrid,
+                    new SmoothBiomassDiffusionRuleFactory(
+                        0.001,
+                        0.01
                     )
+                ),
+                0
+            );
+
+        final var biomassGrower =
+            scheduledRepeating(
+                dateTimeAfterStarting(ONE_YEAR_PERIOD),
+                YEARLY,
+                // TODO: this needs to be a common logistic grower
+                new IndependentBiomassGrowerFactory(
+                    biomassGrid,
+                    carryingCapacityGrid,
+                    new LogisticGrowthRuleFactory(0.372)
                 ),
                 0
             );
@@ -234,7 +241,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             new FixedBiomassProportionGearFactory<>(
                 "FGL", // droplines count as "fixed gears and lines"
                 0.25,
-                ONE_HOUR_DURATION_SUPPLIER
+                always(ONE_HOUR)
             );
 
         final var optionValuesRegister =
@@ -289,15 +296,14 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     ),
                     new SetDestinationToOriginFactory(),
                     new TravelAlongPathFactory(pathFinder, distance),
-                    new LandCatchesFactory(ONE_HOUR_DURATION_SUPPLIER),
+                    new LandCatchesFactory(always(ONE_HOUR)),
                     new EndTripFactory(),
-                    waitFor(constant(hours(12)))
+                    waitFor(always(hours(12)))
                 )
             );
 
         final var agentCreators =
-            new ScheduledOnceFactory<>(
-                startingDateTime,
+            scheduledOnceAtStart(
                 new SteppableSequenceFactory(
                     new MappedFactory<>(
                         new VesselCreatorFactory(
@@ -308,7 +314,9 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             new PrefixedIdFactory("Vessel "),
                             new AccountFactory(),
                             null, // mapped over
-                            new InfiniteBiomassHoldFactory(
+                            new StandardBiomassHoldFactory(
+                                massOf(15_000, KILOGRAM),
+                                massOf(1, KILOGRAM),
                                 new UniformCatchCategoriserFactory<>(catchCategory)
                             ),
                             gear,
@@ -331,7 +339,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             .component("bathymetricGrid", bathymetricGrid)
             .component("carryingCapacityGrid", carryingCapacityGrid)
             .component("biomassGrid", biomassGrid)
-            .component("biologicalProcesses", biologicalProcesses)
+            .component("biomassDiffuser", biomassDiffuser)
+            .component("biomassGrower", biomassGrower)
             .component("portGrid", portGrid)
             .component("marketGrid", marketGrid)
             .component("vesselField", vesselField)
