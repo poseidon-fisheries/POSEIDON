@@ -31,6 +31,7 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static uk.ac.ox.poseidon.io.paths.Factories.path;
 
 @SuppressFBWarnings("DMI")
 class PathFactoryTest {
@@ -40,19 +41,19 @@ class PathFactoryTest {
 
     @Test
     void newInstanceSimpleFile() {
-        final PathFactory<Scope> pathFactory = PathFactory.of(FILENAME);
+        final PathFactory<Scope> pathFactory = path(FILENAME);
         assertEquals(Path.of(FILENAME), pathFactory.get(mock(Scope.class)));
     }
 
     @Test
     void newInstanceFileInFolder() {
-        final PathFactory<Scope> pathFactory = PathFactory.of(FOLDERS + FILENAME);
+        final PathFactory<Scope> pathFactory = path(FOLDERS + FILENAME);
         assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(mock(Scope.class)));
     }
 
     @Test
     void newInstanceWithParent() {
-        final PathFactory<Scope> pathFactory = PathFactory.of(FOLDERS).plus(FILENAME);
+        final PathFactory<Scope> pathFactory = path(FOLDERS).plus(FILENAME);
         assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(mock(Scope.class)));
     }
 

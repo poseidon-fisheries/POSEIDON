@@ -58,8 +58,6 @@ import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledOnceFactory;
 import uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
-import uk.ac.ox.poseidon.core.suppliers.RandomIntSupplierFactory;
-import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 import uk.ac.ox.poseidon.core.utils.ListFactory;
 import uk.ac.ox.poseidon.core.utils.PairFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
@@ -73,9 +71,6 @@ import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactor
 import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
 import uk.ac.ox.poseidon.geography.ports.PortFactory;
 import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
-import uk.ac.ox.poseidon.geography.utils.ElevationTableFactory;
-import uk.ac.ox.poseidon.io.paths.PathFactory;
-import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
 
 import java.nio.file.Path;
 import java.time.Period;
@@ -94,10 +89,14 @@ import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_HOU
 import static uk.ac.ox.poseidon.core.suppliers.Factories.*;
 import static uk.ac.ox.poseidon.core.time.DurationFactory.ONE_DAY;
 import static uk.ac.ox.poseidon.core.time.Factories.hours;
+import static uk.ac.ox.poseidon.core.time.Factories.startOfToday;
 import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
 import static uk.ac.ox.poseidon.geography.grids.adaptors.Factories.cellValue;
 import static uk.ac.ox.poseidon.geography.predicates.Factories.inDepthRange;
 import static uk.ac.ox.poseidon.geography.predicates.Factories.isActiveWaterCell;
+import static uk.ac.ox.poseidon.geography.utils.Factories.elevationTable;
+import static uk.ac.ox.poseidon.io.paths.Factories.path;
+import static uk.ac.ox.poseidon.io.tables.Factories.csvTableFromFile;
 
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
@@ -120,11 +119,11 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     public Scenario get() {
         final Scenario.ScenarioBuilder builder = Scenario.builder();
 
-        final var inputPath = PathFactory.of(INPUT_PATH);
-        final var startingDateTime = DateTimeFactory.ofToday();
+        final var inputPath = path(INPUT_PATH);
+        final var startingDateTime = startOfToday();
         final var elevationTable =
-            new ElevationTableFactory<>(
-                CsvTableFactory.fromFile(inputPath.plus("elevations.csv")),
+            elevationTable(
+                csvTableFromFile(inputPath.plus("elevations.csv")),
                 "lon",
                 "lat",
                 "elevation"
@@ -243,26 +242,24 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 optionValuesRegister
             );
 
-        final var startTrip =
-            new StartTripFactory(
-                new EpsilonGreedyDestinationSupplierFactory(
-                    EXPLORATION_PROBABILITY,
-                    new NeighbourhoodGridExplorerFactory(
-                        optionValues,
-                        adaptedPredicate(
-                            cellValue(carryingCapacityGrid),
-                            above(0)
-                        ),
-                        pathFinder,
-                        new RandomIntSupplierFactory(1, 10)
+        final EpsilonGreedyDestinationSupplierFactory destinationSupplier =
+            new EpsilonGreedyDestinationSupplierFactory(
+                EXPLORATION_PROBABILITY,
+                new NeighbourhoodGridExplorerFactory(
+                    optionValues,
+                    adaptedPredicate(
+                        cellValue(carryingCapacityGrid),
+                        above(0)
                     ),
-                    new ImitatingPickerFactory<>(
-                        optionValues,
-                        alwaysTrue(),
-                        new BestOptionsFromFriendsSupplierFactory<>(
-                            5,
-                            optionValuesRegister
-                        )
+                    pathFinder,
+                    randomInt(1, 10)
+                ),
+                new ImitatingPickerFactory<>(
+                    optionValues,
+                    alwaysTrue(),
+                    new BestOptionsFromFriendsSupplierFactory<>(
+                        5,
+                        optionValuesRegister
                     )
                 )
             );
@@ -270,7 +267,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final var behaviour =
             new BehaviourFactory(
                 sequenceTask(
-                    startTrip,
+                    new StartTripFactory(destinationSupplier),
                     new TravelAlongPathFactory(pathFinder, distance),
                     new FishingFactory(
                         new CurrentCellFisheableFactory(biomassGrid),

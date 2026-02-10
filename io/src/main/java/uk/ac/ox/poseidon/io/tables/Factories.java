@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,35 +22,38 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import tech.tablesaw.api.Table;
-import tech.tablesaw.io.csv.CsvReadOptions;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.io.sources.DataSource;
+import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
+import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
 
-import java.io.Reader;
+import java.nio.file.Path;
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class CsvTableFactory<S extends Scope> extends RelativeScopeFactory<S, Table> {
+import static uk.ac.ox.poseidon.io.paths.Factories.path;
 
-    private Factory<? super S, ? extends DataSource> dataSource;
+public class Factories {
 
-    @Override
-    protected Table newInstance(final S scope) {
-        final Reader reader = dataSource.get(scope).getReader();
-        return Table
-            .read()
-            .usingOptions(CsvReadOptions.builder(reader).sample(false));
+    private Factories() {
     }
 
+    public static CsvTableFactory<Scope> csvTableFromString(final String data) {
+        return new CsvTableFactory<>(new StringDataSourceFactory(data));
+    }
+
+    public static <S extends Scope> CsvTableFactory<S> csvTableFromFile(
+        final Factory<S, ? extends Path> pathFactory
+    ) {
+        return new CsvTableFactory<>(new FileDataSourceFactory<>(pathFactory));
+    }
+
+    public static CsvTableFactory<Scope> csvTableFromFile(
+        final String first,
+        final String... more
+    ) {
+        return csvTableFromFile(path(first, more));
+    }
+
+    public static CsvTableFactory<Scope> csvTableFromFile(final Path path) {
+        return csvTableFromFile(path(path));
+    }
 }

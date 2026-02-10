@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,26 +22,20 @@
 
 package uk.ac.ox.poseidon.io.paths;
 
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 import java.nio.file.Path;
 
-public interface PathFactory<S extends Scope> extends Factory<S, Path> {
+import static uk.ac.ox.poseidon.io.paths.PathFactory.pathToString;
 
-    static String pathToString(final Path path) {
-        return path.toString().replace("\\", "/");
+public class Factories {
+
+    public static RootPathFactory path(final Path path) {
+        return new RootPathFactory(pathToString(path));
     }
 
-    default RelativePathFactory<S> plus(final Path path) {
-        return new RelativePathFactory<>(this, pathToString(path));
-    }
-
-    default RelativePathFactory<S> plus(
+    public static RootPathFactory path(
         final String first,
         final String... more
     ) {
-        return plus(Path.of(first, more));
+        return path(Path.of(first, more));
     }
-
 }

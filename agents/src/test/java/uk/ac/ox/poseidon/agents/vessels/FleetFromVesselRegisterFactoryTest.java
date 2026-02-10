@@ -36,7 +36,6 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
-import uk.ac.ox.poseidon.io.tables.CsvTableFactory;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -47,6 +46,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.core.suppliers.ConstantDurationSuppliers.ONE_DAY_DURATION_SUPPLIER;
+import static uk.ac.ox.poseidon.io.tables.Factories.csvTableFromString;
 
 class FleetFromVesselRegisterFactoryTest {
 
@@ -94,7 +94,7 @@ class FleetFromVesselRegisterFactoryTest {
                             new ObjectFactory<>(portGrid),
                             new ObjectFactory<>(marketGrid)
                         ))
-                        .data(CsvTableFactory.fromString(initialData + extraData))
+                        .data(csvTableFromString(initialData + extraData))
                         .hold(new ObjectFactory<>(h1))
                         .gear(
                             VesselScopeFactoriesByCode.<Gear>builder()

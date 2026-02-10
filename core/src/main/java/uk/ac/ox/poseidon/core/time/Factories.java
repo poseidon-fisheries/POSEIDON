@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public class Factories {
 
     public static DurationFactory duration(
@@ -51,6 +54,29 @@ public class Factories {
 
     public static DurationFactory seconds(final long seconds) {
         return new DurationFactory(0, 0, 0, seconds);
+    }
+
+    public static DateTimeFactory startOfToday() {
+        return startOf(LocalDate.now());
+    }
+
+    public static DateTimeFactory now() {
+        return dateTime(LocalDateTime.now());
+    }
+
+    public static DateTimeFactory startOf(final LocalDate date) {
+        return dateTime(date.atStartOfDay());
+    }
+
+    public static DateTimeFactory dateTime(final LocalDateTime dateTime) {
+        return new DateTimeFactory(
+            dateTime.getYear(),
+            dateTime.getMonthValue(),
+            dateTime.getDayOfMonth(),
+            dateTime.getHour(),
+            dateTime.getMinute(),
+            dateTime.getSecond()
+        );
     }
 
 }

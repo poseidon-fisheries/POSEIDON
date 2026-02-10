@@ -59,6 +59,13 @@ public final class Factories {
         return new RandomDoubleSupplierFactory(minimum, maximum);
     }
 
+    public static RandomIntSupplierFactory randomInt(
+        final int minimum,
+        final int maximum
+    ) {
+        return new RandomIntSupplierFactory(minimum, maximum);
+    }
+
     public static <S extends Scope, T> ConstantSupplierFactory<S, T> constantObject(final T value) {
         return new ConstantSupplierFactory<>(object(value));
     }

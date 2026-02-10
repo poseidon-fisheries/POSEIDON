@@ -26,7 +26,6 @@ import lombok.*;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +33,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
+import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 
 @Getter
 @Setter
@@ -50,7 +50,7 @@ public final class Scenario {
         final LocalDateTime startingDateTime,
         final Map<String, ? extends Factory<? super SimulationScope, ?>> components
     ) {
-        this(DateTimeFactory.of(startingDateTime), components);
+        this(dateTime(startingDateTime), components);
     }
 
     public Scenario(

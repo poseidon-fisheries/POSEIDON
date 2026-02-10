@@ -48,27 +48,4 @@ public class DateTimeFactory extends GlobalScopeFactory<LocalDateTime> {
         return LocalDateTime.of(year, month, day, hour, minute, second);
     }
 
-    public static DateTimeFactory ofToday() {
-        return of(LocalDate.now());
-    }
-
-    public static DateTimeFactory ofNow() {
-        return of(LocalDateTime.now());
-    }
-
-    public static DateTimeFactory of(final LocalDate date) {
-        return of(date.atStartOfDay());
-    }
-
-    public static DateTimeFactory of(final LocalDateTime dateTime) {
-        return new DateTimeFactory(
-            dateTime.getYear(),
-            dateTime.getMonthValue(),
-            dateTime.getDayOfMonth(),
-            dateTime.getHour(),
-            dateTime.getMinute(),
-            dateTime.getSecond()
-        );
-    }
-
 }
