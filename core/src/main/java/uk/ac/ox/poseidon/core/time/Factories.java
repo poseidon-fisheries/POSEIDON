@@ -22,10 +22,29 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.TemporalAmount;
 
 public class Factories {
+
+    public static final DurationFactory ONE_DAY = days(1);
+    public static final DurationFactory ONE_HOUR = hours(1);
+    public static final DurationFactory ONE_MINUTE = minutes(1);
+    public static final DurationFactory ONE_SECOND = seconds(1);
+
+    public static final PeriodFactory ONE_DAY_PERIOD = new PeriodFactory(Period.ofDays(1));
+    public static final PeriodFactory ONE_MONTH_PERIOD = new PeriodFactory(Period.ofMonths(1));
+    public static final PeriodFactory ONE_YEAR_PERIOD = new PeriodFactory(Period.ofYears(1));
+
+    public static final PeriodFactory DAILY = ONE_DAY_PERIOD;
+    public static final PeriodFactory MONTHLY = ONE_MONTH_PERIOD;
+    public static final PeriodFactory YEARLY = ONE_YEAR_PERIOD;
 
     public static DurationFactory duration(
         final long days,
@@ -54,6 +73,14 @@ public class Factories {
 
     public static DurationFactory seconds(final long seconds) {
         return new DurationFactory(0, 0, 0, seconds);
+    }
+
+    public static PeriodFactory period(final String iso8601Period) {
+        return new PeriodFactory(iso8601Period);
+    }
+
+    public static PeriodFactory period(final Period period) {
+        return new PeriodFactory(period);
     }
 
     public static DateTimeFactory startOfToday() {
@@ -85,6 +112,26 @@ public class Factories {
         final int second
     ) {
         return new TimeFactory(hour, minute, second);
+    }
+
+    public static <S extends Scope> DateTimeBeforeFactory<S> dateTimeBefore(
+        final Factory<? super S, ? extends LocalDateTime> referenceDateTime,
+        final Factory<? super S, ? extends TemporalAmount> temporalAmount
+    ) {
+        return new DateTimeBeforeFactory<>(referenceDateTime, temporalAmount);
+    }
+
+    public static <S extends Scope> DateTimeAfterFactory<S> dateTimeAfter(
+        final Factory<? super S, ? extends LocalDateTime> referenceDateTime,
+        final Factory<? super S, ? extends TemporalAmount> amountToAdd
+    ) {
+        return new DateTimeAfterFactory<>(referenceDateTime, amountToAdd);
+    }
+
+    public static DateTimeAfterStartingFactory dateTimeAfterStarting(
+        final Factory<? super SimulationScope, ? extends TemporalAmount> amountToAdd
+    ) {
+        return new DateTimeAfterStartingFactory(amountToAdd);
     }
 
 }

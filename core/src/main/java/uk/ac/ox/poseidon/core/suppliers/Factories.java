@@ -66,11 +66,7 @@ public final class Factories {
         return new RandomIntSupplierFactory(minimum, maximum);
     }
 
-    public static <S extends Scope, T> ConstantSupplierFactory<S, T> constantObject(final T value) {
-        return new ConstantSupplierFactory<>(object(value));
-    }
-
-    public static <S extends Scope, T> ConstantSupplierFactory<S, T> constant(
+    public static <S extends Scope, T> ConstantSupplierFactory<S, T> always(
         final Factory<? super S, ? extends T> value
     ) {
         return new ConstantSupplierFactory<>(value);

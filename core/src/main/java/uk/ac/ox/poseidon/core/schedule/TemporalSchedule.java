@@ -49,6 +49,7 @@ public class TemporalSchedule extends Schedule {
 
     public static final String BEFORE_SIMULATION_STRING = "At Start";
     public static final String AFTER_SIMULATION_STRING = "At End";
+    public static final int DEFAULT_ORDERING = 0;
     private static final System.Logger logger = System.getLogger(TemporalSchedule.class.getName());
     @Serial private static final long serialVersionUID = 4197200009803943439L;
 
@@ -91,7 +92,7 @@ public class TemporalSchedule extends Schedule {
         return scheduleOnceIn(delta.getSeconds(), event);
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "UnusedReturnValue"})
     public boolean scheduleOnceIn(
         final Duration delta,
         final Steppable event,
@@ -100,7 +101,7 @@ public class TemporalSchedule extends Schedule {
         return scheduleOnceIn(delta.getSeconds(), event, ordering);
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "UnusedReturnValue"})
     public boolean scheduleOnce(
         final Temporal dateTime,
         final Steppable event

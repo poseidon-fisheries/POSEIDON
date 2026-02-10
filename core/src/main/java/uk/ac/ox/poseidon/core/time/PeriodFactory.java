@@ -22,12 +22,14 @@
 
 package uk.ac.ox.poseidon.core.time;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.time.LocalDate;
 import java.time.Period;
 
 @Data
@@ -37,23 +39,22 @@ import java.time.Period;
 @EqualsAndHashCode(callSuper = true)
 public class PeriodFactory extends GlobalScopeFactory<Period> {
 
-    public static final PeriodFactory DAILY = new PeriodFactory("P1D");
-    public static final PeriodFactory MONTHLY = new PeriodFactory("P1M");
-    public static final PeriodFactory YEARLY = new PeriodFactory("P1Y");
+    private int years;
+    private int months;
+    private int days;
 
-    @Builder.Default private int year = LocalDate.now().getYear();
-    @Builder.Default private int month = LocalDate.now().getMonthValue();
-    @Builder.Default private int day = LocalDate.now().getDayOfMonth();
+    public PeriodFactory(final Period period) {
+        this.years = period.getYears();
+        this.months = period.getMonths();
+        this.days = period.getDays();
+    }
 
     public PeriodFactory(final String iso8601Period) {
-        final Period period = Period.parse(iso8601Period);
-        this.year = period.getYears();
-        this.month = period.getMonths();
-        this.day = period.getDays();
+        this(Period.parse(iso8601Period));
     }
 
     @Override
     protected Period newInstance(final Scope scope) {
-        return Period.of(year, month, day);
+        return Period.of(years, months, days);
     }
 }

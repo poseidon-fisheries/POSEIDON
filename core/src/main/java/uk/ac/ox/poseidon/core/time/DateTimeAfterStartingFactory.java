@@ -41,7 +41,7 @@ import java.time.temporal.TemporalAmount;
 @EqualsAndHashCode(callSuper = true)
 public class DateTimeAfterStartingFactory extends SimulationScopeFactory<LocalDateTime> {
 
-    Factory<? super SimulationScope, ? extends TemporalAmount> offset;
+    Factory<? super SimulationScope, ? extends TemporalAmount> amountToAdd;
 
     @Override
     protected LocalDateTime newInstance(final SimulationScope scope) {
@@ -49,6 +49,6 @@ public class DateTimeAfterStartingFactory extends SimulationScopeFactory<LocalDa
             .getSimulation()
             .getTemporalSchedule()
             .getStartingDateTime()
-            .plus(offset.get(scope));
+            .plus(amountToAdd.get(scope));
     }
 }

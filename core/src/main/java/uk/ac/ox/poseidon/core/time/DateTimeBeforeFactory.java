@@ -39,17 +39,17 @@ import java.time.temporal.TemporalAmount;
 public class DateTimeBeforeFactory<S extends Scope> extends RelativeDateTimeFactory<S> {
 
     public DateTimeBeforeFactory(
-        final Factory<? super S, ? extends LocalDateTime> referenceDateTimeFactory,
-        final Factory<? super S, ? extends TemporalAmount> temporalAmountFactory
+        final Factory<? super S, ? extends LocalDateTime> referenceDateTime,
+        final Factory<? super S, ? extends TemporalAmount> amountToSubtract
     ) {
-        super(referenceDateTimeFactory, temporalAmountFactory);
+        super(referenceDateTime, amountToSubtract);
     }
 
     @Override
     protected LocalDateTime operation(
         final LocalDateTime referenceDateTime,
-        final TemporalAmount temporalAmount
+        final TemporalAmount amountToSubtract
     ) {
-        return referenceDateTime.minus(temporalAmount);
+        return referenceDateTime.minus(amountToSubtract);
     }
 }

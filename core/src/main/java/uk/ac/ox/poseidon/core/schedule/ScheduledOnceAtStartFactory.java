@@ -20,36 +20,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.time;
+package uk.ac.ox.poseidon.core.schedule;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import java.time.LocalDateTime;
-import java.time.temporal.TemporalAmount;
+import static sim.engine.Schedule.EPOCH;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DateTimeAfterFactory<S extends Scope> extends RelativeDateTimeFactory<S> {
+public class ScheduledOnceAtStartFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
-    public DateTimeAfterFactory(
-        final Factory<? super S, ? extends LocalDateTime> referenceDateTime,
-        final Factory<? super S, ? extends TemporalAmount> amountToAdd
-    ) {
-        super(referenceDateTime, amountToAdd);
-    }
+    private Factory<? super SimulationScope, ? extends C> steppable;
+    private int ordering;
 
     @Override
-    protected LocalDateTime operation(
-        final LocalDateTime referenceDateTime,
-        final TemporalAmount amountToAdd
-    ) {
-        return referenceDateTime.plus(amountToAdd);
+    protected C newInstance(final SimulationScope scope) {
+        final C steppableObject = steppable.get(scope);
+        scope
+            .getSimulation()
+            .getTemporalSchedule()
+            .scheduleOnce(EPOCH, ordering, steppableObject);
+        return steppableObject;
     }
 }
