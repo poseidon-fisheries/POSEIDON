@@ -79,4 +79,12 @@ public class Factories {
         );
     }
 
+    public static TimeFactory time(
+        final int hour,
+        final int minute,
+        final int second
+    ) {
+        return new TimeFactory(hour, minute, second);
+    }
+
 }

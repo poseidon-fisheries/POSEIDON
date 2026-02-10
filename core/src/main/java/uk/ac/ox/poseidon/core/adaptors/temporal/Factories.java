@@ -23,4 +23,14 @@
 package uk.ac.ox.poseidon.core.adaptors.temporal;
 
 public class Factories {
+    private Factories() {}
+
+    public static CurrentDayOfWeekFactory currentDayOfWeek() {
+        return new CurrentDayOfWeekFactory();
+    }
+
+    public static CurrentTimeFactory currentTime() {
+        return new CurrentTimeFactory();
+    }
+    
 }

@@ -20,31 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.general;
+package uk.ac.ox.poseidon.core.predicates.temporal;
 
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.time.Duration;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.time.LocalTime;
 
 public class Factories {
+    private Factories() {}
 
-    private Factories() {
-    }
-
-    public static VesselPredicateTaskFactory vesselPredicate(
-        final Factory<? super VesselScope, ? extends Predicate<Vessel>> predicate
+    public static <S extends Scope> TimeIsAfterFactory<S> timeIsAfter(
+        final Factory<? super S, ? extends LocalTime> referenceTime
     ) {
-        return new VesselPredicateTaskFactory(predicate);
+        return new TimeIsAfterFactory<>(referenceTime);
     }
-
-    public static WaitForFactory waitFor(
-        final Factory<? super VesselScope, ? extends Supplier<Duration>> durationSupplier
-    ) {
-        return new WaitForFactory(durationSupplier);
-    }
-
 }
