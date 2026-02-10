@@ -22,32 +22,34 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import lombok.NonNull;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 
+import java.io.Serial;
+
+/**
+ * A biomass grower that operates on each cell independently.
+ */
 @Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class BiomassGrowerFactory extends SimulationScopeFactory<BiomassGrower> {
+public class IndependentBiomassGrower implements Steppable {
 
-    private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;
-    private Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid;
-    private Factory<? super SimulationScope, ? extends BiomassGrowthRule> biomassGrowthRule;
+    @Serial private static final long serialVersionUID = -7273150961650782548L;
+    @NonNull private final BiomassGrid biomassGrid;
+    @NonNull private final CarryingCapacityGrid carryingCapacityGrid;
+    @NonNull private final BiomassGrowthRule biomassGrowthRule;
 
     @Override
-    protected BiomassGrower newInstance(final SimulationScope scope) {
-        return new BiomassGrower(
-            biomassGrid.get(scope),
-            carryingCapacityGrid.get(scope),
-            biomassGrowthRule.get(scope)
+    public void step(final SimState simState) {
+        carryingCapacityGrid.getHabitableCells().forEach(location ->
+            biomassGrid.setBiomass(
+                location,
+                biomassGrowthRule.newBiomass(
+                    biomassGrid.getValue(location),
+                    carryingCapacityGrid.getCarryingCapacity(location)
+                )
+            )
         );
     }
 }
