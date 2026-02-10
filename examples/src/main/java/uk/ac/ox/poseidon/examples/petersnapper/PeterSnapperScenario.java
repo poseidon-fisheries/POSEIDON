@@ -78,7 +78,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static uk.ac.ox.poseidon.agents.tasks.branches.Factories.sequenceTask;
+import static uk.ac.ox.poseidon.agents.tasks.decorators.Factories.untilFail;
+import static uk.ac.ox.poseidon.agents.tasks.general.Factories.checkThat;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
+import static uk.ac.ox.poseidon.agents.vessels.adaptors.Factories.availableHoldCapacityInKg;
 import static uk.ac.ox.poseidon.core.aggregators.Factories.mean;
 import static uk.ac.ox.poseidon.core.predicates.Factories.adaptedPredicate;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
@@ -269,9 +272,14 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 sequenceTask(
                     new StartTripFactory(destinationSupplier),
                     new TravelAlongPathFactory(pathFinder, distance),
-                    new FishingFactory(
-                        new CurrentCellFisheableFactory(biomassGrid),
-                        new ProportionallyLimitingBiomassToHoldFactory()
+                    untilFail(
+                        sequenceTask(
+                            new FishingFactory(
+                                new CurrentCellFisheableFactory(biomassGrid),
+                                new ProportionallyLimitingBiomassToHoldFactory()
+                            ),
+                            checkThat(availableHoldCapacityInKg(), above(1))
+                        )
                     ),
                     new SetDestinationToOriginFactory(),
                     new TravelAlongPathFactory(pathFinder, distance),

@@ -20,41 +20,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.general;
+package uk.ac.ox.poseidon.agents.tasks.decorators;
 
+import com.badlogic.gdx.ai.btree.Task;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
-
-import java.time.Duration;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
-import static uk.ac.ox.poseidon.core.predicates.Factories.adaptedPredicate;
 
 public class Factories {
 
     private Factories() {
     }
 
-    public static VesselPredicateTaskFactory checkThat(
-        final Factory<? super VesselScope, ? extends Predicate<Vessel>> predicate
+    public static UntilFailTaskFactory untilFail(
+        final Factory<? super VesselScope, ? extends Task<Vessel>> child
     ) {
-        return new VesselPredicateTaskFactory(predicate);
+        return new UntilFailTaskFactory(child);
     }
 
-    public static <T> VesselPredicateTaskFactory checkThat(
-        final Factory<? super VesselScope, ? extends Function<? super Vessel, T>> adaptor,
-        final Factory<? super VesselScope, ? extends Predicate<? super T>> predicate
+    public static UntilSuccessTaskFactory untilSuccess(
+        final Factory<? super VesselScope, ? extends Task<Vessel>> child
     ) {
-        return checkThat(adaptedPredicate(adaptor, predicate));
+        return new UntilSuccessTaskFactory(child);
     }
 
-    public static WaitForFactory waitFor(
-        final Factory<? super VesselScope, ? extends Supplier<Duration>> durationSupplier
+    public static InvertTaskFactory invert(
+        final Factory<? super VesselScope, ? extends Task<Vessel>> child
     ) {
-        return new WaitForFactory(durationSupplier);
+        return new InvertTaskFactory(child);
+    }
+
+    public static AlwaysSucceedTaskFactory alwaysSucceed(
+        final Factory<? super VesselScope, ? extends Task<Vessel>> child
+    ) {
+        return new AlwaysSucceedTaskFactory(child);
+    }
+
+    public static AlwaysFailTaskFactory alwaysFail(
+        final Factory<? super VesselScope, ? extends Task<Vessel>> child
+    ) {
+        return new AlwaysFailTaskFactory(child);
     }
 
 }
