@@ -38,6 +38,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @EqualsAndHashCode(callSuper = true)
 public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
 
+    /* FIXME: Ultimately, I think that VesselScopeFactoriesByCode might broken because changing
+        the code associated with the "default factory" changes the key of the main factory.
+        Maybe that's fine because that code will always be the same as the code of the main
+        factory, but I'm still uneasy about it. Also, this is the main place where having
+        side effects (like putting things on the schedule) in factory (in this case the
+        default factory) can cause problems.
+    */
+
     @Singular private Map<String, ? extends Factory<? super VesselScope, ? extends C>> factories;
     private Factory<? super VesselScope, ? extends C> defaultFactory;
     private String code;
