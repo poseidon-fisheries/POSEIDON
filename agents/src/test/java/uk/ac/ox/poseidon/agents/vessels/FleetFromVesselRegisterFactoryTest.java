@@ -45,7 +45,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
-import static uk.ac.ox.poseidon.core.suppliers.Factories.always;
+import static uk.ac.ox.poseidon.core.suppliers.Factories.constant;
 import static uk.ac.ox.poseidon.core.time.Factories.ONE_DAY;
 import static uk.ac.ox.poseidon.io.tables.Factories.csvTableFromString;
 
@@ -105,7 +105,7 @@ class FleetFromVesselRegisterFactoryTest {
                         )
                         .dataMapping("gear.code", "gear")
                         .engine(new ObjectFactory<>(mock(Engine.class)))
-                        .behaviour(new BehaviourFactory(waitFor(always(ONE_DAY))))
+                        .behaviour(new BehaviourFactory(waitFor(constant(ONE_DAY))))
                         .build()
                 )
             ).startNewSimulation();

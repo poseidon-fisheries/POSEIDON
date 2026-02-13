@@ -241,7 +241,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             new FixedBiomassProportionGearFactory<>(
                 "FGL", // droplines count as "fixed gears and lines"
                 0.25,
-                always(ONE_HOUR)
+                constant(ONE_HOUR)
             );
 
         final var optionValuesRegister =
@@ -296,9 +296,9 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     ),
                     new SetDestinationToOriginFactory(),
                     new TravelAlongPathFactory(pathFinder, distance),
-                    new LandCatchesFactory(always(ONE_HOUR)),
+                    new LandCatchesFactory(constant(ONE_HOUR)),
                     new EndTripFactory(),
-                    waitFor(always(hours(12)))
+                    waitFor(constant(hours(12)))
                 )
             );
 
