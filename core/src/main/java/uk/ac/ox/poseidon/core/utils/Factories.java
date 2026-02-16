@@ -22,10 +22,15 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 public class Factories {
 
@@ -38,20 +43,20 @@ public class Factories {
 
     @SafeVarargs
     public static <T> ObjectFactory<List<T>> listOf(final T... values) {
-        return new ObjectFactory<>(List.of(values));
+        return new ObjectFactory<>(ImmutableList.copyOf(values));
     }
 
     public static <T> ObjectFactory<List<T>> listOf(final Stream<T> values) {
-        return new ObjectFactory<>(values.toList());
+        return new ObjectFactory<>(values.collect(toImmutableList()));
     }
 
     @SafeVarargs
     public static <T> ObjectFactory<Set<T>> setOf(final T... values) {
-        return new ObjectFactory<>(Set.of(values));
+        return new ObjectFactory<>(ImmutableSet.copyOf(values));
     }
 
     public static <T> ObjectFactory<Set<T>> setOf(final Stream<T> values) {
-        return new ObjectFactory<>(values.collect(Collectors.toUnmodifiableSet()));
+        return new ObjectFactory<>(values.collect(toImmutableSet()));
     }
 
 }
