@@ -29,6 +29,8 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.units.indriya.unit.UnitDimension.MASS;
 
 public class Measurements {
@@ -47,6 +49,8 @@ public class Measurements {
     }
 
     public static Unit<Mass> parseMassUnit(final String unitString) {
+        checkNotNull(unitString, "Trying to parse null as a unit of mass");
+        checkArgument(!unitString.isEmpty(), "Trying to parse an empty string as a unit of mass");
         return parseUnit(unitString, Mass.class, MASS);
     }
 }
