@@ -101,7 +101,8 @@ import static uk.ac.ox.poseidon.geography.predicates.Factories.inDepthRange;
 import static uk.ac.ox.poseidon.geography.predicates.Factories.isActiveWaterCell;
 import static uk.ac.ox.poseidon.geography.utils.Factories.elevationTable;
 import static uk.ac.ox.poseidon.io.paths.Factories.path;
-import static uk.ac.ox.poseidon.io.tables.Factories.csvTableFromFile;
+import static uk.ac.ox.poseidon.io.sources.Factories.zipEntryDataSource;
+import static uk.ac.ox.poseidon.io.tables.Factories.csvTableFrom;
 
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
@@ -128,7 +129,10 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final var startingDateTime = startOf(LocalDate.of(2026, 1, 1));
         final var elevationTable =
             elevationTable(
-                csvTableFromFile(inputPath.plus("elevations.csv")),
+                csvTableFrom(zipEntryDataSource(
+                    inputPath.plus("elevations.zip"),
+                    "elevations.csv"
+                )),
                 "lon",
                 "lat",
                 "elevation"

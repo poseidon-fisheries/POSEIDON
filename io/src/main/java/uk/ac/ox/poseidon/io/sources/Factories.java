@@ -20,13 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.io.tables;
+package uk.ac.ox.poseidon.io.sources;
 
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.io.sources.DataSource;
-import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
-import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
 
 import java.nio.file.Path;
 
@@ -35,20 +32,36 @@ public class Factories {
     private Factories() {
     }
 
-    public static CsvTableFactory<Scope> csvTableFromString(final String data) {
-        return new CsvTableFactory<>(new StringDataSourceFactory(data));
+    public static StringDataSourceFactory stringDataSource(final String data) {
+        return new StringDataSourceFactory(data);
     }
 
-    public static <S extends Scope> CsvTableFactory<S> csvTableFromFile(
+    public static <S extends Scope> FileDataSourceFactory<S> fileDataSource(
         final Factory<S, ? extends Path> pathFactory
     ) {
-        return new CsvTableFactory<>(new FileDataSourceFactory<>(pathFactory));
+        return new FileDataSourceFactory<>(pathFactory);
     }
 
-    public static <S extends Scope> CsvTableFactory<S> csvTableFrom(
-        final Factory<S, ? extends DataSource> dataSourceFactory
+    public static <S extends Scope> FileDataSourceFactory<S> fileDataSource(
+        final Factory<S, ? extends Path> pathFactory,
+        final String encoding
     ) {
-        return new CsvTableFactory<>(dataSourceFactory);
+        return new FileDataSourceFactory<>(pathFactory, encoding);
+    }
+
+    public static <S extends Scope> ZipEntryDataSourceFactory<S> zipEntryDataSource(
+        final Factory<S, ? extends Path> pathFactory,
+        final String entry
+    ) {
+        return new ZipEntryDataSourceFactory<>(pathFactory, entry);
+    }
+
+    public static <S extends Scope> ZipEntryDataSourceFactory<S> zipEntryDataSource(
+        final Factory<S, ? extends Path> pathFactory,
+        final String entry,
+        final String encoding
+    ) {
+        return new ZipEntryDataSourceFactory<>(pathFactory, entry, encoding);
     }
 
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -24,23 +24,24 @@ package uk.ac.ox.poseidon.io.sources;
 
 import lombok.Value;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 @Value
-public class FileDataSource implements DataSource {
+public class ZipEntryDataSource implements DataSource {
 
-    File file;
+    ZipFile zipFile;
+    ZipEntry zipEntry;
     Charset charset;
 
-    @Override
     public Reader getReader() {
         try {
-            return Files.newBufferedReader(file.toPath(), charset);
+            return new InputStreamReader(
+                new BufferedInputStream(zipFile.getInputStream(zipEntry)),
+                charset
+            );
         } catch (final IOException e) {
             throw new UncheckedIOException(e);
         }
