@@ -22,15 +22,9 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 public class Factories {
 
@@ -43,20 +37,24 @@ public class Factories {
 
     @SafeVarargs
     public static <T> ObjectFactory<List<T>> listOf(final T... values) {
-        return new ObjectFactory<>(ImmutableList.copyOf(values));
+        return new ObjectFactory<>(List.of(values));
     }
 
     public static <T> ObjectFactory<List<T>> listOf(final Stream<T> values) {
-        return new ObjectFactory<>(values.collect(toImmutableList()));
+        return new ObjectFactory<>(values.toList());
     }
 
     @SafeVarargs
     public static <T> ObjectFactory<Set<T>> setOf(final T... values) {
-        return new ObjectFactory<>(ImmutableSet.copyOf(values));
+        // using LinkedHashSet to preserve insertion order and be consistent with SnakeYAML
+        final LinkedHashSet<T> set = new LinkedHashSet<>(Arrays.asList(values));
+        return new ObjectFactory<>(Collections.unmodifiableSet(set));
     }
 
     public static <T> ObjectFactory<Set<T>> setOf(final Stream<T> values) {
-        return new ObjectFactory<>(values.collect(toImmutableSet()));
+        // using LinkedHashSet to preserve insertion order and be consistent with SnakeYAML
+        final LinkedHashSet<T> set = values.collect(Collectors.toCollection(LinkedHashSet::new));
+        return new ObjectFactory<>(Collections.unmodifiableSet(set));
     }
 
 }
