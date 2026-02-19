@@ -41,6 +41,7 @@ public class CommonBiomassGrower implements Steppable {
     @NonNull private final BiomassGrid biomassGrid;
     @NonNull private final CarryingCapacityGrid carryingCapacityGrid;
     @NonNull private final BiomassGrowthRule biomassGrowthRule;
+    @NonNull private final BiomassRecruitmentAllocator biomassRecruitmentAllocator;
 
     @Override
     public void step(final SimState simState) {
@@ -57,6 +58,6 @@ public class CommonBiomassGrower implements Steppable {
             biomassGrowthRule.newBiomass(currentBiomass, totalCarryingCapacity);
 
         final double recruitment = newTotalBiomass - currentBiomass;
-
+        biomassRecruitmentAllocator.allocate(recruitment, biomassGrid, carryingCapacityGrid);
     }
 }

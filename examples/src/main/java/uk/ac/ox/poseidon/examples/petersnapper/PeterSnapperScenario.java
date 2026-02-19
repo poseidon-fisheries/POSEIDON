@@ -194,11 +194,11 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             scheduledRepeating(
                 dateTimeAfterStarting(ONE_YEAR_PERIOD),
                 YEARLY,
-                // TODO: this needs to be a common logistic grower
-                new IndependentBiomassGrowerFactory(
+                new CommonBiomassGrowerFactory(
                     biomassGrid,
                     carryingCapacityGrid,
-                    new LogisticGrowthRuleFactory(0.372)
+                    new LogisticGrowthRuleFactory(0.372),
+                    new RandomBiomassRecruitmentAllocatorFactory()
                 ),
                 0
             );
