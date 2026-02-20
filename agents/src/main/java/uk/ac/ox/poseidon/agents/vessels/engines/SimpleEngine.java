@@ -22,17 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
-import lombok.Getter;
 import lombok.Value;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Speed;
-
-import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 
 @Value
 public class SimpleEngine implements Engine {
-    Quantity<Speed> cruisingSpeed;
-    @Getter(lazy = true) double cruisingSpeedInKph =
-        getCruisingSpeed().to(KILOMETRE_PER_HOUR).getValue().doubleValue();
+    FuelTank fuelTank;
+    double cruisingSpeedInKph;
+    double litresOfFuelConsumedPerKm;
 }

@@ -28,6 +28,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
+import javax.measure.quantity.Speed;
+import javax.measure.quantity.Volume;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.quantities.AbstractQuantityFactory.parse;
@@ -61,6 +63,31 @@ public class Factories {
     public static MassFactory massOf(final String quantity) {
         final var entry = parse(Mass.class, quantity);
         return new MassFactory(entry.getValue(), entry.getKey());
+    }
+
+    public static VolumeFactory volumeOf(
+        final double value,
+        final Unit<Volume> unit
+    ) {
+        return new VolumeFactory(value, unit.toString());
+    }
+
+    public static VolumeFactory volumeOf(final Quantity<Volume> quantity) {
+        return volumeOf(quantity.getValue().doubleValue(), quantity.getUnit());
+    }
+
+    public static VolumeFactory volumeOf(final String quantity) {
+        final var entry = parse(Volume.class, quantity);
+        return new VolumeFactory(entry.getValue(), entry.getKey());
+    }
+
+    public static SpeedFactory speedOf(final Quantity<Speed> quantity) {
+        return new SpeedFactory(quantity.getValue().doubleValue(), quantity.getUnit().toString());
+    }
+
+    public static SpeedFactory speedOf(final String quantity) {
+        final var entry = parse(Speed.class, quantity);
+        return new SpeedFactory(entry.getValue(), entry.getKey());
     }
 
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,36 +20,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.quantities;
+package uk.ac.ox.poseidon.agents.vessels.engines;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.quantities.VolumeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import javax.measure.Unit;
-import javax.measure.quantity.Speed;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@Data
-@SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-public class SpeedFactory extends AbstractQuantityFactory<Speed> {
+class SimpleFuelTankFactoryTest {
 
-    public SpeedFactory() {
-        super(Speed.class);
+    @Test
+    void createsSimpleFuelTankUsingVolumeFactories() {
+        final SimpleFuelTankFactory<Scope> factory = SimpleFuelTankFactory.<Scope>builder()
+            .capacity(new VolumeFactory(2.0, "m3"))
+            .currentFuel(new VolumeFactory(0.1255, "m3"))
+            .build();
+
+        final FuelTank tank = factory.get(Scope.GLOBAL_SCOPE);
+
+        assertThat(tank).isInstanceOf(SimpleFuelTank.class);
+        assertThat(tank.getCapacityInLitres()).isEqualTo(2000.0);
+        assertThat(tank.getCurrentFuelInLitres()).isEqualTo(125.5);
     }
-
-    public SpeedFactory(
-        final double value,
-        final String unitString
-    ) {
-        super(Speed.class, value, unitString);
-    }
-
-    public SpeedFactory(
-        final double value,
-        final Unit<Speed> unit
-    ) {
-        super(Speed.class, value, unit.toString());
-    }
-
 }

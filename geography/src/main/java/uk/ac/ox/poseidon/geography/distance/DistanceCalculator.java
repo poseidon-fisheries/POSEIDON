@@ -72,6 +72,14 @@ public interface DistanceCalculator {
     }
 
     default Duration travelDuration(
+        final Number2D start,
+        final Number2D end,
+        final double cruisingSpeedInKph
+    ) {
+        return travelDuration(List.of(start, end), cruisingSpeedInKph);
+    }
+    
+    default Duration travelDuration(
         final List<? extends Number2D> path,
         final double cruisingSpeedInKph
     ) {

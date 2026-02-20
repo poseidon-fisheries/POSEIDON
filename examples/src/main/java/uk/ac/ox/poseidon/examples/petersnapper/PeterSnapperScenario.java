@@ -54,7 +54,6 @@ import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.MappedFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.quantities.SpeedFactory;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.utils.ListFactory;
 import uk.ac.ox.poseidon.core.utils.PairFactory;
@@ -77,10 +76,12 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
+import static tech.units.indriya.unit.Units.LITRE;
 import static uk.ac.ox.poseidon.agents.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.agents.tasks.decorators.Factories.untilFail;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.checkThat;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
+import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.fullTank;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.availableHoldCapacityInKg;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.currentTripDuration;
 import static uk.ac.ox.poseidon.core.aggregators.Factories.mean;
@@ -89,8 +90,7 @@ import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.alwaysTrue;
 import static uk.ac.ox.poseidon.core.predicates.numeric.Factories.greaterThan;
-import static uk.ac.ox.poseidon.core.quantities.Factories.kilograms;
-import static uk.ac.ox.poseidon.core.quantities.Factories.massOf;
+import static uk.ac.ox.poseidon.core.quantities.Factories.*;
 import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledOnceAtStart;
 import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledRepeating;
 import static uk.ac.ox.poseidon.core.suppliers.Factories.*;
@@ -111,6 +111,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     private static final double LEARNING_ALPHA = 1;
     private static final double EXPLORATION_PROBABILITY = 0.2;
+    private static final int TOTAL_CARRYING_CAPACITY = 110_749_315;
 
     public static void main(final String[] args) {
         final Simulation simulation =
@@ -126,7 +127,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final Scenario.ScenarioBuilder builder = Scenario.builder();
 
         final var inputPath = path(INPUT_PATH);
-        final var startingDateTime = startOf(LocalDate.of(2026, 1, 1));
+        final var startingDateTime = startOf(LocalDate.of(2000, 1, 1));
         final var elevationTable =
             elevationTable(
                 csvTableFrom(zipEntryDataSource(
@@ -160,7 +161,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             inDepthRange(bathymetricGrid, 30, 800)
                         )
                     ),
-                    kilograms(110_749_315)
+                    kilograms(TOTAL_CARRYING_CAPACITY)
                 )
             );
 
@@ -324,7 +325,11 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                                 new UniformCatchCategoriserFactory<>(catchCategory)
                             ),
                             gear,
-                            new SimpleEngineFactory<>(SpeedFactory.of("10 kn")),
+                            new SimpleEngineFactory<>(
+                                fullTank(volumeOf(100000, LITRE)),
+                                speedOf("10 kn"),
+                                volumeOf(3, LITRE)
+                            ),
                             behaviour, // new InactiveBehaviourFactory(),
                             0 // mapped over
                         ),

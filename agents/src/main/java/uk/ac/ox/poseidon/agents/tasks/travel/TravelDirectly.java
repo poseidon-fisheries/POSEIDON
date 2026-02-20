@@ -51,7 +51,7 @@ public class TravelDirectly extends ExtendedTripTask {
         return distanceCalculator.travelDuration(
             origin,
             destination,
-            getAgent().getEngine().getCruisingSpeed()
+            getAgent().getEngine().getCruisingSpeedInKph()
         );
     }
 

@@ -22,12 +22,9 @@
 
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Speed;
-
 public interface Engine {
 
-    Quantity<Speed> getCruisingSpeed();
+    FuelTank getFuelTank();
 
     double getCruisingSpeedInKph();
 

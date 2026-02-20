@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -32,10 +32,9 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import javax.measure.Quantity;
-import javax.measure.quantity.Speed;
 import javax.measure.quantity.Volume;
 
-import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.units.indriya.unit.Units.LITRE;
 
 @Data
@@ -43,19 +42,24 @@ import static tech.units.indriya.unit.Units.LITRE;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SimpleEngineFactory<S extends Scope> extends RelativeScopeFactory<S, Engine> {
+public class SimpleFuelTankFactory<S extends Scope> extends RelativeScopeFactory<S, FuelTank> {
 
-    private Factory<? super S, ? extends FuelTank> fuelTank;
-    private Factory<? super S, ? extends Quantity<Speed>> cruisingSpeed;
-    private Factory<? super S, ? extends Quantity<Volume>> fuelConsumedPerKm;
+    private Factory<? super S, ? extends Quantity<Volume>> capacity;
+    private Factory<? super S, ? extends Quantity<Volume>> currentFuel;
 
     @Override
-    protected Engine newInstance(final S scope) {
-        return new SimpleEngine(
-            fuelTank.get(scope),
-            cruisingSpeed.get(scope).to(KILOMETRE_PER_HOUR).getValue().doubleValue(),
-            fuelConsumedPerKm.get(scope).to(LITRE).getValue().doubleValue()
-        );
+    protected FuelTank newInstance(final S scope) {
+        final double capacityInLitres = checkNotNull(capacity, "capacity must not be null")
+            .get(scope)
+            .to(LITRE)
+            .getValue()
+            .doubleValue();
+        final double currentFuelInLitres = checkNotNull(currentFuel, "currentFuel must not be null")
+            .get(scope)
+            .to(LITRE)
+            .getValue()
+            .doubleValue();
+        return new SimpleFuelTank(capacityInLitres, currentFuelInLitres);
     }
 
 }

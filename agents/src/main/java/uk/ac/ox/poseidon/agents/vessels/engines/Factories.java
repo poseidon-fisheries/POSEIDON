@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,36 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.quantities;
+package uk.ac.ox.poseidon.agents.vessels.engines;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import javax.measure.Unit;
-import javax.measure.quantity.Speed;
+import javax.measure.Quantity;
+import javax.measure.quantity.Volume;
 
-@Data
-@SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-public class SpeedFactory extends AbstractQuantityFactory<Speed> {
+import static tech.units.indriya.unit.Units.LITRE;
+import static uk.ac.ox.poseidon.core.quantities.Factories.volumeOf;
 
-    public SpeedFactory() {
-        super(Speed.class);
+public class Factories {
+
+    public static <S extends Scope> SimpleFuelTankFactory<S> fullTank(
+        final Factory<? super S, ? extends Quantity<Volume>> capacity
+    ) {
+        return new SimpleFuelTankFactory<>(capacity, capacity);
     }
 
-    public SpeedFactory(
-        final double value,
-        final String unitString
+    public static <S extends Scope> SimpleFuelTankFactory<S> emptyTank(
+        final Factory<? super S, ? extends Quantity<Volume>> capacity
     ) {
-        super(Speed.class, value, unitString);
-    }
-
-    public SpeedFactory(
-        final double value,
-        final Unit<Speed> unit
-    ) {
-        super(Speed.class, value, unit.toString());
+        return new SimpleFuelTankFactory<>(capacity, volumeOf(0, LITRE));
     }
 
 }

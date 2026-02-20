@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -26,30 +26,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
-import javax.measure.Unit;
-import javax.measure.quantity.Speed;
+import javax.measure.quantity.Volume;
 
 @Data
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class SpeedFactory extends AbstractQuantityFactory<Speed> {
+public class VolumeFactory extends AbstractQuantityFactory<Volume> {
 
-    public SpeedFactory() {
-        super(Speed.class);
+    public VolumeFactory() {
+        super(Volume.class);
     }
 
-    public SpeedFactory(
+    public VolumeFactory(
         final double value,
         final String unitString
     ) {
-        super(Speed.class, value, unitString);
-    }
-
-    public SpeedFactory(
-        final double value,
-        final Unit<Speed> unit
-    ) {
-        super(Speed.class, value, unit.toString());
+        super(Volume.class, value, unitString);
     }
 
 }
