@@ -20,16 +20,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.engines;
+package uk.ac.ox.poseidon.agents.tasks.travel;
 
-public interface FuelTank {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
+import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
-    double getCapacityInLitres();
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class RefuelFactory extends VesselTaskFactory<Refuel> {
 
-    double getCurrentFuelInLitres();
+    private Factory<? super VesselScope, ? extends FuelStationGrid> fuelStationGrid;
 
-    void addFuel(double litres);
-
-    void consumeFuel(double litres);
-
+    @Override
+    protected Refuel newTask(final VesselScope scope) {
+        return new Refuel(fuelStationGrid.get(scope));
+    }
+    
 }

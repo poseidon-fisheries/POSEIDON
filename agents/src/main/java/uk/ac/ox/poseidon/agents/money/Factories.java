@@ -20,16 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.engines;
+package uk.ac.ox.poseidon.agents.money;
 
-public interface FuelTank {
+import lombok.NonNull;
 
-    double getCapacityInLitres();
+public class Factories {
 
-    double getCurrentFuelInLitres();
+    private Factories() {}
 
-    void addFuel(double litres);
-
-    void consumeFuel(double litres);
+    public static MoneyFactory money(
+        final double amount,
+        final @NonNull String currencyUnit
+    ) {
+        return new MoneyFactory(amount, currencyUnit);
+    }
 
 }

@@ -20,16 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.engines;
+package uk.ac.ox.poseidon.agents.fuel;
 
-public interface FuelTank {
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-    double getCapacityInLitres();
+import java.util.Map;
 
-    double getCurrentFuelInLitres();
+public class ImmutableFuelStationGrid extends FuelStationGrid {
 
-    void addFuel(double litres);
-
-    void consumeFuel(double litres);
+    ImmutableFuelStationGrid(
+        final ModelGrid modelGrid,
+        final Map<FuelStation, Int2D> fuelStationLocations
+    ) {
+        super(modelGrid);
+        fuelStationLocations.forEach(field::setObjectLocation);
+    }
 
 }

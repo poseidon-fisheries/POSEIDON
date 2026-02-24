@@ -20,16 +20,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.engines;
+package uk.ac.ox.poseidon.agents.tasks.travel;
 
-public interface FuelTank {
+import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
-    double getCapacityInLitres();
+public class Factories {
 
-    double getCurrentFuelInLitres();
+    private Factories() {}
 
-    void addFuel(double litres);
-
-    void consumeFuel(double litres);
+    RefuelFactory refuel(
+        final Factory<? super VesselScope, ? extends FuelStationGrid> fuelStationGrid
+    ) {
+        return new RefuelFactory(fuelStationGrid);
+    }
 
 }
