@@ -78,7 +78,7 @@ public interface DistanceCalculator {
     ) {
         return travelDuration(List.of(start, end), cruisingSpeedInKph);
     }
-    
+
     default Duration travelDuration(
         final List<? extends Number2D> path,
         final double cruisingSpeedInKph
@@ -88,11 +88,18 @@ public interface DistanceCalculator {
             "Path must contain at least two cells but was: %s",
             path
         );
-        final long SECONDS_PER_HOUR = 3600;
         double totalDistanceInKm = 0.0;
         for (int i = 0; i < path.size() - 1; i++) {
             totalDistanceInKm += distanceInKm(path.get(i), path.get(i + 1));
         }
+        return travelDuration(cruisingSpeedInKph, totalDistanceInKm);
+    }
+
+    static Duration travelDuration(
+        final double cruisingSpeedInKph,
+        final double totalDistanceInKm
+    ) {
+        final long SECONDS_PER_HOUR = 3600;
         return Duration.ofSeconds(
             (long) ((totalDistanceInKm / cruisingSpeedInKph) * SECONDS_PER_HOUR)
         );

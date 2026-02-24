@@ -31,6 +31,7 @@ import java.time.Duration;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static lombok.AccessLevel.PACKAGE;
+import static uk.ac.ox.poseidon.geography.distance.DistanceCalculator.travelDuration;
 
 @RequiredArgsConstructor(access = PACKAGE)
 public class TravelDirectly extends ExtendedTripTask {
@@ -38,25 +39,27 @@ public class TravelDirectly extends ExtendedTripTask {
     private final DistanceCalculator distanceCalculator;
     private Int2D origin;
     private Int2D destination;
+    private double distanceInKm;
 
     @Override
     public void start() {
         super.start();
         origin = getAgent().getCell();
         destination = getAgent().getCurrentTrip().getDestination();
+        distanceInKm = distanceCalculator.distanceInKm(origin, destination);
     }
 
     @Override
     protected Duration getDuration() {
-        return distanceCalculator.travelDuration(
-            origin,
-            destination,
+        return travelDuration(
+            distanceInKm,
             getAgent().getEngine().getCruisingSpeedInKph()
         );
     }
 
     @Override
     protected Status complete() {
+        getAgent().getEngine().consumeFuelForDistance(distanceInKm);
         getAgent().setCurrentCell(getAgent().getCurrentTrip().getDestination());
         getTrip().getEventManager().broadcast(new TravelEvent(
             getAgent(),

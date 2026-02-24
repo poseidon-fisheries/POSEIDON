@@ -28,4 +28,10 @@ public interface Engine {
 
     double getCruisingSpeedInKph();
 
+    double getLitresOfFuelConsumedPerKm();
+
+    default void consumeFuelForDistance(final double distanceInKm) {
+        getFuelTank().consumeFuel(getLitresOfFuelConsumedPerKm() * distanceInKm);
+    }
+
 }

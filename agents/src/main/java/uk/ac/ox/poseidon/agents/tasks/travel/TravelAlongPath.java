@@ -39,6 +39,7 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static lombok.AccessLevel.PACKAGE;
+import static uk.ac.ox.poseidon.geography.distance.DistanceCalculator.travelDuration;
 
 @RequiredArgsConstructor(access = PACKAGE)
 public class TravelAlongPath extends AgentTask<Vessel> {
@@ -52,6 +53,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
     private Int2D origin;
     private Int2D destination;
     private double cruisingSpeedInKph;
+    private double distanceToNextCell;
 
     @Override
     public void resetTask() {
@@ -77,6 +79,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
                         vessel
                     )
                 ));
+        distanceToNextCell = 0;
         cruisingSpeedInKph = vessel.getEngine().getCruisingSpeedInKph();
         super.start();
     }
@@ -95,6 +98,8 @@ public class TravelAlongPath extends AgentTask<Vessel> {
         );
 
         vessel.setCurrentCell(currentPath.getFirst());
+        vessel.getEngine().consumeFuelForDistance(distanceToNextCell);
+
         currentPath = currentPath.subList(1, currentPath.size());
         if (currentPath.isEmpty()) {
             trip.getEventManager().broadcast(new TravelEvent(
@@ -107,13 +112,9 @@ public class TravelAlongPath extends AgentTask<Vessel> {
             return SUCCEEDED;
         } else {
             final Int2D nextCell = currentPath.getFirst();
+            distanceToNextCell += distanceCalculator.distanceInKm(vessel.getCell(), nextCell);
             vessel.setHeadingTowards(nextCell);
-            vessel.setTaskDuration(
-                distanceCalculator.travelDuration(
-                    List.of(vessel.getCell(), nextCell),
-                    cruisingSpeedInKph
-                )
-            );
+            vessel.setTaskDuration(travelDuration(distanceToNextCell, cruisingSpeedInKph));
             return RUNNING;
         }
     }
