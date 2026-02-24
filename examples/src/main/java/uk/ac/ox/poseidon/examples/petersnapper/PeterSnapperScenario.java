@@ -31,6 +31,8 @@ import uk.ac.ox.poseidon.agents.components.ComponentFactory;
 import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
+import uk.ac.ox.poseidon.agents.fuel.FuelStationGridFactory;
+import uk.ac.ox.poseidon.agents.fuel.OneFuelStationPerPortFactory;
 import uk.ac.ox.poseidon.agents.market.MarketGridFactory;
 import uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory;
 import uk.ac.ox.poseidon.agents.market.PriceEntryFactory;
@@ -40,6 +42,7 @@ import uk.ac.ox.poseidon.agents.tasks.destinations.StartTripFactory;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingFactory;
 import uk.ac.ox.poseidon.agents.tasks.landings.LandCatchesFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.EndTripFactory;
+import uk.ac.ox.poseidon.agents.tasks.travel.RefuelFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.SetDestinationToOriginFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory;
 import uk.ac.ox.poseidon.agents.vessels.PrefixedIdFactory;
@@ -77,6 +80,7 @@ import java.util.function.Supplier;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.LITRE;
+import static uk.ac.ox.poseidon.agents.money.Factories.money;
 import static uk.ac.ox.poseidon.agents.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.agents.tasks.decorators.Factories.untilFail;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.checkThat;
@@ -233,6 +237,15 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             )
         );
 
+        final var fuelStationGrid = new FuelStationGridFactory<>(
+            portGrid,
+            new OneFuelStationPerPortFactory(
+                portGrid,
+                money(10000, "IDR"),
+                200
+            )
+        );
+
         final var vesselField = new VesselFieldFactory(modelGrid);
 
         final var pathFinder =
@@ -302,6 +315,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     new SetDestinationToOriginFactory(),
                     new TravelAlongPathFactory(pathFinder, distance),
                     new LandCatchesFactory(constant(ONE_HOUR)),
+                    new RefuelFactory(fuelStationGrid),
                     new EndTripFactory(),
                     waitFor(constant(hours(12)))
                 )

@@ -31,6 +31,8 @@ import lombok.Value;
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class Port {
 
+    // TODO: consider storing location directly in port
+    
     @NonNull String code;
     @NonNull String name;
 

@@ -56,6 +56,8 @@ public class Vessel extends Agent implements Oriented2D {
     private final @NonNull String id;
     private final @NonNull VesselField vesselField;
     private final @NonNull PortGrid portGrid;
+
+    // TODO: consider if the vessel really needs a reference to the market grid
     private final @NonNull MarketGrid marketGrid;
 
     public Vessel(
@@ -106,6 +108,7 @@ public class Vessel extends Agent implements Oriented2D {
     public void setHomePort(final Port homePort) {
         mutate(() -> {
             this.homePort = homePort;
+            // TODO: if location were to be stored in port we wouldn't need the port grid here
             if (this.homePort != null && getCell() == null)
                 setCurrentCell(portGrid.getLocation(homePort));
         });
