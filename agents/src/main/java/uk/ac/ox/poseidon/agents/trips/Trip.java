@@ -26,12 +26,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.joda.money.Money;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @SuppressFBWarnings(value = "EI_EXPOSE_REP")
@@ -41,6 +44,10 @@ public class Trip {
     private final @NonNull EventManager eventManager;
     private final @NonNull Int2D origin;
     private final @NonNull LocalDateTime startDateTime;
+
+    private final List<Money> expenses = new ArrayList<>();
+    private final List<Money> revenues = new ArrayList<>();
+
     @Setter
     private @NonNull Int2D destination;
     private LocalDateTime endDateTime;

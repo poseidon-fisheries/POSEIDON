@@ -42,7 +42,6 @@ import uk.ac.ox.poseidon.agents.tasks.destinations.StartTripFactory;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingFactory;
 import uk.ac.ox.poseidon.agents.tasks.landings.LandCatchesFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.EndTripFactory;
-import uk.ac.ox.poseidon.agents.tasks.travel.RefuelFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.SetDestinationToOriginFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory;
 import uk.ac.ox.poseidon.agents.vessels.PrefixedIdFactory;
@@ -85,6 +84,7 @@ import static uk.ac.ox.poseidon.agents.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.agents.tasks.decorators.Factories.untilFail;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.checkThat;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
+import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.refuel;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.fullTank;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.availableHoldCapacityInKg;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.currentTripDuration;
@@ -241,7 +241,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             portGrid,
             new OneFuelStationPerPortFactory(
                 portGrid,
-                money(10000, "IDR"),
+                money(10_000, "IDR"),
                 200
             )
         );
@@ -315,7 +315,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     new SetDestinationToOriginFactory(),
                     new TravelAlongPathFactory(pathFinder, distance),
                     new LandCatchesFactory(constant(ONE_HOUR)),
-                    new RefuelFactory(fuelStationGrid),
+                    refuel(fuelStationGrid),
                     new EndTripFactory(),
                     waitFor(constant(hours(12)))
                 )

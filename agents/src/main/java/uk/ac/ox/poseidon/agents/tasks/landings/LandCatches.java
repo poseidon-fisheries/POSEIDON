@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks.landings;
 
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.market.Market;
-import uk.ac.ox.poseidon.agents.tasks.ExtendedTask;
+import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.time.Duration;
@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 @RequiredArgsConstructor
-public class LandCatches extends ExtendedTask<Vessel> {
+public class LandCatches extends ExtendedTripTask {
 
     final Supplier<Duration> durationSupplier;
 
@@ -64,7 +64,7 @@ public class LandCatches extends ExtendedTask<Vessel> {
             )
             .summary()
             .values()
-            .forEach(vessel.getAccount()::add);
+            .forEach(getTrip().getRevenues()::add);
         return SUCCEEDED;
     }
 

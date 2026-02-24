@@ -49,7 +49,7 @@ public class Refuel extends ExtendedTripTask {
                 "No fuel stations found in cell: " + getAgent().getCell())
             );
         duration = purchase.getDuration();
-        getAgent().getAccount().subtract(purchase.getPrice());
+        getTrip().getExpenses().add(purchase.getPrice());
     }
 
     @Override

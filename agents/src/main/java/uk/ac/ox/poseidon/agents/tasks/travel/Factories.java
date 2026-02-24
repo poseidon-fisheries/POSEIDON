@@ -30,7 +30,7 @@ public class Factories {
 
     private Factories() {}
 
-    RefuelFactory refuel(
+    public static RefuelFactory refuel(
         final Factory<? super VesselScope, ? extends FuelStationGrid> fuelStationGrid
     ) {
         return new RefuelFactory(fuelStationGrid);

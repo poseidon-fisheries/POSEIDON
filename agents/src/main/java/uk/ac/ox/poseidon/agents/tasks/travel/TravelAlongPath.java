@@ -112,7 +112,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
             return SUCCEEDED;
         } else {
             final Int2D nextCell = currentPath.getFirst();
-            distanceToNextCell += distanceCalculator.distanceInKm(vessel.getCell(), nextCell);
+            distanceToNextCell = distanceCalculator.distanceInKm(vessel.getCell(), nextCell);
             vessel.setHeadingTowards(nextCell);
             vessel.setTaskDuration(travelDuration(distanceToNextCell, cruisingSpeedInKph));
             return RUNNING;
