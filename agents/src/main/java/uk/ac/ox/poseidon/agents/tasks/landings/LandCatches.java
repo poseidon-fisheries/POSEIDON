@@ -64,7 +64,7 @@ public class LandCatches extends ExtendedTripTask {
             )
             .summary()
             .values()
-            .forEach(getTrip().getRevenues()::add);
+            .forEach(getTrip().getAccount()::add);
         return SUCCEEDED;
     }
 

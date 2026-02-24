@@ -197,9 +197,8 @@ public class Vessel extends Agent implements Oriented2D {
     }
 
     public void endTrip() {
-        currentTrip.getExpenses().forEach(account::subtract);
-        currentTrip.getRevenues().forEach(account::add);
         currentTrip.endTrip();
+        this.account.add(currentTrip.getAccount());
         this.currentTrip = null;
     }
 }

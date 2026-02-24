@@ -58,4 +58,8 @@ public class Account {
         );
     }
 
+    public void add(final Account other) {
+        other.balances.values().forEach(this::add);
+    }
+
 }
