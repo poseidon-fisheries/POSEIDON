@@ -28,10 +28,11 @@ import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 abstract class BucketTest {
 
@@ -43,13 +44,23 @@ abstract class BucketTest {
     private final Species c = new Species("C", null, "C");
     private final Species d = new Species("D", null, "D");
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private void assertContainsBiomass(
+        final Optional<? extends Content> maybeContent,
+        final double expectedKg
+    ) {
+        assertThat(maybeContent).hasValueSatisfying(
+            content -> assertThat(content).isEqualTo(Biomass.ofKg(expectedKg))
+        );
+    }
+
     @Test
     void simpleBucketCreation() {
         final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        assertThat(bucket.getContent(a)).contains(Biomass.ofKg(100.0));
-        assertThat(bucket.getContent(bA)).contains(Biomass.ofKg(200.0));
-        assertThat(bucket.getContent(bJ)).contains(Biomass.ofKg(300.0));
-        assertThat(bucket.getContent(c)).contains(Biomass.ofKg(400.0));
+        assertContainsBiomass(bucket.getContent(a), 100.0);
+        assertContainsBiomass(bucket.getContent(bA), 200.0);
+        assertContainsBiomass(bucket.getContent(bJ), 300.0);
+        assertContainsBiomass(bucket.getContent(c), 400.0);
         assertThat(bucket.getContent(d)).isEmpty();
     }
 
@@ -57,8 +68,8 @@ abstract class BucketTest {
     void bucketCreationWithAZeroBiomassSpecies() {
         final Bucket bucket = newBucket(Map.of(a, 0.0, bA, 100.0, bJ, 200.0));
         assertThat(bucket.getContent(a)).isEmpty();
-        assertThat(bucket.getContent(bA)).contains(Biomass.ofKg(100.0));
-        assertThat(bucket.getContent(bJ)).contains(Biomass.ofKg(200.0));
+        assertContainsBiomass(bucket.getContent(bA), 100.0);
+        assertContainsBiomass(bucket.getContent(bJ), 200.0);
         assertThat(bucket.getKg(a)).isEqualTo(0);
         assertThat(bucket.getKg(bA)).isEqualTo(100.0);
         assertThat(bucket.getKg(bJ)).isEqualTo(200.0);
@@ -69,10 +80,10 @@ abstract class BucketTest {
         final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
         final Bucket bucket2 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
         final Bucket bucket3 = bucket1.add(bucket2);
-        assertThat(bucket3.getContent(a)).contains(Biomass.ofKg(200.0));
-        assertThat(bucket3.getContent(bA)).contains(Biomass.ofKg(400.0));
-        assertThat(bucket3.getContent(bJ)).contains(Biomass.ofKg(600.0));
-        assertThat(bucket3.getContent(c)).contains(Biomass.ofKg(800.0));
+        assertContainsBiomass(bucket3.getContent(a), 200.0);
+        assertContainsBiomass(bucket3.getContent(bA), 400.0);
+        assertContainsBiomass(bucket3.getContent(bJ), 600.0);
+        assertContainsBiomass(bucket3.getContent(c), 800.0);
     }
 
     @Test
@@ -80,9 +91,9 @@ abstract class BucketTest {
         final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
         final Bucket bucket2 = newBucket(Map.of(bA, 200.0, bJ, 300.0));
         final Bucket bucket3 = bucket1.add(bucket2);
-        assertThat(bucket3.getContent(a)).contains(Biomass.ofKg(100.0));
-        assertThat(bucket3.getContent(bA)).contains(Biomass.ofKg(400.0));
-        assertThat(bucket3.getContent(bJ)).contains(Biomass.ofKg(300.0));
+        assertContainsBiomass(bucket3.getContent(a), 100.0);
+        assertContainsBiomass(bucket3.getContent(bA), 400.0);
+        assertContainsBiomass(bucket3.getContent(bJ), 300.0);
     }
 
     @Test
@@ -146,18 +157,18 @@ abstract class BucketTest {
     void replaceContent() {
         final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
         final Bucket newBucket = bucket.replaceContent(a, Biomass.ofKg(50.0));
-        assertThat(bucket.getContent(a)).contains(Biomass.ofKg(100.0));
-        assertThat(newBucket.getContent(a)).contains(Biomass.ofKg(50.0));
+        assertContainsBiomass(bucket.getContent(a), 100.0);
+        assertContainsBiomass(newBucket.getContent(a), 50.0);
     }
 
     @Test
     void mapContent() {
         final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
         final var newBucket = bucket.mapContent((species, content) -> content.multiply(2.0));
-        assertThat(newBucket.getContent(a)).contains(Biomass.ofKg(200.0));
-        assertThat(newBucket.getContent(bA)).contains(Biomass.ofKg(400.0));
-        assertThat(newBucket.getContent(bJ)).contains(Biomass.ofKg(600.0));
-        assertThat(newBucket.getContent(c)).contains(Biomass.ofKg(800.0));
+        assertContainsBiomass(newBucket.getContent(a), 200.0);
+        assertContainsBiomass(newBucket.getContent(bA), 400.0);
+        assertContainsBiomass(newBucket.getContent(bJ), 600.0);
+        assertContainsBiomass(newBucket.getContent(c), 800.0);
     }
 
     @Test

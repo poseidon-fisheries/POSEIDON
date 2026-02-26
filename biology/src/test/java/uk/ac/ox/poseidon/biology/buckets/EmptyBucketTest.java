@@ -71,7 +71,9 @@ class EmptyBucketTest {
     void replaceContentCreatesNewBucket() {
         final Bucket empty = EmptyBucket.INSTANCE;
         final Bucket replaced = empty.replaceContent(a, Biomass.ofKg(25.0));
-        assertThat(replaced.getContent(a)).contains(Biomass.ofKg(25.0));
+        assertThat(replaced.getContent(a)).hasValueSatisfying(
+            content -> assertThat(content).isEqualTo(Biomass.ofKg(25.0))
+        );
     }
 
     @Test
