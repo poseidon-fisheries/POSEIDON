@@ -61,14 +61,6 @@ public enum EmptyBucket implements Bucket {
     }
 
     @Override
-    public Bucket replaceContent(
-        final Species species,
-        final Content newContent
-    ) {
-        return Bucket.newBuilder().put(species, newContent).build();
-    }
-
-    @Override
     public Bucket mapContent(final BiFunction<Species, Content, Content> mapper) {
         return this;
     }

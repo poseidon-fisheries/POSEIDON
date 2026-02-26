@@ -26,7 +26,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
@@ -119,15 +118,13 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
         @Override
         public Bucket extract(final Bucket fishToExtract) {
             final BucketBuilder fishExtracted = Bucket.newBuilder();
-            fishToExtract
-                .getContent(species)
-                .map(Content::asKg)
-                .ifPresent(biomassToExtract -> {
-                    final double gridBiomass = getBiomass(cell).asKg();
-                    final double biomassExtracted = Math.min(biomassToExtract, gridBiomass);
-                    setBiomass(cell, gridBiomass - biomassExtracted);
-                    fishExtracted.add(species, Biomass.ofKg(biomassExtracted));
-                });
+            final double biomassToExtract = fishToExtract.getKg(species);
+            if (biomassToExtract > 0) {
+                final double gridBiomass = getBiomass(cell).asKg();
+                final double biomassExtracted = Math.min(biomassToExtract, gridBiomass);
+                setBiomass(cell, gridBiomass - biomassExtracted);
+                fishExtracted.add(species, Biomass.ofKg(biomassExtracted));
+            }
             return fishExtracted.build();
         }
     }

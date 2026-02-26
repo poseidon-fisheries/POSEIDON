@@ -69,23 +69,29 @@ public interface Bucket {
     ) {
         // we use a builder instead of the constructor to filter empty content
         // and potentially add together multiple entries for the same species
-        return newBuilder().add(ImmutableMap.copyOf(map)).build();
+        return newBuilder().add(map).build();
     }
 
-    Optional<Content> getContent(Species species);
+    Optional<? extends Content> getContent(Species species);
 
     default double getKg(final Species species) {
         return getContent(species).map(Content::asKg).orElse(0.0);
     }
 
-    Bucket add(Bucket other);
+    default Bucket add(final Bucket other) {
+        return toBuilder().add(other).build();
+    }
 
-    Bucket subtract(Bucket other);
+    default Bucket subtract(final Bucket other) {
+        return toBuilder().subtract(other).build();
+    }
 
-    Bucket replaceContent(
-        Species species,
-        Content newContent
-    );
+    default Bucket replaceContent(
+        final Species species,
+        final Content newContent
+    ) {
+        return toBuilder().put(species, newContent).build();
+    }
 
     default Bucket mapContent(final BiFunction<Species, Content, Content> mapper) {
         final BucketBuilder bucketBuilder = Bucket.newBuilder();
@@ -106,9 +112,16 @@ public interface Bucket {
         return bucketBuilder.build();
     }
 
-    Map<Boolean, Bucket> partitionBy(
-        BiPredicate<Species, Content> predicate
-    );
+    default Map<Boolean, Bucket> partitionBy(
+        final BiPredicate<Species, Content> predicate
+    ) {
+        final BucketBuilder b1 = Bucket.newBuilder();
+        final BucketBuilder b2 = Bucket.newBuilder();
+        getMap().forEach((species, content) ->
+            (predicate.test(species, content) ? b1 : b2).put(species, content)
+        );
+        return Map.of(true, b1.build(), false, b2.build());
+    }
 
     boolean isEmpty();
 

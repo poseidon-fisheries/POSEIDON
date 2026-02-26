@@ -26,7 +26,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import uk.ac.ox.poseidon.biology.Fisheable;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 import java.time.Duration;
@@ -58,8 +57,8 @@ public class FixedBiomassProportionGear implements Gear {
         final Bucket fishToCatch =
             fisheable
                 .availableFish()
-                .mapContent((species, biomass) ->
-                    Biomass.ofKg(biomass.asKg() * proportion)
+                .mapBiomassValue((species, biomass) ->
+                    biomass * proportion
                 );
         final Bucket fishExtracted =
             fisheable.extract(fishToCatch);

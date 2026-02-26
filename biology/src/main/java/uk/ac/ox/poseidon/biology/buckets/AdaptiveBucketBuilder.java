@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 final class AdaptiveBucketBuilder implements BucketBuilder {
@@ -38,12 +39,18 @@ final class AdaptiveBucketBuilder implements BucketBuilder {
 
     @Override
     public AdaptiveBucketBuilder put(final Bucket bucket) {
+        checkNotNull(bucket, "bucket");
         return put(bucket.getMap());
     }
 
     @Override
     public AdaptiveBucketBuilder put(final Map<Species, Content> map) {
-        this.map.putAll(map);
+        checkNotNull(map, "map");
+        map.forEach((species, content) -> {
+            checkNotNull(species, "species");
+            checkNotNull(content, "content");
+            this.map.put(species, content);
+        });
         return this;
     }
 
@@ -52,17 +59,21 @@ final class AdaptiveBucketBuilder implements BucketBuilder {
         final Species species,
         final Content newContent
     ) {
+        checkNotNull(species, "species");
+        checkNotNull(newContent, "newContent");
         map.put(species, newContent);
         return this;
     }
 
     @Override
     public AdaptiveBucketBuilder add(final Bucket bucket) {
+        checkNotNull(bucket, "bucket");
         return add(bucket.getMap());
     }
 
     @Override
     public AdaptiveBucketBuilder add(final Map<Species, Content> map) {
+        checkNotNull(map, "map");
         map.forEach(this::add);
         return this;
     }
@@ -72,17 +83,21 @@ final class AdaptiveBucketBuilder implements BucketBuilder {
         final Species species,
         final Content content
     ) {
+        checkNotNull(species, "species");
+        checkNotNull(content, "content");
         map.merge(species, content, Content::add);
         return this;
     }
 
     @Override
     public AdaptiveBucketBuilder subtract(final Bucket bucket) {
+        checkNotNull(bucket, "bucket");
         return subtract(bucket.getMap());
     }
 
     @Override
     public AdaptiveBucketBuilder subtract(final Map<Species, Content> map) {
+        checkNotNull(map, "map");
         map.forEach(this::subtract);
         return this;
     }
@@ -92,6 +107,8 @@ final class AdaptiveBucketBuilder implements BucketBuilder {
         final Species species,
         final Content content
     ) {
+        checkNotNull(species, "species");
+        checkNotNull(content, "content");
         map.merge(species, content, Content::subtract);
         return this;
     }
@@ -115,8 +132,14 @@ final class AdaptiveBucketBuilder implements BucketBuilder {
 
         final boolean allBiomass = newMap.values().stream().allMatch(Biomass.class::isInstance);
 
-        return allBiomass
-            ? BiomassBucket.ofContentMap(newMap)
-            : ContentBucket.ofContentMap(newMap);
+        if (!allBiomass) return ContentBucket.ofContentMap(newMap);
+        if (newMap.size() == 1) {
+            final Entry<Species, Content> onlyEntry = newMap.entrySet().iterator().next();
+            return new SingleSpeciesBiomassBucket(
+                onlyEntry.getKey(),
+                onlyEntry.getValue().asKg()
+            );
+        }
+        return BiomassBucket.ofContentMap(newMap);
     }
 }

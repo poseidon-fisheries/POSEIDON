@@ -31,7 +31,6 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
@@ -85,33 +84,6 @@ public final class ContentBucket implements Bucket {
                     Content::add
                 ))
         );
-    }
-
-    @Override
-    public Bucket subtract(final Bucket other) {
-        return toBuilder().subtract(other).build();
-    }
-
-    @Override
-    public Bucket replaceContent(
-        final Species species,
-        final Content newContent
-    ) {
-        return toBuilder()
-            .put(species, newContent)
-            .build();
-    }
-
-    @Override
-    public Map<Boolean, Bucket> partitionBy(
-        final BiPredicate<Species, Content> predicate
-    ) {
-        final BucketBuilder b1 = Bucket.newBuilder();
-        final BucketBuilder b2 = Bucket.newBuilder();
-        getMap().forEach((species, content) ->
-            (predicate.test(species, content) ? b1 : b2).put(species, content)
-        );
-        return Map.of(true, b1.build(), false, b2.build());
     }
 
     @Override

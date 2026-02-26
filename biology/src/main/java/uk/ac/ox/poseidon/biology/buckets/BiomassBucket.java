@@ -214,11 +214,15 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
         final Species species,
         final Content newContent
     ) {
-        final int i = speciesIndex.indexOf(species);
-        if (i == -1) return toBuilder().put(species, newContent).build();
-        final double[] newBiomasses = biomasses.clone();
-        newBiomasses[i] = newContent.asKg();
-        return new BiomassBucket(newBiomasses, speciesIndex);
+        if (newContent instanceof Biomass) {
+            final int i = speciesIndex.indexOf(species);
+            if (i != -1) {
+                final double[] newBiomasses = biomasses.clone();
+                newBiomasses[i] = newContent.asKg();
+                return new BiomassBucket(newBiomasses, speciesIndex);
+            }
+        }
+        return Bucket.super.replaceContent(species, newContent);
     }
 
     @Override
