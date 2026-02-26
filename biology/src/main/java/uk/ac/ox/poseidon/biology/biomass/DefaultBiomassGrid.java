@@ -29,7 +29,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
-import uk.ac.ox.poseidon.biology.buckets.BucketBuilder;
+import uk.ac.ox.poseidon.biology.buckets.SingleSpeciesBiomassBucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableDoubleGrid;
@@ -117,15 +117,13 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
 
         @Override
         public Bucket extract(final Bucket fishToExtract) {
-            final BucketBuilder fishExtracted = Bucket.newBuilder();
             final double biomassToExtract = fishToExtract.getKg(species);
-            if (biomassToExtract > 0) {
-                final double gridBiomass = getBiomass(cell).asKg();
-                final double biomassExtracted = Math.min(biomassToExtract, gridBiomass);
-                setBiomass(cell, gridBiomass - biomassExtracted);
-                fishExtracted.add(species, Biomass.ofKg(biomassExtracted));
-            }
-            return fishExtracted.build();
+            if (biomassToExtract <= 0) return Bucket.empty();
+            final double gridBiomass = getValue(cell);
+            if (gridBiomass <= 0) return Bucket.empty();
+            final double biomassExtracted = Math.min(biomassToExtract, gridBiomass);
+            setValue(cell, gridBiomass - biomassExtracted);
+            return new SingleSpeciesBiomassBucket(species, biomassExtracted);
         }
     }
 }
