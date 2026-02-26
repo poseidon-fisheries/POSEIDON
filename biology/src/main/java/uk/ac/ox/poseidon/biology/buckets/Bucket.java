@@ -26,7 +26,6 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
 import java.util.Map;
@@ -36,6 +35,8 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.ObjDoubleConsumer;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public interface Bucket {
 
@@ -51,9 +52,9 @@ public interface Bucket {
         final Species species,
         final double biomassInKg
     ) {
-        return Double.isNaN(biomassInKg)
-            ? Bucket.empty()
-            : BiomassBucket.of(new double[]{biomassInKg}, SpeciesIndex.of(species));
+        if (Double.isNaN(biomassInKg) || biomassInKg == 0.0) return Bucket.empty();
+        checkArgument(biomassInKg > 0, "biomassInKg must be positive");
+        return new SingleSpeciesBiomassBucket(species, biomassInKg);
     }
 
     static Bucket of(
