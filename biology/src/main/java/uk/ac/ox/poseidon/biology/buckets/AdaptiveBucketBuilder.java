@@ -22,17 +22,14 @@
 
 package uk.ac.ox.poseidon.biology.buckets;
 
-import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 final class AdaptiveBucketBuilder implements BucketBuilder {
     private final Map<Species, Content> map = new HashMap<>();
@@ -115,31 +112,51 @@ final class AdaptiveBucketBuilder implements BucketBuilder {
 
     @Override
     public Bucket build() {
+        Species onlySpecies = null;
+        Content onlyContent = null;
+        int nonEmptyEntries = 0;
+        boolean allBiomass = true;
+        Map<Species, Content> filteredMap = null;
 
-        if (map.isEmpty()) {
+        for (final var entry : map.entrySet()) {
+            final Species species = entry.getKey();
+            final Content content = entry.getValue();
+            if (content.isEmpty()) continue;
+
+            if (nonEmptyEntries == 0) {
+                onlySpecies = species;
+                onlyContent = content;
+                nonEmptyEntries = 1;
+                allBiomass = content instanceof Biomass;
+                continue;
+            }
+
+            if (nonEmptyEntries == 1) {
+                filteredMap = new HashMap<>();
+                filteredMap.put(onlySpecies, onlyContent);
+            }
+
+            filteredMap.put(species, content);
+            nonEmptyEntries++;
+            if (!(content instanceof Biomass)) allBiomass = false;
+        }
+
+        if (nonEmptyEntries == 0) {
             return Bucket.empty();
         }
 
-        final ImmutableMap<Species, Content> newMap = this.map
-            .entrySet()
-            .stream()
-            .filter(entry -> !entry.getValue().isEmpty())
-            .collect(toImmutableMap(Entry::getKey, Entry::getValue));
-
-        if (newMap.isEmpty()) {
-            return Bucket.empty();
-        }
-
-        final boolean allBiomass = newMap.values().stream().allMatch(Biomass.class::isInstance);
-
-        if (!allBiomass) return ContentBucket.ofContentMap(newMap);
-        if (newMap.size() == 1) {
-            final Entry<Species, Content> onlyEntry = newMap.entrySet().iterator().next();
+        if (nonEmptyEntries == 1) {
+            if (!(onlyContent instanceof Biomass)) {
+                return ContentBucket.ofContentMap(Map.of(onlySpecies, onlyContent));
+            }
             return new SingleSpeciesBiomassBucket(
-                onlyEntry.getKey(),
-                onlyEntry.getValue().asKg()
+                onlySpecies,
+                onlyContent.asKg()
             );
         }
-        return BiomassBucket.ofContentMap(newMap);
+
+        return allBiomass
+            ? BiomassBucket.ofContentMap(filteredMap)
+            : ContentBucket.ofContentMap(filteredMap);
     }
 }
