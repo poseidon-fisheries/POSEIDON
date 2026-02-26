@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -189,5 +190,64 @@ class EventManagerTest {
             "Broadcasting a null event should not throw exceptions"
         );
     }
+
+    @Test
+    void testDiamondInterfaceHierarchyNotifiedOnce() {
+        final List<BaseEvent> receivedEvents = new ArrayList<>();
+        eventManager.addListener(new SimpleListener<>(BaseEvent.class, receivedEvents::add));
+
+        final DiamondEvent event = new DiamondEvent();
+        eventManager.broadcast(event);
+
+        assertEquals(1, receivedEvents.size());
+        assertEquals(event, receivedEvents.getFirst());
+    }
+
+    @Test
+    void testSameListenerAddedTwiceGetsTwoCallbacksAndRemoveRemovesAllIdenticalRegistrations() {
+        final List<String> receivedEvents = new ArrayList<>();
+        final Listener<String> listener = new SimpleListener<>(String.class, receivedEvents::add);
+        eventManager.addListener(listener);
+        eventManager.addListener(listener);
+
+        eventManager.broadcast("first");
+        assertEquals(2, receivedEvents.size());
+
+        eventManager.removeListener(listener);
+        eventManager.broadcast("second");
+        assertEquals(2, receivedEvents.size());
+    }
+
+    @Test
+    void testRemovingListenerDuringBroadcastDoesNotThrow() {
+        final List<String> receivedEvents = new ArrayList<>();
+
+        final AtomicReference<Listener<String>> listener2Ref = new AtomicReference<>();
+        final Listener<String> listener1 = new SimpleListener<>(
+            String.class,
+            event -> {
+                receivedEvents.add("l1:" + event);
+                eventManager.removeListener(listener2Ref.get());
+            }
+        );
+        final Listener<String> listener2 = new SimpleListener<>(
+            String.class,
+            event -> receivedEvents.add("l2:" + event)
+        );
+        listener2Ref.set(listener2);
+
+        eventManager.addListener(listener1);
+        eventManager.addListener(listener2);
+
+        assertDoesNotThrow(() -> eventManager.broadcast("event"));
+    }
+
+    interface BaseEvent {}
+
+    interface LeftEvent extends BaseEvent {}
+
+    interface RightEvent extends BaseEvent {}
+
+    static class DiamondEvent implements LeftEvent, RightEvent {}
 
 }

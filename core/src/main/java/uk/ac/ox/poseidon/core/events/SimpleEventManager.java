@@ -25,58 +25,79 @@ package uk.ac.ox.poseidon.core.events;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class SimpleEventManager implements EventManager {
 
     private final Multimap<Class<?>, Listener<?>> listeners =
         MultimapBuilder.hashKeys().arrayListValues().build();
+    private final Map<Class<?>, Class<?>[]> dispatchClassCache = new HashMap<>();
+    private final Map<Class<?>, Listener<?>[]> listenerSnapshotCache = new HashMap<>();
 
     @Override
     public void addListener(final Listener<?> listener) {
-        listeners.put(listener.getEventClass(), listener);
+        final Class<?> eventClass = listener.getEventClass();
+        listeners.put(eventClass, listener);
+        listenerSnapshotCache.remove(eventClass);
     }
 
     @Override
     public void removeListener(
         final Listener<?> listener
     ) {
-        listeners.get(listener.getEventClass()).removeIf(l -> l == listener);
+        final Class<?> eventClass = listener.getEventClass();
+        listeners.get(eventClass).removeIf(l -> l == listener);
+        listenerSnapshotCache.remove(eventClass);
     }
 
     @Override
     public <E> void broadcast(final E event) {
-        if (event != null) {
-            Class<?> eventClass = event.getClass();
-            final Set<Class<?>> visitedClasses = new HashSet<>();
-            // Traverse class hierarchy, including interfaces and their superinterfaces
-            while (eventClass != null) {
-                if (visitedClasses.add(eventClass)) { // Only process if not visited
-                    notifyListenersForClass(eventClass, event);
-                    traverseInterfaces(eventClass, event, visitedClasses);
-                }
-                eventClass = eventClass.getSuperclass();
-            }
+        if (event == null) return;
+        final Class<?>[] dispatchClasses = dispatchClassCache.computeIfAbsent(
+            event.getClass(),
+            this::computeDispatchClasses
+        );
+        for (final Class<?> dispatchClass : dispatchClasses) {
+            notifyListenersForClass(dispatchClass, event);
         }
     }
 
-    // Helper method to recursively traverse and notify listeners for interfaces and their
-    // superinterfaces
-    private <E> void traverseInterfaces(
+    private Class<?>[] computeDispatchClasses(final Class<?> rootEventClass) {
+        final List<Class<?>> dispatchClasses = new ArrayList<>();
+        final Set<Class<?>> visitedClasses = new HashSet<>();
+        Class<?> eventClass = rootEventClass;
+        while (eventClass != null) {
+            collectClassAndInterfaces(eventClass, visitedClasses, dispatchClasses);
+            eventClass = eventClass.getSuperclass();
+        }
+        return dispatchClasses.toArray(Class[]::new);
+    }
+
+    private void collectClassAndInterfaces(
         final Class<?> clazz,
-        final E event,
-        final Set<Class<?>> visitedClasses
+        final Set<Class<?>> visitedClasses,
+        final List<Class<?>> dispatchClasses
+    ) {
+        if (!visitedClasses.add(clazz)) return;
+        dispatchClasses.add(clazz);
+        collectInterfaces(clazz, visitedClasses, dispatchClasses);
+    }
+
+    private void collectInterfaces(
+        final Class<?> clazz,
+        final Set<Class<?>> visitedClasses,
+        final List<Class<?>> dispatchClasses
     ) {
         for (final Class<?> interfaceClass : clazz.getInterfaces()) {
-            if (visitedClasses.add(interfaceClass)) { // Only process if not visited
-                notifyListenersForClass(interfaceClass, event);
-                traverseInterfaces(
-                    interfaceClass,
-                    event,
-                    visitedClasses
-                );
-            }
+            if (!visitedClasses.add(interfaceClass)) continue;
+            dispatchClasses.add(interfaceClass);
+            collectInterfaces(interfaceClass, visitedClasses, dispatchClasses);
         }
     }
 
@@ -85,11 +106,18 @@ public class SimpleEventManager implements EventManager {
         final Class<?> eventClass,
         final E event
     ) {
-        listeners
-            .get(eventClass)
-            .forEach(listener ->
-                ((Listener<E>) listener).receive(event)
-            );
+        final Listener<?>[] listenerSnapshot = listenerSnapshotCache.computeIfAbsent(
+            eventClass,
+            this::createListenerSnapshot
+        );
+        for (final Listener<?> listener : listenerSnapshot) {
+            ((Listener<E>) listener).receive(event);
+        }
+    }
+
+    private Listener<?>[] createListenerSnapshot(final Class<?> eventClass) {
+        final Collection<Listener<?>> listenersForClass = listeners.get(eventClass);
+        return listenersForClass.toArray(Listener[]::new);
     }
 
 }
