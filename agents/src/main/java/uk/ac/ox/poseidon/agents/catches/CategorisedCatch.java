@@ -26,11 +26,8 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Value;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Stream;
-
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 @Value
 public class CategorisedCatch {
@@ -46,30 +43,32 @@ public class CategorisedCatch {
     ImmutableMap<CatchCategory, Bucket> buckets;
 
     public CategorisedCatch add(final CategorisedCatch other) {
-        return new CategorisedCatch(
-            Stream
-                .concat(
-                    buckets.entrySet().stream(),
-                    other.buckets.entrySet().stream()
-                )
-                .collect(toImmutableMap(
-                    Entry::getKey,
-                    Entry::getValue,
-                    Bucket::add
-                ))
-        );
+        if (buckets.isEmpty()) return other;
+        if (other.buckets.isEmpty()) return this;
+
+        final Map<CatchCategory, Bucket> merged =
+            new HashMap<>(buckets.size() + other.buckets.size());
+        merged.putAll(buckets);
+        for (final var entry : other.buckets.entrySet()) {
+            merged.merge(entry.getKey(), entry.getValue(), Bucket::add);
+        }
+        return new CategorisedCatch(merged);
     }
 
     public boolean isEmpty() {
-        return buckets.values().stream().allMatch(Bucket::isEmpty);
+        if (buckets.isEmpty()) return true;
+        for (final Bucket bucket : buckets.values()) {
+            if (!bucket.isEmpty()) return false;
+        }
+        return true;
     }
 
     public double getTotalBiomassInKg() {
-        return buckets
-            .values()
-            .stream()
-            .mapToDouble(Bucket::getTotalBiomassInKg)
-            .sum();
+        double totalBiomassInKg = 0.0;
+        for (final Bucket bucket : buckets.values()) {
+            totalBiomassInKg += bucket.getTotalBiomassInKg();
+        }
+        return totalBiomassInKg;
     }
 
 }

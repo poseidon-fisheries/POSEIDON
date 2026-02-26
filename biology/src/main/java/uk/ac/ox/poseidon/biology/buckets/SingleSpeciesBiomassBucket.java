@@ -23,7 +23,9 @@
 package uk.ac.ox.poseidon.biology.buckets;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -41,6 +43,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 
+@ToString
+@EqualsAndHashCode
 public class SingleSpeciesBiomassBucket implements Bucket {
 
     private final Species species;
