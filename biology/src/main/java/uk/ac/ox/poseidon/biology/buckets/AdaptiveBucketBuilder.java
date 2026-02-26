@@ -112,9 +112,16 @@ final class AdaptiveBucketBuilder implements BucketBuilder {
 
     @Override
     public Bucket build() {
-        Species onlySpecies = null;
-        Content onlyContent = null;
-        int nonEmptyEntries = 0;
+        // Performance note:
+        // This method is intentionally implemented as a single-pass loop (instead of
+        // stream/filter/collect) because it sits on a profiled hot path. The loop avoids
+        // transient stream/collector allocations while still preserving builder semantics:
+        // 1) drop empty content,
+        // 2) return Bucket.empty() if everything is empty,
+        // 3) specialize one-species biomass into SingleSpeciesBiomassBucket,
+        // 4) otherwise choose BiomassBucket vs ContentBucket based on filtered entries.
+        Species firstSpecies = null;
+        Content firstContent = null;
         boolean allBiomass = true;
         Map<Species, Content> filteredMap = null;
 
@@ -123,35 +130,33 @@ final class AdaptiveBucketBuilder implements BucketBuilder {
             final Content content = entry.getValue();
             if (content.isEmpty()) continue;
 
-            if (nonEmptyEntries == 0) {
-                onlySpecies = species;
-                onlyContent = content;
-                nonEmptyEntries = 1;
+            if (firstContent == null) {
+                firstSpecies = species;
+                firstContent = content;
                 allBiomass = content instanceof Biomass;
                 continue;
             }
 
-            if (nonEmptyEntries == 1) {
-                filteredMap = new HashMap<>();
-                filteredMap.put(onlySpecies, onlyContent);
+            if (filteredMap == null) {
+                filteredMap = new HashMap<>(map.size());
+                filteredMap.put(firstSpecies, firstContent);
             }
 
             filteredMap.put(species, content);
-            nonEmptyEntries++;
-            if (!(content instanceof Biomass)) allBiomass = false;
+            allBiomass &= content instanceof Biomass;
         }
 
-        if (nonEmptyEntries == 0) {
+        if (firstContent == null) {
             return Bucket.empty();
         }
 
-        if (nonEmptyEntries == 1) {
-            if (!(onlyContent instanceof Biomass)) {
-                return ContentBucket.ofContentMap(Map.of(onlySpecies, onlyContent));
+        if (filteredMap == null) {
+            if (!(firstContent instanceof Biomass)) {
+                return ContentBucket.ofContentMap(Map.of(firstSpecies, firstContent));
             }
             return new SingleSpeciesBiomassBucket(
-                onlySpecies,
-                onlyContent.asKg()
+                firstSpecies,
+                firstContent.asKg()
             );
         }
 

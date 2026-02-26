@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.biology.buckets;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
@@ -58,5 +59,82 @@ class AdaptiveBucketBuilderTest {
             .build();
 
         assertThat(bucket).isInstanceOf(BiomassBucket.class);
+    }
+
+    @Test
+    void singleNonEmptyNonBiomassReturnsContentBucket() {
+        final Bucket bucket = Bucket.newBuilder()
+            .put(a, new TestContent(10.0))
+            .build();
+
+        assertThat(bucket).isInstanceOf(ContentBucket.class);
+    }
+
+    @Test
+    void mixedBiomassAndNonBiomassReturnsContentBucket() {
+        final Bucket bucket = Bucket.newBuilder()
+            .put(a, Biomass.ofKg(10.0))
+            .put(b, new TestContent(5.0))
+            .build();
+
+        assertThat(bucket).isInstanceOf(ContentBucket.class);
+    }
+
+    @Test
+    void ignoresEmptyEntriesAndStillSpecializesSingleBiomass() {
+        final Bucket bucket = Bucket.newBuilder()
+            .put(a, Biomass.ofKg(10.0))
+            .put(b, Biomass.ZERO)
+            .build();
+
+        assertThat(bucket).isInstanceOf(SingleSpeciesBiomassBucket.class);
+    }
+
+    @Test
+    void allEntriesEmptyReturnsEmptyBucket() {
+        final Bucket bucket = Bucket.newBuilder()
+            .put(a, Biomass.ZERO)
+            .put(b, new TestContent(0.0))
+            .build();
+
+        assertThat(bucket).isSameAs(Bucket.empty());
+    }
+
+    @Test
+    void singleEntryAfterFilteringIsNonBiomassReturnsContentBucket() {
+        final Bucket bucket = Bucket.newBuilder()
+            .put(a, Biomass.ZERO)
+            .put(b, new TestContent(5.0))
+            .build();
+
+        assertThat(bucket).isInstanceOf(ContentBucket.class);
+    }
+
+    private static final class TestContent implements Content {
+        private final double kg;
+
+        private TestContent(final double kg) {
+            this.kg = kg;
+        }
+
+        @Override
+        public Biomass multiply(final double value) {
+            return Biomass.ofKg(kg * value);
+        }
+
+        @Override
+        public Biomass divide(final double value) {
+            return Biomass.ofKg(kg / value);
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return kg == 0.0;
+        }
+
+        @Override
+        public Biomass asBiomass() {
+            return Biomass.ofKg(kg);
+        }
     }
 }
