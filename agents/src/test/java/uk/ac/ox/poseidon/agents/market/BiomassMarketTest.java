@@ -26,10 +26,14 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
+import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -103,5 +107,41 @@ class BiomassMarketTest {
             "C1:S1:EUR",
             "C2:S2:USD"
         );
+    }
+
+    @Test
+    void sellFallsBackToGenericPriceWithoutMutatingStoredPriceMap() {
+        final CatchCategory category = new CatchCategory("C1");
+        final Species genericSpecies = new Species("S", null, null);
+        final Species stagedSpecies = new Species("S", "juvenile", null);
+        final Price genericPrice = new Price(Money.of(CurrencyUnit.of("EUR"), 2.0), KILOGRAM);
+
+        final Map<Species, Price> pricesBySpecies = new HashMap<>();
+        pricesBySpecies.put(genericSpecies, genericPrice);
+
+        final Map<CatchCategory, Map<Species, Price>> prices = new HashMap<>();
+        prices.put(category, pricesBySpecies);
+
+        final BiomassMarket market = new BiomassMarket(
+            mock(Port.class),
+            "M3",
+            prices,
+            mock(EventManager.class)
+        );
+
+        final Set<Species> initialKeys = new HashSet<>(market.getPrices().get(category).keySet());
+        final Sale sale = market.sell(
+            mock(Vessel.class),
+            new CategorisedCatch(Map.of(category, Bucket.of(stagedSpecies, 10.0))),
+            LocalDateTime.of(2026, 1, 1, 0, 0)
+        );
+
+        assertThat(sale.getUnsold().isEmpty()).isTrue();
+        assertThat(sale.getItems()).hasSize(1);
+        assertThat(sale.getItems().getFirst().getSpecies()).isEqualTo(stagedSpecies);
+        assertThat(sale.getItems().getFirst().getPrice()).isEqualTo(genericPrice);
+        assertThat(market.getPrices().get(category).keySet())
+            .containsExactlyInAnyOrderElementsOf(initialKeys);
+        assertThat(market.getPrices().get(category)).doesNotContainKey(stagedSpecies);
     }
 }
