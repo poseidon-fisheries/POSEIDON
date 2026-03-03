@@ -57,7 +57,7 @@ import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.Up
 @EqualsAndHashCode(callSuper = true)
 public class RegulationGridPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
-    private Factory<? super SimulationScope, ? extends Regulations<Vessel, ExtendedFishingAction>>
+    private Factory<? super SimulationScope, ? extends Regulations<? super ExtendedFishingAction>>
         regulations;
     private Factory<? super SimulationScope, ? extends VesselField> vesselField;
     private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetric;
@@ -103,7 +103,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
         }
 
         private final TemporalSchedule schedule;
-        private final Regulations<Vessel, ExtendedFishingAction> regulations;
+        private final Regulations<? super ExtendedFishingAction> regulations;
         private final VesselField vesselField;
         private final BathymetricGrid bathymetricGrid;
         private final ObjectGrid2D grid;
@@ -112,7 +112,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
 
         Portrayal(
             final TemporalSchedule schedule,
-            final Regulations<Vessel, ExtendedFishingAction> regulations,
+            final Regulations<? super ExtendedFishingAction> regulations,
             final VesselField vesselField,
             final BathymetricGrid bathymetricGrid,
             final UpdateFrequency updateFrequency,

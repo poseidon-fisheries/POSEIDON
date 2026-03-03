@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
-public class PermittedIf<G, A extends Action<G>> implements Regulations<G, A> {
+public class PermittedIf<A extends Action<?>> implements Regulations<A> {
 
     @NonNull private final Predicate<? super A> actionPredicate;
 

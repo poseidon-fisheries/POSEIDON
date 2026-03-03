@@ -25,19 +25,19 @@ package uk.ac.ox.poseidon.regulations.predicates.spatial;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-import uk.ac.ox.poseidon.regulations.ExtendedAction;
+import uk.ac.ox.poseidon.regulations.SpatialAction;
 
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
-public class ActionCellPredicate implements Predicate<ExtendedAction<?>> {
+public class ActionCellPredicate implements Predicate<SpatialAction<?>> {
 
     private final ModelGrid modelGrid;
     private final Predicate<Int2D> cellPredicate;
 
     @Override
-    public boolean test(final ExtendedAction extendedAction) {
-        return cellPredicate.test(modelGrid.toCell(extendedAction.getStartCoordinate())) ||
-            cellPredicate.test(modelGrid.toCell(extendedAction.getEndCoordinate()));
+    public boolean test(final SpatialAction<?> action) {
+        return cellPredicate.test(modelGrid.toCell(action.getStartCoordinate())) ||
+            cellPredicate.test(modelGrid.toCell(action.getEndCoordinate()));
     }
 }

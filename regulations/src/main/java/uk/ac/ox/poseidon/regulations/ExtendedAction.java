@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-public abstract class ExtendedAction<G> implements Action<G> {
+public abstract class ExtendedAction<G> implements TemporalAction<G>, SpatialAction<G> {
 
     private final G agent;
     private final LocalDateTime startDateTime;

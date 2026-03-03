@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,27 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.fishing;
+package uk.ac.ox.poseidon.regulations;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.regulations.ExtendedFishingAction;
-import uk.ac.ox.poseidon.agents.tasks.AgentTask;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.regulations.Regulations;
+import java.time.LocalDateTime;
 
-import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+public interface TemporalAction<G> extends Action<G> {
 
-@RequiredArgsConstructor
-public class CheckIfFishingHereAndNowIsLegal extends AgentTask<Vessel> {
+    LocalDateTime getStartDateTime();
 
-    @NonNull private final Regulations<? super ExtendedFishingAction> regulations;
-
-    @Override
-    public Status execute() {
-        final ExtendedFishingAction action = new ExtendedFishingAction(getAgent());
-        return regulations.isPermitted(action) ? SUCCEEDED : FAILED;
-    }
+    LocalDateTime getEndDateTime();
 
 }

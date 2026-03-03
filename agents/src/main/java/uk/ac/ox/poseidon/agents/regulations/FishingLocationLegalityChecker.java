@@ -40,7 +40,7 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor(access = PACKAGE)
 public class FishingLocationLegalityChecker implements Predicate<Int2D> {
 
-    private final Regulations<Vessel, ExtendedFishingAction> regulations;
+    private final Regulations<? super ExtendedFishingAction> regulations;
     private final GridPathFinder pathFinder;
     private final DistanceCalculator distanceCalculator;
     private final Supplier<LocalDateTime> currenDateTimeSupplier;

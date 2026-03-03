@@ -48,7 +48,7 @@ class PermittedIfTest {
         final Predicate<ExtendedAction<Object>> predicate = action -> true;
 
         // Create an instance of PermittedIf with the predicate
-        final PermittedIf<Object, ExtendedAction<Object>> permittedIf = new PermittedIf<>(predicate);
+        final PermittedIf<ExtendedAction<Object>> permittedIf = new PermittedIf<>(predicate);
 
         // Assert the method isPermitted returns true
         assertTrue(permittedIf.isPermitted(mockExtendedAction));
@@ -63,7 +63,7 @@ class PermittedIfTest {
         final Predicate<ExtendedAction<Object>> predicate = action -> false;
 
         // Create an instance of PermittedIf with the predicate
-        final PermittedIf<Object, ExtendedAction<Object>> permittedIf = new PermittedIf<>(predicate);
+        final PermittedIf<ExtendedAction<Object>> permittedIf = new PermittedIf<>(predicate);
 
         // Assert the method isPermitted returns false
         assertFalse(permittedIf.isPermitted(mockExtendedAction));
@@ -80,7 +80,7 @@ class PermittedIfTest {
             action -> action.getDuration().equals(Duration.ofHours(2));
 
         // Create an instance of PermittedIf with the predicate
-        final PermittedIf<Object, ExtendedAction<Object>> permittedIf = new PermittedIf<>(predicate);
+        final PermittedIf<ExtendedAction<Object>> permittedIf = new PermittedIf<>(predicate);
 
         // Assert the method isPermitted returns true for the mockAction
         assertTrue(permittedIf.isPermitted(mockExtendedAction));
@@ -97,7 +97,7 @@ class PermittedIfTest {
             action -> action.getDuration().equals(Duration.ofHours(2));
 
         // Create an instance of PermittedIf with the predicate
-        final PermittedIf<Object, ExtendedAction<Object>> permittedIf = new PermittedIf<>(predicate);
+        final PermittedIf<ExtendedAction<Object>> permittedIf = new PermittedIf<>(predicate);
 
         // Assert the method isPermitted returns false for the mockAction
         assertFalse(permittedIf.isPermitted(mockExtendedAction));

@@ -47,7 +47,7 @@ class ForbiddenIfTest {
     @Test
     void testActionIsPermittedWhenPredicateReturnsFalse() {
         // Arrange
-        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf =
+        final ForbiddenIf<ExtendedAction<Object>> forbiddenIf =
             new ForbiddenIf<>(action -> false);
         final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
 
@@ -61,7 +61,7 @@ class ForbiddenIfTest {
     @Test
     void testActionIsNotPermittedWhenPredicateIsAlwaysTrue() {
         // Arrange
-        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf =
+        final ForbiddenIf<ExtendedAction<Object>> forbiddenIf =
             new ForbiddenIf<>(action -> true);
         final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
 
@@ -74,7 +74,7 @@ class ForbiddenIfTest {
 
     @Test
     void testActionWithNullVessel() {
-        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf =
+        final ForbiddenIf<ExtendedAction<Object>> forbiddenIf =
             new ForbiddenIf<>(action -> action.getAgent() == null);
         final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
         Mockito.when(mockExtendedAction.getAgent()).thenReturn(null);
@@ -91,7 +91,7 @@ class ForbiddenIfTest {
         // Arrange
         final Predicate<ExtendedAction<Object>> predicate =
             action -> action.getDuration().compareTo(Duration.ofDays(365)) > 0;
-        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf = new ForbiddenIf<>(predicate);
+        final ForbiddenIf<ExtendedAction<Object>> forbiddenIf = new ForbiddenIf<>(predicate);
 
         final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
         Mockito.when(mockExtendedAction.getDuration()).thenReturn(Duration.ofDays(1000));
@@ -107,7 +107,7 @@ class ForbiddenIfTest {
     void testActionIsNotPermittedWhenPredicateReturnsTrue() {
         // Arrange
         final Predicate<ExtendedAction<Object>> predicate = action -> true;
-        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf = new ForbiddenIf<>(predicate);
+        final ForbiddenIf<ExtendedAction<Object>> forbiddenIf = new ForbiddenIf<>(predicate);
         final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
 
         // Act
@@ -121,7 +121,7 @@ class ForbiddenIfTest {
     void testPredicateChecksSpecificFieldOfAction() {
         final String vessel = "Vessel123";
         // Arrange
-        final ForbiddenIf<String, ExtendedAction<String>> forbiddenIf =
+        final ForbiddenIf<ExtendedAction<String>> forbiddenIf =
             new ForbiddenIf<>(action -> action.getAgent().equals(vessel));
 
         final ExtendedAction<String> mockExtendedAction = Mockito.mock(ExtendedAction.class);
@@ -140,7 +140,7 @@ class ForbiddenIfTest {
         // Arrange
         final Predicate<ExtendedAction<Object>> predicate =
             action -> action.getDuration().compareTo(Duration.ofHours(2)) > 0;
-        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf = new ForbiddenIf<>(predicate);
+        final ForbiddenIf<ExtendedAction<Object>> forbiddenIf = new ForbiddenIf<>(predicate);
 
         final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
         Mockito.when(mockExtendedAction.getDuration()).thenReturn(Duration.ofHours(3));
@@ -157,7 +157,7 @@ class ForbiddenIfTest {
         // Arrange
         final Predicate<ExtendedAction<Object>> predicate =
             action -> action.getDuration().compareTo(Duration.ofHours(2)) > 0;
-        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf = new ForbiddenIf<>(predicate);
+        final ForbiddenIf<ExtendedAction<Object>> forbiddenIf = new ForbiddenIf<>(predicate);
 
         final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
         Mockito.when(mockExtendedAction.getDuration()).thenReturn(Duration.ofMinutes(90));

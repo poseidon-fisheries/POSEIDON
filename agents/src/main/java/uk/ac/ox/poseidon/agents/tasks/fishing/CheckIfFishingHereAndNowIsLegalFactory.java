@@ -44,7 +44,7 @@ public class CheckIfFishingHereAndNowIsLegalFactory
 
     private Factory<
         ? super VesselScope,
-        ? extends Regulations<Vessel, ExtendedFishingAction>
+        ? extends Regulations<? super ExtendedFishingAction>
         > regulations;
     
     @Override

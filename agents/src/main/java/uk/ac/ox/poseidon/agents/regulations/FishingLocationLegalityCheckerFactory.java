@@ -45,7 +45,7 @@ public class FishingLocationLegalityCheckerFactory
 
     private Factory<
         ? super VesselScope,
-        ? extends Regulations<Vessel, ExtendedFishingAction>
+        ? extends Regulations<? super ExtendedFishingAction>
         > regulations;
 
     private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
