@@ -20,12 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.regulations.predicates;
+package uk.ac.ox.poseidon.regulations;
 
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.regulations.Action;
-import uk.ac.ox.poseidon.regulations.ForbiddenIfFactory;
 
 import java.util.function.Predicate;
 
