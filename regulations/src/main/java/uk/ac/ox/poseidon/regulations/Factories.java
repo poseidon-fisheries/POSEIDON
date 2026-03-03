@@ -37,4 +37,10 @@ public class Factories {
         return new ForbiddenIfFactory<S, A>(actionPredicate);
     }
 
+    public static <S extends Scope, A extends Action<?>> PermittedIfFactory<S, A> permittedIf(
+        final Factory<? super S, ? extends Predicate<? super A>> actionPredicate
+    ) {
+        return new PermittedIfFactory<S, A>(actionPredicate);
+    }
+
 }
