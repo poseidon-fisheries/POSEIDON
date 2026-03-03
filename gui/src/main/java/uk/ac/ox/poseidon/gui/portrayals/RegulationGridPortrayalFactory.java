@@ -29,7 +29,7 @@ import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
-import uk.ac.ox.poseidon.agents.regulations.FishingAction;
+import uk.ac.ox.poseidon.agents.regulations.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -57,7 +57,8 @@ import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.Up
 @EqualsAndHashCode(callSuper = true)
 public class RegulationGridPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
-    private Factory<? super SimulationScope, ? extends Regulations<Vessel>> regulations;
+    private Factory<? super SimulationScope, ? extends Regulations<Vessel, ExtendedFishingAction>>
+        regulations;
     private Factory<? super SimulationScope, ? extends VesselField> vesselField;
     private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetric;
     private int displayWidth;
@@ -102,7 +103,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
         }
 
         private final TemporalSchedule schedule;
-        private final Regulations<Vessel> regulations;
+        private final Regulations<Vessel, ExtendedFishingAction> regulations;
         private final VesselField vesselField;
         private final BathymetricGrid bathymetricGrid;
         private final ObjectGrid2D grid;
@@ -111,7 +112,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
 
         Portrayal(
             final TemporalSchedule schedule,
-            final Regulations<Vessel> regulations,
+            final Regulations<Vessel, ExtendedFishingAction> regulations,
             final VesselField vesselField,
             final BathymetricGrid bathymetricGrid,
             final UpdateFrequency updateFrequency,
@@ -163,7 +164,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
                     bagToStream(vesselField.getField().allObjects, Vessel.class)
                         .filter(Vessel::isActive)
                         .map(vessel ->
-                            new FishingAction(
+                            new ExtendedFishingAction(
                                 vessel,
                                 dateTime,
                                 Duration.ZERO,

@@ -26,14 +26,14 @@ import com.badlogic.gdx.ai.btree.LeafTask;
 import com.badlogic.gdx.ai.btree.Task;
 import uk.ac.ox.poseidon.agents.Agent;
 
-public abstract class AgentTask<A extends Agent> extends LeafTask<A> {
+public abstract class AgentTask<G extends Agent> extends LeafTask<G> {
 
-    public A getAgent() {
+    public G getAgent() {
         return getObject();
     }
 
     @Override
-    protected Task<A> copyTo(final Task<A> task) {
+    protected Task<G> copyTo(final Task<G> task) {
         throw new UnsupportedOperationException("Not implemented");
     }
 }

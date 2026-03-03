@@ -30,24 +30,24 @@ import java.lang.ref.WeakReference;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AgentScope<A extends Agent> extends SimulationScope {
+public class AgentScope<G extends Agent> extends SimulationScope {
 
-    private final WeakReference<A> agent;
+    private final WeakReference<G> agent;
 
-    public AgentScope(final AgentScope<A> agentScope) {
+    public AgentScope(final AgentScope<G> agentScope) {
         super(agentScope);
         this.agent = agentScope.agent;
     }
 
     public AgentScope(
         final SimulationScope simulationScope,
-        final A agent
+        final G agent
     ) {
         super(simulationScope);
         this.agent = new WeakReference<>(agent);
     }
 
-    public A getAgent() {
+    public G getAgent() {
         return agent.get();
     }
 

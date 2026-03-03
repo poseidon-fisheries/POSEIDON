@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
 import lombok.Value;
-import uk.ac.ox.poseidon.agents.regulations.FishingAction;
+import uk.ac.ox.poseidon.agents.regulations.ExtendedFishingAction;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
 
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
 @Value
 public class FishingEvent implements ExtendedEvent {
 
-    FishingAction action;
+    ExtendedFishingAction action;
     FishingOutcome outcome;
 
     @Override

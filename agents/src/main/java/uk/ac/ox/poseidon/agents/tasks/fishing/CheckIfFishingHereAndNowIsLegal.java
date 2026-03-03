@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks.fishing;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.regulations.FishingAction;
+import uk.ac.ox.poseidon.agents.regulations.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.regulations.Regulations;
@@ -35,11 +35,11 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 @RequiredArgsConstructor
 public class CheckIfFishingHereAndNowIsLegal extends AgentTask<Vessel> {
 
-    @NonNull private final Regulations<Vessel> regulations;
+    @NonNull private final Regulations<Vessel, ExtendedFishingAction> regulations;
 
     @Override
     public Status execute() {
-        final FishingAction action = new FishingAction(getAgent());
+        final ExtendedFishingAction action = new ExtendedFishingAction(getAgent());
         return regulations.isPermitted(action) ? SUCCEEDED : FAILED;
     }
 

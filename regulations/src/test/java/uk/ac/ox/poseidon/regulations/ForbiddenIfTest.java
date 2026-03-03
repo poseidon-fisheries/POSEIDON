@@ -47,11 +47,12 @@ class ForbiddenIfTest {
     @Test
     void testActionIsPermittedWhenPredicateReturnsFalse() {
         // Arrange
-        final ForbiddenIf<Object> forbiddenIf = new ForbiddenIf<>(action -> false);
-        final Action<Object> mockAction = Mockito.mock(Action.class);
+        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf =
+            new ForbiddenIf<>(action -> false);
+        final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
 
         // Act
-        final boolean result = forbiddenIf.isPermitted(mockAction);
+        final boolean result = forbiddenIf.isPermitted(mockExtendedAction);
 
         // Assert
         assertTrue(result, "Expected action to be permitted when predicate returns false.");
@@ -60,11 +61,12 @@ class ForbiddenIfTest {
     @Test
     void testActionIsNotPermittedWhenPredicateIsAlwaysTrue() {
         // Arrange
-        final ForbiddenIf<Object> forbiddenIf = new ForbiddenIf<>(action -> true);
-        final Action<Object> mockAction = Mockito.mock(Action.class);
+        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf =
+            new ForbiddenIf<>(action -> true);
+        final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
 
         // Act
-        final boolean result = forbiddenIf.isPermitted(mockAction);
+        final boolean result = forbiddenIf.isPermitted(mockExtendedAction);
 
         // Assert
         assertFalse(result, "Expected action to be not permitted when predicate is always true.");
@@ -72,13 +74,13 @@ class ForbiddenIfTest {
 
     @Test
     void testActionWithNullVessel() {
-        final ForbiddenIf<Object> forbiddenIf =
+        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf =
             new ForbiddenIf<>(action -> action.getAgent() == null);
-        final Action<Object> mockAction = Mockito.mock(Action.class);
-        Mockito.when(mockAction.getAgent()).thenReturn(null);
+        final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(mockExtendedAction.getAgent()).thenReturn(null);
 
         // Act
-        final boolean result = forbiddenIf.isPermitted(mockAction);
+        final boolean result = forbiddenIf.isPermitted(mockExtendedAction);
 
         // Assert
         assertFalse(result, "Expected action to be not permitted when agent is null.");
@@ -87,15 +89,15 @@ class ForbiddenIfTest {
     @Test
     void testActionWithExtremelyLongDuration() {
         // Arrange
-        final Predicate<Action<Object>> predicate =
+        final Predicate<ExtendedAction<Object>> predicate =
             action -> action.getDuration().compareTo(Duration.ofDays(365)) > 0;
-        final ForbiddenIf<Object> forbiddenIf = new ForbiddenIf<>(predicate);
+        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf = new ForbiddenIf<>(predicate);
 
-        final Action<Object> mockAction = Mockito.mock(Action.class);
-        Mockito.when(mockAction.getDuration()).thenReturn(Duration.ofDays(1000));
+        final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(mockExtendedAction.getDuration()).thenReturn(Duration.ofDays(1000));
 
         // Act
-        final boolean result = forbiddenIf.isPermitted(mockAction);
+        final boolean result = forbiddenIf.isPermitted(mockExtendedAction);
 
         // Assert
         assertFalse(result, "Expected action to be not permitted when duration exceeds 1 year.");
@@ -104,12 +106,12 @@ class ForbiddenIfTest {
     @Test
     void testActionIsNotPermittedWhenPredicateReturnsTrue() {
         // Arrange
-        final Predicate<Action<Object>> predicate = action -> true;
-        final ForbiddenIf<Object> forbiddenIf = new ForbiddenIf<>(predicate);
-        final Action<Object> mockAction = Mockito.mock(Action.class);
+        final Predicate<ExtendedAction<Object>> predicate = action -> true;
+        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf = new ForbiddenIf<>(predicate);
+        final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
 
         // Act
-        final boolean result = forbiddenIf.isPermitted(mockAction);
+        final boolean result = forbiddenIf.isPermitted(mockExtendedAction);
 
         // Assert
         assertFalse(result, "Expected action to be not permitted when predicate returns true.");
@@ -119,12 +121,12 @@ class ForbiddenIfTest {
     void testPredicateChecksSpecificFieldOfAction() {
         final String vessel = "Vessel123";
         // Arrange
-        final ForbiddenIf<String> forbiddenIf =
+        final ForbiddenIf<String, ExtendedAction<String>> forbiddenIf =
             new ForbiddenIf<>(action -> action.getAgent().equals(vessel));
 
-        final Action<String> mockAction = Mockito.mock(Action.class);
-        Mockito.when(mockAction.getAgent()).thenReturn(vessel);
-        final boolean result = forbiddenIf.isPermitted(mockAction);
+        final ExtendedAction<String> mockExtendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(mockExtendedAction.getAgent()).thenReturn(vessel);
+        final boolean result = forbiddenIf.isPermitted(mockExtendedAction);
 
         // Assert
         assertFalse(
@@ -136,15 +138,15 @@ class ForbiddenIfTest {
     @Test
     void testPredicateChecksDurationGreaterThanThreshold() {
         // Arrange
-        final Predicate<Action<Object>> predicate =
+        final Predicate<ExtendedAction<Object>> predicate =
             action -> action.getDuration().compareTo(Duration.ofHours(2)) > 0;
-        final ForbiddenIf<Object> forbiddenIf = new ForbiddenIf<>(predicate);
+        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf = new ForbiddenIf<>(predicate);
 
-        final Action<Object> mockAction = Mockito.mock(Action.class);
-        Mockito.when(mockAction.getDuration()).thenReturn(Duration.ofHours(3));
+        final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(mockExtendedAction.getDuration()).thenReturn(Duration.ofHours(3));
 
         // Act
-        final boolean result = forbiddenIf.isPermitted(mockAction);
+        final boolean result = forbiddenIf.isPermitted(mockExtendedAction);
 
         // Assert
         assertFalse(result, "Expected action to be not permitted when duration exceeds 2 hours.");
@@ -153,15 +155,15 @@ class ForbiddenIfTest {
     @Test
     void testPredicateChecksDurationLessThanThreshold() {
         // Arrange
-        final Predicate<Action<Object>> predicate =
+        final Predicate<ExtendedAction<Object>> predicate =
             action -> action.getDuration().compareTo(Duration.ofHours(2)) > 0;
-        final ForbiddenIf<Object> forbiddenIf = new ForbiddenIf<>(predicate);
+        final ForbiddenIf<Object, ExtendedAction<Object>> forbiddenIf = new ForbiddenIf<>(predicate);
 
-        final Action<Object> mockAction = Mockito.mock(Action.class);
-        Mockito.when(mockAction.getDuration()).thenReturn(Duration.ofMinutes(90));
+        final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(mockExtendedAction.getDuration()).thenReturn(Duration.ofMinutes(90));
 
         // Act
-        final boolean result = forbiddenIf.isPermitted(mockAction);
+        final boolean result = forbiddenIf.isPermitted(mockExtendedAction);
 
         // Assert
         assertTrue(result, "Expected action to be permitted when duration is less than 2 hours.");

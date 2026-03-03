@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,53 +22,6 @@
 
 package uk.ac.ox.poseidon.regulations;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import uk.ac.ox.poseidon.geography.Coordinate;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-
-@Data
-@AllArgsConstructor
-public abstract class Action<A> {
-
-    private final A agent;
-    private final LocalDateTime startDateTime;
-    private final LocalDateTime endDateTime;
-    private final Coordinate startCoordinate;
-    private final Coordinate endCoordinate;
-
-    public Action(
-        final A agent,
-        final LocalDateTime startDateTime,
-        final LocalDateTime endDateTime,
-        final Coordinate coordinate
-    ) {
-        this(agent, startDateTime, endDateTime, coordinate, coordinate);
-    }
-
-    public Action(
-        final A agent,
-        final LocalDateTime startDateTime,
-        final Duration duration,
-        final Coordinate coordinate
-    ) {
-        this(agent, startDateTime, duration, coordinate, coordinate);
-    }
-
-    public Action(
-        final A agent,
-        final LocalDateTime startDateTime,
-        final Duration duration,
-        final Coordinate startCoordinate,
-        final Coordinate endCoordinate
-    ) {
-        this(agent, startDateTime, startDateTime.plus(duration), startCoordinate, endCoordinate);
-    }
-
-    public Duration getDuration() {
-        return Duration.between(startDateTime, endDateTime);
-    }
-
+public interface Action<G> {
+    G getAgent();
 }

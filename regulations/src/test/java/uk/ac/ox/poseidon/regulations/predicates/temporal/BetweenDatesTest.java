@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import uk.ac.ox.poseidon.regulations.Action;
+import uk.ac.ox.poseidon.regulations.ExtendedAction;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -55,12 +55,24 @@ class BetweenDatesTest {
         final LocalDate endDate = LocalDate.of(2023, 12, 31);
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 6, 15, 12, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2024, 1, 1, 12, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            6,
+            15,
+            12,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2024,
+            1,
+            1,
+            12,
+            0
+        ));
 
         // Act & Assert
-        assertTrue(betweenDates.test(action));
+        assertTrue(betweenDates.test(extendedAction));
     }
 
     @Test
@@ -70,12 +82,24 @@ class BetweenDatesTest {
         final LocalDate endDate = LocalDate.of(2023, 12, 31);
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2022, 12, 31, 12, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 6, 15, 12, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2022,
+            12,
+            31,
+            12,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            6,
+            15,
+            12,
+            0
+        ));
 
         // Act & Assert
-        assertTrue(betweenDates.test(action));
+        assertTrue(betweenDates.test(extendedAction));
     }
 
     @Test
@@ -85,12 +109,24 @@ class BetweenDatesTest {
         final LocalDate endDate = LocalDate.of(2023, 12, 31);
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 1, 1, 0, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 12, 31, 23, 59));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            1,
+            1,
+            0,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            12,
+            31,
+            23,
+            59
+        ));
 
         // Act & Assert
-        assertTrue(betweenDates.test(action));
+        assertTrue(betweenDates.test(extendedAction));
     }
 
     @Test
@@ -100,12 +136,24 @@ class BetweenDatesTest {
         final LocalDate endDate = LocalDate.of(2023, 12, 31);
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2022, 12, 31, 23, 59));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 12, 31, 0, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2022,
+            12,
+            31,
+            23,
+            59
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            12,
+            31,
+            0,
+            0
+        ));
 
         // Act & Assert
-        assertTrue(betweenDates.test(action));
+        assertTrue(betweenDates.test(extendedAction));
     }
 
     @Test
@@ -115,12 +163,24 @@ class BetweenDatesTest {
         final LocalDate endDate = LocalDate.of(2023, 12, 31);
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2022, 12, 30, 12, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2022, 12, 31, 23, 59));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2022,
+            12,
+            30,
+            12,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2022,
+            12,
+            31,
+            23,
+            59
+        ));
 
         // Act & Assert
-        assertFalse(betweenDates.test(action));
+        assertFalse(betweenDates.test(extendedAction));
     }
 
     @Test
@@ -130,12 +190,24 @@ class BetweenDatesTest {
         final LocalDate endDate = LocalDate.of(2023, 12, 31);
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2024, 1, 1, 0, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2024, 1, 2, 12, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2024,
+            1,
+            1,
+            0,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2024,
+            1,
+            2,
+            12,
+            0
+        ));
 
         // Act & Assert
-        assertFalse(betweenDates.test(action));
+        assertFalse(betweenDates.test(extendedAction));
     }
 
     @Test
@@ -145,12 +217,24 @@ class BetweenDatesTest {
         final LocalDate endDate = LocalDate.of(2023, 12, 31);
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 6, 1, 0, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 6, 30, 23, 59));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            6,
+            1,
+            0,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            6,
+            30,
+            23,
+            59
+        ));
 
         // Act & Assert
-        assertTrue(betweenDates.test(action));
+        assertTrue(betweenDates.test(extendedAction));
     }
 
     @Test
@@ -160,11 +244,23 @@ class BetweenDatesTest {
         final LocalDate endDate = LocalDate.of(2023, 12, 31);
         final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2022, 12, 31, 12, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2024, 1, 1, 12, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2022,
+            12,
+            31,
+            12,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2024,
+            1,
+            1,
+            12,
+            0
+        ));
 
         // Act & Assert
-        assertTrue(betweenDates.test(action));
+        assertTrue(betweenDates.test(extendedAction));
     }
 }

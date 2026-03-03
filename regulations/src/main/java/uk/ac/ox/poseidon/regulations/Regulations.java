@@ -23,11 +23,11 @@
 package uk.ac.ox.poseidon.regulations;
 
 @FunctionalInterface
-public interface Regulations<A> {
+public interface Regulations<G, A extends Action<G>> {
 
-    boolean isPermitted(Action<? super A> action);
+    boolean isPermitted(A action);
 
-    default boolean isForbidden(final Action<? super A> action) {
+    default boolean isForbidden(final A action) {
         return !isPermitted(action);
     }
 

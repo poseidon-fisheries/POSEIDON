@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import uk.ac.ox.poseidon.regulations.Action;
+import uk.ac.ox.poseidon.regulations.ExtendedAction;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -42,12 +42,24 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.JULY, 31);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 6, 1, 0, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 6, 1, 23, 59));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            6,
+            1,
+            0,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            6,
+            1,
+            23,
+            59
+        ));
 
         // Act & Assert
-        assertTrue(predicate.test(action));
+        assertTrue(predicate.test(extendedAction));
     }
 
     @Test
@@ -57,12 +69,24 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.DECEMBER, 31);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2022, 6, 15, 10, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2024, 7, 15, 10, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2022,
+            6,
+            15,
+            10,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2024,
+            7,
+            15,
+            10,
+            0
+        ));
 
         // Act & Assert
-        assertTrue(predicate.test(action));
+        assertTrue(predicate.test(extendedAction));
     }
 
     @Test
@@ -72,12 +96,24 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.JULY, 31);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 7, 31, 0, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 7, 31, 23, 59));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            7,
+            31,
+            0,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            7,
+            31,
+            23,
+            59
+        ));
 
         // Act & Assert
-        assertTrue(predicate.test(action));
+        assertTrue(predicate.test(extendedAction));
     }
 
     @Test
@@ -87,12 +123,24 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.MARCH, 1);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2022, 1, 1, 0, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2022, 12, 31, 23, 59));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2022,
+            1,
+            1,
+            0,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2022,
+            12,
+            31,
+            23,
+            59
+        ));
 
         // Act & Assert
-        assertTrue(predicate.test(action));
+        assertTrue(predicate.test(extendedAction));
     }
 
     @Test
@@ -102,12 +150,24 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.JUNE, 30);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 3, 25, 0, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 7, 2, 23, 59));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            3,
+            25,
+            0,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            7,
+            2,
+            23,
+            59
+        ));
 
         // Act & Assert
-        assertTrue(predicate.test(action));
+        assertTrue(predicate.test(extendedAction));
     }
 
     @Test
@@ -117,12 +177,24 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.FEBRUARY, 28);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 12, 31, 0, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2024, 1, 1, 0, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            12,
+            31,
+            0,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2024,
+            1,
+            1,
+            0,
+            0
+        ));
 
         // Act & Assert
-        assertTrue(predicate.test(action));
+        assertTrue(predicate.test(extendedAction));
     }
 
     @Test
@@ -132,12 +204,24 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.APRIL, 10);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 3, 20, 10, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 3, 20, 20, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            3,
+            20,
+            10,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            3,
+            20,
+            20,
+            0
+        ));
 
         // Act & Assert
-        assertTrue(predicate.test(action));
+        assertTrue(predicate.test(extendedAction));
     }
 
     @Test
@@ -147,12 +231,24 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.JULY, 31);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 6, 15, 10, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 7, 15, 10, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            6,
+            15,
+            10,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            7,
+            15,
+            10,
+            0
+        ));
 
         // Act & Assert
-        assertTrue(predicate.test(action));
+        assertTrue(predicate.test(extendedAction));
     }
 
     @Test
@@ -162,12 +258,24 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.JULY, 31);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 5, 15, 10, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 5, 20, 10, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            5,
+            15,
+            10,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            5,
+            20,
+            10,
+            0
+        ));
 
         // Act & Assert
-        assertFalse(predicate.test(action));
+        assertFalse(predicate.test(extendedAction));
     }
 
     @Test
@@ -177,12 +285,24 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.FEBRUARY, 28);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 11, 15, 10, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 12, 15, 10, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            11,
+            15,
+            10,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            12,
+            15,
+            10,
+            0
+        ));
 
         // Act & Assert
-        assertTrue(predicate.test(action));
+        assertTrue(predicate.test(extendedAction));
     }
 
     @Test
@@ -192,12 +312,24 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.FEBRUARY, 28);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 7, 15, 10, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 8, 15, 10, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            7,
+            15,
+            10,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            8,
+            15,
+            10,
+            0
+        ));
 
         // Act & Assert
-        assertFalse(predicate.test(action));
+        assertFalse(predicate.test(extendedAction));
     }
 
     @Test
@@ -207,12 +339,24 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.FEBRUARY, 28);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 12, 15, 10, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2024, 1, 15, 10, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            12,
+            15,
+            10,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2024,
+            1,
+            15,
+            10,
+            0
+        ));
 
         // Act & Assert
-        assertTrue(predicate.test(action));
+        assertTrue(predicate.test(extendedAction));
     }
 
     @Test
@@ -222,11 +366,23 @@ class BetweenYearlyDatesTest {
         final MonthDay end = MonthDay.of(Month.FEBRUARY, 28);
         final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
 
-        final Action action = Mockito.mock(Action.class);
-        Mockito.when(action.getStartDateTime()).thenReturn(LocalDateTime.of(2023, 6, 15, 10, 0));
-        Mockito.when(action.getEndDateTime()).thenReturn(LocalDateTime.of(2023, 9, 15, 10, 0));
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            6,
+            15,
+            10,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            9,
+            15,
+            10,
+            0
+        ));
 
         // Act & Assert
-        assertFalse(predicate.test(action));
+        assertFalse(predicate.test(extendedAction));
     }
 }

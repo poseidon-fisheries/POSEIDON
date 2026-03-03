@@ -26,7 +26,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import uk.ac.ox.poseidon.regulations.Action;
+import uk.ac.ox.poseidon.regulations.ExtendedAction;
 
 import java.time.LocalDateTime;
 import java.time.MonthDay;
@@ -55,7 +55,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class BetweenYearlyDates implements Predicate<Action<?>> {
+public class BetweenYearlyDates implements Predicate<ExtendedAction<?>> {
 
     @NonNull private final MonthDay start;
     @NonNull private final MonthDay end;
@@ -71,10 +71,11 @@ public class BetweenYearlyDates implements Predicate<Action<?>> {
     }
 
     @Override
-    public boolean test(final Action action) {
-        checkArgument(action.getStartDateTime().isBefore(action.getEndDateTime()));
-        return insideRange(action.getStartDateTime()) || insideRange(action.getEndDateTime()) ||
-            coversRange(action.getStartDateTime(), action.getEndDateTime());
+    public boolean test(final ExtendedAction extendedAction) {
+        checkArgument(extendedAction.getStartDateTime().isBefore(extendedAction.getEndDateTime()));
+        return insideRange(extendedAction.getStartDateTime()) ||
+            insideRange(extendedAction.getEndDateTime()) ||
+            coversRange(extendedAction.getStartDateTime(), extendedAction.getEndDateTime());
     }
 
     private boolean coversRange(

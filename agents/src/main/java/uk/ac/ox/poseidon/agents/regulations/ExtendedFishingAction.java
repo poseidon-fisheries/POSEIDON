@@ -22,31 +22,39 @@
 
 package uk.ac.ox.poseidon.agents.regulations;
 
+import lombok.Getter;
 import lombok.NonNull;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.regulations.ExtendedAction;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public interface VesselAction {
+@Getter
+public class ExtendedFishingAction extends ExtendedAction<Vessel> implements FishingAction {
 
-    @NonNull
-    Vessel getVessel();
+    @NonNull private final Gear gear;
 
-    @NonNull
-    LocalDateTime getStartDateTime();
+    public ExtendedFishingAction(
+        @NonNull final Vessel vessel,
+        @NonNull final LocalDateTime startDateTime,
+        @NonNull final Duration duration,
+        @NonNull final Coordinate coordinate,
+        @NonNull final Gear gear
+    ) {
+        super(vessel, startDateTime, duration, coordinate);
+        this.gear = gear;
+    }
 
-    @NonNull
-    Duration getDuration();
-
-    @NonNull
-    LocalDateTime getEndDateTime();
-
-    @NonNull
-    Coordinate getStartCoordinate();
-
-    @NonNull
-    Coordinate getEndCoordinate();
-
+    public ExtendedFishingAction(final Vessel vessel) {
+        this(
+            vessel,
+            vessel.getSchedule().getDateTime(),
+            vessel.getGear().getDurationSupplier().get(),
+            vessel.getVesselField().getModelGrid().toCoordinate(vessel.getCell()),
+            vessel.getGear()
+        );
+    }
 }

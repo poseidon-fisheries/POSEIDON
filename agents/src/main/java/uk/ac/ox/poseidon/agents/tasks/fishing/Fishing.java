@@ -26,7 +26,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
-import uk.ac.ox.poseidon.agents.regulations.FishingAction;
+import uk.ac.ox.poseidon.agents.regulations.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.biology.Fisheable;
@@ -43,12 +43,12 @@ public class Fishing extends ExtendedTripTask {
     @NonNull private final Supplier<Fisheable> fisheableSupplier;
     @NonNull private final DispositionProcess dispositionProcess;
 
-    private FishingAction action;
+    private ExtendedFishingAction action;
 
     @Override
     public void start() {
         super.start();
-        action = new FishingAction(getAgent());
+        action = new ExtendedFishingAction(getAgent());
     }
 
     @Override

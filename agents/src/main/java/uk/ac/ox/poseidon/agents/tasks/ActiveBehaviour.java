@@ -30,14 +30,14 @@ import lombok.RequiredArgsConstructor;
 import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 
 @RequiredArgsConstructor
-public class ActiveBehaviour<A> implements Behaviour {
+public class ActiveBehaviour<G> implements Behaviour {
 
     @NonNull
-    private final BehaviorTree<A> tree;
+    private final BehaviorTree<G> tree;
 
     public ActiveBehaviour(
-        final Task<A> rootTask,
-        final A agent
+        final Task<G> rootTask,
+        final G agent
     ) {
         this(new BehaviorTree<>(rootTask, agent));
     }

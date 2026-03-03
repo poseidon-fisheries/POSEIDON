@@ -43,7 +43,11 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 public class FishingLocationLegalityCheckerFactory
     extends VesselScopeFactory<FishingLocationLegalityChecker> {
 
-    private Factory<? super VesselScope, ? extends Regulations<Vessel>> regulations;
+    private Factory<
+        ? super VesselScope,
+        ? extends Regulations<Vessel, ExtendedFishingAction>
+        > regulations;
+
     private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
     private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
 

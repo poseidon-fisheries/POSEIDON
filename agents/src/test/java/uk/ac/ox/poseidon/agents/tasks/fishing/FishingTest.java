@@ -22,13 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
-import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.BehaviorTree;
+import com.badlogic.gdx.ai.btree.Task;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
-import uk.ac.ox.poseidon.agents.regulations.FishingAction;
+import uk.ac.ox.poseidon.agents.regulations.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
@@ -74,7 +74,12 @@ class FishingTest {
         final ExposedFishing fishing = new ExposedFishing(() -> fisheable, dispositionProcess);
         setTaskObject(fishing, vessel);
         setField(fishing, "trip", trip, fishing.getClass().getSuperclass().getSuperclass());
-        setField(fishing, "action", mock(FishingAction.class), fishing.getClass().getSuperclass());
+        setField(
+            fishing,
+            "action",
+            mock(ExtendedFishingAction.class),
+            fishing.getClass().getSuperclass()
+        );
 
         final Task.Status status = fishing.invokeComplete();
 
@@ -114,7 +119,12 @@ class FishingTest {
         final ExposedFishing fishing = new ExposedFishing(() -> fisheable, dispositionProcess);
         setTaskObject(fishing, vessel);
         setField(fishing, "trip", trip, fishing.getClass().getSuperclass().getSuperclass());
-        setField(fishing, "action", mock(FishingAction.class), fishing.getClass().getSuperclass());
+        setField(
+            fishing,
+            "action",
+            mock(ExtendedFishingAction.class),
+            fishing.getClass().getSuperclass()
+        );
 
         final Task.Status status = fishing.invokeComplete();
 

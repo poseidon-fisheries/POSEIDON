@@ -24,20 +24,20 @@ package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.regulations.Action;
+import uk.ac.ox.poseidon.regulations.ExtendedAction;
 
 import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
-public class InYear implements Predicate<Action<?>> {
+public class InYear implements Predicate<ExtendedAction<?>> {
 
     private final int year;
 
     @Override
-    public boolean test(final Action action) {
-        final var actionStartYear = action.getStartDateTime().getYear();
-        final var actionEndYear = action.getEndDateTime().getYear();
+    public boolean test(final ExtendedAction extendedAction) {
+        final var actionStartYear = extendedAction.getStartDateTime().getYear();
+        final var actionEndYear = extendedAction.getEndDateTime().getYear();
         return actionStartYear == this.year ||
             actionEndYear == this.year ||
             (actionStartYear < this.year && actionEndYear > this.year);

@@ -30,7 +30,7 @@ import java.time.Duration;
 import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 
 @RequiredArgsConstructor
-public abstract class ExtendedTask<A extends Agent> extends AgentTask<A> {
+public abstract class ExtendedTask<G extends Agent> extends AgentTask<G> {
 
     @Override
     public Status execute() {

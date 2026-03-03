@@ -35,14 +35,13 @@ import java.util.function.Predicate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PermittedIfFactory<S extends Scope, A>
-    extends RelativeScopeFactory<S, PermittedIf<A>> {
+public class PermittedIfFactory<S extends Scope, G, A extends Action<G>>
+    extends RelativeScopeFactory<S, PermittedIf<G, A>> {
 
-    @NonNull private Factory<? super S, ? extends Predicate<? super Action<? super A>>>
-        actionPredicate;
+    @NonNull private Factory<? super S, ? extends Predicate<? super A>> actionPredicate;
 
     @Override
-    protected PermittedIf<A> newInstance(final S scope) {
+    protected PermittedIf<G, A> newInstance(final S scope) {
         return new PermittedIf<>(actionPredicate.get(scope));
     }
 

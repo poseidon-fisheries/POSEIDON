@@ -40,7 +40,7 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor(access = PACKAGE)
 public class FishingLocationLegalityChecker implements Predicate<Int2D> {
 
-    private final Regulations<Vessel> regulations;
+    private final Regulations<Vessel, ExtendedFishingAction> regulations;
     private final GridPathFinder pathFinder;
     private final DistanceCalculator distanceCalculator;
     private final Supplier<LocalDateTime> currenDateTimeSupplier;
@@ -53,7 +53,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
         return regulations.isPermitted(makeAction(fishingLocation));
     }
 
-    private FishingAction makeAction(
+    private ExtendedFishingAction makeAction(
         final Int2D fishingLocation
     ) {
         final List<Int2D> pathToFishingLocation =
@@ -72,7 +72,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
                 vessel.getEngine().getCruisingSpeedInKph()
             );
 
-        return new FishingAction(
+        return new ExtendedFishingAction(
             vessel,
             currenDateTimeSupplier.get().plus(travelDuration),
             Duration.ofSeconds(1),

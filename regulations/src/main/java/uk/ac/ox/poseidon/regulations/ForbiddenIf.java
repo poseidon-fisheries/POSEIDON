@@ -28,12 +28,12 @@ import lombok.RequiredArgsConstructor;
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
-public class ForbiddenIf<A> implements Regulations<A> {
+public class ForbiddenIf<G, A extends Action<G>> implements Regulations<G, A> {
 
-    @NonNull private final Predicate<? super Action<? super A>> actionPredicate;
+    @NonNull private final Predicate<? super A> actionPredicate;
 
     @Override
-    public boolean isPermitted(final Action<? super A> action) {
+    public boolean isPermitted(final A action) {
         return !actionPredicate.test(action);
     }
 }

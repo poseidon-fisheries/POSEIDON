@@ -38,13 +38,13 @@ import java.util.function.Predicate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ForbiddenIfFactory<S extends Scope, A>
-    extends RelativeScopeFactory<S, ForbiddenIf<A>> {
+public class ForbiddenIfFactory<S extends Scope, G, A extends Action<G>>
+    extends RelativeScopeFactory<S, ForbiddenIf<G, A>> {
 
-    private Factory<? super S, ? extends Predicate<? super Action<? super A>>> actionPredicate;
+    private Factory<? super S, ? extends Predicate<? super A>> actionPredicate;
 
     @Override
-    protected ForbiddenIf<A> newInstance(final S scope) {
+    protected ForbiddenIf<G, A> newInstance(final S scope) {
         return new ForbiddenIf<>(actionPredicate.get(scope));
     }
 
