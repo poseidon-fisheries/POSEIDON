@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import lombok.Getter;
 import lombok.NonNull;
-import uk.ac.ox.poseidon.regulations.ExtendedAction;
+import uk.ac.ox.poseidon.regulations.TemporalAction;
 
 import java.time.LocalDate;
 import java.util.function.Predicate;
@@ -50,7 +50,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * provided are used in a thread-safe manner.
  */
 @Getter
-public final class BetweenDates implements Predicate<ExtendedAction<?>> {
+public final class BetweenDates implements Predicate<TemporalAction<?>> {
 
     @NonNull private final LocalDate start;
     @NonNull private final LocalDate end;
@@ -70,9 +70,9 @@ public final class BetweenDates implements Predicate<ExtendedAction<?>> {
     }
 
     @Override
-    public boolean test(final ExtendedAction extendedAction) {
-        final LocalDate actionStart = extendedAction.getStartDateTime().toLocalDate();
-        final LocalDate actionEnd = extendedAction.getEndDateTime().toLocalDate();
+    public boolean test(final TemporalAction<?> action) {
+        final LocalDate actionStart = action.getStartDateTime().toLocalDate();
+        final LocalDate actionEnd = action.getEndDateTime().toLocalDate();
         return betweenDates(actionStart) || betweenDates(actionEnd) ||
             (actionStart.isBefore(start) && actionEnd.isAfter(end));
     }

@@ -24,19 +24,19 @@ package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.regulations.ExtendedAction;
+import uk.ac.ox.poseidon.regulations.SpatialAction;
 
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
-public class ActionCoordinatePredicate implements Predicate<ExtendedAction<?>> {
+public class ActionCoordinatePredicate implements Predicate<SpatialAction<?>> {
 
     private final Predicate<Coordinate> coordinatePredicate;
 
     @Override
-    public boolean test(final ExtendedAction extendedAction) {
-        return coordinatePredicate.test(extendedAction.getStartCoordinate()) ||
-            coordinatePredicate.test(extendedAction.getEndCoordinate());
+    public boolean test(final SpatialAction<?> action) {
+        return coordinatePredicate.test(action.getStartCoordinate()) ||
+            coordinatePredicate.test(action.getEndCoordinate());
     }
 
 }
