@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,35 +20,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.temporal;
+package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.time.MonthDay;
+import java.util.function.Predicate;
 
-@Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class BetweenYearlyDatesFactory<S extends Scope>
-    extends RelativeScopeFactory<S, BetweenYearlyDates> {
+public class Factories {
 
-    private Factory<? super S, ? extends MonthDay> start;
-    private Factory<? super S, ? extends MonthDay> end;
+    private Factories() {}
 
-    @Override
-    protected BetweenYearlyDates newInstance(final S scope) {
-        return new BetweenYearlyDates(
-            start.get(scope),
-            end.get(scope)
-        );
+    public static <S extends Scope> ActionCellPredicateFactory<S> actionCellPredicate(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends Predicate<Int2D>> cellPredicate
+    ) {
+        return new ActionCellPredicateFactory<>(modelGrid, cellPredicate);
     }
+
+    public static <S extends Scope> ActionCoordinatePredicateFactory<S> actionCoordinatePredicate(
+        final Factory<? super S, ? extends Predicate<Coordinate>> coordinatePredicate
+    ) {
+        return new ActionCoordinatePredicateFactory<>(coordinatePredicate);
+    }
+
 }
