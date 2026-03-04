@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.geography.grids;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
@@ -34,7 +33,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Double.isNaN;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 abstract class AbstractNormalisedDoubleGridFromAllocatorFactory<

@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.io.sources;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -34,7 +33,6 @@ import java.nio.file.Path;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -44,7 +42,7 @@ public class FileDataSourceFactory<S extends Scope>
     private static final String DEFAULT_ENCODING = UTF_8.name();
 
     private Factory<S, ? extends Path> path;
-    @Builder.Default private String encoding = DEFAULT_ENCODING;
+    private String encoding;
 
     public FileDataSourceFactory(final Factory<S, ? extends Path> path) {
         this.path = path;

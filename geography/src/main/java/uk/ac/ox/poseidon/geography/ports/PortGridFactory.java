@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -45,7 +44,6 @@ import static java.text.MessageFormat.format;
 import static java.util.Comparator.comparingDouble;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

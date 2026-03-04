@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import sim.portrayal.SimplePortrayal2D;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.simple.OrientedPortrayal2D;
@@ -39,7 +38,6 @@ import static java.awt.Color.LIGHT_GRAY;
 import static sim.portrayal.simple.OrientedPortrayal2D.SHAPE_COMPASS;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

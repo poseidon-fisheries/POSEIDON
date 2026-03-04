@@ -25,12 +25,10 @@ package uk.ac.ox.poseidon.agents.tasks;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class InactiveBehaviourFactory extends GlobalScopeFactory<InactiveBehaviour> {

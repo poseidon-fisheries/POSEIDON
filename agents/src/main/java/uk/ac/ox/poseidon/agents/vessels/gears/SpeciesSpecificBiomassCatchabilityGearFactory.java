@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.agents.utils.SpeciesSpecificRateFactorySupport;
@@ -44,7 +43,6 @@ import static java.util.function.UnaryOperator.identity;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

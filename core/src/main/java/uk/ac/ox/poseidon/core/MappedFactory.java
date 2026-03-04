@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.core;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.apache.commons.beanutils.PropertyUtils;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -39,7 +38,6 @@ import static java.util.stream.IntStream.range;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

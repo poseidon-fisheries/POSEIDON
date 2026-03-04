@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import si.uom.NonSI;
 import tech.units.indriya.format.SimpleQuantityFormat;
 import tech.units.indriya.format.SimpleUnitFormat;
@@ -41,7 +40,6 @@ import java.util.Map.Entry;
 import static java.util.Map.entry;
 
 @Data
-@SuperBuilder
 @RequiredArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

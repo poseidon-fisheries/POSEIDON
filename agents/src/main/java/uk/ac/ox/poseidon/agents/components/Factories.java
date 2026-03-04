@@ -20,31 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.io.paths;
+package uk.ac.ox.poseidon.agents.components;
 
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.nio.file.Path;
-
-import static uk.ac.ox.poseidon.io.paths.PathFactory.pathToString;
 
 public class Factories {
 
-    public static RootPathFactory path(final Path path) {
-        return new RootPathFactory(pathToString(path));
+    private Factories() {
     }
 
-    public static RootPathFactory path(
-        final String first,
-        final String... more
+    public static <C> ComponentFactory<C> component(
+        final Factory<? super VesselScope, ? extends C> componentFactory,
+        final Factory<? super VesselScope, ? extends ComponentRegister<C>> componentRegister
     ) {
-        return path(Path.of(first, more));
+        return new ComponentFactory<>(componentFactory, componentRegister);
     }
 
-    public static SimulationFolderFactory simulationFolder(
-        final Factory<? super SimulationScope, ? extends Path> parent
-    ) {
-        return new SimulationFolderFactory(parent);
-    }
 }

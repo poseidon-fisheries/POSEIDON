@@ -23,14 +23,12 @@
 package uk.ac.ox.poseidon.core.utils;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

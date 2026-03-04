@@ -24,13 +24,11 @@ package uk.ac.ox.poseidon.core.quantities;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
 
 import javax.measure.Unit;
 import javax.measure.quantity.Speed;
 
 @Data
-@SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 public class SpeedFactory extends AbstractQuantityFactory<Speed> {
 

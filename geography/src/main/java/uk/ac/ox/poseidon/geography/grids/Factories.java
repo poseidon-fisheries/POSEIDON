@@ -20,31 +20,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.io.paths;
+package uk.ac.ox.poseidon.geography.grids;
 
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 
-import static uk.ac.ox.poseidon.io.paths.PathFactory.pathToString;
-
 public class Factories {
 
-    public static RootPathFactory path(final Path path) {
-        return new RootPathFactory(pathToString(path));
+    private Factories() {
     }
 
-    public static RootPathFactory path(
-        final String first,
-        final String... more
+    public static <S extends Scope> CellSetFromGridFileFactory<S> cellSetFromGridFile(
+        final Factory<? super S, ? extends Path> path,
+        final double includedValue
     ) {
-        return path(Path.of(first, more));
+        return new CellSetFromGridFileFactory<>(path, includedValue);
     }
 
-    public static SimulationFolderFactory simulationFolder(
-        final Factory<? super SimulationScope, ? extends Path> parent
-    ) {
-        return new SimulationFolderFactory(parent);
-    }
 }

@@ -27,7 +27,6 @@ import com.badlogic.gdx.ai.btree.branch.Sequence;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -36,7 +35,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import java.util.List;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SequenceTaskFactory extends BranchTaskFactory<Sequence<Vessel>> {

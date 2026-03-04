@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.geography.vectors;
 
 import com.google.common.collect.ImmutableList;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
 import org.geotools.data.simple.SimpleFeatureCollection;
@@ -42,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

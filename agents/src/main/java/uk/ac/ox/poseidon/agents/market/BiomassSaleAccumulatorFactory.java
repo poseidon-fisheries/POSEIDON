@@ -25,12 +25,10 @@ package uk.ac.ox.poseidon.agents.market;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class BiomassSaleAccumulatorFactory

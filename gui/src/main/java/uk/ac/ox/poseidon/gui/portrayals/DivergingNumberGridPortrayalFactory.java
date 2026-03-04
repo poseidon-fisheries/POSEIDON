@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.gui.portrayals;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import sim.util.gui.ColorMap;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -38,7 +37,6 @@ import static java.lang.Math.abs;
 import static java.lang.Math.max;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class DivergingNumberGridPortrayalFactory extends NumberGridPortrayalFactory {

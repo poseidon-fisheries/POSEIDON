@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 
 import ec.util.MersenneTwisterFast;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -38,7 +37,6 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

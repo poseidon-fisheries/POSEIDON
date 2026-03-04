@@ -24,12 +24,10 @@ package uk.ac.ox.poseidon.core.quantities;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
 
 import javax.measure.quantity.Volume;
 
 @Data
-@SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 public class VolumeFactory extends AbstractQuantityFactory<Volume> {
 

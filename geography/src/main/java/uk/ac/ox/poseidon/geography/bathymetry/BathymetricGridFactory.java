@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.geography.bathymetry;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -35,7 +34,6 @@ import java.util.Collection;
 import java.util.Map;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -44,7 +42,7 @@ public abstract class BathymetricGridFactory<S extends Scope>
 
     @NonNull private Factory<? super S, ? extends ModelGrid> modelGrid;
     @NonNull private Factory<? super S, ? extends Aggregator> aggregator;
-    @Builder.Default private boolean inverted = false;
+    private boolean inverted;
 
     @Override
     protected BathymetricGrid newInstance(final S scope) {

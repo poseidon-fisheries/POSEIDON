@@ -30,16 +30,18 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static uk.ac.ox.poseidon.agents.components.Factories.component;
 
 class ComponentFactoryTest {
 
     @Test
     void registersComponentWhenCreated() {
         final ComponentRegister<String> register = new ComponentRegister<>();
-        final ComponentFactory<String> factory = ComponentFactory.<String>builder()
-            .componentFactory(scope -> "component")
-            .componentRegister(scope -> register)
-            .build();
+        final ComponentFactory<String> factory =
+            component(
+                scope -> "component",
+                scope -> register
+            );
 
         final Vessel vessel = mock(Vessel.class);
         final Simulation simulation = mock(Simulation.class);

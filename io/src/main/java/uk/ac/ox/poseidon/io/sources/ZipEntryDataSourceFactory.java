@@ -23,11 +23,9 @@
 package uk.ac.ox.poseidon.io.sources;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -43,7 +41,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -54,7 +51,7 @@ public class ZipEntryDataSourceFactory<S extends Scope>
 
     private Factory<S, ? extends Path> path;
     private String entry;
-    @Builder.Default private String encoding = DEFAULT_ENCODING;
+    private String encoding;
 
     public ZipEntryDataSourceFactory(
         final Factory<S, ? extends Path> path,

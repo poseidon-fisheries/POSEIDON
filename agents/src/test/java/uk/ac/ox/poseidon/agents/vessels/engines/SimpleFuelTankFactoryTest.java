@@ -27,15 +27,17 @@ import uk.ac.ox.poseidon.core.quantities.VolumeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.tank;
 
 class SimpleFuelTankFactoryTest {
 
     @Test
     void createsSimpleFuelTankUsingVolumeFactories() {
-        final SimpleFuelTankFactory<Scope> factory = SimpleFuelTankFactory.<Scope>builder()
-            .capacity(new VolumeFactory(2.0, "m3"))
-            .currentFuel(new VolumeFactory(0.1255, "m3"))
-            .build();
+        final SimpleFuelTankFactory<Scope> factory =
+            tank(
+                new VolumeFactory(2.0, "m3"),
+                new VolumeFactory(0.1255, "m3")
+            );
 
         final FuelTank tank = factory.get(Scope.GLOBAL_SCOPE);
 

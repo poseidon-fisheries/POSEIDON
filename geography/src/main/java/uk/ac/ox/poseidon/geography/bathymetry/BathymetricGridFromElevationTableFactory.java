@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
@@ -37,7 +36,6 @@ import java.util.Collection;
 import java.util.Map;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

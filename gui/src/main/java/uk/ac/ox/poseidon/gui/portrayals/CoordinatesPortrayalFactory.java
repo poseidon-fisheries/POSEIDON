@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.LocationWrapper;
 import sim.portrayal.SimplePortrayal2D;
@@ -40,7 +39,6 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import java.text.DecimalFormat;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

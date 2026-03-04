@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -37,7 +36,6 @@ import java.util.function.DoubleSupplier;
 import static uk.ac.ox.poseidon.core.suppliers.Factories.constantDouble;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -58,10 +56,10 @@ public class ProportionOfCarryingCapacityAllocatorFactory<S extends Scope>
     public static <S extends Scope> ProportionOfCarryingCapacityAllocatorFactory<S> fullCarryingCapacityAllocator(
         final Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid
     ) {
-        return ProportionOfCarryingCapacityAllocatorFactory.<S>builder()
-            .proportionSupplier(constantDouble(1.0))
-            .carryingCapacityGrid(carryingCapacityGrid)
-            .build();
+        return new ProportionOfCarryingCapacityAllocatorFactory<>(
+            carryingCapacityGrid,
+            constantDouble(1.0)
+        );
     }
 
 }

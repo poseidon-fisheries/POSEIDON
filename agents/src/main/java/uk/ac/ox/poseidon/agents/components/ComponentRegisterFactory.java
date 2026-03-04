@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.agents.components;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -33,7 +32,6 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * Creates a simulation-scoped {@link ComponentRegister} instance.
  */
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ComponentRegisterFactory<C> extends SimulationScopeFactory<ComponentRegister<C>> {

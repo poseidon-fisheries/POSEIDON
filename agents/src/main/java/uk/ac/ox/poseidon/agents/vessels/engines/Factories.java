@@ -33,16 +33,23 @@ import static uk.ac.ox.poseidon.core.quantities.Factories.volumeOf;
 
 public class Factories {
 
+    public static <S extends Scope> SimpleFuelTankFactory<S> tank(
+        final Factory<? super S, ? extends Quantity<Volume>> capacity,
+        final Factory<? super S, ? extends Quantity<Volume>> currentFuel
+    ) {
+        return new SimpleFuelTankFactory<>(capacity, currentFuel);
+    }
+
     public static <S extends Scope> SimpleFuelTankFactory<S> fullTank(
         final Factory<? super S, ? extends Quantity<Volume>> capacity
     ) {
-        return new SimpleFuelTankFactory<>(capacity, capacity);
+        return tank(capacity, capacity);
     }
 
     public static <S extends Scope> SimpleFuelTankFactory<S> emptyTank(
         final Factory<? super S, ? extends Quantity<Volume>> capacity
     ) {
-        return new SimpleFuelTankFactory<>(capacity, volumeOf(0, LITRE));
+        return tank(capacity, volumeOf(0, LITRE));
     }
 
 }

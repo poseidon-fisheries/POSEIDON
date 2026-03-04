@@ -27,7 +27,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -36,10 +35,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.io.File;
 import java.nio.file.Path;
 
+import static lombok.AccessLevel.PACKAGE;
+
 @Data
-@SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = PACKAGE)
 @EqualsAndHashCode(callSuper = true)
 public class CellSetFromGridFileFactory<S extends Scope>
     extends RelativeScopeFactory<S, ImmutableSet<Int2D>> {

@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
@@ -51,7 +50,6 @@ import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
 import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_MONTH;
 
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

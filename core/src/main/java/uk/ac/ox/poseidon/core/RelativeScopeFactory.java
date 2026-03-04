@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.core;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.beans.IntrospectionException;
@@ -40,7 +39,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.beans.Introspector.getBeanInfo;
 import static java.util.stream.Collectors.toMap;
 
-@SuperBuilder
 @NoArgsConstructor
 public abstract class RelativeScopeFactory<S extends Scope, C> extends AbstractFactory<S, C> {
 

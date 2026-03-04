@@ -27,7 +27,6 @@ import uk.ac.ox.poseidon.agents.catches.UncategorisedCatchCategoryFactory;
 import uk.ac.ox.poseidon.agents.catches.UniformCatchCategoriserFactory;
 import uk.ac.ox.poseidon.agents.catches.disposition.ProportionallyLimitingBiomassToHoldFactory;
 import uk.ac.ox.poseidon.agents.choices.*;
-import uk.ac.ox.poseidon.agents.components.ComponentFactory;
 import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
@@ -79,6 +78,7 @@ import java.util.function.Supplier;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.LITRE;
+import static uk.ac.ox.poseidon.agents.components.Factories.component;
 import static uk.ac.ox.poseidon.agents.money.Factories.money;
 import static uk.ac.ox.poseidon.agents.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.agents.tasks.decorators.Factories.untilFail;
@@ -266,7 +266,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             new ComponentRegisterFactory<MutableOptionValues<Int2D>>();
 
         final var optionValues =
-            new ComponentFactory<>(
+            component(
                 new ExponentialMovingAverageOptionValuesFactory<>(LEARNING_ALPHA),
                 optionValuesRegister
             );
