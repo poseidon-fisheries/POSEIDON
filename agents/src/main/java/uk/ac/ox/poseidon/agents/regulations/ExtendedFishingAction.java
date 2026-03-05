@@ -33,7 +33,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Getter
-public class ExtendedFishingAction extends ExtendedAction<Vessel> implements FishingAction {
+public class ExtendedFishingAction
+    extends ExtendedAction<Vessel>
+    implements TemporalFishingAction, SpatialFishingAction {
 
     @NonNull private final Gear gear;
 
