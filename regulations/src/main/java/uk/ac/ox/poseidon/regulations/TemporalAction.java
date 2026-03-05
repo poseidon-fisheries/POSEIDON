@@ -22,12 +22,22 @@
 
 package uk.ac.ox.poseidon.regulations;
 
+import org.threeten.extra.Interval;
+
 import java.time.LocalDateTime;
+
+import static java.time.ZoneOffset.UTC;
 
 public interface TemporalAction<G> extends Action<G> {
 
-    LocalDateTime getStartDateTime();
+    Interval getInterval();
 
-    LocalDateTime getEndDateTime();
+    default LocalDateTime getStartDateTime() {
+        return getInterval().getStart().atZone(UTC).toLocalDateTime();
+    }
+
+    default LocalDateTime getEndDateTime() {
+        return getInterval().getEnd().atZone(UTC).toLocalDateTime();
+    }
 
 }

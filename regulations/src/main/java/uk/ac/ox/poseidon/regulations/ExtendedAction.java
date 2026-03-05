@@ -24,18 +24,20 @@ package uk.ac.ox.poseidon.regulations;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.threeten.extra.Interval;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+
+import static java.time.ZoneOffset.UTC;
 
 @Data
 @AllArgsConstructor
 public abstract class ExtendedAction<G> implements TemporalAction<G>, SpatialAction<G> {
 
     private final G agent;
-    private final LocalDateTime startDateTime;
-    private final LocalDateTime endDateTime;
+    private final Interval interval;
     private final Coordinate startCoordinate;
     private final Coordinate endCoordinate;
 
@@ -45,7 +47,12 @@ public abstract class ExtendedAction<G> implements TemporalAction<G>, SpatialAct
         final LocalDateTime endDateTime,
         final Coordinate coordinate
     ) {
-        this(agent, startDateTime, endDateTime, coordinate, coordinate);
+        this(
+            agent,
+            Interval.of(startDateTime.toInstant(UTC), endDateTime.toInstant(UTC)),
+            coordinate,
+            coordinate
+        );
     }
 
     public ExtendedAction(
@@ -54,7 +61,13 @@ public abstract class ExtendedAction<G> implements TemporalAction<G>, SpatialAct
         final Duration duration,
         final Coordinate coordinate
     ) {
-        this(agent, startDateTime, duration, coordinate, coordinate);
+        this(
+            agent,
+            startDateTime,
+            duration,
+            coordinate,
+            coordinate
+        );
     }
 
     public ExtendedAction(
@@ -64,11 +77,16 @@ public abstract class ExtendedAction<G> implements TemporalAction<G>, SpatialAct
         final Coordinate startCoordinate,
         final Coordinate endCoordinate
     ) {
-        this(agent, startDateTime, startDateTime.plus(duration), startCoordinate, endCoordinate);
+        this(
+            agent,
+            Interval.of(startDateTime.toInstant(UTC), duration),
+            startCoordinate,
+            endCoordinate
+        );
     }
 
     public Duration getDuration() {
-        return Duration.between(startDateTime, endDateTime);
+        return interval.toDuration();
     }
 
 }

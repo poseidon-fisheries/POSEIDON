@@ -27,4 +27,5 @@ plugins {
 
 dependencies {
     api(project(":geography"))
+    api(libs.threeten.extra)
 }

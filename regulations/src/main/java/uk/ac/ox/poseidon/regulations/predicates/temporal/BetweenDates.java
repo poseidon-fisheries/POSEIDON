@@ -24,61 +24,50 @@ package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import lombok.Getter;
 import lombok.NonNull;
+import org.threeten.extra.Interval;
 import uk.ac.ox.poseidon.regulations.TemporalAction;
 
 import java.time.LocalDate;
 import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.time.ZoneOffset.UTC;
 
 /**
- * The BetweenDates class implements a predicate to determine if a given {@code Action} occurs
- * within a specified date range, defined by a start and end date.
+ * Predicate matching temporal actions that overlap a given inclusive date range.
  * <p>
- * Features and Behavior: - The date range is inclusive of both the start and end dates. - The
- * {@code Action} is considered to meet the predicate if any of the following conditions hold: 1.
- * The {@code Action}'s start date falls within the specified range. 2. The {@code Action}'s end
- * date falls within the specified range. 3. The range fully encompasses the {@code Action}'s
- * duration.
+ * The provided dates are converted to a UTC interval
+ * {@code [start at 00:00, day after end at 00:00)}. An action matches when its
+ * interval overlaps this range. Touching only at an endpoint does not match.
+ * Zero-duration actions match when their instant falls inside the range.
  * <p>
- * Immutability: - This class is immutable. Both the start and end dates are required to be
- * non-null.
- * <p>
- * Preconditions: - The start date must not be after the end date.
- * <p>
- * Thread Safety: - Instances of this class are thread-safe as long as the {@code Action} instances
- * provided are used in a thread-safe manner.
+ * Preconditions: the start date must not be after the end date.
  */
 @Getter
 public final class BetweenDates implements Predicate<TemporalAction<?>> {
 
-    @NonNull private final LocalDate start;
-    @NonNull private final LocalDate end;
+    @NonNull private final Interval interval;
 
     public BetweenDates(
         @NonNull final LocalDate start,
         @NonNull final LocalDate end
     ) {
-        this.start = start;
-        this.end = end;
         checkArgument(
             !start.isAfter(end),
             "Start date (%s) must not be after end date (%s).",
             start,
             end
         );
+        this.interval =
+            Interval.of(
+                start.atStartOfDay().toInstant(UTC),
+                end.plusDays(1).atStartOfDay().toInstant(UTC)
+            );
     }
 
     @Override
     public boolean test(final TemporalAction<?> action) {
-        final LocalDate actionStart = action.getStartDateTime().toLocalDate();
-        final LocalDate actionEnd = action.getEndDateTime().toLocalDate();
-        return betweenDates(actionStart) || betweenDates(actionEnd) ||
-            (actionStart.isBefore(start) && actionEnd.isAfter(end));
-    }
-
-    private boolean betweenDates(final LocalDate date) {
-        return !(date.isBefore(start) || date.isAfter(end));
+        return action.getInterval().overlaps(this.interval);
     }
 
 }
