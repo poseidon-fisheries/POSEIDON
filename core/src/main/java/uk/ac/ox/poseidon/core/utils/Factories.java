@@ -57,4 +57,10 @@ public class Factories {
         return new ObjectFactory<>(Collections.unmodifiableSet(set));
     }
 
+    public static NumericIntervalToStringMapperFactory numericIntervalToStringMapper(
+        final NumericIntervalToStringMapperFactory.Interval... intervals
+    ) {
+        return new NumericIntervalToStringMapperFactory(List.of(intervals));
+    }
+
 }

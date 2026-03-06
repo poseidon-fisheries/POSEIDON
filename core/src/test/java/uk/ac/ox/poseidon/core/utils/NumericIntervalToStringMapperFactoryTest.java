@@ -1,0 +1,72 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2026, University of Oxford.
+ *
+ * University of Oxford means the Chancellor, Masters and Scholars of the
+ * University of Oxford, having an administrative office at Wellington
+ * Square, Oxford OX1 2JD, UK.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package uk.ac.ox.poseidon.core.utils;
+
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
+import static uk.ac.ox.poseidon.core.utils.Factories.numericIntervalToStringMapper;
+
+class NumericIntervalToStringMapperFactoryTest {
+
+    @Test
+    void buildsStringMapperFromConfiguredIntervals() {
+        final NumericIntervalToStringMapperFactory factory =
+            new NumericIntervalToStringMapperFactory(
+                List.of(
+                    NumericIntervalToStringMapperFactory.interval(0.0, 6.0, "VL0006"),
+                    NumericIntervalToStringMapperFactory.interval(6.0, 12.0, "VL0612"),
+                    NumericIntervalToStringMapperFactory.interval(40.0, null, "VL40XX")
+                )
+            );
+
+        final NumericIntervalMapper<String> mapper = factory.get(GLOBAL_SCOPE);
+
+        assertThat(mapper.get(5.999)).contains("VL0006");
+        assertThat(mapper.get(6.0)).contains("VL0612");
+        assertThat(mapper.get(40.0)).contains("VL40XX");
+    }
+
+    @Test
+    void createsIntervalsViaStaticHelper() {
+        assertThat(NumericIntervalToStringMapperFactory.interval(6.0, 12.0, "VL0612"))
+            .isEqualTo(new NumericIntervalToStringMapperFactory.Interval(6.0, 12.0, "VL0612"));
+    }
+
+    @Test
+    void buildsFactoryViaFactoriesHelper() {
+        final NumericIntervalMapper<String> mapper =
+            numericIntervalToStringMapper(
+                NumericIntervalToStringMapperFactory.interval(0.0, 6.0, "VL0006"),
+                NumericIntervalToStringMapperFactory.interval(6.0, 12.0, "VL0612"),
+                NumericIntervalToStringMapperFactory.interval(40.0, null, "VL40XX")
+            ).get(GLOBAL_SCOPE);
+
+        assertThat(mapper.get(5.999)).contains("VL0006");
+        assertThat(mapper.get(6.0)).contains("VL0612");
+        assertThat(mapper.get(40.0)).contains("VL40XX");
+    }
+}
