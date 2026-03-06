@@ -30,6 +30,10 @@ import java.util.Optional;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.nullsFirst;
 
+/**
+ * Maps numeric values to labels using non-overlapping intervals.
+ * Bounds are lower-inclusive and upper-exclusive; null bounds are unbounded.
+ */
 @Value
 public class NumericIntervalMapper<T> {
 
@@ -89,6 +93,7 @@ public class NumericIntervalMapper<T> {
     @Value
     public static class Interval<T> {
 
+        // Null means the interval is unbounded on that side.
         Double lowerBoundInclusive;
         Double upperBoundExclusive;
         T mappedValue;

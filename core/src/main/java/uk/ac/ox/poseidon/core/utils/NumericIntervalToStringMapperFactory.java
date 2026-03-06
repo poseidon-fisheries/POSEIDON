@@ -31,6 +31,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
+/**
+ * Factory for {@link NumericIntervalMapper} instances with string outputs.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -68,6 +71,7 @@ public class NumericIntervalToStringMapperFactory
     @AllArgsConstructor
     public static class Interval {
 
+        // Null means unbounded, matching the runtime mapper interval semantics.
         private Double lowerBoundInclusive;
         private Double upperBoundExclusive;
         private String value;
