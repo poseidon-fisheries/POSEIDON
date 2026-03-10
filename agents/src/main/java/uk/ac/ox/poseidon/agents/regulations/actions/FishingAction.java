@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.regulations;
+package uk.ac.ox.poseidon.agents.regulations.actions;
 
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.regulations.TemporalAction;
+import uk.ac.ox.poseidon.regulations.Action;
 
-public interface TemporalFishingAction extends FishingAction, TemporalAction<Vessel> {
+public interface FishingAction extends Action<Vessel> {
 }
