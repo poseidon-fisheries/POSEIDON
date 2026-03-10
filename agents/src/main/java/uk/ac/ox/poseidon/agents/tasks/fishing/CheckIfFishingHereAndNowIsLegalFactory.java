@@ -26,9 +26,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.agents.regulations.ExtendedFishingAction;
+import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.regulations.Regulations;
@@ -44,7 +43,7 @@ public class CheckIfFishingHereAndNowIsLegalFactory
         ? super VesselScope,
         ? extends Regulations<? super ExtendedFishingAction>
         > regulations;
-    
+
     @Override
     protected CheckIfFishingHereAndNowIsLegal newTask(final VesselScope scope) {
         return new CheckIfFishingHereAndNowIsLegal(regulations.get(scope));

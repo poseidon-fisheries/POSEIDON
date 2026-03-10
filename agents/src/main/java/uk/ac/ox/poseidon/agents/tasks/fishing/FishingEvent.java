@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
 import lombok.Value;
-import uk.ac.ox.poseidon.agents.regulations.ExtendedFishingAction;
+import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
 
 import java.time.LocalDateTime;
