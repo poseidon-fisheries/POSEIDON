@@ -31,20 +31,20 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.TemporalAmount;
 
+import static java.time.Period.*;
+
 public class Factories {
 
-    public static final DurationFactory ONE_DAY = days(1);
-    public static final DurationFactory ONE_HOUR = hours(1);
-    public static final DurationFactory ONE_MINUTE = minutes(1);
+    public static final PeriodFactory DAILY = period(ofDays(1));
+    public static final PeriodFactory MONTHLY = period(ofMonths(1));
+    public static final PeriodFactory YEARLY = period(ofYears(1));
+
     public static final DurationFactory ONE_SECOND = seconds(1);
-
-    public static final PeriodFactory ONE_DAY_PERIOD = new PeriodFactory(Period.ofDays(1));
-    public static final PeriodFactory ONE_MONTH_PERIOD = new PeriodFactory(Period.ofMonths(1));
-    public static final PeriodFactory ONE_YEAR_PERIOD = new PeriodFactory(Period.ofYears(1));
-
-    public static final PeriodFactory DAILY = ONE_DAY_PERIOD;
-    public static final PeriodFactory MONTHLY = ONE_MONTH_PERIOD;
-    public static final PeriodFactory YEARLY = ONE_YEAR_PERIOD;
+    public static final DurationFactory ONE_MINUTE = minutes(1);
+    public static final DurationFactory ONE_HOUR = hours(1);
+    public static final DurationFactory ONE_DAY = days(1);
+    public static final PeriodFactory ONE_MONTH = MONTHLY;
+    public static final PeriodFactory ONE_YEAR = YEARLY;
 
     public static DurationFactory duration(
         final long days,

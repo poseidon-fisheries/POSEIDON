@@ -182,7 +182,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
         final var biomassDiffuser =
             scheduledRepeating(
-                dateTimeAfterStarting(ONE_DAY_PERIOD),
+                dateTimeAfterStarting(ONE_DAY),
                 DAILY,
                 new BiomassDiffuserFactory(
                     biomassGrid,
@@ -197,7 +197,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
         final var biomassGrower =
             scheduledRepeating(
-                dateTimeAfterStarting(ONE_YEAR_PERIOD),
+                dateTimeAfterStarting(ONE_YEAR),
                 YEARLY,
                 new CommonBiomassGrowerFactory(
                     biomassGrid,

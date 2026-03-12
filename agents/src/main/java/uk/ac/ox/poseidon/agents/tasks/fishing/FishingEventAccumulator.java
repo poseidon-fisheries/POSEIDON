@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.agents.tasks.fishing;
 import uk.ac.ox.poseidon.core.events.EventAccumulator;
 
 public class FishingEventAccumulator extends EventAccumulator<FishingEvent> {
-    FishingEventAccumulator() {
+    public FishingEventAccumulator() {
         super(FishingEvent.class);
     }
 }
