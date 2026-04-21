@@ -32,10 +32,7 @@ import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGridFactory;
 import uk.ac.ox.poseidon.agents.fuel.OneFuelStationPerPortFactory;
-import uk.ac.ox.poseidon.agents.market.MarketGridFactory;
-import uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory;
-import uk.ac.ox.poseidon.agents.market.PriceEntryFactory;
-import uk.ac.ox.poseidon.agents.market.PriceFactory;
+import uk.ac.ox.poseidon.agents.market.*;
 import uk.ac.ox.poseidon.agents.tasks.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.tasks.destinations.StartTripFactory;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingFactory;
@@ -76,6 +73,7 @@ import java.time.Period;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static java.util.stream.Collectors.*;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.LITRE;
 import static uk.ac.ox.poseidon.agents.components.Factories.component;
@@ -124,6 +122,24 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             .getTemporalSchedule()
             .stepFor(simulation, Period.ofYears(10));
         simulation.finish();
+        System.out.println(
+            simulation
+                .getComponent(BiomassSaleAccumulator.class)
+                .getEvents()
+                .collect(
+                    groupingBy(
+                        sale -> sale.getDateTime().getYear(),
+                        mapping(
+                            sale -> sale
+                                .getItems()
+                                .stream()
+                                .mapToDouble(item -> item.getContent().asKg())
+                                .sum(),
+                            summingDouble(Double::doubleValue)
+                        )
+                    )
+                )
+        );
     }
 
     @Override
@@ -356,6 +372,9 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 0
             );
 
+        final var biomassSaleAccumulator =
+            new BiomassSaleAccumulatorFactory();
+
         return builder
             .startingDateTime(startingDateTime)
             .component("modelGrid", modelGrid)
@@ -368,6 +387,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             .component("marketGrid", marketGrid)
             .component("vesselField", vesselField)
             .component("agentCreators", agentCreators)
+            .component("biomassSaleAccumulator", biomassSaleAccumulator)
             .build();
     }
 }
