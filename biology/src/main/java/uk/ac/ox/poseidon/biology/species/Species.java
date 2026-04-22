@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.biology.species;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.util.Comparator;
 
