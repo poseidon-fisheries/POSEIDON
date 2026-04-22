@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import ec.util.MersenneTwisterFast;
 import lombok.NonNull;
 
@@ -35,6 +36,7 @@ public class RandomDoubleSupplier implements DoubleSupplier {
     private final double minimum;
     private final double maximum;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public RandomDoubleSupplier(
         final @NonNull MersenneTwisterFast rng,
         final double minimum,

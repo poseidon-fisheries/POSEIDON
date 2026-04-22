@@ -71,8 +71,8 @@ class NotFactoryTest {
 
         // Act & Assert
         assertThatThrownBy(() -> notFactory.get(Scope.GLOBAL_SCOPE))
+            .as("Expected Not to fail when the predicate factory returns null.")
             .isInstanceOf(UncheckedExecutionException.class)
-            .hasCauseInstanceOf(NullPointerException.class)
-            .as("Expected Not to fail when the predicate factory returns null.");
+            .hasCauseInstanceOf(NullPointerException.class);
     }
 }

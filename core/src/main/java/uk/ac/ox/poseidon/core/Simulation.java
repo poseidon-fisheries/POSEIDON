@@ -54,7 +54,6 @@ public class Simulation extends SimState {
     private boolean started = false;
     List<?> components;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     Simulation(
         final long seed,
         final TemporalSchedule schedule,

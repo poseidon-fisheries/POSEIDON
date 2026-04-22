@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -63,6 +64,7 @@ public class VesselCreator implements Steppable {
     private final int numberOfVesselsToCreate;
 
     @Override
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public void step(final SimState simState) {
         final Simulation simulation = (Simulation) simState;
         final SimulationScope simulationScope = new SimulationScope(simulation);

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.utils;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import tech.tablesaw.api.NumericColumn;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -34,6 +35,7 @@ public class LonLatTable {
     protected final NumericColumn<?> longitudeColumn;
     protected final NumericColumn<?> latitudeColumn;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public LonLatTable(
         final Table table,
         final String longitudeColumnName,

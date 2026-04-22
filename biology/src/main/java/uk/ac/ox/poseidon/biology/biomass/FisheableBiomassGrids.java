@@ -46,7 +46,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
-public class FisheableBiomassGrids
+public final class FisheableBiomassGrids
     implements FisheableGrid, SpeciesIndexedObjects<BiomassGrid, FisheableBiomassGrids> {
 
     @Getter

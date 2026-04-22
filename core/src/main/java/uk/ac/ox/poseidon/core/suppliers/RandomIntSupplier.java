@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.suppliers;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import ec.util.MersenneTwisterFast;
 import lombok.NonNull;
 
@@ -38,6 +39,7 @@ public class RandomIntSupplier implements IntSupplier {
     private final int minimum;
     private final int range;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public RandomIntSupplier(
         @NonNull final MersenneTwisterFast rng,
         final int minimum,

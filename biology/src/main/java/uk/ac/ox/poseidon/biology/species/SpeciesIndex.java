@@ -38,7 +38,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = PRIVATE)
-public class SpeciesIndex {
+public final class SpeciesIndex {
 
     private static final Interner<SpeciesIndex> interner = Interners.newWeakInterner();
 

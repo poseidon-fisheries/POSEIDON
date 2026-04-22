@@ -99,8 +99,8 @@ class AnyOfFactoryTest {
         // Act & Assert
         final AnyOf<Object> result = anyOfFactory.get(Scope.GLOBAL_SCOPE);
         assertThatThrownBy(() -> result.test("value"))
-            .isInstanceOf(NullPointerException.class)
-            .as("Expected AnyOf to throw NullPointerException when a predicate is null.");
+            .as("Expected AnyOf to throw NullPointerException when a predicate is null.")
+            .isInstanceOf(NullPointerException.class);
     }
 
     /**

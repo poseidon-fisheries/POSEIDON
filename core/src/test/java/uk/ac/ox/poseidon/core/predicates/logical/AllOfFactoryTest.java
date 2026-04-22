@@ -118,9 +118,9 @@ class AllOfFactoryTest {
 
         // Act & Assert
         assertThatThrownBy(() -> allOfFactory.get(Scope.GLOBAL_SCOPE))
+            .as("Expected AllOf to fail when a predicate factory returns null")
             .isInstanceOf(UncheckedExecutionException.class)
-            .hasCauseInstanceOf(NullPointerException.class)
-            .as("Expected AllOf to fail when a predicate factory returns null");
+            .hasCauseInstanceOf(NullPointerException.class);
     }
 
 }
