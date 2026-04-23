@@ -26,7 +26,7 @@ plugins {
     //
     // Keep this plugin reasonably up-to-date; older versions may bring an older Kotlin Gradle
     // plugin onto the classpath and conflict with Gradle's embedded Kotlin used by `kotlin-dsl`.
-    id("dev.panuszewski.typesafe-conventions") version "0.10.0"
+    id("dev.panuszewski.typesafe-conventions") version "0.10.1"
 }
 
 rootProject.name = "buildSrc"

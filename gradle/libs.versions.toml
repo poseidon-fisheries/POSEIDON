@@ -2,26 +2,26 @@
 assertj = "3.27.7"
 batik = "1.19"
 commons-beanutils = "1.11.0"
-commons-io = "2.19.0"
+commons-io = "2.22.0"
 fastutil = "8.5.18"
-flatlaf = "3.5.4"
+flatlaf = "3.7.1"
 gdxai = "6726e345248ddcad7cec0737f6ad83e4e028266d"
 geotools = "34.3"
 guava = "33.6.0-jre"
-indriya = "2.2.2"
+indriya = "2.2.3"
 jcommander = "2.0"
-joda-money = "2.0.2"
-jqwik = "1.9.2"
+joda-money = "2.0.3"
+jqwik = "1.9.3"
 jts = "1.20.0"
-junit = "5.12.0"
+junit = "5.14.3"
 lombok = "1.18.46"
 mockito = "5.23.0"
 si-units = "2.1" # upgrading past 2.1 breaks GeoTools 32.2
-slf4j = "2.0.16"
-snakeyaml = "2.2"
-streamex = "0.8.3"
-tablesaw = "0.44.0"
-spotbugs = "6.4.8"
+slf4j = "2.0.17"
+snakeyaml = "2.6"
+streamex = "0.8.4"
+tablesaw = "0.44.4"
+spotbugs = "6.5.1"
 annotation-api = "1.3.2"
 threeten-extra = "1.8.0"
 
@@ -57,7 +57,7 @@ snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations" }
 spotbugs-gradle-plugin = { module = "com.github.spotbugs.snom:spotbugs-gradle-plugin", version.ref = "spotbugs" }
 streamex = { module = "one.util:streamex", version.ref = "streamex" }
-tablesaw-core = { module = "net.tlabs-data:tablesaw-core", version.ref = "tablesaw" }
+tablesaw-core = { module = "tech.tablesaw:tablesaw-core", version.ref = "tablesaw" }
 threeten-extra = { module = "org.threeten:threeten-extra", version.ref = "threeten-extra" }
 
 [bundles]
