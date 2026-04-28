@@ -34,10 +34,13 @@ import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.core.events.SimpleEventManager;
+import uk.ac.ox.poseidon.core.events.SimpleListener;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -100,5 +103,58 @@ class VesselCreatorTest {
         creator.step(simulation);
 
         assertThat(extraFactoryCalls).hasValue(2);
+    }
+
+    @Test
+    void createsVesselsWithSeparateLocalEventManagers() {
+        final Simulation simulation = mock(Simulation.class);
+        when(simulation.getTemporalSchedule()).thenReturn(mock(TemporalSchedule.class));
+
+        final VesselField vesselField = mock(VesselField.class);
+        final PortGrid portGrid = mock(PortGrid.class);
+        final MarketGrid marketGrid = mock(MarketGrid.class);
+        final Account account = mock(Account.class);
+        final Hold hold = mock(Hold.class);
+        final Gear gear = mock(Gear.class);
+        final Engine engine = mock(Engine.class);
+        final Behaviour behaviour = mock(Behaviour.class);
+        final Port port = mock(Port.class);
+        when(portGrid.getLocation(port)).thenReturn(new Int2D(1, 2));
+
+        final AtomicInteger id = new AtomicInteger();
+        final List<Vessel> vessels = new ArrayList<>();
+        final VesselCreator creator =
+            new VesselCreator(
+                new SimpleEventManager(),
+                vesselField,
+                portGrid,
+                marketGrid,
+                () -> Integer.toString(id.incrementAndGet()),
+                scope -> "Vessel " + scope.getVessel().getId(),
+                scope -> account,
+                scope -> port,
+                scope -> hold,
+                scope -> gear,
+                scope -> engine,
+                scope -> behaviour,
+                List.of(scope -> {
+                    vessels.add(scope.getVessel());
+                    return new Object();
+                }),
+                2
+            );
+
+        creator.step(simulation);
+        final List<String> receivedEvents = new ArrayList<>();
+        vessels
+            .getFirst()
+            .getEventManager()
+            .addListener(new SimpleListener<>(String.class, receivedEvents::add));
+
+        vessels.getLast().getEventManager().broadcast("second");
+        assertThat(receivedEvents).isEmpty();
+
+        vessels.getFirst().getEventManager().broadcast("first");
+        assertThat(receivedEvents).containsExactly("first");
     }
 }

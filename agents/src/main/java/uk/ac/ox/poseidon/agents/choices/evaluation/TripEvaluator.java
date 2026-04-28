@@ -34,7 +34,6 @@ import uk.ac.ox.poseidon.core.events.Listener;
 @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
 public class TripEvaluator implements Listener<TripEvent> {
 
-    private final EventManager eventManager;
     private final MutableOptionValues<Int2D> optionValues;
     private final EvaluationProvider<Int2D> evaluationProvider;
     private Evaluation<Int2D> currentEvaluation;
@@ -44,7 +43,6 @@ public class TripEvaluator implements Listener<TripEvent> {
         final MutableOptionValues<Int2D> optionValues,
         final EvaluationProvider<Int2D> evaluationProvider
     ) {
-        this.eventManager = eventManager;
         this.optionValues = optionValues;
         this.evaluationProvider = evaluationProvider;
         eventManager.addListener(this);
@@ -61,7 +59,7 @@ public class TripEvaluator implements Listener<TripEvent> {
             currentEvaluation =
                 evaluationProvider.newEvaluation(
                     event.getTrip().getDestination(),
-                    this.eventManager
+                    event.getTrip().getEventManager()
                 );
         } else if (event instanceof TripEndEvent) {
             optionValues.observe(currentEvaluation.getOption(), currentEvaluation.getResult());

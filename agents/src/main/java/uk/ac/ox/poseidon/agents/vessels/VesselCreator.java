@@ -37,6 +37,7 @@ import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -74,7 +75,7 @@ public class VesselCreator implements Steppable {
         for (int i = 0; i < numberOfVesselsToCreate; i++) {
             final Vessel vessel = new Vessel(
                 temporalSchedule,
-                eventManager,
+                new ForwardingEventManager(eventManager),
                 InactiveBehaviour.INACTIVE_BEHAVIOUR,
                 vesselIdSupplier.get(),
                 vesselField,
