@@ -51,7 +51,6 @@ import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.MappedFactory;
 import uk.ac.ox.poseidon.core.Scenario;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.utils.ListFactory;
 import uk.ac.ox.poseidon.core.utils.PairFactory;
@@ -69,11 +68,9 @@ import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static java.util.stream.Collectors.*;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.LITRE;
 import static uk.ac.ox.poseidon.agents.components.Factories.component;
@@ -114,33 +111,6 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     private static final double LEARNING_ALPHA = 1;
     private static final double EXPLORATION_PROBABILITY = 0.2;
     private static final int TOTAL_CARRYING_CAPACITY = 110_749_315;
-
-    public static void main(final String[] args) {
-        final Simulation simulation =
-            new PeterSnapperScenario().get().startNewSimulation();
-        simulation
-            .getTemporalSchedule()
-            .stepFor(simulation, Period.ofYears(10));
-        simulation.finish();
-        System.out.println(
-            simulation
-                .getComponent(BiomassSaleAccumulator.class)
-                .getEvents()
-                .collect(
-                    groupingBy(
-                        sale -> sale.getDateTime().getYear(),
-                        mapping(
-                            sale -> sale
-                                .getItems()
-                                .stream()
-                                .mapToDouble(item -> item.getContent().asKg())
-                                .sum(),
-                            summingDouble(Double::doubleValue)
-                        )
-                    )
-                )
-        );
-    }
 
     @Override
     public Scenario get() {
@@ -385,6 +355,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             .component("biomassGrower", biomassGrower)
             .component("portGrid", portGrid)
             .component("marketGrid", marketGrid)
+            .component("gear", gear)
             .component("vesselField", vesselField)
             .component("agentCreators", agentCreators)
             .component("biomassSaleAccumulator", biomassSaleAccumulator)

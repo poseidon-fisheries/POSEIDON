@@ -26,6 +26,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":calibration"))
     implementation(project(":agents"))
     implementation(project(":regulations"))
     implementation(project(":biology"))

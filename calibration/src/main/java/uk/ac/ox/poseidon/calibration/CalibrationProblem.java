@@ -36,7 +36,9 @@ import uk.ac.ox.poseidon.core.SimulationStartOptions;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.time.temporal.TemporalAmount;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.SequencedMap;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -51,17 +53,50 @@ public abstract class CalibrationProblem
     private final Scenario scenario;
     private final TemporalAmount temporalAmount;
     private final SequencedMap<String, DoubleRange> ranges;
+    private final long[] seeds;
 
     private final Codec<SequencedMap<String, Double>, DoubleGene> codec;
 
     public CalibrationProblem(
         final Scenario scenario,
         final TemporalAmount temporalAmount,
+        final List<ParameterRange> ranges
+    ) {
+        this(scenario, temporalAmount, ranges, new long[]{0});
+    }
+
+    public CalibrationProblem(
+        final Scenario scenario,
+        final TemporalAmount temporalAmount,
+        final List<ParameterRange> ranges,
+        final long... seeds
+    ) {
+        this(
+            scenario,
+            temporalAmount,
+            toDoubleRanges(ranges),
+            seeds
+        );
+    }
+
+    public CalibrationProblem(
+        final Scenario scenario,
+        final TemporalAmount temporalAmount,
         final SequencedMap<String, DoubleRange> ranges
+    ) {
+        this(scenario, temporalAmount, ranges, new long[]{0});
+    }
+
+    public CalibrationProblem(
+        final Scenario scenario,
+        final TemporalAmount temporalAmount,
+        final SequencedMap<String, DoubleRange> ranges,
+        final long... seeds
     ) {
         this.scenario = scenario;
         this.temporalAmount = temporalAmount;
         this.ranges = ranges;
+        this.seeds = seeds.length == 0 ? new long[]{0} : Arrays.copyOf(seeds, seeds.length);
         this.codec =
             Codec.of(
                 Genotype.of(DoubleChromosome.of(0.0, 1.0, ranges.size())),
@@ -94,18 +129,48 @@ public abstract class CalibrationProblem
     }
 
     private double evaluate(final SequencedMap<String, Double> parameters) {
+        return Arrays
+            .stream(seeds)
+            .mapToDouble(seed -> evaluate(parameters, seed))
+            .average()
+            .orElseThrow();
+    }
+
+    private double evaluate(
+        final SequencedMap<String, Double> parameters,
+        final long seed
+    ) {
         final Simulation simulation =
             scenario.startNewSimulation(
                 SimulationStartOptions
                     .builder()
+                    .seed(seed)
                     .propertyOverrides(new LinkedHashMap<String, Object>(parameters))
                     .build()
             );
-        final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
-        temporalSchedule.stepFor(simulation, temporalAmount);
-        simulation.finish();
-        return evaluate(simulation);
+        try {
+            final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
+            temporalSchedule.stepFor(simulation, temporalAmount);
+            return evaluate(simulation);
+        } finally {
+            simulation.finish();
+        }
     }
 
     protected abstract double evaluate(Simulation simulation);
+
+    private static SequencedMap<String, DoubleRange> toDoubleRanges(
+        final List<ParameterRange> ranges
+    ) {
+        return ranges
+            .stream()
+            .collect(
+                LinkedHashMap::new,
+                (map, range) -> map.put(
+                    range.propertyName(),
+                    new DoubleRange(range.min(), range.max())
+                ),
+                SequencedMap::putAll
+            );
+    }
 }
