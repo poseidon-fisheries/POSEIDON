@@ -27,8 +27,6 @@ import uk.ac.ox.poseidon.agents.catches.UncategorisedCatchCategoryFactory;
 import uk.ac.ox.poseidon.agents.catches.UniformCatchCategoriserFactory;
 import uk.ac.ox.poseidon.agents.catches.disposition.ProportionallyLimitingBiomassToHoldFactory;
 import uk.ac.ox.poseidon.agents.choices.*;
-import uk.ac.ox.poseidon.agents.choices.evaluation.TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory;
-import uk.ac.ox.poseidon.agents.choices.evaluation.TripEvaluatorFactory;
 import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
@@ -74,7 +72,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
+import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 import static tech.units.indriya.unit.Units.LITRE;
+import static uk.ac.ox.poseidon.agents.choices.evaluation.Factories.profitPerHour;
+import static uk.ac.ox.poseidon.agents.choices.evaluation.Factories.tripEvaluator;
 import static uk.ac.ox.poseidon.agents.components.Factories.component;
 import static uk.ac.ox.poseidon.agents.money.Factories.money;
 import static uk.ac.ox.poseidon.agents.tasks.branches.Factories.sequenceTask;
@@ -114,6 +115,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     private static final double LEARNING_ALPHA = 1;
     private static final double EXPLORATION_PROBABILITY = 0.2;
     private static final int TOTAL_CARRYING_CAPACITY = 110_749_315;
+    private static final String CURRENCY_CODE = "IDR";
 
     @Override
     public Scenario get() {
@@ -220,7 +222,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     new PriceEntryFactory<>(
                         catchCategory,
                         species,
-                        new PriceFactory(40000.0, "IDR", "kg")
+                        new PriceFactory(40000.0, CURRENCY_CODE, "kg")
                     )
                 )
             )
@@ -230,7 +232,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             portGrid,
             new OneFuelStationPerPortFactory(
                 portGrid,
-                money(10_000, "IDR"),
+                money(10_000, CURRENCY_CODE),
                 200
             )
         );
@@ -283,9 +285,9 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             );
 
         final var tripEvaluator =
-            new TripEvaluatorFactory(
+            tripEvaluator(
                 optionValues,
-                new TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory()
+                profitPerHour(CURRENCY_CODE)
             );
 
         final var behaviour =
@@ -336,7 +338,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             gear,
                             new SimpleEngineFactory<>(
                                 fullTank(volumeOf(100000, LITRE)),
-                                speedOf("16 km/h"),
+                                speedOf(16, KILOMETRE_PER_HOUR),
                                 volumeOf(3, LITRE)
                             ),
                             behaviour, // new InactiveBehaviourFactory(),
