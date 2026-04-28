@@ -62,7 +62,6 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableF
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
 import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
-import uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory;
 import uk.ac.ox.poseidon.geography.ports.PortFactory;
 import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
 
@@ -96,6 +95,7 @@ import static uk.ac.ox.poseidon.core.suppliers.Factories.*;
 import static uk.ac.ox.poseidon.core.time.Factories.*;
 import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
 import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
+import static uk.ac.ox.poseidon.geography.paths.Factories.pathFinder;
 import static uk.ac.ox.poseidon.geography.predicates.Factories.inDepthRange;
 import static uk.ac.ox.poseidon.geography.predicates.Factories.isActiveWaterCell;
 import static uk.ac.ox.poseidon.geography.utils.Factories.elevationTable;
@@ -235,7 +235,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final var vesselField = new VesselFieldFactory(modelGrid);
 
         final var pathFinder =
-            new DefaultPathFinderFactory<>(
+            pathFinder(
                 bathymetricGrid,
                 portGrid,
                 distance

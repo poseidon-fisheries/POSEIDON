@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -28,8 +28,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -38,32 +38,15 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DefaultPathFinderFactory
-    extends SimulationScopeFactory<GridPathFinder> {
+public class DefaultPathCacheFactory<S extends Scope>
+    extends RelativeScopeFactory<S, PathCache<Int2D>> {
 
-    private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid;
-    private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
-    private Factory<? super SimulationScope, ? extends DistanceCalculator> distance;
-    private Factory<? super SimulationScope, ? extends PathCache<Int2D>> pathCache;
+    private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+    private Factory<? super S, ? extends PortGrid> portGrid;
+    private Factory<? super S, ? extends DistanceCalculator> distance;
 
     @Override
-    protected GridPathFinder newInstance(final SimulationScope scope) {
-        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
-        final PortGrid portGrid = this.portGrid.get(scope);
-        return new CachingGridPathFinder(
-            new FallbackGridPathfinder(
-                new BresenhamPathFinder(
-                    bathymetricGrid,
-                    portGrid
-                ),
-                new AStarPathFinder(
-                    bathymetricGrid,
-                    portGrid,
-                    distance.get(scope)
-                )
-            ),
-            pathCache.get(scope)
-        );
+    protected PathCache<Int2D> newInstance(final S scope) {
+        return new DefaultPathCache<>();
     }
-
 }
