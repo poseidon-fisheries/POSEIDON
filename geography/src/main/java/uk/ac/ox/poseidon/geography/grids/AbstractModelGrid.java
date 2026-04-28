@@ -22,9 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import lombok.AccessLevel;
@@ -71,12 +70,12 @@ abstract class AbstractModelGrid implements ModelGrid {
     @EqualsAndHashCode.Exclude
     @Getter(AccessLevel.PRIVATE)
     private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> mooreNeighbourhoods =
-        CacheBuilder.newBuilder().build(CacheLoader.from(this::computeMooreNeighbourhood));
+        Caffeine.newBuilder().build(this::computeMooreNeighbourhood);
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Getter(AccessLevel.PRIVATE)
     private final LoadingCache<Entry<Int2D, Integer>, List<Int2D>> activeMooreNeighbourhoods =
-        CacheBuilder.newBuilder().build(CacheLoader.from(this::computeActiveMooreNeighbourhood));
+        Caffeine.newBuilder().build(this::computeActiveMooreNeighbourhood);
     private final ObjectGrid2D coordinatesGrid;
 
     protected AbstractModelGrid(
@@ -156,7 +155,7 @@ abstract class AbstractModelGrid implements ModelGrid {
         final Int2D cell,
         @SuppressWarnings("SameParameterValue") final int neighbourhoodSize
     ) {
-        return mooreNeighbourhoods.getUnchecked(entry(cell, neighbourhoodSize));
+        return mooreNeighbourhoods.get(entry(cell, neighbourhoodSize));
     }
 
     @Override
@@ -164,14 +163,14 @@ abstract class AbstractModelGrid implements ModelGrid {
         final Int2D cell,
         @SuppressWarnings("SameParameterValue") final int neighbourhoodSize
     ) {
-        return activeMooreNeighbourhoods.getUnchecked(entry(cell, neighbourhoodSize));
+        return activeMooreNeighbourhoods.get(entry(cell, neighbourhoodSize));
     }
 
     private List<Int2D> computeActiveMooreNeighbourhood(
         final Entry<Int2D, Integer> entry
     ) {
         return mooreNeighbourhoods
-            .getUnchecked(entry)
+            .get(entry)
             .stream()
             .filter(this::isActive)
             .toList();

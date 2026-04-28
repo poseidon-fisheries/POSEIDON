@@ -22,18 +22,14 @@
 
 package uk.ac.ox.poseidon.core;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.concurrent.ExecutionException;
-
-import static com.google.common.cache.CacheLoader.from;
 
 @SuperBuilder
 @NoArgsConstructor
@@ -44,19 +40,15 @@ public abstract class AbstractFactory<S extends Scope, C> implements Factory<S, 
     // when there are no other properties to serialize and to
     // ensure it's not included in the equals and hashCode implementations
     private final transient LoadingCache<Object, Cache<Integer, C>> cache =
-        CacheBuilder.newBuilder()
+        Caffeine.newBuilder()
             .weakKeys()
-            .build(from(object -> CacheBuilder.newBuilder().build()));
+            .build(object -> Caffeine.newBuilder().build());
 
     @Override
     synchronized public final C get(@NonNull final S scope) {
-        try {
-            return cache
-                .getUnchecked(makeKey(scope))
-                .get(hashCode(), () -> newInstance(scope));
-        } catch (final ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return cache
+            .get(makeKey(scope))
+            .get(hashCode(), key -> newInstance(scope));
     }
 
     protected abstract Object makeKey(S scope);

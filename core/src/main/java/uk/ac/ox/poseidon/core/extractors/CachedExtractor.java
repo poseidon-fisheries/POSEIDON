@@ -22,21 +22,20 @@
 
 package uk.ac.ox.poseidon.core.extractors;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import java.util.function.Function;
 
 public abstract class CachedExtractor<T, R> implements Function<T, R> {
 
     private final LoadingCache<T, R> cache =
-        CacheBuilder.newBuilder().build(CacheLoader.from(this::extract));
+        Caffeine.newBuilder().build(this::extract);
 
     protected abstract R extract(T t);
 
     @Override
     public R apply(final T t) {
-        return cache.getUnchecked(t);
+        return cache.get(t);
     }
 }

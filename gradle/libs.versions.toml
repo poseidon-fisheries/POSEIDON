@@ -3,6 +3,7 @@ assertj = "3.27.7"
 batik = "1.19"
 commons-beanutils = "1.11.0"
 commons-io = "2.22.0"
+caffeine = "3.2.3"
 fastutil = "8.5.18"
 flatlaf = "3.7.1"
 gdxai = "6726e345248ddcad7cec0737f6ad83e4e028266d"
@@ -34,6 +35,7 @@ batik-dom = { module = "org.apache.xmlgraphics:batik-dom", version.ref = "batik"
 batik-transcoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "batik" }
 commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "commons-beanutils" }
 commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
 fastutil-core = { module = "it.unimi.dsi:fastutil-core", version.ref = "fastutil" }
 flatlaf = { module = "com.formdev:flatlaf", version.ref = "flatlaf" }
 gdx-ai = { module = "com.github.libgdx:gdx-ai", version.ref = "gdxai" }

@@ -25,8 +25,8 @@ package uk.ac.ox.poseidon.geography.paths;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph;
 import com.badlogic.gdx.utils.Array;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import lombok.Data;
@@ -37,8 +37,6 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.util.concurrent.ExecutionException;
-
 public class GridAdaptor implements IndexedGraph<Int2D> {
 
     private final Interner<Int2D> interner = Interners.newStrongInterner();
@@ -48,7 +46,7 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
     @Getter
     private final DistanceCalculator distanceCalculator;
     private final Cache<Int2D, Array<Connection<Int2D>>> connectionsCache =
-        CacheBuilder.newBuilder().build();
+        Caffeine.newBuilder().build();
 
     public GridAdaptor(
         final BathymetricGrid bathymetricGrid,
@@ -77,28 +75,24 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
 
     @Override
     public Array<Connection<Int2D>> getConnections(final Int2D cell) {
-        try {
-            return connectionsCache.get(
-                cell,
-                () ->
-                    !isNavigable(cell) ? new Array<>() : new Array<>(
-                        modelGrid
-                            .getNeighbours(cell)
-                            .stream()
-                            .filter(this::isNavigable)
-                            .map(neighbour ->
-                                new WeightedConnection(
-                                    intern(cell),
-                                    intern(neighbour),
-                                    (float) distanceCalculator.distanceInKm(cell, neighbour)
-                                )
+        return connectionsCache.get(
+            cell,
+            key ->
+                !isNavigable(key) ? new Array<>() : new Array<>(
+                    modelGrid
+                        .getNeighbours(key)
+                        .stream()
+                        .filter(this::isNavigable)
+                        .map(neighbour ->
+                            new WeightedConnection(
+                                intern(key),
+                                intern(neighbour),
+                                (float) distanceCalculator.distanceInKm(key, neighbour)
                             )
-                            .toArray(WeightedConnection[]::new)
-                    )
-            );
-        } catch (final ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+                        )
+                        .toArray(WeightedConnection[]::new)
+                )
+        );
     }
 
     /**

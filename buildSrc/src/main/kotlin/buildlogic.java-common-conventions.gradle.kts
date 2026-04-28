@@ -47,6 +47,7 @@ val mockitoAgentArgs = objects.newInstance(MockitoAgentArgumentProvider::class).
 }
 
 dependencies {
+    implementation(libs.caffeine)
     implementation(libs.guava)
     implementation(libs.lombok)
     annotationProcessor(libs.lombok)

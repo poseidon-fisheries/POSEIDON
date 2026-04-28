@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.paths;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -35,7 +35,7 @@ import static java.util.Map.entry;
 public class DefaultPathCache<P> implements PathCache<P> {
 
     private final Cache<Entry<P, P>, Optional<ImmutableList<P>>> memory =
-        CacheBuilder.newBuilder().build();
+        Caffeine.newBuilder().build();
 
     /**
      * Returns a path from start to end if one is known. Otherwise, checks for a path from end to

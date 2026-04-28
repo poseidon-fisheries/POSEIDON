@@ -22,9 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.paths;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
@@ -40,9 +39,9 @@ public class CachingGridPathFinder extends CachingPathFinder<Int2D> implements G
     private final GridPathFinder pathFinder;
     private final Interner<ImmutableList<Int2D>> cellListInterner = Interners.newStrongInterner();
     private final LoadingCache<Int2D, ImmutableList<Int2D>> accessibleCells =
-        CacheBuilder.newBuilder().build(CacheLoader.from(this::computeAccessibleCells));
+        Caffeine.newBuilder().build(this::computeAccessibleCells);
     private final LoadingCache<Entry<Int2D, Integer>, ImmutableList<Int2D>> accessibleNeighbours =
-        CacheBuilder.newBuilder().build(CacheLoader.from(this::computeAccessibleNeighbours));
+        Caffeine.newBuilder().build(this::computeAccessibleNeighbours);
 
     CachingGridPathFinder(
         final GridPathFinder pathFinder,
@@ -58,7 +57,7 @@ public class CachingGridPathFinder extends CachingPathFinder<Int2D> implements G
 
     @Override
     public ImmutableList<Int2D> getAccessibleWaterCells(final Int2D startingCell) {
-        return cellListInterner.intern(accessibleCells.getUnchecked(startingCell));
+        return cellListInterner.intern(accessibleCells.get(startingCell));
     }
 
     private ImmutableList<Int2D> computeAccessibleNeighbours(
@@ -72,7 +71,7 @@ public class CachingGridPathFinder extends CachingPathFinder<Int2D> implements G
         final Int2D startingCell,
         final int neighbourhoodSize
     ) {
-        return accessibleNeighbours.getUnchecked(entry(startingCell, neighbourhoodSize));
+        return accessibleNeighbours.get(entry(startingCell, neighbourhoodSize));
     }
 
     @Override
