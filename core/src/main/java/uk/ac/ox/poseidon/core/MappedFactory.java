@@ -27,9 +27,10 @@ import org.apache.commons.beanutils.PropertyUtils;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -44,7 +45,14 @@ import static uk.ac.ox.poseidon.core.utils.Factories.object;
 public class MappedFactory<S extends Scope, C> extends RelativeScopeFactory<S, List<C>> {
 
     private Factory<S, C> factory;
-    @Singular private Map<String, Factory<? super S, ? extends List<?>>> mappedProperties;
+    @Singular private SequencedMap<String, Factory<? super S, ? extends List<?>>> mappedProperties;
+
+    public MappedFactory(
+        final Factory<S, C> factory,
+        final Map<String, Factory<? super S, ? extends List<?>>> mappedProperties
+    ) {
+        this(factory, new LinkedHashMap<>(mappedProperties));
+    }
 
     @Override
     protected List<C> newInstance(final S scope) {
@@ -53,10 +61,12 @@ public class MappedFactory<S extends Scope, C> extends RelativeScopeFactory<S, L
         checkNotNull(mappedProperties);
         checkState(!mappedProperties.isEmpty());
 
-        final Map<String, ? extends List<?>> componentLists =
+        final SequencedMap<String, ? extends List<?>> componentLists =
             mappedProperties.entrySet().stream().collect(toMap(
                 Map.Entry::getKey,
-                entry -> entry.getValue().get(scope)
+                entry -> entry.getValue().get(scope),
+                (a, b) -> b,
+                LinkedHashMap::new
             ));
 
         final int targetSize = componentLists.values().iterator().next().size();
@@ -65,10 +75,16 @@ public class MappedFactory<S extends Scope, C> extends RelativeScopeFactory<S, L
             "All property value lists must be the same size."
         );
 
-        final Map<String, Object> originalPropertyValues = new HashMap<>();
-        mappedProperties.keySet().forEach(propertyName ->
-            originalPropertyValues.put(propertyName, getProperty(propertyName))
-        );
+        final SequencedMap<String, Object> originalPropertyValues =
+            mappedProperties
+                .sequencedKeySet()
+                .stream()
+                .collect(
+                    LinkedHashMap::new,
+                    (originalValues, propertyName) ->
+                        originalValues.put(propertyName, getProperty(propertyName)),
+                    Map::putAll
+                );
 
         try {
             return range(0, targetSize)
@@ -90,7 +106,7 @@ public class MappedFactory<S extends Scope, C> extends RelativeScopeFactory<S, L
                 })
                 .toList();
         } finally {
-            originalPropertyValues.forEach(this::setProperty);
+            originalPropertyValues.reversed().forEach(this::setProperty);
         }
     }
 

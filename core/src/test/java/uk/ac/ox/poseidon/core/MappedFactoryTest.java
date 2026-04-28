@@ -23,13 +23,16 @@
 package uk.ac.ox.poseidon.core;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.time.DateFactory;
 
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
 
@@ -51,5 +54,59 @@ class MappedFactoryTest {
                 )
             ).get(GLOBAL_SCOPE)
         );
+    }
+
+    @Test
+    void appliesMappedPropertiesInEncounterOrderAndRestoresInReverseOrder() {
+        final DateFactory originalDateFactory = new DateFactory(2000, 1, 1);
+        final DateHolderFactory dateHolderFactory =
+            new DateHolderFactory(originalDateFactory);
+        final Map<String, Factory<? super Scope, ? extends List<?>>> mappedProperties =
+            new LinkedHashMap<>();
+        mappedProperties.put(
+            "dateFactory",
+            listOf(
+                new DateFactory(1999, 1, 1),
+                new DateFactory(1998, 2, 2)
+            )
+        );
+        mappedProperties.put("dateFactory.year", listOf(2001, 2002));
+
+        assertEquals(
+            List.of(
+                LocalDate.of(2001, 1, 1),
+                LocalDate.of(2002, 2, 2)
+            ),
+            new MappedFactory<>(dateHolderFactory, mappedProperties).get(GLOBAL_SCOPE)
+        );
+        assertSame(originalDateFactory, dateHolderFactory.getDateFactory());
+        assertEquals(2000, originalDateFactory.getYear());
+    }
+
+    public static class DateHolderFactory extends GlobalScopeFactory<LocalDate> {
+
+        private DateFactory dateFactory;
+
+        public DateHolderFactory(final DateFactory dateFactory) {
+            this.dateFactory = dateFactory;
+        }
+
+        public DateFactory getDateFactory() {
+            return dateFactory;
+        }
+
+        public void setDateFactory(final DateFactory dateFactory) {
+            this.dateFactory = dateFactory;
+        }
+
+        @Override
+        public int hashCode() {
+            return dateFactory.hashCode();
+        }
+
+        @Override
+        protected LocalDate newInstance(final Scope scope) {
+            return dateFactory.get(scope);
+        }
     }
 }
