@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Period;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SequencedMap;
@@ -50,16 +52,33 @@ public final class PeterSnapperCatchabilityCalibration {
         "components(gear).proportion";
     private static final double MIN_CATCHABILITY = 0.00001;
     private static final double MAX_CATCHABILITY = 0.005;
+    private static final double TUTORIAL_CATCHABILITY = 0.000641964;
+    private static final int DEFAULT_POPULATION_SIZE = 30;
+    private static final long DEFAULT_GENERATIONS = 30;
+    private static final int STEADY_GENERATIONS = 10;
+    private static final double MUTATION_PROBABILITY = 0.20;
+    private static final double RECOMBINATION_PROBABILITY = 0.35;
+    private static final long[] DEFAULT_SEEDS = {0};
 
     private PeterSnapperCatchabilityCalibration() {
     }
 
     public static void main(final String[] args) throws IOException {
-        final int populationSize = args.length > 0 ? Integer.parseInt(args[0]) : 20;
-        final long generations = args.length > 1 ? Long.parseLong(args[1]) : 50;
+        final int populationSize =
+            args.length > 0 ? Integer.parseInt(args[0]) : DEFAULT_POPULATION_SIZE;
+        final long generations =
+            args.length > 1 ? Long.parseLong(args[1]) : DEFAULT_GENERATIONS;
+        final long[] seeds = parseSeeds(args);
         final List<Double> observedLandings = readLandings(LANDINGS_PATH);
         final LandingsCalibrationProblem problem =
-            new LandingsCalibrationProblem(observedLandings);
+            new LandingsCalibrationProblem(observedLandings, seeds);
+
+        System.out.println("population_size=" + populationSize);
+        System.out.println("generations=" + generations);
+        System.out.println("steady_generations=" + STEADY_GENERATIONS);
+        System.out.println("seeds=" + Arrays.toString(seeds));
+        System.out.println("tutorial_catchability=" + TUTORIAL_CATCHABILITY);
+        System.out.println("tutorial_fitness=" + problem.fitnessFor(tutorialParameters()));
 
         final CalibrationRunner.Result result =
             CalibrationRunner.minimize(
@@ -67,18 +86,40 @@ public final class PeterSnapperCatchabilityCalibration {
                 new CalibrationRunner.Options(
                     populationSize,
                     generations,
-                    0.15,
-                    0.35
+                    MUTATION_PROBABILITY,
+                    RECOMBINATION_PROBABILITY,
+                    STEADY_GENERATIONS,
+                    1
                 )
             );
 
         System.out.println("Best parameters: " + result.parameters());
         System.out.println("Best fitness: " + result.fitness());
         System.out.println("Generations: " + result.generations());
+        System.out.printf(
+            "Tutorial catchability error: %.6g%n",
+            result.parameters().get(CATCHABILITY_PROPERTY) - TUTORIAL_CATCHABILITY
+        );
         printLandingsComparison(
             observedLandings,
             problem.landingsFor(result.parameters())
         );
+    }
+
+    private static long[] parseSeeds(final String[] args) {
+        return args.length > 2
+            ? Arrays
+                .stream(args)
+                .skip(2)
+                .mapToLong(Long::parseLong)
+                .toArray()
+            : DEFAULT_SEEDS;
+    }
+
+    private static SequencedMap<String, Double> tutorialParameters() {
+        final SequencedMap<String, Double> parameters = new LinkedHashMap<>();
+        parameters.put(CATCHABILITY_PROPERTY, TUTORIAL_CATCHABILITY);
+        return parameters;
     }
 
     private static List<Double> readLandings(final Path path) throws IOException {
@@ -112,7 +153,10 @@ public final class PeterSnapperCatchabilityCalibration {
 
         private final List<Double> observedLandings;
 
-        private LandingsCalibrationProblem(final List<Double> observedLandings) {
+        private LandingsCalibrationProblem(
+            final List<Double> observedLandings,
+            final long... seeds
+        ) {
             super(
                 new PeterSnapperScenario().get(),
                 Period.ofYears(observedLandings.size()),
@@ -121,9 +165,15 @@ public final class PeterSnapperCatchabilityCalibration {
                     MIN_CATCHABILITY,
                     MAX_CATCHABILITY
                 )),
-                0
+                seeds
             );
             this.observedLandings = observedLandings;
+        }
+
+        private double fitnessFor(
+            final SequencedMap<String, Double> parameters
+        ) {
+            return fitness().apply(parameters);
         }
 
         private List<Double> landingsFor(
@@ -133,8 +183,8 @@ public final class PeterSnapperCatchabilityCalibration {
                 scenario().startNewSimulation(
                     uk.ac.ox.poseidon.core.SimulationStartOptions
                         .builder()
-                        .seed(0)
-                        .propertyOverrides(new java.util.LinkedHashMap<String, Object>(parameters))
+                        .seed(seeds()[0])
+                        .propertyOverrides(new LinkedHashMap<String, Object>(parameters))
                         .build()
                 );
             try {

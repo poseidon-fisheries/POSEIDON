@@ -23,14 +23,18 @@
 package uk.ac.ox.poseidon.calibration;
 
 import io.jenetics.DoubleGene;
+import io.jenetics.EliteSelector;
+import io.jenetics.GaussianMutator;
 import io.jenetics.MeanAlterer;
-import io.jenetics.Mutator;
+import io.jenetics.TournamentSelector;
 import io.jenetics.engine.Engine;
 import io.jenetics.engine.EvolutionResult;
+import io.jenetics.engine.EvolutionStream;
 
 import java.util.SequencedMap;
 
 import static io.jenetics.engine.Limits.byFixedGeneration;
+import static io.jenetics.engine.Limits.bySteadyFitness;
 
 public final class CalibrationRunner {
 
@@ -45,18 +49,33 @@ public final class CalibrationRunner {
         final CalibrationProblem problem,
         final Options options
     ) {
-        final EvolutionResult<DoubleGene, Double> result =
+        final Engine<DoubleGene, Double> engine =
             Engine
                 .builder(problem)
                 .minimizing()
                 .populationSize(options.populationSize())
+                .survivorsSelector(new EliteSelector<>(
+                    1,
+                    new TournamentSelector<DoubleGene, Double>(3)
+                ))
+                .offspringSelector(new TournamentSelector<>(3))
                 .alterers(
-                    new Mutator<>(options.mutationProbability()),
+                    new GaussianMutator<>(options.mutationProbability()),
                     new MeanAlterer<>(options.recombinationProbability())
                 )
-                .build()
+                .build();
+
+        EvolutionStream<DoubleGene, Double> stream = engine
                 .stream()
-                .limit(byFixedGeneration(options.generations()))
+                .limit(byFixedGeneration(options.generations()));
+
+        if (options.steadyGenerations() > 0) {
+            stream = stream.limit(bySteadyFitness(options.steadyGenerations()));
+        }
+
+        final EvolutionResult<DoubleGene, Double> result =
+            stream
+                .peek(evolutionResult -> report(evolutionResult, options))
                 .collect(EvolutionResult.toBestEvolutionResult());
 
         return new Result(
@@ -70,11 +89,22 @@ public final class CalibrationRunner {
         int populationSize,
         long generations,
         double mutationProbability,
-        double recombinationProbability
+        double recombinationProbability,
+        int steadyGenerations,
+        int reportEveryGenerations
     ) {
 
+        public Options(
+            final int populationSize,
+            final long generations,
+            final double mutationProbability,
+            final double recombinationProbability
+        ) {
+            this(populationSize, generations, mutationProbability, recombinationProbability, 0, 0);
+        }
+
         public static Options defaults() {
-            return new Options(20, 50, 0.15, 0.35);
+            return new Options(30, 30, 0.20, 0.35, 10, 1);
         }
     }
 
@@ -83,5 +113,21 @@ public final class CalibrationRunner {
         double fitness,
         long generations
     ) {
+    }
+
+    private static void report(
+        final EvolutionResult<DoubleGene, Double> result,
+        final Options options
+    ) {
+        if (
+            options.reportEveryGenerations() > 0 &&
+            result.generation() % options.reportEveryGenerations() == 0
+        ) {
+            System.out.printf(
+                "generation=%d best_fitness=%.6g%n",
+                result.generation(),
+                result.bestFitness()
+            );
+        }
     }
 }
