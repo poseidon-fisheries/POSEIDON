@@ -39,6 +39,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -61,8 +62,40 @@ public class VesselCreatorFactory extends SimulationScopeFactory<VesselCreator> 
     private Factory<? super VesselScope, ? extends Gear> gear;
     private Factory<? super VesselScope, ? extends Engine> engine;
     private Factory<? super VesselScope, ? extends Behaviour> behaviour;
+    private List<Factory<? super VesselScope, ?>> extraFactories = List.of();
 
     private int numberOfVesselsToCreate;
+
+    public VesselCreatorFactory(
+        final Factory<? super SimulationScope, ? extends VesselField> vesselField,
+        final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
+        final Factory<? super SimulationScope, ? extends MarketGrid> marketGrid,
+        final Factory<? super SimulationScope, ? extends Supplier<String>> vesselIdSupplier,
+        final Factory<? super VesselScope, ? extends String> name,
+        final Factory<? super VesselScope, ? extends Account> account,
+        final Factory<? super VesselScope, ? extends Port> homePort,
+        final Factory<? super VesselScope, ? extends Hold> hold,
+        final Factory<? super VesselScope, ? extends Gear> gear,
+        final Factory<? super VesselScope, ? extends Engine> engine,
+        final Factory<? super VesselScope, ? extends Behaviour> behaviour,
+        final int numberOfVesselsToCreate
+    ) {
+        this(
+            vesselField,
+            portGrid,
+            marketGrid,
+            vesselIdSupplier,
+            name,
+            account,
+            homePort,
+            hold,
+            gear,
+            engine,
+            behaviour,
+            List.of(),
+            numberOfVesselsToCreate
+        );
+    }
 
     @Override
     protected VesselCreator newInstance(final SimulationScope scope) {
@@ -79,6 +112,7 @@ public class VesselCreatorFactory extends SimulationScopeFactory<VesselCreator> 
             checkNotNull(gear),
             checkNotNull(engine),
             checkNotNull(behaviour),
+            extraFactories == null ? List.of() : extraFactories,
             numberOfVesselsToCreate
         );
     }

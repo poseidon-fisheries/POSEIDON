@@ -42,6 +42,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
@@ -60,6 +61,7 @@ public class VesselCreator implements Steppable {
     private final Factory<? super VesselScope, ? extends Gear> gear;
     private final Factory<? super VesselScope, ? extends Engine> engine;
     private final Factory<? super VesselScope, ? extends Behaviour> behaviour;
+    private final List<Factory<? super VesselScope, ?>> extraFactories;
 
     private final int numberOfVesselsToCreate;
 
@@ -87,6 +89,7 @@ public class VesselCreator implements Steppable {
             vessel.setHold(hold.get(vesselScope));
             vessel.setName(name.get(vesselScope));
             vessel.setHomePort(homePort.get(vesselScope));
+            extraFactories.forEach(factory -> factory.get(vesselScope));
             vessel.setRegisteredAsActive(true);
         }
     }

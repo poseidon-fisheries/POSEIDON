@@ -27,6 +27,8 @@ import uk.ac.ox.poseidon.agents.catches.UncategorisedCatchCategoryFactory;
 import uk.ac.ox.poseidon.agents.catches.UniformCatchCategoriserFactory;
 import uk.ac.ox.poseidon.agents.catches.disposition.ProportionallyLimitingBiomassToHoldFactory;
 import uk.ac.ox.poseidon.agents.choices.*;
+import uk.ac.ox.poseidon.agents.choices.evaluation.TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory;
+import uk.ac.ox.poseidon.agents.choices.evaluation.TripEvaluatorFactory;
 import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
@@ -67,6 +69,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -279,6 +282,12 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 )
             );
 
+        final var tripEvaluator =
+            new TripEvaluatorFactory(
+                optionValues,
+                new TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory()
+            );
+
         final var behaviour =
             new BehaviourFactory(
                 sequenceTask(
@@ -327,10 +336,11 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             gear,
                             new SimpleEngineFactory<>(
                                 fullTank(volumeOf(100000, LITRE)),
-                                speedOf("10 kn"),
+                                speedOf("16 km/h"),
                                 volumeOf(3, LITRE)
                             ),
                             behaviour, // new InactiveBehaviourFactory(),
+                            List.of(tripEvaluator),
                             0 // mapped over
                         ),
                         Map.of(
