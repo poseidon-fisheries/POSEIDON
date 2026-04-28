@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Volume;
@@ -33,21 +33,21 @@ import static uk.ac.ox.poseidon.core.quantities.Factories.volumeOf;
 
 public class Factories {
 
-    public static <S extends Scope> SimpleFuelTankFactory<S> tank(
-        final Factory<? super S, ? extends Quantity<Volume>> capacity,
-        final Factory<? super S, ? extends Quantity<Volume>> currentFuel
+    public static SimpleFuelTankFactory tank(
+        final Factory<? super VesselScope, ? extends Quantity<Volume>> capacity,
+        final Factory<? super VesselScope, ? extends Quantity<Volume>> currentFuel
     ) {
-        return new SimpleFuelTankFactory<>(capacity, currentFuel);
+        return new SimpleFuelTankFactory(capacity, currentFuel);
     }
 
-    public static <S extends Scope> SimpleFuelTankFactory<S> fullTank(
-        final Factory<? super S, ? extends Quantity<Volume>> capacity
+    public static SimpleFuelTankFactory fullTank(
+        final Factory<? super VesselScope, ? extends Quantity<Volume>> capacity
     ) {
         return tank(capacity, capacity);
     }
 
-    public static <S extends Scope> SimpleFuelTankFactory<S> emptyTank(
-        final Factory<? super S, ? extends Quantity<Volume>> capacity
+    public static SimpleFuelTankFactory emptyTank(
+        final Factory<? super VesselScope, ? extends Quantity<Volume>> capacity
     ) {
         return tank(capacity, volumeOf(0, LITRE));
     }

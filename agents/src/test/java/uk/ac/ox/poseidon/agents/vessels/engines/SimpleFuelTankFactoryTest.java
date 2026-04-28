@@ -23,26 +23,54 @@
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.quantities.VolumeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.tank;
+import static org.mockito.Mockito.mock;
 
 class SimpleFuelTankFactoryTest {
 
     @Test
     void createsSimpleFuelTankUsingVolumeFactories() {
-        final SimpleFuelTankFactory<Scope> factory =
+        final SimpleFuelTankFactory factory =
             tank(
                 new VolumeFactory(2.0, "m3"),
                 new VolumeFactory(0.1255, "m3")
             );
 
-        final FuelTank tank = factory.get(Scope.GLOBAL_SCOPE);
+        final FuelTank tank = factory.get(vesselScope());
 
         assertThat(tank).isInstanceOf(SimpleFuelTank.class);
         assertThat(tank.getCapacityInLitres()).isEqualTo(2000.0);
         assertThat(tank.getCurrentFuelInLitres()).isEqualTo(125.5);
+    }
+
+    @Test
+    void createsOneFuelTankPerVessel() {
+        final SimpleFuelTankFactory factory =
+            tank(
+                new VolumeFactory(100.0, "l"),
+                new VolumeFactory(100.0, "l")
+            );
+
+        final FuelTank firstTank = factory.get(vesselScope());
+        final FuelTank secondTank = factory.get(vesselScope());
+
+        firstTank.consumeFuel(10.0);
+
+        assertThat(firstTank.getCurrentFuelInLitres()).isEqualTo(90.0);
+        assertThat(secondTank.getCurrentFuelInLitres()).isEqualTo(100.0);
+    }
+
+    private static VesselScope vesselScope() {
+        return new VesselScope(
+            new SimulationScope(mock(Simulation.class)),
+            mock(Vessel.class)
+        );
     }
 }
