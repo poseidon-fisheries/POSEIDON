@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.IntStream;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -161,5 +163,34 @@ class GridAdaptorTest {
             )),
             pathFinder.getPath(new Int2D(0, 0), new Int2D(2, 0))
         );
+    }
+
+    @Test
+    void pathFinderCanBeCalledConcurrently() {
+        final AStarPathFinder pathFinder = new AStarPathFinder(
+            bathymetricGrid,
+            portGrid,
+            distanceCalculator
+        );
+
+        CompletableFuture
+            .allOf(
+                IntStream
+                    .range(0, 100)
+                    .mapToObj(i -> CompletableFuture.runAsync(() ->
+                        assertEquals(
+                            Optional.of(List.of(
+                                new Int2D(0, 0),
+                                new Int2D(0, 1),
+                                new Int2D(1, 2),
+                                new Int2D(2, 1),
+                                new Int2D(2, 0)
+                            )),
+                            pathFinder.getPath(new Int2D(0, 0), new Int2D(2, 0))
+                        )
+                    ))
+                    .toArray(CompletableFuture[]::new)
+            )
+            .join();
     }
 }

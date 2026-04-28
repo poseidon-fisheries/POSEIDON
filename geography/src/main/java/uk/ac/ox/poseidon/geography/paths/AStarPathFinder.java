@@ -52,7 +52,7 @@ public class AStarPathFinder extends AbstractGridPathFinder {
     }
 
     @Override
-    public Optional<ImmutableList<Int2D>> getPath(
+    synchronized public Optional<ImmutableList<Int2D>> getPath(
         final Int2D start,
         final Int2D end
     ) {
