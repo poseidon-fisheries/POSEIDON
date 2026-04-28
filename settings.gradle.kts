@@ -27,6 +27,7 @@ plugins {
 
 rootProject.name = "POSEIDON"
 include("core")
+include("calibration")
 include("geography")
 include("io")
 include("biology")
