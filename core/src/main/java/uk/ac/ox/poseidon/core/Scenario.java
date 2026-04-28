@@ -23,14 +23,17 @@
 package uk.ac.ox.poseidon.core;
 
 import lombok.*;
+import org.apache.commons.beanutils.PropertyUtils;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.SequencedMap;
 
 import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
@@ -61,29 +64,77 @@ public final class Scenario {
     }
 
     public Simulation startNewSimulation() {
-        return startNewSimulation(System.currentTimeMillis(), UUID.randomUUID());
-    }
-
-    public Simulation startNewSimulation(final UUID simulationId) {
-        return startNewSimulation(System.currentTimeMillis(), simulationId);
+        return startNewSimulation(SimulationStartOptions.builder().build());
     }
 
     synchronized public Simulation startNewSimulation(
-        final long seed,
-        final UUID simulationId
+        final SimulationStartOptions options
     ) {
-        final LocalDateTime localDateTime = startingDateTime.get(GLOBAL_SCOPE);
-        final TemporalSchedule schedule = new TemporalSchedule(localDateTime);
-        final Simulation simulation = new Simulation(seed, schedule, simulationId);
-        final SimulationScope simulationScope = new SimulationScope(simulation);
-        simulation.start();
-        simulation.components =
-            getComponents()
-                .values()
+        final SequencedMap<String, Object> originalPropertyValues =
+            options.getPropertyOverrides()
+                .sequencedEntrySet()
                 .stream()
-                .map(factory -> factory.get(simulationScope))
-                .toList();
-        return simulation;
+                .collect(
+                    LinkedHashMap::new,
+                    (originalValues, entry) ->
+                        originalValues.put(entry.getKey(), getProperty(entry.getKey())),
+                    Map::putAll
+                );
+        try {
+            if (!options.getPropertyOverrides().isEmpty()) {
+                setProperties(options.getPropertyOverrides());
+            }
+            final LocalDateTime localDateTime = startingDateTime.get(GLOBAL_SCOPE);
+            final TemporalSchedule schedule = new TemporalSchedule(localDateTime);
+            final Simulation simulation =
+                new Simulation(options.getSeed(), schedule, options.getSimulationId());
+            final SimulationScope simulationScope = new SimulationScope(simulation);
+            simulation.start();
+            simulation.components =
+                getComponents()
+                    .values()
+                    .stream()
+                    .map(factory -> factory.get(simulationScope))
+                    .toList();
+            return simulation;
+        } finally {
+            originalPropertyValues.reversed().forEach(this::setProperty);
+        }
+    }
+
+    synchronized void setProperties(final Map<String, Object> properties) {
+        properties.forEach(this::setProperty);
+    }
+
+    synchronized Object getProperty(
+        final String propertyName
+    ) {
+        try {
+            return PropertyUtils.getProperty(this, propertyName);
+        } catch (
+            final InvocationTargetException | IllegalAccessException | NoSuchMethodException e
+        ) {
+            throw new RuntimeException(
+                "Unable to read property " + propertyName,
+                e
+            );
+        }
+    }
+
+    synchronized void setProperty(
+        final String propertyName,
+        final Object value
+    ) {
+        try {
+            PropertyUtils.setProperty(this, propertyName, value);
+        } catch (
+            final InvocationTargetException | IllegalAccessException | NoSuchMethodException e
+        ) {
+            throw new RuntimeException(
+                "Unable to set property " + propertyName + " to " + value,
+                e
+            );
+        }
     }
 
     @SuppressWarnings("unchecked")
