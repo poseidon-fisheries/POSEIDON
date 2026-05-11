@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
-import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
@@ -33,7 +32,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGridFactory;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 class BathymetricGridFromElevationValuesFactoryTest {
@@ -51,11 +51,8 @@ class BathymetricGridFromElevationValuesFactoryTest {
 
     @Test
     void elevationsValuesMustNotBeNull() {
-        final UncheckedExecutionException error = assertThrows(
-            UncheckedExecutionException.class,
-            () -> factory.get(Scope.GLOBAL_SCOPE)
-        );
-        assertInstanceOf(NullPointerException.class, error.getCause());
+        assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
+            .isInstanceOf(NullPointerException.class);
     }
 
     @Test
@@ -63,13 +60,10 @@ class BathymetricGridFromElevationValuesFactoryTest {
         Stream
             .of(0, 3, 5)
             .map(n -> Stream.generate(() -> 0.0).limit(n).toList())
-            .forEach(elevationValues -> {
+            .forEach(_ -> {
                 factory.setElevationValues(List.of(0.0, 0.0, 0.0));
-                final UncheckedExecutionException error = assertThrows(
-                    UncheckedExecutionException.class,
-                    () -> factory.get(Scope.GLOBAL_SCOPE)
-                );
-                assertInstanceOf(IllegalArgumentException.class, error.getCause());
+                assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
+                    .isInstanceOf(IllegalArgumentException.class);
             });
     }
 

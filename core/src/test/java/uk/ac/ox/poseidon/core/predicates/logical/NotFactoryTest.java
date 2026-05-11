@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -72,7 +71,6 @@ class NotFactoryTest {
         // Act & Assert
         assertThatThrownBy(() -> notFactory.get(Scope.GLOBAL_SCOPE))
             .as("Expected Not to fail when the predicate factory returns null.")
-            .isInstanceOf(UncheckedExecutionException.class)
-            .hasCauseInstanceOf(NullPointerException.class);
+            .isInstanceOf(NullPointerException.class);
     }
 }

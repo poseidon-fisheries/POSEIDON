@@ -68,12 +68,12 @@ class NormalisedDoubleGridFromAllocatorFactoryTest {
         final ModelGrid modelGrid = ModelGrid.create(2, 2, new Envelope(0, 2, 0, 2));
         final NormalisedDoubleGridFromAllocatorFactory<Scope> factory =
             new NormalisedDoubleGridFromAllocatorFactory<>(
-                scope -> modelGrid,
-                scope -> cell -> cell.x == 1 ? -1.0 : 1.0,
-                scope -> 4.0
+                _ -> modelGrid,
+                _ -> cell -> cell.x == 1 ? -1.0 : 1.0,
+                _ -> 4.0
             );
 
         assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
-            .hasRootCauseInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class);
     }
 }

@@ -62,6 +62,6 @@ class DoubleGridFromAllocatorFactoryTest {
                 scope -> cell -> cell.x == 1 ? -1.0 : 1.0
             );
         assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
-            .hasRootCauseInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class);
     }
 }
