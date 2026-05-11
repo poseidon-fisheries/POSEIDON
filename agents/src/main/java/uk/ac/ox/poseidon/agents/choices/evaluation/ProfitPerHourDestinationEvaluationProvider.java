@@ -38,10 +38,10 @@ import static com.google.common.base.Preconditions.checkState;
 
 public class ProfitPerHourDestinationEvaluationProvider implements EvaluationProvider<Int2D> {
 
-    private final CurrencyUnit currencyUnit;
+    private final String currencyCode;
 
     public ProfitPerHourDestinationEvaluationProvider(final CurrencyUnit currencyUnit) {
-        this.currencyUnit = checkNotNull(currencyUnit);
+        this.currencyCode = checkNotNull(currencyUnit).getCode();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class ProfitPerHourDestinationEvaluationProvider implements EvaluationPro
         final Int2D option,
         final EventManager eventManager
     ) {
-        return new ProfitPerHourEvaluation(option, eventManager, currencyUnit);
+        return new ProfitPerHourEvaluation(option, eventManager, CurrencyUnit.of(currencyCode));
     }
 
     private static class ProfitPerHourEvaluation

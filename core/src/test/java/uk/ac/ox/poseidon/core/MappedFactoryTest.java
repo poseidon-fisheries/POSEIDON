@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.time.DateFactory;
@@ -87,14 +88,26 @@ class MappedFactoryTest {
 
         private DateFactory dateFactory;
 
+        @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP2",
+            justification = "This test fixture intentionally stores a nested mutable bean property."
+        )
         public DateHolderFactory(final DateFactory dateFactory) {
             this.dateFactory = dateFactory;
         }
 
+        @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP",
+            justification = "This test fixture intentionally exposes a nested mutable bean property."
+        )
         public DateFactory getDateFactory() {
             return dateFactory;
         }
 
+        @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP2",
+            justification = "This test fixture intentionally stores a nested mutable bean property."
+        )
         public void setDateFactory(final DateFactory dateFactory) {
             this.dateFactory = dateFactory;
         }

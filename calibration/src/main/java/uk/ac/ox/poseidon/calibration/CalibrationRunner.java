@@ -31,6 +31,7 @@ import io.jenetics.engine.Engine;
 import io.jenetics.engine.EvolutionResult;
 import io.jenetics.engine.EvolutionStream;
 
+import java.util.LinkedHashMap;
 import java.util.SequencedMap;
 
 import static io.jenetics.engine.Limits.byFixedGeneration;
@@ -113,6 +114,14 @@ public final class CalibrationRunner {
         double fitness,
         long generations
     ) {
+        public Result {
+            parameters = new LinkedHashMap<>(parameters);
+        }
+
+        @Override
+        public SequencedMap<String, Double> parameters() {
+            return new LinkedHashMap<>(parameters);
+        }
     }
 
     private static void report(

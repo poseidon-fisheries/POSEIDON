@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.calibration;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenetics.DoubleChromosome;
 import io.jenetics.DoubleGene;
 import io.jenetics.Genotype;
@@ -37,6 +38,7 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.time.temporal.TemporalAmount;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.SequencedMap;
@@ -87,6 +89,10 @@ public abstract class CalibrationProblem
         this(scenario, temporalAmount, ranges, new long[]{0});
     }
 
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "Calibration problems intentionally wrap the supplied scenario and temporal amount."
+    )
     public CalibrationProblem(
         final Scenario scenario,
         final TemporalAmount temporalAmount,
@@ -95,16 +101,16 @@ public abstract class CalibrationProblem
     ) {
         this.scenario = scenario;
         this.temporalAmount = temporalAmount;
-        this.ranges = ranges;
+        this.ranges = Collections.unmodifiableSequencedMap(new LinkedHashMap<>(ranges));
         this.seeds = seeds.length == 0 ? new long[]{0} : Arrays.copyOf(seeds, seeds.length);
         this.codec =
             Codec.of(
-                Genotype.of(DoubleChromosome.of(0.0, 1.0, ranges.size())),
+                Genotype.of(DoubleChromosome.of(0.0, 1.0, this.ranges.size())),
                 genotype -> {
-                    final var entries = ranges.sequencedEntrySet().stream().toList();
+                    final var entries = this.ranges.sequencedEntrySet().stream().toList();
                     final var chromosome = genotype.chromosome();
                     return IntStream
-                        .range(0, ranges.size())
+                        .range(0, this.ranges.size())
                         .mapToObj(i -> {
                             final var entry = entries.get(i);
                             final DoubleRange range = entry.getValue();
