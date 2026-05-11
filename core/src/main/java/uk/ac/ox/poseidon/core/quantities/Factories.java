@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.core.quantities;
 
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
@@ -32,8 +31,8 @@ import javax.measure.quantity.Mass;
 import javax.measure.quantity.Speed;
 import javax.measure.quantity.Volume;
 
-import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.quantities.AbstractQuantityFactory.parse;
 
 public class Factories {
@@ -87,11 +86,11 @@ public class Factories {
         return new SpeedFactory(quantity.getValue().doubleValue(), quantity.getUnit().toString());
     }
 
-    public static ObjectFactory<Quantity<Speed>> speedOf(
+    public static SpeedFactory speedOf(
         final double value,
         final Unit<Speed> unit
     ) {
-        return new ObjectFactory<>(getQuantity(value, unit));
+        return speedOf(getQuantity(value, unit));
     }
 
     public static SpeedFactory speedOf(final String quantity) {
