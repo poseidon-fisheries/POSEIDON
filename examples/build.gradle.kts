@@ -36,6 +36,16 @@ dependencies {
 }
 
 tasks.shadowJar {
+    dependencies {
+        exclude(dependency("com.formdev:flatlaf:.*"))
+    }
+
+    from({
+        project.configurations.runtimeClasspath.get()
+            .filter { it.name == "flatlaf-${libs.versions.flatlaf.get()}.jar" }
+            .map { zipTree(it) }
+    })
+
     mergeServiceFiles {
         // those exclusions prevent GeoTools from trying to load the CLib plugin, which crashes:
         exclude("com/sun/media/imageioimpl/plugins/jpeg/CLib*")
