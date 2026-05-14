@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.io;
 
 import com.google.common.collect.ImmutableList;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.poseidon.core.Scenario;
@@ -46,7 +45,7 @@ public class ScenarioLoader {
     private static final List<String> DEFAULT_CLASS_PREFIXES =
         List.of("uk.ac.ox.poseidon", "java");
     private static final int MAX_ALIASES_FOR_COLLECTIONS = 5000;
-    private final Yaml yaml;
+    private final List<String> permittedClassPrefixes;
 
     /**
      * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance, optionally passing
@@ -54,7 +53,7 @@ public class ScenarioLoader {
      * loading factory classes from the YAML scenario.
      */
     public ScenarioLoader(final String... extraClassPrefixes) {
-        this(new Yaml(getLoaderOptions(Arrays.asList(extraClassPrefixes))));
+        this(Arrays.asList(extraClassPrefixes));
     }
 
     /**
@@ -62,27 +61,16 @@ public class ScenarioLoader {
      * prefixes that will be permitted in addition to "uk.ac.ox.poseidon" and "java" when loading
      * factory classes from the YAML scenario.
      */
-    public ScenarioLoader(final Collection<String> extraClassPrefixes) {
-        this(new Yaml(getLoaderOptions(extraClassPrefixes)));
-    }
-
-    /**
-     * Constructs a {@code ScenarioLoader} with a specified {@code Yaml} instance.
-     *
-     * @param yaml the {@code Yaml} instance to use for loading scenarios
-     */
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public ScenarioLoader(final Yaml yaml) {
-        this.yaml = yaml;
-    }
-
-    private static LoaderOptions getLoaderOptions(final Collection<String> extraClassPrefixes) {
-        final LoaderOptions options = new LoaderOptions();
-        final ImmutableList<String> permittedClassPrefixes = ImmutableList
+    public ScenarioLoader(final Collection<String> permittedClassPrefixes) {
+        this.permittedClassPrefixes = ImmutableList
             .<String>builder()
             .addAll(DEFAULT_CLASS_PREFIXES)
-            .addAll(extraClassPrefixes)
+            .addAll(permittedClassPrefixes)
             .build();
+    }
+
+    private LoaderOptions newLoaderOptions() {
+        final LoaderOptions options = new LoaderOptions();
         options.setTagInspector(tag ->
             permittedClassPrefixes
                 .stream()
@@ -92,6 +80,10 @@ public class ScenarioLoader {
         return options;
     }
 
+    private Yaml newYaml() {
+        return new Yaml(newLoaderOptions());
+    }
+
     /**
      * Loads a {@code Scenario} from a YAML string.
      *
@@ -99,9 +91,9 @@ public class ScenarioLoader {
      * @return the loaded {@code Scenario} object
      */
     public Scenario load(final String yamlString) {
-        return yaml.loadAs(yamlString, Scenario.class);
+        return newYaml().loadAs(yamlString, Scenario.class);
     }
-    
+
     public Scenario load(final Path path) {
         return load(path.toFile());
     }
@@ -128,6 +120,6 @@ public class ScenarioLoader {
      * @return the loaded {@code Scenario} object
      */
     public Scenario load(final InputStream inputStream) {
-        return yaml.load(inputStream);
+        return newYaml().load(inputStream);
     }
 }
