@@ -52,4 +52,9 @@ public class DoubleGridWrapper implements DoubleGrid {
         return grid.getMaximumValue();
     }
 
+    @Override
+    public double getSum() {
+        return grid.getSum();
+    }
+
 }

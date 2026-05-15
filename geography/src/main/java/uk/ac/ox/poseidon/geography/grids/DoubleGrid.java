@@ -32,4 +32,6 @@ public interface DoubleGrid extends Grid {
 
     double getMaximumValue();
 
+    double getSum();
+
 }

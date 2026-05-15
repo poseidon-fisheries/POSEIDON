@@ -94,4 +94,17 @@ public class BaseDoubleGrid extends AbstractGrid<DoubleGrid2D>
         return field.get(cell.x, cell.y);
     }
 
+    @Override
+    public double getSum() {
+        double sum = 0.0;
+        final int width = field.width;
+        final int height = field.height;
+        final double[][] a = field.field;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                sum += a[x][y];
+            }
+        }
+        return sum;
+    }
 }

@@ -92,6 +92,26 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
         return new FisheableCell(cell);
     }
 
+    /**
+     * Sums the values for the grid, ignoring NaN, as they occur in non-habitable cells
+     */
+    @Override
+    public double getSum() {
+        double sum = 0.0;
+        final int width = field.width;
+        final int height = field.height;
+        final double[][] a = field.field;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                final double biomass = a[x][y];
+                if (!Double.isNaN(biomass)) {
+                    sum += biomass;
+                }
+            }
+        }
+        return sum;
+    }
+
     @RequiredArgsConstructor
     class FisheableCell implements Fisheable {
 
