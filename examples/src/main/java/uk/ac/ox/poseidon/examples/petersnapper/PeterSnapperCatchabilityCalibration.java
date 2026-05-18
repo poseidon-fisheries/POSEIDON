@@ -31,18 +31,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Period;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SequencedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static java.lang.Math.abs;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.summingDouble;
 
 public final class PeterSnapperCatchabilityCalibration {
 
@@ -63,7 +55,7 @@ public final class PeterSnapperCatchabilityCalibration {
     private PeterSnapperCatchabilityCalibration() {
     }
 
-    public static void main(final String[] args) throws IOException {
+    static void main(final String[] args) throws IOException {
         final int populationSize =
             args.length > 0 ? Integer.parseInt(args[0]) : DEFAULT_POPULATION_SIZE;
         final long generations =
@@ -109,10 +101,10 @@ public final class PeterSnapperCatchabilityCalibration {
     private static long[] parseSeeds(final String[] args) {
         return args.length > 2
             ? Arrays
-                .stream(args)
-                .skip(2)
-                .mapToLong(Long::parseLong)
-                .toArray()
+            .stream(args)
+            .skip(2)
+            .mapToLong(Long::parseLong)
+            .toArray()
             : DEFAULT_SEEDS;
     }
 
@@ -210,7 +202,9 @@ public final class PeterSnapperCatchabilityCalibration {
 
         private List<Double> simulatedLandings(final Simulation simulation) {
             final Map<Integer, Double> annualLandings =
-                annualLandingsKg(simulation);
+                simulation
+                    .getComponent(TotalLandingsPerYearAccumulator.class)
+                    .get();
             final int firstYear =
                 simulation.getTemporalSchedule().getStartingDateTime().getYear();
             return IntStream
@@ -219,24 +213,5 @@ public final class PeterSnapperCatchabilityCalibration {
                 .toList();
         }
 
-        private Map<Integer, Double> annualLandingsKg(final Simulation simulation) {
-            return simulation
-                .getComponent(uk.ac.ox.poseidon.agents.market.BiomassSaleAccumulator.class)
-                .getEvents()
-                .collect(
-                    groupingBy(
-                        sale -> sale.getDateTime().getYear(),
-                        TreeMap::new,
-                        mapping(
-                            sale -> sale
-                                .getItems()
-                                .stream()
-                                .mapToDouble(item -> item.getContent().asKg())
-                                .sum(),
-                            summingDouble(Double::doubleValue)
-                        )
-                    )
-                );
-        }
     }
 }

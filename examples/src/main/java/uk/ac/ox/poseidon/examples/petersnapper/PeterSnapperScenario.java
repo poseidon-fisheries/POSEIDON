@@ -32,7 +32,10 @@ import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
 import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGridFactory;
 import uk.ac.ox.poseidon.agents.fuel.OneFuelStationPerPortFactory;
-import uk.ac.ox.poseidon.agents.market.*;
+import uk.ac.ox.poseidon.agents.market.MarketGridFactory;
+import uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory;
+import uk.ac.ox.poseidon.agents.market.PriceEntryFactory;
+import uk.ac.ox.poseidon.agents.market.PriceFactory;
 import uk.ac.ox.poseidon.agents.tasks.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.tasks.destinations.StartTripFactory;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingFactory;
@@ -51,7 +54,9 @@ import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.MappedFactory;
 import uk.ac.ox.poseidon.core.Scenario;
+import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.utils.ListFactory;
 import uk.ac.ox.poseidon.core.utils.PairFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
@@ -67,13 +72,12 @@ import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
-import static tech.units.indriya.unit.Units.LITRE;
+import static tech.units.indriya.unit.Units.*;
 import static uk.ac.ox.poseidon.agents.choices.evaluation.Factories.profitPerHour;
 import static uk.ac.ox.poseidon.agents.choices.evaluation.Factories.tripEvaluator;
 import static uk.ac.ox.poseidon.agents.components.Factories.component;
@@ -116,6 +120,41 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     private static final double EXPLORATION_PROBABILITY = 0.2;
     private static final int TOTAL_CARRYING_CAPACITY = 110_749_315;
     private static final String CURRENCY_CODE = "IDR";
+
+    static void main() {
+
+        // This just checks that the biomass growth matches that of the old petersnapper scenario.
+        // It does; so the calibration mismatch is from fisher behaviour, not biology.
+
+        final Scenario scenario = new PeterSnapperScenario().get();
+        final Simulation simulation =
+            scenario.startNewSimulation(
+                uk.ac.ox.poseidon.core.SimulationStartOptions
+                    .builder()
+                    .seed(0)
+                    .propertyOverride(
+                        "components(agentCreators).steppable.steppables" +
+                            ".mappedProperties(numberOfVesselsToCreate)",
+                        listOf(1, 0)
+                    )
+                    .build()
+            );
+        try {
+            final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
+            for (int i = 0; i < 10; i++) {
+                temporalSchedule.stepFor(simulation, Period.ofYears(1));
+                System.out.println(simulation.getComponent(BiomassGrid.class).getSum());
+            }
+        } finally {
+            System.out.println(
+                simulation
+                    .getComponent(TotalLandingsPerYearAccumulator.class)
+                    .get()
+            );
+            simulation.finish();
+        }
+
+    }
 
     @Override
     public Scenario get() {
@@ -249,7 +288,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final var gear =
             new FixedBiomassProportionGearFactory<>(
                 "FGL", // droplines count as "fixed gears and lines"
-                0.25,
+                0.000641964,
                 constant(ONE_HOUR)
             );
 
@@ -354,8 +393,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 0
             );
 
-        final var biomassSaleAccumulator =
-            new BiomassSaleAccumulatorFactory();
+        final var totalLandingsPerYearAccumulator =
+            new TotalLandingsPerYearAccumulatorFactory();
 
         return builder
             .startingDateTime(startingDateTime)
@@ -370,7 +409,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             .component("gear", gear)
             .component("vesselField", vesselField)
             .component("agentCreators", agentCreators)
-            .component("biomassSaleAccumulator", biomassSaleAccumulator)
+            .component("totalLandingsPerYearAccumulator", totalLandingsPerYearAccumulator)
             .build();
     }
 }

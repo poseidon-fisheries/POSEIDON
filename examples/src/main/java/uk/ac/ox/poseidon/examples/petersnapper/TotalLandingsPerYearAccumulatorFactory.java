@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,24 +20,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core;
+package uk.ac.ox.poseidon.examples.petersnapper;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Singular;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
-import java.util.Map;
-import java.util.UUID;
+public class TotalLandingsPerYearAccumulatorFactory
+    extends SimulationEventListenerFactory<TotalLandingsPerYearAccumulator> {
 
-@Getter
-@Builder
-public final class SimulationStartOptions {
+    @Override
+    protected TotalLandingsPerYearAccumulator newListener(final SimulationScope scope) {
+        return new TotalLandingsPerYearAccumulator();
+    }
 
-    @Builder.Default
-    private final UUID simulationId = UUID.randomUUID();
-
-    @Builder.Default
-    private final long seed = System.currentTimeMillis();
-
-    @Singular private final Map<String, Object> propertyOverrides;
 }

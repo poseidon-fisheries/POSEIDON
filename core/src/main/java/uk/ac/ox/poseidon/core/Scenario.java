@@ -70,36 +70,52 @@ public final class Scenario {
     synchronized public Simulation startNewSimulation(
         final SimulationStartOptions options
     ) {
-        final SequencedMap<String, Object> originalPropertyValues =
-            options.getPropertyOverrides()
-                .sequencedEntrySet()
-                .stream()
-                .collect(
-                    LinkedHashMap::new,
-                    (originalValues, entry) ->
-                        originalValues.put(entry.getKey(), getProperty(entry.getKey())),
-                    Map::putAll
-                );
-        try {
-            if (!options.getPropertyOverrides().isEmpty()) {
-                setProperties(options.getPropertyOverrides());
-            }
-            final LocalDateTime localDateTime = startingDateTime.get(GLOBAL_SCOPE);
-            final TemporalSchedule schedule = new TemporalSchedule(localDateTime);
-            final Simulation simulation =
-                new Simulation(options.getSeed(), schedule, options.getSimulationId());
-            final SimulationScope simulationScope = new SimulationScope(simulation);
-            simulation.start();
-            simulation.components =
-                getComponents()
-                    .values()
-                    .stream()
-                    .map(factory -> factory.get(simulationScope))
-                    .toList();
-            return simulation;
-        } finally {
-            originalPropertyValues.reversed().forEach(this::setProperty);
+        if (options.getPropertyOverrides().isEmpty()) {
+            return createSimulation(options);
         }
+        final SequencedMap<String, Object> originalPropertyValues =
+            getPropertyValues(options.getPropertyOverrides());
+        try {
+            setProperties(options.getPropertyOverrides());
+            return createSimulation(options);
+        } finally {
+            restoreProperties(originalPropertyValues);
+        }
+    }
+
+    private Simulation createSimulation(final SimulationStartOptions options) {
+        final TemporalSchedule schedule =
+            new TemporalSchedule(startingDateTime.get(GLOBAL_SCOPE));
+        final Simulation simulation =
+            new Simulation(options.getSeed(), schedule, options.getSimulationId());
+        final SimulationScope simulationScope = new SimulationScope(simulation);
+        simulation.start();
+        simulation.components =
+            getComponents()
+                .values()
+                .stream()
+                .map(factory -> factory.get(simulationScope))
+                .toList();
+        return simulation;
+    }
+
+    private SequencedMap<String, Object> getPropertyValues(
+        final Map<String, Object> properties
+    ) {
+        return properties
+            .entrySet()
+            .stream()
+            .collect(
+                LinkedHashMap::new,
+                (values, entry) -> values.put(entry.getKey(), getProperty(entry.getKey())),
+                Map::putAll
+            );
+    }
+
+    private void restoreProperties(
+        final SequencedMap<String, Object> propertyValues
+    ) {
+        propertyValues.reversed().forEach(this::setProperty);
     }
 
     synchronized void setProperties(final Map<String, Object> properties) {

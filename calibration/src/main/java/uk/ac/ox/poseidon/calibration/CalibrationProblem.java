@@ -37,11 +37,7 @@ import uk.ac.ox.poseidon.core.SimulationStartOptions;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.time.temporal.TemporalAmount;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.SequencedMap;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -64,7 +60,7 @@ public abstract class CalibrationProblem
         final TemporalAmount temporalAmount,
         final List<ParameterRange> ranges
     ) {
-        this(scenario, temporalAmount, ranges, new long[]{0});
+        this(scenario, temporalAmount, ranges, 0);
     }
 
     public CalibrationProblem(
@@ -86,12 +82,13 @@ public abstract class CalibrationProblem
         final TemporalAmount temporalAmount,
         final SequencedMap<String, DoubleRange> ranges
     ) {
-        this(scenario, temporalAmount, ranges, new long[]{0});
+        this(scenario, temporalAmount, ranges, 0);
     }
 
     @SuppressFBWarnings(
         value = "EI_EXPOSE_REP2",
-        justification = "Calibration problems intentionally wrap the supplied scenario and temporal amount."
+        justification = "Calibration problems intentionally wrap the supplied scenario and " +
+            "temporal amount."
     )
     public CalibrationProblem(
         final Scenario scenario,
@@ -151,7 +148,7 @@ public abstract class CalibrationProblem
                 SimulationStartOptions
                     .builder()
                     .seed(seed)
-                    .propertyOverrides(new LinkedHashMap<String, Object>(parameters))
+                    .propertyOverrides(parameters)
                     .build()
             );
         try {
