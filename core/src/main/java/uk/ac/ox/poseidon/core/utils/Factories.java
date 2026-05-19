@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
+import sim.engine.Steppable;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,6 +65,12 @@ public class Factories {
         final NumericIntervalToStringMapperFactory.Interval... intervals
     ) {
         return new NumericIntervalToStringMapperFactory(List.of(intervals));
+    }
+
+    public static <C extends Steppable> FinalProcessFactory<C> finalProcess(
+        final Factory<? super SimulationScope, C> process
+    ) {
+        return new FinalProcessFactory<>(process);
     }
 
 }

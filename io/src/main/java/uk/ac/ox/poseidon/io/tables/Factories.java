@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.io.sources.DataSource;
@@ -51,6 +52,15 @@ public class Factories {
         final Factory<S, ? extends DataSource> dataSourceFactory
     ) {
         return new CsvTableFactory<>(dataSourceFactory);
+    }
+
+    public static <S extends Scope> CsvTableWriterFactory<S> csvTableWriter(
+        final Factory<? super S, ? extends Supplier<Table>> tableSupplier,
+        final Factory<? super S, ? extends Path> path,
+        final boolean append,
+        final boolean clearAfterWriting
+    ) {
+        return new CsvTableWriterFactory<>(tableSupplier, path, append, clearAfterWriting);
     }
 
     public static <S extends Scope> TableSupplierFromIntegerDoubleMapSupplierFactory<S> tableSupplierFromIntegerDoubleMapSupplier(

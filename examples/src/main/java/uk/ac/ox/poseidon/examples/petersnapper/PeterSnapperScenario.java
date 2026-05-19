@@ -69,7 +69,6 @@ import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
 import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
 import uk.ac.ox.poseidon.geography.ports.PortFactory;
 import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
-import uk.ac.ox.poseidon.io.tables.TableSupplierFromMapSupplier;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -102,6 +101,7 @@ import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledOnceAtStart;
 import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledRepeating;
 import static uk.ac.ox.poseidon.core.suppliers.Factories.*;
 import static uk.ac.ox.poseidon.core.time.Factories.*;
+import static uk.ac.ox.poseidon.core.utils.Factories.finalProcess;
 import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
 import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
 import static uk.ac.ox.poseidon.geography.paths.Factories.pathFinder;
@@ -110,8 +110,7 @@ import static uk.ac.ox.poseidon.geography.predicates.Factories.isActiveWaterCell
 import static uk.ac.ox.poseidon.geography.utils.Factories.elevationTable;
 import static uk.ac.ox.poseidon.io.paths.Factories.path;
 import static uk.ac.ox.poseidon.io.sources.Factories.zipEntryDataSource;
-import static uk.ac.ox.poseidon.io.tables.Factories.csvTableFrom;
-import static uk.ac.ox.poseidon.io.tables.Factories.tableSupplierFromIntegerDoubleMapSupplier;
+import static uk.ac.ox.poseidon.io.tables.Factories.*;
 
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
@@ -140,10 +139,23 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                         listOf(10, 0)
                     )
                     .extraComponent(
-                        "totalLandingsPerYearAccumulator",
-                        tableSupplierFromIntegerDoubleMapSupplier(
-                            new TotalLandingsPerYearAccumulatorFactory(),
-                            "year", "landings"
+                        "totalLandingsPerYear",
+                        finalProcess(
+                            csvTableWriter(
+                                tableSupplierFromIntegerDoubleMapSupplier(
+                                    new TotalLandingsPerYearAccumulatorFactory(),
+                                    "year", "landings"
+                                ),
+                                path(
+                                    "POSEIDON",
+                                    "examples",
+                                    "outputs",
+                                    "peter_snapper",
+                                    "landings.csv"
+                                ),
+                                false,
+                                true
+                            )
                         )
                     )
                     .build()
@@ -155,11 +167,6 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 System.out.println(simulation.getComponent(BiomassGrid.class).getSum());
             }
         } finally {
-            System.out.println(
-                simulation
-                    .getComponent(TableSupplierFromMapSupplier.class)
-                    .get()
-            );
             simulation.finish();
         }
 
