@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SequencedMap;
+import java.util.stream.Stream;
 
 import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
@@ -91,9 +92,11 @@ public final class Scenario {
         final SimulationScope simulationScope = new SimulationScope(simulation);
         simulation.start();
         simulation.components =
-            getComponents()
-                .values()
-                .stream()
+            Stream
+                .<Factory<? super SimulationScope, ?>>concat(
+                    getComponents().values().stream(),
+                    options.getExtraComponents().values().stream()
+                )
                 .map(factory -> factory.get(simulationScope))
                 .toList();
         return simulation;

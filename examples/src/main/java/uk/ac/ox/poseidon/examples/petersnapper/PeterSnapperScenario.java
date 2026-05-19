@@ -69,6 +69,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
 import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
 import uk.ac.ox.poseidon.geography.ports.PortFactory;
 import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
+import uk.ac.ox.poseidon.io.tables.TableSupplierFromMapSupplier;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -110,6 +111,7 @@ import static uk.ac.ox.poseidon.geography.utils.Factories.elevationTable;
 import static uk.ac.ox.poseidon.io.paths.Factories.path;
 import static uk.ac.ox.poseidon.io.sources.Factories.zipEntryDataSource;
 import static uk.ac.ox.poseidon.io.tables.Factories.csvTableFrom;
+import static uk.ac.ox.poseidon.io.tables.Factories.tableSupplierFromIntegerDoubleMapSupplier;
 
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
@@ -135,7 +137,14 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     .propertyOverride(
                         "components(agentCreators).steppable.steppables" +
                             ".mappedProperties(numberOfVesselsToCreate)",
-                        listOf(1, 0)
+                        listOf(10, 0)
+                    )
+                    .extraComponent(
+                        "totalLandingsPerYearAccumulator",
+                        tableSupplierFromIntegerDoubleMapSupplier(
+                            new TotalLandingsPerYearAccumulatorFactory(),
+                            "year", "landings"
+                        )
                     )
                     .build()
             );
@@ -148,7 +157,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         } finally {
             System.out.println(
                 simulation
-                    .getComponent(TotalLandingsPerYearAccumulator.class)
+                    .getComponent(TableSupplierFromMapSupplier.class)
                     .get()
             );
             simulation.finish();
@@ -409,7 +418,6 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             .component("gear", gear)
             .component("vesselField", vesselField)
             .component("agentCreators", agentCreators)
-            .component("totalLandingsPerYearAccumulator", totalLandingsPerYearAccumulator)
             .build();
     }
 }

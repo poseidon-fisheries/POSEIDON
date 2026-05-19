@@ -22,47 +22,25 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import tech.tablesaw.api.ColumnType;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.io.sources.DataSource;
-import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
-import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
 
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class Factories {
+public class TableSupplierFromIntegerDoubleMapSupplierFactory<S extends Scope>
+    extends AbstractTableSupplierFromMapSupplierFactory<S, Integer, Double> {
 
-    private Factories() {
+    public TableSupplierFromIntegerDoubleMapSupplierFactory() {
+        super(ColumnType.INTEGER, ColumnType.DOUBLE);
     }
 
-    public static CsvTableFactory<Scope> csvTableFromString(final String data) {
-        return new CsvTableFactory<>(new StringDataSourceFactory(data));
-    }
-
-    public static <S extends Scope> CsvTableFactory<S> csvTableFromFile(
-        final Factory<S, ? extends Path> pathFactory
-    ) {
-        return new CsvTableFactory<>(new FileDataSourceFactory<>(pathFactory));
-    }
-
-    public static <S extends Scope> CsvTableFactory<S> csvTableFrom(
-        final Factory<S, ? extends DataSource> dataSourceFactory
-    ) {
-        return new CsvTableFactory<>(dataSourceFactory);
-    }
-
-    public static <S extends Scope> TableSupplierFromIntegerDoubleMapSupplierFactory<S> tableSupplierFromIntegerDoubleMapSupplier(
+    public TableSupplierFromIntegerDoubleMapSupplierFactory(
         final Factory<? super S, ? extends Supplier<Map<Integer, Double>>> mapSupplier,
         final String keyColumnName,
         final String valueColumnName
     ) {
-        return new TableSupplierFromIntegerDoubleMapSupplierFactory<>(
-            mapSupplier,
-            keyColumnName,
-            valueColumnName
-        );
+        super(ColumnType.INTEGER, ColumnType.DOUBLE, mapSupplier, keyColumnName, valueColumnName);
     }
-
 }

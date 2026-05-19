@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.Map;
 import java.util.UUID;
@@ -40,4 +41,6 @@ public final class SimulationStartOptions {
     private final long seed = System.currentTimeMillis();
 
     @Singular private final Map<String, Object> propertyOverrides;
+
+    @Singular private Map<String, ? extends Factory<? super SimulationScope, ?>> extraComponents;
 }
