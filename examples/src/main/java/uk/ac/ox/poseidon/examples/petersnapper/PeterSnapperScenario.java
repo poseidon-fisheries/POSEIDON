@@ -136,7 +136,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     .propertyOverride(
                         "components(agentCreators).steppable.steppables" +
                             ".mappedProperties(numberOfVesselsToCreate)",
-                        listOf(10, 0)
+                        listOf(25, 0)
                     )
                     .extraComponent(
                         "totalLandingsPerYear",

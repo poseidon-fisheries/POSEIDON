@@ -13,3 +13,5 @@ derby.log
 
 # ignore buildSrc artifacts
 buildSrc/.kotlin/
+.Rproj.user
+.positai
