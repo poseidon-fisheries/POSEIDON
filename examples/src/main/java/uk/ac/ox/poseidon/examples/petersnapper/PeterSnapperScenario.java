@@ -409,9 +409,6 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 0
             );
 
-        final var totalLandingsPerYearAccumulator =
-            new TotalLandingsPerYearAccumulatorFactory();
-
         return builder
             .startingDateTime(startingDateTime)
             .component("modelGrid", modelGrid)
