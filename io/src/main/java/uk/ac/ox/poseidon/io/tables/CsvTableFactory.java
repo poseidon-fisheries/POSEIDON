@@ -33,6 +33,7 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.io.sources.DataSource;
 
+import java.io.IOException;
 import java.io.Reader;
 
 @Data
@@ -45,10 +46,13 @@ public class CsvTableFactory<S extends Scope> extends RelativeScopeFactory<S, Ta
 
     @Override
     protected Table newInstance(final S scope) {
-        final Reader reader = dataSource.get(scope).getReader();
-        return Table
-            .read()
-            .usingOptions(CsvReadOptions.builder(reader).sample(false));
+        try (final Reader reader = dataSource.get(scope).getReader()) {
+            return Table
+                .read()
+                .usingOptions(CsvReadOptions.builder(reader).sample(false));
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
