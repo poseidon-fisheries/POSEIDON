@@ -20,32 +20,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices.evaluation;
+package uk.ac.ox.poseidon.core.providers.random;
 
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
-
-public final class Factories {
+public class Factories {
 
     private Factories() {
+        throw new IllegalStateException("Utility class");
     }
 
-    public static ProfitPerHourDestinationEvaluationProviderFactory profitPerHour(
-        final String currencyCode
+    public static RandomBooleanProviderFactory randomBoolean() {
+        return new RandomBooleanProviderFactory(0.5);
+    }
+
+    public static RandomBooleanProviderFactory randomBoolean(final double probability) {
+        return new RandomBooleanProviderFactory(probability);
+    }
+
+    public static RandomDoubleProviderFactory randomDouble(
+        final double minimum,
+        final double maximum
     ) {
-        return new ProfitPerHourDestinationEvaluationProviderFactory(currencyCode);
+        return new RandomDoubleProviderFactory(minimum, maximum);
     }
 
-    public static TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory totalBiomassCaughtPerHour() {
-        return new TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory();
-    }
-
-    public static TripEvaluatorFactory tripEvaluator(
-        final Factory<? super VesselScope, ? extends MutableOptionValues<Int2D>> optionValues,
-        final Factory<? super VesselScope, ? extends Evaluator<Int2D>> evaluationProvider
+    public static RandomIntProviderFactory randomInt(
+        final int minimum,
+        final int maximum
     ) {
-        return new TripEvaluatorFactory(optionValues, evaluationProvider);
+        return new RandomIntProviderFactory(minimum, maximum);
+    }
+
+    public static RandomPoissonProviderFactory randomPoisson(
+        final double mean
+    ) {
+        return new RandomPoissonProviderFactory(mean);
     }
 }

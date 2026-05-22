@@ -40,7 +40,7 @@ import java.util.function.Predicate;
 public class ConditionFactory<S extends Scope, T, U>
     extends RelativeScopeFactory<S, Condition<T, U>> {
 
-    private Factory<? super S, ? extends Function<? super T, U>> extractor;
+    private Factory<? super S, ? extends Function<? super T, ? extends U>> extractor;
     private Factory<? super S, ? extends Predicate<? super U>> predicate;
 
     @Override

@@ -20,22 +20,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates;
+package uk.ac.ox.poseidon.core.providers.temporal;
 
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.providers.Provider;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.function.Supplier;
+
+import static com.google.common.base.Preconditions.checkState;
 
 @RequiredArgsConstructor
-public class Condition<T, U> implements Predicate<T> {
+public class DurationUntilProvider implements Provider<Duration> {
 
-    private final Function<? super T, ? extends U> extractor;
-    private final Predicate<? super U> predicate;
+    private final TemporalSchedule schedule;
+    private final Supplier<? extends LocalDateTime> referenceDateTimeSupplier;
 
     @Override
-    public boolean test(final T t) {
-        return predicate.test(extractor.apply(t));
+    public Duration get() {
+        final LocalDateTime currentDateTime = schedule.getDateTime();
+        final LocalDateTime referenceDateTime = referenceDateTimeSupplier.get();
+        checkState(
+            referenceDateTime.isAfter(currentDateTime),
+            "Reference date-time (%s) must be after current date-time (%s)",
+            referenceDateTime,
+            currentDateTime
+        );
+        return Duration.between(currentDateTime, referenceDateTime);
     }
-
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,32 +20,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices.evaluation;
+package uk.ac.ox.poseidon.core.providers.temporal;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.joda.money.CurrencyUnit;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.providers.Provider;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class ProfitPerHourDestinationEvaluationProviderFactory
-    extends GlobalScopeFactory<Evaluator<Int2D>> {
+@RequiredArgsConstructor
+public class NextDayAtTimeProvider implements Provider<LocalDateTime> {
 
-    private String currencyCode;
+    private final TemporalSchedule schedule;
+    private final LocalTime time;
 
     @Override
-    protected Evaluator<Int2D> newInstance(final Scope scope) {
-        return new ProfitPerHourDestinationEvaluator(
-            CurrencyUnit.of(checkNotNull(currencyCode, "currencyCode"))
-        );
+    public LocalDateTime get() {
+        return schedule.getDate().plusDays(1).atTime(time);
     }
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2024-2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,30 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.joda.money.CurrencyUnit;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.events.EventManager;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class ProfitPerHourDestinationEvaluationProviderFactory
-    extends GlobalScopeFactory<Evaluator<Int2D>> {
-
-    private String currencyCode;
-
-    @Override
-    protected Evaluator<Int2D> newInstance(final Scope scope) {
-        return new ProfitPerHourDestinationEvaluator(
-            CurrencyUnit.of(checkNotNull(currencyCode, "currencyCode"))
-        );
-    }
+public interface Evaluator<O> {
+    Evaluation<O> newEvaluation(
+        O option,
+        EventManager eventManager
+    );
 }

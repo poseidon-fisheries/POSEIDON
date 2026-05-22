@@ -48,7 +48,7 @@ class TripEvaluatorTest {
         final SimpleEventManager tripEventManager = new SimpleEventManager();
         final AtomicReference<EventManager> evaluationEventManager =
             new AtomicReference<>();
-        final EvaluationProvider<Int2D> evaluationProvider = (option, eventManager) -> {
+        final Evaluator<Int2D> evaluator = (option, eventManager) -> {
             evaluationEventManager.set(eventManager);
             return new Evaluation<>() {
                 @Override
@@ -70,7 +70,7 @@ class TripEvaluatorTest {
         new TripEvaluator(
             vesselEventManager,
             new StubOptionValues(),
-            evaluationProvider
+            evaluator
         );
         vesselEventManager.broadcast(new TripStartEvent(trip));
 
@@ -79,7 +79,10 @@ class TripEvaluatorTest {
 
     private static class StubOptionValues implements MutableOptionValues<Int2D> {
         @Override
-        public void observe(final Int2D option, final double value) {
+        public void observe(
+            final Int2D option,
+            final double value
+        ) {
         }
 
         @Override

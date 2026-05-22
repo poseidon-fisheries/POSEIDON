@@ -39,15 +39,16 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class KilogramsFactory<S extends Scope> extends RelativeScopeFactory<S, Number> {
+public class KilogramsFactory<S extends Scope> extends RelativeScopeFactory<S, Double> {
 
     private Factory<? super S, ? extends Quantity<Mass>> mass;
 
     @Override
-    protected Number newInstance(final S scope) {
+    protected Double newInstance(final S scope) {
         return mass.get(scope)
             .to(KILOGRAM)
-            .getValue();
+            .getValue()
+            .doubleValue();
     }
 
 }

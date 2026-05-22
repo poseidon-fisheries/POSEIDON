@@ -20,32 +20,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices.evaluation;
+package uk.ac.ox.poseidon.core.providers;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.joda.money.CurrencyUnit;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+public final class Factories {
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class ProfitPerHourDestinationEvaluationProviderFactory
-    extends GlobalScopeFactory<Evaluator<Int2D>> {
-
-    private String currencyCode;
-
-    @Override
-    protected Evaluator<Int2D> newInstance(final Scope scope) {
-        return new ProfitPerHourDestinationEvaluator(
-            CurrencyUnit.of(checkNotNull(currencyCode, "currencyCode"))
-        );
+    private Factories() {
+        throw new IllegalStateException("Utility class");
     }
+
+    public static <S extends Scope> ShiftedIntProviderFactory<S> shiftedInt(
+        final Factory<? super S, ? extends IntProvider> delegateIntProvider,
+        final int shift
+    ) {
+        return new ShiftedIntProviderFactory<>(delegateIntProvider, shift);
+    }
+
 }

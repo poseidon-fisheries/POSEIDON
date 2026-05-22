@@ -20,32 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices.evaluation;
+package uk.ac.ox.poseidon.core.providers;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.joda.money.CurrencyUnit;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class ProfitPerHourDestinationEvaluationProviderFactory
-    extends GlobalScopeFactory<Evaluator<Int2D>> {
-
-    private String currencyCode;
-
+/**
+ * A supplier of boolean that can also be used in contexts requiring a predicate, in which case it
+ * ignores the argument passed to `test` and just returns the boolean it would have supplied
+ * anyway.
+ */
+public interface BooleanProvider extends BooleanSupplier, Predicate<Object> {
     @Override
-    protected Evaluator<Int2D> newInstance(final Scope scope) {
-        return new ProfitPerHourDestinationEvaluator(
-            CurrencyUnit.of(checkNotNull(currencyCode, "currencyCode"))
-        );
+    default boolean test(final Object ignored) {
+        return getAsBoolean();
     }
 }

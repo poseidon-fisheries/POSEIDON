@@ -39,7 +39,7 @@ import uk.ac.ox.poseidon.core.Factory;
 public class TripEvaluatorFactory extends VesselScopeFactory<TripEvaluator> {
 
     private Factory<? super VesselScope, ? extends MutableOptionValues<Int2D>> optionValues;
-    private Factory<? super VesselScope, ? extends EvaluationProvider<Int2D>> evaluationProvider;
+    private Factory<? super VesselScope, ? extends Evaluator<Int2D>> evaluationProvider;
 
     @Override
     protected TripEvaluator newInstance(final VesselScope scope) {

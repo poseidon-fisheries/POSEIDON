@@ -33,16 +33,16 @@ import uk.ac.ox.poseidon.core.events.Listener;
 public class TripEvaluator implements Listener<TripEvent> {
 
     private final MutableOptionValues<Int2D> optionValues;
-    private final EvaluationProvider<Int2D> evaluationProvider;
+    private final Evaluator<Int2D> evaluator;
     private Evaluation<Int2D> currentEvaluation;
 
     public TripEvaluator(
         final EventManager eventManager,
         final MutableOptionValues<Int2D> optionValues,
-        final EvaluationProvider<Int2D> evaluationProvider
+        final Evaluator<Int2D> evaluator
     ) {
         this.optionValues = optionValues;
-        this.evaluationProvider = evaluationProvider;
+        this.evaluator = evaluator;
         eventManager.addListener(this);
     }
 
@@ -55,7 +55,7 @@ public class TripEvaluator implements Listener<TripEvent> {
     public void receive(final TripEvent event) {
         if (event instanceof TripStartEvent) {
             currentEvaluation =
-                evaluationProvider.newEvaluation(
+                evaluator.newEvaluation(
                     event.getTrip().getDestination(),
                     event.getTrip().getEventManager()
                 );

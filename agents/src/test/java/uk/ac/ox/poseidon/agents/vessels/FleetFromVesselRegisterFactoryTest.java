@@ -45,7 +45,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
-import static uk.ac.ox.poseidon.core.suppliers.Factories.constant;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.time.Factories.ONE_DAY;
 import static uk.ac.ox.poseidon.io.tables.Factories.csvTableFromString;
 

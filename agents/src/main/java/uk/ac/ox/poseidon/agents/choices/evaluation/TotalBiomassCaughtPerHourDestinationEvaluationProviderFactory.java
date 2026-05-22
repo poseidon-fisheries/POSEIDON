@@ -33,11 +33,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory
-    extends GlobalScopeFactory<EvaluationProvider<Int2D>> {
+    extends GlobalScopeFactory<Evaluator<Int2D>> {
 
     @Override
-    protected EvaluationProvider<Int2D> newInstance(final Scope scope) {
-        return new TotalBiomassCaughtPerHourDestinationEvaluationProvider();
+    protected Evaluator<Int2D> newInstance(final Scope scope) {
+        return new TotalBiomassCaughtPerHourDestinationEvaluator();
     }
 
 }
