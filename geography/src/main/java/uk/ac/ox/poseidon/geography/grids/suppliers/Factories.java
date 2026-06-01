@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,31 +20,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.schedule;
+package uk.ac.ox.poseidon.geography.grids.suppliers;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import sim.engine.Sequence;
-import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
-import java.util.List;
+public class Factories {
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class SteppableSequenceFactory extends SimulationScopeFactory<Steppable> {
+    private Factories() {}
 
-    private Factory<? super SimulationScope, ? extends List<? extends Steppable>> steppables;
-
-    @Override
-    protected Steppable newInstance(final SimulationScope scope) {
-        return new Sequence(steppables.get(scope));
+    public static <S extends Scope> GridSumSupplierFactory<S> gridSum(
+        final Factory<? super S, ? extends DoubleGrid> doubleGrid
+    ) {
+        return new GridSumSupplierFactory<>(doubleGrid);
     }
-
+    
 }

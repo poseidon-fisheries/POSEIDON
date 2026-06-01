@@ -22,40 +22,29 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import tech.tablesaw.api.ColumnType;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import tech.tablesaw.api.Table;
+import tech.tablesaw.columns.Column;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
-@Data
 @RequiredArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public abstract class AbstractTableSupplierFromMapSupplierFactory<S extends Scope, K, V>
-    extends RelativeScopeFactory<S, TableSupplierFromMapSupplier<K, V>> {
+public class TableFromMap<K, V> implements Supplier<Table> {
 
-    private final ColumnType keyColumnType;
-    private final ColumnType valueColumnType;
-
-    private Factory<? super S, ? extends Supplier<Map<K, V>>> mapSupplier;
-    private String keyColumnName;
-    private String valueColumnName;
+    private final TableDefinition tableDefinition;
+    private final Supplier<Map<K, V>> mapSupplier;
 
     @Override
-    protected TableSupplierFromMapSupplier<K, V> newInstance(final S scope) {
-        return new TableSupplierFromMapSupplier<>(
-            mapSupplier.get(scope),
-            keyColumnType,
-            keyColumnName,
-            valueColumnType,
-            valueColumnName
-        );
+    public Table get() {
+        final Map<K, V> map = mapSupplier.get();
+        final Table table = tableDefinition.get();
+        final Column<?> keyColumn = table.column(0);
+        final Column<?> valueColumn = table.column(1);
+        for (final Map.Entry<K, V> entry : map.entrySet()) {
+            keyColumn.appendObj(entry.getKey());
+            valueColumn.appendObj(entry.getValue());
+        }
+        return table;
     }
 }

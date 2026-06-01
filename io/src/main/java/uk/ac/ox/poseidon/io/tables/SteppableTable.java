@@ -22,32 +22,38 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import lombok.RequiredArgsConstructor;
-import tech.tablesaw.api.ColumnType;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import tech.tablesaw.api.Table;
-import tech.tablesaw.columns.Column;
 
-import java.util.Map;
+import java.util.List;
 import java.util.function.Supplier;
 
-@RequiredArgsConstructor
-public class TableSupplierFromMapSupplier<K, V> implements Supplier<Table> {
+import static com.google.common.base.Preconditions.checkArgument;
 
-    private final Supplier<Map<K, V>> mapSupplier;
-    private final ColumnType keyColumnType;
-    private final String keyColumnName;
-    private final ColumnType valueColumnType;
-    private final String valueColumnName;
+public class SteppableTable implements Steppable, Supplier<Table> {
+
+    private final Table table;
+    private final List<? extends Supplier<?>> valueSuppliers;
+
+    public SteppableTable(
+        final TableDefinition tableDefinition,
+        final List<? extends Supplier<?>> valueSuppliers
+    ) {
+        this.table = tableDefinition.get();
+        checkArgument(table.columnCount() == valueSuppliers.size());
+        this.valueSuppliers = valueSuppliers;
+    }
 
     @Override
     public Table get() {
-        final Map<K, V> map = mapSupplier.get();
-        final Column<?> keyColumn = keyColumnType.create(keyColumnName);
-        final Column<?> valueColumn = valueColumnType.create(valueColumnName);
-        for (final Map.Entry<K, V> entry : map.entrySet()) {
-            keyColumn.appendObj(entry.getKey());
-            valueColumn.appendObj(entry.getValue());
+        return table;
+    }
+
+    @Override
+    public void step(final SimState simState) {
+        for (int i = 0; i < valueSuppliers.size(); i++) {
+            table.column(i).appendObj(valueSuppliers.get(i).get());
         }
-        return Table.create(keyColumn, valueColumn);
     }
 }

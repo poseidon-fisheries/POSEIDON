@@ -25,11 +25,14 @@ package uk.ac.ox.poseidon.io.tables;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.utils.ListFactory;
 import uk.ac.ox.poseidon.io.sources.DataSource;
 import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
 import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -63,16 +66,52 @@ public class Factories {
         return new CsvTableWriterFactory<>(tableSupplier, path, append, clearAfterWriting);
     }
 
-    public static <S extends Scope> TableSupplierFromIntegerDoubleMapSupplierFactory<S> tableSupplierFromIntegerDoubleMapSupplier(
-        final Factory<? super S, ? extends Supplier<Map<Integer, Double>>> mapSupplier,
-        final String keyColumnName,
-        final String valueColumnName
+    public static <S extends Scope, K, V> TableFromMapFactory<S, K, V> tableFromMap(
+        final Factory<? super S, ? extends TableDefinition> tableDefinition,
+        final Factory<? super S, ? extends Supplier<Map<K, V>>> mapSupplier
     ) {
-        return new TableSupplierFromIntegerDoubleMapSupplierFactory<>(
-            mapSupplier,
-            keyColumnName,
-            valueColumnName
+        return new TableFromMapFactory<>(
+            tableDefinition,
+            mapSupplier
         );
+    }
+
+    @SafeVarargs
+    public static <C extends Supplier<?>> SteppableTableFactory steppableTable(
+        final Factory<? super SimulationScope, TableDefinition> tableDefinition,
+        final Factory<? super SimulationScope, ? extends C>... valueSuppliers
+    ) {
+        return new SteppableTableFactory(
+            tableDefinition,
+            new ListFactory<SimulationScope, C>(List.of(valueSuppliers))
+        );
+    }
+
+    public static SteppableTableFactory steppableTable(
+        final Factory<? super SimulationScope, TableDefinition> tableDefinition,
+        final Factory<? super SimulationScope, List<? extends Supplier<?>>> valueSuppliers
+    ) {
+        return new SteppableTableFactory(tableDefinition, valueSuppliers);
+    }
+
+    public static ColumnDefinitionFactory columnDefinition(
+        final String columnName,
+        final String columnType
+    ) {
+        return new ColumnDefinitionFactory(columnName, columnType);
+    }
+
+    @SafeVarargs
+    public static <S extends Scope, C extends ColumnDefinition> TableDefinitionFactory<S> tableDefinition(
+        final Factory<? super S, C>... columnDefinitions
+    ) {
+        return tableDefinition(new ListFactory<S, C>(List.of(columnDefinitions)));
+    }
+
+    public static <S extends Scope> TableDefinitionFactory<S> tableDefinition(
+        final Factory<? super S, ? extends List<? extends ColumnDefinition>> columnDefinitions
+    ) {
+        return new TableDefinitionFactory<>(columnDefinitions);
     }
 
 }

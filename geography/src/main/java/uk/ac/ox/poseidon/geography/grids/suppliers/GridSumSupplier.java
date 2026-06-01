@@ -20,27 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.io.tables;
+package uk.ac.ox.poseidon.geography.grids.suppliers;
 
-import tech.tablesaw.api.ColumnType;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
-import java.util.Map;
 import java.util.function.Supplier;
 
-public class TableSupplierFromIntegerDoubleMapSupplierFactory<S extends Scope>
-    extends AbstractTableSupplierFromMapSupplierFactory<S, Integer, Double> {
+@RequiredArgsConstructor
+public class GridSumSupplier implements Supplier<Double> {
 
-    public TableSupplierFromIntegerDoubleMapSupplierFactory() {
-        super(ColumnType.INTEGER, ColumnType.DOUBLE);
+    private final DoubleGrid grid;
+
+    @Override
+    public Double get() {
+        return grid.getSum();
     }
 
-    public TableSupplierFromIntegerDoubleMapSupplierFactory(
-        final Factory<? super S, ? extends Supplier<Map<Integer, Double>>> mapSupplier,
-        final String keyColumnName,
-        final String valueColumnName
-    ) {
-        super(ColumnType.INTEGER, ColumnType.DOUBLE, mapSupplier, keyColumnName, valueColumnName);
-    }
 }

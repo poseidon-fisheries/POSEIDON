@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,31 +20,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.schedule;
+package uk.ac.ox.poseidon.io.tables;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import sim.engine.Sequence;
-import sim.engine.Steppable;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import lombok.RequiredArgsConstructor;
+import tech.tablesaw.api.Table;
 
 import java.util.List;
+import java.util.function.Supplier;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class SteppableSequenceFactory extends SimulationScopeFactory<Steppable> {
+@RequiredArgsConstructor
+public class TableDefinition implements Supplier<Table> {
 
-    private Factory<? super SimulationScope, ? extends List<? extends Steppable>> steppables;
+    private final List<? extends ColumnDefinition> columnDefinitions;
 
     @Override
-    protected Steppable newInstance(final SimulationScope scope) {
-        return new Sequence(steppables.get(scope));
+    public Table get() {
+        return Table.create(columnDefinitions.stream().map(ColumnDefinition::get));
     }
 
 }

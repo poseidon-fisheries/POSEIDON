@@ -57,7 +57,6 @@ import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-import uk.ac.ox.poseidon.core.utils.ListFactory;
 import uk.ac.ox.poseidon.core.utils.PairFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.CoordinateFactory;
@@ -65,6 +64,7 @@ import uk.ac.ox.poseidon.geography.allocators.FilteredAllocatorFactory;
 import uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableFactory;
 import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
+import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
 import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
 import uk.ac.ox.poseidon.geography.ports.PortFactory;
@@ -100,13 +100,14 @@ import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomInt;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 import static uk.ac.ox.poseidon.core.quantities.Factories.*;
-import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledOnceAtStart;
-import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledRepeating;
+import static uk.ac.ox.poseidon.core.schedule.Factories.*;
 import static uk.ac.ox.poseidon.core.time.Factories.*;
 import static uk.ac.ox.poseidon.core.utils.Factories.finalProcess;
 import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
 import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
+import static uk.ac.ox.poseidon.geography.grids.suppliers.Factories.gridSum;
 import static uk.ac.ox.poseidon.geography.paths.Factories.pathFinder;
 import static uk.ac.ox.poseidon.geography.predicates.Factories.inDepthRange;
 import static uk.ac.ox.poseidon.geography.predicates.Factories.isActiveWaterCell;
@@ -145,9 +146,12 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                         "totalLandingsPerYear",
                         finalProcess(
                             csvTableWriter(
-                                tableSupplierFromIntegerDoubleMapSupplier(
-                                    new TotalLandingsPerYearAccumulatorFactory(),
-                                    "year", "landings"
+                                tableFromMap(
+                                    tableDefinition(
+                                        columnDefinition("year", "INTEGER"),
+                                        columnDefinition("landings", "DOUBLE")
+                                    ),
+                                    new TotalLandingsPerYearAccumulatorFactory()
                                 ),
                                 path(
                                     "POSEIDON",
@@ -155,6 +159,33 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                                     "outputs",
                                     "peter_snapper",
                                     "landings.csv"
+                                ),
+                                false,
+                                true
+                            )
+                        )
+                    )
+                    .extraComponent(
+                        "biomass_per_year",
+                        finalProcess(
+                            csvTableWriter(
+                                scheduledRepeatingFromStart(
+                                    YEARLY,
+                                    steppableTable(
+                                        tableDefinition(
+                                            columnDefinition("date_time", "LOCAL_DATE_TIME"),
+                                            columnDefinition("total_biomass", "DOUBLE")
+                                        ),
+                                        currentDateTime(),
+                                        gridSum(scenario.<DoubleGrid>component("biomassGrid"))
+                                    )
+                                ),
+                                path(
+                                    "POSEIDON",
+                                    "examples",
+                                    "outputs",
+                                    "peter_snapper",
+                                    "biomass.csv"
                                 ),
                                 false,
                                 true
@@ -262,7 +293,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final PortFactory kupang = new PortFactory("P2", "Kupang");
         final var portGrid =
             new PortGridFactory<>(
-                ListFactory.from(
+                listOf(
                     new PairFactory<>(benoa, new CoordinateFactory(115.238843, -8.799605)),
                     new PairFactory<>(kupang, new CoordinateFactory(123.586249, -10.148044))
                 ),
@@ -276,7 +307,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             portGrid,
             new OneBiomassMarketPerPortFactory(
                 portGrid,
-                ListFactory.from(
+                listOf(
                     new PriceEntryFactory<>(
                         catchCategory,
                         species,
@@ -404,7 +435,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             0 // mapped over
                         ),
                         Map.of(
-                            "homePort", ListFactory.from(benoa, kupang),
+                            "homePort", listOf(benoa, kupang),
                             "numberOfVesselsToCreate", listOf(25, 50)
                         )
                     )

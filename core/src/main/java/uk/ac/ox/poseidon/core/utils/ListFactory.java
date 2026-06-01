@@ -46,11 +46,4 @@ public class ListFactory<S extends Scope, C> extends RelativeScopeFactory<S, Lis
             .toList();
     }
 
-    @SafeVarargs
-    public static <S extends Scope, C> ListFactory<S, C> from(
-        final Factory<? super S, ? extends C>... factories
-    ) {
-        final List<Factory<? super S, ? extends C>> list = List.of(factories);
-        return new ListFactory<>(list);
-    }
 }

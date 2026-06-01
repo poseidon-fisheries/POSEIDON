@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.core.utils;
 
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.*;
@@ -37,6 +38,13 @@ public class Factories {
 
     public static <T> ObjectFactory<T> object(final T value) {
         return new ObjectFactory<>(value);
+    }
+
+    @SafeVarargs
+    public static <S extends Scope, C> ListFactory<S, C> listOf(
+        final Factory<S, ? extends C>... values
+    ) {
+        return new ListFactory<>(List.of(values));
     }
 
     @SafeVarargs

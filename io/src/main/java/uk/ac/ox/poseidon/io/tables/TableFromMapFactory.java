@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,31 +20,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.schedule;
+package uk.ac.ox.poseidon.io.tables;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import sim.engine.Sequence;
-import sim.engine.Steppable;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 @Data
-@NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SteppableSequenceFactory extends SimulationScopeFactory<Steppable> {
+public class TableFromMapFactory<S extends Scope, K, V>
+    extends RelativeScopeFactory<S, TableFromMap<K, V>> {
 
-    private Factory<? super SimulationScope, ? extends List<? extends Steppable>> steppables;
+    private Factory<? super S, ? extends TableDefinition> tableDefinition;
+    private Factory<? super S, ? extends Supplier<Map<K, V>>> mapSupplier;
 
     @Override
-    protected Steppable newInstance(final SimulationScope scope) {
-        return new Sequence(steppables.get(scope));
+    protected TableFromMap<K, V> newInstance(final S scope) {
+        return new TableFromMap<>(
+            tableDefinition.get(scope),
+            mapSupplier.get(scope)
+        );
     }
-
 }
