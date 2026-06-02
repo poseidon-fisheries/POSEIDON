@@ -160,11 +160,24 @@ public final class Scenario {
     public <C> Factory<? super SimulationScope, ? extends C> component(
         final String componentName
     ) {
-        final Factory<? super SimulationScope, ?> factory = components.get(componentName);
+        return (Factory<? super SimulationScope, ? extends C>) component(
+            componentName,
+            Factory.class
+        );
+    }
+
+    public <F extends Factory<?, ?>> F component(
+        final String componentName,
+        final Class<? extends F> factoryClass
+    ) {
+        final var factory = components.get(componentName);
         if (factory == null) {
             throw new IllegalArgumentException("Component not found: " + componentName);
         }
-        return (Factory<? super SimulationScope, ? extends C>) factory;
+        if (!factoryClass.isInstance(factory)) {
+            throw new IllegalArgumentException("Factory is not of type " + factoryClass.getName());
+        }
+        return factoryClass.cast(factory);
     }
 
 }

@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.core.quantities;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -36,7 +36,7 @@ import javax.measure.quantity.Mass;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
 @Data
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class KilogramsFactory<S extends Scope> extends RelativeScopeFactory<S, Double> {

@@ -99,7 +99,7 @@ public class PeterSnapperScenarioWithUI extends ScenarioWithUI {
         );
     }
 
-    public static void main(final String[] args) {
+    static void main(final String[] args) {
         final var scenarioWithUI = new PeterSnapperScenarioWithUI(new PeterSnapperScenario().get());
         scenarioWithUI.createController();
     }

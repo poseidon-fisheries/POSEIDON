@@ -52,7 +52,6 @@ import uk.ac.ox.poseidon.agents.vessels.holds.StandardBiomassHoldFactory;
 import uk.ac.ox.poseidon.biology.allocators.ProportionOfCarryingCapacityAllocatorFactory;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
-import uk.ac.ox.poseidon.core.MappedFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
@@ -69,12 +68,12 @@ import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
 import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
 import uk.ac.ox.poseidon.geography.ports.PortFactory;
 import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
+import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import static tech.units.indriya.unit.Units.*;
@@ -104,8 +103,7 @@ import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTim
 import static uk.ac.ox.poseidon.core.quantities.Factories.*;
 import static uk.ac.ox.poseidon.core.schedule.Factories.*;
 import static uk.ac.ox.poseidon.core.time.Factories.*;
-import static uk.ac.ox.poseidon.core.utils.Factories.finalProcess;
-import static uk.ac.ox.poseidon.core.utils.Factories.listOf;
+import static uk.ac.ox.poseidon.core.utils.Factories.*;
 import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
 import static uk.ac.ox.poseidon.geography.grids.suppliers.Factories.gridSum;
 import static uk.ac.ox.poseidon.geography.paths.Factories.pathFinder;
@@ -132,15 +130,19 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         // It does; so the calibration mismatch is from fisher behaviour, not biology.
 
         final Scenario scenario = new PeterSnapperScenario().get();
-        final Simulation simulation =
+
+        final Path outputPath = Path.of("POSEIDON", "examples", "outputs", "peter_snapper");
+        new ScenarioWriter().write(scenario, outputPath.resolve("scenario.yaml"));
+
+        @SuppressWarnings("RedundantTypeArguments") final Simulation simulation =
             scenario.startNewSimulation(
                 uk.ac.ox.poseidon.core.SimulationStartOptions
                     .builder()
                     .seed(0)
                     .propertyOverride(
-                        "components(agentCreators).steppable.steppables" +
-                            ".mappedProperties(numberOfVesselsToCreate)",
-                        listOf(25, 0)
+                        "components(agentCreators).steppable.steppables.factories[1]" +
+                            ".numberOfVesselsToCreate",
+                        0
                     )
                     .extraComponent(
                         "totalLandingsPerYear",
@@ -153,13 +155,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                                     ),
                                     new TotalLandingsPerYearAccumulatorFactory()
                                 ),
-                                path(
-                                    "POSEIDON",
-                                    "examples",
-                                    "outputs",
-                                    "peter_snapper",
-                                    "landings.csv"
-                                ),
+                                path(outputPath.resolve("landings.csv")),
                                 false,
                                 true
                             )
@@ -180,13 +176,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                                         gridSum(scenario.<DoubleGrid>component("biomassGrid"))
                                     )
                                 ),
-                                path(
-                                    "POSEIDON",
-                                    "examples",
-                                    "outputs",
-                                    "peter_snapper",
-                                    "biomass.csv"
-                                ),
+                                path(outputPath.resolve("biomass.csv")),
                                 false,
                                 true
                             )
@@ -410,7 +400,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final var agentCreators =
             scheduledOnceAtStart(
                 new SteppableSequenceFactory(
-                    new MappedFactory<>(
+                    mappedFactory(
                         new VesselCreatorFactory(
                             vesselField,
                             portGrid,
@@ -434,9 +424,13 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             List.of(tripEvaluator),
                             0 // mapped over
                         ),
-                        Map.of(
-                            "homePort", listOf(benoa, kupang),
-                            "numberOfVesselsToCreate", listOf(25, 50)
+                        mappedProperty(
+                            VesselCreatorFactory::setHomePort,
+                            List.of(benoa, kupang)
+                        ),
+                        mappedProperty(
+                            VesselCreatorFactory::setNumberOfVesselsToCreate,
+                            List.of(25, 50)
                         )
                     )
                 ),
