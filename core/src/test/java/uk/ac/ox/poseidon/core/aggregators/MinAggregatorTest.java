@@ -29,14 +29,15 @@ import java.util.stream.DoubleStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MinTest {
+class MinAggregatorTest {
 
     /**
      * The Min class provides a method to find the minimum value from a given {@link DoubleStream}.
-     * This test class validates the functionality of the {@link Min#apply(DoubleStream)} method.
+     * This test class validates the functionality of the {@link MinAggregator#apply(DoubleStream)}
+     * method.
      */
 
-    private final Min minAggregator = new Min();
+    private final MinAggregator minAggregatorAggregator = new MinAggregator();
 
     @Test
     void testApplyWithNonEmptyStream() {
@@ -44,7 +45,7 @@ class MinTest {
         final DoubleStream doubleStream = DoubleStream.of(3.5, 2.1, 4.8, 1.2, 5.6);
 
         // Act
-        final OptionalDouble result = minAggregator.apply(doubleStream);
+        final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
         // Assert
         assertTrue(result.isPresent(), "Expected result to be present");
@@ -57,7 +58,7 @@ class MinTest {
         final DoubleStream doubleStream = DoubleStream.empty();
 
         // Act
-        final OptionalDouble result = minAggregator.apply(doubleStream);
+        final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
         // Assert
         assertFalse(result.isPresent(), "Expected result to be empty");
@@ -69,7 +70,7 @@ class MinTest {
         final DoubleStream doubleStream = DoubleStream.of(7.9);
 
         // Act
-        final OptionalDouble result = minAggregator.apply(doubleStream);
+        final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
         // Assert
         assertTrue(result.isPresent(), "Expected result to be present");
@@ -87,7 +88,7 @@ class MinTest {
         final DoubleStream doubleStream = DoubleStream.of(-3.4, -1.2, -7.8, -0.5);
 
         // Act
-        final OptionalDouble result = minAggregator.apply(doubleStream);
+        final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
         // Assert
         assertTrue(result.isPresent(), "Expected result to be present");
@@ -105,7 +106,7 @@ class MinTest {
         final DoubleStream doubleStream = DoubleStream.of(4.5, -2.3, 0.0, 3.1, -5.9);
 
         // Act
-        final OptionalDouble result = minAggregator.apply(doubleStream);
+        final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
         // Assert
         assertTrue(result.isPresent(), "Expected result to be present");

@@ -29,19 +29,19 @@ import java.util.stream.DoubleStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MaxTest {
+class MaxAggregatorTest {
 
     /**
      * The Max class implements the Aggregator interface and provides a method to compute the
      * maximum value from a given DoubleStream.
      *
-     * <p>Method being tested: {@link Max#apply(DoubleStream)}.
+     * <p>Method being tested: {@link MaxAggregator#apply(DoubleStream)}.
      */
 
     @Test
     void apply_emptyStream_returnsEmptyOptional() {
         // Arrange
-        final Max maxAggregator = new Max();
+        final MaxAggregator maxAggregator = new MaxAggregator();
         final DoubleStream emptyStream = DoubleStream.empty();
 
         // Act
@@ -57,7 +57,7 @@ class MaxTest {
     @Test
     void apply_singleElementStream_returnsElementAsMax() {
         // Arrange
-        final Max maxAggregator = new Max();
+        final MaxAggregator maxAggregator = new MaxAggregator();
         final DoubleStream singleElementStream = DoubleStream.of(42.0);
 
         // Act
@@ -79,7 +79,7 @@ class MaxTest {
     @Test
     void apply_multipleElements_returnsMaximumValue() {
         // Arrange
-        final Max maxAggregator = new Max();
+        final MaxAggregator maxAggregator = new MaxAggregator();
         final DoubleStream multipleElementsStream = DoubleStream.of(1.0, 2.0, 3.0, 42.0, 5.0);
 
         // Act
@@ -101,7 +101,7 @@ class MaxTest {
     @Test
     void apply_negativeNumbers_returnsMaximumValue() {
         // Arrange
-        final Max maxAggregator = new Max();
+        final MaxAggregator maxAggregator = new MaxAggregator();
         final DoubleStream negativeNumbersStream = DoubleStream.of(-10.0, -5.0, -20.0, -3.0);
 
         // Act
@@ -123,7 +123,7 @@ class MaxTest {
     @Test
     void apply_mixedPositiveAndNegativeNumbers_returnsMaximumValue() {
         // Arrange
-        final Max maxAggregator = new Max();
+        final MaxAggregator maxAggregator = new MaxAggregator();
         final DoubleStream mixedNumbersStream = DoubleStream.of(-1.0, -5.0, 0.0, 10.0, -3.0);
 
         // Act

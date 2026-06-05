@@ -22,18 +22,22 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import java.util.OptionalDouble;
+import java.util.stream.DoubleStream;
 
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class MaxFactory extends GlobalScopeFactory<Max> {
+import static com.google.common.math.Quantiles.median;
+
+public class MedianAggregator implements Aggregator {
+
     @Override
-    protected Max newInstance(final Scope scope) {
-        return new Max();
+    public OptionalDouble apply(final double[] numbers) {
+        return numbers.length == 0
+            ? OptionalDouble.empty()
+            : OptionalDouble.of(median().compute(numbers));
+    }
+
+    @Override
+    public OptionalDouble apply(final DoubleStream doubleStream) {
+        return apply(doubleStream.toArray());
     }
 }

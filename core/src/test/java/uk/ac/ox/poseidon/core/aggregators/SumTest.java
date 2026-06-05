@@ -33,24 +33,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SumTest {
 
     /**
-     * Tests for the {@link Sum} class.
+     * Tests for the {@link SumAggregator} class.
      *
      * <p>
-     * The {@link Sum#apply(DoubleStream)} method takes a {@link DoubleStream} and returns the sum
-     * of all its elements wrapped in an {@link OptionalDouble}. If the stream is empty, the result
-     * will still return a valid {@link OptionalDouble} with its value set to 0.0 since the sum of
-     * zero elements is conventionally 0.0.
+     * The {@link SumAggregator#apply(DoubleStream)} method takes a {@link DoubleStream} and returns
+     * the sum of all its elements wrapped in an {@link OptionalDouble}. If the stream is empty, the
+     * result will still return a valid {@link OptionalDouble} with its value set to 0.0 since the
+     * sum of zero elements is conventionally 0.0.
      * </p>
      */
 
     @Test
     void testApplyWithNonEmptyStream() {
         // Arrange
-        final Sum sum = new Sum();
+        final SumAggregator sumAggregator = new SumAggregator();
         final DoubleStream doubleStream = DoubleStream.of(1.2, 2.3, 3.4, 4.5);
 
         // Act
-        final OptionalDouble result = sum.apply(doubleStream);
+        final OptionalDouble result = sumAggregator.apply(doubleStream);
 
         // Assert
         assertTrue(result.isPresent(), "The result should be present for a non-empty stream.");
@@ -65,11 +65,11 @@ class SumTest {
     @Test
     void testApplyWithEmptyStream() {
         // Arrange
-        final Sum sum = new Sum();
+        final SumAggregator sumAggregator = new SumAggregator();
         final DoubleStream doubleStream = DoubleStream.empty();
 
         // Act
-        final OptionalDouble result = sum.apply(doubleStream);
+        final OptionalDouble result = sumAggregator.apply(doubleStream);
 
         // Assert
         assertTrue(result.isPresent(), "The result should be present even for an empty stream.");
@@ -79,11 +79,11 @@ class SumTest {
     @Test
     void testApplyWithSingleElementStream() {
         // Arrange
-        final Sum sum = new Sum();
+        final SumAggregator sumAggregator = new SumAggregator();
         final DoubleStream doubleStream = DoubleStream.of(5.0);
 
         // Act
-        final OptionalDouble result = sum.apply(doubleStream);
+        final OptionalDouble result = sumAggregator.apply(doubleStream);
 
         // Assert
         assertTrue(result.isPresent(), "The result should be present for a single-element stream.");
@@ -98,11 +98,11 @@ class SumTest {
     @Test
     void testApplyWithNegativeNumbers() {
         // Arrange
-        final Sum sum = new Sum();
+        final SumAggregator sumAggregator = new SumAggregator();
         final DoubleStream doubleStream = DoubleStream.of(-1.0, -2.5, -3.5);
 
         // Act
-        final OptionalDouble result = sum.apply(doubleStream);
+        final OptionalDouble result = sumAggregator.apply(doubleStream);
 
         // Assert
         assertTrue(
@@ -120,11 +120,11 @@ class SumTest {
     @Test
     void testApplyWithMixedNumbers() {
         // Arrange
-        final Sum sum = new Sum();
+        final SumAggregator sumAggregator = new SumAggregator();
         final DoubleStream doubleStream = DoubleStream.of(-1.2, 2.3, -3.4, 4.5);
 
         // Act
-        final OptionalDouble result = sum.apply(doubleStream);
+        final OptionalDouble result = sumAggregator.apply(doubleStream);
 
         // Assert
         assertTrue(

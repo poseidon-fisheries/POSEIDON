@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.core.aggregators;
 import java.util.OptionalDouble;
 import java.util.stream.DoubleStream;
 
-public class Max implements Aggregator {
+public class SumAggregator implements Aggregator {
     @Override
-    public OptionalDouble apply(final DoubleStream numbers) {
-        return numbers.max();
+    public OptionalDouble apply(final DoubleStream doubleStream) {
+        return OptionalDouble.of(doubleStream.sum());
     }
 }

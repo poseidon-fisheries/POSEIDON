@@ -31,9 +31,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MeanFactory extends GlobalScopeFactory<Mean> {
+public class MeanAggregatorFactory extends GlobalScopeFactory<MeanAggregator> {
     @Override
-    protected Mean newInstance(final Scope scope) {
-        return new Mean();
+    protected MeanAggregator newInstance(final Scope scope) {
+        return new MeanAggregator();
     }
 }

@@ -31,9 +31,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MinFactory extends GlobalScopeFactory<Min> {
+public class MinAggregatorFactory extends GlobalScopeFactory<MinAggregator> {
     @Override
-    protected Min newInstance(final Scope scope) {
-        return new Min();
+    protected MinAggregator newInstance(final Scope scope) {
+        return new MinAggregator();
     }
 }

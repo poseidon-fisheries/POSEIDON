@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.core.aggregators;
 import java.util.OptionalDouble;
 import java.util.stream.DoubleStream;
 
-public class Mean implements Aggregator {
+public class MeanAggregator implements Aggregator {
     @Override
     public OptionalDouble apply(final DoubleStream doubleStream) {
         return doubleStream.average();

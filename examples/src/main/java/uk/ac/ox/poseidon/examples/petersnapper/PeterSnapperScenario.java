@@ -89,7 +89,7 @@ import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.refuel;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.fullTank;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.availableHoldCapacityInKg;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.currentTripDuration;
-import static uk.ac.ox.poseidon.core.aggregators.Factories.mean;
+import static uk.ac.ox.poseidon.core.aggregators.Factories.meanAggregator;
 import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
@@ -220,7 +220,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             new BathymetricGridFromElevationTableFactory<>(
                 elevationTable,
                 modelGrid,
-                mean(),
+                meanAggregator(),
                 false
             );
 

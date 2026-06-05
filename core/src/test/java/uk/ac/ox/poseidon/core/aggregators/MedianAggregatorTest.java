@@ -30,14 +30,14 @@ import java.util.stream.DoubleStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class MedianTest {
+class MedianAggregatorTest {
 
     /**
      * This class tests the `apply` method in the `Median` class. The `apply` method calculates the
      * median of a double array or a DoubleStream.
      */
 
-    private final Median median = new Median();
+    private final MedianAggregator median = new MedianAggregator();
 
     @Test
     void testApplyWithEmptyArray() {

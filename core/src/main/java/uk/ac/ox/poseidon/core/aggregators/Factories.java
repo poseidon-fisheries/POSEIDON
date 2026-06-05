@@ -26,24 +26,24 @@ public class Factories {
 
     private Factories() {}
 
-    public static MeanFactory mean() {
-        return new MeanFactory();
+    public static MeanAggregatorFactory meanAggregator() {
+        return new MeanAggregatorFactory();
     }
 
-    public static MinFactory min() {
-        return new MinFactory();
+    public static MinAggregatorFactory minAggregator() {
+        return new MinAggregatorFactory();
     }
 
-    public static MaxFactory max() {
-        return new MaxFactory();
+    public static MaxAggregatorFactory maxAggregator() {
+        return new MaxAggregatorFactory();
     }
 
-    public static MedianFactory median() {
-        return new MedianFactory();
+    public static MedianAggregatorFactory medianAggregator() {
+        return new MedianAggregatorFactory();
     }
 
-    public static SumFactory sum() {
-        return new SumFactory();
+    public static SumAggregatorFactory sumAggregator() {
+        return new SumAggregatorFactory();
     }
 
 }

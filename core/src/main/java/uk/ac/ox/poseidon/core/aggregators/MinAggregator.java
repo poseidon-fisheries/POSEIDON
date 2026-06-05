@@ -22,18 +22,12 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import java.util.OptionalDouble;
+import java.util.stream.DoubleStream;
 
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class SumFactory extends GlobalScopeFactory<Sum> {
+public class MinAggregator implements Aggregator {
     @Override
-    protected Sum newInstance(final Scope scope) {
-        return new Sum();
+    public OptionalDouble apply(final DoubleStream doubleStream) {
+        return doubleStream.min();
     }
 }
