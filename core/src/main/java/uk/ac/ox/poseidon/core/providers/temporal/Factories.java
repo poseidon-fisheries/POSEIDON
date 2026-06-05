@@ -37,6 +37,10 @@ public class Factories {
         return new CurrentDateProviderFactory();
     }
 
+    public static CurrentYearProviderFactory currentYear() {
+        return new CurrentYearProviderFactory();
+    }
+
     public static CurrentDateTimeProviderFactory currentDateTime() {
         return new CurrentDateTimeProviderFactory();
     }
