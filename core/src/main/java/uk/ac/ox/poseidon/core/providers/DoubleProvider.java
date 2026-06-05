@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.core.providers;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 
 /**
@@ -30,9 +32,22 @@ import java.util.function.ToDoubleFunction;
  * ignores the argument passed to `applyAsDouble` and just returns the double it would have supplied
  * anyway.
  */
-public interface DoubleProvider extends DoubleSupplier, ToDoubleFunction<Object> {
+public interface DoubleProvider
+    extends DoubleSupplier, Supplier<Double>, ToDoubleFunction<Object>, Function<Object, Double> {
+
     @Override
     default double applyAsDouble(final Object ignored) {
         return getAsDouble();
     }
+
+    @Override
+    default Double apply(final Object o) {
+        return getAsDouble();
+    }
+
+    @Override
+    default Double get() {
+        return getAsDouble();
+    }
+
 }

@@ -22,7 +22,9 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
+import java.util.function.Function;
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 
 /**
@@ -30,9 +32,22 @@ import java.util.function.ToIntFunction;
  * ignores the argument passed to `applyAsInt` and just returns the int it would have supplied
  * anyway.
  */
-public interface IntProvider extends IntSupplier, ToIntFunction<Object> {
+public interface IntProvider
+    extends IntSupplier, Supplier<Integer>, ToIntFunction<Object>, Function<Object, Integer> {
+
+    @Override
+    default Integer get() {
+        return getAsInt();
+    }
+
     @Override
     default int applyAsInt(final Object value) {
         return getAsInt();
     }
+
+    @Override
+    default Integer apply(final Object o) {
+        return getAsInt();
+    }
+
 }

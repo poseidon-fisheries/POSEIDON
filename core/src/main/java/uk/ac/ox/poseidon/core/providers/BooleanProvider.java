@@ -23,16 +23,30 @@
 package uk.ac.ox.poseidon.core.providers;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * A supplier of boolean that can also be used in contexts requiring a predicate, in which case it
  * ignores the argument passed to `test` and just returns the boolean it would have supplied
  * anyway.
  */
-public interface BooleanProvider extends BooleanSupplier, Predicate<Object> {
+public interface BooleanProvider
+    extends BooleanSupplier, Supplier<Boolean>, Predicate<Object>, Function<Object, Boolean> {
     @Override
     default boolean test(final Object ignored) {
         return getAsBoolean();
     }
+
+    @Override
+    default Boolean apply(final Object o) {
+        return getAsBoolean();
+    }
+
+    @Override
+    default Boolean get() {
+        return getAsBoolean();
+    }
+
 }
