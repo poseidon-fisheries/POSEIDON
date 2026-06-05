@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
+import uk.ac.ox.poseidon.core.functions.DoubleIntToDoubleFunction;
 import uk.ac.ox.poseidon.core.utils.DoubleIntConsumer;
-import uk.ac.ox.poseidon.core.utils.DoubleIntToDoubleFunction;
 import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
 import java.util.function.DoubleConsumer;

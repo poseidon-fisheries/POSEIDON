@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.core.utils;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.functions.NumericIntervalMapper;
+import uk.ac.ox.poseidon.core.functions.NumericIntervalToStringMapperFactory;
 
 import java.util.List;
 
@@ -45,9 +47,9 @@ class NumericIntervalToStringMapperFactoryTest {
 
         final NumericIntervalMapper<String> mapper = factory.get(GLOBAL_SCOPE);
 
-        assertThat(mapper.get(5.999)).contains("VL0006");
-        assertThat(mapper.get(6.0)).contains("VL0612");
-        assertThat(mapper.get(40.0)).contains("VL40XX");
+        assertThat(mapper.apply(5.999)).isEqualTo("VL0006");
+        assertThat(mapper.apply(6.0)).isEqualTo("VL0612");
+        assertThat(mapper.apply(40.0)).isEqualTo("VL40XX");
     }
 
     @Test
@@ -65,8 +67,8 @@ class NumericIntervalToStringMapperFactoryTest {
                 NumericIntervalToStringMapperFactory.interval(40.0, null, "VL40XX")
             ).get(GLOBAL_SCOPE);
 
-        assertThat(mapper.get(5.999)).contains("VL0006");
-        assertThat(mapper.get(6.0)).contains("VL0612");
-        assertThat(mapper.get(40.0)).contains("VL40XX");
+        assertThat(mapper.apply(5.999)).isEqualTo("VL0006");
+        assertThat(mapper.apply(6.0)).isEqualTo("VL0612");
+        assertThat(mapper.apply(40.0)).isEqualTo("VL40XX");
     }
 }

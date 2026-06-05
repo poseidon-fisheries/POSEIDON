@@ -75,12 +75,6 @@ public class Factories {
         return new ObjectFactory<>(Collections.unmodifiableSet(set));
     }
 
-    public static NumericIntervalToStringMapperFactory numericIntervalToStringMapper(
-        final NumericIntervalToStringMapperFactory.Interval... intervals
-    ) {
-        return new NumericIntervalToStringMapperFactory(List.of(intervals));
-    }
-
     public static <C extends Steppable> FinalProcessFactory<C> finalProcess(
         final Factory<? super SimulationScope, C> process
     ) {

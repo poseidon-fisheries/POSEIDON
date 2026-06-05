@@ -20,22 +20,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.utils;
+package uk.ac.ox.poseidon.core.functions;
 
 import lombok.Value;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Function;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.nullsFirst;
 
 /**
- * Maps numeric values to labels using non-overlapping intervals.
- * Bounds are lower-inclusive and upper-exclusive; null bounds are unbounded.
+ * Maps numeric values to labels using non-overlapping intervals. Bounds are lower-inclusive and
+ * upper-exclusive; null bounds are unbounded.
  */
 @Value
-public class NumericIntervalMapper<T> {
+public class NumericIntervalMapper<T> implements Function<Double, T> {
 
     List<Interval<T>> intervals;
 
@@ -44,11 +44,13 @@ public class NumericIntervalMapper<T> {
         validateIntervals(this.intervals);
     }
 
-    public Optional<T> get(final double value) {
+    @Override
+    public T apply(final Double value) {
         return intervals.stream()
             .filter(interval -> interval.contains(value))
             .map(Interval::getMappedValue)
-            .findFirst();
+            .findFirst()
+            .orElse(null);
     }
 
     private static void validateIntervals(final List<? extends Interval<?>> intervals) {

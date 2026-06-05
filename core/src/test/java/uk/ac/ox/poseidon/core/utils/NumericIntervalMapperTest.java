@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.utils;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.functions.NumericIntervalMapper;
 
 import java.util.List;
 
@@ -39,12 +40,12 @@ class NumericIntervalMapperTest {
                 new NumericIntervalMapper.Interval<>(12.0, 18.0, "VL1218")
             ));
 
-        assertThat(mapper.get(0.0)).contains("VL0612");
-        assertThat(mapper.get(11.999)).contains("VL0612");
-        assertThat(mapper.get(12.0)).contains("VL1218");
-        assertThat(mapper.get(17.999)).contains("VL1218");
-        assertThat(mapper.get(-0.001)).isEmpty();
-        assertThat(mapper.get(18.0)).isEmpty();
+        assertThat(mapper.apply(0.0)).isEqualTo("VL0612");
+        assertThat(mapper.apply(11.999)).isEqualTo("VL0612");
+        assertThat(mapper.apply(12.0)).isEqualTo("VL1218");
+        assertThat(mapper.apply(17.999)).isEqualTo("VL1218");
+        assertThat(mapper.apply(-0.001)).isNull();
+        assertThat(mapper.apply(18.0)).isNull();
     }
 
     @Test
@@ -55,9 +56,9 @@ class NumericIntervalMapperTest {
                 new NumericIntervalMapper.Interval<>(40.0, null, "VL40XX")
             ));
 
-        assertThat(mapper.get(39.999)).contains("VL2440");
-        assertThat(mapper.get(40.0)).contains("VL40XX");
-        assertThat(mapper.get(500.0)).contains("VL40XX");
+        assertThat(mapper.apply(39.999)).isEqualTo("VL2440");
+        assertThat(mapper.apply(40.0)).isEqualTo("VL40XX");
+        assertThat(mapper.apply(500.0)).isEqualTo("VL40XX");
     }
 
     @Test
@@ -68,10 +69,10 @@ class NumericIntervalMapperTest {
                 new NumericIntervalMapper.Interval<>(6.0, 12.0, "VL0612")
             ));
 
-        assertThat(mapper.get(-500.0)).contains("VL0006");
-        assertThat(mapper.get(0.0)).contains("VL0006");
-        assertThat(mapper.get(5.999)).contains("VL0006");
-        assertThat(mapper.get(6.0)).contains("VL0612");
+        assertThat(mapper.apply(-500.0)).isEqualTo("VL0006");
+        assertThat(mapper.apply(0.0)).isEqualTo("VL0006");
+        assertThat(mapper.apply(5.999)).isEqualTo("VL0006");
+        assertThat(mapper.apply(6.0)).isEqualTo("VL0612");
     }
 
     @Test
