@@ -32,6 +32,7 @@ dependencies {
     api(fileTree("libs/mason") { include("*.jar") })
     api(libs.indriya)
     api(libs.si.units)
+    api(libs.commons.collections)
     implementation(libs.jcommander)
     implementation(libs.commons.beanutils)
     implementation(libs.fastutil.core)

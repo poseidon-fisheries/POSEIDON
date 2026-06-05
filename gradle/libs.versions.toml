@@ -2,6 +2,7 @@
 assertj = "3.27.7"
 batik = "1.19"
 commons-beanutils = "1.11.0"
+commons-collections = "4.5.0"
 commons-io = "2.22.0"
 caffeine = "3.2.3"
 fastutil = "8.5.18"
@@ -34,6 +35,7 @@ batik-awt-util = { module = "org.apache.xmlgraphics:batik-awt-util", version.ref
 batik-dom = { module = "org.apache.xmlgraphics:batik-dom", version.ref = "batik" }
 batik-transcoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "batik" }
 commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "commons-beanutils" }
+commons-collections = { module = "org.apache.commons:commons-collections4", version.ref = "commons-collections" }
 commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
 fastutil-core = { module = "it.unimi.dsi:fastutil-core", version.ref = "fastutil" }
