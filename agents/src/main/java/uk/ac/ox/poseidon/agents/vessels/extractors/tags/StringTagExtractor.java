@@ -20,26 +20,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.money;
+package uk.ac.ox.poseidon.agents.vessels.extractors.tags;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.utils.Utils;
 
-public class Factories {
+import java.util.function.Function;
 
-    private Factories() {}
+@RequiredArgsConstructor
+public class StringTagExtractor implements Function<Vessel, String> {
 
-    public static MoneyFactory money(
-        final double amount,
-        final @NonNull String currencyUnit
-    ) {
-        return new MoneyFactory(amount, currencyUnit);
+    @NonNull private final String tagName;
+
+    @Override
+    public String apply(final Vessel vessel) {
+        return vessel.getTag(tagName)
+            .map(Utils::nullIfNaString)
+            .orElse(null);
     }
-
-    public static MoneyFromRowFactory moneyFromRow(
-        final String currencyColumnName,
-        final String amountColumnName
-    ) {
-        return new MoneyFromRowFactory(currencyColumnName, amountColumnName);
-    }
-
 }

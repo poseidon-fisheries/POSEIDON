@@ -20,26 +20,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.money;
+package uk.ac.ox.poseidon.agents.tasks.accounting;
 
-import lombok.NonNull;
+import org.joda.money.Money;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+
+import java.util.function.Function;
 
 public class Factories {
-
     private Factories() {}
 
-    public static MoneyFactory money(
-        final double amount,
-        final @NonNull String currencyUnit
+    public static <S extends Scope> PayTripCostFactory<S> payTripCost(
+        final Factory<? super S, ? extends Function<? super Vessel, ? extends Money>> tripCostExtractor
     ) {
-        return new MoneyFactory(amount, currencyUnit);
+        return new PayTripCostFactory<>(tripCostExtractor);
     }
-
-    public static MoneyFromRowFactory moneyFromRow(
-        final String currencyColumnName,
-        final String amountColumnName
-    ) {
-        return new MoneyFromRowFactory(currencyColumnName, amountColumnName);
-    }
-
+    
 }

@@ -20,26 +20,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.money;
+package uk.ac.ox.poseidon.io.tables;
 
-import lombok.NonNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-public class Factories {
+import java.util.List;
 
-    private Factories() {}
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class MultiKeyFromRowFactory extends GlobalScopeFactory<MultiKeyFromRow> {
 
-    public static MoneyFactory money(
-        final double amount,
-        final @NonNull String currencyUnit
-    ) {
-        return new MoneyFactory(amount, currencyUnit);
+    List<String> keyColumnNames;
+
+    @Override
+    protected MultiKeyFromRow newInstance(final Scope scope) {
+        return new MultiKeyFromRow(keyColumnNames);
     }
-
-    public static MoneyFromRowFactory moneyFromRow(
-        final String currencyColumnName,
-        final String amountColumnName
-    ) {
-        return new MoneyFromRowFactory(currencyColumnName, amountColumnName);
-    }
-
+    
 }

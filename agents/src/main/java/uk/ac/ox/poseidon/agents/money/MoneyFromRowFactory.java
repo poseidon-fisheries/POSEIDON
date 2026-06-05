@@ -22,24 +22,25 @@
 
 package uk.ac.ox.poseidon.agents.money;
 
-import lombok.NonNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-public class Factories {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class MoneyFromRowFactory extends GlobalScopeFactory<MoneyFromRow> {
 
-    private Factories() {}
+    private String currencyColumnName;
+    private String amountColumnName;
 
-    public static MoneyFactory money(
-        final double amount,
-        final @NonNull String currencyUnit
-    ) {
-        return new MoneyFactory(amount, currencyUnit);
+    @Override
+    protected MoneyFromRow newInstance(final Scope scope) {
+        return new MoneyFromRow(currencyColumnName, amountColumnName);
     }
-
-    public static MoneyFromRowFactory moneyFromRow(
-        final String currencyColumnName,
-        final String amountColumnName
-    ) {
-        return new MoneyFromRowFactory(currencyColumnName, amountColumnName);
-    }
-
+    
 }

@@ -182,14 +182,14 @@ public class Vessel extends Agent implements Oriented2D {
     }
 
     public void putTag(
-        final String key,
-        final Object value
+        final String tagName,
+        final Object tagValue
     ) {
-        mutate(() -> tags.put(key, value));
+        mutate(() -> tags.put(tagName, tagValue));
     }
 
-    public Optional<Object> getTag(final String key) {
-        return Optional.ofNullable(tags.get(key));
+    public Optional<Object> getTag(final String tagName) {
+        return Optional.ofNullable(tags.get(tagName));
     }
 
     public void startTrip(final Int2D destination) {

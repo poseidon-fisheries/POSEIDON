@@ -22,24 +22,27 @@
 
 package uk.ac.ox.poseidon.agents.money;
 
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
+import tech.tablesaw.api.Row;
 
-public class Factories {
+import java.math.RoundingMode;
+import java.util.function.Function;
 
-    private Factories() {}
+@RequiredArgsConstructor
+public class MoneyFromRow implements Function<Row, Money> {
 
-    public static MoneyFactory money(
-        final double amount,
-        final @NonNull String currencyUnit
-    ) {
-        return new MoneyFactory(amount, currencyUnit);
-    }
+    private final String currencyColumnName;
+    private final String amountColumnName;
 
-    public static MoneyFromRowFactory moneyFromRow(
-        final String currencyColumnName,
-        final String amountColumnName
-    ) {
-        return new MoneyFromRowFactory(currencyColumnName, amountColumnName);
+    @Override
+    public Money apply(final Row row) {
+        return Money.of(
+            CurrencyUnit.of(row.getString(currencyColumnName)),
+            row.getDouble(amountColumnName),
+            RoundingMode.HALF_EVEN
+        );
     }
 
 }

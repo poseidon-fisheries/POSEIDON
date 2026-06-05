@@ -20,26 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.money;
+package uk.ac.ox.poseidon.core.utils;
 
-import lombok.NonNull;
+public class Utils {
 
-public class Factories {
+    private Utils() {}
 
-    private Factories() {}
-
-    public static MoneyFactory money(
-        final double amount,
-        final @NonNull String currencyUnit
-    ) {
-        return new MoneyFactory(amount, currencyUnit);
-    }
-
-    public static MoneyFromRowFactory moneyFromRow(
-        final String currencyColumnName,
-        final String amountColumnName
-    ) {
-        return new MoneyFromRowFactory(currencyColumnName, amountColumnName);
+    public static String nullIfNaString(final Object value) {
+        if (value == null) {
+            return null;
+        }
+        final String stringValue = value.toString().trim();
+        if (stringValue.isEmpty() || stringValue.equalsIgnoreCase("NA")) {
+            return null;
+        }
+        return stringValue;
     }
 
 }

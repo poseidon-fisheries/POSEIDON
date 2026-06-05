@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -32,8 +33,10 @@ import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
 import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Factories {
@@ -112,6 +115,18 @@ public class Factories {
         final Factory<? super S, ? extends List<? extends ColumnDefinition>> columnDefinitions
     ) {
         return new TableDefinitionFactory<>(columnDefinitions);
+    }
+
+    public static <S extends Scope, K, V> MapFromTableFactory<S, K, V> mapFromTable(
+        final Factory<? super S, Table> table,
+        final Factory<? super S, ? extends Function<? super Row, ? extends K>> keyBuilder,
+        final Factory<? super S, ? extends Function<? super Row, ? extends V>> valueBuilder
+    ) {
+        return new MapFromTableFactory<>(table, keyBuilder, valueBuilder);
+    }
+
+    public static MultiKeyFromRowFactory multiKeyFromRow(final String... keyColumnNames) {
+        return new MultiKeyFromRowFactory(Arrays.asList(keyColumnNames));
     }
 
 }

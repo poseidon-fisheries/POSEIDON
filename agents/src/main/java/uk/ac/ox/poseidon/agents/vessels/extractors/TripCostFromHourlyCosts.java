@@ -20,26 +20,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.money;
+package uk.ac.ox.poseidon.agents.vessels.extractors;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.joda.money.Money;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-public class Factories {
+import java.math.RoundingMode;
+import java.time.Duration;
+import java.util.function.Function;
 
-    private Factories() {}
+@RequiredArgsConstructor
+public class TripCostFromHourlyCosts implements Function<Vessel, Money> {
 
-    public static MoneyFactory money(
-        final double amount,
-        final @NonNull String currencyUnit
-    ) {
-        return new MoneyFactory(amount, currencyUnit);
+    @NonNull private final Function<Vessel, Money> hourlyCostsExtractor;
+
+    @Override
+    public Money apply(final Vessel vessel) {
+        final Duration tripDuration = Duration.between(
+            vessel.getCurrentTrip().getStartDateTime(),
+            vessel.getSchedule().getDateTime()
+        );
+        return hourlyCostsExtractor.apply(vessel).multipliedBy(
+            tripDuration.toSeconds() / 3600.0,
+            RoundingMode.HALF_EVEN
+        );
     }
-
-    public static MoneyFromRowFactory moneyFromRow(
-        final String currencyColumnName,
-        final String amountColumnName
-    ) {
-        return new MoneyFromRowFactory(currencyColumnName, amountColumnName);
-    }
-
+    
 }

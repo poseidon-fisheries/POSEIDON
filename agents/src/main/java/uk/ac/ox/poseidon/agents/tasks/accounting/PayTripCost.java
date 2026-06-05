@@ -20,26 +20,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.money;
+package uk.ac.ox.poseidon.agents.tasks.accounting;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.joda.money.Money;
+import uk.ac.ox.poseidon.agents.tasks.AgentTask;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-public class Factories {
+import java.util.function.Function;
 
-    private Factories() {}
+import static com.google.common.base.Preconditions.checkNotNull;
 
-    public static MoneyFactory money(
-        final double amount,
-        final @NonNull String currencyUnit
-    ) {
-        return new MoneyFactory(amount, currencyUnit);
-    }
+@RequiredArgsConstructor
+public class PayTripCost extends AgentTask<Vessel> {
 
-    public static MoneyFromRowFactory moneyFromRow(
-        final String currencyColumnName,
-        final String amountColumnName
-    ) {
-        return new MoneyFromRowFactory(currencyColumnName, amountColumnName);
+    @NonNull private final Function<? super Vessel, ? extends Money> tripCostExtractor;
+
+    @Override
+    public Status execute() {
+        final Vessel vessel = getAgent();
+        final Money tripCost =
+            checkNotNull(
+                tripCostExtractor.apply(vessel),
+                "Unable to extract trip cost for Vessel %s.".formatted(vessel)
+            );
+        vessel.getCurrentTrip().getAccount().subtract(tripCost);
+        return Status.SUCCEEDED;
     }
 
 }
