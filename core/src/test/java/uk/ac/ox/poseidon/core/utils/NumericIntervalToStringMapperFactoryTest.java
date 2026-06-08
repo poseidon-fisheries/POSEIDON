@@ -29,8 +29,8 @@ import uk.ac.ox.poseidon.core.functions.NumericIntervalToStringMapperFactory;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.ac.ox.poseidon.core.functions.Factories.numericIntervalToStringMapper;
 import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
-import static uk.ac.ox.poseidon.core.utils.Factories.numericIntervalToStringMapper;
 
 class NumericIntervalToStringMapperFactoryTest {
 
