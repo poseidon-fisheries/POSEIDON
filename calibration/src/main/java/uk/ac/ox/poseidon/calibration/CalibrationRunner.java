@@ -22,11 +22,7 @@
 
 package uk.ac.ox.poseidon.calibration;
 
-import io.jenetics.DoubleGene;
-import io.jenetics.EliteSelector;
-import io.jenetics.GaussianMutator;
-import io.jenetics.MeanAlterer;
-import io.jenetics.TournamentSelector;
+import io.jenetics.*;
 import io.jenetics.engine.Engine;
 import io.jenetics.engine.EvolutionResult;
 import io.jenetics.engine.EvolutionStream;
@@ -67,8 +63,8 @@ public final class CalibrationRunner {
                 .build();
 
         EvolutionStream<DoubleGene, Double> stream = engine
-                .stream()
-                .limit(byFixedGeneration(options.generations()));
+            .stream()
+            .limit(byFixedGeneration(options.generations()));
 
         if (options.steadyGenerations() > 0) {
             stream = stream.limit(bySteadyFitness(options.steadyGenerations()));
@@ -130,7 +126,7 @@ public final class CalibrationRunner {
     ) {
         if (
             options.reportEveryGenerations() > 0 &&
-            result.generation() % options.reportEveryGenerations() == 0
+                result.generation() % options.reportEveryGenerations() == 0
         ) {
             System.out.printf(
                 "generation=%d best_fitness=%.6g%n",

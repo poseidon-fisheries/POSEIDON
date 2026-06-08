@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
@@ -41,10 +40,9 @@ final class SpeciesSpecificRateBuckets {
                 biomassBucket.mapWithIndex((biomass, index) ->
                     rates.getDouble(index) * biomass
                 );
-            case final Bucket otherBucket ->
-                otherBucket.mapBiomassValue((species, biomass) ->
-                    rates.getDoubleOrDefault(species, 0.0) * biomass
-                );
+            case final Bucket otherBucket -> otherBucket.mapBiomassValue((species, biomass) ->
+                rates.getDoubleOrDefault(species, 0.0) * biomass
+            );
         };
     }
 }

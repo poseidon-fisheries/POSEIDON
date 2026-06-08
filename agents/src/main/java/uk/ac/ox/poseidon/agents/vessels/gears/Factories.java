@@ -23,10 +23,10 @@
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import org.apache.commons.collections4.keyvalue.MultiKey;
+import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.time.Duration;
 import java.util.Collection;

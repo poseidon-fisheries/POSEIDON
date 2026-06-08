@@ -77,7 +77,7 @@ public class QuickRunner implements Runnable {
     )
     private List<String> extraClassPrefixes = List.of();
 
-    public static void main(final String[] args) {
+    static void main(final String[] args) {
         logger.log(INFO, () -> "Received arguments: " + Arrays.toString(args));
         final QuickRunner quickRunner = new QuickRunner();
         final JCommander jCommander = JCommander

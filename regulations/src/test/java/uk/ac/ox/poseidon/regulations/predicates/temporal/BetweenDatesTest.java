@@ -30,9 +30,9 @@ import uk.ac.ox.poseidon.regulations.TemporalAction;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static java.time.ZoneOffset.UTC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static java.time.ZoneOffset.UTC;
 
 class BetweenDatesTest {
 

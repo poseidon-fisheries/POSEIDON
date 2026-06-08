@@ -103,7 +103,7 @@ public class ScenarioWriter {
 
     }
 
-    public static void main(final String[] args) {
+    static void main(final String[] args) {
         final Args writerArgs = new ScenarioWriter.Args();
         JCommander.newBuilder().addObject(writerArgs).build().parse(args);
         final Scenario scenario;

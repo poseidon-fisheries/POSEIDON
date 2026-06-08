@@ -35,9 +35,7 @@ import java.util.function.Supplier;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.speciesSpecificBiomassCatchabilityGear;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
-import static uk.ac.ox.poseidon.io.tables.Factories.csvTableFromString;
-import static uk.ac.ox.poseidon.io.tables.Factories.mapFromTable;
-import static uk.ac.ox.poseidon.io.tables.Factories.multiKeyFromRow;
+import static uk.ac.ox.poseidon.io.tables.Factories.*;
 
 class SpeciesSpecificBiomassCatchabilityGearFactoryTest {
 

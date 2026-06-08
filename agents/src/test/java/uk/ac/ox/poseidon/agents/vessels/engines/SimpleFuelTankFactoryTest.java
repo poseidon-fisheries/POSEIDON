@@ -30,8 +30,8 @@ import uk.ac.ox.poseidon.core.quantities.VolumeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.tank;
 import static org.mockito.Mockito.mock;
+import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.tank;
 
 class SimpleFuelTankFactoryTest {
 

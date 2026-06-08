@@ -25,7 +25,6 @@
  */
 package uk.ac.ox.poseidon.core;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import sim.engine.SimState;
 import sim.engine.Steppable;

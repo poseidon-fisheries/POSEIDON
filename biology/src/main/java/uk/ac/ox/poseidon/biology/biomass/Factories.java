@@ -28,8 +28,6 @@ import uk.ac.ox.poseidon.core.quantities.KilogramsFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
-import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
-import static uk.ac.ox.poseidon.geography.allocators.Factories.supplierAllocator;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGridFromAllocatorFactory;
@@ -42,6 +40,8 @@ import javax.measure.quantity.Mass;
 import java.util.List;
 
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
+import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
+import static uk.ac.ox.poseidon.geography.allocators.Factories.supplierAllocator;
 
 public class Factories {
 
