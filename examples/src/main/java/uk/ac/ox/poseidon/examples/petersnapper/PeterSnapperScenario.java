@@ -29,7 +29,7 @@ import uk.ac.ox.poseidon.agents.catches.disposition.ProportionallyLimitingBiomas
 import uk.ac.ox.poseidon.agents.choices.*;
 import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
 import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
-import uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory;
+import static uk.ac.ox.poseidon.agents.fisheables.Factories.currentCellFisheable;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGridFactory;
 import uk.ac.ox.poseidon.agents.fuel.OneFuelStationPerPortFactory;
 import uk.ac.ox.poseidon.agents.market.MarketGridFactory;
@@ -379,7 +379,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     untilFail(
                         sequenceTask(
                             new FishingFactory(
-                                new CurrentCellFisheableFactory(biomassGrid),
+                                currentCellFisheable(biomassGrid),
                                 new ProportionallyLimitingBiomassToHoldFactory()
                             ),
                             checkThat(
