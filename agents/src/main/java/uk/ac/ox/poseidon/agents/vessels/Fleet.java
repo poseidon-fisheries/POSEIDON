@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -33,8 +35,7 @@ import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,7 +44,7 @@ import static com.google.common.base.Preconditions.checkState;
 @AllArgsConstructor
 public class Fleet {
 
-    private final Map<String, Vessel> vesselsById = new HashMap<>();
+    private final BiMap<String, Vessel> vesselsById = HashBiMap.create();
     private final TemporalSchedule schedule;
     private final EventManager eventManager;
     private final VesselField vesselField;
@@ -59,7 +60,7 @@ public class Fleet {
     }
 
     public Set<Vessel> getVessels() {
-        return Set.copyOf(vesselsById.values());
+        return Collections.unmodifiableSet(vesselsById.values());
     }
 
     public Vessel createVessel(

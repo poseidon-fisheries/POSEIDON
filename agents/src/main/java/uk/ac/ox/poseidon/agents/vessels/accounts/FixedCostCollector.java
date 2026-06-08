@@ -1,0 +1,51 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2026, University of Oxford.
+ *
+ * University of Oxford means the Chancellor, Masters and Scholars of the
+ * University of Oxford, having an administrative office at Wellington
+ * Square, Oxford OX1 2JD, UK.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package uk.ac.ox.poseidon.agents.vessels.accounts;
+
+import lombok.RequiredArgsConstructor;
+import org.joda.money.Money;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import uk.ac.ox.poseidon.agents.vessels.Fleet;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+
+import java.util.function.Function;
+
+@RequiredArgsConstructor
+public class FixedCostCollector implements Steppable {
+
+    private final Fleet fleet;
+    private final Function<? super Vessel, ? extends Money> costExtractor;
+
+    @Override
+    public void step(final SimState simState) {
+        fleet
+            .getVessels()
+            .stream()
+            .filter(Vessel::isActive)
+            .forEach(vessel -> {
+                vessel.getAccount().subtract(costExtractor.apply(vessel));
+            });
+    }
+
+}

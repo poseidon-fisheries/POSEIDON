@@ -45,7 +45,6 @@ import uk.ac.ox.poseidon.agents.tasks.travel.SetDestinationToOriginFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory;
 import uk.ac.ox.poseidon.agents.vessels.PrefixedIdFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory;
-import uk.ac.ox.poseidon.agents.vessels.accounts.AccountFactory;
 import uk.ac.ox.poseidon.agents.vessels.engines.SimpleEngineFactory;
 import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
 import uk.ac.ox.poseidon.agents.vessels.holds.StandardBiomassHoldFactory;
@@ -86,6 +85,7 @@ import static uk.ac.ox.poseidon.agents.tasks.decorators.Factories.untilFail;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.checkThat;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.refuel;
+import static uk.ac.ox.poseidon.agents.vessels.accounts.Factories.account;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.fullTank;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.availableHoldCapacityInKg;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.currentTripDuration;
@@ -407,7 +407,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             marketGrid,
                             new PrefixedIdSupplierFactory("V"),
                             new PrefixedIdFactory("Vessel "),
-                            new AccountFactory(),
+                            account(),
                             null, // mapped over
                             new StandardBiomassHoldFactory(
                                 massOf(15_000, KILOGRAM),
