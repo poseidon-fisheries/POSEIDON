@@ -28,7 +28,7 @@ import uk.ac.ox.poseidon.agents.catches.UniformCatchCategoriserFactory;
 import uk.ac.ox.poseidon.agents.catches.disposition.ProportionallyLimitingBiomassToHoldFactory;
 import uk.ac.ox.poseidon.agents.choices.*;
 import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
-import uk.ac.ox.poseidon.agents.fields.VesselFieldFactory;
+import static uk.ac.ox.poseidon.agents.fields.Factories.vesselField;
 import static uk.ac.ox.poseidon.agents.fisheables.Factories.currentCellFisheable;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGridFactory;
 import uk.ac.ox.poseidon.agents.fuel.OneFuelStationPerPortFactory;
@@ -318,7 +318,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             )
         );
 
-        final var vesselField = new VesselFieldFactory(modelGrid);
+        final var vesselField = vesselField(modelGrid);
 
         final var pathFinder =
             pathFinder(
