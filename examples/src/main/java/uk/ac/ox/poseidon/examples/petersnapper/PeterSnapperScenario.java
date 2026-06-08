@@ -57,7 +57,7 @@ import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.utils.PairFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
-import uk.ac.ox.poseidon.geography.CoordinateFactory;
+import static uk.ac.ox.poseidon.geography.Factories.coordinate;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.supplierAllocator;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableFactory;
@@ -286,8 +286,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final var portGrid =
             new PortGridFactory<>(
                 listOf(
-                    new PairFactory<>(benoa, new CoordinateFactory(115.238843, -8.799605)),
-                    new PairFactory<>(kupang, new CoordinateFactory(123.586249, -10.148044))
+                    new PairFactory<>(benoa, coordinate(115.238843, -8.799605)),
+                    new PairFactory<>(kupang, coordinate(123.586249, -10.148044))
                 ),
                 bathymetricGrid,
                 distance
