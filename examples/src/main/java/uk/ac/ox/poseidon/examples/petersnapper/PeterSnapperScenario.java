@@ -47,7 +47,7 @@ import uk.ac.ox.poseidon.agents.vessels.PrefixedIdFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory;
 import uk.ac.ox.poseidon.agents.vessels.engines.SimpleEngineFactory;
 import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
-import uk.ac.ox.poseidon.agents.vessels.holds.StandardBiomassHoldFactory;
+import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.standardBiomassHold;
 import static uk.ac.ox.poseidon.biology.allocators.Factories.proportionOfCarryingCapacityAllocator;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
@@ -411,7 +411,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             new PrefixedIdFactory("Vessel "),
                             account(),
                             null, // mapped over
-                            new StandardBiomassHoldFactory(
+                            standardBiomassHold(
                                 massOf(15_000, KILOGRAM),
                                 massOf(1, KILOGRAM),
                                 new UniformCatchCategoriserFactory<>(catchCategory)
