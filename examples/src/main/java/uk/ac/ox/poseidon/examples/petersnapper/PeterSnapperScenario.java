@@ -30,8 +30,8 @@ import uk.ac.ox.poseidon.agents.choices.*;
 import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
 import static uk.ac.ox.poseidon.agents.fields.Factories.vesselField;
 import static uk.ac.ox.poseidon.agents.fisheables.Factories.currentCellFisheable;
-import uk.ac.ox.poseidon.agents.fuel.FuelStationGridFactory;
-import uk.ac.ox.poseidon.agents.fuel.OneFuelStationPerPortFactory;
+import static uk.ac.ox.poseidon.agents.fuel.Factories.fuelStationGrid;
+import static uk.ac.ox.poseidon.agents.fuel.Factories.oneFuelStationPerPort;
 import uk.ac.ox.poseidon.agents.market.MarketGridFactory;
 import uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory;
 import uk.ac.ox.poseidon.agents.market.PriceEntryFactory;
@@ -309,9 +309,9 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             )
         );
 
-        final var fuelStationGrid = new FuelStationGridFactory<>(
+        final var fuelStationGrid = fuelStationGrid(
             portGrid,
-            new OneFuelStationPerPortFactory(
+            oneFuelStationPerPort(
                 portGrid,
                 money(10_000, CURRENCY_CODE),
                 200
