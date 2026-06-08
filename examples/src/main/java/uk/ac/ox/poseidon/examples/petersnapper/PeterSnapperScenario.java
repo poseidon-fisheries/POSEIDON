@@ -100,6 +100,7 @@ import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomInt;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+import static uk.ac.ox.poseidon.biology.biomass.Factories.*;
 import static uk.ac.ox.poseidon.biology.species.Factories.species;
 import static uk.ac.ox.poseidon.core.quantities.Factories.*;
 import static uk.ac.ox.poseidon.core.schedule.Factories.*;
@@ -226,7 +227,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             );
 
         final var carryingCapacityGrid =
-            new CarryingCapacityGridFactory<>(
+            carryingCapacityGrid(
                 new NormalisedDoubleGridFromAllocatorFactory<>(
                     modelGrid,
                     new FilteredAllocatorFactory<>(
@@ -242,7 +243,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
         final SpeciesFactory species = species("PS", "Peter Snapper", null);
         final var biomassGrid =
-            new BiomassGridFactory(
+            biomassGrid(
                 modelGrid,
                 species,
                 new ProportionOfCarryingCapacityAllocatorFactory<>(
@@ -255,10 +256,10 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             scheduledRepeating(
                 dateTimeAfterStarting(ONE_DAY),
                 DAILY,
-                new BiomassDiffuserFactory(
+                biomassDiffuser(
                     biomassGrid,
                     carryingCapacityGrid,
-                    new SmoothBiomassDiffusionRuleFactory(
+                    smoothBiomassDiffusionRule(
                         0.001,
                         0.01
                     )
@@ -270,11 +271,11 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             scheduledRepeating(
                 dateTimeAfterStarting(ONE_YEAR),
                 YEARLY,
-                new CommonBiomassGrowerFactory(
+                commonBiomassGrower(
                     biomassGrid,
                     carryingCapacityGrid,
-                    new LogisticGrowthRuleFactory(0.372),
-                    new RandomBiomassRecruitmentAllocatorFactory()
+                    logisticGrowthRule(0.372),
+                    randomBiomassRecruitmentAllocator()
                 ),
                 0
             );

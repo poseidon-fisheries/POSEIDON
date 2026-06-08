@@ -28,21 +28,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.quantities.KilogramsFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.allocators.FilteredAllocatorFactory;
-import uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-import uk.ac.ox.poseidon.geography.grids.DoubleGridFromAllocatorFactory;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
-import uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
 
 @Data
 @NoArgsConstructor
@@ -56,41 +43,6 @@ public class CarryingCapacityGridFactory<S extends Scope>
     @Override
     protected CarryingCapacityGrid newInstance(final S scope) {
         return new CarryingCapacityGrid(grid.get(scope));
-    }
-
-    public static <S extends Scope> CarryingCapacityGridFactory<S> ofUniformCapacity(
-        final Factory<? super S, ? extends ModelGrid> modelGrid,
-        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
-        final Factory<? super S, ? extends Quantity<Mass>> carryingCapacity
-    ) {
-        return new CarryingCapacityGridFactory<>(
-            new DoubleGridFromAllocatorFactory<>(
-                modelGrid,
-                new FilteredAllocatorFactory<>(
-                    new SupplierAllocatorFactory<>(
-                        constantDouble(new KilogramsFactory<>(carryingCapacity))
-                    ),
-                    new IsActiveWaterCellFactory<>(bathymetricGrid)
-                )
-            )
-        );
-    }
-
-    public static <S extends Scope> CarryingCapacityGridFactory<S> ofTotalCapacity(
-        final Factory<? super S, ? extends ModelGrid> modelGrid,
-        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
-        final Factory<? super S, ? extends Quantity<Mass>> totalCarryingCapacity
-    ) {
-        return new CarryingCapacityGridFactory<>(
-            new NormalisedDoubleGridFromAllocatorFactory<>(
-                modelGrid,
-                new FilteredAllocatorFactory<>(
-                    new SupplierAllocatorFactory<>(constantDouble(1.0)),
-                    new IsActiveWaterCellFactory<>(bathymetricGrid)
-                ),
-                new KilogramsFactory<>(totalCarryingCapacity)
-            )
-        );
     }
 
 }
