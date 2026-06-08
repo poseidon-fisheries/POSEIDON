@@ -100,6 +100,7 @@ import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomInt;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+import static uk.ac.ox.poseidon.biology.species.Factories.species;
 import static uk.ac.ox.poseidon.core.quantities.Factories.*;
 import static uk.ac.ox.poseidon.core.schedule.Factories.*;
 import static uk.ac.ox.poseidon.core.time.Factories.*;
@@ -239,7 +240,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 )
             );
 
-        final SpeciesFactory species = new SpeciesFactory("PS", "Peter Snapper", null);
+        final SpeciesFactory species = species("PS", "Peter Snapper", null);
         final var biomassGrid =
             new BiomassGridFactory(
                 modelGrid,
