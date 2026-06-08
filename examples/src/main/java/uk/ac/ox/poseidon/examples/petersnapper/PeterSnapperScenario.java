@@ -23,8 +23,8 @@
 package uk.ac.ox.poseidon.examples.petersnapper;
 
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.catches.UncategorisedCatchCategoryFactory;
-import uk.ac.ox.poseidon.agents.catches.UniformCatchCategoriserFactory;
+import static uk.ac.ox.poseidon.agents.catches.Factories.uncategorisedCatchCategory;
+import static uk.ac.ox.poseidon.agents.catches.Factories.uniformCatchCategoriser;
 import uk.ac.ox.poseidon.agents.catches.disposition.ProportionallyLimitingBiomassToHoldFactory;
 import uk.ac.ox.poseidon.agents.choices.*;
 import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
@@ -293,8 +293,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 distance
             );
 
-        final UncategorisedCatchCategoryFactory catchCategory =
-            new UncategorisedCatchCategoryFactory();
+        final var catchCategory = uncategorisedCatchCategory();
         final var marketGrid = new MarketGridFactory<>(
             portGrid,
             new OneBiomassMarketPerPortFactory(
@@ -414,7 +413,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             standardBiomassHold(
                                 massOf(15_000, KILOGRAM),
                                 massOf(1, KILOGRAM),
-                                new UniformCatchCategoriserFactory<>(catchCategory)
+                                uniformCatchCategoriser(catchCategory)
                             ),
                             gear,
                             new SimpleEngineFactory<>(
