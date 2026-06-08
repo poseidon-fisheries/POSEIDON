@@ -61,7 +61,7 @@ import uk.ac.ox.poseidon.geography.CoordinateFactory;
 import uk.ac.ox.poseidon.geography.allocators.FilteredAllocatorFactory;
 import uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableFactory;
-import uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory;
+import static uk.ac.ox.poseidon.geography.distance.Factories.haversineDistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
 import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
@@ -280,7 +280,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 0
             );
 
-        final var distance = new HaversineDistanceCalculatorFactory<>(modelGrid);
+        final var distance = haversineDistanceCalculator(modelGrid);
         final PortFactory benoa = new PortFactory("P1", "Benoa");
         final PortFactory kupang = new PortFactory("P2", "Kupang");
         final var portGrid =
