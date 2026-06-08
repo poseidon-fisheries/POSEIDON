@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.agents.market.PriceEntryFactory;
 import uk.ac.ox.poseidon.agents.market.PriceFactory;
 import uk.ac.ox.poseidon.agents.tasks.BehaviourFactory;
 import static uk.ac.ox.poseidon.agents.tasks.destinations.Factories.startTrip;
-import uk.ac.ox.poseidon.agents.tasks.fishing.FishingFactory;
+import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishing;
 import uk.ac.ox.poseidon.agents.tasks.landings.LandCatchesFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.EndTripFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.SetDestinationToOriginFactory;
@@ -377,7 +377,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     new TravelAlongPathFactory(pathFinder, distance),
                     untilFail(
                         sequenceTask(
-                            new FishingFactory(
+                            fishing(
                                 currentCellFisheable(biomassGrid),
                                 new ProportionallyLimitingBiomassToHoldFactory()
                             ),
