@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.ac.ox.poseidon.agents.catches.disposition.Factories.discardRates;
 
 class SpeciesSpecificDiscardRatesTest {
 
@@ -86,9 +87,9 @@ class SpeciesSpecificDiscardRatesTest {
         final Set<Species> species = Set.of(adult, juvenile);
 
         final SpeciesSpecificDiscardRatesFactory<Scope> factory =
-            new SpeciesSpecificDiscardRatesFactory<>(
+            discardRates(
                 new ObjectFactory<>(species),
-                Map.of(
+                scope -> Map.of(
                     adult.getKey(), 0.25,
                     juvenile.getKey(), 0.25
                 )

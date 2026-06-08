@@ -20,45 +20,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.gears;
+package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import org.apache.commons.collections4.keyvalue.MultiKey;
+import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.biology.species.Species;
 
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class Factories {
-
     private Factories() {}
 
-    public static <S extends SimulationScope> FixedBiomassProportionGearFactory<S>
-    fixedBiomassProportionGear(
-        final String code,
-        final double proportion,
-        final Factory<? super S, ? extends Supplier<Duration>> durationSupplier
-    ) {
-        return new FixedBiomassProportionGearFactory<>(code, proportion, durationSupplier);
-    }
-
-    public static InactiveGearFactory inactiveGear(final String code) {
-        return new InactiveGearFactory(code);
-    }
-
-    public static <S extends Scope> SpeciesSpecificBiomassCatchabilityGearFactory<S>
-    speciesSpecificBiomassCatchabilityGear(
-        final String code,
-        final Factory<? super S, ? extends Supplier<Duration>> durationSupplier,
+    public static <S extends Scope> SpeciesSpecificDiscardRatesFactory<S> discardRates(
         final Factory<? super S, ? extends Collection<? extends Species>> species,
-        final Factory<? super S, ? extends Map<MultiKey<Object>, Double>> proportions
+        final Factory<? super S, ? extends Map<MultiKey<Object>, Double>> discardRatesBySpeciesKey
     ) {
-        return new SpeciesSpecificBiomassCatchabilityGearFactory<>(
-            code, durationSupplier, species, proportions
-        );
+        return new SpeciesSpecificDiscardRatesFactory<>(species, discardRatesBySpeciesKey);
+    }
+
+    public static <S extends Scope> SpeciesSpecificDiscardMortalityRatesFactory<S> discardMortalityRates(
+        final Factory<? super S, ? extends Collection<? extends Species>> species,
+        final Factory<? super S, ? extends Map<MultiKey<Object>, Double>> mortalityRatesBySpeciesKey
+    ) {
+        return new SpeciesSpecificDiscardMortalityRatesFactory<>(species, mortalityRatesBySpeciesKey);
     }
 }

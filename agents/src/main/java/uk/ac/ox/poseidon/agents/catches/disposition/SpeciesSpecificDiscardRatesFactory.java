@@ -26,14 +26,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Singular;
-import uk.ac.ox.poseidon.biology.species.Species;
+import org.apache.commons.collections4.keyvalue.MultiKey;
 import uk.ac.ox.poseidon.agents.utils.SpeciesSpecificRateFactorySupport;
+import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
@@ -47,36 +46,16 @@ public class SpeciesSpecificDiscardRatesFactory<S extends Scope>
 
     private Factory<? super S, ? extends Collection<? extends Species>> species;
 
-    @Singular("discardRateBySpeciesKey")
-    private Map<String, Double> discardRatesBySpeciesKey;
+    private Factory<? super S, ? extends Map<MultiKey<Object>, Double>> discardRatesBySpeciesKey;
 
     @Override
     protected SpeciesSpecificDiscardRates newInstance(final S scope) {
         final var rates = SpeciesSpecificRateFactorySupport.buildRatesByKey(
             species.get(scope),
-            discardRatesBySpeciesKey,
+            discardRatesBySpeciesKey.get(scope),
             "discard rate"
         );
         return new SpeciesSpecificDiscardRates(rates);
     }
 
-    public static <S extends Scope> SpeciesSpecificDiscardRatesFactory<S> fromFile(
-        final Path speciesFilePath,
-        final String codeColumnName,
-        final String lifeStageColumnName,
-        final Factory<? super S, ? extends Collection<? extends Species>> species,
-        final double defaultRate
-    ) {
-        final Map<String, Double> rates =
-            SpeciesSpecificRateFactorySupport.readRatesByKeyFromFile(
-                speciesFilePath,
-                codeColumnName,
-                lifeStageColumnName,
-                defaultRate
-            );
-        return new SpeciesSpecificDiscardRatesFactory<>(
-            species,
-            rates
-        );
-    }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
+import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -90,7 +91,7 @@ class SpeciesIndexedDoubleArrayTest {
         values[index.indexOf(SPECIES_B)] = 5.0;
         final SpeciesIndexedDoubleArray array = SpeciesIndexedDoubleArray.of(values, index);
 
-        final List<String> speciesKeys = new ArrayList<>();
+        final List<MultiKey<Object>> speciesKeys = new ArrayList<>();
         final List<Double> observedValues = new ArrayList<>();
         array.forEachEntry((species, value) -> {
             speciesKeys.add(species.getKey());

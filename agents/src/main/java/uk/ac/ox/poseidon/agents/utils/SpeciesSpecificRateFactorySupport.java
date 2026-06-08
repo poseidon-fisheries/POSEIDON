@@ -22,18 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.utils;
 
+import org.apache.commons.collections4.keyvalue.MultiKey;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 
-import tech.tablesaw.api.Table;
-
-import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -46,19 +42,19 @@ public final class SpeciesSpecificRateFactorySupport {
 
     public static SpeciesIndexedDoubleArray buildRatesByKey(
         final Collection<? extends Species> species,
-        final Map<String, Double> ratesBySpeciesKey,
+        final Map<MultiKey<Object>, Double> ratesBySpeciesKey,
         final String label
     ) {
         if (ratesBySpeciesKey == null) {
             throw new IllegalArgumentException("ratesBySpeciesKey should not be null");
         }
         final SpeciesIndex speciesIndex = SpeciesIndex.of(Set.copyOf(species));
-        final Set<String> knownCodes =
+        final Set<MultiKey<Object>> knownKeys =
             species.stream().map(Species::getKey).collect(Collectors.toSet());
 
         ratesBySpeciesKey.forEach((key, rate) -> {
             checkArgument(
-                knownCodes.contains(key),
+                knownKeys.contains(key),
                 "Unknown species key '%s' in %s",
                 key,
                 label
@@ -74,29 +70,5 @@ public final class SpeciesSpecificRateFactorySupport {
         }
 
         return SpeciesIndexedDoubleArray.of(rates, speciesIndex);
-    }
-
-    public static Map<String, Double> readRatesByKeyFromFile(
-        final Path speciesFilePath,
-        final String codeColumnName,
-        final String lifeStageColumnName,
-        final double defaultRate
-    ) {
-        checkUnitRange(defaultRate, "defaultRate");
-        final Map<String, Double> rates = new TreeMap<>();
-        Table.read().csv(speciesFilePath.toFile()).stream().forEach(row -> {
-            final String speciesKey =
-                new Species(
-                    row.getString(codeColumnName),
-                    row.getString(lifeStageColumnName),
-                    null
-                ).getKey();
-            if (rates.putIfAbsent(speciesKey, defaultRate) != null) {
-                throw new IllegalArgumentException(
-                    "Duplicate species key '%s' in species file".formatted(speciesKey)
-                );
-            }
-        });
-        return rates;
     }
 }

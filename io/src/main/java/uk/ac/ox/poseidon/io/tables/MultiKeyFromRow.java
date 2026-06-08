@@ -45,7 +45,8 @@ public class MultiKeyFromRow implements Function<Row, MultiKey<Object>> {
     public MultiKey<Object> apply(final Row row) {
         final Object[] keyValues = new Object[keyColumnNames.length];
         for (int k = 0; k < keyColumnNames.length; k++) {
-            keyValues[k] = row.getObject(keyColumnNames[k]);
+            final Object value = row.getObject(keyColumnNames[k]);
+            keyValues[k] = value instanceof final String s && s.trim().isEmpty() ? null : value;
         }
         return new MultiKey<>(keyValues);
     }

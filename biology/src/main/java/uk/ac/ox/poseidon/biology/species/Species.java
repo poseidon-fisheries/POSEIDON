@@ -26,6 +26,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.collections4.keyvalue.MultiKey;
 
 import java.util.Comparator;
 
@@ -45,7 +46,7 @@ public class Species implements Comparable<Species> {
     private final String name;
 
     @Getter(lazy = true)
-    private final String key = code + (lifeStage == null ? "" : (";" + lifeStage));
+    private final MultiKey<Object> key = new MultiKey<>(code, lifeStage);
 
     public Species(
         @NonNull final String code,

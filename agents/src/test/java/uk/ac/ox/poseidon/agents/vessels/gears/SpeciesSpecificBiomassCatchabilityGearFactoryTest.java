@@ -27,39 +27,40 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.speciesSpecificBiomassCatchabilityGear;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
+import static uk.ac.ox.poseidon.io.tables.Factories.csvTableFromString;
+import static uk.ac.ox.poseidon.io.tables.Factories.mapFromTable;
+import static uk.ac.ox.poseidon.io.tables.Factories.multiKeyFromRow;
 
 class SpeciesSpecificBiomassCatchabilityGearFactoryTest {
 
     @Test
-    void fromFile_rejectsDuplicateSpeciesKeys() throws Exception {
-        final Path csvPath = Files.createTempFile("species", ".csv");
-        Files.writeString(
-            csvPath,
-            "code,lifeStage\nCOD,adult\nCOD,adult\n"
-        );
-
+    void mapFromTable_rejectsDuplicateSpeciesKeys() {
         final Factory<Scope, Supplier<Duration>> durationSupplier =
             scope -> () -> Duration.ofHours(1);
         final Factory<Scope, Collection<? extends Species>> species =
             scope -> List.of(new Species("COD", "adult", "Cod"));
 
-        assertThatThrownBy(() -> SpeciesSpecificBiomassCatchabilityGearFactory.fromFile(
-            csvPath,
-            "code",
-            "lifeStage",
+        final var factory = speciesSpecificBiomassCatchabilityGear(
             "G1",
             durationSupplier,
             species,
-            0.5
-        )).isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Duplicate species key 'COD;adult'");
+            mapFromTable(
+                csvTableFromString("code,lifeStage\nCOD,adult\nCOD,adult\n"),
+                multiKeyFromRow("code", "lifeStage"),
+                constantDouble(0.5)
+            )
+        );
+
+        assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Multiple entries with same key");
     }
 }
