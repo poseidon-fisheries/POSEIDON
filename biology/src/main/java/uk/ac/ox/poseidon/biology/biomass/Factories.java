@@ -28,8 +28,8 @@ import uk.ac.ox.poseidon.core.quantities.KilogramsFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
-import uk.ac.ox.poseidon.geography.allocators.FilteredAllocatorFactory;
-import uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory;
+import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
+import static uk.ac.ox.poseidon.geography.allocators.Factories.supplierAllocator;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGridFromAllocatorFactory;
@@ -91,8 +91,8 @@ public class Factories {
         return new CarryingCapacityGridFactory<>(
             new DoubleGridFromAllocatorFactory<>(
                 modelGrid,
-                new FilteredAllocatorFactory<>(
-                    new SupplierAllocatorFactory<>(
+                filteredAllocator(
+                    supplierAllocator(
                         constantDouble(new KilogramsFactory<>(carryingCapacity))
                     ),
                     new IsActiveWaterCellFactory<>(bathymetricGrid)
@@ -109,8 +109,8 @@ public class Factories {
         return new CarryingCapacityGridFactory<>(
             new NormalisedDoubleGridFromAllocatorFactory<>(
                 modelGrid,
-                new FilteredAllocatorFactory<>(
-                    new SupplierAllocatorFactory<>(constantDouble(1.0)),
+                filteredAllocator(
+                    supplierAllocator(constantDouble(1.0)),
                     new IsActiveWaterCellFactory<>(bathymetricGrid)
                 ),
                 new KilogramsFactory<>(totalCarryingCapacity)

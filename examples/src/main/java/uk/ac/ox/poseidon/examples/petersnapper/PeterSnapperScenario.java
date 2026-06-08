@@ -58,8 +58,8 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.utils.PairFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
 import uk.ac.ox.poseidon.geography.CoordinateFactory;
-import uk.ac.ox.poseidon.geography.allocators.FilteredAllocatorFactory;
-import uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory;
+import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
+import static uk.ac.ox.poseidon.geography.allocators.Factories.supplierAllocator;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableFactory;
 import static uk.ac.ox.poseidon.geography.distance.Factories.haversineDistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
@@ -230,8 +230,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             carryingCapacityGrid(
                 new NormalisedDoubleGridFromAllocatorFactory<>(
                     modelGrid,
-                    new FilteredAllocatorFactory<>(
-                        new SupplierAllocatorFactory<>(constantDouble(1.0)),
+                    filteredAllocator(
+                        supplierAllocator(constantDouble(1.0)),
                         allOf(
                             isActiveWaterCell(bathymetricGrid),
                             inDepthRange(bathymetricGrid, 30, 800)
