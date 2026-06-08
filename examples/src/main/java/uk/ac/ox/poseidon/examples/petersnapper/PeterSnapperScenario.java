@@ -46,7 +46,7 @@ import uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory;
 import uk.ac.ox.poseidon.agents.vessels.PrefixedIdFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory;
 import uk.ac.ox.poseidon.agents.vessels.engines.SimpleEngineFactory;
-import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
+import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.fixedBiomassProportionGear;
 import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.standardBiomassHold;
 import static uk.ac.ox.poseidon.biology.allocators.Factories.proportionOfCarryingCapacityAllocator;
 import uk.ac.ox.poseidon.biology.biomass.*;
@@ -327,7 +327,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             );
 
         final var gear =
-            new FixedBiomassProportionGearFactory<>(
+            fixedBiomassProportionGear(
                 "FGL", // droplines count as "fixed gears and lines"
                 0.000641964,
                 constant(ONE_HOUR)
