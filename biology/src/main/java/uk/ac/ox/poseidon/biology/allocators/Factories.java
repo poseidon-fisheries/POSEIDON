@@ -22,33 +22,36 @@
 
 package uk.ac.ox.poseidon.biology.allocators;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.DoubleSupplier;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class ProportionOfCarryingCapacityAllocatorFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ProportionOfCarryingCapacityAllocator> {
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
 
-    private Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid;
-    private Factory<? super S, ? extends DoubleSupplier> proportionSupplier;
+public class Factories {
 
-    @Override
-    protected ProportionOfCarryingCapacityAllocator newInstance(final S scope) {
-        return new ProportionOfCarryingCapacityAllocator(
-            carryingCapacityGrid.get(scope),
-            proportionSupplier.get(scope)
+    private Factories() {}
+
+    public static <S extends Scope> ProportionOfCarryingCapacityAllocatorFactory<S>
+    proportionOfCarryingCapacityAllocator(
+        final Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid,
+        final Factory<? super S, ? extends DoubleSupplier> proportionSupplier
+    ) {
+        return new ProportionOfCarryingCapacityAllocatorFactory<>(
+            carryingCapacityGrid,
+            proportionSupplier
         );
     }
 
+    public static <S extends Scope> ProportionOfCarryingCapacityAllocatorFactory<S>
+    fullCarryingCapacityAllocator(
+        final Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid
+    ) {
+        return new ProportionOfCarryingCapacityAllocatorFactory<>(
+            carryingCapacityGrid,
+            constantDouble(1.0)
+        );
+    }
 }

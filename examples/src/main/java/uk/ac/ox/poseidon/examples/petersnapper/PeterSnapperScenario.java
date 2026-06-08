@@ -48,7 +48,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory;
 import uk.ac.ox.poseidon.agents.vessels.engines.SimpleEngineFactory;
 import uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory;
 import uk.ac.ox.poseidon.agents.vessels.holds.StandardBiomassHoldFactory;
-import uk.ac.ox.poseidon.biology.allocators.ProportionOfCarryingCapacityAllocatorFactory;
+import static uk.ac.ox.poseidon.biology.allocators.Factories.proportionOfCarryingCapacityAllocator;
 import uk.ac.ox.poseidon.biology.biomass.*;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Scenario;
@@ -246,7 +246,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             biomassGrid(
                 modelGrid,
                 species,
-                new ProportionOfCarryingCapacityAllocatorFactory<>(
+                proportionOfCarryingCapacityAllocator(
                     carryingCapacityGrid,
                     randomDouble(0.7, 0.8)
                 )
