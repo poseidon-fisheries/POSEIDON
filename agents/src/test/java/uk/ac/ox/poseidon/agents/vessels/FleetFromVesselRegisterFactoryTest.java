@@ -26,7 +26,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
-import uk.ac.ox.poseidon.agents.tasks.BehaviourFactory;
+import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
@@ -105,7 +105,7 @@ class FleetFromVesselRegisterFactoryTest {
                         )
                         .dataMapping("gear.code", "gear")
                         .engine(new ObjectFactory<>(mock(Engine.class)))
-                        .behaviour(new BehaviourFactory(waitFor(constant(ONE_DAY))))
+                        .behaviour(behaviour(waitFor(constant(ONE_DAY))))
                         .build()
                 )
             ).startNewSimulation();
