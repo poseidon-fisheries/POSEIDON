@@ -29,28 +29,30 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-class ComponentRegisterFactoryTest {
+class VesselComponentRegisterFactoryTest {
 
     @Test
     void returnsSameRegisterForSameSimulation() {
-        final ComponentRegisterFactory<String> factory = new ComponentRegisterFactory<>();
+        final VesselComponentRegisterFactory<String> factory =
+            new VesselComponentRegisterFactory<>();
         final Simulation simulation = mock(Simulation.class);
         final SimulationScope scope = new SimulationScope(simulation);
 
-        final ComponentRegister<String> first = factory.get(scope);
-        final ComponentRegister<String> second = factory.get(scope);
+        final VesselComponentRegister<String> first = factory.get(scope);
+        final VesselComponentRegister<String> second = factory.get(scope);
 
         assertThat(first).isSameAs(second);
     }
 
     @Test
     void returnsDifferentRegistersForDifferentSimulations() {
-        final ComponentRegisterFactory<String> factory = new ComponentRegisterFactory<>();
+        final VesselComponentRegisterFactory<String> factory =
+            new VesselComponentRegisterFactory<>();
         final SimulationScope firstScope = new SimulationScope(mock(Simulation.class));
         final SimulationScope secondScope = new SimulationScope(mock(Simulation.class));
 
-        final ComponentRegister<String> first = factory.get(firstScope);
-        final ComponentRegister<String> second = factory.get(secondScope);
+        final VesselComponentRegister<String> first = factory.get(firstScope);
+        final VesselComponentRegister<String> second = factory.get(secondScope);
 
         assertThat(first).isNotSameAs(second);
     }

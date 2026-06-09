@@ -24,32 +24,37 @@ package uk.ac.ox.poseidon.agents.components;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static uk.ac.ox.poseidon.agents.components.Factories.component;
 
-class ComponentFactoryTest {
+class VesselComponentRegisterTest {
 
     @Test
-    void registersComponentWhenCreated() {
-        final ComponentRegister<String> register = new ComponentRegister<>();
-        final ComponentFactory<String> factory =
-            component(
-                scope -> "component",
-                scope -> register
-            );
-
+    void storesAndRetrievesComponents() {
+        final VesselComponentRegister<String> register = new VesselComponentRegister<>();
         final Vessel vessel = mock(Vessel.class);
-        final Simulation simulation = mock(Simulation.class);
-        final VesselScope scope = new VesselScope(new SimulationScope(simulation), vessel);
 
-        final String component = factory.get(scope);
+        register.putComponent(vessel, "component");
 
-        assertThat(component).isEqualTo("component");
         assertThat(register.getComponent(vessel)).contains("component");
+        assertThat(register.getVessels()).contains(vessel);
+        assertThat(register.getAllEntries()).anyMatch(entry ->
+            entry.getKey() == vessel && entry.getValue().equals("component")
+        );
+    }
+
+    @Test
+    void getOtherEntriesExcludesProvidedVessel() {
+        final VesselComponentRegister<String> register = new VesselComponentRegister<>();
+        final Vessel first = mock(Vessel.class);
+        final Vessel second = mock(Vessel.class);
+
+        register.putComponent(first, "first");
+        register.putComponent(second, "second");
+
+        assertThat(register.getOtherEntries(first))
+            .extracting(entry -> entry.getKey())
+            .containsExactly(second);
     }
 }

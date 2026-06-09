@@ -29,14 +29,14 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * Creates a simulation-scoped {@link ComponentRegister} instance.
+ * Creates a simulation-scoped {@link VesselComponentRegister} instance.
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ComponentRegisterFactory<C> extends SimulationScopeFactory<ComponentRegister<C>> {
+public class VesselComponentRegisterFactory<C> extends SimulationScopeFactory<VesselComponentRegister<C>> {
     @Override
-    protected ComponentRegister<C> newInstance(final SimulationScope scope) {
-        return new ComponentRegister<>();
+    protected VesselComponentRegister<C> newInstance(final SimulationScope scope) {
+        return new VesselComponentRegister<>();
     }
 }

@@ -30,15 +30,15 @@ public class Factories {
     private Factories() {
     }
 
-    public static <C> ComponentFactory<C> component(
+    public static <C> RegisteredVesselComponentFactory<C> registeredVesselComponent(
         final Factory<? super VesselScope, ? extends C> componentFactory,
-        final Factory<? super VesselScope, ? extends ComponentRegister<C>> componentRegister
+        final Factory<? super VesselScope, ? extends VesselComponentRegister<C>> componentRegister
     ) {
-        return new ComponentFactory<>(componentFactory, componentRegister);
+        return new RegisteredVesselComponentFactory<>(componentFactory, componentRegister);
     }
 
-    public static <C> ComponentRegisterFactory<C> componentRegister() {
-        return new ComponentRegisterFactory<>();
+    public static <C> VesselComponentRegisterFactory<C> vesselComponentRegister() {
+        return new VesselComponentRegisterFactory<>();
     }
 
 }

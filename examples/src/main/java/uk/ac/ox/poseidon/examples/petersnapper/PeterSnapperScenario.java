@@ -23,37 +23,16 @@
 package uk.ac.ox.poseidon.examples.petersnapper;
 
 import sim.util.Int2D;
-import static uk.ac.ox.poseidon.agents.catches.disposition.Factories.proportionallyLimitingBiomassToHold;
-import uk.ac.ox.poseidon.agents.choices.*;
-import static uk.ac.ox.poseidon.agents.choices.Factories.*;
-
-import static uk.ac.ox.poseidon.agents.market.Factories.marketGrid;
-import static uk.ac.ox.poseidon.agents.market.Factories.oneBiomassMarketPerPort;
-import static uk.ac.ox.poseidon.agents.market.Factories.price;
-import static uk.ac.ox.poseidon.agents.market.Factories.priceEntry;
-import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
-import static uk.ac.ox.poseidon.agents.tasks.landings.Factories.landCatches;
-import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.endTrip;
-import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.setDestinationToOrigin;
-import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.travelAlongPath;
-import static uk.ac.ox.poseidon.agents.vessels.Factories.prefixedId;
-import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselCreator;
+import uk.ac.ox.poseidon.agents.choices.EpsilonGreedyDestinationSupplierFactory;
+import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
+import uk.ac.ox.poseidon.agents.components.VesselComponentRegisterFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory;
-import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.simpleEngine;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
-import static uk.ac.ox.poseidon.core.schedule.Factories.steppableSequence;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-
-import static uk.ac.ox.poseidon.geography.bathymetry.Factories.bathymetricGridFromElevationTable;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-import static uk.ac.ox.poseidon.geography.grids.Factories.modelGridFromLonLatTable;
-import static uk.ac.ox.poseidon.geography.grids.Factories.normalisedDoubleGridFromAllocator;
-import uk.ac.ox.poseidon.geography.ports.PortFactory;
-import static uk.ac.ox.poseidon.geography.ports.Factories.port;
-import static uk.ac.ox.poseidon.geography.ports.Factories.portGrid;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 import java.nio.file.Path;
@@ -65,24 +44,32 @@ import java.util.function.Supplier;
 import static tech.units.indriya.unit.Units.*;
 import static uk.ac.ox.poseidon.agents.catches.Factories.uncategorisedCatchCategory;
 import static uk.ac.ox.poseidon.agents.catches.Factories.uniformCatchCategoriser;
+import static uk.ac.ox.poseidon.agents.catches.disposition.Factories.proportionallyLimitingBiomassToHold;
+import static uk.ac.ox.poseidon.agents.choices.Factories.*;
 import static uk.ac.ox.poseidon.agents.choices.evaluation.Factories.profitPerHour;
 import static uk.ac.ox.poseidon.agents.choices.evaluation.Factories.tripEvaluator;
-import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
-import static uk.ac.ox.poseidon.agents.components.Factories.component;
+import static uk.ac.ox.poseidon.agents.components.Factories.registeredVesselComponent;
+import static uk.ac.ox.poseidon.agents.components.Factories.vesselComponentRegister;
 import static uk.ac.ox.poseidon.agents.fields.Factories.vesselField;
 import static uk.ac.ox.poseidon.agents.fisheables.Factories.currentCellFisheable;
 import static uk.ac.ox.poseidon.agents.fuel.Factories.fuelStationGrid;
 import static uk.ac.ox.poseidon.agents.fuel.Factories.oneFuelStationPerPort;
+import static uk.ac.ox.poseidon.agents.market.Factories.*;
 import static uk.ac.ox.poseidon.agents.money.Factories.money;
+import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.agents.tasks.decorators.Factories.untilFail;
 import static uk.ac.ox.poseidon.agents.tasks.destinations.Factories.startTrip;
 import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishing;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.checkThat;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
-import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.refuel;
+import static uk.ac.ox.poseidon.agents.tasks.landings.Factories.landCatches;
+import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.*;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.prefixedId;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselCreator;
 import static uk.ac.ox.poseidon.agents.vessels.accounts.Factories.account;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.fullTank;
+import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.simpleEngine;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.availableHoldCapacityInKg;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.currentTripDuration;
 import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.fixedBiomassProportionGear;
@@ -105,20 +92,25 @@ import static uk.ac.ox.poseidon.core.quantities.Factories.*;
 import static uk.ac.ox.poseidon.core.schedule.Factories.*;
 import static uk.ac.ox.poseidon.core.time.Factories.*;
 import static uk.ac.ox.poseidon.core.utils.Factories.*;
+import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPerYearAccumulator;
 import static uk.ac.ox.poseidon.geography.Factories.coordinate;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.supplierAllocator;
+import static uk.ac.ox.poseidon.geography.bathymetry.Factories.bathymetricGridFromElevationTable;
 import static uk.ac.ox.poseidon.geography.distance.Factories.haversineDistanceCalculator;
+import static uk.ac.ox.poseidon.geography.grids.Factories.modelGridFromLonLatTable;
+import static uk.ac.ox.poseidon.geography.grids.Factories.normalisedDoubleGridFromAllocator;
 import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
 import static uk.ac.ox.poseidon.geography.grids.suppliers.Factories.gridSum;
 import static uk.ac.ox.poseidon.geography.paths.Factories.pathFinder;
+import static uk.ac.ox.poseidon.geography.ports.Factories.port;
+import static uk.ac.ox.poseidon.geography.ports.Factories.portGrid;
 import static uk.ac.ox.poseidon.geography.predicates.Factories.inDepthRange;
 import static uk.ac.ox.poseidon.geography.predicates.Factories.isActiveWaterCell;
 import static uk.ac.ox.poseidon.geography.utils.Factories.elevationTable;
 import static uk.ac.ox.poseidon.io.paths.Factories.path;
 import static uk.ac.ox.poseidon.io.sources.Factories.zipEntryDataSource;
 import static uk.ac.ox.poseidon.io.tables.Factories.*;
-import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPerYearAccumulator;
 
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
@@ -285,8 +277,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             );
 
         final var distance = haversineDistanceCalculator(modelGrid);
-        final PortFactory benoa = port("P1", "Benoa");
-        final PortFactory kupang = port("P2", "Kupang");
+        final var benoa = port("P1", "Benoa");
+        final var kupang = port("P2", "Kupang");
         final var portGrid =
             portGrid(
                 listOf(
@@ -337,11 +329,11 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 constant(ONE_HOUR)
             );
 
-        final var optionValuesRegister =
-            new ComponentRegisterFactory<MutableOptionValues<Int2D>>();
+        final VesselComponentRegisterFactory<MutableOptionValues<Int2D>>
+            optionValuesRegister = vesselComponentRegister();
 
         final var optionValues =
-            component(
+            registeredVesselComponent(
                 exponentialMovingAverageOptionValues(LEARNING_ALPHA),
                 optionValuesRegister
             );

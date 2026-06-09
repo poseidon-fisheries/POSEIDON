@@ -26,7 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.agents.components.ComponentRegister;
+import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
@@ -41,7 +41,8 @@ public class BestOptionsFromFriendsSupplierFactory<O>
     extends VesselScopeFactory<Supplier<OptionValues<O>>> {
 
     private int maxNumberOfFriends;
-    private Factory<? super VesselScope, ? extends ComponentRegister<? extends OptionValues<O>>>
+    private Factory<? super VesselScope, ? extends VesselComponentRegister<?
+            extends OptionValues<O>>>
         optionValuesRegister;
 
     @Override

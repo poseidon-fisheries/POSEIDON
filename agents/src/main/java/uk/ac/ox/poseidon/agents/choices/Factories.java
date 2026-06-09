@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.components.ComponentRegister;
+import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -45,7 +45,8 @@ public class Factories {
 
     public static <O> BestOptionsFromFriendsSupplierFactory<O> bestOptionsFromFriends(
         final int maxNumberOfFriends,
-        final Factory<? super VesselScope, ? extends ComponentRegister<? extends OptionValues<O>>>
+        final Factory<? super VesselScope, ? extends VesselComponentRegister<?
+                extends OptionValues<O>>>
             optionValuesRegister
     ) {
         return new BestOptionsFromFriendsSupplierFactory<>(
@@ -54,7 +55,8 @@ public class Factories {
     }
 
     public static <O> BestOptionsSupplierFactory<O> bestOptions(
-        final Factory<? super VesselScope, ? extends ComponentRegister<? extends OptionValues<O>>>
+        final Factory<? super VesselScope, ? extends VesselComponentRegister<?
+                extends OptionValues<O>>>
             optionValuesRegister
     ) {
         return new BestOptionsSupplierFactory<>(optionValuesRegister);

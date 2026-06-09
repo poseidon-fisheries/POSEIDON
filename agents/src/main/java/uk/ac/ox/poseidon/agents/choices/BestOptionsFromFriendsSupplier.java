@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.components.ComponentRegister;
+import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.util.HashMap;
@@ -42,7 +42,7 @@ class BestOptionsFromFriendsSupplier<O> implements Supplier<OptionValues<O>> {
 
     private final Vessel vessel;
     private final int maxNumberOfFriends;
-    private final ComponentRegister<? extends OptionValues<O>> optionValuesRegister;
+    private final VesselComponentRegister<? extends OptionValues<O>> optionValuesRegister;
     private final MersenneTwisterFast rng;
 
     private final @Getter(lazy = true) ImmutableList<Vessel> friends = chooseFriends();

@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 /**
  * Stores per-vessel components for a simulation so other systems can query them by vessel.
  */
-public class ComponentRegister<C> {
+public class VesselComponentRegister<C> {
 
     private final Map<Vessel, C> map = new HashMap<>();
 

@@ -26,7 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.agents.components.ComponentRegister;
+import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
@@ -40,7 +40,7 @@ import java.util.function.Supplier;
 public class BestOptionsSupplierFactory<O>
     extends VesselScopeFactory<Supplier<OptionValues<O>>> {
 
-    Factory<? super VesselScope, ? extends ComponentRegister<? extends OptionValues<O>>>
+    Factory<? super VesselScope, ? extends VesselComponentRegister<? extends OptionValues<O>>>
         optionValuesRegister;
 
     @Override
