@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -90,7 +92,7 @@ class FleetFromVesselRegisterFactoryTest {
                 LocalDate.of(2000, 1, 1),
                 Map.of(
                     "fleet", FleetFromVesselRegisterFactory.builder()
-                        .fleet(new FleetFactory(
+                        .fleet(fleet(
                             new ObjectFactory<>(mock(VesselField.class)),
                             new ObjectFactory<>(portGrid),
                             new ObjectFactory<>(marketGrid)

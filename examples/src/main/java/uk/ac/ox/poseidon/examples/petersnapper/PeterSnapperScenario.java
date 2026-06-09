@@ -36,7 +36,8 @@ import uk.ac.ox.poseidon.agents.tasks.landings.LandCatchesFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.EndTripFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.SetDestinationToOriginFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory;
-import uk.ac.ox.poseidon.agents.vessels.PrefixedIdFactory;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.prefixedId;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselCreator;
 import uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory;
 import uk.ac.ox.poseidon.agents.vessels.engines.SimpleEngineFactory;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
@@ -404,12 +405,12 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             scheduledOnceAtStart(
                 new SteppableSequenceFactory(
                     mappedFactory(
-                        new VesselCreatorFactory(
+                        vesselCreator(
                             vesselField,
                             portGrid,
                             marketGrid,
                             new PrefixedIdSupplierFactory("V"),
-                            new PrefixedIdFactory("Vessel "),
+                            prefixedId("Vessel "),
                             account(),
                             null, // mapped over
                             standardBiomassHold(
