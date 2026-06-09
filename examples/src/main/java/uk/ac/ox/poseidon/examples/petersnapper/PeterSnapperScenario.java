@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.examples.petersnapper;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.catches.disposition.ProportionallyLimitingBiomassToHoldFactory;
 import uk.ac.ox.poseidon.agents.choices.*;
+import static uk.ac.ox.poseidon.agents.choices.Factories.*;
 import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
 import static uk.ac.ox.poseidon.agents.market.Factories.marketGrid;
 import static uk.ac.ox.poseidon.agents.market.Factories.oneBiomassMarketPerPort;
@@ -339,14 +340,14 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
         final var optionValues =
             component(
-                new ExponentialMovingAverageOptionValuesFactory<>(LEARNING_ALPHA),
+                exponentialMovingAverageOptionValues(LEARNING_ALPHA),
                 optionValuesRegister
             );
 
         final EpsilonGreedyDestinationSupplierFactory destinationSupplier =
-            new EpsilonGreedyDestinationSupplierFactory(
+            epsilonGreedyDestination(
                 EXPLORATION_PROBABILITY,
-                new NeighbourhoodGridExplorerFactory(
+                neighbourhoodGridExplorer(
                     optionValues,
                     condition(
                         cellValue(carryingCapacityGrid),
@@ -355,10 +356,10 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     pathFinder,
                     randomInt(1, 10)
                 ),
-                new ImitatingPickerFactory<>(
+                imitatingPicker(
                     optionValues,
                     alwaysTrue(),
-                    new BestOptionsFromFriendsSupplierFactory<>(
+                    bestOptionsFromFriends(
                         5,
                         optionValuesRegister
                     )
