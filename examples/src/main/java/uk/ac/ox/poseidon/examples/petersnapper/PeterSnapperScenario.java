@@ -51,7 +51,8 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
 import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
 import uk.ac.ox.poseidon.geography.ports.PortFactory;
-import uk.ac.ox.poseidon.geography.ports.PortGridFactory;
+import static uk.ac.ox.poseidon.geography.ports.Factories.port;
+import static uk.ac.ox.poseidon.geography.ports.Factories.portGrid;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 import java.nio.file.Path;
@@ -281,10 +282,10 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             );
 
         final var distance = haversineDistanceCalculator(modelGrid);
-        final PortFactory benoa = new PortFactory("P1", "Benoa");
-        final PortFactory kupang = new PortFactory("P2", "Kupang");
+        final PortFactory benoa = port("P1", "Benoa");
+        final PortFactory kupang = port("P2", "Kupang");
         final var portGrid =
-            new PortGridFactory<>(
+            portGrid(
                 listOf(
                     new PairFactory<>(benoa, coordinate(115.238843, -8.799605)),
                     new PairFactory<>(kupang, coordinate(123.586249, -10.148044))
