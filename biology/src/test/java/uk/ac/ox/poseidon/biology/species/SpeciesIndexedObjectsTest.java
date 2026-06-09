@@ -56,10 +56,10 @@ class SpeciesIndexedObjectsTest {
         assertThat(indices).containsExactly(0, 1);
 
         final List<String> speciesKeys = new ArrayList<>();
-        objects.forEachEntry((species, value) -> speciesKeys.add(species.getKey() + ":" + value));
+        objects.forEachEntry((species, value) -> speciesKeys.add(species.getCode() + ":" + value));
         assertThat(speciesKeys).containsExactly(
-            index.speciesAt(0).getKey() + ":" + values[0],
-            index.speciesAt(1).getKey() + ":" + values[1]
+            index.speciesAt(0).getCode() + ":" + values[0],
+            index.speciesAt(1).getCode() + ":" + values[1]
         );
 
         final TestIndexedObjects upper = objects.mapValue(String::toUpperCase);
@@ -71,7 +71,7 @@ class SpeciesIndexedObjectsTest {
             .isEqualTo("beta" + index.indexOf(SPECIES_B));
 
         final TestIndexedObjects withSpecies = objects.mapEntry(
-            (species, value) -> species.getKey() + "-" + value
+            (species, value) -> species.getCode() + "-" + value
         );
         assertThat(withSpecies.get(index.indexOf(SPECIES_A))).isEqualTo("A-alpha");
     }
