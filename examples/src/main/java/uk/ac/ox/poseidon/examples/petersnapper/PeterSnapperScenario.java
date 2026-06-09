@@ -27,7 +27,6 @@ import uk.ac.ox.poseidon.agents.choices.EpsilonGreedyDestinationSupplierFactory;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegisterFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory;
-import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -74,6 +73,7 @@ import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.availableHol
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.currentTripDuration;
 import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.fixedBiomassProportionGear;
 import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.standardBiomassHold;
+import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.accessibleWaterCells;
 import static uk.ac.ox.poseidon.biology.allocators.Factories.proportionOfCarryingCapacityAllocator;
 import static uk.ac.ox.poseidon.biology.biomass.Factories.*;
 import static uk.ac.ox.poseidon.biology.species.Factories.species;
@@ -137,11 +137,16 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 uk.ac.ox.poseidon.core.SimulationStartOptions
                     .builder()
                     .seed(0)
+/*                    .propertyOverride(
+                        "components(agentCreators).steppable.steppables.factories[0]" +
+                            ".numberOfVesselsToCreate",
+                        5
+                    )
                     .propertyOverride(
                         "components(agentCreators).steppable.steppables.factories[1]" +
                             ".numberOfVesselsToCreate",
                         0
-                    )
+                    )*/
                     .extraComponent(
                         "totalLandingsPerYear",
                         finalProcess(
@@ -186,7 +191,6 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
             for (int i = 0; i < 10; i++) {
                 temporalSchedule.stepFor(simulation, Period.ofYears(1));
-                System.out.println(simulation.getComponent(BiomassGrid.class).getSum());
             }
         } finally {
             simulation.finish();
@@ -338,17 +342,20 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                 optionValuesRegister
             );
 
+        final var validCellPredicate =
+            condition(
+                cellValue(carryingCapacityGrid),
+                greaterThan(0)
+            );
         final EpsilonGreedyDestinationSupplierFactory destinationSupplier =
             epsilonGreedyDestination(
                 EXPLORATION_PROBABILITY,
                 neighbourhoodGridExplorer(
                     optionValues,
-                    condition(
-                        cellValue(carryingCapacityGrid),
-                        greaterThan(0)
-                    ),
                     pathFinder,
-                    randomInt(1, 10)
+                    validCellPredicate,
+                    randomInt(1, 10),
+                    randomGridExplorer(accessibleWaterCells(pathFinder), validCellPredicate)
                 ),
                 imitatingPicker(
                     optionValues,
