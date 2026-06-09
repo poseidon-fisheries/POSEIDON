@@ -33,14 +33,14 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 public class EpsilonGreedyChooser<O> implements Supplier<Optional<O>> {
 
     private final double epsilon;
-    private final Picker<O> explorer;
-    private final Picker<O> exploiter;
+    private final Supplier<O> explorer;
+    private final Supplier<O> exploiter;
     private final MersenneTwisterFast rng;
 
     EpsilonGreedyChooser(
         final double epsilon,
-        final Picker<O> explorer,
-        final Picker<O> exploiter,
+        final Supplier<O> explorer,
+        final Supplier<O> exploiter,
         final MersenneTwisterFast rng
     ) {
         this.explorer = explorer;
@@ -51,11 +51,14 @@ public class EpsilonGreedyChooser<O> implements Supplier<Optional<O>> {
 
     @Override
     public Optional<O> get() {
-        final boolean explore = rng.nextBoolean(epsilon);
-        return Optional
-            .of(exploiter)
-            .filter(__ -> !explore)
-            .flatMap(Picker::pick)
-            .or(explorer::pick);
+        final boolean exploit = !rng.nextBoolean(epsilon);
+        O result = null;
+        if (exploit) {
+            result = this.exploiter.get();
+        }
+        if (result == null) {
+            result = this.explorer.get();
+        }
+        return Optional.ofNullable(result);
     }
 }

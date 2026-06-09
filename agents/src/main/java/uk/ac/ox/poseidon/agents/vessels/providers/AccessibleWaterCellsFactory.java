@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,44 +20,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices;
+package uk.ac.ox.poseidon.agents.vessels.providers;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
-import java.util.function.IntSupplier;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class NeighbourhoodGridExplorerFactory extends VesselScopeFactory<NeighbourhoodCellPicker> {
+public class AccessibleWaterCellsFactory extends VesselScopeFactory<AccessibleWaterCells> {
 
-    private Factory<? super VesselScope, ? extends OptionValues<Int2D>> optionValues;
     private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
-    private Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate;
-    private Factory<? super VesselScope, ? extends IntSupplier> neighbourhoodSizeSupplier;
-    private Factory<? super VesselScope, ? extends Supplier<Int2D>> fallbackCellPicker;
 
     @Override
-    protected NeighbourhoodCellPicker newInstance(final VesselScope scope) {
-        return new NeighbourhoodCellPicker(
-            scope.getVessel(),
-            optionValues.get(scope),
-            pathFinder.get(scope),
-            cellPredicate.get(scope),
-            neighbourhoodSizeSupplier.get(scope),
-            fallbackCellPicker.get(scope),
-            scope.getSimulation().random
-        );
+    protected AccessibleWaterCells newInstance(final VesselScope scope) {
+        return new AccessibleWaterCells(scope.getVessel(), pathFinder.get(scope));
     }
+
 }

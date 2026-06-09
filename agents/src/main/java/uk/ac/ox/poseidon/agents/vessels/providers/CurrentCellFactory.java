@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,11 +20,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices;
+package uk.ac.ox.poseidon.agents.vessels.providers;
 
-import java.util.Optional;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
-@FunctionalInterface
-public interface Picker<O> {
-    Optional<O> pick();
+public class CurrentCellFactory extends VesselScopeFactory<CurrentCell> {
+
+    @Override
+    protected CurrentCell newInstance(final VesselScope scope) {
+        return new CurrentCell(scope.getVessel());
+    }
+    
 }

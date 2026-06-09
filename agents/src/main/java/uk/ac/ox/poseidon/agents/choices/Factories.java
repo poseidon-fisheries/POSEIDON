@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+import java.util.List;
 import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -46,7 +47,7 @@ public class Factories {
     public static <O> BestOptionsFromFriendsSupplierFactory<O> bestOptionsFromFriends(
         final int maxNumberOfFriends,
         final Factory<? super VesselScope, ? extends VesselComponentRegister<?
-                extends OptionValues<O>>>
+            extends OptionValues<O>>>
             optionValuesRegister
     ) {
         return new BestOptionsFromFriendsSupplierFactory<>(
@@ -56,7 +57,7 @@ public class Factories {
 
     public static <O> BestOptionsSupplierFactory<O> bestOptions(
         final Factory<? super VesselScope, ? extends VesselComponentRegister<?
-                extends OptionValues<O>>>
+            extends OptionValues<O>>>
             optionValuesRegister
     ) {
         return new BestOptionsSupplierFactory<>(optionValuesRegister);
@@ -71,8 +72,8 @@ public class Factories {
 
     public static EpsilonGreedyDestinationSupplierFactory epsilonGreedyDestination(
         final double epsilon,
-        final Factory<? super VesselScope, ? extends Picker<Int2D>> explorer,
-        final Factory<? super VesselScope, ? extends Picker<Int2D>> exploiter
+        final Factory<? super VesselScope, ? extends Supplier<Int2D>> explorer,
+        final Factory<? super VesselScope, ? extends Supplier<Int2D>> exploiter
     ) {
         return new EpsilonGreedyDestinationSupplierFactory(
             epsilon, explorer, exploiter
@@ -103,19 +104,20 @@ public class Factories {
 
     public static NeighbourhoodGridExplorerFactory neighbourhoodGridExplorer(
         final Factory<? super VesselScope, ? extends OptionValues<Int2D>> optionValues,
-        final Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate,
         final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
-        final Factory<? super VesselScope, ? extends IntSupplier> neighbourhoodSizeSupplier
+        final Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate,
+        final Factory<? super VesselScope, ? extends IntSupplier> neighbourhoodSizeSupplier,
+        final Factory<? super VesselScope, ? extends Supplier<Int2D>> fallbackCellPicker
     ) {
         return new NeighbourhoodGridExplorerFactory(
-            optionValues, cellPredicate, pathFinder, neighbourhoodSizeSupplier
+            optionValues, pathFinder, cellPredicate, neighbourhoodSizeSupplier, fallbackCellPicker
         );
     }
 
     public static RandomGridExplorerFactory randomGridExplorer(
-        final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
+        final Factory<? super VesselScope, ? extends Supplier<? extends List<? extends Int2D>>> cellsSupplier,
         final Factory<? super VesselScope, ? extends Predicate<Int2D>> cellPredicate
     ) {
-        return new RandomGridExplorerFactory(pathFinder, cellPredicate);
+        return new RandomGridExplorerFactory(cellsSupplier, cellPredicate);
     }
 }

@@ -30,23 +30,26 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.core.providers.Provider;
 
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class RandomGridExplorerFactory extends VesselScopeFactory<Picker<Int2D>> {
+public class RandomGridExplorerFactory extends VesselScopeFactory<Provider<Int2D>> {
 
-    private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
+    private Factory<? super VesselScope, ? extends Supplier<? extends List<? extends Int2D>>>
+        cellsSupplier;
     private Factory<? super VesselScope, ? extends Predicate<Int2D>> cellPredicate;
 
     @Override
-    protected Picker<Int2D> newInstance(final VesselScope scope) {
+    protected Provider<Int2D> newInstance(final VesselScope scope) {
         return new RandomPicker<>(
-            pathFinder.get(scope).getAccessibleWaterCells(scope.getVessel().getCell()),
+            cellsSupplier.get(scope),
             cellPredicate.get(scope),
             scope.getSimulation().random
         );

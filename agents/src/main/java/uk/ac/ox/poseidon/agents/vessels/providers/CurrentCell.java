@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,31 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices;
+package uk.ac.ox.poseidon.agents.vessels.providers;
 
-import ec.util.MersenneTwisterFast;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
-import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
-
 @RequiredArgsConstructor
-public class RandomPicker<O> implements Provider<O> {
+public class CurrentCell implements Provider<Int2D> {
 
-    @NonNull private final Supplier<? extends List<? extends O>> options;
-    @NonNull private final Predicate<O> optionPredicate;
-    @NonNull private final MersenneTwisterFast rng;
+    private final Vessel vessel;
 
     @Override
-    public O get() {
-        return shuffledStream(options.get(), rng)
-            .filter(optionPredicate)
-            .findFirst()
-            .orElse(null);
+    public Int2D get() {
+        return vessel.getCell();
     }
+    
 }

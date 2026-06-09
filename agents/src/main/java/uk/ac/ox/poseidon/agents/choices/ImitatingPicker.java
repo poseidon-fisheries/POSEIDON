@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import ec.util.MersenneTwisterFast;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.providers.Provider;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -46,7 +47,7 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
  * option in a chain of explorers; it needs another one to fall back on.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class ImitatingPicker<O> implements Picker<O> {
+public class ImitatingPicker<O> implements Provider<O> {
 
     private final OptionValues<O> optionValues;
     private final Predicate<? super O> optionPredicate;
@@ -54,8 +55,7 @@ public class ImitatingPicker<O> implements Picker<O> {
     private final MersenneTwisterFast rng;
 
     @Override
-    public Optional<O> pick() {
-
+    public O get() {
         final Optional<Entry<O, Double>> currentBestEntry =
             optionValues.getBestEntry(rng);
 
@@ -75,7 +75,7 @@ public class ImitatingPicker<O> implements Picker<O> {
             .filter(optionPredicate)
             .findFirst()
             .or(() -> currentBestEntry.map(Entry::getKey))
-            .filter(optionPredicate);
-
+            .filter(optionPredicate)
+            .orElse(null);
     }
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,36 +20,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices;
+package uk.ac.ox.poseidon.agents.vessels.providers;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
-import java.util.function.Supplier;
+public class Factories {
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class EpsilonGreedyDestinationSupplierFactory extends VesselScopeFactory<DestinationSupplier> {
+    private Factories() {}
 
-    private double epsilon;
-    private Factory<? super VesselScope, ? extends Supplier<Int2D>> explorer;
-    private Factory<? super VesselScope, ? extends Supplier<Int2D>> exploiter;
+    public static CurrentCellFactory currentCell() {
+        return new CurrentCellFactory();
+    }
 
-    @Override
-    protected DestinationSupplier newInstance(final VesselScope scope) {
-        return new EpsilonGreedyChooser<>(
-            epsilon,
-            explorer.get(scope),
-            exploiter.get(scope),
-            scope.getSimulation().random
-        )::get;
+    public static AccessibleWaterCellsFactory accessibleWaterCells(
+        final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder
+    ) {
+        return new AccessibleWaterCellsFactory(pathFinder);
     }
 }

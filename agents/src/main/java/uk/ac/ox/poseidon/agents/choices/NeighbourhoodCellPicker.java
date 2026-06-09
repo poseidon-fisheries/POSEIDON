@@ -26,29 +26,31 @@ import ec.util.MersenneTwisterFast;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.providers.Provider;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.IntSupplier;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static java.lang.Math.max;
 import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 @RequiredArgsConstructor(access = PACKAGE)
-public class NeighbourhoodCellPicker implements Picker<Int2D> {
+public class NeighbourhoodCellPicker implements Provider<Int2D> {
 
     private final Vessel vessel;
     private final OptionValues<Int2D> optionValues;
-    private final Predicate<? super Int2D> optionPredicate;
     private final GridPathFinder pathFinder;
+    private final Predicate<? super Int2D> optionPredicate;
     private final IntSupplier neighbourhoodSizeSupplier;
+    private final Supplier<Int2D> fallbackCellPicker;
     private final MersenneTwisterFast rng;
 
     @Override
-    public Optional<Int2D> pick() {
+    public Int2D get() {
         final int maxNeighbourhoodSize = max(
             pathFinder.getModelGrid().getGridWidth(),
             pathFinder.getModelGrid().getGridHeight()
@@ -56,12 +58,16 @@ public class NeighbourhoodCellPicker implements Picker<Int2D> {
         int neighbourhoodSize = neighbourhoodSizeSupplier.getAsInt();
         List<Int2D> candidates = List.of();
         while (candidates.isEmpty() && neighbourhoodSize <= maxNeighbourhoodSize) {
-            final Int2D startingCell = optionValues.getBestOption(rng).orElse(vessel.getCell());
+            Int2D startingCell = optionValues.getBestOption(rng).orElse(fallbackCellPicker.get());
+            if (startingCell == null) {
+                startingCell = vessel.getCell();
+            }
             candidates = pathFinder.getAccessibleWaterNeighbours(startingCell, neighbourhoodSize);
             neighbourhoodSize++;
         }
         return shuffledStream(candidates, rng)
             .filter(optionPredicate)
-            .findFirst();
+            .findFirst()
+            .orElse(null);
     }
 }
