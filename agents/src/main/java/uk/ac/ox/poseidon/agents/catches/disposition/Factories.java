@@ -28,7 +28,9 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.function.DoubleSupplier;
 
 public class Factories {
     private Factories() {}
@@ -45,5 +47,28 @@ public class Factories {
         final Factory<? super S, ? extends Map<MultiKey<Object>, Double>> mortalityRatesBySpeciesKey
     ) {
         return new SpeciesSpecificDiscardMortalityRatesFactory<>(species, mortalityRatesBySpeciesKey);
+    }
+
+    @SafeVarargs
+    public static <S extends Scope> CompositeDispositionProcessFactory<S> compositeDispositionProcess(
+        final Factory<? super S, ? extends DispositionProcess>... dispositionStrategies
+    ) {
+        return new CompositeDispositionProcessFactory<>(dispositionStrategies);
+    }
+
+    public static <S extends Scope> SelectedSpeciesRetentionFactory<S> selectedSpeciesRetention(
+        final Factory<? super S, ? extends Collection<? extends Species>> selectedSpecies
+    ) {
+        return new SelectedSpeciesRetentionFactory<>(selectedSpecies);
+    }
+
+    public static <S extends Scope> GeneralDiscardMortalityFactory<S> generalDiscardMortality(
+        final Factory<? super S, ? extends DoubleSupplier> mortalityRateSupplier
+    ) {
+        return new GeneralDiscardMortalityFactory<>(mortalityRateSupplier);
+    }
+
+    public static ProportionallyLimitingBiomassToHoldFactory proportionallyLimitingBiomassToHold() {
+        return new ProportionallyLimitingBiomassToHoldFactory();
     }
 }

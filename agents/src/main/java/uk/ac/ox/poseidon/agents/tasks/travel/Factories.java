@@ -22,9 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import com.badlogic.gdx.ai.btree.Task;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 public class Factories {
 
@@ -34,6 +39,30 @@ public class Factories {
         final Factory<? super VesselScope, ? extends FuelStationGrid> fuelStationGrid
     ) {
         return new RefuelFactory(fuelStationGrid);
+    }
+
+    public static RoundTripFactory roundTrip(
+        final Factory<? super VesselScope, ? extends Task<Vessel>> startTripTask,
+        final Factory<? super VesselScope, ? extends Task<Vessel>> travelTask,
+        final Factory<? super VesselScope, ? extends Task<Vessel>> fishingTask,
+        final Factory<? super VesselScope, ? extends Task<Vessel>> landingTask
+    ) {
+        return new RoundTripFactory(startTripTask, travelTask, fishingTask, landingTask);
+    }
+
+    public static TravelAlongPathFactory travelAlongPath(
+        final Factory<? super VesselScope, ? extends PathFinder<Int2D>> pathFinder,
+        final Factory<? super VesselScope, ? extends DistanceCalculator> distance
+    ) {
+        return new TravelAlongPathFactory(pathFinder, distance);
+    }
+
+    public static SetDestinationToOriginFactory setDestinationToOrigin() {
+        return new SetDestinationToOriginFactory();
+    }
+
+    public static EndTripFactory endTrip() {
+        return new EndTripFactory();
     }
 
 }

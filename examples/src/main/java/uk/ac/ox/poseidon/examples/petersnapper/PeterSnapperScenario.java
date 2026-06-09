@@ -23,35 +23,34 @@
 package uk.ac.ox.poseidon.examples.petersnapper;
 
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.catches.disposition.ProportionallyLimitingBiomassToHoldFactory;
+import static uk.ac.ox.poseidon.agents.catches.disposition.Factories.proportionallyLimitingBiomassToHold;
 import uk.ac.ox.poseidon.agents.choices.*;
 import static uk.ac.ox.poseidon.agents.choices.Factories.*;
-import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
+
 import static uk.ac.ox.poseidon.agents.market.Factories.marketGrid;
 import static uk.ac.ox.poseidon.agents.market.Factories.oneBiomassMarketPerPort;
 import static uk.ac.ox.poseidon.agents.market.Factories.price;
 import static uk.ac.ox.poseidon.agents.market.Factories.priceEntry;
 import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
-import uk.ac.ox.poseidon.agents.tasks.landings.LandCatchesFactory;
-import uk.ac.ox.poseidon.agents.tasks.travel.EndTripFactory;
-import uk.ac.ox.poseidon.agents.tasks.travel.SetDestinationToOriginFactory;
-import uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory;
+import static uk.ac.ox.poseidon.agents.tasks.landings.Factories.landCatches;
+import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.endTrip;
+import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.setDestinationToOrigin;
+import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.travelAlongPath;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.prefixedId;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselCreator;
 import uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory;
-import uk.ac.ox.poseidon.agents.vessels.engines.SimpleEngineFactory;
+import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.simpleEngine;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
+import static uk.ac.ox.poseidon.core.schedule.Factories.steppableSequence;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-import uk.ac.ox.poseidon.core.utils.PairFactory;
-import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
+
 import static uk.ac.ox.poseidon.geography.bathymetry.Factories.bathymetricGridFromElevationTable;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
-import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
+import static uk.ac.ox.poseidon.geography.grids.Factories.modelGridFromLonLatTable;
+import static uk.ac.ox.poseidon.geography.grids.Factories.normalisedDoubleGridFromAllocator;
 import uk.ac.ox.poseidon.geography.ports.PortFactory;
 import static uk.ac.ox.poseidon.geography.ports.Factories.port;
 import static uk.ac.ox.poseidon.geography.ports.Factories.portGrid;
@@ -68,6 +67,7 @@ import static uk.ac.ox.poseidon.agents.catches.Factories.uncategorisedCatchCateg
 import static uk.ac.ox.poseidon.agents.catches.Factories.uniformCatchCategoriser;
 import static uk.ac.ox.poseidon.agents.choices.evaluation.Factories.profitPerHour;
 import static uk.ac.ox.poseidon.agents.choices.evaluation.Factories.tripEvaluator;
+import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
 import static uk.ac.ox.poseidon.agents.components.Factories.component;
 import static uk.ac.ox.poseidon.agents.fields.Factories.vesselField;
 import static uk.ac.ox.poseidon.agents.fisheables.Factories.currentCellFisheable;
@@ -118,6 +118,7 @@ import static uk.ac.ox.poseidon.geography.utils.Factories.elevationTable;
 import static uk.ac.ox.poseidon.io.paths.Factories.path;
 import static uk.ac.ox.poseidon.io.sources.Factories.zipEntryDataSource;
 import static uk.ac.ox.poseidon.io.tables.Factories.*;
+import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPerYearAccumulator;
 
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
@@ -158,7 +159,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                                         columnDefinition("year", "INTEGER"),
                                         columnDefinition("landings", "DOUBLE")
                                     ),
-                                    new TotalLandingsPerYearAccumulatorFactory()
+                                    totalLandingsPerYearAccumulator()
                                 ),
                                 path(outputPath.resolve("landings.csv")),
                                 false,
@@ -219,7 +220,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             );
 
         final var modelGrid =
-            new ModelGridFromLonLatTableFactory<>(elevationTable, 70, 0.000001);
+            modelGridFromLonLatTable(elevationTable, 70, 0.000001);
 
         final var bathymetricGrid =
             bathymetricGridFromElevationTable(
@@ -231,7 +232,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
         final var carryingCapacityGrid =
             carryingCapacityGrid(
-                new NormalisedDoubleGridFromAllocatorFactory<>(
+                normalisedDoubleGridFromAllocator(
                     modelGrid,
                     filteredAllocator(
                         supplierAllocator(constantDouble(1.0)),
@@ -289,8 +290,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final var portGrid =
             portGrid(
                 listOf(
-                    new PairFactory<>(benoa, coordinate(115.238843, -8.799605)),
-                    new PairFactory<>(kupang, coordinate(123.586249, -10.148044))
+                    pair(benoa, coordinate(115.238843, -8.799605)),
+                    pair(kupang, coordinate(123.586249, -10.148044))
                 ),
                 bathymetricGrid,
                 distance
@@ -377,12 +378,12 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             behaviour(
                 sequenceTask(
                     startTrip(destinationSupplier),
-                    new TravelAlongPathFactory(pathFinder, distance),
+                    travelAlongPath(pathFinder, distance),
                     untilFail(
                         sequenceTask(
                             fishing(
                                 currentCellFisheable(biomassGrid),
-                                new ProportionallyLimitingBiomassToHoldFactory()
+                                proportionallyLimitingBiomassToHold()
                             ),
                             checkThat(
                                 allOf(
@@ -392,24 +393,24 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             )
                         )
                     ),
-                    new SetDestinationToOriginFactory(),
-                    new TravelAlongPathFactory(pathFinder, distance),
-                    new LandCatchesFactory(constant(ONE_HOUR)),
+                    setDestinationToOrigin(),
+                    travelAlongPath(pathFinder, distance),
+                    landCatches(constant(ONE_HOUR)),
                     refuel(fuelStationGrid),
-                    new EndTripFactory(),
+                    endTrip(),
                     waitFor(constant(hours(12)))
                 )
             );
 
         final var agentCreators =
             scheduledOnceAtStart(
-                new SteppableSequenceFactory(
+                steppableSequence(
                     mappedFactory(
                         vesselCreator(
                             vesselField,
                             portGrid,
                             marketGrid,
-                            new PrefixedIdSupplierFactory("V"),
+                            prefixedIdSupplier("V"),
                             prefixedId("Vessel "),
                             account(),
                             null, // mapped over
@@ -419,7 +420,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                                 uniformCatchCategoriser(catchCategory)
                             ),
                             gear,
-                            new SimpleEngineFactory<>(
+                            simpleEngine(
                                 fullTank(volumeOf(100000, LITRE)),
                                 speedOf(16, KILOMETRE_PER_HOUR),
                                 volumeOf(3, LITRE)

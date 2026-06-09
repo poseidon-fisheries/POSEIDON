@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.tasks.general;
 
+import com.badlogic.gdx.ai.btree.Task;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
@@ -55,6 +56,13 @@ public class Factories {
         final Factory<? super VesselScope, ? extends Supplier<Duration>> durationSupplier
     ) {
         return new WaitForFactory(durationSupplier);
+    }
+
+    public static SucceedOrWaitFactory succeedOrWait(
+        final Factory<? super VesselScope, ? extends Task<Vessel>> mainTask,
+        final Factory<? super VesselScope, ? extends Task<Vessel>> waitTask
+    ) {
+        return new SucceedOrWaitFactory(mainTask, waitTask);
     }
 
 }

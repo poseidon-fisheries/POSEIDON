@@ -75,6 +75,17 @@ public class Factories {
         return new ObjectFactory<>(Collections.unmodifiableSet(set));
     }
 
+    public static <S extends Scope, A, B> PairFactory<S, A, B> pair(
+        final Factory<? super S, ? extends A> first,
+        final Factory<? super S, ? extends B> second
+    ) {
+        return new PairFactory<>(first, second);
+    }
+
+    public static PrefixedIdSupplierFactory prefixedIdSupplier(final String prefix) {
+        return new PrefixedIdSupplierFactory(prefix);
+    }
+
     public static <C extends Steppable> FinalProcessFactory<C> finalProcess(
         final Factory<? super SimulationScope, C> process
     ) {

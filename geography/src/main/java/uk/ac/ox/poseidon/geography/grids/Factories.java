@@ -22,10 +22,14 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.geography.allocators.Allocator;
+import uk.ac.ox.poseidon.geography.utils.LonLatTable;
 
 import java.nio.file.Path;
+import java.util.Collection;
 
 public class Factories {
 
@@ -37,6 +41,39 @@ public class Factories {
         final double includedValue
     ) {
         return new CellSetFromGridFileFactory<>(path, includedValue);
+    }
+
+    public static ModelGridFactory modelGrid(
+        final double resolutionInDegrees,
+        final double westLongitude,
+        final double eastLongitude,
+        final double southLatitude,
+        final double northLatitude
+    ) {
+        return new ModelGridFactory(resolutionInDegrees, westLongitude, eastLongitude, southLatitude, northLatitude);
+    }
+
+    public static <S extends Scope> ModelGridWithActiveCellsFactory<S> modelGridWithActiveCells(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends Collection<Int2D>> activeCells
+    ) {
+        return new ModelGridWithActiveCellsFactory<>(modelGrid, activeCells);
+    }
+
+    public static <S extends Scope> ModelGridFromLonLatTableFactory<S> modelGridFromLonLatTable(
+        final Factory<? super S, ? extends LonLatTable> lonLatTable,
+        final int gridWidthInCells,
+        final double mapPaddingInDegrees
+    ) {
+        return new ModelGridFromLonLatTableFactory<>(lonLatTable, gridWidthInCells, mapPaddingInDegrees);
+    }
+
+    public static <S extends Scope> NormalisedDoubleGridFromAllocatorFactory<S> normalisedDoubleGridFromAllocator(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends Allocator> allocator,
+        final Factory<? super S, ? extends Number> totalValue
+    ) {
+        return new NormalisedDoubleGridFromAllocatorFactory<>(modelGrid, allocator, totalValue);
     }
 
 }

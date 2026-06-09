@@ -37,4 +37,8 @@ public class Factories {
         return new ComponentFactory<>(componentFactory, componentRegister);
     }
 
+    public static <C> ComponentRegisterFactory<C> componentRegister() {
+        return new ComponentRegisterFactory<>();
+    }
+
 }

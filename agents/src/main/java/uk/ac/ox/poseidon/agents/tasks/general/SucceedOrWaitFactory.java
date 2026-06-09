@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SucceedOrWaitTaskFactory extends VesselTaskFactory<Selector<Vessel>> {
+public class SucceedOrWaitFactory extends VesselTaskFactory<Selector<Vessel>> {
 
     private Factory<? super VesselScope, ? extends Task<Vessel>> mainTask;
     private Factory<? super VesselScope, ? extends Task<Vessel>> waitTask;

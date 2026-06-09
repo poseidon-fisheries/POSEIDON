@@ -26,6 +26,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 import javax.measure.Quantity;
+import javax.measure.quantity.Speed;
 import javax.measure.quantity.Volume;
 
 import static tech.units.indriya.unit.Units.LITRE;
@@ -50,6 +51,14 @@ public class Factories {
         final Factory<? super VesselScope, ? extends Quantity<Volume>> capacity
     ) {
         return tank(capacity, volumeOf(0, LITRE));
+    }
+
+    public static SimpleEngineFactory<VesselScope> simpleEngine(
+        final Factory<? super VesselScope, ? extends FuelTank> fuelTank,
+        final Factory<? super VesselScope, ? extends Quantity<Speed>> cruisingSpeed,
+        final Factory<? super VesselScope, ? extends Quantity<Volume>> fuelConsumedPerKm
+    ) {
+        return new SimpleEngineFactory<>(fuelTank, cruisingSpeed, fuelConsumedPerKm);
     }
 
 }
