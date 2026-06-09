@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
+import static uk.ac.ox.poseidon.geography.bathymetry.Factories.bathymetricGridFromElevationValues;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
@@ -43,7 +45,7 @@ class BathymetricGridFromElevationValuesFactoryTest {
 
     @BeforeEach
     void setUp() {
-        factory = new BathymetricGridFromElevationValuesFactory<>();
+        factory = bathymetricGridFromElevationValues(null, null);
         factory.setModelGrid(
             new ModelGridFactory(1, -1, 1, -1, 1)
         );

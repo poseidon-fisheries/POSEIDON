@@ -46,7 +46,7 @@ import uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.utils.PairFactory;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGridFromElevationTableFactory;
+import static uk.ac.ox.poseidon.geography.bathymetry.Factories.bathymetricGridFromElevationTable;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFromLonLatTableFactory;
 import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactory;
@@ -220,7 +220,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             new ModelGridFromLonLatTableFactory<>(elevationTable, 70, 0.000001);
 
         final var bathymetricGrid =
-            new BathymetricGridFromElevationTableFactory<>(
+            bathymetricGridFromElevationTable(
                 elevationTable,
                 modelGrid,
                 meanAggregator(),
