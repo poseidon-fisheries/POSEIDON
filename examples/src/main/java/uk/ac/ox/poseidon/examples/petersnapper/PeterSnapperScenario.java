@@ -26,10 +26,10 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.catches.disposition.ProportionallyLimitingBiomassToHoldFactory;
 import uk.ac.ox.poseidon.agents.choices.*;
 import uk.ac.ox.poseidon.agents.components.ComponentRegisterFactory;
-import uk.ac.ox.poseidon.agents.market.MarketGridFactory;
-import uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory;
-import uk.ac.ox.poseidon.agents.market.PriceEntryFactory;
-import uk.ac.ox.poseidon.agents.market.PriceFactory;
+import static uk.ac.ox.poseidon.agents.market.Factories.marketGrid;
+import static uk.ac.ox.poseidon.agents.market.Factories.oneBiomassMarketPerPort;
+import static uk.ac.ox.poseidon.agents.market.Factories.price;
+import static uk.ac.ox.poseidon.agents.market.Factories.priceEntry;
 import uk.ac.ox.poseidon.agents.tasks.BehaviourFactory;
 import uk.ac.ox.poseidon.agents.tasks.landings.LandCatchesFactory;
 import uk.ac.ox.poseidon.agents.tasks.travel.EndTripFactory;
@@ -295,15 +295,15 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             );
 
         final var catchCategory = uncategorisedCatchCategory();
-        final var marketGrid = new MarketGridFactory<>(
+        final var marketGrid = marketGrid(
             portGrid,
-            new OneBiomassMarketPerPortFactory(
+            oneBiomassMarketPerPort(
                 portGrid,
                 listOf(
-                    new PriceEntryFactory<>(
+                    priceEntry(
                         catchCategory,
                         species,
-                        new PriceFactory(40000.0, CURRENCY_CODE, "kg")
+                        price(40000.0, CURRENCY_CODE, "kg")
                     )
                 )
             )
