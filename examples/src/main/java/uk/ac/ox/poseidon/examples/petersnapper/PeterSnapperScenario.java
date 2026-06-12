@@ -363,7 +363,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     optionValues,
                     alwaysTrue(),
                     bestOptionsFromFriends(
-                        5,
+                        2,
                         optionValuesRegister
                     )
                 )
