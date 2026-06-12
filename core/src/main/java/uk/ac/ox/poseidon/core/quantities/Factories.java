@@ -25,6 +25,8 @@ package uk.ac.ox.poseidon.core.quantities;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+import si.uom.quantity.VolumetricFlowRate;
+
 import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
@@ -96,6 +98,24 @@ public class Factories {
     public static SpeedFactory speedOf(final String quantity) {
         final var entry = parse(Speed.class, quantity);
         return new SpeedFactory(entry.getValue(), entry.getKey());
+    }
+
+    public static VolumetricFlowRateFactory volumetricFlowRateOf(
+        final double value,
+        final Unit<VolumetricFlowRate> unit
+    ) {
+        return new VolumetricFlowRateFactory(value, unit);
+    }
+
+    public static VolumetricFlowRateFactory volumetricFlowRateOf(
+        final Quantity<VolumetricFlowRate> quantity
+    ) {
+        return volumetricFlowRateOf(quantity.getValue().doubleValue(), quantity.getUnit());
+    }
+
+    public static VolumetricFlowRateFactory volumetricFlowRateOf(final String quantity) {
+        final var entry = parse(VolumetricFlowRate.class, quantity);
+        return new VolumetricFlowRateFactory(entry.getValue(), entry.getKey());
     }
 
 }
