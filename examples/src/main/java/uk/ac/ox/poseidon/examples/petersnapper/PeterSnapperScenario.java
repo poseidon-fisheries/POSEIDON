@@ -86,7 +86,9 @@ import static uk.ac.ox.poseidon.core.predicates.numeric.Factories.greaterThan;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
+import static uk.ac.ox.poseidon.core.providers.Factories.firstIntFrom;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomInt;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.perVessel;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 import static uk.ac.ox.poseidon.core.quantities.Factories.*;
 import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_PER_HOUR;
@@ -356,7 +358,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     optionValues,
                     pathFinder,
                     validCellPredicate,
-                    randomInt(1, 10),
+                    firstIntFrom(perVessel(randomInt(1, 10))),
                     randomGridExplorer(accessibleWaterCells(pathFinder), validCellPredicate)
                 ),
                 imitatingPicker(
