@@ -68,6 +68,12 @@ public class Fishing extends ExtendedTripTask {
         getTrip().getEventManager().broadcast(
             new FishingEvent(action, new FishingOutcome(grossCatch, disposition))
         );
+        final double fuelPerHour =
+            getAgent().getGear().getLitresOfFuelConsumedPerHourOfFishing();
+        if (fuelPerHour > 0) {
+            final double hours = getDuration().toSeconds() / 3600.0;
+            getAgent().getEngine().consumeFuel(fuelPerHour * hours);
+        }
         return SUCCEEDED;
     }
 

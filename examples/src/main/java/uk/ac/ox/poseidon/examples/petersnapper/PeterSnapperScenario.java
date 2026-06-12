@@ -89,6 +89,7 @@ import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomInt;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 import static uk.ac.ox.poseidon.core.quantities.Factories.*;
+import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_PER_HOUR;
 import static uk.ac.ox.poseidon.core.schedule.Factories.*;
 import static uk.ac.ox.poseidon.core.time.Factories.*;
 import static uk.ac.ox.poseidon.core.utils.Factories.*;
@@ -330,7 +331,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             fixedBiomassProportionGear(
                 "FGL", // droplines count as "fixed gears and lines"
                 0.000641964,
-                constant(ONE_HOUR)
+                constant(ONE_HOUR),
+                volumetricFlowRateOf(70.0, LITRE_PER_HOUR)
             );
 
         final VesselComponentRegisterFactory<MutableOptionValues<Int2D>>

@@ -26,12 +26,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import si.uom.quantity.VolumetricFlowRate;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+import javax.measure.Quantity;
 import java.time.Duration;
 import java.util.function.Supplier;
+
+import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_PER_HOUR;
 
 @Data
 @NoArgsConstructor
@@ -43,10 +47,19 @@ public class FixedBiomassProportionGearFactory<S extends SimulationScope>
     private String code;
     private double proportion;
     private Factory<? super S, ? extends Supplier<Duration>> durationSupplier;
+    private Factory<? super S, ? extends Quantity<VolumetricFlowRate>>
+        fuelConsumptionRate;
 
     @Override
     protected FixedBiomassProportionGear newInstance(final S scope) {
-        return new FixedBiomassProportionGear(code, proportion, durationSupplier.get(scope));
+        final double fuelPerHour = fuelConsumptionRate
+            .get(scope)
+            .to(LITRE_PER_HOUR)
+            .getValue()
+            .doubleValue();
+        return new FixedBiomassProportionGear(
+            code, proportion, durationSupplier.get(scope), fuelPerHour
+        );
     }
 
 }

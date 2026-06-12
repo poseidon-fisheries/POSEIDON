@@ -40,16 +40,19 @@ public class FixedBiomassProportionGear implements Gear {
     private final String code;
     private final double proportion;
     private final Supplier<Duration> durationSupplier;
+    private final double litresOfFuelConsumedPerHourOfFishing;
     @Setter private boolean active = true;
 
     FixedBiomassProportionGear(
         final String code,
         final double proportion,
-        final Supplier<Duration> durationSupplier
+        final Supplier<Duration> durationSupplier,
+        final double litresOfFuelConsumedPerHourOfFishing
     ) {
         this.code = code;
         this.proportion = checkUnitRange(proportion, "proportion");
         this.durationSupplier = durationSupplier;
+        this.litresOfFuelConsumedPerHourOfFishing = litresOfFuelConsumedPerHourOfFishing;
     }
 
     @Override

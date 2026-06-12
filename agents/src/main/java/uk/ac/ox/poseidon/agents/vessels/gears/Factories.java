@@ -23,11 +23,13 @@
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import org.apache.commons.collections4.keyvalue.MultiKey;
+import si.uom.quantity.VolumetricFlowRate;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+import javax.measure.Quantity;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
@@ -41,9 +43,13 @@ public class Factories {
     fixedBiomassProportionGear(
         final String code,
         final double proportion,
-        final Factory<? super S, ? extends Supplier<Duration>> durationSupplier
+        final Factory<? super S, ? extends Supplier<Duration>> durationSupplier,
+        final Factory<? super S, ? extends Quantity<VolumetricFlowRate>>
+            fuelConsumptionRate
     ) {
-        return new FixedBiomassProportionGearFactory<>(code, proportion, durationSupplier);
+        return new FixedBiomassProportionGearFactory<>(
+            code, proportion, durationSupplier, fuelConsumptionRate
+        );
     }
 
     public static InactiveGearFactory inactiveGear(final String code) {

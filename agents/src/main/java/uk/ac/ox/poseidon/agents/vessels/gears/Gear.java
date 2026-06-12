@@ -32,6 +32,10 @@ public interface Gear {
 
     String getCode();
 
+    default double getLitresOfFuelConsumedPerHourOfFishing() {
+        return 0;
+    }
+
     Supplier<Duration> getDurationSupplier();
 
     Bucket fish(Fisheable fisheable);

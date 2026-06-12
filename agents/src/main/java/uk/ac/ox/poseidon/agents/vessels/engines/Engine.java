@@ -34,4 +34,8 @@ public interface Engine {
         getFuelTank().consumeFuel(getLitresOfFuelConsumedPerKm() * distanceInKm);
     }
 
+    default void consumeFuel(final double litres) {
+        getFuelTank().consumeFuel(litres);
+    }
+
 }
