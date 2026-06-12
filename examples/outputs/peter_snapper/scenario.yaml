@@ -145,6 +145,10 @@ components:
         minutes: 0,
         seconds: 0
       }
+    fuelConsumptionRate: !!uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory {
+      unitString: l/h,
+      value: 70.0
+    }
     proportion: 6.41964E-4
   vesselField: &id020 !!uk.ac.ox.poseidon.agents.fields.VesselFieldFactory
     modelGrid: *id002
@@ -172,7 +176,7 @@ components:
                       componentRegister: &id009 !!uk.ac.ox.poseidon.agents.components.VesselComponentRegisterFactory {
                         }
                     optionValuesSupplier: !!uk.ac.ox.poseidon.agents.choices.BestOptionsFromFriendsSupplierFactory
-                      maxNumberOfFriends: 5
+                      maxNumberOfFriends: 2
                       optionValuesRegister: *id009
                   explorer: !!uk.ac.ox.poseidon.agents.choices.NeighbourhoodGridExplorerFactory
                     cellPredicate: &id010 !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
@@ -192,10 +196,12 @@ components:
                             distance: *id011
                             portGrid: *id007
                           portGrid: *id007
-                    neighbourhoodSizeSupplier: !!uk.ac.ox.poseidon.core.providers.random.RandomIntProviderFactory {
-                      maximum: 10,
-                      minimum: 1
-                    }
+                    neighbourhoodSizeSupplier: !!uk.ac.ox.poseidon.core.providers.FirstIntFromFactory
+                      delegate: !!uk.ac.ox.poseidon.agents.vessels.PerVesselFactory
+                        delegate: !!uk.ac.ox.poseidon.core.providers.random.RandomIntProviderFactory {
+                          maximum: 10,
+                          minimum: 1
+                        }
                     optionValues: *id012
                     pathFinder: *id013
                 guard: null
