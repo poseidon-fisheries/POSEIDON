@@ -37,7 +37,7 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 public class RandomPicker<O> implements Provider<O> {
 
     @NonNull private final Supplier<? extends List<? extends O>> options;
-    @NonNull private final Predicate<O> optionPredicate;
+    @NonNull private final Predicate<? super O> optionPredicate;
     @NonNull private final MersenneTwisterFast rng;
 
     @Override

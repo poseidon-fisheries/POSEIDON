@@ -116,7 +116,7 @@ public class Factories {
 
     public static RandomGridExplorerFactory randomGridExplorer(
         final Factory<? super VesselScope, ? extends Supplier<? extends List<? extends Int2D>>> cellsSupplier,
-        final Factory<? super VesselScope, ? extends Predicate<Int2D>> cellPredicate
+        final Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate
     ) {
         return new RandomGridExplorerFactory(cellsSupplier, cellPredicate);
     }

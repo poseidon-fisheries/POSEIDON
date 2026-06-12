@@ -44,7 +44,7 @@ public class RandomGridExplorerFactory extends VesselScopeFactory<Provider<Int2D
 
     private Factory<? super VesselScope, ? extends Supplier<? extends List<? extends Int2D>>>
         cellsSupplier;
-    private Factory<? super VesselScope, ? extends Predicate<Int2D>> cellPredicate;
+    private Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate;
 
     @Override
     protected Provider<Int2D> newInstance(final VesselScope scope) {
