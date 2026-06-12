@@ -34,6 +34,7 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
+import static uk.ac.ox.poseidon.core.MasonUtils.upToNOf;
 
 class MasonUtilsTest {
 
@@ -126,6 +127,47 @@ class MasonUtilsTest {
         // Verify that all elements are present and there are no duplicates
         assertEquals(size, result.size());
         assertEquals(new HashSet<>(candidates), new HashSet<>(result));
+    }
+
+    @Test
+    void upToNOfReturnsExactlyNElementsWhenNIsSmallerThanSize() {
+        final List<Integer> candidates = List.of(10, 20, 30, 40, 50);
+        final MersenneTwisterFast rng = new MersenneTwisterFast(42);
+        final List<Integer> result = upToNOf(2, candidates, rng);
+        assertEquals(2, result.size());
+        assertTrue(candidates.containsAll(result));
+        assertEquals(result.size(), new HashSet<>(result).size());
+    }
+
+    @Test
+    void upToNOfReturnsAllElementsWhenNEqualsSize() {
+        final List<Integer> candidates = List.of(10, 20, 30, 40, 50);
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        final List<Integer> result = upToNOf(5, candidates, rng);
+        assertEquals(5, result.size());
+        assertTrue(candidates.containsAll(result));
+    }
+
+    @Test
+    void upToNOfReturnsAllElementsWhenNExceedsSize() {
+        final List<Integer> candidates = List.of(10, 20, 30);
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        final List<Integer> result = upToNOf(10, candidates, rng);
+        assertEquals(3, result.size());
+        assertTrue(candidates.containsAll(result));
+    }
+
+    @Test
+    void upToNOfReturnsEmptyWhenNIsZero() {
+        final List<Integer> candidates = List.of(10, 20, 30);
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        assertTrue(upToNOf(0, candidates, rng).isEmpty());
+    }
+
+    @Test
+    void upToNOfReturnsEmptyForEmptyCandidates() {
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        assertTrue(upToNOf(5, List.of(), rng).isEmpty());
     }
 
 }

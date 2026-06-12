@@ -143,7 +143,7 @@ public class MasonUtils {
         checkNonNegative(n, "n");
         if (n == 0 || candidates.isEmpty()) return ImmutableList.of();
         final int size = candidates.size();
-        if (n < candidates.size()) return ImmutableList.copyOf(candidates);
+        if (n >= size) return ImmutableList.copyOf(candidates);
         final ImmutableList.Builder<T> builder = ImmutableList.builder();
         int i = 0;
         int j = 0;
