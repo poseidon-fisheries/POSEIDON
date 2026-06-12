@@ -25,10 +25,39 @@ package uk.ac.ox.poseidon.core.providers;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
+
 public final class Factories {
 
     private Factories() {
         throw new IllegalStateException("Utility class");
+    }
+
+    public static <S extends Scope, T> FirstValueFromFactory<S, T> firstValueFrom(
+        final Factory<? super S, ? extends Supplier<? extends T>> delegate
+    ) {
+        return new FirstValueFromFactory<>(delegate);
+    }
+
+    public static <S extends Scope> FirstIntFromFactory<S> firstIntFrom(
+        final Factory<? super S, ? extends IntSupplier> delegate
+    ) {
+        return new FirstIntFromFactory<>(delegate);
+    }
+
+    public static <S extends Scope> FirstDoubleFromFactory<S> firstDoubleFrom(
+        final Factory<? super S, ? extends DoubleSupplier> delegate
+    ) {
+        return new FirstDoubleFromFactory<>(delegate);
+    }
+
+    public static <S extends Scope> FirstBooleanFromFactory<S> firstBooleanFrom(
+        final Factory<? super S, ? extends BooleanSupplier> delegate
+    ) {
+        return new FirstBooleanFromFactory<>(delegate);
     }
 
     public static <S extends Scope> ShiftedIntProviderFactory<S> shiftedInt(
