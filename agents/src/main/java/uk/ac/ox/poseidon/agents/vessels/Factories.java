@@ -42,6 +42,12 @@ public class Factories {
 
     private Factories() {}
 
+    public static <T> PerVesselFactory<T> perVessel(
+        final Factory<? super VesselScope, ? extends T> delegate
+    ) {
+        return new PerVesselFactory<>(delegate);
+    }
+
     public static FleetFactory fleet(
         final Factory<? super SimulationScope, ? extends VesselField> vesselField,
         final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
