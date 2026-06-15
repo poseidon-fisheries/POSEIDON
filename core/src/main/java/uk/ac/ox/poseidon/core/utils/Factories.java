@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 public class Factories {
 
@@ -129,7 +130,14 @@ public class Factories {
         final F factory
     ) {
         try {
-            return (F) BeanUtils.cloneBean(factory);
+            final Object clone = BeanUtils.cloneBean(factory);
+            checkState(
+                factory.getClass().isInstance(clone),
+                "Clone of %s produced incompatible type: %s",
+                factory.getClass(),
+                clone.getClass()
+            );
+            return (F) clone;
         } catch (
             final IllegalAccessException | InstantiationException |
                   InvocationTargetException | NoSuchMethodException e
