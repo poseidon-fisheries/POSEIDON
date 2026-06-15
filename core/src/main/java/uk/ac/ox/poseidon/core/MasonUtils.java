@@ -99,6 +99,8 @@ public class MasonUtils {
         @SuppressWarnings("rawtypes") final Collection candidates,
         final MersenneTwisterFast random
     ) {
+        checkNotNull(candidates, "collection of candidates must not be null");
+        checkArgument(!candidates.isEmpty(), "collection of candidates must not be empty");
         final int n = candidates.size();
         return n == 1 ? 0 : random.nextInt(n);
     }
