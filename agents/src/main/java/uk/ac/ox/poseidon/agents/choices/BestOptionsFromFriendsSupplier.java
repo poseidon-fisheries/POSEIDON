@@ -63,20 +63,20 @@ class BestOptionsFromFriendsSupplier<O> implements Supplier<OptionValues<O>> {
     }
 
     @Override
-
     public OptionValues<O> get() {
-        // It's faster to build a hashmap first and then let
-        // ImmutableOptionValues copy it into an ImmutableMap
         final Map<O, Double> aggregatedValues = new HashMap<>();
         for (final Vessel friend : getFriends()) {
-            if (friend.isActive()) {
-                optionValuesRegister
-                    .getComponent(friend)
-                    .ifPresent(values -> {
-                        for (final Entry<O, Double> entry : values.getBestEntries()) {
-                            aggregatedValues.merge(entry.getKey(), entry.getValue(), Math::max);
-                        }
-                    });
+            if (!friend.isActive()) continue;
+            final OptionValues<O> values = optionValuesRegister
+                .getComponent(friend)
+                .orElse(null);
+            if (values == null) continue;
+            for (final Entry<O, Double> entry : values.getBestEntries()) {
+                final Double existing = aggregatedValues.get(entry.getKey());
+                final double newValue = entry.getValue();
+                if (existing == null || newValue > existing) {
+                    aggregatedValues.put(entry.getKey(), newValue);
+                }
             }
         }
         return new ImmutableOptionValues<>(aggregatedValues);
