@@ -43,9 +43,9 @@ public class EpsilonGreedyChooser<O> implements Supplier<Optional<O>> {
         final Supplier<O> exploiter,
         final MersenneTwisterFast rng
     ) {
-        this.explorer = explorer;
-        this.exploiter = exploiter;
         this.epsilon = checkUnitRange(epsilon, "epsilon");
+        this.explorer = checkNotNull(explorer);
+        this.exploiter = checkNotNull(exploiter);
         this.rng = checkNotNull(rng);
     }
 
