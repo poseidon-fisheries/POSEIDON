@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.agents.vessels.extractors.tags;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.utils.Utils;
-
 import java.util.function.Function;
+
+import static uk.ac.ox.poseidon.core.utils.Utils.toTrimmedString;
 
 @RequiredArgsConstructor
 public class StringTagExtractor implements Function<Vessel, String> {
@@ -37,7 +37,7 @@ public class StringTagExtractor implements Function<Vessel, String> {
     @Override
     public String apply(final Vessel vessel) {
         return vessel.getTag(tagName)
-            .map(Utils::nullIfNaString)
+            .map(v -> toTrimmedString(v, true))
             .orElse(null);
     }
 }

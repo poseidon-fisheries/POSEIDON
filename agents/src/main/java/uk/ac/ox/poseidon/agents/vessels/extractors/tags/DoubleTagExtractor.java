@@ -28,7 +28,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.util.function.Function;
 
-import static uk.ac.ox.poseidon.core.utils.Utils.nullIfNaString;
+import static uk.ac.ox.poseidon.core.utils.Utils.toTrimmedString;
 
 @RequiredArgsConstructor
 public class DoubleTagExtractor implements Function<Vessel, Double> {
@@ -40,7 +40,7 @@ public class DoubleTagExtractor implements Function<Vessel, Double> {
             final double doubleValue = number.doubleValue();
             return Double.isFinite(doubleValue) ? doubleValue : null;
         }
-        final String stringValue = nullIfNaString(value);
+        final String stringValue = toTrimmedString(value, true);
         if (stringValue == null) {
             return null;
         }

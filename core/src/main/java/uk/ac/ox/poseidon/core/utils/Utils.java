@@ -26,15 +26,15 @@ public class Utils {
 
     private Utils() {}
 
-    public static String nullIfNaString(final Object value) {
+    public static String toTrimmedString(final Object value, final boolean nullIfNa) {
         if (value == null) {
             return null;
         }
-        final String stringValue = value.toString().trim();
-        if (stringValue.isEmpty() || stringValue.equalsIgnoreCase("NA")) {
+        final String trimmed = value.toString().trim();
+        if (nullIfNa && (trimmed.isEmpty() || trimmed.equalsIgnoreCase("NA"))) {
             return null;
         }
-        return stringValue;
+        return trimmed;
     }
 
 }
