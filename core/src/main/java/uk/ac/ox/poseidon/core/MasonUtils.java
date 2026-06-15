@@ -77,9 +77,15 @@ public class MasonUtils {
 
     public static <T> Stream<T> bagToStream(
         final Bag bag,
-        final Class<T> ignored
+        final Class<T> clazz
     ) {
-        return bagToStream(bag);
+        return Optional
+            .ofNullable(bag)
+            .stream()
+            .flatMap(b -> IntStream
+                .range(0, b.size())
+                .mapToObj(i -> clazz.cast(b.get(i)))
+            );
     }
 
     public static Object oneOf(
