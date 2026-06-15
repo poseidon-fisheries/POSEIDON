@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.MasonUtils.upToNOf;
 
@@ -48,8 +49,8 @@ class BestOptionsFromFriendsSupplier<O> implements Supplier<OptionValues<O>> {
     private final @Getter(lazy = true) ImmutableList<Vessel> friends = chooseFriends();
 
     private ImmutableList<Vessel> chooseFriends() {
-        assert optionValuesRegister != null;
-        assert this.vessel != null;
+        checkNotNull(optionValuesRegister);
+        checkNotNull(this.vessel);
         return upToNOf(
             maxNumberOfFriends,
             optionValuesRegister
