@@ -186,25 +186,26 @@ public class MasonUtils {
         final List<T> candidates,
         final MersenneTwisterFast rng
     ) {
-        final BitSet visited = new BitSet(candidates.size()); // Track visited indices
+        if (candidates.isEmpty()) return Stream.empty();
+        final int[] indices = new int[candidates.size()];
+        Arrays.setAll(indices, i -> i);
+
         final Spliterator<T> spliterator = new Spliterators.AbstractSpliterator<>(
             candidates.size(),
-            Spliterator.ORDERED
+            Spliterator.SIZED | Spliterator.SUBSIZED
         ) {
             private int remaining = candidates.size();
 
             @Override
             public boolean tryAdvance(final Consumer<? super T> action) {
-                if (remaining == 0) {
-                    return false; // All elements have been visited
-                }
-                int index;
-                do {
-                    index = rng.nextInt(candidates.size());
-                } while (visited.get(index)); // Ensure no duplicates
-                visited.set(index); // Mark index as visited
+                if (remaining == 0) return false;
+                final int i = candidates.size() - remaining;
+                final int j = i + rng.nextInt(remaining);
+                final int tmp = indices[i];
+                indices[i] = indices[j];
+                indices[j] = tmp;
+                action.accept(candidates.get(indices[i]));
                 remaining--;
-                action.accept(candidates.get(index)); // Provide the element
                 return true;
             }
         };
