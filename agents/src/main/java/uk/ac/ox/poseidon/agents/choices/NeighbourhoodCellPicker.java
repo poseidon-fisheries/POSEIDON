@@ -56,12 +56,12 @@ public class NeighbourhoodCellPicker implements Provider<Int2D> {
             pathFinder.getModelGrid().getGridHeight()
         );
         int neighbourhoodSize = neighbourhoodSizeSupplier.getAsInt();
+        Int2D startingCell = optionValues.getBestOption(rng).orElseGet(fallbackCellPicker::get);
+        if (startingCell == null) {
+            startingCell = vessel.getCell();
+        }
         List<Int2D> candidates = List.of();
         while (candidates.isEmpty() && neighbourhoodSize <= maxNeighbourhoodSize) {
-            Int2D startingCell = optionValues.getBestOption(rng).orElse(fallbackCellPicker.get());
-            if (startingCell == null) {
-                startingCell = vessel.getCell();
-            }
             candidates = pathFinder.getAccessibleWaterNeighbours(startingCell, neighbourhoodSize);
             neighbourhoodSize++;
         }
