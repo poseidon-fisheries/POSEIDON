@@ -25,13 +25,12 @@ package uk.ac.ox.poseidon.agents.choices;
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.Map.Entry.comparingByValue;
-import static one.util.streamex.MoreCollectors.maxAll;
 import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 
 public abstract class MapBasedOptionValues<O> implements OptionValues<O> {
@@ -63,10 +62,19 @@ public abstract class MapBasedOptionValues<O> implements OptionValues<O> {
     @Override
     public List<Map.Entry<O, Double>> getBestEntries() {
         if (cachedBest == null) {
-            cachedBest = getValues()
-                .entrySet()
-                .stream()
-                .collect(maxAll(comparingByValue(), toImmutableList()));
+            final List<Map.Entry<O, Double>> best = new ArrayList<>();
+            double bestValue = Double.NEGATIVE_INFINITY;
+            for (final Map.Entry<O, Double> entry : getValues().entrySet()) {
+                final double v = entry.getValue();
+                if (v > bestValue) {
+                    bestValue = v;
+                    best.clear();
+                    best.add(entry);
+                } else if (v == bestValue) {
+                    best.add(entry);
+                }
+            }
+            cachedBest = ImmutableList.copyOf(best);
         }
         return cachedBest;
     }
