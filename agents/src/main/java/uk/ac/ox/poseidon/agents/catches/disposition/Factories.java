@@ -22,14 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
-import org.apache.commons.collections4.keyvalue.MultiKey;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public class Factories {
@@ -37,16 +35,16 @@ public class Factories {
 
     public static <S extends Scope> IndexedDiscardRatesFactory<S> discardRates(
         final Factory<? super S, ? extends Collection<? extends Species>> species,
-        final Factory<? super S, ? extends Map<MultiKey<Object>, Double>> discardRatesBySpeciesKey
+        final Factory<? super S, ? extends Function<? super Species, Double>> rateFunction
     ) {
-        return new IndexedDiscardRatesFactory<>(species, discardRatesBySpeciesKey);
+        return new IndexedDiscardRatesFactory<S>(species, rateFunction);
     }
 
     public static <S extends Scope> IndexedDiscardMortalityFactory<S> indexedDiscardMortality(
         final Factory<? super S, ? extends Collection<? extends Species>> species,
-        final Factory<? super S, ? extends Map<MultiKey<Object>, Double>> mortalityRatesBySpeciesKey
+        final Factory<? super S, ? extends Function<? super Species, Double>> rateFunction
     ) {
-        return new IndexedDiscardMortalityFactory<>(species, mortalityRatesBySpeciesKey);
+        return new IndexedDiscardMortalityFactory<S>(species, rateFunction);
     }
 
     @SafeVarargs

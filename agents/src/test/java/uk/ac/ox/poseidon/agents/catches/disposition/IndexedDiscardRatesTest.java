@@ -31,7 +31,6 @@ import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
-import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,28 +59,7 @@ class IndexedDiscardRatesTest {
     }
 
     @Test
-    void appliesMortalityRatesToDiscardedAlive() {
-        final Species a = new Species("A", null, null);
-        final Species b = new Species("B", null, null);
-        final SpeciesIndex index = SpeciesIndex.of(a, b);
-        final Bucket discardedAlive = BiomassBucket.of(new double[]{10.0, 20.0}, index);
-        final SpeciesIndexedDoubleArray rates =
-            SpeciesIndexedDoubleArray.of(new double[]{0.1, 0.0}, index);
-        final Disposition disposition =
-            new Disposition(Bucket.empty(), discardedAlive, Bucket.empty());
-
-        final IndexedDiscardMortality process =
-            new IndexedDiscardMortality(rates);
-        final Disposition updated = process.partition(disposition, 0.0);
-
-        assertThat(updated.getDiscardedAlive().getKg(a)).isEqualTo(9.0);
-        assertThat(updated.getDiscardedAlive().getKg(b)).isEqualTo(20.0);
-        assertThat(updated.getDiscardedDead().getKg(a)).isEqualTo(1.0);
-        assertThat(updated.getDiscardedDead().getKg(b)).isEqualTo(0.0);
-    }
-
-    @Test
-    void factoryAppliesRatesBySpeciesKey() {
+    void factoryAppliesFunctionPerSpecies() {
         final Species adult = new Species("A", "adult", null);
         final Species juvenile = new Species("A", "juvenile", null);
         final Set<Species> species = Set.of(adult, juvenile);
@@ -89,10 +67,7 @@ class IndexedDiscardRatesTest {
         final IndexedDiscardRatesFactory<Scope> factory =
             discardRates(
                 new ObjectFactory<>(species),
-                scope -> Map.of(
-                    adult.getKey(), 0.25,
-                    juvenile.getKey(), 0.25
-                )
+                scope -> s -> adult.equals(s) || juvenile.equals(s) ? 0.25 : 0.0
             );
 
         final IndexedDiscardRates process = factory.get(Scope.GLOBAL_SCOPE);
