@@ -25,6 +25,9 @@ package uk.ac.ox.poseidon.io.tables;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.functions.ComposedFunctionFactory;
+import static uk.ac.ox.poseidon.core.functions.Factories.composedFunction;
+import static uk.ac.ox.poseidon.core.functions.Factories.mapValueExtractor;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.core.utils.ListFactory;
@@ -129,4 +132,15 @@ public class Factories {
         return new MultiKeyFromRowFactory(Arrays.asList(keyColumnNames));
     }
 
+    public static <S extends Scope, T, K, V> ComposedFunctionFactory<S, T, K, V> tableLookup(
+        final Factory<? super S, ? extends Function<? super T, ? extends K>> keyExtractor,
+        final Factory<? super S, Table> table,
+        final Factory<? super S, ? extends Function<? super Row, ? extends K>> rowKeyBuilder,
+        final Factory<? super S, ? extends Function<? super Row, ? extends V>> rowValueBuilder
+    ) {
+        return composedFunction(
+            keyExtractor,
+            mapValueExtractor(mapFromTable(table, rowKeyBuilder, rowValueBuilder))
+        );
+    }
 }
