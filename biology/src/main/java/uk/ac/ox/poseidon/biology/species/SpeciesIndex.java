@@ -31,9 +31,12 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static lombok.AccessLevel.PRIVATE;
 
 @EqualsAndHashCode
@@ -48,6 +51,13 @@ public final class SpeciesIndex {
 
     public static SpeciesIndex of(final Set<Species> species) {
         return interner.intern(new SpeciesIndex(species));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static SpeciesIndex of(final Collection<? extends Species> species) {
+        return species instanceof Set
+            ? of((Set<Species>) species)
+            : of(Set.copyOf(species));
     }
 
     public static SpeciesIndex of(final Species... species) {
@@ -71,6 +81,17 @@ public final class SpeciesIndex {
 
     public double[] newDoubleArray() {
         return new double[speciesArray.length];
+    }
+
+    public SpeciesIndexedDoubleArray mapToDoubleArray(
+        final Function<? super Species, Double> function
+    ) {
+        checkNotNull(function);
+        final double[] a = newDoubleArray();
+        for (int i = 0; i < a.length; i++) {
+            a[i] = checkNotNull(function.apply(speciesAt(i)));
+        }
+        return SpeciesIndexedDoubleArray.of(a, this);
     }
 
     /**

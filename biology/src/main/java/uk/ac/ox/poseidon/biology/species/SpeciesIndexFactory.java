@@ -31,7 +31,6 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.Collection;
-import java.util.HashSet;
 
 @Data
 @NoArgsConstructor
@@ -43,6 +42,6 @@ public class SpeciesIndexFactory<S extends Scope> extends RelativeScopeFactory<S
 
     @Override
     protected SpeciesIndex newInstance(final S scope) {
-        return SpeciesIndex.of(new HashSet<>(speciesFactory.get(scope)));
+        return SpeciesIndex.of(speciesFactory.get(scope));
     }
 }
