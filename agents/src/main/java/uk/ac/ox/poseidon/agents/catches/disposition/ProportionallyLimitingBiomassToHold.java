@@ -38,8 +38,8 @@ public class ProportionallyLimitingBiomassToHold
         final double availableCapacityInKg
     ) {
         checkArgument(
-            Double.isFinite(availableCapacityInKg) && availableCapacityInKg >= 0,
-            "availableCapacityInKg must be a non-negative finite value, got %s",
+            !Double.isNaN(availableCapacityInKg) && availableCapacityInKg >= 0,
+            "availableCapacityInKg must be a non-negative value, got %s",
             availableCapacityInKg
         );
         final double currentlyRetainedInKg =
