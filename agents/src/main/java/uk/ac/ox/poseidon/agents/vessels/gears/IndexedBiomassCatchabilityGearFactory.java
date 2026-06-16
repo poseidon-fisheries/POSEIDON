@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.apache.commons.collections4.keyvalue.MultiKey;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.core.Factory;
@@ -35,58 +34,32 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.function.UnaryOperator.identity;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SpeciesSpecificBiomassCatchabilityGearFactory<S extends Scope>
-    extends RelativeScopeFactory<S, SpeciesSpecificBiomassCatchabilityGear> {
+public class IndexedBiomassCatchabilityGearFactory<S extends Scope>
+    extends RelativeScopeFactory<S, IndexedBiomassCatchabilityGear> {
 
     private String code;
     private Factory<? super S, ? extends Supplier<Duration>> durationSupplier;
     private Factory<? super S, ? extends Collection<? extends Species>> species;
 
-    private Factory<? super S, ? extends Map<MultiKey<Object>, Double>> proportions;
+    private Factory<? super S, ? extends Function<? super Species, Double>> proportionFunction;
 
     @Override
-    protected SpeciesSpecificBiomassCatchabilityGear newInstance(final S scope) {
-        final Map<MultiKey<Object>, Double> resolvedProportions = proportions.get(scope);
-        checkNotNull(resolvedProportions, "proportions should not be null");
-        final HashSet<Species> species = new HashSet<>(this.species.get(scope));
-        final SpeciesIndex speciesIndex = SpeciesIndex.of(species);
-        final Map<MultiKey<Object>, Species> speciesByKey =
-            species.stream().collect(java.util.stream.Collectors.toMap(
-                Species::getKey,
-                identity()
-            ));
-
-        final double[] proportionArray = new double[speciesIndex.size()];
-        resolvedProportions.forEach((speciesKey, proportion) -> {
-            final Species resolvedSpecies = speciesByKey.get(speciesKey);
-            checkArgument(
-                resolvedSpecies != null,
-                "Unknown speciesKey '%s' in proportionBySpeciesKey",
-                speciesKey
-            );
-            proportionArray[speciesIndex.indexOf(resolvedSpecies)] =
-                checkUnitRange(proportion, "proportion");
-        });
-
-        return new SpeciesSpecificBiomassCatchabilityGear(
+    protected IndexedBiomassCatchabilityGear newInstance(final S scope) {
+        final var function = proportionFunction.get(scope);
+        return new IndexedBiomassCatchabilityGear(
             code,
-            speciesIndex,
-            proportionArray,
+            SpeciesIndex.of(species.get(scope))
+                .mapToDoubleArray(s -> checkUnitRange(function.apply(s), "proportion")),
             durationSupplier.get(scope)
         );
     }
-
 }

@@ -32,33 +32,40 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.speciesSpecificBiomassCatchabilityGear;
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
-import static uk.ac.ox.poseidon.io.tables.Factories.*;
 
-class SpeciesSpecificBiomassCatchabilityGearFactoryTest {
+class IndexedBiomassCatchabilityGearFactoryTest {
 
     @Test
-    void mapFromTable_rejectsDuplicateSpeciesKeys() {
+    void appliesFunctionPerSpecies() {
         final Factory<Scope, Supplier<Duration>> durationSupplier =
             scope -> () -> Duration.ofHours(1);
         final Factory<Scope, Collection<? extends Species>> species =
             scope -> List.of(new Species("COD", "adult", "Cod"));
-
-        final var factory = speciesSpecificBiomassCatchabilityGear(
+        final var factory = Factories.indexedBiomassCatchabilityGear(
             "G1",
             durationSupplier,
             species,
-            mapFromTable(
-                csvTableFromString("code,lifeStage\nCOD,adult\nCOD,adult\n"),
-                multiKeyFromRow("code", "lifeStage"),
-                constantDouble(0.5)
-            )
+            scope -> s -> 0.5
         );
+        final var gear = factory.get(Scope.GLOBAL_SCOPE);
+        assertThat(gear.getCode()).isEqualTo("G1");
+    }
 
+    @Test
+    void rejectsOutOfRangeProportions() {
+        final Factory<Scope, Supplier<Duration>> durationSupplier =
+            scope -> () -> Duration.ofHours(1);
+        final Factory<Scope, Collection<? extends Species>> species =
+            scope -> List.of(new Species("COD", "adult", "Cod"));
+        final var factory = Factories.indexedBiomassCatchabilityGear(
+            "G1",
+            durationSupplier,
+            species,
+            scope -> s -> 1.5
+        );
         assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Multiple entries with same key");
+            .isInstanceOf(IllegalArgumentException.class);
     }
 }

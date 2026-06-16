@@ -28,6 +28,7 @@ import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 
 import java.time.Duration;
 import java.util.Map;
@@ -37,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.data.Offset.offset;
 
-class SpeciesSpecificBiomassCatchabilityGearTest {
+class IndexedBiomassCatchabilityGearTest {
 
     private static final double EPSILON = 1e-9;
     private static final Supplier<Duration> DURATION = () -> Duration.ofHours(1);
@@ -49,11 +50,10 @@ class SpeciesSpecificBiomassCatchabilityGearTest {
     @Test
     void fish_sameSpeciesIndex_scalesByIndexPosition() {
         final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
-        final SpeciesSpecificBiomassCatchabilityGear gear =
-            new SpeciesSpecificBiomassCatchabilityGear(
+        final IndexedBiomassCatchabilityGear gear =
+            new IndexedBiomassCatchabilityGear(
                 "G1",
-                speciesIndex,
-                new double[]{0.2, 0.6},
+                SpeciesIndexedDoubleArray.of(new double[]{0.2, 0.6}, speciesIndex),
                 DURATION
             );
         final BiomassBucket availableFish =
@@ -69,11 +69,10 @@ class SpeciesSpecificBiomassCatchabilityGearTest {
     @Test
     void fish_differentSpeciesIndex_ignoresMissingSpecies() {
         final SpeciesIndex gearIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
-        final SpeciesSpecificBiomassCatchabilityGear gear =
-            new SpeciesSpecificBiomassCatchabilityGear(
+        final IndexedBiomassCatchabilityGear gear =
+            new IndexedBiomassCatchabilityGear(
                 "G1",
-                gearIndex,
-                new double[]{0.1, 0.5},
+                SpeciesIndexedDoubleArray.of(new double[]{0.1, 0.5}, gearIndex),
                 DURATION
             );
         final Bucket availableFish =
@@ -87,25 +86,12 @@ class SpeciesSpecificBiomassCatchabilityGearTest {
     }
 
     @Test
-    void constructor_rejectsMismatchedProportionsLength() {
-        final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
-
-        assertThatThrownBy(() -> new SpeciesSpecificBiomassCatchabilityGear(
-            "G1",
-            speciesIndex,
-            new double[]{0.4},
-            DURATION
-        )).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
     void constructor_rejectsOutOfRangeProportions() {
         final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
 
-        assertThatThrownBy(() -> new SpeciesSpecificBiomassCatchabilityGear(
+        assertThatThrownBy(() -> new IndexedBiomassCatchabilityGear(
             "G1",
-            speciesIndex,
-            new double[]{0.3, 1.2},
+            SpeciesIndexedDoubleArray.of(new double[]{0.3, 1.2}, speciesIndex),
             DURATION
         )).isInstanceOf(IllegalArgumentException.class);
     }
@@ -113,11 +99,8 @@ class SpeciesSpecificBiomassCatchabilityGearTest {
     @SuppressWarnings("DataFlowIssue")
     @Test
     void constructor_rejectsNullProportions() {
-        final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
-
-        assertThatThrownBy(() -> new SpeciesSpecificBiomassCatchabilityGear(
+        assertThatThrownBy(() -> new IndexedBiomassCatchabilityGear(
             "G1",
-            speciesIndex,
             null,
             DURATION
         )).isInstanceOf(NullPointerException.class);

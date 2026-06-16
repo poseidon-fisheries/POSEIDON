@@ -29,18 +29,16 @@ import lombok.ToString;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
-import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @Getter
 @ToString
-public class SpeciesSpecificBiomassCatchabilityGear implements Gear {
+public class IndexedBiomassCatchabilityGear implements Gear {
 
     @NonNull private final String code;
 
@@ -49,15 +47,14 @@ public class SpeciesSpecificBiomassCatchabilityGear implements Gear {
     @NonNull private final Supplier<Duration> durationSupplier;
     @Setter private boolean active = true;
 
-    public SpeciesSpecificBiomassCatchabilityGear(
+    public IndexedBiomassCatchabilityGear(
         @NonNull final String code,
-        @NonNull final SpeciesIndex speciesIndex,
-        final double @NonNull [] proportions,
+        @NonNull final SpeciesIndexedDoubleArray proportions,
         @NonNull final Supplier<Duration> durationSupplier
     ) {
-        checkArgument(Arrays.stream(proportions).allMatch(p -> p >= 0 && p <= 1));
+        proportions.forEachValue(value -> checkUnitRange(value, "proportion"));
         this.code = code;
-        this.proportions = SpeciesIndexedDoubleArray.of(proportions, speciesIndex);
+        this.proportions = proportions;
         this.durationSupplier = durationSupplier;
     }
 
@@ -69,11 +66,15 @@ public class SpeciesSpecificBiomassCatchabilityGear implements Gear {
                     availableFish.mapWithIndex((biomass, i) ->
                         proportions.getDouble(i) * biomass
                     );
-                case final Bucket availableFish ->
-                    availableFish.mapBiomassValue((species, biomass) ->
-                        proportions.getDoubleOrDefault(species, 0) * biomass
-                    );
+                default -> fisheable.availableFish().mapBiomassValue((species, biomass) ->
+                    proportions.getDoubleOrDefault(species, 0.0) * biomass
+                );
             };
         return fisheable.extract(fishToCatch);
+    }
+
+    @Override
+    public String getCode() {
+        return code;
     }
 }

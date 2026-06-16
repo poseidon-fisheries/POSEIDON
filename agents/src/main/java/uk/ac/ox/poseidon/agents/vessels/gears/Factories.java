@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
-import org.apache.commons.collections4.keyvalue.MultiKey;
 import si.uom.quantity.VolumetricFlowRate;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
@@ -32,7 +31,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import javax.measure.Quantity;
 import java.time.Duration;
 import java.util.Collection;
-import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Factories {
@@ -56,15 +55,15 @@ public class Factories {
         return new InactiveGearFactory(code);
     }
 
-    public static <S extends Scope> SpeciesSpecificBiomassCatchabilityGearFactory<S>
-    speciesSpecificBiomassCatchabilityGear(
+    public static <S extends Scope> IndexedBiomassCatchabilityGearFactory<S>
+    indexedBiomassCatchabilityGear(
         final String code,
         final Factory<? super S, ? extends Supplier<Duration>> durationSupplier,
         final Factory<? super S, ? extends Collection<? extends Species>> species,
-        final Factory<? super S, ? extends Map<MultiKey<Object>, Double>> proportions
+        final Factory<? super S, ? extends Function<? super Species, Double>> proportionFunction
     ) {
-        return new SpeciesSpecificBiomassCatchabilityGearFactory<>(
-            code, durationSupplier, species, proportions
+        return new IndexedBiomassCatchabilityGearFactory<S>(
+            code, durationSupplier, species, proportionFunction
         );
     }
 }
