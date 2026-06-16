@@ -46,11 +46,11 @@ public class SelectedSpeciesRetention implements DispositionProcess {
         final double availableCapacityInKg
     ) {
         final Map<Boolean, Bucket> partition =
-            currentDisposition.getRetained().partitionBy((species, content) ->
+            currentDisposition.getRetained().partitionBy((species, _) ->
                 selectedSpecies.contains(species)
             );
         return new Disposition(
-            currentDisposition.getRetained().add(partition.get(true)),
+            partition.get(true),
             currentDisposition.getDiscardedAlive().add(partition.get(false)),
             currentDisposition.getDiscardedDead()
         );
