@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.catches.disposition;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static lombok.AccessLevel.PACKAGE;
 
 @NoArgsConstructor(access = PACKAGE)
@@ -36,6 +37,11 @@ public class ProportionallyLimitingBiomassToHold
         final Disposition currentDisposition,
         final double availableCapacityInKg
     ) {
+        checkArgument(
+            Double.isFinite(availableCapacityInKg) && availableCapacityInKg >= 0,
+            "availableCapacityInKg must be a non-negative finite value, got %s",
+            availableCapacityInKg
+        );
         final double currentlyRetainedInKg =
             currentDisposition.getRetained().getTotalBiomass().asKg();
         if (currentlyRetainedInKg <= availableCapacityInKg) {
