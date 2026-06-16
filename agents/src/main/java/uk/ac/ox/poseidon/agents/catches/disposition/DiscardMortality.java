@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,39 +22,33 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
-import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
+import uk.ac.ox.poseidon.biology.species.Species;
 
+import java.util.function.Function;
+
+import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
-/**
- * Applies per-species discard mortality rates to discarded catch.
- */
-public class SpeciesSpecificDiscardMortalityRates implements DispositionProcess {
+@RequiredArgsConstructor(access = PACKAGE)
+public class DiscardMortality implements DispositionProcess {
 
-    private final @NonNull SpeciesIndexedDoubleArray mortalityRates;
-
-    public SpeciesSpecificDiscardMortalityRates(
-        @NonNull final SpeciesIndexedDoubleArray mortalityRates
-    ) {
-        mortalityRates.forEachValue(rate -> checkUnitRange(rate, "mortality rate"));
-        this.mortalityRates = mortalityRates;
-    }
+    private final Function<? super Species, Double> mortalityRate;
 
     @Override
     public Disposition partition(
         final Disposition currentDisposition,
         final double availableCapacityInKg
     ) {
+        final Bucket discardedAlive = currentDisposition.getDiscardedAlive();
         final Bucket newlyDead =
-            SpeciesSpecificRateBuckets.applyRates(
-                currentDisposition.getDiscardedAlive(),
-                mortalityRates
+            discardedAlive.mapBiomassValue((species, biomass) ->
+                biomass * checkUnitRange(mortalityRate.apply(species), "Mortality")
             );
         return new Disposition(
             currentDisposition.getRetained(),
-            currentDisposition.getDiscardedAlive().subtract(newlyDead),
+            discardedAlive.subtract(newlyDead),
             currentDisposition.getDiscardedDead().add(newlyDead)
         );
     }

@@ -37,7 +37,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.agents.catches.disposition.Factories.discardRates;
 
-class SpeciesSpecificDiscardRatesTest {
+class IndexedDiscardRatesTest {
 
     @Test
     void discardsPerSpeciesRatesFromRetained() {
@@ -50,7 +50,7 @@ class SpeciesSpecificDiscardRatesTest {
         final Disposition disposition =
             new Disposition(retained, Bucket.empty(), Bucket.empty());
 
-        final SpeciesSpecificDiscardRates process = new SpeciesSpecificDiscardRates(rates);
+        final IndexedDiscardRates process = new IndexedDiscardRates(rates);
         final Disposition updated = process.partition(disposition, 0.0);
 
         assertThat(updated.getRetained().getKg(a)).isEqualTo(5.0);
@@ -70,8 +70,8 @@ class SpeciesSpecificDiscardRatesTest {
         final Disposition disposition =
             new Disposition(Bucket.empty(), discardedAlive, Bucket.empty());
 
-        final SpeciesSpecificDiscardMortalityRates process =
-            new SpeciesSpecificDiscardMortalityRates(rates);
+        final IndexedDiscardMortality process =
+            new IndexedDiscardMortality(rates);
         final Disposition updated = process.partition(disposition, 0.0);
 
         assertThat(updated.getDiscardedAlive().getKg(a)).isEqualTo(9.0);
@@ -86,7 +86,7 @@ class SpeciesSpecificDiscardRatesTest {
         final Species juvenile = new Species("A", "juvenile", null);
         final Set<Species> species = Set.of(adult, juvenile);
 
-        final SpeciesSpecificDiscardRatesFactory<Scope> factory =
+        final IndexedDiscardRatesFactory<Scope> factory =
             discardRates(
                 new ObjectFactory<>(species),
                 scope -> Map.of(
@@ -95,7 +95,7 @@ class SpeciesSpecificDiscardRatesTest {
                 )
             );
 
-        final SpeciesSpecificDiscardRates process = factory.get(Scope.GLOBAL_SCOPE);
+        final IndexedDiscardRates process = factory.get(Scope.GLOBAL_SCOPE);
         final SpeciesIndex index = SpeciesIndex.of(species);
         final Bucket retained = BiomassBucket.of(new double[]{8.0, 4.0}, index);
         final Disposition disposition =

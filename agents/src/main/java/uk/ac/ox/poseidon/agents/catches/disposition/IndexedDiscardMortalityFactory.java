@@ -41,21 +41,20 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SpeciesSpecificDiscardRatesFactory<S extends Scope>
-    extends RelativeScopeFactory<S, SpeciesSpecificDiscardRates> {
+public class IndexedDiscardMortalityFactory<S extends Scope>
+    extends RelativeScopeFactory<S, IndexedDiscardMortality> {
 
     private Factory<? super S, ? extends Collection<? extends Species>> species;
 
-    private Factory<? super S, ? extends Map<MultiKey<Object>, Double>> discardRatesBySpeciesKey;
+    private Factory<? super S, ? extends Map<MultiKey<Object>, Double>> mortalityRatesBySpeciesKey;
 
     @Override
-    protected SpeciesSpecificDiscardRates newInstance(final S scope) {
+    protected IndexedDiscardMortality newInstance(final S scope) {
         final var rates = SpeciesSpecificRateFactorySupport.buildRatesByKey(
             species.get(scope),
-            discardRatesBySpeciesKey.get(scope),
-            "discard rate"
+            mortalityRatesBySpeciesKey.get(scope),
+            "mortality rate"
         );
-        return new SpeciesSpecificDiscardRates(rates);
+        return new IndexedDiscardMortality(rates);
     }
-
 }

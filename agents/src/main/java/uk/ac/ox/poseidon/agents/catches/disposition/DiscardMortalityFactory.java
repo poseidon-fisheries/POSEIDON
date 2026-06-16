@@ -26,23 +26,24 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class GeneralDiscardMortalityFactory<S extends Scope>
-    extends RelativeScopeFactory<S, GeneralDiscardMortality> {
+public class DiscardMortalityFactory<S extends Scope>
+    extends RelativeScopeFactory<S, DiscardMortality> {
 
-    private Factory<? super S, ? extends DoubleSupplier> mortalityRateSupplier;
+    private Factory<? super S, ? extends Function<? super Species, Double>> mortalityRate;
 
     @Override
-    protected GeneralDiscardMortality newInstance(final S scope) {
-        return new GeneralDiscardMortality(mortalityRateSupplier.get(scope));
+    protected DiscardMortality newInstance(final S scope) {
+        return new DiscardMortality(mortalityRate.get(scope));
     }
 }

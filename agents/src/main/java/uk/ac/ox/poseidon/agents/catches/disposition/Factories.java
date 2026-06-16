@@ -30,23 +30,23 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 
 public class Factories {
     private Factories() {}
 
-    public static <S extends Scope> SpeciesSpecificDiscardRatesFactory<S> discardRates(
+    public static <S extends Scope> IndexedDiscardRatesFactory<S> discardRates(
         final Factory<? super S, ? extends Collection<? extends Species>> species,
         final Factory<? super S, ? extends Map<MultiKey<Object>, Double>> discardRatesBySpeciesKey
     ) {
-        return new SpeciesSpecificDiscardRatesFactory<>(species, discardRatesBySpeciesKey);
+        return new IndexedDiscardRatesFactory<>(species, discardRatesBySpeciesKey);
     }
 
-    public static <S extends Scope> SpeciesSpecificDiscardMortalityRatesFactory<S> discardMortalityRates(
+    public static <S extends Scope> IndexedDiscardMortalityFactory<S> indexedDiscardMortality(
         final Factory<? super S, ? extends Collection<? extends Species>> species,
         final Factory<? super S, ? extends Map<MultiKey<Object>, Double>> mortalityRatesBySpeciesKey
     ) {
-        return new SpeciesSpecificDiscardMortalityRatesFactory<>(species, mortalityRatesBySpeciesKey);
+        return new IndexedDiscardMortalityFactory<>(species, mortalityRatesBySpeciesKey);
     }
 
     @SafeVarargs
@@ -62,10 +62,10 @@ public class Factories {
         return new SelectedSpeciesRetentionFactory<>(selectedSpecies);
     }
 
-    public static <S extends Scope> GeneralDiscardMortalityFactory<S> generalDiscardMortality(
-        final Factory<? super S, ? extends DoubleSupplier> mortalityRateSupplier
+    public static <S extends Scope> DiscardMortalityFactory<S> discardMortality(
+        final Factory<? super S, ? extends Function<? super Species, Double>> mortalityRate
     ) {
-        return new GeneralDiscardMortalityFactory<>(mortalityRateSupplier);
+        return new DiscardMortalityFactory<>(mortalityRate);
     }
 
     public static ProportionallyLimitingBiomassToHoldFactory proportionallyLimitingBiomassToHold() {

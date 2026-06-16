@@ -28,27 +28,24 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.DummySpecies;
 import uk.ac.ox.poseidon.biology.species.Species;
 
-import java.util.function.DoubleSupplier;
+import java.util.Map;
+import java.util.function.Function;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.Offset.offset;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class GeneralDiscardMortalityTest {
+class DiscardMortalityTest {
 
-    /**
-     * Tests the `partition` method of the `ProportionalDiscardMortality` class. The method is
-     * expected to apply a proportional mortality rate (provided by the supplier) to the biomass in
-     * the discarded-alive category, moving the corresponding amount to the discarded-dead
-     * category.
-     */
+    private static final double EPSILON = 1e-9;
 
     @Test
     void partition_appliesMortalityRateCorrectly() {
-        // Arrange
         final double mortalityRate = 0.5;
-        final DoubleSupplier mortalityRateSupplier = () -> mortalityRate;
+        final Function<Species, Double> mortalityRateFunction = species -> mortalityRate;
 
-        final GeneralDiscardMortality generalDiscardMortality =
-            new GeneralDiscardMortality(mortalityRateSupplier);
+        final DiscardMortality discardMortality =
+            new DiscardMortality(mortalityRateFunction);
 
         final Bucket retained = Bucket.of(DummySpecies.A, Biomass.ofKg(100.0));
         final Bucket discardedAlive = Bucket.of(DummySpecies.A, Biomass.ofKg(50.0));
@@ -60,13 +57,11 @@ class GeneralDiscardMortalityTest {
             discardedDead
         );
 
-        // Act
-        final Disposition result = generalDiscardMortality.partition(
+        final Disposition result = discardMortality.partition(
             currentDisposition,
             0.0
         );
 
-        // Assert
         assertEquals(retained, result.getRetained());
         assertEquals(
             Bucket.of(DummySpecies.A, Biomass.ofKg(25.0)),
@@ -80,12 +75,11 @@ class GeneralDiscardMortalityTest {
 
     @Test
     void partition_handlesEmptyDiscardedAlive() {
-        // Arrange
         final double mortalityRate = 0.3;
-        final DoubleSupplier mortalityRateSupplier = () -> mortalityRate;
+        final Function<Species, Double> mortalityRateFunction = species -> mortalityRate;
 
-        final GeneralDiscardMortality generalDiscardMortality =
-            new GeneralDiscardMortality(mortalityRateSupplier);
+        final DiscardMortality discardMortality =
+            new DiscardMortality(mortalityRateFunction);
 
         final Bucket retained = Bucket.of(DummySpecies.B, Biomass.ofKg(100.0));
         final Bucket discardedAlive = Bucket.of(DummySpecies.B, Biomass.ofKg(0.0));
@@ -97,13 +91,11 @@ class GeneralDiscardMortalityTest {
             discardedDead
         );
 
-        // Act
-        final Disposition result = generalDiscardMortality.partition(
+        final Disposition result = discardMortality.partition(
             currentDisposition,
             0.0
         );
 
-        // Assert
         assertEquals(retained, result.getRetained());
         assertEquals(
             Bucket.of(DummySpecies.B, Biomass.ofKg(0.0)),
@@ -117,12 +109,11 @@ class GeneralDiscardMortalityTest {
 
     @Test
     void partition_handlesZeroMortalityRate() {
-        // Arrange
         final double mortalityRate = 0.0;
-        final DoubleSupplier mortalityRateSupplier = () -> mortalityRate;
+        final Function<Species, Double> mortalityRateFunction = species -> mortalityRate;
 
-        final GeneralDiscardMortality generalDiscardMortality =
-            new GeneralDiscardMortality(mortalityRateSupplier);
+        final DiscardMortality discardMortality =
+            new DiscardMortality(mortalityRateFunction);
 
         final Bucket retained = Bucket.of(DummySpecies.C, Biomass.ofKg(100.0));
         final Bucket discardedAlive = Bucket.of(DummySpecies.C, Biomass.ofKg(50.0));
@@ -134,13 +125,11 @@ class GeneralDiscardMortalityTest {
             discardedDead
         );
 
-        // Act
-        final Disposition result = generalDiscardMortality.partition(
+        final Disposition result = discardMortality.partition(
             currentDisposition,
             0.0
         );
 
-        // Assert
         assertEquals(retained, result.getRetained());
         assertEquals(
             Bucket.of(DummySpecies.C, Biomass.ofKg(50.0)),
@@ -151,12 +140,11 @@ class GeneralDiscardMortalityTest {
 
     @Test
     void partition_handlesFullMortalityRate() {
-        // Arrange
         final double mortalityRate = 1.0;
-        final DoubleSupplier mortalityRateSupplier = () -> mortalityRate;
+        final Function<Species, Double> mortalityRateFunction = species -> mortalityRate;
 
-        final GeneralDiscardMortality generalDiscardMortality =
-            new GeneralDiscardMortality(mortalityRateSupplier);
+        final DiscardMortality discardMortality =
+            new DiscardMortality(mortalityRateFunction);
 
         final Species species = DummySpecies.A;
 
@@ -170,18 +158,46 @@ class GeneralDiscardMortalityTest {
             discardedDead
         );
 
-        // Act
-        final Disposition result = generalDiscardMortality.partition(
+        final Disposition result = discardMortality.partition(
             currentDisposition,
             0.0
         );
 
-        // Assert
         assertEquals(retained, result.getRetained());
         assertEquals(Bucket.of(species, Biomass.ofKg(0.0)), result.getDiscardedAlive());
         assertEquals(
             Bucket.of(species, Biomass.ofKg(100.0)),
             result.getDiscardedDead()
         );
+    }
+
+    @Test
+    void partition_appliesDifferentRatePerSpecies() {
+        final Map<Species, Double> rates = Map.of(
+            DummySpecies.A, 0.5,
+            DummySpecies.B, 0.1
+        );
+        final DiscardMortality discardMortality =
+            new DiscardMortality(rates::get);
+
+        final Bucket retained = Bucket.empty();
+        final Bucket discardedAlive = Bucket.of(Map.of(
+            DummySpecies.A, Biomass.ofKg(50.0),
+            DummySpecies.B, Biomass.ofKg(100.0)
+        ));
+
+        final Disposition result = discardMortality.partition(
+            new Disposition(retained, discardedAlive, Bucket.empty()),
+            0.0
+        );
+
+        assertThat(result.getDiscardedAlive().getKg(DummySpecies.A))
+            .isCloseTo(25.0, offset(EPSILON));
+        assertThat(result.getDiscardedDead().getKg(DummySpecies.A))
+            .isCloseTo(25.0, offset(EPSILON));
+        assertThat(result.getDiscardedAlive().getKg(DummySpecies.B))
+            .isCloseTo(90.0, offset(EPSILON));
+        assertThat(result.getDiscardedDead().getKg(DummySpecies.B))
+            .isCloseTo(10.0, offset(EPSILON));
     }
 }

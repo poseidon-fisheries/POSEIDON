@@ -29,13 +29,14 @@ import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 /**
- * Applies per-species discard rates to retained catch.
+ * Applies per-species discard rates to retained catch, using a pre-indexed rate array
+ * for efficient array-based operations.
  */
-public class SpeciesSpecificDiscardRates implements DispositionProcess {
+public class IndexedDiscardRates implements DispositionProcess {
 
     private final @NonNull SpeciesIndexedDoubleArray discardRates;
 
-    public SpeciesSpecificDiscardRates(
+    public IndexedDiscardRates(
         @NonNull final SpeciesIndexedDoubleArray discardRates
     ) {
         discardRates.forEachValue(rate -> checkUnitRange(rate, "discard rate"));

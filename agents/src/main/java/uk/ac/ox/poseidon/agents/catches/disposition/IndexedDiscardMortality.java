@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,32 +22,40 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
-import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 
-import java.util.function.DoubleSupplier;
-
-import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
-@RequiredArgsConstructor(access = PACKAGE)
-public class GeneralDiscardMortality implements DispositionProcess {
+/**
+ * Applies per-species discard mortality rates to discarded catch, using a pre-indexed rate array
+ * for efficient array-based operations.
+ */
+public class IndexedDiscardMortality implements DispositionProcess {
 
-    private final DoubleSupplier mortalityRateSupplier;
+    private final @NonNull SpeciesIndexedDoubleArray mortalityRates;
+
+    public IndexedDiscardMortality(
+        @NonNull final SpeciesIndexedDoubleArray mortalityRates
+    ) {
+        mortalityRates.forEachValue(rate -> checkUnitRange(rate, "mortality rate"));
+        this.mortalityRates = mortalityRates;
+    }
 
     @Override
     public Disposition partition(
         final Disposition currentDisposition,
         final double availableCapacityInKg
     ) {
-        final Bucket discardedAlive = currentDisposition.getDiscardedAlive();
         final Bucket newlyDead =
-            discardedAlive.mapBiomassValue((species, biomass) ->
-                biomass * checkUnitRange(mortalityRateSupplier.getAsDouble(), "Mortality")
+            SpeciesSpecificRateBuckets.applyRates(
+                currentDisposition.getDiscardedAlive(),
+                mortalityRates
             );
         return new Disposition(
             currentDisposition.getRetained(),
-            discardedAlive.subtract(newlyDead),
+            currentDisposition.getDiscardedAlive().subtract(newlyDead),
             currentDisposition.getDiscardedDead().add(newlyDead)
         );
     }
