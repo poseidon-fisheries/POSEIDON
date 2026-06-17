@@ -42,7 +42,7 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkState;
 
 @AllArgsConstructor
-public class Fleet {
+public class Fleet implements VesselsGetter {
 
     private final BiMap<String, Vessel> vesselsById = HashBiMap.create();
     private final TemporalSchedule schedule;
@@ -59,6 +59,7 @@ public class Fleet {
         return Optional.ofNullable(vesselsById.get(vesselId));
     }
 
+    @Override
     public Set<Vessel> getVessels() {
         return Collections.unmodifiableSet(vesselsById.values());
     }

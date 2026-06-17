@@ -22,9 +22,6 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import com.google.common.collect.ImmutableList;
-import ec.util.MersenneTwisterFast;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -34,39 +31,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static lombok.AccessLevel.PACKAGE;
-import static uk.ac.ox.poseidon.core.MasonUtils.upToNOf;
 
 @RequiredArgsConstructor(access = PACKAGE)
-class BestOptionsFromFriendsSupplier<O> implements Supplier<OptionValues<O>> {
+class BestOptionsFromFriends<O> implements Supplier<OptionValues<O>> {
 
-    private final Vessel vessel;
-    private final int maxNumberOfFriends;
     private final VesselComponentRegister<? extends OptionValues<O>> optionValuesRegister;
-    private final MersenneTwisterFast rng;
-
-    private final @Getter(lazy = true) ImmutableList<Vessel> friends = chooseFriends();
-
-    private ImmutableList<Vessel> chooseFriends() {
-        checkNotNull(optionValuesRegister);
-        checkNotNull(this.vessel);
-        return upToNOf(
-            maxNumberOfFriends,
-            optionValuesRegister
-                .getVessels()
-                .filter(Vessel::isActive)
-                .filter(vessel -> vessel.getHomePort() == this.vessel.getHomePort())
-                .filter(vessel -> vessel != this.vessel)
-                .toList(),
-            rng
-        );
-    }
+    private final Supplier<? extends Iterable<? extends Vessel>> friendsSupplier;
 
     @Override
     public OptionValues<O> get() {
         final Map<O, Double> aggregatedValues = new HashMap<>();
-        for (final Vessel friend : getFriends()) {
+        for (final Vessel friend : friendsSupplier.get()) {
             if (!friend.isActive()) continue;
             final OptionValues<O> values = optionValuesRegister
                 .getComponent(friend)

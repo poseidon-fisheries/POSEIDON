@@ -22,32 +22,31 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class BestOptionsSupplierFactory<O>
-    extends VesselScopeFactory<Supplier<OptionValues<O>>> {
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static lombok.AccessLevel.PACKAGE;
 
-    Factory<? super VesselScope, ? extends VesselComponentRegister<? extends OptionValues<O>>>
-        optionValuesRegister;
+@RequiredArgsConstructor(access = PACKAGE)
+public class BestOptions<O> implements Supplier<OptionValues<O>> {
+
+    private final Vessel vessel;
+    private final VesselComponentRegister<? extends OptionValues<O>> optionValuesRegister;
 
     @Override
-    protected Supplier<OptionValues<O>> newInstance(final VesselScope scope) {
-        return new BestOptionsSupplier<>(
-            scope.getVessel(),
-            optionValuesRegister.get(scope)
+    public OptionValues<O> get() {
+        return new ImmutableOptionValues<>(
+            optionValuesRegister
+                .getOtherEntries(vessel)
+                .filter(entry -> entry.getKey().isActive())
+                .map(Map.Entry::getValue)
+                .flatMap(optionValues -> optionValues.getBestEntries().stream())
+                .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue, Math::max))
         );
     }
 }

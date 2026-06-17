@@ -64,15 +64,17 @@ import static uk.ac.ox.poseidon.agents.tasks.general.Factories.checkThat;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.agents.tasks.landings.Factories.landCatches;
 import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.*;
-import static uk.ac.ox.poseidon.agents.vessels.Factories.prefixedId;
-import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselCreator;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.*;
 import static uk.ac.ox.poseidon.agents.vessels.accounts.Factories.account;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.fullTank;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.simpleEngine;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.availableHoldCapacityInKg;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.currentTripDuration;
+import static uk.ac.ox.poseidon.agents.vessels.friends.Factories.dynamicFriendsSupplier;
 import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.fixedBiomassProportionGear;
 import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.standardBiomassHold;
+import static uk.ac.ox.poseidon.agents.vessels.predicates.Factories.vesselHasSameHomePort;
+import static uk.ac.ox.poseidon.agents.vessels.predicates.Factories.vesselIsActive;
 import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.accessibleWaterCells;
 import static uk.ac.ox.poseidon.biology.allocators.Factories.proportionOfCarryingCapacityAllocator;
 import static uk.ac.ox.poseidon.biology.biomass.Factories.*;
@@ -83,12 +85,11 @@ import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.alwaysTrue;
 import static uk.ac.ox.poseidon.core.predicates.numeric.Factories.greaterThan;
+import static uk.ac.ox.poseidon.core.providers.Factories.firstIntFrom;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
-import static uk.ac.ox.poseidon.core.providers.Factories.firstIntFrom;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomInt;
-import static uk.ac.ox.poseidon.agents.vessels.Factories.perVessel;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 import static uk.ac.ox.poseidon.core.quantities.Factories.*;
 import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_PER_HOUR;
@@ -365,8 +366,15 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     optionValues,
                     alwaysTrue(),
                     bestOptionsFromFriends(
-                        2,
-                        optionValuesRegister
+                        optionValuesRegister,
+                        dynamicFriendsSupplier(
+                            2,
+                            optionValuesRegister,
+                            allOf(
+                                vesselIsActive(),
+                                vesselHasSameHomePort()
+                            )
+                        )
                     )
                 )
             );

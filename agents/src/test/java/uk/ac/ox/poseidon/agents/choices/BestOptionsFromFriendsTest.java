@@ -1,32 +1,32 @@
 package uk.ac.ox.poseidon.agents.choices;
 
-import ec.util.MersenneTwisterFast;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
+import java.util.List;
+import java.util.function.Supplier;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class BestOptionsFromFriendsSupplierTest {
+class BestOptionsFromFriendsTest {
 
     @Test
     void testGetWhenEmptyRegister() {
-        final Vessel vessel = mock(Vessel.class);
-        final VesselComponentRegister<OptionValues<String>> register = new VesselComponentRegister<>();
-        final BestOptionsFromFriendsSupplier<String> supplier =
-            new BestOptionsFromFriendsSupplier<>(vessel, 10, register, new MersenneTwisterFast(0));
+        final VesselComponentRegister<OptionValues<String>> register =
+            new VesselComponentRegister<>();
+        final Supplier<List<Vessel>> friendsSupplier = List::of;
+        final BestOptionsFromFriends<String> supplier =
+            new BestOptionsFromFriends<>(register, friendsSupplier);
         assertThat(supplier.get().getBestEntries()).isEmpty();
     }
 
     @Test
     void testGetWithSingleFriend() {
         final Port port = mock(Port.class);
-        final Vessel vessel = mock(Vessel.class);
-        when(vessel.getHomePort()).thenReturn(port);
-
         final Vessel friend = mock(Vessel.class);
         when(friend.isActive()).thenReturn(true);
         when(friend.getHomePort()).thenReturn(port);
@@ -35,11 +35,13 @@ class BestOptionsFromFriendsSupplierTest {
         friendValues.observe("A", 10.0);
         friendValues.observe("B", 20.0);
 
-        final VesselComponentRegister<OptionValues<String>> register = new VesselComponentRegister<>();
+        final VesselComponentRegister<OptionValues<String>> register =
+            new VesselComponentRegister<>();
         register.putComponent(friend, friendValues);
 
-        final BestOptionsFromFriendsSupplier<String> supplier =
-            new BestOptionsFromFriendsSupplier<>(vessel, 10, register, new MersenneTwisterFast(0));
+        final Supplier<List<Vessel>> friendsSupplier = () -> List.of(friend);
+        final BestOptionsFromFriends<String> supplier =
+            new BestOptionsFromFriends<>(register, friendsSupplier);
 
         assertThat(supplier.get().getBestOptions()).containsExactly("B");
     }
@@ -47,9 +49,6 @@ class BestOptionsFromFriendsSupplierTest {
     @Test
     void testGetWithMultipleFriendsMergeSameOption() {
         final Port port = mock(Port.class);
-        final Vessel vessel = mock(Vessel.class);
-        when(vessel.getHomePort()).thenReturn(port);
-
         final Vessel friendA = mock(Vessel.class);
         when(friendA.isActive()).thenReturn(true);
         when(friendA.getHomePort()).thenReturn(port);
@@ -64,12 +63,14 @@ class BestOptionsFromFriendsSupplierTest {
         final AverageOptionValues<String> valuesB = new AverageOptionValues<>();
         valuesB.observe("X", 30.0);
 
-        final VesselComponentRegister<OptionValues<String>> register = new VesselComponentRegister<>();
+        final VesselComponentRegister<OptionValues<String>> register =
+            new VesselComponentRegister<>();
         register.putComponent(friendA, valuesA);
         register.putComponent(friendB, valuesB);
 
-        final BestOptionsFromFriendsSupplier<String> supplier =
-            new BestOptionsFromFriendsSupplier<>(vessel, 10, register, new MersenneTwisterFast(0));
+        final Supplier<List<Vessel>> friendsSupplier = () -> List.of(friendA, friendB);
+        final BestOptionsFromFriends<String> supplier =
+            new BestOptionsFromFriends<>(register, friendsSupplier);
 
         assertThat(supplier.get().getBestOptions()).containsExactly("X");
         assertThat(supplier.get().getBestValue()).hasValue(30.0);
@@ -78,9 +79,6 @@ class BestOptionsFromFriendsSupplierTest {
     @Test
     void testGetWithInactiveFriend() {
         final Port port = mock(Port.class);
-        final Vessel vessel = mock(Vessel.class);
-        when(vessel.getHomePort()).thenReturn(port);
-
         final Vessel friend = mock(Vessel.class);
         when(friend.isActive()).thenReturn(false);
         when(friend.getHomePort()).thenReturn(port);
@@ -88,11 +86,13 @@ class BestOptionsFromFriendsSupplierTest {
         final AverageOptionValues<String> friendValues = new AverageOptionValues<>();
         friendValues.observe("A", 10.0);
 
-        final VesselComponentRegister<OptionValues<String>> register = new VesselComponentRegister<>();
+        final VesselComponentRegister<OptionValues<String>> register =
+            new VesselComponentRegister<>();
         register.putComponent(friend, friendValues);
 
-        final BestOptionsFromFriendsSupplier<String> supplier =
-            new BestOptionsFromFriendsSupplier<>(vessel, 10, register, new MersenneTwisterFast(0));
+        final Supplier<List<Vessel>> friendsSupplier = () -> List.of(friend);
+        final BestOptionsFromFriends<String> supplier =
+            new BestOptionsFromFriends<>(register, friendsSupplier);
 
         assertThat(supplier.get().getBestEntries()).isEmpty();
     }
@@ -100,18 +100,17 @@ class BestOptionsFromFriendsSupplierTest {
     @Test
     void testGetWithFriendHavingNoBestEntries() {
         final Port port = mock(Port.class);
-        final Vessel vessel = mock(Vessel.class);
-        when(vessel.getHomePort()).thenReturn(port);
-
         final Vessel friend = mock(Vessel.class);
         when(friend.isActive()).thenReturn(true);
         when(friend.getHomePort()).thenReturn(port);
 
-        final VesselComponentRegister<OptionValues<String>> register = new VesselComponentRegister<>();
+        final VesselComponentRegister<OptionValues<String>> register =
+            new VesselComponentRegister<>();
         register.putComponent(friend, new AverageOptionValues<>());
 
-        final BestOptionsFromFriendsSupplier<String> supplier =
-            new BestOptionsFromFriendsSupplier<>(vessel, 10, register, new MersenneTwisterFast(0));
+        final Supplier<List<Vessel>> friendsSupplier = () -> List.of(friend);
+        final BestOptionsFromFriends<String> supplier =
+            new BestOptionsFromFriends<>(register, friendsSupplier);
 
         assertThat(supplier.get().getBestEntries()).isEmpty();
     }
@@ -119,9 +118,6 @@ class BestOptionsFromFriendsSupplierTest {
     @Test
     void testGetWithMultipleFriendsWithDifferentOptions() {
         final Port port = mock(Port.class);
-        final Vessel vessel = mock(Vessel.class);
-        when(vessel.getHomePort()).thenReturn(port);
-
         final Vessel friendA = mock(Vessel.class);
         when(friendA.isActive()).thenReturn(true);
         when(friendA.getHomePort()).thenReturn(port);
@@ -136,12 +132,14 @@ class BestOptionsFromFriendsSupplierTest {
         final AverageOptionValues<String> valuesB = new AverageOptionValues<>();
         valuesB.observe("B", 20.0);
 
-        final VesselComponentRegister<OptionValues<String>> register = new VesselComponentRegister<>();
+        final VesselComponentRegister<OptionValues<String>> register =
+            new VesselComponentRegister<>();
         register.putComponent(friendA, valuesA);
         register.putComponent(friendB, valuesB);
 
-        final BestOptionsFromFriendsSupplier<String> supplier =
-            new BestOptionsFromFriendsSupplier<>(vessel, 10, register, new MersenneTwisterFast(0));
+        final Supplier<List<Vessel>> friendsSupplier = () -> List.of(friendA, friendB);
+        final BestOptionsFromFriends<String> supplier =
+            new BestOptionsFromFriends<>(register, friendsSupplier);
 
         final OptionValues<String> result = supplier.get();
         assertThat(result.getValue("A")).hasValue(10.0);

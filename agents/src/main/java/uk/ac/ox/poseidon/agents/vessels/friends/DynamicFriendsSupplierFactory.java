@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,38 +20,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices;
+package uk.ac.ox.poseidon.agents.vessels.friends;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
+import lombok.*;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
 
-import java.util.function.Supplier;
+import java.util.function.Predicate;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class BestOptionsFromFriendsSupplierFactory<O>
-    extends VesselScopeFactory<Supplier<OptionValues<O>>> {
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@EqualsAndHashCode(callSuper = false)
+public class DynamicFriendsSupplierFactory extends VesselScopeFactory<DynamicFriendsSupplier> {
 
-    private int maxNumberOfFriends;
-    private Factory<? super VesselScope, ? extends VesselComponentRegister<?
-            extends OptionValues<O>>>
-        optionValuesRegister;
+    private int targetNumberOfFriends;
+    private Factory<? super VesselScope, ? extends VesselsGetter> potentialFriends;
+    private Factory<? super VesselScope, ? extends Predicate<? super Vessel>> friendshipCondition;
 
     @Override
-    protected Supplier<OptionValues<O>> newInstance(final VesselScope scope) {
-        return new BestOptionsFromFriendsSupplier<>(
+    protected DynamicFriendsSupplier newInstance(final VesselScope scope) {
+        return new DynamicFriendsSupplier(
+            targetNumberOfFriends,
+            potentialFriends.get(scope),
+            friendshipCondition.get(scope),
             scope.getVessel(),
-            maxNumberOfFriends,
-            optionValuesRegister.get(scope),
             scope.getSimulation().random
         );
     }
+
 }

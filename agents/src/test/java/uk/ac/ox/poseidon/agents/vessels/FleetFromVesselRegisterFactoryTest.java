@@ -22,13 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
-import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
-import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
@@ -46,7 +43,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.time.Factories.ONE_DAY;
 import static uk.ac.ox.poseidon.io.tables.Factories.csvTableFromString;

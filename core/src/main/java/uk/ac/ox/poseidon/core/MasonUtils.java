@@ -191,6 +191,13 @@ public class MasonUtils {
     }
 
     public static <T> Stream<T> shuffledStream(
+        final Collection<T> candidates,
+        final MersenneTwisterFast rng
+    ) {
+        return shuffledStream(new ArrayList<>(candidates), rng);
+    }
+
+    public static <T> Stream<T> shuffledStream(
         final List<T> candidates,
         final MersenneTwisterFast rng
     ) {

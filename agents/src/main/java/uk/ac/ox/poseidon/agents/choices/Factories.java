@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -44,23 +45,27 @@ public class Factories {
         return new AverageOptionValuesFactory<>();
     }
 
-    public static <O> BestOptionsFromFriendsSupplierFactory<O> bestOptionsFromFriends(
-        final int maxNumberOfFriends,
-        final Factory<? super VesselScope, ? extends VesselComponentRegister<?
-            extends OptionValues<O>>>
-            optionValuesRegister
+    public static <O> BestOptionsFromFriendsFactory<O> bestOptionsFromFriends(
+        final Factory<
+            ? super VesselScope,
+            ? extends VesselComponentRegister<? extends OptionValues<O>>
+            > optionValuesRegister,
+        final Factory<? super VesselScope, ? extends Supplier<? extends Iterable<? extends Vessel>>>
+            friendsSupplier
     ) {
-        return new BestOptionsFromFriendsSupplierFactory<>(
-            maxNumberOfFriends, optionValuesRegister
+        return new BestOptionsFromFriendsFactory<>(
+            optionValuesRegister,
+            friendsSupplier
         );
     }
 
-    public static <O> BestOptionsSupplierFactory<O> bestOptions(
-        final Factory<? super VesselScope, ? extends VesselComponentRegister<?
-            extends OptionValues<O>>>
-            optionValuesRegister
+    public static <O> BestOptionsFactory<O> bestOptions(
+        final Factory<
+            ? super VesselScope,
+            ? extends VesselComponentRegister<? extends OptionValues<O>>
+            > optionValuesRegister
     ) {
-        return new BestOptionsSupplierFactory<>(optionValuesRegister);
+        return new BestOptionsFactory<>(optionValuesRegister);
     }
 
     public static ConstantDestinationSupplierFactory constantDestination(

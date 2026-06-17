@@ -23,17 +23,16 @@
 package uk.ac.ox.poseidon.agents.components;
 
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
  * Stores per-vessel components for a simulation so other systems can query them by vessel.
  */
-public class VesselComponentRegister<C> {
+public class VesselComponentRegister<C> implements VesselsGetter {
 
     private final Map<Vessel, C> map = new HashMap<>();
 
@@ -55,10 +54,11 @@ public class VesselComponentRegister<C> {
     }
 
     /**
-     * Returns a stream of vessels currently in the register.
+     * Returns the set of vessels currently in the register.
      */
-    public Stream<Vessel> getVessels() {
-        return map.keySet().stream();
+    @Override
+    public Set<Vessel> getVessels() {
+        return Collections.unmodifiableSet(map.keySet());
     }
 
     /**
