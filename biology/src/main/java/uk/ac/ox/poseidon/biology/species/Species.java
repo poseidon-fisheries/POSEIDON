@@ -26,11 +26,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import org.apache.commons.collections4.keyvalue.MultiKey;
 
 import java.util.Comparator;
 
 import static java.util.Comparator.nullsFirst;
+import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -46,7 +46,7 @@ public class Species implements Comparable<Species> {
     private final String name;
 
     @Getter(lazy = true)
-    private final MultiKey<Object> key = new MultiKey<>(code, lifeStage);
+    private final String key = multiStringKey(code, lifeStage);
 
     public Species(
         @NonNull final String code,

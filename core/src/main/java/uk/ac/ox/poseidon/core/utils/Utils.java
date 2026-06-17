@@ -43,15 +43,15 @@ public class Utils {
     }
 
     /**
-     * Joins trimmed non-null fields with {@link #STRING_KEY_SEPARATOR} to produce a
-     * map-friendly compound key. The separator character in any field value is rejected
-     * with {@link IllegalArgumentException}, as is ')' which would otherwise interfere
-     * with bean property syntax.
+     * Joins trimmed non-null fields with {@link #STRING_KEY_SEPARATOR} to produce a map-friendly
+     * compound key. The separator character in any field value is rejected with
+     * {@link IllegalArgumentException}, as is ')' which would otherwise interfere with bean
+     * property syntax.
      * <p>
-     * Null, empty, and "NA" fields (after trimming) are treated as absent and
-     * produce no contribution beyond their separator.
+     * Null, empty, and "NA" fields (after trimming) are treated as absent and produce no
+     * contribution beyond their separator.
      */
-    public static String multiStringKey(final String... fields) {
+    public static String multiStringKey(final Object... fields) {
         final var sb = new StringBuilder();
         for (int i = 0; i < fields.length; i++) {
             if (i > 0) {

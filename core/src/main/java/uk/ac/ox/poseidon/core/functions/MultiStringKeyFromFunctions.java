@@ -22,27 +22,27 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import org.apache.commons.collections4.keyvalue.MultiKey;
-
 import java.util.List;
 import java.util.function.Function;
 
-public class MultiKeyFromFunctions<T> implements Function<T, MultiKey<Object>> {
+import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
+
+public class MultiStringKeyFromFunctions<T> implements Function<T, String> {
 
     private final Function<T, ?>[] functions;
 
     @SuppressWarnings("unchecked")
-    public MultiKeyFromFunctions(final List<? extends Function<? super T, ?>> functions) {
+    public MultiStringKeyFromFunctions(final List<? extends Function<? super T, ?>> functions) {
         this.functions = functions.toArray(new Function[0]);
     }
 
     @Override
-    public MultiKey<Object> apply(final T t) {
+    public String apply(final T t) {
         final Object[] keys = new Object[functions.length];
         for (int i = 0; i < keys.length; i++) {
             keys[i] = functions[i].apply(t);
         }
-        return new MultiKey<>(keys);
+        return multiStringKey(keys);
     }
 
 }

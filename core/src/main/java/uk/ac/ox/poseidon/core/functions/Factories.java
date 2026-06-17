@@ -47,11 +47,11 @@ public class Factories {
     }
 
     @SafeVarargs
-    public static <S extends Scope, T> MultiKeyFromFunctionsFactory<S, T> multiKeyFromFunctions(
+    public static <S extends Scope, T> MultiStringKeyFromFunctionsFactory<S, T> multiStringKeyFromFunctions(
         final Factory<? super S, ? extends Function<? super T, ?>>... functions
     ) {
         // noinspection Convert2Diamond
-        return new MultiKeyFromFunctionsFactory<S, T>(Arrays.asList(functions));
+        return new MultiStringKeyFromFunctionsFactory<S, T>(Arrays.asList(functions));
     }
 
     public static NumericIntervalToStringMapperFactory numericIntervalToStringMapper(

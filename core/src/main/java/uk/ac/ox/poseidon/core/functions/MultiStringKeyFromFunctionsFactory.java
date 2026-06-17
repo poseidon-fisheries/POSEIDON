@@ -20,34 +20,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.io.tables;
+package uk.ac.ox.poseidon.core.functions;
 
-import org.apache.commons.collections4.keyvalue.MultiKey;
-import tech.tablesaw.api.Row;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 import java.util.function.Function;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class MultiStringKeyFromFunctionsFactory<S extends Scope, T>
+    extends RelativeScopeFactory<S, MultiStringKeyFromFunctions<T>> {
 
-public class MultiKeyFromRow implements Function<Row, MultiKey<Object>> {
-
-    private final String[] keyColumnNames;
-
-    public MultiKeyFromRow(final List<String> keyColumnNames) {
-        checkNotNull(keyColumnNames);
-        checkArgument(!keyColumnNames.isEmpty());
-        this.keyColumnNames = keyColumnNames.toArray(new String[0]);
-    }
+    private List<Factory<? super S, ? extends Function<? super T, ?>>> functions;
 
     @Override
-    public MultiKey<Object> apply(final Row row) {
-        final Object[] keyValues = new Object[keyColumnNames.length];
-        for (int k = 0; k < keyColumnNames.length; k++) {
-            final Object value = row.getObject(keyColumnNames[k]);
-            keyValues[k] = value instanceof final String s && s.trim().isEmpty() ? null : value;
-        }
-        return new MultiKey<>(keyValues);
+    protected MultiStringKeyFromFunctions<T> newInstance(final S scope) {
+        return new MultiStringKeyFromFunctions<>(
+            functions.stream().map(f -> f.get(scope)).toList()
+        );
     }
 }

@@ -26,8 +26,6 @@ import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.functions.ComposedFunctionFactory;
-import static uk.ac.ox.poseidon.core.functions.Factories.composedFunction;
-import static uk.ac.ox.poseidon.core.functions.Factories.mapValueExtractor;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.core.utils.ListFactory;
@@ -41,6 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static uk.ac.ox.poseidon.core.functions.Factories.composedFunction;
+import static uk.ac.ox.poseidon.core.functions.Factories.mapValueExtractor;
 
 public class Factories {
 
@@ -128,8 +129,8 @@ public class Factories {
         return new MapFromTableFactory<>(table, keyBuilder, valueBuilder);
     }
 
-    public static MultiKeyFromRowFactory multiKeyFromRow(final String... keyColumnNames) {
-        return new MultiKeyFromRowFactory(Arrays.asList(keyColumnNames));
+    public static MultiStringKeyFromRowFactory multiStringKeyFromRow(final String... keyColumnNames) {
+        return new MultiStringKeyFromRowFactory(Arrays.asList(keyColumnNames));
     }
 
     public static <S extends Scope, T, K, V> ComposedFunctionFactory<S, T, K, V> tableLookup(

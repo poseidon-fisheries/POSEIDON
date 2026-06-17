@@ -35,13 +35,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class MultiKeyFromRowFactory extends GlobalScopeFactory<MultiKeyFromRow> {
+public class MultiStringKeyFromRowFactory extends GlobalScopeFactory<MultiStringKeyFromRow> {
 
     List<String> keyColumnNames;
 
     @Override
-    protected MultiKeyFromRow newInstance(final Scope scope) {
-        return new MultiKeyFromRow(keyColumnNames);
+    protected MultiStringKeyFromRow newInstance(final Scope scope) {
+        return new MultiStringKeyFromRow(keyColumnNames);
     }
-    
+
 }

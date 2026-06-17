@@ -20,32 +20,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.functions;
+package uk.ac.ox.poseidon.io.tables;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import tech.tablesaw.api.Row;
 
 import java.util.List;
 import java.util.function.Function;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-public class MultiKeyFromFunctionsFactory<S extends Scope, T>
-    extends RelativeScopeFactory<S, MultiKeyFromFunctions<T>> {
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 
-    private List<Factory<? super S, ? extends Function<? super T, ?>>> functions;
+public class MultiStringKeyFromRow implements Function<Row, String> {
+
+    private final String[] keyColumnNames;
+
+    public MultiStringKeyFromRow(final List<String> keyColumnNames) {
+        checkNotNull(keyColumnNames);
+        checkArgument(!keyColumnNames.isEmpty());
+        this.keyColumnNames = keyColumnNames.toArray(new String[0]);
+    }
 
     @Override
-    protected MultiKeyFromFunctions<T> newInstance(final S scope) {
-        return new MultiKeyFromFunctions<>(
-            functions.stream().map(f -> f.get(scope)).toList()
-        );
+    public String apply(final Row row) {
+        final Object[] keyValues = new Object[keyColumnNames.length];
+        for (int k = 0; k < keyColumnNames.length; k++) {
+            keyValues[k] = row.getObject(keyColumnNames[k]);
+        }
+        return multiStringKey(keyValues);
     }
 }
