@@ -20,10 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.species;
+package uk.ac.ox.poseidon.biology.species.extractors;
 
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -31,9 +32,9 @@ import java.util.function.Function;
 
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SpeciesLifeStageExtractorFactory extends GlobalScopeFactory<Function<Species, String>> {
+public class SpeciesKeyExtractorFactory extends GlobalScopeFactory<Function<Species, String>> {
     @Override
     protected Function<Species, String> newInstance(final Scope scope) {
-        return Species::getLifeStage;
+        return Species::getKey;
     }
 }

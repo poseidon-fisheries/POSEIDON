@@ -76,11 +76,4 @@ public class Factories {
         return new SpeciesIndexFactory<>(speciesFactory);
     }
 
-    public static SpeciesCodeExtractorFactory speciesCode() {
-        return new SpeciesCodeExtractorFactory();
-    }
-
-    public static SpeciesLifeStageExtractorFactory speciesLifeStage() {
-        return new SpeciesLifeStageExtractorFactory();
-    }
 }

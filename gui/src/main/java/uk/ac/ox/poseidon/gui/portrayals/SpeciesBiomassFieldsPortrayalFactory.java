@@ -76,10 +76,7 @@ public class SpeciesBiomassFieldsPortrayalFactory
                     carryingCapacityGrids.get(carryingCapacityGrids.size() == 1 ? 0 : i);
 
                 final Species species = biomassGrid.getSpecies();
-                final String name =
-                    species.getName() +
-                        (species.getLifeStage() != null ? " " + species.getLifeStage() : "") +
-                        " biomass";
+                final String name = species.toString() + " biomass";
                 return new NamedPortrayal(
                     name,
                     new NumberGridWithCapacityPortrayalFactory(
