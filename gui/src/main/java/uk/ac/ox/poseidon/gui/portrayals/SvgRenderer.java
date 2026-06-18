@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.transcoder.TranscoderInput;
@@ -88,6 +89,7 @@ public class SvgRenderer {
         }
 
         @Override
+        @SuppressFBWarnings("EI_EXPOSE_REP")
         public BufferedImage createImage(
             final int width,
             final int height

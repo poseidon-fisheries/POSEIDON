@@ -76,11 +76,11 @@ class FirstDoubleFromFactoryTest {
                 new GlobalScopeFactory<DoubleSupplier>() {
                     @Override
                     protected DoubleSupplier newInstance(final Scope scope) {
-                        return () -> 3.14;
+                        return () -> 1.23;
                     }
                 }
             );
 
-        assertThat(factory.get(Scope.GLOBAL_SCOPE).getAsDouble()).isEqualTo(3.14);
+        assertThat(factory.get(Scope.GLOBAL_SCOPE).getAsDouble()).isEqualTo(1.23);
     }
 }

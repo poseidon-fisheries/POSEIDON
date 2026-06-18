@@ -31,4 +31,8 @@
         <!-- @SuppressFBWarnings doesn't work on records so we do this here -->
         <Class name="uk.ac.ox.poseidon.agents.market.BiomassMarket$Price"/>
     </Match>
+    <Match>
+        <!-- Constructor validation throws are a common and safe pattern -->
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
 </FindBugsFilter>

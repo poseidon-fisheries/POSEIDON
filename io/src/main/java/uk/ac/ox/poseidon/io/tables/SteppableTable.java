@@ -26,14 +26,17 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import tech.tablesaw.api.Table;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serial;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class SteppableTable implements Steppable, Supplier<Table> {
+    @Serial private static final long serialVersionUID = 1L;
 
-    private final Table table;
+    private final transient Table table;
     private final List<? extends Supplier<?>> valueSuppliers;
 
     public SteppableTable(
@@ -42,10 +45,11 @@ public class SteppableTable implements Steppable, Supplier<Table> {
     ) {
         this.table = tableDefinition.get();
         checkArgument(table.columnCount() == valueSuppliers.size());
-        this.valueSuppliers = valueSuppliers;
+        this.valueSuppliers = List.copyOf(valueSuppliers);
     }
 
     @Override
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public Table get() {
         return table;
     }
