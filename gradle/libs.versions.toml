@@ -71,4 +71,4 @@ batik = ["batik-transcoder", "batik-dom", "batik-awt-util"]
 
 [plugins]
 spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugs" }
-shadow = { id = "com.gradleup.shadow", version = "9.4.2" }
+

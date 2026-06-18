@@ -22,7 +22,6 @@
 
 plugins {
     id("buildlogic.java-application-conventions")
-    alias(libs.plugins.shadow)
 }
 
 dependencies {
@@ -33,24 +32,6 @@ dependencies {
     implementation(project(":io"))
     implementation(project(":gui"))
     implementation(libs.jcommander)
-}
-
-tasks.shadowJar {
-    dependencies {
-        exclude(dependency("com.formdev:flatlaf:.*"))
-    }
-
-    from({
-        project.configurations.runtimeClasspath.get()
-            .filter { it.name == "flatlaf-${libs.versions.flatlaf.get()}.jar" }
-            .map { zipTree(it) }
-    })
-
-    mergeServiceFiles {
-        // those exclusions prevent GeoTools from trying to load the CLib plugin, which crashes:
-        exclude("com/sun/media/imageioimpl/plugins/jpeg/CLib*")
-        exclude("META-INF/services/javax.imageio.spi.*")
-    }
 }
 
 val writePeterSnapperScenario = tasks.register("writePeterSnapperScenario", JavaExec::class) {
