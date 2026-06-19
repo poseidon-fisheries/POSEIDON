@@ -22,19 +22,19 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
+import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.calibration.CalibrationProblem;
 import uk.ac.ox.poseidon.calibration.CalibrationRunner;
 import uk.ac.ox.poseidon.calibration.ParameterRange;
+import uk.ac.ox.poseidon.calibration.errors.SumSquaredErrors;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Period;
 import java.util.*;
-import java.util.stream.IntStream;
 
-import static java.lang.Math.abs;
+import static java.util.stream.Collectors.toMap;
+import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPerYearAccumulator;
 
 public final class PeterSnapperCatchabilityCalibration {
 
@@ -55,13 +55,13 @@ public final class PeterSnapperCatchabilityCalibration {
     private PeterSnapperCatchabilityCalibration() {
     }
 
-    static void main(final String[] args) throws IOException {
+    static void main(final String[] args) {
         final int populationSize =
             args.length > 0 ? Integer.parseInt(args[0]) : DEFAULT_POPULATION_SIZE;
         final long generations =
             args.length > 1 ? Long.parseLong(args[1]) : DEFAULT_GENERATIONS;
         final long[] seeds = parseSeeds(args);
-        final List<Double> observedLandings = readLandings(LANDINGS_PATH);
+        final Map<Integer, Double> observedLandings = readLandings(LANDINGS_PATH);
         final LandingsCalibrationProblem problem =
             new LandingsCalibrationProblem(observedLandings, seeds);
 
@@ -114,43 +114,43 @@ public final class PeterSnapperCatchabilityCalibration {
         return parameters;
     }
 
-    private static List<Double> readLandings(final Path path) throws IOException {
-        return Files
-            .lines(path)
-            .skip(1)
-            .map(line -> line.split(","))
-            .map(columns -> Double.parseDouble(columns[1]))
-            .toList();
+    private static Map<Integer, Double> readLandings(final Path path) {
+        return Table.read().csv(path.toFile())
+            .stream()
+            .collect(toMap(
+                row -> row.getInt("year"),
+                row -> (double) row.getInt("landings_kg")
+            ));
     }
 
     private static void printLandingsComparison(
-        final List<Double> observedLandings,
-        final List<Double> simulatedLandings
+        final Map<Integer, Double> observedLandings,
+        final Map<Integer, Double> simulatedLandings
     ) {
         System.out.println("year,observed_kg,simulated_kg,error_kg");
-        IntStream
-            .range(0, observedLandings.size())
-            .forEach(i ->
-                System.out.printf(
-                    "%d,%.0f,%.0f,%.0f%n",
-                    i + 1,
-                    observedLandings.get(i),
-                    simulatedLandings.get(i),
-                    simulatedLandings.get(i) - observedLandings.get(i)
-                )
+        final int bound = observedLandings.keySet().stream().max(Integer::compareTo).orElseThrow();
+        for (int i = 1; i <= bound; i++) {
+            System.out.printf(
+                "%d,%.0f,%.0f,%.0f%n",
+                i,
+                observedLandings.get(i),
+                simulatedLandings.get(i),
+                simulatedLandings.get(i) - observedLandings.get(i)
             );
+        }
     }
 
     private static final class LandingsCalibrationProblem extends CalibrationProblem {
 
-        private final List<Double> observedLandings;
+        private final Map<Integer, Double> observedLandings;
 
         private LandingsCalibrationProblem(
-            final List<Double> observedLandings,
+            final Map<Integer, Double> observedLandings,
             final long... seeds
         ) {
             super(
                 new PeterSnapperScenario().get(),
+                Map.of("totalLandingsPerYear", totalLandingsPerYearAccumulator()),
                 Period.ofYears(observedLandings.size()),
                 List.of(new ParameterRange(
                     CATCHABILITY_PROPERTY,
@@ -168,7 +168,7 @@ public final class PeterSnapperCatchabilityCalibration {
             return fitness().apply(parameters);
         }
 
-        private List<Double> landingsFor(
+        private Map<Integer, Double> landingsFor(
             final SequencedMap<String, Double> parameters
         ) {
             final Simulation simulation =
@@ -176,6 +176,7 @@ public final class PeterSnapperCatchabilityCalibration {
                     uk.ac.ox.poseidon.core.SimulationStartOptions
                         .builder()
                         .seed(seeds()[0])
+                        .extraComponents(extraComponents())
                         .propertyOverrides(new LinkedHashMap<String, Object>(parameters))
                         .build()
                 );
@@ -191,26 +192,16 @@ public final class PeterSnapperCatchabilityCalibration {
 
         @Override
         protected double evaluate(final Simulation simulation) {
-            final List<Double> simulatedLandings = simulatedLandings(simulation);
-            return IntStream
-                .range(0, observedLandings.size())
-                .mapToDouble(i ->
-                    abs(observedLandings.get(i) - simulatedLandings.get(i))
-                )
-                .sum();
+            return new SumSquaredErrors<>(
+                () -> observedLandings,
+                () -> simulatedLandings(simulation)
+            ).getAsDouble();
         }
 
-        private List<Double> simulatedLandings(final Simulation simulation) {
-            final Map<Integer, Double> annualLandings =
-                simulation
-                    .getComponent(TotalLandingsPerYearAccumulator.class)
-                    .get();
-            final int firstYear =
-                simulation.getTemporalSchedule().getStartingDateTime().getYear();
-            return IntStream
-                .range(0, observedLandings.size())
-                .mapToObj(i -> annualLandings.getOrDefault(firstYear + i, 0.0))
-                .toList();
+        private Map<Integer, Double> simulatedLandings(final Simulation simulation) {
+            return simulation
+                .getComponent(TotalLandingsPerYearAccumulator.class)
+                .get();
         }
 
     }
