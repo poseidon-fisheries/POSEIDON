@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
+import com.google.common.collect.Sets;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.calibration.CalibrationProblem;
 import uk.ac.ox.poseidon.calibration.CalibrationRunner;
@@ -70,7 +71,9 @@ public final class PeterSnapperCatchabilityCalibration {
         System.out.println("steady_generations=" + STEADY_GENERATIONS);
         System.out.println("seeds=" + Arrays.toString(seeds));
         System.out.println("tutorial_catchability=" + TUTORIAL_CATCHABILITY);
-        System.out.println("tutorial_fitness=" + problem.fitnessFor(tutorialParameters()));
+        final SequencedMap<String, Double> tutorialParams = new LinkedHashMap<>();
+        tutorialParams.put(CATCHABILITY_PROPERTY, TUTORIAL_CATCHABILITY);
+        System.out.println("tutorial_fitness=" + problem.fitness().apply(tutorialParams));
 
         final CalibrationRunner.Result result =
             CalibrationRunner.minimize(
@@ -108,12 +111,6 @@ public final class PeterSnapperCatchabilityCalibration {
             : DEFAULT_SEEDS;
     }
 
-    private static SequencedMap<String, Double> tutorialParameters() {
-        final SequencedMap<String, Double> parameters = new LinkedHashMap<>();
-        parameters.put(CATCHABILITY_PROPERTY, TUTORIAL_CATCHABILITY);
-        return parameters;
-    }
-
     private static Map<Integer, Double> readLandings(final Path path) {
         return Table.read().csv(path.toFile())
             .stream()
@@ -128,15 +125,12 @@ public final class PeterSnapperCatchabilityCalibration {
         final Map<Integer, Double> simulatedLandings
     ) {
         System.out.println("year,observed_kg,simulated_kg,error_kg");
-        final int bound = observedLandings.keySet().stream().max(Integer::compareTo).orElseThrow();
-        for (int i = 1; i <= bound; i++) {
-            System.out.printf(
-                "%d,%.0f,%.0f,%.0f%n",
-                i,
-                observedLandings.get(i),
-                simulatedLandings.get(i),
-                simulatedLandings.get(i) - observedLandings.get(i)
-            );
+        for (final int year : new TreeSet<>(Sets.union(
+            observedLandings.keySet(), simulatedLandings.keySet()
+        ))) {
+            final double observed = observedLandings.getOrDefault(year, 0.0);
+            final double simulated = simulatedLandings.getOrDefault(year, 0.0);
+            System.out.printf("%d,%.0f,%.0f,%.0f%n", year, observed, simulated, simulated - observed);
         }
     }
 
@@ -162,12 +156,6 @@ public final class PeterSnapperCatchabilityCalibration {
             this.observedLandings = observedLandings;
         }
 
-        private double fitnessFor(
-            final SequencedMap<String, Double> parameters
-        ) {
-            return fitness().apply(parameters);
-        }
-
         private Map<Integer, Double> landingsFor(
             final SequencedMap<String, Double> parameters
         ) {
@@ -177,13 +165,13 @@ public final class PeterSnapperCatchabilityCalibration {
                         .builder()
                         .seed(seeds()[0])
                         .extraComponents(extraComponents())
-                        .propertyOverrides(new LinkedHashMap<String, Object>(parameters))
+                        .propertyOverrides(new LinkedHashMap<>(parameters))
                         .build()
                 );
             try {
                 simulation
                     .getTemporalSchedule()
-                    .stepFor(simulation, Period.ofYears(observedLandings.size()));
+                    .stepFor(simulation, duration());
                 return simulatedLandings(simulation);
             } finally {
                 simulation.finish();
