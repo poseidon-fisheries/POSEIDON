@@ -31,10 +31,12 @@ import io.jenetics.engine.Problem;
 import io.jenetics.util.DoubleRange;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationStartOptions;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.temporal.TemporalAmount;
 import java.util.*;
@@ -49,7 +51,8 @@ public abstract class CalibrationProblem
     implements Problem<SequencedMap<String, Double>, DoubleGene, Double> {
 
     private final Scenario scenario;
-    private final TemporalAmount temporalAmount;
+    private final Map<String, ? extends Factory<? super SimulationScope, ?>> extraComponents;
+    private final TemporalAmount duration;
     private final SequencedMap<String, DoubleRange> ranges;
     private final long[] seeds;
 
@@ -57,21 +60,24 @@ public abstract class CalibrationProblem
 
     public CalibrationProblem(
         final Scenario scenario,
-        final TemporalAmount temporalAmount,
+        final Map<String, ? extends Factory<? super SimulationScope, ?>> extraComponents,
+        final TemporalAmount duration,
         final List<ParameterRange> ranges
     ) {
-        this(scenario, temporalAmount, ranges, 0);
+        this(scenario, extraComponents, duration, ranges, 0);
     }
 
     public CalibrationProblem(
         final Scenario scenario,
-        final TemporalAmount temporalAmount,
+        final Map<String, ? extends Factory<? super SimulationScope, ?>> extraComponents,
+        final TemporalAmount duration,
         final List<ParameterRange> ranges,
         final long... seeds
     ) {
         this(
             scenario,
-            temporalAmount,
+            extraComponents,
+            duration,
             toDoubleRanges(ranges),
             seeds
         );
@@ -79,10 +85,11 @@ public abstract class CalibrationProblem
 
     public CalibrationProblem(
         final Scenario scenario,
-        final TemporalAmount temporalAmount,
+        final Map<String, ? extends Factory<? super SimulationScope, ?>> extraComponents,
+        final TemporalAmount duration,
         final SequencedMap<String, DoubleRange> ranges
     ) {
-        this(scenario, temporalAmount, ranges, 0);
+        this(scenario, extraComponents, duration, ranges, 0);
     }
 
     @SuppressFBWarnings(
@@ -92,12 +99,14 @@ public abstract class CalibrationProblem
     )
     public CalibrationProblem(
         final Scenario scenario,
-        final TemporalAmount temporalAmount,
+        final Map<String, ? extends Factory<? super SimulationScope, ?>> extraComponents,
+        final TemporalAmount duration,
         final SequencedMap<String, DoubleRange> ranges,
         final long... seeds
     ) {
         this.scenario = scenario;
-        this.temporalAmount = temporalAmount;
+        this.extraComponents = extraComponents;
+        this.duration = duration;
         this.ranges = Collections.unmodifiableSequencedMap(new LinkedHashMap<>(ranges));
         this.seeds = seeds.length == 0 ? new long[]{0} : Arrays.copyOf(seeds, seeds.length);
         this.codec =
@@ -149,11 +158,12 @@ public abstract class CalibrationProblem
                     .builder()
                     .seed(seed)
                     .propertyOverrides(parameters)
+                    .extraComponents(extraComponents)
                     .build()
             );
         try {
             final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
-            temporalSchedule.stepFor(simulation, temporalAmount);
+            temporalSchedule.stepFor(simulation, duration);
             return evaluate(simulation);
         } finally {
             simulation.finish();
