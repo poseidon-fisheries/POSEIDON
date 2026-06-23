@@ -22,17 +22,20 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.ImmutableLongArray;
+import io.jenetics.util.DoubleRange;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.calibration.CalibrationProblem;
 import uk.ac.ox.poseidon.calibration.CalibrationRunner;
-import uk.ac.ox.poseidon.calibration.ParameterRange;
 import uk.ac.ox.poseidon.calibration.errors.SumSquaredErrors;
-import uk.ac.ox.poseidon.core.Simulation;
 
 import java.nio.file.Path;
 import java.time.Period;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.SequencedMap;
 
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPerYearAccumulator;
@@ -95,10 +98,6 @@ public final class PeterSnapperCatchabilityCalibration {
             "Tutorial catchability error: %.6g%n",
             result.parameters().get(CATCHABILITY_PROPERTY) - TUTORIAL_CATCHABILITY
         );
-        printLandingsComparison(
-            observedLandings,
-            problem.landingsFor(result.parameters())
-        );
     }
 
     private static long[] parseSeeds(final String[] args) {
@@ -120,23 +119,7 @@ public final class PeterSnapperCatchabilityCalibration {
             ));
     }
 
-    private static void printLandingsComparison(
-        final Map<Integer, Double> observedLandings,
-        final Map<Integer, Double> simulatedLandings
-    ) {
-        System.out.println("year,observed_kg,simulated_kg,error_kg");
-        for (final int year : new TreeSet<>(Sets.union(
-            observedLandings.keySet(), simulatedLandings.keySet()
-        ))) {
-            final double observed = observedLandings.getOrDefault(year, 0.0);
-            final double simulated = simulatedLandings.getOrDefault(year, 0.0);
-            System.out.printf("%d,%.0f,%.0f,%.0f%n", year, observed, simulated, simulated - observed);
-        }
-    }
-
     private static final class LandingsCalibrationProblem extends CalibrationProblem {
-
-        private final Map<Integer, Double> observedLandings;
 
         private LandingsCalibrationProblem(
             final Map<Integer, Double> observedLandings,
@@ -144,52 +127,19 @@ public final class PeterSnapperCatchabilityCalibration {
         ) {
             super(
                 new PeterSnapperScenario().get(),
-                Map.of("totalLandingsPerYear", totalLandingsPerYearAccumulator()),
                 Period.ofYears(observedLandings.size()),
-                List.of(new ParameterRange(
-                    CATCHABILITY_PROPERTY,
-                    MIN_CATCHABILITY,
-                    MAX_CATCHABILITY
-                )),
-                seeds
+                ImmutableMap.of(
+                    "totalLandingsPerYear", totalLandingsPerYearAccumulator()
+                ),
+                ImmutableMap.of(
+                    CATCHABILITY_PROPERTY, new DoubleRange(MIN_CATCHABILITY, MAX_CATCHABILITY)
+                ),
+                new SumSquaredErrors<>(
+                    observedLandings,
+                    sim -> sim.getComponent(TotalLandingsPerYearAccumulator.class).get()
+                ),
+                ImmutableLongArray.copyOf(seeds)
             );
-            this.observedLandings = observedLandings;
-        }
-
-        private Map<Integer, Double> landingsFor(
-            final SequencedMap<String, Double> parameters
-        ) {
-            final Simulation simulation =
-                scenario().startNewSimulation(
-                    uk.ac.ox.poseidon.core.SimulationStartOptions
-                        .builder()
-                        .seed(seeds()[0])
-                        .extraComponents(extraComponents())
-                        .propertyOverrides(new LinkedHashMap<>(parameters))
-                        .build()
-                );
-            try {
-                simulation
-                    .getTemporalSchedule()
-                    .stepFor(simulation, duration());
-                return simulatedLandings(simulation);
-            } finally {
-                simulation.finish();
-            }
-        }
-
-        @Override
-        protected double evaluate(final Simulation simulation) {
-            return new SumSquaredErrors<>(
-                () -> observedLandings,
-                () -> simulatedLandings(simulation)
-            ).getAsDouble();
-        }
-
-        private Map<Integer, Double> simulatedLandings(final Simulation simulation) {
-            return simulation
-                .getComponent(TotalLandingsPerYearAccumulator.class)
-                .get();
         }
 
     }

@@ -24,21 +24,21 @@ package uk.ac.ox.poseidon.calibration.errors;
 
 import com.google.common.collect.Sets;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.Simulation;
 
 import java.util.Map;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 
 @RequiredArgsConstructor
-public class SumSquaredErrors<K> implements DoubleSupplier {
+public class SumSquaredErrors<K> implements ToDoubleFunction<Simulation> {
 
-    private final Supplier<Map<K, Double>> targetValues;
-    private final Supplier<Map<K, Double>> actualValues;
+    private final Map<K, Double> targetValues;
+    private final Function<Simulation, Map<K, Double>> actualValues;
 
     @Override
-    public double getAsDouble() {
-        final Map<K, Double> targetValues = this.targetValues.get();
-        final Map<K, Double> actualValues = this.actualValues.get();
+    public double applyAsDouble(final Simulation simulation) {
+        final Map<K, Double> actualValues = this.actualValues.apply(simulation);
         return Sets
             .union(targetValues.keySet(), actualValues.keySet())
             .stream()
