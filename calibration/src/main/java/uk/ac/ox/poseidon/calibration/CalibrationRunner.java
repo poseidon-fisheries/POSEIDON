@@ -57,7 +57,7 @@ public final class CalibrationRunner {
                 ))
                 .offspringSelector(new TournamentSelector<>(3))
                 .alterers(
-                    new GaussianMutator<>(options.mutationProbability()),
+                    new GaussianMutator<>(options.mutationProbability(), new GaussianMutator.Shape(options.mutatorShapeShift(), options.mutatorShapeSigma())),
                     new MeanAlterer<>(options.recombinationProbability())
                 )
                 .build();
@@ -88,7 +88,9 @@ public final class CalibrationRunner {
         double mutationProbability,
         double recombinationProbability,
         int steadyGenerations,
-        int reportEveryGenerations
+        int reportEveryGenerations,
+        double mutatorShapeShift,
+        double mutatorShapeSigma
     ) {
 
         public Options(
@@ -97,11 +99,22 @@ public final class CalibrationRunner {
             final double mutationProbability,
             final double recombinationProbability
         ) {
-            this(populationSize, generations, mutationProbability, recombinationProbability, 0, 0);
+            this(populationSize, generations, mutationProbability, recombinationProbability, 0, 0, 0, 1);
+        }
+
+        public Options(
+            final int populationSize,
+            final long generations,
+            final double mutationProbability,
+            final double recombinationProbability,
+            final int steadyGenerations,
+            final int reportEveryGenerations
+        ) {
+            this(populationSize, generations, mutationProbability, recombinationProbability, steadyGenerations, reportEveryGenerations, 0, 1);
         }
 
         public static Options defaults() {
-            return new Options(30, 30, 0.20, 0.35, 10, 1);
+            return new Options(30, 30, 0.20, 0.35, 10, 1, 0, 1);
         }
     }
 
