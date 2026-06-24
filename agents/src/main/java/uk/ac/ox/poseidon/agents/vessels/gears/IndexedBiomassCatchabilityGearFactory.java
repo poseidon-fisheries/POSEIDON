@@ -32,11 +32,14 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @Data
@@ -51,6 +54,7 @@ public class IndexedBiomassCatchabilityGearFactory<S extends Scope>
     private Factory<? super S, ? extends Collection<? extends Species>> species;
 
     private Factory<? super S, ? extends Function<? super Species, Double>> proportionFunction;
+    private Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold;
 
     @Override
     protected IndexedBiomassCatchabilityGear newInstance(final S scope) {
@@ -59,6 +63,7 @@ public class IndexedBiomassCatchabilityGearFactory<S extends Scope>
             code,
             SpeciesIndex.of(species.get(scope))
                 .mapToDoubleArray(s -> checkUnitRange(function.apply(s), "proportion")),
+            minimumCatchThreshold.get(scope).to(KILOGRAM).getValue().doubleValue(),
             durationSupplier.get(scope)
         );
     }

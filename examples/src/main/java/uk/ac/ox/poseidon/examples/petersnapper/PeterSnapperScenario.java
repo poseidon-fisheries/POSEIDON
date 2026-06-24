@@ -334,6 +334,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             fixedBiomassProportionGear(
                 "FGL", // droplines count as "fixed gears and lines"
                 0.000641964,
+                massOf(1, KILOGRAM),
                 constant(ONE_HOUR),
                 volumetricFlowRateOf(70.0, LITRE_PER_HOUR)
             );

@@ -34,6 +34,7 @@ import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 import java.time.Duration;
 import java.util.function.Supplier;
 
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @Getter
@@ -43,6 +44,7 @@ public class IndexedBiomassCatchabilityGear implements Gear {
     @NonNull private final String code;
 
     private final SpeciesIndexedDoubleArray proportions;
+    private final double minimumCatchThresholdInKg;
 
     @NonNull private final Supplier<Duration> durationSupplier;
     @Setter private boolean active = true;
@@ -50,11 +52,16 @@ public class IndexedBiomassCatchabilityGear implements Gear {
     public IndexedBiomassCatchabilityGear(
         @NonNull final String code,
         @NonNull final SpeciesIndexedDoubleArray proportions,
+        final double minimumCatchThresholdInKg,
         @NonNull final Supplier<Duration> durationSupplier
     ) {
         proportions.forEachValue(value -> checkUnitRange(value, "proportion"));
         this.code = code;
         this.proportions = proportions;
+        this.minimumCatchThresholdInKg = checkPositive(
+            minimumCatchThresholdInKg,
+            "minimumCatchThresholdInKg"
+        );
         this.durationSupplier = durationSupplier;
     }
 
@@ -63,12 +70,14 @@ public class IndexedBiomassCatchabilityGear implements Gear {
         final Bucket fishToCatch =
             switch (fisheable.availableFish()) {
                 case final BiomassBucket availableFish when proportions.sameIndex(availableFish) ->
-                    availableFish.mapWithIndex((biomass, i) ->
-                        proportions.getDouble(i) * biomass
-                    );
-                default -> fisheable.availableFish().mapBiomassValue((species, biomass) ->
-                    proportions.getDoubleOrDefault(species, 0.0) * biomass
-                );
+                    availableFish.mapWithIndex((biomass, i) -> {
+                        final double v = proportions.getDouble(i) * biomass;
+                        return v >= minimumCatchThresholdInKg ? v : 0;
+                    });
+                default -> fisheable.availableFish().mapBiomassValue((species, biomass) -> {
+                    final double v = proportions.getDoubleOrDefault(species, 0.0) * biomass;
+                    return v >= minimumCatchThresholdInKg ? v : 0;
+                });
             };
         return fisheable.extract(fishToCatch);
     }

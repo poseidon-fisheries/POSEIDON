@@ -27,6 +27,8 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -34,6 +36,8 @@ import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.poseidon.core.quantities.Factories.massOf;
 
 class IndexedBiomassCatchabilityGearFactoryTest {
 
@@ -47,7 +51,8 @@ class IndexedBiomassCatchabilityGearFactoryTest {
             "G1",
             durationSupplier,
             species,
-            scope -> s -> 0.5
+            scope -> s -> 0.5,
+            massOf(1, KILOGRAM)
         );
         final var gear = factory.get(Scope.GLOBAL_SCOPE);
         assertThat(gear.getCode()).isEqualTo("G1");
@@ -63,7 +68,8 @@ class IndexedBiomassCatchabilityGearFactoryTest {
             "G1",
             durationSupplier,
             species,
-            scope -> s -> 1.5
+            scope -> s -> 1.5,
+            massOf(1, KILOGRAM)
         );
         assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
             .isInstanceOf(IllegalArgumentException.class);

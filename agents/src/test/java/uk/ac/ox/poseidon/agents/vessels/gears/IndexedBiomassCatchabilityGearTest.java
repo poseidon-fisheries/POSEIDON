@@ -46,6 +46,7 @@ class IndexedBiomassCatchabilityGearTest {
     private static final Species SPECIES_A = new Species("A", null, "Alpha");
     private static final Species SPECIES_B = new Species("B", null, "Beta");
     private static final Species SPECIES_C = new Species("C", null, "Gamma");
+    private static final double MINIMUM_CATCH_THRESHOLD = 1.0;
 
     @Test
     void fish_sameSpeciesIndex_scalesByIndexPosition() {
@@ -54,6 +55,7 @@ class IndexedBiomassCatchabilityGearTest {
             new IndexedBiomassCatchabilityGear(
                 "G1",
                 SpeciesIndexedDoubleArray.of(new double[]{0.2, 0.6}, speciesIndex),
+                MINIMUM_CATCH_THRESHOLD,
                 DURATION
             );
         final BiomassBucket availableFish =
@@ -73,6 +75,7 @@ class IndexedBiomassCatchabilityGearTest {
             new IndexedBiomassCatchabilityGear(
                 "G1",
                 SpeciesIndexedDoubleArray.of(new double[]{0.1, 0.5}, gearIndex),
+                MINIMUM_CATCH_THRESHOLD,
                 DURATION
             );
         final Bucket availableFish =
@@ -92,6 +95,37 @@ class IndexedBiomassCatchabilityGearTest {
         assertThatThrownBy(() -> new IndexedBiomassCatchabilityGear(
             "G1",
             SpeciesIndexedDoubleArray.of(new double[]{0.3, 1.2}, speciesIndex),
+            MINIMUM_CATCH_THRESHOLD,
+            DURATION
+        )).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void fish_returnsZero_belowThreshold() {
+        final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A);
+        final IndexedBiomassCatchabilityGear gear =
+            new IndexedBiomassCatchabilityGear(
+                "G1",
+                SpeciesIndexedDoubleArray.of(new double[]{0.5}, speciesIndex),
+                MINIMUM_CATCH_THRESHOLD,
+                DURATION
+            );
+        final BiomassBucket availableFish =
+            BiomassBucket.of(new double[]{1.0}, speciesIndex);
+        final Fisheable fisheable = new StubFisheable(availableFish);
+
+        final Bucket caught = gear.fish(fisheable);
+
+        assertThat(caught.getKg(SPECIES_A)).isCloseTo(0.0, offset(EPSILON));
+    }
+
+    @Test
+    void constructor_rejectsNegativeThreshold() {
+        final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
+        assertThatThrownBy(() -> new IndexedBiomassCatchabilityGear(
+            "G1",
+            SpeciesIndexedDoubleArray.of(new double[]{0.3, 0.5}, speciesIndex),
+            -1.0,
             DURATION
         )).isInstanceOf(IllegalArgumentException.class);
     }
@@ -102,6 +136,7 @@ class IndexedBiomassCatchabilityGearTest {
         assertThatThrownBy(() -> new IndexedBiomassCatchabilityGear(
             "G1",
             null,
+            MINIMUM_CATCH_THRESHOLD,
             DURATION
         )).isInstanceOf(NullPointerException.class);
     }

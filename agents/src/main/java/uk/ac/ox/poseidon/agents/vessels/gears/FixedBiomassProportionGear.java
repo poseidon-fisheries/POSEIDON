@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import java.time.Duration;
 import java.util.function.Supplier;
 
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 @Getter
@@ -39,6 +40,7 @@ public class FixedBiomassProportionGear implements Gear {
 
     private final String code;
     private final double proportion;
+    private final double minimumCatchThresholdInKg;
     private final Supplier<Duration> durationSupplier;
     private final double litresOfFuelConsumedPerHourOfFishing;
     @Setter private boolean active = true;
@@ -46,11 +48,16 @@ public class FixedBiomassProportionGear implements Gear {
     FixedBiomassProportionGear(
         final String code,
         final double proportion,
+        final double minimumCatchThresholdInKg,
         final Supplier<Duration> durationSupplier,
         final double litresOfFuelConsumedPerHourOfFishing
     ) {
         this.code = code;
         this.proportion = checkUnitRange(proportion, "proportion");
+        this.minimumCatchThresholdInKg = checkPositive(
+            minimumCatchThresholdInKg,
+            "minimumCatchThresholdInKg"
+        );
         this.durationSupplier = durationSupplier;
         this.litresOfFuelConsumedPerHourOfFishing = litresOfFuelConsumedPerHourOfFishing;
     }
@@ -60,9 +67,10 @@ public class FixedBiomassProportionGear implements Gear {
         final Bucket fishToCatch =
             fisheable
                 .availableFish()
-                .mapBiomassValue((species, biomass) ->
-                    biomass * proportion
-                );
+                .mapBiomassValue((_, biomass) -> {
+                    final double v = biomass * proportion;
+                    return v >= minimumCatchThresholdInKg ? v : 0;
+                });
         final Bucket fishExtracted =
             fisheable.extract(fishToCatch);
         assert fishExtracted.equals(fishToCatch);

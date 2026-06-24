@@ -29,6 +29,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.function.Function;
@@ -42,12 +43,13 @@ public class Factories {
     fixedBiomassProportionGear(
         final String code,
         final double proportion,
+        final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold,
         final Factory<? super S, ? extends Supplier<Duration>> durationSupplier,
         final Factory<? super S, ? extends Quantity<VolumetricFlowRate>>
             fuelConsumptionRate
     ) {
         return new FixedBiomassProportionGearFactory<>(
-            code, proportion, durationSupplier, fuelConsumptionRate
+            code, proportion, minimumCatchThreshold, durationSupplier, fuelConsumptionRate
         );
     }
 
@@ -60,10 +62,11 @@ public class Factories {
         final String code,
         final Factory<? super S, ? extends Supplier<Duration>> durationSupplier,
         final Factory<? super S, ? extends Collection<? extends Species>> species,
-        final Factory<? super S, ? extends Function<? super Species, Double>> proportionFunction
+        final Factory<? super S, ? extends Function<? super Species, Double>> proportionFunction,
+        final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold
     ) {
         return new IndexedBiomassCatchabilityGearFactory<S>(
-            code, durationSupplier, species, proportionFunction
+            code, durationSupplier, species, proportionFunction, minimumCatchThreshold
         );
     }
 }
