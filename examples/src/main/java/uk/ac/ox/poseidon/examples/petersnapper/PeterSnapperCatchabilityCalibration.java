@@ -66,8 +66,22 @@ public final class PeterSnapperCatchabilityCalibration {
             args.length > 1 ? Long.parseLong(args[1]) : DEFAULT_GENERATIONS;
         final long[] seeds = parseSeeds(args);
         final Map<Integer, Double> observedLandings = readLandings(LANDINGS_PATH);
-        final LandingsCalibrationProblem problem =
-            new LandingsCalibrationProblem(observedLandings, seeds);
+        final CalibrationProblem problem =
+            new CalibrationProblem(
+                new PeterSnapperScenario().get(),
+                Period.ofYears(observedLandings.size()),
+                ImmutableMap.of(
+                    "totalLandingsPerYear", totalLandingsPerYearAccumulator()
+                ),
+                ImmutableMap.of(
+                    CATCHABILITY_PROPERTY, new DoubleRange(MIN_CATCHABILITY, MAX_CATCHABILITY)
+                ),
+                new SumSquaredErrors<>(
+                    observedLandings,
+                    sim -> sim.getComponent(TotalLandingsPerYearAccumulator.class).get()
+                ),
+                ImmutableLongArray.copyOf(seeds)
+            );
 
         System.out.println("population_size=" + populationSize);
         System.out.println("generations=" + generations);
@@ -119,28 +133,4 @@ public final class PeterSnapperCatchabilityCalibration {
             ));
     }
 
-    private static final class LandingsCalibrationProblem extends CalibrationProblem {
-
-        private LandingsCalibrationProblem(
-            final Map<Integer, Double> observedLandings,
-            final long... seeds
-        ) {
-            super(
-                new PeterSnapperScenario().get(),
-                Period.ofYears(observedLandings.size()),
-                ImmutableMap.of(
-                    "totalLandingsPerYear", totalLandingsPerYearAccumulator()
-                ),
-                ImmutableMap.of(
-                    CATCHABILITY_PROPERTY, new DoubleRange(MIN_CATCHABILITY, MAX_CATCHABILITY)
-                ),
-                new SumSquaredErrors<>(
-                    observedLandings,
-                    sim -> sim.getComponent(TotalLandingsPerYearAccumulator.class).get()
-                ),
-                ImmutableLongArray.copyOf(seeds)
-            );
-        }
-
-    }
 }
