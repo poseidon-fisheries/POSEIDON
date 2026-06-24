@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core.utils;
 import org.apache.commons.beanutils.BeanUtils;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.PerSimulationFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -85,6 +86,12 @@ public class Factories {
 
     public static PrefixedIdSupplierFactory prefixedIdSupplier(final String prefix) {
         return new PrefixedIdSupplierFactory(prefix);
+    }
+
+    public static <T> PerSimulationFactory<T> perSimulation(
+        final Factory<? super SimulationScope, ? extends T> delegate
+    ) {
+        return new PerSimulationFactory<>(delegate);
     }
 
     public static <C extends Steppable> FinalProcessFactory<C> finalProcess(
