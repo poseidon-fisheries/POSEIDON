@@ -49,12 +49,12 @@ public final class PeterSnapperCatchabilityCalibration {
     private static final double MIN_CATCHABILITY = 0.00001;
     private static final double MAX_CATCHABILITY = 0.005;
     private static final double TUTORIAL_CATCHABILITY = 0.000641964;
-    private static final int DEFAULT_POPULATION_SIZE = 30;
-    private static final long DEFAULT_GENERATIONS = 30;
+    private static final int DEFAULT_POPULATION_SIZE = 50;
+    private static final long DEFAULT_GENERATIONS = 100;
     private static final int STEADY_GENERATIONS = 10;
     private static final double MUTATION_PROBABILITY = 0.20;
     private static final double RECOMBINATION_PROBABILITY = 0.35;
-    private static final long[] DEFAULT_SEEDS = {0};
+    private static final long[] DEFAULT_SEEDS = {0, 1, 2};
 
     private PeterSnapperCatchabilityCalibration() {
     }

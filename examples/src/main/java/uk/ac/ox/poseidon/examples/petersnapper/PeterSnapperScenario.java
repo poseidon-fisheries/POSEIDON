@@ -158,7 +158,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                                 tableFromMap(
                                     tableDefinition(
                                         columnDefinition("year", "INTEGER"),
-                                        columnDefinition("landings", "DOUBLE")
+                                        columnDefinition("landings_kg", "DOUBLE")
                                     ),
                                     totalLandingsPerYearAccumulator()
                                 ),
