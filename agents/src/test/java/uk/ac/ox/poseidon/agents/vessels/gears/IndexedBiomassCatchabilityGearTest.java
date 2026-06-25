@@ -58,8 +58,8 @@ class IndexedBiomassCatchabilityGearTest {
                 MINIMUM_CATCH_THRESHOLD,
                 DURATION
             );
-        final BiomassBucket availableFish =
-            BiomassBucket.of(new double[]{10.0, 5.0}, speciesIndex);
+        final Bucket availableFish =
+            Bucket.of(new double[]{10.0, 5.0}, speciesIndex);
         final Fisheable fisheable = new StubFisheable(availableFish);
 
         final Bucket caught = gear.fish(fisheable);
@@ -110,8 +110,8 @@ class IndexedBiomassCatchabilityGearTest {
                 MINIMUM_CATCH_THRESHOLD,
                 DURATION
             );
-        final BiomassBucket availableFish =
-            BiomassBucket.of(new double[]{1.0}, speciesIndex);
+        final Bucket availableFish =
+            Bucket.of(new double[]{1.0}, speciesIndex);
         final Fisheable fisheable = new StubFisheable(availableFish);
 
         final Bucket caught = gear.fish(fisheable);

@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
@@ -43,7 +42,7 @@ class IndexedDiscardRatesTest {
         final Species a = new Species("A", null, null);
         final Species b = new Species("B", null, null);
         final SpeciesIndex index = SpeciesIndex.of(a, b);
-        final Bucket retained = BiomassBucket.of(new double[]{10.0, 20.0}, index);
+        final Bucket retained = Bucket.of(new double[]{10.0, 20.0}, index);
         final SpeciesIndexedDoubleArray rates =
             SpeciesIndexedDoubleArray.of(new double[]{0.5, 0.0}, index);
         final Disposition disposition =
@@ -72,7 +71,7 @@ class IndexedDiscardRatesTest {
 
         final IndexedDiscardRates process = factory.get(Scope.GLOBAL_SCOPE);
         final SpeciesIndex index = SpeciesIndex.of(species);
-        final Bucket retained = BiomassBucket.of(new double[]{8.0, 4.0}, index);
+        final Bucket retained = Bucket.of(new double[]{8.0, 4.0}, index);
         final Disposition disposition =
             new Disposition(retained, Bucket.empty(), Bucket.empty());
 

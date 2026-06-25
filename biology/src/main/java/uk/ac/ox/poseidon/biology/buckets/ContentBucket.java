@@ -28,15 +28,15 @@ import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 @Data
-public final class ContentBucket implements Bucket {
+final class ContentBucket implements Bucket {
 
     private final ImmutableMap<Species, Content> map;
 
@@ -74,21 +74,28 @@ public final class ContentBucket implements Bucket {
     }
 
     @Override
-    public ContentBucket add(final Bucket other) {
-        return new ContentBucket(
-            Stream
-                .concat(getMap().entrySet().stream(), other.getMap().entrySet().stream())
-                .collect(toImmutableMap(
-                    Entry::getKey,
-                    Entry::getValue,
-                    Content::add
-                ))
-        );
+    public Bucket add(final Bucket other) {
+        final Map<Species, Content> results = new HashMap<>(getMap());
+        for (final Entry<Species, Content> entry : other.getMap().entrySet()) {
+            results.merge(
+                entry.getKey(),
+                entry.getValue(),
+                Content::add
+            );
+        }
+        results.values().removeIf(Content::isEmpty);
+        if (results.isEmpty()) {
+            return Bucket.empty();
+        }
+        if (results.values().stream().allMatch(Biomass.class::isInstance)) {
+            return BiomassBucket.ofContentMap(results);
+        }
+        return ContentBucket.ofContentMap(results);
     }
 
     @Override
     public boolean isEmpty() {
-        return getMap().values().stream().allMatch(Content::isEmpty);
+        return getMap().isEmpty();
     }
 
     @Override

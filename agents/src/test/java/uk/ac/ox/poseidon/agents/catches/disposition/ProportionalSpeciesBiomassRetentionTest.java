@@ -54,7 +54,7 @@ class ProportionalSpeciesBiomassRetentionTest {
         final double[] retainedBiomass = new double[speciesIndex.size()];
         retainedBiomass[speciesIndex.indexOf(DummySpecies.A)] = 10.0;
         retainedBiomass[speciesIndex.indexOf(DummySpecies.B)] = 5.0;
-        final Bucket retained = BiomassBucket.of(retainedBiomass, speciesIndex);
+        final Bucket retained = Bucket.of(retainedBiomass, speciesIndex);
 
         final Disposition result = retention.partition(
             new Disposition(retained, Bucket.empty(), Bucket.empty()),

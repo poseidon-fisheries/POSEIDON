@@ -133,10 +133,86 @@ class SingleSpeciesBiomassBucketTest {
     }
 
     @Test
+    void mapBiomassValueReturningNaNReturnsEmptyBucket() {
+        final Bucket bucket = new SingleSpeciesBiomassBucket(a, 10.0);
+        final Bucket mapped = bucket.mapBiomassValue((species, value) -> Double.NaN);
+        assertThat(mapped).isSameAs(Bucket.empty());
+    }
+
+    @Test
+    void addDifferentSpeciesReturnsMultiSpeciesBucket() {
+        final Bucket bucketA = new SingleSpeciesBiomassBucket(a, 7.0);
+        final Bucket bucketB = new SingleSpeciesBiomassBucket(b, 3.0);
+        final Bucket result = bucketA.add(bucketB);
+        assertThat(result.getKg(a)).isEqualTo(7.0);
+        assertThat(result.getKg(b)).isEqualTo(3.0);
+        assertThat(result.getSpecies()).isEqualTo(Set.of(a, b));
+    }
+
+    @Test
+    void subtractDifferentSpeciesReturnsOriginalMinusNothing() {
+        final Bucket bucketA = new SingleSpeciesBiomassBucket(a, 7.0);
+        final Bucket bucketB = new SingleSpeciesBiomassBucket(b, 3.0);
+        final Bucket result = bucketA.subtract(bucketB);
+        assertThat(result.getKg(a)).isEqualTo(7.0);
+        assertThat(result.getKg(b)).isEqualTo(0.0);
+    }
+
+    @Test
+    void mapBiomassValueReturningNegativeThrows() {
+        final Bucket bucket = new SingleSpeciesBiomassBucket(a, 10.0);
+        assertThatThrownBy(() -> bucket.mapBiomassValue((species, value) -> -1.0))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void replaceContentWithNonBiomassFallsToDefault() {
+        final Bucket bucket = new SingleSpeciesBiomassBucket(a, 10.0);
+        final Content nonBiomass = new NonBiomassContent(6.0);
+        final Bucket replaced = bucket.replaceContent(a, nonBiomass);
+        assertThat(replaced.getKg(a)).isEqualTo(6.0);
+    }
+
+    @Test
+    void mapContentReturningNonBiomassFallsToDefault() {
+        final Bucket bucket = new SingleSpeciesBiomassBucket(a, 10.0);
+        final Bucket mapped = bucket.mapContent((species, content) -> new NonBiomassContent(5.0));
+        assertThat(mapped.getKg(a)).isEqualTo(5.0);
+    }
+
+    @Test
     void partitionBySeparatesSingleEntry() {
         final Bucket bucket = new SingleSpeciesBiomassBucket(a, 10.0);
         final var partitions = bucket.partitionBy((species, content) -> species.equals(a));
         assertThat(partitions.get(true)).isSameAs(bucket);
         assertThat(partitions.get(false)).isSameAs(Bucket.empty());
+    }
+
+    private static final class NonBiomassContent implements Content {
+        private final double kg;
+
+        private NonBiomassContent(final double kg) {
+            this.kg = kg;
+        }
+
+        @Override
+        public Biomass multiply(final double value) {
+            return Biomass.ofKg(kg * value);
+        }
+
+        @Override
+        public Biomass divide(final double value) {
+            return Biomass.ofKg(kg / value);
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return kg == 0.0;
+        }
+
+        @Override
+        public Biomass asBiomass() {
+            return Biomass.ofKg(kg);
+        }
     }
 }

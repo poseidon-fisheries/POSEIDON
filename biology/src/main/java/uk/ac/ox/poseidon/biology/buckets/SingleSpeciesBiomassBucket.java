@@ -45,12 +45,12 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 
 @ToString
 @EqualsAndHashCode
-public class SingleSpeciesBiomassBucket implements Bucket {
+class SingleSpeciesBiomassBucket implements Bucket {
 
     private final Species species;
     private final double biomassInKg;
 
-    public SingleSpeciesBiomassBucket(
+    SingleSpeciesBiomassBucket(
         final Species species,
         final double biomassInKg
     ) {
@@ -123,9 +123,8 @@ public class SingleSpeciesBiomassBucket implements Bucket {
     ) {
         if (species.equals(this.species) && newContent instanceof Biomass) {
             final double newBiomass = newContent.asKg();
-            return newBiomass == 0
-                ? Bucket.empty()
-                : new SingleSpeciesBiomassBucket(species, newBiomass);
+            if (Double.isNaN(newBiomass) || newBiomass == 0) return Bucket.empty();
+            return new SingleSpeciesBiomassBucket(species, newBiomass);
         } else {
             return Bucket.super.replaceContent(species, newContent);
         }
@@ -136,9 +135,8 @@ public class SingleSpeciesBiomassBucket implements Bucket {
         final Content mapped = mapper.apply(species, getContent());
         if (mapped instanceof Biomass) {
             final double mappedKg = mapped.asKg();
-            return mappedKg == 0
-                ? Bucket.empty()
-                : new SingleSpeciesBiomassBucket(species, mappedKg);
+            if (Double.isNaN(mappedKg) || mappedKg == 0) return Bucket.empty();
+            return new SingleSpeciesBiomassBucket(species, mappedKg);
         }
         return Bucket.super.mapContent(mapper);
     }
@@ -146,7 +144,7 @@ public class SingleSpeciesBiomassBucket implements Bucket {
     @Override
     public Bucket mapBiomassValue(final ObjDoubleToDoubleFunction<Species> mapper) {
         final double mappedKg = mapper.applyAsDouble(species, biomassInKg);
-        return mappedKg == 0
+        return Double.isNaN(mappedKg) || mappedKg == 0
             ? Bucket.empty()
             : new SingleSpeciesBiomassBucket(species, mappedKg);
     }

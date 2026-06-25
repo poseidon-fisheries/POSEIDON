@@ -35,7 +35,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.ObjDoubleConsumer;
 
-public enum EmptyBucket implements Bucket {
+enum EmptyBucket implements Bucket {
 
     INSTANCE;
 

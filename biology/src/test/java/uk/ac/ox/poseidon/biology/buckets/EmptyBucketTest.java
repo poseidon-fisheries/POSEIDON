@@ -91,6 +91,36 @@ class EmptyBucketTest {
     }
 
     @Test
+    void forEachIsNoOp() {
+        final Bucket empty = EmptyBucket.INSTANCE;
+        final boolean[] visited = {false};
+        empty.forEach((species, content) -> visited[0] = true);
+        assertThat(visited[0]).isFalse();
+    }
+
+    @Test
+    void forEachBiomassValueIsNoOp() {
+        final Bucket empty = EmptyBucket.INSTANCE;
+        final boolean[] visited = {false};
+        empty.forEachBiomassValue((species, value) -> visited[0] = true);
+        assertThat(visited[0]).isFalse();
+    }
+
+    @Test
+    void mapBiomassValueReturnsEmpty() {
+        final Bucket empty = EmptyBucket.INSTANCE;
+        final Bucket result = empty.mapBiomassValue((species, value) -> 10.0);
+        assertThat(result).isSameAs(empty);
+    }
+
+    @Test
+    void addContentBucketReturnsContentBucket() {
+        final Bucket empty = EmptyBucket.INSTANCE;
+        final Bucket contentBucket = ContentBucket.ofContentMap(Map.of(a, Biomass.ofKg(10.0)));
+        assertThat(empty.add(contentBucket)).isSameAs(contentBucket);
+    }
+
+    @Test
     void toBuilderBuildsEmptyBucket() {
         final Bucket empty = EmptyBucket.INSTANCE;
         assertThat(empty.toBuilder().build()).isSameAs(empty);

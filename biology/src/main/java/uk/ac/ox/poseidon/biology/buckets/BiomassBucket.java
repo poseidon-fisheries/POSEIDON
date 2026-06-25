@@ -51,6 +51,10 @@ import static lombok.AccessLevel.PRIVATE;
 @RequiredArgsConstructor(access = PRIVATE)
 public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
 
+    private static boolean isPresent(final double biomass) {
+        return biomass > 0;
+    }
+
     private final double[] biomasses;
     @Getter private final SpeciesIndex speciesIndex;
 
@@ -60,13 +64,13 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
             .asMap()
             .entrySet()
             .stream()
-            .filter(entry -> biomasses[entry.getValue()] > 0)
+            .filter(entry -> isPresent(biomasses[entry.getValue()]))
             .collect(toImmutableMap(
                 Entry::getKey,
                 entry -> Biomass.ofKg(biomasses[entry.getValue()])
             ));
 
-    public static BiomassBucket ofContentMap(final Map<Species, Content> map) {
+    static BiomassBucket ofContentMap(final Map<Species, Content> map) {
         return ofBiomassMap(Maps.transformValues(map, Content::asKg));
     }
 
@@ -78,10 +82,10 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
             final int index = speciesIndexMap.get(entry.getKey());
             biomasses[index] = entry.getValue();
         }
-        return new BiomassBucket(biomasses, speciesIndex);
+        return create(biomasses, speciesIndex);
     }
 
-    public static BiomassBucket of(
+    static BiomassBucket create(
         final double[] biomasses,
         final SpeciesIndex speciesIndex
     ) {
@@ -89,15 +93,19 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
             biomasses.length == speciesIndex.size(),
             "Biomass array length must match species index size"
         );
-        for (int i = 0; i < biomasses.length; i++) {
-            if (biomasses[i] < 0) {
+        final double[] normalized = biomasses.clone();
+        for (int i = 0; i < normalized.length; i++) {
+            if (normalized[i] < 0) {
                 throw new IllegalArgumentException(
-                    "Negative biomass (" + biomasses[i] + ") at index " + i + " in array: " +
+                    "Negative biomass (" + normalized[i] + ") at index " + i + " in array: " +
                         Arrays.toString(biomasses)
                 );
             }
+            if (Double.isNaN(normalized[i])) {
+                normalized[i] = 0;
+            }
         }
-        return new BiomassBucket(biomasses.clone(), speciesIndex);
+        return new BiomassBucket(normalized, speciesIndex);
     }
 
     @Override
@@ -105,7 +113,7 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
         final int i = speciesIndex.indexOf(species);
         if (i == -1) return Optional.empty();
         final double biomass = biomasses[i];
-        if (biomass == 0) return Optional.empty();
+        if (!isPresent(biomass)) return Optional.empty();
         return Optional.of(Biomass.ofKg(biomass));
     }
 
@@ -120,23 +128,29 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
 
     private Bucket addBiomassArrayBucket(final BiomassBucket other) {
         final double[] newBiomasses = new double[biomasses.length];
+        boolean hasPresent = false;
         for (int i = 0; i < biomasses.length; i++) {
             newBiomasses[i] = biomasses[i] + other.biomasses[i];
+            if (isPresent(newBiomasses[i])) hasPresent = true;
         }
-        return new BiomassBucket(newBiomasses, speciesIndex);
+        return hasPresent
+            ? new BiomassBucket(newBiomasses, speciesIndex)
+            : Bucket.empty();
     }
 
     private Bucket addOtherBucket(final Bucket other) {
         final SpeciesIndex speciesIndex = commonIndex(other);
         final double[] newBiomasses = speciesIndex.newDoubleArray();
-
+        boolean hasPresent = false;
         for (final var entry : speciesIndex.asMap().entrySet()) {
             final var species = entry.getKey();
             final int index = entry.getValue();
             newBiomasses[index] = this.getKg(species) + other.getKg(species);
+            if (isPresent(newBiomasses[index])) hasPresent = true;
         }
-
-        return new BiomassBucket(newBiomasses, speciesIndex);
+        return hasPresent
+            ? new BiomassBucket(newBiomasses, speciesIndex)
+            : Bucket.empty();
     }
 
     private SpeciesIndex commonIndex(final Bucket other) {
@@ -169,32 +183,32 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
     }
 
     private Bucket subtractBiomassArrayBucket(final BiomassBucket other) {
-        boolean allZero = true;
+        boolean hasPresent = false;
         final double[] newBiomasses = new double[biomasses.length];
         for (int i = 0; i < biomasses.length; i++) {
             final double otherBiomass = other.biomasses[i];
             newBiomasses[i] = biomasses[i] - other.biomasses[i];
-            if (newBiomasses[i] != 0) allZero = false;
+            if (isPresent(newBiomasses[i])) hasPresent = true;
             checkBiomassNonNegativeWhenSubtracting(newBiomasses[i], otherBiomass, i);
         }
-        return allZero
-            ? Bucket.empty()
-            : new BiomassBucket(newBiomasses, speciesIndex);
+        return hasPresent
+            ? new BiomassBucket(newBiomasses, speciesIndex)
+            : Bucket.empty();
     }
 
     private Bucket subtractOtherBucket(final Bucket other) {
-        boolean allZero = true;
+        boolean hasPresent = false;
         final double[] newBiomasses = speciesIndex.newDoubleArray();
         for (int i = 0; i < speciesIndex.size(); i++) {
             final Species species = speciesIndex.speciesAt(i);
             final double otherBiomass = other.getContent(species).map(Content::asKg).orElse(0.0);
             newBiomasses[i] = biomasses[i] - otherBiomass;
-            if (newBiomasses[i] != 0) allZero = false;
+            if (isPresent(newBiomasses[i])) hasPresent = true;
             checkBiomassNonNegativeWhenSubtracting(newBiomasses[i], otherBiomass, i);
         }
-        return allZero
-            ? Bucket.empty()
-            : new BiomassBucket(newBiomasses, speciesIndex);
+        return hasPresent
+            ? new BiomassBucket(newBiomasses, speciesIndex)
+            : Bucket.empty();
     }
 
     private void checkBiomassNonNegativeWhenSubtracting(
@@ -217,8 +231,16 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
         if (newContent instanceof Biomass) {
             final int i = speciesIndex.indexOf(species);
             if (i != -1) {
+                final double rawValue = newContent.asKg();
+                final double newValue = Double.isNaN(rawValue) ? 0.0 : rawValue;
                 final double[] newBiomasses = biomasses.clone();
-                newBiomasses[i] = newContent.asKg();
+                newBiomasses[i] = newValue;
+                if (!isPresent(newValue)) {
+                    for (final double b : newBiomasses) {
+                        if (isPresent(b)) return new BiomassBucket(newBiomasses, speciesIndex);
+                    }
+                    return Bucket.empty();
+                }
                 return new BiomassBucket(newBiomasses, speciesIndex);
             }
         }
@@ -227,29 +249,52 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
 
     @Override
     public Bucket mapBiomassValue(final ObjDoubleToDoubleFunction<Species> mapper) {
-        return mapEntry(mapper);
+        final double[] mapped = speciesIndex.newDoubleArray();
+        boolean hasPositive = false;
+        for (int i = 0; i < speciesIndex.size(); i++) {
+            if (!isPresent(biomasses[i])) continue;
+            final double v = mapper.applyAsDouble(speciesIndex.speciesAt(i), biomasses[i]);
+            if (Double.isNaN(v)) continue;
+            if (v < 0) {
+                throw new IllegalArgumentException(
+                    "Negative biomass (" + v + ") from mapper for species " +
+                        speciesIndex.speciesAt(i)
+                );
+            }
+            mapped[i] = v;
+            if (isPresent(v)) hasPositive = true;
+        }
+        if (!hasPositive) return Bucket.empty();
+        return new BiomassBucket(mapped, speciesIndex);
     }
 
     @Override
     public Map<Boolean, Bucket> partitionBy(final BiPredicate<Species, Content> predicate) {
-
         final double[] t = speciesIndex.newDoubleArray();
         final double[] f = speciesIndex.newDoubleArray();
-
+        boolean hasTrue = false;
+        boolean hasFalse = false;
         for (int i = 0; i < speciesIndex.size(); i++) {
+            if (!isPresent(biomasses[i])) continue;
             final boolean b = predicate.test(speciesIndex.speciesAt(i), Biomass.ofKg(biomasses[i]));
-            (b ? t : f)[i] = biomasses[i];
+            if (b) {
+                t[i] = biomasses[i];
+                hasTrue = true;
+            } else {
+                f[i] = biomasses[i];
+                hasFalse = true;
+            }
         }
         return Map.of(
-            true, BiomassBucket.of(t, speciesIndex),
-            false, BiomassBucket.of(f, speciesIndex)
+            true, hasTrue ? BiomassBucket.create(t, speciesIndex) : Bucket.empty(),
+            false, hasFalse ? BiomassBucket.create(f, speciesIndex) : Bucket.empty()
         );
-
     }
 
     @Override
     public void forEach(final BiConsumer<Species, Content> action) {
         for (int i = 0; i < biomasses.length; i++) {
+            if (!isPresent(biomasses[i])) continue;
             action.accept(speciesIndex.speciesAt(i), Biomass.ofKg(biomasses[i]));
         }
     }
@@ -257,13 +302,17 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
     @Override
     public void forEachBiomassValue(final ObjDoubleConsumer<Species> action) {
         for (int i = 0; i < biomasses.length; i++) {
+            if (!isPresent(biomasses[i])) continue;
             action.accept(speciesIndex.speciesAt(i), biomasses[i]);
         }
     }
 
     @Override
     public boolean isEmpty() {
-        return Arrays.stream(biomasses).sum() == 0;
+        for (final double b : biomasses) {
+            if (isPresent(b)) return false;
+        }
+        return true;
     }
 
     @Override
@@ -273,7 +322,7 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
 
     @Override
     public BiomassBucket newInstance(final double[] values) {
-        return new BiomassBucket(values, speciesIndex);
+        return BiomassBucket.create(values, speciesIndex);
     }
 
     @Override
@@ -284,7 +333,9 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
     @Override
     public double getTotalBiomassInKg() {
         double sum = 0.0;
-        for (final double biomass : biomasses) {sum += biomass;}
+        for (final double biomass : biomasses) {
+            if (isPresent(biomass)) sum += biomass;
+        }
         return sum;
     }
 
@@ -292,7 +343,7 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
     public Set<Species> getSpecies() {
         final HashSet<Species> species = new HashSet<>();
         for (int i = 0; i < biomasses.length; i++) {
-            if (biomasses[i] > 0) species.add(speciesIndex.speciesAt(i));
+            if (isPresent(biomasses[i])) species.add(speciesIndex.speciesAt(i));
         }
         return species;
     }

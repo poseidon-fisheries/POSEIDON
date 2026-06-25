@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.DummySpecies;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
@@ -43,7 +42,7 @@ class SelectedSpeciesRetentionTest {
         retainedBiomass[speciesIndex.indexOf(DummySpecies.A)] = 10.0;
         retainedBiomass[speciesIndex.indexOf(DummySpecies.B)] = 5.0;
         retainedBiomass[speciesIndex.indexOf(DummySpecies.C)] = 3.0;
-        final Bucket retained = BiomassBucket.of(retainedBiomass, speciesIndex);
+        final Bucket retained = Bucket.of(retainedBiomass, speciesIndex);
 
         final SelectedSpeciesRetention retention =
             new SelectedSpeciesRetention(List.of(DummySpecies.A, DummySpecies.C));
@@ -68,11 +67,11 @@ class SelectedSpeciesRetentionTest {
         final double[] retainedBiomass = new double[speciesIndex.size()];
         retainedBiomass[speciesIndex.indexOf(DummySpecies.A)] = 10.0;
         retainedBiomass[speciesIndex.indexOf(DummySpecies.B)] = 5.0;
-        final Bucket retained = BiomassBucket.of(retainedBiomass, speciesIndex);
+        final Bucket retained = Bucket.of(retainedBiomass, speciesIndex);
 
         final double[] discardedAliveBiomass = new double[speciesIndex.size()];
         discardedAliveBiomass[speciesIndex.indexOf(DummySpecies.A)] = 2.0;
-        final Bucket discardedAlive = BiomassBucket.of(discardedAliveBiomass, speciesIndex);
+        final Bucket discardedAlive = Bucket.of(discardedAliveBiomass, speciesIndex);
 
         final SelectedSpeciesRetention retention =
             new SelectedSpeciesRetention(List.of(DummySpecies.A));
@@ -94,7 +93,7 @@ class SelectedSpeciesRetentionTest {
         final double[] retainedBiomass = new double[speciesIndex.size()];
         retainedBiomass[speciesIndex.indexOf(DummySpecies.A)] = 10.0;
         retainedBiomass[speciesIndex.indexOf(DummySpecies.B)] = 5.0;
-        final Bucket retained = BiomassBucket.of(retainedBiomass, speciesIndex);
+        final Bucket retained = Bucket.of(retainedBiomass, speciesIndex);
 
         final SelectedSpeciesRetention retention =
             new SelectedSpeciesRetention(List.of());
@@ -115,7 +114,7 @@ class SelectedSpeciesRetentionTest {
         final double[] retainedBiomass = new double[speciesIndex.size()];
         retainedBiomass[speciesIndex.indexOf(DummySpecies.A)] = 10.0;
         retainedBiomass[speciesIndex.indexOf(DummySpecies.B)] = 5.0;
-        final Bucket retained = BiomassBucket.of(retainedBiomass, speciesIndex);
+        final Bucket retained = Bucket.of(retainedBiomass, speciesIndex);
 
         final SelectedSpeciesRetention retention =
             new SelectedSpeciesRetention(List.of(DummySpecies.A, DummySpecies.B));

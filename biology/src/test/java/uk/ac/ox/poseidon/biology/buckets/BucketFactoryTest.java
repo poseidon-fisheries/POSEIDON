@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.biology.buckets;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
@@ -56,5 +57,22 @@ class BucketFactoryTest {
     void ofSpeciesAndNegativeBiomassThrows() {
         assertThatThrownBy(() -> Bucket.of(a, -1.0))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void ofSpeciesAndContentFiltersEmptyContent() {
+        final Content emptyContent = new Content() {
+            @Override public Biomass multiply(double value) { return Biomass.ZERO; }
+            @Override public Biomass divide(double value) { return Biomass.ZERO; }
+            @Override public boolean isEmpty() { return true; }
+            @Override public Biomass asBiomass() { return Biomass.ZERO; }
+        };
+        assertThat(Bucket.of(a, emptyContent)).isSameAs(Bucket.empty());
+    }
+
+    @Test
+    void ofSpeciesAndNonEmptyContentReturnsBucket() {
+        final Bucket bucket = Bucket.of(a, Biomass.ofKg(5.0));
+        assertThat(bucket.getKg(a)).isEqualTo(5.0);
     }
 }

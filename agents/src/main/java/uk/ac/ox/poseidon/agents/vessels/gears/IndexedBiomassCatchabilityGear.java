@@ -67,14 +67,15 @@ public class IndexedBiomassCatchabilityGear implements Gear {
 
     @Override
     public Bucket fish(final Fisheable fisheable) {
+        final Bucket availableFish = fisheable.availableFish();
         final Bucket fishToCatch =
-            switch (fisheable.availableFish()) {
-                case final BiomassBucket availableFish when proportions.sameIndex(availableFish) ->
-                    availableFish.mapWithIndex((biomass, i) -> {
+            switch (availableFish) {
+                case final BiomassBucket biomassBucket when proportions.sameIndex(biomassBucket) ->
+                    biomassBucket.mapWithIndex((biomass, i) -> {
                         final double v = proportions.getDouble(i) * biomass;
                         return v >= minimumCatchThresholdInKg ? v : 0;
                     });
-                default -> fisheable.availableFish().mapBiomassValue((species, biomass) -> {
+                default -> availableFish.mapBiomassValue((species, biomass) -> {
                     final double v = proportions.getDoubleOrDefault(species, 0.0) * biomass;
                     return v >= minimumCatchThresholdInKg ? v : 0;
                 });

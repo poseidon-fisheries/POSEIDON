@@ -29,7 +29,6 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
-import uk.ac.ox.poseidon.biology.buckets.SingleSpeciesBiomassBucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableDoubleGrid;
@@ -143,7 +142,7 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
             if (gridBiomass <= 0) return Bucket.empty();
             final double biomassExtracted = Math.min(biomassToExtract, gridBiomass);
             setValue(cell, gridBiomass - biomassExtracted);
-            return new SingleSpeciesBiomassBucket(species, biomassExtracted);
+            return Bucket.of(species, biomassExtracted);
         }
     }
 }

@@ -106,7 +106,7 @@ final class AdaptiveBucketBuilder implements BucketBuilder {
     ) {
         checkNotNull(species, "species");
         checkNotNull(content, "content");
-        map.merge(species, content, Content::subtract);
+        map.computeIfPresent(species, (k, existing) -> existing.subtract(content));
         return this;
     }
 

@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
 import java.util.Map;
@@ -73,6 +74,14 @@ public interface Bucket {
         return newBuilder().add(map).build();
     }
 
+    static Bucket of(
+        final double[] biomasses,
+        final SpeciesIndex speciesIndex
+    ) {
+        final BiomassBucket bucket = BiomassBucket.create(biomasses, speciesIndex);
+        return bucket.isEmpty() ? Bucket.empty() : bucket;
+    }
+
     Optional<? extends Content> getContent(Species species);
 
     default double getKg(final Species species) {
@@ -104,12 +113,12 @@ public interface Bucket {
 
     default Bucket mapBiomassValue(final ObjDoubleToDoubleFunction<Species> mapper) {
         final BucketBuilder bucketBuilder = newBuilder();
-        getMap().forEach((species, content) ->
-            bucketBuilder.put(
-                species,
-                Biomass.ofKg(mapper.applyAsDouble(species, content.asKg()))
-            )
-        );
+        getMap().forEach((species, content) -> {
+            final double biomassInKg = mapper.applyAsDouble(species, content.asKg());
+            if (!Double.isNaN(biomassInKg)) {
+                bucketBuilder.put(species, Biomass.ofKg(biomassInKg));
+            }
+        });
         return bucketBuilder.build();
     }
 

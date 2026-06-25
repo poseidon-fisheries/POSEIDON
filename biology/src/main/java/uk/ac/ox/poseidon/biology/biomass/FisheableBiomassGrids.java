@@ -116,7 +116,7 @@ public final class FisheableBiomassGrids
                     if (i != -1) extractBiomass(i, biomass, biomassExtracted);
                 });
             }
-            return BiomassBucket.of(biomassExtracted, speciesIndex);
+            return Bucket.of(biomassExtracted, speciesIndex);
         }
 
         private void extractBiomass(
@@ -137,7 +137,7 @@ public final class FisheableBiomassGrids
             for (int i = 0; i < grids.length; i++) {
                 biomasses[i] = grids[i].getValue(cell);
             }
-            return BiomassBucket.of(biomasses, speciesIndex);
+            return Bucket.of(biomasses, speciesIndex);
         }
 
         @Override
