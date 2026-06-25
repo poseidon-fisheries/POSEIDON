@@ -26,8 +26,6 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
@@ -38,10 +36,11 @@ class BestOptionsFromFriends<O> implements Supplier<OptionValues<O>> {
 
     private final VesselComponentRegister<? extends OptionValues<O>> optionValuesRegister;
     private final Supplier<? extends Iterable<? extends Vessel>> friendsSupplier;
+    private final ReusableOptionValues<O> aggregatedValues = new ReusableOptionValues<>();
 
     @Override
     public OptionValues<O> get() {
-        final Map<O, Double> aggregatedValues = new HashMap<>();
+        aggregatedValues.clear();
         for (final Vessel friend : friendsSupplier.get()) {
             if (!friend.isActive()) continue;
             final OptionValues<O> values = optionValuesRegister
@@ -49,13 +48,9 @@ class BestOptionsFromFriends<O> implements Supplier<OptionValues<O>> {
                 .orElse(null);
             if (values == null) continue;
             for (final Entry<O, Double> entry : values.getBestEntries()) {
-                final Double existing = aggregatedValues.get(entry.getKey());
-                final double newValue = entry.getValue();
-                if (existing == null || newValue > existing) {
-                    aggregatedValues.put(entry.getKey(), newValue);
-                }
+                aggregatedValues.putIfGreater(entry.getKey(), entry.getValue());
             }
         }
-        return new ImmutableOptionValues<>(aggregatedValues);
+        return aggregatedValues;
     }
 }

@@ -22,10 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static lombok.AccessLevel.PACKAGE;
@@ -36,7 +42,7 @@ public abstract class HashMapBasedOptionValues<O>
     extends MapBasedOptionValues<O>
     implements MutableOptionValues<O> {
 
-    protected final Map<O, Double> values = new HashMap<>();
+    protected final Object2DoubleOpenHashMap<O> values = new Object2DoubleOpenHashMap<>();
 
     @Override
     public void observe(
@@ -46,6 +52,29 @@ public abstract class HashMapBasedOptionValues<O>
         final double oldValue = values.getOrDefault(option, 0.0);
         values.put(option, newValue(option, oldValue, value));
         invalidateCache();
+    }
+
+    @Override
+    public List<Map.Entry<O, Double>> getBestEntries() {
+        if (cachedBest == null) {
+            final List<Map.Entry<O, Double>> best = new ArrayList<>();
+            double bestValue = Double.NEGATIVE_INFINITY;
+            final ObjectIterator<Object2DoubleMap.Entry<O>> iterator =
+                values.object2DoubleEntrySet().fastIterator();
+            while (iterator.hasNext()) {
+                final Object2DoubleMap.Entry<O> entry = iterator.next();
+                final double v = entry.getDoubleValue();
+                if (v > bestValue) {
+                    bestValue = v;
+                    best.clear();
+                    best.add(new AbstractMap.SimpleEntry<>(entry.getKey(), v));
+                } else if (v == bestValue) {
+                    best.add(new AbstractMap.SimpleEntry<>(entry.getKey(), v));
+                }
+            }
+            cachedBest = ImmutableList.copyOf(best);
+        }
+        return cachedBest;
     }
 
     protected void invalidateCache() {

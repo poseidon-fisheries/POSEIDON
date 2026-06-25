@@ -33,4 +33,5 @@ dependencies {
     api(libs.gdx.ai)
     implementation(libs.streamex)
     implementation(libs.commons.beanutils)
+    implementation(libs.fastutil.core)
 }
