@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static uk.ac.ox.poseidon.core.MasonUtils.reservoirSample;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 import static uk.ac.ox.poseidon.core.MasonUtils.upToNOf;
 
@@ -168,6 +169,79 @@ class MasonUtilsTest {
     void upToNOfReturnsEmptyForEmptyCandidates() {
         final MersenneTwisterFast rng = new MersenneTwisterFast();
         assertTrue(upToNOf(5, List.of(), rng).isEmpty());
+    }
+
+    @Test
+    void reservoirSampleReturnsAllWhenPoolSmallerThanSampleSize() {
+        final List<Integer> pool = List.of(10, 20, 30);
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        final List<Integer> result = reservoirSample(pool, 10, x -> true, rng);
+        assertEquals(3, result.size());
+        assertTrue(pool.containsAll(result));
+    }
+
+    @Test
+    void reservoirSampleReturnsEmptyWhenNoItemsPassFilter() {
+        final List<Integer> pool = List.of(10, 20, 30);
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        assertTrue(reservoirSample(pool, 5, x -> false, rng).isEmpty());
+    }
+
+    @Test
+    void reservoirSampleReturnsEmptyWhenSampleSizeIsZero() {
+        final List<Integer> pool = List.of(10, 20, 30);
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        assertTrue(reservoirSample(pool, 0, x -> true, rng).isEmpty());
+    }
+
+    @Test
+    void reservoirSampleReturnsAllWhenPoolEqualsSampleSize() {
+        final List<Integer> pool = List.of(10, 20, 30, 40, 50);
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        final List<Integer> result = reservoirSample(pool, 5, x -> true, rng);
+        assertEquals(5, result.size());
+        assertTrue(pool.containsAll(result));
+    }
+
+    @Test
+    void reservoirSampleReturnsCorrectSize() {
+        final List<Integer> pool = IntStream.range(0, 100).boxed().toList();
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        final List<Integer> result = reservoirSample(pool, 10, x -> true, rng);
+        assertEquals(10, result.size());
+        assertTrue(pool.containsAll(result));
+    }
+
+    @Test
+    void reservoirSampleReturnsOnlyFilteredItems() {
+        final List<Integer> pool = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        final MersenneTwisterFast rng = new MersenneTwisterFast();
+        final List<Integer> result = reservoirSample(pool, 10, x -> x % 2 == 0, rng);
+        assertTrue(result.stream().allMatch(x -> x % 2 == 0));
+    }
+
+    @Test
+    void reservoirSampleIsUniform() {
+        final int poolSize = 20;
+        final int sampleSize = 5;
+        final int trials = 200_000;
+        final double tolerance = 0.02;
+        final double expectedRate = (double) sampleSize / poolSize;
+        final List<Integer> pool = IntStream.range(0, poolSize).boxed().toList();
+        final MersenneTwisterFast rng = new MersenneTwisterFast(123);
+        final int[] counts = new int[poolSize];
+
+        for (int t = 0; t < trials; t++) {
+            for (final int item : reservoirSample(pool, sampleSize, x -> true, rng)) {
+                counts[item]++;
+            }
+        }
+
+        for (int i = 0; i < poolSize; i++) {
+            final double rate = (double) counts[i] / trials;
+            assertEquals(expectedRate, rate, tolerance,
+                "Item " + i + " appears at rate " + rate + ", expected " + expectedRate);
+        }
     }
 
 }

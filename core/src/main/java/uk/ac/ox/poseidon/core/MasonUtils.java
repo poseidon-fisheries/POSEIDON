@@ -32,6 +32,7 @@ import sim.util.Double2D;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -229,5 +230,39 @@ public class MasonUtils {
             }
         };
         return StreamSupport.stream(spliterator, false);
+    }
+
+    /**
+     * Reservoir-samples up to {@code sampleSize} items from {@code pool} that pass {@code filter},
+     * uniformly without replacement. O(|pool|) time, O(sampleSize) memory.
+     *
+     * @param pool       the source of items, traversed once
+     * @param sampleSize maximum number of items to return
+     * @param filter     predicate that items must satisfy to be eligible
+     * @param rng        random number generator
+     * @param <T>        item type
+     * @return list of up to {@code sampleSize} items, uniformly sampled without replacement
+     */
+    public static <T> List<T> reservoirSample(
+        final Iterable<? extends T> pool,
+        final int sampleSize,
+        final Predicate<? super T> filter,
+        final MersenneTwisterFast rng
+    ) {
+        final List<T> reservoir = new ArrayList<>();
+        int count = 0;
+        for (final T item : pool) {
+            if (!filter.test(item)) continue;
+            if (count < sampleSize) {
+                reservoir.add(item);
+            } else {
+                final int j = rng.nextInt(count + 1);
+                if (j < sampleSize) {
+                    reservoir.set(j, item);
+                }
+            }
+            count++;
+        }
+        return reservoir;
     }
 }

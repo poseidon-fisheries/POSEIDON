@@ -35,7 +35,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static java.util.function.Predicate.not;
-import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
+import static uk.ac.ox.poseidon.core.MasonUtils.reservoirSample;
 
 /**
  * A per-vessel supplier that maintains a bounded, randomly sampled set of "friends" from a pool of
@@ -45,12 +45,9 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
  * condition. If the target count has not been reached, new friends are sampled uniformly (without
  * replacement) from the pool, filtered by the condition and excluding current friends.
  *
- * <p>The sampling uses {@link uk.ac.ox.poseidon.core.MasonUtils#shuffledStream shuffledStream}
- * combined with {@code limit}, which evaluates the friendship condition lazily — only as many
- * candidates as needed to reach the target are examined. This minimizes predicate cost at high
- * acceptance rates, but allocates O(pool size) per call for the shuffle index array and the pool
- * copy. If the pool grows large and the condition is cheap, consider replacing with reservoir
- * sampling for O(target) allocation at the cost of O(pool) predicate evaluations.
+ * <p>The sampling uses reservoir sampling ({@link
+ * uk.ac.ox.poseidon.core.MasonUtils#reservoirSample reservoirSample}) for O(target) allocation
+ * at the cost of O(pool) predicate evaluations.
  */
 @RequiredArgsConstructor
 public class DynamicFriendsSupplier implements Supplier<Set<Vessel>> {
@@ -69,11 +66,14 @@ public class DynamicFriendsSupplier implements Supplier<Set<Vessel>> {
         currentFriends.removeIf(not(friendshipCondition));
 
         if (currentFriends.size() < targetNumberOfFriends) {
-            shuffledStream(potentialFriends.getVessels(), rng)
-                .filter(vessel -> vessel != this.vessel)
-                .filter(not(currentFriends::contains))
-                .filter(friendshipCondition)
-                .limit(targetNumberOfFriends - currentFriends.size())
+            reservoirSample(
+                potentialFriends.getVessels(),
+                targetNumberOfFriends - currentFriends.size(),
+                v -> v != this.vessel
+                    && !currentFriends.contains(v)
+                    && friendshipCondition.test(v),
+                rng
+            )
                 .forEach(currentFriends::add);
         }
 
