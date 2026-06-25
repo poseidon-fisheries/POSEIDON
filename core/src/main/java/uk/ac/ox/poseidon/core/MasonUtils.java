@@ -190,10 +190,14 @@ public class MasonUtils {
         return inBounds(location, grid2D.getWidth(), grid2D.getHeight());
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> Stream<T> shuffledStream(
         final Collection<T> candidates,
         final MersenneTwisterFast rng
     ) {
+        if (candidates instanceof RandomAccess && candidates instanceof List) {
+            return shuffledStream((List<T>) candidates, rng);
+        }
         return shuffledStream(new ArrayList<>(candidates), rng);
     }
 
