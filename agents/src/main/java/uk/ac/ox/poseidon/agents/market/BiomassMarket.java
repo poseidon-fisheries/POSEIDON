@@ -90,6 +90,7 @@ public class BiomassMarket implements Market {
                     .add(bucket);
             } else {
                 bucket.forEach((species, biomass) -> {
+                    if (biomass.asKg() <= 0.0) return;
                     getPrice(catchCategory, species).ifPresentOrElse(
                         price -> {
                             soldItems.add(new Sale.Item(
