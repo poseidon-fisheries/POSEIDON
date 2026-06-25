@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import ec.util.MersenneTwisterFast;
+import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -41,4 +42,8 @@ public interface OptionValues<O> {
     List<Entry<O, Double>> getBestEntries();
 
     Optional<Entry<O, Double>> getBestEntry(MersenneTwisterFast rng);
+
+    default void forEachBestEntry(final ObjectDoubleBiConsumer<? super O> consumer) {
+        getBestEntries().forEach(entry -> consumer.accept(entry.getKey(), entry.getValue()));
+    }
 }

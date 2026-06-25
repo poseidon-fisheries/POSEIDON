@@ -23,18 +23,22 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import com.google.common.collect.ImmutableList;
+import ec.util.MersenneTwisterFast;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static lombok.AccessLevel.PACKAGE;
+import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 
 @Getter
 @NoArgsConstructor(access = PACKAGE)
@@ -43,6 +47,8 @@ public abstract class HashMapBasedOptionValues<O>
     implements MutableOptionValues<O> {
 
     protected final Object2DoubleOpenHashMap<O> values = new Object2DoubleOpenHashMap<>();
+    private ImmutableList<O> cachedBestKeys = null;
+    private double cachedBestValue = Double.NEGATIVE_INFINITY;
 
     @Override
     public void observe(
@@ -50,35 +56,93 @@ public abstract class HashMapBasedOptionValues<O>
         final double value
     ) {
         final double oldValue = values.getOrDefault(option, 0.0);
-        values.put(option, newValue(option, oldValue, value));
-        invalidateCache();
+        final double newValue = newValue(option, oldValue, value);
+        values.put(option, newValue);
+        updateBestCache(option, newValue);
+    }
+
+    private void updateBestCache(final O option, final double newValue) {
+        if (cachedBestKeys == null) return;
+        if (newValue > cachedBestValue) {
+            cachedBestKeys = ImmutableList.of(option);
+            cachedBestValue = newValue;
+        } else if (newValue == cachedBestValue) {
+            if (!cachedBestKeys.contains(option)) {
+                cachedBestKeys = ImmutableList.<O>builder()
+                    .addAll(cachedBestKeys)
+                    .add(option)
+                    .build();
+            }
+        } else if (cachedBestKeys.contains(option)) {
+            if (cachedBestKeys.size() == 1) {
+                cachedBestKeys = null;
+            } else {
+                cachedBestKeys = cachedBestKeys.stream()
+                    .filter(k -> !k.equals(option))
+                    .collect(toImmutableList());
+            }
+        }
+    }
+
+    private void computeBestCache() {
+        ImmutableList.Builder<O> bestKeys = ImmutableList.builder();
+        double bestValue = Double.NEGATIVE_INFINITY;
+        final ObjectIterator<Object2DoubleMap.Entry<O>> iterator =
+            values.object2DoubleEntrySet().fastIterator();
+        while (iterator.hasNext()) {
+            final Object2DoubleMap.Entry<O> entry = iterator.next();
+            final double v = entry.getDoubleValue();
+            if (v > bestValue) {
+                bestValue = v;
+                bestKeys = ImmutableList.builder();
+                bestKeys.add(entry.getKey());
+            } else if (v == bestValue) {
+                bestKeys.add(entry.getKey());
+            }
+        }
+        cachedBestKeys = bestKeys.build();
+        cachedBestValue = bestValue;
+    }
+
+    @Override
+    public void forEachBestEntry(final ObjectDoubleBiConsumer<? super O> consumer) {
+        if (cachedBestKeys == null) computeBestCache();
+        for (int i = 0; i < cachedBestKeys.size(); i++) {
+            consumer.accept(cachedBestKeys.get(i), cachedBestValue);
+        }
     }
 
     @Override
     public List<Map.Entry<O, Double>> getBestEntries() {
-        if (cachedBest == null) {
-            final List<Map.Entry<O, Double>> best = new ArrayList<>();
-            double bestValue = Double.NEGATIVE_INFINITY;
-            final ObjectIterator<Object2DoubleMap.Entry<O>> iterator =
-                values.object2DoubleEntrySet().fastIterator();
-            while (iterator.hasNext()) {
-                final Object2DoubleMap.Entry<O> entry = iterator.next();
-                final double v = entry.getDoubleValue();
-                if (v > bestValue) {
-                    bestValue = v;
-                    best.clear();
-                    best.add(new AbstractMap.SimpleEntry<>(entry.getKey(), v));
-                } else if (v == bestValue) {
-                    best.add(new AbstractMap.SimpleEntry<>(entry.getKey(), v));
-                }
-            }
-            cachedBest = ImmutableList.copyOf(best);
-        }
-        return cachedBest;
+        if (cachedBestKeys == null) computeBestCache();
+        return cachedBestKeys.stream()
+            .map(k -> new AbstractMap.SimpleEntry<>(k, cachedBestValue))
+            .collect(toImmutableList());
+    }
+
+    @Override
+    public List<O> getBestOptions() {
+        if (cachedBestKeys == null) computeBestCache();
+        return cachedBestKeys;
+    }
+
+    @Override
+    public Optional<Double> getBestValue() {
+        if (cachedBestKeys == null) computeBestCache();
+        if (cachedBestKeys.isEmpty()) return Optional.empty();
+        return Optional.of(cachedBestValue);
+    }
+
+    @Override
+    public Optional<Map.Entry<O, Double>> getBestEntry(final MersenneTwisterFast rng) {
+        if (cachedBestKeys == null) computeBestCache();
+        if (cachedBestKeys.isEmpty()) return Optional.empty();
+        final O key = oneOf(cachedBestKeys, rng);
+        return Optional.of(new AbstractMap.SimpleEntry<>(key, cachedBestValue));
     }
 
     protected void invalidateCache() {
-        cachedBest = null;
+        cachedBestKeys = null;
     }
 
     protected abstract double newValue(

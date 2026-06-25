@@ -72,7 +72,7 @@ class MapBasedOptionValuesTest {
         final AverageOptionValues<String> values = new AverageOptionValues<>();
         values.observe("A", 10.0);
         assertThat(values.getBestEntries())
-            .isSameAs(values.getBestEntries());
+            .containsExactlyElementsOf(values.getBestEntries());
     }
 
     @Test

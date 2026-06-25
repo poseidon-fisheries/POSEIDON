@@ -26,6 +26,7 @@ import ec.util.MersenneTwisterFast;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -62,14 +63,10 @@ public class ImitatingPicker<O> implements Provider<O> {
         final double currentBestValue =
             currentBestEntry.map(Entry::getValue).orElse(NEGATIVE_INFINITY);
 
-        final List<O> candidates =
-            candidatesSupplier
-                .get()
-                .getBestEntries()
-                .stream()
-                .filter(entry -> entry.getValue() > currentBestValue)
-                .map(Entry::getKey)
-                .toList();
+        final List<O> candidates = new ArrayList<>();
+        candidatesSupplier.get().forEachBestEntry((key, value) -> {
+            if (value > currentBestValue) candidates.add(key);
+        });
 
         return shuffledStream(candidates, rng)
             .filter(optionPredicate)

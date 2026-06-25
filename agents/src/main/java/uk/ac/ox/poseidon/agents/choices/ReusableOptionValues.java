@@ -22,7 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.util.Map;
 
@@ -47,6 +50,23 @@ class ReusableOptionValues<O> extends MapBasedOptionValues<O> {
     void putIfGreater(final O key, final double value) {
         if (value > values.getOrDefault(key, Double.NEGATIVE_INFINITY)) {
             values.put(key, value);
+        }
+    }
+
+    @Override
+    public void forEachBestEntry(final ObjectDoubleBiConsumer<? super O> consumer) {
+        double bestValue = Double.NEGATIVE_INFINITY;
+        final ObjectIterator<Object2DoubleMap.Entry<O>> iterator =
+            values.object2DoubleEntrySet().fastIterator();
+        while (iterator.hasNext()) {
+            final Object2DoubleMap.Entry<O> entry = iterator.next();
+            final double v = entry.getDoubleValue();
+            if (v > bestValue) {
+                bestValue = v;
+                consumer.accept(entry.getKey(), v);
+            } else if (v == bestValue) {
+                consumer.accept(entry.getKey(), v);
+            }
         }
     }
 

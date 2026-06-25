@@ -26,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import static lombok.AccessLevel.PACKAGE;
@@ -47,9 +46,7 @@ class BestOptionsFromFriends<O> implements Supplier<OptionValues<O>> {
                 .getComponent(friend)
                 .orElse(null);
             if (values == null) continue;
-            for (final Entry<O, Double> entry : values.getBestEntries()) {
-                aggregatedValues.putIfGreater(entry.getKey(), entry.getValue());
-            }
+            values.forEachBestEntry(aggregatedValues::putIfGreater);
         }
         return aggregatedValues;
     }
