@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.Fisheable;
-import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
@@ -79,7 +79,10 @@ class IndexedBiomassCatchabilityGearTest {
                 DURATION
             );
         final Bucket availableFish =
-            BiomassBucket.ofBiomassMap(Map.of(SPECIES_B, 8.0, SPECIES_C, 4.0));
+            Bucket.of(Map.of(
+                SPECIES_B, Biomass.ofKg(8.0),
+                SPECIES_C, Biomass.ofKg(4.0)
+            ));
         final Fisheable fisheable = new StubFisheable(availableFish);
 
         final Bucket caught = gear.fish(fisheable);

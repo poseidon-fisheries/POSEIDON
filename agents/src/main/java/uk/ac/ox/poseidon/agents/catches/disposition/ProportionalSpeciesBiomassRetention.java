@@ -23,8 +23,6 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import lombok.NonNull;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
-import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 
@@ -52,22 +50,13 @@ public class ProportionalSpeciesBiomassRetention implements DispositionProcess {
         final Disposition currentDisposition,
         final double availableCapacityInKg
     ) {
-        final Bucket discarded =
-            switch (currentDisposition.getRetained()) {
-                case final BiomassBucket currentlyRetained
-                    when currentlyRetained.sameIndex(proportionsToDiscard) ->
-                    currentlyRetained.mapWithIndex((biomass, index) ->
-                        proportionsToDiscard.getDouble(index) * biomass
-                    );
-                case final Bucket currentlyRetained ->
-                    currentlyRetained.mapContent((species, content) ->
-                        Biomass.ofKg(
-                            proportionsToDiscard.getDoubleOrDefault(species, 0) * content.asKg()
-                        )
-                    );
-            };
+        final Bucket retained = currentDisposition.getRetained();
+        final Bucket discarded = retained.mapWithIndex(
+            proportionsToDiscard,
+            (biomass, index) -> proportionsToDiscard.getDouble(index) * biomass
+        );
         return new Disposition(
-            currentDisposition.getRetained().subtract(discarded),
+            retained.subtract(discarded),
             currentDisposition.getDiscardedAlive().add(discarded),
             currentDisposition.getDiscardedDead()
         );

@@ -27,6 +27,9 @@ import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndexed;
+import uk.ac.ox.poseidon.core.functions.DoubleIntToDoubleFunction;
+import uk.ac.ox.poseidon.core.utils.DoubleIntConsumer;
 import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
 import java.util.Map;
@@ -122,6 +125,16 @@ public interface Bucket {
         return bucketBuilder.build();
     }
 
+    default Bucket mapWithIndex(
+        final SpeciesIndexed other,
+        final DoubleIntToDoubleFunction mapper
+    ) {
+        return mapBiomassValue((species, biomass) -> {
+            final int i = other.getSpeciesIndex().indexOf(species);
+            return i == -1 ? 0.0 : mapper.applyAsDouble(biomass, i);
+        });
+    }
+
     default Map<Boolean, Bucket> partitionBy(
         final BiPredicate<Species, Content> predicate
     ) {
@@ -157,6 +170,29 @@ public interface Bucket {
 
     default void forEachBiomassValue(final ObjDoubleConsumer<Species> action) {
         forEach((species, content) -> action.accept(species, content.asKg()));
+    }
+
+    default void forEachWithIndex(
+        final SpeciesIndexed other,
+        final DoubleIntConsumer action
+    ) {
+        forEachWithIndex(other, action, (species, biomass) -> {
+        });
+    }
+
+    default void forEachWithIndex(
+        final SpeciesIndexed other,
+        final DoubleIntConsumer action,
+        final ObjDoubleConsumer<Species> missingSpeciesAction
+    ) {
+        forEachBiomassValue((species, biomass) -> {
+            final int i = other.getSpeciesIndex().indexOf(species);
+            if (i == -1) {
+                missingSpeciesAction.accept(species, biomass);
+            } else {
+                action.accept(biomass, i);
+            }
+        });
     }
 
 }

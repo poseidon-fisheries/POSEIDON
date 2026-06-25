@@ -29,7 +29,6 @@ import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
-import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
@@ -105,17 +104,10 @@ public final class FisheableBiomassGrids
         @Override
         public Bucket extract(final Bucket fishToExtract) {
             final double[] biomassExtracted = speciesIndex.newDoubleArray();
-            switch (fishToExtract) {
-                case final BiomassBucket biomassBucket when sameIndex(biomassBucket) -> {
-                    for (int i = 0; i < speciesIndex.size(); i++) {
-                        extractBiomass(i, biomassBucket.getDouble(i), biomassExtracted);
-                    }
-                }
-                default -> fishToExtract.forEachBiomassValue((species, biomass) -> {
-                    final int i = speciesIndex.indexOf(species);
-                    if (i != -1) extractBiomass(i, biomass, biomassExtracted);
-                });
-            }
+            fishToExtract.forEachWithIndex(
+                FisheableBiomassGrids.this,
+                (biomass, i) -> extractBiomass(i, biomass, biomassExtracted)
+            );
             return Bucket.of(biomassExtracted, speciesIndex);
         }
 
@@ -142,22 +134,18 @@ public final class FisheableBiomassGrids
 
         @Override
         public void release(@NonNull final Bucket fishToRelease) {
-            switch (fishToRelease) {
-                case final BiomassBucket biomassBucket when sameIndex(biomassBucket) -> {
-                    for (int i = 0; i < speciesIndex.size(); i++) {
-                        final BiomassGrid grid = grids[i];
-                        grid.setBiomass(cell, grid.getValue(cell) + biomassBucket.getDouble(i));
-                    }
-                }
-                default -> fishToRelease.forEachBiomassValue((species, biomass) -> {
-                    final int i = speciesIndex.indexOf(species);
-                    if (i == -1) throw new IllegalArgumentException(
-                        "No grid available to release %s.".formatted(species)
-                    );
+            fishToRelease.forEachWithIndex(
+                FisheableBiomassGrids.this,
+                (biomass, i) -> {
                     final BiomassGrid grid = grids[i];
                     grid.setBiomass(cell, grid.getValue(cell) + biomass);
-                });
-            }
+                },
+                (species, biomass) -> {
+                    throw new IllegalArgumentException(
+                        "No grid available to release %s.".formatted(species)
+                    );
+                }
+            );
         }
     }
 

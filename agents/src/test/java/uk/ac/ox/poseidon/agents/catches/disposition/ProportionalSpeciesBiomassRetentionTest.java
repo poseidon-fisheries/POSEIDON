@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.DummySpecies;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
@@ -83,9 +83,9 @@ class ProportionalSpeciesBiomassRetentionTest {
         final ProportionalSpeciesBiomassRetention retention =
             new ProportionalSpeciesBiomassRetention(proportionsToDiscard);
 
-        final Bucket retained = BiomassBucket.ofBiomassMap(Map.of(
-            DummySpecies.A, 10.0,
-            DummySpecies.C, 4.0
+        final Bucket retained = Bucket.of(Map.of(
+            DummySpecies.A, Biomass.ofKg(10.0),
+            DummySpecies.C, Biomass.ofKg(4.0)
         ));
 
         final Disposition result = retention.partition(

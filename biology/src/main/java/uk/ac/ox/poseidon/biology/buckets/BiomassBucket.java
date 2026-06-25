@@ -33,7 +33,10 @@ import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
+import uk.ac.ox.poseidon.biology.species.SpeciesIndexed;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubles;
+import uk.ac.ox.poseidon.core.functions.DoubleIntToDoubleFunction;
+import uk.ac.ox.poseidon.core.utils.DoubleIntConsumer;
 import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
 import java.util.*;
@@ -49,7 +52,7 @@ import static lombok.AccessLevel.PRIVATE;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = PRIVATE)
-public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
+class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
 
     private static boolean isPresent(final double biomass) {
         return biomass > 0;
@@ -74,7 +77,7 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
         return ofBiomassMap(Maps.transformValues(map, Content::asKg));
     }
 
-    public static BiomassBucket ofBiomassMap(final Map<Species, Double> map) {
+    static BiomassBucket ofBiomassMap(final Map<Species, Double> map) {
         final SpeciesIndex speciesIndex = SpeciesIndex.of(map.keySet());
         final double[] biomasses = speciesIndex.newDoubleArray();
         final Map<Species, Integer> speciesIndexMap = speciesIndex.asMap();
@@ -269,6 +272,31 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
     }
 
     @Override
+    public Bucket mapWithIndex(
+        final SpeciesIndexed other,
+        final DoubleIntToDoubleFunction mapper
+    ) {
+        if (!sameIndex(other)) return Bucket.super.mapWithIndex(other, mapper);
+        final double[] mapped = speciesIndex.newDoubleArray();
+        boolean hasPositive = false;
+        for (int i = 0; i < speciesIndex.size(); i++) {
+            if (!isPresent(biomasses[i])) continue;
+            final double v = mapper.applyAsDouble(biomasses[i], i);
+            if (Double.isNaN(v)) continue;
+            if (v < 0) {
+                throw new IllegalArgumentException(
+                    "Negative biomass (" + v + ") from mapper for species " +
+                        speciesIndex.speciesAt(i)
+                );
+            }
+            mapped[i] = v;
+            if (isPresent(v)) hasPositive = true;
+        }
+        if (!hasPositive) return Bucket.empty();
+        return new BiomassBucket(mapped, speciesIndex);
+    }
+
+    @Override
     public Map<Boolean, Bucket> partitionBy(final BiPredicate<Species, Content> predicate) {
         final double[] t = speciesIndex.newDoubleArray();
         final double[] f = speciesIndex.newDoubleArray();
@@ -304,6 +332,22 @@ public class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucke
         for (int i = 0; i < biomasses.length; i++) {
             if (!isPresent(biomasses[i])) continue;
             action.accept(speciesIndex.speciesAt(i), biomasses[i]);
+        }
+    }
+
+    @Override
+    public void forEachWithIndex(
+        final SpeciesIndexed other,
+        final DoubleIntConsumer action,
+        final ObjDoubleConsumer<Species> missingSpeciesAction
+    ) {
+        if (!sameIndex(other)) {
+            Bucket.super.forEachWithIndex(other, action, missingSpeciesAction);
+            return;
+        }
+        for (int i = 0; i < biomasses.length; i++) {
+            if (!isPresent(biomasses[i])) continue;
+            action.accept(biomasses[i], i);
         }
     }
 

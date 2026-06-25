@@ -27,7 +27,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import uk.ac.ox.poseidon.biology.Fisheable;
-import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 
@@ -68,18 +67,10 @@ public class IndexedBiomassCatchabilityGear implements Gear {
     @Override
     public Bucket fish(final Fisheable fisheable) {
         final Bucket availableFish = fisheable.availableFish();
-        final Bucket fishToCatch =
-            switch (availableFish) {
-                case final BiomassBucket biomassBucket when proportions.sameIndex(biomassBucket) ->
-                    biomassBucket.mapWithIndex((biomass, i) -> {
-                        final double v = proportions.getDouble(i) * biomass;
-                        return v >= minimumCatchThresholdInKg ? v : 0;
-                    });
-                default -> availableFish.mapBiomassValue((species, biomass) -> {
-                    final double v = proportions.getDoubleOrDefault(species, 0.0) * biomass;
-                    return v >= minimumCatchThresholdInKg ? v : 0;
-                });
-            };
+        final Bucket fishToCatch = availableFish.mapWithIndex(proportions, (biomass, i) -> {
+            final double v = proportions.getDouble(i) * biomass;
+            return v >= minimumCatchThresholdInKg ? v : 0;
+        });
         return fisheable.extract(fishToCatch);
     }
 

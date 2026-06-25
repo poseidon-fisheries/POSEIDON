@@ -2,12 +2,10 @@ package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.Fisheable;
-import uk.ac.ox.poseidon.biology.buckets.BiomassBucket;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.time.Duration;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,7 +22,7 @@ class FixedBiomassProportionGearTest {
     void fish_appliesProportion_aboveThreshold() {
         final var gear = new FixedBiomassProportionGear("G1", 0.25, 1.0, DURATION, 0.0);
         final Bucket availableFish =
-            BiomassBucket.ofBiomassMap(Map.of(SPECIES_A, 10.0));
+            Bucket.of(SPECIES_A, 10.0);
         final Fisheable fisheable = new StubFisheable(availableFish);
 
         final Bucket caught = gear.fish(fisheable);
@@ -36,7 +34,7 @@ class FixedBiomassProportionGearTest {
     void fish_returnsZero_belowThreshold() {
         final var gear = new FixedBiomassProportionGear("G1", 0.25, 1.0, DURATION, 0.0);
         final Bucket availableFish =
-            BiomassBucket.ofBiomassMap(Map.of(SPECIES_A, 3.0));
+            Bucket.of(SPECIES_A, 3.0);
         final Fisheable fisheable = new StubFisheable(availableFish);
 
         final Bucket caught = gear.fish(fisheable);
@@ -48,7 +46,7 @@ class FixedBiomassProportionGearTest {
     void fish_returnsPositive_atThreshold() {
         final var gear = new FixedBiomassProportionGear("G1", 0.25, 1.0, DURATION, 0.0);
         final Bucket availableFish =
-            BiomassBucket.ofBiomassMap(Map.of(SPECIES_A, 4.0));
+            Bucket.of(SPECIES_A, 4.0);
         final Fisheable fisheable = new StubFisheable(availableFish);
 
         final Bucket caught = gear.fish(fisheable);
@@ -60,7 +58,7 @@ class FixedBiomassProportionGearTest {
     void fish_zeroProportion_returnsZero() {
         final var gear = new FixedBiomassProportionGear("G1", 0.0, 1.0, DURATION, 0.0);
         final Bucket availableFish =
-            BiomassBucket.ofBiomassMap(Map.of(SPECIES_A, 100.0));
+            Bucket.of(SPECIES_A, 100.0);
         final Fisheable fisheable = new StubFisheable(availableFish);
 
         final Bucket caught = gear.fish(fisheable);
