@@ -56,7 +56,7 @@ public class NeighbourhoodCellPicker implements Provider<Int2D> {
             pathFinder.getModelGrid().getGridHeight()
         );
         int neighbourhoodSize = neighbourhoodSizeSupplier.getAsInt();
-        Int2D startingCell = optionValues.getBestOption(rng).orElseGet(fallbackCellPicker::get);
+        Int2D startingCell = optionValues.getBestOption(rng).orElseGet(fallbackCellPicker);
         if (startingCell == null) {
             startingCell = vessel.getCell();
         }

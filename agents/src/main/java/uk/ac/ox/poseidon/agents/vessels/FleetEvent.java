@@ -31,14 +31,13 @@ import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
-import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
+import static com.google.common.base.Preconditions.checkState;
 import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.ACTIVATION;
 
 @Value
@@ -70,12 +69,31 @@ public class FleetEvent implements Steppable {
                     throw new IllegalStateException("Vessel " + vesselId + " does not exist");
             });
 
-        final Optional<Port> port = fleet
+        fleet
             .getPortGrid()
-            .getObject(portCode);
+            .getObject(portCode)
+            .ifPresentOrElse(
+                port -> {
+                    vessel.setHomePort(port);
+                    if (dateTime.isBefore(vessel.getSchedule().getDateTime())) {
+                        // if the change of port is something that happened in the past
+                        // (i.e., before the start of the simulation) we move the vessel
+                        // to its new location right away
+                        checkState(
+                            !vessel.getBehaviour().isRunning(),
+                            "Trying to apply retroactive fleet event %s " +
+                                "from %s to vessel %s while behaviour is running.",
+                            eventType, dateTime, vesselId
+                        );
+                        vessel.setCurrentCell(vessel.getPortGrid().getLocation(port));
+                    }
+                },
+                // this will only get applied once current vessel behaviour is done running
+                // so it shouldn't pause any problems to ongoing trips as long as vessel
+                // behaviours always end with the vessel at a port.
+                () -> vessel.setHomePort(null)
+            );
 
-        // TODO: check how setting the home port to null interferes with vessels currently in a trip
-        vessel.setHomePort(port.orElse(null));
         vessel.setName(vesselName);
         tags.forEach(vessel::putTag);
         vessel.setBehaviour(behaviourFactoryFunction.apply(vessel));
