@@ -27,6 +27,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class Factories {
@@ -57,6 +58,12 @@ public class Factories {
         final Factory<? super SimulationScope, ? extends LocalTime> time
     ) {
         return new NextDayAtTimeProviderFactory(time);
+    }
+
+    public static NextTimeAtOneOfProviderFactory nextTimeAtOneOf(
+        final List<Factory<? super SimulationScope, ? extends LocalTime>> times
+    ) {
+        return new NextTimeAtOneOfProviderFactory(times);
     }
 
     public static DurationUntilProviderFactory durationUntil(
