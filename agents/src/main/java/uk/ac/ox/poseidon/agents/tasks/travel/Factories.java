@@ -28,8 +28,11 @@ import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
+
+import java.util.function.Supplier;
 
 public class Factories {
 
@@ -50,11 +53,13 @@ public class Factories {
         return new RoundTripFactory(startTripTask, travelTask, fishingTask, landingTask);
     }
 
-    public static TravelAlongPathFactory travelAlongPath(
+    public static TravelAlongPathFactory travelAlongPathTo(
         final Factory<? super VesselScope, ? extends PathFinder<Int2D>> pathFinder,
-        final Factory<? super VesselScope, ? extends DistanceCalculator> distance
+        final Factory<? super VesselScope, ? extends DistanceCalculator> distance,
+        final Factory<? super VesselScope, ? extends Supplier<Int2D>> destinationCell,
+        final Factory<? super VesselScope, ? extends Supplier<EventManager>> eventManager
     ) {
-        return new TravelAlongPathFactory(pathFinder, distance);
+        return new TravelAlongPathFactory(pathFinder, distance, destinationCell, eventManager);
     }
 
     public static SetDestinationToOriginFactory setDestinationToOrigin() {

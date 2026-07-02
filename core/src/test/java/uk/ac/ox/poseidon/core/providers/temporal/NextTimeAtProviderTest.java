@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class NextTimeAtOneOfProviderTest {
+class NextTimeAtProviderTest {
 
     @Test
     void picksNextTimeLaterToday() {
@@ -41,7 +41,7 @@ class NextTimeAtOneOfProviderTest {
         when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2025, 6, 1, 2, 0));
         when(schedule.getDate()).thenReturn(LocalDate.of(2025, 6, 1));
 
-        NextTimeAtOneOfProvider provider = new NextTimeAtOneOfProvider(
+        NextTimeAtProvider provider = new NextTimeAtProvider(
             schedule,
             new LocalTime[]{LocalTime.of(6, 0), LocalTime.of(22, 0)}
         );
@@ -55,7 +55,7 @@ class NextTimeAtOneOfProviderTest {
         when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2025, 6, 1, 7, 0));
         when(schedule.getDate()).thenReturn(LocalDate.of(2025, 6, 1));
 
-        NextTimeAtOneOfProvider provider = new NextTimeAtOneOfProvider(
+        NextTimeAtProvider provider = new NextTimeAtProvider(
             schedule,
             new LocalTime[]{LocalTime.of(6, 0), LocalTime.of(22, 0)}
         );
@@ -69,7 +69,7 @@ class NextTimeAtOneOfProviderTest {
         when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2025, 6, 1, 23, 0));
         when(schedule.getDate()).thenReturn(LocalDate.of(2025, 6, 1));
 
-        NextTimeAtOneOfProvider provider = new NextTimeAtOneOfProvider(
+        NextTimeAtProvider provider = new NextTimeAtProvider(
             schedule,
             new LocalTime[]{LocalTime.of(6, 0), LocalTime.of(22, 0)}
         );
@@ -83,7 +83,7 @@ class NextTimeAtOneOfProviderTest {
         when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2025, 6, 1, 6, 0));
         when(schedule.getDate()).thenReturn(LocalDate.of(2025, 6, 1));
 
-        NextTimeAtOneOfProvider provider = new NextTimeAtOneOfProvider(
+        NextTimeAtProvider provider = new NextTimeAtProvider(
             schedule,
             new LocalTime[]{LocalTime.of(6, 0), LocalTime.of(22, 0)}
         );
@@ -97,7 +97,7 @@ class NextTimeAtOneOfProviderTest {
         when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2025, 6, 1, 22, 0));
         when(schedule.getDate()).thenReturn(LocalDate.of(2025, 6, 1));
 
-        NextTimeAtOneOfProvider provider = new NextTimeAtOneOfProvider(
+        NextTimeAtProvider provider = new NextTimeAtProvider(
             schedule,
             new LocalTime[]{LocalTime.of(6, 0), LocalTime.of(22, 0)}
         );
@@ -111,7 +111,7 @@ class NextTimeAtOneOfProviderTest {
         when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2025, 6, 1, 11, 0));
         when(schedule.getDate()).thenReturn(LocalDate.of(2025, 6, 1));
 
-        NextTimeAtOneOfProvider provider = new NextTimeAtOneOfProvider(
+        NextTimeAtProvider provider = new NextTimeAtProvider(
             schedule,
             new LocalTime[]{LocalTime.of(12, 0)}
         );
@@ -125,7 +125,7 @@ class NextTimeAtOneOfProviderTest {
         when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2025, 6, 1, 13, 0));
         when(schedule.getDate()).thenReturn(LocalDate.of(2025, 6, 1));
 
-        NextTimeAtOneOfProvider provider = new NextTimeAtOneOfProvider(
+        NextTimeAtProvider provider = new NextTimeAtProvider(
             schedule,
             new LocalTime[]{LocalTime.of(12, 0)}
         );
@@ -139,7 +139,7 @@ class NextTimeAtOneOfProviderTest {
         when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2025, 6, 1, 2, 0));
         when(schedule.getDate()).thenReturn(LocalDate.of(2025, 6, 1));
 
-        NextTimeAtOneOfProvider provider = new NextTimeAtOneOfProvider(
+        NextTimeAtProvider provider = new NextTimeAtProvider(
             schedule,
             new LocalTime[]{LocalTime.of(22, 0), LocalTime.of(6, 0)}
         );
@@ -153,7 +153,7 @@ class NextTimeAtOneOfProviderTest {
         when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2025, 6, 1, 23, 0));
         when(schedule.getDate()).thenReturn(LocalDate.of(2025, 6, 1));
 
-        NextTimeAtOneOfProvider provider = new NextTimeAtOneOfProvider(
+        NextTimeAtProvider provider = new NextTimeAtProvider(
             schedule,
             new LocalTime[]{LocalTime.of(22, 0), LocalTime.of(6, 0)}
         );

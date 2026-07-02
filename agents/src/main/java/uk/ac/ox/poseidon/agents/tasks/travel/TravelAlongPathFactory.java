@@ -30,8 +30,11 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
+
+import java.util.function.Supplier;
 
 @Data
 @NoArgsConstructor
@@ -42,12 +45,16 @@ public class TravelAlongPathFactory
 
     private Factory<? super VesselScope, ? extends PathFinder<Int2D>> pathFinder;
     private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
+    private Factory<? super VesselScope, ? extends Supplier<Int2D>> destinationCell;
+    private Factory<? super VesselScope, ? extends Supplier<EventManager>> eventManager;
 
     @Override
     protected TravelAlongPath newTask(final VesselScope scope) {
         return new TravelAlongPath(
             pathFinder.get(scope),
-            distance.get(scope)
+            distance.get(scope),
+            destinationCell.get(scope),
+            eventManager.get(scope)
         );
     }
 }

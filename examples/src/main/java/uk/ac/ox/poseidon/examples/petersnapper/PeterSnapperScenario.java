@@ -76,6 +76,8 @@ import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.standardBiomassHo
 import static uk.ac.ox.poseidon.agents.vessels.predicates.Factories.vesselHasSameHomePort;
 import static uk.ac.ox.poseidon.agents.vessels.predicates.Factories.vesselIsActive;
 import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.accessibleWaterCells;
+import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.currentTripDestinationCell;
+import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.currentTripEventManager;
 import static uk.ac.ox.poseidon.biology.allocators.Factories.proportionOfCarryingCapacityAllocator;
 import static uk.ac.ox.poseidon.biology.biomass.Factories.*;
 import static uk.ac.ox.poseidon.biology.species.Factories.species;
@@ -390,7 +392,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             behaviour(
                 sequenceTask(
                     startTrip(destinationSupplier),
-                    travelAlongPath(pathFinder, distance),
+                    travelAlongPathTo(pathFinder, distance, currentTripDestinationCell(), currentTripEventManager()),
                     untilFail(
                         sequenceTask(
                             fishing(
@@ -406,7 +408,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                         )
                     ),
                     setDestinationToOrigin(),
-                    travelAlongPath(pathFinder, distance),
+                    travelAlongPathTo(pathFinder, distance, currentTripDestinationCell(), currentTripEventManager()),
                     landCatches(constant(ONE_HOUR)),
                     refuel(fuelStationGrid),
                     endTrip(),

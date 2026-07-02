@@ -20,31 +20,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.branches;
+package uk.ac.ox.poseidon.agents.vessels.providers;
 
-import com.badlogic.gdx.ai.btree.Task;
+import lombok.RequiredArgsConstructor;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.providers.Provider;
 
-import java.util.List;
+@RequiredArgsConstructor
+public class CurrentTripDestinationCell implements Provider<Int2D> {
 
-public class Factories {
+    private final Vessel vessel;
 
-    private Factories() {}
-
-    @SafeVarargs
-    public static SequenceTaskFactory sequenceTask(
-        final Factory<? super VesselScope, ? extends Task<Vessel>>... children
-    ) {
-        return new SequenceTaskFactory(List.of(children));
+    @Override
+    public Int2D get() {
+        final Trip trip = vessel.getCurrentTrip();
+        return trip != null ? trip.getDestination() : null;
     }
-
-    @SafeVarargs
-    public static SelectorTaskFactory selectorTask(
-        final Factory<? super VesselScope, ? extends Task<Vessel>>... children
-    ) {
-        return new SelectorTaskFactory(List.of(children));
-    }
-    
 }

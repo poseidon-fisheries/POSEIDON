@@ -20,31 +20,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.branches;
+package uk.ac.ox.poseidon.agents.vessels.predicates;
 
-import com.badlogic.gdx.ai.btree.Task;
+import lombok.RequiredArgsConstructor;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
 
-import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
-public class Factories {
+@RequiredArgsConstructor
+public class VesselIsAt implements Predicate<Vessel> {
 
-    private Factories() {}
+    private final Supplier<Int2D> cellSupplier;
 
-    @SafeVarargs
-    public static SequenceTaskFactory sequenceTask(
-        final Factory<? super VesselScope, ? extends Task<Vessel>>... children
-    ) {
-        return new SequenceTaskFactory(List.of(children));
+    @Override
+    public boolean test(final Vessel vessel) {
+        final Int2D cell = cellSupplier.get();
+        return cell != null && cell.equals(vessel.getCell());
     }
-
-    @SafeVarargs
-    public static SelectorTaskFactory selectorTask(
-        final Factory<? super VesselScope, ? extends Task<Vessel>>... children
-    ) {
-        return new SelectorTaskFactory(List.of(children));
-    }
-    
 }

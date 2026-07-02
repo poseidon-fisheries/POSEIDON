@@ -22,6 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
+
+import java.util.function.Supplier;
+
 public class Factories {
 
     private Factories() {}
@@ -32,5 +38,11 @@ public class Factories {
 
     public static VesselHasSameHomePortFactory vesselHasSameHomePort() {
         return new VesselHasSameHomePortFactory();
+    }
+
+    public static VesselIsAtFactory vesselIsAt(
+        final Factory<? super VesselScope, ? extends Supplier<Int2D>> cellSupplier
+    ) {
+        return new VesselIsAtFactory(cellSupplier);
     }
 }

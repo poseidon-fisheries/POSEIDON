@@ -24,7 +24,10 @@ package uk.ac.ox.poseidon.agents.vessels.providers;
 
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+
+import java.util.function.Supplier;
 
 public class Factories {
 
@@ -38,5 +41,21 @@ public class Factories {
         final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder
     ) {
         return new AccessibleWaterCellsFactory(pathFinder);
+    }
+
+    public static HomePortCellFactory homePortCell() {
+        return new HomePortCellFactory();
+    }
+
+    public static CurrentTripDestinationCellFactory currentTripDestinationCell() {
+        return new CurrentTripDestinationCellFactory();
+    }
+
+    public static VesselEventManagerFactory vesselEventManager() {
+        return new VesselEventManagerFactory();
+    }
+
+    public static CurrentTripEventManagerFactory currentTripEventManager() {
+        return new CurrentTripEventManagerFactory();
     }
 }

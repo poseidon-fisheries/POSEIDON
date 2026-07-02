@@ -30,12 +30,12 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 
-public class NextTimeAtOneOfProvider implements Provider<LocalDateTime> {
+public class NextTimeAtProvider implements Provider<LocalDateTime> {
 
     private final TemporalSchedule schedule;
     private final LocalTime[] times;
 
-    public NextTimeAtOneOfProvider(final TemporalSchedule schedule, final LocalTime[] times) {
+    public NextTimeAtProvider(final TemporalSchedule schedule, final LocalTime[] times) {
         this.schedule = schedule;
         this.times = times.clone();
         Arrays.sort(this.times);

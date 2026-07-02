@@ -20,31 +20,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.branches;
+package uk.ac.ox.poseidon.agents.vessels.providers;
 
-import com.badlogic.gdx.ai.btree.Task;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
-import java.util.List;
+public class CurrentTripEventManagerFactory extends VesselScopeFactory<CurrentTripEventManager> {
 
-public class Factories {
-
-    private Factories() {}
-
-    @SafeVarargs
-    public static SequenceTaskFactory sequenceTask(
-        final Factory<? super VesselScope, ? extends Task<Vessel>>... children
-    ) {
-        return new SequenceTaskFactory(List.of(children));
+    @Override
+    protected CurrentTripEventManager newInstance(final VesselScope scope) {
+        return new CurrentTripEventManager(scope.getVessel());
     }
-
-    @SafeVarargs
-    public static SelectorTaskFactory selectorTask(
-        final Factory<? super VesselScope, ? extends Task<Vessel>>... children
-    ) {
-        return new SelectorTaskFactory(List.of(children));
-    }
-    
 }

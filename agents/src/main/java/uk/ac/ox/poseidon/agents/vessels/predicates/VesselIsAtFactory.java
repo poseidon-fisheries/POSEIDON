@@ -20,31 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.branches;
+package uk.ac.ox.poseidon.agents.vessels.predicates;
 
-import com.badlogic.gdx.ai.btree.Task;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
-import java.util.List;
+import java.util.function.Supplier;
 
-public class Factories {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class VesselIsAtFactory extends VesselScopeFactory<VesselIsAt> {
 
-    private Factories() {}
+    private Factory<? super VesselScope, ? extends Supplier<Int2D>> cellSupplier;
 
-    @SafeVarargs
-    public static SequenceTaskFactory sequenceTask(
-        final Factory<? super VesselScope, ? extends Task<Vessel>>... children
-    ) {
-        return new SequenceTaskFactory(List.of(children));
+    @Override
+    protected VesselIsAt newInstance(final VesselScope scope) {
+        return new VesselIsAt(cellSupplier.get(scope));
     }
-
-    @SafeVarargs
-    public static SelectorTaskFactory selectorTask(
-        final Factory<? super VesselScope, ? extends Task<Vessel>>... children
-    ) {
-        return new SelectorTaskFactory(List.of(children));
-    }
-    
 }

@@ -25,14 +25,15 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
-import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
@@ -46,9 +47,11 @@ public class TravelAlongPath extends AgentTask<Vessel> {
 
     private final PathFinder<Int2D> pathFinder;
     private final DistanceCalculator distanceCalculator;
+    private final Supplier<Int2D> destinationCell;
+    private final Supplier<EventManager> eventManagerSupplier;
     private List<Int2D> currentPath;
+    private EventManager eventManager;
 
-    private Trip trip;
     private LocalDateTime startDateTime;
     private Int2D origin;
     private Int2D destination;
@@ -58,16 +61,17 @@ public class TravelAlongPath extends AgentTask<Vessel> {
     @Override
     public void resetTask() {
         currentPath = null;
+        eventManager = null;
         super.resetTask();
     }
 
     @Override
     public void start() {
         final Vessel vessel = getAgent();
-        trip = checkNotNull(vessel.getCurrentTrip());
+        destination = checkNotNull(destinationCell.get());
+        eventManager = eventManagerSupplier.get();
         startDateTime = vessel.getSchedule().getDateTime();
         origin = vessel.getCell();
-        destination = checkNotNull(vessel.getCurrentTrip().getDestination());
         currentPath =
             pathFinder
                 .getPath(vessel.getCell(), destination)
@@ -87,13 +91,11 @@ public class TravelAlongPath extends AgentTask<Vessel> {
     @Override
     public Status execute() {
         final Vessel vessel = getAgent();
-        final Int2D destinationCell = checkNotNull(getAgent().getCurrentTrip().getDestination());
         checkState(
-            // TODO: consider whether we should reroute instead
-            currentPath.getLast().equals(destinationCell),
+            currentPath.getLast().equals(destination),
             "Current path %s does not match current destination %s for vessel %s.",
             currentPath,
-            destinationCell,
+            destination,
             vessel
         );
 
@@ -102,7 +104,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
 
         currentPath = currentPath.subList(1, currentPath.size());
         if (currentPath.isEmpty()) {
-            trip.getEventManager().broadcast(new TravelEvent(
+            eventManager.broadcast(new TravelEvent(
                 getAgent(),
                 startDateTime,
                 getAgent().getSchedule().getDateTime(),
@@ -118,5 +120,4 @@ public class TravelAlongPath extends AgentTask<Vessel> {
             return RUNNING;
         }
     }
-
 }

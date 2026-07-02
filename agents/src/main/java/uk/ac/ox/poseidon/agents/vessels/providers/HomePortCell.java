@@ -20,34 +20,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.temporal;
+package uk.ac.ox.poseidon.agents.vessels.providers;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import lombok.RequiredArgsConstructor;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.providers.Provider;
 
-import java.time.LocalTime;
-import java.util.List;
+@RequiredArgsConstructor
+public class HomePortCell implements Provider<Int2D> {
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class NextTimeAtOneOfProviderFactory extends SimulationScopeFactory<NextTimeAtOneOfProvider> {
-
-    private List<Factory<? super SimulationScope, ? extends LocalTime>> times;
+    private final Vessel vessel;
 
     @Override
-    protected NextTimeAtOneOfProvider newInstance(final SimulationScope scope) {
-        return new NextTimeAtOneOfProvider(
-            scope.getSimulation().getTemporalSchedule(),
-            times.stream()
-                .map(t -> t.get(scope))
-                .toArray(LocalTime[]::new)
-        );
+    public Int2D get() {
+        return vessel.getPortGrid().getLocation(vessel.getHomePort());
     }
 }

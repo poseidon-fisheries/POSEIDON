@@ -60,10 +60,11 @@ public class Factories {
         return new NextDayAtTimeProviderFactory(time);
     }
 
-    public static NextTimeAtOneOfProviderFactory nextTimeAtOneOf(
-        final List<Factory<? super SimulationScope, ? extends LocalTime>> times
+    @SafeVarargs
+    public static NextTimeAtProviderFactory nextTimeAt(
+        final Factory<? super SimulationScope, ? extends LocalTime>... times
     ) {
-        return new NextTimeAtOneOfProviderFactory(times);
+        return new NextTimeAtProviderFactory(List.of(times));
     }
 
     public static DurationUntilProviderFactory durationUntil(

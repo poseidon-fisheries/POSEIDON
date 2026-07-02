@@ -20,31 +20,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.branches;
+package uk.ac.ox.poseidon.core.providers.temporal;
 
-import com.badlogic.gdx.ai.btree.Task;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+import java.time.LocalTime;
 import java.util.List;
 
-public class Factories {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class NextTimeAtProviderFactory extends SimulationScopeFactory<NextTimeAtProvider> {
 
-    private Factories() {}
+    private List<Factory<? super SimulationScope, ? extends LocalTime>> times;
 
-    @SafeVarargs
-    public static SequenceTaskFactory sequenceTask(
-        final Factory<? super VesselScope, ? extends Task<Vessel>>... children
-    ) {
-        return new SequenceTaskFactory(List.of(children));
+    @Override
+    protected NextTimeAtProvider newInstance(final SimulationScope scope) {
+        return new NextTimeAtProvider(
+            scope.getSimulation().getTemporalSchedule(),
+            times.stream()
+                .map(t -> t.get(scope))
+                .toArray(LocalTime[]::new)
+        );
     }
-
-    @SafeVarargs
-    public static SelectorTaskFactory selectorTask(
-        final Factory<? super VesselScope, ? extends Task<Vessel>>... children
-    ) {
-        return new SelectorTaskFactory(List.of(children));
-    }
-    
 }
