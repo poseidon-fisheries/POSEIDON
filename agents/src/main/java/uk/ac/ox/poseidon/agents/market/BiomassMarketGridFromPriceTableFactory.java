@@ -45,13 +45,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import static com.google.common.collect.Streams.stream;
 import static java.math.RoundingMode.HALF_EVEN;
 import static java.util.Map.entry;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
+import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 
 @Data
 @NoArgsConstructor
@@ -79,9 +81,17 @@ public class BiomassMarketGridFromPriceTableFactory
     @Override
     protected MarketGrid newInstance(final SimulationScope scope) {
 
-        final Map<String, List<Species>> speciesByCode =
-            stream(this.species.get(scope))
-                .collect(groupingBy(Species::getCode));
+        final List<? extends Species> configuredSpecies =
+            stream(this.species.get(scope)).toList();
+        final Map<String, Species> speciesByKey =
+            configuredSpecies
+                .stream()
+                .collect(toMap(Species::getKey, identity()));
+        final Set<String> speciesCodes =
+            configuredSpecies
+                .stream()
+                .map(Species::getCode)
+                .collect(toSet());
 
         final PortGrid portGrid = this.portGrid.get(scope);
         final Map<String, BiomassMarket> markets = new HashMap<>();
@@ -90,7 +100,7 @@ public class BiomassMarketGridFromPriceTableFactory
         final List<Entry<LocalDateTime, PriceUpdate>> priceUpdatesByDate =
             data.get(scope)
                 .stream()
-                .flatMap(row -> {
+                .map(row -> {
                         final BiomassMarket biomassMarket = markets.computeIfAbsent(
                             row.getString(portCodeColumn),
                             portCode -> {
@@ -109,12 +119,22 @@ public class BiomassMarketGridFromPriceTableFactory
                             }
                         );
                         final String speciesCode = row.getString(speciesCodeColumn);
-                        final List<Species> speciesList = speciesByCode.get(speciesCode);
-                        if (speciesList == null) {
+                        if (!speciesCodes.contains(speciesCode)) {
                             throw new RuntimeException(
                                 "Species " + speciesCode + " not found."
                             );
                         }
+
+                        final Species species =
+                            // Use the existing species definition if we have it, but otherwise
+                            // create a new species object for that particular price. The latter
+                            // case will be common when we have species with life stages in the
+                            // simulation but the market only deals with generic species.
+                            speciesByKey.computeIfAbsent(
+                                multiStringKey(speciesCode, null),
+                                _ -> new Species(speciesCode, null, null)
+                            );
+
                         final CatchCategory catchCategory =
                             catchCategories.computeIfAbsent(
                                 row.getString(categoryCodeColumn),
@@ -130,21 +150,17 @@ public class BiomassMarketGridFromPriceTableFactory
                             HALF_EVEN
                         );
                         final LocalDateTime localDateTime = row.getDate(dateColumn).atStartOfDay();
-                        return speciesList
-                            .stream()
-                            .map(species ->
-                                entry(
-                                    localDateTime,
-                                    new PriceUpdate(
-                                        biomassMarket,
-                                        new PriceEntry(
-                                            catchCategory,
-                                            species,
-                                            new Price(money, massUnit)
-                                        )
-                                    )
+                        return entry(
+                            localDateTime,
+                            new PriceUpdate(
+                                biomassMarket,
+                                new PriceEntry(
+                                    catchCategory,
+                                    species,
+                                    new Price(money, massUnit)
                                 )
-                            );
+                            )
+                        );
                     }
                 ).toList();
         scope.getSimulation().getTemporalSchedule().scheduleByDateTime(priceUpdatesByDate);
