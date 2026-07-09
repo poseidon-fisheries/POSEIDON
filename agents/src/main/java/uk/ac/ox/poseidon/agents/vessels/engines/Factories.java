@@ -53,6 +53,10 @@ public class Factories {
         return tank(capacity, volumeOf(0, LITRE));
     }
 
+    public static InfiniteFuelTankFactory infiniteTank() {
+        return new InfiniteFuelTankFactory();
+    }
+
     public static SimpleEngineFactory<VesselScope> simpleEngine(
         final Factory<? super VesselScope, ? extends FuelTank> fuelTank,
         final Factory<? super VesselScope, ? extends Quantity<Speed>> cruisingSpeed,
