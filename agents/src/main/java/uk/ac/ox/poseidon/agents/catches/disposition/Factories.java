@@ -69,4 +69,8 @@ public class Factories {
     public static ProportionallyLimitingBiomassToHoldFactory proportionallyLimitingBiomassToHold() {
         return new ProportionallyLimitingBiomassToHoldFactory();
     }
+
+    public static FullDiscardMortalityFactory fullDiscardMortality() {
+        return new FullDiscardMortalityFactory();
+    }
 }
