@@ -133,6 +133,10 @@ public class Factories {
         return new MultiStringKeyFromRowFactory(Arrays.asList(keyColumnNames));
     }
 
+    public static DoubleFromRowFactory doubleFromRow(final String columnName) {
+        return new DoubleFromRowFactory(columnName);
+    }
+
     public static <S extends Scope, T, K, V> ComposedFunctionFactory<S, T, K, V> tableLookup(
         final Factory<? super S, ? extends Function<? super T, ? extends K>> keyExtractor,
         final Factory<? super S, Table> table,
