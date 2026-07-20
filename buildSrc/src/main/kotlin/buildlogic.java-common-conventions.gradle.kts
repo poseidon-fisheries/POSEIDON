@@ -38,7 +38,7 @@ abstract class MockitoAgentArgumentProvider : CommandLineArgumentProvider {
     abstract val agentJar: RegularFileProperty
 
     override fun asArguments(): Iterable<String> {
-        return listOf("-javaagent:${agentJar.asFile.get().absolutePath}")
+        return listOf("-javaagent:${agentJar.asFile.get().absolutePath}", "-Xshare:off")
     }
 }
 
