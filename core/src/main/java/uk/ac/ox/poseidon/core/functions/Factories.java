@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
+
 public class Factories {
     private Factories() {}
 
@@ -44,6 +46,20 @@ public class Factories {
         final Factory<? super S, ? extends Function<? super T2, ? extends R>> function2
     ) {
         return new ComposedFunctionFactory<>(function1, function2);
+    }
+
+    public static <S extends Scope, T, R> DefaultIfNullFactory<S, T, R> defaultIfNull(
+        final Factory<? super S, ? extends Function<? super T, ? extends R>> delegate,
+        final Factory<? super S, ? extends R> defaultValue
+    ) {
+        return new DefaultIfNullFactory<>(delegate, defaultValue);
+    }
+
+    public static <S extends Scope, T, R> DefaultIfNullFactory<S, T, R> defaultIfNull(
+        final Factory<? super S, ? extends Function<? super T, ? extends R>> delegate,
+        final R defaultValue
+    ) {
+        return defaultIfNull(delegate, object(defaultValue));
     }
 
     @SafeVarargs
