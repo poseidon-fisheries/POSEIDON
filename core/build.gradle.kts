@@ -35,5 +35,5 @@ dependencies {
     api(libs.commons.collections)
     implementation(libs.jcommander)
     implementation(libs.commons.beanutils)
-    implementation(libs.fastutil.core)
+    api(libs.fastutil.core)
 }
