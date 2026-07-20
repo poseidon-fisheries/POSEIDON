@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import uk.ac.ox.poseidon.core.providers.Provider;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
@@ -32,6 +33,7 @@ import java.util.Arrays;
 
 public class NextTimeAtProvider implements Provider<LocalDateTime> {
 
+    @SuppressFBWarnings("EI2")
     private final TemporalSchedule schedule;
     private final LocalTime[] times;
 
