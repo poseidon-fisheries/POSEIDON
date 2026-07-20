@@ -30,5 +30,10 @@ dependencies {
     api(libs.snakeyaml)
     implementation(libs.commons.io)
     implementation(libs.jcommander)
+    constraints {
+        api(libs.classgraph) {
+            because("classgraph 4.8.180 avoids JDK 24+ sun.misc.Unsafe::invokeCleaner warnings")
+        }
+    }
     runtimeOnly(libs.slf4j.jdk14) // tablesaw uses slf4j, which we reroute to j.u.Logging
 }
