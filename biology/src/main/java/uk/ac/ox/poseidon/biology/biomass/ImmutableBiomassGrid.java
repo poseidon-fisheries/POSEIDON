@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * its backing array; it is not {@link uk.ac.ox.poseidon.biology.Fisheable} either, since fishing
  * always targets a live, simulation-scoped, mutable {@link BiomassGrid} instead.
  */
-public class ImmutableBiomassGrid extends DoubleGridWrapper {
+public class ImmutableBiomassGrid extends DoubleGridWrapper implements SpeciesGrid {
 
     @Getter
     private final Species species;

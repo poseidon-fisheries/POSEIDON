@@ -38,7 +38,9 @@ import uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
@@ -183,5 +185,13 @@ public class Factories {
         final String separator
     ) {
         return new DateIndexedBiomassGridsFromNetCdfFactory<>(modelGrid, species, ncFilePath, separator);
+    }
+
+    public static DateIndexedBiomassGridUpdatesFactory dateIndexedBiomassGridUpdates(
+        final Factory<? super SimulationScope, ? extends FisheableBiomassGrids> biomassGrids,
+        final Factory<? super SimulationScope, ? extends Map<LocalDate, ? extends List<? extends SpeciesGrid>>>
+            dateIndexedBiomassGrids
+    ) {
+        return new DateIndexedBiomassGridUpdatesFactory(biomassGrids, dateIndexedBiomassGrids);
     }
 }
