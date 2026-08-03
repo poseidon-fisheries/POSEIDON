@@ -20,6 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
 plugins {
     // Apply the foojay-resolver plugin to allow automatic download of JDKs
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
@@ -37,7 +44,10 @@ include("agents")
 include("regulations")
 
 dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        // This repository list (including comments and order) is intentionally mirrored in the
+        // parent SURIMI-POSEIDON/settings.gradle.kts. Keep both in sync.
         maven {
             // needs to come before Maven Central, otherwise we fail to find javax.media:jai_core:1.1.3
             url = uri("https://repo.osgeo.org/repository/geotools-releases/")
@@ -46,8 +56,8 @@ dependencyResolutionManagement {
         maven("https://jitpack.io")
         maven { url = uri("https://maven.geo-solutions.it/") }
         maven {
-            // needs to come after mavenCentral otherwise we fail to find
-            // flatlaf-3.5.1-macos-arm64.dylib and flatlaf-3.5.1-macos-x86_64.dylib
+            // needs to come after mavenCentral otherwise we fail to find the FlatLaf native
+            // macOS artifacts (flatlaf-<version>-macos-arm64.dylib / -macos-x86_64.dylib)
             url = uri("https://nexus.geomatys.com/repository/maven-public/")
         }
     }
