@@ -6,6 +6,7 @@ commons-collections = "4.5.0"
 commons-io = "2.22.0"
 caffeine = "3.2.3"
 classgraph = "4.8.180"
+cdm-core = "5.10.0"
 fastutil = "8.5.18"
 flatlaf = "3.7.1"
 gdxai = "50d94f4847303dc18ba8077f8a3424d1be5e0692"
@@ -39,6 +40,7 @@ commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.re
 commons-collections = { module = "org.apache.commons:commons-collections4", version.ref = "commons-collections" }
 commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
+cdm-core = { module = "edu.ucar:cdm-core", version.ref = "cdm-core" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
 fastutil-core = { module = "it.unimi.dsi:fastutil-core", version.ref = "fastutil" }
 flatlaf = { module = "com.formdev:flatlaf", version.ref = "flatlaf" }

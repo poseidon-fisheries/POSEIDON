@@ -34,4 +34,5 @@ dependencies {
     implementation(libs.gt.coverage)
     runtimeOnly(libs.gt.shapefile)
     runtimeOnly(libs.gt.arcgrid)
+    implementation(libs.cdm.core)
 }
