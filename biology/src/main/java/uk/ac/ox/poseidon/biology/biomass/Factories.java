@@ -37,6 +37,7 @@ import uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
+import java.nio.file.Path;
 import java.util.List;
 
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
@@ -163,5 +164,24 @@ public class Factories {
 
     public static RandomBiomassRecruitmentAllocatorFactory randomBiomassRecruitmentAllocator() {
         return new RandomBiomassRecruitmentAllocatorFactory();
+    }
+
+    public static <S extends Scope> DateIndexedBiomassGridsFromNetCdfFactory<S>
+        dateIndexedBiomassGridsFromNetCdf(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends List<? extends Species>> species,
+        final Factory<? super S, ? extends Path> ncFilePath
+    ) {
+        return dateIndexedBiomassGridsFromNetCdf(modelGrid, species, ncFilePath, "_");
+    }
+
+    public static <S extends Scope> DateIndexedBiomassGridsFromNetCdfFactory<S>
+        dateIndexedBiomassGridsFromNetCdf(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends List<? extends Species>> species,
+        final Factory<? super S, ? extends Path> ncFilePath,
+        final String separator
+    ) {
+        return new DateIndexedBiomassGridsFromNetCdfFactory<>(modelGrid, species, ncFilePath, separator);
     }
 }

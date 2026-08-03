@@ -28,6 +28,9 @@ dependencies {
     api(project(":geography"))
     implementation(libs.tablesaw.core)
     implementation(libs.fastutil.core)
+    // Used only to write NetCDF test fixtures; NetCdfGridWrapper's own API (in :geography) is
+    // ucar-free, so production biology code has no NetCDF dependency of its own.
+    testImplementation(libs.cdm.core)
     constraints {
         implementation(libs.classgraph) {
             because("classgraph 4.8.180 avoids JDK 24+ sun.misc.Unsafe::invokeCleaner warnings")
