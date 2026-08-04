@@ -6,7 +6,7 @@ components:
       elevationColumnName: elevation
       latitudeColumnName: lat
       longitudeColumnName: lon
-      table: !!uk.ac.ox.poseidon.io.tables.CsvTableFactory
+      table: !!uk.ac.ox.poseidon.io.tables.TableFromCsvFactory
         dataSource: !!uk.ac.ox.poseidon.io.sources.ZipEntryDataSourceFactory
           encoding: UTF-8
           entry: elevations.csv
@@ -149,6 +149,10 @@ components:
       unitString: l/h,
       value: 70.0
     }
+    minimumCatchThreshold: !!uk.ac.ox.poseidon.core.quantities.MassFactory {
+      unitString: kg,
+      value: 1.0
+    }
     proportion: 6.41964E-4
   vesselField: &id020 !!uk.ac.ox.poseidon.agents.fields.VesselFieldFactory
     modelGrid: *id002
@@ -214,7 +218,11 @@ components:
                     pathFinder: *id013
                 guard: null
               - !!uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory
+                destinationCell: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripDestinationCellFactory {
+                  }
                 distance: *id011
+                eventManager: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripEventManagerFactory {
+                  }
                 guard: null
                 pathFinder: *id013
               - !!uk.ac.ox.poseidon.agents.tasks.decorators.UntilFailTaskFactory
@@ -252,7 +260,11 @@ components:
                 guard: null
               }
               - !!uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory
+                destinationCell: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripDestinationCellFactory {
+                  }
                 distance: *id011
+                eventManager: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripEventManagerFactory {
+                  }
                 guard: null
                 pathFinder: *id013
               - !!uk.ac.ox.poseidon.agents.tasks.landings.LandCatchesFactory
