@@ -48,7 +48,7 @@ import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.time.Factories.ONE_DAY;
-import static uk.ac.ox.poseidon.io.tables.Factories.csvTableFromString;
+import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 
 class FleetFromVesselRegisterFactoryTest {
 
@@ -96,7 +96,7 @@ class FleetFromVesselRegisterFactoryTest {
                             new ObjectFactory<>(portGrid),
                             new ObjectFactory<>(marketGrid)
                         ))
-                        .data(csvTableFromString(initialData + extraData))
+                        .data(tableFromCsvString(initialData + extraData))
                         .hold(new ObjectFactory<>(h1))
                         .gear(
                             VesselScopeFactoriesByCode.<Gear>builder()

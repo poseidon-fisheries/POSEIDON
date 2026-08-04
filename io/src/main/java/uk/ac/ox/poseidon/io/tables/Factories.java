@@ -48,20 +48,20 @@ public class Factories {
     private Factories() {
     }
 
-    public static CsvTableFactory<Scope> csvTableFromString(final String data) {
-        return new CsvTableFactory<>(new StringDataSourceFactory(data));
+    public static TableFromCsvFactory<Scope> tableFromCsvString(final String data) {
+        return new TableFromCsvFactory<>(new StringDataSourceFactory(data));
     }
 
-    public static <S extends Scope> CsvTableFactory<S> csvTableFromFile(
+    public static <S extends Scope> TableFromCsvFactory<S> tableFromCsvFile(
         final Factory<S, ? extends Path> pathFactory
     ) {
-        return new CsvTableFactory<>(new FileDataSourceFactory<>(pathFactory));
+        return new TableFromCsvFactory<>(new FileDataSourceFactory<>(pathFactory));
     }
 
-    public static <S extends Scope> CsvTableFactory<S> csvTableFrom(
+    public static <S extends Scope> TableFromCsvFactory<S> tableFromCsv(
         final Factory<S, ? extends DataSource> dataSourceFactory
     ) {
-        return new CsvTableFactory<>(dataSourceFactory);
+        return new TableFromCsvFactory<>(dataSourceFactory);
     }
 
     public static <S extends Scope> CsvTableWriterFactory<S> csvTableWriter(

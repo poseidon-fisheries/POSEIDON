@@ -212,7 +212,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final var startingDateTime = startOf(LocalDate.of(1, 1, 1));
         final var elevationTable =
             elevationTable(
-                csvTableFrom(zipEntryDataSource(
+                tableFromCsv(zipEntryDataSource(
                     inputPath.plus("elevations.zip"),
                     "elevations.csv"
                 )),

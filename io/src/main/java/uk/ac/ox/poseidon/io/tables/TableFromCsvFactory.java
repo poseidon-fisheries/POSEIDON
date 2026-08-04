@@ -40,7 +40,7 @@ import java.io.Reader;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CsvTableFactory<S extends Scope> extends RelativeScopeFactory<S, Table> {
+public class TableFromCsvFactory<S extends Scope> extends RelativeScopeFactory<S, Table> {
 
     private Factory<? super S, ? extends DataSource> dataSource;
 
