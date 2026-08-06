@@ -64,9 +64,7 @@ class StaticGridsFromNetCdfFactoryTest {
         final StaticGridsFromNetCdfFactory<Scope> factory =
             new StaticGridsFromNetCdfFactory<>(
                 scope -> modelGrid,
-                scope -> fixture,
-                "latitude",
-                "longitude"
+                new StaticNetCdfGridReaderFactory<>(scope -> fixture, "latitude", "longitude")
             );
 
         final ImmutableMap<String, DoubleGridWrapper> result = factory.get(mock(Scope.class));
@@ -90,9 +88,7 @@ class StaticGridsFromNetCdfFactoryTest {
         final StaticGridsFromNetCdfFactory<Scope> factory =
             new StaticGridsFromNetCdfFactory<>(
                 scope -> modelGrid,
-                scope -> fixture,
-                "latitude",
-                "longitude"
+                new StaticNetCdfGridReaderFactory<>(scope -> fixture, "latitude", "longitude")
             );
 
         assertThatThrownBy(() -> factory.get(mock(Scope.class)))

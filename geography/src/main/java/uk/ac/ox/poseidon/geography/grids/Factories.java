@@ -88,4 +88,11 @@ public class Factories {
         );
     }
 
+    public static <S extends Scope> StaticGridsFromNetCdfFactory<S> staticGridsFromNetCdf(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends Supplier<StaticNetCdfGridReader>> staticNetCdfGridReader
+    ) {
+        return new StaticGridsFromNetCdfFactory<>(modelGrid, staticNetCdfGridReader);
+    }
+
 }

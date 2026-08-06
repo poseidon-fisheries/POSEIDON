@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.nio.file.Path;
+import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
@@ -53,20 +53,14 @@ public class StaticGridsFromNetCdfFactory<S extends Scope>
     extends RelativeScopeFactory<S, ImmutableMap<String, DoubleGridWrapper>> {
 
     private Factory<? super S, ? extends ModelGrid> modelGrid;
-    private Factory<? super S, ? extends Path> ncFilePath;
-    private String latitudeDimensionName;
-    private String longitudeDimensionName;
+    private Factory<? super S, ? extends Supplier<StaticNetCdfGridReader>> staticNetCdfGridReader;
 
     @Override
     protected ImmutableMap<String, DoubleGridWrapper> newInstance(final S scope) {
 
         final ModelGrid modelGrid = this.modelGrid.get(scope);
 
-        try (final StaticNetCdfGridReader netCdfGridReader = new StaticNetCdfGridReader(
-            ncFilePath.get(scope),
-            latitudeDimensionName,
-            longitudeDimensionName
-        )) {
+        try (final StaticNetCdfGridReader netCdfGridReader = staticNetCdfGridReader.get(scope).get()) {
 
             netCdfGridReader.checkAlignmentWith(modelGrid);
 

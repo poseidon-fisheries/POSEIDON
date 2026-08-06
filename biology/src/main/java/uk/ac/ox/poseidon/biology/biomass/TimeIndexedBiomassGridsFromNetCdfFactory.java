@@ -35,14 +35,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.TimeIndexedNetCdfGridReader;
 
-import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -77,11 +72,8 @@ public class TimeIndexedBiomassGridsFromNetCdfFactory<S extends Scope>
 
     private Factory<? super S, ? extends ModelGrid> modelGrid;
     private Factory<? super S, ? extends List<? extends Species>> species;
-    private Factory<? super S, ? extends Path> ncFilePath;
     private String separator;
-    private String timeDimensionName;
-    private String latitudeDimensionName;
-    private String longitudeDimensionName;
+    private Factory<? super S, ? extends Supplier<TimeIndexedNetCdfGridReader>> timeIndexedNetCdfGridReader;
 
     @Override
     protected ImmutableMap<LocalDateTime, ImmutableList<ImmutableBiomassGrid>> newInstance(final S scope) {
@@ -90,12 +82,9 @@ public class TimeIndexedBiomassGridsFromNetCdfFactory<S extends Scope>
         final List<? extends Species> configuredSpecies = this.species.get(scope);
         checkNoCodeContainsSeparator(configuredSpecies, separator);
 
-        try (final TimeIndexedNetCdfGridReader netCdfGridReader = new TimeIndexedNetCdfGridReader(
-            ncFilePath.get(scope),
-            timeDimensionName,
-            latitudeDimensionName,
-            longitudeDimensionName
-        )) {
+        try (
+            final TimeIndexedNetCdfGridReader netCdfGridReader = timeIndexedNetCdfGridReader.get(scope).get()
+        ) {
 
             netCdfGridReader.checkAlignmentWith(modelGrid);
 
@@ -117,8 +106,8 @@ public class TimeIndexedBiomassGridsFromNetCdfFactory<S extends Scope>
                         final LocalDateTime dateTime = dateTimes.get(timeIndex);
                         checkState(
                             seenDateTimes.add(dateTime),
-                            "Duplicate date %s at time index %s in %s",
-                            dateTime, timeIndex, ncFilePath.get(scope)
+                            "Duplicate date %s at time index %s",
+                            dateTime, timeIndex
                         );
                         return dateTime;
                     },

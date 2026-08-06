@@ -45,6 +45,7 @@ import java.util.Map;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.supplierAllocator;
+import static uk.ac.ox.poseidon.geography.grids.Factories.timeIndexedNetCdfGridReader;
 
 public class Factories {
 
@@ -185,7 +186,8 @@ public class Factories {
         final String separator
     ) {
         return new TimeIndexedBiomassGridsFromNetCdfFactory<>(
-            modelGrid, species, ncFilePath, separator, "time", "latitude", "longitude"
+            modelGrid, species, separator,
+            timeIndexedNetCdfGridReader(ncFilePath, "time", "latitude", "longitude")
         );
     }
 
