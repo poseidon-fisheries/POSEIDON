@@ -34,7 +34,7 @@ import java.nio.file.Path;
 import java.util.function.Supplier;
 
 /**
- * Resolves {@code ncFilePath} and the dimension names against scope once (cheap — no file I/O),
+ * Resolves {@code ncFilePath} against scope once (cheap — no file I/O),
  * and returns a {@link Supplier} whose {@code get()} opens a fresh, independent
  * {@link TimeIndexedNetCdfGridReader} on every call. Memoizing the supplier (as every
  * {@code Factory} does) is safe because it holds no open resource itself; memoizing an open

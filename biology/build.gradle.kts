@@ -28,7 +28,7 @@ dependencies {
     api(project(":geography"))
     implementation(libs.tablesaw.core)
     implementation(libs.fastutil.core)
-    // Used only to write NetCDF test fixtures; NetCdfGridWrapper's own API (in :geography) is
+    // Used only to write NetCDF test fixtures; the NetCDF readers' own API (in :geography) is
     // ucar-free, so production biology code has no NetCDF dependency of its own.
     testImplementation(libs.cdm.core)
     constraints {

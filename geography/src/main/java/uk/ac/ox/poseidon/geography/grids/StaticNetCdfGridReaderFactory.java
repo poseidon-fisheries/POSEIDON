@@ -34,7 +34,7 @@ import java.nio.file.Path;
 import java.util.function.Supplier;
 
 /**
- * Resolves {@code ncFilePath} and the dimension names against scope once (cheap — no file I/O),
+ * Resolves {@code ncFilePath} against scope once (cheap — no file I/O),
  * and returns a {@link Supplier} whose {@code get()} opens a fresh, independent
  * {@link StaticNetCdfGridReader} on every call. See {@link TimeIndexedNetCdfGridReaderFactory}
  * for why the supplier indirection matters.
