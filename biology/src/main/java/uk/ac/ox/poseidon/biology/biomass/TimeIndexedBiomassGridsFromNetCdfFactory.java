@@ -28,17 +28,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-import uk.ac.ox.poseidon.geography.grids.NetCdfGridWrapper;
+import uk.ac.ox.poseidon.geography.grids.TimeIndexedNetCdfGridReader;
 
 import java.nio.file.Path;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,18 +53,18 @@ import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 
 /**
- * Reads a NetCDF file holding, for each of a number of dates, one biomass raster per species,
- * on a grid that must align cell-for-cell with the given {@link ModelGrid} (no resampling is
- * performed; misalignment is an error). The resulting grids are immutable and meant to be
- * shared: this resolves to global scope when its input factories do (see
- * {@link RelativeScopeFactory}), so the whole map is typically computed once and reused across
- * every simulation started from the same loaded scenario.
+ * Reads a NetCDF file holding, for each of a number of dates, one biomass raster per species, on a
+ * grid that must align cell-for-cell with the given {@link ModelGrid} (no resampling is performed;
+ * misalignment is an error). The resulting grids are immutable and meant to be shared: this
+ * resolves to global scope when its input factories do (see {@link RelativeScopeFactory}), so the
+ * whole map is typically computed once and reused across every simulation started from the same
+ * loaded scenario.
  * <p>
  * Each NetCDF data variable name is split on the last occurrence of {@code separator} into a
- * species code and a life stage; a name containing no {@code separator} names a bare species
- * with no life stage. The resulting (code, lifeStage) pairs are matched against the configured
- * species list, strictly both ways: every configured species must have exactly one matching
- * variable and vice versa, or this throws. Configured species codes must not themselves contain
+ * species code and a life stage; a name containing no {@code separator} names a bare species with
+ * no life stage. The resulting (code, lifeStage) pairs are matched against the configured species
+ * list, strictly both ways: every configured species must have exactly one matching variable and
+ * vice versa, or this throws. Configured species codes must not themselves contain
  * {@code separator}, since that would make a bare code indistinguishable from a code/lifeStage
  * pair.
  */
@@ -74,49 +72,55 @@ import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DateIndexedBiomassGridsFromNetCdfFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ImmutableMap<LocalDate, ImmutableList<ImmutableBiomassGrid>>> {
-
-    private static final double COORDINATE_EPSILON = 1e-6;
+public class TimeIndexedBiomassGridsFromNetCdfFactory<S extends Scope>
+    extends RelativeScopeFactory<S, ImmutableMap<LocalDateTime, ImmutableList<ImmutableBiomassGrid>>> {
 
     private Factory<? super S, ? extends ModelGrid> modelGrid;
     private Factory<? super S, ? extends List<? extends Species>> species;
     private Factory<? super S, ? extends Path> ncFilePath;
     private String separator;
+    private String timeDimensionName;
+    private String latitudeDimensionName;
+    private String longitudeDimensionName;
 
     @Override
-    protected ImmutableMap<LocalDate, ImmutableList<ImmutableBiomassGrid>> newInstance(final S scope) {
+    protected ImmutableMap<LocalDateTime, ImmutableList<ImmutableBiomassGrid>> newInstance(final S scope) {
 
         final ModelGrid modelGrid = this.modelGrid.get(scope);
         final List<? extends Species> configuredSpecies = this.species.get(scope);
         checkNoCodeContainsSeparator(configuredSpecies, separator);
 
-        try (final NetCdfGridWrapper netCdfGridWrapper = new NetCdfGridWrapper(ncFilePath.get(scope))) {
+        try (final TimeIndexedNetCdfGridReader netCdfGridReader = new TimeIndexedNetCdfGridReader(
+            ncFilePath.get(scope),
+            timeDimensionName,
+            latitudeDimensionName,
+            longitudeDimensionName
+        )) {
 
-            checkGridAlignment(netCdfGridWrapper, modelGrid);
+            netCdfGridReader.checkAlignmentWith(modelGrid);
 
             final Map<String, String> variableNamesBySpeciesKey =
                 matchVariablesToSpecies(
-                    netCdfGridWrapper.getDataVariableNames(),
+                    netCdfGridReader.getDataVariableNames(),
                     configuredSpecies,
                     separator
                 );
 
-            final List<Long> epochDays = netCdfGridWrapper.getEpochDays();
-            final Set<LocalDate> seenDates = new HashSet<>();
+            final List<LocalDateTime> dateTimes = netCdfGridReader.getDateTimes();
+            final Set<LocalDateTime> seenDateTimes = new HashSet<>();
 
             return IntStream
-                .range(0, epochDays.size())
+                .range(0, dateTimes.size())
                 .boxed()
                 .collect(toImmutableMap(
                     timeIndex -> {
-                        final LocalDate date = LocalDate.ofEpochDay(epochDays.get(timeIndex));
+                        final LocalDateTime dateTime = dateTimes.get(timeIndex);
                         checkState(
-                            seenDates.add(date),
+                            seenDateTimes.add(dateTime),
                             "Duplicate date %s at time index %s in %s",
-                            date, timeIndex, ncFilePath.get(scope)
+                            dateTime, timeIndex, ncFilePath.get(scope)
                         );
-                        return date;
+                        return dateTime;
                     },
                     timeIndex -> configuredSpecies
                         .stream()
@@ -124,7 +128,7 @@ public class DateIndexedBiomassGridsFromNetCdfFactory<S extends Scope>
                             final String variableName =
                                 variableNamesBySpeciesKey.get(currentSpecies.getKey());
                             final double[][] values =
-                                netCdfGridWrapper.readSlice(variableName, timeIndex);
+                                netCdfGridReader.readSlice(variableName, timeIndex);
                             return new ImmutableBiomassGrid(modelGrid, currentSpecies, values);
                         })
                         .collect(toImmutableList())
@@ -133,43 +137,9 @@ public class DateIndexedBiomassGridsFromNetCdfFactory<S extends Scope>
     }
 
     /**
-     * Validates that the NetCDF grid aligns exactly with the {@code ModelGrid}, comparing cell
-     * <em>centers</em> (via {@link ModelGrid#toCoordinate}) rather than raw envelope/cellsize
-     * values, since those disagree at the 1e-7-1e-9 level between an {@code .asc} grid header and
-     * a NetCDF {@code geotransform} even for grids that describe the same raster.
-     */
-    private static void checkGridAlignment(
-        final NetCdfGridWrapper netCdfGridWrapper,
-        final ModelGrid modelGrid
-    ) {
-        checkState(
-            netCdfGridWrapper.getLonDimensionSize() == modelGrid.getGridWidth()
-                && netCdfGridWrapper.getLatDimensionSize() == modelGrid.getGridHeight(),
-            "NetCDF grid is %sx%s but ModelGrid is %sx%s",
-            netCdfGridWrapper.getLonDimensionSize(), netCdfGridWrapper.getLatDimensionSize(),
-            modelGrid.getGridWidth(), modelGrid.getGridHeight()
-        );
-        final double[] longitudes = netCdfGridWrapper.getLongitudes();
-        final double[] latitudes = netCdfGridWrapper.getLatitudes();
-        for (int lonIndex = 0; lonIndex < longitudes.length; lonIndex++) {
-            for (int latIndex = 0; latIndex < latitudes.length; latIndex++) {
-                final Coordinate expected = modelGrid.toCoordinate(new Int2D(lonIndex, latIndex));
-                checkState(
-                    Math.abs(expected.lon - longitudes[lonIndex]) < COORDINATE_EPSILON
-                        && Math.abs(expected.lat - latitudes[latIndex]) < COORDINATE_EPSILON,
-                    "NetCDF cell (lonIndex=%s, latIndex=%s) at (%s, %s) does not align with " +
-                        "ModelGrid cell (%s, %s) at (%s, %s)",
-                    lonIndex, latIndex, longitudes[lonIndex], latitudes[latIndex],
-                    lonIndex, latIndex, expected.lon, expected.lat
-                );
-            }
-        }
-    }
-
-    /**
-     * Rejects any configured species whose code contains {@code separator}: since variable
-     * names are split on it unconditionally, such a code would be indistinguishable from a
-     * code/lifeStage pair and could never be matched correctly.
+     * Rejects any configured species whose code contains {@code separator}: since variable names
+     * are split on it unconditionally, such a code would be indistinguishable from a code/lifeStage
+     * pair and could never be matched correctly.
      */
     private static void checkNoCodeContainsSeparator(
         final List<? extends Species> configuredSpecies,
@@ -224,9 +194,9 @@ public class DateIndexedBiomassGridsFromNetCdfFactory<S extends Scope>
     }
 
     /**
-     * Splits a variable name into a (code, lifeStage) species key by splitting unconditionally
-     * on the last occurrence of {@code separator}; a name with no {@code separator} at all is a
-     * bare code with a {@code null} life stage.
+     * Splits a variable name into a (code, lifeStage) species key by splitting unconditionally on
+     * the last occurrence of {@code separator}; a name with no {@code separator} at all is a bare
+     * code with a {@code null} life stage.
      */
     private static String speciesKeyOf(
         final String variableName,

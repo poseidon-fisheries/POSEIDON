@@ -49,7 +49,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class DateIndexedBiomassGridUpdatesFactoryTest {
+class TimeIndexedBiomassGridUpdatesFactoryTest {
 
     private static final Int2D CELL = new Int2D(0, 0);
     private static final LocalDateTime SIMULATION_START = LocalDateTime.of(2026, 1, 1, 0, 0);
@@ -63,11 +63,11 @@ class DateIndexedBiomassGridUpdatesFactoryTest {
         final DefaultBiomassGrid target = new DefaultBiomassGrid(modelGrid, HKE, 0.0);
         final TemporalSchedule schedule = scheduleBeforeStart();
 
-        final DateIndexedBiomassGridUpdatesFactory factory = new DateIndexedBiomassGridUpdatesFactory(
+        final TimeIndexedBiomassGridUpdatesFactory factory = new TimeIndexedBiomassGridUpdatesFactory(
             _ -> new FisheableBiomassGrids(List.of(target)),
             _ -> Map.of(
-                LocalDate.of(2020, 1, 1), List.of(snapshot(HKE, 1.0)),
-                LocalDate.of(2025, 6, 15), List.of(snapshot(HKE, 2.0))
+                LocalDate.of(2020, 1, 1).atStartOfDay(), List.of(snapshot(HKE, 1.0)),
+                LocalDate.of(2025, 6, 15).atStartOfDay(), List.of(snapshot(HKE, 2.0))
             )
         );
 
@@ -83,9 +83,9 @@ class DateIndexedBiomassGridUpdatesFactoryTest {
         final TemporalSchedule schedule = scheduleBeforeStart();
         final LocalDate futureDate = LocalDate.of(2026, 3, 1);
 
-        final DateIndexedBiomassGridUpdatesFactory factory = new DateIndexedBiomassGridUpdatesFactory(
+        final TimeIndexedBiomassGridUpdatesFactory factory = new TimeIndexedBiomassGridUpdatesFactory(
             _ -> new FisheableBiomassGrids(List.of(target)),
-            _ -> Map.of(futureDate, List.of(snapshot(HKE, 5.0)))
+            _ -> Map.of(futureDate.atStartOfDay(), List.of(snapshot(HKE, 5.0)))
         );
 
         factory.get(new SimulationScope(simulation(schedule)));
@@ -100,14 +100,32 @@ class DateIndexedBiomassGridUpdatesFactoryTest {
     }
 
     @Test
+    void futureSnapshotAtNonMidnightTimeIsScheduledAtThatExactTime() {
+        // Proves the fractional-day part of a time-indexed snapshot survives all the way to
+        // scheduling: this factory must not force updates to midnight via atStartOfDay().
+        final DefaultBiomassGrid target = new DefaultBiomassGrid(modelGrid, HKE, 0.0);
+        final TemporalSchedule schedule = scheduleBeforeStart();
+        final LocalDateTime futureNoon = LocalDateTime.of(2026, 3, 1, 12, 0);
+
+        final TimeIndexedBiomassGridUpdatesFactory factory = new TimeIndexedBiomassGridUpdatesFactory(
+            _ -> new FisheableBiomassGrids(List.of(target)),
+            _ -> Map.of(futureNoon, List.of(snapshot(HKE, 5.0)))
+        );
+
+        factory.get(new SimulationScope(simulation(schedule)));
+
+        verify(schedule).scheduleOnce(eq(futureNoon), any(Steppable.class));
+    }
+
+    @Test
     void eachSpeciesUpdatesItsOwnGridOnly() {
         final DefaultBiomassGrid hkeGrid = new DefaultBiomassGrid(modelGrid, HKE, 0.0);
         final DefaultBiomassGrid aneGrid = new DefaultBiomassGrid(modelGrid, ANE, 0.0);
         final TemporalSchedule schedule = scheduleBeforeStart();
 
-        final DateIndexedBiomassGridUpdatesFactory factory = new DateIndexedBiomassGridUpdatesFactory(
+        final TimeIndexedBiomassGridUpdatesFactory factory = new TimeIndexedBiomassGridUpdatesFactory(
             _ -> new FisheableBiomassGrids(List.of(hkeGrid, aneGrid)),
-            _ -> Map.of(LocalDate.of(2020, 1, 1), List.of(snapshot(HKE, 3.0), snapshot(ANE, 7.0)))
+            _ -> Map.of(LocalDate.of(2020, 1, 1).atStartOfDay(), List.of(snapshot(HKE, 3.0), snapshot(ANE, 7.0)))
         );
 
         factory.get(new SimulationScope(simulation(schedule)));
@@ -122,8 +140,8 @@ class DateIndexedBiomassGridUpdatesFactoryTest {
             new FisheableBiomassGrids(List.of(new DefaultBiomassGrid(modelGrid, HKE, 0.0)));
         final TemporalSchedule schedule = scheduleBeforeStart();
 
-        final DateIndexedBiomassGridUpdatesFactory factory =
-            new DateIndexedBiomassGridUpdatesFactory(_ -> target, _ -> Map.of());
+        final TimeIndexedBiomassGridUpdatesFactory factory =
+            new TimeIndexedBiomassGridUpdatesFactory(_ -> target, _ -> Map.of());
 
         assertThat(factory.get(new SimulationScope(simulation(schedule)))).isSameAs(target);
     }

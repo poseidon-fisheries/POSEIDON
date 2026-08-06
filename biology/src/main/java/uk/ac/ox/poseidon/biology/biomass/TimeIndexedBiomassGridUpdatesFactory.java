@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,7 +41,7 @@ import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Schedules the full replacement of {@code biomassGrids}' contents, species by species, with the
- * dated snapshots given by {@code dateIndexedBiomassGrids} — meant to replace a biological grower
+ * dated snapshots given by {@code timeIndexedBiomassGrids} — meant to replace a biological grower
  * entirely, not run alongside one. Unlike
  * {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule#scheduleByDateTime}, entries dated before
  * the simulation's effective start are not all replayed in order: since each update is a full
@@ -52,19 +52,19 @@ import static java.util.stream.Collectors.groupingBy;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DateIndexedBiomassGridUpdatesFactory
+public class TimeIndexedBiomassGridUpdatesFactory
     extends SimulationScopeFactory<FisheableBiomassGrids> {
 
     private Factory<? super SimulationScope, ? extends FisheableBiomassGrids> biomassGrids;
-    private Factory<? super SimulationScope, ? extends Map<LocalDate, ? extends List<? extends SpeciesGrid>>>
-        dateIndexedBiomassGrids;
+    private Factory<? super SimulationScope, ? extends Map<LocalDateTime, ? extends List<? extends SpeciesGrid>>>
+        timeIndexedBiomassGrids;
 
     @Override
     protected FisheableBiomassGrids newInstance(final SimulationScope scope) {
 
         final FisheableBiomassGrids target = biomassGrids.get(scope);
-        final Map<LocalDate, ? extends List<? extends SpeciesGrid>> dateIndexedBiomassGrids =
-            this.dateIndexedBiomassGrids.get(scope);
+        final Map<LocalDateTime, ? extends List<? extends SpeciesGrid>> timeIndexedBiomassGrids =
+            this.timeIndexedBiomassGrids.get(scope);
         final TemporalSchedule schedule = scope.getSimulation().getTemporalSchedule();
 
         // Mirrors the minimumDateTime computation in TemporalSchedule.scheduleByDateTime, which
@@ -73,11 +73,11 @@ public class DateIndexedBiomassGridUpdatesFactory
             ? schedule.toDateTime(TemporalSchedule.EPOCH)
             : schedule.getDateTime();
 
-        final Map<Boolean, List<Entry<LocalDate, ? extends List<? extends SpeciesGrid>>>>
-            entriesBeforeAndAfter = dateIndexedBiomassGrids
+        final Map<Boolean, List<Entry<LocalDateTime, ? extends List<? extends SpeciesGrid>>>>
+            entriesBeforeAndAfter = timeIndexedBiomassGrids
             .entrySet()
             .stream()
-            .collect(groupingBy(entry -> entry.getKey().atStartOfDay().isBefore(minimumDateTime)));
+            .collect(groupingBy(entry -> entry.getKey().isBefore(minimumDateTime)));
 
         // Before start: only the latest snapshot can affect the final state, so drop the rest.
         Optional.ofNullable(entriesBeforeAndAfter.get(true))
@@ -90,7 +90,7 @@ public class DateIndexedBiomassGridUpdatesFactory
         Optional.ofNullable(entriesBeforeAndAfter.get(false))
             .ifPresent(entriesAfter -> entriesAfter.forEach(entry ->
                 schedule.scheduleOnce(
-                    entry.getKey().atStartOfDay(),
+                    entry.getKey(),
                     new BiomassGridUpdate(entry.getValue(), target)
                 )
             ));

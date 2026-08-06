@@ -42,13 +42,14 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
-class DateIndexedBiomassGridsFromNetCdfFactoryTest {
+class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
 
     private static final float FILL_VALUE = -999f;
     private static final double[] LONGITUDES = {10.0, 20.0, 30.0};
@@ -76,21 +77,25 @@ class DateIndexedBiomassGridsFromNetCdfFactoryTest {
             true
         );
 
-        final DateIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
-            new DateIndexedBiomassGridsFromNetCdfFactory<>(
+        final TimeIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
+            new TimeIndexedBiomassGridsFromNetCdfFactory<>(
                 scope -> modelGrid,
                 scope -> List.of(ANE_ADULT, HKE),
                 scope -> fixture,
-                "_"
+                "_",
+                "time",
+                "latitude",
+                "longitude"
             );
 
-        final ImmutableMap<LocalDate, ImmutableList<ImmutableBiomassGrid>> result =
+        final ImmutableMap<LocalDateTime, ImmutableList<ImmutableBiomassGrid>> result =
             factory.get(mock(Scope.class));
 
         assertThat(result).isInstanceOf(ImmutableMap.class);
-        assertThat(result.keySet()).containsExactly(date0, date1, date2);
+        assertThat(result.keySet())
+            .containsExactly(date0.atStartOfDay(), date1.atStartOfDay(), date2.atStartOfDay());
 
-        final ImmutableList<ImmutableBiomassGrid> grids0 = result.get(date0);
+        final ImmutableList<ImmutableBiomassGrid> grids0 = result.get(date0.atStartOfDay());
         assertThat(grids0).isInstanceOf(ImmutableList.class);
         assertThat(grids0)
             .extracting(ImmutableBiomassGrid::getSpecies)
@@ -115,12 +120,15 @@ class DateIndexedBiomassGridsFromNetCdfFactoryTest {
             false
         );
 
-        final DateIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
-            new DateIndexedBiomassGridsFromNetCdfFactory<>(
+        final TimeIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
+            new TimeIndexedBiomassGridsFromNetCdfFactory<>(
                 scope -> modelGrid,
                 scope -> List.of(HKE),
                 scope -> fixture,
-                "_"
+                "_",
+                "time",
+                "latitude",
+                "longitude"
             );
 
         assertThatThrownBy(() -> factory.get(mock(Scope.class)))
@@ -137,12 +145,15 @@ class DateIndexedBiomassGridsFromNetCdfFactoryTest {
             false
         );
 
-        final DateIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
-            new DateIndexedBiomassGridsFromNetCdfFactory<>(
+        final TimeIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
+            new TimeIndexedBiomassGridsFromNetCdfFactory<>(
                 scope -> modelGrid,
                 scope -> List.of(HKE),
                 scope -> fixture,
-                "_"
+                "_",
+                "time",
+                "latitude",
+                "longitude"
             );
 
         assertThatThrownBy(() -> factory.get(mock(Scope.class)))
@@ -159,12 +170,15 @@ class DateIndexedBiomassGridsFromNetCdfFactoryTest {
             false
         );
 
-        final DateIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
-            new DateIndexedBiomassGridsFromNetCdfFactory<>(
+        final TimeIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
+            new TimeIndexedBiomassGridsFromNetCdfFactory<>(
                 scope -> modelGrid,
                 scope -> List.of(HKE, ANE_ADULT),
                 scope -> fixture,
-                "_"
+                "_",
+                "time",
+                "latitude",
+                "longitude"
             );
 
         assertThatThrownBy(() -> factory.get(mock(Scope.class)))
@@ -184,12 +198,15 @@ class DateIndexedBiomassGridsFromNetCdfFactoryTest {
             false
         );
 
-        final DateIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
-            new DateIndexedBiomassGridsFromNetCdfFactory<>(
+        final TimeIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
+            new TimeIndexedBiomassGridsFromNetCdfFactory<>(
                 scope -> modelGrid,
                 scope -> List.of(HKE),
                 scope -> fixture,
-                "_"
+                "_",
+                "time",
+                "latitude",
+                "longitude"
             );
 
         assertThatThrownBy(() -> factory.get(mock(Scope.class)))
@@ -210,16 +227,19 @@ class DateIndexedBiomassGridsFromNetCdfFactoryTest {
             false
         );
 
-        final DateIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
-            new DateIndexedBiomassGridsFromNetCdfFactory<>(
+        final TimeIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
+            new TimeIndexedBiomassGridsFromNetCdfFactory<>(
                 scope -> modelGrid,
                 scope -> List.of(codLarva, codSpawner),
                 scope -> fixture,
-                "-"
+                "-",
+                "time",
+                "latitude",
+                "longitude"
             );
 
         final ImmutableList<ImmutableBiomassGrid> grids =
-            factory.get(mock(Scope.class)).get(LocalDate.of(2020, 1, 1));
+            factory.get(mock(Scope.class)).get(LocalDate.of(2020, 1, 1).atStartOfDay());
 
         assertThat(grids)
             .extracting(ImmutableBiomassGrid::getSpecies)
@@ -238,16 +258,19 @@ class DateIndexedBiomassGridsFromNetCdfFactoryTest {
             false
         );
 
-        final DateIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
-            new DateIndexedBiomassGridsFromNetCdfFactory<>(
+        final TimeIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
+            new TimeIndexedBiomassGridsFromNetCdfFactory<>(
                 scope -> modelGrid,
                 scope -> List.of(hkeXxx),
                 scope -> fixture,
-                "_"
+                "_",
+                "time",
+                "latitude",
+                "longitude"
             );
 
         final ImmutableList<ImmutableBiomassGrid> grids =
-            factory.get(mock(Scope.class)).get(LocalDate.of(2020, 1, 1));
+            factory.get(mock(Scope.class)).get(LocalDate.of(2020, 1, 1).atStartOfDay());
 
         assertThat(grids).extracting(ImmutableBiomassGrid::getSpecies).containsExactly(hkeXxx);
     }
@@ -263,12 +286,15 @@ class DateIndexedBiomassGridsFromNetCdfFactoryTest {
             false
         );
 
-        final DateIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
-            new DateIndexedBiomassGridsFromNetCdfFactory<>(
+        final TimeIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
+            new TimeIndexedBiomassGridsFromNetCdfFactory<>(
                 scope -> modelGrid,
                 scope -> List.of(HKE),
                 scope -> fixture,
-                "_"
+                "_",
+                "time",
+                "latitude",
+                "longitude"
             );
 
         assertThatThrownBy(() -> factory.get(mock(Scope.class)))
@@ -280,17 +306,129 @@ class DateIndexedBiomassGridsFromNetCdfFactoryTest {
     void speciesCodeContainingSeparatorThrowsUpFrontBeforeReadingTheFile() {
         final Species badSpecies = new Species("AA_BB", null, null);
 
-        final DateIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
-            new DateIndexedBiomassGridsFromNetCdfFactory<>(
+        final TimeIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
+            new TimeIndexedBiomassGridsFromNetCdfFactory<>(
                 scope -> modelGrid,
                 scope -> List.of(badSpecies),
                 scope -> tempDir.resolve("does-not-need-to-exist.nc"),
-                "_"
+                "_",
+                "time",
+                "latitude",
+                "longitude"
             );
 
         assertThatThrownBy(() -> factory.get(mock(Scope.class)))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("AA_BB");
+    }
+
+    @Test
+    void fractionalTimeValuePreservesTimeOfDay() throws IOException {
+        final Path fixture = tempDir.resolve("fractional.nc");
+        try (NetcdfFileWriter writer =
+                 NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, fixture.toString())) {
+            final Dimension timeDim = writer.addDimension("time", 1);
+            final Dimension latDim = writer.addDimension("latitude", LATITUDES.length);
+            final Dimension lonDim = writer.addDimension("longitude", LONGITUDES.length);
+            final Variable timeVar = writer.addVariable("time", DataType.DOUBLE, List.of(timeDim));
+            writer.addVariableAttribute(timeVar, new Attribute("units", "days since 1970-01-01"));
+            final Variable latVar = writer.addVariable("latitude", DataType.DOUBLE, List.of(latDim));
+            final Variable lonVar = writer.addVariable("longitude", DataType.DOUBLE, List.of(lonDim));
+            final Variable dataVar =
+                writer.addVariable("HKE", DataType.FLOAT, List.of(timeDim, latDim, lonDim));
+            writer.addVariableAttribute(dataVar, new Attribute("_FillValue", FILL_VALUE));
+            writer.create();
+            // 18262.5 days since 1970-01-01 = noon on 2020-01-01, not midnight.
+            writer.write(timeVar, Array.makeFromJavaArray(new double[]{18262.5}));
+            writer.write(latVar, Array.makeFromJavaArray(LATITUDES));
+            writer.write(lonVar, Array.makeFromJavaArray(LONGITUDES));
+            final float[][][] data = new float[1][LATITUDES.length][LONGITUDES.length];
+            for (int i = 0; i < LATITUDES.length; i++) {
+                for (int j = 0; j < LONGITUDES.length; j++) {
+                    data[0][i][j] = (float) expectedValue(0, 0, i, j);
+                }
+            }
+            writer.write(dataVar, Array.makeFromJavaArray(data));
+        } catch (final InvalidRangeException e) {
+            throw new RuntimeException(e);
+        }
+
+        final TimeIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
+            new TimeIndexedBiomassGridsFromNetCdfFactory<>(
+                scope -> modelGrid,
+                scope -> List.of(HKE),
+                scope -> fixture,
+                "_",
+                "time",
+                "latitude",
+                "longitude"
+            );
+
+        assertThat(factory.get(mock(Scope.class)).keySet())
+            .containsExactly(LocalDateTime.of(2020, 1, 1, 12, 0));
+    }
+
+    @Test
+    void dimensionNamesAreConfigurable() throws IOException {
+        final Path fixture = writeFixtureWithCustomDimensionNames(
+            LONGITUDES, LATITUDES, LocalDate.of(2020, 1, 1), "HKE"
+        );
+
+        final TimeIndexedBiomassGridsFromNetCdfFactory<Scope> factory =
+            new TimeIndexedBiomassGridsFromNetCdfFactory<>(
+                scope -> modelGrid,
+                scope -> List.of(HKE),
+                scope -> fixture,
+                "_",
+                "t",
+                "y",
+                "x"
+            );
+
+        final ImmutableList<ImmutableBiomassGrid> grids =
+            factory.get(mock(Scope.class)).get(LocalDate.of(2020, 1, 1).atStartOfDay());
+
+        assertThat(grids).extracting(ImmutableBiomassGrid::getSpecies).containsExactly(HKE);
+    }
+
+    private Path writeFixtureWithCustomDimensionNames(
+        final double[] longitudes,
+        final double[] latitudes,
+        final LocalDate date,
+        final String variableName
+    ) throws IOException {
+        final Path file = tempDir.resolve("custom-dims.nc");
+        try (NetcdfFileWriter writer =
+                 NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, file.toString())) {
+
+            final Dimension timeDim = writer.addDimension("t", 1);
+            final Dimension latDim = writer.addDimension("y", latitudes.length);
+            final Dimension lonDim = writer.addDimension("x", longitudes.length);
+
+            final Variable timeVar = writer.addVariable("t", DataType.DOUBLE, List.of(timeDim));
+            writer.addVariableAttribute(timeVar, new Attribute("units", "days since 1970-01-01"));
+            final Variable latVar = writer.addVariable("y", DataType.DOUBLE, List.of(latDim));
+            final Variable lonVar = writer.addVariable("x", DataType.DOUBLE, List.of(lonDim));
+            final Variable dataVar =
+                writer.addVariable(variableName, DataType.FLOAT, List.of(timeDim, latDim, lonDim));
+            writer.addVariableAttribute(dataVar, new Attribute("_FillValue", FILL_VALUE));
+
+            writer.create();
+
+            writer.write(timeVar, Array.makeFromJavaArray(new double[]{date.toEpochDay()}));
+            writer.write(latVar, Array.makeFromJavaArray(latitudes));
+            writer.write(lonVar, Array.makeFromJavaArray(longitudes));
+            final float[][][] data = new float[1][latitudes.length][longitudes.length];
+            for (int i = 0; i < latitudes.length; i++) {
+                for (int j = 0; j < longitudes.length; j++) {
+                    data[0][i][j] = (float) expectedValue(0, 0, i, j);
+                }
+            }
+            writer.write(dataVar, Array.makeFromJavaArray(data));
+        } catch (final InvalidRangeException e) {
+            throw new RuntimeException(e);
+        }
+        return file;
     }
 
     private static double expectedValue(

@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import java.nio.file.Path;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -168,30 +168,32 @@ public class Factories {
         return new RandomBiomassRecruitmentAllocatorFactory();
     }
 
-    public static <S extends Scope> DateIndexedBiomassGridsFromNetCdfFactory<S>
-        dateIndexedBiomassGridsFromNetCdf(
+    public static <S extends Scope> TimeIndexedBiomassGridsFromNetCdfFactory<S>
+        timeIndexedBiomassGridsFromNetCdf(
         final Factory<? super S, ? extends ModelGrid> modelGrid,
         final Factory<? super S, ? extends List<? extends Species>> species,
         final Factory<? super S, ? extends Path> ncFilePath
     ) {
-        return dateIndexedBiomassGridsFromNetCdf(modelGrid, species, ncFilePath, "_");
+        return timeIndexedBiomassGridsFromNetCdf(modelGrid, species, ncFilePath, "_");
     }
 
-    public static <S extends Scope> DateIndexedBiomassGridsFromNetCdfFactory<S>
-        dateIndexedBiomassGridsFromNetCdf(
+    public static <S extends Scope> TimeIndexedBiomassGridsFromNetCdfFactory<S>
+        timeIndexedBiomassGridsFromNetCdf(
         final Factory<? super S, ? extends ModelGrid> modelGrid,
         final Factory<? super S, ? extends List<? extends Species>> species,
         final Factory<? super S, ? extends Path> ncFilePath,
         final String separator
     ) {
-        return new DateIndexedBiomassGridsFromNetCdfFactory<>(modelGrid, species, ncFilePath, separator);
+        return new TimeIndexedBiomassGridsFromNetCdfFactory<>(
+            modelGrid, species, ncFilePath, separator, "time", "latitude", "longitude"
+        );
     }
 
-    public static DateIndexedBiomassGridUpdatesFactory dateIndexedBiomassGridUpdates(
+    public static TimeIndexedBiomassGridUpdatesFactory timeIndexedBiomassGridUpdates(
         final Factory<? super SimulationScope, ? extends FisheableBiomassGrids> biomassGrids,
-        final Factory<? super SimulationScope, ? extends Map<LocalDate, ? extends List<? extends SpeciesGrid>>>
-            dateIndexedBiomassGrids
+        final Factory<? super SimulationScope, ? extends Map<LocalDateTime, ? extends List<? extends SpeciesGrid>>>
+            timeIndexedBiomassGrids
     ) {
-        return new DateIndexedBiomassGridUpdatesFactory(biomassGrids, dateIndexedBiomassGrids);
+        return new TimeIndexedBiomassGridUpdatesFactory(biomassGrids, timeIndexedBiomassGrids);
     }
 }
