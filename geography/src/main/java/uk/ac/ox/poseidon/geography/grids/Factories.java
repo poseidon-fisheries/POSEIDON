@@ -30,6 +30,7 @@ import uk.ac.ox.poseidon.geography.utils.LonLatTable;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.function.Supplier;
 
 public class Factories {
 
@@ -74,6 +75,17 @@ public class Factories {
         final Factory<? super S, ? extends Number> totalValue
     ) {
         return new NormalisedDoubleGridFromAllocatorFactory<>(modelGrid, allocator, totalValue);
+    }
+
+    public static <S extends Scope> TimeIndexedNetCdfGridReaderFactory<S> timeIndexedNetCdfGridReader(
+        final Factory<? super S, ? extends Path> ncFilePath,
+        final String timeDimensionName,
+        final String latitudeDimensionName,
+        final String longitudeDimensionName
+    ) {
+        return new TimeIndexedNetCdfGridReaderFactory<>(
+            ncFilePath, timeDimensionName, latitudeDimensionName, longitudeDimensionName
+        );
     }
 
 }
