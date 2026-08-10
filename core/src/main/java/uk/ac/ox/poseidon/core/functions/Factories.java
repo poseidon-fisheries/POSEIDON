@@ -41,6 +41,13 @@ public class Factories {
         return new MapValueExtractorFactory<>(map);
     }
 
+    public static <S extends Scope, K, V> MapEntryFactory<S, K, V> mapEntry(
+        final Factory<? super S, ? extends Map<? super K, ? extends V>> map,
+        final K key
+    ) {
+        return new MapEntryFactory<>(map, key);
+    }
+
     public static <S extends Scope, T1, T2, R> ComposedFunctionFactory<S, T1, T2, R> composedFunction(
         final Factory<? super S, ? extends Function<? super T1, ? extends T2>> function1,
         final Factory<? super S, ? extends Function<? super T2, ? extends R>> function2
