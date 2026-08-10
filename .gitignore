@@ -15,6 +15,3 @@ derby.log
 buildSrc/.kotlin/
 .Rproj.user
 .positai
-
-# agent files
-CLAUDE.md
