@@ -26,114 +26,114 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BelowTest {
+class LessThanTest {
 
     /**
-     * Tests the `Below` class which is an implementation of a Predicate<Double>. It evaluates
-     * whether a given value is below the specified threshold.
+     * Tests the `LessThan` class which is an implementation of a Predicate<Double>. It evaluates
+     * whether a given value is less than the specified threshold.
      */
 
     @Test
-    void testValueBelowThreshold() {
+    void testValueLessThanThreshold() {
         // Arrange
         final double threshold = 10.0;
-        final Below below = new Below(threshold);
+        final LessThan lessThan = new LessThan(threshold);
 
         // Act
-        final boolean result = below.test(5.0);
+        final boolean result = lessThan.test(5.0);
 
         // Assert
-        assertTrue(result, "The value 5.0 should be below the threshold 10.0");
+        assertTrue(result, "The value 5.0 should be less than the threshold 10.0");
     }
 
     @Test
     void testValueEqualsThreshold() {
         // Arrange
         final double threshold = 10.0;
-        final Below below = new Below(threshold);
+        final LessThan lessThan = new LessThan(threshold);
 
         // Act
-        final boolean result = below.test(10.0);
+        final boolean result = lessThan.test(10.0);
 
         // Assert
-        assertFalse(result, "The value 10.0 should not be below the threshold 10.0");
+        assertFalse(result, "The value 10.0 should not be less than the threshold 10.0");
     }
 
     @Test
     void testValueAboveThreshold() {
         // Arrange
         final double threshold = 10.0;
-        final Below below = new Below(threshold);
+        final LessThan lessThan = new LessThan(threshold);
 
         // Act
-        final boolean result = below.test(15.0);
+        final boolean result = lessThan.test(15.0);
 
         // Assert
-        assertFalse(result, "The value 15.0 should not be below the threshold 10.0");
+        assertFalse(result, "The value 15.0 should not be less than the threshold 10.0");
     }
 
     @Test
-    void testNegativeValueBelowNegativeThreshold() {
+    void testNegativeValueLessThanNegativeThreshold() {
         // Arrange
         final double threshold = -5.0;
-        final Below below = new Below(threshold);
+        final LessThan lessThan = new LessThan(threshold);
 
         // Act
-        final boolean result = below.test(-10.0);
+        final boolean result = lessThan.test(-10.0);
 
         // Assert
-        assertTrue(result, "The value -10.0 should be below the threshold -5.0");
+        assertTrue(result, "The value -10.0 should be less than the threshold -5.0");
     }
 
     @Test
     void testNegativeValueEqualsNegativeThreshold() {
         // Arrange
         final double threshold = -5.0;
-        final Below below = new Below(threshold);
+        final LessThan lessThan = new LessThan(threshold);
 
         // Act
-        final boolean result = below.test(-5.0);
+        final boolean result = lessThan.test(-5.0);
 
         // Assert
-        assertFalse(result, "The value -5.0 should not be below the threshold -5.0");
+        assertFalse(result, "The value -5.0 should not be less than the threshold -5.0");
     }
 
     @Test
-    void testNegativeValueAboveNegativeThreshold() {
+    void testNegativeValueGreaterThanNegativeThreshold() {
         // Arrange
         final double threshold = -10.0;
-        final Below below = new Below(threshold);
+        final LessThan lessThan = new LessThan(threshold);
 
         // Act
-        final boolean result = below.test(-5.0);
+        final boolean result = lessThan.test(-5.0);
 
         // Assert
-        assertFalse(result, "The value -5.0 should not be below the threshold -10.0");
+        assertFalse(result, "The value -5.0 should not be less than the threshold -10.0");
     }
 
     @Test
     void testWithZeroValue() {
         // Arrange
         final double threshold = 0.0;
-        final Below below = new Below(threshold);
+        final LessThan lessThan = new LessThan(threshold);
 
         // Act
-        final boolean result = below.test(-1.0);
+        final boolean result = lessThan.test(-1.0);
 
         // Assert
-        assertTrue(result, "The value -1.0 should be below the threshold 0.0");
+        assertTrue(result, "The value -1.0 should be less than the threshold 0.0");
     }
 
     @Test
     void testValueIsNull() {
         // Arrange
         final double threshold = 10.0;
-        final Below below = new Below(threshold);
+        final LessThan lessThan = new LessThan(threshold);
 
         // Act & Assert
         assertThrows(
             NullPointerException.class,
-            () -> below.test(null),
+            () -> lessThan.test(null),
             "Passing null should throw NullPointerException"
         );
     }

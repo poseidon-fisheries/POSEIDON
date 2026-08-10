@@ -31,8 +31,8 @@ public class Factories {
         return new GreaterThanFactory(threshold);
     }
 
-    public static BelowFactory below(final double threshold) {
-        return new BelowFactory(threshold);
+    public static LessThanFactory lessThan(final double threshold) {
+        return new LessThanFactory(threshold);
     }
 
     public static BetweenFactory between(

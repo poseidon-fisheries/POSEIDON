@@ -22,20 +22,23 @@
 
 package uk.ac.ox.poseidon.core.predicates.numeric;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.function.Predicate;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class LessThanFactory extends GlobalScopeFactory<LessThan> {
 
-@Getter
-@RequiredArgsConstructor
-public class Below implements Predicate<Number> {
-
-    private final double threshold;
+    private double threshold;
 
     @Override
-    public boolean test(@NonNull final Number number) {
-        return number.doubleValue() < threshold;
+    protected LessThan newInstance(final Scope scope) {
+        return new LessThan(threshold);
     }
 }
