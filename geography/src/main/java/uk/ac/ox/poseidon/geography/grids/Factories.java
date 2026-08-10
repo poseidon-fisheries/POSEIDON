@@ -88,6 +88,14 @@ public class Factories {
         );
     }
 
+    public static <S extends Scope> StaticNetCdfGridReaderFactory<S> staticNetCdfGridReader(
+        final Factory<? super S, ? extends Path> ncFilePath,
+        final String latitudeDimensionName,
+        final String longitudeDimensionName
+    ) {
+        return new StaticNetCdfGridReaderFactory<>(ncFilePath, latitudeDimensionName, longitudeDimensionName);
+    }
+
     public static <S extends Scope> StaticGridsFromNetCdfFactory<S> staticGridsFromNetCdf(
         final Factory<? super S, ? extends ModelGrid> modelGrid,
         final Factory<? super S, ? extends Supplier<StaticNetCdfGridReader>> staticNetCdfGridReader
