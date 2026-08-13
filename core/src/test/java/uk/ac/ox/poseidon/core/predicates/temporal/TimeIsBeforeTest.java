@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,21 +22,24 @@
 
 package uk.ac.ox.poseidon.core.predicates.temporal;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
-@Getter
-@RequiredArgsConstructor
-public class TimeIsBefore implements Predicate<LocalTime> {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    private final Supplier<? extends LocalTime> referenceTime;
+class TimeIsBeforeTest {
 
-    @Override
-    public boolean test(final LocalTime localTime) {
-        return localTime.isBefore(referenceTime.get());
+    private final TimeIsBefore predicate = new TimeIsBefore(() -> LocalTime.of(12, 0));
+
+    @Test
+    void testEarlierTimeIsBefore() {
+        assertTrue(predicate.test(LocalTime.of(11, 0)));
+    }
+
+    @Test
+    void testLaterTimeIsNotBefore() {
+        assertFalse(predicate.test(LocalTime.of(13, 0)));
     }
 }
