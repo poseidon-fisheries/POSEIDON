@@ -26,19 +26,22 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+
+import java.util.function.DoubleSupplier;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class GreaterThanFactory extends GlobalScopeFactory<GreaterThan> {
+public class GreaterThanFactory<S extends Scope> extends RelativeScopeFactory<S, GreaterThan> {
 
-    private double threshold;
+    private Factory<? super S, ? extends DoubleSupplier> threshold;
 
     @Override
-    protected GreaterThan newInstance(final Scope scope) {
-        return new GreaterThan(threshold);
+    protected GreaterThan newInstance(final S scope) {
+        return new GreaterThan(threshold.get(scope));
     }
 }

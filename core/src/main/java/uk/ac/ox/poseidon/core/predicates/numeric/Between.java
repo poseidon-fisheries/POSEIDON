@@ -22,38 +22,29 @@
 
 package uk.ac.ox.poseidon.core.predicates.numeric;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+import java.util.function.DoubleSupplier;
 import java.util.function.Predicate;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 /**
- * Represents a numeric predicate that checks if a given number falls within a specified range
- * [minimum, maximum], inclusive.
+ * Represents a numeric predicate that checks if a given number falls within the range supplied by
+ * {@code minimum} and {@code maximum} at test time, inclusive.
  * <p>
- * Note that the {@code maximum} value must always be greater than the {@code minimum} value. If
- * this condition is not met, an {@code IllegalArgumentException} will be thrown during
- * construction.
+ * Since the bounds are read fresh on every {@link #test}, they may vary over time; unlike the
+ * previous fixed-bound version, this class can no longer validate at construction time that
+ * {@code maximum} is greater than {@code minimum}.
  */
+@RequiredArgsConstructor
 public class Between implements Predicate<Number> {
 
-    private final double minimum;
-    private final double maximum;
-
-    public Between(
-        final double minimum,
-        final double maximum
-    ) {
-        checkArgument(
-            maximum > minimum,
-            "Maximum (%s) must be greater than minimum (%s)".formatted(maximum, minimum)
-        );
-        this.minimum = minimum;
-        this.maximum = maximum;
-    }
+    private final @NonNull DoubleSupplier minimum;
+    private final @NonNull DoubleSupplier maximum;
 
     @Override
     public boolean test(final Number number) {
         final double value = number.doubleValue();
-        return value >= minimum && value <= maximum;
+        return value >= minimum.getAsDouble() && value <= maximum.getAsDouble();
     }
 }

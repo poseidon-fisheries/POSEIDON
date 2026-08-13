@@ -402,7 +402,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             checkThat(
                                 allOf(
                                     condition(availableHoldCapacityInKg(), greaterThan(1)),
-                                    condition(currentTripDuration(), lessThan(days(10)))
+                                    condition(currentTripDuration(), lessThan(constant(days(10))))
                                 )
                             )
                         )

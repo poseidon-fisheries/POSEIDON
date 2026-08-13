@@ -22,24 +22,20 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
-import com.google.common.collect.ImmutableSet;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class InSet<T> implements Predicate<T> {
 
-    private final ImmutableSet<T> values;
-
-    public InSet(final Collection<? extends T> values) {
-        this(ImmutableSet.copyOf(values));
-    }
+    private final Supplier<? extends Collection<? extends T>> values;
 
     @Override
     public boolean test(final T t) {
-        return values.contains(t);
+        return values.get().contains(t);
     }
 
 }

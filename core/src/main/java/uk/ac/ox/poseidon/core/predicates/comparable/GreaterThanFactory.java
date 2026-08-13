@@ -30,13 +30,15 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+import java.util.function.Supplier;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class GreaterThanFactory<S extends Scope, T> extends RelativeScopeFactory<S, GreaterThan<T>> {
 
-    private Factory<? super S, ? extends T> value;
+    private Factory<? super S, ? extends Supplier<? extends T>> value;
 
     @Override
     protected GreaterThan<T> newInstance(final S scope) {

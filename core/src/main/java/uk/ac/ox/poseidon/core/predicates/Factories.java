@@ -28,6 +28,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.util.Collection;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class Factories {
 
@@ -41,7 +42,7 @@ public class Factories {
     }
 
     public static <S extends Scope, T> InSetFactory<S, T> in(
-        final Factory<? super S, ? extends Collection<? extends T>> values
+        final Factory<? super S, ? extends Supplier<? extends Collection<? extends T>>> values
     ) {
         return new InSetFactory<>(values);
     }

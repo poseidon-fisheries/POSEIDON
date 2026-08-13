@@ -25,15 +25,16 @@ package uk.ac.ox.poseidon.core.predicates;
 import lombok.RequiredArgsConstructor;
 
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class Equal<T> implements Predicate<T> {
 
-    private final T value;
+    private final Supplier<? extends T> value;
 
     @Override
     public boolean test(final T t) {
-        return this.value.equals(t);
+        return value.get().equals(t);
     }
 
 }

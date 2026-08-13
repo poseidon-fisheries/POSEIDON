@@ -25,19 +25,21 @@ package uk.ac.ox.poseidon.core.predicates.comparable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+import java.util.function.Supplier;
+
 public class Factories {
     private Factories() {}
 
     public static <S extends Scope, T> LessThanFactory<S, T> lessThan(
-        final Factory<? super S, ? extends T> value
+        final Factory<? super S, ? extends Supplier<? extends T>> value
     ) {
         return new LessThanFactory<>(value);
     }
 
     public static <S extends Scope, T> GreaterThanFactory<S, T> greaterThan(
-        final Factory<? super S, ? extends T> value
+        final Factory<? super S, ? extends Supplier<? extends T>> value
     ) {
         return new GreaterThanFactory<>(value);
     }
-    
+
 }

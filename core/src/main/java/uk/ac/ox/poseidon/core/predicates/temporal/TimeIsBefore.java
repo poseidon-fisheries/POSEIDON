@@ -27,15 +27,16 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalTime;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @Getter
 @RequiredArgsConstructor
 public class TimeIsBefore implements Predicate<LocalTime> {
 
-    private final LocalTime referenceTime;
+    private final Supplier<? extends LocalTime> referenceTime;
 
     @Override
     public boolean test(final LocalTime localTime) {
-        return localTime.isAfter(referenceTime);
+        return localTime.isAfter(referenceTime.get());
     }
 }

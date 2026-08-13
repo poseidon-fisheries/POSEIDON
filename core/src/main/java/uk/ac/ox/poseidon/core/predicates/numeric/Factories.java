@@ -22,24 +22,50 @@
 
 package uk.ac.ox.poseidon.core.predicates.numeric;
 
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+
+import java.util.function.DoubleSupplier;
+
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
+
 public class Factories {
 
     private Factories() {
     }
 
-    public static GreaterThanFactory greaterThan(final double threshold) {
-        return new GreaterThanFactory(threshold);
+    public static <S extends Scope> GreaterThanFactory<S> greaterThan(final double threshold) {
+        return greaterThan(constantDouble(threshold));
     }
 
-    public static LessThanFactory lessThan(final double threshold) {
-        return new LessThanFactory(threshold);
+    public static <S extends Scope> GreaterThanFactory<S> greaterThan(
+        final Factory<? super S, ? extends DoubleSupplier> threshold
+    ) {
+        return new GreaterThanFactory<>(threshold);
     }
 
-    public static BetweenFactory between(
+    public static <S extends Scope> LessThanFactory<S> lessThan(final double threshold) {
+        return lessThan(constantDouble(threshold));
+    }
+
+    public static <S extends Scope> LessThanFactory<S> lessThan(
+        final Factory<? super S, ? extends DoubleSupplier> threshold
+    ) {
+        return new LessThanFactory<>(threshold);
+    }
+
+    public static <S extends Scope> BetweenFactory<S> between(
         final double minimum,
         final double maximum
     ) {
-        return new BetweenFactory(minimum, maximum);
+        return between(constantDouble(minimum), constantDouble(maximum));
+    }
+
+    public static <S extends Scope> BetweenFactory<S> between(
+        final Factory<? super S, ? extends DoubleSupplier> minimum,
+        final Factory<? super S, ? extends DoubleSupplier> maximum
+    ) {
+        return new BetweenFactory<>(minimum, maximum);
     }
 
 }

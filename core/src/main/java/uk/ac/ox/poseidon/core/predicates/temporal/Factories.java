@@ -28,24 +28,25 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.function.Supplier;
 
 public class Factories {
     private Factories() {}
 
     public static <S extends Scope> AfterTimeFactory<S> afterTime(
-        final Factory<? super S, ? extends LocalTime> referenceTime
+        final Factory<? super S, ? extends Supplier<? extends LocalTime>> referenceTime
     ) {
         return new AfterTimeFactory<>(referenceTime);
     }
 
     public static <S extends Scope> AfterDateFactory<S> afterDate(
-        final Factory<? super S, ? extends LocalDate> referenceDate
+        final Factory<? super S, ? extends Supplier<? extends LocalDate>> referenceDate
     ) {
         return new AfterDateFactory<>(referenceDate);
     }
 
     public static <S extends Scope> AfterDateTimeFactory<S> afterDateTime(
-        final Factory<? super S, ? extends LocalDateTime> referenceDateTime
+        final Factory<? super S, ? extends Supplier<? extends LocalDateTime>> referenceDateTime
     ) {
         return new AfterDateTimeFactory<>(referenceDateTime);
     }

@@ -27,15 +27,16 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @Getter
 @RequiredArgsConstructor
 public class AfterDate implements Predicate<LocalDate> {
 
-    private final LocalDate referenceDate;
+    private final Supplier<? extends LocalDate> referenceDate;
 
     @Override
     public boolean test(final LocalDate localDate) {
-        return localDate.isAfter(referenceDate);
+        return localDate.isAfter(referenceDate.get());
     }
 }

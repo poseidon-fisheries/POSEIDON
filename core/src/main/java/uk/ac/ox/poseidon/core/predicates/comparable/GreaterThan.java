@@ -26,15 +26,16 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class GreaterThan<T> implements Predicate<Comparable<T>> {
 
-    private final @NonNull T value;
+    private final @NonNull Supplier<? extends T> value;
 
     @Override
     public boolean test(final @NonNull Comparable<T> other) {
-        return other.compareTo(value) > 0;
+        return other.compareTo(value.get()) > 0;
     }
 
 }

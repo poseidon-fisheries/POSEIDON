@@ -38,7 +38,7 @@ class GreaterThanTest {
     void testValueAboveThresholdShouldReturnTrue() {
         // Arrange
         final double threshold = 10.0;
-        final GreaterThan greaterThan = new GreaterThan(threshold);
+        final GreaterThan greaterThan = new GreaterThan(() -> threshold);
 
         // Act
         final boolean result = greaterThan.test(15.0);
@@ -54,7 +54,7 @@ class GreaterThanTest {
     void testValueBelowThresholdShouldReturnFalse() {
         // Arrange
         final double threshold = 10.0;
-        final GreaterThan greaterThan = new GreaterThan(threshold);
+        final GreaterThan greaterThan = new GreaterThan(() -> threshold);
 
         // Act
         final boolean result = greaterThan.test(5.0);
@@ -70,7 +70,7 @@ class GreaterThanTest {
     void testValueEqualToThresholdShouldReturnFalse() {
         // Arrange
         final double threshold = 10.0;
-        final GreaterThan greaterThan = new GreaterThan(threshold);
+        final GreaterThan greaterThan = new GreaterThan(() -> threshold);
 
         // Act
         final boolean result = greaterThan.test(10.0);
@@ -86,7 +86,7 @@ class GreaterThanTest {
     void testValueIsNotNull() {
         // Arrange
         final double threshold = 10.0;
-        final GreaterThan greaterThan = new GreaterThan(threshold);
+        final GreaterThan greaterThan = new GreaterThan(() -> threshold);
 
         // Act & Assert
         assertDoesNotThrow(
@@ -100,7 +100,7 @@ class GreaterThanTest {
     void testValueIsNullShouldThrowException() {
         // Arrange
         final double threshold = 10.0;
-        final GreaterThan greaterThan = new GreaterThan(threshold);
+        final GreaterThan greaterThan = new GreaterThan(() -> threshold);
 
         // Act & Assert
         assertThrows(

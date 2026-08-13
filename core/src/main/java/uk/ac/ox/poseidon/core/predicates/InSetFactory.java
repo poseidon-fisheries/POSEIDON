@@ -33,6 +33,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 import java.util.Collection;
+import java.util.function.Supplier;
+
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 @Data
 @NoArgsConstructor
@@ -40,11 +43,11 @@ import java.util.Collection;
 @EqualsAndHashCode(callSuper = true)
 public class InSetFactory<S extends Scope, T> extends RelativeScopeFactory<S, InSet<T>> {
 
-    private Factory<? super S, ? extends Collection<? extends T>> values;
+    private Factory<? super S, ? extends Supplier<? extends Collection<? extends T>>> values;
 
     @SafeVarargs
     public static <T> InSetFactory<Scope, T> of(final T... values) {
-        return new InSetFactory<>(new ObjectFactory<>(ImmutableSet.copyOf(values)));
+        return new InSetFactory<>(constant(new ObjectFactory<>(ImmutableSet.copyOf(values))));
     }
 
     @Override

@@ -26,16 +26,17 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
 public class GreaterThan implements Predicate<Number> {
 
-    private final double threshold;
+    private final @NonNull DoubleSupplier threshold;
 
     @Override
     public boolean test(@NonNull final Number number) {
-        return number.doubleValue() > threshold;
+        return number.doubleValue() > threshold.getAsDouble();
     }
 }

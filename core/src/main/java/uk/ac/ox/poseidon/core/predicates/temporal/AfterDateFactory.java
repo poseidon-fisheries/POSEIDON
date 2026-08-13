@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDate;
+import java.util.function.Supplier;
 
 @Data
 @NoArgsConstructor
@@ -38,7 +39,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 public class AfterDateFactory<S extends Scope> extends RelativeScopeFactory<S, AfterDate> {
 
-    private Factory<? super S, ? extends LocalDate> referenceDate;
+    private Factory<? super S, ? extends Supplier<? extends LocalDate>> referenceDate;
 
     @Override
     protected AfterDate newInstance(final S scope) {

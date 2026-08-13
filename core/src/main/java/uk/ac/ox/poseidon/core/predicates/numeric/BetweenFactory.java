@@ -26,20 +26,23 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+
+import java.util.function.DoubleSupplier;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BetweenFactory extends GlobalScopeFactory<Between> {
+public class BetweenFactory<S extends Scope> extends RelativeScopeFactory<S, Between> {
 
-    private double minimum;
-    private double maximum;
+    private Factory<? super S, ? extends DoubleSupplier> minimum;
+    private Factory<? super S, ? extends DoubleSupplier> maximum;
 
     @Override
-    protected Between newInstance(final Scope scope) {
-        return new Between(minimum, maximum);
+    protected Between newInstance(final S scope) {
+        return new Between(minimum.get(scope), maximum.get(scope));
     }
 }

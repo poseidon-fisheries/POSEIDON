@@ -37,7 +37,7 @@ class LessThanTest {
     void testValueLessThanThreshold() {
         // Arrange
         final double threshold = 10.0;
-        final LessThan lessThan = new LessThan(threshold);
+        final LessThan lessThan = new LessThan(() -> threshold);
 
         // Act
         final boolean result = lessThan.test(5.0);
@@ -50,7 +50,7 @@ class LessThanTest {
     void testValueEqualsThreshold() {
         // Arrange
         final double threshold = 10.0;
-        final LessThan lessThan = new LessThan(threshold);
+        final LessThan lessThan = new LessThan(() -> threshold);
 
         // Act
         final boolean result = lessThan.test(10.0);
@@ -63,7 +63,7 @@ class LessThanTest {
     void testValueAboveThreshold() {
         // Arrange
         final double threshold = 10.0;
-        final LessThan lessThan = new LessThan(threshold);
+        final LessThan lessThan = new LessThan(() -> threshold);
 
         // Act
         final boolean result = lessThan.test(15.0);
@@ -76,7 +76,7 @@ class LessThanTest {
     void testNegativeValueLessThanNegativeThreshold() {
         // Arrange
         final double threshold = -5.0;
-        final LessThan lessThan = new LessThan(threshold);
+        final LessThan lessThan = new LessThan(() -> threshold);
 
         // Act
         final boolean result = lessThan.test(-10.0);
@@ -89,7 +89,7 @@ class LessThanTest {
     void testNegativeValueEqualsNegativeThreshold() {
         // Arrange
         final double threshold = -5.0;
-        final LessThan lessThan = new LessThan(threshold);
+        final LessThan lessThan = new LessThan(() -> threshold);
 
         // Act
         final boolean result = lessThan.test(-5.0);
@@ -102,7 +102,7 @@ class LessThanTest {
     void testNegativeValueGreaterThanNegativeThreshold() {
         // Arrange
         final double threshold = -10.0;
-        final LessThan lessThan = new LessThan(threshold);
+        final LessThan lessThan = new LessThan(() -> threshold);
 
         // Act
         final boolean result = lessThan.test(-5.0);
@@ -115,7 +115,7 @@ class LessThanTest {
     void testWithZeroValue() {
         // Arrange
         final double threshold = 0.0;
-        final LessThan lessThan = new LessThan(threshold);
+        final LessThan lessThan = new LessThan(() -> threshold);
 
         // Act
         final boolean result = lessThan.test(-1.0);
@@ -128,7 +128,7 @@ class LessThanTest {
     void testValueIsNull() {
         // Arrange
         final double threshold = 10.0;
-        final LessThan lessThan = new LessThan(threshold);
+        final LessThan lessThan = new LessThan(() -> threshold);
 
         // Act & Assert
         assertThrows(
