@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core.functions;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,12 @@ public class Factories {
         final Factory<? super S, ? extends Function<? super T2, ? extends R>> function2
     ) {
         return new ComposedFunctionFactory<>(function1, function2);
+    }
+
+    public static <S extends Scope> CombinedDurationFactory<S> combinedDuration(
+        final Factory<? super S, ? extends Duration> fixedDuration
+    ) {
+        return new CombinedDurationFactory<>(fixedDuration);
     }
 
     public static <S extends Scope, T, R> DefaultIfNullFactory<S, T, R> defaultIfNull(
