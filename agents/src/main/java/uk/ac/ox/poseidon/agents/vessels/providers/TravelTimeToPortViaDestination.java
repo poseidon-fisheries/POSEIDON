@@ -46,7 +46,7 @@ public class TravelTimeToPortViaDestination implements Function<Int2D, Duration>
         final Int2D destination
     ) {
         final double cruisingSpeedInKph = vessel.getEngine().getCruisingSpeedInKph();
-        final Int2D homePortCell = vessel.getPortGrid().getLocation(vessel.getHomePort());
+        final Int2D homePortCell = vessel.getHomePortLocation();
 
         final List<Int2D> pathToDestination =
             pathFinder.getPath(

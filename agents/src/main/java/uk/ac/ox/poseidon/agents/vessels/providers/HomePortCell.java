@@ -34,6 +34,6 @@ public class HomePortCell implements Provider<Int2D> {
 
     @Override
     public Int2D get() {
-        return vessel.getPortGrid().getLocation(vessel.getHomePort());
+        return vessel.getHomePortLocation();
     }
 }

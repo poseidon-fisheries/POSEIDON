@@ -178,7 +178,11 @@ public class Vessel extends Agent implements Oriented2D {
     }
 
     public boolean isAtHomePort() {
-        return getCell().equals(portGrid.getLocation(getHomePort()));
+        return getCell().equals(getHomePortLocation());
+    }
+
+    public Int2D getHomePortLocation() {
+        return portGrid.getLocation(homePort);
     }
 
     public void putTag(
