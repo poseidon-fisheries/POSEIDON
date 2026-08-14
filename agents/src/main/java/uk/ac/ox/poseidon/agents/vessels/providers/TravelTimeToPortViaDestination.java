@@ -38,7 +38,6 @@ import static lombok.AccessLevel.PACKAGE;
 public class TravelTimeToPortViaDestination implements Function<Int2D, Duration> {
 
     private final Vessel vessel;
-    private final Int2D homePortCell;
     private final GridPathFinder pathFinder;
     private final DistanceCalculator distanceCalculator;
 
@@ -47,6 +46,7 @@ public class TravelTimeToPortViaDestination implements Function<Int2D, Duration>
         final Int2D destination
     ) {
         final double cruisingSpeedInKph = vessel.getEngine().getCruisingSpeedInKph();
+        final Int2D homePortCell = vessel.getPortGrid().getLocation(vessel.getHomePort());
 
         final List<Int2D> pathToDestination =
             pathFinder.getPath(

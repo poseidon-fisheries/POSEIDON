@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
@@ -35,10 +36,10 @@ public class CurrentTripDuration implements Provider<Duration> {
 
     @Override
     public Duration get() {
-        return Duration.between(
-            vessel.getCurrentTrip().getStartDateTime(),
-            vessel.getSchedule().getDateTime()
-        );
+        final Trip currentTrip = vessel.getCurrentTrip();
+        return currentTrip == null
+            ? Duration.ZERO
+            : Duration.between(currentTrip.getStartDateTime(), vessel.getSchedule().getDateTime());
     }
 
 }

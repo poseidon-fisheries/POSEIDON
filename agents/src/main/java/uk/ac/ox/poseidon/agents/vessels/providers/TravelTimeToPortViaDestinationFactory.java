@@ -46,7 +46,6 @@ public class TravelTimeToPortViaDestinationFactory
     protected TravelTimeToPortViaDestination newInstance(final VesselScope scope) {
         return new TravelTimeToPortViaDestination(
             scope.getVessel(),
-            new HomePortCell(scope.getVessel()).get(),
             pathFinder.get(scope),
             distance.get(scope)
         );

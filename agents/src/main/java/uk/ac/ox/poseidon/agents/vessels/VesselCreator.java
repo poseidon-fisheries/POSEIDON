@@ -83,13 +83,13 @@ public class VesselCreator implements Steppable {
                 marketGrid
             );
             final VesselScope vesselScope = new VesselScope(simulationScope, vessel);
+            vessel.setHomePort(homePort.get(vesselScope));
             vessel.setAccount(account.get(vesselScope));
             vessel.setGear(gear.get(vesselScope));
             vessel.setEngine(engine.get(vesselScope));
-            vessel.setBehaviour(behaviour.get(vesselScope));
             vessel.setHold(hold.get(vesselScope));
             vessel.setName(name.get(vesselScope));
-            vessel.setHomePort(homePort.get(vesselScope));
+            vessel.setBehaviour(behaviour.get(vesselScope));
             extraFactories.forEach(factory -> factory.get(vesselScope));
             vessel.setRegisteredAsActive(true);
         }

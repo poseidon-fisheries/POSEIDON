@@ -106,6 +106,52 @@ class VesselCreatorTest {
     }
 
     @Test
+    void setsHomePortBeforeResolvingBehaviour() {
+        final Simulation simulation = mock(Simulation.class);
+        when(simulation.getTemporalSchedule()).thenReturn(mock(TemporalSchedule.class));
+
+        final VesselField vesselField = mock(VesselField.class);
+        final PortGrid portGrid = mock(PortGrid.class);
+        final MarketGrid marketGrid = mock(MarketGrid.class);
+        final Account account = mock(Account.class);
+        final Hold hold = mock(Hold.class);
+        final Gear gear = mock(Gear.class);
+        final Engine engine = mock(Engine.class);
+        final Behaviour behaviour = mock(Behaviour.class);
+        final Port port = mock(Port.class);
+        when(portGrid.getLocation(port)).thenReturn(new Int2D(1, 2));
+
+        final AtomicInteger behaviourFactoryCalls = new AtomicInteger();
+        final Factory<VesselScope, Behaviour> behaviourFactory = scope -> {
+            assertThat(scope.getVessel().getHomePort()).isSameAs(port);
+            behaviourFactoryCalls.incrementAndGet();
+            return behaviour;
+        };
+
+        final VesselCreator creator =
+            new VesselCreator(
+                mock(EventManager.class),
+                vesselField,
+                portGrid,
+                marketGrid,
+                () -> "1",
+                scope -> "Vessel " + scope.getVessel().getId(),
+                scope -> account,
+                scope -> port,
+                scope -> hold,
+                scope -> gear,
+                scope -> engine,
+                behaviourFactory,
+                List.of(),
+                1
+            );
+
+        creator.step(simulation);
+
+        assertThat(behaviourFactoryCalls).hasValue(1);
+    }
+
+    @Test
     void createsVesselsWithSeparateLocalEventManagers() {
         final Simulation simulation = mock(Simulation.class);
         when(simulation.getTemporalSchedule()).thenReturn(mock(TemporalSchedule.class));
