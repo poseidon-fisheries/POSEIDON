@@ -22,18 +22,25 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import lombok.RequiredArgsConstructor;
-
 import java.time.Duration;
+import java.util.List;
 import java.util.function.Function;
 
-@RequiredArgsConstructor
-public class CombinedDuration implements Function<Duration, Duration> {
+public class CombinedDuration<T> implements Function<T, Duration> {
 
-    private final Duration fixedDuration;
+    private final Function<T, ? extends Duration>[] durations;
+
+    @SuppressWarnings("unchecked")
+    public CombinedDuration(final List<? extends Function<? super T, ? extends Duration>> durations) {
+        this.durations = durations.toArray(new Function[0]);
+    }
 
     @Override
-    public Duration apply(final Duration duration) {
-        return duration.plus(fixedDuration);
+    public Duration apply(final T t) {
+        Duration total = Duration.ZERO;
+        for (final Function<T, ? extends Duration> duration : durations) {
+            total = total.plus(duration.apply(t));
+        }
+        return total;
     }
 }

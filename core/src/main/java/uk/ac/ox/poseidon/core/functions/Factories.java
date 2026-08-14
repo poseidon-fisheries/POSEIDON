@@ -56,10 +56,11 @@ public class Factories {
         return new ComposedFunctionFactory<>(function1, function2);
     }
 
-    public static <S extends Scope> CombinedDurationFactory<S> combinedDuration(
-        final Factory<? super S, ? extends Duration> fixedDuration
+    @SafeVarargs
+    public static <S extends Scope, T> CombinedDurationFactory<S, T> combinedDuration(
+        final Factory<? super S, ? extends Function<? super T, ? extends Duration>>... durations
     ) {
-        return new CombinedDurationFactory<>(fixedDuration);
+        return new CombinedDurationFactory<S, T>(List.of(durations));
     }
 
     public static <S extends Scope, T, R> DefaultIfNullFactory<S, T, R> defaultIfNull(

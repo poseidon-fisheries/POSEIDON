@@ -31,18 +31,22 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.function.Function;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class CombinedDurationFactory<S extends Scope>
-    extends RelativeScopeFactory<S, CombinedDuration> {
+@EqualsAndHashCode(callSuper = false)
+public class CombinedDurationFactory<S extends Scope, T>
+    extends RelativeScopeFactory<S, CombinedDuration<T>> {
 
-    private Factory<? super S, ? extends Duration> fixedDuration;
+    private List<Factory<? super S, ? extends Function<? super T, ? extends Duration>>> durations;
 
     @Override
-    protected CombinedDuration newInstance(final S scope) {
-        return new CombinedDuration(fixedDuration.get(scope));
+    protected CombinedDuration<T> newInstance(final S scope) {
+        return new CombinedDuration<>(
+            durations.stream().map(d -> d.get(scope)).toList()
+        );
     }
 }
