@@ -52,6 +52,10 @@ public class Factories {
         return new CurrentTripDestinationCellFactory();
     }
 
+    public static CurrentTripDurationFactory currentTripDuration() {
+        return new CurrentTripDurationFactory();
+    }
+
     public static VesselEventManagerFactory vesselEventManager() {
         return new VesselEventManagerFactory();
     }

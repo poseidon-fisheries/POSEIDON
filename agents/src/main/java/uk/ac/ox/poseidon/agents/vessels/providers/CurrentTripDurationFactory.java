@@ -20,19 +20,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.extractors;
+package uk.ac.ox.poseidon.agents.vessels.providers;
 
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
-import java.time.Duration;
-import java.util.function.Function;
+public class CurrentTripDurationFactory extends VesselScopeFactory<CurrentTripDuration> {
 
-public class CurrentTripDuration implements Function<Vessel, Duration> {
     @Override
-    public Duration apply(final Vessel vessel) {
-        return Duration.between(
-            vessel.getCurrentTrip().getStartDateTime(),
-            vessel.getSchedule().getDateTime()
-        );
+    protected CurrentTripDuration newInstance(final VesselScope scope) {
+        return new CurrentTripDuration(scope.getVessel());
     }
+
 }

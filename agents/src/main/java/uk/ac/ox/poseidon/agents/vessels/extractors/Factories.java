@@ -30,8 +30,4 @@ public class Factories {
         return new AvailableHoldCapacityInKgFactory();
     }
 
-    public static CurrentTripDurationFactory currentTripDuration() {
-        return new CurrentTripDurationFactory();
-    }
-
 }

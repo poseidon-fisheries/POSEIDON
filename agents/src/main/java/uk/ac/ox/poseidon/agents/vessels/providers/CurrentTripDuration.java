@@ -20,20 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.extractors;
+package uk.ac.ox.poseidon.agents.vessels.providers;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.providers.Provider;
 
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class CurrentTripDurationFactory extends GlobalScopeFactory<CurrentTripDuration> {
+import java.time.Duration;
+
+@RequiredArgsConstructor
+public class CurrentTripDuration implements Provider<Duration> {
+
+    private final Vessel vessel;
+
     @Override
-    protected CurrentTripDuration newInstance(final Scope scope) {
-        return new CurrentTripDuration();
+    public Duration get() {
+        return Duration.between(
+            vessel.getCurrentTrip().getStartDateTime(),
+            vessel.getSchedule().getDateTime()
+        );
     }
+
 }

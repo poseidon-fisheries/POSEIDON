@@ -69,7 +69,6 @@ import static uk.ac.ox.poseidon.agents.vessels.accounts.Factories.account;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.fullTank;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.simpleEngine;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.availableHoldCapacityInKg;
-import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.currentTripDuration;
 import static uk.ac.ox.poseidon.agents.vessels.friends.Factories.dynamicFriendsSupplier;
 import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.fixedBiomassProportionGear;
 import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.standardBiomassHold;
@@ -77,6 +76,7 @@ import static uk.ac.ox.poseidon.agents.vessels.predicates.Factories.vesselHasSam
 import static uk.ac.ox.poseidon.agents.vessels.predicates.Factories.vesselIsActive;
 import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.accessibleWaterCells;
 import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.currentTripDestinationCell;
+import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.currentTripDuration;
 import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.currentTripEventManager;
 import static uk.ac.ox.poseidon.biology.allocators.Factories.proportionOfCarryingCapacityAllocator;
 import static uk.ac.ox.poseidon.biology.biomass.Factories.*;
