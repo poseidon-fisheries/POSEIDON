@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.comparable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,18 +30,27 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class GreaterThanFactory<S extends Scope> extends RelativeScopeFactory<S, GreaterThan> {
+public class BetweenFactory<S extends Scope, T> extends RelativeScopeFactory<S, Between<T>> {
 
-    private Factory<? super S, ? extends DoubleSupplier> threshold;
+    private Factory<? super S, ? extends Supplier<? extends T>> minimum;
+    private Factory<? super S, ? extends Supplier<? extends T>> maximum;
+    private boolean includeMinimum = true;
+    private boolean includeMaximum = true;
 
     @Override
-    protected GreaterThan newInstance(final S scope) {
-        return new GreaterThan(threshold.get(scope));
+    protected Between<T> newInstance(final S scope) {
+        return new Between<>(
+            minimum.get(scope),
+            maximum.get(scope),
+            includeMinimum,
+            includeMaximum
+        );
     }
+
 }

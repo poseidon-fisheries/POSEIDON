@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,23 +20,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.comparable;
 
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import java.util.function.DoubleSupplier;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
-@Getter
 @RequiredArgsConstructor
-public class GreaterThan implements Predicate<Number> {
+public class Between<T> implements Predicate<Comparable<T>> {
 
-    private final @NonNull DoubleSupplier threshold;
+    private final @NonNull Supplier<? extends T> minimum;
+    private final @NonNull Supplier<? extends T> maximum;
+    private final boolean includeMinimum;
+    private final boolean includeMaximum;
 
     @Override
-    public boolean test(@NonNull final Number number) {
-        return number.doubleValue() > threshold.getAsDouble();
+    public boolean test(final @NonNull Comparable<T> other) {
+        final int comparedToMinimum = other.compareTo(minimum.get());
+        final int comparedToMaximum = other.compareTo(maximum.get());
+        return (includeMinimum ? comparedToMinimum >= 0 : comparedToMinimum > 0)
+            && (includeMaximum ? comparedToMaximum <= 0 : comparedToMaximum < 0);
     }
+
 }

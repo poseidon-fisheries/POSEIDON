@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.numeric;
+package uk.ac.ox.poseidon.core.predicates.comparable;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,67 +28,44 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GreaterThanTest {
 
-    /**
-     * The Above class represents a Predicate<Double> that checks whether a given value is above a
-     * certain threshold. The test(Double value) method returns true if the provided value is
-     * greater than the threshold, and false otherwise.
-     */
-
     @Test
     void testValueAboveThresholdShouldReturnTrue() {
-        // Arrange
         final double threshold = 10.0;
-        final GreaterThan greaterThan = new GreaterThan(() -> threshold);
+        final GreaterThan<Double> greaterThan = new GreaterThan<>(() -> threshold);
 
-        // Act
-        final boolean result = greaterThan.test(15.0);
-
-        // Assert
         assertTrue(
-            result,
+            greaterThan.test(15.0),
             "Expected the test to return true when the value is above the threshold"
         );
     }
 
     @Test
     void testValueBelowThresholdShouldReturnFalse() {
-        // Arrange
         final double threshold = 10.0;
-        final GreaterThan greaterThan = new GreaterThan(() -> threshold);
+        final GreaterThan<Double> greaterThan = new GreaterThan<>(() -> threshold);
 
-        // Act
-        final boolean result = greaterThan.test(5.0);
-
-        // Assert
         assertFalse(
-            result,
+            greaterThan.test(5.0),
             "Expected the test to return false when the value is below the threshold"
         );
     }
 
     @Test
     void testValueEqualToThresholdShouldReturnFalse() {
-        // Arrange
         final double threshold = 10.0;
-        final GreaterThan greaterThan = new GreaterThan(() -> threshold);
+        final GreaterThan<Double> greaterThan = new GreaterThan<>(() -> threshold);
 
-        // Act
-        final boolean result = greaterThan.test(10.0);
-
-        // Assert
         assertFalse(
-            result,
+            greaterThan.test(10.0),
             "Expected the test to return false when the value is equal to the threshold"
         );
     }
 
     @Test
     void testValueIsNotNull() {
-        // Arrange
         final double threshold = 10.0;
-        final GreaterThan greaterThan = new GreaterThan(() -> threshold);
+        final GreaterThan<Double> greaterThan = new GreaterThan<>(() -> threshold);
 
-        // Act & Assert
         assertDoesNotThrow(
             () -> greaterThan.test(12.0),
             "Expected the test to execute without throwing a NullPointerException when the value " +
@@ -98,11 +75,9 @@ class GreaterThanTest {
 
     @Test
     void testValueIsNullShouldThrowException() {
-        // Arrange
         final double threshold = 10.0;
-        final GreaterThan greaterThan = new GreaterThan(() -> threshold);
+        final GreaterThan<Double> greaterThan = new GreaterThan<>(() -> threshold);
 
-        // Act & Assert
         assertThrows(
             NullPointerException.class,
             () -> greaterThan.test(null),

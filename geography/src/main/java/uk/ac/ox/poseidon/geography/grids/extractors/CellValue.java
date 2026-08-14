@@ -30,12 +30,12 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
-public class CellValue implements Function<Int2D, Number> {
+public class CellValue implements Function<Int2D, Double> {
 
     private final @NonNull DoubleGrid grid;
 
     @Override
-    public Number apply(final Int2D int2D) {
+    public Double apply(final Int2D int2D) {
         return grid.getValue(int2D);
     }
     

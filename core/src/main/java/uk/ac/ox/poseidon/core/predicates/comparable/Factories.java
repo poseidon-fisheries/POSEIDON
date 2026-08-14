@@ -27,8 +27,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Supplier;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
+
 public class Factories {
     private Factories() {}
+
+    public static <S extends Scope> LessThanFactory<S, Double> lessThan(final double threshold) {
+        return lessThan(constant(threshold));
+    }
 
     public static <S extends Scope, T> LessThanFactory<S, T> lessThan(
         final Factory<? super S, ? extends Supplier<? extends T>> value
@@ -36,10 +42,46 @@ public class Factories {
         return new LessThanFactory<>(value);
     }
 
+    public static <S extends Scope> GreaterThanFactory<S, Double> greaterThan(final double threshold) {
+        return greaterThan(constant(threshold));
+    }
+
     public static <S extends Scope, T> GreaterThanFactory<S, T> greaterThan(
         final Factory<? super S, ? extends Supplier<? extends T>> value
     ) {
         return new GreaterThanFactory<>(value);
+    }
+
+    public static <S extends Scope> BetweenFactory<S, Double> between(
+        final double minimum,
+        final double maximum
+    ) {
+        return between(minimum, maximum, true, true);
+    }
+
+    public static <S extends Scope> BetweenFactory<S, Double> between(
+        final double minimum,
+        final double maximum,
+        final boolean includeMinimum,
+        final boolean includeMaximum
+    ) {
+        return between(constant(minimum), constant(maximum), includeMinimum, includeMaximum);
+    }
+
+    public static <S extends Scope, T> BetweenFactory<S, T> between(
+        final Factory<? super S, ? extends Supplier<? extends T>> minimum,
+        final Factory<? super S, ? extends Supplier<? extends T>> maximum
+    ) {
+        return between(minimum, maximum, true, true);
+    }
+
+    public static <S extends Scope, T> BetweenFactory<S, T> between(
+        final Factory<? super S, ? extends Supplier<? extends T>> minimum,
+        final Factory<? super S, ? extends Supplier<? extends T>> maximum,
+        final boolean includeMinimum,
+        final boolean includeMaximum
+    ) {
+        return new BetweenFactory<>(minimum, maximum, includeMinimum, includeMaximum);
     }
 
 }

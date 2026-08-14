@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import java.util.function.Predicate;
 
 import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
-import static uk.ac.ox.poseidon.core.predicates.numeric.Factories.between;
+import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.between;
 import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
 
 public class Factories {
