@@ -25,6 +25,8 @@ package uk.ac.ox.poseidon.core.providers.constant;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
+
 public class Factories {
 
     private Factories() {
@@ -61,6 +63,12 @@ public class Factories {
         final Factory<? super S, ? extends Integer> integerFactory
     ) {
         return new ConstantIntProviderFactory<>(integerFactory);
+    }
+
+    public static <S extends Scope, T> ConstantProviderFactory<S, T> constant(
+        final T value
+    ) {
+        return new ConstantProviderFactory<>(object(value));
     }
 
     public static <S extends Scope, T> ConstantProviderFactory<S, T> constant(
