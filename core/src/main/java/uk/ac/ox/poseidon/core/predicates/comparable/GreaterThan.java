@@ -28,6 +28,12 @@ import lombok.RequiredArgsConstructor;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/**
+ * A {@link Predicate} that is true iff the tested value is strictly greater than a supplied
+ * threshold. Built via {@link Factories Factories.greaterThan(...)} in this package.
+ *
+ * @param <T> the {@link Comparable} type of the threshold
+ */
 @RequiredArgsConstructor
 public class GreaterThan<T> implements Predicate<Comparable<T>> {
 

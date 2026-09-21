@@ -20,28 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.comparable;
-
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 /**
- * A {@link Predicate} that is true iff the tested value is strictly less than a supplied
- * threshold. Built via {@link Factories Factories.lessThan(...)} in this package.
- *
- * @param <T> the {@link Comparable} type of the threshold
+ * {@link java.util.function.Predicate}s that compare a tested {@link Comparable} value against
+ * one or two thresholds ({@link uk.ac.ox.poseidon.core.predicates.comparable.LessThan},
+ * {@link uk.ac.ox.poseidon.core.predicates.comparable.GreaterThan},
+ * {@link uk.ac.ox.poseidon.core.predicates.comparable.Between}). See
+ * {@link uk.ac.ox.poseidon.core.predicates.comparable.Factories} for the entry points.
  */
-@RequiredArgsConstructor
-public class LessThan<T> implements Predicate<Comparable<T>> {
-
-    private final @NonNull Supplier<? extends T> value;
-
-    @Override
-    public boolean test(final @NonNull Comparable<T> other) {
-        return other.compareTo(value.get()) < 0;
-    }
-
-}
+package uk.ac.ox.poseidon.core.predicates.comparable;
