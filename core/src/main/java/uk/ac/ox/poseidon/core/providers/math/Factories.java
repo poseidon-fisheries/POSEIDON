@@ -28,10 +28,20 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
+/**
+ * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that compute a numeric result
+ * from other supplied values via a basic math operation (currently max and min).
+ */
 public class Factories {
-    
+
     private Factories() {}
 
+    /**
+     * @param a one of the two values to compare
+     * @param b the other value to compare
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MaxDouble}
+     * @see MaxDouble
+     */
     public static <S extends Scope> MaxDoubleFactory<S> maxDouble(
         final Factory<? super S, ? extends DoubleSupplier> a,
         final Factory<? super S, ? extends DoubleSupplier> b
@@ -39,6 +49,12 @@ public class Factories {
         return new MaxDoubleFactory<>(a, b);
     }
 
+    /**
+     * @param a one of the two values to compare
+     * @param b the other value to compare
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MinDouble}
+     * @see MinDouble
+     */
     public static <S extends Scope> MinDoubleFactory<S> minDouble(
         final Factory<? super S, ? extends DoubleSupplier> a,
         final Factory<? super S, ? extends DoubleSupplier> b
@@ -46,6 +62,12 @@ public class Factories {
         return new MinDoubleFactory<>(a, b);
     }
 
+    /**
+     * @param a one of the two values to compare
+     * @param b the other value to compare
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MaxInt}
+     * @see MaxInt
+     */
     public static <S extends Scope> MaxIntFactory<S> maxInt(
         final Factory<? super S, ? extends IntSupplier> a,
         final Factory<? super S, ? extends IntSupplier> b
@@ -53,6 +75,12 @@ public class Factories {
         return new MaxIntFactory<>(a, b);
     }
 
+    /**
+     * @param a one of the two values to compare
+     * @param b the other value to compare
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MinInt}
+     * @see MinInt
+     */
     public static <S extends Scope> MinIntFactory<S> minInt(
         final Factory<? super S, ? extends IntSupplier> a,
         final Factory<? super S, ? extends IntSupplier> b

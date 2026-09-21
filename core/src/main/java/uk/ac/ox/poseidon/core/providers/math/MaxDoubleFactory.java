@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.DoubleSupplier;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link MaxDouble}, built via
+ * {@link Factories#maxDouble(Factory, Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

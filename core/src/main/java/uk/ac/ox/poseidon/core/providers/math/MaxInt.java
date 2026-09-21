@@ -28,6 +28,11 @@ import uk.ac.ox.poseidon.core.providers.IntProvider;
 
 import java.util.function.IntSupplier;
 
+/**
+ * An {@link IntProvider} that returns the greater of two supplied int values, recomputed on every
+ * call. Built via {@link Factories#maxInt(uk.ac.ox.poseidon.core.Factory,
+ * uk.ac.ox.poseidon.core.Factory)} in this package.
+ */
 @RequiredArgsConstructor
 public class MaxInt implements IntProvider {
 

@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.IntSupplier;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link MinInt}, built via
+ * {@link Factories#minInt(Factory, Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

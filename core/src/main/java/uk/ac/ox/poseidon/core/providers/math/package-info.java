@@ -20,27 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.math;
-
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.IntProvider;
-
-import java.util.function.IntSupplier;
-
 /**
- * An {@link IntProvider} that returns the lesser of two supplied int values, recomputed on every
- * call. Built via {@link Factories#minInt(uk.ac.ox.poseidon.core.Factory,
- * uk.ac.ox.poseidon.core.Factory)} in this package.
+ * {@link uk.ac.ox.poseidon.core.providers.Provider}s that compute a numeric result from other
+ * supplied values via a basic math operation (currently max and min). See
+ * {@link uk.ac.ox.poseidon.core.providers.math.Factories} for the entry points.
  */
-@RequiredArgsConstructor
-public class MinInt implements IntProvider {
-
-    @NonNull private final IntSupplier a;
-    @NonNull private final IntSupplier b;
-
-    @Override
-    public int getAsInt() {
-        return Math.min(a.getAsInt(), b.getAsInt());
-    }
-}
+package uk.ac.ox.poseidon.core.providers.math;

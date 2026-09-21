@@ -28,6 +28,11 @@ import uk.ac.ox.poseidon.core.providers.DoubleProvider;
 
 import java.util.function.DoubleSupplier;
 
+/**
+ * A {@link DoubleProvider} that returns the greater of two supplied double values, recomputed on
+ * every call. Built via {@link Factories#maxDouble(uk.ac.ox.poseidon.core.Factory,
+ * uk.ac.ox.poseidon.core.Factory)} in this package.
+ */
 @RequiredArgsConstructor
 public class MaxDouble implements DoubleProvider {
 

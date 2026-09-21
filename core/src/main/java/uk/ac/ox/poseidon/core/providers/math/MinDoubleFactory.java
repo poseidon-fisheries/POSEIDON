@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.DoubleSupplier;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link MinDouble}, built via
+ * {@link Factories#minDouble(Factory, Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
