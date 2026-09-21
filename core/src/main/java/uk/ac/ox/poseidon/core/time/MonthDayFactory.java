@@ -32,6 +32,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.time.Month;
 import java.time.MonthDay;
 
+/**
+ * A {@link GlobalScopeFactory} for a fixed {@link MonthDay} (a month/day-of-month pair with no
+ * year, e.g. for recurring yearly dates). No separate plain component class here: the produced
+ * value is a bare JDK type, with no wrapper to carry documentation. Not currently reachable via
+ * {@code time.Factories} — construct directly, via {@link #parse}, or as a YAML bean.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,6 +47,10 @@ public class MonthDayFactory extends GlobalScopeFactory<MonthDay> {
     private int month;
     private int dayOfMonth;
 
+    /**
+     * @param month      the month
+     * @param dayOfMonth the day of the month
+     */
     public MonthDayFactory(
         final Month month,
         final int dayOfMonth
@@ -48,6 +58,10 @@ public class MonthDayFactory extends GlobalScopeFactory<MonthDay> {
         this(month.getValue(), dayOfMonth);
     }
 
+    /**
+     * @param text a month-day string as accepted by {@link MonthDay#parse} (e.g. {@code "--12-03"})
+     * @return a factory for the parsed month-day
+     */
     public static MonthDayFactory parse(final CharSequence text) {
         final var monthDay = MonthDay.parse(text);
         return new MonthDayFactory(monthDay.getMonthValue(), monthDay.getDayOfMonth());

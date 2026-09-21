@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.Duration;
 
+/**
+ * A {@link SimulationScopeFactory} counterpart of {@link ExponentiallyDistributedDuration}, built
+ * via {@link Factories#exponentiallyDistributedDuration(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

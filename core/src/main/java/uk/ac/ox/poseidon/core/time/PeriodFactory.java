@@ -31,6 +31,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.Period;
 
+/**
+ * A {@link GlobalScopeFactory} for a fixed {@link Period}. No separate plain component class
+ * here: the produced value is a bare JDK type, with no wrapper to carry documentation. Built via
+ * {@link Factories Factories.period(...)}, or the {@code DAILY}/{@code MONTHLY}/{@code YEARLY}/
+ * {@code ONE_MONTH}/{@code ONE_YEAR} constants.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,12 +47,19 @@ public class PeriodFactory extends GlobalScopeFactory<Period> {
     private int months;
     private int days;
 
+    /**
+     * @param period the period to decompose into years/months/days
+     */
     public PeriodFactory(final Period period) {
         this.years = period.getYears();
         this.months = period.getMonths();
         this.days = period.getDays();
     }
 
+    /**
+     * @param iso8601Period an ISO-8601 period string (e.g. {@code "P1Y2M"}), as accepted by
+     *                      {@link Period#parse}
+     */
     public PeriodFactory(final String iso8601Period) {
         this(Period.parse(iso8601Period));
     }

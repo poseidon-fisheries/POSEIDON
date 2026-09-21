@@ -33,6 +33,12 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 
+/**
+ * A {@link SimulationScopeFactory} for a {@link LocalDateTime} computed as the simulation's
+ * starting date-time plus a resolved {@link TemporalAmount}. No separate plain component class
+ * here: the produced value is a bare JDK type, with no wrapper to carry documentation. Built via
+ * {@link Factories#dateTimeAfterStarting(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

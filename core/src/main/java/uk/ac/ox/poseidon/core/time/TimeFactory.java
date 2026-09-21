@@ -31,6 +31,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalTime;
 
+/**
+ * A {@link GlobalScopeFactory} for a fixed {@link LocalTime}. No separate plain component class
+ * here: the produced value is a bare JDK type, with no wrapper to carry documentation. Built via
+ * {@link Factories#time(int, int, int)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

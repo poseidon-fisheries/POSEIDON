@@ -30,6 +30,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 
+/**
+ * A {@link RelativeScopeFactory} template for a {@link LocalDateTime} computed by adding or
+ * subtracting a resolved {@link TemporalAmount} from a resolved reference date-time; subclasses
+ * ({@link DateTimeAfterFactory}, {@link DateTimeBeforeFactory}) supply the direction via
+ * {@link #operation}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -31,6 +31,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 
+/**
+ * A {@link RelativeDateTimeFactory} for a {@link LocalDateTime} computed as the resolved
+ * reference date-time minus a resolved {@link TemporalAmount}. Built via
+ * {@link Factories#dateTimeBefore(Factory, Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)

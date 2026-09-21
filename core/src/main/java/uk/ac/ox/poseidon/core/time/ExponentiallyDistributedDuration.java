@@ -29,6 +29,12 @@ import sim.util.distribution.Exponential;
 import java.time.Duration;
 import java.util.function.Supplier;
 
+/**
+ * A {@link Supplier} of exponentially distributed random {@link Duration}s, drawn from the
+ * simulation's shared RNG on every call. Built via
+ * {@link Factories#exponentiallyDistributedDuration(uk.ac.ox.poseidon.core.Factory)} in this
+ * package.
+ */
 @RequiredArgsConstructor
 public class ExponentiallyDistributedDuration implements Supplier<Duration> {
 
