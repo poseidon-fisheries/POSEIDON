@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.core.predicates.temporal;
 
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.predicates.comparable.GreaterThanFactory;
+import uk.ac.ox.poseidon.core.predicates.comparable.LessThanFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDate;
@@ -30,13 +32,16 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.function.Supplier;
 
+import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.greaterThan;
+import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
+
 public class Factories {
     private Factories() {}
 
-    public static <S extends Scope> AfterTimeFactory<S> afterTime(
+    public static <S extends Scope> GreaterThanFactory<S, LocalTime> afterTime(
         final Factory<? super S, ? extends Supplier<? extends LocalTime>> referenceTime
     ) {
-        return new AfterTimeFactory<>(referenceTime);
+        return greaterThan(referenceTime);
     }
 
     public static <S extends Scope> AfterDateFactory<S> afterDate(
@@ -51,10 +56,10 @@ public class Factories {
         return new AfterDateTimeFactory<>(referenceDateTime);
     }
 
-    public static <S extends Scope> TimeIsBeforeFactory<S> timeIsBefore(
+    public static <S extends Scope> LessThanFactory<S, LocalTime> timeIsBefore(
         final Factory<? super S, ? extends Supplier<? extends LocalTime>> referenceTime
     ) {
-        return new TimeIsBeforeFactory<>(referenceTime);
+        return lessThan(referenceTime);
     }
 
     public static <S extends Scope> DateIsBeforeFactory<S> dateIsBefore(
