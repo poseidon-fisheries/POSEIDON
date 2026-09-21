@@ -114,6 +114,18 @@ public class Factories {
         return new TimeFactory(hour, minute, second);
     }
 
+    public static DateFactory date(
+        final int year,
+        final int month,
+        final int day
+    ) {
+        return new DateFactory(year, month, day);
+    }
+
+    public static DateFactory date(final LocalDate date) {
+        return date(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+    }
+
     public static <S extends Scope> DateTimeBeforeFactory<S> dateTimeBefore(
         final Factory<? super S, ? extends LocalDateTime> referenceDateTime,
         final Factory<? super S, ? extends TemporalAmount> temporalAmount
