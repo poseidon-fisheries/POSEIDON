@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkState;
  * A {@link Provider} that returns the {@link Duration} between the simulation's current date-time
  * and a reference date-time supplied at construction, recomputed on every call. Throws if the
  * reference date-time is not after the current one. Built via
- * {@code Factories.durationUntil(...)} in this package.
+ * {@link Factories Factories.durationUntil(...)} in this package.
  */
 @RequiredArgsConstructor
 public class DurationUntilProvider implements Provider<Duration> {

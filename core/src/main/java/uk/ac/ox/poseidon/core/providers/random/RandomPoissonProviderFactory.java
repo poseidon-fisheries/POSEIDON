@@ -32,7 +32,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link RandomPoissonProvider}, built via
- * {@code Factories.randomPoisson(...)}.
+ * {@link Factories Factories.randomPoisson(...)}.
  */
 @Data
 @NoArgsConstructor

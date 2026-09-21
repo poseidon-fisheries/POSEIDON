@@ -32,7 +32,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of {@link ConstantBooleanProvider}, built via
- * {@code Factories.alwaysTrue()}/{@code Factories.alwaysFalse()}.
+ * {@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()}.
  */
 @Data
 @NoArgsConstructor

@@ -28,7 +28,7 @@ import java.util.stream.DoubleStream;
 /**
  * An {@link Aggregator} that returns the sum of its input numbers, {@code 0.0} for an empty input
  * (unlike the other aggregators in this package, sum is defined for zero elements). Built via
- * {@code Factories.sumAggregator()} in this package.
+ * {@link Factories Factories.sumAggregator()} in this package.
  */
 public class SumAggregator implements Aggregator {
     @Override

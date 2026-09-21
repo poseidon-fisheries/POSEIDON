@@ -28,8 +28,8 @@ import uk.ac.ox.poseidon.core.providers.BooleanProvider;
 
 /**
  * A {@link BooleanProvider} that returns {@code true} with the given probability on each call,
- * drawn from the simulation's shared RNG. Built via {@code Factories.randomBoolean(...)} in this
- * package.
+ * drawn from the simulation's shared RNG. Built via
+ * {@link Factories Factories.randomBoolean(...)} in this package.
  */
 @RequiredArgsConstructor
 public class RandomBooleanProvider implements BooleanProvider {

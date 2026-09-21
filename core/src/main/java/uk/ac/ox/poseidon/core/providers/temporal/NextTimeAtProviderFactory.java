@@ -35,7 +35,7 @@ import java.util.List;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link NextTimeAtProvider}, built via
- * {@code Factories.nextTimeAt(...)}.
+ * {@link Factories Factories.nextTimeAt(...)}.
  */
 @Data
 @NoArgsConstructor

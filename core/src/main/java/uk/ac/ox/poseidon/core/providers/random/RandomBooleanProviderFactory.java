@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link RandomBooleanProvider}, built via
- * {@code Factories.randomBoolean(...)}.
+ * {@link Factories Factories.randomBoolean(...)}.
  */
 @Data
 @NoArgsConstructor

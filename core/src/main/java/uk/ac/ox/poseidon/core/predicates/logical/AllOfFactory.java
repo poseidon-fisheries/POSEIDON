@@ -34,7 +34,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link AllOf}, built via
- * {@code Factories.allOf(...)}.
+ * {@link Factories Factories.allOf(...)}.
  */
 @Data
 @NoArgsConstructor

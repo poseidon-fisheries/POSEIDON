@@ -35,7 +35,7 @@ import java.util.Arrays;
  * A {@link Provider} that returns the next of several times of day to occur after the
  * simulation's current date-time — the earliest given time still later today, or the earliest
  * given time tomorrow if all of today's have passed — recomputed on every call. Built via
- * {@code Factories.nextTimeAt(...)} in this package.
+ * {@link Factories Factories.nextTimeAt(...)} in this package.
  */
 public class NextTimeAtProvider implements Provider<LocalDateTime> {
 

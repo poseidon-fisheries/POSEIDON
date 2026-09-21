@@ -30,8 +30,8 @@ import java.time.LocalDate;
 
 /**
  * A {@link Provider} that returns the simulation's current date, read live from the
- * {@link TemporalSchedule} on every call. Built via {@code Factories.currentDate()} in this
- * package.
+ * {@link TemporalSchedule} on every call. Built via
+ * {@link Factories Factories.currentDate()} in this package.
  */
 @RequiredArgsConstructor
 public class CurrentDateProvider implements Provider<LocalDate> {

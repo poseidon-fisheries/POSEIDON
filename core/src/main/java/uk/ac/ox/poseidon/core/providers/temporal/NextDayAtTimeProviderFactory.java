@@ -34,7 +34,7 @@ import java.time.LocalTime;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link NextDayAtTimeProvider}, built via
- * {@code Factories.nextDayAtTime(...)}.
+ * {@link Factories Factories.nextDayAtTime(...)}.
  */
 @Data
 @NoArgsConstructor

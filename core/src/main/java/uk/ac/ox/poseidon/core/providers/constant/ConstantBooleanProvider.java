@@ -27,7 +27,7 @@ import uk.ac.ox.poseidon.core.providers.BooleanProvider;
 
 /**
  * A {@link BooleanProvider} that always returns the same, fixed value. Built via
- * {@code Factories.alwaysTrue()}/{@code Factories.alwaysFalse()} in this package.
+ * {@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()} in this package.
  */
 @RequiredArgsConstructor
 public class ConstantBooleanProvider implements BooleanProvider {

@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of {@link MedianAggregator}, built via
- * {@code Factories.medianAggregator()}.
+ * {@link Factories Factories.medianAggregator()}.
  */
 @Data
 @NoArgsConstructor

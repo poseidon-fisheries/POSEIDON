@@ -28,7 +28,7 @@ import java.util.stream.DoubleStream;
 /**
  * An {@link Aggregator} that returns the minimum of its input numbers, or
  * {@link java.util.OptionalDouble#empty()} for an empty input. Built via
- * {@code Factories.minAggregator()} in this package.
+ * {@link Factories Factories.minAggregator()} in this package.
  */
 public class MinAggregator implements Aggregator {
     @Override

@@ -27,7 +27,7 @@ import uk.ac.ox.poseidon.core.providers.DoubleProvider;
 
 /**
  * A {@link DoubleProvider} that always returns the same, fixed value. Built via
- * {@code Factories.constantDouble(...)} in this package.
+ * {@link Factories Factories.constantDouble(...)} in this package.
  */
 @RequiredArgsConstructor
 public class ConstantDoubleProvider implements DoubleProvider {

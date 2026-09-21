@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link CurrentDateTimeProvider}, built via
- * {@code Factories.currentDateTime()}.
+ * {@link Factories Factories.currentDateTime()}.
  */
 @Data
 @NoArgsConstructor

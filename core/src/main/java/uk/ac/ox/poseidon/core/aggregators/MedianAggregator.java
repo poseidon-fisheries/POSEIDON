@@ -30,7 +30,7 @@ import static com.google.common.math.Quantiles.median;
 /**
  * An {@link Aggregator} that returns the median of its input numbers, or
  * {@link java.util.OptionalDouble#empty()} for an empty input. Built via
- * {@code Factories.medianAggregator()} in this package.
+ * {@link Factories Factories.medianAggregator()} in this package.
  */
 public class MedianAggregator implements Aggregator {
 

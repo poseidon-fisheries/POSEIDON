@@ -27,7 +27,7 @@ import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
  * A {@link Provider} that always returns the same, fixed value, no matter how many times
- * {@link #get()} is called. Built via {@code Factories.constant(...)} in this package.
+ * {@link #get()} is called. Built via {@link Factories Factories.constant(...)} in this package.
  *
  * @param <T> the type of the constant value returned
  */
