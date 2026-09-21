@@ -27,6 +27,14 @@ import java.util.function.Function;
 
 import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 
+/**
+ * A {@link Function} that applies several other functions to the same input and joins their
+ * results into a single composite string key (via {@code Utils.multiStringKey}). Built via
+ * {@link Factories#multiStringKeyFromFunctions(uk.ac.ox.poseidon.core.Factory...)} in this
+ * package.
+ *
+ * @param <T> the type of input the wrapped functions are applied to
+ */
 public class MultiStringKeyFromFunctions<T> implements Function<T, String> {
 
     private final Function<T, ?>[] functions;

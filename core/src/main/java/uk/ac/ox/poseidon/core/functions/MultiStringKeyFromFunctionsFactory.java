@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link MultiStringKeyFromFunctions}, built via
+ * {@link Factories#multiStringKeyFromFunctions(Factory...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -26,6 +26,13 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * A {@link Function} that sums the {@link Duration}s produced by applying several other functions
+ * to the same input. Built via
+ * {@link Factories#combinedDuration(uk.ac.ox.poseidon.core.Factory...)} in this package.
+ *
+ * @param <T> the type of input the wrapped duration-producing functions are applied to
+ */
 public class CombinedDuration<T> implements Function<T, Duration> {
 
     private final Function<T, ? extends Duration>[] durations;

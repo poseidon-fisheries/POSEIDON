@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Function;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link DefaultIfNull}, built via
+ * {@link Factories Factories.defaultIfNull(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

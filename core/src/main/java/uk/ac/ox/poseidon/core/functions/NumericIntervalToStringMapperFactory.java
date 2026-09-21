@@ -32,7 +32,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.util.List;
 
 /**
- * Factory for {@link NumericIntervalMapper} instances with string outputs.
+ * A {@link GlobalScopeFactory} counterpart of {@link NumericIntervalMapper} (specialized to
+ * {@link String} outputs), built via
+ * {@link Factories#numericIntervalToStringMapper(Interval...)}.
  */
 @Data
 @NoArgsConstructor
@@ -43,6 +45,10 @@ public class NumericIntervalToStringMapperFactory
 
     private List<Interval> intervals;
 
+    /**
+     * @return an {@link Interval} literal, for use as a
+     * {@link Factories#numericIntervalToStringMapper(Interval...)} argument
+     */
     public static Interval interval(
         final Double lowerBoundInclusive,
         final Double upperBoundExclusive,

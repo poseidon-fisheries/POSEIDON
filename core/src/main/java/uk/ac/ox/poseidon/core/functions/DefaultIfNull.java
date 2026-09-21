@@ -26,6 +26,14 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.function.Function;
 
+/**
+ * A {@link Function} that delegates to another function and substitutes a fixed default whenever
+ * that delegate returns {@code null}. Built via {@link Factories Factories.defaultIfNull(...)} in
+ * this package.
+ *
+ * @param <T> the type of input
+ * @param <R> the type of output, and of the default value
+ */
 @RequiredArgsConstructor
 public class DefaultIfNull<T, R> implements Function<T, R> {
 

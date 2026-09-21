@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.Map;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link MapValueExtractor}, built via
+ * {@link Factories#mapValueExtractor(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

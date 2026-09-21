@@ -20,16 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.functions;
-
 /**
- * A function of a {@code double} and an {@code int} returning a {@code double}, avoiding the
- * boxing a {@code BiFunction<Double, Integer, Double>} would require.
+ * {@link java.util.function.Function}s that transform, combine, or look up values. See
+ * {@link uk.ac.ox.poseidon.core.functions.Factories} for the entry points.
  */
-@FunctionalInterface
-public interface DoubleIntToDoubleFunction {
-    double applyAsDouble(
-        double value,
-        int index
-    );
-}
+package uk.ac.ox.poseidon.core.functions;

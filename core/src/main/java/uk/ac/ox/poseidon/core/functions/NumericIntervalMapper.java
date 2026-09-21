@@ -31,8 +31,11 @@ import static java.util.Comparator.comparing;
 import static java.util.Comparator.nullsFirst;
 
 /**
- * Maps numeric values to labels using non-overlapping intervals. Bounds are lower-inclusive and
- * upper-exclusive; null bounds are unbounded.
+ * A {@link Function} that maps numeric values to labels using non-overlapping intervals. Bounds
+ * are lower-inclusive and upper-exclusive; null bounds are unbounded. Built via
+ * {@link Factories#numericIntervalToStringMapper(NumericIntervalToStringMapperFactory.Interval...)}
+ * in this package (currently the only Factory-facing specialization, with {@code T} fixed to
+ * {@link String}).
  */
 @Value
 public class NumericIntervalMapper<T> implements Function<Double, T> {

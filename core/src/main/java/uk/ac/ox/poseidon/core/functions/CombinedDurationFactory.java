@@ -34,6 +34,10 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link CombinedDuration}, built via
+ * {@link Factories#combinedDuration(Factory...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

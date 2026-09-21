@@ -24,6 +24,17 @@ package uk.ac.ox.poseidon.core.functions;
 
 import java.util.function.Function;
 
+/**
+ * A {@link Function} equivalent to applying two other functions in sequence
+ * ({@code function2.compose(function1)}). Built via
+ * {@link Factories#composedFunction(uk.ac.ox.poseidon.core.Factory,
+ * uk.ac.ox.poseidon.core.Factory)} in this package.
+ *
+ * @param <T1> the type of the composed function's input
+ * @param <T2> the intermediate type produced by {@code function1} and consumed by
+ *             {@code function2}
+ * @param <R>  the type of the composed function's output
+ */
 public class ComposedFunction<T1, T2, R> implements Function<T1, R> {
 
     private final Function<? super T1, ? extends R> composedFunction;
