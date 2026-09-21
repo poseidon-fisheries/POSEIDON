@@ -29,6 +29,12 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+/**
+ * {@link uk.ac.ox.poseidon.core.Factory} counterpart of {@link RandomDoubleProvider}, built via
+ * {@code Factories.randomDouble(...)}.
+ * Scope: per-simulation — a fresh instance is created for each simulation run, never
+ * shared across runs.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -29,6 +29,11 @@ import uk.ac.ox.poseidon.core.providers.DoubleProvider;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * A {@link DoubleProvider} that returns a uniformly distributed random value in
+ * {@code [minimum, maximum)} on each call, drawn from the simulation's shared RNG. Built via
+ * {@code Factories.randomDouble(...)} in this package.
+ */
 public class RandomDoubleProvider implements DoubleProvider {
 
     private final MersenneTwisterFast rng;

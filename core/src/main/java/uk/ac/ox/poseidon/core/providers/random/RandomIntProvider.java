@@ -30,7 +30,9 @@ import uk.ac.ox.poseidon.core.providers.IntProvider;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * Supplies uniformly distributed random integers in the inclusive range [minimum, maximum].
+ * An {@link IntProvider} that returns a uniformly distributed random integer in the inclusive
+ * range {@code [minimum, maximum]} on each call, drawn from the simulation's shared RNG. Built via
+ * {@code Factories.randomInt(...)} in this package.
  */
 public class RandomIntProvider implements IntProvider {
 

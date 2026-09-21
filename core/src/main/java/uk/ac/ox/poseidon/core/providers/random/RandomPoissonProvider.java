@@ -26,6 +26,11 @@ import lombok.RequiredArgsConstructor;
 import sim.util.distribution.Poisson;
 import uk.ac.ox.poseidon.core.providers.IntProvider;
 
+/**
+ * An {@link IntProvider} that returns a Poisson-distributed random integer with the given mean on
+ * each call, drawn from the simulation's shared RNG. Built via {@code Factories.randomPoisson(...)}
+ * in this package.
+ */
 @RequiredArgsConstructor
 public class RandomPoissonProvider implements IntProvider {
 

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,25 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.random;
-
-import ec.util.MersenneTwisterFast;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.BooleanProvider;
-
 /**
- * A {@link BooleanProvider} that returns {@code true} with the given probability on each call,
- * drawn from the simulation's shared RNG. Built via {@code Factories.randomBoolean(...)} in this
- * package.
+ * {@link uk.ac.ox.poseidon.core.providers.Provider}s that draw a fresh random value, from the
+ * simulation's shared RNG, on every call. See
+ * {@link uk.ac.ox.poseidon.core.providers.random.Factories} for the entry points.
  */
-@RequiredArgsConstructor
-public class RandomBooleanProvider implements BooleanProvider {
-
-    private final double probability;
-    private final MersenneTwisterFast rng;
-
-    @Override
-    public boolean getAsBoolean() {
-        return rng.nextBoolean(probability);
-    }
-}
+package uk.ac.ox.poseidon.core.providers.random;
