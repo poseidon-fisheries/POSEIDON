@@ -20,29 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.scopes;
-
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Marks the sharing/lifecycle boundary a {@link uk.ac.ox.poseidon.core.Factory}-produced object
- * belongs to. The base class itself represents the global scope, shared by every
- * {@code AbstractFactory} invocation regardless of the simulation it's built for; subclasses such
- * as {@link SimulationScope} narrow that boundary to a single simulation run.
+ * The {@link uk.ac.ox.poseidon.core.scopes.Scope} hierarchy that marks the sharing/lifecycle
+ * boundary a {@link uk.ac.ox.poseidon.core.Factory}-produced object belongs to: a single instance
+ * shared globally across every simulation built from a scenario, or one scoped to a single
+ * {@link uk.ac.ox.poseidon.core.Simulation} run. See the {@code *ScopeFactory} classes in
+ * {@code uk.ac.ox.poseidon.core} ({@code GlobalScopeFactory}, {@code PerSimulationFactory},
+ * {@code RelativeScopeFactory}, {@code SimulationScopeFactory}) for how factories pick a scope.
  */
-public class Scope {
-
-    /**
-     * The single global scope instance, used by factories whose output is shared across every
-     * simulation built from a scenario (see {@code GlobalScopeFactory}).
-     */
-    @SuppressWarnings("InstantiationOfUtilityClass")
-    public static final Scope GLOBAL_SCOPE = new Scope();
-
-    protected static final Map<Class<? extends Scope>, Scope> SCOPES = new HashMap<>();
-
-    Scope() {
-    }
-
-}
+package uk.ac.ox.poseidon.core.scopes;
