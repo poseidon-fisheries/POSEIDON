@@ -26,6 +26,12 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+/**
+ * A {@link Factory} whose produced object is cached per {@link Simulation} instance — one
+ * instance per simulation run, shared by every resolution within that run, but never shared
+ * across different runs. Use for components that depend on a live simulation's state (its RNG,
+ * its {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}, etc.).
+ */
 @SuperBuilder
 @NoArgsConstructor
 public abstract class SimulationScopeFactory<C>

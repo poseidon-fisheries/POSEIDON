@@ -27,7 +27,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.Factory;
 
+/**
+ * A {@link Factory} whose produced object is cached per {@link Vessel} — one instance per vessel
+ * agent, shared by every resolution against that vessel for the life of the simulation, but never
+ * shared between different vessels or across simulation runs. Use for components that depend on a
+ * single vessel's own state.
+ */
 @Data
 @SuperBuilder
 @NoArgsConstructor

@@ -39,6 +39,15 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.beans.Introspector.getBeanInfo;
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * A {@link Factory} whose effective scope is derived from its own {@link Factory}-typed fields
+ * rather than fixed: it inspects those fields, finds their common (leaf) scope class, and caches
+ * its produced object under that same key — so it inherits whatever scope its inputs resolve at,
+ * falling back to {@link Scope#GLOBAL_SCOPE} if it has no {@link Factory}-typed fields. Prefer
+ * this over {@link GlobalScopeFactory} for any factory with {@link Factory}-typed input fields: it
+ * still ends up at global scope when its inputs do, but safely demotes to a narrower scope instead
+ * of silently sharing stale state if an input ever isn't global.
+ */
 @NoArgsConstructor
 public abstract class RelativeScopeFactory<S extends Scope, C> extends AbstractFactory<S, C> {
 
