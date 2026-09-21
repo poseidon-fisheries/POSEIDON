@@ -28,6 +28,10 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/**
+ * A {@link GlobalScopeFactory} counterpart of {@link MaxAggregator}, built via
+ * {@code Factories.maxAggregator()}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)

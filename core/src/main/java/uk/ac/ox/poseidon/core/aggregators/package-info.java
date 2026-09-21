@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,19 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.aggregators;
-
-import java.util.OptionalDouble;
-import java.util.stream.DoubleStream;
-
 /**
- * An {@link Aggregator} that returns the sum of its input numbers, {@code 0.0} for an empty input
- * (unlike the other aggregators in this package, sum is defined for zero elements). Built via
- * {@code Factories.sumAggregator()} in this package.
+ * {@link uk.ac.ox.poseidon.core.aggregators.Aggregator}s that reduce a stream, collection, or
+ * array of numbers to a single summary value. See
+ * {@link uk.ac.ox.poseidon.core.aggregators.Factories} for the entry points.
  */
-public class SumAggregator implements Aggregator {
-    @Override
-    public OptionalDouble apply(final DoubleStream doubleStream) {
-        return OptionalDouble.of(doubleStream.sum());
-    }
-}
+package uk.ac.ox.poseidon.core.aggregators;

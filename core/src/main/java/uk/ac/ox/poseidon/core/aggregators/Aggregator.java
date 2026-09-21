@@ -29,6 +29,13 @@ import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
+/**
+ * Reduces a stream, collection, or array of numbers to a single summary value, or
+ * {@link OptionalDouble#empty()} if the implementation has no defined result for an empty input
+ * (e.g. min/max/mean/median over zero numbers). Implementations live alongside their
+ * {@link uk.ac.ox.poseidon.core.Factory} counterpart in this package; see
+ * {@link uk.ac.ox.poseidon.core.aggregators.Factories} for the entry points.
+ */
 public interface Aggregator extends Function<DoubleStream, OptionalDouble> {
 
     default OptionalDouble apply(final Stream<? extends Number> numbers) {
