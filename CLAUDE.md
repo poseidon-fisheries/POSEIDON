@@ -126,14 +126,18 @@ documented in four different places, once each, not duplicated across them:
 - **`Factories` class itself** gets a short class-level Javadoc: one or two sentences naming what
   the grouped static methods produce (e.g. "Factories for `Provider`s that always return a fixed
   value.") — the entry point a reader lands on before drilling into individual methods.
+- **Package `package-info.java`** (for any package containing a `Factories` class): a short
+  blurb — one or two sentences on what the package's components do — plus a `{@link Factories}`
+  pointer, so a reader landing on the package summary gets routed straight to the discoverability
+  entry point instead of having to guess which class to open.
 
 Don't write the same behavioral explanation twice across the triplet; every doc comment except the
 component's should be a pointer, not prose.
 
 The pattern itself — why the triplet exists, why scenario code never calls `.get()` directly — is
 already covered in "Core architectural pattern" above; don't restate it in per-package Javadoc.
-Package `package-info.java` files may add package-specific context but should `@link` back to
-`Factory`/`Scenario` rather than re-explaining the general pattern.
+Package `package-info.java` files should stick to that short blurb + `{@link Factories}` pointer,
+and `@link` back to `Factory`/`Scenario` rather than re-explaining the general pattern.
 
 ## Lombok usage
 
