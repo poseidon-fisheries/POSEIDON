@@ -112,12 +112,17 @@ documented in four different places, once each, not duplicated across them:
   the one source of truth — put depth here, nowhere else.
 - **`Factory` subclass** (the YAML bean) gets a one-line pointer only: `A
   {@link GlobalScopeFactory} counterpart of {@link Component}, built via
-  {@code Factories.method(...)}.` — naming whichever `*ScopeFactory` the leaf class directly
-  extends (`GlobalScopeFactory`, `SimulationScopeFactory`, `RelativeScopeFactory` in `core`;
-  domain-specific ones like `VesselScopeFactory` in `agents`) in place of the generic `Factory`.
-  No behavior explanation — scenario-building code never touches these directly (per "Core
-  architectural pattern" above), so a reader here just needs to be routed to the component and to
-  the helper that builds it.
+  {@link Factories Factories.method(...)}.` — naming whichever `*ScopeFactory` the leaf class
+  directly extends (`GlobalScopeFactory`, `SimulationScopeFactory`, `RelativeScopeFactory` in
+  `core`; domain-specific ones like `VesselScopeFactory` in `agents`) in place of the generic
+  `Factory`. The `built via` half is a real `{@link}` to the `Factories` class (not `{@code}`) so
+  it's clickable, but always links the class itself, never a specific overload — `{@link}`'s label
+  renders in code font, matching how `{@code}` used to look, without pretending one overload is
+  "the" one. When multiple distinct method *names* apply (not overloads, e.g.
+  `alwaysTrue()`/`alwaysFalse()`), combine them in one link's label:
+  `{@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()}`. No behavior explanation —
+  scenario-building code never touches these directly (per "Core architectural pattern" above), so
+  a reader here just needs to be routed to the component and to the helper that builds it.
 - **Scope semantics are documented once, not per factory.** Each `*ScopeFactory` base class
   carries the real explanation of what that scope means and when to reach for it, on the class
   itself. Never restate that explanation in free text on a leaf `Factory` subclass — copies drift.
