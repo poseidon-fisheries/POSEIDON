@@ -50,4 +50,22 @@ public class Factories {
     ) {
         return new AfterDateTimeFactory<>(referenceDateTime);
     }
+
+    public static <S extends Scope> TimeIsBeforeFactory<S> timeIsBefore(
+        final Factory<? super S, ? extends Supplier<? extends LocalTime>> referenceTime
+    ) {
+        return new TimeIsBeforeFactory<>(referenceTime);
+    }
+
+    public static <S extends Scope> DateIsBeforeFactory<S> dateIsBefore(
+        final Factory<? super S, ? extends Supplier<? extends LocalDate>> referenceDate
+    ) {
+        return new DateIsBeforeFactory<>(referenceDate);
+    }
+
+    public static <S extends Scope> DateTimeIsBeforeFactory<S> dateTimeIsBefore(
+        final Factory<? super S, ? extends Supplier<? extends LocalDateTime>> referenceDateTime
+    ) {
+        return new DateTimeIsBeforeFactory<>(referenceDateTime);
+    }
 }
