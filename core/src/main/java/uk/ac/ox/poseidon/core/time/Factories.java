@@ -26,6 +26,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -144,6 +145,12 @@ public class Factories {
         final Factory<? super SimulationScope, ? extends TemporalAmount> amountToAdd
     ) {
         return new DateTimeAfterStartingFactory(amountToAdd);
+    }
+
+    public static ExponentiallyDistributedDurationSupplierFactory exponentiallyDistributedDuration(
+        final Factory<? super SimulationScope, ? extends Duration> meanDuration
+    ) {
+        return new ExponentiallyDistributedDurationSupplierFactory(meanDuration);
     }
 
 }
