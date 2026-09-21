@@ -30,6 +30,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
+
 public class Factories {
 
     private Factories() {}
@@ -39,6 +41,16 @@ public class Factories {
         final Factory<? super S, ? extends Predicate<? super U>> predicate
     ) {
         return new ConditionFactory<>(extractor, predicate);
+    }
+
+    public static <S extends Scope, T> EqualFactory<S, T> equal(final T value) {
+        return equal(constant(value));
+    }
+
+    public static <S extends Scope, T> EqualFactory<S, T> equal(
+        final Factory<? super S, ? extends Supplier<? extends T>> value
+    ) {
+        return new EqualFactory<>(value);
     }
 
     public static <S extends Scope, T> InSetFactory<S, T> in(
