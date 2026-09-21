@@ -28,6 +28,12 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.function.Predicate;
 
+/**
+ * A {@link Predicate} that negates the result of a wrapped predicate. Built via
+ * {@code Factories.not(...)} in this package.
+ *
+ * @param <T> the type of input tested
+ */
 @Getter
 @RequiredArgsConstructor
 public class Not<T> implements Predicate<T> {

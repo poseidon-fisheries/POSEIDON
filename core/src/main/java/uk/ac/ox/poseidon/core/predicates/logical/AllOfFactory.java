@@ -32,6 +32,10 @@ import java.util.function.Predicate;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link AllOf}, built via
+ * {@code Factories.allOf(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

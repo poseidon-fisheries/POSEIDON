@@ -28,6 +28,13 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+/**
+ * A {@link Predicate} that is true iff at least one of its component predicates is true for the
+ * given input (false for zero predicates). Built via {@code Factories.anyOf(...)} in this
+ * package.
+ *
+ * @param <T> the type of input tested
+ */
 public class AnyOf<T> implements Predicate<T> {
 
     // Using an array for performance reasons

@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.util.List;
 import java.util.function.Predicate;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link AnyOf}, built via
+ * {@code Factories.anyOf(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

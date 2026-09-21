@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,31 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.logical;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Predicate;
-
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link Not}, built via {@code Factories.not(...)}.
+ * {@link java.util.function.Predicate} combinators ({@link uk.ac.ox.poseidon.core.predicates.logical.AllOf},
+ * {@link uk.ac.ox.poseidon.core.predicates.logical.AnyOf}, {@link uk.ac.ox.poseidon.core.predicates.logical.Not})
+ * that build a predicate out of other predicates. See
+ * {@link uk.ac.ox.poseidon.core.predicates.logical.Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class NotFactory<S extends Scope, T> extends RelativeScopeFactory<S, Not<T>> {
-
-    private Factory<? super S, ? extends Predicate<? super T>> predicate;
-
-    @Override
-    protected Not<T> newInstance(final S scope) {
-        return new Not<>(predicate.get(scope));
-    }
-}
+package uk.ac.ox.poseidon.core.predicates.logical;
