@@ -33,3 +33,14 @@ subprojects {
         archiveBaseName.set("${rootProject.name}-${project.name}")
     }
 }
+
+tasks.register<Javadoc>("aggregateJavadoc") {
+    group = "documentation"
+    description = "Generates aggregated Javadoc across all subprojects."
+    dependsOn(subprojects.map { it.tasks.named("javadoc") })
+    subprojects.forEach { sub ->
+        source(sub.extensions.getByType<SourceSetContainer>()["main"].allJava)
+    }
+    classpath = files(subprojects.map { it.configurations.getByName("compileClasspath") })
+    setDestinationDir(layout.buildDirectory.dir("docs/javadoc").get().asFile)
+}

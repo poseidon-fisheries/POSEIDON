@@ -47,7 +47,7 @@ public final class Envelope {
     }
 
     /**
-     * Constructs an Envelope by ordering (x1, x2) and (y1, y2) so min <= max.
+     * Constructs an Envelope by ordering (x1, x2) and (y1, y2) so {@code min <= max}.
      */
     public Envelope(
         final double x1,
