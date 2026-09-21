@@ -30,6 +30,10 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/**
+ * {@link Factory} counterpart of {@link ConstantIntProvider}, built via
+ * {@code Factories.constantInt(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

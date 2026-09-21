@@ -29,6 +29,10 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/**
+ * {@link uk.ac.ox.poseidon.core.Factory} counterpart of {@link ConstantDoubleProvider}, built via
+ * {@code Factories.constantDouble(double)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

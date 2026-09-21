@@ -25,6 +25,12 @@ package uk.ac.ox.poseidon.core.providers.constant;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
+/**
+ * A {@link Provider} that always returns the same, fixed value, no matter how many times
+ * {@link #get()} is called. Built via {@code Factories.constant(...)} in this package.
+ *
+ * @param <T> the type of the constant value returned
+ */
 @RequiredArgsConstructor
 public class ConstantProvider<T> implements Provider<T> {
     private final T value;

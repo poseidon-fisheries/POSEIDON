@@ -30,6 +30,11 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.providers.BooleanProvider;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/**
+ * {@link uk.ac.ox.poseidon.core.Factory} counterpart of {@link ConstantBooleanProvider}, built via
+ * {@code Factories.alwaysTrue()}/{@code Factories.alwaysFalse()}.
+ * Scope: global — one instance shared across every simulation built from this scenario.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

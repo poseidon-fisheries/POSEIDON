@@ -25,6 +25,10 @@ package uk.ac.ox.poseidon.core.providers.constant;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.IntProvider;
 
+/**
+ * An {@link IntProvider} that always returns the same, fixed value. Built via
+ * {@code Factories.constantInt(...)} in this package.
+ */
 @RequiredArgsConstructor
 public class ConstantIntProvider implements IntProvider {
 
