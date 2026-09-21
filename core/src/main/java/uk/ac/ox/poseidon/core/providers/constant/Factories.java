@@ -38,8 +38,8 @@ public class Factories {
     }
 
     /**
-     * @return a factory for a {@link ConstantBooleanProvider} that always returns {@code true}.
-     * Scope: global — one instance shared across every simulation built from this scenario.
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+     * {@link ConstantBooleanProvider} that always returns {@code true}
      * @see ConstantBooleanProvider
      */
     public static ConstantBooleanProviderFactory alwaysTrue() {
@@ -47,8 +47,8 @@ public class Factories {
     }
 
     /**
-     * @return a factory for a {@link ConstantBooleanProvider} that always returns {@code false}.
-     * Scope: global — one instance shared across every simulation built from this scenario.
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+     * {@link ConstantBooleanProvider} that always returns {@code false}
      * @see ConstantBooleanProvider
      */
     public static ConstantBooleanProviderFactory alwaysFalse() {
@@ -57,7 +57,8 @@ public class Factories {
 
     /**
      * @param value the value the resulting provider will always return
-     * @return a factory for a {@link ConstantDoubleProvider} wrapping the given literal value
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+     * a {@link ConstantDoubleProvider} wrapping the given literal value
      * @see ConstantDoubleProvider
      */
     public static <S extends Scope> ConstantDoubleProviderFromValueFactory<S> constantDouble(
@@ -68,7 +69,8 @@ public class Factories {
 
     /**
      * @param doubleFactory factory for the value the resulting provider will always return
-     * @return a factory for a {@link ConstantDoubleProvider} wrapping the resolved value
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+     * a {@link ConstantDoubleProvider} wrapping the resolved value
      * @see ConstantDoubleProvider
      */
     public static <S extends Scope> ConstantDoubleProviderFactory<S> constantDouble(
@@ -79,7 +81,8 @@ public class Factories {
 
     /**
      * @param value the value the resulting provider will always return
-     * @return a factory for a {@link ConstantIntProvider} wrapping the given literal value
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+     * a {@link ConstantIntProvider} wrapping the given literal value
      * @see ConstantIntProvider
      */
     public static <S extends Scope> ConstantIntProviderFromValueFactory<S> constantInt(
@@ -90,7 +93,8 @@ public class Factories {
 
     /**
      * @param integerFactory factory for the value the resulting provider will always return
-     * @return a factory for a {@link ConstantIntProvider} wrapping the resolved value
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+     * a {@link ConstantIntProvider} wrapping the resolved value
      * @see ConstantIntProvider
      */
     public static <S extends Scope> ConstantIntProviderFactory<S> constantInt(
@@ -101,7 +105,8 @@ public class Factories {
 
     /**
      * @param value the value the resulting provider will always return
-     * @return a factory for a {@link ConstantProvider} wrapping the given literal value
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+     * a {@link ConstantProvider} wrapping the given literal value
      * @see ConstantProvider
      */
     public static <S extends Scope, T> ConstantProviderFactory<S, T> constant(
@@ -112,7 +117,8 @@ public class Factories {
 
     /**
      * @param value factory for the value the resulting provider will always return
-     * @return a factory for a {@link ConstantProvider} wrapping the resolved value
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+     * a {@link ConstantProvider} wrapping the resolved value
      * @see ConstantProvider
      */
     public static <S extends Scope, T> ConstantProviderFactory<S, T> constant(

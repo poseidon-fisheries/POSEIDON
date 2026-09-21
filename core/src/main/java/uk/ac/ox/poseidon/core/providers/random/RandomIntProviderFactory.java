@@ -30,10 +30,8 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * {@link uk.ac.ox.poseidon.core.Factory} counterpart of {@link RandomIntProvider}, built via
+ * A {@link SimulationScopeFactory} counterpart of {@link RandomIntProvider}, built via
  * {@code Factories.randomInt(...)}.
- * Scope: per-simulation — a fresh instance is created for each simulation run, never
- * shared across runs.
  */
 @Data
 @NoArgsConstructor

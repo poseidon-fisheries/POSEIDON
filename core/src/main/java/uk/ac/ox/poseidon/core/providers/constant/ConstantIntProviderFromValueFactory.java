@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.core.providers.IntProvider;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * {@link uk.ac.ox.poseidon.core.Factory} counterpart of {@link ConstantIntProvider}, built via
+ * A {@link RelativeScopeFactory} counterpart of {@link ConstantIntProvider}, built via
  * {@code Factories.constantInt(int)}.
  */
 @Data

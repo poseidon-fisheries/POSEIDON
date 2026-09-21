@@ -24,8 +24,7 @@ package uk.ac.ox.poseidon.core.providers.random;
 
 /**
  * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that draw a fresh random value,
- * from the simulation's shared RNG, on every call. Every factory here is per-simulation scoped —
- * see the individual factory classes.
+ * from the simulation's shared RNG, on every call.
  */
 public class Factories {
 
@@ -34,8 +33,8 @@ public class Factories {
     }
 
     /**
-     * @return a factory for a {@link RandomBooleanProvider} with an even (0.5) probability of
-     * returning {@code true}
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link RandomBooleanProvider} with an even (0.5) probability of returning {@code true}
      * @see RandomBooleanProvider
      */
     public static RandomBooleanProviderFactory randomBoolean() {
@@ -45,7 +44,8 @@ public class Factories {
     /**
      * @param probability the probability, in {@code [0, 1]}, that the resulting provider returns
      *                    {@code true}
-     * @return a factory for a {@link RandomBooleanProvider} with the given probability
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link RandomBooleanProvider} with the given probability
      * @see RandomBooleanProvider
      */
     public static RandomBooleanProviderFactory randomBoolean(final double probability) {
@@ -55,7 +55,8 @@ public class Factories {
     /**
      * @param minimum inclusive lower bound of the returned values
      * @param maximum exclusive upper bound of the returned values
-     * @return a factory for a {@link RandomDoubleProvider} uniformly distributed over the range
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link RandomDoubleProvider} uniformly distributed over the range
      * @see RandomDoubleProvider
      */
     public static RandomDoubleProviderFactory randomDouble(
@@ -68,7 +69,8 @@ public class Factories {
     /**
      * @param minimum inclusive lower bound of the returned values
      * @param maximum inclusive upper bound of the returned values
-     * @return a factory for a {@link RandomIntProvider} uniformly distributed over the range
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link RandomIntProvider} uniformly distributed over the range
      * @see RandomIntProvider
      */
     public static RandomIntProviderFactory randomInt(
@@ -80,7 +82,8 @@ public class Factories {
 
     /**
      * @param mean the mean of the Poisson distribution the resulting provider draws from
-     * @return a factory for a {@link RandomPoissonProvider} with the given mean
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link RandomPoissonProvider} with the given mean
      * @see RandomPoissonProvider
      */
     public static RandomPoissonProviderFactory randomPoisson(
