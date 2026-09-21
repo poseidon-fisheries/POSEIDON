@@ -52,12 +52,4 @@ public class Factories {
     ) {
         return new NotFactory<S, T>(predicate);
     }
-
-    public static AlwaysTrueFactory alwaysTrue() {
-        return new AlwaysTrueFactory();
-    }
-
-    public static AlwaysFalseFactory alwaysFalse() {
-        return new AlwaysFalseFactory();
-    }
 }

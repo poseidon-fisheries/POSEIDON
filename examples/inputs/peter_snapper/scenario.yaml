@@ -32,10 +32,17 @@ components:
           - !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
             extractor: !!uk.ac.ox.poseidon.geography.grids.extractors.CellValueFactory
               grid: *id003
-            predicate: !!uk.ac.ox.poseidon.core.predicates.numeric.BetweenFactory {
-              maximum: -30.0,
-              minimum: -800.0
-            }
+            predicate: !!uk.ac.ox.poseidon.core.predicates.comparable.BetweenFactory
+              includeMaximum: true
+              includeMinimum: true
+              maximum: !!uk.ac.ox.poseidon.core.providers.constant.ConstantProviderFactory
+                object: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {
+                  value: -30.0
+                }
+              minimum: !!uk.ac.ox.poseidon.core.providers.constant.ConstantProviderFactory
+                object: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {
+                  value: -800.0
+                }
         delegateAllocator: !!uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory
           doubleSupplier: !!uk.ac.ox.poseidon.core.providers.constant.ConstantDoubleProviderFromValueFactory {
             value: 1.0
@@ -171,8 +178,9 @@ components:
                 destinationSupplier: !!uk.ac.ox.poseidon.agents.choices.EpsilonGreedyDestinationSupplierFactory
                   epsilon: 0.2
                   exploiter: !!uk.ac.ox.poseidon.agents.choices.ImitatingPickerFactory
-                    optionPredicate: !!uk.ac.ox.poseidon.core.predicates.logical.AlwaysTrueFactory {
-                      }
+                    optionPredicate: !!uk.ac.ox.poseidon.core.providers.constant.ConstantBooleanProviderFactory {
+                      value: true
+                    }
                     optionValues: &id012 !!uk.ac.ox.poseidon.agents.components.RegisteredVesselComponentFactory
                       componentFactory: !!uk.ac.ox.poseidon.agents.choices.ExponentialMovingAverageOptionValuesFactory {
                         alpha: 1.0
@@ -194,9 +202,11 @@ components:
                     cellPredicate: &id010 !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
                       extractor: !!uk.ac.ox.poseidon.geography.grids.extractors.CellValueFactory
                         grid: *id004
-                      predicate: !!uk.ac.ox.poseidon.core.predicates.numeric.GreaterThanFactory {
-                        threshold: 0.0
-                      }
+                      predicate: !!uk.ac.ox.poseidon.core.predicates.comparable.GreaterThanFactory
+                        value: !!uk.ac.ox.poseidon.core.providers.constant.ConstantProviderFactory
+                          object: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {
+                            value: 0.0
+                          }
                     fallbackCellPicker: !!uk.ac.ox.poseidon.agents.choices.RandomGridExplorerFactory
                       cellPredicate: *id010
                       cellsSupplier: !!uk.ac.ox.poseidon.agents.vessels.providers.AccessibleWaterCellsFactory
@@ -241,19 +251,22 @@ components:
                       - !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
                         extractor: !!uk.ac.ox.poseidon.agents.vessels.extractors.AvailableHoldCapacityInKgFactory {
                           }
-                        predicate: !!uk.ac.ox.poseidon.core.predicates.numeric.GreaterThanFactory {
-                          threshold: 1.0
-                        }
+                        predicate: !!uk.ac.ox.poseidon.core.predicates.comparable.GreaterThanFactory
+                          value: !!uk.ac.ox.poseidon.core.providers.constant.ConstantProviderFactory
+                            object: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {
+                              value: 1.0
+                            }
                       - !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
-                        extractor: !!uk.ac.ox.poseidon.agents.vessels.extractors.CurrentTripDurationFactory {
+                        extractor: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripDurationFactory {
                           }
                         predicate: !!uk.ac.ox.poseidon.core.predicates.comparable.LessThanFactory
-                          value: !!uk.ac.ox.poseidon.core.time.DurationFactory {
-                            days: 10,
-                            hours: 0,
-                            minutes: 0,
-                            seconds: 0
-                          }
+                          value: !!uk.ac.ox.poseidon.core.providers.constant.ConstantProviderFactory
+                            object: !!uk.ac.ox.poseidon.core.time.DurationFactory {
+                              days: 10,
+                              hours: 0,
+                              minutes: 0,
+                              seconds: 0
+                            }
                   guard: null
                 guard: null
               - !!uk.ac.ox.poseidon.agents.tasks.travel.SetDestinationToOriginFactory {
