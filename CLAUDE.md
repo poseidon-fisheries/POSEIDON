@@ -110,21 +110,24 @@ documented in four different places, once each, not duplicated across them:
 - **Component class** (the plain value/config class actually doing the work, e.g.
   `ConstantProvider`) carries the real behavior doc: what it does, semantics, edge cases. This is
   the one source of truth — put depth here, nowhere else.
-- **`Factory` subclass** (the YAML bean) gets a one-line pointer only: `{@link Factory} counterpart
-  of {@link Component}, built via {@code Factories.method(...)}.` No behavior explanation —
-  scenario-building code never touches these directly (per "Core architectural pattern" above), so
-  a reader here just needs to be routed to the component and to the helper that builds it.
-- **Scope semantics are documented once, not per factory.** Every `*ScopeFactory` base class
-  (`GlobalScopeFactory`, `SimulationScopeFactory`, `RelativeScopeFactory` in `core`;
-  domain-specific ones like `VesselScopeFactory` in `agents`) carries the real explanation of what
-  that scope means and when to reach for it, on the class itself. Never restate that explanation in
-  free text on a leaf `Factory` subclass — copies drift. Instead, every leaf `Factory` subclass's
-  one-liner ends with a fixed-form pointer to whichever `*ScopeFactory` it directly extends:
-  `Scope: {@link SimulationScopeFactory}.` (substitute the actual superclass). Repeat the identical
-  pointer on the corresponding `Factories` helper method.
+- **`Factory` subclass** (the YAML bean) gets a one-line pointer only: `A
+  {@link GlobalScopeFactory} counterpart of {@link Component}, built via
+  {@code Factories.method(...)}.` — naming whichever `*ScopeFactory` the leaf class directly
+  extends (`GlobalScopeFactory`, `SimulationScopeFactory`, `RelativeScopeFactory` in `core`;
+  domain-specific ones like `VesselScopeFactory` in `agents`) in place of the generic `Factory`.
+  No behavior explanation — scenario-building code never touches these directly (per "Core
+  architectural pattern" above), so a reader here just needs to be routed to the component and to
+  the helper that builds it.
+- **Scope semantics are documented once, not per factory.** Each `*ScopeFactory` base class
+  carries the real explanation of what that scope means and when to reach for it, on the class
+  itself. Never restate that explanation in free text on a leaf `Factory` subclass — copies drift.
+  The `{@link GlobalScopeFactory}` in the one-liner above is the pointer; no separate "Scope:" line
+  is needed. Do the same on the corresponding `Factories` helper method's `@return`: `@return a
+  {@link GlobalScopeFactory} for a {@link Component} that always returns {@code true}`.
 - **Static `Factories` helper method** is the discoverability layer: this is what scenario-building
   code actually calls and what autocomplete surfaces. Document `@param`/`@return` for what the
-  method takes and produces, plus `@see Component` for the full behavior — not a re-explanation.
+  method takes and produces (the scope link folded into `@return` per above), plus `@see Component`
+  for the full behavior — not a re-explanation.
 - **`Factories` class itself** gets a short class-level Javadoc: one or two sentences naming what
   the grouped static methods produce (e.g. "Factories for `Provider`s that always return a fixed
   value.") — the entry point a reader lands on before drilling into individual methods.
