@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link Condition}, built via
+ * {@link Factories Factories.condition(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

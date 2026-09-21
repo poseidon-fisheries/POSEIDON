@@ -32,10 +32,21 @@ import java.util.function.Supplier;
 
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
+/**
+ * Factories for {@link Predicate}s that test a value derived from, or drawn against, other
+ * factory-resolved inputs.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @param extractor the function applied to the tested input before checking {@code predicate}
+     * @param predicate the predicate the extracted value is tested against
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link Condition} that
+     * composes the given extractor and predicate
+     * @see Condition
+     */
     public static <S extends Scope, T, U> ConditionFactory<S, T, U> condition(
         final Factory<? super S, ? extends Function<? super T, U>> extractor,
         final Factory<? super S, ? extends Predicate<? super U>> predicate
@@ -43,16 +54,34 @@ public class Factories {
         return new ConditionFactory<>(extractor, predicate);
     }
 
+    /**
+     * @param value the value the resulting predicate tests against
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link Equal} predicate
+     * over the given literal value
+     * @see Equal
+     */
     public static <S extends Scope, T> EqualFactory<S, T> equal(final T value) {
         return equal(constant(value));
     }
 
+    /**
+     * @param value factory for the value the resulting predicate tests against
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link Equal} predicate
+     * over the resolved value
+     * @see Equal
+     */
     public static <S extends Scope, T> EqualFactory<S, T> equal(
         final Factory<? super S, ? extends Supplier<? extends T>> value
     ) {
         return new EqualFactory<>(value);
     }
 
+    /**
+     * @param values factory for the collection the resulting predicate tests membership against
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link InSet} predicate
+     * over the resolved collection
+     * @see InSet
+     */
     public static <S extends Scope, T> InSetFactory<S, T> in(
         final Factory<? super S, ? extends Supplier<? extends Collection<? extends T>>> values
     ) {

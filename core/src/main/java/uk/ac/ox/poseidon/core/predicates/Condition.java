@@ -27,6 +27,14 @@ import lombok.RequiredArgsConstructor;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * A {@link Predicate} that extracts a value from its input via a {@link Function}, then tests
+ * that extracted value against another predicate. Built via
+ * {@link Factories Factories.condition(...)} in this package.
+ *
+ * @param <T> the type of input tested
+ * @param <U> the type extracted from the input and actually tested
+ */
 @RequiredArgsConstructor
 public class Condition<T, U> implements Predicate<T> {
 

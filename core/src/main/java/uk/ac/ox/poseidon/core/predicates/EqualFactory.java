@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Supplier;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link Equal}, built via
+ * {@link Factories Factories.equal(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

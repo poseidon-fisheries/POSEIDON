@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,27 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates;
-
-import lombok.RequiredArgsConstructor;
-
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 /**
- * A {@link Predicate} that is true iff the tested value {@link Object#equals(Object) equals} a
- * supplied value. Built via {@link Factories Factories.equal(...)} in this package.
- *
- * @param <T> the type of input tested
+ * {@link java.util.function.Predicate}s that test a value derived from, or drawn against, other
+ * factory-resolved inputs ({@link uk.ac.ox.poseidon.core.predicates.Condition},
+ * {@link uk.ac.ox.poseidon.core.predicates.Equal}, {@link uk.ac.ox.poseidon.core.predicates.InSet}).
+ * See {@link uk.ac.ox.poseidon.core.predicates.Factories} for the entry points. Sibling packages
+ * {@link uk.ac.ox.poseidon.core.predicates.logical} and
+ * {@link uk.ac.ox.poseidon.core.predicates.comparable} hold predicate combinators and
+ * comparison-based predicates, respectively.
  */
-@RequiredArgsConstructor
-public class Equal<T> implements Predicate<T> {
-
-    private final Supplier<? extends T> value;
-
-    @Override
-    public boolean test(final T t) {
-        return value.get().equals(t);
-    }
-
-}
+package uk.ac.ox.poseidon.core.predicates;

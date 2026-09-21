@@ -37,6 +37,11 @@ import java.util.function.Supplier;
 
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link InSet}, built via
+ * {@link Factories Factories.in(...)} or the literal-values convenience {@link #of(Object[])} on
+ * this class.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,6 +50,10 @@ public class InSetFactory<S extends Scope, T> extends RelativeScopeFactory<S, In
 
     private Factory<? super S, ? extends Supplier<? extends Collection<? extends T>>> values;
 
+    /**
+     * @param values the literal values the resulting predicate tests membership against
+     * @return an {@link InSetFactory} for an {@link InSet} predicate over the given values
+     */
     @SafeVarargs
     public static <T> InSetFactory<Scope, T> of(final T... values) {
         return new InSetFactory<>(constant(new ObjectFactory<>(ImmutableSet.copyOf(values))));

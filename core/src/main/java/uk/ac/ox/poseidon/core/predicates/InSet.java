@@ -28,6 +28,12 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/**
+ * A {@link Predicate} that is true iff the tested value is a member of a supplied collection.
+ * Built via {@link Factories Factories.in(...)} in this package.
+ *
+ * @param <T> the type of input tested
+ */
 @RequiredArgsConstructor
 public class InSet<T> implements Predicate<T> {
 
