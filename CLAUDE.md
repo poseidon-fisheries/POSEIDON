@@ -114,12 +114,14 @@ documented in four different places, once each, not duplicated across them:
   of {@link Component}, built via {@code Factories.method(...)}.` No behavior explanation —
   scenario-building code never touches these directly (per "Core architectural pattern" above), so
   a reader here just needs to be routed to the component and to the helper that builds it.
-  If the `Factory` subclass is anything other than `RelativeScopeFactory` (i.e. it hard-codes
-  `GlobalScopeFactory`, `PerSimulationFactory`, `SimulationScopeFactory`, or similar), state the
-  scope and why in a second sentence — e.g. `Scope: global — one instance shared across every
-  simulation built from this scenario.` `RelativeScopeFactory` is the default/common case and
-  needs no such note. Repeat the same one-line scope note on the corresponding `Factories` helper
-  method, since that's what callers read before wiring the factory in, not the bean class itself.
+- **Scope semantics are documented once, not per factory.** Every `*ScopeFactory` base class
+  (`GlobalScopeFactory`, `SimulationScopeFactory`, `RelativeScopeFactory` in `core`;
+  domain-specific ones like `VesselScopeFactory` in `agents`) carries the real explanation of what
+  that scope means and when to reach for it, on the class itself. Never restate that explanation in
+  free text on a leaf `Factory` subclass — copies drift. Instead, every leaf `Factory` subclass's
+  one-liner ends with a fixed-form pointer to whichever `*ScopeFactory` it directly extends:
+  `Scope: {@link SimulationScopeFactory}.` (substitute the actual superclass). Repeat the identical
+  pointer on the corresponding `Factories` helper method.
 - **Static `Factories` helper method** is the discoverability layer: this is what scenario-building
   code actually calls and what autocomplete surfaces. Document `@param`/`@return` for what the
   method takes and produces, plus `@see Component` for the full behavior — not a re-explanation.
@@ -132,7 +134,7 @@ documented in four different places, once each, not duplicated across them:
   entry point instead of having to guess which class to open.
 
 Don't write the same behavioral explanation twice across the triplet; every doc comment except the
-component's should be a pointer, not prose.
+component's and the `*ScopeFactory` base classes' should be a pointer, not prose.
 
 The pattern itself — why the triplet exists, why scenario code never calls `.get()` directly — is
 already covered in "Core architectural pattern" above; don't restate it in per-package Javadoc.
