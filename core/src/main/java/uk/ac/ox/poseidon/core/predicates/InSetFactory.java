@@ -39,7 +39,7 @@ import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link InSet}, built via
- * {@link Factories Factories.in(...)} or the literal-values convenience {@link #of(Object[])} on
+ * {@link Factories#in(Factory)} or the literal-values convenience {@link #of(Object[])} on
  * this class.
  */
 @Data

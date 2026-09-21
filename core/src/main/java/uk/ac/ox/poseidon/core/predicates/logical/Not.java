@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 
 /**
  * A {@link Predicate} that negates the result of a wrapped predicate. Built via
- * {@link Factories Factories.not(...)} in this package.
+ * {@link Factories#not(uk.ac.ox.poseidon.core.Factory)} in this package.
  *
  * @param <T> the type of input tested
  */

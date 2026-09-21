@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of {@link MaxAggregator}, built via
- * {@link Factories Factories.maxAggregator()}.
+ * {@link Factories#maxAggregator()}.
  */
 @Data
 @NoArgsConstructor

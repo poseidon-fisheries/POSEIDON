@@ -31,7 +31,7 @@ import java.time.LocalTime;
 /**
  * A {@link Provider} that returns the simulation's current time of day, read live from the
  * {@link TemporalSchedule} on every call. Built via
- * {@link Factories Factories.currentTime()} in this package.
+ * {@link Factories#currentTime()} in this package.
  */
 @RequiredArgsConstructor
 public class CurrentTimeProvider implements Provider<LocalTime> {

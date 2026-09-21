@@ -30,7 +30,8 @@ import java.util.function.Predicate;
 /**
  * A {@link Predicate} that extracts a value from its input via a {@link Function}, then tests
  * that extracted value against another predicate. Built via
- * {@link Factories Factories.condition(...)} in this package.
+ * {@link Factories#condition(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * in this package.
  *
  * @param <T> the type of input tested
  * @param <U> the type extracted from the input and actually tested

@@ -32,7 +32,7 @@ import java.time.LocalTime;
 /**
  * A {@link Provider} that returns the given time of day on the simulation's next calendar day
  * (i.e. always one day after the current simulated date), recomputed on every call. Built via
- * {@link Factories Factories.nextDayAtTime(...)} in this package.
+ * {@link Factories#nextDayAtTime(Factory)} in this package.
  */
 @RequiredArgsConstructor
 public class NextDayAtTimeProvider implements Provider<LocalDateTime> {

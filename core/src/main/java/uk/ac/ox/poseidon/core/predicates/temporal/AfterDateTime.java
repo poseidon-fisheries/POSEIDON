@@ -31,7 +31,8 @@ import java.util.function.Supplier;
 
 /**
  * A {@link Predicate} that is true iff the tested date-time is strictly after a supplied
- * reference date-time. Built via {@link Factories Factories.afterDateTime(...)} in this package.
+ * reference date-time. Built via
+ * {@link Factories#afterDateTime(uk.ac.ox.poseidon.core.Factory)} in this package.
  */
 @Getter
 @RequiredArgsConstructor

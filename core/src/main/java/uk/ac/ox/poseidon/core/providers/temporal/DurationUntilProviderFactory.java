@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link DurationUntilProvider}, built via
- * {@link Factories Factories.durationUntil(...)}.
+ * {@link Factories#durationUntil(Factory)}.
  */
 @Data
 @NoArgsConstructor

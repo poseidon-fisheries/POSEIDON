@@ -35,7 +35,7 @@ import java.util.function.Predicate;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link Condition}, built via
- * {@link Factories Factories.condition(...)}.
+ * {@link Factories#condition(Factory, Factory)}.
  */
 @Data
 @NoArgsConstructor

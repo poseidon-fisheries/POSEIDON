@@ -31,7 +31,7 @@ import java.time.DayOfWeek;
 /**
  * A {@link Provider} that returns the simulation's current day of the week, read live from the
  * {@link TemporalSchedule} on every call. Built via
- * {@link Factories Factories.currentDayOfWeek()} in this package.
+ * {@link Factories#currentDayOfWeek()} in this package.
  */
 @RequiredArgsConstructor
 public class CurrentDayOfWeekProvider implements Provider<DayOfWeek> {

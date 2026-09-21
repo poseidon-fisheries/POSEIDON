@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link Not}, built via
- * {@link Factories Factories.not(...)}.
+ * {@link Factories#not(Factory)}.
  */
 @Data
 @NoArgsConstructor

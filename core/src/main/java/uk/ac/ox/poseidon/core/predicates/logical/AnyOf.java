@@ -30,8 +30,8 @@ import java.util.stream.Stream;
 
 /**
  * A {@link Predicate} that is true iff at least one of its component predicates is true for the
- * given input (false for zero predicates). Built via {@link Factories Factories.anyOf(...)} in this
- * package.
+ * given input (false for zero predicates). Built via
+ * {@link Factories#anyOf(uk.ac.ox.poseidon.core.Factory...)} in this package.
  *
  * @param <T> the type of input tested
  */

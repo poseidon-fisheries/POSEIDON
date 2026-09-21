@@ -31,8 +31,8 @@ import java.util.function.Supplier;
 
 /**
  * A {@link Predicate} that is true iff the tested date-time is strictly before a supplied
- * reference date-time. Built via {@link Factories Factories.dateTimeIsBefore(...)} in this
- * package.
+ * reference date-time. Built via
+ * {@link Factories#dateTimeIsBefore(uk.ac.ox.poseidon.core.Factory)} in this package.
  */
 @Getter
 @RequiredArgsConstructor

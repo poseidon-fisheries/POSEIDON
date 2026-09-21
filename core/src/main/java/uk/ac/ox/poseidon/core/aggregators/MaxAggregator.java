@@ -28,7 +28,7 @@ import java.util.stream.DoubleStream;
 /**
  * An {@link Aggregator} that returns the maximum of its input numbers, or
  * {@link java.util.OptionalDouble#empty()} for an empty input. Built via
- * {@link Factories Factories.maxAggregator()} in this package.
+ * {@link Factories#maxAggregator()} in this package.
  */
 public class MaxAggregator implements Aggregator {
     @Override

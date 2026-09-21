@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link AfterDateTime}, built via
- * {@link Factories Factories.afterDateTime(...)}.
+ * {@link Factories#afterDateTime(Factory)}.
  */
 @Data
 @NoArgsConstructor

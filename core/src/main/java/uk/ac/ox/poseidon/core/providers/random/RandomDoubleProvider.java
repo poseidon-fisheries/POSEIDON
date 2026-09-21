@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * A {@link DoubleProvider} that returns a uniformly distributed random value in
  * {@code [minimum, maximum)} on each call, drawn from the simulation's shared RNG. Built via
- * {@link Factories Factories.randomDouble(...)} in this package.
+ * {@link Factories#randomDouble(double, double)} in this package.
  */
 public class RandomDoubleProvider implements DoubleProvider {
 

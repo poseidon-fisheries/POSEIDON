@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * An {@link IntProvider} that returns a uniformly distributed random integer in the inclusive
  * range {@code [minimum, maximum]} on each call, drawn from the simulation's shared RNG. Built via
- * {@link Factories Factories.randomInt(...)} in this package.
+ * {@link Factories#randomInt(int, int)} in this package.
  */
 public class RandomIntProvider implements IntProvider {
 

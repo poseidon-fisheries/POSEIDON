@@ -35,7 +35,7 @@ import java.util.function.Predicate;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link AnyOf}, built via
- * {@link Factories Factories.anyOf(...)}.
+ * {@link Factories#anyOf(Factory...)}.
  */
 @Data
 @NoArgsConstructor
