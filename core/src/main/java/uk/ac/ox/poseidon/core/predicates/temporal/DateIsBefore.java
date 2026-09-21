@@ -29,6 +29,10 @@ import java.time.LocalDate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/**
+ * A {@link Predicate} that is true iff the tested date is strictly before a supplied reference
+ * date. Built via {@link Factories Factories.dateIsBefore(...)} in this package.
+ */
 @Getter
 @RequiredArgsConstructor
 public class DateIsBefore implements Predicate<LocalDate> {

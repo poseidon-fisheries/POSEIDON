@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,27 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.temporal;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-import java.time.LocalDate;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 /**
- * A {@link Predicate} that is true iff the tested date is strictly after a supplied reference
- * date. Built via {@link Factories Factories.afterDate(...)} in this package.
+ * {@link java.util.function.Predicate}s that compare a tested date, time, or date-time against a
+ * reference. See {@link uk.ac.ox.poseidon.core.predicates.temporal.Factories} for the entry
+ * points.
  */
-@Getter
-@RequiredArgsConstructor
-public class AfterDate implements Predicate<LocalDate> {
-
-    private final Supplier<? extends LocalDate> referenceDate;
-
-    @Override
-    public boolean test(final LocalDate localDate) {
-        return localDate.isAfter(referenceDate.get());
-    }
-}
+package uk.ac.ox.poseidon.core.predicates.temporal;

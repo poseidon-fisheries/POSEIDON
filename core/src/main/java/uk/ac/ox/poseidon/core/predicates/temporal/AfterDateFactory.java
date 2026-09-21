@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.time.LocalDate;
 import java.util.function.Supplier;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link AfterDate}, built via
+ * {@link Factories Factories.afterDate(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

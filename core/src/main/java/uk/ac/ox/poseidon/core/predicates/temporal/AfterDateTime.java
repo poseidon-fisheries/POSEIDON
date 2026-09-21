@@ -29,6 +29,10 @@ import java.time.LocalDateTime;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/**
+ * A {@link Predicate} that is true iff the tested date-time is strictly after a supplied
+ * reference date-time. Built via {@link Factories Factories.afterDateTime(...)} in this package.
+ */
 @Getter
 @RequiredArgsConstructor
 public class AfterDateTime implements Predicate<LocalDateTime> {
