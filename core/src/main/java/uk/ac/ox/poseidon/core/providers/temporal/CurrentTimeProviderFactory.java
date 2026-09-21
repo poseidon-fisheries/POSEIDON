@@ -28,6 +28,10 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+/**
+ * A {@link SimulationScopeFactory} counterpart of {@link CurrentTimeProvider}, built via
+ * {@code Factories.currentTime()}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)

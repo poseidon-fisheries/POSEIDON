@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * A {@link SimulationScopeFactory} counterpart of {@link NextTimeAtProvider}, built via
+ * {@code Factories.nextTimeAt(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

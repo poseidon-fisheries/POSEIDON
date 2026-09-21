@@ -30,36 +30,77 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that read the simulation's
+ * current or upcoming date/time from its {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link CurrentDateProvider}
+     * @see CurrentDateProvider
+     */
     public static CurrentDateProviderFactory currentDate() {
         return new CurrentDateProviderFactory();
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link CurrentYearProvider}
+     * @see CurrentYearProvider
+     */
     public static CurrentYearProviderFactory currentYear() {
         return new CurrentYearProviderFactory();
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link CurrentDateTimeProvider}
+     * @see CurrentDateTimeProvider
+     */
     public static CurrentDateTimeProviderFactory currentDateTime() {
         return new CurrentDateTimeProviderFactory();
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link CurrentDayOfWeekProvider}
+     * @see CurrentDayOfWeekProvider
+     */
     public static CurrentDayOfWeekProviderFactory currentDayOfWeek() {
         return new CurrentDayOfWeekProviderFactory();
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link CurrentTimeProvider}
+     * @see CurrentTimeProvider
+     */
     public static CurrentTimeProviderFactory currentTime() {
         return new CurrentTimeProviderFactory();
     }
 
+    /**
+     * @param time the time of day the resulting provider will resolve to on the following day
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link NextDayAtTimeProvider}
+     * @see NextDayAtTimeProvider
+     */
     public static NextDayAtTimeProviderFactory nextDayAtTime(
         final Factory<? super SimulationScope, ? extends LocalTime> time
     ) {
         return new NextDayAtTimeProviderFactory(time);
     }
 
+    /**
+     * @param times the candidate times of day the resulting provider picks the next of
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link NextTimeAtProvider}
+     * @see NextTimeAtProvider
+     */
     @SafeVarargs
     public static NextTimeAtProviderFactory nextTimeAt(
         final Factory<? super SimulationScope, ? extends LocalTime>... times
@@ -67,6 +108,13 @@ public class Factories {
         return new NextTimeAtProviderFactory(List.of(times));
     }
 
+    /**
+     * @param referenceDateTime factory for the date-time the resulting provider computes the
+     *                          duration until; must resolve to a value after the current time
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+     * a {@link DurationUntilProvider}
+     * @see DurationUntilProvider
+     */
     public static DurationUntilProviderFactory durationUntil(
         final Factory<? super SimulationScope, ? extends Supplier<LocalDateTime>> referenceDateTime
     ) {

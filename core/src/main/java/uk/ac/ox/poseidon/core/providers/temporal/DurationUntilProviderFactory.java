@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
+/**
+ * A {@link SimulationScopeFactory} counterpart of {@link DurationUntilProvider}, built via
+ * {@code Factories.durationUntil(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

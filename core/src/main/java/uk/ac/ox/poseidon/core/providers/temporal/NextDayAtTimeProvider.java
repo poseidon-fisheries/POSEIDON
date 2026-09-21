@@ -29,6 +29,11 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+/**
+ * A {@link Provider} that returns the given time of day on the simulation's next calendar day
+ * (i.e. always one day after the current simulated date), recomputed on every call. Built via
+ * {@code Factories.nextDayAtTime(...)} in this package.
+ */
 @RequiredArgsConstructor
 public class NextDayAtTimeProvider implements Provider<LocalDateTime> {
 

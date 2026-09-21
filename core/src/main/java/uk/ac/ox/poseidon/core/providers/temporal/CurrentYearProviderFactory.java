@@ -26,6 +26,10 @@ import lombok.EqualsAndHashCode;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+/**
+ * A {@link SimulationScopeFactory} counterpart of {@link CurrentYearProvider}, built via
+ * {@code Factories.currentYear()}.
+ */
 @EqualsAndHashCode(callSuper = true)
 public class CurrentYearProviderFactory extends SimulationScopeFactory<CurrentYearProvider> {
     @Override
