@@ -102,6 +102,39 @@ varies per scope. A plain literal that's just configuration — a `String`, `dou
 consistency" or "to be safe" is over-engineering: it adds a layer of indirection nothing resolves
 differently through, and every call site has to write `scope -> "value"` for no gain.
 
+## Javadoc conventions
+
+The component/`Factory`/`Factories`-helper triplet (see "Core architectural pattern" above) gets
+documented in four different places, once each, not duplicated across them:
+
+- **Component class** (the plain value/config class actually doing the work, e.g.
+  `ConstantProvider`) carries the real behavior doc: what it does, semantics, edge cases. This is
+  the one source of truth — put depth here, nowhere else.
+- **`Factory` subclass** (the YAML bean) gets a one-line pointer only: `{@link Factory} counterpart
+  of {@link Component}, built via {@code Factories.method(...)}.` No behavior explanation —
+  scenario-building code never touches these directly (per "Core architectural pattern" above), so
+  a reader here just needs to be routed to the component and to the helper that builds it.
+  If the `Factory` subclass is anything other than `RelativeScopeFactory` (i.e. it hard-codes
+  `GlobalScopeFactory`, `PerSimulationFactory`, `SimulationScopeFactory`, or similar), state the
+  scope and why in a second sentence — e.g. `Scope: global — one instance shared across every
+  simulation built from this scenario.` `RelativeScopeFactory` is the default/common case and
+  needs no such note. Repeat the same one-line scope note on the corresponding `Factories` helper
+  method, since that's what callers read before wiring the factory in, not the bean class itself.
+- **Static `Factories` helper method** is the discoverability layer: this is what scenario-building
+  code actually calls and what autocomplete surfaces. Document `@param`/`@return` for what the
+  method takes and produces, plus `@see Component` for the full behavior — not a re-explanation.
+- **`Factories` class itself** gets a short class-level Javadoc: one or two sentences naming what
+  the grouped static methods produce (e.g. "Factories for `Provider`s that always return a fixed
+  value.") — the entry point a reader lands on before drilling into individual methods.
+
+Don't write the same behavioral explanation twice across the triplet; every doc comment except the
+component's should be a pointer, not prose.
+
+The pattern itself — why the triplet exists, why scenario code never calls `.get()` directly — is
+already covered in "Core architectural pattern" above; don't restate it in per-package Javadoc.
+Package `package-info.java` files may add package-specific context but should `@link` back to
+`Factory`/`Scenario` rather than re-explaining the general pattern.
+
 ## Lombok usage
 
 Lombok (`buildlogic.java-common-conventions`, all modules) is used pervasively to cut constructor/
