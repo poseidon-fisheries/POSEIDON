@@ -112,17 +112,32 @@ documented in four different places, once each, not duplicated across them:
   the one source of truth — put depth here, nowhere else.
 - **`Factory` subclass** (the YAML bean) gets a one-line pointer only: `A
   {@link GlobalScopeFactory} counterpart of {@link Component}, built via
-  {@link Factories Factories.method(...)}.` — naming whichever `*ScopeFactory` the leaf class
-  directly extends (`GlobalScopeFactory`, `SimulationScopeFactory`, `RelativeScopeFactory` in
-  `core`; domain-specific ones like `VesselScopeFactory` in `agents`) in place of the generic
-  `Factory`. The `built via` half is a real `{@link}` to the `Factories` class (not `{@code}`) so
-  it's clickable, but always links the class itself, never a specific overload — `{@link}`'s label
-  renders in code font, matching how `{@code}` used to look, without pretending one overload is
-  "the" one. When multiple distinct method *names* apply (not overloads, e.g.
-  `alwaysTrue()`/`alwaysFalse()`), combine them in one link's label:
-  `{@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()}`. No behavior explanation —
-  scenario-building code never touches these directly (per "Core architectural pattern" above), so
-  a reader here just needs to be routed to the component and to the helper that builds it.
+  {@link Factories#method(Factory)}.` — naming whichever `*ScopeFactory` the leaf class directly
+  extends (`GlobalScopeFactory`, `SimulationScopeFactory`, `RelativeScopeFactory` in `core`;
+  domain-specific ones like `VesselScopeFactory` in `agents`) in place of the generic `Factory`.
+  The `built via` half is a real `{@link}`, clickable, not `{@code}`. How it's written depends on
+  how many `Factories` methods build this component:
+  - **Exactly one method builds this component, however many overloads that method has:** link
+    straight to it — `{@link Factories#method(Factory)}` if it's overloaded (name the erasure of
+    one overload's params to disambiguate; Javadoc renders the label from the signature, no custom
+    label needed), or plain `{@link Factories#method()}` if it isn't. There's nothing to hide
+    behind a class-level link when only one method reaches this component — link it directly. This
+    is the common case; check it first before reaching for the fallbacks below.
+  - **More than one overload of the same method name independently builds this exact component**
+    (e.g. `between(double, double)` and `between(Factory, Factory)` both ultimately return a
+    `BetweenFactory`): link the class with a custom label instead of picking one overload to stand
+    for all of them: `{@link Factories Factories.method(...)}`.
+  - **More than one distinct method *name* builds this component** (not overloads, e.g.
+    `alwaysTrue()`/`alwaysFalse()` both returning `ConstantBooleanProviderFactory`): combine them
+    in one class-level link's label: `{@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()}`.
+
+  Don't assume same-name overloads share a target or a distinct name doesn't — check what each
+  overload actually returns (e.g. `constantDouble(double)` and `constantDouble(Factory)` return two
+  *different* factory classes despite sharing a name, so each gets its own direct link; `constant(T)`
+  and `constant(Factory)` both return the same `ConstantProviderFactory`, so that one stays a
+  class-level link). No behavior explanation on the `Factory` subclass — scenario-building code
+  never touches these directly (per "Core architectural pattern" above), so a reader here just
+  needs to be routed to the component and to the helper that builds it.
 - **Scope semantics are documented once, not per factory.** Each `*ScopeFactory` base class
   carries the real explanation of what that scope means and when to reach for it, on the class
   itself. Never restate that explanation in free text on a leaf `Factory` subclass — copies drift.
