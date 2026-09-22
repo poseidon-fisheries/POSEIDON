@@ -54,6 +54,12 @@ public abstract class AbstractNetCdfGridReader implements AutoCloseable {
     protected final String latitudeDimensionName;
     protected final String longitudeDimensionName;
 
+    /**
+     * @param ncFile                 the NetCDF file to open
+     * @param latitudeDimensionName  the name of the latitude dimension/coordinate variable
+     * @param longitudeDimensionName the name of the longitude dimension/coordinate variable
+     * @throws RuntimeException if an I/O error occurs
+     */
     protected AbstractNetCdfGridReader(
         final Path ncFile,
         final String latitudeDimensionName,
@@ -68,10 +74,12 @@ public abstract class AbstractNetCdfGridReader implements AutoCloseable {
         this.longitudeDimensionName = longitudeDimensionName;
     }
 
+    /** @return the size of the longitude dimension */
     public int getLonDimensionSize() {
         return findDimension(longitudeDimensionName).getLength();
     }
 
+    /** @return the size of the latitude dimension */
     public int getLatDimensionSize() {
         return findDimension(latitudeDimensionName).getLength();
     }
@@ -162,6 +170,11 @@ public abstract class AbstractNetCdfGridReader implements AutoCloseable {
         return values;
     }
 
+    /**
+     * @param variableName the name of the variable to read
+     * @return the variable's full raw content
+     * @throws RuntimeException if an I/O error occurs
+     */
     protected Array readVariable(final String variableName) {
         try {
             return findVariable(variableName).read();
@@ -200,6 +213,7 @@ public abstract class AbstractNetCdfGridReader implements AutoCloseable {
         return variable;
     }
 
+    /** @throws RuntimeException if an I/O error occurs */
     @Override
     public void close() {
         try {

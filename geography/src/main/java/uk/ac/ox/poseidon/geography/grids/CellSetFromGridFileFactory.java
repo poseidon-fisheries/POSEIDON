@@ -37,6 +37,13 @@ import java.nio.file.Path;
 
 import static lombok.AccessLevel.PACKAGE;
 
+/**
+ * A {@link RelativeScopeFactory} that reads a raster grid file and returns the set of cells whose
+ * value equals a fixed target — e.g. picking out land cells from a land/water raster. There's no
+ * separate plain component class here: the produced {@link ImmutableSet} is returned as-is, with
+ * no wrapper type to carry documentation, so this factory carries the behavior doc directly.
+ * Built via {@link Factories#cellSetFromGridFile(Factory, double)} in this package.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(access = PACKAGE)
@@ -47,6 +54,7 @@ public class CellSetFromGridFileFactory<S extends Scope>
     private Factory<? super S, ? extends Path> path;
     private double includedValue;
 
+    /** @throws RuntimeException if {@code path} doesn't point to a file */
     @Override
     protected ImmutableSet<Int2D> newInstance(final S scope) {
         final File gridFile = path.get(scope).toFile();

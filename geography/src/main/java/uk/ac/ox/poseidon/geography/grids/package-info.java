@@ -20,32 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.grids.extractors;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link CellValue}, built via
- * {@link Factories#cellValue(Factory)}.
+ * The rectangular cell grid ({@link uk.ac.ox.poseidon.geography.grids.ModelGrid}) underlying
+ * every other spatial component in this module, plus grids of values over it
+ * ({@link uk.ac.ox.poseidon.geography.grids.DoubleGrid},
+ * {@link uk.ac.ox.poseidon.geography.grids.ObjectGrid}) and readers for raster/NetCDF data
+ * files. Subpackages build category-specific value extractors ({@code extractors}) and
+ * aggregators ({@code suppliers}) on top of these. See
+ * {@link uk.ac.ox.poseidon.geography.grids.Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class CellValueFactory<S extends Scope> extends RelativeScopeFactory<S, CellValue> {
-
-    private Factory<? super S, ? extends DoubleGrid> grid;
-
-    @Override
-    protected CellValue newInstance(final S scope) {
-        return new CellValue(grid.get(scope));
-    }
-
-}
+package uk.ac.ox.poseidon.geography.grids;

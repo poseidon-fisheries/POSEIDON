@@ -33,6 +33,12 @@ import uk.ac.ox.poseidon.geography.Envelope;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.math.DoubleMath.isMathematicalInteger;
 
+/**
+ * A {@link GlobalScopeFactory} for a {@link ModelGrid} covering a fixed geographic bounding box,
+ * divided into cells of a fixed resolution (both dimensions must divide evenly into the
+ * resolution). Built via
+ * {@link Factories#modelGrid(double, double, double, double, double)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,6 +51,10 @@ public class ModelGridFactory extends GlobalScopeFactory<ModelGrid> {
     private double southLatitude;
     private double northLatitude;
 
+    /**
+     * @throws IllegalStateException if the width or height (in degrees) isn't an exact multiple
+     *                                of {@code resolutionInDegrees}
+     */
     @Override
     protected ModelGrid newInstance(final Scope scope) {
         final double widthInDegrees = eastLongitude - westLongitude;

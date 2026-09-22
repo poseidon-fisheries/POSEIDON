@@ -22,8 +22,10 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+/** Something defined over a {@link ModelGrid}. */
 public interface Grid {
 
+    /** @return the grid this is defined over */
     ModelGrid getModelGrid();
 
 }

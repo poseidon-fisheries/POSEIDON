@@ -27,6 +27,7 @@ import lombok.Getter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
 
+/** An {@link AbstractModelGrid} where every cell is active. Built via {@link ModelGrid#create}. */
 class ModelGridWithAllCellsActive extends AbstractModelGrid {
 
     @Getter(lazy = true)

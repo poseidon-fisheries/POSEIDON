@@ -88,7 +88,7 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
 
     /**
      * @return {@code cell}'s outgoing connections to its navigable neighbours, weighted by
-     * {@link #getDistanceCalculator()}; empty if {@code cell} itself isn't navigable
+     * {@code getDistanceCalculator()}; empty if {@code cell} itself isn't navigable
      */
     @Override
     public Array<Connection<Int2D>> getConnections(final Int2D cell) {

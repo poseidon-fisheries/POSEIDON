@@ -42,6 +42,12 @@ public final class TimeIndexedNetCdfGridReader extends AbstractNetCdfGridReader 
 
     private final String timeDimensionName;
 
+    /**
+     * @param ncFile                 the NetCDF file to open
+     * @param timeDimensionName      the name of the time dimension/coordinate variable
+     * @param latitudeDimensionName  the name of the latitude dimension/coordinate variable
+     * @param longitudeDimensionName the name of the longitude dimension/coordinate variable
+     */
     public TimeIndexedNetCdfGridReader(
         final Path ncFile,
         final String timeDimensionName,

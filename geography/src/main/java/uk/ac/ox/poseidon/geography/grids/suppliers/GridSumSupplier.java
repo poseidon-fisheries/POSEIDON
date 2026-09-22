@@ -27,6 +27,10 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 import java.util.function.Supplier;
 
+/**
+ * A {@link Supplier} of a fixed, resolved {@link DoubleGrid}'s current sum. Built via
+ * {@link Factories#gridSum(uk.ac.ox.poseidon.core.Factory)} in this package.
+ */
 @RequiredArgsConstructor
 public class GridSumSupplier implements Supplier<Double> {
 

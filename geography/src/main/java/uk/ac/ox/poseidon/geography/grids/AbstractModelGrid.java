@@ -48,6 +48,12 @@ import static java.util.Map.entry;
 import static java.util.function.Function.identity;
 import static java.util.stream.IntStream.range;
 
+/**
+ * A {@link ModelGrid} base class providing the actual coordinate/point/cell math and neighbour
+ * computation, caching Moore neighbourhoods (plain and active-filtered) since they're recomputed
+ * often. Subclasses only need to supply {@link #isActive}. Instantiated indirectly via
+ * {@link ModelGrid#create}/{@link ModelGrid#withActiveCells}.
+ */
 @Getter
 @ToString
 @EqualsAndHashCode
@@ -59,6 +65,7 @@ abstract class AbstractModelGrid implements ModelGrid {
     private final double cellWidth;   // the width of a cell in degrees
     private final double cellHeight;  // the height of a cell in degrees
 
+    /** Every cell in the grid, active or not, in the order returned by {@link #getAllCells()}. */
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     protected final Int2D[] allCells;
@@ -75,6 +82,13 @@ abstract class AbstractModelGrid implements ModelGrid {
         Caffeine.newBuilder().build(this::computeActiveMooreNeighbourhood);
     private final ObjectGrid2D coordinatesGrid;
 
+    /**
+     * @param gridWidth  the number of cells wide
+     * @param gridHeight the number of cells tall
+     * @param envelope   the geographic bounding box the grid covers
+     * @param allCells   every cell in the grid, in the order {@link #getAllCells()} should return
+     *                   them
+     */
     protected AbstractModelGrid(
         final int gridWidth,
         final int gridHeight,
@@ -90,6 +104,10 @@ abstract class AbstractModelGrid implements ModelGrid {
         this.coordinatesGrid = makeCoordinateGrid();
     }
 
+    /**
+     * @return every cell of a {@code gridWidth x gridHeight} grid, in x-then-y order
+     * @throws IllegalArgumentException if {@code gridWidth} or {@code gridHeight} isn't positive
+     */
     protected static Int2D[] makeAllCellsArray(
         final int gridWidth,
         final int gridHeight
@@ -141,6 +159,7 @@ abstract class AbstractModelGrid implements ModelGrid {
         return new Double2D(x, y);
     }
 
+    /** Cached: computed once per (cell, neighbourhoodSize) pair and reused thereafter. */
     @Override
     public List<Int2D> getNeighbours(
         final Int2D cell,
@@ -149,6 +168,7 @@ abstract class AbstractModelGrid implements ModelGrid {
         return mooreNeighbourhoods.get(entry(cell, neighbourhoodSize));
     }
 
+    /** Cached: computed once per (cell, neighbourhoodSize) pair and reused thereafter. */
     @Override
     public List<Int2D> getActiveNeighbours(
         final Int2D cell,

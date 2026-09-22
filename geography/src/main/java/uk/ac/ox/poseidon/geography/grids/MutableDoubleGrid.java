@@ -25,12 +25,22 @@ package uk.ac.ox.poseidon.geography.grids;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Int2D;
 
+/**
+ * A {@link BaseDoubleGrid} whose values can be changed after construction, via
+ * {@link #setValue}. Built via {@code Factories.mutableDoubleGridFromAllocator(...)}/
+ * {@code Factories.normalisedMutableDoubleGridFromAllocator(...)} in this package.
+ */
 public class MutableDoubleGrid extends BaseDoubleGrid
     implements MutableGrid<DoubleGrid2D> {
+    /** @param modelGrid the grid this is defined over; every cell starts at {@code 0.0} */
     public MutableDoubleGrid(final ModelGrid modelGrid) {
         super(modelGrid);
     }
 
+    /**
+     * @param modelGrid    the grid this is defined over
+     * @param initialValue the value every cell starts at
+     */
     public MutableDoubleGrid(
         final ModelGrid modelGrid,
         final double initialValue
@@ -38,6 +48,10 @@ public class MutableDoubleGrid extends BaseDoubleGrid
         super(modelGrid, initialValue);
     }
 
+    /**
+     * @param modelGrid the grid this is defined over
+     * @param values    the values, indexed {@code [x][y]}
+     */
     public MutableDoubleGrid(
         final ModelGrid modelGrid,
         final double[][] values
@@ -45,6 +59,10 @@ public class MutableDoubleGrid extends BaseDoubleGrid
         super(modelGrid, values);
     }
 
+    /**
+     * @param modelGrid the grid this is defined over
+     * @param grid      the values to copy
+     */
     public MutableDoubleGrid(
         final ModelGrid modelGrid,
         final DoubleGrid2D grid
@@ -52,6 +70,10 @@ public class MutableDoubleGrid extends BaseDoubleGrid
         super(modelGrid, grid);
     }
 
+    /**
+     * @param cell  the cell to update
+     * @param value the new value
+     */
     protected void setValue(
         final Int2D cell,
         final double value

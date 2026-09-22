@@ -34,6 +34,11 @@ import java.util.List;
  */
 public final class StaticNetCdfGridReader extends AbstractNetCdfGridReader {
 
+    /**
+     * @param ncFile                 the NetCDF file to open
+     * @param latitudeDimensionName  the name of the latitude dimension/coordinate variable
+     * @param longitudeDimensionName the name of the longitude dimension/coordinate variable
+     */
     public StaticNetCdfGridReader(
         final Path ncFile,
         final String latitudeDimensionName,

@@ -33,6 +33,10 @@ import java.util.function.Predicate;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
+/**
+ * An {@link AbstractModelGrid} where only a fixed subset of cells is active. Built via
+ * {@link ModelGrid#withActiveCells}.
+ */
 class ModelGridWithSomeCellsActive extends AbstractModelGrid {
 
     // Using ImmutableSet here as it should provide fast lookup _and_ iteration

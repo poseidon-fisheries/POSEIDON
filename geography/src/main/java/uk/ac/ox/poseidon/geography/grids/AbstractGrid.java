@@ -27,11 +27,23 @@ import sim.field.grid.Grid2D;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A {@link Grid} base class wrapping a MASON {@link Grid2D} of type {@code F}, sized to match a
+ * {@link ModelGrid}.
+ */
 public abstract class AbstractGrid<F extends Grid2D> implements Grid {
 
+    /** The underlying MASON field, sized to match {@link #getModelGrid()}. */
     protected final F field;
     private final ModelGrid modelGrid;
 
+    /**
+     * @param modelGrid the grid this is defined over
+     * @param field     the underlying MASON field; must have the same dimensions as
+     *                  {@code modelGrid}
+     * @throws IllegalArgumentException if {@code field}'s dimensions don't match
+     *                                   {@code modelGrid}'s, or either is non-positive
+     */
     protected AbstractGrid(
         final ModelGrid modelGrid,
         final F field

@@ -24,10 +24,16 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import sim.util.Int2D;
 
+/**
+ * A {@link DoubleGrid} that delegates every method to a wrapped {@link DoubleGrid}. Meant to be
+ * subclassed by decorators that override only the methods they need to change.
+ */
 public class DoubleGridWrapper implements DoubleGrid {
 
+    /** The wrapped grid every method delegates to by default. */
     protected final DoubleGrid grid;
 
+    /** @param grid the grid to wrap */
     public DoubleGridWrapper(final DoubleGrid grid) {
         this.grid = grid;
     }

@@ -29,12 +29,22 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
 
+/**
+ * An {@link AbstractNormalisedDoubleGridFromAllocatorFactory} for a {@link MutableDoubleGrid},
+ * whose values can be changed afterward via {@link MutableDoubleGrid#setValue}. Built via
+ * {@link Factories#normalisedMutableDoubleGridFromAllocator(Factory, Factory, Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class NormalisedMutableDoubleGridFromAllocatorFactory<S extends Scope>
     extends AbstractNormalisedDoubleGridFromAllocatorFactory<S, MutableDoubleGrid> {
 
+    /**
+     * @param modelGrid  factory for the grid to build over
+     * @param allocator  factory for the allocator assigning each cell's raw value
+     * @param totalValue factory for the value the grid's values should sum to once normalised
+     */
     public NormalisedMutableDoubleGridFromAllocatorFactory(
         final Factory<? super S, ? extends ModelGrid> modelGrid,
         final Factory<? super S, ? extends Allocator> allocator,

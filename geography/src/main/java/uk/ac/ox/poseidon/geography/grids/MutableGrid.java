@@ -24,8 +24,14 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import sim.field.grid.Grid2D;
 
+/**
+ * A {@link Grid} that exposes its underlying MASON field directly, for callers that need to
+ * mutate it (e.g. {@link ObjectGrid}-family classes with a package-visible {@code createPort}-style
+ * method, or {@link MutableDoubleGrid}).
+ */
 public interface MutableGrid<F extends Grid2D> extends Grid {
 
+    /** @return the underlying, mutable MASON field */
     F getField();
 
 }

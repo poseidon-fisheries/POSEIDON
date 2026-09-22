@@ -40,16 +40,26 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
 
+/**
+ * An {@link AbstractGrid} placing arbitrary objects of type {@code T} on cells (a MASON
+ * {@link SparseGrid2D}, so multiple objects can share a cell). Subclassed by
+ * {@link uk.ac.ox.poseidon.geography.ports.AbstractPortGrid} in this module.
+ */
 public abstract class ObjectGrid<T>
     extends AbstractGrid<SparseGrid2D>
     implements Iterable<T> {
 
+    /** @param modelGrid the grid this is defined over; starts empty */
     protected ObjectGrid(
         final ModelGrid modelGrid
     ) {
         super(modelGrid, new SparseGrid2D(modelGrid.getGridWidth(), modelGrid.getGridHeight()));
     }
 
+    /**
+     * @param modelGrid the grid this is defined over
+     * @param field     the underlying MASON field to use directly (not copied)
+     */
     protected ObjectGrid(
         final ModelGrid modelGrid,
         final SparseGrid2D field
@@ -57,20 +67,24 @@ public abstract class ObjectGrid<T>
         super(modelGrid, field);
     }
 
+    /** @return the cell {@code object} is placed on */
     public Int2D getLocation(final T object) {
         return field.getObjectLocation(object);
     }
 
+    /** @return the objects placed on {@code cell} */
     public Stream<T> getObjectsAt(final Int2D cell) {
         return bagToStream(
             field.getObjectsAtLocation(cell.x, cell.y)
         );
     }
 
+    /** @return whether any object is placed on {@code cell} */
     public boolean anyObjectsAt(final Int2D cell) {
         return numObjectsAt(cell) > 0;
     }
 
+    /** @return the number of objects placed on {@code cell} */
     public int numObjectsAt(final Int2D cell) {
         return field.numObjectsAtLocation(cell.x, cell.y);
     }
@@ -81,10 +95,18 @@ public abstract class ObjectGrid<T>
         return MasonUtils.<T>bagToStream(field.allObjects).iterator();
     }
 
+    /** @return every object on this grid */
     public Stream<T> stream() {
         return Streams.stream(iterator());
     }
 
+    /**
+     * @param bathymetricGrid  the bathymetric grid objects are placed relative to
+     * @param portCoordinates  the ports to place, each at its given coordinate
+     * @return a fresh field with one entry per {@code portCoordinates} entry
+     * @throws IllegalArgumentException if any port's coordinate isn't on land, or isn't adjacent
+     *                                   to an active water cell
+     */
     protected static SparseGrid2D makeField(
         final BathymetricGrid bathymetricGrid,
         final Map<? extends Port, ? extends Coordinate> portCoordinates
@@ -116,16 +138,19 @@ public abstract class ObjectGrid<T>
         return grid;
     }
 
+    /** @return {@code object}'s unique id, used by {@link #getObject} */
     protected abstract String getObjectId(T object);
 
     private Map<String, T> getObjectsById() {
         return Streams.stream(iterator()).collect(toMap(this::getObjectId, o -> o));
     }
 
+    /** @return the object with the given id, if one exists on this grid */
     public Optional<T> getObject(final String id) {
         return Optional.ofNullable(getObjectsById().get(id));
     }
 
+    /** @return an independent copy of the underlying field */
     public SparseGrid2D copyOfField() {
         return new SparseGrid2D(field);
     }

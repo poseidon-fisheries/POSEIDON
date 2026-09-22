@@ -38,16 +38,27 @@ import java.io.File;
 import java.io.IOException;
 import java.util.function.BiConsumer;
 
+/**
+ * Wraps a GeoTools {@link GridCoverage2D} (a raster grid, e.g. read from a GeoTIFF or ASCII grid
+ * file) with convenience accessors used across this module to build a {@link ModelGrid} or read
+ * per-cell values from raster files.
+ */
 @Getter
 @RequiredArgsConstructor
 public final class CoverageWrapper {
 
     private final GridCoverage2D coverage;
 
+    /** @param gridFile the raster grid file to read, in any format GeoTools can auto-detect */
     public CoverageWrapper(final File gridFile) {
         this(readCoverage(gridFile));
     }
 
+    /**
+     * @param gridFile the raster grid file to read, in any format GeoTools can auto-detect
+     * @return the file's content as a GeoTools coverage
+     * @throws RuntimeException if an I/O error occurs
+     */
     public static GridCoverage2D readCoverage(final File gridFile) {
         final AbstractGridFormat format = GridFormatFinder.findFormat(gridFile);
         final GridCoverage2DReader reader = format.getReader(gridFile);
@@ -60,6 +71,10 @@ public final class CoverageWrapper {
         }
     }
 
+    /**
+     * @param action called once per raster cell, with its (x, y) position and its value (only the
+     *               first band is read)
+     */
     public void processGrid(
         final BiConsumer<Int2D, Double> action
     ) {
@@ -74,14 +89,17 @@ public final class CoverageWrapper {
         }
     }
 
+    /** @return the raster's width, in cells */
     public int getGridWidth() {
         return coverage.getRenderedImage().getWidth();
     }
 
+    /** @return the raster's height, in cells */
     public int getGridHeight() {
         return coverage.getRenderedImage().getHeight();
     }
 
+    /** @return the raster's geographic bounding box, as an {@link Envelope} */
     public Envelope makeEnvelope() {
         final Bounds bounds = coverage.getEnvelope();
         return new Envelope(

@@ -35,6 +35,14 @@ import uk.ac.ox.poseidon.geography.allocators.Allocator;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Double.isNaN;
 
+/**
+ * A {@link RelativeScopeFactory} base for building a {@link DoubleGrid} from a resolved
+ * {@link Allocator}: applies the allocator to every cell (skipping the running sum for
+ * {@link Double#NaN}, i.e. excluded cells) and hands the resulting per-cell values, plus their
+ * sum, to {@link #postProcess} before building the grid via {@link #makeGrid}. Subclasses fix the
+ * concrete {@link DoubleGrid} type ({@link BaseDoubleGrid} or {@link MutableDoubleGrid}) and
+ * whether to normalise the values (see {@link AbstractNormalisedDoubleGridFromAllocatorFactory}).
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,6 +53,7 @@ abstract class AbstractDoubleGridFromAllocatorFactory<S extends Scope, G extends
     private Factory<? super S, ? extends ModelGrid> modelGrid;
     private Factory<? super S, ? extends Allocator> allocator;
 
+    /** @throws IllegalArgumentException if the allocator returns a negative, non-NaN value */
     @Override
     protected G newInstance(final S scope) {
         final ModelGrid modelGrid = this.modelGrid.get(scope);
@@ -62,6 +71,13 @@ abstract class AbstractDoubleGridFromAllocatorFactory<S extends Scope, G extends
         return makeGrid(modelGrid, postProcess(scope, values, sum.doubleValue()));
     }
 
+    /**
+     * @param scope  the scope being resolved against
+     * @param values the raw per-cell allocator values, indexed {@code [x][y]}
+     * @param sum    the sum of the non-{@code NaN} values
+     * @return the values to actually build the grid from; the base implementation returns
+     * {@code values} unchanged
+     */
     protected double[][] postProcess(
         final S scope,
         final double[][] values,
@@ -70,6 +86,11 @@ abstract class AbstractDoubleGridFromAllocatorFactory<S extends Scope, G extends
         return values;
     }
 
+    /**
+     * @param modelGrid the resolved grid to build over
+     * @param values    the final per-cell values, indexed {@code [x][y]}
+     * @return the built grid
+     */
     abstract G makeGrid(
         final ModelGrid modelGrid,
         final double[][] values

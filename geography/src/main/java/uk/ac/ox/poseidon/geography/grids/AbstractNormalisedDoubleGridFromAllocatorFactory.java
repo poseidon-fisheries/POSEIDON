@@ -32,6 +32,11 @@ import uk.ac.ox.poseidon.geography.allocators.Allocator;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Double.isNaN;
 
+/**
+ * An {@link AbstractDoubleGridFromAllocatorFactory} that rescales every cell's raw allocator
+ * value so the grid's total ({@link #postProcess}'s {@code sum}) equals a fixed
+ * {@code totalValue}, preserving each cell's relative share.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -41,6 +46,11 @@ abstract class AbstractNormalisedDoubleGridFromAllocatorFactory<
 
     private Factory<? super S, ? extends Number> totalValue;
 
+    /**
+     * @param modelGrid  factory for the grid to build over
+     * @param allocator  factory for the allocator assigning each cell's raw value
+     * @param totalValue factory for the value the grid's values should sum to once normalised
+     */
     protected AbstractNormalisedDoubleGridFromAllocatorFactory(
         final Factory<? super S, ? extends ModelGrid> modelGrid,
         final Factory<? super S, ? extends Allocator> allocator,
@@ -50,6 +60,9 @@ abstract class AbstractNormalisedDoubleGridFromAllocatorFactory<
         this.totalValue = totalValue;
     }
 
+    /**
+     * @throws IllegalArgumentException if the resolved total value or {@code sum} isn't positive
+     */
     @Override
     protected double[][] postProcess(
         final S scope,

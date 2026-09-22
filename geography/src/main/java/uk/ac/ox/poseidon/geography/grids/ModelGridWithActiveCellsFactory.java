@@ -33,6 +33,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.Collection;
 
+/**
+ * A {@link RelativeScopeFactory} for a resolved {@link ModelGrid} narrowed to a fixed set of
+ * active cells (via {@link ModelGrid#withActiveCells}). Built via
+ * {@link Factories#modelGridWithActiveCells(Factory, Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

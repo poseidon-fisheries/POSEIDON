@@ -38,8 +38,22 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * The rectangular cell grid underlying every other spatial component in this module: maps between
+ * geographic {@link Coordinate}s, continuous grid points ({@link Double2D}), and discrete cells
+ * ({@link Int2D}), and tracks which cells are "active" (participate in the simulation) versus
+ * merely present. Built via {@link #create}/{@link #withActiveCells}, or
+ * {@link uk.ac.ox.poseidon.geography.grids.Factories} for the {@code Factory}-facing entry
+ * points.
+ */
 public interface ModelGrid {
 
+    /**
+     * @param gridWidth  the number of cells wide
+     * @param gridHeight the number of cells tall
+     * @param envelope   the geographic bounding box the grid covers
+     * @return a new grid, of size {@code gridWidth x gridHeight}, with every cell active
+     */
     static ModelGrid create(
         final int gridWidth,
         final int gridHeight,
@@ -52,6 +66,11 @@ public interface ModelGrid {
         );
     }
 
+    /**
+     * @param activeCells the cells that should be active in the returned grid
+     * @return a grid with the same dimensions and envelope as this one, but with only
+     * {@code activeCells} active (or, if that's every cell, an all-active grid)
+     */
     default ModelGrid withActiveCells(final Collection<Int2D> activeCells) {
         final Set<Int2D> activeCellSet = Set.copyOf(activeCells);
         return getAllCells().allMatch(activeCellSet::contains)
@@ -64,6 +83,7 @@ public interface ModelGrid {
             );
     }
 
+    /** @return every cell in the grid, active or not */
     Stream<Int2D> getAllCells();
 
     /**
@@ -80,8 +100,10 @@ public interface ModelGrid {
         };
     }
 
+    /** @return {@code cell}'s coordinate, at the centre of the cell */
     Coordinate toCoordinate(Int2D cell);
 
+    /** @throws IllegalArgumentException if {@code point} is outside the grid */
     default Coordinate toCoordinate(final Double2D point) {
         checkArgument(isInGrid(point), "%s outside of grid", point);
         return new Coordinate(
@@ -90,51 +112,71 @@ public interface ModelGrid {
         );
     }
 
+    /** @return {@code coordinate}'s position as a continuous grid point */
     Double2D toPoint(Coordinate coordinate);
 
+    /** @return the continuous grid point at the centre of {@code cell} */
     @SuppressWarnings("MagicNumber")
     default Double2D toPoint(final Int2D cell) {
         return new Double2D(cell.getX() + 0.5, cell.getY() + 0.5);
     }
 
+    /** @return the discrete cell containing {@code coordinate} */
     default Int2D toCell(final Coordinate coordinate) {
         return toCell(toPoint(coordinate));
     }
 
+    /** @return the discrete cell containing {@code point} */
     default Int2D toCell(final Double2D point) {
         return new Int2D((int) point.x, (int) point.y);
     }
 
+    /** @return {@code cell}'s Moore neighbours, within a neighbourhood size of 1 */
     default List<Int2D> getNeighbours(final Int2D cell) {
         return getNeighbours(cell, 1);
     }
 
+    /** @return {@code cell}'s Moore neighbours, within the given neighbourhood size */
     List<Int2D> getNeighbours(
         Int2D cell,
         @SuppressWarnings("SameParameterValue") int neighbourhoodSize
     );
 
+    /**
+     * @return {@code cell}'s Moore neighbours that are also active, within the given
+     * neighbourhood size
+     */
     List<Int2D> getActiveNeighbours(
         Int2D cell,
         @SuppressWarnings("SameParameterValue") int neighbourhoodSize
     );
 
+    /** @return a uniformly-random cell in the grid, active or not */
     default Int2D randomCell(final MersenneTwisterFast rng) {
         final int x = rng.nextInt(getGridWidth());
         final int y = rng.nextInt(getGridHeight());
         return new Int2D(x, y);
     }
 
+    /**
+     * @return a fresh {@code [gridWidth][gridHeight]} array, e.g. for building a
+     * {@link DoubleGrid}
+     */
     default double[][] makeDoubleArray() {
         return new double[getGridWidth()][getGridHeight()];
     }
 
+    /**
+     * @return {@code cell}'s Moore neighbours that are also active, within a neighbourhood size
+     * of 1
+     */
     default List<Int2D> getActiveNeighbours(
         final Int2D cell
     ) {
         return getActiveNeighbours(cell, 1);
     }
 
+    /** @throws IllegalArgumentException if {@code coordinate} is outside the grid */
     default void checkIsInGrid(final Coordinate coordinate) {
         checkArgument(
             isInGrid(coordinate),
@@ -144,6 +186,7 @@ public interface ModelGrid {
         );
     }
 
+    /** @throws IllegalArgumentException if {@code cell} is outside the grid */
     default void checkIsInGrid(final Int2D cell) {
         checkArgument(
             isInGrid(cell),
@@ -152,39 +195,52 @@ public interface ModelGrid {
         );
     }
 
+    /** @return whether {@code coordinate} falls within the grid's envelope */
     default boolean isInGrid(final Coordinate coordinate) {
         return getEnvelope().intersects(coordinate);
     }
 
+    /** @return whether {@code point}'s cell is within the grid's bounds */
     default boolean isInGrid(final Double2D point) {
         return isInGrid(toCell(point));
     }
 
+    /** @return whether {@code cell} is within the grid's bounds (does not check activeness) */
     default boolean isInGrid(final Int2D cell) {
         return cell.x >= 0 && cell.y >= 0 && cell.x < getGridWidth() && cell.y < getGridHeight();
     }
 
+    /** @return whether {@code coordinate}'s cell is active */
     default boolean isActive(final Coordinate coordinate) {
         return isActive(toCell(coordinate));
     }
 
+    /** @return whether {@code point}'s cell is active */
     default boolean isActive(final Double2D point) {
         return isActive(toCell(point));
     }
 
+    /** @return whether {@code cell} participates in the simulation */
     boolean isActive(Int2D cell);
 
+    /** @return the number of cells wide */
     int getGridWidth();
 
+    /** @return the number of cells tall */
     int getGridHeight();
 
+    /** @return the geographic bounding box the grid covers */
     Envelope getEnvelope();
 
+    /** @return the width of one cell, in degrees of longitude */
     double getCellWidth();
 
+    /** @return the height of one cell, in degrees of latitude */
     double getCellHeight();
 
+    /** @return every active cell in the grid */
     ImmutableSet<Int2D> getActiveCells();
 
+    /** @return a MASON grid holding each cell's {@link Coordinate}, for direct MASON interop */
     ObjectGrid2D getCoordinatesGrid();
 }

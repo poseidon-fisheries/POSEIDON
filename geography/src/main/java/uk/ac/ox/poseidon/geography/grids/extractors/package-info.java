@@ -20,32 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.grids.extractors;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link CellValue}, built via
- * {@link Factories#cellValue(Factory)}.
+ * {@link java.util.function.Function}s that extract a value from a resolved
+ * {@link uk.ac.ox.poseidon.geography.grids.DoubleGrid}. See
+ * {@link uk.ac.ox.poseidon.geography.grids.extractors.Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class CellValueFactory<S extends Scope> extends RelativeScopeFactory<S, CellValue> {
-
-    private Factory<? super S, ? extends DoubleGrid> grid;
-
-    @Override
-    protected CellValue newInstance(final S scope) {
-        return new CellValue(grid.get(scope));
-    }
-
-}
+package uk.ac.ox.poseidon.geography.grids.extractors;

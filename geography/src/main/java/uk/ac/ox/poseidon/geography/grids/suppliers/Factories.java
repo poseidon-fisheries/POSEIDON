@@ -26,14 +26,24 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
+/**
+ * Factories for {@link java.util.function.Supplier}s that aggregate a resolved
+ * {@link DoubleGrid}.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @param doubleGrid factory for the grid to sum
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link GridSumSupplier}
+     * over the resolved grid
+     * @see GridSumSupplier
+     */
     public static <S extends Scope> GridSumSupplierFactory<S> gridSum(
         final Factory<? super S, ? extends DoubleGrid> doubleGrid
     ) {
         return new GridSumSupplierFactory<>(doubleGrid);
     }
-    
+
 }

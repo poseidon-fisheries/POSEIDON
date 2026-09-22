@@ -31,6 +31,10 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link GridSumSupplier}, built via
+ * {@link Factories#gridSum(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
