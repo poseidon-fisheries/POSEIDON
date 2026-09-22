@@ -40,6 +40,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A {@link SimulationScopeFactory} that reads every feature's geometry out of an ESRI shapefile
+ * (via GeoTools) into an immutable list. There's no separate plain component class here: the
+ * produced {@link Collection} is returned as-is, with no wrapper type to carry documentation, so
+ * this factory carries the behavior doc directly. Built via
+ * {@link Factories#geometriesFromShapeFile(Factory)} in this package.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

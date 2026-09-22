@@ -20,27 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Components for reading vector geometry data (e.g. ESRI shapefiles) into JTS
+ * {@link org.locationtech.jts.geom.Geometry} objects. See
+ * {@link uk.ac.ox.poseidon.geography.vectors.Factories} for the entry points.
+ */
 package uk.ac.ox.poseidon.geography.vectors;
-
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.nio.file.Path;
-
-/** Factories for reading vector geometry data. */
-public class Factories {
-
-    private Factories() {}
-
-    /**
-     * @param path factory for the shapefile to read
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for the list of geometries
-     * read from the resolved shapefile
-     * @see GeometriesFromShapeFileFactory
-     */
-    public static GeometriesFromShapeFileFactory geometriesFromShapeFile(
-        final Factory<? super SimulationScope, ? extends Path> path
-    ) {
-        return new GeometriesFromShapeFileFactory(path);
-    }
-}
