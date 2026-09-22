@@ -37,7 +37,7 @@ import java.util.function.Function;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class PayTripCostFactory<S extends Scope>
     extends RelativeScopeFactory<S, PayTripCost> {
 

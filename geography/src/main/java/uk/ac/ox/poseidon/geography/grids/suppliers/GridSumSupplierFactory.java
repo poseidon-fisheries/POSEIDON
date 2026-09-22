@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class GridSumSupplierFactory<S extends Scope>
     extends RelativeScopeFactory<S, GridSumSupplier> {
 

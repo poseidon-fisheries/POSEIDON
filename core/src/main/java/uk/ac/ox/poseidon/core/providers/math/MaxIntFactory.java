@@ -39,7 +39,7 @@ import java.util.function.IntSupplier;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class MaxIntFactory<S extends Scope> extends RelativeScopeFactory<S, MaxInt> {
 
     private Factory<? super S, ? extends IntSupplier> a;

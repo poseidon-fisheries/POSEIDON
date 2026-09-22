@@ -39,7 +39,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class MapValueExtractorFactory<S extends Scope, K, V>
     extends RelativeScopeFactory<S, MapValueExtractor<K, V>> {
 

@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class DynamicFriendsSupplierFactory extends VesselScopeFactory<DynamicFriendsSupplier> {
 
     private int targetNumberOfFriends;

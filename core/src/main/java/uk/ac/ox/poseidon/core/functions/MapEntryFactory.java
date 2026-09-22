@@ -43,7 +43,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class MapEntryFactory<S extends Scope, K, V> extends RelativeScopeFactory<S, V> {
 
     private Factory<? super S, ? extends Map<? super K, ? extends V>> map;

@@ -32,7 +32,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class MoneyFromRowFactory extends GlobalScopeFactory<MoneyFromRow> {
 
     private String currencyColumnName;

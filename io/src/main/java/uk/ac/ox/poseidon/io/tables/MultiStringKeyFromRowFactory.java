@@ -38,7 +38,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class MultiStringKeyFromRowFactory extends GlobalScopeFactory<MultiStringKeyFromRow> {
 
     List<String> keyColumnNames;

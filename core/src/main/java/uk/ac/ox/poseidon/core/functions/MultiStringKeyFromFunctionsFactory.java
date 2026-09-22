@@ -40,7 +40,7 @@ import java.util.function.Function;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class MultiStringKeyFromFunctionsFactory<S extends Scope, T>
     extends RelativeScopeFactory<S, MultiStringKeyFromFunctions<T>> {
 

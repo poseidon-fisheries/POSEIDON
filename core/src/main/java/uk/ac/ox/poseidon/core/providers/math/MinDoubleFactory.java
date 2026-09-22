@@ -39,7 +39,7 @@ import java.util.function.DoubleSupplier;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class MinDoubleFactory<S extends Scope> extends RelativeScopeFactory<S, MinDouble> {
 
     private Factory<? super S, ? extends DoubleSupplier> a;
