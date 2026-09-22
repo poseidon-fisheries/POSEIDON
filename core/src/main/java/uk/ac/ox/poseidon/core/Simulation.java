@@ -34,7 +34,6 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.io.Serial;
 import java.text.MessageFormat;
-import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
 import java.util.stream.Stream;
@@ -160,13 +159,6 @@ public class Simulation extends SimState {
         final TemporalAmount temporalAmount
     ) {
         temporalSchedule.stepFor(this, temporalAmount);
-    }
-
-    public void stepUntil(
-        final SimState simState,
-        final LocalDateTime dateTime
-    ) {
-        temporalSchedule.stepUntil(this, dateTime);
     }
 
 }
