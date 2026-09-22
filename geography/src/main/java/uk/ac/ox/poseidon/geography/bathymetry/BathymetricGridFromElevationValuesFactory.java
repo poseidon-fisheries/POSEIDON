@@ -36,6 +36,13 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A {@link RelativeScopeFactory} for a {@link DefaultBathymetricGrid} built directly from one
+ * literal elevation value per cell (no aggregation, unlike {@link BathymetricGridFactory}'s
+ * subclasses): {@code elevationValues} must have exactly one entry per grid cell, in row-major
+ * (x-then-y) order. Built via
+ * {@link Factories#bathymetricGridFromElevationValues(Factory, java.util.List)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

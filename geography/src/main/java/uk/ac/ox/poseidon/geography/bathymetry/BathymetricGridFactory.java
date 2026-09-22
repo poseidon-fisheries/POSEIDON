@@ -33,6 +33,15 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * A {@link RelativeScopeFactory} base for building a {@link DefaultBathymetricGrid} from raw
+ * elevation samples: subclasses supply the samples, grouped by grid cell (via
+ * {@link #readElevationValues}, since a cell may receive several raw values, e.g. from an
+ * unaligned source grid); this class handles resolving each cell's final elevation by applying
+ * the resolved {@link Aggregator} to its sample values (an empty cell defaults to {@code 0}) and
+ * optionally negating every value (via {@code inverted}, for sources where elevation and depth
+ * are the opposite sign convention from this codebase's "negative is water" rule).
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -59,6 +68,12 @@ public abstract class BathymetricGridFactory<S extends Scope>
         return new DefaultBathymetricGrid(modelGrid, array);
     }
 
+    /**
+     * @param modelGrid the resolved grid to read elevation samples for
+     * @param scope     the scope being resolved against
+     * @return every raw elevation sample, grouped by the cell it belongs to (subclasses are
+     * responsible for applying {@code inverted} to their own values)
+     */
     protected abstract Map<Int2D, Collection<Double>> readElevationValues(
         ModelGrid modelGrid,
         S scope

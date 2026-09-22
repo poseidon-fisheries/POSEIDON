@@ -36,6 +36,20 @@ import static java.lang.Math.min;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * A {@link SimulationScopeFactory} for a synthetic {@link DefaultBathymetricGrid}, generated
+ * (using the simulation's own random stream, so it varies run to run but not on repeated calls
+ * within a run) rather than read from real data: a randomly-elevated ocean/land split along the
+ * grid's x axis (land confined to a strip of at most {@code maximumLandWidth} columns), then
+ * roughened by randomly flipping land cells adjacent to water to water
+ * ({@code coastalRoughness} passes, each cell flipped with probability
+ * {@code probabilityOfFlippingLandToWater}), then smoothed toward its neighbours' average
+ * elevation ({@code smoothingIterations} passes, each nudging every cell by up to
+ * {@code smoothingStrength} of the gap between its own and its neighbours' average elevation,
+ * without crossing the water/land boundary). Built via
+ * {@link Factories#roughCoastalBathymetricGrid(Factory, int, int, double, int, double, double,
+ * double)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -52,6 +66,10 @@ public class RoughCoastalBathymetricGridFactory
     private double maximumElevation;
     private double probabilityOfFlippingLandToWater;
 
+    /**
+     * @throws IllegalStateException if {@code minimumElevation >= 0} or
+     *                                {@code maximumElevation <= 0}
+     */
     @Override
     protected BathymetricGrid newInstance(final SimulationScope scope) {
         checkState(minimumElevation < 0);

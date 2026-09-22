@@ -28,6 +28,12 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+/**
+ * A {@link RelativeScopeFactory} for a {@link DefaultBathymetricGrid} where every cell has the
+ * same depth (i.e. a flat seabed, no land): {@code depth} is negated to produce the (negative)
+ * elevation value every cell is set to. Built via
+ * {@link Factories#uniformBathymetricGrid(Factory, double)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

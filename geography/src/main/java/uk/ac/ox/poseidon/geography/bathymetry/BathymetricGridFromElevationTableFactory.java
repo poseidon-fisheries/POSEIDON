@@ -35,6 +35,11 @@ import uk.ac.ox.poseidon.geography.utils.ElevationTable;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * A {@link BathymetricGridFactory} whose elevation samples come from a resolved
+ * {@link ElevationTable}. Built via
+ * {@link Factories#bathymetricGridFromElevationTable(Factory, Factory, Factory, boolean)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,6 +49,12 @@ public class BathymetricGridFromElevationTableFactory<S extends Scope>
 
     private Factory<? super S, ? extends ElevationTable> elevationTable;
 
+    /**
+     * @param elevationTable factory for the table to read elevation samples from
+     * @param modelGrid      factory for the grid this bathymetry is defined over
+     * @param aggregator     factory for the aggregator combining a cell's samples
+     * @param inverted       whether to negate every sample value
+     */
     public BathymetricGridFromElevationTableFactory(
         @NonNull final Factory<? super S, ? extends ElevationTable> elevationTable,
         @NonNull final Factory<? super S, ? extends ModelGrid> modelGrid,

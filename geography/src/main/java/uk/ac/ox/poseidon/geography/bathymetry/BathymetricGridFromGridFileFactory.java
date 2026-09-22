@@ -44,6 +44,12 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * A {@link BathymetricGridFactory} whose elevation samples come from a raster grid file (e.g.
+ * GeoTIFF, via GeoTools' {@link CoverageWrapper}), reprojected cell-by-cell into this codebase's
+ * {@link ModelGrid}. Built via
+ * {@link Factories#bathymetricGridFromGridFile(Factory, Factory, Factory, boolean)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -53,6 +59,12 @@ public class BathymetricGridFromGridFileFactory<S extends Scope>
 
     private Factory<? super S, ? extends Path> path;
 
+    /**
+     * @param path       factory for the raster grid file to read
+     * @param modelGrid  factory for the grid this bathymetry is defined over
+     * @param aggregator factory for the aggregator combining a cell's samples
+     * @param inverted   whether to negate every sample value
+     */
     public BathymetricGridFromGridFileFactory(
         final Factory<? super S, ? extends Path> path,
         final Factory<? super S, ? extends ModelGrid> modelGrid,

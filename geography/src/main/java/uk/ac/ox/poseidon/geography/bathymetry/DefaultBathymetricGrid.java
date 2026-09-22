@@ -33,6 +33,12 @@ import java.util.stream.Stream;
 
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * The default {@link BathymetricGrid} implementation, backed by a MASON {@link DoubleGrid2D} of
+ * elevation values. Caches its land/water/active-water cell lists (computed lazily, once, on
+ * first access) since {@link BathymetricGrid}'s default implementations of those would otherwise
+ * rescan the whole grid on every call.
+ */
 public class DefaultBathymetricGrid extends BaseDoubleGrid implements BathymetricGrid {
 
     @Getter(value = PRIVATE, lazy = true)
@@ -47,10 +53,15 @@ public class DefaultBathymetricGrid extends BaseDoubleGrid implements Bathymetri
     private final Int2D[] activeWaterCellsArray =
         BathymetricGrid.super.getActiveWaterCells().toArray(Int2D[]::new);
 
+    /**
+     * @param modelGrid the grid this bathymetry is defined over; all elevations start at
+     *                  {@code 0}
+     */
     public DefaultBathymetricGrid(final ModelGrid modelGrid) {
         super(modelGrid);
     }
 
+    /** @param values the elevation values, indexed {@code [x][y]}; also determines the grid size */
     public DefaultBathymetricGrid(final double[][] values) {
         super(values);
     }
@@ -62,6 +73,10 @@ public class DefaultBathymetricGrid extends BaseDoubleGrid implements Bathymetri
         super(modelGrid, initialValue);
     }
 
+    /**
+     * @param modelGrid the grid this bathymetry is defined over
+     * @param values    the elevation values, indexed {@code [x][y]}
+     */
     public DefaultBathymetricGrid(
         final ModelGrid modelGrid,
         final double[][] values
@@ -76,16 +91,19 @@ public class DefaultBathymetricGrid extends BaseDoubleGrid implements Bathymetri
         super(modelGrid, grid);
     }
 
+    /** Cached: see the class doc. */
     @Override
     public Stream<Int2D> getActiveWaterCells() {
         return Arrays.stream(getActiveWaterCellsArray());
     }
 
+    /** Cached: see the class doc. */
     @Override
     public Stream<Int2D> getWaterCells() {
         return Arrays.stream(getWaterCellsArray());
     }
 
+    /** Cached: see the class doc. */
     @Override
     public Stream<Int2D> getLandCells() {
         return Arrays.stream(getLandCellsArray());
