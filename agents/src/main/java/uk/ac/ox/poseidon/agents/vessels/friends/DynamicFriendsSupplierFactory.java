@@ -31,6 +31,10 @@ import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Predicate;
 
+/**
+ * A {@link VesselScopeFactory} for a {@link DynamicFriendsSupplier}. Built via
+ * {@link Factories#dynamicFriendsSupplier}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
