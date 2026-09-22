@@ -22,12 +22,26 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors;
 
+import org.joda.money.Money;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+
+import java.util.function.Function;
+
 public class Factories {
 
     private Factories() {}
 
     public static AvailableHoldCapacityInKgFactory availableHoldCapacityInKg() {
         return new AvailableHoldCapacityInKgFactory();
+    }
+
+    public static <S extends Scope> TripCostFromHourlyCostsFactory<S> tripCostFromHourlyCosts(
+        final Factory<? super S, ? extends Function<? super Vessel, ? extends Money>>
+            hourlyCostsExtractor
+    ) {
+        return new TripCostFromHourlyCostsFactory<>(hourlyCostsExtractor);
     }
 
 }

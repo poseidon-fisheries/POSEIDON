@@ -22,30 +22,30 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.math.RoundingMode;
-import java.time.Duration;
 import java.util.function.Function;
 
-@RequiredArgsConstructor
-public class TripCostFromHourlyCosts implements Function<Vessel, Money> {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class TripCostFromHourlyCostsFactory<S extends Scope>
+    extends RelativeScopeFactory<S, TripCostFromHourlyCosts> {
 
-    @NonNull private final Function<? super Vessel, ? extends Money> hourlyCostsExtractor;
+    private Factory<? super S, ? extends Function<? super Vessel, ? extends Money>>
+        hourlyCostsExtractor;
 
     @Override
-    public Money apply(final Vessel vessel) {
-        final Duration tripDuration = Duration.between(
-            vessel.getCurrentTrip().getStartDateTime(),
-            vessel.getSchedule().getDateTime()
-        );
-        return hourlyCostsExtractor.apply(vessel).multipliedBy(
-            tripDuration.toSeconds() / 3600.0,
-            RoundingMode.HALF_EVEN
-        );
+    protected TripCostFromHourlyCosts newInstance(final S scope) {
+        return new TripCostFromHourlyCosts(hourlyCostsExtractor.get(scope));
     }
-    
 }
