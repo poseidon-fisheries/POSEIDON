@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.trips;
 
+/** An event broadcast by a {@link Trip}, e.g. {@link TripStartEvent} or {@link TripEndEvent}. */
 public interface TripEvent {
+    /** @return the trip this event was broadcast by */
     Trip getTrip();
 }

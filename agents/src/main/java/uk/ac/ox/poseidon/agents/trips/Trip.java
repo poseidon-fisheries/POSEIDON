@@ -33,6 +33,16 @@ import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 
 import java.time.LocalDateTime;
 
+/**
+ * A single fishing trip: the span between a vessel leaving its current cell with a destination in
+ * mind and {@link #endTrip()} being called. Broadcasts a {@link TripStartEvent} at construction and
+ * a {@link TripEndEvent} on {@link #endTrip()}, through an {@link EventManager} that forwards to
+ * the vessel's own, so trip-scoped listeners can be added without affecting vessel-level ones.
+ * {@code destination} can be redirected mid-trip via {@link #setDestination}, e.g. to head towards
+ * a new destination or, via {@link #setDestinationToTripOrigin()}, to abort and return home; every
+ * change is validated against the vessel's grid, the way the initial destination is at
+ * construction. {@code origin} and {@code startDateTime} are fixed once the trip begins.
+ */
 @Getter
 @SuppressFBWarnings(value = "EI_EXPOSE_REP")
 public class Trip {
@@ -46,6 +56,10 @@ public class Trip {
     private @NonNull Int2D destination;
     private LocalDateTime endDateTime;
 
+    /**
+     * @param vessel      the vessel taking this trip
+     * @param destination where the trip is initially headed; must be a cell in the vessel's grid
+     */
     public Trip(
         final @NonNull Vessel vessel,
         final @NonNull Int2D destination
@@ -58,16 +72,22 @@ public class Trip {
         this.eventManager.broadcast(new TripStartEvent(this));
     }
 
+    /**
+     * @param destination the new destination; must be a cell in the vessel's grid
+     * @throws IllegalArgumentException if {@code destination} is outside the vessel's grid
+     */
     public void setDestination(final @NonNull Int2D destination) {
         vessel.getVesselField().getModelGrid().checkIsInGrid(destination);
         this.destination = destination;
     }
 
+    /** Marks the trip as ended at the vessel's current simulation time and broadcasts a {@link TripEndEvent}. */
     public void endTrip() {
         this.endDateTime = vessel.getSchedule().getDateTime();
         this.eventManager.broadcast(new TripEndEvent(this));
     }
 
+    /** Redirects the trip back towards where it started. */
     public void setDestinationToTripOrigin() {
         setDestination(origin);
     }
