@@ -26,10 +26,20 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+/**
+ * Factories for {@link DistanceCalculator}s: geographic (equirectangular, haversine) and
+ * grid-native (Cartesian) distance measures.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @param modelGrid factory for the grid to measure distances over
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+     * {@link EquirectangularDistanceCalculator}
+     * @see EquirectangularDistanceCalculator
+     */
     public static <S extends Scope> EquirectangularDistanceCalculatorFactory<S>
     equirectangularDistanceCalculator(
         final Factory<? super S, ? extends ModelGrid> modelGrid
@@ -37,6 +47,12 @@ public class Factories {
         return new EquirectangularDistanceCalculatorFactory<>(modelGrid);
     }
 
+    /**
+     * @param modelGrid factory for the grid to measure distances over
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link HaversineDistanceCalculator}
+     * @see HaversineDistanceCalculator
+     */
     public static <S extends Scope> HaversineDistanceCalculatorFactory<S>
     haversineDistanceCalculator(
         final Factory<? super S, ? extends ModelGrid> modelGrid
@@ -44,6 +60,13 @@ public class Factories {
         return new HaversineDistanceCalculatorFactory<>(modelGrid);
     }
 
+    /**
+     * @param modelGrid    factory for the grid to measure distances over
+     * @param cellSizeInKm the length, in kilometres, of one grid cell's side
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link CartesianDistanceCalculator}
+     * @see CartesianDistanceCalculator
+     */
     public static <S extends Scope> CartesianDistanceCalculatorFactory<S>
     cartesianDistanceCalculator(
         final Factory<? super S, ? extends ModelGrid> modelGrid,

@@ -37,18 +37,34 @@ import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 import static tech.units.indriya.unit.Units.METRE;
 
+/**
+ * Measures distance and derived travel duration between two points, given either as
+ * {@link Coordinate}s or grid points ({@link Number2D}). Built via
+ * {@link uk.ac.ox.poseidon.geography.distance.Factories}.
+ */
 public interface DistanceCalculator {
 
+    /**
+     * @param a one coordinate
+     * @param b the other coordinate
+     * @return the distance between {@code a} and {@code b}, in kilometres
+     */
     double distanceInKm(
         Coordinate a,
         Coordinate b
     );
 
+    /**
+     * @param start one grid point
+     * @param end   the other grid point
+     * @return the distance between {@code start} and {@code end}, in kilometres
+     */
     double distanceInKm(
         Number2D start,
         Number2D end
     );
 
+    /** @return {@link #distanceInKm(Number2D, Number2D)} as a length {@link Quantity} */
     default Quantity<Length> distance(
         final Number2D start,
         final Number2D end
@@ -56,6 +72,7 @@ public interface DistanceCalculator {
         return getQuantity(distanceInKm(start, end), KILO(METRE));
     }
 
+    /** @return {@link #distanceInKm(Coordinate, Coordinate)} as a length {@link Quantity} */
     default Quantity<Length> distance(
         final Coordinate a,
         final Coordinate b
@@ -63,6 +80,7 @@ public interface DistanceCalculator {
         return getQuantity(distanceInKm(a, b), KILO(METRE));
     }
 
+    /** @return the time to travel from {@code start} to {@code end} at {@code cruisingSpeed} */
     default Duration travelDuration(
         final Number2D start,
         final Number2D end,
@@ -71,6 +89,9 @@ public interface DistanceCalculator {
         return travelDuration(List.of(start, end), cruisingSpeed);
     }
 
+    /**
+     * @return the time to travel from {@code start} to {@code end} at {@code cruisingSpeedInKph}
+     */
     default Duration travelDuration(
         final Number2D start,
         final Number2D end,
@@ -79,6 +100,13 @@ public interface DistanceCalculator {
         return travelDuration(List.of(start, end), cruisingSpeedInKph);
     }
 
+    /**
+     * @param path              the waypoints to travel through in order, at least two
+     * @param cruisingSpeedInKph the constant travel speed, in km/h
+     * @return the time to travel the full path at {@code cruisingSpeedInKph}, summing the
+     * distance of each leg
+     * @throws IllegalArgumentException if {@code path} has fewer than two waypoints
+     */
     default Duration travelDuration(
         final List<? extends Number2D> path,
         final double cruisingSpeedInKph
@@ -95,6 +123,11 @@ public interface DistanceCalculator {
         return travelDuration(cruisingSpeedInKph, totalDistanceInKm);
     }
 
+    /**
+     * @param cruisingSpeedInKph the constant travel speed, in km/h
+     * @param totalDistanceInKm  the total distance to travel, in kilometres
+     * @return the time to travel {@code totalDistanceInKm} at {@code cruisingSpeedInKph}
+     */
     static Duration travelDuration(
         final double cruisingSpeedInKph,
         final double totalDistanceInKm
@@ -105,6 +138,7 @@ public interface DistanceCalculator {
         );
     }
 
+    /** @return the time to travel the full path at {@code cruisingSpeed} */
     default Duration travelDuration(
         final List<? extends Number2D> path,
         final Quantity<Speed> cruisingSpeed

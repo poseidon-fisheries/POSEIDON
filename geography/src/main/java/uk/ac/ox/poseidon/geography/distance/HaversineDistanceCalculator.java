@@ -27,8 +27,15 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import static java.lang.Math.*;
 
+/**
+ * A {@link CoordinateBasedDistanceCalculator} using the haversine great-circle formula: accurate
+ * over any distance, at somewhat more computational cost than
+ * {@link EquirectangularDistanceCalculator}. Built via
+ * {@link Factories#haversineDistanceCalculator(uk.ac.ox.poseidon.core.Factory)} in this package.
+ */
 public class HaversineDistanceCalculator extends CoordinateBasedDistanceCalculator {
 
+    /** @param modelGrid the grid this calculator measures distances over */
     public HaversineDistanceCalculator(final ModelGrid modelGrid) {
         super(modelGrid);
     }

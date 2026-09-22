@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,22 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.distance;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
 /**
- * A {@link DistanceCalculator} base class holding the {@link ModelGrid} it measures distances
- * over. Subclassed by {@link CoordinateBasedDistanceCalculator} (geographic distance from
- * lon/lat) and {@link GridBasedDistanceCalculator} (distance in grid-cell space).
+ * {@link uk.ac.ox.poseidon.geography.distance.DistanceCalculator}s and derived travel-duration
+ * calculations, both geographic (equirectangular, haversine) and grid-native (Cartesian). See
+ * {@link uk.ac.ox.poseidon.geography.distance.Factories} for the entry points.
  */
-@Getter
-@RequiredArgsConstructor
-public abstract class AbstractDistanceCalculator implements DistanceCalculator {
-    /** The mean radius of the Earth, in kilometres, used by great-circle distance formulas. */
-    public static final double EARTH_RADIUS_IN_KM = 6371.0;
-    /** The grid this calculator measures distances over. */
-    protected final ModelGrid modelGrid;
-}
+package uk.ac.ox.poseidon.geography.distance;

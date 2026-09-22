@@ -25,8 +25,16 @@ package uk.ac.ox.poseidon.geography.distance;
 import sim.util.Number2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+/**
+ * An {@link AbstractDistanceCalculator} that computes geographic distance from lon/lat
+ * {@link uk.ac.ox.poseidon.geography.Coordinate}s: grid-point inputs are converted to coordinates
+ * first, via {@link ModelGrid#toCoordinate}. Subclassed by
+ * {@link EquirectangularDistanceCalculator} and {@link HaversineDistanceCalculator}, which supply
+ * the actual formula.
+ */
 public abstract class CoordinateBasedDistanceCalculator extends AbstractDistanceCalculator {
 
+    /** @param modelGrid the grid this calculator measures distances over */
     public CoordinateBasedDistanceCalculator(final ModelGrid modelGrid) {
         super(modelGrid);
     }

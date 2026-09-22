@@ -25,8 +25,16 @@ package uk.ac.ox.poseidon.geography.distance;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+/**
+ * An {@link AbstractDistanceCalculator} that computes distance directly in grid-cell space:
+ * coordinate inputs are converted to grid points first, via {@link ModelGrid#toPoint}. Cheaper
+ * than {@link CoordinateBasedDistanceCalculator}'s implementations but assumes the grid's cells
+ * are uniform in size. Subclassed by {@link CartesianDistanceCalculator}, which supplies the
+ * actual formula.
+ */
 public abstract class GridBasedDistanceCalculator extends AbstractDistanceCalculator {
 
+    /** @param modelGrid the grid this calculator measures distances over */
     public GridBasedDistanceCalculator(final ModelGrid modelGrid) {
         super(modelGrid);
     }

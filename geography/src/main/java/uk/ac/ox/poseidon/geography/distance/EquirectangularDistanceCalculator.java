@@ -31,12 +31,20 @@ import java.text.MessageFormat;
 import static java.lang.System.Logger.Level.WARNING;
 import static org.apache.commons.math3.util.FastMath.*;
 
+/**
+ * A {@link CoordinateBasedDistanceCalculator} using the equirectangular approximation: fast, but
+ * only accurate over short distances (a warning is logged past {@code WARNING_THRESHOLD} km) —
+ * prefer {@link HaversineDistanceCalculator} when accuracy matters more than speed. Built via
+ * {@link Factories#equirectangularDistanceCalculator(uk.ac.ox.poseidon.core.Factory)} in this
+ * package.
+ */
 public class EquirectangularDistanceCalculator extends CoordinateBasedDistanceCalculator {
 
     private static final Logger logger =
         System.getLogger(EquirectangularDistanceCalculator.class.getName());
     private static final double WARNING_THRESHOLD = 250;
 
+    /** @param modelGrid the grid this calculator measures distances over */
     public EquirectangularDistanceCalculator(final ModelGrid modelGrid) {
         super(modelGrid);
     }
