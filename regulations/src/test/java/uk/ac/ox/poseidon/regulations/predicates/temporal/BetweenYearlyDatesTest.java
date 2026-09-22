@@ -360,6 +360,60 @@ class BetweenYearlyDatesTest {
     }
 
     @Test
+    void testZeroDurationActionInsideRangeMatches() {
+        // Arrange
+        final MonthDay beginning = MonthDay.of(Month.JUNE, 1);
+        final MonthDay end = MonthDay.of(Month.JULY, 31);
+        final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
+
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            6,
+            15,
+            12,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            6,
+            15,
+            12,
+            0
+        ));
+
+        // Act & Assert
+        assertTrue(predicate.test(extendedAction));
+    }
+
+    @Test
+    void testZeroDurationActionOutsideRangeDoesNotMatch() {
+        // Arrange
+        final MonthDay beginning = MonthDay.of(Month.JUNE, 1);
+        final MonthDay end = MonthDay.of(Month.JULY, 31);
+        final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
+
+        final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+        Mockito.when(extendedAction.getStartDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            5,
+            15,
+            12,
+            0
+        ));
+        Mockito.when(extendedAction.getEndDateTime()).thenReturn(LocalDateTime.of(
+            2023,
+            5,
+            15,
+            12,
+            0
+        ));
+
+        // Act & Assert
+        assertFalse(predicate.test(extendedAction));
+    }
+
+    @Test
     void testActionSpanningAcrossYearBoundaryOutsideRange() {
         // Arrange
         final MonthDay beginning = MonthDay.of(Month.NOVEMBER, 1);

@@ -72,7 +72,7 @@ public class BetweenYearlyDates implements Predicate<TemporalAction<?>> {
 
     @Override
     public boolean test(final TemporalAction<?> action) {
-        checkArgument(action.getStartDateTime().isBefore(action.getEndDateTime()));
+        checkArgument(!action.getStartDateTime().isAfter(action.getEndDateTime()));
         return insideRange(action.getStartDateTime()) ||
             insideRange(action.getEndDateTime()) ||
             coversRange(action.getStartDateTime(), action.getEndDateTime());
