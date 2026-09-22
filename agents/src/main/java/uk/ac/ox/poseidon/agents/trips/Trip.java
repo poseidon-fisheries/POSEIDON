@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.agents.trips;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
@@ -44,7 +43,6 @@ public class Trip {
     private final @NonNull LocalDateTime startDateTime;
     private final Account account = new Account();
 
-    @Setter
     private @NonNull Int2D destination;
     private LocalDateTime endDateTime;
 
@@ -53,12 +51,16 @@ public class Trip {
         final @NonNull Int2D destination
     ) {
         this.vessel = vessel;
-        this.vessel.getVesselField().getModelGrid().checkIsInGrid(destination);
-        this.destination = destination;
+        setDestination(destination);
         this.eventManager = new ForwardingEventManager(vessel.getEventManager());
         this.origin = vessel.getCell();
         this.startDateTime = vessel.getSchedule().getDateTime();
         this.eventManager.broadcast(new TripStartEvent(this));
+    }
+
+    public void setDestination(final @NonNull Int2D destination) {
+        vessel.getVesselField().getModelGrid().checkIsInGrid(destination);
+        this.destination = destination;
     }
 
     public void endTrip() {
@@ -67,6 +69,6 @@ public class Trip {
     }
 
     public void setDestinationToTripOrigin() {
-        destination = origin;
+        setDestination(origin);
     }
 }
