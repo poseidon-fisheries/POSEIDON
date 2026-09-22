@@ -31,6 +31,14 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * The default {@link BucketBuilder}: accumulates content in a plain map, then picks the
+ * {@link Bucket} implementation that best suits it at {@link #build()} time —
+ * {@link Bucket#empty()} if nothing is left once empty entries are dropped,
+ * {@link SingleSpeciesBiomassBucket} for a lone species' biomass,
+ * {@link BiomassBucket} when everything is {@link Biomass}, and
+ * {@link ContentBucket} otherwise.
+ */
 final class AdaptiveBucketBuilder implements BucketBuilder {
     private final Map<Species, Content> map = new HashMap<>();
 

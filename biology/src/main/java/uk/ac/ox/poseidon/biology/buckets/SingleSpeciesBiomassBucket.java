@@ -42,6 +42,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 
+/**
+ * A {@link Bucket} holding a positive biomass of exactly one species — by far the most common
+ * shape in practice, so it stores just the species and a {@code double} and overrides most
+ * operations to stay on that representation instead of going through a builder. Lazily caches the
+ * boxed views ({@link #getContent()}, {@link #getMap()}, ...) that the general {@link Bucket}
+ * interface exposes, so callers that only ever ask for kilograms never pay for them.
+ */
 @ToString
 class SingleSpeciesBiomassBucket implements Bucket {
 
@@ -58,6 +65,11 @@ class SingleSpeciesBiomassBucket implements Bucket {
         return Bucket.contentHashCode(this);
     }
 
+    /**
+     * @param species     the species held
+     * @param biomassInKg the amount held, in kilograms; must be positive, since an empty bucket
+     *                    is represented by {@link EmptyBucket} instead
+     */
     SingleSpeciesBiomassBucket(
         final Species species,
         final double biomassInKg

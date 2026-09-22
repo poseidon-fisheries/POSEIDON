@@ -36,6 +36,14 @@ import java.util.Optional;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
+/**
+ * The general-purpose {@link Bucket}, holding arbitrary {@link Content} per species in a plain
+ * map. Used only when the content isn't all {@link Biomass}, which no scenario produces yet since
+ * {@code Biomass} is currently the only {@code Content} implementation — but this is the shape the
+ * whole abstraction is built for: an age- or length-structured abundance is just another
+ * {@code Content}, so adding one doesn't require duplicating any of the machinery that moves fish
+ * around. Keep it that way when touching this package.
+ */
 @Getter
 @ToString
 final class ContentBucket implements Bucket {
@@ -56,6 +64,7 @@ final class ContentBucket implements Bucket {
         return Bucket.contentHashCode(this);
     }
 
+    /** @return a bucket holding {@code map}'s entries, dropping those with no positive mass */
     static ContentBucket ofContentMap(final Map<Species, Content> map) {
         return new ContentBucket(
             map
@@ -66,6 +75,11 @@ final class ContentBucket implements Bucket {
         );
     }
 
+    /**
+     * @return a bucket holding {@code map}'s biomasses in kilograms, dropping non-positive
+     * entries. Exists so the shared bucket test suite can build a {@code ContentBucket} from the
+     * same fixture as its siblings; production code goes through {@link #ofContentMap}.
+     */
     static ContentBucket ofBiomassMap(final Map<Species, Double> map) {
         return new ContentBucket(
             map

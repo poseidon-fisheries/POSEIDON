@@ -29,7 +29,16 @@ import javax.measure.Unit;
 import javax.measure.quantity.Mass;
 
 /**
- * Represents quantitative content; implementations are expected to be immutable.
+ * Represents quantitative content; implementations are expected to be immutable, and to define
+ * {@code equals}/{@code hashCode} by value, since {@link uk.ac.ox.poseidon.biology.buckets.Bucket}
+ * equality is defined in terms of it.
+ *
+ * <p>Everything that moves fish around — {@link uk.ac.ox.poseidon.biology.buckets.Bucket}s, holds,
+ * landings, markets — is written against this interface rather than against {@link Biomass}
+ * directly, so that an age- or length-structured abundance can be introduced as just another
+ * {@code Content} implementation. That's deliberate: in the legacy codebase biomass- and
+ * abundance-based biology were parallel hierarchies, and every piece of surrounding machinery had
+ * to be written twice.
  */
 public interface Content {
 

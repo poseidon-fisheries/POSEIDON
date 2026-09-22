@@ -35,6 +35,13 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.ObjDoubleConsumer;
 
+/**
+ * The shared, contentless {@link Bucket}, obtained from {@link Bucket#empty()}. A singleton (a
+ * plain class rather than an enum, since {@link Enum#equals}/{@link Enum#hashCode} are
+ * {@code final} and this class needs to define content-based equality like every other
+ * {@link Bucket} implementation), so the many operations that end up with nothing left need not
+ * allocate.
+ */
 final class EmptyBucket implements Bucket {
 
     static final EmptyBucket INSTANCE = new EmptyBucket();
@@ -67,6 +74,7 @@ final class EmptyBucket implements Bucket {
         return other;
     }
 
+    /** @throws IllegalArgumentException unless {@code other} is itself empty */
     @Override
     public Bucket subtract(final Bucket other) {
         if (other.isEmpty()) return this;
