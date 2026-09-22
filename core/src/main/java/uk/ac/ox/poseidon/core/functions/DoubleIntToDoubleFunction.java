@@ -28,6 +28,11 @@ package uk.ac.ox.poseidon.core.functions;
  */
 @FunctionalInterface
 public interface DoubleIntToDoubleFunction {
+    /**
+     * @param value the element at {@code index}
+     * @param index the element's position
+     * @return the mapped value
+     */
     double applyAsDouble(
         double value,
         int index
