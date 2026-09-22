@@ -34,6 +34,10 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 
 import java.util.function.Function;
 
+/**
+ * A {@link RelativeScopeFactory} for an {@link IsPermittedPredicate}. Built via
+ * {@link Factories#isPermitted}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

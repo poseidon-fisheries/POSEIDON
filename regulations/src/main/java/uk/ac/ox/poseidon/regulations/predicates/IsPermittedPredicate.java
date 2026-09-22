@@ -29,6 +29,13 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * Turns a {@link Regulations} rule back into a {@link Predicate} over the agent, by first building
+ * the {@link Action} the rule judges via {@code actionFunction}. This is what lets a rule be
+ * composed with ordinary predicate logic (see
+ * {@link uk.ac.ox.poseidon.core.predicates.logical}) alongside other agent predicates, rather than
+ * composing {@code Regulations} instances directly.
+ */
 @RequiredArgsConstructor
 public class IsPermittedPredicate<G, A extends Action<G>> implements Predicate<G> {
 
