@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -151,7 +152,7 @@ abstract class BucketTest {
         final Bucket bucket1 = newBucket(Map.of(a, 100.0));
         final Bucket bucket2 = newBucket(Map.of(a, 200.0));
         assertThatThrownBy(() -> bucket1.subtract(bucket2))
-            .isInstanceOfAny(IllegalStateException.class, IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -323,6 +324,40 @@ abstract class BucketTest {
         assertThat(replaced.getKg(a)).isEqualTo(100.0);
         assertThat(replaced.getKg(bA)).isEqualTo(50.0);
         assertThat(replaced.getSpecies()).isEqualTo(Set.of(a, bA));
+    }
+
+    @Test
+    void hashCodeMatchesGetMapHashCode() {
+        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
+        assertThat(bucket.hashCode()).isEqualTo(bucket.getMap().hashCode());
+    }
+
+    @Test
+    void equalBucketsFromDifferentImplementationsCompareEqual() {
+        final Map<Species, Double> map = Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0);
+        final Bucket bucket = newBucket(map);
+        final Bucket bucketFromFactory = Bucket.of(
+            map.entrySet()
+                .stream()
+                .collect(toMap(Map.Entry::getKey, e -> (Content) Biomass.ofKg(e.getValue())))
+        );
+        assertThat(bucket).isEqualTo(bucketFromFactory);
+        assertThat(bucket.hashCode()).isEqualTo(bucketFromFactory.hashCode());
+    }
+
+    @Test
+    void singleSpeciesBucketsFromDifferentImplementationsCompareEqual() {
+        final Bucket bucket = newBucket(Map.of(a, 100.0));
+        final Bucket singleSpeciesBucket = Bucket.of(a, 100.0);
+        assertThat(bucket).isEqualTo(singleSpeciesBucket);
+        assertThat(bucket.hashCode()).isEqualTo(singleSpeciesBucket.hashCode());
+    }
+
+    @Test
+    void emptyBucketsFromDifferentImplementationsCompareEqual() {
+        final Bucket bucket = newBucket(Map.of());
+        assertThat(bucket).isEqualTo(Bucket.empty());
+        assertThat(bucket.hashCode()).isEqualTo(Bucket.empty().hashCode());
     }
 
 }

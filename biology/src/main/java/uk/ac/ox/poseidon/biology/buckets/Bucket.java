@@ -48,6 +48,19 @@ public interface Bucket {
         return EmptyBucket.INSTANCE;
     }
 
+    static boolean contentEquals(
+        final Bucket bucket,
+        final Object other
+    ) {
+        if (bucket == other) return true;
+        if (!(other instanceof final Bucket otherBucket)) return false;
+        return bucket.getMap().equals(otherBucket.getMap());
+    }
+
+    static int contentHashCode(final Bucket bucket) {
+        return bucket.getMap().hashCode();
+    }
+
     static BucketBuilder newBuilder() {
         return new AdaptiveBucketBuilder();
     }

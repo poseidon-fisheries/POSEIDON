@@ -23,7 +23,8 @@
 package uk.ac.ox.poseidon.biology.buckets;
 
 import com.google.common.collect.ImmutableMap;
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -35,13 +36,24 @@ import java.util.Optional;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
-@Data
+@Getter
+@ToString
 final class ContentBucket implements Bucket {
 
     private final ImmutableMap<Species, Content> map;
 
     private ContentBucket(final ImmutableMap<Species, Content> map) {
         this.map = map;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return Bucket.contentEquals(this, obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Bucket.contentHashCode(this);
     }
 
     static ContentBucket ofContentMap(final Map<Species, Content> map) {
@@ -54,7 +66,7 @@ final class ContentBucket implements Bucket {
         );
     }
 
-    static Bucket ofBiomassMap(final Map<Species, Double> map) {
+    static ContentBucket ofBiomassMap(final Map<Species, Double> map) {
         return new ContentBucket(
             map
                 .entrySet()

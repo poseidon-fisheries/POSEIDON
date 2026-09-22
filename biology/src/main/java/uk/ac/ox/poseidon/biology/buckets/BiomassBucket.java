@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.biology.buckets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -50,7 +49,6 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static lombok.AccessLevel.PRIVATE;
 
 @ToString
-@EqualsAndHashCode
 @RequiredArgsConstructor(access = PRIVATE)
 class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
 
@@ -60,6 +58,16 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
 
     private final double[] biomasses;
     @Getter private final SpeciesIndex speciesIndex;
+
+    @Override
+    public boolean equals(final Object obj) {
+        return Bucket.contentEquals(this, obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Bucket.contentHashCode(this);
+    }
 
     @Getter(lazy = true)
     private final ImmutableMap<Species, Content> map =
@@ -219,7 +227,7 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
         final double otherBiomass,
         final int i
     ) {
-        if (newBiomass < 0) throw new IllegalStateException(
+        if (newBiomass < 0) throw new IllegalArgumentException(
             "Subtracting " + otherBiomass + " kg from " + biomasses[i] +
                 " kg for species " + speciesIndex.speciesAt(i) +
                 " results in negative biomass " + newBiomass

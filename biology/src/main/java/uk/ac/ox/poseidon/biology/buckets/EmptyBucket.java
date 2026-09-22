@@ -35,9 +35,22 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.ObjDoubleConsumer;
 
-enum EmptyBucket implements Bucket {
+final class EmptyBucket implements Bucket {
 
-    INSTANCE;
+    static final EmptyBucket INSTANCE = new EmptyBucket();
+
+    private EmptyBucket() {
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return Bucket.contentEquals(this, obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Bucket.contentHashCode(this);
+    }
 
     @Override
     public Optional<Content> getContent(final Species species) {

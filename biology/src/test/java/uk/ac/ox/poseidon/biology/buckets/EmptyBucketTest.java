@@ -125,4 +125,12 @@ class EmptyBucketTest {
         final Bucket empty = EmptyBucket.INSTANCE;
         assertThat(empty.toBuilder().build()).isSameAs(empty);
     }
+
+    @Test
+    void equalsAndHashCodeAreContentBased() {
+        final Bucket empty = EmptyBucket.INSTANCE;
+        assertThat(empty).isEqualTo(EmptyBucket.INSTANCE);
+        assertThat(empty.hashCode()).isEqualTo(empty.getMap().hashCode());
+        assertThat(empty).isNotEqualTo(Bucket.of(Map.of(a, Biomass.ofKg(10.0))));
+    }
 }
