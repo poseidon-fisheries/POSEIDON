@@ -33,30 +33,39 @@ import javax.measure.quantity.Mass;
  */
 public interface Content {
 
+    /** @return this content plus {@code content}, as a {@link Biomass} */
     default Content add(final Content content) {
         return this.asBiomass().add(content.asBiomass());
     }
 
+    /** @return this content minus {@code content}, as a {@link Biomass} */
     default Content subtract(final Content content) {
         return this.asBiomass().subtract(content.asBiomass());
     }
 
+    /** @return this content's mass, in {@code biomassUnit} */
     default double as(final Unit<Mass> biomassUnit) {
         return this.asBiomass().as(biomassUnit);
     }
 
+    /** @return this content scaled by {@code value} */
     Biomass multiply(double value);
 
+    /** @return this content divided by {@code value} */
     Biomass divide(double value);
 
+    /** @return whether this content has zero mass */
     boolean isEmpty();
 
+    /** @return this content as a plain {@link Biomass} */
     Biomass asBiomass();
 
+    /** @return this content's mass, as a {@link Quantity} */
     default Quantity<Mass> asQuantity() {
         return this.asBiomass().asQuantity();
     }
 
+    /** @return this content's mass, in kilograms */
     default double asKg() {
         return this.asBiomass().asKg();
     }

@@ -24,10 +24,13 @@ package uk.ac.ox.poseidon.biology;
 
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
+/** Something that fish can be caught from and released back to, at a single grid cell. */
 public interface Fisheable {
 
+    /** @return the fish currently available to be caught */
     Bucket availableFish();
 
+    /** @param fishToRelease fish to add back, e.g. live discards */
     void release(Bucket fishToRelease);
 
     /**
