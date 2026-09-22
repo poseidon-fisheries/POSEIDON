@@ -20,29 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.accounting;
-
-import org.joda.money.Money;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Function;
-
 /**
- * Factories for tasks that account for a trip's costs.
+ * Tasks that settle a trip's finances: {@link uk.ac.ox.poseidon.agents.tasks.accounting.PayTripCost}
+ * deducts a cost from the current trip's account. See
+ * {@link uk.ac.ox.poseidon.agents.tasks.accounting.Factories} for the entry points.
  */
-public class Factories {
-    private Factories() {}
-
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link PayTripCost}
-     * @see PayTripCostFactory
-     */
-    public static <S extends Scope> PayTripCostFactory<S> payTripCost(
-        final Factory<? super S, ? extends Function<? super Vessel, ? extends Money>> tripCostExtractor
-    ) {
-        return new PayTripCostFactory<>(tripCostExtractor);
-    }
-
-}
+package uk.ac.ox.poseidon.agents.tasks.accounting;

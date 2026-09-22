@@ -34,6 +34,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Function;
 
+/**
+ * A {@link RelativeScopeFactory} for a {@link PayTripCost}. Built via
+ * {@link Factories#payTripCost}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
