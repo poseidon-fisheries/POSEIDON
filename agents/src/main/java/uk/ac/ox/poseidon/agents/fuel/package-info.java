@@ -20,20 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Fuel stations: {@link uk.ac.ox.poseidon.agents.fuel.FuelStation} sells fuel at a per-litre price
+ * and pump rate, broadcasting a {@link uk.ac.ox.poseidon.agents.fuel.FuelStation.Purchase} on each
+ * refill; {@link uk.ac.ox.poseidon.agents.fuel.FuelStationGrid} locates stations spatially. See
+ * {@link uk.ac.ox.poseidon.agents.fuel.Factories} for the entry points.
+ */
 package uk.ac.ox.poseidon.agents.fuel;
-
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
-
-/** A grid of {@link FuelStation}s, keyed by each station's {@code getCode()}. */
-public class FuelStationGrid extends ObjectGrid<FuelStation> {
-
-    public FuelStationGrid(final ModelGrid modelGrid) {
-        super(modelGrid);
-    }
-
-    @Override
-    protected String getObjectId(final FuelStation object) {
-        return object.getCode();
-    }
-}

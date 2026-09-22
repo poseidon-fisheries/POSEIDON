@@ -35,6 +35,10 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.List;
 
+/**
+ * A {@link SimulationScopeFactory} creating one {@link FuelStation} per port in {@code portGrid},
+ * all sharing the same price and pump rate. Built via {@link Factories#oneFuelStationPerPort}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

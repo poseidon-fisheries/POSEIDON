@@ -27,6 +27,10 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.Map;
 
+/**
+ * A {@link FuelStationGrid} whose station locations are fixed at construction, from a
+ * station-to-cell map, rather than mutated afterwards.
+ */
 public class ImmutableFuelStationGrid extends FuelStationGrid {
 
     ImmutableFuelStationGrid(

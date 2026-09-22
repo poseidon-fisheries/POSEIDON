@@ -30,10 +30,18 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.List;
 
+/**
+ * Factories for fuel stations and the grid that locates them.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link uk.ac.ox.poseidon.agents.fuel.FuelStationGrid} over the resolved stations
+     * @see FuelStationGridFactory
+     */
     public static <S extends Scope> FuelStationGridFactory<S> fuelStationGrid(
         final Factory<? super S, ? extends PortGrid> portGrid,
         final Factory<? super S, ? extends List<? extends FuelStation>> fuelStations
@@ -41,6 +49,11 @@ public class Factories {
         return new FuelStationGridFactory<>(portGrid, fuelStations);
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for one
+     * {@link FuelStation} per port in {@code portGrid}
+     * @see OneFuelStationPerPortFactory
+     */
     public static OneFuelStationPerPortFactory oneFuelStationPerPort(
         final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
         final Factory<? super SimulationScope, ? extends Money> pricePerLitres,

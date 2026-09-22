@@ -39,6 +39,12 @@ import static lombok.AccessLevel.NONE;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 
+/**
+ * A single fuel station at a {@link Port}, selling fuel at a per-litre price and a fixed pump
+ * rate; each {@link #refill} broadcasts its resulting {@link Purchase} through the station's
+ * {@link EventManager}. {@code pricePerLitre} can be changed after construction (via
+ * {@link #setPricePerLitre}); everything else about a station is fixed for its lifetime.
+ */
 @Data
 public class FuelStation {
 
@@ -50,6 +56,13 @@ public class FuelStation {
     private @NonNull Money pricePerLitre;
     private final double pumpRateInLitresPerMinute;
 
+    /**
+     * @param port                      the port this station is located at
+     * @param code                      this station's unique identifier
+     * @param eventManager              the event manager this station reports through
+     * @param pricePerLitre             the non-negative initial price per litre
+     * @param pumpRateInLitresPerMinute the strictly positive pump rate
+     */
     public FuelStation(
         final @NonNull Port port,
         final @NonNull String code,
@@ -65,11 +78,18 @@ public class FuelStation {
             checkPositive(pumpRateInLitresPerMinute, "pumpRateInLitresPerMinute");
     }
 
+    /** @param pricePerLitre the new, non-negative price per litre */
     public void setPricePerLitre(final @NonNull Money pricePerLitre) {
         checkNonNegative(pricePerLitre.getAmount().doubleValue(), "pricePerLitre");
         this.pricePerLitre = pricePerLitre;
     }
 
+    /**
+     * Tops {@code fuelTank} up to full, charges for and times the fill, and broadcasts the
+     * resulting {@link Purchase} through {@link #eventManager}.
+     *
+     * @return the completed purchase: litres added, price charged, and time taken
+     */
     public Purchase refill(final FuelTank fuelTank) {
         final double litresToAdd =
             fuelTank.getCapacityInLitres() - fuelTank.getCurrentFuelInLitres();
@@ -83,6 +103,7 @@ public class FuelStation {
         return purchase;
     }
 
+    /** The outcome of a single {@link #refill}. */
     @Value
     public static class Purchase {
         double litres;
@@ -90,12 +111,14 @@ public class FuelStation {
         Duration duration;
     }
 
+    /** @return how long pumping {@code litres} takes, at {@link #pumpRateInLitresPerMinute} */
     public Duration durationFor(final double litres) {
         final double seconds = litres * 60.0 / pumpRateInLitresPerMinute;
         final long durationInSeconds = (long) Math.ceil(seconds);
         return Duration.ofSeconds(durationInSeconds);
     }
 
+    /** @return the price of {@code litres}, at {@link #pricePerLitre} */
     public Money priceFor(final double litres) {
         return pricePerLitre.multipliedBy(litres, CEILING);
     }

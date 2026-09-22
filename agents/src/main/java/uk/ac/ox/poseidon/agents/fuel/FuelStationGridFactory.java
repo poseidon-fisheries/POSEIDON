@@ -36,6 +36,11 @@ import java.util.List;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * A {@link RelativeScopeFactory} for an {@link ImmutableFuelStationGrid} placing each resolved
+ * {@link FuelStation} at its own port's location in {@code portGrid}. Built via
+ * {@link Factories#fuelStationGrid}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
