@@ -31,6 +31,10 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+/**
+ * A {@link SimulationScopeFactory} for a {@link VesselField}. Built via
+ * {@link Factories#vesselField}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

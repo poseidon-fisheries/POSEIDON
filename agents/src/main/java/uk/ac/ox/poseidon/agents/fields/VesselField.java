@@ -29,6 +29,12 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+/**
+ * Tracks each vessel's continuous-space location, backed by a MASON {@link Continuous2D} sized to
+ * the model grid's dimensions — read both by the GUI's portrayal layer and by code (e.g.
+ * regulation checks) that needs a vessel's current cell. A vessel with no recorded location (never
+ * placed, or off-grid) reports {@code null} from {@link #getPoint}/{@link #getCell}.
+ */
 @Getter
 public class VesselField {
 
@@ -44,6 +50,7 @@ public class VesselField {
         this.modelGrid = modelGrid;
     }
 
+    /** Places {@code vessel} at the continuous-space point corresponding to {@code cell}. */
     @SuppressWarnings("UnusedReturnValue")
     public boolean setCell(
         final Vessel vessel,
@@ -52,6 +59,7 @@ public class VesselField {
         return setPoint(vessel, modelGrid.toPoint(cell));
     }
 
+    /** Places {@code vessel} at {@code location}. */
     @SuppressWarnings("WeakerAccess")
     public boolean setPoint(
         final Vessel vessel,
@@ -60,10 +68,12 @@ public class VesselField {
         return field.setObjectLocation(vessel, location);
     }
 
+    /** @return {@code vessel}'s recorded location, or {@code null} if it has none */
     public Double2D getPoint(final Vessel vessel) {
         return field.getObjectLocation(vessel);
     }
 
+    /** @return the cell containing {@code vessel}'s recorded location, or {@code null} if it has none */
     public Int2D getCell(final Vessel vessel) {
         final Double2D point = getPoint(vessel);
         return point != null ? modelGrid.toCell(point) : null;

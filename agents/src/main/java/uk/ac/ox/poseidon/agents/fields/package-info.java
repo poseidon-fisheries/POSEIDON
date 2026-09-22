@@ -20,27 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.fields;
-
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
 /**
- * Factories for tracking vessel locations in continuous space.
+ * Continuous-space tracking of vessel locations:
+ * {@link uk.ac.ox.poseidon.agents.fields.VesselField} wraps a MASON {@code Continuous2D}, read by
+ * both the GUI's portrayal layer and by code needing a vessel's current cell. See
+ * {@link uk.ac.ox.poseidon.agents.fields.Factories} for the entry points.
  */
-public class Factories {
-
-    private Factories() {}
-
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link VesselField}
-     * over the resolved grid
-     * @see VesselFieldFactory
-     */
-    public static VesselFieldFactory vesselField(
-        final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid
-    ) {
-        return new VesselFieldFactory(modelGrid);
-    }
-}
+package uk.ac.ox.poseidon.agents.fields;
