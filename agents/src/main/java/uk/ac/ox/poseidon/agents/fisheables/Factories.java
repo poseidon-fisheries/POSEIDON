@@ -26,10 +26,19 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.core.Factory;
 
+/**
+ * Factories for suppliers of the {@link uk.ac.ox.poseidon.biology.Fisheable} at a vessel's current
+ * location.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link CurrentCellFisheable}
+     * @see CurrentCellFisheableFactory
+     */
     public static CurrentCellFisheableFactory currentCellFisheable(
         final Factory<? super VesselScope, ? extends FisheableGrid> fisheableGrid
     ) {

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,29 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.fisheables;
-
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.biology.Fisheable;
-import uk.ac.ox.poseidon.biology.FisheableGrid;
-
-import java.util.function.Supplier;
-
-import static lombok.AccessLevel.PACKAGE;
-
 /**
- * Resupplies the {@link Fisheable} at {@code vessel}'s current cell on every call, tracking the
- * vessel as it moves rather than fixing on a single cell at construction time.
+ * Bridges a vessel's live location to the biology module's
+ * {@link uk.ac.ox.poseidon.biology.Fisheable} abstraction:
+ * {@link uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheable} resolves the fisheable content
+ * at wherever the vessel currently is, re-evaluated on every call. See
+ * {@link uk.ac.ox.poseidon.agents.fisheables.Factories} for the entry points.
  */
-@RequiredArgsConstructor(access = PACKAGE)
-public class CurrentCellFisheable implements Supplier<Fisheable> {
-
-    private final Vessel vessel;
-    private final FisheableGrid fisheableGrid;
-
-    @Override
-    public Fisheable get() {
-        return fisheableGrid.getFisheableCell(vessel.getCell());
-    }
-}
+package uk.ac.ox.poseidon.agents.fisheables;

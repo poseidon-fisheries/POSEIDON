@@ -34,6 +34,10 @@ import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Supplier;
 
+/**
+ * A {@link VesselScopeFactory} for a {@link CurrentCellFisheable} over the resolved
+ * {@code fisheableGrid}. Built via {@link Factories#currentCellFisheable}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
