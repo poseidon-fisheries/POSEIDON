@@ -43,6 +43,13 @@ import java.util.Optional;
 import static java.text.MessageFormat.format;
 import static java.util.Comparator.comparingDouble;
 
+/**
+ * A {@link RelativeScopeFactory} for an {@link ImmutablePortGrid} built from a fixed list of
+ * (port, coordinate) pairs: each port's coordinate is snapped to a valid land cell — its own cell
+ * if suitable, otherwise the closest suitable land neighbour by resolved
+ * {@link DistanceCalculator}. Built via
+ * {@link Factories#portGrid(Factory, Factory, Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

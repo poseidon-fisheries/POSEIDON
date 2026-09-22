@@ -34,10 +34,20 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Factories for {@link Port}s and {@link PortGrid}s: standalone ports, ports placed at fixed
+ * coordinates (directly or read from a table), and ports placed at random suitable locations.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @param code the port's unique code
+     * @param name the port's display name
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a standalone {@link Port}
+     * @see Port
+     */
     public static PortFactory port(
         final String code,
         final String name
@@ -45,6 +55,15 @@ public class Factories {
         return new PortFactory(code, name);
     }
 
+    /**
+     * @param ports              factory for the (port, coordinate) pairs to place
+     * @param bathymetricGrid    factory for the bathymetric grid ports are placed relative to
+     * @param distanceCalculator factory for the calculator used to find the closest suitable
+     *                           land cell when a port's own coordinate isn't valid
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+     * {@link ImmutablePortGrid}
+     * @see PortGridFactory
+     */
     public static <S extends Scope> PortGridFactory<S> portGrid(
         final Factory<? super S, ? extends List<Pair<Port, Coordinate>>> ports,
         final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
@@ -53,6 +72,16 @@ public class Factories {
         return new PortGridFactory<>(ports, bathymetricGrid, distanceCalculator);
     }
 
+    /**
+     * @param table               factory for the table to read
+     * @param portCodeColumnName  the name of the column holding port codes
+     * @param portNameColumnName  the name of the column holding port names
+     * @param longitudeColumnName the name of the column holding port longitudes
+     * @param latitudeColumnName  the name of the column holding port latitudes
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the list of (port,
+     * coordinate) pairs read from the resolved table
+     * @see PortsFromTableFactory
+     */
     public static <S extends Scope> PortsFromTableFactory<S> portsFromTable(
         final Factory<? super S, Table> table,
         final String portCodeColumnName,
@@ -69,6 +98,16 @@ public class Factories {
         );
     }
 
+    /**
+     * @param bathymetricGrid           factory for the bathymetric grid ports are placed on
+     * @param idSupplier                factory for the supplier of each new port's code
+     * @param numberOfPorts             how many ports to place
+     * @param minimumAdjacentWaterTiles the minimum number of active water neighbours a land cell
+     *                                  must have to be a candidate port location
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+     * {@link MutablePortGrid} with randomly-placed ports
+     * @see RandomLocationsPortGridFactory
+     */
     public static RandomLocationsPortGridFactory randomLocationsPortGrid(
         final Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid,
         final Factory<? super SimulationScope, ? extends Supplier<String>> idSupplier,

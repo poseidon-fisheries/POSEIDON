@@ -27,6 +27,14 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 
+/**
+ * A named port, uniquely identified by its {@code code} within a {@link PortGrid}. Only
+ * constructible within this package (via {@link PortGridFactory},
+ * {@link RandomLocationsPortGridFactory}, {@link PortsFromTableFactory}, or
+ * {@code MutablePortGrid.createPort}) or via {@link Factories#port(String, String)} for a
+ * standalone {@link uk.ac.ox.poseidon.core.GlobalScopeFactory}-resolved instance; a {@code Port}
+ * carries no location of its own — that's tracked by whichever {@link PortGrid} it's placed on.
+ */
 @Value
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class Port {

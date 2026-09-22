@@ -20,27 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.ports;
-
-import lombok.NonNull;
-import sim.field.grid.SparseGrid2D;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-
 /**
- * A {@link PortGrid} whose ports are fixed at construction time, defensively copying the given
- * field so later mutation of the source doesn't affect this grid. Built via
- * {@link Factories#portGrid(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory,
- * uk.ac.ox.poseidon.core.Factory)} in this package.
+ * {@link uk.ac.ox.poseidon.geography.ports.Port}s and
+ * {@link uk.ac.ox.poseidon.geography.ports.PortGrid}s: named locations placed on land cells
+ * adjacent to active water, built from fixed coordinates, a table, or randomly-chosen suitable
+ * locations. See {@link uk.ac.ox.poseidon.geography.ports.Factories} for the entry points.
  */
-public class ImmutablePortGrid extends AbstractPortGrid {
-    /**
-     * @param field           the field of ports to copy
-     * @param bathymetricGrid the bathymetric grid ports are placed relative to
-     */
-    public ImmutablePortGrid(
-        final SparseGrid2D field,
-        @NonNull final BathymetricGrid bathymetricGrid
-    ) {
-        super(bathymetricGrid.getModelGrid(), new SparseGrid2D(field), bathymetricGrid);
-    }
-}
+package uk.ac.ox.poseidon.geography.ports;

@@ -33,12 +33,20 @@ import java.util.stream.Stream;
 
 import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
 
+/**
+ * A {@link PortGrid} base class, shared by {@link ImmutablePortGrid} and {@link MutablePortGrid}.
+ */
 @Getter
 public abstract class AbstractPortGrid extends ObjectGrid<Port> implements PortGrid {
 
     @NonNull
     protected final BathymetricGrid bathymetricGrid;
 
+    /**
+     * @param modelGrid       the grid ports are placed on
+     * @param field           the underlying MASON sparse field
+     * @param bathymetricGrid the bathymetric grid ports are placed relative to
+     */
     public AbstractPortGrid(
         final ModelGrid modelGrid,
         final SparseGrid2D field,

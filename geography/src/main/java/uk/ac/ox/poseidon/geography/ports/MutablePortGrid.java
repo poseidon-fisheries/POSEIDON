@@ -35,9 +35,13 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.stream.Collectors.toSet;
 
+/**
+ * A {@link PortGrid} that ports can be added to after construction, via {@link #createPort}.
+ */
 @Getter
 public class MutablePortGrid extends AbstractPortGrid implements MutableGrid<SparseGrid2D> {
 
+    /** @return a new, independent {@code MutablePortGrid} with the same ports as {@code source} */
     public static MutablePortGrid copyOf(final @NonNull PortGrid source) {
         final SparseGrid2D sparseGrid2D = new SparseGrid2D(
             source.getModelGrid().getGridWidth(),
@@ -48,6 +52,10 @@ public class MutablePortGrid extends AbstractPortGrid implements MutableGrid<Spa
         return new MutablePortGrid(source.getBathymetricGrid(), sparseGrid2D);
     }
 
+    /**
+     * @param bathymetricGrid the bathymetric grid ports are placed relative to
+     * @param sparseGrid2D    the field to use directly (not copied)
+     */
     public MutablePortGrid(
         final @NonNull BathymetricGrid bathymetricGrid,
         final @NonNull SparseGrid2D sparseGrid2D
@@ -55,6 +63,11 @@ public class MutablePortGrid extends AbstractPortGrid implements MutableGrid<Spa
         super(bathymetricGrid.getModelGrid(), sparseGrid2D, bathymetricGrid);
     }
 
+    /**
+     * @param bathymetricGrid  the bathymetric grid ports are placed relative to
+     * @param portCoordinates  the ports to place, each at its given coordinate
+     * @throws IllegalArgumentException if any port's coordinate isn't a valid port location
+     */
     public MutablePortGrid(
         final BathymetricGrid bathymetricGrid,
         final Map<Port, ? extends Coordinate> portCoordinates

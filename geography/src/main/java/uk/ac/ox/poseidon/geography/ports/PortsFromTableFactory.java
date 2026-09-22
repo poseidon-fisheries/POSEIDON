@@ -35,6 +35,17 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.util.List;
 
+/**
+ * A {@link RelativeScopeFactory} that reads one (port, coordinate) pair per row of a resolved
+ * {@code tablesaw} table, taking the port's code/name and coordinate lon/lat from named columns.
+ * There's no separate plain component class here: the produced {@link List} is returned as-is,
+ * with no wrapper type to carry documentation, so this factory carries the behavior doc directly.
+ * Built via
+ * {@link Factories#portsFromTable(uk.ac.ox.poseidon.core.Factory, String, String, String, String)}
+ * in this package. The resulting pairs are typically passed on to
+ * {@link Factories#portGrid(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory,
+ * uk.ac.ox.poseidon.core.Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
