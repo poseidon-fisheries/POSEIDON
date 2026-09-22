@@ -38,8 +38,8 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.quantities.AbstractQuantityFactory.parse;
 
 /**
- * Factories for JSR-385 {@link Quantity} values (mass, volume, speed, volumetric flow rate), and
- * for unwrapping a resolved {@link Mass} into a plain kilogram {@link Double}.
+ * Factories for JSR-385 {@link Quantity} values (e.g. mass, volume), and for unwrapping a
+ * resolved {@link Mass} into a plain kilogram {@link Double}.
  */
 public class Factories {
 

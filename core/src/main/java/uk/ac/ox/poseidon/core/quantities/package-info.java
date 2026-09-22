@@ -21,8 +21,7 @@
  */
 
 /**
- * Factories for JSR-385 (units-of-measurement) quantities, such as mass, volume, speed and
- * volumetric flow rate. See {@link uk.ac.ox.poseidon.core.quantities.Factories} for the entry
- * points.
+ * Factories for JSR-385 (units-of-measurement) quantities, such as mass and volume. See
+ * {@link uk.ac.ox.poseidon.core.quantities.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.core.quantities;

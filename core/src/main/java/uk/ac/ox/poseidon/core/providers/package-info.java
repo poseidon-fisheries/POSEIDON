@@ -23,7 +23,7 @@
 /**
  * The {@link Provider} family of supplier/function adapter interfaces, and factories that
  * snapshot or transform another provider's value. See {@link Factories} for the entry points.
- * Subpackages ({@code constant}, {@code random}, {@code temporal}, {@code math}) hold their own
- * component/Factory families and each have their own {@code Factories} class.
+ * Subpackages (e.g. {@code constant}, {@code random}) hold their own component/Factory families
+ * and each have their own {@code Factories} class.
  */
 package uk.ac.ox.poseidon.core.providers;

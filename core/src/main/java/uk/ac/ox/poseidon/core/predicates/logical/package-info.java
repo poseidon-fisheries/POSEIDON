@@ -21,9 +21,8 @@
  */
 
 /**
- * {@link java.util.function.Predicate} combinators ({@link uk.ac.ox.poseidon.core.predicates.logical.AllOf},
- * {@link uk.ac.ox.poseidon.core.predicates.logical.AnyOf}, {@link uk.ac.ox.poseidon.core.predicates.logical.Not})
- * that build a predicate out of other predicates. See
- * {@link uk.ac.ox.poseidon.core.predicates.logical.Factories} for the entry points.
+ * {@link java.util.function.Predicate} combinators that build a predicate out of other
+ * predicates. See {@link uk.ac.ox.poseidon.core.predicates.logical.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.core.predicates.logical;

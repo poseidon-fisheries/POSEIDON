@@ -37,9 +37,9 @@ import java.util.List;
 import static uk.ac.ox.poseidon.core.schedule.TemporalSchedule.DEFAULT_ORDERING;
 
 /**
- * Factories for {@link Steppable}s that schedule themselves (once, once at start, or repeatedly)
- * onto the simulation's {@link TemporalSchedule} when built, and for MASON step-grouping
- * constructs ({@link Sequence}, {@link RandomSequence}) over a resolved list of steppables.
+ * Factories for {@link Steppable}s that schedule themselves onto the simulation's
+ * {@link TemporalSchedule} when built, and for MASON step-grouping constructs (e.g.
+ * {@link Sequence}) over a resolved list of steppables.
  */
 public class Factories {
 
