@@ -29,6 +29,14 @@ import uk.ac.ox.poseidon.core.Factory;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+/**
+ * Pairs a bean-property setter with a list of values to apply, one per index — used by
+ * {@link Factories#mappedFactory(Factory, MappedProperty[])} to vary a cloned factory's property
+ * across a batch of clones (e.g. for calibration).
+ *
+ * @param <F> the factory type whose property is being set
+ * @param <T> the type of the property values
+ */
 @Value
 public class MappedProperty<F extends Factory<?, ?>, T> implements ObjectIntBiConsumer<F> {
 

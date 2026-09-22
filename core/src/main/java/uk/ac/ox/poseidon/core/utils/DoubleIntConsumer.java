@@ -22,8 +22,13 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
+/** A consumer of a {@code double} value paired with an {@code int} index. */
 @FunctionalInterface
 public interface DoubleIntConsumer {
+    /**
+     * @param value the value
+     * @param index the associated index
+     */
     void accept(
         double value,
         int index

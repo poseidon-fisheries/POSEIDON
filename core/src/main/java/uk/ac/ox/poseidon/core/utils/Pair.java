@@ -24,17 +24,30 @@ package uk.ac.ox.poseidon.core.utils;
 
 import lombok.Value;
 
+/**
+ * An immutable pair of two values, of possibly different types. Built via
+ * {@link Factories#pair(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)} in this
+ * package.
+ *
+ * @param <A> the type of the first value
+ * @param <B> the type of the second value
+ */
 @Value
 public class Pair<A, B> {
 
     A first;
     B second;
 
+    /**
+     * @param a the first value
+     * @param b the second value
+     * @return a pair of the two values
+     */
     public static <A, B> Pair<A, B> of(
         final A a,
         final B b
     ) {
         return new Pair<>(a, b);
     }
-    
+
 }

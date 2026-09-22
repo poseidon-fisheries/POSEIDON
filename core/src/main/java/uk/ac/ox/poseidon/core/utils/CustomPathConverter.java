@@ -26,11 +26,19 @@ import com.beust.jcommander.converters.PathConverter;
 
 import java.nio.file.Path;
 
+/**
+ * A JCommander {@link PathConverter} that also expands a leading {@code ~} to the user's home
+ * directory before delegating to the standard conversion.
+ */
 public class CustomPathConverter extends PathConverter {
+    /** @param optionName the JCommander option name this converter is registered for */
     public CustomPathConverter(final String optionName) {
         super(optionName);
     }
 
+    /**
+     * @return the converted path, with a leading {@code ~} expanded to the user's home directory
+     */
     @Override
     public Path convert(final String value) {
         return super.convert(value.replaceFirst("^~", System.getProperty("user.home")));

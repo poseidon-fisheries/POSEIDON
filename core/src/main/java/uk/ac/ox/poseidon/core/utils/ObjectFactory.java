@@ -29,6 +29,12 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/**
+ * A {@link GlobalScopeFactory} that always resolves to the given value, unchanged. No separate
+ * plain component class here: the produced value is passed through as-is, with nothing to wrap.
+ * Built via
+ * {@link Factories Factories.object(...)/Factories.listOf(...)/Factories.setOf(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

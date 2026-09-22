@@ -28,6 +28,10 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * A {@link SimulationScopeFactory} counterpart of {@link PrefixedIdSupplier}, built via
+ * {@link Factories#prefixedIdSupplier(String)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

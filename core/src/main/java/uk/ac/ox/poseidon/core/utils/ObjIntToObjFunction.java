@@ -22,9 +22,20 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
+/**
+ * A function of a {@code T} and an {@code int} index that produces an {@code R}.
+ *
+ * @param <T> the type of the object argument
+ * @param <R> the type of the result
+ */
 @FunctionalInterface
 public interface ObjIntToObjFunction<T, R> {
 
+    /**
+     * @param value the object argument
+     * @param index the associated index
+     * @return the computed result
+     */
     R apply(T value, int index);
 
 }

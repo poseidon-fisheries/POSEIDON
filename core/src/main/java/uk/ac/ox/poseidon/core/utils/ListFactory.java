@@ -29,6 +29,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
+/**
+ * A {@link RelativeScopeFactory} for a {@link List} of resolved values from the given component
+ * factories, in order. No separate plain component class here: the produced value is a bare
+ * {@link List}, with no wrapper to carry documentation. Built via
+ * {@link Factories Factories.listOf(...)/Factories.mappedFactory(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

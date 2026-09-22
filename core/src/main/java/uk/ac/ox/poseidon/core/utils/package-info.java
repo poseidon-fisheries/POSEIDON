@@ -20,22 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.utils;
-
 /**
- * A function of a {@code T} and a {@code double} that produces a {@code double}.
- *
- * @param <T> the type of the object argument
+ * General-purpose helpers that don't belong to a more specific domain package: functional
+ * interfaces, small stateless utility classes, and factories for simple, broadly-applicable
+ * building blocks. See {@link uk.ac.ox.poseidon.core.utils.Factories} for the factory entry
+ * points.
  */
-@FunctionalInterface
-public interface ObjDoubleToDoubleFunction<T> {
-    /**
-     * @param t     the object argument
-     * @param value the double argument
-     * @return the computed result
-     */
-    double applyAsDouble(
-        T t,
-        double value
-    );
-}
+package uk.ac.ox.poseidon.core.utils;

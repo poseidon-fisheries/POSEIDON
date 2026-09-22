@@ -33,10 +33,18 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.units.indriya.unit.UnitDimension.MASS;
 
+/** Helpers for parsing and validating JSR-385 {@link Unit}s. */
 public class Measurements {
     private Measurements() {
     }
 
+    /**
+     * @param unitString    the unit string to parse
+     * @param quantityClass the quantity type to type the parsed unit as
+     * @param dimension     the dimension the parsed unit must have
+     * @return the parsed unit typed as {@code Q}, or {@code null} if its dimension doesn't match
+     * {@code dimension}
+     */
     public static <Q extends Quantity<Q>> Unit<Q> parseUnit(
         final String unitString,
         final Class<Q> quantityClass,
@@ -48,6 +56,10 @@ public class Measurements {
             : null;
     }
 
+    /**
+     * @param unitString a non-null, non-empty unit string
+     * @return the parsed unit, typed as {@link Mass}, or {@code null} if its dimension isn't mass
+     */
     public static Unit<Mass> parseMassUnit(final String unitString) {
         checkNotNull(unitString, "Trying to parse null as a unit of mass");
         checkArgument(!unitString.isEmpty(), "Trying to parse an empty string as a unit of mass");

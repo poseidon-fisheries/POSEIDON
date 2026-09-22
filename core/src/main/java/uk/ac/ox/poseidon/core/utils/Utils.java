@@ -22,12 +22,20 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
+/** General-purpose string helpers used across the codebase. */
 public class Utils {
 
     private Utils() {}
 
+    /** The separator used to join fields in {@link #multiStringKey(Object...)}. */
     public static final char STRING_KEY_SEPARATOR = ';';
 
+    /**
+     * @param value     the value to stringify, or {@code null}
+     * @param nullIfNa  whether {@code ""} and {@code "NA"} (case-insensitive, after trimming)
+     *                  should also be treated as {@code null}
+     * @return {@code value.toString()}, trimmed, or {@code null} per the rules above
+     */
     public static String toTrimmedString(
         final Object value,
         final boolean nullIfNa
