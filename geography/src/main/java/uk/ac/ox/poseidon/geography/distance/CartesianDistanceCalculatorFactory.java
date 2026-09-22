@@ -22,33 +22,31 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-public class Factories {
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link CartesianDistanceCalculator}, built via
+ * {@link Factories#cartesianDistanceCalculator(Factory, double)}.
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class CartesianDistanceCalculatorFactory<S extends Scope>
+    extends RelativeScopeFactory<S, CartesianDistanceCalculator> {
 
-    private Factories() {}
+    private Factory<? super S, ? extends ModelGrid> modelGrid;
+    private double cellSizeInKm;
 
-    public static <S extends Scope> EquirectangularDistanceCalculatorFactory<S>
-    equirectangularDistanceCalculator(
-        final Factory<? super S, ? extends ModelGrid> modelGrid
-    ) {
-        return new EquirectangularDistanceCalculatorFactory<>(modelGrid);
-    }
-
-    public static <S extends Scope> HaversineDistanceCalculatorFactory<S>
-    haversineDistanceCalculator(
-        final Factory<? super S, ? extends ModelGrid> modelGrid
-    ) {
-        return new HaversineDistanceCalculatorFactory<>(modelGrid);
-    }
-
-    public static <S extends Scope> CartesianDistanceCalculatorFactory<S>
-    cartesianDistanceCalculator(
-        final Factory<? super S, ? extends ModelGrid> modelGrid,
-        final double cellSizeInKm
-    ) {
-        return new CartesianDistanceCalculatorFactory<>(modelGrid, cellSizeInKm);
+    @Override
+    protected CartesianDistanceCalculator newInstance(final S scope) {
+        return new CartesianDistanceCalculator(modelGrid.get(scope), cellSizeInKm);
     }
 }
