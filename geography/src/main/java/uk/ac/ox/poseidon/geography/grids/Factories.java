@@ -69,12 +69,41 @@ public class Factories {
         return new ModelGridFromLonLatTableFactory<>(lonLatTable, gridWidthInCells, mapPaddingInDegrees);
     }
 
+    public static <S extends Scope> DoubleGridFromAllocatorFactory<S> doubleGridFromAllocator(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends Allocator> allocator
+    ) {
+        return new DoubleGridFromAllocatorFactory<>(modelGrid, allocator);
+    }
+
     public static <S extends Scope> NormalisedDoubleGridFromAllocatorFactory<S> normalisedDoubleGridFromAllocator(
         final Factory<? super S, ? extends ModelGrid> modelGrid,
         final Factory<? super S, ? extends Allocator> allocator,
         final Factory<? super S, ? extends Number> totalValue
     ) {
         return new NormalisedDoubleGridFromAllocatorFactory<>(modelGrid, allocator, totalValue);
+    }
+
+    public static <S extends Scope> MutableDoubleGridFromAllocatorFactory<S> mutableDoubleGridFromAllocator(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends Allocator> allocator
+    ) {
+        return new MutableDoubleGridFromAllocatorFactory<>(modelGrid, allocator);
+    }
+
+    public static <S extends Scope> NormalisedMutableDoubleGridFromAllocatorFactory<S>
+    normalisedMutableDoubleGridFromAllocator(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends Allocator> allocator,
+        final Factory<? super S, ? extends Number> totalValue
+    ) {
+        return new NormalisedMutableDoubleGridFromAllocatorFactory<>(modelGrid, allocator, totalValue);
+    }
+
+    public static <S extends Scope> ModelGridFromGridFileFactory<S> modelGridFromGridFile(
+        final Factory<? super S, ? extends Path> gridFilePath
+    ) {
+        return new ModelGridFromGridFileFactory<>(gridFilePath);
     }
 
     public static <S extends Scope> TimeIndexedNetCdfGridReaderFactory<S> timeIndexedNetCdfGridReader(

@@ -37,7 +37,7 @@ import java.nio.file.Path;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ModelGridFromGridFile<S extends Scope>
+public class ModelGridFromGridFileFactory<S extends Scope>
     extends RelativeScopeFactory<S, ModelGrid> {
 
     private Factory<? super S, ? extends Path> gridFilePath;
