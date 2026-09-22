@@ -22,9 +22,6 @@
 
 package uk.ac.ox.poseidon.core.scopes;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Marks the sharing/lifecycle boundary a {@link uk.ac.ox.poseidon.core.Factory}-produced object
  * belongs to. The base class itself represents the global scope, shared by every
@@ -39,8 +36,6 @@ public class Scope {
      */
     @SuppressWarnings("InstantiationOfUtilityClass")
     public static final Scope GLOBAL_SCOPE = new Scope();
-
-    protected static final Map<Class<? extends Scope>, Scope> SCOPES = new HashMap<>();
 
     Scope() {
     }
