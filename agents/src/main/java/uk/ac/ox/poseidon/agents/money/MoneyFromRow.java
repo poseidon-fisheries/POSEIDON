@@ -30,6 +30,10 @@ import tech.tablesaw.api.Row;
 import java.math.RoundingMode;
 import java.util.function.Function;
 
+/**
+ * Reads a {@link Money} amount off a table {@link Row}, from a currency column and an amount
+ * column.
+ */
 @RequiredArgsConstructor
 public class MoneyFromRow implements Function<Row, Money> {
 

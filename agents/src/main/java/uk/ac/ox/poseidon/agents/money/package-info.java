@@ -20,38 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.money;
-
-import lombok.NonNull;
-
 /**
- * Factories for {@link org.joda.money.Money} amounts: a fixed amount, or one read from a table row.
+ * Constructing {@link org.joda.money.Money} amounts, either fixed or read from tabular data. See
+ * {@link uk.ac.ox.poseidon.agents.money.Factories} for the entry points.
  */
-public class Factories {
-
-    private Factories() {}
-
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a fixed
-     * {@link org.joda.money.Money} amount
-     * @see MoneyFactory
-     */
-    public static MoneyFactory money(
-        final double amount,
-        final @NonNull String currencyUnit
-    ) {
-        return new MoneyFactory(amount, currencyUnit);
-    }
-
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MoneyFromRow}
-     * @see MoneyFromRowFactory
-     */
-    public static MoneyFromRowFactory moneyFromRow(
-        final String currencyColumnName,
-        final String amountColumnName
-    ) {
-        return new MoneyFromRowFactory(currencyColumnName, amountColumnName);
-    }
-
-}
+package uk.ac.ox.poseidon.agents.money;

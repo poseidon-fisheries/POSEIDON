@@ -34,6 +34,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.math.RoundingMode.HALF_EVEN;
 
+/**
+ * A {@link GlobalScopeFactory} for a fixed {@link Money} amount. Built via
+ * {@link Factories#money}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
