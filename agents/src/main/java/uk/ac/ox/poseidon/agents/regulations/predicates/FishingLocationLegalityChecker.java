@@ -44,7 +44,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
     private final Regulations<? super ExtendedFishingAction> regulations;
     private final GridPathFinder pathFinder;
     private final DistanceCalculator distanceCalculator;
-    private final Supplier<LocalDateTime> currenDateTimeSupplier;
+    private final Supplier<LocalDateTime> currentDateTimeSupplier;
     private final Vessel vessel;
 
     @Override
@@ -75,7 +75,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
 
         return new ExtendedFishingAction(
             vessel,
-            currenDateTimeSupplier.get().plus(travelDuration),
+            currentDateTimeSupplier.get().plus(travelDuration),
             Duration.ofSeconds(1),
             vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation),
             vessel.getGear()
