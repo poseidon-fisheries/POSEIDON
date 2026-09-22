@@ -22,11 +22,14 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
+import org.locationtech.jts.geom.Geometry;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
+import java.util.Collection;
 import java.util.function.Predicate;
 
 import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
@@ -52,6 +55,18 @@ public class Factories {
             cellValue(bathymetricGrid),
             between(-maximumDepth, -minimumDepth)
         );
+    }
+
+    public static <S extends Scope> InRectangularAreaFactory<S> inRectangularArea(
+        final Factory<? super S, ? extends Envelope> envelope
+    ) {
+        return new InRectangularAreaFactory<>(envelope);
+    }
+
+    public static <S extends Scope> InGeometriesFactory<S> inGeometries(
+        final Factory<? super S, ? extends Collection<? extends Geometry>> geometries
+    ) {
+        return new InGeometriesFactory<>(geometries);
     }
 
 }
