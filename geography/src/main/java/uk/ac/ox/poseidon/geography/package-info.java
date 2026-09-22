@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,31 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link Coordinate}, built via
- * {@link Factories#coordinate(double, double)}.
+ * Basic spatial primitives, built on JTS: geographic
+ * {@link uk.ac.ox.poseidon.geography.Coordinate}s and bounding-box
+ * {@link uk.ac.ox.poseidon.geography.Envelope}s. See
+ * {@link uk.ac.ox.poseidon.geography.Factories} for the entry points. Subpackages build on these
+ * for grids, bathymetry, ports, spatial allocation, and related predicates and utilities.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class CoordinateFactory extends GlobalScopeFactory<Coordinate> {
-
-    private double longitude;
-    private double latitude;
-
-    @Override
-    protected Coordinate newInstance(final Scope scope) {
-        return new Coordinate(longitude, latitude);
-    }
-
-}
+package uk.ac.ox.poseidon.geography;

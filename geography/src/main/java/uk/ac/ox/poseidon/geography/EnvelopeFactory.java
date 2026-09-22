@@ -29,6 +29,10 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/**
+ * A {@link GlobalScopeFactory} counterpart of {@link Envelope}, built via
+ * {@link Factories#envelope(double, double, double, double)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

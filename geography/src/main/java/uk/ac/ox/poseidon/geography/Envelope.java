@@ -25,7 +25,12 @@ package uk.ac.ox.poseidon.geography;
 import lombok.Data;
 
 /**
- * Immutable Envelope equivalent to com.vividsolutions.jts.geom.Envelope
+ * An immutable bounding box, equivalent to {@code org.locationtech.jts.geom.Envelope} but safe for
+ * concurrency and use as a hash key. Built via
+ * {@link Factories#envelope(double, double, double, double)}. A "null" envelope (one where
+ * {@code maxX < minX} or {@code maxY < minY}, as returned by the no-arg constructor) represents an
+ * empty region; most methods special-case it (e.g. {@link #getWidth()} returns {@code 0}, most
+ * predicates return {@code false}).
  */
 @Data
 public final class Envelope {
@@ -95,6 +100,9 @@ public final class Envelope {
         this(env.minX, env.maxX, env.minY, env.maxY);
     }
 
+    /**
+     * @return whether the envelope defined by {@code p1}/{@code p2} intersects the point {@code q}
+     */
     public static boolean intersects(
         final Coordinate p1,
         final Coordinate p2,
@@ -106,6 +114,10 @@ public final class Envelope {
             && q.lat <= Math.max(p1.lat, p2.lat);
     }
 
+    /**
+     * @return whether the envelope defined by {@code p1}/{@code p2} intersects the envelope
+     * defined by {@code q1}/{@code q2}
+     */
     public static boolean intersects(
         final Coordinate p1,
         final Coordinate p2,
@@ -143,27 +155,39 @@ public final class Envelope {
         );
     }
 
+    /** @return whether this envelope is empty (i.e. {@code maxX < minX} or {@code maxY < minY}) */
     public boolean isNull() {
         return (maxX < minX) || (maxY < minY);
     }
 
+    /** @return {@code maxX - minX}, or {@code 0} if this envelope is {@link #isNull() null} */
     public double getWidth() {
         return isNull() ? 0.0 : (maxX - minX);
     }
 
+    /** @return {@code maxY - minY}, or {@code 0} if this envelope is {@link #isNull() null} */
     public double getHeight() {
         return isNull() ? 0.0 : (maxY - minY);
     }
 
+    /** @return {@link #getWidth()} times {@link #getHeight()} */
     public double getArea() {
         return getWidth() * getHeight();
     }
 
+    /**
+     * @return the smaller of {@link #getWidth()} and {@link #getHeight()}, or {@code 0} if this
+     * envelope is {@link #isNull() null}
+     */
     public double minExtent() {
         if (isNull()) return 0.0;
         return Math.min(getWidth(), getHeight());
     }
 
+    /**
+     * @return the larger of {@link #getWidth()} and {@link #getHeight()}, or {@code 0} if this
+     * envelope is {@link #isNull() null}
+     */
     public double maxExtent() {
         if (isNull()) return 0.0;
         return Math.max(getWidth(), getHeight());
@@ -254,6 +278,7 @@ public final class Envelope {
         );
     }
 
+    /** @return the midpoint of this envelope, or {@code null} if it is {@link #isNull() null} */
     public Coordinate centre() {
         if (isNull()) {
             return null;
@@ -261,6 +286,10 @@ public final class Envelope {
         return new Coordinate((minX + maxX) / 2.0, (minY + maxY) / 2.0);
     }
 
+    /**
+     * @return the overlapping region of this envelope and {@code env}, or a {@link #isNull() null}
+     * envelope if they don't overlap
+     */
     public Envelope intersection(final Envelope env) {
         if (this.isNull() || env.isNull() || !this.intersects(env)) {
             return new Envelope();
@@ -272,6 +301,7 @@ public final class Envelope {
         return new Envelope(intMinX, intMaxX, intMinY, intMaxY);
     }
 
+    /** @return whether this envelope and {@code other} overlap (touching counts as overlapping) */
     public boolean intersects(final Envelope other) {
         if (this.isNull() || other.isNull()) return false;
         if (other.minX > this.maxX) return false;
@@ -280,20 +310,24 @@ public final class Envelope {
         return !(other.maxY < this.minY);
     }
 
+    /** @deprecated use {@link #intersects(Envelope)} */
     @Deprecated
     public boolean overlaps(final Envelope other) {
         return intersects(other);
     }
 
+    /** @return whether this envelope contains or touches the point {@code p} */
     public boolean intersects(final Coordinate p) {
         return intersects(p.lon, p.lat);
     }
 
+    /** @deprecated use {@link #intersects(Coordinate)} */
     @Deprecated
     public boolean overlaps(final Coordinate p) {
         return intersects(p);
     }
 
+    /** @return whether this envelope contains or touches the point {@code (x, y)} */
     public boolean intersects(
         final double x,
         final double y
@@ -305,6 +339,7 @@ public final class Envelope {
         return !(y < minY);
     }
 
+    /** @deprecated use {@link #intersects(double, double)} */
     @Deprecated
     public boolean overlaps(
         final double x,
@@ -313,14 +348,26 @@ public final class Envelope {
         return intersects(x, y);
     }
 
+    /**
+     * @return whether this envelope fully covers {@code other} (alias for
+     * {@link #covers(Envelope)})
+     */
     public boolean contains(final Envelope other) {
         return covers(other);
     }
 
+    /**
+     * @return whether this envelope covers the point {@code p} (alias for
+     * {@link #covers(Coordinate)})
+     */
     public boolean contains(final Coordinate p) {
         return covers(p);
     }
 
+    /**
+     * @return whether this envelope covers the point {@code (x, y)} (alias for
+     * {@link #covers(double, double)})
+     */
     public boolean contains(
         final double x,
         final double y
@@ -328,6 +375,10 @@ public final class Envelope {
         return covers(x, y);
     }
 
+    /**
+     * @return whether this envelope covers the point {@code (x, y)}; unlike
+     * {@link #intersects(double, double)}, a {@link #isNull() null} envelope covers nothing
+     */
     public boolean covers(
         final double x,
         final double y
@@ -336,24 +387,22 @@ public final class Envelope {
         return x >= minX && x <= maxX && y >= minY && y <= maxY;
     }
 
-    // -----------------------------------------------------------------------
-    // Static JTS methods, copied as-is
-    // -----------------------------------------------------------------------
-
+    /** @return whether this envelope covers the point {@code p} */
     public boolean covers(final Coordinate p) {
         return covers(p.lon, p.lat);
     }
 
+    /** @return whether this envelope fully covers {@code other} */
     public boolean covers(final Envelope other) {
         if (this.isNull() || other.isNull()) return false;
         return other.minX >= this.minX && other.maxX <= this.maxX
             && other.minY >= this.minY && other.maxY <= this.maxY;
     }
 
-    // -----------------------------------------------------------------------
-    // Conversion to/from JTS
-    // -----------------------------------------------------------------------
-
+    /**
+     * @return the shortest distance between this envelope and {@code env}, or {@code 0} if they
+     * overlap
+     */
     public double distance(final Envelope env) {
         if (this.intersects(env)) {
             return 0.0;
