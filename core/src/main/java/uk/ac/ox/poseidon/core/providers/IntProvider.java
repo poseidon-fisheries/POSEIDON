@@ -28,9 +28,10 @@ import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 
 /**
- * A supplier of int that can also be used in contexts requiring a function, in which case it
- * ignores the argument passed to `applyAsInt` and just returns the int it would have supplied
- * anyway.
+ * An {@link IntSupplier} that can also be used anywhere a {@link ToIntFunction} or {@link Function}
+ * of {@link Integer} is required, in which case it ignores the argument passed to
+ * {@link #applyAsInt}/{@link #apply} and just returns the int it would have supplied anyway. Lets
+ * the same object be wired into any of those call sites without an adapter.
  */
 public interface IntProvider
     extends IntSupplier, Supplier<Integer>, ToIntFunction<Object>, Function<Object, Integer> {

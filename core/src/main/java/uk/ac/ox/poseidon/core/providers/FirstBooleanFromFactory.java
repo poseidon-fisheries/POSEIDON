@@ -33,6 +33,13 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.BooleanSupplier;
 
+/**
+ * A {@link RelativeScopeFactory} that resolves the given delegate {@link BooleanSupplier} once,
+ * when built, and returns a {@link BooleanProvider} that keeps handing out that same
+ * first-resolved value thereafter — a snapshot, not a live pass-through to the delegate. No
+ * separate plain component class here: the produced value is a {@link ConstantBooleanProvider}
+ * wrapping the snapshot, built via {@link Factories#firstBooleanFrom(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

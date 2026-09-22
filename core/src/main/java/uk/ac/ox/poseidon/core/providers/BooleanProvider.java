@@ -28,9 +28,10 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * A supplier of boolean that can also be used in contexts requiring a predicate, in which case it
- * ignores the argument passed to `test` and just returns the boolean it would have supplied
- * anyway.
+ * A {@link BooleanSupplier} that can also be used anywhere a {@link Predicate} or {@link Function}
+ * of {@link Boolean} is required, in which case it ignores the argument passed to {@link #test}/
+ * {@link #apply} and just returns the boolean it would have supplied anyway. Lets the same object
+ * be wired into any of those call sites without an adapter.
  */
 public interface BooleanProvider
     extends BooleanSupplier, Supplier<Boolean>, Predicate<Object>, Function<Object, Boolean> {

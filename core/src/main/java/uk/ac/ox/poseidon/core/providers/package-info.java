@@ -20,20 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers;
-
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 /**
- * A {@link Supplier} of {@code T} that can also be used anywhere a {@link Function} is required,
- * in which case it ignores the argument passed to {@link #apply} and just returns the value it
- * would have supplied anyway. Lets the same object be wired into either kind of call site without
- * an adapter.
- *
- * @param <T> the type of object returned by the provider
+ * The {@link Provider} family of supplier/function adapter interfaces, and factories that
+ * snapshot or transform another provider's value. See {@link Factories} for the entry points.
+ * Subpackages ({@code constant}, {@code random}, {@code temporal}, {@code math}) hold their own
+ * component/Factory families and each have their own {@code Factories} class.
  */
-public interface Provider<T> extends Supplier<T>, Function<Object, T> {
-    @Override
-    default T apply(final Object ignored) {return get();}
-}
+package uk.ac.ox.poseidon.core.providers;

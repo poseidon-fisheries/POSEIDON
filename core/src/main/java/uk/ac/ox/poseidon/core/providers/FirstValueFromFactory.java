@@ -33,6 +33,13 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Supplier;
 
+/**
+ * A {@link RelativeScopeFactory} that resolves the given delegate {@link Supplier} once, when
+ * built, and returns a {@link Provider} that keeps handing out that same first-resolved value
+ * thereafter — a snapshot, not a live pass-through to the delegate. No separate plain component
+ * class here: the produced value is a {@link ConstantProvider} wrapping the snapshot, built via
+ * {@link Factories#firstValueFrom(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

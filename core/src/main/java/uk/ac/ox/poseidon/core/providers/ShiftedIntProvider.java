@@ -26,6 +26,10 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.function.IntSupplier;
 
+/**
+ * An {@link IntProvider} that adds a fixed integer shift to a delegate {@link IntSupplier}'s value
+ * on every call.
+ */
 @RequiredArgsConstructor
 public class ShiftedIntProvider implements IntProvider {
 

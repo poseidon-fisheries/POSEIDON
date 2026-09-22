@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.IntSupplier;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link ShiftedIntProvider}, built via
+ * {@link Factories#shiftedInt(Factory, int)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
