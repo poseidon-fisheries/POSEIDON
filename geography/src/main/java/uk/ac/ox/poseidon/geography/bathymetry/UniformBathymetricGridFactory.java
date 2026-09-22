@@ -40,6 +40,6 @@ public class UniformBathymetricGridFactory<S extends Scope>
 
     @Override
     protected BathymetricGrid newInstance(final S scope) {
-        return new DefaultBathymetricGrid(modelGrid.get(scope), depth);
+        return new DefaultBathymetricGrid(modelGrid.get(scope), -depth);
     }
 }
