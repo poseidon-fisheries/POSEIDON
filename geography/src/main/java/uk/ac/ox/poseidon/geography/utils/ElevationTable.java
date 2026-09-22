@@ -31,11 +31,23 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+/**
+ * A {@link LonLatTable} that also has an elevation column, exposing its rows as a stream of
+ * coordinate/elevation {@link Entry} pairs. Built via
+ * {@link Factories#elevationTable(uk.ac.ox.poseidon.core.Factory, String, String, String)} in
+ * this package.
+ */
 @Getter
 public class ElevationTable extends LonLatTable {
 
     private final NumericColumn<?> elevationColumn;
 
+    /**
+     * @param table               the table to wrap
+     * @param longitudeColumnName the name of the column holding longitude values
+     * @param latitudeColumnName  the name of the column holding latitude values
+     * @param elevationColumnName the name of the column holding elevation values
+     */
     public ElevationTable(
         final Table table,
         final String longitudeColumnName,
@@ -46,12 +58,14 @@ public class ElevationTable extends LonLatTable {
         this.elevationColumn = table.numberColumn(elevationColumnName);
     }
 
+    /** One row's coordinate and elevation. */
     @Value
     public static class Entry {
         Coordinate coordinate;
         double elevation;
     }
 
+    /** @return one {@link Entry} per row, in table order */
     public Stream<Entry> entryStream() {
         return IntStream.range(0, table.rowCount())
             .mapToObj(i -> new Entry(

@@ -31,6 +31,10 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link ElevationTable}, built via
+ * {@link Factories#elevationTable(Factory, String, String, String)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

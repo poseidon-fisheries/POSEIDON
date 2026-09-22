@@ -30,11 +30,25 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+/**
+ * Wraps a {@code tablesaw} {@link Table} that has longitude and latitude columns, exposing its
+ * rows as a stream of {@link Coordinate}s. Built via
+ * {@link Factories#lonLatTable(uk.ac.ox.poseidon.core.Factory, String, String)} in this package;
+ * subclassed by {@link ElevationTable} for tables with a further elevation column.
+ */
 public class LonLatTable {
+    /** The wrapped table. */
     protected final Table table;
+    /** The table's longitude column, resolved by name at construction time. */
     protected final NumericColumn<?> longitudeColumn;
+    /** The table's latitude column, resolved by name at construction time. */
     protected final NumericColumn<?> latitudeColumn;
 
+    /**
+     * @param table               the table to wrap
+     * @param longitudeColumnName the name of the column holding longitude values
+     * @param latitudeColumnName  the name of the column holding latitude values
+     */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public LonLatTable(
         final Table table,
@@ -46,6 +60,7 @@ public class LonLatTable {
         this.latitudeColumn = table.numberColumn(latitudeColumnName);
     }
 
+    /** @return one {@link Coordinate} per row, in table order */
     public Stream<Coordinate> coordinateStream() {
         return IntStream.range(0, table.rowCount())
             .mapToObj(i ->

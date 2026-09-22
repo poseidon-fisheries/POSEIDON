@@ -31,6 +31,10 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link LonLatTable}, built via
+ * {@link Factories#lonLatTable(Factory, String, String)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
