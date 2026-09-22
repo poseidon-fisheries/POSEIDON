@@ -42,4 +42,12 @@ public class Factories {
         );
     }
 
+    public static <S extends Scope> LonLatTableFactory<S> lonLatTable(
+        final Factory<? super S, ? extends Table> table,
+        final String longitudeColumnName,
+        final String latitudeColumnName
+    ) {
+        return new LonLatTableFactory<>(table, longitudeColumnName, latitudeColumnName);
+    }
+
 }
