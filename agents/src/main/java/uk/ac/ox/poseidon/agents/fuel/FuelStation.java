@@ -22,9 +22,9 @@
 
 package uk.ac.ox.poseidon.agents.fuel;
 
-import com.google.common.base.Preconditions;
 import lombok.Data;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.Value;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.vessels.engines.FuelTank;
@@ -35,6 +35,9 @@ import java.time.Duration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.math.RoundingMode.CEILING;
+import static lombok.AccessLevel.NONE;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 
 @Data
 public class FuelStation {
@@ -42,8 +45,10 @@ public class FuelStation {
     private final @NonNull Port port;
     private final @NonNull String code;
     private final @NonNull EventManager eventManager;
+    // suppresses @Data's unchecked setter; setPricePerLitre below enforces non-negativity instead
+    @Setter(NONE)
     private @NonNull Money pricePerLitre;
-    private double pumpRateInLitresPerMinute;
+    private final double pumpRateInLitresPerMinute;
 
     public FuelStation(
         final @NonNull Port port,
@@ -55,27 +60,27 @@ public class FuelStation {
         this.port = checkNotNull(port, "port must not be null");
         this.code = checkNotNull(code, "code must not be null");
         this.eventManager = checkNotNull(eventManager, "eventManager must not be null");
-        this.pricePerLitre = checkNotNull(pricePerLitre, "pricePerLitre must not be null");
-        Preconditions.checkArgument(
-            !pricePerLitre.isNegative(),
-            "pricePerLitre must be non-negative"
-        );
-        Preconditions.checkArgument(
-            pumpRateInLitresPerMinute > 0.0,
-            "pumpRateInLitresPerMinute must be positive"
-        );
-        this.pumpRateInLitresPerMinute = pumpRateInLitresPerMinute;
+        setPricePerLitre(pricePerLitre);
+        this.pumpRateInLitresPerMinute =
+            checkPositive(pumpRateInLitresPerMinute, "pumpRateInLitresPerMinute");
+    }
+
+    public void setPricePerLitre(final @NonNull Money pricePerLitre) {
+        checkNonNegative(pricePerLitre.getAmount().doubleValue(), "pricePerLitre");
+        this.pricePerLitre = pricePerLitre;
     }
 
     public Purchase refill(final FuelTank fuelTank) {
         final double litresToAdd =
             fuelTank.getCapacityInLitres() - fuelTank.getCurrentFuelInLitres();
         fuelTank.addFuel(litresToAdd);
-        return new Purchase(
+        final Purchase purchase = new Purchase(
             litresToAdd,
             priceFor(litresToAdd),
             durationFor(litresToAdd)
         );
+        eventManager.broadcast(purchase);
+        return purchase;
     }
 
     @Value
