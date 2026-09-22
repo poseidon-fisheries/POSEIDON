@@ -35,7 +35,7 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 @RequiredArgsConstructor
 public class LandCatches extends ExtendedTripTask {
 
-    final Supplier<Duration> durationSupplier;
+    private final Supplier<Duration> durationSupplier;
 
     @Override
     protected Duration getDuration() {
