@@ -36,7 +36,7 @@ import java.util.function.Predicate;
 public class PermittedIfFactory<S extends Scope, A extends Action<?>>
     extends RelativeScopeFactory<S, PermittedIf<A>> {
 
-    @NonNull private Factory<? super S, ? extends Predicate<? super A>> actionPredicate;
+    private Factory<? super S, ? extends Predicate<? super A>> actionPredicate;
 
     @Override
     protected PermittedIf<A> newInstance(final S scope) {
