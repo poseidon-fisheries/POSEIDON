@@ -33,12 +33,25 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.Optional;
 
+/**
+ * A {@link GridPathFinder} using the A* search algorithm (libGDX's {@link IndexedAStarPathFinder},
+ * via {@link GridAdaptor}), guided by a resolved {@link DistanceCalculator} as its heuristic:
+ * complete (finds a path whenever one exists) but slower than {@link BresenhamPathFinder}. Not
+ * built standalone — see {@link DefaultPathFinderFactory} for the combination this package
+ * exposes.
+ */
 public class AStarPathFinder extends AbstractGridPathFinder {
 
     private final GridAdaptor gridAdaptor;
     private final IndexedAStarPathFinder<Int2D> pathFinder;
     private final Heuristic<Int2D> heuristic;
 
+    /**
+     * @param bathymetricGrid    the grid to find water/land cells on
+     * @param portGrid           the grid of ports, whose cells also count as navigable
+     * @param distanceCalculator the distance calculator used both as the A* heuristic and to
+     *                           weight connections between cells
+     */
     public AStarPathFinder(
         final BathymetricGrid bathymetricGrid,
         final PortGrid portGrid,

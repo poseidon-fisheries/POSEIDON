@@ -34,6 +34,20 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+/**
+ * A {@link RelativeScopeFactory} for a {@link DefaultPathCache}, built via
+ * {@link Factories#pathCache(Factory, Factory, Factory)}. {@link #newInstance} builds a bare,
+ * empty {@link DefaultPathCache} regardless of the resolved dependencies — {@code bathymetricGrid},
+ * {@code portGrid}, and {@code distance} are never read there. They exist purely to shape this
+ * factory's identity: {@code @Data}-generated {@code equals}/{@code hashCode} include them, and
+ * {@link uk.ac.ox.poseidon.core.AbstractFactory#get} caches by (scope key, this factory's
+ * {@code hashCode()}), so two
+ * {@code DefaultPathCacheFactory}s built from the <em>same</em> grid/port/distance dependencies
+ * resolve to the <em>same</em> cache instance (correctly sharing cached paths), while factories
+ * built from different dependencies get distinct caches. Don't "simplify" this by dropping the
+ * unused fields — that would collapse every path cache in a scenario into one shared instance
+ * regardless of which grids it was actually built for.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

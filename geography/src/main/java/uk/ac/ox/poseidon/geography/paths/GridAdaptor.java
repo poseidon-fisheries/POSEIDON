@@ -37,6 +37,12 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+/**
+ * Adapts this package's grid model to libGDX AI's {@link IndexedGraph}, so
+ * {@link com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder} can search it (used by
+ * {@link AStarPathFinder}). Caches each cell's outgoing connections, since libGDX's search
+ * revisits cells and the underlying grid queries aren't free.
+ */
 public class GridAdaptor implements IndexedGraph<Int2D> {
 
     private final Interner<Int2D> interner = Interners.newStrongInterner();
@@ -48,6 +54,11 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
     private final Cache<Int2D, Array<Connection<Int2D>>> connectionsCache =
         Caffeine.newBuilder().build();
 
+    /**
+     * @param bathymetricGrid    the grid to find water/land cells on
+     * @param portGrid           the grid of ports, whose cells also count as navigable
+     * @param distanceCalculator the distance calculator used to weight connections between cells
+     */
     public GridAdaptor(
         final BathymetricGrid bathymetricGrid,
         final PortGrid portGrid,
@@ -63,16 +74,22 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
         return bathymetricGrid.isWater(cell) || portGrid.anyObjectsAt(cell);
     }
 
+    /** @return a unique index for {@code cell}, as required by {@link IndexedGraph} */
     @Override
     public int getIndex(final Int2D cell) {
         return cell.x + cell.y * modelGrid.getGridWidth();
     }
 
+    /** @return the total number of cells in the grid */
     @Override
     public int getNodeCount() {
         return modelGrid.getGridHeight() * modelGrid.getGridWidth();
     }
 
+    /**
+     * @return {@code cell}'s outgoing connections to its navigable neighbours, weighted by
+     * {@link #getDistanceCalculator()}; empty if {@code cell} itself isn't navigable
+     */
     @Override
     public Array<Connection<Int2D>> getConnections(final Int2D cell) {
         return connectionsCache.get(

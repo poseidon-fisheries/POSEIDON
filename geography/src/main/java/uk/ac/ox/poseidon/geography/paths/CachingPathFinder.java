@@ -27,10 +27,19 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Optional;
 
+/**
+ * A {@link PathFinder} that delegates to another {@link PathFinder}, consulting and updating a
+ * {@link PathCache} so repeated queries for the same start/end are served from memory. Built via
+ * {@link uk.ac.ox.poseidon.geography.paths.Factories}.
+ */
 public class CachingPathFinder<P> implements PathFinder<P> {
     private final PathFinder<P> pathFinder;
     private final PathCache<P> cache;
 
+    /**
+     * @param pathFinder the delegate consulted on a cache miss
+     * @param cache      the cache consulted first, and updated with any new result
+     */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CachingPathFinder(
         final PathFinder<P> pathFinder,

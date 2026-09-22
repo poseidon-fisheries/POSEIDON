@@ -34,6 +34,13 @@ import java.util.Map.Entry;
 
 import static java.util.Map.entry;
 
+/**
+ * A {@link GridPathFinder} counterpart of {@link CachingPathFinder}: in addition to caching
+ * individual paths (inherited from {@link CachingPathFinder}), it caches the results of
+ * {@link #getAccessibleWaterCells} and {@link #getAccessibleWaterNeighbours}, since both are
+ * expensive to recompute and interned so equal results share one instance. Not built directly —
+ * see {@link DefaultPathFinderFactory}/{@link uk.ac.ox.poseidon.geography.paths.Factories}.
+ */
 public class CachingGridPathFinder extends CachingPathFinder<Int2D> implements GridPathFinder {
 
     private final GridPathFinder pathFinder;

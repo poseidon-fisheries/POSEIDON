@@ -32,6 +32,11 @@ import java.util.Optional;
 
 import static java.util.Map.entry;
 
+/**
+ * The default {@link PathCache}: an in-memory, unbounded Caffeine {@link Cache} keyed by
+ * (start, end) pairs. Built via {@link Factories#pathCache(uk.ac.ox.poseidon.core.Factory,
+ * uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)} in this package.
+ */
 public class DefaultPathCache<P> implements PathCache<P> {
 
     private final Cache<Entry<P, P>, Optional<ImmutableList<P>>> memory =
@@ -42,8 +47,8 @@ public class DefaultPathCache<P> implements PathCache<P> {
      * start that we can reverse, storing it and returning it if there is one. Returned paths are
      * wrapped in Optional. An empty optional means the path is impossible.
      *
-     * @param start The N at which the path should start
-     * @param end   The N at which the path should end
+     * @param start The point at which the path should start
+     * @param end   The point at which the path should end
      * @return Either:
      * <ul>
      * <li>An immutable list of sea tiles wrapped in an Optional if there is a known path between

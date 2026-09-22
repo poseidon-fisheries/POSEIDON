@@ -27,6 +27,12 @@ import lombok.AllArgsConstructor;
 
 import java.util.Optional;
 
+/**
+ * A {@link PathFinder} that tries a fast heuristic first, falling back to a slower but complete
+ * pathfinder whenever the heuristic comes up empty (see {@link PathFinder#getPath} for how that
+ * interacts with {@link BresenhamPathFinder}'s use of "empty" to mean "give up here", not
+ * necessarily "impossible"). Built via {@link uk.ac.ox.poseidon.geography.paths.Factories}.
+ */
 @AllArgsConstructor
 public class FallbackPathfinder<P> implements PathFinder<P> {
 

@@ -27,10 +27,15 @@ import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.Optional;
 
+/**
+ * A {@link PathFinder} that also remembers paths (and the absence thereof) it's told about, so
+ * repeated queries for the same start/end don't require recomputation. Built via
+ * {@link uk.ac.ox.poseidon.geography.paths.Factories}; implemented by {@link DefaultPathCache}.
+ */
 public interface PathCache<P> extends PathFinder<P> {
 
     /**
-     * Turns a path provided as a {@link Collection} into and {@link ImmutableList} before putting
+     * Turns a path provided as a {@link Collection} into an {@link ImmutableList} before putting
      * it into memory. For this to make sense, the collection must be ordered (i.e., be a
      * {@link java.util.List}, a {@link java.util.Queue}, or a {@link java.util.SortedSet}).
      *
@@ -42,6 +47,12 @@ public interface PathCache<P> extends PathFinder<P> {
         putPath(ImmutableList.copyOf(path));
     }
 
+    /**
+     * @param start the starting point of the path
+     * @param end   the ending point of the path
+     * @param path  the path to remember: present for a known path, empty for a known-impossible
+     *              one
+     */
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     void putPath(
         P start,

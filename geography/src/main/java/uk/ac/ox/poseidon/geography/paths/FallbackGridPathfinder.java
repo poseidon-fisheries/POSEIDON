@@ -26,10 +26,22 @@ import com.google.common.collect.ImmutableList;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+/**
+ * A {@link GridPathFinder} counterpart of {@link FallbackPathfinder}: {@link #getPath} is
+ * inherited from {@link FallbackPathfinder}, while the other {@link GridPathFinder} methods
+ * delegate straight to the canonical (complete) pathfinder, since it's the one with authoritative
+ * knowledge of the grid. Not built directly — see {@link DefaultPathFinderFactory}/
+ * {@link uk.ac.ox.poseidon.geography.paths.Factories}.
+ */
 public class FallbackGridPathfinder extends FallbackPathfinder<Int2D> implements GridPathFinder {
 
     private final GridPathFinder canonicalPathFinder;
 
+    /**
+     * @param heuristicPathFinder  the fast pathfinder tried first
+     * @param canonicalPathFinder  the complete pathfinder tried on a heuristic miss, and consulted
+     *                             for every other {@link GridPathFinder} method
+     */
     public FallbackGridPathfinder(
         final GridPathFinder heuristicPathFinder,
         final GridPathFinder canonicalPathFinder

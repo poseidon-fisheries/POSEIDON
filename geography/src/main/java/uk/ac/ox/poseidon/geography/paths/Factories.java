@@ -29,11 +29,23 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+/**
+ * Factories for pathfinding over a {@link uk.ac.ox.poseidon.geography.grids.ModelGrid}: a
+ * {@link PathCache} sharing entries with any other path cache built from the same dependencies
+ * (see {@link DefaultPathCacheFactory}), and this package's default {@link GridPathFinder}.
+ */
 public class Factories {
 
     private Factories() {
     }
 
+    /**
+     * @param bathymetricGrid factory for the grid to find water/land cells on
+     * @param portGrid        factory for the grid of ports
+     * @param distance        factory for the distance calculator
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DefaultPathCache}
+     * @see DefaultPathCacheFactory
+     */
     public static <S extends Scope> DefaultPathCacheFactory<S> pathCache(
         final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
         final Factory<? super S, ? extends PortGrid> portGrid,
@@ -42,6 +54,14 @@ public class Factories {
         return new DefaultPathCacheFactory<>(bathymetricGrid, portGrid, distance);
     }
 
+    /**
+     * @param bathymetricGrid factory for the grid to find water/land cells on
+     * @param portGrid        factory for the grid of ports
+     * @param distance        factory for the distance calculator
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for this package's default
+     * {@link GridPathFinder}
+     * @see DefaultPathFinderFactory
+     */
     public static DefaultPathFinderFactory pathFinder(
         final Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid,
         final Factory<? super SimulationScope, ? extends PortGrid> portGrid,

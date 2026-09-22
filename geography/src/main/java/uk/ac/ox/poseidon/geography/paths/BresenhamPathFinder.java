@@ -32,8 +32,19 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.Optional;
 
+/**
+ * A {@link GridPathFinder} that only ever tries the direct straight line between two cells
+ * (libGDX's {@link Bresenham2}), returning an empty result immediately if any cell along that
+ * line isn't navigable. Fast, but not complete: an empty result here means "the straight line
+ * didn't work," not "no path exists at all" — see {@link PathFinder#getPath}. Not built
+ * standalone — see {@link DefaultPathFinderFactory} for the combination this package exposes.
+ */
 public class BresenhamPathFinder extends AbstractGridPathFinder {
 
+    /**
+     * @param bathymetricGrid the grid to find water/land cells on
+     * @param portGrid        the grid of ports, whose cells also count as navigable
+     */
     public BresenhamPathFinder(
         final BathymetricGrid bathymetricGrid,
         final PortGrid portGrid

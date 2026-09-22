@@ -34,6 +34,14 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+/**
+ * A {@link SimulationScopeFactory} for this package's default {@link GridPathFinder}: a
+ * {@link BresenhamPathFinder} heuristic falling back to an {@link AStarPathFinder} (via
+ * {@link FallbackGridPathfinder}), wrapped in a {@link CachingGridPathFinder} backed by the
+ * resolved {@link PathCache}. Built via
+ * {@link Factories#pathFinder(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory,
+ * uk.ac.ox.poseidon.core.Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
