@@ -28,6 +28,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+/**
+ * A {@link SimulationScopeFactory} that resolves a delegate factory once per simulation and
+ * caches that result — regardless of what scope the delegate itself would otherwise resolve at.
+ * Use to force a component that's normally shared globally to instead get a fresh instance per
+ * simulation run. No separate plain component class here: the produced value is whatever the
+ * delegate produces, passed through unchanged. Built via
+ * {@link uk.ac.ox.poseidon.core.utils.Factories#perSimulation(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

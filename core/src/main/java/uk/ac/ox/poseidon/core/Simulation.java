@@ -41,6 +41,13 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
+/**
+ * The resolved, runnable form of a {@link Scenario}: a MASON {@link SimState} that owns the
+ * {@link TemporalSchedule}, an {@link EventManager}, a unique id, and the list of resolved
+ * scenario components. Built exclusively via {@link Scenario#startNewSimulation()} (or the
+ * {@link SimulationStartOptions}-taking overload) — never constructed directly, since the
+ * constructor is package-private.
+ */
 @Getter
 public class Simulation extends SimState {
 
@@ -62,6 +69,7 @@ public class Simulation extends SimState {
         this.id = simulationId;
     }
 
+    /** @throws IllegalStateException if the simulation has already been started */
     @Override
     public void start() {
         if (started) throw new IllegalStateException("Simulation already started.");
@@ -69,25 +77,38 @@ public class Simulation extends SimState {
         started = true;
     }
 
+    /** @param process registered to run once, at {@link #finish()} */
     public void addFinalProcess(final Steppable process) {
         finalProcesses.add(process);
     }
 
+    /** @param process registered to run once, at {@link #finish()} */
     public void addFinalProcess(final Runnable process) {
         finalProcesses.add(simState -> process.run());
     }
 
+    /** Runs every registered {@link #addFinalProcess} process, then delegates to {@code super}. */
     @Override
     public void finish() {
         finalProcesses.forEach(process -> process.step(this));
         super.finish();
     }
 
+    /**
+     * Pinned {@code final} to lock in {@code Object}'s default reference-equality semantics
+     * (neither {@link SimState} nor this class declares {@code @EqualsAndHashCode}): without this
+     * override, a subclass could otherwise change what "equal simulations" means.
+     */
     @Override
     public final int hashCode() {
         return super.hashCode();
     }
 
+    /**
+     * Pinned {@code final} to lock in {@code Object}'s default reference-equality semantics
+     * (neither {@link SimState} nor this class declares {@code @EqualsAndHashCode}): without this
+     * override, a subclass could otherwise change what "equal simulations" means.
+     */
     @Override
     public final boolean equals(final Object obj) {
         return super.equals(obj);
@@ -108,6 +129,12 @@ public class Simulation extends SimState {
             .map(componentClass::cast);
     }
 
+    /**
+     * @param componentClass the type of component to look up; nested collections in the resolved
+     *                       component list are flattened first
+     * @return every resolved component assignable to {@code componentClass}
+     * @throws NoSuchElementException if none are found
+     */
     public <T> Set<T> getComponents(final Class<T> componentClass) {
         final Set<T> components =
             getComponents(this.components, componentClass).collect(toImmutableSet());
@@ -119,6 +146,12 @@ public class Simulation extends SimState {
         return components;
     }
 
+    /**
+     * @param componentClass the type of component to look up
+     * @return the single resolved component assignable to {@code componentClass}
+     * @throws NoSuchElementException if none are found
+     * @throws IllegalStateException  if more than one is found
+     */
     public <T> T getComponent(
         final Class<T> componentClass
     ) {
@@ -133,6 +166,18 @@ public class Simulation extends SimState {
         return components.iterator().next();
     }
 
+    /**
+     * Logs a message prefixed with the simulation's id and current simulation timestamp. The
+     * message is only formatted if {@code level} is enabled for {@code logger}, since it's built
+     * lazily inside the log call.
+     *
+     * @param logger   the logger to log to
+     * @param level    the level to log at
+     * @param simState the simulation to read the id and timestamp from; must be a {@link
+     *                 Simulation} whose {@code schedule} is a {@link TemporalSchedule}
+     * @param format   a {@link MessageFormat} pattern
+     * @param args     arguments substituted into {@code format}
+     */
     public static void log(
         final System.Logger logger,
         final System.Logger.Level level,
@@ -151,10 +196,12 @@ public class Simulation extends SimState {
         );
     }
 
+    /** Runs a single step of the schedule. */
     public void step() {
         schedule.step(this);
     }
 
+    /** @param temporalAmount the amount of simulation time to advance by, stepping synchronously */
     public void stepFor(
         final TemporalAmount temporalAmount
     ) {

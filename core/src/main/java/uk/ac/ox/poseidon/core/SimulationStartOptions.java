@@ -30,6 +30,13 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Per-run overrides passed to {@link Scenario#startNewSimulation(SimulationStartOptions)}: an id
+ * and RNG seed for the run, bean-property overrides temporarily applied to the {@link Scenario}
+ * for the duration of the build (dotted property paths, via {@code commons-beanutils}), and extra
+ * components to resolve alongside the scenario's own. Used heavily by calibration, which needs to
+ * vary parameters run-to-run without mutating the original {@link Scenario}.
+ */
 @Getter
 @Builder
 public final class SimulationStartOptions {

@@ -65,6 +65,19 @@ public abstract class RelativeScopeFactory<S extends Scope, C> extends AbstractF
             .toList();
     });
 
+    /**
+     * Finds this factory's member {@link Factory}-typed fields (recursing into nested
+     * {@link Map}s, {@link Collection}s, and other {@link RelativeScopeFactory}s), determines
+     * their single common leaf scope class, and delegates key generation to one of the member
+     * factories that has that leaf scope — so this factory's cache key matches whichever scope
+     * its inputs are ultimately rooted in. Falls back to {@link Scope#GLOBAL_SCOPE} if there are
+     * no member factories.
+     *
+     * @param scope the scope being resolved against
+     * @return the delegated cache key
+     * @throws IllegalStateException if member factories are rooted in more than one leaf scope
+     *                                class
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     protected Object makeKey(final S scope) {
@@ -108,12 +121,22 @@ public abstract class RelativeScopeFactory<S extends Scope, C> extends AbstractF
             .orElseThrow();
     }
 
+    /**
+     * @throws UnsupportedOperationException always — a relative scope factory's effective scope
+     * class is derived per call from its member factories (see {@link #makeKey}), not fixed, so
+     * there is no single answer to give here
+     */
     @Override
     protected Class<S> scopeClass() {
         throw new UnsupportedOperationException(
             "Relative scope factories do not provide a scope class");
     }
 
+    /**
+     * @return this factory's distinct leaf {@link AbstractFactory} inputs: its own
+     * {@code Factory}-typed bean properties, with any nested {@link RelativeScopeFactory}s
+     * expanded recursively into their own member factories (so only genuine leaves are returned)
+     */
     @SuppressWarnings("rawtypes")
     synchronized protected Stream<AbstractFactory> memberFactories() {
         return leafFactories(
