@@ -43,6 +43,11 @@ public class CommonBiomassGrower implements Steppable {
     @NonNull private final BiomassGrowthRule biomassGrowthRule;
     @NonNull private final BiomassRecruitmentAllocator biomassRecruitmentAllocator;
 
+    /**
+     * Sums biomass and carrying capacity over all habitable cells, applies
+     * {@link #biomassGrowthRule} once to those totals, then hands the resulting total recruitment
+     * to {@link #biomassRecruitmentAllocator} to spread back across cells.
+     */
     @Override
     public void step(final SimState simState) {
 

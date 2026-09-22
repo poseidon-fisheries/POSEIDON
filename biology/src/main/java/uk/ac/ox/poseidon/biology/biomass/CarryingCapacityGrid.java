@@ -29,8 +29,14 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGridWrapper;
 
 import java.util.List;
 
+/**
+ * The maximum biomass each cell can sustain. A cell with zero carrying capacity is uninhabitable
+ * and excluded from {@code getHabitableCells()}, which growers and diffusers iterate over instead
+ * of the full grid.
+ */
 public class CarryingCapacityGrid extends DoubleGridWrapper {
 
+    /** Active cells with strictly positive carrying capacity, computed once and cached. */
     @Getter(lazy = true)
     private final List<Int2D> habitableCells =
         getModelGrid()
@@ -43,6 +49,7 @@ public class CarryingCapacityGrid extends DoubleGridWrapper {
         super(grid);
     }
 
+    /** @return the carrying capacity at {@code cell} */
     public double getCarryingCapacity(final Int2D cell) {
         return grid.getValue(cell);
     }

@@ -29,6 +29,10 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/**
+ * A {@link GlobalScopeFactory} for a {@link LogisticGrowthRule}. Built via
+ * {@link Factories#logisticGrowthRule}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

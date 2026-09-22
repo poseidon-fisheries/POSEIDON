@@ -45,6 +45,11 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
+/**
+ * A whole-community {@link FisheableGrid}: one {@link BiomassGrid} per species, indexed by a shared
+ * {@link SpeciesIndex} so a {@link Bucket} can be extracted from or released into every species'
+ * grid at a cell in one pass, rather than one {@link Fisheable} per species.
+ */
 public final class FisheableBiomassGrids
     implements FisheableGrid, SpeciesIndexedObjects<BiomassGrid, FisheableBiomassGrids> {
 
@@ -52,6 +57,9 @@ public final class FisheableBiomassGrids
     private final SpeciesIndex speciesIndex;
     private final BiomassGrid[] grids;
 
+    /**
+     * @param grids the per-species grids; must not contain two grids for the same species
+     */
     public FisheableBiomassGrids(final Collection<? extends BiomassGrid> grids) {
         final ImmutableMap<Species, ? extends BiomassGrid> gridMap =
             grids.stream().collect(toImmutableMap(
@@ -96,6 +104,11 @@ public final class FisheableBiomassGrids
         return new FisheableCell(cell);
     }
 
+    /**
+     * Extracting and releasing act on every species' grid at this cell at once, indexed by
+     * {@link #speciesIndex}; extracting never over-draws a species' grid, and releasing a species
+     * with no backing grid throws.
+     */
     @RequiredArgsConstructor
     class FisheableCell implements Fisheable {
 

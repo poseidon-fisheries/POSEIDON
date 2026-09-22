@@ -38,6 +38,11 @@ import java.util.stream.IntStream;
 
 import static com.google.common.base.Preconditions.checkState;
 
+/**
+ * A {@link SimulationScopeFactory} for one {@link BiomassGrid} per configured species.
+ * {@code biomassAllocators} must have either one entry (reused for every species) or exactly one
+ * entry per species. Built via {@link Factories#biomassGrids}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

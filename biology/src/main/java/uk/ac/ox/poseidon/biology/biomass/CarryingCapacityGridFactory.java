@@ -31,6 +31,11 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
+/**
+ * A {@link RelativeScopeFactory} for a {@link CarryingCapacityGrid} wrapping the resolved
+ * {@code grid}. Built via {@link Factories#carryingCapacityGrid},
+ * {@link Factories#uniformCarryingCapacityGrid}, and {@link Factories#totalCarryingCapacityGrid}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

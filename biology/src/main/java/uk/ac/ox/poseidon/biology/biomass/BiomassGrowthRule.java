@@ -22,7 +22,18 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+/**
+ * A rule computing the next-step biomass for a location, given its current biomass and the
+ * carrying capacity it is growing towards. {@code currentBiomass} and {@code carryingCapacity} may
+ * refer to a single cell ({@link IndependentBiomassGrower}) or a whole grid's totals
+ * ({@link CommonBiomassGrower}), depending on the grower applying the rule.
+ */
 public interface BiomassGrowthRule {
+    /**
+     * @param currentBiomass    the current biomass
+     * @param carryingCapacity  the carrying capacity being grown towards
+     * @return the biomass after one growth step
+     */
     double newBiomass(
         double currentBiomass,
         double carryingCapacity

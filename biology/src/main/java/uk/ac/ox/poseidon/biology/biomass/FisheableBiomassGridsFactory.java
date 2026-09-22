@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.List;
 
+/**
+ * A {@link SimulationScopeFactory} for a {@link FisheableBiomassGrids} over the resolved
+ * {@code biomassGrids}. Built via {@link Factories#fisheableBiomassGrids}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

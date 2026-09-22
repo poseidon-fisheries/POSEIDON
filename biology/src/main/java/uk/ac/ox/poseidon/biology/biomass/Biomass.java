@@ -34,6 +34,10 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 
+/**
+ * A single quantity of fish mass, immutable and always non-negative. The canonical, concrete
+ * {@link Content} implementation — every other {@code Content} method reduces to one of these.
+ */
 @EqualsAndHashCode
 public class Biomass implements Content {
 
@@ -42,10 +46,17 @@ public class Biomass implements Content {
     // Biomass stored internally in kilograms
     private final double biomassInKg;
 
+    /**
+     * @param biomassInKg the mass, in kilograms; must be non-negative
+     */
     public Biomass(final double biomassInKg) {
         this.biomassInKg = checkNonNegative(biomassInKg, "Biomass");
     }
 
+    /**
+     * @param value the mass, in {@code unit}; must convert to a non-negative number of kilograms
+     * @param unit  the unit {@code value} is expressed in
+     */
     public Biomass(
         final Number value,
         final Unit<Mass> unit
@@ -59,6 +70,10 @@ public class Biomass implements Content {
         );
     }
 
+    /**
+     * @param value the mass, in kilograms; must be non-negative
+     * @return a new {@link Biomass} of {@code value} kilograms
+     */
     public static Biomass ofKg(final double value) {
         return new Biomass(value);
     }
@@ -68,20 +83,35 @@ public class Biomass implements Content {
         return this.asQuantity().to(biomassUnit).getValue().doubleValue();
     }
 
+    /**
+     * @return the sum of this and {@code content}
+     */
     public Biomass add(final Biomass content) {
         return new Biomass(this.biomassInKg + content.biomassInKg);
     }
 
+    /**
+     * @param content the amount to subtract; must not exceed this biomass, or the resulting
+     *                 negative mass is rejected by the constructor
+     * @return this minus {@code content}
+     */
     public Biomass subtract(final Biomass content) {
         return new Biomass(this.biomassInKg - content.biomassInKg);
     }
 
+    /**
+     * @param value the non-negative factor to scale by
+     */
     @Override
     public Biomass multiply(final double value) {
         checkNonNegative(value, "Amount by which to multiply biomass");
         return new Biomass(this.biomassInKg * value);
     }
 
+    /**
+     * @param value the strictly positive divisor; {@code 0} is rejected rather than silently
+     *              producing an infinite biomass
+     */
     @Override
     public Biomass divide(final double value) {
         checkPositive(value, "Amount by which to divide biomass");

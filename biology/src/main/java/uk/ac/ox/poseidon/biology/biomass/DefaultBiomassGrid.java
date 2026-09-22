@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableDoubleGrid;
 
+/**
+ * The default {@link BiomassGrid} implementation: a single-species {@link MutableDoubleGrid} that
+ * is also directly {@link FisheableGrid} (fishing extracts from and releases into it in place).
+ */
 @Getter
 class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, FisheableGrid {
 
@@ -111,6 +115,10 @@ class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, Fishe
         return sum;
     }
 
+    /**
+     * Extracting takes at most what the cell holds (never over-draws it); releasing rejects any
+     * species other than this grid's own.
+     */
     @RequiredArgsConstructor
     class FisheableCell implements Fisheable {
 

@@ -25,6 +25,12 @@ package uk.ac.ox.poseidon.biology.biomass;
 import lombok.Data;
 import sim.util.Double2D;
 
+/**
+ * Moves biomass from X to Y, one direction per call, only when X currently holds more biomass than
+ * Y and Y has spare capacity; never moves Y to X. Since {@link BiomassDiffuser} calls this once per
+ * ordered (cell, neighbour) pair each step, an unordered pair is effectively considered in both
+ * directions over a full step.
+ */
 @Data
 public class SmoothBiomassDiffusionRule implements BiomassDiffusionRule {
 

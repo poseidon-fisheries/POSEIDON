@@ -26,6 +26,10 @@ import lombok.Data;
 
 import static java.lang.Math.min;
 
+/**
+ * Logistic (Verhulst) growth: biomass grows fastest at half of carrying capacity and approaches
+ * (but never exceeds) carrying capacity as it's approached.
+ */
 @Data
 public class LogisticGrowthRule implements BiomassGrowthRule {
     private final double growthRate;

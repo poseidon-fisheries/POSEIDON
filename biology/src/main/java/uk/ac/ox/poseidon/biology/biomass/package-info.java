@@ -20,22 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.biomass;
-
 /**
- * Spreads a newly-recruited total biomass across a grid's habitable cells. Used by
- * {@link CommonBiomassGrower}, whose growth rule works on grid-wide totals and so needs a separate
- * step to turn that total back into per-cell biomass.
+ * Biomass-based biology: {@link uk.ac.ox.poseidon.biology.biomass.Biomass}, the concrete
+ * {@link uk.ac.ox.poseidon.biology.Content} implementation used throughout the model, plus the
+ * per-species and whole-community grids, growth and diffusion rules, recruitment allocation, and
+ * NetCDF-backed time-indexed snapshots built on top of it. See
+ * {@link uk.ac.ox.poseidon.biology.biomass.Factories} for the entry points.
  */
-public interface BiomassRecruitmentAllocator {
-    /**
-     * @param recruitedBiomassInKg the non-negative total biomass, in kilograms, to allocate
-     * @param biomassGrid          the grid to add the allocated biomass into
-     * @param carryingCapacityGrid the grid bounding how much each cell can receive
-     */
-    void allocate(
-        double recruitedBiomassInKg,
-        BiomassGrid biomassGrid,
-        CarryingCapacityGrid carryingCapacityGrid
-    );
-}
+package uk.ac.ox.poseidon.biology.biomass;

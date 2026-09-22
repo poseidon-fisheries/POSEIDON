@@ -27,13 +27,19 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableGrid;
 
+/**
+ * A live, mutable, single-species biomass grid: the grid actually fished against and grown during
+ * a simulation. Contrast with {@link ImmutableBiomassGrid}, a read-only snapshot.
+ */
 public interface BiomassGrid
     extends SpeciesGrid, MutableGrid<DoubleGrid2D>, FisheableGrid {
 
+    /** @return the biomass at {@code cell} */
     default Biomass getBiomass(final Int2D cell) {
         return Biomass.ofKg(getValue(cell));
     }
 
+    /** Sets the biomass at {@code cell} to {@code biomass}. */
     default void setBiomass(
         final Int2D cell,
         final Biomass biomass
@@ -41,6 +47,7 @@ public interface BiomassGrid
         setBiomass(cell, biomass.asKg());
     }
 
+    /** Sets the biomass at {@code cell}, in kilograms, to {@code value}. */
     void setBiomass(
         final Int2D cell,
         final double value

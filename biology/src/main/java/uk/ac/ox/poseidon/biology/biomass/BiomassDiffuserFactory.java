@@ -30,6 +30,10 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+/**
+ * A {@link SimulationScopeFactory} for a {@link BiomassDiffuser}. Built via
+ * {@link Factories#biomassDiffuser}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

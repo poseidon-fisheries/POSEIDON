@@ -37,6 +37,11 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * Moves biomass between neighbouring habitable cells of a single-species grid, each step, according
+ * to {@link BiomassDiffusionRule}. Cells and their neighbour lists are visited in a freshly shuffled
+ * order every step, so no cell or pairing is systematically favoured over a run.
+ */
 public class BiomassDiffuser implements Steppable {
 
     @Serial private static final long serialVersionUID = 6904676724631409234L;
@@ -53,6 +58,12 @@ public class BiomassDiffuser implements Steppable {
 
     private final Map<Int2D, List<Int2D>> habitableNeighbours;
 
+    /**
+     * @param biomassGrid          the grid diffusion reads from and writes into
+     * @param carryingCapacityGrid must share the same {@link uk.ac.ox.poseidon.geography.grids.ModelGrid} as {@code biomassGrid}
+     * @param biomassDiffusionRule the per-pair diffusion rule
+     * @param rng                  the source used to derive this diffuser's own {@link Random}
+     */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public BiomassDiffuser(
         final BiomassGrid biomassGrid,
@@ -83,6 +94,10 @@ public class BiomassDiffuser implements Steppable {
                 ));
     }
 
+    /**
+     * Visits every habitable cell, in shuffled order, and diffuses biomass between it and each of
+     * its (also shuffled) habitable neighbours in turn.
+     */
     @Override
     public void step(final SimState simState) {
         Collections.shuffle(habitableLocations, rng);
