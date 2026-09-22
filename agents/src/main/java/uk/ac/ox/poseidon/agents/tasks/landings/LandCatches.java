@@ -32,16 +32,28 @@ import java.util.function.Supplier;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
+/**
+ * Sells the vessel's hold contents to a market at its current cell and credits the trip's account
+ * with the proceeds.
+ */
 @RequiredArgsConstructor
 public class LandCatches extends ExtendedTripTask {
 
     private final Supplier<Duration> durationSupplier;
 
+    /** @return how long landing takes */
     @Override
     protected Duration getDuration() {
         return durationSupplier.get();
     }
 
+    /**
+     * Sells the vessel's entire hold to a market at its current cell, adding the sale's proceeds
+     * (by currency) to the trip's account.
+     *
+     * @return {@link Status#SUCCEEDED}
+     * @throws RuntimeException if no market is found at the vessel's current cell
+     */
     @Override
     protected Status complete() {
         final Vessel vessel = getAgent();

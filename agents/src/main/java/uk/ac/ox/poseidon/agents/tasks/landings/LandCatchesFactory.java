@@ -33,6 +33,9 @@ import uk.ac.ox.poseidon.core.Factory;
 import java.time.Duration;
 import java.util.function.Supplier;
 
+/**
+ * A {@link VesselTaskFactory} for a {@link LandCatches}. Built via {@link Factories#landCatches}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

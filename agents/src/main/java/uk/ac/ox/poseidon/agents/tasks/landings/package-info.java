@@ -20,29 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.landings;
-
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
-
-import java.time.Duration;
-import java.util.function.Supplier;
-
 /**
- * Factories for tasks that land a vessel's catch at market.
+ * {@link uk.ac.ox.poseidon.agents.tasks.landings.LandCatches}: sells a vessel's hold contents to
+ * a market at its current cell and credits the proceeds to the trip's account. See
+ * {@link uk.ac.ox.poseidon.agents.tasks.landings.Factories} for the entry points.
  */
-public class Factories {
-
-    private Factories() {}
-
-    /**
-     * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a {@link LandCatches}
-     * @see LandCatchesFactory
-     */
-    public static LandCatchesFactory landCatches(
-        final Factory<? super VesselScope, ? extends Supplier<Duration>> durationSupplier
-    ) {
-        return new LandCatchesFactory(durationSupplier);
-    }
-
-}
+package uk.ac.ox.poseidon.agents.tasks.landings;
