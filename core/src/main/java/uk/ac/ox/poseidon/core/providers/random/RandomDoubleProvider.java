@@ -40,6 +40,11 @@ public class RandomDoubleProvider implements DoubleProvider {
     private final double minimum;
     private final double maximum;
 
+    /**
+     * @param rng     the shared RNG to draw from
+     * @param minimum the inclusive lower bound
+     * @param maximum the exclusive upper bound, must be greater than {@code minimum}
+     */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public RandomDoubleProvider(
         final @NonNull MersenneTwisterFast rng,

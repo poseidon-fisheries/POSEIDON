@@ -39,6 +39,7 @@ public class MultiStringKeyFromFunctions<T> implements Function<T, String> {
 
     private final Function<T, ?>[] functions;
 
+    /** @param functions the functions whose results are joined into the composite key */
     @SuppressWarnings("unchecked")
     public MultiStringKeyFromFunctions(final List<? extends Function<? super T, ?>> functions) {
         this.functions = functions.toArray(new Function[0]);

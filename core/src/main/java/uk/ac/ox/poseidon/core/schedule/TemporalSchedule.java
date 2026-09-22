@@ -55,23 +55,32 @@ import static java.util.stream.Collectors.*;
 @RequiredArgsConstructor
 public class TemporalSchedule extends Schedule {
 
+    /** The timestamp label used for events before the simulation has started. */
     public static final String BEFORE_SIMULATION_STRING = "At Start";
+    /** The timestamp label used for events after the simulation has ended. */
     public static final String AFTER_SIMULATION_STRING = "At End";
+    /** The schedule ordering used when none is specified. */
     public static final int DEFAULT_ORDERING = 0;
     private static final System.Logger logger = System.getLogger(TemporalSchedule.class.getName());
     @Serial private static final long serialVersionUID = 4197200009803943439L;
 
     private final LocalDateTime startingDateTime;
 
+    /** @return the current simulation time as a {@link LocalDateTime} */
     @SuppressWarnings("WeakerAccess")
     public LocalDateTime getDateTime() {
         return toDateTime(getTime());
     }
 
+    /** @return the current simulation time as a {@link LocalDate} */
     public LocalDate getDate() {
         return getDateTime().toLocalDate();
     }
 
+    /**
+     * @return the current simulation time as a human-readable timestamp, using
+     * {@link #BEFORE_SIMULATION_STRING}/{@link #AFTER_SIMULATION_STRING} for the boundary cases
+     */
     public String getTimestamp() {
         return getTimestamp(BEFORE_SIMULATION_STRING, AFTER_SIMULATION_STRING);
     }
@@ -92,6 +101,11 @@ public class TemporalSchedule extends Schedule {
         }
     }
 
+    /**
+     * @param delta the amount of time from now to schedule the event at
+     * @param event the event to schedule
+     * @return whether the event was successfully scheduled
+     */
     @SuppressWarnings("unused")
     public boolean scheduleOnceIn(
         final Duration delta,
@@ -100,6 +114,12 @@ public class TemporalSchedule extends Schedule {
         return scheduleOnceIn(delta.getSeconds(), event);
     }
 
+    /**
+     * @param delta    the amount of time from now to schedule the event at
+     * @param event    the event to schedule
+     * @param ordering the schedule ordering to use
+     * @return whether the event was successfully scheduled
+     */
     @SuppressWarnings({"unused", "UnusedReturnValue"})
     public boolean scheduleOnceIn(
         final Duration delta,
@@ -109,6 +129,11 @@ public class TemporalSchedule extends Schedule {
         return scheduleOnceIn(delta.getSeconds(), event, ordering);
     }
 
+    /**
+     * @param dateTime the date-time to schedule the event at
+     * @param event    the event to schedule
+     * @return whether the event was successfully scheduled
+     */
     @SuppressWarnings({"unused", "UnusedReturnValue"})
     public boolean scheduleOnce(
         final Temporal dateTime,
@@ -130,11 +155,21 @@ public class TemporalSchedule extends Schedule {
         return Duration.between(startingDateTime, dateTime).getSeconds();
     }
 
+    /**
+     * @param time internal MASON schedule time, as seconds elapsed since {@link #startingDateTime}
+     * @return the {@link LocalDateTime} corresponding to {@code time}
+     */
     @SuppressWarnings("WeakerAccess")
     public LocalDateTime toDateTime(final double time) {
         return startingDateTime.plusSeconds((long) time);
     }
 
+    /**
+     * @param dateTime the date-time to schedule the event at
+     * @param ordering the schedule ordering to use
+     * @param event    the event to schedule
+     * @return whether the event was successfully scheduled
+     */
     @SuppressWarnings("WeakerAccess")
     public boolean scheduleOnce(
         final Temporal dateTime,
@@ -189,6 +224,12 @@ public class TemporalSchedule extends Schedule {
             );
     }
 
+    /**
+     * @param event    the event to schedule repeatedly
+     * @param interval the recurring interval, also used to compute the first firing (now plus
+     *                 this interval)
+     * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling failed
+     */
     @SuppressWarnings("unused")
     public TemporalRepeat scheduleRepeating(
         final Steppable event,
@@ -197,6 +238,13 @@ public class TemporalSchedule extends Schedule {
         return this.scheduleRepeating(getDateTime().plus(interval), 0, event, interval);
     }
 
+    /**
+     * @param event    the event to schedule repeatedly
+     * @param ordering the schedule ordering to use
+     * @param interval the recurring interval, also used to compute the first firing (now plus
+     *                 this interval)
+     * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling failed
+     */
     @SuppressWarnings("unused")
     public TemporalRepeat scheduleRepeating(
         final Steppable event,
@@ -206,6 +254,12 @@ public class TemporalSchedule extends Schedule {
         return scheduleRepeating(getDateTime().plus(interval), ordering, event, interval);
     }
 
+    /**
+     * @param dateTime the date-time of the first firing
+     * @param event    the event to schedule repeatedly
+     * @param interval the recurring interval
+     * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling failed
+     */
     @SuppressWarnings("unused")
     public TemporalRepeat scheduleRepeating(
         final Temporal dateTime,
@@ -215,6 +269,13 @@ public class TemporalSchedule extends Schedule {
         return this.scheduleRepeating(dateTime, 0, event, interval);
     }
 
+    /**
+     * @param dateTime the date-time of the first firing
+     * @param ordering the schedule ordering to use
+     * @param event    the event to schedule repeatedly
+     * @param interval the recurring interval
+     * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling failed
+     */
     public TemporalRepeat scheduleRepeating(
         final Temporal dateTime,
         final int ordering,
@@ -225,6 +286,13 @@ public class TemporalSchedule extends Schedule {
         return scheduleOnce(dateTime, ordering, r) ? r : null;
     }
 
+    /**
+     * Runs the simulation forward from the current time by a fixed amount, stepping synchronously
+     * until that point is reached.
+     *
+     * @param simState        the simulation to step
+     * @param temporalAmount the amount of time to advance by
+     */
     public void stepFor(
         final SimState simState,
         final TemporalAmount temporalAmount
@@ -232,6 +300,12 @@ public class TemporalSchedule extends Schedule {
         this.stepUntil(simState, getDateTime().plus(temporalAmount));
     }
 
+    /**
+     * Runs the simulation forward, stepping synchronously until the given date-time is reached.
+     *
+     * @param simState the simulation to step
+     * @param dateTime the date-time to step until
+     */
     public void stepUntil(
         final SimState simState,
         final LocalDateTime dateTime

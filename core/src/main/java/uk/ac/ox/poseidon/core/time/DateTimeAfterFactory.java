@@ -41,6 +41,10 @@ import java.time.temporal.TemporalAmount;
 @EqualsAndHashCode(callSuper = true)
 public class DateTimeAfterFactory<S extends Scope> extends RelativeDateTimeFactory<S> {
 
+    /**
+     * @param referenceDateTime factory for the date-time to add to
+     * @param amountToAdd       factory for the amount to add
+     */
     public DateTimeAfterFactory(
         final Factory<? super S, ? extends LocalDateTime> referenceDateTime,
         final Factory<? super S, ? extends TemporalAmount> amountToAdd

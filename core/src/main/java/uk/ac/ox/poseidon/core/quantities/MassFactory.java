@@ -35,10 +35,15 @@ import javax.measure.quantity.Mass;
 @EqualsAndHashCode(callSuper = true)
 public class MassFactory extends AbstractQuantityFactory<Mass> {
 
+    /** No-args constructor, used only by SnakeYAML during deserialization. */
     public MassFactory() {
         super(Mass.class);
     }
 
+    /**
+     * @param value      the numeric mass value
+     * @param unitString the unit, in the format produced by {@code Unit.toString()}
+     */
     public MassFactory(
         final double value,
         final String unitString

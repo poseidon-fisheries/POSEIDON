@@ -47,6 +47,9 @@ public class SimulationScope extends Scope {
         this.simulation = simulationScope.simulation;
     }
 
+    /**
+     * @param simulation the simulation this scope is tied to, held via a {@link WeakReference}
+     */
     public SimulationScope(
         final Simulation simulation
     ) {

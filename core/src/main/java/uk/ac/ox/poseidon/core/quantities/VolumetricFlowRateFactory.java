@@ -43,10 +43,15 @@ public class VolumetricFlowRateFactory extends AbstractQuantityFactory<Volumetri
     public static final Unit<VolumetricFlowRate> LITRE_PER_HOUR =
         LITRE.divide(HOUR).asType(VolumetricFlowRate.class);
 
+    /** No-args constructor, used only by SnakeYAML during deserialization. */
     public VolumetricFlowRateFactory() {
         super(VolumetricFlowRate.class);
     }
 
+    /**
+     * @param value      the numeric flow rate value
+     * @param unitString the unit, in the format produced by {@code Unit.toString()}
+     */
     public VolumetricFlowRateFactory(
         final double value,
         final String unitString
@@ -54,6 +59,10 @@ public class VolumetricFlowRateFactory extends AbstractQuantityFactory<Volumetri
         super(VolumetricFlowRate.class, value, unitString);
     }
 
+    /**
+     * @param value the numeric flow rate value
+     * @param unit  the unit the value is expressed in
+     */
     public VolumetricFlowRateFactory(
         final double value,
         final Unit<VolumetricFlowRate> unit

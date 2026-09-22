@@ -36,10 +36,15 @@ import javax.measure.quantity.Speed;
 @EqualsAndHashCode(callSuper = true)
 public class SpeedFactory extends AbstractQuantityFactory<Speed> {
 
+    /** No-args constructor, used only by SnakeYAML during deserialization. */
     public SpeedFactory() {
         super(Speed.class);
     }
 
+    /**
+     * @param value      the numeric speed value
+     * @param unitString the unit, in the format produced by {@code Unit.toString()}
+     */
     public SpeedFactory(
         final double value,
         final String unitString
@@ -47,6 +52,10 @@ public class SpeedFactory extends AbstractQuantityFactory<Speed> {
         super(Speed.class, value, unitString);
     }
 
+    /**
+     * @param value the numeric speed value
+     * @param unit  the unit the value is expressed in
+     */
     public SpeedFactory(
         final double value,
         final Unit<Speed> unit

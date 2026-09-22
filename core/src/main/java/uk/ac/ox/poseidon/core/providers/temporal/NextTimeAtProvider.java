@@ -43,6 +43,10 @@ public class NextTimeAtProvider implements Provider<LocalDateTime> {
     private final TemporalSchedule schedule;
     private final LocalTime[] times;
 
+    /**
+     * @param schedule the schedule to read the current date-time from
+     * @param times    the times of day to choose the next occurrence among
+     */
     public NextTimeAtProvider(final TemporalSchedule schedule, final LocalTime[] times) {
         this.schedule = schedule;
         this.times = times.clone();

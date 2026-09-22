@@ -40,11 +40,13 @@ public class AllOf<T> implements Predicate<T> {
     // Using an array for performance reason (and not exposing outside the class)
     @NonNull private final Predicate<? super T>[] predicates;
 
+    /** @param predicates the component predicates, all of which must pass */
     @SuppressWarnings("unchecked")
     public AllOf(@NonNull final Collection<Predicate<? super T>> predicates) {
         this.predicates = predicates.toArray(Predicate[]::new);
     }
 
+    /** @return the component predicates */
     public Stream<Predicate<? super T>> getPredicates() {
         return Stream.of(predicates);
     }

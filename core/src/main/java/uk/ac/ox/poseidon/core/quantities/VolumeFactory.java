@@ -35,10 +35,15 @@ import javax.measure.quantity.Volume;
 @EqualsAndHashCode(callSuper = true)
 public class VolumeFactory extends AbstractQuantityFactory<Volume> {
 
+    /** No-args constructor, used only by SnakeYAML during deserialization. */
     public VolumeFactory() {
         super(Volume.class);
     }
 
+    /**
+     * @param value      the numeric volume value
+     * @param unitString the unit, in the format produced by {@code Unit.toString()}
+     */
     public VolumeFactory(
         final double value,
         final String unitString

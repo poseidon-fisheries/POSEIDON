@@ -164,6 +164,22 @@ documented in four different places, once each, not duplicated across them:
 Don't write the same behavioral explanation twice across the triplet; every doc comment except the
 component's and the `*ScopeFactory` base classes' should be a pointer, not prose.
 
+**Every public and protected member of a class you touch needs to be documented** — not just the
+triplet skeleton described above. Constants, public constructors, and any other public/protected
+method or field get a real (if short) Javadoc comment. The one exception: a *trivial* `@Override`
+method whose superclass/interface method is already documented doesn't need its own comment —
+Java's standard doc-inheritance applies (the javadoc tool shows "Description copied from..."), so
+`newInstance(scope)` overrides of `AbstractFactory`'s hook, and `get()`/`test()`/`apply()`-style
+overrides of `Supplier`/`Predicate`/`Provider` etc., are already covered as long as the method
+they override carries a doc comment somewhere up the hierarchy and the override itself does
+nothing but implement the plain contract. If the override has genuinely special behavior worth
+calling out — an edge case the inherited doc doesn't cover, a surprising choice, a deviation from
+what a reader would assume from the interface alone — give it its own comment rather than leaning
+on inheritance; the bar is "would a reader be misled by only reading the inherited doc," not
+"is this technically an override." When auditing a package already marked done, check for this
+too — it's easy to document the triplet shape and miss a public constant or constructor sitting
+alongside it.
+
 The pattern itself — why the triplet exists, why scenario code never calls `.get()` directly — is
 already covered in "Core architectural pattern" above; don't restate it in per-package Javadoc.
 Package `package-info.java` files should stick to that short blurb + `{@link Factories}` pointer,

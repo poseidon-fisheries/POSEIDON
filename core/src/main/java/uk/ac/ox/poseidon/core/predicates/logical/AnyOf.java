@@ -40,11 +40,13 @@ public class AnyOf<T> implements Predicate<T> {
     // Using an array for performance reasons
     @NonNull private final Predicate<? super T>[] predicates;
 
+    /** @param predicates the component predicates, at least one of which must pass */
     @SuppressWarnings("unchecked")
     public AnyOf(final Collection<? extends Predicate<? super T>> predicates) {
         this.predicates = predicates.toArray(Predicate[]::new);
     }
 
+    /** @return the component predicates */
     public Stream<Predicate<? super T>> getPredicates() {
         return Stream.of(predicates);
     }

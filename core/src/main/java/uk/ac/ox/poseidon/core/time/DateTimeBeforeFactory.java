@@ -41,6 +41,10 @@ import java.time.temporal.TemporalAmount;
 @EqualsAndHashCode(callSuper = true)
 public class DateTimeBeforeFactory<S extends Scope> extends RelativeDateTimeFactory<S> {
 
+    /**
+     * @param referenceDateTime factory for the date-time to subtract from
+     * @param amountToSubtract  factory for the amount to subtract
+     */
     public DateTimeBeforeFactory(
         final Factory<? super S, ? extends LocalDateTime> referenceDateTime,
         final Factory<? super S, ? extends TemporalAmount> amountToSubtract

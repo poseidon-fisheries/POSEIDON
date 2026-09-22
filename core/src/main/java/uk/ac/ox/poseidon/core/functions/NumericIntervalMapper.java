@@ -42,11 +42,17 @@ public class NumericIntervalMapper<T> implements Function<Double, T> {
 
     List<Interval<T>> intervals;
 
+    /**
+     * @param intervals the non-overlapping intervals to map values through; each must have at
+     *                  least one bound, and a lower bound strictly less than its upper bound
+     */
     public NumericIntervalMapper(final List<Interval<T>> intervals) {
         this.intervals = List.copyOf(intervals);
         validateIntervals(this.intervals);
     }
 
+    /** @return the mapped value for the interval containing {@code value}, or {@code null} if no
+     * interval contains it */
     @Override
     public T apply(final Double value) {
         return intervals.stream()
@@ -103,6 +109,7 @@ public class NumericIntervalMapper<T> implements Function<Double, T> {
         Double upperBoundExclusive;
         T mappedValue;
 
+        /** @return whether {@code value} falls within this interval's bounds */
         public boolean contains(final double value) {
             return lowerBoundContains(value) && upperBoundContains(value);
         }

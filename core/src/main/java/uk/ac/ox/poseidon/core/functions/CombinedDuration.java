@@ -37,6 +37,7 @@ public class CombinedDuration<T> implements Function<T, Duration> {
 
     private final Function<T, ? extends Duration>[] durations;
 
+    /** @param durations the duration-producing functions to sum */
     @SuppressWarnings("unchecked")
     public CombinedDuration(final List<? extends Function<? super T, ? extends Duration>> durations) {
         this.durations = durations.toArray(new Function[0]);

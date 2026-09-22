@@ -40,6 +40,11 @@ public class RandomIntProvider implements IntProvider {
     private final int minimum;
     private final int range;
 
+    /**
+     * @param rng     the shared RNG to draw from
+     * @param minimum the inclusive lower bound
+     * @param maximum the inclusive upper bound, must be greater than or equal to {@code minimum}
+     */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public RandomIntProvider(
         @NonNull final MersenneTwisterFast rng,

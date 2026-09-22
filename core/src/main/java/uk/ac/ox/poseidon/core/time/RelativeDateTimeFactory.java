@@ -54,6 +54,11 @@ abstract class RelativeDateTimeFactory<S extends Scope>
         );
     }
 
+    /**
+     * @param referenceDateTime the resolved reference date-time
+     * @param temporalAmount    the resolved amount
+     * @return the reference date-time with the amount added or subtracted, per subclass direction
+     */
     protected abstract LocalDateTime operation(
         LocalDateTime referenceDateTime,
         TemporalAmount temporalAmount
