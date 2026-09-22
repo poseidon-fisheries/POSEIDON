@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.MonthDay;
 
+/**
+ * A {@link RelativeScopeFactory} for a {@link BetweenYearlyDates}. Built via
+ * {@link Factories#betweenYearlyDates}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

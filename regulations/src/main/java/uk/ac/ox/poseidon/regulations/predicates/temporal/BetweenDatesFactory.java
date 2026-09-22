@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDate;
 
+/**
+ * A {@link RelativeScopeFactory} for a {@link BetweenDates}. Built via
+ * {@link Factories#betweenDates}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

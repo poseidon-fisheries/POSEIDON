@@ -36,21 +36,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The BetweenYearlyDates class implements a predicate to determine whether an {@code Action}'s
- * start and end dates overlap with a specified range of dates, repeating every calendar year.
- * <p>
- * The range is defined using two {@code MonthDay} instances representing the inclusive start and
- * end of the range. The class accounts for whether the range crosses the boundary of a calendar
- * year (year spanning).
- * <p>
- * Key behavior: - If the date range does not span a year (start is before or equal to end within
- * the same year), the predicate checks if the action's dates fall within this range. - If the date
- * range spans a year (start is after end crossing into the next calendar year), actions are tested
- * with respect to the wrapped year-spanning interval. - The predicate will return {@code true} if
- * the action's start or end date lies inside the range, or if the range fully encompasses the
- * action's entire duration.
- * <p>
- * This class is immutable, with precondition checks performed to ensure valid input parameters.
+ * Predicate matching temporal actions whose start or end date falls within an inclusive
+ * {@code [start, end]} range of {@link MonthDay}s that repeats every calendar year, or whose
+ * duration fully covers the range. A range where {@code end} is before {@code start} (e.g.
+ * November 1 to February 28) is treated as spanning the year boundary rather than empty.
  */
 @Getter
 @ToString
@@ -61,6 +50,11 @@ public class BetweenYearlyDates implements Predicate<TemporalAction<?>> {
     @NonNull private final MonthDay end;
     private final boolean yearSpanning;
 
+    /**
+     * @param start the inclusive start of the range; {@code end} before {@code start} makes the
+     *              range year-spanning rather than invalid
+     * @param end   the inclusive end of the range
+     */
     public BetweenYearlyDates(
         final MonthDay start,
         final MonthDay end
@@ -78,6 +72,10 @@ public class BetweenYearlyDates implements Predicate<TemporalAction<?>> {
             coversRange(action.getStartDateTime(), action.getEndDateTime());
     }
 
+    /**
+     * Whether the action's duration fully covers the range, e.g. a multi-month trip encompassing
+     * a whole month-long closure.
+     */
     private boolean coversRange(
         final LocalDateTime actionStart,
         final LocalDateTime actionEnd

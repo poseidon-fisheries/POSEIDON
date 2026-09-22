@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,29 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.temporal;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 /**
- * A {@link GlobalScopeFactory} for an {@link InYear}. Built via {@link Factories#inYear}.
+ * Predicates over a {@link uk.ac.ox.poseidon.regulations.TemporalAction}'s date/time span: a fixed
+ * date range ({@link uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenDates}), a range
+ * repeating every calendar year
+ * ({@link uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenYearlyDates}), and a single
+ * year ({@link uk.ac.ox.poseidon.regulations.predicates.temporal.InYear}). See
+ * {@link uk.ac.ox.poseidon.regulations.predicates.temporal.Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class InYearFactory extends GlobalScopeFactory<InYear> {
-
-    private int year;
-
-    @Override
-    protected InYear newInstance(final Scope scope) {
-        return new InYear(year);
-    }
-
-}
+package uk.ac.ox.poseidon.regulations.predicates.temporal;

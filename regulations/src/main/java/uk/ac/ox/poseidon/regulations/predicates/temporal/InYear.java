@@ -28,6 +28,10 @@ import uk.ac.ox.poseidon.regulations.TemporalAction;
 
 import java.util.function.Predicate;
 
+/**
+ * Predicate matching temporal actions whose start or end year is {@code year}, or whose duration
+ * spans it entirely.
+ */
 @Getter
 @RequiredArgsConstructor
 public class InYear implements Predicate<TemporalAction<?>> {

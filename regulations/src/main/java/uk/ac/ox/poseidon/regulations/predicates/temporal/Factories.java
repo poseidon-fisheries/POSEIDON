@@ -29,10 +29,18 @@ import uk.ac.ox.poseidon.core.time.MonthDayFactory;
 import java.time.LocalDate;
 import java.time.MonthDay;
 
+/**
+ * Factories for predicates over a {@link uk.ac.ox.poseidon.regulations.TemporalAction}'s
+ * date/time span: a fixed date range, a range repeating every calendar year, and a single year.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link BetweenDates}
+     * @see BetweenDatesFactory
+     */
     public static <S extends Scope> BetweenDatesFactory<S> betweenDates(
         final Factory<? super S, ? extends LocalDate> startDate,
         final Factory<? super S, ? extends LocalDate> endDate
@@ -40,6 +48,11 @@ public class Factories {
         return new BetweenDatesFactory<>(startDate, endDate);
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link BetweenYearlyDates}
+     * @see BetweenYearlyDatesFactory
+     */
     public static <S extends Scope> BetweenYearlyDatesFactory<S> betweenYearlyDates(
         final Factory<? super S, ? extends MonthDay> start,
         final Factory<? super S, ? extends MonthDay> end
@@ -47,6 +60,13 @@ public class Factories {
         return new BetweenYearlyDatesFactory<>(start, end);
     }
 
+    /**
+     * @param start the inclusive start of the range, parsed via {@link MonthDayFactory#parse}
+     * @param end   the inclusive end of the range, parsed via {@link MonthDayFactory#parse}
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link BetweenYearlyDates}, resolvable against any {@link Scope}
+     * @see BetweenYearlyDatesFactory
+     */
     public static BetweenYearlyDatesFactory<Scope> betweenYearlyDates(
         final CharSequence start,
         final CharSequence end
@@ -57,6 +77,10 @@ public class Factories {
         );
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an {@link InYear}
+     * @see InYearFactory
+     */
     public static InYearFactory inYear(final int year) {
         return new InYearFactory(year);
     }

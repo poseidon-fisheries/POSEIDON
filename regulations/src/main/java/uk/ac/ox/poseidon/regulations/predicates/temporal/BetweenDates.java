@@ -48,6 +48,10 @@ public final class BetweenDates implements Predicate<TemporalAction<?>> {
 
     @NonNull private final Interval interval;
 
+    /**
+     * @param start the inclusive start date; must not be after {@code end}
+     * @param end   the inclusive end date
+     */
     public BetweenDates(
         @NonNull final LocalDate start,
         @NonNull final LocalDate end
