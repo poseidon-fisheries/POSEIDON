@@ -39,6 +39,14 @@ import java.util.Queue;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static lombok.AccessLevel.NONE;
 
+/**
+ * A single simulated agent (typically a vessel): a {@link Steppable} that repeatedly drives its
+ * current {@link Behaviour} forward, rescheduling itself either after a fixed
+ * {@link #taskDuration} (while the behaviour reports itself running) or on the very next tick
+ * (once it doesn't). Mutations that could change the agent's active status (e.g. swapping its
+ * behaviour) are queued via {@link #mutate} rather than applied immediately whenever the current
+ * behaviour is mid-step, so a behaviour never observes itself being replaced out from under it.
+ */
 @Getter
 public class Agent implements Steppable {
 
@@ -54,6 +62,11 @@ public class Agent implements Steppable {
 
     @Setter private Duration taskDuration;
 
+    /**
+     * @param schedule     the schedule this agent reschedules itself on after each step
+     * @param eventManager the event manager this agent's behaviours report through
+     * @param behaviour    the agent's initial behaviour
+     */
     @SuppressFBWarnings(
         value = "EI2",
         justification = "Agent keeps references to mutable schedule/event manager by design."
@@ -68,6 +81,11 @@ public class Agent implements Steppable {
         this.behaviour = behaviour;
     }
 
+    /**
+     * Drains any queued mutations (only once the behaviour isn't running), then, if still active,
+     * steps the behaviour and reschedules — after {@link #taskDuration} if it's now running, or on
+     * the next tick otherwise.
+     */
     @Override
     public void step(final SimState simState) {
         if (!behaviour.isRunning()) {
@@ -86,6 +104,7 @@ public class Agent implements Steppable {
         }
     }
 
+    /** @return whether the current behaviour is active */
     public boolean isActive() {
         return behaviour.isActive();
     }
@@ -111,6 +130,7 @@ public class Agent implements Steppable {
         }
     }
 
+    /** Replaces the current behaviour, via {@link #mutate}. */
     public void setBehaviour(final Behaviour behaviour) {
         mutate(() -> this.behaviour = behaviour);
     }

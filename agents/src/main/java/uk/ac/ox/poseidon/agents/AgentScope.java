@@ -28,6 +28,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.lang.ref.WeakReference;
 
+/**
+ * A {@link SimulationScope} narrowed to a single agent, for factories building agent-owned
+ * components. Holds the agent via a {@link WeakReference} rather than directly, so that scoping to
+ * an agent never itself keeps that agent alive past its natural lifetime.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class AgentScope<G extends Agent> extends SimulationScope {
@@ -47,6 +52,7 @@ public class AgentScope<G extends Agent> extends SimulationScope {
         this.agent = new WeakReference<>(agent);
     }
 
+    /** @return the scoped agent, or {@code null} if it has since been garbage-collected */
     public G getAgent() {
         return agent.get();
     }
