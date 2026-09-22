@@ -35,7 +35,7 @@ import java.io.Serial;
 @Data
 public class IndependentBiomassGrower implements Steppable {
 
-    @Serial private static final long serialVersionUID = -7273150961650782548L;
+    @Serial private static final long serialVersionUID = -560728986379999066L;
     @NonNull private final BiomassGrid biomassGrid;
     @NonNull private final CarryingCapacityGrid carryingCapacityGrid;
     @NonNull private final BiomassGrowthRule biomassGrowthRule;

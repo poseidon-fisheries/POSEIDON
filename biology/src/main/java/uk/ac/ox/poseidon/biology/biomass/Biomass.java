@@ -32,6 +32,7 @@ import javax.measure.quantity.Mass;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 
 @EqualsAndHashCode
 public class Biomass implements Content {
@@ -83,6 +84,7 @@ public class Biomass implements Content {
 
     @Override
     public Biomass divide(final double value) {
+        checkPositive(value, "Amount by which to divide biomass");
         return new Biomass(this.biomassInKg / value);
     }
 
