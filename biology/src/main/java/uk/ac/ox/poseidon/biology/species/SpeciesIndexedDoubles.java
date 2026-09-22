@@ -30,6 +30,11 @@ import java.util.function.DoubleConsumer;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.ObjDoubleConsumer;
 
+/**
+ * A {@link SpeciesIndexed} array of primitive {@code double} values, one per species. Implemented
+ * by {@link SpeciesIndexedDoubleArray} (a plain array) and {@code BiomassBucket} in
+ * {@code biology.buckets}.
+ */
 public interface SpeciesIndexedDoubles<S extends SpeciesIndexedDoubles<S>> extends SpeciesIndexed {
 
     /**

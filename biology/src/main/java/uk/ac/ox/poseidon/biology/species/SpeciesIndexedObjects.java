@@ -26,6 +26,10 @@ import uk.ac.ox.poseidon.core.utils.ObjIntToObjFunction;
 
 import java.util.function.*;
 
+/**
+ * A {@link SpeciesIndexed} array of arbitrary objects of type {@code T}, one per species.
+ * Implemented by {@code FisheableBiomassGrids} in {@code biology.biomass}.
+ */
 public interface SpeciesIndexedObjects<T, S extends SpeciesIndexedObjects<T, S>>
     extends SpeciesIndexed {
 

@@ -39,6 +39,14 @@ import java.util.function.Function;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * A fixed, sorted set of {@link Species}, assigning each a stable integer position — the shared
+ * addressing scheme behind {@link SpeciesIndexedDoubles}/{@link SpeciesIndexedObjects} and the
+ * array-backed {@code Bucket} implementations, letting them operate on plain arrays instead of
+ * species-keyed maps. Interned: two indices built from the same set of species are the same
+ * instance (subject to GC, since interning is weak), so equal indices are cheap to compare and
+ * {@link SpeciesIndexed#sameIndex} can shortcut to the fast array-aligned path.
+ */
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = PRIVATE)
 public final class SpeciesIndex {
@@ -49,10 +57,12 @@ public final class SpeciesIndex {
     private final Species[] speciesArray;
     private transient volatile Map<Species, Integer> cachedMap;
 
+    /** @return the interned index over {@code species} */
     public static SpeciesIndex of(final Set<Species> species) {
         return interner.intern(new SpeciesIndex(species));
     }
 
+    /** @return the interned index over {@code species} */
     @SuppressWarnings("unchecked")
     public static SpeciesIndex of(final Collection<? extends Species> species) {
         return species instanceof Set
@@ -60,6 +70,7 @@ public final class SpeciesIndex {
             : of(Set.copyOf(species));
     }
 
+    /** @return the interned index over {@code species} */
     public static SpeciesIndex of(final Species... species) {
         return interner.intern(new SpeciesIndex(Set.of(species)));
     }
@@ -79,10 +90,17 @@ public final class SpeciesIndex {
         }
     }
 
+    /** @return a fresh {@code double} array sized to this index, one slot per species */
     public double[] newDoubleArray() {
         return new double[speciesArray.length];
     }
 
+    /**
+     * @param function applied to each species, in index order, to build the array
+     * @return a {@link SpeciesIndexedDoubleArray} over this index, holding {@code function}'s
+     * result for each species
+     * @throws NullPointerException if {@code function} returns {@code null} for any species
+     */
     public SpeciesIndexedDoubleArray mapToDoubleArray(
         final Function<? super Species, Double> function
     ) {
@@ -119,10 +137,12 @@ public final class SpeciesIndex {
             : speciesArray[index];
     }
 
+    /** @return the number of species in this index */
     public int size() {
         return speciesArray.length;
     }
 
+    /** @return this index's species-to-position mapping. Cached after first access. */
     public Map<Species, Integer> asMap() {
         Map<Species, Integer> map = cachedMap;
         if (map == null) {

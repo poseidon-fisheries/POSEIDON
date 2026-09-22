@@ -20,25 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.species.extractors;
-
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Function;
-
 /**
- * A {@link GlobalScopeFactory} for a {@link Function} extracting a {@link Species}' code. Built
- * via {@link Factories#speciesCode()} in this package.
+ * {@link uk.ac.ox.poseidon.biology.species.Species} identity, and the array-backed addressing
+ * scheme ({@link uk.ac.ox.poseidon.biology.species.SpeciesIndex}, {@code SpeciesIndexed*}) used
+ * across the model to store per-species data without species-keyed maps. See
+ * {@link uk.ac.ox.poseidon.biology.species.Factories} for the entry points. The
+ * {@code extractors} subpackage builds simple {@link java.util.function.Function}s that pull a
+ * field off a {@link uk.ac.ox.poseidon.biology.species.Species}.
  */
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class SpeciesCodeExtractorFactory extends GlobalScopeFactory<Function<Species, String>> {
-    @Override
-    protected Function<Species, String> newInstance(final Scope scope) {
-        return Species::getCode;
-    }
-}
+package uk.ac.ox.poseidon.biology.species;

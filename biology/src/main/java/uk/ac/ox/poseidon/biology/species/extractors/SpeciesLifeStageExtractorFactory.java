@@ -30,6 +30,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Function;
 
+/**
+ * A {@link GlobalScopeFactory} for a {@link Function} extracting a {@link Species}' life stage.
+ * Built via {@link Factories#speciesLifeStage()} in this package.
+ */
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SpeciesLifeStageExtractorFactory

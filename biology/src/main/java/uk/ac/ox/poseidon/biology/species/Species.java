@@ -32,6 +32,14 @@ import java.util.Comparator;
 import static java.util.Comparator.nullsFirst;
 import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 
+/**
+ * A species, optionally narrowed to a life stage (e.g. "adult"/"juvenile") — the unit of species
+ * identity tracked throughout the model, from biology to markets. Identity ({@code equals}/
+ * {@code hashCode}/{@link #compareTo}) is based on {@code code} and {@code lifeStage} only,
+ * {@code name} is purely cosmetic. Built via
+ * {@link Factories#species()}/{@link Factories#species(String)}/
+ * {@link Factories#species(String, String, String)}.
+ */
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Species implements Comparable<Species> {
@@ -45,9 +53,18 @@ public class Species implements Comparable<Species> {
 
     private final String name;
 
+    /** A composite string key combining {@code code} and {@code lifeStage}. */
     @Getter(lazy = true)
     private final String key = multiStringKey(code, lifeStage);
 
+    /**
+     * @param code      the species' code; blank-only values aren't specially treated, only
+     *                   {@code null}/blank {@code lifeStage}/{@code name} are normalized
+     * @param lifeStage the life stage, or {@code null} for the species as a whole; a blank string
+     *                  is normalized to {@code null}
+     * @param name      the display name, or {@code null}; a blank string is normalized to
+     *                  {@code null}
+     */
     public Species(
         @NonNull final String code,
         final String lifeStage,
@@ -68,12 +85,16 @@ public class Species implements Comparable<Species> {
      * FIXME: this is needed, but a bit of a kludge and I'm not sure that this is the right approach
      *  in general. We probably need some kind of standard species ontology (with the possibility
      *  of encoding supra-species functional groups as well)
+     *
+     * @param other the species to check against
+     * @return whether this species covers {@code other}
      */
     public boolean covers(final Species other) {
         return this.code.equals(other.code) &&
             (this.lifeStage == null || this.lifeStage.equals(other.lifeStage));
     }
 
+    /** @return {@code "code"}, plus {@code " - name"} and/or {@code " (lifeStage)"} if present */
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
@@ -87,6 +108,7 @@ public class Species implements Comparable<Species> {
         return sb.toString();
     }
 
+    /** Orders by {@code code}, then by {@code lifeStage} ({@code null} sorting first). */
     @Override
     public int compareTo(final @NonNull Species o) {
         return Comparator

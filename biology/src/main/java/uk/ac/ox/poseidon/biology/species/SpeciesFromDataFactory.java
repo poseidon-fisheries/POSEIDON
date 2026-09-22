@@ -33,6 +33,16 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
+/**
+ * A {@link RelativeScopeFactory} that reads one {@link Species} per row of a resolved
+ * {@code tablesaw} table, taking the code/name from named columns, and the life stage from a
+ * named column too if {@code lifeStageColumn} is given (otherwise every row gets no life stage).
+ * There's no separate plain component class here: the produced {@link List} is returned as-is,
+ * with no wrapper type to carry documentation, so this factory carries the behavior doc directly.
+ * Built via
+ * {@link Factories#speciesFromData(uk.ac.ox.poseidon.core.Factory, String, String, String)} in
+ * this package.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

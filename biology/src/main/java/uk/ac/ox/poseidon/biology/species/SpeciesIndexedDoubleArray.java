@@ -47,6 +47,12 @@ public class SpeciesIndexedDoubleArray implements SpeciesIndexedDoubles<SpeciesI
         this.speciesIndex = speciesIndex;
     }
 
+    /**
+     * @param a            the values, aligned with {@code speciesIndex}; copied
+     * @param speciesIndex the index the array is aligned with
+     * @return a new instance holding a copy of {@code a}
+     * @throws IllegalArgumentException if {@code a}'s length doesn't match the index's size
+     */
     public static SpeciesIndexedDoubleArray of(
         final double @NonNull [] a,
         @NonNull final SpeciesIndex speciesIndex

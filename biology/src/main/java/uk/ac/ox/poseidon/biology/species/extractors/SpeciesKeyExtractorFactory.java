@@ -30,6 +30,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Function;
 
+/**
+ * A {@link GlobalScopeFactory} for a {@link Function} extracting a {@link Species}' composite
+ * key. Built via {@link Factories#speciesKey()} in this package.
+ */
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SpeciesKeyExtractorFactory extends GlobalScopeFactory<Function<Species, String>> {

@@ -22,18 +22,39 @@
 
 package uk.ac.ox.poseidon.biology.species.extractors;
 
+import uk.ac.ox.poseidon.biology.species.Species;
+
+/**
+ * Factories for {@link java.util.function.Function}s that pull a single field off a
+ * {@link Species}.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a function extracting a
+     * species' code
+     * @see SpeciesCodeExtractorFactory
+     */
     public static SpeciesCodeExtractorFactory speciesCode() {
         return new SpeciesCodeExtractorFactory();
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a function extracting a
+     * species' life stage
+     * @see SpeciesLifeStageExtractorFactory
+     */
     public static SpeciesLifeStageExtractorFactory speciesLifeStage() {
         return new SpeciesLifeStageExtractorFactory();
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a function extracting a
+     * species' composite key
+     * @see SpeciesKeyExtractorFactory
+     */
     public static SpeciesKeyExtractorFactory speciesKey() {
         return new SpeciesKeyExtractorFactory();
     }

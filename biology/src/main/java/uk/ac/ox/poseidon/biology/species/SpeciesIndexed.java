@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
+/** Something whose data is ordered by a {@link SpeciesIndex}. */
 public interface SpeciesIndexed {
 
     /**

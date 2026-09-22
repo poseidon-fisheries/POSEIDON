@@ -22,6 +22,11 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
+/**
+ * Three fixed, no-lifestage {@link Species} instances for use as test fixtures across modules —
+ * placed in {@code src/main} (rather than a test source set) since tests in other modules only
+ * see this module's main classes, not its test classes.
+ */
 public class DummySpecies {
 
     private DummySpecies() {}

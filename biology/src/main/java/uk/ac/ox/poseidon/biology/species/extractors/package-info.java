@@ -20,25 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.species.extractors;
-
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Function;
-
 /**
- * A {@link GlobalScopeFactory} for a {@link Function} extracting a {@link Species}' code. Built
- * via {@link Factories#speciesCode()} in this package.
+ * {@link java.util.function.Function}s that pull a single field (code, name, life stage, ...) off
+ * a {@link uk.ac.ox.poseidon.biology.species.Species}. See
+ * {@link uk.ac.ox.poseidon.biology.species.extractors.Factories} for the entry points.
  */
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class SpeciesCodeExtractorFactory extends GlobalScopeFactory<Function<Species, String>> {
-    @Override
-    protected Function<Species, String> newInstance(final Scope scope) {
-        return Species::getCode;
-    }
-}
+package uk.ac.ox.poseidon.biology.species.extractors;

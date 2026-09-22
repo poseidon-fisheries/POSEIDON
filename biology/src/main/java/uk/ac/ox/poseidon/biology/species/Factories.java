@@ -29,18 +29,36 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Factories for {@link Species} and the collections built from them: standalone species (given
+ * literally, or read from a table), filtering a species list by code, and building a
+ * {@link SpeciesIndex} over a resolved collection.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an unnamed, uncoded species
+     */
     public static SpeciesFactory species() {
         return new SpeciesFactory();
     }
 
+    /**
+     * @param code the species' code; name defaults to {@code "Species <code>"}, no life stage
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link Species}
+     */
     public static SpeciesFactory species(final String code) {
         return new SpeciesFactory(code);
     }
 
+    /**
+     * @param code      the species' code
+     * @param name      the display name
+     * @param lifeStage the life stage, or {@code null} for the species as a whole
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link Species}
+     */
     public static SpeciesFactory species(
         final String code,
         final String name,
@@ -49,6 +67,16 @@ public class Factories {
         return new SpeciesFactory(code, name, lifeStage);
     }
 
+    /**
+     * @param data              factory for the table to read
+     * @param speciesCodeColumn the name of the column holding species codes
+     * @param speciesNameColumn the name of the column holding species names
+     * @param lifeStageColumn   the name of the column holding life stages, or {@code null} if the
+     *                          table has none
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the list of species read
+     * from the resolved table
+     * @see SpeciesFromDataFactory
+     */
     public static <S extends Scope> SpeciesFromDataFactory<S> speciesFromData(
         final Factory<? super S, ? extends Table> data,
         final String speciesCodeColumn,
@@ -63,6 +91,13 @@ public class Factories {
         );
     }
 
+    /**
+     * @param speciesCodes factory for the codes to keep
+     * @param speciesList  factory for the list of species to filter
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the resolved species list,
+     * narrowed to the resolved codes
+     * @see SpeciesByCodeFactory
+     */
     public static <S extends Scope> SpeciesByCodeFactory<S> speciesByCode(
         final Factory<? super S, ? extends List<? extends String>> speciesCodes,
         final Factory<? super S, ? extends List<? extends Species>> speciesList
@@ -70,6 +105,12 @@ public class Factories {
         return new SpeciesByCodeFactory<>(speciesCodes, speciesList);
     }
 
+    /**
+     * @param speciesFactory factory for the species to index
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link SpeciesIndex}
+     * over the resolved species
+     * @see SpeciesIndexFactory
+     */
     public static <S extends Scope> SpeciesIndexFactory<S> speciesIndex(
         final Factory<S, ? extends Collection<? extends Species>> speciesFactory
     ) {
