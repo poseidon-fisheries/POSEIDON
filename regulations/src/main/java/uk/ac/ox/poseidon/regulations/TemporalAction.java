@@ -28,14 +28,18 @@ import java.time.LocalDateTime;
 
 import static java.time.ZoneOffset.UTC;
 
+/** An {@link Action} that occupies a time interval, e.g. for date- or duration-based regulations. */
 public interface TemporalAction<G> extends Action<G> {
 
+    /** @return the interval this action occupies */
     Interval getInterval();
 
+    /** @return {@link #getInterval()}'s start, as a UTC {@link LocalDateTime} */
     default LocalDateTime getStartDateTime() {
         return getInterval().getStart().atZone(UTC).toLocalDateTime();
     }
 
+    /** @return {@link #getInterval()}'s end, as a UTC {@link LocalDateTime} */
     default LocalDateTime getEndDateTime() {
         return getInterval().getEnd().atZone(UTC).toLocalDateTime();
     }

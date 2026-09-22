@@ -24,10 +24,17 @@ package uk.ac.ox.poseidon.regulations;
 
 import uk.ac.ox.poseidon.geography.Coordinate;
 
+/**
+ * An {@link Action} that occupies a location, e.g. for spatially-defined regulations. Start and
+ * end coordinates are the same for an instantaneous or stationary action; they differ for one
+ * spanning a movement, such as a trip leg.
+ */
 public interface SpatialAction<G> extends Action<G> {
 
+    /** @return where this action starts */
     Coordinate getStartCoordinate();
 
+    /** @return where this action ends */
     Coordinate getEndCoordinate();
 
 }

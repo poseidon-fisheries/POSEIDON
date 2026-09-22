@@ -22,6 +22,12 @@
 
 package uk.ac.ox.poseidon.regulations;
 
+/**
+ * Something an agent does that a {@link Regulations} rule can permit or forbid. {@code G} is the
+ * agent type; concrete actions typically also implement {@link TemporalAction} and/or
+ * {@link SpatialAction} so predicates can constrain when and where the action happens.
+ */
 public interface Action<G> {
+    /** @return the agent performing this action */
     G getAgent();
 }

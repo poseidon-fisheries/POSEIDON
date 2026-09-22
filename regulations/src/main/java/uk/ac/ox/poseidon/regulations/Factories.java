@@ -27,16 +27,28 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Predicate;
 
+/**
+ * Factories for the two base {@link Regulations} rules, {@link ForbiddenIf} and
+ * {@link PermittedIf}, each built from a predicate over the action.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link ForbiddenIf}
+     * @see ForbiddenIfFactory
+     */
     public static <S extends Scope, A extends Action<?>> ForbiddenIfFactory<S, A> forbiddenIf(
         final Factory<? super S, ? extends Predicate<? super A>> actionPredicate
     ) {
         return new ForbiddenIfFactory<S, A>(actionPredicate);
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link PermittedIf}
+     * @see PermittedIfFactory
+     */
     public static <S extends Scope, A extends Action<?>> PermittedIfFactory<S, A> permittedIf(
         final Factory<? super S, ? extends Predicate<? super A>> actionPredicate
     ) {

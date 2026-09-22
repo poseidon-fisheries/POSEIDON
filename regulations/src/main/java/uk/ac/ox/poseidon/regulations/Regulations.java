@@ -22,11 +22,19 @@
 
 package uk.ac.ox.poseidon.regulations;
 
+/**
+ * A rule deciding whether a given {@link Action} is allowed. {@link ForbiddenIf} and
+ * {@link PermittedIf} are the two base implementations; composition (e.g. all-of/any-of) is
+ * expected to build on {@link uk.ac.ox.poseidon.core.predicates.logical} predicates over the same
+ * action, rather than on {@code Regulations} composition directly.
+ */
 @FunctionalInterface
 public interface Regulations<A extends Action<?>> {
 
+    /** @return whether {@code action} is allowed under this rule */
     boolean isPermitted(A action);
 
+    /** @return the negation of {@link #isPermitted} */
     default boolean isForbidden(final A action) {
         return !isPermitted(action);
     }

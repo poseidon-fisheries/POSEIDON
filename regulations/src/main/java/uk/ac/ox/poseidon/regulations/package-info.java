@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,21 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * The regulation-rule model: {@link uk.ac.ox.poseidon.regulations.Action} (what a rule judges),
+ * {@link uk.ac.ox.poseidon.regulations.Regulations} (the rule itself), and the two base rules,
+ * {@link uk.ac.ox.poseidon.regulations.ForbiddenIf} and
+ * {@link uk.ac.ox.poseidon.regulations.PermittedIf}, each parameterised by a predicate over the
+ * action. See {@link uk.ac.ox.poseidon.regulations.predicates} for predicates built on top of this
+ * model, including composing rules themselves back into predicates. See
+ * {@link uk.ac.ox.poseidon.regulations.Factories} for the entry points.
+ */
 package uk.ac.ox.poseidon.regulations;
-
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-
-import java.util.function.Predicate;
-
-/** A {@link Regulations} rule permitting only actions matching {@code actionPredicate}. */
-@RequiredArgsConstructor
-public class PermittedIf<A extends Action<?>> implements Regulations<A> {
-
-    @NonNull private final Predicate<? super A> actionPredicate;
-
-    @Override
-    public boolean isPermitted(final A action) {
-        return actionPredicate.test(action);
-    }
-}

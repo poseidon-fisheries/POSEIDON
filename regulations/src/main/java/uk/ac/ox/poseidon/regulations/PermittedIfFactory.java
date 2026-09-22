@@ -29,6 +29,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Predicate;
 
+/**
+ * A {@link RelativeScopeFactory} for a {@link PermittedIf}. Built via
+ * {@link Factories#permittedIf}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
