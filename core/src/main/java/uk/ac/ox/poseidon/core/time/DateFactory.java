@@ -46,6 +46,7 @@ public class DateFactory extends GlobalScopeFactory<LocalDate> {
     private Integer month;
     private Integer day;
 
+    @Override
     protected LocalDate newInstance(final Scope scope) {
         return LocalDate.of(year, month, day);
     }
