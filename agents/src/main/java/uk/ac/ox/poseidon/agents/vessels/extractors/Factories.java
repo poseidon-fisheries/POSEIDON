@@ -29,14 +29,27 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Function;
 
+/**
+ * Factories for functions extracting a value from a vessel.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
+     * {@link AvailableHoldCapacityInKg}
+     * @see AvailableHoldCapacityInKgFactory
+     */
     public static AvailableHoldCapacityInKgFactory availableHoldCapacityInKg() {
         return new AvailableHoldCapacityInKgFactory();
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link TripCostFromHourlyCosts}
+     * @see TripCostFromHourlyCostsFactory
+     */
     public static <S extends Scope> TripCostFromHourlyCostsFactory<S> tripCostFromHourlyCosts(
         final Factory<? super S, ? extends Function<? super Vessel, ? extends Money>>
             hourlyCostsExtractor

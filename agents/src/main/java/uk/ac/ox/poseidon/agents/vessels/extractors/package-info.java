@@ -20,24 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.extractors;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 /**
- * A {@link GlobalScopeFactory} for an {@link AvailableHoldCapacityInKg}. Built via
- * {@link Factories#availableHoldCapacityInKg}.
+ * {@link java.util.function.Function}s that pull a value off a
+ * {@link uk.ac.ox.poseidon.agents.vessels.Vessel}: remaining hold capacity, or a trip's
+ * accumulated cost from an hourly rate. See tag-specific extractors in
+ * {@link uk.ac.ox.poseidon.agents.vessels.extractors.tags}. See
+ * {@link uk.ac.ox.poseidon.agents.vessels.extractors.Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class AvailableHoldCapacityInKgFactory extends GlobalScopeFactory<AvailableHoldCapacityInKg> {
-    @Override
-    protected AvailableHoldCapacityInKg newInstance(final Scope scope) {
-        return new AvailableHoldCapacityInKg();
-    }
-}
+package uk.ac.ox.poseidon.agents.vessels.extractors;

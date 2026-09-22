@@ -26,6 +26,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.util.function.Function;
 
+/** Extracts a vessel's remaining hold capacity, in kilograms. */
 public class AvailableHoldCapacityInKg implements Function<Vessel, Double> {
     @Override
     public Double apply(final Vessel vessel) {

@@ -31,11 +31,16 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.util.function.Function;
 
+/**
+ * Extracts the cost of a vessel's current trip so far, as its elapsed duration times an hourly
+ * rate from {@code hourlyCostsExtractor}.
+ */
 @RequiredArgsConstructor
 public class TripCostFromHourlyCosts implements Function<Vessel, Money> {
 
     @NonNull private final Function<? super Vessel, ? extends Money> hourlyCostsExtractor;
 
+    /** @return {@code hourlyCostsExtractor}'s rate for {@code vessel}, times elapsed trip hours */
     @Override
     public Money apply(final Vessel vessel) {
         final Duration tripDuration = Duration.between(
