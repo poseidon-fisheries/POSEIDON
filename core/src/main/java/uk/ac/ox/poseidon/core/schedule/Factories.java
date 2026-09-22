@@ -29,6 +29,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
+import java.util.Collection;
 import java.util.List;
 
 import static uk.ac.ox.poseidon.core.schedule.TemporalSchedule.DEFAULT_ORDERING;
@@ -102,6 +103,12 @@ public class Factories {
         final Factory<? super SimulationScope, ? extends List<? extends Steppable>> steppables
     ) {
         return new SteppableSequenceFactory(steppables);
+    }
+
+    public static SteppableRandomSequenceFactory steppableRandomSequence(
+        final Factory<? super SimulationScope, ? extends Collection<? extends Steppable>> steppables
+    ) {
+        return new SteppableRandomSequenceFactory(steppables);
     }
 
 }
