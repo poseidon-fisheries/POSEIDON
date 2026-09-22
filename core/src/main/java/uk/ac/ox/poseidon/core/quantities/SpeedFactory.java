@@ -28,6 +28,10 @@ import lombok.EqualsAndHashCode;
 import javax.measure.Unit;
 import javax.measure.quantity.Speed;
 
+/**
+ * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link Speed} quantities, built via
+ * {@link Factories Factories.speedOf(...)}.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SpeedFactory extends AbstractQuantityFactory<Speed> {

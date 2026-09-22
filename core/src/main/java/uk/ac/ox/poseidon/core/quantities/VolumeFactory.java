@@ -27,6 +27,10 @@ import lombok.EqualsAndHashCode;
 
 import javax.measure.quantity.Volume;
 
+/**
+ * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link Volume} quantities, built via
+ * {@link Factories Factories.volumeOf(...)}.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class VolumeFactory extends AbstractQuantityFactory<Volume> {

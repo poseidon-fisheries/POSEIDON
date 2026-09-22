@@ -35,6 +35,13 @@ import javax.measure.quantity.Mass;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
+/**
+ * A {@link RelativeScopeFactory} for the numeric value, in kilograms, of a resolved {@link Mass}
+ * quantity — a convenience unwrapper for code that wants a plain {@code double} rather than a
+ * JSR-385 {@link Quantity}. No separate plain component class here: the produced value is a bare
+ * {@link Double}, with no wrapper to carry documentation. Built via
+ * {@link Factories Factories.kilograms(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

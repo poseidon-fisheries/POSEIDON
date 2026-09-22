@@ -31,10 +31,15 @@ import javax.measure.Unit;
 import static tech.units.indriya.unit.Units.HOUR;
 import static tech.units.indriya.unit.Units.LITRE;
 
+/**
+ * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link VolumetricFlowRate} quantities,
+ * built via {@link Factories Factories.volumetricFlowRateOf(...)}.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class VolumetricFlowRateFactory extends AbstractQuantityFactory<VolumetricFlowRate> {
 
+    /** The unit of one litre per hour. */
     public static final Unit<VolumetricFlowRate> LITRE_PER_HOUR =
         LITRE.divide(HOUR).asType(VolumetricFlowRate.class);
 

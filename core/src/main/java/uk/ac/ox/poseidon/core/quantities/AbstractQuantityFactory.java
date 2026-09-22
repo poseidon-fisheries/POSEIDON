@@ -39,6 +39,17 @@ import java.util.Map.Entry;
 
 import static java.util.Map.entry;
 
+/**
+ * A {@link GlobalScopeFactory} that parses a unit string (e.g. {@code "kg"}, {@code "m/s"}) and a
+ * numeric value into a {@link Quantity} of the declared type {@code Q}. No separate plain
+ * component class here: the produced value is a bare JSR-385 {@link Quantity}, with no domain
+ * wrapper to carry documentation. Package-private template base for the leaf {@code *Factory}
+ * classes ({@link MassFactory}, {@link VolumeFactory}, {@link SpeedFactory},
+ * {@link VolumetricFlowRateFactory}), each of which just fixes {@code Q} and exposes the
+ * no-args/all-args constructors SnakeYAML and {@link Factories} need.
+ *
+ * @param <Q> the JSR-385 quantity type this factory produces
+ */
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -57,6 +68,12 @@ public abstract class AbstractQuantityFactory<Q extends Quantity<Q>>
     private double value;
     private String unitString;
 
+    /**
+     * @param type     the quantity type to parse the string as
+     * @param quantity a quantity string in the format produced by {@code Quantity.toString()}
+     *                 (e.g. {@code "3.5 kg"})
+     * @return the parsed value paired with its unit's string representation
+     */
     static <Q extends Quantity<Q>> Entry<String, Double> parse(
         final Class<Q> type,
         final String quantity
