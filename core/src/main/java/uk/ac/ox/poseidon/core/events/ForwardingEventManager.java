@@ -24,6 +24,12 @@ package uk.ac.ox.poseidon.core.events;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * An {@link EventManager} that forwards every {@link #addListener}/{@link #removeListener} and
+ * {@link #broadcast} call to a private, always-fresh {@link SimpleEventManager}, and additionally
+ * forwards every broadcast event to a given secondary {@link EventManager} — used to fan a single
+ * event stream out to a second, independently-managed set of listeners.
+ */
 @RequiredArgsConstructor
 public class ForwardingEventManager implements EventManager {
 

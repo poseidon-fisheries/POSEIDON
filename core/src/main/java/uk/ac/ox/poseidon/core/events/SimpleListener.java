@@ -24,9 +24,18 @@ package uk.ac.ox.poseidon.core.events;
 
 import java.util.function.Consumer;
 
+/**
+ * An {@link AbstractListener} that delegates received events to a given {@link Consumer}.
+ *
+ * @param <E> the type of event received
+ */
 public class SimpleListener<E> extends AbstractListener<E> {
     private final Consumer<E> consumer;
 
+    /**
+     * @param eventClass the event type this listener is registered for
+     * @param consumer   the consumer invoked with every received event
+     */
     public SimpleListener(
         final Class<E> eventClass,
         final Consumer<E> consumer

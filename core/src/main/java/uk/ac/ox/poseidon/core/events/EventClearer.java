@@ -29,6 +29,12 @@ import sim.engine.Steppable;
 import static java.lang.System.Logger.Level.DEBUG;
 import static uk.ac.ox.poseidon.core.Simulation.log;
 
+/**
+ * A {@link Steppable} that clears a given {@link EventAccumulator} every time it runs, logging how
+ * many events were discarded. Scheduled periodically to keep an accumulator from growing
+ * unbounded when only recent events matter. Built via
+ * {@link Factories#eventClearer(uk.ac.ox.poseidon.core.Factory)} in this package.
+ */
 @RequiredArgsConstructor
 public class EventClearer implements Steppable {
 

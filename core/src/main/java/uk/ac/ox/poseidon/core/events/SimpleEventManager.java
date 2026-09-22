@@ -27,6 +27,13 @@ import com.google.common.collect.MultimapBuilder;
 
 import java.util.*;
 
+/**
+ * The default {@link EventManager} implementation: dispatches a broadcast event to every listener
+ * registered for the event's exact class, or for any of its superclasses or implemented
+ * interfaces (so a listener registered for a supertype still receives subtype events). Caches the
+ * computed dispatch-class set and the listener snapshot per event class, invalidating the
+ * snapshot cache whenever listeners are added or removed.
+ */
 public class SimpleEventManager implements EventManager {
 
     private final Multimap<Class<?>, Listener<?>> listeners =

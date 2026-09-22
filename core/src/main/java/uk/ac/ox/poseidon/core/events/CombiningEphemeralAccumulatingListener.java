@@ -27,12 +27,34 @@ import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A {@link Supplier} that combines the results of two independent
+ * {@link EphemeralAccumulatingListener}s via a {@code combiner} function, once both are read. Like
+ * its component listeners, each is self-unsubscribed and frozen the first time this combined
+ * {@link #get()} is called.
+ *
+ * @param <E1> the first listener's event type
+ * @param <T1> the first listener's accumulated value type
+ * @param <E2> the second listener's event type
+ * @param <T2> the second listener's accumulated value type
+ * @param <R>  the combined result type
+ */
 public class CombiningEphemeralAccumulatingListener<E1, T1, E2, T2, R> implements Supplier<R> {
 
     private final EphemeralAccumulatingListener<E1, T1> firstListener;
     private final EphemeralAccumulatingListener<E2, T2> secondListener;
     private final BiFunction<T1, T2, R> combiner;
 
+    /**
+     * @param eventManager        the event manager both component listeners register with
+     * @param firstEventClass     the first listener's event type
+     * @param firstInitialValue   the first listener's starting value
+     * @param firstAccumulator    the first listener's accumulator function
+     * @param secondEventClass    the second listener's event type
+     * @param secondInitialValue  the second listener's starting value
+     * @param secondAccumulator   the second listener's accumulator function
+     * @param combiner            combines the two listeners' final values into the result
+     */
     public CombiningEphemeralAccumulatingListener(
         final EventManager eventManager,
         final Class<E1> firstEventClass,

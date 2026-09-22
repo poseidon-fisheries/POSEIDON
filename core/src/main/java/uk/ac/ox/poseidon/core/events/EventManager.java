@@ -22,15 +22,24 @@
 
 package uk.ac.ox.poseidon.core.events;
 
+/**
+ * A publish/subscribe hub: {@link Listener}s register for the event types they care about, and
+ * {@link #broadcast} dispatches an event to every listener whose {@link Listener#getEventClass()}
+ * matches the event's class or any of its superclasses/interfaces. Decouples event producers from
+ * consumers across the simulation.
+ */
 public interface EventManager {
 
+    /** @param listener the listener to register, for its {@link Listener#getEventClass()} */
     void addListener(
         Listener<?> listener
     );
 
+    /** @param listener the listener to unregister */
     void removeListener(
         Listener<?> listener
     );
 
+    /** @param event the event to dispatch to every matching registered listener */
     <E> void broadcast(E event);
 }

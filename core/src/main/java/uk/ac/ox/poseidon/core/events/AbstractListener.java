@@ -26,10 +26,17 @@ import lombok.Getter;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A {@link Listener} base class that stores the event type given at construction, so subclasses
+ * only need to implement {@link #receive}.
+ *
+ * @param <E> the type of event received
+ */
 @Getter
 public abstract class AbstractListener<E> implements Listener<E> {
     private final Class<E> eventClass;
 
+    /** @param eventClass the event type this listener is registered for, must not be null */
     protected AbstractListener(final Class<E> eventClass) {
         this.eventClass = checkNotNull(eventClass);
     }

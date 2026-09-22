@@ -20,25 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * A lightweight publish/subscribe event system ({@link uk.ac.ox.poseidon.core.events.EventManager},
+ * {@link uk.ac.ox.poseidon.core.events.Listener}) used to decouple event producers from consumers
+ * across the simulation, plus listener implementations that accumulate or fold received events.
+ * Most types here are plain classes constructed directly, not via the Factory pattern; see
+ * {@link uk.ac.ox.poseidon.core.events.Factories} for the one component that is.
+ */
 package uk.ac.ox.poseidon.core.events;
-
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-/** Factories for scheduling maintenance steppables over the event subsystem. */
-public class Factories {
-
-    private Factories() {}
-
-    /**
-     * @param eventAccumulator factory for the accumulator to periodically clear
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for an {@link EventClearer}
-     * over the resolved accumulator
-     * @see EventClearer
-     */
-    public static EventClearerFactory eventClearer(
-        final Factory<? super SimulationScope, ? extends EventAccumulator<?>> eventAccumulator
-    ) {
-        return new EventClearerFactory(eventAccumulator);
-    }
-}

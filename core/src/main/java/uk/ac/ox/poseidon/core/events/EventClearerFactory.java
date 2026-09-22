@@ -30,6 +30,10 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+/**
+ * A {@link SimulationScopeFactory} counterpart of {@link EventClearer}, built via
+ * {@link Factories#eventClearer(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

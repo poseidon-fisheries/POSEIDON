@@ -22,10 +22,17 @@
 
 package uk.ac.ox.poseidon.core.events;
 
+/**
+ * Receives events of a declared type from an {@link EventManager}.
+ *
+ * @param <E> the type of event received
+ */
 public interface Listener<E> {
 
+    /** @return the event type this listener is registered for */
     Class<? extends E> getEventClass();
 
+    /** @param event the received event */
     void receive(E event);
 
 }

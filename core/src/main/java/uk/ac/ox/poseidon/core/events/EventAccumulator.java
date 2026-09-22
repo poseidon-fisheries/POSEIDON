@@ -25,10 +25,18 @@ package uk.ac.ox.poseidon.core.events;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
+/**
+ * An {@link AbstractListener} that collects every received event, in order, until
+ * {@link #clear()} is called. Typically paired with an {@link EventClearer} to periodically
+ * flush accumulated events.
+ *
+ * @param <E> the type of event received
+ */
 public class EventAccumulator<E> extends AbstractListener<E> {
 
     private final ArrayList<E> events = new ArrayList<>();
 
+    /** @param eventClass the event type this accumulator is registered for */
     public EventAccumulator(final Class<E> eventClass) {
         super(eventClass);
     }
@@ -38,10 +46,12 @@ public class EventAccumulator<E> extends AbstractListener<E> {
         events.add(event);
     }
 
+    /** @return the accumulated events, in the order received */
     public Stream<E> getEvents() {
         return events.stream();
     }
 
+    /** Discards every accumulated event. */
     public void clear() {
         events.clear();
     }
