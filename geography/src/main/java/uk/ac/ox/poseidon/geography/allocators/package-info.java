@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,20 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.allocators;
-
-import sim.util.Int2D;
-
-import java.util.function.ToDoubleFunction;
-
 /**
- * Assigns a weight to a grid cell, e.g. for weighted random placement. Built via
- * {@link uk.ac.ox.poseidon.geography.allocators.Factories}.
+ * {@link uk.ac.ox.poseidon.geography.allocators.Allocator}s: functions that assign a weight to a
+ * grid cell, e.g. for weighted random placement. See
+ * {@link uk.ac.ox.poseidon.geography.allocators.Factories} for the entry points.
  */
-public interface Allocator extends ToDoubleFunction<Int2D> {
-    /**
-     * @param cell the cell to weigh
-     * @return the cell's weight; may be {@link Double#NaN} to mean "excluded"
-     */
-    double applyAsDouble(final Int2D cell);
-}
+package uk.ac.ox.poseidon.geography.allocators;

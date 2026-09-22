@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.DoubleSupplier;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link SupplierAllocator}, built via
+ * {@link Factories#supplierAllocator(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

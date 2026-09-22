@@ -29,10 +29,18 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.util.function.DoubleSupplier;
 import java.util.function.Predicate;
 
+/** Factories for {@link Allocator}s: weight functions used to place things on a grid. */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @param delegateAllocator factory for the allocator to delegate to for matching cells
+     * @param cellPredicate     factory for the predicate deciding which cells are allocated to
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link FilteredAllocator}
+     * @see FilteredAllocator
+     */
     public static <S extends Scope> FilteredAllocatorFactory<S> filteredAllocator(
         final Factory<? super S, ? extends Allocator> delegateAllocator,
         final Factory<? super S, ? extends Predicate<? super Int2D>> cellPredicate
@@ -40,6 +48,12 @@ public class Factories {
         return new FilteredAllocatorFactory<>(delegateAllocator, cellPredicate);
     }
 
+    /**
+     * @param doubleSupplier factory for the supplier providing every cell's weight
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link SupplierAllocator}
+     * @see SupplierAllocator
+     */
     public static <S extends Scope> SupplierAllocatorFactory<S> supplierAllocator(
         final Factory<? super S, ? extends DoubleSupplier> doubleSupplier
     ) {

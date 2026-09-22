@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Predicate;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link FilteredAllocator}, built via
+ * {@link Factories#filteredAllocator(Factory, Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

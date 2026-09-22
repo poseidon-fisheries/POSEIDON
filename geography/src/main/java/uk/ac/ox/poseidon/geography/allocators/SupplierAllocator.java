@@ -28,6 +28,11 @@ import sim.util.Int2D;
 
 import java.util.function.DoubleSupplier;
 
+/**
+ * An {@link Allocator} that ignores the cell entirely and returns the same resolved
+ * {@link DoubleSupplier}'s value for every cell. Built via
+ * {@link Factories#supplierAllocator(uk.ac.ox.poseidon.core.Factory)} in this package.
+ */
 @RequiredArgsConstructor
 public class SupplierAllocator implements Allocator {
 
@@ -37,5 +42,5 @@ public class SupplierAllocator implements Allocator {
     public double applyAsDouble(final Int2D cell) {
         return supplier.getAsDouble();
     }
-    
+
 }
