@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -40,10 +39,8 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -91,12 +88,6 @@ abstract class AbstractModelGrid implements ModelGrid {
         this.cellHeight = envelope.getHeight() / (double) this.getGridHeight();
         this.allCells = allCells;
         this.coordinatesGrid = makeCoordinateGrid();
-    }
-
-    protected static Set<Int2D> toSet(final Collection<Int2D> cells) {
-        return cells instanceof Set<Int2D>
-            ? (Set<Int2D>) cells
-            : ImmutableSet.copyOf(cells);
     }
 
     protected static Int2D[] makeAllCellsArray(
