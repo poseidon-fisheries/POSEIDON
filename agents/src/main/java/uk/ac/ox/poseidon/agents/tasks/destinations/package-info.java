@@ -20,26 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.destinations;
-
-import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
-
 /**
- * Factories for tasks that pick and start towards a destination.
+ * {@link uk.ac.ox.poseidon.agents.tasks.destinations.StartTrip}: draws a destination from a
+ * {@link uk.ac.ox.poseidon.agents.choices.DestinationSupplier} and starts the vessel's trip
+ * towards it. See {@link uk.ac.ox.poseidon.agents.tasks.destinations.Factories} for the entry
+ * points.
  */
-public class Factories {
-
-    private Factories() {}
-
-    /**
-     * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a {@link StartTrip}
-     * @see StartTripFactory
-     */
-    public static StartTripFactory startTrip(
-        final Factory<? super VesselScope, ? extends DestinationSupplier> destinationSupplier
-    ) {
-        return new StartTripFactory(destinationSupplier);
-    }
-}
+package uk.ac.ox.poseidon.agents.tasks.destinations;
