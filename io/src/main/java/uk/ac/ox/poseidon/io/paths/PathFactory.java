@@ -27,16 +27,33 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 
+/**
+ * A {@link Factory} that resolves to a {@link Path}: either an absolute path
+ * ({@link RootPathFactory}) or one resolved relative to another {@code PathFactory}
+ * ({@link RelativePathFactory}, via {@link #plus}). Built via
+ * {@link uk.ac.ox.poseidon.io.paths.Factories}.
+ */
 public interface PathFactory<S extends Scope> extends Factory<S, Path> {
 
+    /** @return {@code path} with platform-specific separators normalized to {@code "/"} */
     static String pathToString(final Path path) {
         return path.toString().replace("\\", "/");
     }
 
+    /**
+     * @param path the path segment to resolve against this factory's own resolved path
+     * @return a {@link RelativePathFactory} for {@code path}, resolved relative to this factory
+     */
     default RelativePathFactory<S> plus(final Path path) {
         return new RelativePathFactory<>(this, pathToString(path));
     }
 
+    /**
+     * @param first the first path segment
+     * @param more  further path segments, joined with {@code first} before being resolved
+     * @return a {@link RelativePathFactory} for the joined path, resolved relative to this
+     * factory
+     */
     default RelativePathFactory<S> plus(
         final String first,
         final String... more

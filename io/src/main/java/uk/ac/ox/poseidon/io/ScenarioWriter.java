@@ -37,13 +37,24 @@ import java.util.function.Supplier;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * Serializes a {@link Scenario} to YAML, either as a string or written directly to a file/stream.
+ * The counterpart of {@link ScenarioLoader}; also runnable as a CLI ({@code main}) that
+ * instantiates a named {@code Supplier<Scenario>} class and writes its result to a given path —
+ * this is how the generated scenario files under {@code inputs/} are produced, never by hand-
+ * editing the YAML.
+ */
 public class ScenarioWriter {
     private final Yaml yaml;
 
+    /**
+     * Constructs a {@code ScenarioWriter} with default {@link DumperOptions} (pretty flow-style).
+     */
     public ScenarioWriter() {
         this(new Yaml(defaultDumperOptions()));
     }
 
+    /** @param yaml the configured {@link Yaml} instance to dump scenarios through */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ScenarioWriter(final Yaml yaml) {
         this.yaml = yaml;
@@ -55,10 +66,19 @@ public class ScenarioWriter {
         return dumperOptions;
     }
 
+    /**
+     * @param scenario the scenario to serialize
+     * @return the scenario as a YAML string
+     */
     public String write(final Scenario scenario) {
         return yaml.dump(scenario);
     }
 
+    /**
+     * @param scenario the scenario to serialize
+     * @param filePath the path of the file to write the YAML to
+     * @throws RuntimeException if an I/O error occurs
+     */
     public void write(
         final Scenario scenario,
         final Path filePath
@@ -66,6 +86,11 @@ public class ScenarioWriter {
         write(scenario, filePath.toFile());
     }
 
+    /**
+     * @param scenario the scenario to serialize
+     * @param file     the file to write the YAML to
+     * @throws RuntimeException if an I/O error occurs
+     */
     public void write(
         final Scenario scenario,
         final File file
@@ -77,6 +102,10 @@ public class ScenarioWriter {
         }
     }
 
+    /**
+     * @param scenario the scenario to serialize
+     * @param writer   the writer to dump the YAML to
+     */
     public void write(
         final Scenario scenario,
         final Writer writer

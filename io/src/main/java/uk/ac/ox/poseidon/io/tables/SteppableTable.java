@@ -33,12 +33,24 @@ import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * A {@link Table} that grows one row per simulation step: each {@link #step} call appends the
+ * current values of a fixed list of per-column {@link Supplier}s. Built via
+ * {@link Factories#steppableTable(uk.ac.ox.poseidon.core.Factory,
+ * uk.ac.ox.poseidon.core.Factory[])} in this package.
+ */
 public class SteppableTable implements Steppable, Supplier<Table> {
     @Serial private static final long serialVersionUID = 1L;
 
     private final transient Table table;
     private final List<? extends Supplier<?>> valueSuppliers;
 
+    /**
+     * @param tableDefinition the shape of the table to create
+     * @param valueSuppliers  one value supplier per column, in column order
+     * @throws IllegalArgumentException if the number of suppliers doesn't match the number of
+     *                                   columns in {@code tableDefinition}
+     */
     public SteppableTable(
         final TableDefinition tableDefinition,
         final List<? extends Supplier<?>> valueSuppliers
@@ -48,12 +60,14 @@ public class SteppableTable implements Steppable, Supplier<Table> {
         this.valueSuppliers = List.copyOf(valueSuppliers);
     }
 
+    /** @return the underlying, growing {@link Table} */
     @Override
     @SuppressFBWarnings("EI_EXPOSE_REP")
     public Table get() {
         return table;
     }
 
+    /** Appends one row: the current value of each of {@code valueSuppliers}, in column order. */
     @Override
     public void step(final SimState simState) {
         for (int i = 0; i < valueSuppliers.size(); i++) {

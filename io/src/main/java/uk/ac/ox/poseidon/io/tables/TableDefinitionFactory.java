@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link TableDefinition}, built via
+ * {@code Factories.tableDefinition(...)}.
+ */
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor

@@ -27,6 +27,10 @@ import lombok.Value;
 import java.io.Reader;
 import java.io.StringReader;
 
+/**
+ * A {@link DataSource} over a fixed, in-memory string. Built via
+ * {@link Factories#stringDataSource(String)} in this package.
+ */
 @Value
 public class StringDataSource implements DataSource {
 

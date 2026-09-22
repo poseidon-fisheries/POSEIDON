@@ -39,6 +39,13 @@ import java.util.function.Supplier;
 
 import static java.lang.System.Logger.Level.INFO;
 
+/**
+ * A {@link Steppable} that writes a resolved {@link Table} to a CSV file when stepped, optionally
+ * appending to an existing file (writing a header only when the file is new) and clearing the
+ * table's rows afterward. Built via
+ * {@link Factories#csvTableWriter(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory,
+ * boolean, boolean)} in this package.
+ */
 @RequiredArgsConstructor
 public class CsvTableWriter implements Steppable {
 
@@ -49,6 +56,7 @@ public class CsvTableWriter implements Steppable {
     private final boolean append;
     private final boolean clearAfterWriting;
 
+    /** @throws RuntimeException if an I/O error occurs while writing */
     @Override
     public void step(final SimState state) {
         final boolean fileExists = path.toFile().exists();

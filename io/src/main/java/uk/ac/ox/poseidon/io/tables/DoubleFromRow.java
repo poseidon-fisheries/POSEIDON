@@ -27,6 +27,10 @@ import tech.tablesaw.api.Row;
 
 import java.util.function.Function;
 
+/**
+ * A {@link Function} that reads a fixed column's value as a {@link Double} from a {@code
+ * tablesaw} {@link Row}. Built via {@link Factories#doubleFromRow(String)} in this package.
+ */
 @RequiredArgsConstructor
 public class DoubleFromRow implements Function<Row, Double> {
 

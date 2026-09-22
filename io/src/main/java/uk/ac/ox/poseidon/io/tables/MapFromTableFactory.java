@@ -35,6 +35,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Function;
 
+/**
+ * A {@link RelativeScopeFactory} that builds an {@link ImmutableMap} from a resolved
+ * {@code tablesaw} {@link Table}: each row's key and value are computed by resolved
+ * row-to-value {@link Function}s. There's no separate plain component class here: the produced
+ * map is returned as-is, with no wrapper type to carry documentation, so this factory carries the
+ * behavior doc directly. Built via
+ * {@link Factories#mapFromTable(Factory, Factory, Factory)} in this package.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

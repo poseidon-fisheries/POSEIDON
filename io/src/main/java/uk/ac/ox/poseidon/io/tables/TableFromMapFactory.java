@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link TableFromMap}, built via
+ * {@link Factories#tableFromMap(Factory, Factory)}.
+ */
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor

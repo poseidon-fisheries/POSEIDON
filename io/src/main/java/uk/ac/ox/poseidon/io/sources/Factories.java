@@ -27,21 +27,44 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 
+/**
+ * Factories for {@link DataSource}s: sources of readable character data backed by a string
+ * literal, a file, or an entry within a zip archive.
+ */
 public class Factories {
 
     private Factories() {
     }
 
+    /**
+     * @param data the literal string content
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link StringDataSource}
+     * over {@code data}
+     * @see StringDataSource
+     */
     public static StringDataSourceFactory stringDataSource(final String data) {
         return new StringDataSourceFactory(data);
     }
 
+    /**
+     * @param pathFactory factory for the file to read, using the default UTF-8 encoding
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link FileDataSource}
+     * over the resolved file
+     * @see FileDataSource
+     */
     public static <S extends Scope> FileDataSourceFactory<S> fileDataSource(
         final Factory<S, ? extends Path> pathFactory
     ) {
         return new FileDataSourceFactory<>(pathFactory);
     }
 
+    /**
+     * @param pathFactory factory for the file to read
+     * @param encoding    the character encoding to read the file with
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link FileDataSource}
+     * over the resolved file
+     * @see FileDataSource
+     */
     public static <S extends Scope> FileDataSourceFactory<S> fileDataSource(
         final Factory<S, ? extends Path> pathFactory,
         final String encoding
@@ -49,6 +72,14 @@ public class Factories {
         return new FileDataSourceFactory<>(pathFactory, encoding);
     }
 
+    /**
+     * @param pathFactory factory for the zip archive to read
+     * @param entry       the name of the entry to read within the archive, using the default
+     *                    UTF-8 encoding
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link ZipEntryDataSource} over the resolved archive entry
+     * @see ZipEntryDataSource
+     */
     public static <S extends Scope> ZipEntryDataSourceFactory<S> zipEntryDataSource(
         final Factory<S, ? extends Path> pathFactory,
         final String entry
@@ -56,6 +87,14 @@ public class Factories {
         return new ZipEntryDataSourceFactory<>(pathFactory, entry);
     }
 
+    /**
+     * @param pathFactory factory for the zip archive to read
+     * @param entry       the name of the entry to read within the archive
+     * @param encoding    the character encoding to read the entry with
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link ZipEntryDataSource} over the resolved archive entry
+     * @see ZipEntryDataSource
+     */
     public static <S extends Scope> ZipEntryDataSourceFactory<S> zipEntryDataSource(
         final Factory<S, ? extends Path> pathFactory,
         final String entry,

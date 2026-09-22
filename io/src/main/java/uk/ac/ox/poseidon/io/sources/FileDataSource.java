@@ -31,6 +31,11 @@ import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
+/**
+ * A {@link DataSource} over a plain file, read with a fixed {@link Charset}. Built via
+ * {@link Factories#fileDataSource(uk.ac.ox.poseidon.core.Factory)}/
+ * {@link Factories#fileDataSource(uk.ac.ox.poseidon.core.Factory, String)} in this package.
+ */
 @Value
 public class FileDataSource implements DataSource {
 

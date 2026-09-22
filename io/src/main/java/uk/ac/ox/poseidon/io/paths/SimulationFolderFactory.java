@@ -35,6 +35,11 @@ import java.nio.file.Path;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A {@link SimulationScopeFactory} for a per-simulation subdirectory of a resolved parent path,
+ * named after the simulation's id and created on disk (if absent) at resolution time. Built via
+ * {@link Factories#simulationFolder(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

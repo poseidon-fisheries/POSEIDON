@@ -29,6 +29,13 @@ import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+/**
+ * A {@link DataSource} over a single entry of a zip archive, read with a fixed {@link Charset}.
+ * Built via
+ * {@link Factories#zipEntryDataSource(uk.ac.ox.poseidon.core.Factory, String)}/
+ * {@link Factories#zipEntryDataSource(uk.ac.ox.poseidon.core.Factory, String, String)} in this
+ * package.
+ */
 @Value
 public class ZipEntryDataSource implements DataSource {
 
@@ -36,6 +43,7 @@ public class ZipEntryDataSource implements DataSource {
     ZipEntry zipEntry;
     Charset charset;
 
+    @Override
     public Reader getReader() {
         try {
             return new InputStreamReader(

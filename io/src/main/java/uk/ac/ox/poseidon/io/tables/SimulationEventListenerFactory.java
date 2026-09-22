@@ -29,14 +29,28 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+/**
+ * A {@link SimulationScopeFactory} base for {@link Listener}s that must be registered with the
+ * simulation's {@link uk.ac.ox.poseidon.core.events.EventManager} as soon as they're built, so
+ * they start receiving events from resolution time onward. Subclasses supply the listener itself
+ * via {@link #newListener}; registration is handled once, here, so it can't be forgotten.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class SimulationEventListenerFactory<T extends Listener<?>>
     extends SimulationScopeFactory<T> {
 
+    /**
+     * @param scope the scope being resolved against
+     * @return a freshly built listener, not yet registered with the event manager
+     */
     protected abstract T newListener(final SimulationScope scope);
 
+    /**
+     * Builds the listener via {@link #newListener}, then registers it with the resolved
+     * simulation's {@link uk.ac.ox.poseidon.core.events.EventManager} before returning it.
+     */
     @Override
     protected final T newInstance(final SimulationScope scope) {
         final T listener = newListener(scope);

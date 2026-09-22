@@ -30,6 +30,10 @@ import sim.engine.Steppable;
 import java.io.IOException;
 import java.nio.file.Path;
 
+/**
+ * A {@link Steppable} that recursively deletes a target directory when stepped. Built via
+ * {@link Factories#directoryRemover(uk.ac.ox.poseidon.core.Factory, boolean)} in this package.
+ */
 @RequiredArgsConstructor
 public class DirectoryRemover implements Steppable {
 
@@ -38,6 +42,10 @@ public class DirectoryRemover implements Steppable {
     private final Path target;
     private final boolean ignoreIfAbsent;
 
+    /**
+     * @throws IllegalStateException if {@code target} doesn't exist and {@code ignoreIfAbsent} is
+     *                                {@code false}, or if it exists but isn't a directory
+     */
     @Override
     public void step(final SimState simState) {
         if (!target.toFile().exists()) {

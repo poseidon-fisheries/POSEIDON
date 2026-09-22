@@ -94,6 +94,13 @@ public class ScenarioLoader {
         return newYaml().loadAs(yamlString, Scenario.class);
     }
 
+    /**
+     * Loads a {@code Scenario} from a file path.
+     *
+     * @param path the path to the file containing the YAML data
+     * @return the loaded {@code Scenario} object
+     * @throws RuntimeException if an I/O error occurs
+     */
     public Scenario load(final Path path) {
         return load(path.toFile());
     }

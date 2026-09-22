@@ -24,7 +24,13 @@ package uk.ac.ox.poseidon.io.sources;
 
 import java.io.Reader;
 
+/**
+ * A source of character data that can be read once resolved: a string literal
+ * ({@link StringDataSource}), a file ({@link FileDataSource}), or a zip archive entry
+ * ({@link ZipEntryDataSource}). Built via {@link uk.ac.ox.poseidon.io.sources.Factories}.
+ */
 @FunctionalInterface
 public interface DataSource {
+    /** @return a fresh {@link Reader} over this source's data */
     Reader getReader();
 }

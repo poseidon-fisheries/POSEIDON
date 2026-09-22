@@ -34,6 +34,10 @@ import java.nio.file.Path;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A {@link RelativeScopeFactory} for a {@link Path} resolved against another
+ * {@link PathFactory}'s resolved path, built via {@link PathFactory#plus}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

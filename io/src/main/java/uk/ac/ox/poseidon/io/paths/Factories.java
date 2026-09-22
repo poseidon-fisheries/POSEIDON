@@ -29,12 +29,30 @@ import java.nio.file.Path;
 
 import static uk.ac.ox.poseidon.io.paths.PathFactory.pathToString;
 
+/**
+ * Factories for {@link PathFactory}s: fixed absolute paths and paths derived from another
+ * resolved path (relative segments, per-simulation subdirectories).
+ */
 public class Factories {
 
+    private Factories() {}
+
+    /**
+     * @param path the literal absolute path
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@code path}
+     * @see RootPathFactory
+     */
     public static RootPathFactory path(final Path path) {
         return new RootPathFactory(pathToString(path));
     }
 
+    /**
+     * @param first the first path segment
+     * @param more  further path segments, joined with {@code first}
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the joined literal absolute
+     * path
+     * @see RootPathFactory
+     */
     public static RootPathFactory path(
         final String first,
         final String... more
@@ -42,6 +60,13 @@ public class Factories {
         return path(Path.of(first, more));
     }
 
+    /**
+     * @param parent factory for the parent directory the per-simulation subdirectory is created
+     *               under
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for the resolved
+     * simulation's subdirectory
+     * @see SimulationFolderFactory
+     */
     public static SimulationFolderFactory simulationFolder(
         final Factory<? super SimulationScope, ? extends Path> parent
     ) {

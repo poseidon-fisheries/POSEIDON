@@ -28,11 +28,17 @@ import tech.tablesaw.api.Table;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * A named, typed {@code tablesaw} {@link Table} shape that can be created (empty) on demand, from
+ * a fixed list of {@link ColumnDefinition}s. Built via {@code Factories.tableDefinition(...)} in
+ * this package.
+ */
 @RequiredArgsConstructor
 public class TableDefinition implements Supplier<Table> {
 
     private final List<? extends ColumnDefinition> columnDefinitions;
 
+    /** @return a fresh, empty {@link Table} with one column per {@code columnDefinitions} entry */
     @Override
     public Table get() {
         return Table.create(columnDefinitions.stream().map(ColumnDefinition::get));

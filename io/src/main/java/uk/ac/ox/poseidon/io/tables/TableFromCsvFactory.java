@@ -36,6 +36,16 @@ import uk.ac.ox.poseidon.io.sources.DataSource;
 import java.io.IOException;
 import java.io.Reader;
 
+/**
+ * A {@link RelativeScopeFactory} that parses a resolved {@link DataSource}'s content as CSV into
+ * a {@code tablesaw} {@link Table}, inferring column types (sampling disabled, so the whole file
+ * is scanned). There's no separate plain component class here: the produced {@link Table} is
+ * returned as-is, with no wrapper type to carry documentation, so this factory carries the
+ * behavior doc directly. Built via
+ * {@link uk.ac.ox.poseidon.io.tables.Factories#tableFromCsvString(String)}/
+ * {@link uk.ac.ox.poseidon.io.tables.Factories#tableFromCsvFile(Factory)}/
+ * {@link uk.ac.ox.poseidon.io.tables.Factories#tableFromCsv(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

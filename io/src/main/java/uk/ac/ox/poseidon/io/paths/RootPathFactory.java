@@ -30,6 +30,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 
+/**
+ * A {@link GlobalScopeFactory} for a fixed, absolute {@link Path}, built via
+ * {@link Factories#path(Path)}/{@link Factories#path(String, String...)}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -37,6 +41,7 @@ public class RootPathFactory
     extends GlobalScopeFactory<Path>
     implements PathFactory<Scope> {
 
+    /** @param path the literal path, with any {@code "\\"} separators normalized to {@code "/"} */
     public RootPathFactory(final String path) {
         this.path = path.replace("\\", "/");
     }

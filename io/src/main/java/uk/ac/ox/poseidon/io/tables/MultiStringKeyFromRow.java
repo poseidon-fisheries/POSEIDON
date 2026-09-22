@@ -31,10 +31,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 
+/**
+ * A {@link Function} that reads several fixed columns' values from a {@code tablesaw} {@link Row}
+ * and joins them into a single composite string key (via {@code Utils.multiStringKey}). Built via
+ * {@link Factories#multiStringKeyFromRow(String...)} in this package.
+ */
 public class MultiStringKeyFromRow implements Function<Row, String> {
 
     private final String[] keyColumnNames;
 
+    /** @param keyColumnNames the non-empty list of columns whose values are joined into the key */
     public MultiStringKeyFromRow(final List<String> keyColumnNames) {
         checkNotNull(keyColumnNames);
         checkArgument(!keyColumnNames.isEmpty());

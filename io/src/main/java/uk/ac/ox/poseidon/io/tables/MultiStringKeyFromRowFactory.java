@@ -31,6 +31,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
+/**
+ * A {@link GlobalScopeFactory} counterpart of {@link MultiStringKeyFromRow}, built via
+ * {@link Factories#multiStringKeyFromRow(String...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

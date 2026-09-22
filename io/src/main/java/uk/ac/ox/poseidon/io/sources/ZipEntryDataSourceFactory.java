@@ -40,6 +40,11 @@ import java.util.zip.ZipFile;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link ZipEntryDataSource}, built via
+ * {@link Factories#zipEntryDataSource(Factory, String)}/
+ * {@link Factories#zipEntryDataSource(Factory, String, String)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -53,6 +58,11 @@ public class ZipEntryDataSourceFactory<S extends Scope>
     private String entry;
     private String encoding;
 
+    /**
+     * @param path  factory for the zip archive to read
+     * @param entry the name of the entry to read within the archive, using the default UTF-8
+     *              encoding
+     */
     public ZipEntryDataSourceFactory(
         final Factory<S, ? extends Path> path,
         final String entry

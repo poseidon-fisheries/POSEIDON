@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.nio.file.Path;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link DirectoryRemover}, built via
+ * {@link Factories#directoryRemover(Factory, boolean)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

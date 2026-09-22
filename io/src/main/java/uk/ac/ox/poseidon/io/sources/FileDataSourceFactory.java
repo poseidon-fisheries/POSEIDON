@@ -35,6 +35,10 @@ import java.nio.file.Path;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link FileDataSource}, built via
+ * {@link Factories#fileDataSource(Factory)}/{@link Factories#fileDataSource(Factory, String)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -47,6 +51,7 @@ public class FileDataSourceFactory<S extends Scope>
     private Factory<S, ? extends Path> path;
     private String encoding;
 
+    /** @param path factory for the file to read, using the default UTF-8 encoding */
     public FileDataSourceFactory(final Factory<S, ? extends Path> path) {
         this.path = path;
         this.encoding = DEFAULT_ENCODING;

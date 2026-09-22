@@ -33,6 +33,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * A {@link SimulationScopeFactory} counterpart of {@link SteppableTable}, built via
+ * {@link Factories#steppableTable(Factory, Factory[])}/
+ * {@link Factories#steppableTable(Factory, Factory)}.
+ */
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
