@@ -29,10 +29,19 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
+/**
+ * Factories for predicates over candidate fishing locations, built on the
+ * {@link uk.ac.ox.poseidon.regulations} model.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link FishingLocationLegalityChecker}
+     * @see FishingLocationLegalityCheckerFactory
+     */
     public static FishingLocationLegalityCheckerFactory fishingLocationLegalityChecker(
         final Factory<
             ? super VesselScope,

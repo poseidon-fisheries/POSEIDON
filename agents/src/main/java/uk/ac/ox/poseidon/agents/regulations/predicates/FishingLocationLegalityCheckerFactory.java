@@ -34,6 +34,10 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
+/**
+ * A {@link VesselScopeFactory} for a {@link FishingLocationLegalityChecker}. Built via
+ * {@link Factories#fishingLocationLegalityChecker}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

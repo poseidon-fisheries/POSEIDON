@@ -38,6 +38,12 @@ import java.util.function.Supplier;
 
 import static lombok.AccessLevel.PACKAGE;
 
+/**
+ * Predicate matching cells the vessel could legally fish at: builds a hypothetical
+ * {@link ExtendedFishingAction} for arriving at the candidate cell (travel time included, via
+ * {@code pathFinder}/{@code distanceCalculator}) and checks it against {@code regulations}. Used to
+ * filter fishing-location candidates before committing to a trip there.
+ */
 @RequiredArgsConstructor(access = PACKAGE)
 public class FishingLocationLegalityChecker implements Predicate<Int2D> {
 
@@ -47,6 +53,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
     private final Supplier<LocalDateTime> currentDateTimeSupplier;
     private final Vessel vessel;
 
+    /** @return whether fishing at {@code fishingLocation} would currently be permitted */
     @Override
     public boolean test(
         final Int2D fishingLocation
@@ -54,6 +61,13 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
         return regulations.isPermitted(makeAction(fishingLocation));
     }
 
+    /**
+     * Builds a nominal, 1-second {@link ExtendedFishingAction} at {@code fishingLocation}, starting
+     * whenever the vessel would arrive there from its current cell.
+     *
+     * @throws RuntimeException if no path exists from the vessel's current cell to
+     *                          {@code fishingLocation}
+     */
     private ExtendedFishingAction makeAction(
         final Int2D fishingLocation
     ) {
