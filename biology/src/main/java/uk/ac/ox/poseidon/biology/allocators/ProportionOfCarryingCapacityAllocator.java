@@ -31,12 +31,19 @@ import java.util.function.DoubleSupplier;
 
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
+/**
+ * An {@link Allocator} that weighs a cell by a fixed proportion of its carrying capacity — e.g.
+ * for seeding a fixed fraction of a stock's maximum biomass at each location. Built via
+ * {@code Factories.proportionOfCarryingCapacityAllocator(...)}/
+ * {@code Factories.fullCarryingCapacityAllocator(...)} in this package.
+ */
 @RequiredArgsConstructor
 public class ProportionOfCarryingCapacityAllocator implements Allocator {
 
     private final CarryingCapacityGrid carryingCapacityGrid;
     private final DoubleSupplier proportionSupplier;
 
+    /** @throws IllegalArgumentException if the resolved proportion isn't in {@code [0, 1]} */
     @Override
     public double applyAsDouble(final Int2D cell) {
         final double proportion = proportionSupplier.getAsDouble();

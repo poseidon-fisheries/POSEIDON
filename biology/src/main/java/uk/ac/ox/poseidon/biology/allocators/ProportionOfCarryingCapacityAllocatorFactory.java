@@ -33,6 +33,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.DoubleSupplier;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link ProportionOfCarryingCapacityAllocator},
+ * built via {@link Factories#proportionOfCarryingCapacityAllocator(Factory, Factory)}/
+ * {@link Factories#fullCarryingCapacityAllocator(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
