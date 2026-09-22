@@ -34,6 +34,12 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.Collection;
 
+/**
+ * A {@link SimulationScopeFactory} for a MASON {@link RandomSequence} that runs the resolved
+ * collection of steppables, in a freshly shuffled order, on every step. No separate plain
+ * component class here: the produced value is a bare MASON type, with no wrapper to carry
+ * documentation. Built via {@link Factories#steppableRandomSequence(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -42,6 +42,14 @@ import java.util.stream.Stream;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.stream.Collectors.*;
 
+/**
+ * MASON's {@link Schedule}, extended to let callers schedule {@link Steppable}s by
+ * {@link LocalDateTime}/{@link Temporal} and {@link TemporalAmount} intervals instead of raw
+ * {@code double} simulation time — converting to and from MASON's internal time via the seconds
+ * elapsed since {@link #startingDateTime}. Owned by {@link uk.ac.ox.poseidon.core.Simulation}; the
+ * {@code schedule*} factories in this package are the usual way scenario-built components get
+ * onto it.
+ */
 @SuppressWarnings("rawtypes")
 @Getter
 @RequiredArgsConstructor
@@ -244,6 +252,8 @@ public class TemporalSchedule extends Schedule {
         return "TemporalSchedule[" + getTimestamp() + "]";
     }
 
+    /** A {@link Repeat} whose next firing time is computed by adding {@link #interval} to the
+     * current {@link LocalDateTime}, rather than a fixed {@code double} step. */
     public class TemporalRepeat extends Repeat {
 
         @Serial private static final long serialVersionUID = -3948718709942805794L;

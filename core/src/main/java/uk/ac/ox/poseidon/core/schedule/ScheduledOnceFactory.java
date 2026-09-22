@@ -33,6 +33,12 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.temporal.Temporal;
 
+/**
+ * A {@link SimulationScopeFactory} that schedules the resolved steppable to run once at a
+ * resolved date-time, at a fixed ordering, and returns that same steppable. No separate plain
+ * component class here: scheduling is a side effect of building the factory, not a distinct
+ * behavior class. Built via {@link Factories Factories.scheduledOnce(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
