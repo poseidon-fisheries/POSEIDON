@@ -20,32 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.predicates;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link IsActiveWaterCell}, built via
- * {@link Factories#isActiveWaterCell(Factory)}.
+ * Spatial predicates: testing grid cells or geographic coordinates against bathymetry, a
+ * bounding box, or a set of geometries. See
+ * {@link uk.ac.ox.poseidon.geography.predicates.Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class IsActiveWaterCellFactory<S extends Scope>
-    extends RelativeScopeFactory<S, IsActiveWaterCell> {
-
-    private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
-
-    @Override
-    protected IsActiveWaterCell newInstance(final S scope) {
-        return new IsActiveWaterCell(bathymetricGrid.get(scope));
-    }
-}
+package uk.ac.ox.poseidon.geography.predicates;

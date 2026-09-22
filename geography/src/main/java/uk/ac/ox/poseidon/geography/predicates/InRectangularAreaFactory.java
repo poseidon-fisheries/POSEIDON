@@ -28,6 +28,10 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link InRectangularArea}, built via
+ * {@link Factories#inRectangularArea(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

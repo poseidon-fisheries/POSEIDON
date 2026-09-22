@@ -29,12 +29,17 @@ import uk.ac.ox.poseidon.geography.Envelope;
 
 import java.util.function.Predicate;
 
+/**
+ * A {@link Predicate} testing whether a {@link Coordinate} falls within a fixed {@link Envelope}.
+ * Built via {@link Factories#inRectangularArea(uk.ac.ox.poseidon.core.Factory)} in this package.
+ */
 @Getter
 @RequiredArgsConstructor
 public class InRectangularArea implements Predicate<Coordinate> {
 
     private final Envelope envelope;
 
+    /** @return whether {@code coordinate} falls within this predicate's envelope */
     @Override
     public boolean test(final Coordinate coordinate) {
         return envelope.contains(coordinate);

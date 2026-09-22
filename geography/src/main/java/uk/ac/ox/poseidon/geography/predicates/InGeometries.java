@@ -30,14 +30,21 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import java.util.Collection;
 import java.util.function.Predicate;
 
+/**
+ * A {@link Predicate} testing whether a {@link Coordinate} falls within any of a fixed set of JTS
+ * {@link Geometry}s. Built via
+ * {@link Factories#inGeometries(uk.ac.ox.poseidon.core.Factory)} in this package.
+ */
 public class InGeometries implements Predicate<Coordinate> {
 
     private final Geometry[] geometries;
 
+    /** @param geometries the geometries to test against */
     public InGeometries(@NonNull final Collection<? extends Geometry> geometries) {
         this.geometries = geometries.toArray(Geometry[]::new);
     }
 
+    /** @return whether {@code coordinate} falls within any of this predicate's geometries */
     @Override
     public boolean test(final Coordinate coordinate) {
         for (final Geometry geometry : geometries) {

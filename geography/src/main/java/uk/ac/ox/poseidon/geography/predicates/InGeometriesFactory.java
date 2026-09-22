@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.Collection;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link InGeometries}, built via
+ * {@link Factories#inGeometries(Factory)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
