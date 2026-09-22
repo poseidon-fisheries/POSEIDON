@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,28 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.regulations.predicates.spatial;
-
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.regulations.SpatialAction;
-
-import java.util.function.Predicate;
-
 /**
- * Matches a {@link SpatialAction} whose start coordinate or end coordinate satisfies
- * {@code coordinatePredicate}. Contrast with {@link ActionCellPredicate}, which tests against grid
- * cells rather than raw coordinates.
+ * Predicates over a {@link uk.ac.ox.poseidon.regulations.SpatialAction}'s start/end location,
+ * matched either as grid cells ({@link uk.ac.ox.poseidon.regulations.predicates.spatial.ActionCellPredicate})
+ * or as raw coordinates
+ * ({@link uk.ac.ox.poseidon.regulations.predicates.spatial.ActionCoordinatePredicate}). See
+ * {@link uk.ac.ox.poseidon.regulations.predicates.spatial.Factories} for the entry points.
  */
-@RequiredArgsConstructor
-public class ActionCoordinatePredicate implements Predicate<SpatialAction<?>> {
-
-    private final Predicate<Coordinate> coordinatePredicate;
-
-    @Override
-    public boolean test(final SpatialAction<?> action) {
-        return coordinatePredicate.test(action.getStartCoordinate()) ||
-            coordinatePredicate.test(action.getEndCoordinate());
-    }
-
-}
+package uk.ac.ox.poseidon.regulations.predicates.spatial;

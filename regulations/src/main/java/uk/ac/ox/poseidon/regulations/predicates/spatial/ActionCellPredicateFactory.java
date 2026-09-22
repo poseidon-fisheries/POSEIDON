@@ -34,6 +34,10 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.function.Predicate;
 
+/**
+ * A {@link RelativeScopeFactory} for an {@link ActionCellPredicate}. Built via
+ * {@link Factories#actionCellPredicate}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

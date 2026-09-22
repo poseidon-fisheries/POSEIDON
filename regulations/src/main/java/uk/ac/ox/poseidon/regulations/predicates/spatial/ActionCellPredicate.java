@@ -29,6 +29,10 @@ import uk.ac.ox.poseidon.regulations.SpatialAction;
 
 import java.util.function.Predicate;
 
+/**
+ * Matches a {@link SpatialAction} whose start cell or end cell (converted from its coordinates via
+ * {@code modelGrid}) satisfies {@code cellPredicate}.
+ */
 @RequiredArgsConstructor
 public class ActionCellPredicate implements Predicate<SpatialAction<?>> {
 

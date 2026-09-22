@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 
 import java.util.function.Predicate;
 
+/**
+ * A {@link RelativeScopeFactory} for an {@link ActionCoordinatePredicate}. Built via
+ * {@link Factories#actionCoordinatePredicate}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

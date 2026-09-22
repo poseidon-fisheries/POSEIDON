@@ -30,10 +30,19 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.function.Predicate;
 
+/**
+ * Factories for predicates over a {@link uk.ac.ox.poseidon.regulations.SpatialAction}'s start/end
+ * location, either as grid cells or as raw coordinates.
+ */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+     * {@link ActionCellPredicate}
+     * @see ActionCellPredicateFactory
+     */
     public static <S extends Scope> ActionCellPredicateFactory<S> actionCellPredicate(
         final Factory<? super S, ? extends ModelGrid> modelGrid,
         final Factory<? super S, ? extends Predicate<Int2D>> cellPredicate
@@ -41,6 +50,11 @@ public class Factories {
         return new ActionCellPredicateFactory<>(modelGrid, cellPredicate);
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+     * {@link ActionCoordinatePredicate}
+     * @see ActionCoordinatePredicateFactory
+     */
     public static <S extends Scope> ActionCoordinatePredicateFactory<S> actionCoordinatePredicate(
         final Factory<? super S, ? extends Predicate<Coordinate>> coordinatePredicate
     ) {
