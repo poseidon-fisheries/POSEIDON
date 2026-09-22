@@ -29,8 +29,6 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
-import uk.ac.ox.poseidon.geography.ports.Port;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.Optional;
 
@@ -44,9 +42,6 @@ class TravelTimeToPortViaDestinationTest {
         final Engine engine = mock(Engine.class);
         final GridPathFinder pathFinder = mock(GridPathFinder.class);
         final DistanceCalculator distanceCalculator = mock(DistanceCalculator.class);
-        final PortGrid portGrid = mock(PortGrid.class);
-        final Port firstPort = mock(Port.class);
-        final Port secondPort = mock(Port.class);
 
         final Int2D vesselCell = new Int2D(0, 0);
         final Int2D destination = new Int2D(1, 1);
@@ -56,9 +51,6 @@ class TravelTimeToPortViaDestinationTest {
         when(vessel.getEngine()).thenReturn(engine);
         when(engine.getCruisingSpeedInKph()).thenReturn(10.0);
         when(vessel.getCell()).thenReturn(vesselCell);
-        when(vessel.getPortGrid()).thenReturn(portGrid);
-        when(portGrid.getLocation(firstPort)).thenReturn(firstPortCell);
-        when(portGrid.getLocation(secondPort)).thenReturn(secondPortCell);
         when(pathFinder.getPath(any(), any()))
             .thenReturn(Optional.of(ImmutableList.of(vesselCell, destination)));
         when(distanceCalculator.travelDuration(anyList(), anyDouble()))
@@ -67,11 +59,11 @@ class TravelTimeToPortViaDestinationTest {
         final TravelTimeToPortViaDestination travelTime =
             new TravelTimeToPortViaDestination(vessel, pathFinder, distanceCalculator);
 
-        when(vessel.getHomePort()).thenReturn(firstPort);
+        when(vessel.getHomePortLocation()).thenReturn(firstPortCell);
         travelTime.apply(destination);
         verify(pathFinder).getPath(destination, firstPortCell);
 
-        when(vessel.getHomePort()).thenReturn(secondPort);
+        when(vessel.getHomePortLocation()).thenReturn(secondPortCell);
         travelTime.apply(destination);
         verify(pathFinder).getPath(destination, secondPortCell);
     }
