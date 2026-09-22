@@ -32,8 +32,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 
 /**
- * A {@link RelativeDateTimeFactory} for a {@link LocalDateTime} computed as the resolved
- * reference date-time plus a resolved {@link TemporalAmount}. Built via
+ * A {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link LocalDateTime} computed as
+ * the resolved reference date-time plus a resolved {@link TemporalAmount}. Built via
  * {@link Factories#dateTimeAfter(Factory, Factory)}.
  */
 @Data

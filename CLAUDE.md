@@ -112,11 +112,16 @@ documented in four different places, once each, not duplicated across them:
   the one source of truth — put depth here, nowhere else.
 - **`Factory` subclass** (the YAML bean) gets a one-line pointer only: `A
   {@link GlobalScopeFactory} counterpart of {@link Component}, built via
-  {@link Factories#method(Factory)}.` — naming whichever `*ScopeFactory` the leaf class directly
-  extends (`GlobalScopeFactory`, `SimulationScopeFactory`, `RelativeScopeFactory` in `core`;
+  {@link Factories#method(Factory)}.` — naming whichever `*ScopeFactory` the leaf class's ancestry
+  is rooted in (`GlobalScopeFactory`, `SimulationScopeFactory`, `RelativeScopeFactory` in `core`;
   domain-specific ones like `VesselScopeFactory` in `agents`) in place of the generic `Factory`.
-  The `built via` half is a real `{@link}`, clickable, not `{@code}`. How it's written depends on
-  how many `Factories` methods build this component:
+  When the leaf extends a `*ScopeFactory` directly, that's the one to name. When it instead
+  extends an intermediate abstract template base that isn't itself a `*ScopeFactory` (e.g.
+  `RelativeDateTimeFactory`, `AbstractQuantityFactory`), walk up to the `*ScopeFactory` that base
+  is ultimately rooted in and name that instead — naming the template base defeats the point of
+  the pointer, since the base carries no scope-semantics prose of its own to link to. The `built
+  via` half is a real `{@link}`, clickable, not `{@code}`. How it's written depends on how many
+  `Factories` methods build this component:
   - **Exactly one method builds this component, however many overloads that method has:** link
     straight to it — `{@link Factories#method(Factory)}` if it's overloaded (name the erasure of
     one overload's params to disambiguate; Javadoc renders the label from the signature, no custom
