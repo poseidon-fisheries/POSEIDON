@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels.extractors.tags;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+
 import java.util.function.Function;
 
 import static uk.ac.ox.poseidon.core.utils.Utils.toTrimmedString;

@@ -41,5 +41,5 @@ public class StringTagExtractorFactory extends GlobalScopeFactory<StringTagExtra
     protected StringTagExtractor newInstance(final Scope scope) {
         return new StringTagExtractor(tagName);
     }
-    
+
 }
