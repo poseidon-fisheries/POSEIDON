@@ -34,17 +34,27 @@ import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.List;
 
+/**
+ * A {@link BranchTaskFactory} for a gdx-ai {@link Sequence}: runs its children in order, failing
+ * (and stopping) as soon as one fails, succeeding once all of them have. Built via
+ * {@link Factories#sequenceTask}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SequenceTaskFactory extends BranchTaskFactory<Sequence<Vessel>> {
 
+    /** @param children factories for the sequence's child tasks, resolved and attached in order */
     public SequenceTaskFactory(
         final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
     ) {
         super(children);
     }
 
+    /**
+     * @param guard    optional task guarding whether this sequence runs at all
+     * @param children factories for the sequence's child tasks, resolved and attached in order
+     */
     public SequenceTaskFactory(
         final VesselScopeFactory<? extends Task<Vessel>> guard,
         final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children

@@ -34,17 +34,26 @@ import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.List;
 
+/**
+ * A {@link BranchTaskFactory} for a gdx-ai {@link Parallel}: runs all of its children every step,
+ * regardless of individual outcomes. Built via {@link Factories#parallelTask}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ParallelTaskFactory extends BranchTaskFactory<Parallel<Vessel>> {
 
+    /** @param children factories for the parallel node's child tasks, resolved and attached in order */
     public ParallelTaskFactory(
         final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
     ) {
         super(children);
     }
 
+    /**
+     * @param guard    optional task guarding whether this parallel node runs at all
+     * @param children factories for the parallel node's child tasks, resolved and attached in order
+     */
     public ParallelTaskFactory(
         final VesselScopeFactory<? extends Task<Vessel>> guard,
         final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
