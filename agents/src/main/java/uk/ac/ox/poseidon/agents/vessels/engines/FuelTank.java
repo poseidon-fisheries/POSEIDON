@@ -22,14 +22,19 @@
 
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
+/** A vessel's fuel reserve, with a fixed total capacity. */
 public interface FuelTank {
 
+    /** @return this tank's total capacity, in litres */
     double getCapacityInLitres();
 
+    /** @return the fuel currently in the tank, in litres */
     double getCurrentFuelInLitres();
 
+    /** @param litres the amount of fuel to add, in litres; must not exceed remaining capacity */
     void addFuel(double litres);
 
+    /** @param litres the amount of fuel to consume, in litres; must not exceed current fuel */
     void consumeFuel(double litres);
 
 }

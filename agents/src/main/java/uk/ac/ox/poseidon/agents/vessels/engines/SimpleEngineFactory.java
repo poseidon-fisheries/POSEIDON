@@ -37,6 +37,10 @@ import javax.measure.quantity.Volume;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 import static tech.units.indriya.unit.Units.LITRE;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link SimpleEngine}, built via
+ * {@link Factories#simpleEngine}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

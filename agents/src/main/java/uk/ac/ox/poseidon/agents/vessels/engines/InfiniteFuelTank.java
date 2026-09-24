@@ -22,22 +22,27 @@
 
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
+/** A {@link FuelTank} with unlimited capacity; adding or consuming fuel is a no-op. */
 public class InfiniteFuelTank implements FuelTank {
+    /** @return {@link Double#POSITIVE_INFINITY} */
     @Override
     public double getCapacityInLitres() {
         return Double.POSITIVE_INFINITY;
     }
 
+    /** @return {@link Double#POSITIVE_INFINITY} */
     @Override
     public double getCurrentFuelInLitres() {
         return Double.POSITIVE_INFINITY;
     }
 
+    /** No-op. */
     @Override
     public void addFuel(final double litres) {
         // no op
     }
 
+    /** No-op. */
     @Override
     public void consumeFuel(final double litres) {
         // no op

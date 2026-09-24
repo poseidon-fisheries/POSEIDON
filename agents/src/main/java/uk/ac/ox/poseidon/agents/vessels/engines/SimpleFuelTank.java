@@ -28,6 +28,11 @@ import lombok.ToString;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * A {@link FuelTank} with a fixed capacity: {@link #addFuel}/{@link #consumeFuel} clamp to
+ * {@code [0, capacityInLitres]}, tolerating a tiny ({@value #TOLERANCE_IN_LITRES}-litre) overage
+ * or underage from floating-point error before throwing.
+ */
 @Getter
 @ToString
 @EqualsAndHashCode
@@ -38,6 +43,11 @@ public class SimpleFuelTank implements FuelTank {
     private final double capacityInLitres;
     private double currentFuelInLitres;
 
+    /**
+     * @param capacityInLitres    the tank's total capacity, in litres; must be non-negative
+     * @param currentFuelInLitres the tank's starting fuel level, in litres; must be non-negative
+     *                            and not exceed {@code capacityInLitres}
+     */
     public SimpleFuelTank(
         final double capacityInLitres,
         final double currentFuelInLitres
@@ -54,6 +64,10 @@ public class SimpleFuelTank implements FuelTank {
         this.currentFuelInLitres = currentFuelInLitres;
     }
 
+    /**
+     * @throws IllegalArgumentException if {@code litres} is negative, or would overfill the tank
+     *                                   by more than {@value #TOLERANCE_IN_LITRES} litres
+     */
     @Override
     public void addFuel(final double litres) {
         checkArgument(litres >= 0, "litres must be >= 0");
@@ -72,6 +86,10 @@ public class SimpleFuelTank implements FuelTank {
         }
     }
 
+    /**
+     * @throws IllegalArgumentException if {@code litres} is negative, or would draw the tank
+     *                                   below {@code -}{@value #TOLERANCE_IN_LITRES} litres
+     */
     @Override
     public void consumeFuel(final double litres) {
         checkArgument(litres >= 0, "litres must be >= 0");

@@ -24,9 +24,13 @@ package uk.ac.ox.poseidon.agents.vessels.engines;
 
 import lombok.Value;
 
+/** An {@link Engine} with a fixed cruising speed and fuel consumption rate. */
 @Value
 public class SimpleEngine implements Engine {
+    /** The tank this engine draws fuel from. */
     FuelTank fuelTank;
+    /** This engine's cruising speed, in kilometres per hour. */
     double cruisingSpeedInKph;
+    /** This engine's fuel consumption rate, in litres per kilometre travelled. */
     double litresOfFuelConsumedPerKm;
 }

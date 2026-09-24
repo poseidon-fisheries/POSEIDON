@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,20 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.engines;
-
-import lombok.EqualsAndHashCode;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link InfiniteFuelTank}, built via
- * {@link Factories#infiniteTank()}.
+ * A vessel's propulsion: an {@link uk.ac.ox.poseidon.agents.vessels.engines.Engine} with a fixed
+ * cruising speed and fuel consumption rate, drawing on a
+ * {@link uk.ac.ox.poseidon.agents.vessels.engines.FuelTank} with unlimited or fixed capacity. See
+ * {@link uk.ac.ox.poseidon.agents.vessels.engines.Factories} for the entry points.
  */
-@EqualsAndHashCode(callSuper = true)
-public class InfiniteFuelTankFactory extends GlobalScopeFactory<InfiniteFuelTank> {
-    @Override
-    protected InfiniteFuelTank newInstance(final Scope scope) {
-        return new InfiniteFuelTank();
-    }
-}
+package uk.ac.ox.poseidon.agents.vessels.engines;

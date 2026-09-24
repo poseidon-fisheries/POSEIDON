@@ -22,18 +22,24 @@
 
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
+/** A vessel's propulsion: a fixed cruising speed and fuel consumption rate, drawing on a tank. */
 public interface Engine {
 
+    /** @return the tank this engine draws fuel from */
     FuelTank getFuelTank();
 
+    /** @return this engine's cruising speed, in kilometres per hour */
     double getCruisingSpeedInKph();
 
+    /** @return this engine's fuel consumption rate, in litres per kilometre travelled */
     double getLitresOfFuelConsumedPerKm();
 
+    /** Consumes {@link #getLitresOfFuelConsumedPerKm()} times {@code distanceInKm} litres. */
     default void consumeFuelForDistance(final double distanceInKm) {
         getFuelTank().consumeFuel(getLitresOfFuelConsumedPerKm() * distanceInKm);
     }
 
+    /** Consumes {@code litres} directly from {@link #getFuelTank()}. */
     default void consumeFuel(final double litres) {
         getFuelTank().consumeFuel(litres);
     }

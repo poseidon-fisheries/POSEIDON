@@ -36,6 +36,10 @@ import javax.measure.quantity.Volume;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.units.indriya.unit.Units.LITRE;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link SimpleFuelTank}, built via
+ * {@link Factories Factories.tank(...)/Factories.fullTank(...)/Factories.emptyTank(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
