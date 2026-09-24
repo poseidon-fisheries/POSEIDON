@@ -31,15 +31,24 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
+/**
+ * A {@link DecoratorTaskFactory} for a gdx-ai {@link UntilFail}: re-runs its child every step
+ * until it fails, then succeeds. Built via {@link Factories#untilFail}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class UntilFailTaskFactory extends DecoratorTaskFactory<UntilFail<Vessel>> {
 
+    /** @param child factory for the child task to re-run until it fails */
     public UntilFailTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> child) {
         super(child);
     }
 
+    /**
+     * @param guard optional task guarding whether this decorator runs at all
+     * @param child factory for the child task to re-run until it fails
+     */
     public UntilFailTaskFactory(
         final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
         final Factory<? super VesselScope, ? extends Task<Vessel>> child

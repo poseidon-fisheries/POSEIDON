@@ -31,15 +31,24 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
+/**
+ * A {@link DecoratorTaskFactory} for a gdx-ai {@link AlwaysFail}: runs its child, then reports
+ * failure regardless of that child's outcome. Built via {@link Factories#alwaysFail}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class AlwaysFailTaskFactory extends DecoratorTaskFactory<AlwaysFail<Vessel>> {
 
+    /** @param child factory for the child task to always report failure for */
     public AlwaysFailTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> child) {
         super(child);
     }
 
+    /**
+     * @param guard optional task guarding whether this decorator runs at all
+     * @param child factory for the child task to always report failure for
+     */
     public AlwaysFailTaskFactory(
         final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
         final Factory<? super VesselScope, ? extends Task<Vessel>> child

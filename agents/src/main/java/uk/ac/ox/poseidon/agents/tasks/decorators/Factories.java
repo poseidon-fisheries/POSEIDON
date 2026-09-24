@@ -27,35 +27,66 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
+/** Factories for behavior-tree decorator nodes wrapping a single child task. */
 public class Factories {
 
     private Factories() {
     }
 
+    /**
+     * @param child the child task to decorate
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link com.badlogic.gdx.ai.btree.decorator.UntilFail}
+     * @see UntilFailTaskFactory
+     */
     public static UntilFailTaskFactory untilFail(
         final Factory<? super VesselScope, ? extends Task<Vessel>> child
     ) {
         return new UntilFailTaskFactory(child);
     }
 
+    /**
+     * @param child the child task to decorate
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link com.badlogic.gdx.ai.btree.decorator.UntilSuccess}
+     * @see UntilSuccessTaskFactory
+     */
     public static UntilSuccessTaskFactory untilSuccess(
         final Factory<? super VesselScope, ? extends Task<Vessel>> child
     ) {
         return new UntilSuccessTaskFactory(child);
     }
 
+    /**
+     * @param child the child task to decorate
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link com.badlogic.gdx.ai.btree.decorator.Invert}
+     * @see InvertTaskFactory
+     */
     public static InvertTaskFactory invert(
         final Factory<? super VesselScope, ? extends Task<Vessel>> child
     ) {
         return new InvertTaskFactory(child);
     }
 
+    /**
+     * @param child the child task to decorate
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link com.badlogic.gdx.ai.btree.decorator.AlwaysSucceed}
+     * @see AlwaysSucceedTaskFactory
+     */
     public static AlwaysSucceedTaskFactory alwaysSucceed(
         final Factory<? super VesselScope, ? extends Task<Vessel>> child
     ) {
         return new AlwaysSucceedTaskFactory(child);
     }
 
+    /**
+     * @param child the child task to decorate
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link com.badlogic.gdx.ai.btree.decorator.AlwaysFail}
+     * @see AlwaysFailTaskFactory
+     */
     public static AlwaysFailTaskFactory alwaysFail(
         final Factory<? super VesselScope, ? extends Task<Vessel>> child
     ) {

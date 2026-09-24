@@ -31,15 +31,24 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
+/**
+ * A {@link DecoratorTaskFactory} for a gdx-ai {@link Invert}: runs its child and flips its
+ * outcome (success becomes failure and vice versa). Built via {@link Factories#invert}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class InvertTaskFactory extends DecoratorTaskFactory<Invert<Vessel>> {
 
+    /** @param child factory for the child task whose outcome gets inverted */
     public InvertTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> child) {
         super(child);
     }
 
+    /**
+     * @param guard optional task guarding whether this decorator runs at all
+     * @param child factory for the child task whose outcome gets inverted
+     */
     public InvertTaskFactory(
         final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
         final Factory<? super VesselScope, ? extends Task<Vessel>> child
