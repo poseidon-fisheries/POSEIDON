@@ -29,8 +29,14 @@ import uk.ac.ox.poseidon.core.events.CombiningEphemeralAccumulatingListener;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
 
+/**
+ * An {@link Evaluator} that scores a destination by the total biomass caught during the trip,
+ * divided by the combined duration of every {@link ExtendedEvent} broadcast on the trip's event
+ * manager (not just fishing events).
+ */
 public class TotalBiomassCaughtPerHourDestinationEvaluator implements Evaluator<Int2D> {
 
+    /** @return an evaluation accumulating catch and elapsed hours as trip events arrive */
     @Override
     public uk.ac.ox.poseidon.agents.choices.evaluation.Evaluation<Int2D> newEvaluation(
         final Int2D option,

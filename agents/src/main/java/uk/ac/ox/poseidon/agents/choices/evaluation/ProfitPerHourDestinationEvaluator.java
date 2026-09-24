@@ -36,14 +36,20 @@ import java.time.Duration;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+/**
+ * An {@link Evaluator} that scores a destination by the vessel's trip profit (in a fixed
+ * currency), divided by the trip's wall-clock duration in hours.
+ */
 public class ProfitPerHourDestinationEvaluator implements Evaluator<Int2D> {
 
     private final String currencyCode;
 
+    /** @param currencyUnit the currency trip profit is measured in */
     public ProfitPerHourDestinationEvaluator(final CurrencyUnit currencyUnit) {
         this.currencyCode = checkNotNull(currencyUnit).getCode();
     }
 
+    /** @return an evaluation that scores {@code option} once the trip it's part of ends */
     @Override
     public Evaluation<Int2D> newEvaluation(
         final Int2D option,

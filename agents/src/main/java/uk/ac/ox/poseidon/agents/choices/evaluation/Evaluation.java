@@ -22,10 +22,18 @@
 
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
+/**
+ * An in-progress or completed scoring of one option, kept alive across events until a result is
+ * available.
+ *
+ * @param <O> the type of option being evaluated
+ */
 public interface Evaluation<O> {
 
+    /** @return the option being evaluated */
     O getOption();
 
+    /** @return this option's score, once evaluation is complete */
     double getResult();
 
 }

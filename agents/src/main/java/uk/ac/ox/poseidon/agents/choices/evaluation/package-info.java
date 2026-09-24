@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,28 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices.evaluation;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link TotalBiomassCaughtPerHourDestinationEvaluator},
- * built via {@link Factories#totalBiomassCaughtPerHour()}.
+ * Scores a vessel's trip destinations from what actually happened on each trip — profit per hour,
+ * biomass caught per hour — and feeds the scores back into the choice model via
+ * {@link uk.ac.ox.poseidon.agents.choices.evaluation.TripEvaluator}, so future destination
+ * choices (see {@link uk.ac.ox.poseidon.agents.choices}) can learn from past outcomes. See
+ * {@link uk.ac.ox.poseidon.agents.choices.evaluation.Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory
-    extends GlobalScopeFactory<Evaluator<Int2D>> {
-
-    @Override
-    protected Evaluator<Int2D> newInstance(final Scope scope) {
-        return new TotalBiomassCaughtPerHourDestinationEvaluator();
-    }
-
-}
+package uk.ac.ox.poseidon.agents.choices.evaluation;

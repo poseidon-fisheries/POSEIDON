@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A {@link GlobalScopeFactory} counterpart of {@link ProfitPerHourDestinationEvaluator}, built
+ * via {@link Factories#profitPerHour}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

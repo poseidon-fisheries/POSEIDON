@@ -24,7 +24,18 @@ package uk.ac.ox.poseidon.agents.choices.evaluation;
 
 import uk.ac.ox.poseidon.core.events.EventManager;
 
+/**
+ * Starts scoring one option, listening on {@code eventManager} for whatever events the score
+ * depends on.
+ *
+ * @param <O> the type of option evaluated
+ */
 public interface Evaluator<O> {
+    /**
+     * @param option       the option to evaluate
+     * @param eventManager the event manager to listen on while scoring {@code option}
+     * @return a fresh, in-progress {@link Evaluation} of {@code option}
+     */
     Evaluation<O> newEvaluation(
         O option,
         EventManager eventManager
