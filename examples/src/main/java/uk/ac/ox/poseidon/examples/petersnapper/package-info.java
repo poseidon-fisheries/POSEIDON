@@ -20,23 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.examples.petersnapper;
-
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
-
 /**
- * A {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} counterpart of
- * {@link TotalLandingsPerYearAccumulator}, registering it with the {@code EventManager} (see
- * {@link SimulationEventListenerFactory}), built via
- * {@link Factories#totalLandingsPerYearAccumulator()}.
+ * A worked example scenario ({@link uk.ac.ox.poseidon.examples.petersnapper.PeterSnapperScenario})
+ * built entirely from POSEIDON's own factories, plus its GUI variant
+ * ({@link uk.ac.ox.poseidon.examples.petersnapper.PeterSnapperScenarioWithUI}), a gear
+ * catchability calibration entry point, and the total-landings accumulator the calibration scores
+ * against.
  */
-public class TotalLandingsPerYearAccumulatorFactory
-    extends SimulationEventListenerFactory<TotalLandingsPerYearAccumulator> {
-
-    @Override
-    protected TotalLandingsPerYearAccumulator newListener(final SimulationScope scope) {
-        return new TotalLandingsPerYearAccumulator();
-    }
-
-}
+package uk.ac.ox.poseidon.examples.petersnapper;

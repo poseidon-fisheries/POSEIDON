@@ -118,6 +118,12 @@ import static uk.ac.ox.poseidon.io.paths.Factories.path;
 import static uk.ac.ox.poseidon.io.sources.Factories.zipEntryDataSource;
 import static uk.ac.ox.poseidon.io.tables.Factories.*;
 
+/**
+ * A worked example scenario: a single-species, single-gear artisanal fishery (modelled on
+ * Indonesia's Peter Snapper fishery/tutorial) with two ports, epsilon-greedy destination choice
+ * (with imitation of nearby vessels' best options), a fixed-proportion gear, and logistic
+ * biomass growth with diffusion.
+ */
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
     private static final Path INPUT_PATH =
@@ -204,6 +210,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     }
 
+    /** @return a freshly built Peter Snapper {@link Scenario} */
     @Override
     public Scenario get() {
         final Scenario.ScenarioBuilder builder = Scenario.builder();

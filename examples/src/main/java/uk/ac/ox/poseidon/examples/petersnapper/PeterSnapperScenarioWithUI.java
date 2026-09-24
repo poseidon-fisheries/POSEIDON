@@ -32,8 +32,13 @@ import java.util.List;
 import static java.awt.Color.WHITE;
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.IMOLA;
 
+/**
+ * A {@link ScenarioWithUI} for the Peter Snapper example fishery: a single 2D display showing
+ * bathymetry, carrying capacity, species biomass, markets, ports, vessels and cell coordinates.
+ */
 public class PeterSnapperScenarioWithUI extends ScenarioWithUI {
 
+    /** @param scenario the scenario to run, wired up as the display's data source */
     public PeterSnapperScenarioWithUI(
         final Scenario scenario
     ) {

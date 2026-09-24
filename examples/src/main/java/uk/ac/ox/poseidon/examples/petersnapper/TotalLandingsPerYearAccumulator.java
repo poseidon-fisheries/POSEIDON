@@ -30,6 +30,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Supplier;
 
+/**
+ * An {@link AbstractListener} that accumulates total biomass sold (in kg), per calendar year,
+ * across every {@link Sale} it receives.
+ */
 public class TotalLandingsPerYearAccumulator
     extends AbstractListener<Sale>
     implements Supplier<Map<Integer, Double>> {
@@ -40,6 +44,7 @@ public class TotalLandingsPerYearAccumulator
         super(Sale.class);
     }
 
+    /** Adds {@code sale}'s total biomass to the running total for its year. */
     @Override
     public void receive(final Sale sale) {
         final int year = sale.getDateTime().getYear();
@@ -54,6 +59,7 @@ public class TotalLandingsPerYearAccumulator
         );
     }
 
+    /** @return the accumulated total landings (in kg), by year, unmodifiable */
     @Override
     public Map<Integer, Double> get() {
         return Collections.unmodifiableMap(totalLandingsPerYear);

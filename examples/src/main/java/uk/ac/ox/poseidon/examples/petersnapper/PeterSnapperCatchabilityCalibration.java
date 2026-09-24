@@ -40,6 +40,11 @@ import java.util.SequencedMap;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPerYearAccumulator;
 
+/**
+ * CLI entry point that calibrates the Peter Snapper scenario's gear catchability against
+ * observed yearly landings, via {@link CalibrationRunner}, and reports the result against the
+ * scenario's tutorial catchability value.
+ */
 public final class PeterSnapperCatchabilityCalibration {
 
     private static final Path LANDINGS_PATH =
