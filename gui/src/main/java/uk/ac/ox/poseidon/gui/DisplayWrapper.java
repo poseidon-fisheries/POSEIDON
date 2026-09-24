@@ -28,6 +28,10 @@ import uk.ac.ox.poseidon.core.Simulation;
 
 import javax.swing.*;
 
+/**
+ * Owns one MASON display window (type {@code D}, e.g. {@link sim.display.Display2D}): builds it,
+ * sets up its portrayals from a running {@link Simulation}, and tears it down on quit.
+ */
 public abstract class DisplayWrapper<D> {
 
     private final String title;

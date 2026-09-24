@@ -38,6 +38,11 @@ import java.util.stream.Stream;
 
 import static java.lang.System.Logger.Level.WARNING;
 
+/**
+ * A {@link DisplayWrapper} for a MASON {@link Display2D}: attaches one {@link NamedPortrayal} per
+ * value produced by {@code fieldPortrayalFactories} (unwrapping any {@link Collection} a factory
+ * returns), against a fixed-size, fixed-backdrop 2D field.
+ */
 public class DisplayWrapper2D extends DisplayWrapper<Display2D> {
 
     private static final System.Logger logger = System.getLogger(DisplayWrapper2D.class.getName());
@@ -49,6 +54,15 @@ public class DisplayWrapper2D extends DisplayWrapper<Display2D> {
     private final double height;
     private final Paint backDrop;
 
+    /**
+     * @param title                   the display window's title
+     * @param fieldPortrayalFactories factories evaluated against a fresh {@link SimulationScope}
+     *                                on each {@link #setupPortrayals}; each must produce a
+     *                                {@link NamedPortrayal}, or a {@link Collection} of them
+     * @param width                   the field's width
+     * @param height                  the field's height
+     * @param backDrop                the field's background paint
+     */
     public DisplayWrapper2D(
         final String title,
         final List<Factory<? super SimulationScope, ?>> fieldPortrayalFactories,
@@ -87,7 +101,7 @@ public class DisplayWrapper2D extends DisplayWrapper<Display2D> {
             .stream()
             .flatMap(factory -> {
                 final Object o = factory.get(scope);
-                return factory.get(scope) instanceof final Collection<?> os
+                return o instanceof final Collection<?> os
                     ? os.stream()
                     : Stream.of(o);
             })

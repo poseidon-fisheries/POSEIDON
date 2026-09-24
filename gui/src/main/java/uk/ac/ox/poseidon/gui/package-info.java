@@ -20,28 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.gui;
-
-import lombok.RequiredArgsConstructor;
-import sim.display.Controller;
-import uk.ac.ox.poseidon.core.Scenario;
-
-import java.util.List;
-
 /**
- * A GUI-runnable {@link Scenario}: wraps it, and a fixed set of displays, into a
- * {@link SimulationWithUI} and hands back its MASON {@link Controller}.
+ * Wires a {@link uk.ac.ox.poseidon.core.Scenario} into a MASON GUI:
+ * {@link uk.ac.ox.poseidon.gui.ScenarioWithUI} builds a
+ * {@link uk.ac.ox.poseidon.gui.SimulationWithUI} ({@link sim.display.GUIState}), which in turn
+ * drives one {@link uk.ac.ox.poseidon.gui.DisplayWrapper} per display window (see
+ * {@link uk.ac.ox.poseidon.gui.DisplayWrapper2D} for the 2D case). See
+ * {@link uk.ac.ox.poseidon.gui.portrayals} for the factories that build the portrayals a display
+ * attaches, and {@link uk.ac.ox.poseidon.gui.palettes} for the colour maps they use.
  */
-@RequiredArgsConstructor
-public class ScenarioWithUI {
-
-    private final Scenario scenario;
-    private final List<DisplayWrapper<?>> displays;
-
-    /**
-     * @return the {@link Controller} of a new {@link SimulationWithUI} wrapping {@link #scenario}
-     */
-    public Controller createController() {
-        return new SimulationWithUI(scenario::startNewSimulation, displays).createController();
-    }
-}
+package uk.ac.ox.poseidon.gui;
