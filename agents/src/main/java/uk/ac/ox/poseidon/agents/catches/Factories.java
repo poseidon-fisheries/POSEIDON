@@ -25,18 +25,35 @@ package uk.ac.ox.poseidon.agents.catches;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/** Factories for {@link CatchCategory}s and the {@link CatchCategoriser}s that sort into them. */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @param code the category's code
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link CatchCategory}
+     * @see CatchCategory
+     */
     public static CatchCategoryFactory catchCategory(final String code) {
         return new CatchCategoryFactory(code);
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for
+     * {@link CatchCategory#UNCATEGORISED}
+     * @see CatchCategory
+     */
     public static UncategorisedCatchCategoryFactory uncategorisedCatchCategory() {
         return new UncategorisedCatchCategoryFactory();
     }
 
+    /**
+     * @param catchCategory the category every bucket gets sorted into
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link UniformCatchCategoriser}
+     * @see UniformCatchCategoriser
+     */
     public static <S extends Scope> UniformCatchCategoriserFactory<S> uniformCatchCategoriser(
         final Factory<? super S, ? extends CatchCategory> catchCategory
     ) {

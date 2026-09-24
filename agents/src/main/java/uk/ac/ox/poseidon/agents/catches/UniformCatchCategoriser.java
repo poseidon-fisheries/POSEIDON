@@ -26,11 +26,14 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Value;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
+/** A {@link CatchCategoriser} that puts the whole bucket into a single, fixed category. */
 @Value
 public class UniformCatchCategoriser implements CatchCategoriser {
 
+    /** The category every bucket is sorted into. */
     CatchCategory catchCategory;
 
+    /** @return a categorised catch with a single bucket, under {@link #catchCategory} */
     @Override
     public CategorisedCatch apply(final Bucket bucket) {
         return new CategorisedCatch(ImmutableMap.of(catchCategory, bucket));

@@ -26,6 +26,7 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 import java.util.function.Function;
 
+/** Sorts a bucket of caught biomass into a {@link CategorisedCatch}. */
 public interface CatchCategoriser
     extends Function<Bucket, CategorisedCatch> {
 }

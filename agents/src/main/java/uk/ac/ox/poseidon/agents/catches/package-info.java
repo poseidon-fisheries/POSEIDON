@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,29 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.catches;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link CatchCategory}, built via
- * {@link Factories#catchCategory}.
+ * Sorts a caught {@link uk.ac.ox.poseidon.biology.buckets.Bucket} of biomass into one or more
+ * {@link uk.ac.ox.poseidon.agents.catches.CatchCategory}s, producing a
+ * {@link uk.ac.ox.poseidon.agents.catches.CategorisedCatch}. See
+ * {@link uk.ac.ox.poseidon.agents.catches.disposition} for what happens to a categorised catch
+ * afterward, and {@link uk.ac.ox.poseidon.agents.catches.Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class CatchCategoryFactory extends GlobalScopeFactory<CatchCategory> {
-
-    private String code;
-
-    @Override
-    protected CatchCategory newInstance(final Scope scope) {
-        return new CatchCategory(code);
-    }
-}
+package uk.ac.ox.poseidon.agents.catches;
