@@ -27,6 +27,10 @@ import lombok.EqualsAndHashCode;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/**
+ * A {@link GlobalScopeFactory} counterpart of {@link DepartNowActionFunction}, built via
+ * {@link Factories#departNow()}.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DepartNowActionFunctionFactory extends GlobalScopeFactory<DepartNowActionFunction> {

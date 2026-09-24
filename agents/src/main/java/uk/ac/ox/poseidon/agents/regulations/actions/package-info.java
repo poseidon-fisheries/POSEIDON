@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,17 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * A vessel's {@link uk.ac.ox.poseidon.agents.regulations.actions.FishingAction}s: things a
+ * vessel does that the regulations engine can permit or forbid, timed and located so
+ * {@link uk.ac.ox.poseidon.regulations.TemporalAction}/
+ * {@link uk.ac.ox.poseidon.regulations.SpatialAction} predicates can constrain them. See
+ * {@link uk.ac.ox.poseidon.agents.regulations.actions.Factories} for the entry points.
+ */
 package uk.ac.ox.poseidon.agents.regulations.actions;
-
-/** Factories for {@link FishingAction}s tested against the regulations engine. */
-public class Factories {
-
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-     * {@link DepartNowActionFunction}
-     * @see DepartNow
-     */
-    public static DepartNowActionFunctionFactory departNow() {
-        return new DepartNowActionFunctionFactory();
-    }
-}

@@ -25,5 +25,6 @@ package uk.ac.ox.poseidon.agents.regulations.actions;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.regulations.Action;
 
+/** An {@link Action} taken by a {@link Vessel}, tested against the regulations engine. */
 public interface FishingAction extends Action<Vessel> {
 }

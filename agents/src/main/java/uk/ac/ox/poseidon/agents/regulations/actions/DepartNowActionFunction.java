@@ -27,6 +27,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.util.function.Function;
 
+/** Builds a {@link DepartNow} action for a given vessel. */
 @RequiredArgsConstructor
 public class DepartNowActionFunction implements Function<Vessel, DepartNow> {
     @Override

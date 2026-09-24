@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.regulations.actions;
 
+import lombok.Getter;
 import lombok.NonNull;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
@@ -30,11 +31,23 @@ import uk.ac.ox.poseidon.regulations.ExtendedAction;
 
 import java.time.LocalDateTime;
 
+/**
+ * A {@link FishingAction} with zero duration: starts and ends at the same instant, at a given
+ * place, with a given {@link Gear}.
+ */
+@Getter
 public class InstantFishingAction extends ExtendedAction<Vessel>
     implements TemporalFishingAction, SpatialFishingAction {
 
+    /** The gear the vessel is recorded as fishing with. */
     @NonNull private final Gear gear;
 
+    /**
+     * @param vessel     the vessel taking the action
+     * @param dateTime   when the action happens (start and end time are the same)
+     * @param coordinate where the action takes place
+     * @param gear       the gear the vessel fishes with
+     */
     public InstantFishingAction(
         @NonNull final Vessel vessel,
         @NonNull final LocalDateTime dateTime,
@@ -45,6 +58,11 @@ public class InstantFishingAction extends ExtendedAction<Vessel>
         this.gear = gear;
     }
 
+    /**
+     * Happens now, at the vessel's current cell, with the vessel's current gear.
+     *
+     * @param vessel the vessel taking the action
+     */
     public InstantFishingAction(final Vessel vessel) {
         this(
             vessel,
