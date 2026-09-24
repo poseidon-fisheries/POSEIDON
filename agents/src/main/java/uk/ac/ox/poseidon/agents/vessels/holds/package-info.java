@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,26 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * A vessel's {@link uk.ac.ox.poseidon.agents.vessels.holds.Hold} for caught biomass: the
+ * {@link uk.ac.ox.poseidon.agents.vessels.holds.Hold} contract itself, and
+ * {@link uk.ac.ox.poseidon.agents.vessels.holds.BiomassHold} implementations with unlimited or
+ * fixed capacity. See {@link uk.ac.ox.poseidon.agents.vessels.holds.Factories} for the entry
+ * points.
+ */
 package uk.ac.ox.poseidon.agents.vessels.holds;
-
-import lombok.Getter;
-import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
-
-import static java.lang.Double.POSITIVE_INFINITY;
-
-/** A {@link BiomassHold} with unlimited capacity; never full, never rejects content. */
-@Getter
-public class InfiniteBiomassHold extends BiomassHold {
-
-    /** @param catchCategoriser sorts uncategorised content added to the hold */
-    public InfiniteBiomassHold(final CatchCategoriser catchCategoriser) {
-        super(catchCategoriser);
-    }
-
-    /** @return {@link Double#POSITIVE_INFINITY} */
-    @Override
-    public double getTotalCapacityInKg() {
-        return POSITIVE_INFINITY;
-    }
-
-}

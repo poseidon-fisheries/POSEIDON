@@ -36,6 +36,10 @@ import javax.measure.quantity.Mass;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link StandardBiomassHold}, built via
+ * {@link Factories#standardBiomassHold}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

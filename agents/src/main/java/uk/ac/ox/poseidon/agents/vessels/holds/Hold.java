@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels.holds;
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
+/** A vessel's storage for caught biomass, with a fixed total capacity. */
 public interface Hold {
 
     /**
@@ -48,6 +49,7 @@ public interface Hold {
      */
     CategorisedCatch getContent();
 
+    /** @return {@code true} if there's no available capacity left */
     default boolean isFull() {
         return getAvailableCapacityInKg() <= 0;
     }
@@ -55,16 +57,20 @@ public interface Hold {
     /**
      * Removes all content currently held in the container and returns it.
      *
-     * @return the removed content. If the container was empty, returns an empty Bucket.
+     * @return the removed content. If the container was empty, returns an empty
+     * {@link CategorisedCatch}.
      */
     CategorisedCatch extractContent();
 
+    /** @return {@code true} if the current content is empty */
     default boolean isEmpty() {
         return getContent().isEmpty();
     }
 
+    /** @return this hold's fixed total capacity, in kilograms */
     double getTotalCapacityInKg();
 
+    /** @return {@link #getTotalCapacityInKg()} minus the current content's total biomass */
     default double getAvailableCapacityInKg() {
         return getTotalCapacityInKg() - getContent().getTotalBiomassInKg();
     }

@@ -29,16 +29,29 @@ import uk.ac.ox.poseidon.core.Factory;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 
+/** Factories for a vessel's {@link Hold}, with unlimited or fixed capacity. */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @param catchCategoriser sorts uncategorised content added to the hold
+     * @return a {@link VesselScope}-relative factory for an {@link InfiniteBiomassHold}
+     * @see InfiniteBiomassHold
+     */
     public static InfiniteBiomassHoldFactory infiniteBiomassHold(
         final Factory<? super VesselScope, ? extends CatchCategoriser> catchCategoriser
     ) {
         return new InfiniteBiomassHoldFactory(catchCategoriser);
     }
 
+    /**
+     * @param capacity         the hold's total capacity
+     * @param tolerance        how far over capacity the hold may go before rejecting content
+     * @param catchCategoriser sorts uncategorised content added to the hold
+     * @return a {@link VesselScope}-relative factory for a {@link StandardBiomassHold}
+     * @see StandardBiomassHold
+     */
     public static StandardBiomassHoldFactory standardBiomassHold(
         final Factory<? super VesselScope, ? extends Quantity<Mass>> capacity,
         final Factory<? super VesselScope, ? extends Quantity<Mass>> tolerance,
