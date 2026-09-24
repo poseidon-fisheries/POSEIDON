@@ -39,6 +39,10 @@ import java.util.function.Supplier;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_PER_HOUR;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link FixedBiomassProportionGear}, built via
+ * {@link Factories#fixedBiomassProportionGear}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

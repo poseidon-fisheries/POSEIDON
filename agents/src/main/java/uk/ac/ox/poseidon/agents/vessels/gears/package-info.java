@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,30 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.gears;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link InactiveGear}, built via
- * {@link Factories#inactiveGear}.
+ * A vessel's fishing {@link uk.ac.ox.poseidon.agents.vessels.gears.Gear}: the contract itself,
+ * an inactive placeholder, and implementations that catch a fixed or per-species proportion of
+ * available biomass. See {@link uk.ac.ox.poseidon.agents.vessels.gears.Factories} for the entry
+ * points.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class InactiveGearFactory extends GlobalScopeFactory<InactiveGear> {
-
-    private String code;
-
-    @Override
-    protected InactiveGear newInstance(final Scope scope) {
-        return new InactiveGear(code);
-    }
-
-}
+package uk.ac.ox.poseidon.agents.vessels.gears;

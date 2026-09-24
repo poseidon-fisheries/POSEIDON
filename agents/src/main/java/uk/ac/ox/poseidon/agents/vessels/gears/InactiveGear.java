@@ -30,22 +30,26 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import java.time.Duration;
 import java.util.function.Supplier;
 
+/** A {@link Gear} standing for having no gear at all; fishing with it is an error. */
 @Getter
 @RequiredArgsConstructor
 public class InactiveGear implements Gear {
 
     private final String code;
 
+    /** @throws IllegalStateException always */
     @Override
     public Supplier<Duration> getDurationSupplier() {
         throw new IllegalStateException("Gear is inactive");
     }
 
+    /** @throws IllegalStateException always */
     @Override
     public Bucket fish(final Fisheable fisheable) {
         throw new IllegalStateException("Gear is inactive");
     }
 
+    /** @return always {@code false} */
     @Override
     public boolean isActive() {
         return false;

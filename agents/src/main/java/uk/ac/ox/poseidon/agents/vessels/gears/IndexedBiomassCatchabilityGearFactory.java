@@ -42,6 +42,10 @@ import java.util.function.Supplier;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link IndexedBiomassCatchabilityGear}, built via
+ * {@link Factories#indexedBiomassCatchabilityGear}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
