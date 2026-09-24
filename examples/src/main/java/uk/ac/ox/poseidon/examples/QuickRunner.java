@@ -43,6 +43,11 @@ import java.util.List;
 
 import static java.lang.System.Logger.Level.INFO;
 
+/**
+ * A JCommander-driven CLI entry point that loads a {@link Scenario} from a YAML file, runs it for
+ * a fixed {@link Period}, and logs start/completion. See {@code -h}/the {@link Parameter}
+ * annotations below for the accepted flags.
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuickRunner implements Runnable {
@@ -105,6 +110,9 @@ public class QuickRunner implements Runnable {
         logger.log(INFO, () -> "Simulation completed (" + schedule.getDateTime() + ")");
     }
 
+    /**
+     * Loads the scenario from {@code scenarioPath} and runs it for {@code period}.
+     */
     @Override
     public void run() {
         logger.log(INFO, () -> "Loading scenario: " + scenarioPath);
