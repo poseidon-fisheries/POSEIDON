@@ -73,8 +73,12 @@ Don't write the same behavioral explanation twice across the triplet; every doc 
 component's and the `*ScopeFactory` base classes' should be a pointer, not prose.
 
 **Every public and protected member of a class you touch needs to be documented** — not just the
-triplet skeleton described above. Constants, public constructors, and any other public/protected
-method or field get a real (if short) Javadoc comment. The one exception: a *trivial* `@Override`
+triplet skeleton described above, and not just the public ones. Constants, constructors, fields,
+and methods all get a real (if short) Javadoc comment as soon as they're `public` or `protected`,
+including `protected` fields/methods on an abstract base meant for subclassing (e.g. a
+`*ScopeFactory` base class's protected constructor or protected helper field) — subclass authors
+read those same as any public API. Package-private and private members stay undocumented unless
+their behavior is genuinely non-obvious. The one exception: a *trivial* `@Override`
 method whose superclass/interface method is already documented doesn't need its own comment —
 Java's standard doc-inheritance applies (the javadoc tool shows "Description copied from..."), so
 `newInstance(scope)` overrides of `AbstractFactory`'s hook, and `get()`/`test()`/`apply()`-style
