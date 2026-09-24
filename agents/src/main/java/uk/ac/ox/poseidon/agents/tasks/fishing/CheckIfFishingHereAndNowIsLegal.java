@@ -32,11 +32,19 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
+/**
+ * A leaf {@link AgentTask} that succeeds if a fishing action started now, at the vessel's
+ * current cell and with its current gear, would be permitted by {@code regulations}.
+ */
 @RequiredArgsConstructor
 public class CheckIfFishingHereAndNowIsLegal extends AgentTask<Vessel> {
 
     @NonNull private final Regulations<? super ExtendedFishingAction> regulations;
 
+    /**
+     * @return {@code SUCCEEDED} if a fishing action started now, here, would be permitted,
+     * {@code FAILED} otherwise
+     */
     @Override
     public Status execute() {
         final ExtendedFishingAction action = new ExtendedFishingAction(getAgent());

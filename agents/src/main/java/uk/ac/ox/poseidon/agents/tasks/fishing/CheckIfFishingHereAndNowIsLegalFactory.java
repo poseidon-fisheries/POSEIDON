@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
+/**
+ * A {@link VesselTaskFactory} counterpart of {@link CheckIfFishingHereAndNowIsLegal}, built via
+ * {@link Factories#checkIfFishingHereAndNowIsLegal}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -34,6 +34,9 @@ import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Supplier;
 
+/**
+ * A {@link VesselTaskFactory} counterpart of {@link Fishing}, built via {@link Factories#fishing}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

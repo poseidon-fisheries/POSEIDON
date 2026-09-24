@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,17 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * The vessel's core fishing behavior: {@link uk.ac.ox.poseidon.agents.tasks.fishing.Fishing}
+ * (the task that actually fishes and sorts the catch), a legality precheck
+ * ({@link uk.ac.ox.poseidon.agents.tasks.fishing.CheckIfFishingHereAndNowIsLegal}), and the
+ * {@link uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent}/
+ * {@link uk.ac.ox.poseidon.agents.tasks.fishing.FishingOutcome} records it broadcasts. See
+ * {@link uk.ac.ox.poseidon.agents.tasks.fishing.Factories} for the entry points.
+ */
 package uk.ac.ox.poseidon.agents.tasks.fishing;
-
-import lombok.Value;
-import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
-import uk.ac.ox.poseidon.biology.buckets.Bucket;
-
-/** The result of one fishing event: the raw catch, and how it was disposed of. */
-@Value
-public class FishingOutcome {
-    /** Everything caught, before any disposition. */
-    Bucket grossCatch;
-    /** How {@link #grossCatch} was split between retained, discarded alive and discarded dead. */
-    Disposition disposition;
-}

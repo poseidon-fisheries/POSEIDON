@@ -37,6 +37,12 @@ import java.util.function.Supplier;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
+/**
+ * An {@link ExtendedTripTask} that fishes a single {@link Fisheable} using the vessel's gear:
+ * runs for the gear's own duration, then sorts the catch via {@code dispositionProcess}, adds the
+ * retained portion to the hold, releases what's discarded alive back to the fisheable, broadcasts
+ * a {@link FishingEvent}, and consumes the fuel the gear burns per hour of fishing.
+ */
 @RequiredArgsConstructor
 public class Fishing extends ExtendedTripTask {
 
@@ -45,17 +51,27 @@ public class Fishing extends ExtendedTripTask {
 
     private ExtendedFishingAction action;
 
+    /** Starts a new {@link ExtendedFishingAction} for the current agent, cell and gear. */
     @Override
     public void start() {
         super.start();
         action = new ExtendedFishingAction(getAgent());
     }
 
+    /** @return {@link #action}'s duration (fixed for the life of this fishing event) */
     @Override
     protected Duration getDuration() {
         return action.getDuration();
     }
 
+    /**
+     * Fishes the fisheable {@link #fisheableSupplier} supplies, sorts the catch via
+     * {@link #dispositionProcess}, retains what fits in the hold, releases the rest alive back
+     * to the fisheable, broadcasts a {@link FishingEvent}, and consumes fuel for the elapsed
+     * duration.
+     *
+     * @return always {@code SUCCEEDED}
+     */
     @Override
     protected Status complete() {
         final Fisheable fisheable = fisheableSupplier.get();
@@ -77,6 +93,7 @@ public class Fishing extends ExtendedTripTask {
         return SUCCEEDED;
     }
 
+    /** Clears {@link #action}, so the next run starts a fresh fishing action. */
     @Override
     public void resetTask() {
         action = null;

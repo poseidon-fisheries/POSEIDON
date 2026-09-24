@@ -31,10 +31,17 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 
 import java.util.function.Supplier;
 
+/** Factories for fishing behavior-tree tasks and their supporting event accumulator. */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @param regulations the regulations a fishing action started now, here, is checked against
+     * @return a {@link VesselScope}-relative factory for a
+     * {@link CheckIfFishingHereAndNowIsLegal}
+     * @see CheckIfFishingHereAndNowIsLegal
+     */
     public static CheckIfFishingHereAndNowIsLegalFactory checkIfFishingHereAndNowIsLegal(
         final Factory<
             ? super VesselScope,
@@ -44,10 +51,21 @@ public class Factories {
         return new CheckIfFishingHereAndNowIsLegalFactory(regulations);
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+     * {@link FishingEventAccumulator}
+     * @see FishingEventAccumulator
+     */
     public static FishingEventAccumulatorFactory fishingEventAccumulator() {
         return new FishingEventAccumulatorFactory();
     }
 
+    /**
+     * @param fisheableSupplier supplies the fisheable to fish from
+     * @param dispositionProcess sorts the catch into retained/discarded
+     * @return a {@link VesselScope}-relative factory for a {@link Fishing} task
+     * @see Fishing
+     */
     public static FishingFactory fishing(
         final Factory<? super VesselScope, ? extends Supplier<Fisheable>> fisheableSupplier,
         final Factory<? super VesselScope, ? extends DispositionProcess> dispositionProcess
