@@ -20,30 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.extractors.tags;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link DoubleTagExtractor}, built via
- * {@link Factories#doubleTagExtractor}.
+ * Extracts a named tag off a {@link uk.ac.ox.poseidon.agents.vessels.Vessel}, as a {@link String}
+ * or a {@link Double}. See {@link Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class DoubleTagExtractorFactory extends GlobalScopeFactory<DoubleTagExtractor> {
-
-    private String tagName;
-
-    @Override
-    protected DoubleTagExtractor newInstance(final Scope scope) {
-        return new DoubleTagExtractor(tagName);
-    }
-
-}
+package uk.ac.ox.poseidon.agents.vessels.extractors.tags;

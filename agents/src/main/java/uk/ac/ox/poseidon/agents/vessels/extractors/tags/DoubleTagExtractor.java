@@ -30,6 +30,12 @@ import java.util.function.Function;
 
 import static uk.ac.ox.poseidon.core.utils.Utils.toTrimmedString;
 
+/**
+ * Extracts a vessel's tag named {@code tagName} as a {@link Double}: a {@link Number} tag value
+ * is converted via {@link Number#doubleValue()}, any other value is trimmed to a string (with the
+ * same rules as {@link StringTagExtractor}) and parsed. Returns {@code null} if the tag is
+ * absent, its numeric value isn't finite, or its string form doesn't parse as a double.
+ */
 @RequiredArgsConstructor
 public class DoubleTagExtractor implements Function<Vessel, Double> {
 

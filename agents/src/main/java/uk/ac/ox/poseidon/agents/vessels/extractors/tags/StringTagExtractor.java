@@ -30,6 +30,10 @@ import java.util.function.Function;
 
 import static uk.ac.ox.poseidon.core.utils.Utils.toTrimmedString;
 
+/**
+ * Extracts a vessel's tag named {@code tagName} as a trimmed string. Returns {@code null} if the
+ * tag is absent, or trims to an empty string or {@code "NA"} (case-insensitive).
+ */
 @RequiredArgsConstructor
 public class StringTagExtractor implements Function<Vessel, String> {
 

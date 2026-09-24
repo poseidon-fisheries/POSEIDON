@@ -22,13 +22,26 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors.tags;
 
+/** Factories for {@code Function<Vessel, ?>}s that extract a vessel's tag by name. */
 public class Factories {
     private Factories() {}
 
+    /**
+     * @param tagName the name of the tag to extract
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+     * {@link DoubleTagExtractor} extracting the {@code tagName} tag
+     * @see DoubleTagExtractor
+     */
     public static DoubleTagExtractorFactory doubleTagExtractor(final String tagName) {
         return new DoubleTagExtractorFactory(tagName);
     }
 
+    /**
+     * @param tagName the name of the tag to extract
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+     * {@link StringTagExtractor} extracting the {@code tagName} tag
+     * @see StringTagExtractor
+     */
     public static StringTagExtractorFactory stringTagExtractor(final String tagName) {
         return new StringTagExtractorFactory(tagName);
     }
