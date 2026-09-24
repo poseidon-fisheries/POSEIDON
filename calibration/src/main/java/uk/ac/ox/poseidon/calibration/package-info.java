@@ -20,11 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Calibrates a {@link uk.ac.ox.poseidon.core.Scenario}'s properties against real-world targets
+ * using a genetic algorithm: {@link uk.ac.ox.poseidon.calibration.CalibrationProblem} defines
+ * what to optimize, {@link uk.ac.ox.poseidon.calibration.CalibrationRunner} runs the search. See
+ * {@link uk.ac.ox.poseidon.calibration.errors} for the error metrics a
+ * {@code CalibrationProblem} can be scored with.
+ */
 package uk.ac.ox.poseidon.calibration;
-
-public record ParameterRange(
-    String propertyName,
-    double min,
-    double max
-) {
-}

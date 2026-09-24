@@ -50,11 +50,20 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * A jenetics {@link Problem} that calibrates a subset of a {@link Scenario}'s properties by
+ * running it forward for a fixed duration, once per seed, and scoring the outcome with an
+ * {@code evaluator}. A candidate solution is a map of property name to value, each value encoded
+ * as an allele in {@code [0.0, 1.0]} that {@link #codec()} rescales to that property's
+ * {@code parameterRanges} entry; {@link #fitness()} runs the scenario with those property
+ * overrides for every seed in {@code seeds} and returns the average evaluator score.
+ */
 @RequiredArgsConstructor
 @Accessors(fluent = true)
 public class CalibrationProblem
     implements Problem<SequencedMap<String, Double>, DoubleGene, Double> {
 
+    /** The scenario being calibrated; started fresh, with property overrides, for each seed. */
     protected final @NonNull Scenario scenario;
     private final @NonNull TemporalAmount duration;
     private final @NonNull ImmutableMap<String, ? extends Factory<? super SimulationScope, ?>>
@@ -63,6 +72,11 @@ public class CalibrationProblem
     private final @NonNull ToDoubleFunction<Simulation> evaluator;
     private final @NonNull ImmutableLongArray seeds;
 
+    /**
+     * Encodes/decodes a genotype of {@code parameterRanges.size()} alleles in {@code [0.0, 1.0]}
+     * to/from a map of property name to value, by linearly rescaling each allele to its
+     * corresponding entry in {@code parameterRanges}. Computed lazily, once, on first access.
+     */
     @Getter(lazy = true)
     private final Codec<SequencedMap<String, Double>, DoubleGene> codec =
         Codec.of(
@@ -90,6 +104,10 @@ public class CalibrationProblem
             }
         );
 
+    /**
+     * @return a function that runs {@link #scenario} once per seed in {@code seeds}, with the
+     * given property overrides, and returns the average of {@code evaluator}'s score across seeds
+     */
     public Function<SequencedMap<String, Double>, Double> fitness() {
         return this::evaluate;
     }
