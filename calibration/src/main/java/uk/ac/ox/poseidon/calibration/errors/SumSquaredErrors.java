@@ -30,12 +30,24 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
+/**
+ * A calibration error metric that sums the squared differences between a fixed map of target
+ * values and a map of actual values extracted from a {@link Simulation}, keyed by an arbitrary
+ * type {@code K}. A key present in only one of the two maps is treated as having a value of
+ * {@code 0.0} on the other side, so it still contributes to the error.
+ *
+ * @param <K> the type of key the target and actual value maps are indexed by
+ */
 @RequiredArgsConstructor
 public class SumSquaredErrors<K> implements ToDoubleFunction<Simulation> {
 
     private final Map<K, Double> targetValues;
     private final Function<Simulation, Map<K, Double>> actualValues;
 
+    /**
+     * Extracts the actual values from {@code simulation} and returns the sum of squared
+     * differences against {@link #targetValues}, over the union of both maps' keys.
+     */
     @Override
     public double applyAsDouble(final Simulation simulation) {
         final Map<K, Double> actualValues = this.actualValues.apply(simulation);

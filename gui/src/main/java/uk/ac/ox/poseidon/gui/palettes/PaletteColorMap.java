@@ -35,18 +35,38 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+/**
+ * A MASON {@link AbstractColorMap} that interpolates over a scientific colour palette loaded
+ * from a {@code /palettes/*.txt} resource, clamping the input value to {@code [minimum, maximum]}
+ * and mapping {@link Double#NaN} to a transparent colour.
+ */
 @Getter
 public class PaletteColorMap extends AbstractColorMap {
 
+    /** Name of the "imola" palette resource. */
     public static final String IMOLA = "imola";
+    /** Name of the "lajolla" palette resource. */
     public static final String LAJOLLA = "lajolla";
+    /** Name of the "oleron" palette resource. */
     public static final String OLERON = "oleron";
+    /** Name of the "turku" palette resource. */
     public static final String TURKU = "turku";
     private static final Color TRANSPARENT = new Color(0, 0, 0, 0);
+    /** The palette's colours, in order from {@link #minimum} to {@link #maximum}. */
     private final Color[] colors;
+    /** The value that maps to the first colour in {@link #colors}. */
     private final double minimum;
+    /** The value that maps to the last colour in {@link #colors}. */
     private final double maximum;
 
+    /**
+     * Loads the named palette (one of {@link #IMOLA}, {@link #LAJOLLA}, {@link #OLERON},
+     * {@link #TURKU}) from its {@code /palettes/<mapName>.txt} resource.
+     *
+     * @param mapName the palette's resource name
+     * @param minimum the value that maps to the first colour
+     * @param maximum the value that maps to the last colour, must be greater than {@code minimum}
+     */
     public PaletteColorMap(
         final String mapName,
         final double minimum,
@@ -59,6 +79,15 @@ public class PaletteColorMap extends AbstractColorMap {
         );
     }
 
+    /**
+     * Builds a colour map from an explicit array of colours.
+     *
+     * @param colors  the palette's colours, in order from {@code minimum} to {@code maximum};
+     *                must contain at least two colours, and is defensively copied
+     * @param minimum the value that maps to {@code colors[0]}
+     * @param maximum the value that maps to the last colour in {@code colors}, must be greater
+     *                than {@code minimum}
+     */
     public PaletteColorMap(
         final Color[] colors,
         final double minimum,
@@ -95,6 +124,11 @@ public class PaletteColorMap extends AbstractColorMap {
             .toArray(Color[]::new);
     }
 
+    /**
+     * @return the transparent colour if {@code v} is {@link Double#NaN}, otherwise the palette
+     * colour for {@code v} clamped to {@code [minimum, maximum]} and linearly interpolated over
+     * {@link #colors}
+     */
     @Override
     public Color getColor(final double v) {
         if (Double.isNaN(v)) {
