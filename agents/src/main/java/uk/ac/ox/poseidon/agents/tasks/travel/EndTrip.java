@@ -27,7 +27,9 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
+/** A leaf {@link AgentTask} that ends the vessel's current trip and always succeeds. */
 public class EndTrip extends AgentTask<Vessel> {
+    /** Ends the vessel's current trip. */
     @Override
     public Status execute() {
         getAgent().endTrip();

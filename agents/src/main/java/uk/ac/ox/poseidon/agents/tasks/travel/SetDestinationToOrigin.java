@@ -27,7 +27,12 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
+/**
+ * A leaf {@link AgentTask} that points the vessel's current trip back at its origin (e.g. to head
+ * home after fishing) and always succeeds.
+ */
 public class SetDestinationToOrigin extends AgentTask<Vessel> {
+    /** Sets the current trip's destination back to its origin. */
     @Override
     public Status execute() {
         getAgent().getCurrentTrip().setDestinationToTripOrigin();

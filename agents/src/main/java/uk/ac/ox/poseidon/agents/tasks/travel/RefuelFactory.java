@@ -31,6 +31,9 @@ import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
+/**
+ * A {@link VesselTaskFactory} counterpart of {@link Refuel}, built via {@link Factories#refuel}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -36,6 +36,10 @@ import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 import java.util.function.Supplier;
 
+/**
+ * A {@link VesselTaskFactory} counterpart of {@link TravelAlongPath}, built via
+ * {@link Factories#travelAlongPathTo}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -31,6 +31,10 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
+/**
+ * A {@link VesselTaskFactory} counterpart of {@link TravelDirectly}, built via
+ * {@link Factories#travelDirectly}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

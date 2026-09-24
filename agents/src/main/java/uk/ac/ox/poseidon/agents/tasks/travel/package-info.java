@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,25 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.travel;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-
 /**
- * A {@link VesselTaskFactory} counterpart of {@link EndTrip}, built via
- * {@link Factories#endTrip()}.
+ * Behavior-tree tasks for moving a vessel and running its trips end to end: travelling along a
+ * path or directly to a destination, refuelling, turning back, ending a trip, and
+ * {@link uk.ac.ox.poseidon.agents.tasks.travel.RoundTripFactory} for stringing a whole trip
+ * together out of these and the fishing/landing tasks from sibling packages. See
+ * {@link uk.ac.ox.poseidon.agents.tasks.travel.Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class EndTripFactory extends VesselTaskFactory<EndTrip> {
-
-    @Override
-    protected EndTrip newTask(final VesselScope scope) {
-        return new EndTrip();
-    }
-}
+package uk.ac.ox.poseidon.agents.tasks.travel;
