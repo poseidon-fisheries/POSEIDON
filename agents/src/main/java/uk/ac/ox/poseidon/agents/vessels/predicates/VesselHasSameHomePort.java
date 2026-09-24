@@ -27,6 +27,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.util.function.Predicate;
 
+/** Holds for a vessel that shares {@code vessel}'s home port. */
 @RequiredArgsConstructor
 public class VesselHasSameHomePort implements Predicate<Vessel> {
 

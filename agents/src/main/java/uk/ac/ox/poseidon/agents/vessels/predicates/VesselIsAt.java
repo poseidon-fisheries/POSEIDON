@@ -29,6 +29,10 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/**
+ * Holds for a vessel currently at the cell {@code cellSupplier} returns, resolved fresh on each
+ * {@link #test}; never holds if the supplied cell is {@code null}.
+ */
 @RequiredArgsConstructor
 public class VesselIsAt implements Predicate<Vessel> {
 

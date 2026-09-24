@@ -25,6 +25,10 @@ package uk.ac.ox.poseidon.agents.vessels.predicates;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/**
+ * A {@link GlobalScopeFactory} counterpart of {@link VesselIsActive}, built via
+ * {@link Factories#vesselIsActive()}.
+ */
 public class VesselIsActiveFactory extends GlobalScopeFactory<VesselIsActive> {
     @Override
     protected VesselIsActive newInstance(final Scope scope) {

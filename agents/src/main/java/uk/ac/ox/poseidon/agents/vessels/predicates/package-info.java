@@ -20,33 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.predicates;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
-
-import java.util.function.Supplier;
-
 /**
- * A {@link VesselScopeFactory} counterpart of {@link VesselIsAt}, built via
- * {@link Factories#vesselIsAt}.
+ * {@link java.util.function.Predicate}s testing a
+ * {@link uk.ac.ox.poseidon.agents.vessels.Vessel}'s activity, home port or current location. See
+ * {@link Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class VesselIsAtFactory extends VesselScopeFactory<VesselIsAt> {
-
-    private Factory<? super VesselScope, ? extends Supplier<Int2D>> cellSupplier;
-
-    @Override
-    protected VesselIsAt newInstance(final VesselScope scope) {
-        return new VesselIsAt(cellSupplier.get(scope));
-    }
-}
+package uk.ac.ox.poseidon.agents.vessels.predicates;

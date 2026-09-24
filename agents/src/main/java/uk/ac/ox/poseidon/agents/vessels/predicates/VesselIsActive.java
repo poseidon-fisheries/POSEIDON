@@ -26,6 +26,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.util.function.Predicate;
 
+/** Holds for a vessel that is currently active. */
 public class VesselIsActive implements Predicate<Vessel> {
     @Override
     public boolean test(final Vessel vessel) {

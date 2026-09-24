@@ -28,18 +28,33 @@ import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Supplier;
 
+/** Factories for {@code Predicate<Vessel>}s testing a vessel's activity, home port or location. */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link VesselIsActive}
+     * @see VesselIsActive
+     */
     public static VesselIsActiveFactory vesselIsActive() {
         return new VesselIsActiveFactory();
     }
 
+    /**
+     * @return a {@link VesselScope}-relative factory for a {@link VesselHasSameHomePort}
+     * matching the scoped vessel's home port
+     * @see VesselHasSameHomePort
+     */
     public static VesselHasSameHomePortFactory vesselHasSameHomePort() {
         return new VesselHasSameHomePortFactory();
     }
 
+    /**
+     * @param cellSupplier supplies the cell to test the vessel's location against
+     * @return a {@link VesselScope}-relative factory for a {@link VesselIsAt}
+     * @see VesselIsAt
+     */
     public static VesselIsAtFactory vesselIsAt(
         final Factory<? super VesselScope, ? extends Supplier<Int2D>> cellSupplier
     ) {
