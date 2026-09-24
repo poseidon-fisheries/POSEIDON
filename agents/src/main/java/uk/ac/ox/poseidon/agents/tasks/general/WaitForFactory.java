@@ -34,6 +34,10 @@ import uk.ac.ox.poseidon.core.Factory;
 import java.time.Duration;
 import java.util.function.Supplier;
 
+/**
+ * A {@link VesselTaskFactory} counterpart of {@link WaitFor}, built via
+ * {@link Factories#waitFor}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

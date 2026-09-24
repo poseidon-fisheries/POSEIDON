@@ -31,11 +31,18 @@ import java.util.function.Predicate;
 import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
+/**
+ * A leaf {@link AgentTask} that succeeds or fails in one step, depending on whether
+ * {@code predicate} holds for the agent.
+ *
+ * @param <G> the type of agent this task runs against
+ */
 @RequiredArgsConstructor
 public class AgentPredicateTask<G extends Agent> extends AgentTask<G> {
 
     private final Predicate<? super G> predicate;
 
+    /** @return {@code SUCCEEDED} if {@code predicate} holds for the agent, {@code FAILED} otherwise */
     @Override
     public Status execute() {
         return predicate.test(getAgent()) ? SUCCEEDED : FAILED;

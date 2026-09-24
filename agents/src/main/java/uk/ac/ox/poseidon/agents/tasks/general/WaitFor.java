@@ -31,16 +31,24 @@ import java.util.function.Supplier;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
+/**
+ * An {@link ExtendedTask} that runs for a fixed duration, drawn fresh from
+ * {@code durationSupplier} each time it starts, and then always succeeds.
+ *
+ * @param <G> the type of agent this task runs against
+ */
 @RequiredArgsConstructor
 public class WaitFor<G extends Agent> extends ExtendedTask<G> {
 
     final Supplier<Duration> durationSupplier;
 
+    /** @return a fresh duration from {@link #durationSupplier} */
     @Override
     protected Duration getDuration() {
         return durationSupplier.get();
     }
 
+    /** @return always {@code SUCCEEDED} */
     @Override
     protected Status complete() {
         return SUCCEEDED;

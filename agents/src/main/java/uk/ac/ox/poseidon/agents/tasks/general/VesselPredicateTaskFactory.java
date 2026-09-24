@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Predicate;
 
+/**
+ * A {@link VesselTaskFactory} counterpart of {@link AgentPredicateTask}, built via
+ * {@link Factories Factories.checkThat(...)}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
