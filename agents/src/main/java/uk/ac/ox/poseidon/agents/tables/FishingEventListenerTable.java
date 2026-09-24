@@ -35,18 +35,33 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * A {@link ListenerTable} that records one row per species per {@link FishingEvent}: the
+ * catching vessel, the event's start/end times and end location, and the species' gross catch
+ * broken down by {@link Disposition} (retained, discarded alive, discarded dead).
+ */
 @SuppressWarnings("FieldCanBeLocal")
 public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
 
+    /** Name of the vessel-ID column. */
     public static final String VESSEL_ID = "vessel_id";
+    /** Name of the event start-time column. */
     public static final String START_DATE_TIME = "start_date_time";
+    /** Name of the event end-time column. */
     public static final String END_DATE_TIME = "end_date_time";
+    /** Name of the event's end-location longitude column. */
     public static final String LONGITUDE = "longitude";
+    /** Name of the event's end-location latitude column. */
     public static final String LATITUDE = "latitude";
+    /** Name of the species-code column. */
     public static final String SPECIES_CODE = "species_code";
+    /** Name of the gross-catch column. */
     public static final String GROSS_CATCH = "gross_catch";
+    /** Name of the retained-biomass column. */
     public static final String RETAINED = "retained";
+    /** Name of the discarded-alive-biomass column. */
     public static final String DISCARDED_ALIVE = "discarded_alive";
+    /** Name of the discarded-dead-biomass column. */
     public static final String DISCARDED_DEAD = "discarded_dead";
 
     private final StringColumn vesselId = StringColumn.create(VESSEL_ID);
@@ -60,6 +75,7 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
     private final DoubleColumn discardedAlive = DoubleColumn.create(DISCARDED_ALIVE);
     private final DoubleColumn discardedDead = DoubleColumn.create(DISCARDED_DEAD);
 
+    /** Creates the table with all ten columns, empty. */
     public FishingEventListenerTable() {
         super(FishingEvent.class);
         get().addColumns(
@@ -76,6 +92,7 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
         );
     }
 
+    /** Appends one row per species involved in {@code event} to {@link #table}. */
     @Override
     public void receive(final FishingEvent event) {
         final Disposition disposition = event.getOutcome().getDisposition();

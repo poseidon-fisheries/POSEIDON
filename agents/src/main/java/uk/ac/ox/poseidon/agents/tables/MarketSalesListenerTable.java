@@ -27,17 +27,31 @@ import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import uk.ac.ox.poseidon.agents.market.Sale;
 
+/**
+ * A {@link ListenerTable} that records one row per {@link Sale.Item} in every {@link Sale}: the
+ * sale's date/time, ID, market and vessel, and the item's category, species, biomass sold and
+ * sale value.
+ */
 @SuppressWarnings("rawtypes")
 public class MarketSalesListenerTable extends ListenerTable<Sale> {
 
+    /** Name of the sale date/time column. */
     public static final String DATE_TIME_COLUMN = "date_time";
+    /** Name of the sale-ID column. */
     public static final String SALES_ID_COLUMN = "sales_id";
+    /** Name of the market-ID column. */
     public static final String MARKET_ID_COLUMN = "market_id";
+    /** Name of the vessel-ID column. */
     public static final String VESSEL_ID_COLUMN = "vessel_id";
+    /** Name of the sale item's category-code column. */
     public static final String CATEGORY_CODE_COLUMN = "category_code";
+    /** Name of the sale item's species-code column. */
     public static final String SPECIES_CODE_COLUMN = "species_code";
+    /** Name of the sale item's biomass-sold (in kg) column. */
     public static final String BIOMASS_SOLD_COLUMN = "biomass_sold_in_kg";
+    /** Name of the sale item's sale-value column. */
     public static final String SALE_VALUE_COLUMN = "sale_value";
+    /** Name of the sale item's currency column. */
     public static final String CURRENCY_COLUMN = "currency";
 
     private final DateTimeColumn dateTime = DateTimeColumn.create(DATE_TIME_COLUMN);
@@ -65,6 +79,7 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
         );
     }
 
+    /** Appends one row per {@link Sale.Item} in {@code sale} to {@link #table}. */
     @Override
     public void receive(final Sale sale) {
         sale.getItems().forEach(item -> {

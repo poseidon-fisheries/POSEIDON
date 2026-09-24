@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,28 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * {@link uk.ac.ox.poseidon.agents.tables.ListenerTable}s: simulation event listeners that
+ * accumulate the events they receive into a tablesaw table, for later export/analysis. See
+ * {@link uk.ac.ox.poseidon.agents.tables.Factories} for the entry points.
+ */
 package uk.ac.ox.poseidon.agents.tables;
-
-/** Factories for {@link ListenerTable}s that accumulate simulation events into a tablesaw table. */
-public class Factories {
-
-    private Factories() {}
-
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
-     * {@link FishingEventListenerTable}
-     * @see FishingEventListenerTable
-     */
-    public static FishingEventListenerTableFactory fishingEventListenerTable() {
-        return new FishingEventListenerTableFactory();
-    }
-
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
-     * {@link MarketSalesListenerTable}
-     * @see MarketSalesListenerTable
-     */
-    public static MarketSalesListenerTableFactory marketSalesListenerTable() {
-        return new MarketSalesListenerTableFactory();
-    }
-}

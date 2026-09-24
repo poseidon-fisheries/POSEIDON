@@ -28,6 +28,11 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
+/**
+ * A {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} counterpart of
+ * {@link MarketSalesListenerTable}, registering it with the {@code EventManager} (see
+ * {@link SimulationEventListenerFactory}), built via {@link Factories#marketSalesListenerTable}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
