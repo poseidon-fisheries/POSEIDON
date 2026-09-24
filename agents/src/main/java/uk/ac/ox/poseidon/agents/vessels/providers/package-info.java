@@ -20,22 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * {@link uk.ac.ox.poseidon.core.providers.Provider}s and suppliers of values and services
+ * derived from a vessel's current state: its cell, home port, current trip's destination/
+ * duration/event manager, its own event manager, accessible water cells, and travel time to
+ * port via a candidate destination. See
+ * {@link uk.ac.ox.poseidon.agents.vessels.providers.Factories} for the entry points.
+ */
 package uk.ac.ox.poseidon.agents.vessels.providers;
-
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.events.EventManager;
-
-import java.util.function.Supplier;
-
-/** Supplies a vessel's own event manager (as opposed to its current trip's, see {@link CurrentTripEventManager}). */
-@RequiredArgsConstructor
-public class VesselEventManager implements Supplier<EventManager> {
-
-    private final Vessel vessel;
-
-    @Override
-    public EventManager get() {
-        return vessel.getEventManager();
-    }
-}

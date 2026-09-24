@@ -25,6 +25,10 @@ package uk.ac.ox.poseidon.agents.vessels.providers;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link HomePortCell}, built via
+ * {@link Factories#homePortCell()}.
+ */
 public class HomePortCellFactory extends VesselScopeFactory<HomePortCell> {
 
     @Override

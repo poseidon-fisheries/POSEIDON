@@ -34,6 +34,10 @@ import java.util.function.Function;
 
 import static lombok.AccessLevel.PACKAGE;
 
+/**
+ * Computes the round-trip travel time from a vessel's current cell to a candidate destination
+ * and back to its home port, at the vessel's cruising speed.
+ */
 @RequiredArgsConstructor(access = PACKAGE)
 public class TravelTimeToPortViaDestination implements Function<Int2D, Duration> {
 
@@ -41,6 +45,12 @@ public class TravelTimeToPortViaDestination implements Function<Int2D, Duration>
     private final GridPathFinder pathFinder;
     private final DistanceCalculator distanceCalculator;
 
+    /**
+     * @param destination the candidate destination to route through
+     * @return the travel time from the vessel's current cell to {@code destination}, plus from
+     * {@code destination} back to the vessel's home port
+     * @throws RuntimeException if no path exists either leg
+     */
     @Override
     public Duration apply(
         final Int2D destination

@@ -27,6 +27,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
+/** Provides a vessel's current cell. */
 @RequiredArgsConstructor
 public class CurrentCell implements Provider<Int2D> {
 
@@ -36,5 +37,5 @@ public class CurrentCell implements Provider<Int2D> {
     public Int2D get() {
         return vessel.getCell();
     }
-    
+
 }

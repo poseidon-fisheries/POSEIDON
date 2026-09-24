@@ -25,6 +25,10 @@ package uk.ac.ox.poseidon.agents.vessels.providers;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link VesselEventManager}, built via
+ * {@link Factories#vesselEventManager()}.
+ */
 public class VesselEventManagerFactory extends VesselScopeFactory<VesselEventManager> {
 
     @Override

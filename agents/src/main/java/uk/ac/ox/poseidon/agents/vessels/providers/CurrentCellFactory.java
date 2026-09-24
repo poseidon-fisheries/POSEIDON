@@ -25,6 +25,10 @@ package uk.ac.ox.poseidon.agents.vessels.providers;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link CurrentCell}, built via
+ * {@link Factories#currentCell()}.
+ */
 public class CurrentCellFactory extends VesselScopeFactory<CurrentCell> {
 
     @Override

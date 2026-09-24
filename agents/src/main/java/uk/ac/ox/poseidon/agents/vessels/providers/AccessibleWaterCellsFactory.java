@@ -31,6 +31,10 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link AccessibleWaterCells}, built via
+ * {@link Factories#accessibleWaterCells}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

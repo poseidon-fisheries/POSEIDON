@@ -27,6 +27,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
+/** Provides a vessel's home port cell. */
 @RequiredArgsConstructor
 public class HomePortCell implements Provider<Int2D> {
 

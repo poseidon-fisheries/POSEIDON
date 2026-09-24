@@ -28,11 +28,13 @@ import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
+/** Provides a vessel's current trip's destination cell, or {@code null} if it has no current trip. */
 @RequiredArgsConstructor
 public class CurrentTripDestinationCell implements Provider<Int2D> {
 
     private final Vessel vessel;
 
+    /** @return the current trip's destination, or {@code null} if there is no current trip */
     @Override
     public Int2D get() {
         final Trip trip = vessel.getCurrentTrip();

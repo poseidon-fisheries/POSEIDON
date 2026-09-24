@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 import java.util.List;
 
+/** Provides the water cells reachable from a vessel's current cell, per {@code pathFinder}. */
 @RequiredArgsConstructor
 public class AccessibleWaterCells implements Provider<List<Int2D>> {
 

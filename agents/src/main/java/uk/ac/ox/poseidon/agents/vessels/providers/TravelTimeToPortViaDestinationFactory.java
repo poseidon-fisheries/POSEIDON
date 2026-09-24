@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link TravelTimeToPortViaDestination}, built via
+ * {@link Factories#travelTimeToPortViaDestination}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

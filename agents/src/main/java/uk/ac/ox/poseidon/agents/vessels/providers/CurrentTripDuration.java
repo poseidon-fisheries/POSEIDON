@@ -29,11 +29,19 @@ import uk.ac.ox.poseidon.core.providers.Provider;
 
 import java.time.Duration;
 
+/**
+ * Provides how long a vessel's current trip has been running, or {@link Duration#ZERO} if it has
+ * no current trip.
+ */
 @RequiredArgsConstructor
 public class CurrentTripDuration implements Provider<Duration> {
 
     private final Vessel vessel;
 
+    /**
+     * @return the elapsed time since the current trip's start, or {@link Duration#ZERO} if there
+     * is no current trip
+     */
     @Override
     public Duration get() {
         final Trip currentTrip = vessel.getCurrentTrip();
