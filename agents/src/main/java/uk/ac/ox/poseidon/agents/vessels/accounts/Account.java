@@ -30,16 +30,24 @@ import org.joda.money.Money;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A vessel's running balance, kept as one {@link Money} amount per {@link CurrencyUnit}
+ * encountered. Missing currencies are implicitly zero; adding or subtracting an amount creates
+ * that currency's entry on demand.
+ */
 @Getter
 @ToString
 public class Account {
 
+    /** The account's live balance map; read-only by convention, not defensively copied. */
     private final Map<CurrencyUnit, Money> balances = new HashMap<>();
 
+    /** Overwrites the balance for {@code balance}'s currency. */
     public void setBalance(final Money balance) {
         balances.put(balance.getCurrencyUnit(), balance);
     }
 
+    /** Adds {@code amount} to the balance for its currency. */
     public void add(final Money amount) {
         balances.put(
             amount.getCurrencyUnit(),
@@ -49,6 +57,7 @@ public class Account {
         );
     }
 
+    /** Subtracts {@code amount} from the balance for its currency. */
     public void subtract(final Money amount) {
         balances.put(
             amount.getCurrencyUnit(),
@@ -58,6 +67,7 @@ public class Account {
         );
     }
 
+    /** Adds every one of {@code other}'s balances to this account, currency by currency. */
     public void add(final Account other) {
         other.balances.values().forEach(this::add);
     }

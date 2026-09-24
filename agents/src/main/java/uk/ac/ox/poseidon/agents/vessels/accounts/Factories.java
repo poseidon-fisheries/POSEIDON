@@ -30,14 +30,27 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Function;
 
+/** Factories for a vessel's {@link Account} and for {@link sim.engine.Steppable}s that draw on it. */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an
+     * {@link Account}
+     * @see Account
+     */
     public static AccountFactory account() {
         return new AccountFactory();
     }
 
+    /**
+     * @param fleet         the fleet whose active vessels get charged
+     * @param costExtractor computes the amount to subtract from each vessel's account
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link FixedCostCollector}
+     * @see FixedCostCollector
+     */
     public static <S extends Scope> FixedCostCollectorFactory<S> fixedCostCollector(
         final Factory<? super S, ? extends Fleet> fleet,
         final Factory<? super S, ? extends Function<? super Vessel, ? extends Money>> costExtractor

@@ -35,6 +35,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Function;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link FixedCostCollector}, built via
+ * {@link Factories#fixedCostCollector}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

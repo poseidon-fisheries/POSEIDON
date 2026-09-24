@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,24 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.accounts;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-
 /**
- * A {@link VesselScopeFactory} counterpart of {@link Account}, built via
- * {@link Factories#account()}.
+ * A vessel's running {@link uk.ac.ox.poseidon.agents.vessels.accounts.Account} balance, and
+ * {@link sim.engine.Steppable}s that draw on it (e.g.
+ * {@link uk.ac.ox.poseidon.agents.vessels.accounts.FixedCostCollector} for periodic fixed costs).
+ * See {@link uk.ac.ox.poseidon.agents.vessels.accounts.Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class AccountFactory extends VesselScopeFactory<Account> {
-    @Override
-    protected Account newInstance(final VesselScope scope) {
-        return new Account();
-    }
-}
+package uk.ac.ox.poseidon.agents.vessels.accounts;
