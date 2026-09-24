@@ -29,9 +29,21 @@ import java.time.Duration;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 
+/**
+ * An {@link AgentTask} that runs over more than one step: on first execution it sets the agent's
+ * task duration to {@link #getDuration()} and reports {@code RUNNING}; once that duration has
+ * elapsed and the task is executed again, it reports the outcome of {@link #complete()}.
+ *
+ * @param <G> the type of agent this task runs against
+ */
 @RequiredArgsConstructor
 public abstract class ExtendedTask<G extends Agent> extends AgentTask<G> {
 
+    /**
+     * @return {@link #complete()}'s outcome if already {@code RUNNING} (the task's duration has
+     * elapsed), otherwise sets the agent's task duration to {@link #getDuration()} and returns
+     * {@code RUNNING}
+     */
     @Override
     public Status execute() {
         if (getStatus() == RUNNING)
@@ -42,8 +54,10 @@ public abstract class ExtendedTask<G extends Agent> extends AgentTask<G> {
         }
     }
 
+    /** @return how long this task should run for, computed once, when it starts */
     protected abstract Duration getDuration();
 
+    /** @return this task's outcome once {@link #getDuration()} has elapsed */
     protected abstract Status complete();
 
 }

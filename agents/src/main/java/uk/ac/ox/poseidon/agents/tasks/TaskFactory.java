@@ -32,6 +32,15 @@ import uk.ac.ox.poseidon.agents.AgentScope;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
+/**
+ * An {@link AbstractFactory} base for behavior-tree {@link Task}s: subclasses supply the task via
+ * {@link #newTask}, and this base attaches the optional {@code guard} and keys resolved
+ * instances by agent, so each agent gets its own task instance.
+ *
+ * @param <G> the type of agent the task runs against
+ * @param <S> the agent scope type
+ * @param <T> the concrete task type built
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,15 +50,18 @@ public abstract class TaskFactory<G extends Agent, S extends AgentScope<G>, T ex
 
     private Factory<? super S, ? extends Task<G>> guard;
 
+    /** @return a freshly built, unguarded task */
     protected abstract T newTask(
         final S scope
     );
 
+    /** @return {@code scope}'s agent, so each agent gets its own resolved task */
     @Override
     protected Object makeKey(final S scope) {
         return scope.getAgent();
     }
 
+    /** @return a task built by {@link #newTask}, with {@link #guard} attached if set */
     @Override
     protected T newInstance(final S scope) {
         final T task = newTask(scope);

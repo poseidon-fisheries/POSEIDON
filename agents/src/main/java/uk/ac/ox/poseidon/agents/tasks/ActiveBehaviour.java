@@ -29,12 +29,21 @@ import lombok.RequiredArgsConstructor;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 
+/**
+ * A {@link Behaviour} that actually runs a gdx-ai {@link BehaviorTree}.
+ *
+ * @param <G> the type of agent the tree runs against
+ */
 @RequiredArgsConstructor
 public class ActiveBehaviour<G> implements Behaviour {
 
     @NonNull
     private final BehaviorTree<G> tree;
 
+    /**
+     * @param rootTask the tree's root task
+     * @param agent    the agent the tree runs against
+     */
     public ActiveBehaviour(
         final Task<G> rootTask,
         final G agent
@@ -42,16 +51,19 @@ public class ActiveBehaviour<G> implements Behaviour {
         this(new BehaviorTree<>(rootTask, agent));
     }
 
+    /** @return always {@code true} */
     @Override
     public boolean isActive() {
         return true;
     }
 
+    /** @return {@code true} if {@link #tree} is currently {@code RUNNING} */
     @Override
     public boolean isRunning() {
         return tree.getStatus() == RUNNING;
     }
 
+    /** Steps {@link #tree} once. */
     @Override
     public void step() {
         tree.step();

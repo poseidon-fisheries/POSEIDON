@@ -28,10 +28,15 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+/**
+ * A {@link GlobalScopeFactory} counterpart of {@link InactiveBehaviour}, built via
+ * {@link Factories#inactiveBehaviour()}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class InactiveBehaviourFactory extends GlobalScopeFactory<InactiveBehaviour> {
+    /** @return {@link InactiveBehaviour#INACTIVE_BEHAVIOUR} */
     @Override
     protected InactiveBehaviour newInstance(final Scope scope) {
         return InactiveBehaviour.INACTIVE_BEHAVIOUR;

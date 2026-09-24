@@ -26,12 +26,20 @@ import com.badlogic.gdx.ai.btree.LeafTask;
 import com.badlogic.gdx.ai.btree.Task;
 import uk.ac.ox.poseidon.agents.Agent;
 
+/**
+ * A gdx-ai {@link LeafTask} run against an {@link Agent}. Behavior trees are built fresh per
+ * agent rather than cloned, so {@link #copyTo} is deliberately unsupported.
+ *
+ * @param <G> the type of agent this task runs against
+ */
 public abstract class AgentTask<G extends Agent> extends LeafTask<G> {
 
+    /** @return the agent this task is running against */
     public G getAgent() {
         return getObject();
     }
 
+    /** @throws UnsupportedOperationException always; behavior trees are never cloned */
     @Override
     protected Task<G> copyTo(final Task<G> task) {
         throw new UnsupportedOperationException("Not implemented");

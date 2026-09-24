@@ -22,12 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
+/** An agent's behavior-tree-driven behavior, steppable once per simulation tick. */
 public interface Behaviour {
 
+    /** @return {@code true} if this behaviour actually runs a tree (see {@link ActiveBehaviour}) */
     boolean isActive();
 
+    /** @return {@code true} if the underlying tree is currently {@code RUNNING} */
     boolean isRunning();
 
+    /** Advances the behaviour by one simulation tick. */
     void step();
 
 }
