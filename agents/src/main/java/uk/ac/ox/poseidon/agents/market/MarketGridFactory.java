@@ -36,6 +36,11 @@ import java.util.List;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link ImmutableMarketGrid}, placing each
+ * resolved {@link Market} at its own port's location in {@link #portGrid}, built via
+ * {@link Factories#marketGrid}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

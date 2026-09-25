@@ -28,12 +28,21 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.LocalDateTime;
 
+/** A place, at a {@link Port}, where a vessel sells its catch. */
 public interface Market {
 
+    /** @return this market's identifying code */
     String getCode();
 
+    /** @return the port this market is located at */
     Port getPort();
 
+    /**
+     * @param vessel            the selling vessel
+     * @param categorisedCatch  the catch offered for sale
+     * @param dateTime          when the sale happens
+     * @return the resulting sale, recording what sold and what didn't
+     */
     Sale sell(
         Vessel vessel,
         CategorisedCatch categorisedCatch,

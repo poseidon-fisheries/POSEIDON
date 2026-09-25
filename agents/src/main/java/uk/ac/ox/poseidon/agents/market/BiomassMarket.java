@@ -42,6 +42,11 @@ import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * A {@link Market} with a fixed per-port set of prices, keyed by (catch category, species), with
+ * a fallback lookup via {@link Species#covers}. Selling a catch splits it into what has a price
+ * (sold, broadcast as a {@link Sale}) and what doesn't (left in {@link Sale#getUnsold()}).
+ */
 @Getter
 @ToString
 public class BiomassMarket implements Market {
@@ -74,6 +79,11 @@ public class BiomassMarket implements Market {
         this.eventManager = eventManager;
     }
 
+    /**
+     * Splits {@code categorisedCatch} into sold items (priced via {@link #getPrice}) and unsold
+     * remainder (no price for that category, or that species within it), broadcasts the
+     * resulting {@link Sale} on {@link #eventManager}, and returns it.
+     */
     @Override
     public Sale sell(
         final Vessel vessel,
@@ -141,6 +151,11 @@ public class BiomassMarket implements Market {
         );
     }
 
+    /**
+     * @return this market's price for {@code species} under {@code catchCategory}: a direct
+     * match if one is set, otherwise the first priced species whose {@link Species#covers} the
+     * requested species, otherwise empty
+     */
     public Optional<Price> getPrice(
         final CatchCategory catchCategory,
         final Species species
@@ -157,6 +172,7 @@ public class BiomassMarket implements Market {
         );
     }
 
+    /** Sets (or replaces) this market's price for {@code species} under {@code catchCategory}. */
     public void setPrice(
         final CatchCategory catchCategory,
         final Species species,
@@ -185,6 +201,7 @@ public class BiomassMarket implements Market {
         return Optional.empty();
     }
 
+    /** Receives one (catch category, species, price) triple, as passed to {@link #forEachPrice}. */
     @FunctionalInterface
     public interface PriceConsumer {
         void accept(

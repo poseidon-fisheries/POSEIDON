@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,13 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Where a vessel sells its catch: {@link uk.ac.ox.poseidon.agents.market.Market}s (concretely
+ * {@link uk.ac.ox.poseidon.agents.market.BiomassMarket}) priced per (catch category, species),
+ * placed in space via {@link uk.ac.ox.poseidon.agents.market.MarketGrid}, and the
+ * {@link uk.ac.ox.poseidon.agents.market.Sale} record each sale produces. See
+ * {@link uk.ac.ox.poseidon.agents.market.Factories} for the entry points.
+ */
 package uk.ac.ox.poseidon.agents.market;
-
-import uk.ac.ox.poseidon.core.events.EventAccumulator;
-
-/** An {@link EventAccumulator} of {@link Sale}s. */
-public class BiomassSaleAccumulator extends EventAccumulator<Sale> {
-    BiomassSaleAccumulator() {
-        super(Sale.class);
-    }
-}

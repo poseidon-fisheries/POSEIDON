@@ -33,10 +33,18 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.List;
 
+/** Factories for markets, prices, and the grid that places markets in space. */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @param port          the market's port
+     * @param marketCode    the market's code; the port's own code is used if this is null
+     * @param pricesEntries the market's fixed (category, species) prices
+     * @return a {@link SimulationScopeFactory} for a {@link BiomassMarket}
+     * @see BiomassMarket
+     */
     public static BiomassMarketFactory biomassMarket(
         final Factory<? super SimulationScope, ? extends Port> port,
         final String marketCode,
@@ -45,6 +53,20 @@ public class Factories {
         return new BiomassMarketFactory(port, marketCode, pricesEntries);
     }
 
+    /**
+     * @param data                  the price table
+     * @param dateColumn            column giving each row's effective date
+     * @param portCodeColumn        column giving each row's port code
+     * @param speciesCodeColumn     column giving each row's species code
+     * @param categoryCodeColumn    column giving each row's catch category code
+     * @param priceColumn           column giving each row's price amount
+     * @param currencyColumn        column giving each row's currency code
+     * @param measurementUnitColumn column giving each row's unit of mass
+     * @param portGrid              locates each row's port
+     * @param species               the species to match row species codes against
+     * @return a {@link SimulationScopeFactory} for a {@link MarketGrid} built from the table
+     * @see BiomassMarketGridFromPriceTableFactory
+     */
     public static BiomassMarketGridFromPriceTableFactory biomassMarketGridFromPriceTable(
         final Factory<? super SimulationScope, ? extends Table> data,
         final String dateColumn,
@@ -64,10 +86,21 @@ public class Factories {
         );
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+     * {@link BiomassSaleAccumulator}
+     * @see BiomassSaleAccumulator
+     */
     public static BiomassSaleAccumulatorFactory biomassSaleAccumulator() {
         return new BiomassSaleAccumulatorFactory();
     }
 
+    /**
+     * @param portGrid locates each market's port
+     * @param markets  the markets to place
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link ImmutableMarketGrid}
+     * @see MarketGridFactory
+     */
     public static <S extends Scope> MarketGridFactory<S> marketGrid(
         final Factory<? super S, ? extends PortGrid> portGrid,
         final Factory<? super S, ? extends List<? extends Market>> markets
@@ -75,6 +108,12 @@ public class Factories {
         return new MarketGridFactory<>(portGrid, markets);
     }
 
+    /**
+     * @param portGrid      the ports to build one market per
+     * @param pricesEntries the shared price list every market uses
+     * @return a {@link SimulationScopeFactory} for a list of {@link BiomassMarket}s, one per port
+     * @see OneBiomassMarketPerPortFactory
+     */
     public static OneBiomassMarketPerPortFactory oneBiomassMarketPerPort(
         final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
         final Factory<? super SimulationScope, ? extends List<PriceEntry>> pricesEntries
@@ -82,6 +121,13 @@ public class Factories {
         return new OneBiomassMarketPerPortFactory(portGrid, pricesEntries);
     }
 
+    /**
+     * @param catchCategory the entry's catch category
+     * @param species       the entry's species
+     * @param price         the entry's price
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link PriceEntry}
+     * @see PriceEntry
+     */
     public static <S extends Scope> PriceEntryFactory<S> priceEntry(
         final Factory<? super S, ? extends CatchCategory> catchCategory,
         final Factory<? super S, ? extends Species> species,
@@ -90,6 +136,13 @@ public class Factories {
         return new PriceEntryFactory<>(catchCategory, species, price);
     }
 
+    /**
+     * @param amount       the amount paid per {@code massUnit}
+     * @param currencyUnit the currency code {@code amount} is in
+     * @param massUnit     the unit of mass {@code amount} is quoted per
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link Price}
+     * @see Price
+     */
     public static PriceFactory price(
         final double amount,
         final String currencyUnit,

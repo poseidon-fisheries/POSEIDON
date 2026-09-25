@@ -25,12 +25,14 @@ package uk.ac.ox.poseidon.agents.market;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
 
+/** An {@link ObjectGrid} of {@link Market}s, keyed by their code. */
 public class MarketGrid extends ObjectGrid<Market> {
 
     MarketGrid(final ModelGrid modelGrid) {
         super(modelGrid);
     }
 
+    /** @return {@code market}'s code */
     @Override
     protected String getObjectId(final Market market) {
         return market.getCode();

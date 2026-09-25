@@ -40,15 +40,23 @@ import java.util.Map;
 
 import static java.math.RoundingMode.HALF_EVEN;
 
+/** The record of one vessel's completed sale: what sold (as line {@link Item}s) and what didn't. */
 @Data
 public class Sale {
+    /** When the sale happened. */
     private final LocalDateTime dateTime;
+    /** This sale's identifying ID. */
     private final String id;
+    /** The market the sale happened at. */
     private final Market market;
+    /** The selling vessel. */
     private final Vessel vessel;
+    /** What sold, one item per (category, species) combination. */
     private final List<Item> items;
+    /** What was offered but didn't sell. */
     private final CategorisedCatch unsold;
 
+    /** @return the total sale value, per currency, summed across {@link #items} */
     public Map<CurrencyUnit, Money> summary() {
         // Aggregate as doubles to avoid per-item Money creation; round once per currency.
         final Map<CurrencyUnit, Double> totals = new HashMap<>();
@@ -65,13 +73,19 @@ public class Sale {
         return result;
     }
 
+    /** One sold line: a (category, species) combination, how much, and at what price. */
     @Value
     public static class Item {
+        /** The item's catch category. */
         CatchCategory category;
+        /** The item's species. */
         Species species;
+        /** How much sold. */
         Content content;
+        /** The price it sold at. */
         Price price;
 
+        /** The total value of this line, computed lazily on first access. */
         @Getter(lazy = true)
         Money saleValue = price.valueFor(content);
     }

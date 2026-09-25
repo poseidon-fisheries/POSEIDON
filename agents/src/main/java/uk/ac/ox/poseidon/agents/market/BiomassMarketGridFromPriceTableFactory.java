@@ -48,6 +48,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import static com.google.common.collect.Streams.stream;
+import static java.lang.System.Logger.Level.WARNING;
 import static java.math.RoundingMode.HALF_EVEN;
 import static java.util.Map.entry;
 import static java.util.function.Function.identity;
@@ -59,6 +60,14 @@ import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+/**
+ * A {@link SimulationScopeFactory} that builds one {@link BiomassMarket} per distinct port code
+ * found in a price table, schedules every row as a future {@link PriceUpdate} on the market it
+ * belongs to (so prices change over time as the table dictates), and returns them as a
+ * {@link MarketGrid}. Species codes not among {@link #species} get a generic, life-stage-less
+ * {@link Species} created on the fly. Built via
+ * {@link Factories#biomassMarketGridFromPriceTable}.
+ */
 public class BiomassMarketGridFromPriceTableFactory
     extends SimulationScopeFactory<MarketGrid> {
 
@@ -78,6 +87,11 @@ public class BiomassMarketGridFromPriceTableFactory
     private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
     private Factory<? super SimulationScope, ? extends Iterable<? extends Species>> species;
 
+    /**
+     * @return a market grid with one market per distinct port code in {@link #data}, each
+     * scheduled to receive its price updates over the simulation's timeline
+     * @throws RuntimeException if a row references a port or species code that can't be resolved
+     */
     @Override
     protected MarketGrid newInstance(final SimulationScope scope) {
 
@@ -132,7 +146,16 @@ public class BiomassMarketGridFromPriceTableFactory
                             // simulation but the market only deals with generic species.
                             speciesByKey.computeIfAbsent(
                                 multiStringKey(speciesCode, null),
-                                _ -> new Species(speciesCode, null, null)
+                                _ -> {
+                                    logger.log(
+                                        WARNING,
+                                        "No configured species matches price table species " +
+                                            "code {0}; creating a generic (no life stage) " +
+                                            "species for it.",
+                                        speciesCode
+                                    );
+                                    return new Species(speciesCode, null, null);
+                                }
                             );
 
                         final CatchCategory catchCategory =

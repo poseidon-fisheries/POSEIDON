@@ -35,6 +35,9 @@ import uk.ac.ox.poseidon.core.utils.Measurements;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.math.RoundingMode.HALF_EVEN;
 
+/**
+ * A {@link GlobalScopeFactory} counterpart of {@link Price}, built via {@link Factories#price}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

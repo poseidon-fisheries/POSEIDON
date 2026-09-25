@@ -36,6 +36,10 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.poseidon.agents.market.PriceEntry.groupByCategoryAndSpecies;
 
+/**
+ * A {@link SimulationScopeFactory} counterpart of {@link BiomassMarket}, built via
+ * {@link Factories#biomassMarket}. If {@link #marketCode} isn't set, the port's own code is used.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

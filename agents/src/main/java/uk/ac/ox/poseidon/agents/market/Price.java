@@ -37,15 +37,22 @@ import static java.math.RoundingMode.HALF_EVEN;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
+/** A price per unit of biomass, e.g. "40000 IDR / kg". */
 @Value
 public class Price {
-    
+
+    /** The amount paid per {@link #biomassUnit}. */
     @NonNull Money amount;
+    /** The unit of mass {@link #amount} is quoted per. */
     @NonNull Unit<Mass> biomassUnit;
 
     @Getter(AccessLevel.NONE)
     double amountPerKg;
 
+    /**
+     * @param amount      the amount paid per {@code biomassUnit}
+     * @param biomassUnit the unit of mass {@code amount} is quoted per
+     */
     @SuppressFBWarnings(
         value = "EI2",
         justification = "Price stores Money/Unit references by design; they are treated as value objects."
@@ -61,11 +68,13 @@ public class Price {
         this.amountPerKg = amount.getAmount().doubleValue() / kgPerUnit;
     }
 
+    /** @return this price's value for {@code content}'s biomass */
     public Money valueFor(final Content content) {
         final double value = amountPerKg * content.asKg();
         return Money.of(amount.getCurrencyUnit(), value, HALF_EVEN);
     }
 
+    /** @return this price's value for {@code kg} kilograms, as a raw double (no rounding) */
     public double valueForKgDouble(final double kg) {
         return amountPerKg * kg;
     }

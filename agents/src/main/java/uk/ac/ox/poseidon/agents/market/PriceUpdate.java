@@ -28,14 +28,18 @@ import sim.engine.Steppable;
 
 import java.io.Serial;
 
+/** A scheduled {@link Steppable} that, when run, updates one price entry on a {@link BiomassMarket}. */
 @Value
 public class PriceUpdate implements Steppable {
 
     @Serial private static final long serialVersionUID = 135321789743469343L;
 
+    /** The market to update. */
     BiomassMarket market;
+    /** The (category, species, price) entry to apply. */
     PriceEntry priceEntry;
 
+    /** Sets {@link #market}'s price for {@link #priceEntry}'s category and species. */
     @Override
     public void step(final SimState simState) {
         market.setPrice(

@@ -32,13 +32,18 @@ import java.util.Map;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 
+/** A single (catch category, species) price. */
 @Value
 public class PriceEntry {
 
+    /** The entry's catch category. */
     CatchCategory catchCategory;
+    /** The entry's species. */
     Species species;
+    /** The price for this category/species combination. */
     Price price;
 
+    /** @return {@code priceEntries} regrouped as a nested map, keyed by category then species */
     static Map<CatchCategory, Map<Species, Price>> groupByCategoryAndSpecies(
         final Collection<PriceEntry> pricesEntries
     ) {

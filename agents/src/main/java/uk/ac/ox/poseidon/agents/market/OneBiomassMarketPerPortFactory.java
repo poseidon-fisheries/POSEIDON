@@ -39,6 +39,11 @@ import java.util.Map;
 
 import static uk.ac.ox.poseidon.agents.market.PriceEntry.groupByCategoryAndSpecies;
 
+/**
+ * A {@link SimulationScopeFactory} that builds one {@link BiomassMarket} per port in
+ * {@link #portGrid}, all sharing the same price list, built via
+ * {@link Factories#oneBiomassMarketPerPort}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

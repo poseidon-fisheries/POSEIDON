@@ -27,6 +27,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.Map;
 
+/** A {@link MarketGrid} placed once, at construction, from a fixed set of market locations. */
 public class ImmutableMarketGrid extends MarketGrid {
     ImmutableMarketGrid(
         final ModelGrid modelGrid,
