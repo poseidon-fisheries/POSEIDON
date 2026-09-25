@@ -46,6 +46,11 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * A scheduled {@link Steppable} that, when run, creates {@link #numberOfVesselsToCreate}
+ * vessels, resolving each one's name/account/home port/hold/gear/engine/behaviour against a
+ * fresh {@link VesselScope}, and marks them registered-active.
+ */
 @RequiredArgsConstructor
 public class VesselCreator implements Steppable {
 
@@ -66,6 +71,7 @@ public class VesselCreator implements Steppable {
 
     private final int numberOfVesselsToCreate;
 
+    /** Creates {@link #numberOfVesselsToCreate} vessels and registers them as active. */
     @Override
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public void step(final SimState simState) {

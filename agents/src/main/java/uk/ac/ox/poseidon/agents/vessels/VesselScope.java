@@ -27,14 +27,20 @@ import lombok.EqualsAndHashCode;
 import uk.ac.ox.poseidon.agents.AgentScope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+/** An {@link AgentScope} narrowed to a {@link Vessel}, for factories building vessel-owned components. */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class VesselScope extends AgentScope<Vessel> {
 
+    /** @param vesselScope the scope to copy */
     public VesselScope(final VesselScope vesselScope) {
         super(vesselScope);
     }
 
+    /**
+     * @param simulationScope the simulation scope to narrow
+     * @param vessel          the vessel to scope to
+     */
     public VesselScope(
         final SimulationScope simulationScope,
         final Vessel vessel
@@ -42,6 +48,7 @@ public class VesselScope extends AgentScope<Vessel> {
         super(new AgentScope<>(simulationScope, vessel));
     }
 
+    /** @return the scoped vessel, or {@code null} if it has since been garbage-collected */
     public Vessel getVessel() {
         return getAgent();
     }

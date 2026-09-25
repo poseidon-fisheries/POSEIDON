@@ -50,6 +50,12 @@ import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.*;
 import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.*;
 
+/**
+ * A {@link SimulationScopeFactory} that turns a vessel register table (one row per vessel
+ * activation/deactivation/modification event) into a {@link Fleet}, scheduling every row as a
+ * {@link FleetEvent} at its own event date. Built directly via its {@code @SuperBuilder}, not
+ * from {@code Factories}, given how many optional columns/mappings it takes.
+ */
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -57,31 +63,52 @@ import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.*;
 @EqualsAndHashCode(callSuper = true)
 public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet> {
 
+    /** The vessel register table. */
     private Factory<? super SimulationScope, ? extends Table> data;
+    /** The fleet every row's event is applied to. */
     private Factory<? super SimulationScope, ? extends Fleet> fleet;
 
+    /** Column giving each row's vessel id. */
     @Builder.Default private String vesselIdColumn = "cfr";
+    /** Column giving each row's vessel name. */
     @Builder.Default private String vesselNameColumn = "name_of_vessel";
+    /** Column giving each row's home port code. */
     @Builder.Default private String portCodeColumn = "place_of_registration";
+    /** Column giving each row's event code. */
     @Builder.Default private String eventCodeColumn = "event";
+    /** Column giving each row's event date. */
     @Builder.Default private String eventDateColumn = "event_start_date";
+    /** Columns to exclude from a row's tags, on top of the other named columns. */
     @Builder.Default private List<String> ignoredColumns =
         List.of("event_end_date");
+    /** Event codes that map to {@link FleetEvent.Type#ACTIVATION}. */
     @Builder.Default private List<String> activationEventCodes =
         List.of("CEN", "CST", "IMP", "CHA");
+    /** Event codes that map to {@link FleetEvent.Type#DEACTIVATION}. */
     @Builder.Default private List<String> deactivationEventCodes =
         List.of("DES", "EXP", "RET");
+    /** Event codes that map to {@link FleetEvent.Type#MODIFICATION}. */
     @Builder.Default private List<String> modificationEventCodes =
         List.of("MOD");
 
+    /** Builds each affected vessel's behaviour. */
     private Factory<? super VesselScope, ? extends Behaviour> behaviour;
+    /** Builds each affected vessel's hold. */
     private Factory<? super VesselScope, ? extends Hold> hold;
+    /** Builds each affected vessel's gear. */
     private Factory<? super VesselScope, ? extends Gear> gear;
+    /** Builds each affected vessel's engine. */
     private Factory<? super VesselScope, ? extends Engine> engine;
 
+    /** Extra per-vessel components to build for each affected vessel. */
     @Singular
     private List<Factory<? super VesselScope, ?>> extraFactories;
 
+    /**
+     * Maps a bean property path on this factory to a table column: before resolving
+     * {@link #behaviour}/{@link #hold}/{@link #gear}/{@link #engine}/{@link #extraFactories} for
+     * a row, each mapped property is set to that row's value in the named column.
+     */
     @Singular
     private Map<String, String> dataMappings;
 
@@ -98,6 +125,10 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
         }
     }
 
+    /**
+     * @return {@link #fleet}, with one {@link FleetEvent} per row of {@link #data} scheduled at
+     * that row's event date
+     */
     @Override
     protected Fleet newInstance(final SimulationScope scope) {
         final Fleet fleet = this.fleet.get(scope);

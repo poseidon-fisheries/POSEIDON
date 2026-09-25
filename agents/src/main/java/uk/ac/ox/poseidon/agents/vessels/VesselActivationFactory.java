@@ -41,6 +41,11 @@ import java.util.Map.Entry;
 
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * A {@link SimulationScopeFactory} for a {@link FleetEvent} of type
+ * {@link FleetEvent.Type#ACTIVATION}, scheduled to run once, immediately, at the simulation's
+ * starting date-time. Built via {@link Factories#vesselActivation}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -58,6 +63,7 @@ public class VesselActivationFactory extends SimulationScopeFactory<FleetEvent> 
     private Factory<? super VesselScope, ? extends Gear> gear;
     private Factory<? super VesselScope, ? extends Engine> engine;
 
+    /** @return a {@link FleetEvent.Type#ACTIVATION} event, already scheduled to run once */
     @Override
     protected FleetEvent newInstance(final SimulationScope scope) {
         final Map<String, Object> tags = this.tags

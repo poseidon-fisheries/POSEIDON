@@ -41,6 +41,7 @@ import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkState;
 
+/** The set of vessels operating out of a set of ports, indexed by id, and the markets they sell into. */
 @AllArgsConstructor
 public class Fleet implements VesselsGetter {
 
@@ -55,15 +56,22 @@ public class Fleet implements VesselsGetter {
     @Getter
     private final MarketGrid marketGrid;
 
+    /** @return the vessel registered under {@code vesselId}, if any */
     public Optional<Vessel> getVessel(final String vesselId) {
         return Optional.ofNullable(vesselsById.get(vesselId));
     }
 
+    /** @return every vessel in this fleet, unmodifiable */
     @Override
     public Set<Vessel> getVessels() {
         return Collections.unmodifiableSet(vesselsById.values());
     }
 
+    /**
+     * @param vesselId the new vessel's id
+     * @return a freshly created, inactive vessel with no home port, gear, hold or engine yet set
+     * @throws IllegalStateException if {@code vesselId} is already in use
+     */
     public Vessel createVessel(
         final String vesselId
     ) {

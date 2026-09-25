@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+/**
+ * A {@link SimulationScopeFactory} counterpart of {@link Fleet}, built via
+ * {@link Factories#fleet}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

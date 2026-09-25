@@ -31,6 +31,12 @@ import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A {@link VesselScopeFactory} that picks which of several factories to resolve based on
+ * {@link #code} (e.g. a gear type or fleet segment code), falling back to
+ * {@link #defaultFactory} if {@link #code} has no entry in {@link #factories}. Built directly via
+ * its {@code @SuperBuilder}, not from {@code Factories}.
+ */
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -50,6 +56,13 @@ public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
     private Factory<? super VesselScope, ? extends C> defaultFactory;
     private String code;
 
+    /**
+     * @return the resolved value from {@link #factories}' entry for {@link #code}, or
+     * {@link #defaultFactory}'s if there's no entry for {@link #code}
+     * @throws NullPointerException     if {@link #code} isn't set
+     * @throws IllegalArgumentException if neither {@link #factories} nor
+     *                                   {@link #defaultFactory} has an answer for {@link #code}
+     */
     @Override
     protected C newInstance(final VesselScope scope) {
         checkNotNull(

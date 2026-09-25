@@ -24,6 +24,8 @@ package uk.ac.ox.poseidon.agents.vessels;
 
 import java.util.Collection;
 
+/** Something that owns a collection of {@link Vessel}s. */
 public interface VesselsGetter {
+    /** @return the owned vessels */
     Collection<Vessel> getVessels();
 }

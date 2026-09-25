@@ -28,7 +28,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * Used to generate simple vessel names by prepending a prefix to the vessel id.
+ * A {@link VesselScopeFactory} for a simple vessel name: {@link #prefix} prepended to the
+ * vessel's own id. Built via {@link Factories#prefixedId}.
  */
 @Data
 @NoArgsConstructor
@@ -38,6 +39,7 @@ public class PrefixedIdFactory extends VesselScopeFactory<String> {
 
     private String prefix;
 
+    /** @return {@link #prefix} followed by the scoped vessel's id */
     @Override
     protected String newInstance(final VesselScope scope) {
         return prefix + scope.getVessel().getId();

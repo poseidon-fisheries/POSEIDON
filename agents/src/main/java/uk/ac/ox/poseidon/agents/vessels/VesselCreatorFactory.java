@@ -44,6 +44,10 @@ import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A {@link SimulationScopeFactory} counterpart of {@link VesselCreator}, built via
+ * {@link Factories#vesselCreator}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -66,6 +70,7 @@ public class VesselCreatorFactory extends SimulationScopeFactory<VesselCreator> 
 
     private int numberOfVesselsToCreate;
 
+    /** Shorthand for the full constructor with no extra per-vessel factories. */
     public VesselCreatorFactory(
         final Factory<? super SimulationScope, ? extends VesselField> vesselField,
         final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
@@ -97,6 +102,7 @@ public class VesselCreatorFactory extends SimulationScopeFactory<VesselCreator> 
         );
     }
 
+    /** @return a {@link VesselCreator} ready to create {@link #numberOfVesselsToCreate} vessels */
     @Override
     protected VesselCreator newInstance(final SimulationScope scope) {
         return new VesselCreator(

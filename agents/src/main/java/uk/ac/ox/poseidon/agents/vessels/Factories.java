@@ -38,16 +38,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/** Factories for a vessel's scope, its fleet, and the events that create/update vessels. */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @param delegate the factory to resolve once per vessel
+     * @return a {@link VesselScopeFactory} for {@code T}
+     * @see PerVesselFactory
+     */
     public static <T> PerVesselFactory<T> perVessel(
         final Factory<? super VesselScope, ? extends T> delegate
     ) {
         return new PerVesselFactory<>(delegate);
     }
 
+    /**
+     * @param vesselField the field vessels move within
+     * @param portGrid    the fleet's ports
+     * @param marketGrid  the fleet's markets
+     * @return a {@link SimulationScopeFactory} for a {@link Fleet}
+     * @see Fleet
+     */
     public static FleetFactory fleet(
         final Factory<? super SimulationScope, ? extends VesselField> vesselField,
         final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
@@ -56,10 +69,28 @@ public class Factories {
         return new FleetFactory(vesselField, portGrid, marketGrid);
     }
 
+    /**
+     * @param prefix the prefix to prepend to the vessel's own id
+     * @return a {@link VesselScopeFactory} for a simple vessel name
+     * @see PrefixedIdFactory
+     */
     public static PrefixedIdFactory prefixedId(final String prefix) {
         return new PrefixedIdFactory(prefix);
     }
 
+    /**
+     * @param fleet     the fleet the vessel belongs (or will belong) to
+     * @param id        the vessel's id
+     * @param name      the vessel's name
+     * @param portCode  the vessel's home port code
+     * @param tags      tags to set on the vessel
+     * @param behaviour builds the vessel's behaviour
+     * @param hold      builds the vessel's hold
+     * @param gear      builds the vessel's gear
+     * @param engine    builds the vessel's engine
+     * @return a {@link SimulationScopeFactory} for a {@link FleetEvent.Type#ACTIVATION} event
+     * @see VesselActivationFactory
+     */
     public static VesselActivationFactory vesselActivation(
         final Factory<? super SimulationScope, ? extends Fleet> fleet,
         final String id,
@@ -76,6 +107,23 @@ public class Factories {
         );
     }
 
+    /**
+     * @param vesselField             the field vessels move within
+     * @param portGrid                the vessels' ports
+     * @param marketGrid              the vessels' markets
+     * @param vesselIdSupplier        supplies each new vessel's id
+     * @param name                    builds each vessel's name
+     * @param account                 builds each vessel's account
+     * @param homePort                builds each vessel's home port
+     * @param hold                    builds each vessel's hold
+     * @param gear                    builds each vessel's gear
+     * @param engine                  builds each vessel's engine
+     * @param behaviour               builds each vessel's behaviour
+     * @param extraFactories          extra per-vessel components to build
+     * @param numberOfVesselsToCreate how many vessels to create
+     * @return a {@link SimulationScopeFactory} for a {@link VesselCreator}
+     * @see VesselCreator
+     */
     public static VesselCreatorFactory vesselCreator(
         final Factory<? super SimulationScope, ? extends VesselField> vesselField,
         final Factory<? super SimulationScope, ? extends PortGrid> portGrid,

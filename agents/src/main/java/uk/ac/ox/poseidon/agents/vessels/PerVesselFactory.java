@@ -28,6 +28,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 
+/**
+ * A {@link VesselScopeFactory} that resolves a delegate factory once per vessel and caches that
+ * result — regardless of what scope the delegate itself would otherwise resolve at. Use to force
+ * a component that's normally shared globally to instead get a fresh instance per vessel. No
+ * separate plain component class here: the produced value is whatever the delegate produces,
+ * passed through unchanged. Built via {@link Factories#perVessel}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,6 +43,7 @@ public class PerVesselFactory<T> extends VesselScopeFactory<T> {
 
     private Factory<? super VesselScope, ? extends T> delegate;
 
+    /** @return {@link #delegate}'s resolved value */
     @Override
     protected T newInstance(final VesselScope scope) {
         return delegate.get(scope);
