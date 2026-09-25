@@ -54,8 +54,10 @@ import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 @AllArgsConstructor
 public final class Scenario {
 
+    /** The simulation's starting date-time. */
     private Factory<Scope, LocalDateTime> startingDateTime;
 
+    /** The named component factories making up the scenario. */
     @Singular private Map<String, ? extends Factory<? super SimulationScope, ?>> components;
 
     /**
