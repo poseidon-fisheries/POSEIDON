@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.Collection;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link SelectedSpeciesRetention}, built via
+ * {@link Factories#selectedSpeciesRetention}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -31,11 +31,19 @@ import java.util.function.Function;
 import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
+/**
+ * A {@link DispositionProcess} that moves a per-species proportion of the currently
+ * discarded-alive catch into discarded-dead.
+ */
 @RequiredArgsConstructor(access = PACKAGE)
 public class DiscardMortality implements DispositionProcess {
 
     private final Function<? super Species, Double> mortalityRate;
 
+    /**
+     * @return {@code currentDisposition} with {@link #mortalityRate}'s per-species fraction of
+     * its discarded-alive catch moved into discarded-dead
+     */
     @Override
     public Disposition partition(
         final Disposition currentDisposition,

@@ -36,6 +36,10 @@ import java.util.Collection;
 import java.util.function.Function;
 
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link IndexedDiscardMortality}, built via
+ * {@link Factories#indexedDiscardMortality}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

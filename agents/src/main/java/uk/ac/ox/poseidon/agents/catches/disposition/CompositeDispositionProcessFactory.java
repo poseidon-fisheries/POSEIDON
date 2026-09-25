@@ -34,6 +34,10 @@ import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link CompositeDispositionProcess}, built via
+ * {@link Factories#compositeDispositionProcess}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,6 +47,7 @@ public class CompositeDispositionProcessFactory<S extends Scope>
 
     private List<Factory<? super S, ? extends DispositionProcess>> dispositionStrategies;
 
+    /** @param dispositionStrategies the steps to chain, in order */
     @SafeVarargs
     @SuppressWarnings("varargs")
     public CompositeDispositionProcessFactory(
@@ -51,6 +56,7 @@ public class CompositeDispositionProcessFactory<S extends Scope>
         this(List.of(dispositionStrategies));
     }
 
+    /** @return a {@link CompositeDispositionProcess} chaining every resolved step, in order */
     @Override
     protected CompositeDispositionProcess newInstance(final S scope) {
         return new CompositeDispositionProcess(

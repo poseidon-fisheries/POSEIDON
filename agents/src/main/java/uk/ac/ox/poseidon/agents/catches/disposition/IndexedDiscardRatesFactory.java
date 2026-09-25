@@ -36,6 +36,10 @@ import java.util.Collection;
 import java.util.function.Function;
 
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link IndexedDiscardRates}, built via
+ * {@link Factories#discardRates}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

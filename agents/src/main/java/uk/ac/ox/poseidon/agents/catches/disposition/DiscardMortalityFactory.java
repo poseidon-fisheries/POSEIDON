@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Function;
 
+/**
+ * A {@link RelativeScopeFactory} counterpart of {@link DiscardMortality}, built via
+ * {@link Factories#discardMortality}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

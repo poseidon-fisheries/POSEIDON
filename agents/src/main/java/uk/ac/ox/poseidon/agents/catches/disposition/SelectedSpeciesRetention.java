@@ -31,6 +31,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A {@link DispositionProcess} that discards (alive) any retained catch whose species isn't in
+ * {@link #selectedSpecies}, leaving the rest retained.
+ */
 @Getter
 public class SelectedSpeciesRetention implements DispositionProcess {
 
@@ -40,6 +44,10 @@ public class SelectedSpeciesRetention implements DispositionProcess {
         this.selectedSpecies = ImmutableSet.copyOf(selectedSpecies);
     }
 
+    /**
+     * @return {@code currentDisposition} with its retained catch split by species membership in
+     * {@link #selectedSpecies}: selected species stay retained, the rest move to discarded-alive
+     */
     @Override
     public Disposition partition(
         final Disposition currentDisposition,

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,25 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.catches.disposition;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link FullDiscardMortality}, built via
- * {@link Factories#fullDiscardMortality()}.
+ * What happens to a {@link uk.ac.ox.poseidon.agents.catches.CategorisedCatch} once it's caught:
+ * one or more {@link uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess} steps sort
+ * it into retained/discarded-alive/discarded-dead
+ * ({@link uk.ac.ox.poseidon.agents.catches.disposition.Disposition}), chained via
+ * {@link uk.ac.ox.poseidon.agents.catches.disposition.CompositeDispositionProcess}. See
+ * {@link uk.ac.ox.poseidon.agents.catches.disposition.Factories} for the entry points.
  */
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class FullDiscardMortalityFactory
-    extends GlobalScopeFactory<FullDiscardMortality> {
-    @Override
-    protected FullDiscardMortality newInstance(final Scope scope) {
-        return new FullDiscardMortality();
-    }
-}
+package uk.ac.ox.poseidon.agents.catches.disposition;

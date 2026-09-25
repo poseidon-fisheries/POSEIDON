@@ -36,6 +36,7 @@ public class IndexedDiscardMortality implements DispositionProcess {
 
     private final @NonNull SpeciesIndexedDoubleArray mortalityRates;
 
+    /** @param mortalityRates per-species discard mortality rate, each in {@code [0, 1]} */
     public IndexedDiscardMortality(
         @NonNull final SpeciesIndexedDoubleArray mortalityRates
     ) {
@@ -43,6 +44,10 @@ public class IndexedDiscardMortality implements DispositionProcess {
         this.mortalityRates = mortalityRates;
     }
 
+    /**
+     * @return {@code currentDisposition} with {@link #mortalityRates}' per-species fraction of
+     * its discarded-alive catch moved into discarded-dead
+     */
     @Override
     public Disposition partition(
         final Disposition currentDisposition,

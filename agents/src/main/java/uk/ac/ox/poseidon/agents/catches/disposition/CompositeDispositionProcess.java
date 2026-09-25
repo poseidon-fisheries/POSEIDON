@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import java.util.Collection;
 
+/** A {@link DispositionProcess} that chains several steps, each refining the previous one's result. */
 public class CompositeDispositionProcess implements DispositionProcess {
 
     private final DispositionProcess[] dispositionStrategies;
@@ -32,6 +33,7 @@ public class CompositeDispositionProcess implements DispositionProcess {
         this.dispositionStrategies = dispositionStrategies.toArray(DispositionProcess[]::new);
     }
 
+    /** @return the disposition after running every step in {@link #dispositionStrategies}, in order */
     @Override
     public Disposition partition(
         final Disposition currentDisposition,
