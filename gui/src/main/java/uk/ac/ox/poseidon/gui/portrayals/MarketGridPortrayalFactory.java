@@ -37,10 +37,12 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+/** A {@link SimulationScopeFactory} that portrays a {@link MarketGrid} as ovals, one per market cell. */
 public final class MarketGridPortrayalFactory extends SimulationScopeFactory<SparseGridPortrayal2D> {
 
     private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;
 
+    /** @return a sparse grid portrayal showing {@link #marketGrid}'s cells as ovals */
     @Override
     protected SparseGridPortrayal2D newInstance(final SimulationScope scope) {
         final SparseGridPortrayal2D sparseGridPortrayal2D = new SparseGridPortrayal2D();

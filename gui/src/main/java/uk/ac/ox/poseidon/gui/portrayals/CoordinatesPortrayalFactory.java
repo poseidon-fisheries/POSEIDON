@@ -42,11 +42,19 @@ import java.text.DecimalFormat;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+/**
+ * A {@link SimulationScopeFactory} that shows each cell's lon/lat coordinate as a tooltip,
+ * formatted to a fixed number of decimal places, with no visible mark of its own.
+ */
 public class CoordinatesPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
     private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
     private DecimalFormat decimalFormat;
 
+    /**
+     * @param modelGrid     the grid whose cells' coordinates are shown
+     * @param decimalPlaces how many decimal places to format each coordinate to
+     */
     public CoordinatesPortrayalFactory(
         final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid,
         final int decimalPlaces
@@ -57,6 +65,7 @@ public class CoordinatesPortrayalFactory extends SimulationScopeFactory<ObjectGr
         decimalFormat.setMinimumFractionDigits(decimalPlaces);
     }
 
+    /** @return an invisible object-grid portrayal whose tooltip reports each cell's coordinate */
     @Override
     protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
         final ObjectGridPortrayal2D objectGridPortrayal2D = new ObjectGridPortrayal2D();
@@ -74,7 +83,10 @@ public class CoordinatesPortrayalFactory extends SimulationScopeFactory<ObjectGr
                 @Override
                 public String getName(final LocationWrapper wrapper) {
                     final Coordinate coordinate = (Coordinate) wrapper.getObject();
-                    return "Coordinates: %.3f, %.3f".formatted(coordinate.lon, coordinate.lat);
+                    return "Coordinates: %s, %s".formatted(
+                        decimalFormat.format(coordinate.lon),
+                        decimalFormat.format(coordinate.lat)
+                    );
                 }
             }
         );

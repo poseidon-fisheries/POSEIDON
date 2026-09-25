@@ -34,14 +34,23 @@ import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+/**
+ * A {@link SimpleFieldPortrayalFactory} preset for a {@link BathymetricGrid}: labelled
+ * "Bathymetry", diverging colour range around zero elevation.
+ */
 public class BathymetryFieldPortrayalFactory extends SimpleFieldPortrayalFactory {
 
+    /** @param bathymetricGrid the grid to portray; starts visible */
     public BathymetryFieldPortrayalFactory(
         final Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid
     ) {
         this(bathymetricGrid, true);
     }
 
+    /**
+     * @param bathymetricGrid the grid to portray
+     * @param visible         whether this layer starts visible
+     */
     public BathymetryFieldPortrayalFactory(
         final Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid,
         final boolean visible

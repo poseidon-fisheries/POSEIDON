@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,18 +20,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Factories that build MASON field portrayals (bathymetry, biomass, markets, ports, vessels,
+ * coordinates, regulation status) for a {@link uk.ac.ox.poseidon.gui.DisplayWrapper2D} to attach,
+ * plus {@link uk.ac.ox.poseidon.gui.portrayals.SvgPortrayal}/
+ * {@link uk.ac.ox.poseidon.gui.portrayals.SvgRenderer} for drawing SVG icons. Unlike most POSEIDON
+ * packages, these factories are wired up directly in Java (see
+ * {@code PeterSnapperScenarioWithUI}) rather than from YAML, so there is no {@code Factories}
+ * entry-point class here.
+ */
 package uk.ac.ox.poseidon.gui.portrayals;
-
-import lombok.Data;
-import sim.portrayal.FieldPortrayal2D;
-
-/** A MASON {@link FieldPortrayal2D}, labelled and with an initial visibility, for a display. */
-@Data
-public class NamedPortrayal {
-    /** The label shown for this portrayal in the display's layer list. */
-    private final String name;
-    /** The portrayal itself. */
-    private final FieldPortrayal2D portrayal;
-    /** Whether this layer starts visible. */
-    private final boolean visible;
-}

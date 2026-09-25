@@ -53,6 +53,11 @@ import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.Up
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+/**
+ * A {@link SimulationScopeFactory} that overlays a checkered texture on cells where fishing is
+ * currently forbidden for every active vessel's gear, recomputed once per
+ * {@link UpdateFrequency#EVERY_MONTH month} rather than on every draw.
+ */
 public class RegulationGridPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
     private Factory<? super SimulationScope, ? extends Regulations<? super ExtendedFishingAction>>
@@ -62,6 +67,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
     private int displayWidth;
     private int displayHeight;
 
+    /** @return a portrayal overlaying a checkered texture on cells currently forbidden to fish */
     @Override
     protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
         return new Portrayal(

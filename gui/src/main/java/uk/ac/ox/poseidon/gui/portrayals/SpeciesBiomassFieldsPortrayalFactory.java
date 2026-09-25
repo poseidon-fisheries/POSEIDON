@@ -45,6 +45,12 @@ import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+/**
+ * A {@link SimulationScopeFactory} that portrays several species' {@link BiomassGrid}s at once,
+ * one {@link NamedPortrayal} per species. {@link #biomassGrids} and
+ * {@link #carryingCapacityGrids} must each resolve to either exactly one grid (broadcast to every
+ * species) or as many grids as there are species.
+ */
 public class SpeciesBiomassFieldsPortrayalFactory
     extends SimulationScopeFactory<List<NamedPortrayal>> {
 
@@ -53,6 +59,11 @@ public class SpeciesBiomassFieldsPortrayalFactory
         carryingCapacityGrids;
     private boolean visible;
 
+    /**
+     * @return one named portrayal per species, pairing each biomass grid with its (possibly
+     * broadcast) carrying capacity grid
+     * @throws IllegalStateException if the two lists' sizes are incompatible
+     */
     @Override
     protected List<NamedPortrayal> newInstance(final SimulationScope scope) {
 

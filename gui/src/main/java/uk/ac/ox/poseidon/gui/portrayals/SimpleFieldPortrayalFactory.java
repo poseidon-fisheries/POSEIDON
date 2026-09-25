@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+/** A {@link SimulationScopeFactory} that wraps a resolved {@link FieldPortrayal2D} as a {@link NamedPortrayal}. */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,6 +42,7 @@ public class SimpleFieldPortrayalFactory extends SimulationScopeFactory<NamedPor
     private Factory<? super SimulationScope, ? extends FieldPortrayal2D> portrayal;
     private boolean visible;
 
+    /** @return {@link #name}, the resolved {@link #portrayal}, and {@link #visible}, wrapped as a {@link NamedPortrayal} */
     @Override
     protected NamedPortrayal newInstance(final SimulationScope scope) {
         return new NamedPortrayal(name, portrayal.get(scope), visible);

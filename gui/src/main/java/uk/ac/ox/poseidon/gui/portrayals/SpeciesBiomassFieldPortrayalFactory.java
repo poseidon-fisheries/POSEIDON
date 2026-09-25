@@ -39,12 +39,18 @@ import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+/**
+ * A {@link SimulationScopeFactory} that portrays a single species' {@link BiomassGrid} as a
+ * {@link NamedPortrayal}, named after the species and coloured relative to
+ * {@link #carryingCapacityGrid}'s maximum.
+ */
 public class SpeciesBiomassFieldPortrayalFactory extends SimulationScopeFactory<NamedPortrayal> {
 
     private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;
     private Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid;
     private boolean visible;
 
+    /** @return a named portrayal of {@link #biomassGrid}, labelled with the species' name and life stage */
     @Override
     protected NamedPortrayal newInstance(final SimulationScope scope) {
         final Species species = biomassGrid.get(scope).getSpecies();

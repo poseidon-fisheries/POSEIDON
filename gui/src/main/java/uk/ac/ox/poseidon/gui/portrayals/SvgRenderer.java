@@ -36,11 +36,16 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
+/** Rasterises a parsed SVG document, via Apache Batik, to a given pixel size on demand. */
 @RequiredArgsConstructor
 public class SvgRenderer {
 
     private final SVGDocument svgDocument;
 
+    /**
+     * @param svgInputStream the SVG document to parse
+     * @throws RuntimeException if the document can't be parsed
+     */
     public static SvgRenderer from(final InputStream svgInputStream) {
         final String parser = XMLResourceDescriptor.getXMLParserClassName();
         final SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
@@ -51,6 +56,11 @@ public class SvgRenderer {
         }
     }
 
+    /**
+     * @param width  the rasterised image's width, in pixels
+     * @param height the rasterised image's height, in pixels
+     * @return a freshly rasterised image, at {@code width x height}
+     */
     public BufferedImage render(
         final int width,
         final int height
@@ -61,6 +71,11 @@ public class SvgRenderer {
         return transcoder.getBufferedImage();
     }
 
+    /**
+     * Rasterises the SVG at {@code width x height} and draws it at {@code (x, y)}.
+     *
+     * @throws RuntimeException if rasterising fails
+     */
     public void draw(
         final Graphics2D g,
         final int x,

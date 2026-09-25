@@ -37,10 +37,12 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+/** A {@link SimulationScopeFactory} that portrays a {@link PortGrid} with a port icon per cell. */
 public final class PortGridPortrayalFactory extends SimulationScopeFactory<SparseGridPortrayal2D> {
 
     private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
 
+    /** @return a sparse grid portrayal showing {@link #portGrid}'s cells with a port icon */
     @Override
     protected SparseGridPortrayal2D newInstance(final SimulationScope scope) {
         final SparseGridPortrayal2D sparseGridPortrayal2D = new SparseGridPortrayal2D();
