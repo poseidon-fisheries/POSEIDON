@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
@@ -42,20 +43,34 @@ class ReusableOptionValues<O> extends MapBasedOptionValues<O> {
 
     private final Object2DoubleOpenHashMap<O> values = new Object2DoubleOpenHashMap<>();
 
+    // A field rather than a local so its backing array survives across forEachBestEntry() calls
+    // (clear() resets size to 0 but keeps the array) instead of being reallocated every call.
+    // Holds only the keys currently tied for the best value, not the whole map.
+    private final ObjectArrayList<O> bestKeysBuffer = new ObjectArrayList<>();
+
+    /** Empties this instance so it can be reused for a fresh round of {@link #putIfGreater} calls. */
     void clear() {
         values.clear();
         cachedBest = null;
     }
 
+    /** Sets {@code key}'s value to {@code value} only if it's greater than what's currently stored. */
     void putIfGreater(final O key, final double value) {
         if (value > values.getOrDefault(key, Double.NEGATIVE_INFINITY)) {
             values.put(key, value);
         }
     }
 
+    /**
+     * Calls {@code consumer} once per entry tied for the highest value, in a single pass:
+     * {@link #bestKeysBuffer} collects the keys tied for the best value seen so far, is cleared
+     * whenever a strictly higher value is found, and is only iterated (not the whole map) once
+     * the best value is settled.
+     */
     @Override
     public void forEachBestEntry(final ObjectDoubleBiConsumer<? super O> consumer) {
         double bestValue = Double.NEGATIVE_INFINITY;
+        bestKeysBuffer.clear();
         final ObjectIterator<Object2DoubleMap.Entry<O>> iterator =
             values.object2DoubleEntrySet().fastIterator();
         while (iterator.hasNext()) {
@@ -63,10 +78,14 @@ class ReusableOptionValues<O> extends MapBasedOptionValues<O> {
             final double v = entry.getDoubleValue();
             if (v > bestValue) {
                 bestValue = v;
-                consumer.accept(entry.getKey(), v);
+                bestKeysBuffer.clear();
+                bestKeysBuffer.add(entry.getKey());
             } else if (v == bestValue) {
-                consumer.accept(entry.getKey(), v);
+                bestKeysBuffer.add(entry.getKey());
             }
+        }
+        for (final O key : bestKeysBuffer) {
+            consumer.accept(key, bestValue);
         }
     }
 
