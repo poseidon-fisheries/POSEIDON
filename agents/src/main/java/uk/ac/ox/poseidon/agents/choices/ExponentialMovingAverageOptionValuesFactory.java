@@ -29,6 +29,10 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link ExponentialMovingAverageOptionValues}, built
+ * via {@link Factories#exponentialMovingAverageOptionValues}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -31,6 +31,7 @@ import java.util.Optional;
 
 import static lombok.AccessLevel.PACKAGE;
 
+/** A {@link DestinationSupplier} that always returns the vessel's home port cell. */
 @RequiredArgsConstructor(access = PACKAGE)
 public class HomePortDestinationSupplier implements DestinationSupplier {
 

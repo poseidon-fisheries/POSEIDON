@@ -36,6 +36,10 @@ import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link NeighbourhoodCellPicker}, built via
+ * {@link Factories#neighbourhoodGridExplorer}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

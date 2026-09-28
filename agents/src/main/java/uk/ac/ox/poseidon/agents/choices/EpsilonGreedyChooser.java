@@ -30,6 +30,10 @@ import java.util.function.Supplier;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
+/**
+ * With probability {@code epsilon}, explores (calls {@link #explorer}); otherwise exploits
+ * (calls {@link #exploiter}), falling back to exploring if the exploiter has nothing to offer.
+ */
 public class EpsilonGreedyChooser<O> implements Supplier<Optional<O>> {
 
     private final double epsilon;
@@ -37,6 +41,12 @@ public class EpsilonGreedyChooser<O> implements Supplier<Optional<O>> {
     private final Supplier<O> exploiter;
     private final MersenneTwisterFast rng;
 
+    /**
+     * @param epsilon   probability of exploring instead of exploiting, in {@code [0, 1]}
+     * @param explorer  supplies an exploratory option
+     * @param exploiter supplies the currently-best-known option
+     * @param rng       the RNG to draw the explore/exploit decision from
+     */
     EpsilonGreedyChooser(
         final double epsilon,
         final Supplier<O> explorer,
@@ -49,6 +59,7 @@ public class EpsilonGreedyChooser<O> implements Supplier<Optional<O>> {
         this.rng = checkNotNull(rng);
     }
 
+    /** @return the exploiter's pick with probability {@code 1 - epsilon} (else the explorer's), falling back to the explorer if the exploiter returns {@code null} */
     @Override
     public Optional<O> get() {
         final boolean exploit = !rng.nextBoolean(epsilon);

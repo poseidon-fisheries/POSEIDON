@@ -29,11 +29,13 @@ import java.util.Map;
 
 import static lombok.AccessLevel.PACKAGE;
 
+/** A {@link HashMapBasedOptionValues} whose value is the plain running average of every observation. */
 @NoArgsConstructor(access = PACKAGE)
 public class AverageOptionValues<T> extends HashMapBasedOptionValues<T> {
 
     private final Map<T, Integer> counts = new HashMap<>();
 
+    /** @return the running average of {@code oldValue} and {@code observedValue}, weighted by observation count */
     @Override
     protected double newValue(
         final T option,

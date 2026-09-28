@@ -28,6 +28,10 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link AverageOptionValues}, built via
+ * {@link Factories#averageOptionValues()}.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)

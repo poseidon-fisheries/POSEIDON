@@ -40,6 +40,11 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 
+/**
+ * A {@link MutableOptionValues} backed by a fastutil primitive-double hash map, tracking the
+ * best-value cache incrementally on every {@link #observe} rather than rescanning the whole map.
+ * Subclasses supply how a new observation combines with the previous value via {@link #newValue}.
+ */
 @Getter
 @NoArgsConstructor(access = PACKAGE)
 public abstract class HashMapBasedOptionValues<O>
@@ -50,6 +55,7 @@ public abstract class HashMapBasedOptionValues<O>
     private ImmutableList<O> cachedBestKeys = null;
     private double cachedBestValue = Double.NEGATIVE_INFINITY;
 
+    /** Combines {@code value} into {@code option}'s value via {@link #newValue}, updating the best-value cache incrementally. */
     @Override
     public void observe(
         final O option,
@@ -104,6 +110,7 @@ public abstract class HashMapBasedOptionValues<O>
         cachedBestValue = bestValue;
     }
 
+    /** Calls {@code consumer} once per cached best (option, value) entry, computing the cache first if stale. */
     @Override
     public void forEachBestEntry(final ObjectDoubleBiConsumer<? super O> consumer) {
         if (cachedBestKeys == null) computeBestCache();
@@ -141,10 +148,17 @@ public abstract class HashMapBasedOptionValues<O>
         return Optional.of(new AbstractMap.SimpleEntry<>(key, cachedBestValue));
     }
 
+    /** Forces the next best-value lookup to rescan {@link #values} from scratch. */
     protected void invalidateCache() {
         cachedBestKeys = null;
     }
 
+    /**
+     * @param option        the option just observed
+     * @param oldValue      its previous value, or {@code 0.0} if this is its first observation
+     * @param observedValue the value just observed for it
+     * @return the new value to store for {@code option}
+     */
     protected abstract double newValue(
         O option,
         double oldValue,

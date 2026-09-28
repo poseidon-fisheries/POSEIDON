@@ -31,6 +31,10 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link HomePortDestinationSupplier}, built via
+ * {@link Factories#homePortDestination}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

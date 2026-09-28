@@ -32,6 +32,10 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link ConstantDestinationSupplier}, built via
+ * {@link Factories#constantDestination}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,6 +45,10 @@ public class ConstantDestinationSupplierFactory extends VesselScopeFactory<Desti
     private Factory<? super VesselScope, ? extends ModelGrid> modelGrid;
     private Factory<? super VesselScope, ? extends Coordinate> coordinate;
 
+    /**
+     * @return a {@link ConstantDestinationSupplier} for {@link #coordinate}'s cell in {@link #modelGrid}
+     * @throws IllegalArgumentException if {@link #coordinate} falls outside {@link #modelGrid}
+     */
     @Override
     protected DestinationSupplier newInstance(final VesselScope scope) {
         final ModelGrid modelGrid = this.modelGrid.get(scope);

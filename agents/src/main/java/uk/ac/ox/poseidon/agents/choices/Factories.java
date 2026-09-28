@@ -37,14 +37,27 @@ import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/** Factories for a vessel's learned {@link OptionValues} and its destination-choice strategies. */
 public class Factories {
 
     private Factories() {}
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an
+     * {@link AverageOptionValues}
+     * @see AverageOptionValues
+     */
     public static <O> AverageOptionValuesFactory<O> averageOptionValues() {
         return new AverageOptionValuesFactory<>();
     }
 
+    /**
+     * @param optionValuesRegister looks up each other vessel's own option-values component
+     * @param friendsSupplier      supplies the vessel's current friends
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a supplier of
+     * friends' best options
+     * @see BestOptionsFromFriends
+     */
     public static <O> BestOptionsFromFriendsFactory<O> bestOptionsFromFriends(
         final Factory<
             ? super VesselScope,
@@ -59,6 +72,12 @@ public class Factories {
         );
     }
 
+    /**
+     * @param optionValuesRegister looks up each other vessel's own option-values component
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a supplier of
+     * every other active vessel's best options
+     * @see BestOptions
+     */
     public static <O> BestOptionsFactory<O> bestOptions(
         final Factory<
             ? super VesselScope,
@@ -68,6 +87,13 @@ public class Factories {
         return new BestOptionsFactory<>(optionValuesRegister);
     }
 
+    /**
+     * @param modelGrid  the grid {@code coordinate} is resolved against
+     * @param coordinate the fixed destination
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link ConstantDestinationSupplier}
+     * @see ConstantDestinationSupplier
+     */
     public static ConstantDestinationSupplierFactory constantDestination(
         final Factory<? super VesselScope, ? extends ModelGrid> modelGrid,
         final Factory<? super VesselScope, ? extends Coordinate> coordinate
@@ -75,6 +101,14 @@ public class Factories {
         return new ConstantDestinationSupplierFactory(modelGrid, coordinate);
     }
 
+    /**
+     * @param epsilon   probability of exploring instead of exploiting
+     * @param explorer  supplies an exploratory destination
+     * @param exploiter supplies the currently-best-known destination
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an
+     * {@link EpsilonGreedyChooser}-backed {@link DestinationSupplier}
+     * @see EpsilonGreedyChooser
+     */
     public static EpsilonGreedyDestinationSupplierFactory epsilonGreedyDestination(
         final double epsilon,
         final Factory<? super VesselScope, ? extends Supplier<Int2D>> explorer,
@@ -85,17 +119,37 @@ public class Factories {
         );
     }
 
+    /**
+     * @param alpha the smoothing factor, in {@code [0, 1]}
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an
+     * {@link ExponentialMovingAverageOptionValues}
+     * @see ExponentialMovingAverageOptionValues
+     */
     public static <O> ExponentialMovingAverageOptionValuesFactory<O>
     exponentialMovingAverageOptionValues(final double alpha) {
         return new ExponentialMovingAverageOptionValuesFactory<>(alpha);
     }
 
+    /**
+     * @param portGrid locates the vessel's home port
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link HomePortDestinationSupplier}
+     * @see HomePortDestinationSupplier
+     */
     public static HomePortDestinationSupplierFactory homePortDestination(
         final Factory<? super VesselScope, ? extends PortGrid> portGrid
     ) {
         return new HomePortDestinationSupplierFactory(portGrid);
     }
 
+    /**
+     * @param optionValues          the vessel's own learned option values
+     * @param optionPredicate       filters which candidate options are eligible
+     * @param optionValuesSupplier  supplies the candidate options to imitate
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an
+     * {@link ImitatingPicker}
+     * @see ImitatingPicker
+     */
     public static <O> ImitatingPickerFactory<O> imitatingPicker(
         final Factory<? super VesselScope, ? extends OptionValues<O>> optionValues,
         final Factory<? super VesselScope, ? extends Predicate<? super O>> optionPredicate,
@@ -107,6 +161,17 @@ public class Factories {
         );
     }
 
+    /**
+     * @param optionValues              the vessel's own learned option values, for the search's
+     *                                  starting cell
+     * @param pathFinder                finds accessible water neighbours
+     * @param cellPredicate             filters which candidate cells are eligible
+     * @param neighbourhoodSizeSupplier the initial search radius
+     * @param fallbackCellPicker        supplies a starting cell if there's no best-known option
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link NeighbourhoodCellPicker}
+     * @see NeighbourhoodCellPicker
+     */
     public static NeighbourhoodGridExplorerFactory neighbourhoodGridExplorer(
         final Factory<? super VesselScope, ? extends OptionValues<Int2D>> optionValues,
         final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
@@ -119,6 +184,13 @@ public class Factories {
         );
     }
 
+    /**
+     * @param cellsSupplier the candidate cells to pick from
+     * @param cellPredicate filters which candidate cells are eligible
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link RandomPicker}
+     * @see RandomPicker
+     */
     public static RandomGridExplorerFactory randomGridExplorer(
         final Factory<? super VesselScope, ? extends Supplier<? extends List<? extends Int2D>>> cellsSupplier,
         final Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate

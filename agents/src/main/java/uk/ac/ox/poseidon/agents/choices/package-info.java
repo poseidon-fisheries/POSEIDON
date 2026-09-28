@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,22 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * A vessel's destination choice: {@link uk.ac.ox.poseidon.agents.choices.OptionValues} holds
+ * what's been learned about each candidate option (see
+ * {@link uk.ac.ox.poseidon.agents.choices.evaluation} for how those observations are produced),
+ * and a {@link uk.ac.ox.poseidon.agents.choices.DestinationSupplier} (or, at a lower level, a
+ * {@link uk.ac.ox.poseidon.core.providers.Provider} of a cell) picks the next destination —
+ * exploring randomly or in a neighbourhood, exploiting the best-known option, imitating friends'
+ * best options, or an epsilon-greedy mix of exploring and exploiting. See
+ * {@link uk.ac.ox.poseidon.agents.choices.Factories} for the entry points.
+ */
 package uk.ac.ox.poseidon.agents.choices;
-
-import com.google.common.collect.ImmutableMap;
-import lombok.Getter;
-
-import java.util.Map;
-
-/** A {@link MapBasedOptionValues} over a fixed, defensively-copied map; never mutated after construction. */
-@Getter
-public class ImmutableOptionValues<O> extends MapBasedOptionValues<O> {
-
-    private final ImmutableMap<O, Double> values;
-
-    /** @param values the fixed option-to-value map, defensively copied */
-    ImmutableOptionValues(final Map<O, Double> values) {
-        this.values = ImmutableMap.copyOf(values);
-    }
-
-}

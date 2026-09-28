@@ -33,10 +33,16 @@ import java.util.Optional;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 
+/**
+ * An {@link OptionValues} backed by a {@link Map} of option to value, computing (and caching)
+ * the best entries by a full scan of that map.
+ */
 public abstract class MapBasedOptionValues<O> implements OptionValues<O> {
 
+    /** Cached result of {@link #getBestEntries()}; cleared by subclasses on mutation. */
     protected ImmutableList<Map.Entry<O, Double>> cachedBest = null;
 
+    /** @return the backing option-to-value map */
     protected abstract Map<O, Double> getValues();
 
     @Override
@@ -59,6 +65,7 @@ public abstract class MapBasedOptionValues<O> implements OptionValues<O> {
         return getBestEntries().stream().findAny().map(Map.Entry::getValue);
     }
 
+    /** @return every entry tied for the highest value, computed by a full scan and cached in {@link #cachedBest} */
     @Override
     public List<Map.Entry<O, Double>> getBestEntries() {
         if (cachedBest == null) {
@@ -79,6 +86,7 @@ public abstract class MapBasedOptionValues<O> implements OptionValues<O> {
         return cachedBest;
     }
 
+    /** @param rng the RNG to break ties with; @return one entry uniformly picked among the best, if any */
     @Override
     public Optional<Map.Entry<O, Double>> getBestEntry(final MersenneTwisterFast rng) {
         final List<Map.Entry<O, Double>> bestEntries = getBestEntries();

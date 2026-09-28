@@ -55,6 +55,10 @@ public class ImitatingPicker<O> implements Provider<O> {
     private final Supplier<OptionValues<O>> candidatesSupplier;
     private final MersenneTwisterFast rng;
 
+    /**
+     * @return a uniformly random candidate strictly better than the current best-known option, if
+     * any are accessible; otherwise the current best-known option; {@code null} if there is none
+     */
     @Override
     public O get() {
         final Optional<Entry<O, Double>> currentBestEntry =

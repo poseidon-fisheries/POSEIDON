@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Supplier;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link BestOptions}, built via
+ * {@link Factories#bestOptions}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

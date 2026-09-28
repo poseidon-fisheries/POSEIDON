@@ -32,12 +32,21 @@ import java.util.function.Supplier;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static lombok.AccessLevel.PACKAGE;
 
+/**
+ * Supplies the best options across every other active vessel's own {@link OptionValues}
+ * component in a {@link VesselComponentRegister}, merging ties by keeping the highest value seen
+ * for each option.
+ */
 @RequiredArgsConstructor(access = PACKAGE)
 public class BestOptions<O> implements Supplier<OptionValues<O>> {
 
     private final Vessel vessel;
     private final VesselComponentRegister<? extends OptionValues<O>> optionValuesRegister;
 
+    /**
+     * @return an {@link ImmutableOptionValues} snapshot of every active other vessel's best
+     * options, merged by keeping the highest value for each option
+     */
     @Override
     public OptionValues<O> get() {
         return new ImmutableOptionValues<>(

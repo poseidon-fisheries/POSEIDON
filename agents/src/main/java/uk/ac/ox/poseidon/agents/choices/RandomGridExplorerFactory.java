@@ -36,6 +36,10 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link RandomPicker}, built via
+ * {@link Factories#randomGridExplorer}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

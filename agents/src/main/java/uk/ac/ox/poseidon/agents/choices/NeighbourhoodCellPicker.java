@@ -38,6 +38,11 @@ import static java.lang.Math.max;
 import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
+/**
+ * Picks a random accessible water cell in the neighbourhood of the vessel's current best-known
+ * option (or a fallback cell if there isn't one), growing the search radius until at least one
+ * candidate is found or the whole grid has been searched.
+ */
 @RequiredArgsConstructor(access = PACKAGE)
 public class NeighbourhoodCellPicker implements Provider<Int2D> {
 
@@ -49,6 +54,11 @@ public class NeighbourhoodCellPicker implements Provider<Int2D> {
     private final Supplier<Int2D> fallbackCellPicker;
     private final MersenneTwisterFast rng;
 
+    /**
+     * @return a uniformly random accessible water cell, satisfying the option predicate, within
+     * the smallest searched neighbourhood that yields any candidates; {@code null} if none
+     * qualify even at the grid's full extent
+     */
     @Override
     public Int2D get() {
         final int maxNeighbourhoodSize = max(

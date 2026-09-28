@@ -29,20 +29,33 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 
+/**
+ * A learned value per option (e.g. per destination cell), supporting lookup of the current best
+ * option(s) — the highest-valued one(s), possibly tied.
+ *
+ * @param <O> the type of option valued
+ */
 public interface OptionValues<O> {
 
+    /** @return {@code option}'s current value, if it has been observed */
     Optional<Double> getValue(O option);
 
+    /** @return every option currently tied for the highest value */
     List<O> getBestOptions();
 
+    /** @param rng the RNG to break ties with; @return one option uniformly picked among the best, if any */
     Optional<O> getBestOption(MersenneTwisterFast rng);
 
+    /** @return the current highest value, if any options have been observed */
     Optional<Double> getBestValue();
 
+    /** @return every (option, value) pair currently tied for the highest value */
     List<Entry<O, Double>> getBestEntries();
 
+    /** @param rng the RNG to break ties with; @return one (option, value) pair uniformly picked among the best, if any */
     Optional<Entry<O, Double>> getBestEntry(MersenneTwisterFast rng);
 
+    /** Calls {@code consumer} once per {@link #getBestEntries()} entry. */
     default void forEachBestEntry(final ObjectDoubleBiConsumer<? super O> consumer) {
         getBestEntries().forEach(entry -> consumer.accept(entry.getKey(), entry.getValue()));
     }

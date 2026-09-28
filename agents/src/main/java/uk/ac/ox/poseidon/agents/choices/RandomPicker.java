@@ -33,6 +33,7 @@ import java.util.function.Supplier;
 
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
+/** Picks a uniformly random option from a supplied list, subject to a predicate, or {@code null} if none qualify. */
 @RequiredArgsConstructor
 public class RandomPicker<O> implements Provider<O> {
 

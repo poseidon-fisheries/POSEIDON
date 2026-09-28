@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.Factory;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link ImitatingPicker}, built via
+ * {@link Factories#imitatingPicker}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

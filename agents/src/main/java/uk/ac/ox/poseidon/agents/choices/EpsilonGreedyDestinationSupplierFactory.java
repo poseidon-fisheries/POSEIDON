@@ -33,6 +33,10 @@ import uk.ac.ox.poseidon.core.Factory;
 
 import java.util.function.Supplier;
 
+/**
+ * A {@link VesselScopeFactory} counterpart of {@link EpsilonGreedyChooser}, built via
+ * {@link Factories#epsilonGreedyDestination}.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,6 +47,7 @@ public class EpsilonGreedyDestinationSupplierFactory extends VesselScopeFactory<
     private Factory<? super VesselScope, ? extends Supplier<Int2D>> explorer;
     private Factory<? super VesselScope, ? extends Supplier<Int2D>> exploiter;
 
+    /** @return an {@link EpsilonGreedyChooser} over the resolved explorer/exploiter, as a {@link DestinationSupplier} */
     @Override
     protected DestinationSupplier newInstance(final VesselScope scope) {
         return new EpsilonGreedyChooser<>(
