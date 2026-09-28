@@ -40,7 +40,10 @@ public class SmoothBiomassDiffusionRule implements BiomassDiffusionRule {
     private final double differentialPercentageToMove;
 
     /**
-     * maximum percentage of biomass that can leave one place for another
+     * maximum percentage of biomass that can leave one place for another in a single call to
+     * {@link #updatedBiomasses}, i.e. per {@link BiomassDiffuser} step — not necessarily daily,
+     * despite the field name, since the step interval is whatever {@link BiomassDiffuser} is
+     * scheduled at.
      */
     private final double percentageLimitOnDailyMovement;
 

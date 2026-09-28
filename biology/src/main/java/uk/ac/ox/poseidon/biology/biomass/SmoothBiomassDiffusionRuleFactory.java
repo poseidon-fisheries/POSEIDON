@@ -45,7 +45,9 @@ public class SmoothBiomassDiffusionRuleFactory extends GlobalScopeFactory<Smooth
     private double differentialPercentageToMove;
 
     /**
-     * maximum percentage of biomass that can leave one place for another
+     * maximum percentage of biomass that can leave one place for another per
+     * {@link SmoothBiomassDiffusionRule} step, not necessarily daily despite the field name — see
+     * {@link SmoothBiomassDiffusionRule#percentageLimitOnDailyMovement}.
      */
     private double percentageLimitOnDailyMovement;
 
