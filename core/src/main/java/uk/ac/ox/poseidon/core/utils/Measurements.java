@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
+import si.uom.NonSI;
 import tech.units.indriya.format.SimpleUnitFormat;
 
 import javax.measure.Dimension;
@@ -35,6 +36,13 @@ import static tech.units.indriya.unit.UnitDimension.MASS;
 
 /** Helpers for parsing and validating JSR-385 {@link Unit}s. */
 public class Measurements {
+
+    static {
+        // si.uom.NonSI registers its unit labels ("t", "kn", ...) with SimpleUnitFormat when it is
+        // first loaded; force that before any parsing so it doesn't depend on class-loading order.
+        checkNotNull(NonSI.TONNE);
+    }
+
     private Measurements() {
     }
 
