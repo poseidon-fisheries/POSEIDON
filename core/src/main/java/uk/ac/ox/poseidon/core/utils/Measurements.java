@@ -38,9 +38,10 @@ import static tech.units.indriya.unit.UnitDimension.MASS;
 public class Measurements {
 
     static {
-        // si.uom.NonSI registers its unit labels ("t", "kn", ...) with SimpleUnitFormat when it is
-        // first loaded; force that before any parsing so it doesn't depend on class-loading order.
-        checkNotNull(NonSI.TONNE);
+        // We need to trigger static initialization of the NonSI class
+        // in order for non-SI unit string formats to be registered
+        // noinspection ResultOfMethodCallIgnored
+        NonSI.getInstance();
     }
 
     private Measurements() {
