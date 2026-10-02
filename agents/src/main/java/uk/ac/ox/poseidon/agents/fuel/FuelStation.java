@@ -33,10 +33,10 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.Duration;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.math.RoundingMode.CEILING;
 import static lombok.AccessLevel.NONE;
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 
 /**
@@ -73,15 +73,23 @@ public class FuelStation {
         this.port = checkNotNull(port, "port must not be null");
         this.code = checkNotNull(code, "code must not be null");
         this.eventManager = checkNotNull(eventManager, "eventManager must not be null");
-        setPricePerLitre(pricePerLitre);
+        this.pricePerLitre = checkPrice(pricePerLitre);
         this.pumpRateInLitresPerMinute =
             checkPositive(pumpRateInLitresPerMinute, "pumpRateInLitresPerMinute");
     }
 
     /** @param pricePerLitre the new, non-negative price per litre */
     public void setPricePerLitre(final @NonNull Money pricePerLitre) {
-        checkNonNegative(pricePerLitre.getAmount().doubleValue(), "pricePerLitre");
-        this.pricePerLitre = pricePerLitre;
+        this.pricePerLitre = checkPrice(pricePerLitre);
+    }
+
+    private static Money checkPrice(final Money pricePerLitre) {
+        checkArgument(
+            !pricePerLitre.isNegative(),
+            "pricePerLitre must not be negative but was %s",
+            pricePerLitre
+        );
+        return pricePerLitre;
     }
 
     /**

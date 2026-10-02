@@ -65,7 +65,7 @@ public class Trip {
         final @NonNull Int2D destination
     ) {
         this.vessel = vessel;
-        setDestination(destination);
+        this.destination = checkInGrid(destination);
         this.eventManager = new ForwardingEventManager(vessel.getEventManager());
         this.origin = vessel.getCell();
         this.startDateTime = vessel.getSchedule().getDateTime();
@@ -77,8 +77,12 @@ public class Trip {
      * @throws IllegalArgumentException if {@code destination} is outside the vessel's grid
      */
     public void setDestination(final @NonNull Int2D destination) {
-        vessel.getVesselField().getModelGrid().checkIsInGrid(destination);
-        this.destination = destination;
+        this.destination = checkInGrid(destination);
+    }
+
+    private Int2D checkInGrid(final Int2D cell) {
+        vessel.getVesselField().getModelGrid().checkIsInGrid(cell);
+        return cell;
     }
 
     /** Marks the trip as ended at the vessel's current simulation time and broadcasts a {@link TripEndEvent}. */
