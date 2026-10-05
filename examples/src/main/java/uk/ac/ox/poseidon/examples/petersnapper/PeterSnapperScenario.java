@@ -309,8 +309,12 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         final var catchCategory = uncategorisedCatchCategory();
         final var marketGrid = marketGrid(
             portGrid,
-            oneBiomassMarketPerPort(
-                portGrid,
+            oneBiomassMarketPerPort(portGrid)
+        );
+
+        final var initialPrices = initialPrices(
+            uniformMarketPrices(
+                marketGrid,
                 listOf(
                     priceEntry(
                         catchCategory,
@@ -473,6 +477,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             .component("biomassGrower", biomassGrower)
             .component("portGrid", portGrid)
             .component("marketGrid", marketGrid)
+            .component("initialPrices", initialPrices)
             .component("gear", gear)
             .component("vesselField", vesselField)
             .component("agentCreators", agentCreators)

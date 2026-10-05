@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -29,32 +29,31 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.geography.ports.Port;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.List;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link BiomassMarket}, built via
- * {@link Factories#biomassMarket}. If {@link #marketCode} isn't set, the port's own code is used.
+ * A {@link SimulationScopeFactory} for the {@link MarketPrice}s of one market: one per entry in
+ * {@link #priceEntries}, all at {@link #market}. Built via {@link Factories#marketPrices}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BiomassMarketFactory extends SimulationScopeFactory<BiomassMarket> {
+public class MarketPricesFactory extends SimulationScopeFactory<List<MarketPrice>> {
 
-    private Factory<? super SimulationScope, ? extends Port> port;
-    private String marketCode;
+    private Factory<? super SimulationScope, ? extends BiomassMarket> market;
+    private Factory<? super SimulationScope, ? extends List<PriceEntry>> priceEntries;
 
     @Override
-    protected BiomassMarket newInstance(final SimulationScope scope) {
-        checkNotNull(port, "port must not be null");
-        final Port port = this.port.get(scope);
-        final String marketCode = this.marketCode != null ? this.marketCode : port.getCode();
-        return new BiomassMarket(
-            port,
-            marketCode,
-            scope.getSimulation().getEventManager()
-        );
+    protected List<MarketPrice> newInstance(final SimulationScope scope) {
+        final BiomassMarket market = this.market.get(scope);
+        return priceEntries
+            .get(scope)
+            .stream()
+            .map(priceEntry -> new MarketPrice(market, priceEntry))
+            .collect(toImmutableList());
     }
 }

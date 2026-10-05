@@ -39,18 +39,16 @@ public class Factories {
     private Factories() {}
 
     /**
-     * @param port          the market's port
-     * @param marketCode    the market's code; the port's own code is used if this is null
-     * @param pricesEntries the market's fixed (category, species) prices
-     * @return a {@link SimulationScopeFactory} for a {@link BiomassMarket}
+     * @param port       the market's port
+     * @param marketCode the market's code; the port's own code is used if this is null
+     * @return a {@link SimulationScopeFactory} for a {@link BiomassMarket}, without prices
      * @see BiomassMarket
      */
     public static BiomassMarketFactory biomassMarket(
         final Factory<? super SimulationScope, ? extends Port> port,
-        final String marketCode,
-        final Factory<? super SimulationScope, ? extends List<PriceEntry>> pricesEntries
+        final String marketCode
     ) {
-        return new BiomassMarketFactory(port, marketCode, pricesEntries);
+        return new BiomassMarketFactory(port, marketCode);
     }
 
     /**
@@ -60,6 +58,19 @@ public class Factories {
      */
     public static BiomassSaleAccumulatorFactory biomassSaleAccumulator() {
         return new BiomassSaleAccumulatorFactory();
+    }
+
+    /**
+     * @param marketPrices the market prices to apply, concatenated in order
+     * @return a {@link SimulationScopeFactory} for the {@link MarketPrice}s, applied when the
+     * simulation is built
+     * @see InitialPricesFactory
+     */
+    @SafeVarargs
+    public static InitialPricesFactory initialPrices(
+        final Factory<? super SimulationScope, ? extends List<MarketPrice>>... marketPrices
+    ) {
+        return new InitialPricesFactory(List.of(marketPrices));
     }
 
     /**
@@ -76,16 +87,42 @@ public class Factories {
     }
 
     /**
-     * @param portGrid      the ports to build one market per
-     * @param pricesEntries the shared price list every market uses
-     * @return a {@link SimulationScopeFactory} for a list of {@link BiomassMarket}s, one per port
+     * @param market       the market the prices apply to
+     * @param priceEntries the (category, species) prices at that market
+     * @return a {@link SimulationScopeFactory} for one {@link MarketPrice} per entry, all at
+     * {@code market}
+     * @see MarketPricesFactory
+     */
+    public static MarketPricesFactory marketPrices(
+        final Factory<? super SimulationScope, ? extends BiomassMarket> market,
+        final Factory<? super SimulationScope, ? extends List<PriceEntry>> priceEntries
+    ) {
+        return new MarketPricesFactory(market, priceEntries);
+    }
+
+    /**
+     * @param marketGrid   the markets the prices apply to
+     * @param priceEntries the (category, species) prices, the same at every market
+     * @return a {@link SimulationScopeFactory} for one {@link MarketPrice} per market and entry
+     * @see UniformMarketPricesFactory
+     */
+    public static UniformMarketPricesFactory uniformMarketPrices(
+        final Factory<? super SimulationScope, ? extends MarketGrid> marketGrid,
+        final Factory<? super SimulationScope, ? extends List<PriceEntry>> priceEntries
+    ) {
+        return new UniformMarketPricesFactory(marketGrid, priceEntries);
+    }
+
+    /**
+     * @param portGrid the ports to build one market per
+     * @return a {@link SimulationScopeFactory} for a list of {@link BiomassMarket}s, one per port,
+     * without prices
      * @see OneBiomassMarketPerPortFactory
      */
     public static OneBiomassMarketPerPortFactory oneBiomassMarketPerPort(
-        final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
-        final Factory<? super SimulationScope, ? extends List<PriceEntry>> pricesEntries
+        final Factory<? super SimulationScope, ? extends PortGrid> portGrid
     ) {
-        return new OneBiomassMarketPerPortFactory(portGrid, pricesEntries);
+        return new OneBiomassMarketPerPortFactory(portGrid);
     }
 
     /**

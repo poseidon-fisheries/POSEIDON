@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,17 +23,26 @@
 package uk.ac.ox.poseidon.agents.market;
 
 import lombok.Value;
-import uk.ac.ox.poseidon.agents.catches.CatchCategory;
-import uk.ac.ox.poseidon.biology.species.Species;
 
-/** A single (catch category, species) price. */
+/**
+ * A price at one market: the price of a species in a catch category there. This is a price
+ * assignment, not an event: {@link PriceUpdate} schedules one as a change over time, and
+ * {@link Factories#initialPrices} applies a set of them when the simulation is built.
+ */
 @Value
-public class PriceEntry {
+public class MarketPrice {
 
-    /** The entry's catch category. */
-    CatchCategory catchCategory;
-    /** The entry's species. */
-    Species species;
-    /** The price for this category/species combination. */
-    Price price;
+    /** The market the price applies to. */
+    BiomassMarket market;
+    /** The (category, species, price) entry. */
+    PriceEntry priceEntry;
+
+    /** Sets this price on {@link #market}, replacing any price it had for the same entry. */
+    public void apply() {
+        market.setPrice(
+            priceEntry.getCatchCategory(),
+            priceEntry.getSpecies(),
+            priceEntry.getPrice()
+        );
+    }
 }

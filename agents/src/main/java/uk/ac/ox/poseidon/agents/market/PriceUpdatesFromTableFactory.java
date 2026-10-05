@@ -168,11 +168,13 @@ public class PriceUpdatesFromTableFactory
                     return entry(
                         localDateTime,
                         new PriceUpdate(
-                            biomassMarket,
-                            new PriceEntry(
-                                catchCategory,
-                                species,
-                                new Price(money, massUnit)
+                            new MarketPrice(
+                                biomassMarket,
+                                new PriceEntry(
+                                    catchCategory,
+                                    species,
+                                    new Price(money, massUnit)
+                                )
                             )
                         )
                     );

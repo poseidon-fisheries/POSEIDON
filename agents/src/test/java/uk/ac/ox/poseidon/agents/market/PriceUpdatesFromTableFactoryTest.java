@@ -149,7 +149,7 @@ class PriceUpdatesFromTableFactoryTest {
     }
 
     private static BiomassMarket market(final String code) {
-        return new BiomassMarket(mock(Port.class), code, Map.of(), mock(EventManager.class));
+        return new BiomassMarket(mock(Port.class), code, mock(EventManager.class));
     }
 
     private static MarketGrid marketGrid(final BiomassMarket market) {

@@ -43,8 +43,9 @@ import java.util.function.Supplier;
 import static java.util.stream.Collectors.toMap;
 
 /**
- * A {@link Market} with a fixed per-port set of prices, keyed by (catch category, species), with
- * a fallback lookup via {@link Species#covers}. Selling a catch splits it into what has a price
+ * A {@link Market} with prices keyed by (catch category, species), with a fallback lookup via
+ * {@link Species#covers}. A market starts with no prices: they are set through
+ * {@link #setPrice}, e.g. by {@link MarketPrice#apply()}. Selling a catch splits it into what has a price
  * (sold, broadcast as a {@link Sale}) and what doesn't (left in {@link Sale#getUnsold()}).
  */
 @Getter
@@ -63,18 +64,11 @@ public class BiomassMarket implements Market {
     BiomassMarket(
         final Port port,
         final String code,
-        final Map<CatchCategory, Map<Species, Price>> prices,
         final EventManager eventManager
     ) {
         this.port = port;
         this.code = code;
-        this.prices = prices
-            .entrySet()
-            .stream()
-            .collect(toMap(
-                Entry::getKey,
-                entry -> new HashMap<>(entry.getValue())
-            ));
+        this.prices = new HashMap<>();
         this.saleIdSupplier = new PrefixedIdSupplier(code);
         this.eventManager = eventManager;
     }

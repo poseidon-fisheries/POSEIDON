@@ -61,7 +61,7 @@ components:
         minimum: 0.7
       }
     modelGrid: *id002
-    species: &id008 !!uk.ac.ox.poseidon.biology.species.SpeciesFactory {
+    species: &id009 !!uk.ac.ox.poseidon.biology.species.SpeciesFactory {
       code: PS,
       lifeStage: null,
       name: Peter Snapper
@@ -106,12 +106,12 @@ components:
       carryingCapacityGrid: *id004
   portGrid: &id007 !!uk.ac.ox.poseidon.geography.ports.PortGridFactory
     bathymetricGrid: *id003
-    distanceCalculator: &id011 !!uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory
+    distanceCalculator: &id012 !!uk.ac.ox.poseidon.geography.distance.HaversineDistanceCalculatorFactory
       modelGrid: *id002
     ports: !!uk.ac.ox.poseidon.core.utils.ListFactory
       factories:
       - !!uk.ac.ox.poseidon.core.utils.PairFactory
-        first: &id018 !!uk.ac.ox.poseidon.geography.ports.PortFactory {
+        first: &id019 !!uk.ac.ox.poseidon.geography.ports.PortFactory {
           code: P1,
           name: Benoa
         }
@@ -128,25 +128,29 @@ components:
           latitude: -10.148044,
           longitude: 123.586249
         }
-  marketGrid: &id019 !!uk.ac.ox.poseidon.agents.market.MarketGridFactory
+  marketGrid: &id008 !!uk.ac.ox.poseidon.agents.market.MarketGridFactory
     markets: !!uk.ac.ox.poseidon.agents.market.OneBiomassMarketPerPortFactory
       portGrid: *id007
-      pricesEntries: !!uk.ac.ox.poseidon.core.utils.ListFactory
+    portGrid: *id007
+  initialPrices: !!uk.ac.ox.poseidon.agents.market.InitialPricesFactory
+    marketPrices:
+    - !!uk.ac.ox.poseidon.agents.market.UniformMarketPricesFactory
+      marketGrid: *id008
+      priceEntries: !!uk.ac.ox.poseidon.core.utils.ListFactory
         factories:
         - !!uk.ac.ox.poseidon.agents.market.PriceEntryFactory
-          catchCategory: &id017 !!uk.ac.ox.poseidon.agents.catches.UncategorisedCatchCategoryFactory {
+          catchCategory: &id018 !!uk.ac.ox.poseidon.agents.catches.UncategorisedCatchCategoryFactory {
             }
           price: !!uk.ac.ox.poseidon.agents.market.PriceFactory {
             amount: 40000.0,
             currencyUnit: IDR,
             massUnit: kg
           }
-          species: *id008
-    portGrid: *id007
-  gear: &id016 !!uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory
+          species: *id009
+  gear: &id017 !!uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory
     code: FGL
     durationSupplier: !!uk.ac.ox.poseidon.core.providers.constant.ConstantProviderFactory
-      object: &id014 !!uk.ac.ox.poseidon.core.time.DurationFactory {
+      object: &id015 !!uk.ac.ox.poseidon.core.time.DurationFactory {
         days: 0,
         hours: 1,
         minutes: 0,
@@ -181,11 +185,11 @@ components:
                     optionPredicate: !!uk.ac.ox.poseidon.core.providers.constant.ConstantBooleanProviderFactory {
                       value: true
                     }
-                    optionValues: &id012 !!uk.ac.ox.poseidon.agents.components.RegisteredVesselComponentFactory
+                    optionValues: &id013 !!uk.ac.ox.poseidon.agents.components.RegisteredVesselComponentFactory
                       componentFactory: !!uk.ac.ox.poseidon.agents.choices.ExponentialMovingAverageOptionValuesFactory {
                         alpha: 1.0
                       }
-                      componentRegister: &id009 !!uk.ac.ox.poseidon.agents.components.VesselComponentRegisterFactory {
+                      componentRegister: &id010 !!uk.ac.ox.poseidon.agents.components.VesselComponentRegisterFactory {
                         }
                     optionValuesSupplier: !!uk.ac.ox.poseidon.agents.choices.BestOptionsFromFriendsFactory
                       friendsSupplier: !!uk.ac.ox.poseidon.agents.vessels.friends.DynamicFriendsSupplierFactory
@@ -195,11 +199,11 @@ components:
                             }
                           - !!uk.ac.ox.poseidon.agents.vessels.predicates.VesselHasSameHomePortFactory {
                             }
-                        potentialFriends: *id009
+                        potentialFriends: *id010
                         targetNumberOfFriends: 2
-                      optionValuesRegister: *id009
+                      optionValuesRegister: *id010
                   explorer: !!uk.ac.ox.poseidon.agents.choices.NeighbourhoodGridExplorerFactory
-                    cellPredicate: &id010 !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
+                    cellPredicate: &id011 !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
                       extractor: !!uk.ac.ox.poseidon.geography.grids.extractors.CellValueFactory
                         grid: *id004
                       predicate: !!uk.ac.ox.poseidon.core.predicates.comparable.GreaterThanFactory
@@ -208,14 +212,14 @@ components:
                             value: 0.0
                           }
                     fallbackCellPicker: !!uk.ac.ox.poseidon.agents.choices.RandomGridExplorerFactory
-                      cellPredicate: *id010
+                      cellPredicate: *id011
                       cellsSupplier: !!uk.ac.ox.poseidon.agents.vessels.providers.AccessibleWaterCellsFactory
-                        pathFinder: &id013 !!uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory
+                        pathFinder: &id014 !!uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory
                           bathymetricGrid: *id003
-                          distance: *id011
+                          distance: *id012
                           pathCache: !!uk.ac.ox.poseidon.geography.paths.DefaultPathCacheFactory
                             bathymetricGrid: *id003
-                            distance: *id011
+                            distance: *id012
                             portGrid: *id007
                           portGrid: *id007
                     neighbourhoodSizeSupplier: !!uk.ac.ox.poseidon.core.providers.FirstIntFromFactory
@@ -224,17 +228,17 @@ components:
                           maximum: 10,
                           minimum: 1
                         }
-                    optionValues: *id012
-                    pathFinder: *id013
+                    optionValues: *id013
+                    pathFinder: *id014
                 guard: null
               - !!uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory
                 destinationCell: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripDestinationCellFactory {
                   }
-                distance: *id011
+                distance: *id012
                 eventManager: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripEventManagerFactory {
                   }
                 guard: null
-                pathFinder: *id013
+                pathFinder: *id014
               - !!uk.ac.ox.poseidon.agents.tasks.decorators.UntilFailTaskFactory
                 child: !!uk.ac.ox.poseidon.agents.tasks.branches.SequenceTaskFactory
                   children:
@@ -275,14 +279,14 @@ components:
               - !!uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory
                 destinationCell: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripDestinationCellFactory {
                   }
-                distance: *id011
+                distance: *id012
                 eventManager: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripEventManagerFactory {
                   }
                 guard: null
-                pathFinder: *id013
+                pathFinder: *id014
               - !!uk.ac.ox.poseidon.agents.tasks.landings.LandCatchesFactory
                 durationSupplier: !!uk.ac.ox.poseidon.core.providers.constant.ConstantProviderFactory
-                  object: *id014
+                  object: *id015
                 guard: null
               - !!uk.ac.ox.poseidon.agents.tasks.travel.RefuelFactory
                 fuelStationGrid: !!uk.ac.ox.poseidon.agents.fuel.FuelStationGridFactory
@@ -318,31 +322,31 @@ components:
               value: 3.0
             }
             fuelTank: !!uk.ac.ox.poseidon.agents.vessels.engines.SimpleFuelTankFactory
-              capacity: &id015 !!uk.ac.ox.poseidon.core.quantities.VolumeFactory {
+              capacity: &id016 !!uk.ac.ox.poseidon.core.quantities.VolumeFactory {
                 unitString: l,
                 value: 100000.0
               }
-              currentFuel: *id015
+              currentFuel: *id016
           extraFactories: &id024
           - !!uk.ac.ox.poseidon.agents.choices.evaluation.TripEvaluatorFactory
             evaluationProvider: !!uk.ac.ox.poseidon.agents.choices.evaluation.ProfitPerHourDestinationEvaluationProviderFactory {
               currencyCode: IDR
             }
-            optionValues: *id012
-          gear: *id016
+            optionValues: *id013
+          gear: *id017
           hold: &id025 !!uk.ac.ox.poseidon.agents.vessels.holds.StandardBiomassHoldFactory
             capacity: !!uk.ac.ox.poseidon.core.quantities.MassFactory {
               unitString: kg,
               value: 15000.0
             }
             catchCategoriser: !!uk.ac.ox.poseidon.agents.catches.UniformCatchCategoriserFactory
-              catchCategory: *id017
+              catchCategory: *id018
             tolerance: !!uk.ac.ox.poseidon.core.quantities.MassFactory {
               unitString: kg,
               value: 1.0
             }
-          homePort: *id018
-          marketGrid: *id019
+          homePort: *id019
+          marketGrid: *id008
           name: &id027 !!uk.ac.ox.poseidon.agents.vessels.PrefixedIdFactory {
             prefix: 'Vessel '
           }
@@ -357,10 +361,10 @@ components:
           behaviour: *id022
           engine: *id023
           extraFactories: *id024
-          gear: *id016
+          gear: *id017
           hold: *id025
           homePort: *id026
-          marketGrid: *id019
+          marketGrid: *id008
           name: *id027
           numberOfVesselsToCreate: 50
           portGrid: *id007

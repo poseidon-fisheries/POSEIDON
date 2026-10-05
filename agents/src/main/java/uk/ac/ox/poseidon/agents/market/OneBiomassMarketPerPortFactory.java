@@ -26,8 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.agents.catches.CatchCategory;
-import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -35,13 +33,10 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.List;
-import java.util.Map;
-
-import static uk.ac.ox.poseidon.agents.market.PriceEntry.groupByCategoryAndSpecies;
 
 /**
  * A {@link SimulationScopeFactory} that builds one {@link BiomassMarket} per port in
- * {@link #portGrid}, all sharing the same price list, built via
+ * {@link #portGrid}, without prices, built via
  * {@link Factories#oneBiomassMarketPerPort}.
  */
 @Data
@@ -52,19 +47,15 @@ public class OneBiomassMarketPerPortFactory
     extends SimulationScopeFactory<List<BiomassMarket>> {
 
     private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
-    private Factory<? super SimulationScope, ? extends List<PriceEntry>> pricesEntries;
 
     @Override
     protected List<BiomassMarket> newInstance(final SimulationScope scope) {
-        final Map<CatchCategory, Map<Species, Price>> prices =
-            groupByCategoryAndSpecies(pricesEntries.get(scope));
         final EventManager eventManager = scope.getSimulation().getEventManager();
         return portGrid.get(scope).getPorts()
             .map(port ->
                 new BiomassMarket(
                     port,
                     port.getCode(),
-                    prices,
                     eventManager
                 )
             )

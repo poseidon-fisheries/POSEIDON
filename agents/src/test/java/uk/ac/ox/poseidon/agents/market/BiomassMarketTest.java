@@ -61,12 +61,7 @@ class BiomassMarketTest {
         final Map<CatchCategory, Map<Species, Price>> prices = new HashMap<>();
         prices.put(category, pricesBySpecies);
 
-        final BiomassMarket market = new BiomassMarket(
-            mock(Port.class),
-            "M1",
-            prices,
-            mock(EventManager.class)
-        );
+        final BiomassMarket market = marketWithPrices("M1", prices);
 
         assertThat(market.getPrice(category, juvenileSpecies)).contains(basePrice);
         assertThat(market.getPrice(category, missingSpecies)).isEmpty();
@@ -90,12 +85,7 @@ class BiomassMarketTest {
         prices.put(firstCategory, Map.of(firstSpecies, firstPrice));
         prices.put(secondCategory, Map.of(secondSpecies, secondPrice));
 
-        final BiomassMarket market = new BiomassMarket(
-            mock(Port.class),
-            "M2",
-            prices,
-            mock(EventManager.class)
-        );
+        final BiomassMarket market = marketWithPrices("M2", prices);
 
         final Set<String> seen = new HashSet<>();
         market.forEachPrice((category, species, price) ->
@@ -122,12 +112,7 @@ class BiomassMarketTest {
         final Map<CatchCategory, Map<Species, Price>> prices = new HashMap<>();
         prices.put(category, pricesBySpecies);
 
-        final BiomassMarket market = new BiomassMarket(
-            mock(Port.class),
-            "M3",
-            prices,
-            mock(EventManager.class)
-        );
+        final BiomassMarket market = marketWithPrices("M3", prices);
 
         final Set<Species> initialKeys = new HashSet<>(market.getPrices().get(category).keySet());
         final Sale sale = market.sell(
@@ -143,5 +128,17 @@ class BiomassMarketTest {
         assertThat(market.getPrices().get(category).keySet())
             .containsExactlyInAnyOrderElementsOf(initialKeys);
         assertThat(market.getPrices().get(category)).doesNotContainKey(stagedSpecies);
+    }
+
+    private static BiomassMarket marketWithPrices(
+        final String code,
+        final Map<CatchCategory, Map<Species, Price>> prices
+    ) {
+        final BiomassMarket market =
+            new BiomassMarket(mock(Port.class), code, mock(EventManager.class));
+        prices.forEach((category, pricesBySpecies) ->
+            pricesBySpecies.forEach((species, price) -> market.setPrice(category, species, price))
+        );
+        return market;
     }
 }
