@@ -260,8 +260,8 @@ public class Factories {
     }
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} scheduling {@code timeIndexedBiomassGrids} to
-     * replace {@code biomassGrids}' contents over time
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for dated updates replacing
+     * {@code biomassGrids}' contents with {@code timeIndexedBiomassGrids}' snapshots
      * @see TimeIndexedBiomassGridUpdatesFactory
      */
     public static TimeIndexedBiomassGridUpdatesFactory timeIndexedBiomassGridUpdates(

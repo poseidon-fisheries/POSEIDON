@@ -29,10 +29,12 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
 
 import static uk.ac.ox.poseidon.core.schedule.TemporalSchedule.DEFAULT_ORDERING;
 
@@ -44,6 +46,20 @@ import static uk.ac.ox.poseidon.core.schedule.TemporalSchedule.DEFAULT_ORDERING;
 public class Factories {
 
     private Factories() {
+    }
+
+    /**
+     * @param steppablesByDateTime factory for the steppables to schedule, each with its own
+     *                             date-time
+     * @return a {@link SimulationScopeFactory} for the resolved dated steppables, each scheduled
+     * once at its own date-time
+     * @see ScheduledByDateTimeFactory
+     */
+    public static <C extends Steppable> ScheduledByDateTimeFactory<C> scheduledByDateTime(
+        final Factory<? super SimulationScope, ? extends List<Entry<LocalDateTime, C>>>
+            steppablesByDateTime
+    ) {
+        return new ScheduledByDateTimeFactory<>(steppablesByDateTime);
     }
 
     /**

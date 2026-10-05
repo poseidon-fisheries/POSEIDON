@@ -28,74 +28,50 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 
-import static java.util.stream.Collectors.groupingBy;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Map.entry;
 
 /**
- * Schedules the full replacement of {@code biomassGrids}' contents, species by species, with the
- * dated snapshots given by {@code timeIndexedBiomassGrids} — meant to replace a biological grower
- * entirely, not run alongside one. Unlike
- * {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule#scheduleByDateTime}, entries dated before
- * the simulation's effective start are not all replayed in order: since each update is a full
- * replacement rather than a delta, only the single most recent pre-start snapshot can affect the
- * final state, so earlier ones are dropped rather than scheduled.
+ * Turns the dated snapshots given by {@code timeIndexedBiomassGrids} into
+ * {@link BiomassGridUpdate}s that fully replace {@code biomassGrids}' contents, species by
+ * species, each dated at its snapshot's date-time — meant to replace a biological grower
+ * entirely, not run alongside one. Nothing is scheduled here: pass the result to
+ * {@link uk.ac.ox.poseidon.core.schedule.Factories#scheduledByDateTime(Factory)} for the
+ * snapshots to apply over time. Built via
+ * {@link Factories#timeIndexedBiomassGridUpdates(Factory, Factory)}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class TimeIndexedBiomassGridUpdatesFactory
-    extends SimulationScopeFactory<FisheableBiomassGrids> {
+    extends SimulationScopeFactory<List<Entry<LocalDateTime, BiomassGridUpdate>>> {
 
     private Factory<? super SimulationScope, ? extends FisheableBiomassGrids> biomassGrids;
     private Factory<? super SimulationScope, ? extends Map<LocalDateTime, ? extends List<? extends SpeciesGrid>>>
         timeIndexedBiomassGrids;
 
     @Override
-    protected FisheableBiomassGrids newInstance(final SimulationScope scope) {
-
+    protected List<Entry<LocalDateTime, BiomassGridUpdate>> newInstance(
+        final SimulationScope scope
+    ) {
         final FisheableBiomassGrids target = biomassGrids.get(scope);
-        final Map<LocalDateTime, ? extends List<? extends SpeciesGrid>> timeIndexedBiomassGrids =
-            this.timeIndexedBiomassGrids.get(scope);
-        final TemporalSchedule schedule = scope.getSimulation().getTemporalSchedule();
-
-        // Mirrors the minimumDateTime computation in TemporalSchedule.scheduleByDateTime, which
-        // has no public accessor for it.
-        final var minimumDateTime = schedule.getTime() < TemporalSchedule.EPOCH
-            ? schedule.toDateTime(TemporalSchedule.EPOCH)
-            : schedule.getDateTime();
-
-        final Map<Boolean, List<Entry<LocalDateTime, ? extends List<? extends SpeciesGrid>>>>
-            entriesBeforeAndAfter = timeIndexedBiomassGrids
+        return timeIndexedBiomassGrids
+            .get(scope)
             .entrySet()
             .stream()
-            .collect(groupingBy(entry -> entry.getKey().isBefore(minimumDateTime)));
-
-        // Before start: only the latest snapshot can affect the final state, so drop the rest.
-        Optional.ofNullable(entriesBeforeAndAfter.get(true))
-            .flatMap(entriesBefore -> entriesBefore.stream().max(
-                (entryA, entryB) -> entryA.getKey().compareTo(entryB.getKey())
+            .map(snapshot -> entry(
+                snapshot.getKey(),
+                new BiomassGridUpdate(snapshot.getValue(), target)
             ))
-            .ifPresent(entry -> schedule.scheduleOnce(new BiomassGridUpdate(entry.getValue(), target)));
-
-        // At/after start: schedule each individually, at its own date-time.
-        Optional.ofNullable(entriesBeforeAndAfter.get(false))
-            .ifPresent(entriesAfter -> entriesAfter.forEach(entry ->
-                schedule.scheduleOnce(
-                    entry.getKey(),
-                    new BiomassGridUpdate(entry.getValue(), target)
-                )
-            ));
-
-        return target;
+            .collect(toImmutableList());
     }
 
 }
