@@ -49,7 +49,7 @@ import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
  */
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public final class Scenario {
