@@ -43,11 +43,13 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalField;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import static java.time.temporal.ChronoField.*;
 import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
-import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_MONTH;
+import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_DAY;
 
 @Data
 @NoArgsConstructor
@@ -55,14 +57,17 @@ import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.Up
 @EqualsAndHashCode(callSuper = true)
 /**
  * A {@link SimulationScopeFactory} that overlays a checkered texture on cells where fishing is
- * currently forbidden for any active vessel's gear, recomputed once per
- * {@link UpdateFrequency#EVERY_MONTH month} rather than on every draw.
+ * currently forbidden for every active vessel of a fleet, i.e. cells closed to the whole fleet,
+ * recomputed once per {@link UpdateFrequency#EVERY_DAY day} rather than on every draw. Cells
+ * closed to only part of the fleet, e.g. to the vessels of a port under a temporary closure, are
+ * not marked. If no vessel of the fleet is active, no cell is marked.
  */
 public class RegulationGridPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
 
     private Factory<? super SimulationScope, ? extends Regulations<? super ExtendedFishingAction>>
         regulations;
     private Factory<? super SimulationScope, ? extends VesselField> vesselField;
+    private Factory<? super SimulationScope, ? extends Predicate<? super Vessel>> fleet;
     private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetric;
     private int displayWidth;
     private int displayHeight;
@@ -74,8 +79,9 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
             scope.getSimulation().getTemporalSchedule(),
             regulations.get(scope),
             vesselField.get(scope),
+            fleet.get(scope),
             bathymetric.get(scope),
-            EVERY_MONTH,
+            EVERY_DAY,
             displayWidth,
             displayHeight
         );
@@ -109,6 +115,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
         private final TemporalSchedule schedule;
         private final Regulations<? super ExtendedFishingAction> regulations;
         private final VesselField vesselField;
+        private final Predicate<? super Vessel> fleet;
         private final BathymetricGrid bathymetricGrid;
         private final ObjectGrid2D grid;
         private final UpdateFrequency updateFrequency;
@@ -118,6 +125,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
             final TemporalSchedule schedule,
             final Regulations<? super ExtendedFishingAction> regulations,
             final VesselField vesselField,
+            final Predicate<? super Vessel> fleet,
             final BathymetricGrid bathymetricGrid,
             final UpdateFrequency updateFrequency,
             final int displayWidth,
@@ -126,6 +134,7 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
             super();
             this.regulations = regulations;
             this.vesselField = vesselField;
+            this.fleet = fleet;
             this.bathymetricGrid = bathymetricGrid;
             final int gridWidth = bathymetricGrid.getModelGrid().getGridWidth();
             final int gridHeight = bathymetricGrid.getModelGrid().getGridHeight();
@@ -162,21 +171,27 @@ public class RegulationGridPortrayalFactory extends SimulationScopeFactory<Objec
         }
 
         void updateGrid() {
+            final LocalDateTime dateTime = schedule.getDateTime();
+            final List<Vessel> fleetVessels =
+                bagToStream(vesselField.getField().allObjects, Vessel.class)
+                    .filter(Vessel::isActive)
+                    .filter(fleet)
+                    .toList();
             bathymetricGrid.getActiveWaterCells().forEach(cell -> {
-                final LocalDateTime dateTime = schedule.getDateTime();
                 final boolean forbidden =
-                    bagToStream(vesselField.getField().allObjects, Vessel.class)
-                        .filter(Vessel::isActive)
-                        .map(vessel ->
-                            new ExtendedFishingAction(
-                                vessel,
-                                dateTime,
-                                Duration.ZERO,
-                                bathymetricGrid.getModelGrid().toCoordinate(cell),
-                                vessel.getGear()
+                    !fleetVessels.isEmpty() &&
+                        fleetVessels
+                            .stream()
+                            .map(vessel ->
+                                new ExtendedFishingAction(
+                                    vessel,
+                                    dateTime,
+                                    Duration.ZERO,
+                                    bathymetricGrid.getModelGrid().toCoordinate(cell),
+                                    vessel.getGear()
+                                )
                             )
-                        )
-                        .anyMatch(regulations::isForbidden);
+                            .allMatch(regulations::isForbidden);
                 grid.field[cell.x][cell.y] = forbidden ? "FORBIDDEN" : null;
             });
         }
