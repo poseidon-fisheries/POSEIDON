@@ -43,8 +43,8 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 /**
  * The resolved, runnable form of a {@link Scenario}: a MASON {@link SimState} that owns the
- * {@link TemporalSchedule}, an {@link EventManager}, a unique id, and the list of resolved
- * scenario components. Built exclusively via {@link Scenario#startNewSimulation()} (or the
+ * {@link TemporalSchedule}, an {@link EventManager}, a unique id, and the resolved scenario
+ * components, by name. Built exclusively via {@link Scenario#startNewSimulation()} (or the
  * {@link SimulationStartOptions}-taking overload) — never constructed directly, since the
  * constructor is package-private.
  */
@@ -57,7 +57,12 @@ public class Simulation extends SimState {
     private final UUID id;
     private final List<Steppable> finalProcesses = new ArrayList<>();
     private boolean started = false;
-    List<?> components;
+    /**
+     * The resolved components, keyed by the name they were registered under in the
+     * {@link Scenario} (or in {@link SimulationStartOptions#getExtraComponents()}), in registration
+     * order.
+     */
+    Map<String, ?> components;
 
     Simulation(
         final long seed,
@@ -130,14 +135,14 @@ public class Simulation extends SimState {
     }
 
     /**
-     * @param componentClass the type of component to look up; nested collections in the resolved
-     *                       component list are flattened first
+     * @param componentClass the type of component to look up; nested collections among the
+     *                       resolved components are flattened first
      * @return every resolved component assignable to {@code componentClass}
      * @throws NoSuchElementException if none are found
      */
     public <T> Set<T> getComponents(final Class<T> componentClass) {
         final Set<T> components =
-            getComponents(this.components, componentClass).collect(toImmutableSet());
+            getComponents(this.components.values(), componentClass).collect(toImmutableSet());
         if (components.isEmpty()) {
             throw new NoSuchElementException(
                 "No components of class %s found in simulation.".formatted(componentClass.getName())

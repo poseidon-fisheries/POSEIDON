@@ -163,9 +163,12 @@ public class SimulationWithUI extends GUIState {
             return propertyOrNull(Simulation::getFinalProcesses);
         }
 
-        /** @return the current simulation's components, or {@code null} if there is none */
-        public List<?> getComponents() {
-            return propertyOrNull(Simulation::getComponents);
+        /**
+         * @return one {@link ComponentView} per component of the current simulation, or
+         * {@code null} if there is none
+         */
+        public List<ComponentView> getComponents() {
+            return propertyOrNull(ComponentView::of);
         }
 
     }

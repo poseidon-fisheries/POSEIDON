@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.*;
 import org.apache.commons.beanutils.PropertyUtils;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -131,14 +132,14 @@ public final class Scenario {
             new Simulation(options.getSeed(), schedule, options.getSimulationId());
         final SimulationScope simulationScope = new SimulationScope(simulation);
         simulation.start();
-        simulation.components =
-            Stream
-                .<Factory<? super SimulationScope, ?>>concat(
-                    getComponents().values().stream(),
-                    options.getExtraComponents().values().stream()
-                )
-                .map(factory -> factory.get(simulationScope))
-                .toList();
+        final ImmutableMap.Builder<String, Object> resolved = ImmutableMap.builder();
+        Stream
+            .concat(
+                getComponents().entrySet().stream(),
+                options.getExtraComponents().entrySet().stream()
+            )
+            .forEach(entry -> resolved.put(entry.getKey(), entry.getValue().get(simulationScope)));
+        simulation.components = resolved.buildOrThrow();
         return simulation;
     }
 
