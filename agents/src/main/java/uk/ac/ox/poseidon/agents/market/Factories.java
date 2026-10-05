@@ -54,39 +54,6 @@ public class Factories {
     }
 
     /**
-     * @param data                  the price table
-     * @param dateColumn            column giving each row's effective date
-     * @param portCodeColumn        column giving each row's port code
-     * @param speciesCodeColumn     column giving each row's species code
-     * @param categoryCodeColumn    column giving each row's catch category code
-     * @param priceColumn           column giving each row's price amount
-     * @param currencyColumn        column giving each row's currency code
-     * @param measurementUnitColumn column giving each row's unit of mass
-     * @param portGrid              locates each row's port
-     * @param species               the species to match row species codes against
-     * @return a {@link SimulationScopeFactory} for a {@link MarketGrid} built from the table
-     * @see BiomassMarketGridFromPriceTableFactory
-     */
-    public static BiomassMarketGridFromPriceTableFactory biomassMarketGridFromPriceTable(
-        final Factory<? super SimulationScope, ? extends Table> data,
-        final String dateColumn,
-        final String portCodeColumn,
-        final String speciesCodeColumn,
-        final String categoryCodeColumn,
-        final String priceColumn,
-        final String currencyColumn,
-        final String measurementUnitColumn,
-        final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
-        final Factory<? super SimulationScope, ? extends Iterable<? extends Species>> species
-    ) {
-        return new BiomassMarketGridFromPriceTableFactory(
-            data, dateColumn, portCodeColumn, speciesCodeColumn,
-            categoryCodeColumn, priceColumn, currencyColumn,
-            measurementUnitColumn, portGrid, species
-        );
-    }
-
-    /**
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
      * {@link BiomassSaleAccumulator}
      * @see BiomassSaleAccumulator
@@ -119,6 +86,40 @@ public class Factories {
         final Factory<? super SimulationScope, ? extends List<PriceEntry>> pricesEntries
     ) {
         return new OneBiomassMarketPerPortFactory(portGrid, pricesEntries);
+    }
+
+    /**
+     * @param data                  the price table
+     * @param dateColumn            column giving each row's effective date
+     * @param marketCodeColumn      column giving each row's market code
+     * @param speciesCodeColumn     column giving each row's species code
+     * @param categoryCodeColumn    column giving each row's catch category code
+     * @param priceColumn           column giving each row's price amount
+     * @param currencyColumn        column giving each row's currency code
+     * @param measurementUnitColumn column giving each row's unit of mass
+     * @param marketGrid            the markets whose prices the table updates
+     * @param species               the species to match row species codes against
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for the table's price
+     * updates, each dated at its row's date
+     * @see PriceUpdatesFromTableFactory
+     */
+    public static PriceUpdatesFromTableFactory priceUpdatesFromTable(
+        final Factory<? super SimulationScope, ? extends Table> data,
+        final String dateColumn,
+        final String marketCodeColumn,
+        final String speciesCodeColumn,
+        final String categoryCodeColumn,
+        final String priceColumn,
+        final String currencyColumn,
+        final String measurementUnitColumn,
+        final Factory<? super SimulationScope, ? extends MarketGrid> marketGrid,
+        final Factory<? super SimulationScope, ? extends Iterable<? extends Species>> species
+    ) {
+        return new PriceUpdatesFromTableFactory(
+            data, dateColumn, marketCodeColumn, speciesCodeColumn,
+            categoryCodeColumn, priceColumn, currencyColumn,
+            measurementUnitColumn, marketGrid, species
+        );
     }
 
     /**
