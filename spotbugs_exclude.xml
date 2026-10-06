@@ -35,4 +35,9 @@
         <!-- Constructor validation throws are a common and safe pattern -->
         <Bug pattern="CT_CONSTRUCTOR_THROW"/>
     </Match>
+    <Match>
+        <!-- Tests pass null on purpose to check that it is rejected -->
+        <Class name="~.*Test"/>
+        <Bug pattern="NP_NONNULL_PARAM_VIOLATION"/>
+    </Match>
 </FindBugsFilter>
