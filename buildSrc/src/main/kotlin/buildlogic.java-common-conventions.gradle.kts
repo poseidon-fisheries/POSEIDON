@@ -59,6 +59,11 @@ dependencies {
     mockitoAgent(libs.mockito) { isTransitive = false }
     testRuntimeOnly(libs.junit.platform.launcher)
     compileOnly("${libs.spotbugs.annotations.get()}:${spotbugs.toolVersion.get()}")
+    constraints {
+        implementation(libs.jackson.core) {
+            because("GeoTools 35.1 brings 3.2.0, affected by GHSA-p6pp-m3f8-5c89 and GHSA-7hhh-6rmp-j9qf")
+        }
+    }
 }
 
 

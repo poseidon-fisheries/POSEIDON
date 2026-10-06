@@ -13,6 +13,7 @@ gdxai = "50d94f4847303dc18ba8077f8a3424d1be5e0692"
 geotools = "35.1"
 guava = "33.6.0-jre"
 indriya = "2.2.3"
+jackson-core = "3.2.3" # transitive via GeoTools; drop once a GeoTools release brings 3.2.3 or later
 jcommander = "2.0"
 jenetics = "9.0.0"
 joda-money = "2.0.3"
@@ -52,6 +53,7 @@ gt-main = { module = "org.geotools:gt-main", version.ref = "geotools" }
 gt-shapefile = { module = "org.geotools:gt-shapefile", version.ref = "geotools" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 indriya = { module = "tech.units:indriya", version.ref = "indriya" }
+jackson-core = { module = "tools.jackson.core:jackson-core", version.ref = "jackson-core" }
 jcommander = { module = "org.jcommander:jcommander", version.ref = "jcommander" }
 jenetics = { module = "io.jenetics:jenetics", version.ref = "jenetics" }
 joda-money = { module = "org.joda:joda-money", version.ref = "joda-money" }
