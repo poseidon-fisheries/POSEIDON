@@ -1,5 +1,5 @@
 [![Java CI with Gradle](https://github.com/poseidon-fisheries/POSEIDON/actions/workflows/gradle.yml/badge.svg)](https://github.com/poseidon-fisheries/POSEIDON/actions/workflows/gradle.yml)
-[![codecov](https://codecov.io/github/nicolaspayette/POSEIDON/branch/main/graph/badge.svg?token=U1N84R6YDV)](https://codecov.io/github/nicolaspayette/POSEIDON)
+[![codecov](https://codecov.io/gh/poseidon-fisheries/POSEIDON/branch/main/graph/badge.svg)](https://codecov.io/gh/poseidon-fisheries/POSEIDON)
 [![Javadoc](https://github.com/poseidon-fisheries/POSEIDON/actions/workflows/javadoc.yml/badge.svg)](https://poseidon-fisheries.github.io/POSEIDON/)
 
 This is the code for POSEIDON, a fishery agent-based model.
