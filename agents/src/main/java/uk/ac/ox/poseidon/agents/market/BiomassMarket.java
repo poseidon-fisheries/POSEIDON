@@ -46,7 +46,7 @@ import static java.util.stream.Collectors.toMap;
  * A {@link Market} with prices keyed by (catch category, species), with a fallback lookup via
  * {@link Species#covers}. A market starts with no prices: they are set through
  * {@link #setPrice}, e.g. by {@link MarketPrice#apply()}. Selling a catch splits it into what has a price
- * (sold, broadcast as a {@link Sale}) and what doesn't (left in {@link Sale#getUnsold()}).
+ * (sold, broadcast as a {@link Sale}) and what doesn't (left in the sale's {@code unsold} catch).
  */
 @Getter
 @ToString

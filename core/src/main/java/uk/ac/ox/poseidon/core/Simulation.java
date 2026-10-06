@@ -59,8 +59,8 @@ public class Simulation extends SimState {
     private boolean started = false;
     /**
      * The resolved components, keyed by the name they were registered under in the
-     * {@link Scenario} (or in {@link SimulationStartOptions#getExtraComponents()}), in registration
-     * order.
+     * {@link Scenario} (or among the {@code extraComponents} of the {@link SimulationStartOptions}),
+     * in registration order.
      */
     Map<String, ?> components;
 

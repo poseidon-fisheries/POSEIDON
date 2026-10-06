@@ -26,6 +26,7 @@ import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -52,7 +53,7 @@ public class Factories {
     }
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+     * @return a {@link SimulationScopeFactory} for a
      * {@link BiomassSaleAccumulator}
      * @see BiomassSaleAccumulator
      */
@@ -136,7 +137,7 @@ public class Factories {
      * @param measurementUnitColumn column giving each row's unit of mass
      * @param marketGrid            the markets whose prices the table updates
      * @param species               the species to match row species codes against
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for the table's price
+     * @return a {@link SimulationScopeFactory} for the table's price
      * updates, each dated at its row's date
      * @see PriceUpdatesFromTableFactory
      */
