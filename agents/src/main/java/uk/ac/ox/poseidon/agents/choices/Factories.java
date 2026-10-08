@@ -37,7 +37,10 @@ import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-/** Factories for a vessel's learned {@link OptionValues} and its destination-choice strategies. */
+/**
+ * Factories for a vessel's learned {@link OptionValues}, its {@link Memory} of observations and the
+ * rules updating it, and its destination-choice strategies.
+ */
 public class Factories {
 
     private Factories() {}
@@ -117,6 +120,18 @@ public class Factories {
         return new EpsilonGreedyDestinationSupplierFactory(
             epsilon, explorer, exploiter
         );
+    }
+
+    /**
+     * @param alpha the weight of a new observation, between 0 and 1
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link Memory} update rule
+     * that is an exponential moving average of {@code Double}s
+     * @see ExponentialMovingAverageOfDoubles
+     */
+    public static ExponentialMovingAverageOfDoublesFactory exponentialMovingAverageOfDoubles(
+        final double alpha
+    ) {
+        return new ExponentialMovingAverageOfDoublesFactory(alpha);
     }
 
     /**
