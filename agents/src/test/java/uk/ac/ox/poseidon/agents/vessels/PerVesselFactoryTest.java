@@ -24,8 +24,12 @@ package uk.ac.ox.poseidon.agents.vessels;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.providers.FirstIntFromFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntSupplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -93,5 +97,41 @@ class PerVesselFactoryTest {
         factory.get(scope);
 
         assertThat(counter).hasValue(1);
+    }
+
+    private static VesselScope scopeOfNewVessel() {
+        final Vessel vessel = mock(Vessel.class);
+        final VesselScope scope = mock(VesselScope.class);
+        when(scope.getVessel()).thenReturn(vessel);
+        return scope;
+    }
+
+    private static class CountingIntSupplierFactory extends GlobalScopeFactory<IntSupplier> {
+        @Override
+        protected IntSupplier newInstance(final Scope scope) {
+            final AtomicInteger counter = new AtomicInteger(0);
+            return counter::incrementAndGet;
+        }
+    }
+
+    @Test
+    void sharedDelegateGivesEveryVesselTheSameInstance() {
+        final PerVesselFactory<IntSupplier> factory =
+            new PerVesselFactory<>(new CountingIntSupplierFactory());
+
+        assertThat(factory.get(scopeOfNewVessel())).isSameAs(factory.get(scopeOfNewVessel()));
+    }
+
+    @Test
+    void factoriesBuiltOnItAreResolvedOncePerVessel() {
+        final FirstIntFromFactory<VesselScope> factory = new FirstIntFromFactory<>(
+            new PerVesselFactory<>(new CountingIntSupplierFactory())
+        );
+        final VesselScope scopeA = scopeOfNewVessel();
+        final VesselScope scopeB = scopeOfNewVessel();
+
+        assertThat(factory.get(scopeA).getAsInt()).isEqualTo(1);
+        assertThat(factory.get(scopeB).getAsInt()).isEqualTo(2);
+        assertThat(factory.get(scopeA).getAsInt()).isEqualTo(1);
     }
 }
