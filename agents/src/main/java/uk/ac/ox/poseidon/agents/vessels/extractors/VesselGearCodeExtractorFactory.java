@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2024-2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,11 +20,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * {@link java.util.function.Function}s that pull a value off a
- * {@link uk.ac.ox.poseidon.agents.vessels.Vessel}, such as its remaining hold capacity or the code
- * of its current gear. See tag-specific extractors in
- * {@link uk.ac.ox.poseidon.agents.vessels.extractors.tags}. See
- * {@link uk.ac.ox.poseidon.agents.vessels.extractors.Factories} for the entry points.
- */
 package uk.ac.ox.poseidon.agents.vessels.extractors;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+
+/**
+ * A {@link GlobalScopeFactory} counterpart of {@link VesselGearCodeExtractor}, built via
+ * {@link Factories#vesselGearCodeExtractor()}.
+ */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class VesselGearCodeExtractorFactory extends GlobalScopeFactory<VesselGearCodeExtractor> {
+    @Override
+    protected VesselGearCodeExtractor newInstance(final Scope scope) {
+        return new VesselGearCodeExtractor();
+    }
+}

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2024-2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,11 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * {@link java.util.function.Function}s that pull a value off a
- * {@link uk.ac.ox.poseidon.agents.vessels.Vessel}, such as its remaining hold capacity or the code
- * of its current gear. See tag-specific extractors in
- * {@link uk.ac.ox.poseidon.agents.vessels.extractors.tags}. See
- * {@link uk.ac.ox.poseidon.agents.vessels.extractors.Factories} for the entry points.
- */
 package uk.ac.ox.poseidon.agents.vessels.extractors;
+
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+
+import java.util.function.Function;
+
+/**
+ * Extracts the code of a vessel's current gear, read at each call so that a gear change is seen
+ * straight away. Returns {@code null} for a gear without a code, such as an inactive gear.
+ */
+public class VesselGearCodeExtractor implements Function<Vessel, String> {
+    @Override
+    public String apply(final Vessel vessel) {
+        return vessel.getGear().getCode();
+    }
+}

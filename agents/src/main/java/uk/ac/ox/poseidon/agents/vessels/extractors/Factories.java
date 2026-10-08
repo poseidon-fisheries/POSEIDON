@@ -57,4 +57,12 @@ public class Factories {
         return new TripCostFromHourlyCostsFactory<>(hourlyCostsExtractor);
     }
 
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+     * {@link VesselGearCodeExtractor}
+     * @see VesselGearCodeExtractor
+     */
+    public static VesselGearCodeExtractorFactory vesselGearCodeExtractor() {
+        return new VesselGearCodeExtractorFactory();
+    }
 }
