@@ -193,8 +193,10 @@ public class Factories {
     }
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an empty
-     * {@link KeyedMemory}
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for an empty
+     * {@link KeyedMemory}, shared by the whole simulation; wrap it in
+     * {@link uk.ac.ox.poseidon.agents.vessels.Factories#perVessel} for one per vessel, and give
+     * every selector of a vessel's memory that same wrapper (two wrappers make two memories)
      * @see KeyedMemory
      */
     public static <K, O, M> KeyedMemoryFactory<K, O, M> keyedMemory() {
@@ -217,8 +219,9 @@ public class Factories {
     }
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an empty
-     * {@link Memory}
+     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for an empty {@link Memory},
+     * shared by the whole simulation; wrap it in
+     * {@link uk.ac.ox.poseidon.agents.vessels.Factories#perVessel} for one per vessel
      * @see Memory
      */
     public static <O, M> MemoryFactory<O, M> memory() {

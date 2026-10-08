@@ -25,19 +25,19 @@ package uk.ac.ox.poseidon.agents.choices;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link KeyedMemory}, built via
+ * A {@link SimulationScopeFactory} counterpart of {@link KeyedMemory}, built via
  * {@link Factories#keyedMemory()}.
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class KeyedMemoryFactory<K, O, M> extends VesselScopeFactory<KeyedMemory<K, O, M>> {
+public class KeyedMemoryFactory<K, O, M> extends SimulationScopeFactory<KeyedMemory<K, O, M>> {
     @Override
-    protected KeyedMemory<K, O, M> newInstance(final VesselScope scope) {
+    protected KeyedMemory<K, O, M> newInstance(final SimulationScope scope) {
         return new KeyedMemory<>();
     }
 }

@@ -25,19 +25,19 @@ package uk.ac.ox.poseidon.agents.choices;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link Memory}, built via
+ * A {@link SimulationScopeFactory} counterpart of {@link Memory}, built via
  * {@link Factories#memory()}.
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MemoryFactory<O, M> extends VesselScopeFactory<Memory<O, M>> {
+public class MemoryFactory<O, M> extends SimulationScopeFactory<Memory<O, M>> {
     @Override
-    protected Memory<O, M> newInstance(final VesselScope scope) {
+    protected Memory<O, M> newInstance(final SimulationScope scope) {
         return new Memory<>();
     }
 }
