@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
 import ec.util.MersenneTwisterFast;
+import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
@@ -88,6 +89,10 @@ class TripEvaluatorTest {
         @Override
         public Optional<Double> getValue(final Int2D option) {
             return Optional.empty();
+        }
+
+        @Override
+        public void forEachEntry(final ObjectDoubleBiConsumer<? super Int2D> consumer) {
         }
 
         @Override

@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
+import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,11 @@ public abstract class MapBasedOptionValues<O> implements OptionValues<O> {
     @Override
     public Optional<Double> getValue(final O option) {
         return Optional.ofNullable(getValues().get(option));
+    }
+
+    @Override
+    public void forEachEntry(final ObjectDoubleBiConsumer<? super O> consumer) {
+        getValues().forEach((option, value) -> consumer.accept(option, (double) value));
     }
 
     @Override

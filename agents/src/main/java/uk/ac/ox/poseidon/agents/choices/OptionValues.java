@@ -55,6 +55,13 @@ public interface OptionValues<O> {
     /** @param rng the RNG to break ties with; @return one (option, value) pair uniformly picked among the best, if any */
     Optional<Entry<O, Double>> getBestEntry(MersenneTwisterFast rng);
 
+    /**
+     * Calls {@code consumer} once per observed option, with its value, in no particular order.
+     *
+     * @param consumer the consumer to call
+     */
+    void forEachEntry(ObjectDoubleBiConsumer<? super O> consumer);
+
     /** Calls {@code consumer} once per {@link #getBestEntries()} entry. */
     default void forEachBestEntry(final ObjectDoubleBiConsumer<? super O> consumer) {
         getBestEntries().forEach(entry -> consumer.accept(entry.getKey(), entry.getValue()));
