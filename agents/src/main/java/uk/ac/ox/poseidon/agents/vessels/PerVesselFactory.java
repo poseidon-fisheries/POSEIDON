@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * <b>It does not, by itself, give each vessel its own instance.</b> It calls
  * {@code delegate.get(scope)}, and the delegate keeps its own cache, keyed on its own scope. So:
  * <ul>
- *     <li>if the delegate is vessel-scoped (or does not cache), each vessel gets its own
- *     instance, as it would without the wrapper;</li>
+ *     <li>if the delegate is vessel-scoped, each vessel gets its own instance, as it would
+ *     without the wrapper;</li>
  *     <li>if the delegate is simulation-scoped or global, every vessel gets <em>the same</em>
  *     instance: the one the delegate shares.</li>
  * </ul>
