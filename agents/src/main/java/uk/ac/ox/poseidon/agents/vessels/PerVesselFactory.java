@@ -27,40 +27,32 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.PerScopeFactory;
 
 /**
- * A {@link VesselScopeFactory} that resolves its delegate once per vessel and caches the result
- * under that vessel.
- * <p>
- * <b>It does not, by itself, give each vessel its own instance.</b> It calls
- * {@code delegate.get(scope)}, and the delegate keeps its own cache, keyed on its own scope. So:
- * <ul>
- *     <li>if the delegate is vessel-scoped, each vessel gets its own instance, as it would
- *     without the wrapper;</li>
- *     <li>if the delegate is simulation-scoped or global, every vessel gets <em>the same</em>
- *     instance: the one the delegate shares.</li>
- * </ul>
- * What the wrapper does change is the scope of what is built on top of it. A factory that takes
- * the scope of its inputs (a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory}) becomes
- * vessel-scoped when one of its inputs is wrapped, and so is resolved once per vessel. For example,
- * {@code firstIntFrom(perVessel(randomInt(1, 10)))} draws a separate number for each vessel from
- * one random provider shared by the simulation, whereas {@code firstIntFrom(randomInt(1, 10))}
- * draws a single number shared by every vessel.
- * <p>
- * There is no separate component class: the produced value is whatever the delegate produces,
- * passed through unchanged. Built via {@link Factories#perVessel}.
+ * A {@link PerScopeFactory} that builds its delegate's product once per vessel, whatever scope the
+ * delegate has: wrapping a global or simulation-scoped factory gives each vessel its own instance
+ * (see {@link PerScopeFactory} for what is and is not new). Factories built on top of it that take
+ * the scope of their inputs (a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory}) become
+ * vessel-scoped too, e.g. {@code firstIntFrom(perVessel(randomInt(1, 10)))} draws a separate number
+ * for each vessel. No separate plain component class here: the produced value is whatever the
+ * delegate produces, passed through unchanged. Built via {@link Factories#perVessel}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PerVesselFactory<T> extends VesselScopeFactory<T> {
+public class PerVesselFactory<T> extends PerScopeFactory<VesselScope, T> {
 
     private Factory<? super VesselScope, ? extends T> delegate;
 
-    /** @return {@link #delegate}'s resolved value */
     @Override
-    protected T newInstance(final VesselScope scope) {
-        return delegate.get(scope);
+    protected Object makeKey(final VesselScope scope) {
+        return scope.getVessel();
+    }
+
+    @Override
+    protected Class<VesselScope> scopeClass() {
+        return VesselScope.class;
     }
 }

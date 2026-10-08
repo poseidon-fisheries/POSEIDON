@@ -115,11 +115,15 @@ class PerVesselFactoryTest {
     }
 
     @Test
-    void sharedDelegateGivesEveryVesselTheSameInstance() {
-        final PerVesselFactory<IntSupplier> factory =
-            new PerVesselFactory<>(new CountingIntSupplierFactory());
+    void eachVesselGetsItsOwnInstanceEvenFromASharedDelegate() {
+        final CountingIntSupplierFactory delegate = new CountingIntSupplierFactory();
+        final PerVesselFactory<IntSupplier> factory = new PerVesselFactory<>(delegate);
+        final VesselScope scopeA = scopeOfNewVessel();
+        final VesselScope scopeB = scopeOfNewVessel();
 
-        assertThat(factory.get(scopeOfNewVessel())).isSameAs(factory.get(scopeOfNewVessel()));
+        assertThat(factory.get(scopeA)).isSameAs(factory.get(scopeA));
+        assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
+        assertThat(factory.get(scopeA)).isNotSameAs(delegate.get(scopeA));
     }
 
     @Test
@@ -130,8 +134,7 @@ class PerVesselFactoryTest {
         final VesselScope scopeA = scopeOfNewVessel();
         final VesselScope scopeB = scopeOfNewVessel();
 
-        assertThat(factory.get(scopeA).getAsInt()).isEqualTo(1);
-        assertThat(factory.get(scopeB).getAsInt()).isEqualTo(2);
-        assertThat(factory.get(scopeA).getAsInt()).isEqualTo(1);
+        assertThat(factory.get(scopeA)).isSameAs(factory.get(scopeA));
+        assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
     }
 }

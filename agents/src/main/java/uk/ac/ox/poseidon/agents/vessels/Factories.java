@@ -45,10 +45,8 @@ public class Factories {
     private Factories() {}
 
     /**
-     * @param delegate the factory to resolve once per vessel; each vessel only gets its own
-     *                 instance if this factory itself gives one per vessel
-     * @return a {@link VesselScopeFactory} for {@code T}, which makes factories built on top of
-     * it vessel-scoped
+     * @param delegate the factory whose product is built once per vessel
+     * @return a {@link uk.ac.ox.poseidon.core.PerScopeFactory} for {@code T}, one per vessel
      * @see PerVesselFactory
      */
     public static <T> PerVesselFactory<T> perVessel(
