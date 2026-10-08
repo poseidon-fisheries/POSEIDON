@@ -125,6 +125,19 @@ public class Factories {
     /**
      * @param alpha the weight of a new observation, between 0 and 1
      * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link Memory} update rule
+     * that is a species-by-species exponential moving average of
+     * {@link uk.ac.ox.poseidon.biology.buckets.Bucket}s
+     * @see ExponentialMovingAverageOfBuckets
+     */
+    public static ExponentialMovingAverageOfBucketsFactory exponentialMovingAverageOfBuckets(
+        final double alpha
+    ) {
+        return new ExponentialMovingAverageOfBucketsFactory(alpha);
+    }
+
+    /**
+     * @param alpha the weight of a new observation, between 0 and 1
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link Memory} update rule
      * that is an exponential moving average of {@code Double}s
      * @see ExponentialMovingAverageOfDoubles
      */
