@@ -43,11 +43,10 @@ class MemoryBasedOptionValuesTest {
     private final AtomicReference<String> contextKey = new AtomicReference<>("trawl");
     private final AtomicReference<ToDoubleBiFunction<String, Double>> valuation =
         new AtomicReference<>((option, recollection) -> recollection);
-    private final MemoryBasedOptionValues<String, String, Double> optionValues =
+    private final MemoryBasedOptionValues<String, Double> optionValues =
         new MemoryBasedOptionValues<>(
-            keyedMemory,
+            new KeyedMemorySelector<>(keyedMemory, vessel -> contextKey.get()),
             mock(Vessel.class),
-            vessel -> contextKey.get(),
             (option, recollection) -> valuation.get().applyAsDouble(option, recollection)
         );
 
