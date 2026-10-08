@@ -28,8 +28,8 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 /**
  * A {@link Memory} update rule for {@code Double}s: an exponential moving average, which
- * remembers {@code remembered × (1 − alpha) + observed × alpha}. An {@code alpha} of 1 replaces
- * what is remembered with each new observation; an {@code alpha} of 0 keeps it forever.
+ * remembers {@code recollection × (1 − alpha) + observation × alpha}. An {@code alpha} of 1
+ * replaces what is remembered with each new observation; an {@code alpha} of 0 keeps it forever.
  */
 public class ExponentialMovingAverageOfDoubles implements BinaryOperator<Double> {
 
@@ -42,9 +42,9 @@ public class ExponentialMovingAverageOfDoubles implements BinaryOperator<Double>
 
     @Override
     public Double apply(
-        final Double remembered,
-        final Double observed
+        final Double recollection,
+        final Double observation
     ) {
-        return remembered * (1 - alpha) + observed * alpha;
+        return recollection * (1 - alpha) + observation * alpha;
     }
 }

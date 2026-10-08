@@ -55,8 +55,9 @@ public class Memory<O, M> {
      *
      * @param option      the option observed
      * @param observation what was observed; must not be {@code null}
-     * @param rule        called with what is remembered first and {@code observation} second, it
-     *                    returns what to remember from now on; must not return {@code null}
+     * @param rule        called with the recollection of {@code option} first and
+     *                    {@code observation} second, it returns what to remember from now on; must
+     *                    not return {@code null}
      */
     public void observe(
         final O option,
@@ -66,8 +67,8 @@ public class Memory<O, M> {
         contents.merge(
             option,
             requireNonNull(observation, "observation"),
-            (remembered, observed) ->
-                requireNonNull(rule.apply(remembered, observed), "rule result")
+            (recollection, _) ->
+                requireNonNull(rule.apply(recollection, observation), "rule result")
         );
     }
 

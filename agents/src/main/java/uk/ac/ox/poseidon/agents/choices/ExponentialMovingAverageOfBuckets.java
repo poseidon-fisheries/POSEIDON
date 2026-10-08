@@ -30,8 +30,8 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 /**
  * A {@link Memory} update rule for {@link Bucket}s: an exponential moving average taken species by
- * species, which remembers {@code remembered × (1 − alpha) + observed × alpha} of each species'
- * biomass. A species missing from either bucket counts as zero there, so a species that is
+ * species, which remembers {@code recollection × (1 − alpha) + observation × alpha} of each
+ * species' biomass. A species missing from either bucket counts as zero there, so a species that is
  * remembered but not observed decays, and one observed for the first time enters at
  * {@code alpha} of its observed biomass.
  * <p>
@@ -49,11 +49,11 @@ public class ExponentialMovingAverageOfBuckets implements BinaryOperator<Bucket>
 
     @Override
     public Bucket apply(
-        final Bucket remembered,
-        final Bucket observed
+        final Bucket recollection,
+        final Bucket observation
     ) {
-        return remembered
+        return recollection
             .mapBiomassValue((species, kg) -> kg * (1 - alpha))
-            .add(observed.mapBiomassValue((species, kg) -> kg * alpha));
+            .add(observation.mapBiomassValue((species, kg) -> kg * alpha));
     }
 }

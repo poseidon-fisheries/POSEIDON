@@ -52,7 +52,7 @@ class MemoryTest {
     @Test
     void firstObservationIsStoredAsIs() {
         final Memory<String, Double> memory = new Memory<>();
-        memory.observe("A", 3.0, (remembered, observed) -> {
+        memory.observe("A", 3.0, (recollection, observation) -> {
             throw new AssertionError("the rule must not be called on a first observation");
         });
 
@@ -61,10 +61,10 @@ class MemoryTest {
     }
 
     @Test
-    void laterObservationGoesThroughTheRuleWithRememberedValueFirst() {
+    void laterObservationGoesThroughTheRuleWithRecollectionFirst() {
         final Memory<String, Double> memory = new Memory<>();
         memory.observe("A", 3.0, SUM);
-        memory.observe("A", 5.0, (remembered, observed) -> remembered * 10 + observed);
+        memory.observe("A", 5.0, (recollection, observation) -> recollection * 10 + observation);
 
         assertThat(memory.get("A")).contains(35.0);
     }
@@ -96,7 +96,7 @@ class MemoryTest {
         memory.observe("A", 3.0, SUM);
 
         assertThatNullPointerException()
-            .isThrownBy(() -> memory.observe("A", 5.0, (remembered, observed) -> null));
+            .isThrownBy(() -> memory.observe("A", 5.0, (recollection, observation) -> null));
         assertThat(memory.get("A")).contains(3.0);
     }
 }
