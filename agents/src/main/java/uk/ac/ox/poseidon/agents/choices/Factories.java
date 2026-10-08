@@ -27,12 +27,14 @@ import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -187,6 +189,39 @@ public class Factories {
         return new ImitatingPickerFactory<>(
             optionValues, optionPredicate, optionValuesSupplier
         );
+    }
+
+    /**
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an empty
+     * {@link KeyedMemory}
+     * @see KeyedMemory
+     */
+    public static <K, O, M> KeyedMemoryFactory<K, O, M> keyedMemory() {
+        return new KeyedMemoryFactory<>();
+    }
+
+    /**
+     * @param keyedMemory  the keyed memory to select from
+     * @param keyExtractor extracts the key from the selector's input
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link KeyedMemorySelector}
+     * @see KeyedMemorySelector
+     */
+    public static <S extends Scope, T, K, O, M>
+    KeyedMemorySelectorFactory<S, T, K, O, M> keyedMemorySelector(
+        final Factory<? super S, ? extends KeyedMemory<K, O, M>> keyedMemory,
+        final Factory<? super S, ? extends Function<? super T, ? extends K>> keyExtractor
+    ) {
+        return new KeyedMemorySelectorFactory<>(keyedMemory, keyExtractor);
+    }
+
+    /**
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an empty
+     * {@link Memory}
+     * @see Memory
+     */
+    public static <O, M> MemoryFactory<O, M> memory() {
+        return new MemoryFactory<>();
     }
 
     /**
