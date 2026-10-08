@@ -29,23 +29,27 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} that resolves a delegate factory once per simulation and
- * caches that result — regardless of what scope the delegate itself would otherwise resolve at.
- * Use to force a component that's normally shared globally to instead get a fresh instance per
- * simulation run. No separate plain component class here: the produced value is whatever the
- * delegate produces, passed through unchanged. Built via
+ * A {@link PerScopeFactory} that builds its delegate's product once per simulation, whatever
+ * scope the delegate has: wrapping a global factory gives each simulation its own instance (see
+ * {@link PerScopeFactory} for what is and is not new). No separate plain component class here: the
+ * produced value is whatever the delegate produces, passed through unchanged. Built via
  * {@link uk.ac.ox.poseidon.core.utils.Factories#perSimulation(Factory)}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PerSimulationFactory<T> extends SimulationScopeFactory<T> {
+public class PerSimulationFactory<T> extends PerScopeFactory<SimulationScope, T> {
 
     private Factory<? super SimulationScope, ? extends T> delegate;
 
     @Override
-    protected T newInstance(final SimulationScope scope) {
-        return delegate.get(scope);
+    protected Object makeKey(final SimulationScope scope) {
+        return scope.getSimulation();
+    }
+
+    @Override
+    protected Class<SimulationScope> scopeClass() {
+        return SimulationScope.class;
     }
 }
