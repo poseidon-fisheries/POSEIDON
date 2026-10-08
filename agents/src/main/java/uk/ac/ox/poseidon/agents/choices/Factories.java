@@ -38,6 +38,7 @@ import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.function.ToDoubleBiFunction;
 
 /**
  * Factories for a vessel's learned {@link OptionValues}, its {@link Memory} of observations and the
@@ -222,6 +223,24 @@ public class Factories {
      */
     public static <O, M> MemoryFactory<O, M> memory() {
         return new MemoryFactory<>();
+    }
+
+    /**
+     * @param memorySelector selects the memory to read for the vessel
+     * @param valuation      values an option given what is remembered about it
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link MemoryBasedOptionValues}
+     * @see MemoryBasedOptionValues
+     */
+    public static <O, M> MemoryBasedOptionValuesFactory<O, M> memoryBasedOptionValues(
+        final Factory<
+            ? super VesselScope,
+            ? extends Function<? super Vessel, ? extends Memory<O, M>>
+            > memorySelector,
+        final Factory<? super VesselScope, ? extends ToDoubleBiFunction<? super O, ? super M>>
+            valuation
+    ) {
+        return new MemoryBasedOptionValuesFactory<>(memorySelector, valuation);
     }
 
     /**

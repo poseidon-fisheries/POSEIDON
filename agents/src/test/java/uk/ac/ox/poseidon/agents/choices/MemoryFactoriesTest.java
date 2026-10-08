@@ -29,6 +29,7 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Function;
+import java.util.function.ToDoubleBiFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.choices.Factories.keyedMemory;
 import static uk.ac.ox.poseidon.agents.choices.Factories.keyedMemorySelector;
 import static uk.ac.ox.poseidon.agents.choices.Factories.memory;
+import static uk.ac.ox.poseidon.agents.choices.Factories.memoryBasedOptionValues;
 
 class MemoryFactoriesTest {
 
@@ -62,6 +64,21 @@ class MemoryFactoriesTest {
         @Override
         protected Function<String, String> newInstance(final Scope scope) {
             return String::toUpperCase;
+        }
+    }
+
+    private static class TrawlKeyFactory extends GlobalScopeFactory<Function<Vessel, String>> {
+        @Override
+        protected Function<Vessel, String> newInstance(final Scope scope) {
+            return vessel -> "trawl";
+        }
+    }
+
+    private static class RecollectionValuationFactory
+        extends GlobalScopeFactory<ToDoubleBiFunction<String, Double>> {
+        @Override
+        protected ToDoubleBiFunction<String, Double> newInstance(final Scope scope) {
+            return (option, recollection) -> recollection;
         }
     }
 
@@ -100,5 +117,19 @@ class MemoryFactoriesTest {
 
         assertThat(writer.get(scopeA).apply("Trawl")).isSameAs(reader.get(scopeA).apply("t"));
         assertThat(writer.get(scopeA).apply("Trawl")).isNotSameAs(reader.get(scopeB).apply("t"));
+    }
+
+    @Test
+    void optionValuesReadTheMemoryTheVesselsSelectorGives() {
+        final KeyedMemoryFactory<String, String, Double> keyedMemory = keyedMemory();
+        final MemoryBasedOptionValuesFactory<String, Double> factory = memoryBasedOptionValues(
+            keyedMemorySelector(keyedMemory, new TrawlKeyFactory()),
+            new RecollectionValuationFactory()
+        );
+        keyedMemory.get(scopeA).get("trawl").observe("X", 3.0, Double::sum);
+
+        assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
+        assertThat(factory.get(scopeA).getValue("X")).contains(3.0);
+        assertThat(factory.get(scopeB).getValue("X")).isEmpty();
     }
 }
