@@ -34,6 +34,7 @@ import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,11 @@ public class Sale {
 
     /** @return the total sale value, per currency, summed across {@link #items} */
     public Map<CurrencyUnit, Money> summary() {
+        return summarise(items);
+    }
+
+    /** @return the total value of {@code items}, per currency */
+    public static Map<CurrencyUnit, Money> summarise(final Collection<Item> items) {
         // Aggregate as doubles to avoid per-item Money creation; round once per currency.
         final Map<CurrencyUnit, Double> totals = new HashMap<>();
         for (final Item item : items) {

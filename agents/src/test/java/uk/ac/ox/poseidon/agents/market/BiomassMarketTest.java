@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -36,11 +37,13 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
 class BiomassMarketTest {
@@ -128,6 +131,31 @@ class BiomassMarketTest {
         assertThat(market.getPrices().get(category).keySet())
             .containsExactlyInAnyOrderElementsOf(initialKeys);
         assertThat(market.getPrices().get(category)).doesNotContainKey(stagedSpecies);
+    }
+
+    @Test
+    void quotePricesOnlyWhatHasAPriceWithoutBroadcasting() {
+        final CatchCategory pricedCategory = new CatchCategory("C1");
+        final CatchCategory unpricedCategory = new CatchCategory("C2");
+        final Species pricedSpecies = new Species("S1", null, null);
+        final Species unpricedSpecies = new Species("S2", null, null);
+        final Price price = new Price(Money.of(CurrencyUnit.of("EUR"), 2.0), KILOGRAM);
+        final EventManager eventManager = mock(EventManager.class);
+        final BiomassMarket market = new BiomassMarket(mock(Port.class), "M4", eventManager);
+        market.setPrice(pricedCategory, pricedSpecies, price);
+
+        final List<Sale.Item> items = market.quote(new CategorisedCatch(Map.of(
+            pricedCategory, Bucket.of(Map.of(
+                pricedSpecies, Biomass.ofKg(10.0),
+                unpricedSpecies, Biomass.ofKg(20.0)
+            )),
+            unpricedCategory, Bucket.of(pricedSpecies, 30.0)
+        )));
+
+        assertThat(items).containsExactly(
+            new Sale.Item(pricedCategory, pricedSpecies, Biomass.ofKg(10.0), price)
+        );
+        verifyNoInteractions(eventManager);
     }
 
     private static BiomassMarket marketWithPrices(

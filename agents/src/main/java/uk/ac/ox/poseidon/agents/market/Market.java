@@ -27,6 +27,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /** A place, at a {@link Port}, where a vessel sells its catch. */
 public interface Market {
@@ -48,5 +49,15 @@ public interface Market {
         CategorisedCatch categorisedCatch,
         LocalDateTime dateTime
     );
+
+    /**
+     * Prices {@code categorisedCatch} as {@link #sell} would, without selling it: nothing is
+     * broadcast and no sale ID is used.
+     *
+     * @param categorisedCatch the catch to price
+     * @return the items that would sell, one per priced (category, species) combination; what
+     * has no price is left out
+     */
+    List<Sale.Item> quote(CategorisedCatch categorisedCatch);
 
 }

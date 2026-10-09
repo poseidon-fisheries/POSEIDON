@@ -38,6 +38,8 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toMap;
@@ -86,31 +88,13 @@ public class BiomassMarket implements Market {
     ) {
         final List<Sale.Item> soldItems = new ArrayList<>();
         final Map<CatchCategory, BucketBuilder> unsoldByCategory = new HashMap<>();
-
-        categorisedCatch.getBuckets().forEach((catchCategory, bucket) -> {
-            if (prices.get(catchCategory) == null) {
-                unsoldByCategory
-                    .computeIfAbsent(catchCategory, key -> Bucket.newBuilder())
-                    .add(bucket);
-            } else {
-                bucket.forEach((species, biomass) -> {
-                    if (biomass.asKg() <= 0.0) return;
-                    getPrice(catchCategory, species).ifPresentOrElse(
-                        price -> {
-                            soldItems.add(new Sale.Item(
-                                catchCategory,
-                                species,
-                                biomass,
-                                price
-                            ));
-                        },
-                        () -> unsoldByCategory
-                            .computeIfAbsent(catchCategory, key -> Bucket.newBuilder())
-                            .add(species, biomass)
-                    );
-                });
-            }
-        });
+        split(
+            categorisedCatch,
+            soldItems::add,
+            (catchCategory, bucket) -> unsoldByCategory
+                .computeIfAbsent(catchCategory, key -> Bucket.newBuilder())
+                .add(bucket)
+        );
         final CategorisedCatch unsold = unsoldByCategory.isEmpty()
             ? CategorisedCatch.empty()
             : new CategorisedCatch(
@@ -132,6 +116,48 @@ public class BiomassMarket implements Market {
         );
         eventManager.broadcast(sale);
         return sale;
+    }
+
+    /** Prices {@code categorisedCatch} via {@link #getPrice}, as {@link #sell} does. */
+    @Override
+    public List<Sale.Item> quote(final CategorisedCatch categorisedCatch) {
+        final List<Sale.Item> items = new ArrayList<>();
+        split(categorisedCatch, items::add, (catchCategory, bucket) -> {});
+        return items;
+    }
+
+    /**
+     * Splits {@code categorisedCatch} into priced items (priced via {@link #getPrice}), passed to
+     * {@code pricedItemConsumer}, and unpriced catch (no price for that category, or that species
+     * within it), passed to {@code unpricedCatchConsumer}. Species with no biomass are skipped,
+     * except within a wholly unpriced category.
+     */
+    private void split(
+        final CategorisedCatch categorisedCatch,
+        final Consumer<Sale.Item> pricedItemConsumer,
+        final BiConsumer<CatchCategory, Bucket> unpricedCatchConsumer
+    ) {
+        categorisedCatch.getBuckets().forEach((catchCategory, bucket) -> {
+            if (prices.get(catchCategory) == null) {
+                unpricedCatchConsumer.accept(catchCategory, bucket);
+            } else {
+                bucket.forEach((species, biomass) -> {
+                    if (biomass.asKg() <= 0.0) return;
+                    getPrice(catchCategory, species).ifPresentOrElse(
+                        price -> pricedItemConsumer.accept(new Sale.Item(
+                            catchCategory,
+                            species,
+                            biomass,
+                            price
+                        )),
+                        () -> unpricedCatchConsumer.accept(
+                            catchCategory,
+                            Bucket.of(species, biomass)
+                        )
+                    );
+                });
+            }
+        });
     }
 
     /**
