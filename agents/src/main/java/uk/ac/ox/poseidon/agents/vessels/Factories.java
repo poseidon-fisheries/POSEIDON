@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -145,5 +146,17 @@ public class Factories {
             name, account, homePort, hold, gear, engine,
             behaviour, extraFactories, numberOfVesselsToCreate
         );
+    }
+
+    /**
+     * @param listener the factory giving the vessel's listener
+     * @return a {@link VesselScopeFactory} that registers the vessel's listener on the vessel's
+     * event manager and gives it; add it to the vessel's extra factories
+     * @see VesselEventListenerFactory
+     */
+    public static <L extends Listener<?>> VesselEventListenerFactory<L> vesselEventListener(
+        final Factory<? super VesselScope, ? extends L> listener
+    ) {
+        return new VesselEventListenerFactory<>(listener);
     }
 }
