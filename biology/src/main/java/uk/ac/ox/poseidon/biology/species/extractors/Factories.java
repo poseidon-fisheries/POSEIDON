@@ -24,39 +24,19 @@ package uk.ac.ox.poseidon.biology.species.extractors;
 
 import uk.ac.ox.poseidon.biology.species.Species;
 
-/**
- * Factories for {@link java.util.function.Function}s that pull a single field off a
- * {@link Species}.
- */
+/** Factories for {@link java.util.function.Function}s that read a {@link Species}' properties. */
 public class Factories {
 
     private Factories() {}
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a function extracting a
-     * species' code
-     * @see SpeciesCodeExtractorFactory
+     * @param propertyPath the dotted path of properties to follow from the species, e.g.
+     *                     {@code "key"}, {@code "code"} or {@code "lifeStage"}
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
+     * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a species
+     * @see SpeciesPropertyFactory
      */
-    public static SpeciesCodeExtractorFactory speciesCode() {
-        return new SpeciesCodeExtractorFactory();
+    public static <R> SpeciesPropertyFactory<R> speciesProperty(final String propertyPath) {
+        return new SpeciesPropertyFactory<>(propertyPath);
     }
-
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a function extracting a
-     * species' life stage
-     * @see SpeciesLifeStageExtractorFactory
-     */
-    public static SpeciesLifeStageExtractorFactory speciesLifeStage() {
-        return new SpeciesLifeStageExtractorFactory();
-    }
-
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a function extracting a
-     * species' composite key
-     * @see SpeciesKeyExtractorFactory
-     */
-    public static SpeciesKeyExtractorFactory speciesKey() {
-        return new SpeciesKeyExtractorFactory();
-    }
-
 }

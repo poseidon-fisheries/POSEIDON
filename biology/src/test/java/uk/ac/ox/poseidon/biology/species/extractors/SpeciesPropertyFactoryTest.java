@@ -22,23 +22,41 @@
 
 package uk.ac.ox.poseidon.biology.species.extractors;
 
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.function.Function;
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.ac.ox.poseidon.biology.species.extractors.Factories.speciesProperty;
 
-/**
- * A {@link GlobalScopeFactory} for a {@link Function} extracting a {@link Species}' code. Built
- * via {@link Factories#speciesCode()} in this package.
- */
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class SpeciesCodeExtractorFactory extends GlobalScopeFactory<Function<Species, String>> {
-    @Override
-    protected Function<Species, String> newInstance(final Scope scope) {
-        return Species::getCode;
+class SpeciesPropertyFactoryTest {
+
+    private final Species juvenileHake = new Species("HKE", "juvenile", null);
+
+    @Test
+    void readsTheCode() {
+        assertThat(speciesProperty("code").get(Scope.GLOBAL_SCOPE).apply(juvenileHake))
+            .isEqualTo("HKE");
+    }
+
+    @Test
+    void readsTheKey() {
+        assertThat(speciesProperty("key").get(Scope.GLOBAL_SCOPE).apply(juvenileHake))
+            .isEqualTo(juvenileHake.getKey());
+    }
+
+    @Test
+    void readsTheLifeStage() {
+        assertThat(speciesProperty("lifeStage").get(Scope.GLOBAL_SCOPE).apply(juvenileHake))
+            .isEqualTo("juvenile");
+    }
+
+    @Test
+    void readsNullForASpeciesWithoutLifeStage() {
+        assertThat(
+            speciesProperty("lifeStage")
+                .get(Scope.GLOBAL_SCOPE)
+                .apply(new Species("HKE", null, null))
+        ).isNull();
     }
 }

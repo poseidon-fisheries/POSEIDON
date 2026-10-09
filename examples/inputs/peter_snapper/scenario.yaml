@@ -12,7 +12,7 @@ components:
           entry: elevations.csv
           path: !!uk.ac.ox.poseidon.io.paths.RelativePathFactory
             parent: !!uk.ac.ox.poseidon.io.paths.RootPathFactory {
-              path: POSEIDON/examples/inputs/peter_snapper
+              path: inputs/peter_snapper
             }
             path: elevations.zip
     mapPaddingInDegrees: 1.0E-6
@@ -253,8 +253,9 @@ components:
                     predicate: !!uk.ac.ox.poseidon.core.predicates.logical.AllOfFactory
                       predicates:
                       - !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
-                        extractor: !!uk.ac.ox.poseidon.agents.vessels.extractors.AvailableHoldCapacityInKgFactory {
-                          }
+                        extractor: !!uk.ac.ox.poseidon.agents.vessels.extractors.VesselPropertyFactory {
+                          propertyPath: hold.availableCapacityInKg
+                        }
                         predicate: !!uk.ac.ox.poseidon.core.predicates.comparable.GreaterThanFactory
                           value: !!uk.ac.ox.poseidon.core.providers.constant.ConstantProviderFactory
                             object: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {

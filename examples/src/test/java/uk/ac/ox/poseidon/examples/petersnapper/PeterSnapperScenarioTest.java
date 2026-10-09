@@ -20,26 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.biology.species.extractors;
+package uk.ac.ox.poseidon.examples.petersnapper;
 
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.Simulation;
 
-import java.util.function.Function;
+import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * A {@link GlobalScopeFactory} for a {@link Function} extracting a {@link Species}' life stage.
- * Built via {@link Factories#speciesLifeStage()} in this package.
- */
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class SpeciesLifeStageExtractorFactory
-    extends GlobalScopeFactory<Function<Species, String>> {
-    @Override
-    protected Function<Species, String> newInstance(final Scope scope) {
-        return Species::getLifeStage;
+class PeterSnapperScenarioTest {
+
+    @Test
+    void runsAStep() {
+        final Simulation simulation = new PeterSnapperScenario().get().startNewSimulation();
+        simulation.step();
+        assertThat(simulation.schedule.getSteps()).isEqualTo(1);
     }
 }

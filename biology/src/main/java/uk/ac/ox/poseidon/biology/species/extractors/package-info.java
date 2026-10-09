@@ -21,8 +21,8 @@
  */
 
 /**
- * {@link java.util.function.Function}s that pull a single field (code, name, life stage, ...) off
- * a {@link uk.ac.ox.poseidon.biology.species.Species}. See
+ * {@link java.util.function.Function}s that read the properties (code, key, life stage, ...) of a
+ * {@link uk.ac.ox.poseidon.biology.species.Species}. See
  * {@link uk.ac.ox.poseidon.biology.species.extractors.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.biology.species.extractors;

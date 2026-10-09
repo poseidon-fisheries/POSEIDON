@@ -68,7 +68,7 @@ import static uk.ac.ox.poseidon.agents.vessels.Factories.*;
 import static uk.ac.ox.poseidon.agents.vessels.accounts.Factories.account;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.fullTank;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.simpleEngine;
-import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.availableHoldCapacityInKg;
+import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.vesselProperty;
 import static uk.ac.ox.poseidon.agents.vessels.friends.Factories.dynamicFriendsSupplier;
 import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.fixedBiomassProportionGear;
 import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.standardBiomassHold;
@@ -126,8 +126,9 @@ import static uk.ac.ox.poseidon.io.tables.Factories.*;
  */
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
-    private static final Path INPUT_PATH =
-        Path.of("POSEIDON", "examples", "inputs", "peter_snapper");
+    // Relative to the examples module, which Gradle runs from: set IDE run configurations to the
+    // module's working directory.
+    private static final Path INPUT_PATH = Path.of("inputs", "peter_snapper");
 
     private static final double LEARNING_ALPHA = 1;
     private static final double EXPLORATION_PROBABILITY = 0.2;
@@ -141,7 +142,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
         final Scenario scenario = new PeterSnapperScenario().get();
 
-        final Path outputPath = Path.of("POSEIDON", "examples", "outputs", "peter_snapper");
+        final Path outputPath = Path.of("outputs", "peter_snapper");
         new ScenarioWriter().write(scenario, outputPath.resolve("scenario.yaml"));
 
         @SuppressWarnings("RedundantTypeArguments") final Simulation simulation =
@@ -412,7 +413,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             ),
                             checkThat(
                                 allOf(
-                                    condition(availableHoldCapacityInKg(), greaterThan(1)),
+                                    condition(vesselProperty("hold.availableCapacityInKg"), greaterThan(1)),
                                     condition(currentTripDuration(), lessThan(constant(days(10))))
                                 )
                             )

@@ -25,20 +25,26 @@ package uk.ac.ox.poseidon.biology.species.extractors;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Function;
+import uk.ac.ox.poseidon.core.functions.ObjectProperty;
+import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
 
 /**
- * A {@link GlobalScopeFactory} for a {@link Function} extracting a {@link Species}' composite
- * key. Built via {@link Factories#speciesKey()} in this package.
+ * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a {@link Species}, built via
+ * {@link Factories#speciesProperty}.
+ *
+ * @param <R> the type of the property; not checked
  */
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SpeciesKeyExtractorFactory extends GlobalScopeFactory<Function<Species, String>> {
+public class SpeciesPropertyFactory<R> extends ObjectPropertyFactory<Species, R> {
+
+    /** @param propertyPath the dotted path of properties to follow from the species */
+    public SpeciesPropertyFactory(final String propertyPath) {
+        super(propertyPath);
+    }
+
     @Override
-    protected Function<Species, String> newInstance(final Scope scope) {
-        return Species::getKey;
+    protected Class<Species> rootClass() {
+        return Species.class;
     }
 }

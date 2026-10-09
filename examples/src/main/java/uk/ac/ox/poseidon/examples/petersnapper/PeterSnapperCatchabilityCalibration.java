@@ -48,7 +48,7 @@ import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPer
 public final class PeterSnapperCatchabilityCalibration {
 
     private static final Path LANDINGS_PATH =
-        Path.of("POSEIDON", "examples", "inputs", "peter_snapper", "landings.csv");
+        Path.of("inputs", "peter_snapper", "landings.csv");
     private static final String CATCHABILITY_PROPERTY =
         "components(gear).proportion";
     private static final double MIN_CATCHABILITY = 0.00001;
