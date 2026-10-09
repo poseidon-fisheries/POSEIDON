@@ -59,7 +59,7 @@ class HaulRecorderTest {
         return modelGrid;
     }
 
-    private static FishingEvent haul(
+    static FishingEvent haul(
         final String gearCode,
         final Coordinate coordinate,
         final Bucket retained

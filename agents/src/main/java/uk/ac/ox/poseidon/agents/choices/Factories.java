@@ -24,8 +24,10 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
+import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -34,6 +36,7 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import java.util.List;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.Predicate;
@@ -159,6 +162,25 @@ public class Factories {
     public static <O> ExponentialMovingAverageOptionValuesFactory<O>
     exponentialMovingAverageOptionValues(final double alpha) {
         return new ExponentialMovingAverageOptionValuesFactory<>(alpha);
+    }
+
+    /**
+     * @param modelGrid      the grid giving the cell of a haul's coordinate
+     * @param memorySelector selects, from a haul, the memory to record it in
+     * @param updateRule     revises what is remembered of a cell with a new observation of it
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link HaulRecorder}, which it does not register with anything
+     * @see HaulRecorder
+     */
+    public static HaulRecorderFactory haulRecorder(
+        final Factory<? super VesselScope, ? extends ModelGrid> modelGrid,
+        final Factory<
+            ? super VesselScope,
+            ? extends Function<? super FishingEvent, ? extends Memory<Int2D, Bucket>>
+            > memorySelector,
+        final Factory<? super VesselScope, ? extends BinaryOperator<Bucket>> updateRule
+    ) {
+        return new HaulRecorderFactory(modelGrid, memorySelector, updateRule);
     }
 
     /**
