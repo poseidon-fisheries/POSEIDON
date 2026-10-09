@@ -165,6 +165,20 @@ public class Factories {
     }
 
     /**
+     * @param optionValues    the values of the options to pick from
+     * @param optionPredicate which options can be picked
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link GreedyPicker}
+     * @see GreedyPicker
+     */
+    public static <O> GreedyPickerFactory<O> greedyPicker(
+        final Factory<? super VesselScope, ? extends OptionValues<O>> optionValues,
+        final Factory<? super VesselScope, ? extends Predicate<? super O>> optionPredicate
+    ) {
+        return new GreedyPickerFactory<>(optionValues, optionPredicate);
+    }
+
+    /**
      * @param modelGrid      the grid giving the cell of a haul's coordinate
      * @param memorySelector selects, from a haul, the memory to record it in
      * @param updateRule     revises what is remembered of a cell with a new observation of it
