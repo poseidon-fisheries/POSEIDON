@@ -31,6 +31,9 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link Memory}, built via
  * {@link Factories#memory()}.
+ * <p>
+ * Being simulation-scoped, the memory it builds is shared by the whole simulation. Wrap it in
+ * {@link uk.ac.ox.poseidon.agents.vessels.Factories#perVessel} to give each vessel its own.
  */
 @Data
 @NoArgsConstructor
