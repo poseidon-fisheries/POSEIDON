@@ -28,9 +28,11 @@ import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Sells the vessel's hold contents to a market at its current cell and credits the trip's account
@@ -52,22 +54,24 @@ public class LandCatches extends ExtendedTripTask {
      * (by currency) to the trip's account.
      *
      * @return {@link Status#SUCCEEDED}
-     * @throws RuntimeException if no market is found at the vessel's current cell
+     * @throws IllegalStateException if there is not exactly one market at the vessel's current
+     *                               cell
      */
     @Override
     protected Status complete() {
         final Vessel vessel = getAgent();
-        final Market market = vessel
+        final List<Market> markets = vessel
             .getMarketGrid()
             .getObjectsAt(vessel.getCell())
-            // TODO: cover the case where there are multiple markets in the cell
-            .findAny()
-            .orElseThrow(() -> new RuntimeException(
-                "No market found for vessel %s at location %s.".formatted(
-                    vessel.getId(),
-                    vessel.getCell()
-                )
-            ));
+            .toList();
+        checkState(
+            markets.size() == 1,
+            "Expected one market for vessel %s at location %s, found %s.",
+            vessel.getId(),
+            vessel.getCell(),
+            markets.size()
+        );
+        final Market market = markets.getFirst();
         market
             .sell(
                 vessel,
