@@ -23,7 +23,9 @@
 package uk.ac.ox.poseidon.agents.market;
 
 import tech.tablesaw.api.Table;
+import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -59,6 +61,19 @@ public class Factories {
      */
     public static BiomassSaleAccumulatorFactory biomassSaleAccumulator() {
         return new BiomassSaleAccumulatorFactory();
+    }
+
+    /**
+     * @param catchCategoriser sorts the catch before pricing; give it the same factory as the
+     *                         vessel's hold, so that both sort the catch the same way
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link HomePortCatchValuation}
+     * @see HomePortCatchValuation
+     */
+    public static HomePortCatchValuationFactory homePortCatchValuation(
+        final Factory<? super VesselScope, ? extends CatchCategoriser> catchCategoriser
+    ) {
+        return new HomePortCatchValuationFactory(catchCategoriser);
     }
 
     /**
