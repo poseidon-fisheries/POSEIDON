@@ -120,17 +120,20 @@ public interface DistanceCalculator {
         for (int i = 0; i < path.size() - 1; i++) {
             totalDistanceInKm += distanceInKm(path.get(i), path.get(i + 1));
         }
-        return travelDuration(cruisingSpeedInKph, totalDistanceInKm);
+        return travelDuration(totalDistanceInKm, cruisingSpeedInKph);
     }
 
     /**
-     * @param cruisingSpeedInKph the constant travel speed, in km/h
+     * Takes the distance first and the speed last, like the other {@code travelDuration} methods:
+     * both are {@code double}s, so a swap would not be caught by the compiler.
+     *
      * @param totalDistanceInKm  the total distance to travel, in kilometres
+     * @param cruisingSpeedInKph the constant travel speed, in km/h
      * @return the time to travel {@code totalDistanceInKm} at {@code cruisingSpeedInKph}
      */
     static Duration travelDuration(
-        final double cruisingSpeedInKph,
-        final double totalDistanceInKm
+        final double totalDistanceInKm,
+        final double cruisingSpeedInKph
     ) {
         final long SECONDS_PER_HOUR = 3600;
         return Duration.ofSeconds(

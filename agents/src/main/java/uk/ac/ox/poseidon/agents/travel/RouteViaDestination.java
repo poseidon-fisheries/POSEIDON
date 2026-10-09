@@ -72,8 +72,8 @@ public class RouteViaDestination implements Function<Int2D, Route> {
         return new Route(
             distanceInKm,
             DistanceCalculator.travelDuration(
-                vessel.getEngine().getCruisingSpeedInKph(),
-                distanceInKm
+                distanceInKm,
+                vessel.getEngine().getCruisingSpeedInKph()
             )
         );
     }
