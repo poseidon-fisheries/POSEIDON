@@ -22,17 +22,29 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors;
 
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.function.Function;
+import uk.ac.ox.poseidon.core.functions.ObjectProperty;
+import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
 
 /**
- * Extracts the code of a vessel's current gear, read at each call so that a gear change is seen
- * straight away. Returns {@code null} for a gear without a code, such as an inactive gear.
+ * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a {@link Vessel}, built via
+ * {@link Factories#vesselProperty}.
+ *
+ * @param <R> the type of the property; not checked
  */
-public class VesselGearCodeExtractor implements Function<Vessel, String> {
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class VesselPropertyFactory<R> extends ObjectPropertyFactory<Vessel, R> {
+
+    /** @param propertyPath the dotted path of properties to follow from the vessel */
+    public VesselPropertyFactory(final String propertyPath) {
+        super(propertyPath);
+    }
+
     @Override
-    public String apply(final Vessel vessel) {
-        return vessel.getGear().getCode();
+    protected Class<Vessel> rootClass() {
+        return Vessel.class;
     }
 }

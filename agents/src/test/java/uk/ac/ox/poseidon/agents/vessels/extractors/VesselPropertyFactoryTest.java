@@ -23,14 +23,18 @@
 package uk.ac.ox.poseidon.agents.vessels.extractors;
 
 import org.junit.jupiter.api.Test;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.vesselProperty;
 
-class VesselGearCodeExtractorTest {
+class VesselPropertyFactoryTest {
 
     private static Vessel vesselWithGearCode(final String gearCode) {
         final Gear gear = mock(Gear.class);
@@ -41,13 +45,26 @@ class VesselGearCodeExtractorTest {
     }
 
     @Test
-    void extractsTheCodeOfTheVesselsCurrentGear() {
-        assertThat(new VesselGearCodeExtractor().apply(vesselWithGearCode("OTB")))
-            .isEqualTo("OTB");
+    void survivesAYamlRoundTripWithOnlyItsPath() {
+        final LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setTagInspector(tag -> tag.getClassName().startsWith("uk.ac.ox.poseidon"));
+        final Yaml yaml = new Yaml(loaderOptions);
+        final String dumped = yaml.dump(vesselProperty("gear.code"));
+        assertThat(dumped).contains("propertyPath: gear.code").doesNotContain("rootClass");
+        assertThat(yaml.<Object>load(dumped)).isEqualTo(vesselProperty("gear.code"));
     }
 
     @Test
-    void extractsNullForAGearWithoutCode() {
-        assertThat(new VesselGearCodeExtractor().apply(vesselWithGearCode(null))).isNull();
+    void readsTheCodeOfTheVesselsCurrentGear() {
+        assertThat(
+            vesselProperty("gear.code").get(Scope.GLOBAL_SCOPE).apply(vesselWithGearCode("OTB"))
+        ).isEqualTo("OTB");
+    }
+
+    @Test
+    void readsNullForAGearWithoutCode() {
+        assertThat(
+            vesselProperty("gear.code").get(Scope.GLOBAL_SCOPE).apply(vesselWithGearCode(null))
+        ).isNull();
     }
 }

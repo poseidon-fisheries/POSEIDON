@@ -20,8 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.extractors;
+package uk.ac.ox.poseidon.core.functions;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -29,15 +30,28 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link VesselGearCodeExtractor}, built via
- * {@link Factories#vesselGearCodeExtractor()}.
+ * A {@link GlobalScopeFactory} counterpart of {@link ObjectProperty}. Each subclass fixes the
+ * class the property path starts from, so that only the path appears in a scenario.
+ *
+ * @param <T> the type of the object read
+ * @param <R> the type of the property; not checked
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class VesselGearCodeExtractorFactory extends GlobalScopeFactory<VesselGearCodeExtractor> {
+public abstract class ObjectPropertyFactory<T, R> extends GlobalScopeFactory<ObjectProperty<T, R>> {
+
+    private String propertyPath;
+
+    /**
+     * @return the class the property path starts from; deliberately not named as a getter, so
+     * that it isn't taken for a property when the scenario is written out
+     */
+    protected abstract Class<T> rootClass();
+
     @Override
-    protected VesselGearCodeExtractor newInstance(final Scope scope) {
-        return new VesselGearCodeExtractor();
+    protected ObjectProperty<T, R> newInstance(final Scope scope) {
+        return new ObjectProperty<>(rootClass(), propertyPath);
     }
 }

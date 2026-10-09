@@ -61,6 +61,20 @@ public class Factories {
     }
 
     /**
+     * @param propertyPath the dotted path of properties to follow from the fishing event, e.g.
+     *                     {@code "action.gear.code"} for the code of the gear the haul was made
+     *                     with
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
+     * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a fishing event
+     * @see FishingEventPropertyFactory
+     */
+    public static <R> FishingEventPropertyFactory<R> fishingEventProperty(
+        final String propertyPath
+    ) {
+        return new FishingEventPropertyFactory<>(propertyPath);
+    }
+
+    /**
      * @param fisheableSupplier supplies the fisheable to fish from
      * @param dispositionProcess sorts the catch into retained/discarded
      * @return a {@link VesselScope}-relative factory for a {@link Fishing} task

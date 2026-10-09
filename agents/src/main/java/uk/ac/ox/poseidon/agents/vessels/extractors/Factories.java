@@ -58,11 +58,13 @@ public class Factories {
     }
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-     * {@link VesselGearCodeExtractor}
-     * @see VesselGearCodeExtractor
+     * @param propertyPath the dotted path of properties to follow from the vessel, e.g.
+     *                     {@code "gear.code"} for the code of the vessel's current gear
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
+     * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a vessel
+     * @see VesselPropertyFactory
      */
-    public static VesselGearCodeExtractorFactory vesselGearCodeExtractor() {
-        return new VesselGearCodeExtractorFactory();
+    public static <R> VesselPropertyFactory<R> vesselProperty(final String propertyPath) {
+        return new VesselPropertyFactory<>(propertyPath);
     }
 }
