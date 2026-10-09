@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Comparator.comparingDouble;
 import static java.util.Map.entry;
 import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
@@ -43,6 +44,9 @@ import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
  * Options are tested from the highest value down, one value at a time, and testing stops at the
  * first value with an option that passes: the predicate can be costly (such as a check that
  * computes a path), and is not called for options that could not be picked anyway.
+ * <p>
+ * Infinite values are ordinary values, but a {@code NaN} value is an error: it has no place in
+ * the order of values, so it would hide a broken valuation behind an arbitrary pick.
  *
  * @param <O> the type of option
  */
@@ -67,10 +71,17 @@ public class GreedyPicker<O> implements Provider<O> {
         this.rng = checkNotNull(rng);
     }
 
+    /**
+     * @return the picked option, or {@code null} if no option passes the predicate
+     * @throws IllegalStateException if the value of any option is {@code NaN}
+     */
     @Override
     public O get() {
         final List<Entry<O, Double>> entries = new ArrayList<>();
-        optionValues.forEachEntry((option, value) -> entries.add(entry(option, value)));
+        optionValues.forEachEntry((option, value) -> {
+            checkState(!Double.isNaN(value), "Value of option %s is NaN.", option);
+            entries.add(entry(option, value));
+        });
         entries.sort(comparingDouble((Entry<O, Double> entry) -> entry.getValue()).reversed());
 
         int start = 0;
