@@ -26,7 +26,6 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
@@ -38,13 +37,15 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.util.Map;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.poseidon.agents.market.MarketGridTest.market;
+import static uk.ac.ox.poseidon.agents.market.MarketGridTest.marketGrid;
 
 class HomePortCatchValuationTest {
 
@@ -53,10 +54,8 @@ class HomePortCatchValuationTest {
     private final Species unpricedSpecies = new Species("S2", null, null);
     private final CatchCategoriser catchCategoriser =
         bucket -> new CategorisedCatch(Map.of(category, bucket));
-    private final Int2D homePortLocation = new Int2D(1, 2);
     private final Port homePort = mock(Port.class);
     private final Vessel vessel = mock(Vessel.class);
-    private final MarketGrid marketGrid = mock(MarketGrid.class);
     private final BiomassMarket market =
         new BiomassMarket(homePort, "M", mock(EventManager.class));
     private final HomePortCatchValuation valuation =
@@ -65,13 +64,21 @@ class HomePortCatchValuationTest {
     @BeforeEach
     void setUp() {
         when(vessel.getHomePort()).thenReturn(homePort);
-        when(vessel.getHomePortLocation()).thenReturn(homePortLocation);
-        when(vessel.getMarketGrid()).thenReturn(marketGrid);
-        when(marketGrid.getObjectsAt(homePortLocation)).thenAnswer(invocation -> Stream.of(market));
+        givenMarkets(market);
     }
 
     @Test
     void valuesTheCatchAtHomePortPrices() {
+        market.setPrice(category, pricedSpecies, eurosPerKg(2.0));
+        assertThat(valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0)))
+            .isEqualTo(20.0);
+    }
+
+    @Test
+    void valuesTheCatchAtTheHomePortsMarketWhenAnotherPortSharesItsCell() {
+        final Market otherMarket = market(mock(Port.class));
+        when(otherMarket.quote(any())).thenThrow(new AssertionError("quoted the wrong port"));
+        givenMarkets(market, otherMarket);
         market.setPrice(category, pricedSpecies, eurosPerKg(2.0));
         assertThat(valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0)))
             .isEqualTo(20.0);
@@ -102,19 +109,18 @@ class HomePortCatchValuationTest {
     }
 
     @Test
-    void throwsWithoutAMarketAtTheHomePort() {
-        when(marketGrid.getObjectsAt(homePortLocation)).thenAnswer(invocation -> Stream.empty());
+    void throwsWithoutAMarketForTheHomePort() {
+        givenMarkets(market(mock(Port.class)));
         assertThatThrownBy(() ->
             valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0))
         ).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
-    void throwsWithMoreThanOneMarketAtTheHomePort() {
+    void throwsWithMoreThanOneMarketForTheHomePort() {
         final BiomassMarket otherMarket =
             new BiomassMarket(homePort, "N", mock(EventManager.class));
-        when(marketGrid.getObjectsAt(homePortLocation))
-            .thenAnswer(invocation -> Stream.of(market, otherMarket));
+        givenMarkets(market, otherMarket);
         assertThatThrownBy(() ->
             valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0))
         ).isInstanceOf(IllegalStateException.class);
@@ -134,6 +140,11 @@ class HomePortCatchValuationTest {
         ));
         assertThatThrownBy(() -> valuation.applyAsDouble(new Object(), bucket))
             .isInstanceOf(IllegalStateException.class);
+    }
+
+    private void givenMarkets(final Market... markets) {
+        final MarketGrid marketGrid = marketGrid(markets);
+        when(vessel.getMarketGrid()).thenReturn(marketGrid);
     }
 
     private static Price eurosPerKg(final double amount) {

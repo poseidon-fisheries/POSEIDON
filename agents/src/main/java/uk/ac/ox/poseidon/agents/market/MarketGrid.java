@@ -24,6 +24,11 @@ package uk.ac.ox.poseidon.agents.market;
 
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
+import uk.ac.ox.poseidon.geography.ports.Port;
+
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /** An {@link ObjectGrid} of {@link Market}s, keyed by their code. */
 public class MarketGrid extends ObjectGrid<Market> {
@@ -36,6 +41,26 @@ public class MarketGrid extends ObjectGrid<Market> {
     @Override
     protected String getObjectId(final Market market) {
         return market.getCode();
+    }
+
+    /**
+     * Finds a market by the port it belongs to, not by its cell: ports can share a cell.
+     *
+     * @param port the port whose market to find
+     * @return the one market of {@code port}
+     * @throws IllegalStateException if {@code port} does not have exactly one market
+     */
+    public Market getMarket(final Port port) {
+        final List<Market> markets = stream()
+            .filter(market -> market.getPort().equals(port))
+            .toList();
+        checkState(
+            markets.size() == 1,
+            "Expected one market at port %s, found %s.",
+            port,
+            markets.size()
+        );
+        return markets.getFirst();
     }
 
 }

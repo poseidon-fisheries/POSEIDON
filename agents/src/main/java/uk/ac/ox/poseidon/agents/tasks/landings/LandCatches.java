@@ -23,20 +23,19 @@
 package uk.ac.ox.poseidon.agents.tasks.landings;
 
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.market.Market;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.function.Supplier;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Sells the vessel's hold contents to a market at its current cell and credits the trip's account
- * with the proceeds.
+ * Sells the vessel's hold contents to the market of its home port, where it must be, and credits
+ * the trip's account with the proceeds. The market is found by port, not by cell, because ports
+ * can share a cell.
  */
 @RequiredArgsConstructor
 public class LandCatches extends ExtendedTripTask {
@@ -50,29 +49,27 @@ public class LandCatches extends ExtendedTripTask {
     }
 
     /**
-     * Sells the vessel's entire hold to a market at its current cell, adding the sale's proceeds
+     * Sells the vessel's entire hold to the market of its home port, adding the sale's proceeds
      * (by currency) to the trip's account.
      *
      * @return {@link Status#SUCCEEDED}
-     * @throws IllegalStateException if there is not exactly one market at the vessel's current
-     *                               cell
+     * @throws IllegalStateException if the vessel has no home port, is not at its home port, or
+     *                               its home port does not have exactly one market
      */
     @Override
     protected Status complete() {
         final Vessel vessel = getAgent();
-        final List<Market> markets = vessel
-            .getMarketGrid()
-            .getObjectsAt(vessel.getCell())
-            .toList();
+        checkState(vessel.getHomePort() != null, "Vessel %s has no home port.", vessel.getId());
         checkState(
-            markets.size() == 1,
-            "Expected one market for vessel %s at location %s, found %s.",
+            vessel.getCell().equals(vessel.getHomePortLocation()),
+            "Vessel %s is landing at %s, not at its home port %s.",
             vessel.getId(),
             vessel.getCell(),
-            markets.size()
+            vessel.getHomePort()
         );
-        final Market market = markets.getFirst();
-        market
+        vessel
+            .getMarketGrid()
+            .getMarket(vessel.getHomePort())
             .sell(
                 vessel,
                 vessel.getHold().extractContent(),

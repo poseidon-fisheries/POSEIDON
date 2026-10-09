@@ -29,7 +29,6 @@ import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.ToDoubleBiFunction;
 
@@ -51,9 +50,9 @@ public class HomePortCatchValuation implements ToDoubleBiFunction<Object, Bucket
     private final CatchCategoriser catchCategoriser;
 
     /**
-     * @throws IllegalStateException if the vessel has no home port, there is not exactly one
-     *                               market at its home port, or the catch is priced in more
-     *                               than one currency
+     * @throws IllegalStateException if the vessel has no home port, its home port does not have
+     *                               exactly one market, or the catch is priced in more than one
+     *                               currency
      */
     @Override
     public double applyAsDouble(
@@ -61,17 +60,7 @@ public class HomePortCatchValuation implements ToDoubleBiFunction<Object, Bucket
         final Bucket bucket
     ) {
         checkState(vessel.getHomePort() != null, "Vessel %s has no home port.", vessel.getId());
-        final List<Market> markets = vessel
-            .getMarketGrid()
-            .getObjectsAt(vessel.getHomePortLocation())
-            .toList();
-        checkState(
-            markets.size() == 1,
-            "Expected one market at the home port of vessel %s, found %s.",
-            vessel.getId(),
-            markets.size()
-        );
-        final Market market = markets.getFirst();
+        final Market market = vessel.getMarketGrid().getMarket(vessel.getHomePort());
         final Map<CurrencyUnit, Money> summary =
             Sale.summarise(market.quote(catchCategoriser.apply(bucket)));
         checkState(
