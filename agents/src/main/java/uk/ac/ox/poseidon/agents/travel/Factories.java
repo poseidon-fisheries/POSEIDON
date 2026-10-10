@@ -23,12 +23,14 @@
 package uk.ac.ox.poseidon.agents.travel;
 
 import org.joda.money.Money;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
+import java.util.List;
 import java.util.function.Function;
 
 /** Factories for the routes vessels would sail and what travelling them costs. */
@@ -60,6 +62,23 @@ public class Factories {
             hourlyCost
     ) {
         return new TimeCostFactory(hourlyCost);
+    }
+
+    /**
+     * @param routeFunction gives the route via a cell
+     * @param routeCosts    what is charged for a route, each in money
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link TravelCost}
+     * @see TravelCost
+     */
+    @SafeVarargs
+    public static TravelCostFactory travelCost(
+        final Factory<? super VesselScope, ? extends Function<? super Int2D, ? extends Route>>
+            routeFunction,
+        final Factory<? super VesselScope, ? extends Function<? super Route, ? extends Money>>...
+            routeCosts
+    ) {
+        return new TravelCostFactory(routeFunction, List.of(routeCosts));
     }
 
     /**
