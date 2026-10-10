@@ -40,6 +40,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class RouteViaDestinationTest {
@@ -106,6 +108,14 @@ class RouteViaDestinationTest {
 
         assertThat(route.getDistanceInKm()).isEqualTo(5.0);
         assertThat(route.getDuration()).isEqualTo(Duration.ofMinutes(30));
+    }
+
+    @Test
+    void sumsThePathBetweenTwoCellsOnlyOnce() {
+        routeViaDestination.apply(destination);
+        routeViaDestination.apply(destination);
+
+        verify(distanceCalculator, times(2)).distanceInKm(anyList());
     }
 
     @Test

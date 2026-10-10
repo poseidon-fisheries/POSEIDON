@@ -27,20 +27,27 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Map.entry;
 
 /**
  * The {@link Route} a vessel would sail to fish at a destination cell: from its current cell to
  * the destination, then back to its home port (from port, the round trip). The vessel's cell, home
- * port and cruising speed are read at each call.
+ * port and cruising speed are read at each call. The length of the path between two cells is
+ * remembered after it is first summed: it only depends on the two cells, and the path finder gives
+ * the same path for them throughout a run.
  */
 public class RouteViaDestination implements Function<Int2D, Route> {
 
     private final Vessel vessel;
     private final GridPathFinder pathFinder;
     private final DistanceCalculator distanceCalculator;
+    private final Map<Entry<Int2D, Int2D>, Double> pathLengthsInKm = new HashMap<>();
 
     /**
      * @param vessel             the vessel that would sail the route
@@ -81,9 +88,11 @@ public class RouteViaDestination implements Function<Int2D, Route> {
         final Int2D start,
         final Int2D end
     ) {
-        return distanceCalculator.distanceInKm(
-            pathFinder.getPath(start, end).orElseThrow(() ->
-                new IllegalStateException("No path from " + start + " to " + end)
+        return pathLengthsInKm.computeIfAbsent(entry(start, end), _ ->
+            distanceCalculator.distanceInKm(
+                pathFinder.getPath(start, end).orElseThrow(() ->
+                    new IllegalStateException("No path from " + start + " to " + end)
+                )
             )
         );
     }
