@@ -31,7 +31,6 @@ import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 import java.nio.file.Path;
@@ -189,7 +188,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                                             columnDefinition("total_biomass", "DOUBLE")
                                         ),
                                         currentDateTime(),
-                                        gridSum(scenario.<DoubleGrid>component("biomassGrid"))
+                                        gridSum(scenario.component("biomassGrid"))
                                     )
                                 ),
                                 path(outputPath.resolve("biomass.csv")),
