@@ -49,6 +49,7 @@ class RouteViaDestinationTest {
     private final Int2D destination = new Int2D(1, 1);
     private final Int2D portCell = new Int2D(2, 2);
     private final Vessel vessel = mock(Vessel.class);
+    private final Engine engine = mock(Engine.class);
     private final GridPathFinder pathFinder = mock(GridPathFinder.class);
     private final DistanceCalculator distanceCalculator = mock(DistanceCalculator.class);
     private final RouteViaDestination routeViaDestination =
@@ -56,7 +57,6 @@ class RouteViaDestinationTest {
 
     @BeforeEach
     void setUp() {
-        final Engine engine = mock(Engine.class);
         when(engine.getCruisingSpeedInKph()).thenReturn(10.0);
         when(vessel.getEngine()).thenReturn(engine);
         when(vessel.getCell()).thenReturn(vesselCell);
@@ -79,16 +79,21 @@ class RouteViaDestinationTest {
     }
 
     @Test
-    void readsTheVesselsCurrentCellAndHomePortAtEachCall() {
+    void readsTheVesselsCurrentCellHomePortAndSpeedAtEachCall() {
+        final Route routeBefore = routeViaDestination.apply(destination);
+
         final Int2D otherPortCell = new Int2D(3, 3);
         when(vessel.getCell()).thenReturn(destination);
         when(vessel.getHomePortLocation()).thenReturn(otherPortCell);
+        when(engine.getCruisingSpeedInKph()).thenReturn(20.0);
         when(pathFinder.getPath(destination, destination))
             .thenReturn(Optional.of(ImmutableList.of(destination)));
         when(pathFinder.getPath(destination, otherPortCell))
             .thenReturn(Optional.of(ImmutableList.of(destination, waypoint, otherPortCell)));
+        final Route routeAfter = routeViaDestination.apply(destination);
 
-        assertThat(routeViaDestination.apply(destination).getDistanceInKm()).isEqualTo(10.0);
+        assertThat(routeBefore).isEqualTo(new Route(15.0, Duration.ofMinutes(90)));
+        assertThat(routeAfter).isEqualTo(new Route(10.0, Duration.ofMinutes(30)));
     }
 
     @Test
