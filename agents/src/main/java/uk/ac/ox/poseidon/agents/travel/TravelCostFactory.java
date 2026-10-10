@@ -28,30 +28,30 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.joda.money.Money;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 import java.util.function.Function;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link TravelCost}, built via
+ * A {@link RelativeScopeFactory} counterpart of {@link TravelCost}, built via
  * {@link Factories#travelCost(Factory, Factory...)}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TravelCostFactory extends VesselScopeFactory<TravelCost> {
+public class TravelCostFactory<S extends Scope> extends RelativeScopeFactory<S, TravelCost> {
 
-    private Factory<? super VesselScope, ? extends Function<? super Int2D, ? extends Route>>
+    private Factory<? super S, ? extends Function<? super Int2D, ? extends Route>>
         routeFunction;
-    private List<Factory<? super VesselScope, ? extends Function<? super Route, ? extends Money>>>
+    private List<Factory<? super S, ? extends Function<? super Route, ? extends Money>>>
         routeCosts;
 
     @Override
-    protected TravelCost newInstance(final VesselScope scope) {
+    protected TravelCost newInstance(final S scope) {
         return new TravelCost(
             routeFunction.get(scope),
             routeCosts.stream().map(routeCost -> routeCost.get(scope)).toList()

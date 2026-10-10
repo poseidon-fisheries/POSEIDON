@@ -28,17 +28,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link HaulRecorder}, built via
+ * A {@link RelativeScopeFactory} counterpart of {@link HaulRecorder}, built via
  * {@link Factories#haulRecorder(Factory, Factory, Factory)}. It only builds the recorder: it does
  * not register it with the vessel's event manager or anything else, since a vessel can have
  * several recorders, each registered with whatever gives it the hauls it records.
@@ -47,17 +47,17 @@ import java.util.function.Function;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class HaulRecorderFactory extends VesselScopeFactory<HaulRecorder> {
+public class HaulRecorderFactory<S extends Scope> extends RelativeScopeFactory<S, HaulRecorder> {
 
-    private Factory<? super VesselScope, ? extends ModelGrid> modelGrid;
+    private Factory<? super S, ? extends ModelGrid> modelGrid;
     private Factory<
-        ? super VesselScope,
+        ? super S,
         ? extends Function<? super FishingEvent, ? extends Memory<Int2D, Bucket>>
         > memorySelector;
-    private Factory<? super VesselScope, ? extends BinaryOperator<Bucket>> updateRule;
+    private Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule;
 
     @Override
-    protected HaulRecorder newInstance(final VesselScope scope) {
+    protected HaulRecorder newInstance(final S scope) {
         return new HaulRecorder(
             modelGrid.get(scope),
             memorySelector.get(scope),

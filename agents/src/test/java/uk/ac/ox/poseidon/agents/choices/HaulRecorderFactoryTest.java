@@ -64,7 +64,7 @@ class HaulRecorderFactoryTest {
     private final VesselScope scopeB = scopeOfNewVessel(simulation);
     private final PerVesselFactory<KeyedMemory<String, Int2D, Bucket>> keyedMemory =
         perVessel(keyedMemory());
-    private final HaulRecorderFactory factory = haulRecorder(
+    private final HaulRecorderFactory<VesselScope> factory = haulRecorder(
         object(modelGrid()),
         keyedMemorySelector(keyedMemory, fishingEventProperty("action.gear.code")),
         exponentialMovingAverageOfBuckets(0.5)
@@ -129,5 +129,16 @@ class HaulRecorderFactoryTest {
     void givesOneRecorderPerVessel() {
         assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
         assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
+    }
+
+    @Test
+    void sharesOneRecorderBetweenVesselsSharingAMemory() {
+        final HaulRecorderFactory<VesselScope> sharedFactory = haulRecorder(
+            object(modelGrid()),
+            keyedMemorySelector(keyedMemory(), fishingEventProperty("action.gear.code")),
+            exponentialMovingAverageOfBuckets(0.5)
+        );
+
+        assertThat(sharedFactory.get(scopeA)).isNotNull().isSameAs(sharedFactory.get(scopeB));
     }
 }

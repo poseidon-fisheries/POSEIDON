@@ -27,6 +27,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
@@ -67,18 +68,17 @@ public class Factories {
     /**
      * @param routeFunction gives the route via a cell
      * @param routeCosts    what is charged for a route, each in money
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-     * {@link TravelCost}
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link TravelCost}
      * @see TravelCost
      */
     @SafeVarargs
-    public static TravelCostFactory travelCost(
-        final Factory<? super VesselScope, ? extends Function<? super Int2D, ? extends Route>>
+    public static <S extends Scope> TravelCostFactory<S> travelCost(
+        final Factory<? super S, ? extends Function<? super Int2D, ? extends Route>>
             routeFunction,
-        final Factory<? super VesselScope, ? extends Function<? super Route, ? extends Money>>...
+        final Factory<? super S, ? extends Function<? super Route, ? extends Money>>...
             routeCosts
     ) {
-        return new TravelCostFactory(routeFunction, List.of(routeCosts));
+        return new TravelCostFactory<>(routeFunction, List.of(routeCosts));
     }
 
     /**
