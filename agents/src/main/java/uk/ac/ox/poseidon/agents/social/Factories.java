@@ -21,9 +21,12 @@
  */
 package uk.ac.ox.poseidon.agents.social;
 
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+
+import java.util.function.Function;
 
 /** Factories for the ties between vessels. */
 public class Factories {
@@ -42,5 +45,24 @@ public class Factories {
         final Factory<? super SimulationScope, ? extends VesselsGetter> candidates
     ) {
         return new SocialNetworkFactory(candidates);
+    }
+
+    /**
+     * @param network           the network whose ties the dynamics add and remove
+     * @param groupingKey       gives a vessel's grouping key: vessels are eligible for each other
+     *                          when both are active and their keys are equal
+     * @param maximumCliqueSize the largest clique a vessel joins, itself included; 1 means no
+     *                          vessel ever has partners
+     * @return a {@link uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory} for a
+     * {@link CliqueDynamics} registered with the simulation's event manager, so that it hears
+     * every vessel's trip starts
+     * @see CliqueDynamics
+     */
+    public static CliqueDynamicsFactory cliqueDynamics(
+        final Factory<? super SimulationScope, ? extends SocialNetwork> network,
+        final Factory<? super SimulationScope, ? extends Function<? super Vessel, ?>> groupingKey,
+        final int maximumCliqueSize
+    ) {
+        return new CliqueDynamicsFactory(network, groupingKey, maximumCliqueSize);
     }
 }
