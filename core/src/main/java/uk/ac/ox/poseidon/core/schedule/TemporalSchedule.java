@@ -65,6 +65,9 @@ public class TemporalSchedule extends Schedule {
     @Serial private static final long serialVersionUID = 4197200009803943439L;
 
     private final LocalDateTime startingDateTime;
+    // The last time converted by toDateTime, which is called with the same time many times in a
+    // step: converting it is costly, its result never changes.
+    private transient Conversion lastConversion;
 
     /** @return the current simulation time as a {@link LocalDateTime} */
     @SuppressWarnings("WeakerAccess")
@@ -161,8 +164,15 @@ public class TemporalSchedule extends Schedule {
      */
     @SuppressWarnings("WeakerAccess")
     public LocalDateTime toDateTime(final double time) {
-        return startingDateTime.plusSeconds((long) time);
+        final long seconds = (long) time;
+        final Conversion conversion = lastConversion;
+        if (conversion != null && conversion.seconds() == seconds) return conversion.dateTime();
+        final LocalDateTime dateTime = startingDateTime.plusSeconds(seconds);
+        lastConversion = new Conversion(seconds, dateTime);
+        return dateTime;
     }
+
+    private record Conversion(long seconds, LocalDateTime dateTime) {}
 
     /**
      * @param dateTime the date-time to schedule the event at
