@@ -45,4 +45,15 @@ public class Factories {
     ) {
         return new RouteViaDestinationFactory(pathFinder, distance);
     }
+
+    /**
+     * @param propertyPath the dotted path of properties to follow from the route, e.g.
+     *                     {@code "duration"} for how long sailing it takes
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
+     * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a route
+     * @see RoutePropertyFactory
+     */
+    public static <R> RoutePropertyFactory<R> routeProperty(final String propertyPath) {
+        return new RoutePropertyFactory<>(propertyPath);
+    }
 }
