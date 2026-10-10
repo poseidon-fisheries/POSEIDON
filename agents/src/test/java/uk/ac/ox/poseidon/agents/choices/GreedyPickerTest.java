@@ -116,7 +116,23 @@ class GreedyPickerTest {
         );
 
         assertThat(picker.get()).isEqualTo("D");
-        assertThat(tested).containsExactlyInAnyOrder("B", "D");
+        assertThat(tested).doesNotContain("A", "C");
+    }
+
+    @Test
+    void stopsTestingTiedOptionsOnceOnePasses() {
+        final List<String> tested = new ArrayList<>();
+        final GreedyPicker<String> picker = picker(
+            Map.of("A", 3.0, "B", 3.0, "C", 3.0, "D", 3.0),
+            option -> {
+                tested.add(option);
+                return true;
+            }
+        );
+
+        picker.get();
+
+        assertThat(tested).hasSize(1);
     }
 
     @Test
