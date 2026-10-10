@@ -33,7 +33,10 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class MarketGridTest {
@@ -67,6 +70,16 @@ class MarketGridTest {
 
         assertThat(marketGrid.getMarket(portA)).isSameAs(marketA);
         assertThat(marketGrid.getMarket(portB)).isSameAs(marketB);
+    }
+
+    @Test
+    void findsTheMarketOfAPortWithoutScanningEveryMarket() {
+        final MarketGrid marketGrid = marketGrid(marketA, marketB);
+        clearInvocations(marketA, marketB);
+
+        marketGrid.getMarket(portA);
+
+        verify(marketB, never()).getPort();
     }
 
     @Test

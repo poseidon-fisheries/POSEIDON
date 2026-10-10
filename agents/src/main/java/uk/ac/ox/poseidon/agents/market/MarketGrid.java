@@ -51,9 +51,7 @@ public class MarketGrid extends ObjectGrid<Market> {
      * @throws IllegalStateException if {@code port} does not have exactly one market
      */
     public Market getMarket(final Port port) {
-        final List<Market> markets = stream()
-            .filter(market -> market.getPort().equals(port))
-            .toList();
+        final List<Market> markets = marketsOf(port);
         checkState(
             markets.size() == 1,
             "Expected one market at port %s, found %s.",
@@ -61,6 +59,17 @@ public class MarketGrid extends ObjectGrid<Market> {
             markets.size()
         );
         return markets.getFirst();
+    }
+
+    /**
+     * @param port the port whose markets to find
+     * @return the markets of {@code port}, by scanning every market; a grid whose markets never
+     * change can index them instead
+     */
+    protected List<Market> marketsOf(final Port port) {
+        return stream()
+            .filter(market -> market.getPort().equals(port))
+            .toList();
     }
 
 }

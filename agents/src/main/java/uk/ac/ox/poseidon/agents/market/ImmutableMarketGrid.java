@@ -22,18 +22,34 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Multimaps;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
+import java.util.List;
 import java.util.Map;
 
-/** A {@link MarketGrid} placed once, at construction, from a fixed set of market locations. */
+/**
+ * A {@link MarketGrid} placed once, at construction, from a fixed set of market locations. Since its
+ * markets never change, it indexes them by port, so finding the market of a port does not scan
+ * every market.
+ */
 public class ImmutableMarketGrid extends MarketGrid {
+
+    private final ImmutableListMultimap<Port, Market> marketsByPort;
     ImmutableMarketGrid(
         final ModelGrid modelGrid,
         final Map<Market, Int2D> marketLocations
     ) {
         super(modelGrid);
         marketLocations.forEach(field::setObjectLocation);
+        this.marketsByPort = Multimaps.index(marketLocations.keySet(), Market::getPort);
+    }
+
+    @Override
+    protected List<Market> marketsOf(final Port port) {
+        return marketsByPort.get(port);
     }
 }
