@@ -283,7 +283,7 @@ public class MasonUtils {
     }
 
     /**
-     * @param candidates the candidates to shuffle, in place
+     * @param candidates the candidates to shuffle, left unchanged
      * @param rng        the RNG to draw from
      * @return a lazily, partially Fisher-Yates-shuffled stream over {@code candidates}: only as
      * many elements are shuffled as are actually consumed from the returned stream, so early

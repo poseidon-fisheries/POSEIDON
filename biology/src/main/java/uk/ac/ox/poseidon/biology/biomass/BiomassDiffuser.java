@@ -34,8 +34,8 @@ import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toMap;
+import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 /**
  * Moves biomass between neighbouring habitable cells of a single-species grid, each step, according
@@ -50,7 +50,7 @@ public class BiomassDiffuser implements Steppable {
 
     private final transient CarryingCapacityGrid carryingCapacityGrid;
 
-    private final Random rng;
+    private final MersenneTwisterFast rng;
 
     private final transient BiomassDiffusionRule biomassDiffusionRule;
 
@@ -62,7 +62,7 @@ public class BiomassDiffuser implements Steppable {
      * @param biomassGrid          the grid diffusion reads from and writes into
      * @param carryingCapacityGrid must share the same {@link uk.ac.ox.poseidon.geography.grids.ModelGrid} as {@code biomassGrid}
      * @param biomassDiffusionRule the per-pair diffusion rule
-     * @param rng                  the source used to derive this diffuser's own {@link Random}
+     * @param rng                  the random number generator shuffling the visiting order
      */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public BiomassDiffuser(
@@ -75,9 +75,8 @@ public class BiomassDiffuser implements Steppable {
         this.biomassGrid = biomassGrid;
         this.carryingCapacityGrid = carryingCapacityGrid;
         this.biomassDiffusionRule = biomassDiffusionRule;
-        this.rng = new Random(rng.nextLong());
-        // we copy the habitable locations list because we are going to shuffle it repeatedly
-        this.habitableLocations = new ArrayList<>(carryingCapacityGrid.getHabitableCells());
+        this.rng = rng;
+        this.habitableLocations = List.copyOf(carryingCapacityGrid.getHabitableCells());
         final HashSet<Int2D> habitableLocationsSet = new HashSet<>(habitableLocations);
         this.habitableNeighbours =
             habitableLocations
@@ -90,7 +89,7 @@ public class BiomassDiffuser implements Steppable {
                             .getActiveNeighbours(location)
                             .stream()
                             .filter(habitableLocationsSet::contains)
-                            .collect(toCollection(ArrayList::new))
+                            .toList()
                 ));
     }
 
@@ -100,11 +99,8 @@ public class BiomassDiffuser implements Steppable {
      */
     @Override
     public void step(final SimState simState) {
-        Collections.shuffle(habitableLocations, rng);
-        habitableLocations.forEach(location -> {
-            final List<Int2D> neighbours = habitableNeighbours.get(location);
-            Collections.shuffle(neighbours, rng);
-            neighbours.forEach(neighbour -> {
+        shuffledStream(habitableLocations, rng).forEach(location -> {
+            shuffledStream(habitableNeighbours.get(location), rng).forEach(neighbour -> {
                 final Double2D updatedBiomasses =
                     biomassDiffusionRule.updatedBiomasses(
                         biomassGrid.getValue(location),

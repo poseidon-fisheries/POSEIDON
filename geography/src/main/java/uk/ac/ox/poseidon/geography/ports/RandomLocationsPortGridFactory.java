@@ -34,14 +34,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkState;
-import static java.util.stream.Collectors.toCollection;
+import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 /**
  * A {@link SimulationScopeFactory} for a {@link MutablePortGrid} with a fixed number of ports
@@ -78,16 +75,12 @@ public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortG
                         .filter(bathymetricGrid::isWater)
                         .count() >= minimumAdjacentWaterTiles
                 )
-                .collect(toCollection(ArrayList::new)); // because we are going to shuffle it
+                .toList();
         checkState(
             suitableTiles.size() >= numberOfPorts,
             "Only %s suitable land tiles for %s ports.",
             suitableTiles.size(),
             numberOfPorts
-        );
-        Collections.shuffle(
-            suitableTiles,
-            new Random(scope.getSimulation().random.nextLong())
         );
         final SparseGrid2D sparseGrid2D =
             new SparseGrid2D(
@@ -96,8 +89,7 @@ public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortG
             );
         final MutablePortGrid portGrid = new MutablePortGrid(bathymetricGrid, sparseGrid2D);
         final Supplier<String> idSupplier = this.idSupplier.get(scope);
-        suitableTiles
-            .stream()
+        shuffledStream(suitableTiles, scope.getSimulation().random)
             .limit(numberOfPorts)
             .forEach(cell -> {
                 final String portCode = idSupplier.get();
