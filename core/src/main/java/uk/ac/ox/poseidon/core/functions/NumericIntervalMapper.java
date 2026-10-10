@@ -55,11 +55,12 @@ public class NumericIntervalMapper<T> implements Function<Double, T> {
      * interval contains it */
     @Override
     public T apply(final Double value) {
-        return intervals.stream()
-            .filter(interval -> interval.contains(value))
-            .map(Interval::getMappedValue)
-            .findFirst()
-            .orElse(null);
+        // A loop, not a stream: this runs for every cell valued, and the stream's overhead showed
+        // in profiles.
+        for (final Interval<T> interval : intervals) {
+            if (interval.contains(value)) return interval.getMappedValue();
+        }
+        return null;
     }
 
     private static void validateIntervals(final List<? extends Interval<?>> intervals) {
