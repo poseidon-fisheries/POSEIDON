@@ -21,9 +21,12 @@
  */
 package uk.ac.ox.poseidon.agents.social;
 
+import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.util.function.Function;
@@ -77,5 +80,20 @@ public class Factories {
         final Factory<? super SimulationScope, ? extends SocialNetwork> network
     ) {
         return new HaulSharerFactory(network);
+    }
+
+    /**
+     * @param listener   the factory giving the vessel's shared haul listener
+     * @param haulSharer the sharer to register the listener with
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} that registers the
+     * vessel's listener with the sharer and gives it; add it to the vessel's extra factories
+     * @see SharedHaulListenerFactory
+     */
+    public static <L extends Listener<? super FishingEvent>> SharedHaulListenerFactory<L>
+    sharedHaulListener(
+        final Factory<? super VesselScope, ? extends L> listener,
+        final Factory<? super SimulationScope, ? extends HaulSharer> haulSharer
+    ) {
+        return new SharedHaulListenerFactory<>(listener, haulSharer);
     }
 }
