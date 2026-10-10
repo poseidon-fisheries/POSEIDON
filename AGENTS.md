@@ -29,6 +29,7 @@ Notes:
 - Compilation treats warnings as errors (`-Werror`), so unused-import or unchecked warnings fail the build, not just linting.
 - Test tasks are auto-configured with a Mockito Java agent (`-javaagent`, `-Xshare:off`) — don't remove this if editing `buildlogic.java-common-conventions.gradle.kts`.
 - Tests use JUnit 5 (`useJUnitPlatform()`), AssertJ, Mockito, and jqwik (property-based testing) — check existing tests in a module before assuming which style applies.
+- `SimulationScope` and `AgentScope` hold their simulation and agent through `WeakReference`s. In tests, keep the mocked `Simulation` or agent in a field: one that only the scope references (`new SimulationScope(mock(Simulation.class))`, or a local variable not used afterwards) can be garbage-collected mid-test, and the test then fails at random with a `NullPointerException`.
 - SpotBugs exclusions live in `spotbugs_exclude.xml` at the repo root; consult it before assuming a finding is a false positive.
 - To run one of the example scenarios directly: `./gradlew :examples:run` (see `examples/build.gradle.kts` for the `writePeterSnapperScenario` task that writes a scenario YAML from Java code).
 

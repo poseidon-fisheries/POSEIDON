@@ -34,6 +34,8 @@ import static uk.ac.ox.poseidon.agents.components.Factories.registeredVesselComp
 
 class RegisteredVesselComponentFactoryTest {
 
+    private final Simulation simulation = mock(Simulation.class);
+
     @Test
     void registersComponentWhenCreated() {
         final VesselComponentRegister<String> register = new VesselComponentRegister<>();
@@ -44,7 +46,6 @@ class RegisteredVesselComponentFactoryTest {
             );
 
         final Vessel vessel = mock(Vessel.class);
-        final Simulation simulation = mock(Simulation.class);
         final VesselScope scope = new VesselScope(new SimulationScope(simulation), vessel);
 
         final String component = factory.get(scope);

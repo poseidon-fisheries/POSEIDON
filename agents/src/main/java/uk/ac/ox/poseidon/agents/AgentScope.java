@@ -31,7 +31,8 @@ import java.lang.ref.WeakReference;
 /**
  * A {@link SimulationScope} narrowed to a single agent, for factories building agent-owned
  * components. Holds the agent via a {@link WeakReference} rather than directly, so that scoping to
- * an agent never itself keeps that agent alive past its natural lifetime.
+ * an agent never itself keeps that agent alive past its natural lifetime. In tests, keep the
+ * agent in a field, for the reason given in {@link SimulationScope}.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

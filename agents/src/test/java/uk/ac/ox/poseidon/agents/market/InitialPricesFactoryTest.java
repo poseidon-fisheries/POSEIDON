@@ -50,6 +50,8 @@ class InitialPricesFactoryTest {
     private static final CatchCategory CATEGORY = new CatchCategory("C");
     private static final Species HKE = new Species("HKE", null, "Hake");
 
+    private final Simulation simulation = mock(Simulation.class);
+
     @Test
     void appliesMarketSpecificPricesWhenBuilt() {
         final BiomassMarket m1 = market("M1");
@@ -106,7 +108,7 @@ class InitialPricesFactoryTest {
         return new BiomassMarket(mock(Port.class), code, mock(EventManager.class));
     }
 
-    private static SimulationScope scope() {
-        return new SimulationScope(mock(Simulation.class));
+    private SimulationScope scope() {
+        return new SimulationScope(simulation);
     }
 }

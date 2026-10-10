@@ -31,11 +31,13 @@ import static org.mockito.Mockito.mock;
 
 class VesselComponentRegisterFactoryTest {
 
+    private final Simulation simulation = mock(Simulation.class);
+    private final Simulation otherSimulation = mock(Simulation.class);
+
     @Test
     void returnsSameRegisterForSameSimulation() {
         final VesselComponentRegisterFactory<String> factory =
             new VesselComponentRegisterFactory<>();
-        final Simulation simulation = mock(Simulation.class);
         final SimulationScope scope = new SimulationScope(simulation);
 
         final VesselComponentRegister<String> first = factory.get(scope);
@@ -48,8 +50,8 @@ class VesselComponentRegisterFactoryTest {
     void returnsDifferentRegistersForDifferentSimulations() {
         final VesselComponentRegisterFactory<String> factory =
             new VesselComponentRegisterFactory<>();
-        final SimulationScope firstScope = new SimulationScope(mock(Simulation.class));
-        final SimulationScope secondScope = new SimulationScope(mock(Simulation.class));
+        final SimulationScope firstScope = new SimulationScope(simulation);
+        final SimulationScope secondScope = new SimulationScope(otherSimulation);
 
         final VesselComponentRegister<String> first = factory.get(firstScope);
         final VesselComponentRegister<String> second = factory.get(secondScope);

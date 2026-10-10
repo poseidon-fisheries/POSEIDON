@@ -38,6 +38,9 @@ import static uk.ac.ox.poseidon.geography.paths.Factories.pathFinder;
 
 class DefaultPathFinderFactoryTest {
 
+    private final Simulation simulation = mock(Simulation.class);
+    private final Simulation otherSimulation = mock(Simulation.class);
+
     @Test
     void createsOnePathFinderPerSimulation() {
         final DefaultPathFinderFactory factory =
@@ -47,8 +50,8 @@ class DefaultPathFinderFactoryTest {
                 object(mock(DistanceCalculator.class))
             );
 
-        final GridPathFinder first = factory.get(simulationScope());
-        final GridPathFinder second = factory.get(simulationScope());
+        final GridPathFinder first = factory.get(new SimulationScope(simulation));
+        final GridPathFinder second = factory.get(new SimulationScope(otherSimulation));
 
         assertThat(first).isNotSameAs(second);
     }
@@ -61,7 +64,7 @@ class DefaultPathFinderFactoryTest {
                 object(mock(PortGrid.class)),
                 object(mock(DistanceCalculator.class))
             );
-        final SimulationScope scope = simulationScope();
+        final SimulationScope scope = new SimulationScope(simulation);
 
         final GridPathFinder first = factory.get(scope);
         final GridPathFinder second = factory.get(scope);
@@ -75,7 +78,4 @@ class DefaultPathFinderFactoryTest {
         return bathymetricGrid;
     }
 
-    private static SimulationScope simulationScope() {
-        return new SimulationScope(mock(Simulation.class));
-    }
 }

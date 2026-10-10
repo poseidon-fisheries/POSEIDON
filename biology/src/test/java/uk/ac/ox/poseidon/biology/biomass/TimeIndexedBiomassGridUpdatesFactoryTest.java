@@ -47,6 +47,8 @@ class TimeIndexedBiomassGridUpdatesFactoryTest {
 
     private final ModelGrid modelGrid = ModelGrid.create(1, 1, new Envelope(0, 1, 0, 1));
 
+    private final Simulation simulation = mock(Simulation.class);
+
     @Test
     void datesEachUpdateAtItsSnapshotDateTime() {
         // A non-midnight date-time proves the time of day survives: this factory must not force
@@ -106,8 +108,8 @@ class TimeIndexedBiomassGridUpdatesFactoryTest {
         return new ImmutableBiomassGrid(modelGrid, species, new double[][] {{value}});
     }
 
-    private static SimulationScope scope() {
-        return new SimulationScope(mock(Simulation.class));
+    private SimulationScope scope() {
+        return new SimulationScope(simulation);
     }
 
 }

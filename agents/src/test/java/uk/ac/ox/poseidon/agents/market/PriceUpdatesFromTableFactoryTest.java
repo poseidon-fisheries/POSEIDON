@@ -50,6 +50,8 @@ class PriceUpdatesFromTableFactoryTest {
 
     private static final CatchCategory CATCH_CATEGORY = new CatchCategory("Fresh - Whole");
 
+    private final Simulation simulation = mock(Simulation.class);
+
     @Test
     void setsPricesOnExistingMarket() {
         final BiomassMarket market = market("M1");
@@ -172,11 +174,11 @@ class PriceUpdatesFromTableFactoryTest {
             .containsExactly(LocalDate.of(2026, 1, 1).atStartOfDay());
     }
 
-    private static void applyAll(final PriceUpdatesFromTableFactory factory) {
+    private void applyAll(final PriceUpdatesFromTableFactory factory) {
         factory.get(scope()).forEach(update -> update.getValue().step(null));
     }
 
-    private static SimulationScope scope() {
-        return new SimulationScope(mock(Simulation.class));
+    private SimulationScope scope() {
+        return new SimulationScope(simulation);
     }
 }

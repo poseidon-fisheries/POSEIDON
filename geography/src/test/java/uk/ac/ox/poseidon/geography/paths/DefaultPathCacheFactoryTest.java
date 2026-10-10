@@ -38,6 +38,9 @@ import static uk.ac.ox.poseidon.geography.paths.Factories.pathCache;
 
 class DefaultPathCacheFactoryTest {
 
+    private final Simulation simulation = mock(Simulation.class);
+    private final Simulation otherSimulation = mock(Simulation.class);
+
     @Test
     void sharesCacheWhenRoutingInputsAreGlobal() {
         final DefaultPathCacheFactory<SimulationScope> factory =
@@ -47,8 +50,8 @@ class DefaultPathCacheFactoryTest {
                 object(mock(DistanceCalculator.class))
             );
 
-        final PathCache<Int2D> first = factory.get(simulationScope());
-        final PathCache<Int2D> second = factory.get(simulationScope());
+        final PathCache<Int2D> first = factory.get(new SimulationScope(simulation));
+        final PathCache<Int2D> second = factory.get(new SimulationScope(otherSimulation));
 
         assertThat(first).isSameAs(second);
     }
@@ -62,14 +65,10 @@ class DefaultPathCacheFactoryTest {
                 object(mock(DistanceCalculator.class))
             );
 
-        final PathCache<Int2D> first = factory.get(simulationScope());
-        final PathCache<Int2D> second = factory.get(simulationScope());
+        final PathCache<Int2D> first = factory.get(new SimulationScope(simulation));
+        final PathCache<Int2D> second = factory.get(new SimulationScope(otherSimulation));
 
         assertThat(first).isNotSameAs(second);
-    }
-
-    private static SimulationScope simulationScope() {
-        return new SimulationScope(mock(Simulation.class));
     }
 
     private static final class SimulationBathymetricGridFactory

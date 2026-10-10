@@ -40,6 +40,8 @@ import static org.mockito.Mockito.when;
 
 class ScheduledByDateTimeFactoryTest {
 
+    private final Simulation simulation = mock(Simulation.class);
+
     @Test
     void schedulesAndReturnsTheResolvedSteppables() {
         final List<Entry<LocalDateTime, Steppable>> steppables = List.of(
@@ -47,7 +49,6 @@ class ScheduledByDateTimeFactoryTest {
             entry(LocalDate.of(2021, 1, 1).atStartOfDay(), mock(Steppable.class))
         );
         final TemporalSchedule schedule = mock(TemporalSchedule.class);
-        final Simulation simulation = mock(Simulation.class);
         when(simulation.getTemporalSchedule()).thenReturn(schedule);
 
         final List<Entry<LocalDateTime, Steppable>> result =
