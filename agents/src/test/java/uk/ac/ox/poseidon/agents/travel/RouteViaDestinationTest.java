@@ -38,6 +38,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -62,6 +63,7 @@ class RouteViaDestinationTest {
         when(vessel.getHomePortLocation()).thenReturn(portCell);
         when(distanceCalculator.distanceInKm(any(Number2D.class), any(Number2D.class)))
             .thenReturn(5.0);
+        when(distanceCalculator.distanceInKm(anyList())).thenCallRealMethod();
         when(pathFinder.getPath(vesselCell, destination))
             .thenReturn(Optional.of(ImmutableList.of(vesselCell, waypoint, destination)));
         when(pathFinder.getPath(destination, portCell))

@@ -64,6 +64,19 @@ public interface DistanceCalculator {
         Number2D end
     );
 
+    /**
+     * @param path the waypoints to travel through in order
+     * @return the length of {@code path}, summing the distance of each leg, in kilometres; zero
+     * for a path of a single waypoint
+     */
+    default double distanceInKm(final List<? extends Number2D> path) {
+        double distanceInKm = 0.0;
+        for (int i = 0; i < path.size() - 1; i++) {
+            distanceInKm += distanceInKm(path.get(i), path.get(i + 1));
+        }
+        return distanceInKm;
+    }
+
     /** @return {@link #distanceInKm(Number2D, Number2D)} as a length {@link Quantity} */
     default Quantity<Length> distance(
         final Number2D start,
@@ -116,11 +129,7 @@ public interface DistanceCalculator {
             "Path must contain at least two cells but was: %s",
             path
         );
-        double totalDistanceInKm = 0.0;
-        for (int i = 0; i < path.size() - 1; i++) {
-            totalDistanceInKm += distanceInKm(path.get(i), path.get(i + 1));
-        }
-        return travelDuration(totalDistanceInKm, cruisingSpeedInKph);
+        return travelDuration(distanceInKm(path), cruisingSpeedInKph);
     }
 
     /**

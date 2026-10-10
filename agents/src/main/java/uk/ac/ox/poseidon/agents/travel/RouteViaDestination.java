@@ -27,7 +27,6 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
-import java.util.List;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -82,13 +81,10 @@ public class RouteViaDestination implements Function<Int2D, Route> {
         final Int2D start,
         final Int2D end
     ) {
-        final List<Int2D> path = pathFinder.getPath(start, end).orElseThrow(() ->
-            new IllegalStateException("No path from " + start + " to " + end)
+        return distanceCalculator.distanceInKm(
+            pathFinder.getPath(start, end).orElseThrow(() ->
+                new IllegalStateException("No path from " + start + " to " + end)
+            )
         );
-        double distanceInKm = 0.0;
-        for (int i = 0; i < path.size() - 1; i++) {
-            distanceInKm += distanceCalculator.distanceInKm(path.get(i), path.get(i + 1));
-        }
-        return distanceInKm;
     }
 }

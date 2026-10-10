@@ -44,4 +44,18 @@ class DistanceCalculatorTest {
         assertThat(calculator.travelDuration(List.of(new Int2D(0, 0), new Int2D(3, 4)), 10.0))
             .isEqualTo(Duration.ofMinutes(30));
     }
+
+    @Test
+    void distanceAlongAPathSumsItsLegs() {
+        final DistanceCalculator calculator = new CartesianDistanceCalculator(null, 1.0);
+        assertThat(calculator.distanceInKm(
+            List.of(new Int2D(0, 0), new Int2D(3, 4), new Int2D(3, 8))
+        )).isEqualTo(9.0);
+    }
+
+    @Test
+    void distanceAlongAOneCellPathIsZero() {
+        final DistanceCalculator calculator = new CartesianDistanceCalculator(null, 1.0);
+        assertThat(calculator.distanceInKm(List.of(new Int2D(3, 4)))).isEqualTo(0.0);
+    }
 }
