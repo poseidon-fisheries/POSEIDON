@@ -21,13 +21,17 @@
  */
 package uk.ac.ox.poseidon.agents.social;
 
+import ec.util.MersenneTwisterFast;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -41,12 +45,21 @@ class CliqueDynamicsTest {
     private final Vessel d = activeVessel();
     private final SocialNetwork network = new SocialNetwork(() -> List.of(a, b, c, d));
     private final Map<Vessel, String> ports = new HashMap<>(Map.of(a, "X", b, "X", c, "X", d, "X"));
-    private final CliqueDynamics dynamics = new CliqueDynamics(network, ports::get, 5);
+    private final CliqueDynamics dynamics = dynamics(5);
 
     private static Vessel activeVessel() {
         final Vessel vessel = mock(Vessel.class);
         when(vessel.isActive()).thenReturn(true);
         return vessel;
+    }
+
+    private CliqueDynamics dynamics(final int maximumCliqueSize) {
+        return new CliqueDynamics(
+            network,
+            ports::get,
+            maximumCliqueSize,
+            new MersenneTwisterFast(0)
+        );
     }
 
     private void tieAll(final Vessel... vessels) {
@@ -118,7 +131,120 @@ class CliqueDynamicsTest {
 
     @Test
     void rejectsAMaximumCliqueSizeBelowOne() {
-        assertThatThrownBy(() -> new CliqueDynamics(network, ports::get, 0))
+        assertThatThrownBy(() -> dynamics(0))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void aLoneVesselJoinsAWholeCliqueWithRoom() {
+        tieAll(a, b, c);
+
+        dynamics.join(d);
+
+        assertPartners(d, a, b, c);
+        assertPartners(a, b, c, d);
+    }
+
+    @Test
+    void aFullCliqueIsNotJoined() {
+        tieAll(a, b, c);
+
+        dynamics(3).join(d);
+
+        assertPartners(d);
+        assertPartners(a, b, c);
+    }
+
+    @Test
+    void twoLoneVesselsPairUp() {
+        ports.put(c, "Y");
+        ports.put(d, "Y");
+
+        dynamics.join(a);
+
+        assertPartners(a, b);
+        assertPartners(b, a);
+    }
+
+    @Test
+    void aVesselWithNoEligibleVesselWithRoomStaysAlone() {
+        ports.put(b, "Y");
+        ports.put(c, "Y");
+        when(d.isActive()).thenReturn(false);
+
+        dynamics.join(a);
+
+        assertPartners(a);
+    }
+
+    @Test
+    void aVesselWithPartnersDoesNotJoin() {
+        tieAll(a, b);
+
+        dynamics.join(a);
+
+        assertPartners(a, b);
+        assertPartners(c);
+        assertPartners(d);
+    }
+
+    @Test
+    void aVesselAloneInTheFleetStaysAlone() {
+        final SocialNetwork network = new SocialNetwork(() -> List.of(a));
+        final CliqueDynamics dynamics =
+            new CliqueDynamics(network, ports::get, 5, new MersenneTwisterFast(0));
+
+        dynamics.join(a);
+
+        assertThat(network.getRecipients(a)).isEmpty();
+        assertThat(network.getSources(a)).isEmpty();
+    }
+
+    @Test
+    void withAMaximumCliqueSizeOfOneNoVesselJoins() {
+        final CliqueDynamics dynamics = dynamics(1);
+
+        List.of(a, b, c, d).forEach(dynamics::join);
+
+        List.of(a, b, c, d).forEach(this::assertPartners);
+    }
+
+    @Test
+    void joiningSettlesTheChosenClique() {
+        tieAll(a, b, c);
+        ports.put(c, "Y");
+
+        dynamics(4).join(d);
+
+        assertPartners(d, a, b);
+        assertPartners(c);
+    }
+
+    @Test
+    void theSameSeedAndTripStartsGiveTheSameCliques() {
+        assertThat(cliquesAfterJoining(8)).isEqualTo(cliquesAfterJoining(8));
+    }
+
+    /**
+     * @return the partners of each of a fresh fleet's vessels, as indices in the fleet, after
+     * each vessel joins in turn
+     */
+    private List<Set<Integer>> cliquesAfterJoining(final int fleetSize) {
+        final List<Vessel> fleet = new ArrayList<>();
+        for (int i = 0; i < fleetSize; i++) {
+            fleet.add(activeVessel());
+        }
+        final SocialNetwork network = new SocialNetwork(() -> fleet);
+        final CliqueDynamics dynamics =
+            new CliqueDynamics(network, vessel -> "X", 3, new MersenneTwisterFast(42));
+        fleet.forEach(dynamics::join);
+        return fleet
+            .stream()
+            .map(vessel -> network
+                .getRecipients(vessel)
+                .stream()
+                .map(fleet::indexOf)
+                .collect(toSet()))
+            .toList();
     }
 }
