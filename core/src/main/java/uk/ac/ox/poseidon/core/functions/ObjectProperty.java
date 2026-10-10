@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.core.functions;
 
 import com.google.common.collect.ImmutableList;
 
+import javax.lang.model.SourceVersion;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
@@ -53,18 +54,27 @@ public class ObjectProperty<T, R> implements Function<T, R> {
     /**
      * @param rootClass    the class the path starts from
      * @param propertyPath the dotted path of properties to follow
-     * @throws IllegalArgumentException if a property along the path has no public getter on the
-     *                                  declared type it is read from
+     * @throws IllegalArgumentException if a property name along the path is not a Java
+     *                                  identifier, or has no public getter on the declared type it
+     *                                  is read from
      */
     ObjectProperty(
         final Class<T> rootClass,
         final String propertyPath
     ) {
         this.propertyPath = propertyPath;
-        this.propertyNames = ImmutableList.copyOf(propertyPath.split("\\."));
+        this.propertyNames = ImmutableList.copyOf(propertyPath.split("\\.", -1));
         final ImmutableList.Builder<MethodHandle> builder = ImmutableList.builder();
         Class<?> currentClass = rootClass;
         for (final String propertyName : propertyNames) {
+            if (!SourceVersion.isIdentifier(propertyName)) {
+                throw new IllegalArgumentException(
+                    "Invalid property name \"%s\" in property path \"%s\".".formatted(
+                        propertyName,
+                        propertyPath
+                    )
+                );
+            }
             final Method getter = findGetter(currentClass, propertyName);
             try {
                 builder.add(MethodHandles.publicLookup().unreflect(getter));

@@ -24,6 +24,8 @@ package uk.ac.ox.poseidon.core.functions;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -74,6 +76,18 @@ public class ObjectPropertyTest {
         assertThatThrownBy(() -> new ObjectProperty<Outer, String>(Outer.class, "inner.colour"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("colour");
+    }
+
+    @Test
+    void throwsWhenBuiltWithAnInvalidPropertyName() {
+        for (final String path : List.of(
+            "", ".", ".name", "name.", "inner..code", "inner code", "inner-code"
+        )) {
+            assertThatThrownBy(() -> new ObjectProperty<Outer, Object>(Outer.class, path))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Invalid property name")
+                .hasMessageContaining("\"" + path + "\"");
+        }
     }
 
     @Test
