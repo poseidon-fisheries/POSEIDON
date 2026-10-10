@@ -25,6 +25,10 @@ The model is built around a declarative configuration → runtime object pattern
   Surface the drift to the user and let them decide whether to accept the full regenerated file
   (folding the unrelated fix in) or handle it as a separate change.
 - **When building a `Scenario`, use the module's static `Factories` helper methods, not `new SomeFactory(...)` directly.** Modules expose a `Factories` class (e.g. `core/.../time/Factories.java`, and similarly in `io`, `geography`, `regulations`, and per-example packages) with static factory methods (`Factories.days(3)`, `Factories.dateTime(...)`, etc.) that scenario-building code should call instead of instantiating `*Factory` classes directly.
+- **In scenario-building code, write a factory inline where it is used, and give it a local variable only when:**
+  - **it is used more than once.** This is about identity, not tidiness: each factory instance has its own cache, so two inline copies of the same expression build two different objects. When an object must be shared (e.g. one per-vessel memory that both a learner and the view read), a single named instance is what makes it shared, and inlining it would silently duplicate it;
+  - **it is a root-level component** of the `Scenario` (`.component("name", ...)`);
+  - **something outside the scenario needs to reach it**, such as the GUI or a calibration (by component name or property path).
 
 When adding a new simulation component (a new kind of provider, allocator, regulation, etc.), follow the existing pattern in the relevant package: a plain class implementing the domain interface, plus a `*Factory` (typically extending `AbstractFactory`) that YAML scenarios instantiate, and a static helper method added to that package's `Factories` class for programmatic construction.
 
