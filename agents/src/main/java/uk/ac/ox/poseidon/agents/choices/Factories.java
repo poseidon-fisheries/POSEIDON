@@ -306,6 +306,21 @@ public class Factories {
     }
 
     /**
+     * @param revenueValuation values an option given what is remembered about it
+     * @param costValuation    values the cost of an option given what is remembered about it
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link NetValuation}
+     * @see NetValuation
+     */
+    public static <S extends Scope, O, M> NetValuationFactory<S, O, M> netValuation(
+        final Factory<? super S, ? extends ToDoubleBiFunction<? super O, ? super M>>
+            revenueValuation,
+        final Factory<? super S, ? extends ToDoubleBiFunction<? super O, ? super M>>
+            costValuation
+    ) {
+        return new NetValuationFactory<>(revenueValuation, costValuation);
+    }
+
+    /**
      * @param cellsSupplier the candidate cells to pick from
      * @param cellPredicate filters which candidate cells are eligible
      * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
