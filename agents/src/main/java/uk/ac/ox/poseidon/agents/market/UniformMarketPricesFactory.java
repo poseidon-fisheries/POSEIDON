@@ -27,15 +27,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
- * A {@link SimulationScopeFactory} for the same {@link MarketPrice}s at every
+ * A {@link RelativeScopeFactory} for the same {@link MarketPrice}s at every
  * {@link BiomassMarket} of {@link #marketGrid}: one per market and entry in
  * {@link #priceEntries}. Built via {@link Factories#uniformMarketPrices}.
  */
@@ -43,13 +43,14 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UniformMarketPricesFactory extends SimulationScopeFactory<List<MarketPrice>> {
+public class UniformMarketPricesFactory<S extends Scope>
+    extends RelativeScopeFactory<S, List<MarketPrice>> {
 
-    private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;
-    private Factory<? super SimulationScope, ? extends List<PriceEntry>> priceEntries;
+    private Factory<? super S, ? extends MarketGrid> marketGrid;
+    private Factory<? super S, ? extends List<PriceEntry>> priceEntries;
 
     @Override
-    protected List<MarketPrice> newInstance(final SimulationScope scope) {
+    protected List<MarketPrice> newInstance(final S scope) {
         final List<PriceEntry> priceEntries = this.priceEntries.get(scope);
         return marketGrid
             .get(scope)

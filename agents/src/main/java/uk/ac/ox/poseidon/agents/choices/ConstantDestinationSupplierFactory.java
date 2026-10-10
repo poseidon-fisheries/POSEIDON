@@ -26,31 +26,32 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link ConstantDestinationSupplier}, built via
+ * A {@link RelativeScopeFactory} counterpart of {@link ConstantDestinationSupplier}, built via
  * {@link Factories#constantDestination}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantDestinationSupplierFactory extends VesselScopeFactory<DestinationSupplier> {
+public class ConstantDestinationSupplierFactory<S extends Scope>
+    extends RelativeScopeFactory<S, DestinationSupplier> {
 
-    private Factory<? super VesselScope, ? extends ModelGrid> modelGrid;
-    private Factory<? super VesselScope, ? extends Coordinate> coordinate;
+    private Factory<? super S, ? extends ModelGrid> modelGrid;
+    private Factory<? super S, ? extends Coordinate> coordinate;
 
     /**
      * @return a {@link ConstantDestinationSupplier} for {@link #coordinate}'s cell in {@link #modelGrid}
      * @throws IllegalArgumentException if {@link #coordinate} falls outside {@link #modelGrid}
      */
     @Override
-    protected DestinationSupplier newInstance(final VesselScope scope) {
+    protected DestinationSupplier newInstance(final S scope) {
         final ModelGrid modelGrid = this.modelGrid.get(scope);
         final Coordinate coordinate = this.coordinate.get(scope);
         modelGrid.checkIsInGrid(coordinate);

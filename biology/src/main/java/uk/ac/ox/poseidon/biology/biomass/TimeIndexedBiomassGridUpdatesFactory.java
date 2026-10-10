@@ -27,8 +27,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,16 +51,16 @@ import static java.util.Map.entry;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TimeIndexedBiomassGridUpdatesFactory
-    extends SimulationScopeFactory<List<Entry<LocalDateTime, BiomassGridUpdate>>> {
+public class TimeIndexedBiomassGridUpdatesFactory<S extends Scope>
+    extends RelativeScopeFactory<S, List<Entry<LocalDateTime, BiomassGridUpdate>>> {
 
-    private Factory<? super SimulationScope, ? extends FisheableBiomassGrids> biomassGrids;
-    private Factory<? super SimulationScope, ? extends Map<LocalDateTime, ? extends List<? extends SpeciesGrid>>>
+    private Factory<? super S, ? extends FisheableBiomassGrids> biomassGrids;
+    private Factory<? super S, ? extends Map<LocalDateTime, ? extends List<? extends SpeciesGrid>>>
         timeIndexedBiomassGrids;
 
     @Override
     protected List<Entry<LocalDateTime, BiomassGridUpdate>> newInstance(
-        final SimulationScope scope
+        final S scope
     ) {
         final FisheableBiomassGrids target = biomassGrids.get(scope);
         return timeIndexedBiomassGrids

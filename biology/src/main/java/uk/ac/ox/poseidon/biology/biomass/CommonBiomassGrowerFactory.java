@@ -27,27 +27,28 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link SimulationScopeFactory} for a {@link CommonBiomassGrower}. Built via
+ * A {@link RelativeScopeFactory} for a {@link CommonBiomassGrower}. Built via
  * {@link Factories#commonBiomassGrower}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CommonBiomassGrowerFactory extends SimulationScopeFactory<CommonBiomassGrower> {
+public class CommonBiomassGrowerFactory<S extends Scope>
+    extends RelativeScopeFactory<S, CommonBiomassGrower> {
 
-    private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;
-    private Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid;
-    private Factory<? super SimulationScope, ? extends BiomassGrowthRule> biomassGrowthRule;
-    private Factory<? super SimulationScope, ? extends BiomassRecruitmentAllocator>
+    private Factory<? super S, ? extends BiomassGrid> biomassGrid;
+    private Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid;
+    private Factory<? super S, ? extends BiomassGrowthRule> biomassGrowthRule;
+    private Factory<? super S, ? extends BiomassRecruitmentAllocator>
         biomassRecruitmentAllocator;
 
     @Override
-    protected CommonBiomassGrower newInstance(final SimulationScope scope) {
+    protected CommonBiomassGrower newInstance(final S scope) {
         return new CommonBiomassGrower(
             biomassGrid.get(scope),
             carryingCapacityGrid.get(scope),

@@ -30,8 +30,8 @@ import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.locationtech.jts.geom.Geometry;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.io.IOException;
 import java.net.URL;
@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A {@link SimulationScopeFactory} that reads every feature's geometry out of an ESRI shapefile
+ * A {@link RelativeScopeFactory} that reads every feature's geometry out of an ESRI shapefile
  * (via GeoTools) into an immutable list. There's no separate plain component class here: the
  * produced {@link Collection} is returned as-is, with no wrapper type to carry documentation, so
  * this factory carries the behavior doc directly. Built via
@@ -51,14 +51,14 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class GeometriesFromShapeFileFactory
-    extends SimulationScopeFactory<Collection<Geometry>> {
+public class GeometriesFromShapeFileFactory<S extends Scope>
+    extends RelativeScopeFactory<S, Collection<Geometry>> {
 
     @NonNull
-    private Factory<? super SimulationScope, ? extends Path> path;
+    private Factory<? super S, ? extends Path> path;
 
     @Override
-    protected List<Geometry> newInstance(final SimulationScope scope) {
+    protected List<Geometry> newInstance(final S scope) {
         final Path filePath = this.path.get(scope);
         return readShapeFile(filePath);
     }

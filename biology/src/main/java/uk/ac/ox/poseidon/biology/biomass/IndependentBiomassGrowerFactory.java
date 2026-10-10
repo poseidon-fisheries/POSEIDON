@@ -27,25 +27,26 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link SimulationScopeFactory} for an {@link IndependentBiomassGrower}. Built via
+ * A {@link RelativeScopeFactory} for an {@link IndependentBiomassGrower}. Built via
  * {@link Factories#independentBiomassGrower}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class IndependentBiomassGrowerFactory extends SimulationScopeFactory<IndependentBiomassGrower> {
+public class IndependentBiomassGrowerFactory<S extends Scope>
+    extends RelativeScopeFactory<S, IndependentBiomassGrower> {
 
-    private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;
-    private Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid;
-    private Factory<? super SimulationScope, ? extends BiomassGrowthRule> biomassGrowthRule;
+    private Factory<? super S, ? extends BiomassGrid> biomassGrid;
+    private Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid;
+    private Factory<? super S, ? extends BiomassGrowthRule> biomassGrowthRule;
 
     @Override
-    protected IndependentBiomassGrower newInstance(final SimulationScope scope) {
+    protected IndependentBiomassGrower newInstance(final S scope) {
         return new IndependentBiomassGrower(
             biomassGrid.get(scope),
             carryingCapacityGrid.get(scope),

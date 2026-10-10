@@ -32,8 +32,8 @@ import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.Measurements;
 
 import javax.measure.Unit;
@@ -70,13 +70,13 @@ import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PriceUpdatesFromTableFactory
-    extends SimulationScopeFactory<List<Entry<LocalDateTime, PriceUpdate>>> {
+public class PriceUpdatesFromTableFactory<S extends Scope>
+    extends RelativeScopeFactory<S, List<Entry<LocalDateTime, PriceUpdate>>> {
 
     private static final System.Logger logger =
         System.getLogger(PriceUpdatesFromTableFactory.class.getName());
 
-    private Factory<? super SimulationScope, ? extends Table> data;
+    private Factory<? super S, ? extends Table> data;
 
     private String dateColumn;
     private String marketCodeColumn;
@@ -86,11 +86,11 @@ public class PriceUpdatesFromTableFactory
     private String currencyColumn;
     private String measurementUnitColumn;
 
-    private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;
-    private Factory<? super SimulationScope, ? extends Iterable<? extends Species>> species;
+    private Factory<? super S, ? extends MarketGrid> marketGrid;
+    private Factory<? super S, ? extends Iterable<? extends Species>> species;
 
     @Override
-    protected List<Entry<LocalDateTime, PriceUpdate>> newInstance(final SimulationScope scope) {
+    protected List<Entry<LocalDateTime, PriceUpdate>> newInstance(final S scope) {
 
         final List<? extends Species> configuredSpecies =
             stream(this.species.get(scope)).toList();

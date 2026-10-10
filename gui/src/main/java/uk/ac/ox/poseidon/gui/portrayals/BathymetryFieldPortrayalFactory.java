@@ -38,7 +38,7 @@ import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
  * A {@link SimpleFieldPortrayalFactory} preset for a {@link BathymetricGrid}: labelled
  * "Bathymetry", diverging colour range around zero elevation.
  */
-public class BathymetryFieldPortrayalFactory extends SimpleFieldPortrayalFactory {
+public class BathymetryFieldPortrayalFactory extends SimpleFieldPortrayalFactory<SimulationScope> {
 
     /** @param bathymetricGrid the grid to portray; starts visible */
     public BathymetryFieldPortrayalFactory(

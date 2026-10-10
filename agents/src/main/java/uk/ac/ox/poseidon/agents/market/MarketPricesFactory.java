@@ -27,28 +27,29 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
- * A {@link SimulationScopeFactory} for the {@link MarketPrice}s of one market: one per entry in
+ * A {@link RelativeScopeFactory} for the {@link MarketPrice}s of one market: one per entry in
  * {@link #priceEntries}, all at {@link #market}. Built via {@link Factories#marketPrices}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MarketPricesFactory extends SimulationScopeFactory<List<MarketPrice>> {
+public class MarketPricesFactory<S extends Scope>
+    extends RelativeScopeFactory<S, List<MarketPrice>> {
 
-    private Factory<? super SimulationScope, ? extends BiomassMarket> market;
-    private Factory<? super SimulationScope, ? extends List<PriceEntry>> priceEntries;
+    private Factory<? super S, ? extends BiomassMarket> market;
+    private Factory<? super S, ? extends List<PriceEntry>> priceEntries;
 
     @Override
-    protected List<MarketPrice> newInstance(final SimulationScope scope) {
+    protected List<MarketPrice> newInstance(final S scope) {
         final BiomassMarket market = this.market.get(scope);
         return priceEntries
             .get(scope)

@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels.predicates;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Supplier;
 
@@ -55,9 +56,9 @@ public class Factories {
      * @return a {@link VesselScope}-relative factory for a {@link VesselIsAt}
      * @see VesselIsAt
      */
-    public static VesselIsAtFactory vesselIsAt(
-        final Factory<? super VesselScope, ? extends Supplier<Int2D>> cellSupplier
+    public static <S extends Scope> VesselIsAtFactory<S> vesselIsAt(
+        final Factory<? super S, ? extends Supplier<Int2D>> cellSupplier
     ) {
-        return new VesselIsAtFactory(cellSupplier);
+        return new VesselIsAtFactory<>(cellSupplier);
     }
 }

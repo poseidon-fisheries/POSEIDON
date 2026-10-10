@@ -99,15 +99,15 @@ public class Factories {
     /**
      * @param modelGrid  the grid {@code coordinate} is resolved against
      * @param coordinate the fixed destination
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
      * {@link ConstantDestinationSupplier}
      * @see ConstantDestinationSupplier
      */
-    public static ConstantDestinationSupplierFactory constantDestination(
-        final Factory<? super VesselScope, ? extends ModelGrid> modelGrid,
-        final Factory<? super VesselScope, ? extends Coordinate> coordinate
+    public static <S extends Scope> ConstantDestinationSupplierFactory<S> constantDestination(
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
+        final Factory<? super S, ? extends Coordinate> coordinate
     ) {
-        return new ConstantDestinationSupplierFactory(modelGrid, coordinate);
+        return new ConstantDestinationSupplierFactory<>(modelGrid, coordinate);
     }
 
     /**

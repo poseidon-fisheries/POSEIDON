@@ -27,23 +27,23 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link EventClearer}, built via
+ * A {@link RelativeScopeFactory} counterpart of {@link EventClearer}, built via
  * {@link Factories#eventClearer(Factory)}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class EventClearerFactory extends SimulationScopeFactory<EventClearer> {
+public class EventClearerFactory<S extends Scope> extends RelativeScopeFactory<S, EventClearer> {
 
-    private Factory<? super SimulationScope, ? extends EventAccumulator<?>> eventAccumulator;
+    private Factory<? super S, ? extends EventAccumulator<?>> eventAccumulator;
 
     @Override
-    protected EventClearer newInstance(final SimulationScope scope) {
+    protected EventClearer newInstance(final S scope) {
         return new EventClearer(eventAccumulator.get(scope));
     }
 

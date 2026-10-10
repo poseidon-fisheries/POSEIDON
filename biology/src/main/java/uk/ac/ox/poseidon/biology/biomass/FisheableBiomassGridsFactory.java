@@ -27,25 +27,26 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.List;
 
 /**
- * A {@link SimulationScopeFactory} for a {@link FisheableBiomassGrids} over the resolved
+ * A {@link RelativeScopeFactory} for a {@link FisheableBiomassGrids} over the resolved
  * {@code biomassGrids}. Built via {@link Factories#fisheableBiomassGrids}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FisheableBiomassGridsFactory extends SimulationScopeFactory<FisheableBiomassGrids> {
+public class FisheableBiomassGridsFactory<S extends Scope>
+    extends RelativeScopeFactory<S, FisheableBiomassGrids> {
 
-    private Factory<? super SimulationScope, ? extends List<? extends BiomassGrid>> biomassGrids;
+    private Factory<? super S, ? extends List<? extends BiomassGrid>> biomassGrids;
 
     @Override
-    protected FisheableBiomassGrids newInstance(final SimulationScope scope) {
+    protected FisheableBiomassGrids newInstance(final S scope) {
         return new FisheableBiomassGrids(biomassGrids.get(scope));
     }
 

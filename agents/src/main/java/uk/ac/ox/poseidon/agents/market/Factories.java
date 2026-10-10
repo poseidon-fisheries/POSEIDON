@@ -105,28 +105,29 @@ public class Factories {
     /**
      * @param market       the market the prices apply to
      * @param priceEntries the (category, species) prices at that market
-     * @return a {@link SimulationScopeFactory} for one {@link MarketPrice} per entry, all at
-     * {@code market}
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for one
+     * {@link MarketPrice} per entry, all at {@code market}
      * @see MarketPricesFactory
      */
-    public static MarketPricesFactory marketPrices(
-        final Factory<? super SimulationScope, ? extends BiomassMarket> market,
-        final Factory<? super SimulationScope, ? extends List<PriceEntry>> priceEntries
+    public static <S extends Scope> MarketPricesFactory<S> marketPrices(
+        final Factory<? super S, ? extends BiomassMarket> market,
+        final Factory<? super S, ? extends List<PriceEntry>> priceEntries
     ) {
-        return new MarketPricesFactory(market, priceEntries);
+        return new MarketPricesFactory<>(market, priceEntries);
     }
 
     /**
      * @param marketGrid   the markets the prices apply to
      * @param priceEntries the (category, species) prices, the same at every market
-     * @return a {@link SimulationScopeFactory} for one {@link MarketPrice} per market and entry
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for one
+     * {@link MarketPrice} per market and entry
      * @see UniformMarketPricesFactory
      */
-    public static UniformMarketPricesFactory uniformMarketPrices(
-        final Factory<? super SimulationScope, ? extends MarketGrid> marketGrid,
-        final Factory<? super SimulationScope, ? extends List<PriceEntry>> priceEntries
+    public static <S extends Scope> UniformMarketPricesFactory<S> uniformMarketPrices(
+        final Factory<? super S, ? extends MarketGrid> marketGrid,
+        final Factory<? super S, ? extends List<PriceEntry>> priceEntries
     ) {
-        return new UniformMarketPricesFactory(marketGrid, priceEntries);
+        return new UniformMarketPricesFactory<>(marketGrid, priceEntries);
     }
 
     /**
@@ -152,12 +153,12 @@ public class Factories {
      * @param measurementUnitColumn column giving each row's unit of mass
      * @param marketGrid            the markets whose prices the table updates
      * @param species               the species to match row species codes against
-     * @return a {@link SimulationScopeFactory} for the table's price
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the table's price
      * updates, each dated at its row's date
      * @see PriceUpdatesFromTableFactory
      */
-    public static PriceUpdatesFromTableFactory priceUpdatesFromTable(
-        final Factory<? super SimulationScope, ? extends Table> data,
+    public static <S extends Scope> PriceUpdatesFromTableFactory<S> priceUpdatesFromTable(
+        final Factory<? super S, ? extends Table> data,
         final String dateColumn,
         final String marketCodeColumn,
         final String speciesCodeColumn,
@@ -165,10 +166,10 @@ public class Factories {
         final String priceColumn,
         final String currencyColumn,
         final String measurementUnitColumn,
-        final Factory<? super SimulationScope, ? extends MarketGrid> marketGrid,
-        final Factory<? super SimulationScope, ? extends Iterable<? extends Species>> species
+        final Factory<? super S, ? extends MarketGrid> marketGrid,
+        final Factory<? super S, ? extends Iterable<? extends Species>> species
     ) {
-        return new PriceUpdatesFromTableFactory(
+        return new PriceUpdatesFromTableFactory<>(
             data, dateColumn, marketCodeColumn, speciesCodeColumn,
             categoryCodeColumn, priceColumn, currencyColumn,
             measurementUnitColumn, marketGrid, species

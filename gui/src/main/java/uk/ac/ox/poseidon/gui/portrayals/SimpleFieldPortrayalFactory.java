@@ -28,23 +28,24 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import sim.portrayal.FieldPortrayal2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-/** A {@link SimulationScopeFactory} that wraps a resolved {@link FieldPortrayal2D} as a {@link NamedPortrayal}. */
+/** A {@link RelativeScopeFactory} that wraps a resolved {@link FieldPortrayal2D} as a {@link NamedPortrayal}. */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SimpleFieldPortrayalFactory extends SimulationScopeFactory<NamedPortrayal> {
+public class SimpleFieldPortrayalFactory<S extends Scope>
+    extends RelativeScopeFactory<S, NamedPortrayal> {
 
     private String name;
-    private Factory<? super SimulationScope, ? extends FieldPortrayal2D> portrayal;
+    private Factory<? super S, ? extends FieldPortrayal2D> portrayal;
     private boolean visible;
 
     /** @return {@link #name}, the resolved {@link #portrayal}, and {@link #visible}, wrapped as a {@link NamedPortrayal} */
     @Override
-    protected NamedPortrayal newInstance(final SimulationScope scope) {
+    protected NamedPortrayal newInstance(final S scope) {
         return new NamedPortrayal(name, portrayal.get(scope), visible);
     }
 }

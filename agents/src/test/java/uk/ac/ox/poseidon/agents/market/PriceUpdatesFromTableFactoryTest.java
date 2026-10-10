@@ -55,7 +55,7 @@ class PriceUpdatesFromTableFactoryTest {
     @Test
     void setsPricesOnExistingMarket() {
         final BiomassMarket market = market("M1");
-        final PriceUpdatesFromTableFactory factory = factory(
+        final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
             priceTable("M1", "HKE"),
             marketGrid(market),
             List.of(new Species("HKE", null, "Hake"))
@@ -72,7 +72,7 @@ class PriceUpdatesFromTableFactoryTest {
     @Test
     void stagedConfiguredSpeciesUseSingleGenericPriceEntry() {
         final BiomassMarket market = market("M1");
-        final PriceUpdatesFromTableFactory factory = factory(
+        final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
             priceTable("M1", "HKE"),
             marketGrid(market),
             List.of(
@@ -93,7 +93,7 @@ class PriceUpdatesFromTableFactoryTest {
 
     @Test
     void rejectsUnknownPriceTableSpecies() {
-        final PriceUpdatesFromTableFactory factory = factory(
+        final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
             priceTable("M1", "XYZ"),
             marketGrid(market("M1")),
             List.of(new Species("HKE", "adult", "Hake"))
@@ -106,7 +106,7 @@ class PriceUpdatesFromTableFactoryTest {
 
     @Test
     void rejectsUnknownMarket() {
-        final PriceUpdatesFromTableFactory factory = factory(
+        final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
             priceTable("M2", "HKE"),
             marketGrid(market("M1")),
             List.of(new Species("HKE", null, "Hake"))
@@ -117,12 +117,12 @@ class PriceUpdatesFromTableFactoryTest {
             .hasMessage("Market M2 not found in market grid.");
     }
 
-    private static PriceUpdatesFromTableFactory factory(
+    private static PriceUpdatesFromTableFactory<SimulationScope> factory(
         final Table priceTable,
         final MarketGrid marketGrid,
         final List<? extends Species> species
     ) {
-        return new PriceUpdatesFromTableFactory(
+        return new PriceUpdatesFromTableFactory<>(
             _ -> priceTable,
             "date",
             "market_code",
@@ -163,7 +163,7 @@ class PriceUpdatesFromTableFactoryTest {
 
     @Test
     void datesEachUpdateAtItsRowDate() {
-        final PriceUpdatesFromTableFactory factory = factory(
+        final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
             priceTable("M1", "HKE"),
             marketGrid(market("M1")),
             List.of(new Species("HKE", null, "Hake"))
@@ -174,7 +174,7 @@ class PriceUpdatesFromTableFactoryTest {
             .containsExactly(LocalDate.of(2026, 1, 1).atStartOfDay());
     }
 
-    private void applyAll(final PriceUpdatesFromTableFactory factory) {
+    private void applyAll(final PriceUpdatesFromTableFactory<SimulationScope> factory) {
         factory.get(scope()).forEach(update -> update.getValue().step(null));
     }
 

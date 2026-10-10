@@ -81,14 +81,14 @@ public class Factories {
     }
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link FisheableBiomassGrids} over the
-     * resolved per-species grids
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link FisheableBiomassGrids} over the resolved per-species grids
      * @see FisheableBiomassGridsFactory
      */
-    public static FisheableBiomassGridsFactory fisheableBiomassGrids(
-        final Factory<? super SimulationScope, ? extends List<? extends BiomassGrid>> biomassGrids
+    public static <S extends Scope> FisheableBiomassGridsFactory<S> fisheableBiomassGrids(
+        final Factory<? super S, ? extends List<? extends BiomassGrid>> biomassGrids
     ) {
-        return new FisheableBiomassGridsFactory(biomassGrids);
+        return new FisheableBiomassGridsFactory<>(biomassGrids);
     }
 
     /**
@@ -185,17 +185,18 @@ public class Factories {
     }
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link CommonBiomassGrower}
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link CommonBiomassGrower}
      * @see CommonBiomassGrowerFactory
      */
-    public static CommonBiomassGrowerFactory commonBiomassGrower(
-        final Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid,
-        final Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid,
-        final Factory<? super SimulationScope, ? extends BiomassGrowthRule> biomassGrowthRule,
-        final Factory<? super SimulationScope, ? extends BiomassRecruitmentAllocator>
+    public static <S extends Scope> CommonBiomassGrowerFactory<S> commonBiomassGrower(
+        final Factory<? super S, ? extends BiomassGrid> biomassGrid,
+        final Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid,
+        final Factory<? super S, ? extends BiomassGrowthRule> biomassGrowthRule,
+        final Factory<? super S, ? extends BiomassRecruitmentAllocator>
             biomassRecruitmentAllocator
     ) {
-        return new CommonBiomassGrowerFactory(
+        return new CommonBiomassGrowerFactory<>(
             biomassGrid,
             carryingCapacityGrid,
             biomassGrowthRule,
@@ -204,15 +205,16 @@ public class Factories {
     }
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for an {@link IndependentBiomassGrower}
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+     * {@link IndependentBiomassGrower}
      * @see IndependentBiomassGrowerFactory
      */
-    public static IndependentBiomassGrowerFactory independentBiomassGrower(
-        final Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid,
-        final Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid,
-        final Factory<? super SimulationScope, ? extends BiomassGrowthRule> biomassGrowthRule
+    public static <S extends Scope> IndependentBiomassGrowerFactory<S> independentBiomassGrower(
+        final Factory<? super S, ? extends BiomassGrid> biomassGrid,
+        final Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid,
+        final Factory<? super S, ? extends BiomassGrowthRule> biomassGrowthRule
     ) {
-        return new IndependentBiomassGrowerFactory(
+        return new IndependentBiomassGrowerFactory<>(
             biomassGrid,
             carryingCapacityGrid,
             biomassGrowthRule
@@ -260,15 +262,16 @@ public class Factories {
     }
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for dated updates replacing
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for dated updates replacing
      * {@code biomassGrids}' contents with {@code timeIndexedBiomassGrids}' snapshots
      * @see TimeIndexedBiomassGridUpdatesFactory
      */
-    public static TimeIndexedBiomassGridUpdatesFactory timeIndexedBiomassGridUpdates(
-        final Factory<? super SimulationScope, ? extends FisheableBiomassGrids> biomassGrids,
-        final Factory<? super SimulationScope, ? extends Map<LocalDateTime, ? extends List<? extends SpeciesGrid>>>
+    public static <S extends Scope>
+    TimeIndexedBiomassGridUpdatesFactory<S> timeIndexedBiomassGridUpdates(
+        final Factory<? super S, ? extends FisheableBiomassGrids> biomassGrids,
+        final Factory<? super S, ? extends Map<LocalDateTime, ? extends List<? extends SpeciesGrid>>>
             timeIndexedBiomassGrids
     ) {
-        return new TimeIndexedBiomassGridUpdatesFactory(biomassGrids, timeIndexedBiomassGrids);
+        return new TimeIndexedBiomassGridUpdatesFactory<>(biomassGrids, timeIndexedBiomassGrids);
     }
 }

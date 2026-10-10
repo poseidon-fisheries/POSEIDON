@@ -27,26 +27,26 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Supplier;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link VesselIsAt}, built via
+ * A {@link RelativeScopeFactory} counterpart of {@link VesselIsAt}, built via
  * {@link Factories#vesselIsAt}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class VesselIsAtFactory extends VesselScopeFactory<VesselIsAt> {
+public class VesselIsAtFactory<S extends Scope> extends RelativeScopeFactory<S, VesselIsAt> {
 
-    private Factory<? super VesselScope, ? extends Supplier<Int2D>> cellSupplier;
+    private Factory<? super S, ? extends Supplier<Int2D>> cellSupplier;
 
     @Override
-    protected VesselIsAt newInstance(final VesselScope scope) {
+    protected VesselIsAt newInstance(final S scope) {
         return new VesselIsAt(cellSupplier.get(scope));
     }
 }

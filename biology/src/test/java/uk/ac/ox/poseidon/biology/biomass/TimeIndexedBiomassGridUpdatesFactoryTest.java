@@ -55,13 +55,16 @@ class TimeIndexedBiomassGridUpdatesFactoryTest {
         // updates to midnight via atStartOfDay().
         final LocalDateTime midnight = LocalDate.of(2020, 1, 1).atStartOfDay();
         final LocalDateTime noon = LocalDateTime.of(2026, 3, 1, 12, 0);
-        final TimeIndexedBiomassGridUpdatesFactory factory = new TimeIndexedBiomassGridUpdatesFactory(
-            _ -> new FisheableBiomassGrids(List.of(new DefaultBiomassGrid(modelGrid, HKE, 0.0))),
-            _ -> Map.of(
-                midnight, List.of(snapshot(HKE, 1.0)),
-                noon, List.of(snapshot(HKE, 2.0))
-            )
-        );
+        final TimeIndexedBiomassGridUpdatesFactory<SimulationScope> factory =
+            new TimeIndexedBiomassGridUpdatesFactory<>(
+                _ -> new FisheableBiomassGrids(
+                    List.of(new DefaultBiomassGrid(modelGrid, HKE, 0.0))
+                ),
+                _ -> Map.of(
+                    midnight, List.of(snapshot(HKE, 1.0)),
+                    noon, List.of(snapshot(HKE, 2.0))
+                )
+            );
 
         assertThat(factory.get(scope()))
             .extracting(Entry::getKey)
@@ -71,10 +74,11 @@ class TimeIndexedBiomassGridUpdatesFactoryTest {
     @Test
     void updatesReplaceGridContentsOnlyWhenStepped() {
         final DefaultBiomassGrid target = new DefaultBiomassGrid(modelGrid, HKE, 0.0);
-        final TimeIndexedBiomassGridUpdatesFactory factory = new TimeIndexedBiomassGridUpdatesFactory(
-            _ -> new FisheableBiomassGrids(List.of(target)),
-            _ -> Map.of(LocalDate.of(2026, 3, 1).atStartOfDay(), List.of(snapshot(HKE, 5.0)))
-        );
+        final TimeIndexedBiomassGridUpdatesFactory<SimulationScope> factory =
+            new TimeIndexedBiomassGridUpdatesFactory<>(
+                _ -> new FisheableBiomassGrids(List.of(target)),
+                _ -> Map.of(LocalDate.of(2026, 3, 1).atStartOfDay(), List.of(snapshot(HKE, 5.0)))
+            );
 
         final List<Entry<LocalDateTime, BiomassGridUpdate>> updates = factory.get(scope());
         assertThat(target.getValue(CELL)).isEqualTo(0.0);
@@ -87,13 +91,14 @@ class TimeIndexedBiomassGridUpdatesFactoryTest {
     void eachSpeciesUpdatesItsOwnGridOnly() {
         final DefaultBiomassGrid hkeGrid = new DefaultBiomassGrid(modelGrid, HKE, 0.0);
         final DefaultBiomassGrid aneGrid = new DefaultBiomassGrid(modelGrid, ANE, 0.0);
-        final TimeIndexedBiomassGridUpdatesFactory factory = new TimeIndexedBiomassGridUpdatesFactory(
-            _ -> new FisheableBiomassGrids(List.of(hkeGrid, aneGrid)),
-            _ -> Map.of(
-                LocalDate.of(2020, 1, 1).atStartOfDay(),
-                List.of(snapshot(HKE, 3.0), snapshot(ANE, 7.0))
-            )
-        );
+        final TimeIndexedBiomassGridUpdatesFactory<SimulationScope> factory =
+            new TimeIndexedBiomassGridUpdatesFactory<>(
+                _ -> new FisheableBiomassGrids(List.of(hkeGrid, aneGrid)),
+                _ -> Map.of(
+                    LocalDate.of(2020, 1, 1).atStartOfDay(),
+                    List.of(snapshot(HKE, 3.0), snapshot(ANE, 7.0))
+                )
+            );
 
         factory.get(scope()).forEach(update -> update.getValue().step(null));
 
