@@ -23,7 +23,9 @@ package uk.ac.ox.poseidon.agents.social;
 
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.poseidon.agents.trips.TripStartEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.events.Listener;
 
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +41,7 @@ import static uk.ac.ox.poseidon.core.MasonUtils.upToOneOf;
  * and gear). Every tie goes both ways, so a vessel's clique is itself and its partners, its
  * recipients in the network.
  */
-public class CliqueDynamics {
+public class CliqueDynamics implements Listener<TripStartEvent> {
 
     private final SocialNetwork network;
     private final Function<? super Vessel, ?> groupingKey;
@@ -66,6 +68,22 @@ public class CliqueDynamics {
      * Removes every tie between two members of the vessel's clique that are not eligible for each
      * other. Eligibility being transitive, the clique splits into cliques of eligible vessels.
      */
+    @Override
+    public Class<TripStartEvent> getEventClass() {
+        return TripStartEvent.class;
+    }
+
+    /**
+     * Settles the clique of the trip's vessel, then, if that leaves the vessel alone, has it join
+     * one, so that the vessel goes fishing with partners eligible for it whenever there are some.
+     */
+    @Override
+    public void receive(final TripStartEvent event) {
+        final Vessel vessel = event.getTrip().getVessel();
+        settle(vessel);
+        join(vessel);
+    }
+
     /**
      * If the vessel is alone, picks at random, among the network's candidates, a vessel eligible
      * for it whose clique has room, settles that clique and ties the vessel, both ways, to every

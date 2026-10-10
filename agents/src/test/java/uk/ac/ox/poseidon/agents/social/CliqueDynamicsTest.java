@@ -36,6 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.social.CliqueDynamicsPropertyTest.assertCliqueInvariants;
+import static uk.ac.ox.poseidon.agents.social.CliqueDynamicsPropertyTest.startTrip;
 
 class CliqueDynamicsTest {
 
@@ -246,5 +248,56 @@ class CliqueDynamicsTest {
                 .map(fleet::indexOf)
                 .collect(toSet()))
             .toList();
+    }
+
+    @Test
+    void aVesselLeftAloneBySettlingJoinsInTheSameStep() {
+        tieAll(a, b);
+        ports.put(a, "Y");
+        ports.put(c, "Y");
+        ports.put(d, "Z");
+
+        startTrip(dynamics, a);
+
+        assertPartners(a, c);
+        assertPartners(b);
+    }
+
+    @Test
+    void aPortChangeBetweenTwoTripStartsIsSeenAtTheSecond() {
+        tieAll(a, b);
+        ports.put(c, "Y");
+        ports.put(d, "Y");
+        startTrip(dynamics, a);
+        assertPartners(a, b);
+
+        ports.put(b, "Z");
+        startTrip(dynamics, a);
+
+        assertPartners(a);
+        assertPartners(b);
+    }
+
+    @Test
+    void vesselsMovingIntoAFullCliquesPortNeitherOverfillItNorLeaveOneWayTies() {
+        // The 2026-10-09 review's case, with A, B, D, E and F as a, b, c, d and e.
+        final Vessel e = activeVessel();
+        final List<Vessel> fleet = List.of(a, b, c, d, e);
+        final SocialNetwork network = new SocialNetwork(() -> fleet);
+        final CliqueDynamics dynamics =
+            new CliqueDynamics(network, ports::get, 3, new MersenneTwisterFast(0));
+        ports.putAll(Map.of(a, "P", b, "P", c, "Q", d, "Q", e, "Q"));
+        network.addTie(a, b);
+        network.addTie(b, a);
+        network.addTie(c, d);
+        network.addTie(d, c);
+
+        ports.put(a, "Q");
+        startTrip(dynamics, a);
+        ports.put(b, "Q");
+        startTrip(dynamics, b);
+        startTrip(dynamics, e);
+
+        assertCliqueInvariants(network, fleet, 3);
     }
 }
