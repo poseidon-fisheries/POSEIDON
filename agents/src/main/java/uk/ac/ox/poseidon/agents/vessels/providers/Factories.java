@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.agents.vessels.providers;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.events.EventManager;
-import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 import java.util.function.Supplier;
@@ -92,19 +91,5 @@ public class Factories {
      */
     public static CurrentTripEventManagerFactory currentTripEventManager() {
         return new CurrentTripEventManagerFactory();
-    }
-
-    /**
-     * @param pathFinder finds a path between two cells
-     * @param distance   computes the travel duration of a path at a given speed
-     * @return a {@link VesselScope}-relative factory for a
-     * {@link TravelTimeToPortViaDestination}
-     * @see TravelTimeToPortViaDestination
-     */
-    public static TravelTimeToPortViaDestinationFactory travelTimeToPortViaDestination(
-        final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
-        final Factory<? super VesselScope, ? extends DistanceCalculator> distance
-    ) {
-        return new TravelTimeToPortViaDestinationFactory(pathFinder, distance);
     }
 }
