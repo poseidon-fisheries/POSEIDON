@@ -22,10 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
+import org.joda.money.Money;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+
+import java.util.function.Function;
 
 /** Factories for the routes vessels would sail and what travelling them costs. */
 public class Factories {
@@ -44,6 +48,18 @@ public class Factories {
         final Factory<? super VesselScope, ? extends DistanceCalculator> distance
     ) {
         return new RouteViaDestinationFactory(pathFinder, distance);
+    }
+
+    /**
+     * @param hourlyCost gives the vessel's cost per hour at sea
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a {@link TimeCost}
+     * @see TimeCost
+     */
+    public static TimeCostFactory timeCost(
+        final Factory<? super VesselScope, ? extends Function<? super Vessel, ? extends Money>>
+            hourlyCost
+    ) {
+        return new TimeCostFactory(hourlyCost);
     }
 
     /**
