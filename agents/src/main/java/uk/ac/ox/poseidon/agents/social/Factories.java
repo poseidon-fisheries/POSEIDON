@@ -65,4 +65,17 @@ public class Factories {
     ) {
         return new CliqueDynamicsFactory(network, groupingKey, maximumCliqueSize);
     }
+
+    /**
+     * @param network the network whose ties decide who hears each haul
+     * @return a {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory} for a
+     * {@link HaulSharer} registered with the simulation's event manager, so that it hears every
+     * vessel's hauls
+     * @see HaulSharer
+     */
+    public static HaulSharerFactory haulSharer(
+        final Factory<? super SimulationScope, ? extends SocialNetwork> network
+    ) {
+        return new HaulSharerFactory(network);
+    }
 }
