@@ -20,13 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.io.tables;
+package uk.ac.ox.poseidon.core.events;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**

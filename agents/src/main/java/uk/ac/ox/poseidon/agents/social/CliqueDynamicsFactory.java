@@ -27,8 +27,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
 import java.util.function.Function;
 

@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
+import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-import uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory;
 
 /**
  * A {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} counterpart of

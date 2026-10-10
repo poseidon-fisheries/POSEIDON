@@ -53,7 +53,7 @@ public class Factories {
      *                          when both are active and their keys are equal
      * @param maximumCliqueSize the largest clique a vessel joins, itself included; 1 means no
      *                          vessel ever has partners
-     * @return a {@link uk.ac.ox.poseidon.io.tables.SimulationEventListenerFactory} for a
+     * @return a {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory} for a
      * {@link CliqueDynamics} registered with the simulation's event manager, so that it hears
      * every vessel's trip starts
      * @see CliqueDynamics
