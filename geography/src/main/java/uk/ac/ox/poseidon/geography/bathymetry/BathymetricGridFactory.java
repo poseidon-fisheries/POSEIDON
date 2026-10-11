@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,7 +64,8 @@ public abstract class BathymetricGridFactory<S extends Scope>
         );
         final double[][] array = modelGrid.makeDoubleArray();
         modelGrid.getAllCells().forEach(int2D ->
-            array[int2D.x][int2D.y] = aggregator.apply(elevationValues.get(int2D)).orElse(0)
+            array[int2D.x][int2D.y] =
+                aggregator.apply(elevationValues.getOrDefault(int2D, List.of())).orElse(0)
         );
         return new DefaultBathymetricGrid(modelGrid, array);
     }

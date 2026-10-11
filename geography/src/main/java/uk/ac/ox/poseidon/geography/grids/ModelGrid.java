@@ -126,9 +126,12 @@ public interface ModelGrid {
         return toCell(toPoint(coordinate));
     }
 
-    /** @return the discrete cell containing {@code point} */
+    /**
+     * @return the discrete cell containing {@code point}; a point west or north of the grid gives a
+     * negative column or row, so {@link #isInGrid(Int2D)} rejects it
+     */
     default Int2D toCell(final Double2D point) {
-        return new Int2D((int) point.x, (int) point.y);
+        return new Int2D((int) Math.floor(point.x), (int) Math.floor(point.y));
     }
 
     /** @return {@code cell}'s Moore neighbours, within a neighbourhood size of 1 */
