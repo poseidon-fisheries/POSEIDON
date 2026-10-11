@@ -89,7 +89,7 @@ public class VesselActivationFactory extends SimulationScopeFactory<FleetEvent> 
             List.of()
         );
         // TODO: figure out scheduling
-        simulation.getTemporalSchedule().scheduleOnce(fleetEvent);
+        simulation.getTemporalSchedule().scheduleOnce(fleetEvent.getDateTime(), fleetEvent);
         return fleetEvent;
     }
 }
