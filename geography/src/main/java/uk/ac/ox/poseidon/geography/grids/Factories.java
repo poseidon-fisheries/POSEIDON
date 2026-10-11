@@ -45,6 +45,8 @@ public class Factories {
 
     /**
      * @param path          factory for the raster grid file to read
+     * @param modelGrid     factory for the model grid whose cells the file's columns and rows
+     *                      are; the file must cover the same cells
      * @param includedValue the cell value to select
      * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the set of cells in the
      * resolved file whose value equals {@code includedValue}
@@ -52,9 +54,10 @@ public class Factories {
      */
     public static <S extends Scope> CellSetFromGridFileFactory<S> cellSetFromGridFile(
         final Factory<? super S, ? extends Path> path,
+        final Factory<? super S, ? extends ModelGrid> modelGrid,
         final double includedValue
     ) {
-        return new CellSetFromGridFileFactory<>(path, includedValue);
+        return new CellSetFromGridFileFactory<>(path, modelGrid, includedValue);
     }
 
     /**

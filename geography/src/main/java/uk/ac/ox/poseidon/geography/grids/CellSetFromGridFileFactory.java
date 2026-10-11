@@ -31,10 +31,12 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.geography.Envelope;
 
 import java.io.File;
 import java.nio.file.Path;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static lombok.AccessLevel.PACKAGE;
 
 /**
@@ -42,7 +44,11 @@ import static lombok.AccessLevel.PACKAGE;
  * value equals a fixed target — e.g. picking out land cells from a land/water raster. There's no
  * separate plain component class here: the produced {@link ImmutableSet} is returned as-is, with
  * no wrapper type to carry documentation, so this factory carries the behavior doc directly.
- * Built via {@link Factories#cellSetFromGridFile(Factory, double)} in this package.
+ * <p>
+ * The file's columns and rows are taken as the cells of {@code modelGrid}, so the file must cover
+ * the same cells: the same number of columns and rows, and the same extent to within a hundredth
+ * of a cell (enough to allow for the same header printed with different precision).
+ * Built via {@link Factories#cellSetFromGridFile(Factory, Factory, double)} in this package.
  */
 @Data
 @NoArgsConstructor
@@ -51,10 +57,18 @@ import static lombok.AccessLevel.PACKAGE;
 public class CellSetFromGridFileFactory<S extends Scope>
     extends RelativeScopeFactory<S, ImmutableSet<Int2D>> {
 
+    /** The share of a cell by which the file's extent may differ from the model grid's. */
+    private static final double EXTENT_TOLERANCE_IN_CELLS = 0.01;
+
     private Factory<? super S, ? extends Path> path;
+    private Factory<? super S, ? extends ModelGrid> modelGrid;
     private double includedValue;
 
-    /** @throws RuntimeException if {@code path} doesn't point to a file */
+    /**
+     * @throws RuntimeException         if {@code path} doesn't point to a file
+     * @throws IllegalArgumentException if the file doesn't cover the same cells as
+     *                                  {@code modelGrid}
+     */
     @Override
     protected ImmutableSet<Int2D> newInstance(final S scope) {
         final File gridFile = path.get(scope).toFile();
@@ -62,6 +76,7 @@ public class CellSetFromGridFileFactory<S extends Scope>
             throw new RuntimeException(gridFile + " does not point to a file.");
         }
         final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
+        checkSameCells(gridFile, coverageWrapper, modelGrid.get(scope));
         final ImmutableSet.Builder<Int2D> builder = ImmutableSet.builder();
         coverageWrapper.processGrid((cell, value) -> {
             if (value == includedValue) {
@@ -69,5 +84,36 @@ public class CellSetFromGridFileFactory<S extends Scope>
             }
         });
         return builder.build();
+    }
+
+    private static void checkSameCells(
+        final File gridFile,
+        final CoverageWrapper coverageWrapper,
+        final ModelGrid modelGrid
+    ) {
+        checkArgument(
+            coverageWrapper.getGridWidth() == modelGrid.getGridWidth() &&
+                coverageWrapper.getGridHeight() == modelGrid.getGridHeight(),
+            "%s has %s columns and %s rows, but the model grid has %s and %s.",
+            gridFile,
+            coverageWrapper.getGridWidth(),
+            coverageWrapper.getGridHeight(),
+            modelGrid.getGridWidth(),
+            modelGrid.getGridHeight()
+        );
+        final Envelope fileExtent = coverageWrapper.makeEnvelope();
+        final Envelope gridExtent = modelGrid.getEnvelope();
+        final double xTolerance = EXTENT_TOLERANCE_IN_CELLS * modelGrid.getCellWidth();
+        final double yTolerance = EXTENT_TOLERANCE_IN_CELLS * modelGrid.getCellHeight();
+        checkArgument(
+            Math.abs(fileExtent.getMinX() - gridExtent.getMinX()) <= xTolerance &&
+                Math.abs(fileExtent.getMaxX() - gridExtent.getMaxX()) <= xTolerance &&
+                Math.abs(fileExtent.getMinY() - gridExtent.getMinY()) <= yTolerance &&
+                Math.abs(fileExtent.getMaxY() - gridExtent.getMaxY()) <= yTolerance,
+            "%s covers %s, but the model grid covers %s.",
+            gridFile,
+            fileExtent,
+            gridExtent
+        );
     }
 }

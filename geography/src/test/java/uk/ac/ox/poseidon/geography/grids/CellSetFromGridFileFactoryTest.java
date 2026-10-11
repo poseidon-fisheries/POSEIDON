@@ -28,6 +28,7 @@ import org.junit.jupiter.api.io.TempDir;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.Envelope;
 
 import java.nio.file.Path;
 import java.util.Set;
@@ -44,8 +45,21 @@ class CellSetFromGridFileFactoryTest {
     @TempDir
     private Path tempDir;
 
-    private Set<Int2D> cellsWith(final Path file, final double includedValue) {
-        return cellSetFromGridFile(scope -> file, includedValue).get(mock(Scope.class));
+    /** The fixture's own grid: 3 by 2 cells from 10°E to 13°E and 40°N to 42°N. */
+    private static final ModelGrid FIXTURE_GRID =
+        ModelGrid.create(3, 2, new Envelope(10, 13, 40, 42));
+
+    private static Set<Int2D> cellsWith(
+        final Path file,
+        final ModelGrid modelGrid,
+        final double includedValue
+    ) {
+        return cellSetFromGridFile(scope -> file, scope -> modelGrid, includedValue)
+            .get(mock(Scope.class));
+    }
+
+    private static Set<Int2D> cellsWith(final Path file, final double includedValue) {
+        return cellsWith(file, FIXTURE_GRID, includedValue);
     }
 
     @Test
@@ -76,8 +90,42 @@ class CellSetFromGridFileFactoryTest {
         // another with the same header. A cell from the set must be where its value is.
         final Path file = writeFixture(tempDir, "fixture.asc");
         final ModelGrid modelGrid = modelGridFromGridFile(scope -> file).get(mock(Scope.class));
-        final Int2D cellWithTwo = cellsWith(file, 2).iterator().next();
+        final Int2D cellWithTwo = cellsWith(file, modelGrid, 2).iterator().next();
         assertThat(modelGrid.toCoordinate(cellWithTwo)).isEqualTo(new Coordinate(11.5, 41.5));
+    }
+
+    @Test
+    void aFileWithOtherColumnsOrRowsFails() {
+        final Path file = writeFixture(tempDir, "fixture.asc");
+        final ModelGrid wider = ModelGrid.create(4, 2, new Envelope(10, 14, 40, 42));
+        assertThatThrownBy(() -> cellsWith(file, wider, 2))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("has 3 columns and 2 rows, but the model grid has 4 and 2");
+        final ModelGrid taller = ModelGrid.create(3, 3, new Envelope(10, 13, 39, 42));
+        assertThatThrownBy(() -> cellsWith(file, taller, 2))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void aFileOffsetFromTheModelGridFails() {
+        // Same size, but a fiftieth of a cell east, then half a cell north
+        final Path file = writeFixture(tempDir, "fixture.asc");
+        final ModelGrid east = ModelGrid.create(3, 2, new Envelope(10.02, 13.02, 40, 42));
+        assertThatThrownBy(() -> cellsWith(file, east, 2))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("but the model grid covers");
+        final ModelGrid north = ModelGrid.create(3, 2, new Envelope(10, 13, 40.5, 42.5));
+        assertThatThrownBy(() -> cellsWith(file, north, 2))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void anExtentWithinAHundredthOfACellIsTheSame() {
+        // As when the same header is printed with less precision
+        final Path file = writeFixture(tempDir, "fixture.asc");
+        final ModelGrid nearly =
+            ModelGrid.create(3, 2, new Envelope(10.005, 13.005, 39.995, 41.995));
+        assertThat(cellsWith(file, nearly, 2)).containsExactly(new Int2D(1, 0));
     }
 
     @Test
