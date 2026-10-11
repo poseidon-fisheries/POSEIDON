@@ -41,8 +41,14 @@ import static lombok.AccessLevel.PACKAGE;
 /**
  * Predicate matching cells the vessel could legally fish at: builds a hypothetical
  * {@link ExtendedFishingAction} for arriving at the candidate cell (travel time included, via
- * {@code pathFinder}/{@code distanceCalculator}) and checks it against {@code regulations}. Used to
- * filter fishing-location candidates before committing to a trip there.
+ * {@code pathFinder}/{@code distanceCalculator}) and lasting {@code fishingDuration}, and checks it
+ * against {@code regulations}. Used to filter fishing-location candidates before committing to a
+ * trip there.
+ * <p>
+ * {@code fishingDuration} is the typical duration of a fishing action: fishers don't know how long
+ * a given set or haul will take, so they plan with a typical one. A fishing action expected to run
+ * into a closure is refused here; one that actually runs longer than planned is not this
+ * checker's concern.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class FishingLocationLegalityChecker implements Predicate<Int2D> {
@@ -50,6 +56,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
     private final Regulations<? super ExtendedFishingAction> regulations;
     private final GridPathFinder pathFinder;
     private final DistanceCalculator distanceCalculator;
+    private final Duration fishingDuration;
     private final Supplier<LocalDateTime> currentDateTimeSupplier;
     private final Vessel vessel;
 
@@ -62,8 +69,9 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
     }
 
     /**
-     * Builds a nominal, 1-second {@link ExtendedFishingAction} at {@code fishingLocation}, starting
-     * whenever the vessel would arrive there from its current cell.
+     * Builds the {@link ExtendedFishingAction} the vessel would plan at {@code fishingLocation}:
+     * starting whenever it would arrive there from its current cell, and lasting
+     * {@code fishingDuration}.
      *
      * @throws RuntimeException if no path exists from the vessel's current cell to
      *                          {@code fishingLocation}
@@ -90,7 +98,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
         return new ExtendedFishingAction(
             vessel,
             currentDateTimeSupplier.get().plus(travelDuration),
-            Duration.ofSeconds(1),
+            fishingDuration,
             vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation),
             vessel.getGear()
         );
