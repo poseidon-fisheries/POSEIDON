@@ -31,6 +31,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.chrono.MinguoChronology;
 import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.List;
@@ -419,6 +420,51 @@ class TemporalScheduleTest {
             dateTime(2013, 4, 1),
             dateTime(2013, 5, 1)
         );
+    }
+
+    @Test
+    void repeatsMonthlyOnTheLastDaysOfLongMonths() {
+        schedule.scheduleRepeating(dateTime(2013, 1, 31), recordFiring, Period.ofMonths(1));
+        schedule.stepUntil(simState, dateTime(2013, 5, 1));
+        assertThat(firings).containsExactly(
+            dateTime(2013, 1, 31),
+            dateTime(2013, 2, 28),
+            dateTime(2013, 3, 31),
+            dateTime(2013, 4, 30)
+        );
+    }
+
+    @Test
+    void repeatsAFractionalDurationAtItsAveragePace() {
+        schedule.scheduleRepeating(start, recordFiring, Duration.ofMillis(1_500));
+        schedule.stepUntil(simState, start.plusSeconds(7));
+        assertThat(firings).containsExactly(
+            start,
+            start.plusSeconds(1),
+            start.plusSeconds(3),
+            start.plusSeconds(4),
+            start.plusSeconds(6)
+        );
+    }
+
+    @Test
+    void repeatsYearlyFromALeapDayOnEachLeapDay() {
+        schedule.scheduleRepeating(dateTime(2016, 2, 29), recordFiring, Period.ofYears(1));
+        schedule.stepUntil(simState, dateTime(2020, 3, 1));
+        assertThat(firings).containsExactly(
+            dateTime(2016, 2, 29),
+            dateTime(2017, 2, 28),
+            dateTime(2018, 2, 28),
+            dateTime(2019, 2, 28),
+            dateTime(2020, 2, 29)
+        );
+    }
+
+    @Test
+    void refusesARepeatIntervalThatCannotBeMultiplied() {
+        final TemporalAmount minguoMonth = MinguoChronology.INSTANCE.period(0, 1, 0);
+        assertThatThrownBy(() -> schedule.scheduleRepeating(start, recordFiring, minguoMonth))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

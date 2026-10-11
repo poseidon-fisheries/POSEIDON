@@ -33,6 +33,7 @@ import java.io.Serial;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
@@ -370,9 +371,10 @@ public class TemporalSchedule extends Schedule {
      * @param dateTime the date-time of the first firing
      * @param ordering the schedule ordering to use
      * @param event    the event to schedule repeatedly
-     * @param interval the recurring interval
+     * @param interval the recurring interval, a {@link Period} or a {@link Duration}
      * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling failed
-     * @throws IllegalArgumentException if {@code interval} does not move time forward
+     * @throws IllegalArgumentException if {@code interval} is neither a {@link Period} nor a
+     *                                  {@link Duration}, or does not move time forward
      */
     public TemporalRepeat scheduleRepeating(
         final Temporal dateTime,
@@ -596,20 +598,38 @@ public class TemporalSchedule extends Schedule {
         }
     }
 
-    /** A {@link Repeat} whose next firing time is computed by adding {@link #interval} to the
-     * current {@link LocalDateTime}, rather than a fixed {@code double} step. */
+    /**
+     * A {@link Repeat} anchored to its first firing: its n-th firing after the first is the first
+     * plus n times {@link #interval}, floored to the second like any date-time, never the previous
+     * firing plus the interval. So neither calendar clamping nor flooring accumulates. Monthly from
+     * 31 January, it fires on 31 January, 28 February, 31 March, 30 April, and so on; every 1.5
+     * seconds from 0, it fires at 0, 1, 3, 4, 6 seconds, and so on.
+     */
     public class TemporalRepeat extends Repeat {
 
         @Serial private static final long serialVersionUID = -3948718709942805794L;
         private final TemporalAmount interval;
+        // The anchor of the later firings, set at the first firing.
+        private LocalDateTime firstFiring;
+        // The number of firings computed from the anchor so far.
+        private long firingsAfterTheFirst;
 
-        /** @throws IllegalArgumentException if {@code interval} does not move time forward */
+        /**
+         * @throws IllegalArgumentException if {@code interval} is neither a {@link Period} nor a
+         *                                  {@link Duration}, the amounts that can be multiplied, or
+         *                                  does not move time forward
+         */
         TemporalRepeat(
             final Steppable event,
             final int ordering,
             final TemporalAmount interval
         ) {
             super(event, ordering);
+            if (!(interval instanceof Period) && !(interval instanceof Duration)) {
+                throw new IllegalArgumentException(
+                    "A repeat's interval must be a Period or a Duration, not " + interval + "."
+                );
+            }
             checkMovesTimeForward(interval);
             this.interval = interval;
         }
@@ -619,7 +639,19 @@ public class TemporalSchedule extends Schedule {
             final SimState simState,
             final double currentTime
         ) {
-            return schedulingTime(toDateTime(currentTime).plus(interval));
+            if (firstFiring == null) {
+                firstFiring = toDateTime(currentTime);
+            }
+            firingsAfterTheFirst++;
+            return schedulingTime(firstFiring.plus(intervalTimes(firingsAfterTheFirst)));
+        }
+
+        private TemporalAmount intervalTimes(final long n) {
+            return switch (interval) {
+                case final Period period -> period.multipliedBy(Math.toIntExact(n));
+                case final Duration duration -> duration.multipliedBy(n);
+                default -> throw new IllegalStateException("Unexpected interval: " + interval);
+            };
         }
 
     }
