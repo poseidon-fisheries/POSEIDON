@@ -26,12 +26,9 @@ package uk.ac.ox.poseidon.geography.paths;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * {@link DefaultPathCache}'s contract: {@code null} for a path it knows nothing about, an empty
@@ -53,80 +50,32 @@ class DefaultPathCacheTest {
 
     @Test
     void aStoredPathIsReturned() {
-        cache.putPath(path("A", "B", "C"));
+        cache.putPath("A", "C", Optional.of(path("A", "B", "C")));
         assertThat(cache.getPath("A", "C")).contains(path("A", "B", "C"));
-    }
-
-    @Test
-    void everySuffixOfAStoredPathIsKnownButNoOtherPart() {
-        cache.putPath(path("A", "B", "C", "D"));
-        assertThat(cache.getPath("B", "D")).contains(path("B", "C", "D"));
-        assertThat(cache.getPath("C", "D")).contains(path("C", "D"));
-        // A prefix or a middle part is not stored
-        assertThat(cache.getPath("A", "C")).isNull();
-        assertThat(cache.getPath("B", "C")).isNull();
-    }
-
-    @Test
-    void aPathKnownTheOtherWayIsReversedAndStored() {
-        cache.putPath(path("A", "B", "C"));
-        assertThat(cache.getPath("C", "A")).contains(path("C", "B", "A"));
-        // Stored as its own entry, with its own suffixes
-        assertThat(cache.getPath("B", "A")).contains(path("B", "A"));
-    }
-
-    @Test
-    void aSuffixKnownTheOtherWayIsReversed() {
-        cache.putPath(path("A", "B", "C", "D"));
-        assertThat(cache.getPath("D", "B")).contains(path("D", "C", "B"));
     }
 
     @Test
     void anImpossiblePathIsEmptyNotNull() {
-        cache.putImpossiblePath("A", "B");
+        cache.putPath("A", "B", Optional.empty());
         assertThat(cache.getPath("A", "B")).isNotNull().isEmpty();
     }
 
     @Test
-    void aPathImpossibleTheOtherWayIsImpossible() {
-        cache.putImpossiblePath("A", "B");
-        assertThat(cache.getPath("B", "A")).isNotNull().isEmpty();
-    }
-
-    @Test
-    void putPathWithStartAndEndStoresAPathOrAnImpossibility() {
-        cache.putPath("A", "C", Optional.of(path("A", "B", "C")));
-        cache.putPath("A", "D", Optional.empty());
-        assertThat(cache.getPath("A", "C")).contains(path("A", "B", "C"));
-        assertThat(cache.getPath("B", "C")).contains(path("B", "C"));
-        assertThat(cache.getPath("A", "D")).isNotNull().isEmpty();
-    }
-
-    @Test
-    void aPathFromACollectionIsStoredInItsOrder() {
-        cache.putPath(List.of("A", "B", "C"));
-        assertThat(cache.getPath("A", "C")).contains(path("A", "B", "C"));
+    void onlyTheStoredStartAndEndAreKnown() {
+        cache.putPath("A", "D", Optional.of(path("A", "B", "C", "D")));
+        cache.putPath("E", "F", Optional.empty());
+        // Neither reversed nor a tail of a stored path
+        assertThat(cache.getPath("D", "A")).isNull();
+        assertThat(cache.getPath("B", "D")).isNull();
+        assertThat(cache.getPath("F", "E")).isNull();
     }
 
     @Test
     void aLaterPathReplacesAnEarlierOne() {
-        cache.putImpossiblePath("A", "C");
-        cache.putPath(path("A", "B", "C"));
+        cache.putPath("A", "C", Optional.empty());
+        cache.putPath("A", "C", Optional.of(path("A", "B", "C")));
         assertThat(cache.getPath("A", "C")).contains(path("A", "B", "C"));
-        cache.putPath(path("A", "D", "C"));
+        cache.putPath("A", "C", Optional.of(path("A", "D", "C")));
         assertThat(cache.getPath("A", "C")).contains(path("A", "D", "C"));
-    }
-
-    @Test
-    void aPathOfOnePointIsNotStored() {
-        // Nothing is wrong, but the path is recomputed every time it is asked for
-        cache.putPath(path("A"));
-        assertThat(cache.getPath("A", "A")).isNull();
-    }
-
-    @Test
-    void anEmptyPathFails() {
-        assertThatThrownBy(() -> cache.putPath(path()))
-            .isInstanceOf(NoSuchElementException.class);
     }
 }
