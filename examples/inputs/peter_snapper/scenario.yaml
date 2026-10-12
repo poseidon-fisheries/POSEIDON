@@ -215,6 +215,9 @@ components:
                       cellPredicate: *id011
                       cellsSupplier: !!uk.ac.ox.poseidon.agents.vessels.providers.AccessibleWaterCellsFactory
                         pathFinder: &id014 !!uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory
+                          accessibleWaterCellsCache: !!uk.ac.ox.poseidon.geography.paths.AccessibleWaterCellsCacheFactory
+                            bathymetricGrid: *id003
+                            portGrid: *id007
                           bathymetricGrid: *id003
                           distance: *id012
                           pathCache: !!uk.ac.ox.poseidon.geography.paths.DefaultPathCacheFactory

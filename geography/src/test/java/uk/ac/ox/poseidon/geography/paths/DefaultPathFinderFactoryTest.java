@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.geography.paths;
 
 import org.junit.jupiter.api.Test;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
@@ -32,6 +33,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.geography.paths.Factories.pathFinder;
@@ -70,6 +73,25 @@ class DefaultPathFinderFactoryTest {
         final GridPathFinder second = factory.get(scope);
 
         assertThat(first).isSameAs(second);
+    }
+
+    @Test
+    void sharesAccessibleWaterNeighboursBetweenSimulations() {
+        final ModelGrid modelGrid = mock(ModelGrid.class);
+        final BathymetricGrid bathymetricGrid = mock(BathymetricGrid.class);
+        when(bathymetricGrid.getModelGrid()).thenReturn(modelGrid);
+        final DefaultPathFinderFactory factory =
+            pathFinder(
+                object(bathymetricGrid),
+                object(mock(PortGrid.class)),
+                object(mock(DistanceCalculator.class))
+            );
+        final Int2D cell = new Int2D(1, 1);
+
+        factory.get(new SimulationScope(simulation)).getAccessibleWaterNeighbours(cell, 1);
+        factory.get(new SimulationScope(otherSimulation)).getAccessibleWaterNeighbours(cell, 1);
+
+        verify(modelGrid, times(1)).getActiveNeighbours(cell, 1);
     }
 
     private static BathymetricGrid bathymetricGrid() {

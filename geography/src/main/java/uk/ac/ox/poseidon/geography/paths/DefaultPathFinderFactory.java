@@ -38,7 +38,9 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * A {@link SimulationScopeFactory} for this package's default {@link GridPathFinder}: a
  * {@link BresenhamPathFinder} heuristic falling back to an {@link AStarPathFinder} (via
  * {@link FallbackGridPathfinder}), wrapped in a {@link CachingGridPathFinder} backed by the
- * resolved {@link PathCache}. Built via
+ * resolved {@link PathCache} and {@link AccessibleWaterCellsCache}. One per simulation because the
+ * A* search keeps state between calls and is not safe to share between simulations running in
+ * parallel; the two caches can be, and are when their inputs are. Built via
  * {@link Factories#pathFinder(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory,
  * uk.ac.ox.poseidon.core.Factory)}.
  */
@@ -53,6 +55,8 @@ public class DefaultPathFinderFactory
     private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
     private Factory<? super SimulationScope, ? extends DistanceCalculator> distance;
     private Factory<? super SimulationScope, ? extends PathCache<Int2D>> pathCache;
+    private Factory<? super SimulationScope, ? extends AccessibleWaterCellsCache>
+        accessibleWaterCellsCache;
 
     @Override
     protected GridPathFinder newInstance(final SimulationScope scope) {
@@ -70,7 +74,8 @@ public class DefaultPathFinderFactory
                     distance.get(scope)
                 )
             ),
-            pathCache.get(scope)
+            pathCache.get(scope),
+            accessibleWaterCellsCache.get(scope)
         );
     }
 

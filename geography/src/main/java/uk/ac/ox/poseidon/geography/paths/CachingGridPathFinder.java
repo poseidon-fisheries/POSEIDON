@@ -22,55 +22,36 @@
 
 package uk.ac.ox.poseidon.geography.paths;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Interner;
-import com.google.common.collect.Interners;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.util.Map.Entry;
-
-import static java.util.Map.entry;
-
 /**
  * A {@link GridPathFinder} counterpart of {@link CachingPathFinder}: in addition to caching
- * individual paths (inherited from {@link CachingPathFinder}), it caches the results of
- * {@link #getAccessibleWaterCells} and {@link #getAccessibleWaterNeighbours}, since both are
- * expensive to recompute and interned so equal results share one instance. Not built directly —
- * see {@link DefaultPathFinderFactory}/{@link uk.ac.ox.poseidon.geography.paths.Factories}.
+ * individual paths (inherited from {@link CachingPathFinder}), it serves
+ * {@link #getAccessibleWaterCells} and {@link #getAccessibleWaterNeighbours} from an
+ * {@link AccessibleWaterCellsCache}, since both are expensive to recompute; on a miss, its own
+ * delegate computes the result. Not built directly — see
+ * {@link DefaultPathFinderFactory}/{@link uk.ac.ox.poseidon.geography.paths.Factories}.
  */
 public class CachingGridPathFinder extends CachingPathFinder<Int2D> implements GridPathFinder {
 
     private final GridPathFinder pathFinder;
-    private final Interner<ImmutableList<Int2D>> cellListInterner = Interners.newStrongInterner();
-    private final LoadingCache<Int2D, ImmutableList<Int2D>> accessibleCells =
-        Caffeine.newBuilder().build(this::computeAccessibleCells);
-    private final LoadingCache<Entry<Int2D, Integer>, ImmutableList<Int2D>> accessibleNeighbours =
-        Caffeine.newBuilder().build(this::computeAccessibleNeighbours);
+    private final AccessibleWaterCellsCache accessibleWaterCellsCache;
 
     CachingGridPathFinder(
         final GridPathFinder pathFinder,
-        final PathCache<Int2D> cache
+        final PathCache<Int2D> cache,
+        final AccessibleWaterCellsCache accessibleWaterCellsCache
     ) {
         super(pathFinder, cache);
         this.pathFinder = pathFinder;
-    }
-
-    private ImmutableList<Int2D> computeAccessibleCells(final Int2D startingCell) {
-        return pathFinder.getAccessibleWaterCells(startingCell);
+        this.accessibleWaterCellsCache = accessibleWaterCellsCache;
     }
 
     @Override
     public ImmutableList<Int2D> getAccessibleWaterCells(final Int2D startingCell) {
-        return cellListInterner.intern(accessibleCells.get(startingCell));
-    }
-
-    private ImmutableList<Int2D> computeAccessibleNeighbours(
-        final Entry<Int2D, Integer> entry
-    ) {
-        return pathFinder.getAccessibleWaterNeighbours(entry.getKey(), entry.getValue());
+        return accessibleWaterCellsCache.getAccessibleWaterCells(startingCell, pathFinder);
     }
 
     @Override
@@ -78,7 +59,11 @@ public class CachingGridPathFinder extends CachingPathFinder<Int2D> implements G
         final Int2D startingCell,
         final int neighbourhoodSize
     ) {
-        return accessibleNeighbours.get(entry(startingCell, neighbourhoodSize));
+        return accessibleWaterCellsCache.getAccessibleWaterNeighbours(
+            startingCell,
+            neighbourhoodSize,
+            pathFinder
+        );
     }
 
     @Override

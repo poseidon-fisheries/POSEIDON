@@ -30,9 +30,9 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * Factories for pathfinding over a {@link uk.ac.ox.poseidon.geography.grids.ModelGrid}: a
- * {@link PathCache} sharing entries with any other path cache built from the same dependencies
- * (see {@link DefaultPathCacheFactory}), and this package's default {@link GridPathFinder}.
+ * Factories for pathfinding over a {@link uk.ac.ox.poseidon.geography.grids.ModelGrid}: caches
+ * shared with any other cache built from the same dependencies (see
+ * {@link DefaultPathCacheFactory}), and this package's default {@link GridPathFinder}.
  */
 public class Factories {
 
@@ -57,6 +57,20 @@ public class Factories {
     /**
      * @param bathymetricGrid factory for the grid to find water/land cells on
      * @param portGrid        factory for the grid of ports
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+     * {@link AccessibleWaterCellsCache}
+     * @see AccessibleWaterCellsCacheFactory
+     */
+    public static <S extends Scope> AccessibleWaterCellsCacheFactory<S> accessibleWaterCellsCache(
+        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
+        final Factory<? super S, ? extends PortGrid> portGrid
+    ) {
+        return new AccessibleWaterCellsCacheFactory<>(bathymetricGrid, portGrid);
+    }
+
+    /**
+     * @param bathymetricGrid factory for the grid to find water/land cells on
+     * @param portGrid        factory for the grid of ports
      * @param distance        factory for the distance calculator
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for this package's default
      * {@link GridPathFinder}
@@ -71,7 +85,8 @@ public class Factories {
             bathymetricGrid,
             portGrid,
             distance,
-            pathCache(bathymetricGrid, portGrid, distance)
+            pathCache(bathymetricGrid, portGrid, distance),
+            accessibleWaterCellsCache(bathymetricGrid, portGrid)
         );
     }
 }
