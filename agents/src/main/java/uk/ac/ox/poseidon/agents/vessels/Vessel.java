@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.agents.vessels;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
@@ -53,6 +52,11 @@ import java.util.Optional;
  * A fishing vessel: an {@link Agent} with a hold, gear, engine, home port, and behaviour tree
  * driving its trips. Active only while {@link #isActive()} holds — the base agent is active, it's
  * registered as active, its gear is active, and it has a home port.
+ * <p>
+ * Its modifiable characteristics (name, account, home port, hold, gear, engine, registration,
+ * tags, and behaviour) are changed from outside its behaviour, by the fleet register, so their
+ * setters go through {@link #mutate} and take effect between runs of the behaviour. Its current
+ * state (cell, heading, trips) is changed by the behaviour itself and changes immediately.
  */
 @Getter
 @SuppressFBWarnings(value = "EI_EXPOSE_REP")
@@ -104,9 +108,9 @@ public class Vessel extends Agent implements Oriented2D {
 
     // Modifiable characteristics
     /** This vessel's display name. */
-    @Setter private String name;
+    private String name;
     /** This vessel's running balance. */
-    @Setter private Account account;
+    private Account account;
     /** This vessel's home port. */
     private Port homePort;
     /** This vessel's hold. */
@@ -134,6 +138,16 @@ public class Vessel extends Agent implements Oriented2D {
             registeredAsActive &&
             gear.isActive() &&
             homePort != null;
+    }
+
+    /** Sets the vessel's display name. */
+    public void setName(final String name) {
+        mutate(() -> this.name = name);
+    }
+
+    /** Sets the vessel's running balance. */
+    public void setAccount(final Account account) {
+        mutate(() -> this.account = account);
     }
 
     /** Sets the vessel's home port, moving it there if it has no current cell yet. */

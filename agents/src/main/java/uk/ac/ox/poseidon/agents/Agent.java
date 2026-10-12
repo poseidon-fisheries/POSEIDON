@@ -43,9 +43,14 @@ import static lombok.AccessLevel.NONE;
  * A single simulated agent (typically a vessel) that repeatedly drives its current
  * {@link Behaviour} forward, rescheduling itself either after a fixed
  * {@link #taskDuration} (while the behaviour reports itself running) or on the very next tick
- * (once it doesn't). Mutations that could change the agent's active status (e.g. swapping its
- * behaviour) are queued via {@link #mutate} rather than applied immediately whenever the current
- * behaviour is mid-step, so a behaviour never observes itself being replaced out from under it.
+ * (once it doesn't).
+ * <p>
+ * Changes from outside the behaviour (swapping it, or changing the agent's characteristics, as a
+ * fleet register does) take effect between runs of the behaviour, never during one: they go
+ * through {@link #mutate}, which queues them while the behaviour is running. A run is never
+ * disturbed, so, for example, a vessel isn't deactivated at sea or given a new hold with its catch
+ * on board. Changes the behaviour makes itself, such as moving the agent, take effect
+ * immediately.
  * <p>
  * An agent has at most one step pending on the schedule. The agent isn't itself a
  * {@link Steppable}: what goes on the schedule is its private {@link #stepper}, so nothing outside
@@ -137,10 +142,9 @@ public class Agent {
     }
 
     /**
-     * This method is meant for mutating the agent in ways that might change its "active" status.
-     * Mutations can't be applied while an agent behaviour is running, so if the agent is currently
-     * active, we queue the mutation, and it will be applied the next time the agent is stepped and
-     * the current behaviour is not running.
+     * Applies a change from outside the agent's behaviour, between runs of the behaviour. If the
+     * behaviour is running, we queue the mutation, and it will be applied the next time the agent
+     * is stepped and the behaviour is not running.
      * <p>
      * Otherwise, we apply the mutation immediately and then restore the invariant that, outside a
      * step, an active agent has a step pending: if the agent is active and has none, we schedule

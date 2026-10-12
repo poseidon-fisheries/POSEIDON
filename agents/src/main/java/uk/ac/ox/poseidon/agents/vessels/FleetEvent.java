@@ -105,7 +105,10 @@ public class FleetEvent implements Steppable {
                     if (dateTime.isBefore(vessel.getSchedule().getDateTime())) {
                         // if the change of port is something that happened in the past
                         // (i.e., before the start of the simulation) we move the vessel
-                        // to its new location right away
+                        // to its new location right away. This is a change from outside the
+                        // behaviour, so it must not happen during a run; but it records
+                        // something that has already happened, so we refuse a running
+                        // behaviour instead of deferring the move as mutate would.
                         checkState(
                             !vessel.getBehaviour().isRunning(),
                             "Trying to apply retroactive fleet event %s " +
