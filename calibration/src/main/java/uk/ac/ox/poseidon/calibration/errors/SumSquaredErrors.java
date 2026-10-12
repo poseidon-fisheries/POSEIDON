@@ -23,26 +23,53 @@
 package uk.ac.ox.poseidon.calibration.errors;
 
 import com.google.common.collect.Sets;
-import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.Simulation;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * A calibration error metric that sums the squared differences between a fixed map of target
  * values and a map of actual values extracted from a {@link Simulation}, keyed by an arbitrary
  * type {@code K}. A key present in only one of the two maps is treated as having a value of
- * {@code 0.0} on the other side, so it still contributes to the error.
+ * {@code 0.0} on the other side, so it still contributes to the error. Every target must be a
+ * finite number: a single {@code NaN} target would make every error {@code NaN}, and the
+ * calibration would have nothing to compare.
  *
  * @param <K> the type of key the target and actual value maps are indexed by
  */
-@RequiredArgsConstructor
 public class SumSquaredErrors<K> implements ToDoubleFunction<Simulation> {
 
     private final Map<K, Double> targetValues;
     private final Function<Simulation, Map<K, Double>> actualValues;
+
+    /**
+     * @throws IllegalArgumentException if a target value is {@code null}, {@code NaN} or infinite
+     */
+    public SumSquaredErrors(
+        final Map<K, Double> targetValues,
+        final Function<Simulation, Map<K, Double>> actualValues
+    ) {
+        final List<K> invalidKeys = targetValues
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() == null || !Double.isFinite(entry.getValue()))
+            .map(Map.Entry::getKey)
+            .toList();
+        checkArgument(
+            invalidKeys.isEmpty(),
+            "Target values must be finite numbers, but %s of %s are not: %s",
+            invalidKeys.size(),
+            targetValues.size(),
+            invalidKeys
+        );
+        this.targetValues = Map.copyOf(targetValues);
+        this.actualValues = actualValues;
+    }
 
     /**
      * Extracts the actual values from {@code simulation} and returns the sum of squared
