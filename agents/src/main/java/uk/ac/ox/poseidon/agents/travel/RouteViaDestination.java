@@ -28,12 +28,11 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.Map.entry;
 
 /**
  * The {@link Route} a vessel would sail to fish at a destination cell: from its current cell to
@@ -47,7 +46,9 @@ public class RouteViaDestination implements Function<Int2D, Route> {
     private final Vessel vessel;
     private final GridPathFinder pathFinder;
     private final DistanceCalculator distanceCalculator;
-    private final Map<Entry<Int2D, Int2D>, Double> pathLengthsInKm = new HashMap<>();
+    // Keyed by List.of(start, end): Map.entry's hash, the XOR of the two cells' hashes, collides
+    // badly on grid cells (A to B and B to A always collide).
+    private final Map<List<Int2D>, Double> pathLengthsInKm = new HashMap<>();
 
     /**
      * @param vessel             the vessel that would sail the route
@@ -88,7 +89,7 @@ public class RouteViaDestination implements Function<Int2D, Route> {
         final Int2D start,
         final Int2D end
     ) {
-        return pathLengthsInKm.computeIfAbsent(entry(start, end), _ ->
+        return pathLengthsInKm.computeIfAbsent(List.of(start, end), _ ->
             distanceCalculator.distanceInKm(
                 pathFinder.getPath(start, end).orElseThrow(() ->
                     new IllegalStateException("No path from " + start + " to " + end)

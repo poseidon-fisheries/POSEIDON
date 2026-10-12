@@ -26,10 +26,8 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableList;
 
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.Optional;
-
-import static java.util.Map.entry;
 
 /**
  * The default {@link PathCache}: an in-memory, unbounded Caffeine {@link Cache} keyed by
@@ -38,7 +36,9 @@ import static java.util.Map.entry;
  */
 public class DefaultPathCache<P> implements PathCache<P> {
 
-    private final Cache<Entry<P, P>, Optional<ImmutableList<P>>> memory =
+    // Keyed by List.of(start, end): Map.entry's hash, the XOR of the two points' hashes, collides
+    // badly on grid cells (A to B and B to A always collide).
+    private final Cache<List<P>, Optional<ImmutableList<P>>> memory =
         Caffeine.newBuilder().build();
 
     /**
@@ -57,7 +57,7 @@ public class DefaultPathCache<P> implements PathCache<P> {
         final P start,
         final P end
     ) {
-        return memory.getIfPresent(entry(start, end));
+        return memory.getIfPresent(List.of(start, end));
     }
 
     @Override
@@ -66,7 +66,7 @@ public class DefaultPathCache<P> implements PathCache<P> {
         final P end,
         final Optional<ImmutableList<P>> path
     ) {
-        memory.put(entry(start, end), path);
+        memory.put(List.of(start, end), path);
     }
 
 }
