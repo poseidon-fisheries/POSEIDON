@@ -288,6 +288,8 @@ public class Factories {
      * @param pathFinder                finds accessible water neighbours
      * @param cellPredicate             filters which candidate cells are eligible
      * @param neighbourhoodSizeSupplier the initial search radius
+     * @param maximumWidening           how many cells the radius may grow beyond the initial one
+     *                                  while no cell satisfies {@code cellPredicate}
      * @param fallbackCellPicker        supplies a starting cell if there's no best-known option
      * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
      * {@link NeighbourhoodCellPicker}
@@ -298,10 +300,16 @@ public class Factories {
         final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
         final Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate,
         final Factory<? super VesselScope, ? extends IntSupplier> neighbourhoodSizeSupplier,
+        final int maximumWidening,
         final Factory<? super VesselScope, ? extends Supplier<Int2D>> fallbackCellPicker
     ) {
         return new NeighbourhoodGridExplorerFactory(
-            optionValues, pathFinder, cellPredicate, neighbourhoodSizeSupplier, fallbackCellPicker
+            optionValues,
+            pathFinder,
+            cellPredicate,
+            neighbourhoodSizeSupplier,
+            maximumWidening,
+            fallbackCellPicker
         );
     }
 

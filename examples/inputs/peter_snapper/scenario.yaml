@@ -222,6 +222,7 @@ components:
                             distance: *id012
                             portGrid: *id007
                           portGrid: *id007
+                    maximumWidening: 3
                     neighbourhoodSizeSupplier: !!uk.ac.ox.poseidon.core.providers.FirstIntFromFactory
                       delegate: !!uk.ac.ox.poseidon.agents.vessels.PerVesselFactory
                         delegate: !!uk.ac.ox.poseidon.core.providers.random.RandomIntProviderFactory {

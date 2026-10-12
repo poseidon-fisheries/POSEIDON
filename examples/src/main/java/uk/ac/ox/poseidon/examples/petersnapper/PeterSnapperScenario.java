@@ -131,6 +131,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     private static final double LEARNING_ALPHA = 1;
     private static final double EXPLORATION_PROBABILITY = 0.2;
+    private static final int MAXIMUM_EXPLORATION_WIDENING = 3;
     private static final int TOTAL_CARRYING_CAPACITY = 110_749_315;
     private static final String CURRENCY_CODE = "IDR";
 
@@ -374,6 +375,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     pathFinder,
                     validCellPredicate,
                     firstIntFrom(perVessel(randomInt(1, 10))),
+                    MAXIMUM_EXPLORATION_WIDENING,
                     randomGridExplorer(accessibleWaterCells(pathFinder), validCellPredicate)
                 ),
                 imitatingPicker(

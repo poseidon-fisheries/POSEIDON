@@ -34,14 +34,19 @@ import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 /**
  * Picks a random accessible water cell in the neighbourhood of the vessel's current best-known
- * option (or a fallback cell if there isn't one), growing the search radius until at least one
- * candidate is found or the whole grid has been searched.
+ * option (or a fallback cell if there isn't one), growing the search radius until a cell
+ * satisfies the option predicate. The radius grows by at most {@code maximumWidening} cells
+ * beyond the initial one, and never beyond the grid's larger dimension: when no cell is legal
+ * anywhere, which is common (a closed port, no time left), an unbounded search would test every
+ * water cell of the grid.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class NeighbourhoodCellPicker implements Provider<Int2D> {
@@ -51,33 +56,59 @@ public class NeighbourhoodCellPicker implements Provider<Int2D> {
     private final GridPathFinder pathFinder;
     private final Predicate<? super Int2D> optionPredicate;
     private final IntSupplier neighbourhoodSizeSupplier;
+    private final int maximumWidening;
     private final Supplier<Int2D> fallbackCellPicker;
     private final MersenneTwisterFast rng;
 
     /**
-     * @return a uniformly random accessible water cell, satisfying the option predicate, within
-     * the smallest searched neighbourhood that yields any candidates; {@code null} if none
-     * qualify even at the grid's full extent
+     * @return a uniformly random accessible water cell satisfying the option predicate, within
+     * the smallest searched neighbourhood that has any; {@code null} if none qualify within the
+     * largest neighbourhood searched
      */
     @Override
     public Int2D get() {
-        final int maxNeighbourhoodSize = max(
+        final int initialNeighbourhoodSize = neighbourhoodSizeSupplier.getAsInt();
+        final int gridExtent = max(
             pathFinder.getModelGrid().getGridWidth(),
             pathFinder.getModelGrid().getGridHeight()
         );
-        int neighbourhoodSize = neighbourhoodSizeSupplier.getAsInt();
-        Int2D startingCell = optionValues.getBestOption(rng).orElseGet(fallbackCellPicker);
-        if (startingCell == null) {
-            startingCell = vessel.getCell();
+        final int maxNeighbourhoodSize =
+            initialNeighbourhoodSize + min(maximumWidening, gridExtent - initialNeighbourhoodSize);
+        final Int2D bestOrFallback =
+            optionValues.getBestOption(rng).orElseGet(fallbackCellPicker);
+        final Int2D centre = bestOrFallback != null ? bestOrFallback : vessel.getCell();
+        for (
+            int neighbourhoodSize = initialNeighbourhoodSize;
+            neighbourhoodSize <= maxNeighbourhoodSize;
+            neighbourhoodSize++
+        ) {
+            final List<Int2D> neighbours =
+                pathFinder.getAccessibleWaterNeighbours(centre, neighbourhoodSize);
+            // Every cell of the previous neighbourhood has already failed the predicate
+            final List<Int2D> candidates =
+                neighbourhoodSize == initialNeighbourhoodSize
+                    ? neighbours
+                    : ring(neighbours, centre, neighbourhoodSize);
+            final Int2D picked = shuffledStream(candidates, rng)
+                .filter(optionPredicate)
+                .findFirst()
+                .orElse(null);
+            if (picked != null) {
+                return picked;
+            }
         }
-        List<Int2D> candidates = List.of();
-        while (candidates.isEmpty() && neighbourhoodSize <= maxNeighbourhoodSize) {
-            candidates = pathFinder.getAccessibleWaterNeighbours(startingCell, neighbourhoodSize);
-            neighbourhoodSize++;
-        }
-        return shuffledStream(candidates, rng)
-            .filter(optionPredicate)
-            .findFirst()
-            .orElse(null);
+        return null;
+    }
+
+    /** @return the cells of {@code neighbours} exactly {@code size} cells away from the centre */
+    private static List<Int2D> ring(
+        final List<Int2D> neighbours,
+        final Int2D centre,
+        final int size
+    ) {
+        return neighbours
+            .stream()
+            .filter(cell -> max(abs(cell.x - centre.x), abs(cell.y - centre.y)) == size)
+            .toList();
     }
 }

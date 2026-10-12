@@ -50,6 +50,7 @@ public class NeighbourhoodGridExplorerFactory extends VesselScopeFactory<Neighbo
     private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
     private Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate;
     private Factory<? super VesselScope, ? extends IntSupplier> neighbourhoodSizeSupplier;
+    private int maximumWidening;
     private Factory<? super VesselScope, ? extends Supplier<Int2D>> fallbackCellPicker;
 
     @Override
@@ -60,6 +61,7 @@ public class NeighbourhoodGridExplorerFactory extends VesselScopeFactory<Neighbo
             pathFinder.get(scope),
             cellPredicate.get(scope),
             neighbourhoodSizeSupplier.get(scope),
+            maximumWidening,
             fallbackCellPicker.get(scope),
             scope.getSimulation().random
         );
