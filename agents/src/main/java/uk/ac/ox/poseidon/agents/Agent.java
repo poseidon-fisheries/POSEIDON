@@ -50,9 +50,10 @@ import static lombok.AccessLevel.NONE;
  * An agent has at most one step pending on the schedule. The agent isn't itself a
  * {@link Steppable}: what goes on the schedule is its private {@link #stepper}, so nothing outside
  * the agent can schedule it, and every step is scheduled through {@link #scheduleNextStep}, which
- * refuses to schedule a second one. Becoming inactive doesn't
- * cancel a pending step; the step still runs, finds the agent inactive and schedules nothing, so an
- * agent can be inactive with a step pending, and reactivating it then needs no new step.
+ * refuses to schedule a second one. Outside a step, an active agent always has a step pending
+ * ({@link #mutate} restores this after each mutation). Becoming inactive doesn't cancel a pending
+ * step; the step still runs, finds the agent inactive and schedules nothing, so an agent can be
+ * inactive with a step pending, and reactivating it then needs no new step.
  */
 @Getter
 public class Agent {
@@ -141,17 +142,18 @@ public class Agent {
      * active, we queue the mutation, and it will be applied the next time the agent is stepped and
      * the current behaviour is not running.
      * <p>
-     * If the agent is inactive, we apply the mutation immediately and check if its effect activated
-     * the agent, in which case we schedule it to be stepped again, unless it still has a step
-     * pending from before it became inactive.
+     * Otherwise, we apply the mutation immediately and then restore the invariant that, outside a
+     * step, an active agent has a step pending: if the agent is active and has none, we schedule
+     * one. This depends only on the agent's state after the mutation, not on what it was before, so
+     * a sequence of mutations that briefly activates and deactivates the agent (as a fleet event's
+     * setters can) never leaves it with more than one step pending.
      */
     protected void mutate(final Runnable mutation) {
         if (behaviour.isRunning()) {
             mutationQueue.add(mutation);
         } else {
-            final boolean wasActive = isActive();
             mutation.run();
-            if (!wasActive && isActive() && !stepPending) {
+            if (isActive() && !stepPending) {
                 scheduleNextStep();
             }
         }
