@@ -73,6 +73,11 @@ public class Agent {
     @Getter(NONE)
     private final Queue<Runnable> mutationQueue = new LinkedList<>();
 
+    /**
+     * How long until the running behaviour's task is executed again: set by that task when it
+     * reports {@code RUNNING} (see {@link uk.ac.ox.poseidon.agents.tasks.AgentTask#runFor}), and
+     * cleared once this agent's next step is scheduled, so each running step must set its own.
+     */
     @Setter private Duration taskDuration;
 
     /** What this agent puts on the schedule: runs {@link #step()}. Private, so only it can. */
@@ -117,7 +122,13 @@ public class Agent {
         if (isActive()) {
             behaviour.step();
             if (behaviour.isRunning()) {
-                scheduleNextStep(checkNotNull(taskDuration));
+                final Duration delay = checkNotNull(
+                    taskDuration,
+                    "Agent %s's behaviour is running, but no task set a duration this step.",
+                    this
+                );
+                taskDuration = null;
+                scheduleNextStep(delay);
             } else {
                 scheduleNextStep();
             }

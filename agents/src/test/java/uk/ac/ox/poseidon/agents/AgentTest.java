@@ -37,6 +37,7 @@ import java.util.List;
 import static java.time.Duration.ofHours;
 import static java.time.Duration.ofSeconds;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 class AgentTest {
@@ -173,6 +174,41 @@ class AgentTest {
             START.plusHours(1).plusSeconds(1),
             START.plusHours(1).plusSeconds(2)
         );
+    }
+
+    @Test
+    void aBehaviourThatKeepsRunningWithoutSettingANewTaskDurationFails() {
+        final class KeepsRunningBehaviour implements Behaviour {
+            private Agent agent;
+            private boolean started;
+
+            @Override
+            public boolean isActive() {
+                return true;
+            }
+
+            @Override
+            public boolean isRunning() {
+                return started;
+            }
+
+            @Override
+            public void step() {
+                if (!started) {
+                    agent.setTaskDuration(ofHours(1));
+                    started = true;
+                }
+            }
+        }
+        final KeepsRunningBehaviour keepsRunningBehaviour = new KeepsRunningBehaviour();
+        final Agent keepsRunningAgent =
+            new Agent(schedule, mock(EventManager.class), keepsRunningBehaviour);
+        keepsRunningBehaviour.agent = keepsRunningAgent;
+        keepsRunningAgent.mutate(() -> { });
+        stepFor(ofSeconds(2));
+        assertThatThrownBy(() -> stepFor(ofHours(2)))
+            .isInstanceOf(NullPointerException.class)
+            .hasMessageContaining("no task set a duration this step");
     }
 
     @Test

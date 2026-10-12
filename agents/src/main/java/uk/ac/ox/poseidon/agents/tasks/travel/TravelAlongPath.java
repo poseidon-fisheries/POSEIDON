@@ -35,7 +35,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -132,8 +131,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
             final Int2D nextCell = currentPath.getFirst();
             distanceToNextCell = distanceCalculator.distanceInKm(vessel.getCell(), nextCell);
             vessel.setHeadingTowards(nextCell);
-            vessel.setTaskDuration(travelDuration(distanceToNextCell, cruisingSpeedInKph));
-            return RUNNING;
+            return runFor(travelDuration(distanceToNextCell, cruisingSpeedInKph));
         }
     }
 }
