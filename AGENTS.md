@@ -65,6 +65,8 @@ Convention plugins (in `buildSrc/src/main/kotlin/`) centralize shared config:
 
 Mark everything that can be `final` as `final` — local variables, method/constructor parameters, and caught exceptions (e.g. `catch (final IOException e)`, `try (final SomeResource r = ...)`). The only common exception is a traditional counting `for` loop's own loop variable (`for (int i = 0; ...; i++)`), which must stay mutable by definition.
 
+Prefer lambdas to anonymous classes, and method references to lambdas, wherever they fit. For a `Listener`, which has two abstract methods, use `new SimpleListener<>(EventClass.class, consumer)`. Scenario classes (such as `PeterSnapperScenario`) are the exception: they stay readable for people new to Java, with no method references or other clever tricks.
+
 ## Licensing
 
 All source files carry a GNU GPLv3 header (University of Oxford copyright). Preserve this header format when creating new source files — copy it from a neighboring file in the same module rather than retyping it.
