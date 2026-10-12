@@ -29,7 +29,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.Supplier;
 
-/** Factories for {@code Predicate<Vessel>}s testing a vessel's activity, home port or location. */
+/** Factories for {@code Predicate<Vessel>}s testing a vessel's activity, trips, home port or location. */
 public class Factories {
 
     private Factories() {}
@@ -40,6 +40,15 @@ public class Factories {
      */
     public static VesselIsActiveFactory vesselIsActive() {
         return new VesselIsActiveFactory();
+    }
+
+    /**
+     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+     * {@link VesselHasStartedTripToday}
+     * @see VesselHasStartedTripToday
+     */
+    public static VesselHasStartedTripTodayFactory vesselHasStartedTripToday() {
+        return new VesselHasStartedTripTodayFactory();
     }
 
     /**

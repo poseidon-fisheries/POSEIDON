@@ -124,6 +124,8 @@ public class Vessel extends Agent implements Oriented2D {
     private double heading;
     /** The vessel's current trip, or {@code null} if it isn't on one. */
     private Trip currentTrip;
+    /** The vessel's last finished trip, or {@code null} if it hasn't finished one yet. */
+    private Trip previousTrip;
 
     /** @return whether the base agent is active, {@link #registeredAsActive}, the gear is active, and there's a home port */
     @Override
@@ -246,10 +248,14 @@ public class Vessel extends Agent implements Oriented2D {
         this.currentTrip = new Trip(this, destination);
     }
 
-    /** Ends the current trip, folding its account into the vessel's own. */
+    /**
+     * Ends the current trip, folding its account into the vessel's own, and keeps it as the
+     * {@link #previousTrip}.
+     */
     public void endTrip() {
         currentTrip.endTrip();
         this.account.add(currentTrip.getAccount());
+        this.previousTrip = currentTrip;
         this.currentTrip = null;
     }
 }
