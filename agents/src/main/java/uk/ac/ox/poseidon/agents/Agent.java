@@ -26,7 +26,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -37,18 +36,26 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static lombok.AccessLevel.NONE;
 
 /**
- * A single simulated agent (typically a vessel): a {@link Steppable} that repeatedly drives its
- * current {@link Behaviour} forward, rescheduling itself either after a fixed
+ * A single simulated agent (typically a vessel) that repeatedly drives its current
+ * {@link Behaviour} forward, rescheduling itself either after a fixed
  * {@link #taskDuration} (while the behaviour reports itself running) or on the very next tick
  * (once it doesn't). Mutations that could change the agent's active status (e.g. swapping its
  * behaviour) are queued via {@link #mutate} rather than applied immediately whenever the current
  * behaviour is mid-step, so a behaviour never observes itself being replaced out from under it.
+ * <p>
+ * An agent has at most one step pending on the schedule. The agent isn't itself a
+ * {@link Steppable}: what goes on the schedule is its private {@link #stepper}, so nothing outside
+ * the agent can schedule it, and every step is scheduled through {@link #scheduleNextStep}, which
+ * refuses to schedule a second one. Becoming inactive doesn't
+ * cancel a pending step; the step still runs, finds the agent inactive and schedules nothing, so an
+ * agent can be inactive with a step pending, and reactivating it then needs no new step.
  */
 @Getter
-public class Agent implements Steppable {
+public class Agent {
 
     private static final int AGENT_BEHAVIOUR_ORDERING = 1;
 
@@ -61,6 +68,14 @@ public class Agent implements Steppable {
     private final Queue<Runnable> mutationQueue = new LinkedList<>();
 
     @Setter private Duration taskDuration;
+
+    /** What this agent puts on the schedule: runs {@link #step()}. Private, so only it can. */
+    @Getter(NONE)
+    private final Steppable stepper = _ -> step();
+
+    /** Whether this agent has a step on the schedule that hasn't run yet. */
+    @Getter(NONE)
+    private boolean stepPending;
 
     /**
      * @param schedule     the schedule this agent reschedules itself on after each step
@@ -86,8 +101,8 @@ public class Agent implements Steppable {
      * steps the behaviour and reschedules — after {@link #taskDuration} if it's now running, or on
      * the next tick otherwise.
      */
-    @Override
-    public void step(final SimState simState) {
+    private void step() {
+        stepPending = false;
         if (!behaviour.isRunning()) {
             while (!mutationQueue.isEmpty()) {
                 mutationQueue.poll().run();
@@ -96,12 +111,23 @@ public class Agent implements Steppable {
         if (isActive()) {
             behaviour.step();
             if (behaviour.isRunning()) {
-                checkNotNull(taskDuration);
-                schedule.scheduleOnceIn(taskDuration, this, AGENT_BEHAVIOUR_ORDERING);
+                scheduleNextStep(checkNotNull(taskDuration));
             } else {
-                schedule.scheduleOnce(this, AGENT_BEHAVIOUR_ORDERING);
+                scheduleNextStep();
             }
         }
+    }
+
+    /** Schedules this agent's next step on the next tick. */
+    private void scheduleNextStep() {
+        checkState(!stepPending, "Agent %s already has a step pending.", this);
+        stepPending = schedule.scheduleOnce(stepper, AGENT_BEHAVIOUR_ORDERING);
+    }
+
+    /** Schedules this agent's next step after {@code delay}. */
+    private void scheduleNextStep(final Duration delay) {
+        checkState(!stepPending, "Agent %s already has a step pending.", this);
+        stepPending = schedule.scheduleOnceIn(delay, stepper, AGENT_BEHAVIOUR_ORDERING);
     }
 
     /** @return whether the current behaviour is active */
@@ -116,7 +142,8 @@ public class Agent implements Steppable {
      * the current behaviour is not running.
      * <p>
      * If the agent is inactive, we apply the mutation immediately and check if its effect activated
-     * the agent, in which case we schedule it to be stepped again.
+     * the agent, in which case we schedule it to be stepped again, unless it still has a step
+     * pending from before it became inactive.
      */
     protected void mutate(final Runnable mutation) {
         if (behaviour.isRunning()) {
@@ -124,8 +151,8 @@ public class Agent implements Steppable {
         } else {
             final boolean wasActive = isActive();
             mutation.run();
-            if (!wasActive && isActive()) {
-                schedule.scheduleOnce(this, AGENT_BEHAVIOUR_ORDERING);
+            if (!wasActive && isActive() && !stepPending) {
+                scheduleNextStep();
             }
         }
     }
