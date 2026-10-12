@@ -41,9 +41,12 @@ import uk.ac.ox.poseidon.core.SimulationStartOptions;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+import java.time.Duration;
 import java.time.temporal.TemporalAmount;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.SequencedMap;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.IntStream;
@@ -56,7 +59,10 @@ import static java.util.stream.Collectors.toMap;
  * {@code evaluator}. A candidate solution is a map of property name to value, each value encoded
  * as an allele in {@code [0.0, 1.0]} that {@link #codec()} rescales to that property's
  * {@code parameterRanges} entry; {@link #fitness()} runs the scenario with those property
- * overrides for every seed in {@code seeds} and returns the average evaluator score.
+ * overrides for every seed in {@code seeds} and returns the average evaluator score. The seeds
+ * of one evaluation run in parallel, on the common fork-join pool (where jenetics also evaluates
+ * the population), so the simulations running at once are bounded by the processors. It counts
+ * the simulations it runs and how long they take; see {@link #takeSimulationTimes()}.
  */
 @RequiredArgsConstructor
 @Accessors(fluent = true)
@@ -71,6 +77,9 @@ public class CalibrationProblem
     private final @NonNull ImmutableMap<String, DoubleRange> parameterRanges;
     private final @NonNull ToDoubleFunction<Simulation> evaluator;
     private final @NonNull ImmutableLongArray seeds;
+    private final LongAdder simulations = new LongAdder();
+    private final LongAdder simulationNanos = new LongAdder();
+    private final LongAdder buildingNanos = new LongAdder();
 
     /**
      * Encodes/decodes a genotype of {@code parameterRanges.size()} alleles in {@code [0.0, 1.0]}
@@ -112,34 +121,67 @@ public class CalibrationProblem
         return this::evaluate;
     }
 
+    /**
+     * @return the number of simulations run, and their total time, since the previous call (or
+     * since this problem was created); meant to be read between generations, when no simulation
+     * is running
+     */
+    public SimulationTimes takeSimulationTimes() {
+        return new SimulationTimes(
+            simulations.sumThenReset(),
+            Duration.ofNanos(simulationNanos.sumThenReset()),
+            Duration.ofNanos(buildingNanos.sumThenReset())
+        );
+    }
+
     private double evaluate(final SequencedMap<String, Double> parameters) {
-        return seeds
+        // Scores are collected in seed order and averaged sequentially, so the result does not
+        // depend on which simulation finishes first
+        final double[] scores = seeds
             .stream()
+            .parallel()
             .mapToDouble(seed -> evaluate(parameters, seed))
-            .average()
-            .orElseThrow();
+            .toArray();
+        return Arrays.stream(scores).average().orElseThrow();
     }
 
     private double evaluate(
         final SequencedMap<String, Double> parameters,
         final long seed
     ) {
-        final Simulation simulation =
-            scenario.startNewSimulation(
-                SimulationStartOptions
-                    .builder()
-                    .seed(seed)
-                    .propertyOverrides(parameters)
-                    .extraComponents(extraComponents)
-                    .build()
-            );
+        final long start = System.nanoTime();
         try {
-            final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
-            temporalSchedule.stepFor(simulation, duration);
-            return evaluator.applyAsDouble(simulation);
+            final Simulation simulation =
+                scenario.startNewSimulation(
+                    SimulationStartOptions
+                        .builder()
+                        .seed(seed)
+                        .propertyOverrides(parameters)
+                        .extraComponents(extraComponents)
+                        .build()
+                );
+            buildingNanos.add(System.nanoTime() - start);
+            try {
+                final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
+                temporalSchedule.stepFor(simulation, duration);
+                return evaluator.applyAsDouble(simulation);
+            } finally {
+                simulation.finish();
+            }
         } finally {
-            simulation.finish();
+            simulations.increment();
+            simulationNanos.add(System.nanoTime() - start);
         }
     }
+
+    /**
+     * Simulations run over some period, with their total time.
+     *
+     * @param simulations the number of simulations run
+     * @param total       their total time, from building each one to finishing it
+     * @param building    the part of {@code total} spent building them, which
+     *                    {@link Scenario#startNewSimulation} does one at a time
+     */
+    public record SimulationTimes(long simulations, Duration total, Duration building) {}
 
 }

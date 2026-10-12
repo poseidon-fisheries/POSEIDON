@@ -26,9 +26,15 @@ import io.jenetics.*;
 import io.jenetics.engine.Engine;
 import io.jenetics.engine.EvolutionResult;
 import io.jenetics.engine.EvolutionStream;
+import io.jenetics.util.BaseSeq;
 
+import uk.ac.ox.poseidon.calibration.CalibrationProblem.SimulationTimes;
+
+import java.time.Duration;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.SequencedMap;
+import java.util.concurrent.ForkJoinTask;
 
 import static io.jenetics.engine.Limits.byFixedGeneration;
 import static io.jenetics.engine.Limits.bySteadyFitness;
@@ -36,7 +42,9 @@ import static io.jenetics.engine.Limits.bySteadyFitness;
 /**
  * Runs a {@link CalibrationProblem} through a jenetics genetic-algorithm {@link Engine}
  * (Gaussian mutation, mean-value recombination, single-elite tournament selection) and returns
- * the best solution found.
+ * the best solution found. Each individual is evaluated in its own task on the common fork-join
+ * pool: by default jenetics runs the individuals of a generation in batches of up to five, one
+ * after another within a batch, which suits cheap fitness functions but not simulations.
  */
 public final class CalibrationRunner {
 
@@ -71,12 +79,18 @@ public final class CalibrationRunner {
                     new TournamentSelector<DoubleGene, Double>(3)
                 ))
                 .offspringSelector(new TournamentSelector<>(3))
+                .fitnessExecutor(CalibrationRunner::evaluateSeparately)
                 .alterers(
                     new GaussianMutator<>(options.mutationProbability(), new GaussianMutator.Shape(options.mutatorShapeShift(), options.mutatorShapeSigma())),
                     new MeanAlterer<>(options.recombinationProbability())
                 )
                 .build();
 
+        final Reporter reporter = new Reporter(
+            problem,
+            options.reportEveryGenerations(),
+            Runtime.getRuntime().availableProcessors()
+        );
         EvolutionStream<DoubleGene, Double> stream = engine
             .stream()
             .limit(byFixedGeneration(options.generations()));
@@ -87,7 +101,7 @@ public final class CalibrationRunner {
 
         final EvolutionResult<DoubleGene, Double> result =
             stream
-                .peek(evolutionResult -> report(evolutionResult, options))
+                .peek(reporter::report)
                 .collect(EvolutionResult.toBestEvolutionResult());
 
         return new Result(
@@ -108,7 +122,10 @@ public final class CalibrationRunner {
      *                                   fitness hasn't improved for this many consecutive
      *                                   generations; {@code 0} disables early stopping
      * @param reportEveryGenerations     if greater than {@code 0}, print a progress line every
-     *                                   this many generations; {@code 0} disables reporting
+     *                                   this many generations: the best fitness and, since the
+     *                                   previous line, the wall time, the simulations run, their
+     *                                   time and the share of the processors they used;
+     *                                   {@code 0} disables reporting
      * @param mutatorShapeShift          shift parameter of the Gaussian mutator's shape
      * @param mutatorShapeSigma          sigma (spread) parameter of the Gaussian mutator's shape
      */
@@ -183,19 +200,72 @@ public final class CalibrationRunner {
         }
     }
 
-    private static void report(
-        final EvolutionResult<DoubleGene, Double> result,
-        final Options options
+    /** Runs each of {@code evaluations} in its own fork-join task, and waits for them all. */
+    static void evaluateSeparately(final BaseSeq<? extends Runnable> evaluations) {
+        ForkJoinTask.invokeAll(evaluations.stream().map(ForkJoinTask::adapt).toList());
+    }
+
+    /**
+     * @return a progress line: {@code machine_use} is the simulations' total time over the wall
+     * time multiplied by the number of processors, so 1 means every processor ran a simulation
+     * all along
+     */
+    static String formatReport(
+        final long generation,
+        final double bestFitness,
+        final Duration wallTime,
+        final SimulationTimes times,
+        final int processors
     ) {
-        if (
-            options.reportEveryGenerations() > 0 &&
-                result.generation() % options.reportEveryGenerations() == 0
+        final double machineUse = wallTime.isZero()
+            ? 0
+            : (double) times.total().toNanos() / wallTime.toNanos() / processors;
+        return String.format(
+            Locale.ROOT,
+            "generation=%d best_fitness=%.6g wall_seconds=%.1f simulations=%d " +
+                "simulation_seconds=%.1f building_seconds=%.1f processors=%d machine_use=%.2f",
+            generation,
+            bestFitness,
+            wallTime.toNanos() / 1e9,
+            times.simulations(),
+            times.total().toNanos() / 1e9,
+            times.building().toNanos() / 1e9,
+            processors,
+            machineUse
+        );
+    }
+
+    /** Prints {@link #formatReport} lines, measuring the time between them. */
+    private static final class Reporter {
+
+        private final CalibrationProblem problem;
+        private final int everyGenerations;
+        private final int processors;
+        private long previousNanos = System.nanoTime();
+
+        private Reporter(
+            final CalibrationProblem problem,
+            final int everyGenerations,
+            final int processors
         ) {
-            System.out.printf(
-                "generation=%d best_fitness=%.6g%n",
+            this.problem = problem;
+            this.everyGenerations = everyGenerations;
+            this.processors = processors;
+        }
+
+        private void report(final EvolutionResult<DoubleGene, Double> result) {
+            if (everyGenerations <= 0 || result.generation() % everyGenerations != 0) {
+                return;
+            }
+            final long now = System.nanoTime();
+            System.out.println(formatReport(
                 result.generation(),
-                result.bestFitness()
-            );
+                result.bestFitness(),
+                Duration.ofNanos(now - previousNanos),
+                problem.takeSimulationTimes(),
+                processors
+            ));
+            previousNanos = now;
         }
     }
 }
