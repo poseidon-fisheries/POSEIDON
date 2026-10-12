@@ -52,15 +52,6 @@ public class Factories {
     private Factories() {}
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an
-     * {@link AverageOptionValues}
-     * @see AverageOptionValues
-     */
-    public static <O> AverageOptionValuesFactory<O> averageOptionValues() {
-        return new AverageOptionValuesFactory<>();
-    }
-
-    /**
      * @param optionValuesRegister looks up each other vessel's own option-values component
      * @param friendsSupplier      supplies the vessel's current friends
      * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a supplier of
@@ -79,21 +70,6 @@ public class Factories {
             optionValuesRegister,
             friendsSupplier
         );
-    }
-
-    /**
-     * @param optionValuesRegister looks up each other vessel's own option-values component
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a supplier of
-     * every other active vessel's best options
-     * @see BestOptions
-     */
-    public static <O> BestOptionsFactory<O> bestOptions(
-        final Factory<
-            ? super VesselScope,
-            ? extends VesselComponentRegister<? extends OptionValues<O>>
-            > optionValuesRegister
-    ) {
-        return new BestOptionsFactory<>(optionValuesRegister);
     }
 
     /**

@@ -53,7 +53,8 @@ class BestOptionsFromFriendsTest {
         when(friend.isActive()).thenReturn(true);
         when(friend.getHomePort()).thenReturn(port);
 
-        final AverageOptionValues<String> friendValues = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> friendValues =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         friendValues.observe("A", 10.0);
         friendValues.observe("B", 20.0);
 
@@ -79,10 +80,12 @@ class BestOptionsFromFriendsTest {
         when(friendB.isActive()).thenReturn(true);
         when(friendB.getHomePort()).thenReturn(port);
 
-        final AverageOptionValues<String> valuesA = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> valuesA =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         valuesA.observe("X", 10.0);
 
-        final AverageOptionValues<String> valuesB = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> valuesB =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         valuesB.observe("X", 30.0);
 
         final VesselComponentRegister<OptionValues<String>> register =
@@ -105,7 +108,8 @@ class BestOptionsFromFriendsTest {
         when(friend.isActive()).thenReturn(false);
         when(friend.getHomePort()).thenReturn(port);
 
-        final AverageOptionValues<String> friendValues = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> friendValues =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         friendValues.observe("A", 10.0);
 
         final VesselComponentRegister<OptionValues<String>> register =
@@ -128,7 +132,7 @@ class BestOptionsFromFriendsTest {
 
         final VesselComponentRegister<OptionValues<String>> register =
             new VesselComponentRegister<>();
-        register.putComponent(friend, new AverageOptionValues<>());
+        register.putComponent(friend, new ExponentialMovingAverageOptionValues<>(1.0));
 
         final Supplier<List<Vessel>> friendsSupplier = () -> List.of(friend);
         final BestOptionsFromFriends<String> supplier =
@@ -148,10 +152,12 @@ class BestOptionsFromFriendsTest {
         when(friendB.isActive()).thenReturn(true);
         when(friendB.getHomePort()).thenReturn(port);
 
-        final AverageOptionValues<String> valuesA = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> valuesA =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         valuesA.observe("A", 10.0);
 
-        final AverageOptionValues<String> valuesB = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> valuesB =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         valuesB.observe("B", 20.0);
 
         final VesselComponentRegister<OptionValues<String>> register =

@@ -46,15 +46,6 @@ public final class Factories {
     }
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-     * {@link TotalBiomassCaughtPerHourDestinationEvaluator}
-     * @see TotalBiomassCaughtPerHourDestinationEvaluator
-     */
-    public static TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory totalBiomassCaughtPerHour() {
-        return new TotalBiomassCaughtPerHourDestinationEvaluationProviderFactory();
-    }
-
-    /**
      * @param optionValues       where each completed trip's (destination, score) observation is
      *                           fed
      * @param evaluationProvider starts a fresh evaluation for each trip's destination
