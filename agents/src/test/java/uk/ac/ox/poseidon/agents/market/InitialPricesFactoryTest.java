@@ -24,16 +24,19 @@ package uk.ac.ox.poseidon.agents.market;
 
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +54,13 @@ class InitialPricesFactoryTest {
     private static final Species HKE = new Species("HKE", null, "Hake");
 
     private final Simulation simulation = mock(Simulation.class);
+    private final TemporalSchedule schedule = mock(TemporalSchedule.class);
+
+    @BeforeEach
+    void setUp() {
+        when(simulation.getTemporalSchedule()).thenReturn(schedule);
+        when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 0, 0));
+    }
 
     @Test
     void appliesMarketSpecificPricesWhenBuilt() {

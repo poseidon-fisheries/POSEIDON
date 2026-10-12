@@ -24,6 +24,8 @@ package uk.ac.ox.poseidon.agents.market;
 
 import lombok.Value;
 
+import java.time.LocalDateTime;
+
 /**
  * A price at one market: the price of a species in a catch category there. This is a price
  * assignment, not an event: {@link PriceUpdate} schedules one as a change over time, and
@@ -37,12 +39,17 @@ public class MarketPrice {
     /** The (category, species, price) entry. */
     PriceEntry priceEntry;
 
-    /** Sets this price on {@link #market}, replacing any price it had for the same entry. */
-    public void apply() {
+    /**
+     * Sets this price on {@link #market}, replacing any price it had for the same entry.
+     *
+     * @param dateTime when the price changes
+     */
+    public void apply(final LocalDateTime dateTime) {
         market.setPrice(
             priceEntry.getCatchCategory(),
             priceEntry.getSpecies(),
-            priceEntry.getPrice()
+            priceEntry.getPrice(),
+            dateTime
         );
     }
 }

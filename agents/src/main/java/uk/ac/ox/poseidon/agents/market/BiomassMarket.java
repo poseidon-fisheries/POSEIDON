@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import com.google.common.collect.Maps;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.ToString;
@@ -47,7 +48,7 @@ import static java.util.stream.Collectors.toMap;
 /**
  * A {@link Market} with prices keyed by (catch category, species), with a fallback lookup via
  * {@link Species#covers}. A market starts with no prices: they are set through
- * {@link #setPrice}, e.g. by {@link MarketPrice#apply()}. Selling a catch splits it into what has a price
+ * {@link #setPrice}, e.g. by {@link MarketPrice#apply}. Selling a catch splits it into what has a price
  * (sold, broadcast as a {@link Sale}) and what doesn't (left in the sale's {@code unsold} catch).
  */
 @Getter
@@ -56,10 +57,14 @@ public class BiomassMarket implements Market {
 
     private final Port port;
     private final String code;
+    @Getter(AccessLevel.NONE)
     private final Map<CatchCategory, Map<Species, Price>> prices;
     // Cache resolved prices (including misses) to avoid repeated covers() scans.
     @Getter(AccessLevel.NONE)
     private final Map<CatchCategory, Map<Species, Optional<Price>>> priceCache = new HashMap<>();
+    // Absent until the first price is set.
+    @Getter(AccessLevel.NONE)
+    private LocalDateTime lastPriceChangeDateTime;
     private final Supplier<String> saleIdSupplier;
     private final EventManager eventManager;
 
@@ -160,6 +165,13 @@ public class BiomassMarket implements Market {
         });
     }
 
+    /** @return this market's prices, by catch category then species, as a read-only view */
+    public Map<CatchCategory, Map<Species, Price>> getPrices() {
+        return Collections.unmodifiableMap(
+            Maps.transformValues(prices, Collections::unmodifiableMap)
+        );
+    }
+
     /**
      * Iterates prices without exposing the mutable backing maps.
      */
@@ -192,16 +204,27 @@ public class BiomassMarket implements Market {
         );
     }
 
-    /** Sets (or replaces) this market's price for {@code species} under {@code catchCategory}. */
+    @Override
+    public Optional<LocalDateTime> getLastPriceChangeDateTime() {
+        return Optional.ofNullable(lastPriceChangeDateTime);
+    }
+
+    /**
+     * Sets (or replaces) this market's price for {@code species} under {@code catchCategory}.
+     *
+     * @param dateTime when the price changes
+     */
     public void setPrice(
         final CatchCategory catchCategory,
         final Species species,
-        final Price price
+        final Price price,
+        final LocalDateTime dateTime
     ) {
         prices
             .computeIfAbsent(catchCategory, k -> new HashMap<>())
             .put(species, price);
         priceCache.remove(catchCategory);
+        lastPriceChangeDateTime = dateTime;
     }
 
     private Optional<Price> resolvePrice(
