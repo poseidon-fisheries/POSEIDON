@@ -259,34 +259,45 @@ public class Factories {
     }
 
     /**
-     * @param optionValues              the vessel's own learned option values, for the search's
-     *                                  starting cell
      * @param pathFinder                finds accessible water neighbours
      * @param cellPredicate             filters which candidate cells are eligible
      * @param neighbourhoodSizeSupplier the initial search radius
      * @param maximumWidening           how many cells the radius may grow beyond the initial one
      *                                  while no cell satisfies {@code cellPredicate}
-     * @param fallbackCellPicker        supplies a starting cell if there's no best-known option
+     * @param searchCentre              supplies the cell to search around, asked for anew on each
+     *                                  pick
      * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
      * {@link NeighbourhoodCellPicker}
      * @see NeighbourhoodCellPicker
      */
     public static NeighbourhoodGridExplorerFactory neighbourhoodGridExplorer(
-        final Factory<? super VesselScope, ? extends OptionValues<Int2D>> optionValues,
         final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
         final Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate,
         final Factory<? super VesselScope, ? extends IntSupplier> neighbourhoodSizeSupplier,
         final int maximumWidening,
-        final Factory<? super VesselScope, ? extends Supplier<Int2D>> fallbackCellPicker
+        final Factory<? super VesselScope, ? extends Supplier<Int2D>> searchCentre
     ) {
         return new NeighbourhoodGridExplorerFactory(
-            optionValues,
             pathFinder,
             cellPredicate,
             neighbourhoodSizeSupplier,
             maximumWidening,
-            fallbackCellPicker
+            searchCentre
         );
+    }
+
+    /**
+     * @param optionValues the values of the options
+     * @param fallback     supplies an option when none is known
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link BestKnownOption}
+     * @see BestKnownOption
+     */
+    public static <O> BestKnownOptionFactory<O> bestKnownOption(
+        final Factory<? super VesselScope, ? extends OptionValues<O>> optionValues,
+        final Factory<? super VesselScope, ? extends Supplier<O>> fallback
+    ) {
+        return new BestKnownOptionFactory<>(optionValues, fallback);
     }
 
     /**

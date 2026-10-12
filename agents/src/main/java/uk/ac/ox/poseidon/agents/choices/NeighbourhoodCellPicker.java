@@ -41,8 +41,8 @@ import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 /**
- * Picks a random accessible water cell in the neighbourhood of the vessel's current best-known
- * option (or a fallback cell if there isn't one), growing the search radius until a cell
+ * Picks a random accessible water cell in the neighbourhood of a search centre, asked for anew on
+ * each pick (the vessel's own cell if it gives none), growing the search radius until a cell
  * satisfies the option predicate. The radius grows by at most {@code maximumWidening} cells
  * beyond the initial one, and never beyond the grid's larger dimension: when no cell is legal
  * anywhere, which is common (a closed port, no time left), an unbounded search would test every
@@ -52,12 +52,11 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 public class NeighbourhoodCellPicker implements Provider<Int2D> {
 
     private final Vessel vessel;
-    private final OptionValues<Int2D> optionValues;
     private final GridPathFinder pathFinder;
     private final Predicate<? super Int2D> optionPredicate;
     private final IntSupplier neighbourhoodSizeSupplier;
     private final int maximumWidening;
-    private final Supplier<Int2D> fallbackCellPicker;
+    private final Supplier<Int2D> searchCentre;
     private final MersenneTwisterFast rng;
 
     /**
@@ -74,9 +73,8 @@ public class NeighbourhoodCellPicker implements Provider<Int2D> {
         );
         final int maxNeighbourhoodSize =
             initialNeighbourhoodSize + min(maximumWidening, gridExtent - initialNeighbourhoodSize);
-        final Int2D bestOrFallback =
-            optionValues.getBestOption(rng).orElseGet(fallbackCellPicker);
-        final Int2D centre = bestOrFallback != null ? bestOrFallback : vessel.getCell();
+        final Int2D suppliedCentre = searchCentre.get();
+        final Int2D centre = suppliedCentre != null ? suppliedCentre : vessel.getCell();
         for (
             int neighbourhoodSize = initialNeighbourhoodSize;
             neighbourhoodSize <= maxNeighbourhoodSize;

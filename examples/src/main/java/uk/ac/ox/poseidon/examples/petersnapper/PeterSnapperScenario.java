@@ -371,12 +371,14 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             epsilonGreedyDestination(
                 EXPLORATION_PROBABILITY,
                 neighbourhoodGridExplorer(
-                    optionValues,
                     pathFinder,
                     validCellPredicate,
                     firstIntFrom(perVessel(randomInt(1, 10))),
                     MAXIMUM_EXPLORATION_WIDENING,
-                    randomGridExplorer(accessibleWaterCells(pathFinder), validCellPredicate)
+                    bestKnownOption(
+                        optionValues,
+                        randomGridExplorer(accessibleWaterCells(pathFinder), validCellPredicate)
+                    )
                 ),
                 imitatingPicker(
                     optionValues,
