@@ -23,7 +23,8 @@
 /**
  * {@link uk.ac.ox.poseidon.agents.tasks.destinations.StartTrip}: draws a destination from a
  * {@link uk.ac.ox.poseidon.agents.choices.DestinationSupplier} and starts the vessel's trip
- * towards it. See {@link uk.ac.ox.poseidon.agents.tasks.destinations.Factories} for the entry
- * points.
+ * towards it; {@link uk.ac.ox.poseidon.agents.tasks.destinations.ChooseNextDestination} redirects
+ * the current trip to the next one it draws. See
+ * {@link uk.ac.ox.poseidon.agents.tasks.destinations.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.agents.tasks.destinations;
