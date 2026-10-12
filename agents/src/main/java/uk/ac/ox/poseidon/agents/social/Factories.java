@@ -70,30 +70,30 @@ public class Factories {
     }
 
     /**
-     * @param network the network whose ties decide who hears each haul
+     * @param network the network whose ties decide who hears each fishing event
      * @return a {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory} for a
-     * {@link HaulSharer} registered with the simulation's event manager, so that it hears every
-     * vessel's hauls
-     * @see HaulSharer
+     * {@link FishingEventSharer} registered with the simulation's event manager, so that it hears
+     * every vessel's fishing events
+     * @see FishingEventSharer
      */
-    public static HaulSharerFactory haulSharer(
+    public static FishingEventSharerFactory fishingEventSharer(
         final Factory<? super SimulationScope, ? extends SocialNetwork> network
     ) {
-        return new HaulSharerFactory(network);
+        return new FishingEventSharerFactory(network);
     }
 
     /**
-     * @param listener   the factory giving the vessel's shared haul listener
-     * @param haulSharer the sharer to register the listener with
+     * @param listener           the factory giving the vessel's shared fishing event listener
+     * @param fishingEventSharer the sharer to register the listener with
      * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} that registers the
      * vessel's listener with the sharer and gives it; add it to the vessel's extra factories
-     * @see SharedHaulListenerFactory
+     * @see SharedFishingEventListenerFactory
      */
-    public static <L extends Listener<? super FishingEvent>> SharedHaulListenerFactory<L>
-    sharedHaulListener(
+    public static <L extends Listener<? super FishingEvent>> SharedFishingEventListenerFactory<L>
+    sharedFishingEventListener(
         final Factory<? super VesselScope, ? extends L> listener,
-        final Factory<? super SimulationScope, ? extends HaulSharer> haulSharer
+        final Factory<? super SimulationScope, ? extends FishingEventSharer> fishingEventSharer
     ) {
-        return new SharedHaulListenerFactory<>(listener, haulSharer);
+        return new SharedFishingEventListenerFactory<>(listener, fishingEventSharer);
     }
 }

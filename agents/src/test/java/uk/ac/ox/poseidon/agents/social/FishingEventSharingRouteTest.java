@@ -64,13 +64,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.choices.Factories.exponentialMovingAverageOfBuckets;
-import static uk.ac.ox.poseidon.agents.choices.Factories.haulRecorder;
+import static uk.ac.ox.poseidon.agents.choices.Factories.fishingEventRecorder;
 import static uk.ac.ox.poseidon.agents.choices.Factories.keyedMemory;
 import static uk.ac.ox.poseidon.agents.choices.Factories.keyedMemorySelector;
 import static uk.ac.ox.poseidon.agents.choices.Factories.memoryBasedOptionValues;
 import static uk.ac.ox.poseidon.agents.social.Factories.cliqueDynamics;
-import static uk.ac.ox.poseidon.agents.social.Factories.haulSharer;
-import static uk.ac.ox.poseidon.agents.social.Factories.sharedHaulListener;
+import static uk.ac.ox.poseidon.agents.social.Factories.fishingEventSharer;
+import static uk.ac.ox.poseidon.agents.social.Factories.sharedFishingEventListener;
 import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
 import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventAccumulator;
@@ -87,12 +87,12 @@ import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 
 /**
- * The complete route of a haul, wired as in NW Med: one base fleet factory given both to the
- * register loader creating the vessels and to the social network, an own and a shared haul
- * recorder per vessel on the same memory, and real event managers from trip to vessel to
+ * The complete route of a fishing event, wired as in NW Med: one base fleet factory given both to
+ * the register loader creating the vessels and to the social network, an own and a shared fishing
+ * event recorder per vessel on the same memory, and real event managers from trip to vessel to
  * simulation.
  */
-class HaulSharingRouteTest {
+class FishingEventSharingRouteTest {
 
     private static final double OWN_ALPHA = 0.5;
     private static final double SOCIAL_ALPHA = 0.25;
@@ -126,7 +126,7 @@ class HaulSharingRouteTest {
     private final FleetFactory baseFleet =
         fleet(object(vesselField), object(portGrid), object(marketGrid));
     private final SocialNetworkFactory network = socialNetwork(baseFleet);
-    private final HaulSharerFactory haulSharer = haulSharer(network);
+    private final FishingEventSharerFactory fishingEventSharer = fishingEventSharer(network);
 
     private Simulation simulation;
     private SimulationScope simulationScope;
@@ -157,7 +157,7 @@ class HaulSharingRouteTest {
             loader
                 .extraFactory(
                     vesselEventListener(
-                        haulRecorder(
+                        fishingEventRecorder(
                             object(modelGrid),
                             keyedMemorySelector(
                                 vesselMemory,
@@ -168,8 +168,8 @@ class HaulSharingRouteTest {
                     )
                 )
                 .extraFactory(
-                    sharedHaulListener(
-                        haulRecorder(
+                    sharedFishingEventListener(
+                        fishingEventRecorder(
                             object(modelGrid),
                             keyedMemorySelector(
                                 vesselMemory,
@@ -177,7 +177,7 @@ class HaulSharingRouteTest {
                             ),
                             exponentialMovingAverageOfBuckets(SOCIAL_ALPHA)
                         ),
-                        haulSharer
+                        fishingEventSharer
                     )
                 );
         }
@@ -193,7 +193,7 @@ class HaulSharingRouteTest {
                 )
                 .component("fishingEventAccumulator", fishingEventAccumulator());
         if (withSharing) {
-            scenario.component("haulSharer", haulSharer);
+            scenario.component("fishingEventSharer", fishingEventSharer);
         }
         simulation = scenario.build().startNewSimulation();
         simulationScope = new SimulationScope(simulation);
@@ -220,8 +220,8 @@ class HaulSharingRouteTest {
         return optionValues.get(scopeOf(vessel)).getValue(cell);
     }
 
-    /** Broadcasts a haul on the trip's event manager, as {@code Fishing} does. */
-    private void haul(final Trip trip, final double kg) {
+    /** Broadcasts a fishing event on the trip's event manager, as {@code Fishing} does. */
+    private void fishingEvent(final Trip trip, final double kg) {
         final Vessel vessel = trip.getVessel();
         final ExtendedFishingAction action = new ExtendedFishingAction(
             vessel,
@@ -243,7 +243,7 @@ class HaulSharingRouteTest {
     }
 
     @Test
-    void oneHaulIsAccountedOnceAndUpdatesTheSenderByItsOwnRuleAndTheReceiverBySocialRule() {
+    void oneFishingEventIsAccountedOnceAndUpdatesTheSenderByItsOwnRuleAndTheReceiverBySocialRule() {
         startSimulation(VESSEL_REGISTER, true);
         final Vessel a = vessel("A");
         final Vessel b = vessel("B");
@@ -251,7 +251,7 @@ class HaulSharingRouteTest {
         remember(b, 10);
         final Trip trip = new Trip(a, cell);
 
-        haul(trip, 20);
+        fishingEvent(trip, 20);
 
         assertThat(simulation.getComponent(FishingEventAccumulator.class).getEvents()).hasSize(1);
         assertThat(valueOfTheCellFor(a)).contains(15.0);
@@ -265,7 +265,7 @@ class HaulSharingRouteTest {
         final Vessel b = vessel("B");
         final Trip trip = new Trip(a, cell);
 
-        haul(trip, 20);
+        fishingEvent(trip, 20);
 
         assertThat(valueOfTheCellFor(a)).contains(20.0);
         assertThat(valueOfTheCellFor(b)).contains(20.0);

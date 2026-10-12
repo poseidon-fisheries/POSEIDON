@@ -44,16 +44,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.choices.Factories.exponentialMovingAverageOfBuckets;
-import static uk.ac.ox.poseidon.agents.choices.Factories.haulRecorder;
+import static uk.ac.ox.poseidon.agents.choices.Factories.fishingEventRecorder;
 import static uk.ac.ox.poseidon.agents.choices.Factories.keyedMemory;
 import static uk.ac.ox.poseidon.agents.choices.Factories.keyedMemorySelector;
 import static uk.ac.ox.poseidon.agents.choices.Factories.memoryBasedOptionValues;
-import static uk.ac.ox.poseidon.agents.choices.HaulRecorderTest.haul;
+import static uk.ac.ox.poseidon.agents.choices.FishingEventRecorderTest.fishingEvent;
 import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventProperty;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.perVessel;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
-class HaulRecorderFactoryTest {
+class FishingEventRecorderFactoryTest {
 
     private static final Species SPECIES = new Species("A", null, "A");
     private static final Coordinate COORDINATE = new Coordinate(1.5, 41.5);
@@ -64,7 +64,7 @@ class HaulRecorderFactoryTest {
     private final VesselScope scopeB = scopeOfNewVessel(simulation);
     private final PerVesselFactory<KeyedMemory<String, Int2D, Bucket>> keyedMemory =
         perVessel(keyedMemory());
-    private final HaulRecorderFactory<VesselScope> factory = haulRecorder(
+    private final FishingEventRecorderFactory<VesselScope> factory = fishingEventRecorder(
         object(modelGrid()),
         keyedMemorySelector(keyedMemory, fishingEventProperty("action.gear.code")),
         exponentialMovingAverageOfBuckets(0.5)
@@ -107,7 +107,7 @@ class HaulRecorderFactoryTest {
         factory.get(scopeA);
         scopeA.getVessel()
             .getEventManager()
-            .broadcast(haul("PS", COORDINATE, Bucket.of(SPECIES, 10)));
+            .broadcast(fishingEvent("PS", COORDINATE, Bucket.of(SPECIES, 10)));
 
         assertThat(keyedMemory.get(scopeA).get("PS").get(CELL)).isEmpty();
     }
@@ -119,7 +119,7 @@ class HaulRecorderFactoryTest {
             new KgOfSpeciesValuationFactory()
         );
 
-        factory.get(scopeA).receive(haul("PS", COORDINATE, Bucket.of(SPECIES, 10)));
+        factory.get(scopeA).receive(fishingEvent("PS", COORDINATE, Bucket.of(SPECIES, 10)));
 
         assertThat(optionValues.get(scopeA).getValue(CELL)).contains(10.0);
         assertThat(optionValues.get(scopeB).getValue(CELL)).isEmpty();
@@ -133,7 +133,7 @@ class HaulRecorderFactoryTest {
 
     @Test
     void sharesOneRecorderBetweenVesselsSharingAMemory() {
-        final HaulRecorderFactory<VesselScope> sharedFactory = haulRecorder(
+        final FishingEventRecorderFactory<VesselScope> sharedFactory = fishingEventRecorder(
             object(modelGrid()),
             keyedMemorySelector(keyedMemory(), fishingEventProperty("action.gear.code")),
             exponentialMovingAverageOfBuckets(0.5)

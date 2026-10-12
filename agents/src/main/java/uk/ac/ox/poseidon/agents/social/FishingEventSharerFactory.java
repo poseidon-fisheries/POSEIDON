@@ -32,21 +32,21 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A {@link SimulationEventListenerFactory} for a {@link HaulSharer}, built via
- * {@link Factories#haulSharer}. Registered with the simulation's event manager, the sharer hears
- * the hauls every vessel's event manager forwards there.
+ * A {@link SimulationEventListenerFactory} for a {@link FishingEventSharer}, built via
+ * {@link Factories#fishingEventSharer}. Registered with the simulation's event manager, the sharer
+ * hears the fishing events every vessel's event manager forwards there.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class HaulSharerFactory extends SimulationEventListenerFactory<HaulSharer> {
+public class FishingEventSharerFactory extends SimulationEventListenerFactory<FishingEventSharer> {
 
     private Factory<? super SimulationScope, ? extends SocialNetwork> network;
 
     @Override
-    protected HaulSharer newListener(final SimulationScope scope) {
+    protected FishingEventSharer newListener(final SimulationScope scope) {
         checkNotNull(network, "network must not be null");
-        return new HaulSharer(network.get(scope));
+        return new FishingEventSharer(network.get(scope));
     }
 }

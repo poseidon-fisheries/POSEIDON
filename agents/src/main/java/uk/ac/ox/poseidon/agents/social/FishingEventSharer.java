@@ -33,45 +33,49 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Shares every haul it hears with the recipients of the vessel that made it: for each recipient
- * of the sender in the {@link SocialNetwork}, it calls that recipient's shared haul listener,
- * right away, with the haul. A recipient with no shared haul listener registered is skipped. The
- * shared haul listeners are only called from here, not registered with any event manager.
+ * Shares every fishing event it hears with the recipients of the vessel that made it: for each
+ * recipient of the sender in the {@link SocialNetwork}, it calls that recipient's shared fishing
+ * event listener, right away, with the event. A recipient with no shared fishing event listener
+ * registered is skipped. The shared fishing event listeners are only called from here, not
+ * registered with any event manager.
  */
-public class HaulSharer extends AbstractListener<FishingEvent> {
+public class FishingEventSharer extends AbstractListener<FishingEvent> {
 
     private final SocialNetwork network;
-    private final Map<Vessel, Listener<? super FishingEvent>> sharedHaulListeners =
+    private final Map<Vessel, Listener<? super FishingEvent>> sharedFishingEventListeners =
         new HashMap<>();
 
-    HaulSharer(final SocialNetwork network) {
+    FishingEventSharer(final SocialNetwork network) {
         super(FishingEvent.class);
         this.network = checkNotNull(network);
     }
 
     /**
-     * @param vessel             the vessel the listener hears shared hauls for
-     * @param sharedHaulListener hears the hauls shared with {@code vessel}
-     * @throws IllegalStateException if {@code vessel} already has a shared haul listener
+     * @param vessel                     the vessel the listener hears shared fishing events for
+     * @param sharedFishingEventListener hears the fishing events shared with {@code vessel}
+     * @throws IllegalStateException if {@code vessel} already has a shared fishing event listener
      */
-    public void registerSharedHaulListener(
+    public void registerSharedFishingEventListener(
         final Vessel vessel,
-        final Listener<? super FishingEvent> sharedHaulListener
+        final Listener<? super FishingEvent> sharedFishingEventListener
     ) {
         checkState(
-            !sharedHaulListeners.containsKey(vessel),
-            "Vessel %s already has a shared haul listener.", vessel.getId()
+            !sharedFishingEventListeners.containsKey(vessel),
+            "Vessel %s already has a shared fishing event listener.", vessel.getId()
         );
-        sharedHaulListeners.put(checkNotNull(vessel), checkNotNull(sharedHaulListener));
+        sharedFishingEventListeners.put(
+            checkNotNull(vessel),
+            checkNotNull(sharedFishingEventListener)
+        );
     }
 
     @Override
     public void receive(final FishingEvent event) {
         for (final Vessel recipient : network.getRecipients(event.getAction().getAgent())) {
-            final Listener<? super FishingEvent> sharedHaulListener =
-                sharedHaulListeners.get(recipient);
-            if (sharedHaulListener != null) {
-                sharedHaulListener.receive(event);
+            final Listener<? super FishingEvent> sharedFishingEventListener =
+                sharedFishingEventListeners.get(recipient);
+            if (sharedFishingEventListener != null) {
+                sharedFishingEventListener.receive(event);
             }
         }
     }

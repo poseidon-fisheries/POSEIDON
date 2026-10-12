@@ -179,14 +179,14 @@ public class Factories {
     }
 
     /**
-     * @param modelGrid      the grid giving the cell of a haul's coordinate
-     * @param memorySelector selects, from a haul, the memory to record it in
+     * @param modelGrid      the grid giving the cell of a fishing event's coordinate
+     * @param memorySelector selects, from a fishing event, the memory to record it in
      * @param updateRule     revises what is remembered of a cell with a new observation of it
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link HaulRecorder},
-     * which it does not register with anything
-     * @see HaulRecorder
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link FishingEventRecorder}, which it does not register with anything
+     * @see FishingEventRecorder
      */
-    public static <S extends Scope> HaulRecorderFactory<S> haulRecorder(
+    public static <S extends Scope> FishingEventRecorderFactory<S> fishingEventRecorder(
         final Factory<? super S, ? extends ModelGrid> modelGrid,
         final Factory<
             ? super S,
@@ -194,7 +194,7 @@ public class Factories {
             > memorySelector,
         final Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule
     ) {
-        return new HaulRecorderFactory<>(modelGrid, memorySelector, updateRule);
+        return new FishingEventRecorderFactory<>(modelGrid, memorySelector, updateRule);
     }
 
     /**

@@ -39,11 +39,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.social.Factories.haulSharer;
+import static uk.ac.ox.poseidon.agents.social.Factories.fishingEventSharer;
 import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
-class HaulSharerFactoryTest {
+class FishingEventSharerFactoryTest {
 
     private final EventManager simulationEventManager = new SimpleEventManager();
     private final Simulation simulation = simulation(simulationEventManager);
@@ -52,7 +52,7 @@ class HaulSharerFactoryTest {
     private final Vessel b = vessel(simulationEventManager);
     private final VesselsGetter fleet = () -> List.of(a, b);
     private final SocialNetworkFactory network = socialNetwork(object(fleet));
-    private final HaulSharerFactory factory = haulSharer(network);
+    private final FishingEventSharerFactory factory = fishingEventSharer(network);
 
     private static Simulation simulation(final EventManager eventManager) {
         final Simulation simulation = mock(Simulation.class);
@@ -77,10 +77,10 @@ class HaulSharerFactoryTest {
     }
 
     @Test
-    void aHaulBroadcastOnAVesselsEventManagerReachesItsRecipientThroughForwarding() {
+    void aFishingEventBroadcastOnAVesselsEventManagerReachesItsRecipientThroughForwarding() {
         final SimulationScope scope = new SimulationScope(simulation);
         final List<FishingEvent> heardByB = new ArrayList<>();
-        factory.get(scope).registerSharedHaulListener(b, new Listener<FishingEvent>() {
+        factory.get(scope).registerSharedFishingEventListener(b, new Listener<FishingEvent>() {
             @Override
             public Class<FishingEvent> getEventClass() {
                 return FishingEvent.class;
@@ -94,10 +94,10 @@ class HaulSharerFactoryTest {
         network.get(scope).addTie(a, b);
         final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
         when(action.getAgent()).thenReturn(a);
-        final FishingEvent haulByA = new FishingEvent(action, null);
+        final FishingEvent fishingEventByA = new FishingEvent(action, null);
 
-        a.getEventManager().broadcast(haulByA);
+        a.getEventManager().broadcast(fishingEventByA);
 
-        assertThat(heardByB).containsExactly(haulByA);
+        assertThat(heardByB).containsExactly(fishingEventByA);
     }
 }

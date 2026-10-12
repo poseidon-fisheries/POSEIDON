@@ -34,26 +34,26 @@ import java.util.function.Function;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Records each haul it receives in a {@link Memory}: the haul's retained catch, observed in the
- * cell where the haul started, in the memory selected from the haul (such as the slice for the
- * gear it was made with), revised with an update rule.
+ * Records each fishing event it receives in a {@link Memory}: the event's retained catch, observed
+ * in the cell where the fishing action started, in the memory selected from the event (such as the
+ * slice for the gear it was made with), revised with an update rule.
  * <p>
- * It does not register itself with anything: whatever it is registered with decides whose hauls
- * it records. A vessel can have several, on the same memory, with different update rules, such
- * as one for its own hauls and one for hauls it is told about.
+ * It does not register itself with anything: whatever it is registered with decides whose fishing
+ * events it records. A vessel can have several, on the same memory, with different update rules,
+ * such as one for its own fishing events and one for fishing events it is told about.
  */
-public class HaulRecorder extends AbstractListener<FishingEvent> {
+public class FishingEventRecorder extends AbstractListener<FishingEvent> {
 
     private final ModelGrid modelGrid;
     private final Function<? super FishingEvent, ? extends Memory<Int2D, Bucket>> memorySelector;
     private final BinaryOperator<Bucket> updateRule;
 
     /**
-     * @param modelGrid      the grid giving the cell of a haul's coordinate
-     * @param memorySelector selects, from a haul, the memory to record it in
+     * @param modelGrid      the grid giving the cell of a fishing event's coordinate
+     * @param memorySelector selects, from a fishing event, the memory to record it in
      * @param updateRule     revises what is remembered of a cell with a new observation of it
      */
-    HaulRecorder(
+    FishingEventRecorder(
         final ModelGrid modelGrid,
         final Function<? super FishingEvent, ? extends Memory<Int2D, Bucket>> memorySelector,
         final BinaryOperator<Bucket> updateRule

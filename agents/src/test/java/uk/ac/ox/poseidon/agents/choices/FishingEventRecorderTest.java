@@ -38,13 +38,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class HaulRecorderTest {
+class FishingEventRecorderTest {
 
     private final Species species = new Species("A", null, "A");
     private final Coordinate coordinate = new Coordinate(1.5, 41.5);
     private final Int2D cell = new Int2D(3, 4);
     private final KeyedMemory<String, Int2D, Bucket> keyedMemory = new KeyedMemory<>();
-    private final HaulRecorder haulRecorder = new HaulRecorder(
+    private final FishingEventRecorder fishingEventRecorder = new FishingEventRecorder(
         modelGrid(),
         new KeyedMemorySelector<>(
             keyedMemory,
@@ -59,7 +59,7 @@ class HaulRecorderTest {
         return modelGrid;
     }
 
-    static FishingEvent haul(
+    static FishingEvent fishingEvent(
         final String gearCode,
         final Coordinate coordinate,
         final Bucket retained
@@ -79,8 +79,8 @@ class HaulRecorderTest {
     }
 
     @Test
-    void recordsTheRetainedCatchInTheCellOfTheHaulInTheSliceOfItsGear() {
-        haulRecorder.receive(haul("PS", coordinate, Bucket.of(species, 10)));
+    void recordsTheRetainedCatchInTheCellOfTheFishingEventInTheSliceOfItsGear() {
+        fishingEventRecorder.receive(fishingEvent("PS", coordinate, Bucket.of(species, 10)));
 
         assertThat(keyedMemory.get("PS").get(cell))
             .hasValueSatisfying(bucket -> assertThat(bucket.getKg(species)).isEqualTo(10));
@@ -88,7 +88,7 @@ class HaulRecorderTest {
 
     @Test
     void recordsAnEmptyRetainedCatch() {
-        haulRecorder.receive(haul("PS", coordinate, Bucket.empty()));
+        fishingEventRecorder.receive(fishingEvent("PS", coordinate, Bucket.empty()));
 
         assertThat(keyedMemory.get("PS").get(cell))
             .hasValueSatisfying(bucket -> assertThat(bucket.isEmpty()).isTrue());
@@ -96,17 +96,17 @@ class HaulRecorderTest {
 
     @Test
     void revisesWhatIsRememberedWithTheUpdateRule() {
-        haulRecorder.receive(haul("PS", coordinate, Bucket.of(species, 10)));
-        haulRecorder.receive(haul("PS", coordinate, Bucket.of(species, 4)));
+        fishingEventRecorder.receive(fishingEvent("PS", coordinate, Bucket.of(species, 10)));
+        fishingEventRecorder.receive(fishingEvent("PS", coordinate, Bucket.of(species, 4)));
 
         assertThat(keyedMemory.get("PS").get(cell))
             .hasValueSatisfying(bucket -> assertThat(bucket.getKg(species)).isEqualTo(14));
     }
 
     @Test
-    void recordsAHaulWithAnotherGearInAnotherSlice() {
-        haulRecorder.receive(haul("PS", coordinate, Bucket.of(species, 10)));
-        haulRecorder.receive(haul("OTB", coordinate, Bucket.of(species, 4)));
+    void recordsAFishingEventWithAnotherGearInAnotherSlice() {
+        fishingEventRecorder.receive(fishingEvent("PS", coordinate, Bucket.of(species, 10)));
+        fishingEventRecorder.receive(fishingEvent("OTB", coordinate, Bucket.of(species, 4)));
 
         assertThat(keyedMemory.get("PS").get(cell))
             .hasValueSatisfying(bucket -> assertThat(bucket.getKg(species)).isEqualTo(10));

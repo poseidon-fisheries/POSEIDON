@@ -38,16 +38,17 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link HaulRecorder}, built via
- * {@link Factories#haulRecorder(Factory, Factory, Factory)}. It only builds the recorder: it does
- * not register it with the vessel's event manager or anything else, since a vessel can have
- * several recorders, each registered with whatever gives it the hauls it records.
+ * A {@link RelativeScopeFactory} counterpart of {@link FishingEventRecorder}, built via
+ * {@link Factories#fishingEventRecorder(Factory, Factory, Factory)}. It only builds the recorder:
+ * it does not register it with the vessel's event manager or anything else, since a vessel can
+ * have several recorders, each registered with whatever gives it the fishing events it records.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class HaulRecorderFactory<S extends Scope> extends RelativeScopeFactory<S, HaulRecorder> {
+public class FishingEventRecorderFactory<S extends Scope>
+    extends RelativeScopeFactory<S, FishingEventRecorder> {
 
     private Factory<? super S, ? extends ModelGrid> modelGrid;
     private Factory<
@@ -57,8 +58,8 @@ public class HaulRecorderFactory<S extends Scope> extends RelativeScopeFactory<S
     private Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule;
 
     @Override
-    protected HaulRecorder newInstance(final S scope) {
-        return new HaulRecorder(
+    protected FishingEventRecorder newInstance(final S scope) {
+        return new FishingEventRecorder(
             modelGrid.get(scope),
             memorySelector.get(scope),
             updateRule.get(scope)

@@ -35,9 +35,9 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Registers the vessel's {@link #listener} with the {@link HaulSharer}, once per vessel, and
- * gives that listener: it then hears the hauls of the vessel's sources. Built via
- * {@link Factories#sharedHaulListener}.
+ * Registers the vessel's {@link #listener} with the {@link FishingEventSharer}, once per vessel,
+ * and gives that listener: it then hears the fishing events of the vessel's sources. Built via
+ * {@link Factories#sharedFishingEventListener}.
  * <p>
  * A listener nothing else reads would never be built for a vessel, since factories only build
  * when asked: add this factory to the vessel's extra factories, which are built when the vessel
@@ -49,18 +49,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SharedHaulListenerFactory<L extends Listener<? super FishingEvent>>
+public class SharedFishingEventListenerFactory<L extends Listener<? super FishingEvent>>
     extends VesselScopeFactory<L> {
 
     private Factory<? super VesselScope, ? extends L> listener;
-    private Factory<? super SimulationScope, ? extends HaulSharer> haulSharer;
+    private Factory<? super SimulationScope, ? extends FishingEventSharer> fishingEventSharer;
 
     @Override
     protected L newInstance(final VesselScope scope) {
         checkNotNull(listener, "listener must not be null");
-        checkNotNull(haulSharer, "haulSharer must not be null");
+        checkNotNull(fishingEventSharer, "fishingEventSharer must not be null");
         final L listener = this.listener.get(scope);
-        haulSharer.get(scope).registerSharedHaulListener(scope.getVessel(), listener);
+        fishingEventSharer
+            .get(scope)
+            .registerSharedFishingEventListener(scope.getVessel(), listener);
         return listener;
     }
 }

@@ -39,12 +39,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.social.Factories.haulSharer;
-import static uk.ac.ox.poseidon.agents.social.Factories.sharedHaulListener;
+import static uk.ac.ox.poseidon.agents.social.Factories.fishingEventSharer;
+import static uk.ac.ox.poseidon.agents.social.Factories.sharedFishingEventListener;
 import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
-class SharedHaulListenerFactoryTest {
+class SharedFishingEventListenerFactoryTest {
 
     private final Simulation simulation = simulation();
     private final Vessel a = mock(Vessel.class);
@@ -53,10 +53,10 @@ class SharedHaulListenerFactoryTest {
     private final SimulationScope simulationScope = new SimulationScope(simulation);
     private final VesselScope scopeB = new VesselScope(simulationScope, b);
     private final SocialNetworkFactory network = socialNetwork(object(fleet));
-    private final HaulSharerFactory haulSharer = haulSharer(network);
+    private final FishingEventSharerFactory fishingEventSharer = fishingEventSharer(network);
     private final RecordingListenerFactory listener = new RecordingListenerFactory();
-    private final SharedHaulListenerFactory<RecordingListener> factory =
-        sharedHaulListener(listener, haulSharer);
+    private final SharedFishingEventListenerFactory<RecordingListener> factory =
+        sharedFishingEventListener(listener, fishingEventSharer);
 
     private static Simulation simulation() {
         final Simulation simulation = mock(Simulation.class);
@@ -84,21 +84,21 @@ class SharedHaulListenerFactoryTest {
         }
     }
 
-    private static FishingEvent haulBy(final Vessel vessel) {
+    private static FishingEvent fishingEventBy(final Vessel vessel) {
         final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
         when(action.getAgent()).thenReturn(vessel);
         return new FishingEvent(action, null);
     }
 
     @Test
-    void aHaulByOneOfTheVesselsSourcesReachesItsListener() {
+    void aFishingEventByOneOfTheVesselsSourcesReachesItsListener() {
         factory.get(scopeB);
         network.get(simulationScope).addTie(a, b);
-        final FishingEvent haulByA = haulBy(a);
+        final FishingEvent fishingEventByA = fishingEventBy(a);
 
-        haulSharer.get(simulationScope).receive(haulByA);
+        fishingEventSharer.get(simulationScope).receive(fishingEventByA);
 
-        assertThat(listener.get(scopeB).heard).containsExactly(haulByA);
+        assertThat(listener.get(scopeB).heard).containsExactly(fishingEventByA);
     }
 
     @Test
@@ -112,7 +112,7 @@ class SharedHaulListenerFactoryTest {
         factory.get(scopeB);
         network.get(simulationScope).addTie(a, b);
 
-        haulSharer.get(simulationScope).receive(haulBy(a));
+        fishingEventSharer.get(simulationScope).receive(fishingEventBy(a));
 
         assertThat(listener.get(scopeB).heard).hasSize(1);
     }

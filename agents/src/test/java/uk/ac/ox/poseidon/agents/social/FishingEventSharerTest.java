@@ -35,16 +35,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class HaulSharerTest {
+class FishingEventSharerTest {
 
     private final Vessel a = mock(Vessel.class);
     private final Vessel b = mock(Vessel.class);
     private final SocialNetwork network = new SocialNetwork(() -> List.of(a, b));
-    private final HaulSharer haulSharer = new HaulSharer(network);
+    private final FishingEventSharer fishingEventSharer = new FishingEventSharer(network);
     private final List<FishingEvent> heardByA = new ArrayList<>();
     private final List<FishingEvent> heardByB = new ArrayList<>();
 
-    private static FishingEvent haulBy(final Vessel vessel) {
+    private static FishingEvent fishingEventBy(final Vessel vessel) {
         final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
         when(action.getAgent()).thenReturn(vessel);
         return new FishingEvent(action, null);
@@ -65,55 +65,57 @@ class HaulSharerTest {
     }
 
     @Test
-    void aHaulReachesTheSendersRecipientsOnly() {
-        haulSharer.registerSharedHaulListener(a, listener(heardByA));
-        haulSharer.registerSharedHaulListener(b, listener(heardByB));
+    void aFishingEventReachesTheSendersRecipientsOnly() {
+        fishingEventSharer.registerSharedFishingEventListener(a, listener(heardByA));
+        fishingEventSharer.registerSharedFishingEventListener(b, listener(heardByB));
         network.addTie(a, b);
-        final FishingEvent haulByA = haulBy(a);
+        final FishingEvent fishingEventByA = fishingEventBy(a);
 
-        haulSharer.receive(haulByA);
-        haulSharer.receive(haulBy(b));
+        fishingEventSharer.receive(fishingEventByA);
+        fishingEventSharer.receive(fishingEventBy(b));
 
-        assertThat(heardByB).containsExactly(haulByA);
+        assertThat(heardByB).containsExactly(fishingEventByA);
         assertThat(heardByA).isEmpty();
     }
 
     @Test
-    void aHaulIsNotDeliveredBackToItsSender() {
-        haulSharer.registerSharedHaulListener(a, listener(heardByA));
-        haulSharer.registerSharedHaulListener(b, listener(heardByB));
+    void aFishingEventIsNotDeliveredBackToItsSender() {
+        fishingEventSharer.registerSharedFishingEventListener(a, listener(heardByA));
+        fishingEventSharer.registerSharedFishingEventListener(b, listener(heardByB));
         network.addTie(a, b);
         network.addTie(b, a);
 
-        haulSharer.receive(haulBy(a));
+        fishingEventSharer.receive(fishingEventBy(a));
 
         assertThat(heardByA).isEmpty();
         assertThat(heardByB).hasSize(1);
     }
 
     @Test
-    void skipsARecipientWithNoSharedHaulListener() {
+    void skipsARecipientWithNoSharedFishingEventListener() {
         network.addTie(a, b);
 
-        haulSharer.receive(haulBy(a));
+        fishingEventSharer.receive(fishingEventBy(a));
     }
 
     @Test
     void deliversNothingWithoutTies() {
-        haulSharer.registerSharedHaulListener(a, listener(heardByA));
-        haulSharer.registerSharedHaulListener(b, listener(heardByB));
+        fishingEventSharer.registerSharedFishingEventListener(a, listener(heardByA));
+        fishingEventSharer.registerSharedFishingEventListener(b, listener(heardByB));
 
-        haulSharer.receive(haulBy(a));
+        fishingEventSharer.receive(fishingEventBy(a));
 
         assertThat(heardByA).isEmpty();
         assertThat(heardByB).isEmpty();
     }
 
     @Test
-    void rejectsASecondSharedHaulListenerForTheSameVessel() {
-        haulSharer.registerSharedHaulListener(a, listener(heardByA));
+    void rejectsASecondSharedFishingEventListenerForTheSameVessel() {
+        fishingEventSharer.registerSharedFishingEventListener(a, listener(heardByA));
 
-        assertThatThrownBy(() -> haulSharer.registerSharedHaulListener(a, listener(heardByB)))
+        assertThatThrownBy(
+            () -> fishingEventSharer.registerSharedFishingEventListener(a, listener(heardByB))
+        )
             .isInstanceOf(IllegalStateException.class);
     }
 }
