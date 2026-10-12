@@ -26,12 +26,19 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.NonNull;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
+import uk.ac.ox.poseidon.core.events.SimpleListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static lombok.AccessLevel.NONE;
 
 /**
  * A single fishing trip: the span between a vessel leaving its current cell with a destination in
@@ -52,6 +59,9 @@ public class Trip {
     private final @NonNull Int2D origin;
     private final @NonNull LocalDateTime startDateTime;
     private final Account account = new Account();
+    /** The fishing events of this trip, in the order they happened. */
+    @Getter(NONE)
+    private final List<FishingEvent> fishingEvents = new ArrayList<>();
 
     private @NonNull Int2D destination;
     private LocalDateTime endDateTime;
@@ -67,6 +77,9 @@ public class Trip {
         this.vessel = vessel;
         this.destination = checkInGrid(destination);
         this.eventManager = new ForwardingEventManager(vessel.getEventManager());
+        // Registered on the trip's own event manager, which delivers to its listeners before
+        // forwarding to the vessel's, so the record is complete before vessel-level listeners react.
+        this.eventManager.addListener(new SimpleListener<>(FishingEvent.class, fishingEvents::add));
         this.origin = vessel.getCell();
         this.startDateTime = vessel.getSchedule().getDateTime();
         this.eventManager.broadcast(new TripStartEvent(this));
@@ -89,6 +102,11 @@ public class Trip {
     public void endTrip() {
         this.endDateTime = vessel.getSchedule().getDateTime();
         this.eventManager.broadcast(new TripEndEvent(this));
+    }
+
+    /** @return an unmodifiable view of the fishing events of this trip, in the order they happened */
+    public List<FishingEvent> getFishingEvents() {
+        return Collections.unmodifiableList(fishingEvents);
     }
 
     /** Redirects the trip back towards where it started. */

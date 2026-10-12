@@ -25,12 +25,19 @@ package uk.ac.ox.poseidon.agents.trips;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
+import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
+import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.agents.tasks.fishing.FishingOutcome;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.core.events.SimpleEventManager;
+import uk.ac.ox.poseidon.core.events.SimpleListener;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -45,6 +52,14 @@ class TripTest {
         final Int2D cell,
         final ModelGrid modelGrid
     ) {
+        return newVessel(cell, modelGrid, mock(EventManager.class));
+    }
+
+    private static Vessel newVessel(
+        final Int2D cell,
+        final ModelGrid modelGrid,
+        final EventManager vesselEventManager
+    ) {
         final Vessel vessel = mock(Vessel.class);
         final VesselField vesselField = mock(VesselField.class);
         final TemporalSchedule schedule = mock(TemporalSchedule.class);
@@ -53,7 +68,7 @@ class TripTest {
         when(vessel.getCell()).thenReturn(cell);
         when(vessel.getSchedule()).thenReturn(schedule);
         when(schedule.getDateTime()).thenReturn(LocalDateTime.now());
-        when(vessel.getEventManager()).thenReturn(mock(EventManager.class));
+        when(vessel.getEventManager()).thenReturn(vesselEventManager);
         return vessel;
     }
 
@@ -92,5 +107,48 @@ class TripTest {
         trip.setDestinationToTripOrigin();
 
         assertThat(trip.getDestination()).isEqualTo(origin);
+    }
+
+    @Test
+    void recordsFishingEventsBroadcastOnItsEventManagerInOrder() {
+        final Trip trip = new Trip(newVessel(new Int2D(0, 0), mock(ModelGrid.class)), new Int2D(1, 1));
+        final FishingEvent first = newFishingEvent();
+        final FishingEvent second = newFishingEvent();
+
+        trip.getEventManager().broadcast(first);
+        trip.getEventManager().broadcast(second);
+
+        assertThat(trip.getFishingEvents()).containsExactly(first, second);
+    }
+
+    @Test
+    void recordsAFishingEventBeforeVesselListenersReceiveIt() {
+        final EventManager vesselEventManager = new SimpleEventManager();
+        final Trip trip = new Trip(
+            newVessel(new Int2D(0, 0), mock(ModelGrid.class), vesselEventManager),
+            new Int2D(1, 1)
+        );
+        final List<List<FishingEvent>> recordedWhenReceived = new ArrayList<>();
+        vesselEventManager.addListener(new SimpleListener<>(
+            FishingEvent.class,
+            event -> recordedWhenReceived.add(List.copyOf(trip.getFishingEvents()))
+        ));
+        final FishingEvent fishingEvent = newFishingEvent();
+
+        trip.getEventManager().broadcast(fishingEvent);
+
+        assertThat(recordedWhenReceived).containsExactly(List.of(fishingEvent));
+    }
+
+    @Test
+    void fishingEventsCannotBeModifiedFromOutside() {
+        final Trip trip = new Trip(newVessel(new Int2D(0, 0), mock(ModelGrid.class)), new Int2D(1, 1));
+
+        assertThatThrownBy(() -> trip.getFishingEvents().add(newFishingEvent()))
+            .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    private static FishingEvent newFishingEvent() {
+        return new FishingEvent(mock(ExtendedFishingAction.class), mock(FishingOutcome.class));
     }
 }
