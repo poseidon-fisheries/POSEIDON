@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
-import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -51,7 +50,6 @@ class VesselTest {
         final Vessel vessel = new Vessel(
             schedule,
             mock(EventManager.class),
-            mock(Behaviour.class),
             "vessel",
             vesselField,
             mock(PortGrid.class),

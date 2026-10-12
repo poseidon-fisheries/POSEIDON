@@ -47,7 +47,7 @@ class AgentTest {
     private final TemporalSchedule schedule = new TemporalSchedule(START);
     private final SimState simState = new SimState(0, schedule) {};
     private final RecordingBehaviour behaviour = new RecordingBehaviour();
-    private final Agent agent = new Agent(schedule, mock(EventManager.class), behaviour);
+    private final Agent agent = new Agent(schedule, mock(EventManager.class));
 
     /**
      * A behaviour that records when it is stepped; active while {@link #active}. With a
@@ -82,10 +82,14 @@ class AgentTest {
         }
     }
 
-    /** Keeps the schedule from running out of events, which would stop it. */
+    /**
+     * Keeps the schedule from running out of events, which would stop it, and gives the agent its
+     * behaviour, inactive until a test activates it.
+     */
     @BeforeEach
-    void keepTheScheduleGoing() {
+    void setUp() {
         schedule.scheduleRepeating(_ -> { }, 0, 1.0);
+        agent.setBehaviour(behaviour);
     }
 
     private void activate() {
@@ -98,6 +102,11 @@ class AgentTest {
 
     private void stepFor(final Duration duration) {
         schedule.stepFor(simState, duration);
+    }
+
+    @Test
+    void aNewAgentIsInactive() {
+        assertThat(new Agent(schedule, mock(EventManager.class)).isActive()).isFalse();
     }
 
     @Test
@@ -202,9 +211,9 @@ class AgentTest {
         }
         final KeepsRunningBehaviour keepsRunningBehaviour = new KeepsRunningBehaviour();
         final Agent keepsRunningAgent =
-            new Agent(schedule, mock(EventManager.class), keepsRunningBehaviour);
+            new Agent(schedule, mock(EventManager.class));
         keepsRunningBehaviour.agent = keepsRunningAgent;
-        keepsRunningAgent.mutate(() -> { });
+        keepsRunningAgent.setBehaviour(keepsRunningBehaviour);
         stepFor(ofSeconds(2));
         assertThatThrownBy(() -> stepFor(ofHours(2)))
             .isInstanceOf(NullPointerException.class)

@@ -31,7 +31,6 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
-import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
@@ -76,7 +75,6 @@ public class Vessel extends Agent implements Oriented2D {
     /**
      * @param schedule      the simulation's temporal schedule
      * @param eventManager  the event manager this vessel broadcasts on
-     * @param nextBehaviour the vessel's initial behaviour
      * @param id            the vessel's identifying id
      * @param vesselField   the field the vessel moves within
      * @param portGrid      the grid of ports the vessel can dock at
@@ -85,13 +83,12 @@ public class Vessel extends Agent implements Oriented2D {
     public Vessel(
         @NonNull final TemporalSchedule schedule,
         @NonNull final EventManager eventManager,
-        @NonNull final Behaviour nextBehaviour,
         @NonNull final String id,
         @NonNull final VesselField vesselField,
         @NonNull final PortGrid portGrid,
         @NonNull final MarketGrid marketGrid
     ) {
-        super(schedule, eventManager, nextBehaviour);
+        super(schedule, eventManager);
         this.id = id;
         this.vesselField = vesselField;
         this.portGrid = portGrid;

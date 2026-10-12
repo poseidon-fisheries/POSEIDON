@@ -29,7 +29,6 @@ import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.tasks.Behaviour;
-import uk.ac.ox.poseidon.agents.tasks.InactiveBehaviour;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
@@ -82,7 +81,6 @@ public class VesselCreator implements Steppable {
             final Vessel vessel = new Vessel(
                 temporalSchedule,
                 new ForwardingEventManager(eventManager),
-                InactiveBehaviour.INACTIVE_BEHAVIOUR,
                 vesselIdSupplier.get(),
                 vesselField,
                 portGrid,

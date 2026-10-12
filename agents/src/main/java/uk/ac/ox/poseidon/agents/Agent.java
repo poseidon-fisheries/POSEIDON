@@ -28,6 +28,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.tasks.Behaviour;
+import uk.ac.ox.poseidon.agents.tasks.InactiveBehaviour;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
@@ -68,7 +69,8 @@ public class Agent {
     private final @NonNull TemporalSchedule schedule;
     private final @NonNull EventManager eventManager;
 
-    private @NonNull Behaviour behaviour;
+    /** Starts as {@link InactiveBehaviour}, so a new agent is inactive; see {@link #setBehaviour}. */
+    private @NonNull Behaviour behaviour = InactiveBehaviour.INACTIVE_BEHAVIOUR;
 
     @Getter(NONE)
     private final Queue<Runnable> mutationQueue = new LinkedList<>();
@@ -89,9 +91,12 @@ public class Agent {
     private boolean stepPending;
 
     /**
+     * Creates an inactive agent, with no behaviour yet. It starts stepping once it becomes active,
+     * through {@link #mutate}: an agent never starts active, so an active agent always has a step
+     * pending.
+     *
      * @param schedule     the schedule this agent reschedules itself on after each step
      * @param eventManager the event manager this agent's behaviours report through
-     * @param behaviour    the agent's initial behaviour
      */
     @SuppressFBWarnings(
         value = "EI2",
@@ -99,12 +104,10 @@ public class Agent {
     )
     public Agent(
         @NonNull final TemporalSchedule schedule,
-        @NonNull final EventManager eventManager,
-        @NonNull final Behaviour behaviour
+        @NonNull final EventManager eventManager
     ) {
         this.schedule = schedule;
         this.eventManager = eventManager;
-        this.behaviour = behaviour;
     }
 
     /**
