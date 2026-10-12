@@ -31,19 +31,20 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class CurrentTripDurationTest {
 
     @Test
-    void isZeroWhenNoTripIsInProgress() {
+    void throwsWhenNoTripIsInProgress() {
         final Vessel vessel = mock(Vessel.class);
         when(vessel.getCurrentTrip()).thenReturn(null);
 
         final CurrentTripDuration currentTripDuration = new CurrentTripDuration(vessel);
 
-        assertEquals(Duration.ZERO, currentTripDuration.get());
+        assertThrows(IllegalStateException.class, currentTripDuration::get);
     }
 
     @Test

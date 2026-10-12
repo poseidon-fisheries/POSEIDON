@@ -29,9 +29,11 @@ import uk.ac.ox.poseidon.core.providers.Provider;
 
 import java.time.Duration;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
- * Provides how long a vessel's current trip has been running, or {@link Duration#ZERO} if it has
- * no current trip.
+ * Provides how long a vessel's current trip has been running; only checks made during a trip read
+ * it.
  */
 @RequiredArgsConstructor
 public class CurrentTripDuration implements Provider<Duration> {
@@ -39,15 +41,14 @@ public class CurrentTripDuration implements Provider<Duration> {
     private final Vessel vessel;
 
     /**
-     * @return the elapsed time since the current trip's start, or {@link Duration#ZERO} if there
-     * is no current trip
+     * @return the elapsed time since the current trip's start
+     * @throws IllegalStateException if the vessel is not on a trip
      */
     @Override
     public Duration get() {
         final Trip currentTrip = vessel.getCurrentTrip();
-        return currentTrip == null
-            ? Duration.ZERO
-            : Duration.between(currentTrip.getStartDateTime(), vessel.getSchedule().getDateTime());
+        checkState(currentTrip != null, "Vessel %s is not on a trip.", vessel.getId());
+        return Duration.between(currentTrip.getStartDateTime(), vessel.getSchedule().getDateTime());
     }
 
 }

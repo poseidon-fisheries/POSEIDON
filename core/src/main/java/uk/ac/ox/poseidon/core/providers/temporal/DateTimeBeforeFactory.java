@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -27,31 +27,29 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.time.LocalTime;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAmount;
+import java.util.function.Supplier;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link NextTimeAtProvider}, built via
- * {@link Factories#nextTimeAt(Factory...)}.
+ * A {@link RelativeScopeFactory} for a {@link DateTimeBefore}. Built via
+ * {@link Factories#dateTimeBefore(Factory, Factory)}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class NextTimeAtProviderFactory extends SimulationScopeFactory<NextTimeAtProvider> {
+public class DateTimeBeforeFactory<S extends Scope>
+    extends RelativeScopeFactory<S, DateTimeBefore> {
 
-    private List<Factory<? super SimulationScope, ? extends LocalTime>> times;
+    private Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime;
+    private Factory<? super S, ? extends Supplier<? extends TemporalAmount>> amountToSubtract;
 
     @Override
-    protected NextTimeAtProvider newInstance(final SimulationScope scope) {
-        return new NextTimeAtProvider(
-            scope.getSimulation().getTemporalSchedule(),
-            times.stream()
-                .map(t -> t.get(scope))
-                .toArray(LocalTime[]::new)
-        );
+    protected DateTimeBefore newInstance(final S scope) {
+        return new DateTimeBefore(referenceDateTime.get(scope), amountToSubtract.get(scope));
     }
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,43 +20,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.time;
+package uk.ac.ox.poseidon.core.providers.temporal;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAmount;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
- * A {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link LocalDateTime} computed as
- * the resolved reference date-time minus a resolved {@link TemporalAmount}. Built via
- * {@link Factories#dateTimeBefore(Factory, Factory)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link NextOccurrenceOfTimeOfDay}, built via
+ * {@link Factories Factories.nextOccurrenceOf(...)/Factories.nextOccurrenceAfter(...)}.
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DateTimeBeforeFactory<S extends Scope> extends RelativeDateTimeFactory<S> {
+public class NextOccurrenceOfTimeOfDayFactory<S extends Scope>
+    extends RelativeScopeFactory<S, NextOccurrenceOfTimeOfDay> {
 
-    /**
-     * @param referenceDateTime factory for the date-time to subtract from
-     * @param amountToSubtract  factory for the amount to subtract
-     */
-    public DateTimeBeforeFactory(
-        final Factory<? super S, ? extends LocalDateTime> referenceDateTime,
-        final Factory<? super S, ? extends TemporalAmount> amountToSubtract
-    ) {
-        super(referenceDateTime, amountToSubtract);
-    }
+    private Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime;
+    private List<Factory<? super S, ? extends LocalTime>> times;
 
     @Override
-    protected LocalDateTime operation(
-        final LocalDateTime referenceDateTime,
-        final TemporalAmount amountToSubtract
-    ) {
-        return referenceDateTime.minus(amountToSubtract);
+    protected NextOccurrenceOfTimeOfDay newInstance(final S scope) {
+        return new NextOccurrenceOfTimeOfDay(
+            referenceDateTime.get(scope),
+            times.stream()
+                .map(time -> time.get(scope))
+                .toArray(LocalTime[]::new)
+        );
     }
 }

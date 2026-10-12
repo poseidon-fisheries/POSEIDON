@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,43 +20,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.time;
+package uk.ac.ox.poseidon.core.providers.temporal;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
+import java.util.function.Supplier;
 
 /**
- * A {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link LocalDateTime} computed as
- * the resolved reference date-time plus a resolved {@link TemporalAmount}. Built via
+ * A {@link RelativeScopeFactory} for a {@link DateTimeAfter}. Built via
  * {@link Factories#dateTimeAfter(Factory, Factory)}.
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DateTimeAfterFactory<S extends Scope> extends RelativeDateTimeFactory<S> {
+public class DateTimeAfterFactory<S extends Scope>
+    extends RelativeScopeFactory<S, DateTimeAfter> {
 
-    /**
-     * @param referenceDateTime factory for the date-time to add to
-     * @param amountToAdd       factory for the amount to add
-     */
-    public DateTimeAfterFactory(
-        final Factory<? super S, ? extends LocalDateTime> referenceDateTime,
-        final Factory<? super S, ? extends TemporalAmount> amountToAdd
-    ) {
-        super(referenceDateTime, amountToAdd);
-    }
+    private Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime;
+    private Factory<? super S, ? extends Supplier<? extends TemporalAmount>> amountToAdd;
 
     @Override
-    protected LocalDateTime operation(
-        final LocalDateTime referenceDateTime,
-        final TemporalAmount amountToAdd
-    ) {
-        return referenceDateTime.plus(amountToAdd);
+    protected DateTimeAfter newInstance(final S scope) {
+        return new DateTimeAfter(referenceDateTime.get(scope), amountToAdd.get(scope));
     }
 }

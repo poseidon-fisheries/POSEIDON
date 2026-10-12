@@ -23,12 +23,18 @@
 package uk.ac.ox.poseidon.core.providers.temporal;
 
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.time.DurationFactory;
+import uk.ac.ox.poseidon.core.time.PeriodFactory;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAmount;
 import java.util.List;
 import java.util.function.Supplier;
+
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 /**
  * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that read the simulation's
@@ -84,28 +90,125 @@ public class Factories {
     }
 
     /**
-     * @param times the candidate times of day the resulting provider picks the next of
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link NextTimeAtProvider}
-     * @see NextTimeAtProvider
+     * @param times the times of day
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link NextOccurrenceOfTimeOfDay} of the given times strictly after the current date-time
+     * @see NextOccurrenceOfTimeOfDay
      */
     @SafeVarargs
-    public static NextTimeAtProviderFactory nextTimeAt(
+    public static NextOccurrenceOfTimeOfDayFactory<SimulationScope> nextOccurrenceOf(
         final Factory<? super SimulationScope, ? extends LocalTime>... times
     ) {
-        return new NextTimeAtProviderFactory(List.of(times));
+        return new NextOccurrenceOfTimeOfDayFactory<>(currentDateTime(), List.of(times));
     }
 
     /**
-     * @param referenceDateTime factory for the date-time the resulting provider computes the
-     *                          duration until; must resolve to a value after the current time
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link DurationUntil}
+     * @param referenceDateTime supplies the date-time the occurrence must be strictly after
+     * @param times             the times of day
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link NextOccurrenceOfTimeOfDay} of the given times strictly after the reference
+     * @see NextOccurrenceOfTimeOfDay
+     */
+    @SafeVarargs
+    public static <S extends Scope> NextOccurrenceOfTimeOfDayFactory<S> nextOccurrenceAfter(
+        final Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime,
+        final Factory<? super S, ? extends LocalTime>... times
+    ) {
+        return new NextOccurrenceOfTimeOfDayFactory<>(referenceDateTime, List.of(times));
+    }
+
+    /**
+     * @param referenceDateTime supplies the date-time to compute the time left until; the result is
+     *                          negative once it has passed
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DurationUntil}
+     * from the current date-time
      * @see DurationUntil
      */
-    public static DurationUntilFactory durationUntil(
-        final Factory<? super SimulationScope, ? extends Supplier<LocalDateTime>> referenceDateTime
+    public static <S extends SimulationScope> DurationUntilFactory<S> durationUntil(
+        final Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime
     ) {
-        return new DurationUntilFactory(referenceDateTime);
+        return new DurationUntilFactory<>(currentDateTime(), referenceDateTime);
+    }
+
+    /**
+     * @param referenceDateTime supplies the date-time to add to
+     * @param amountToAdd       supplies the amount to add
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateTimeAfter}
+     * @see DateTimeAfter
+     */
+    public static <S extends Scope> DateTimeAfterFactory<S> dateTimeAfter(
+        final Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime,
+        final Factory<? super S, ? extends Supplier<? extends TemporalAmount>> amountToAdd
+    ) {
+        return new DateTimeAfterFactory<>(referenceDateTime, amountToAdd);
+    }
+
+    /**
+     * @param referenceDateTime supplies the date-time to add to
+     * @param amountToAdd       the amount to add
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateTimeAfter}
+     * over a constant amount
+     * @see DateTimeAfter
+     */
+    public static <S extends Scope> DateTimeAfterFactory<S> dateTimeAfter(
+        final Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime,
+        final DurationFactory amountToAdd
+    ) {
+        return dateTimeAfter(referenceDateTime, constant(amountToAdd));
+    }
+
+    /**
+     * @param referenceDateTime supplies the date-time to add to
+     * @param amountToAdd       the amount to add
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateTimeAfter}
+     * over a constant amount
+     * @see DateTimeAfter
+     */
+    public static <S extends Scope> DateTimeAfterFactory<S> dateTimeAfter(
+        final Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime,
+        final PeriodFactory amountToAdd
+    ) {
+        return dateTimeAfter(referenceDateTime, constant(amountToAdd));
+    }
+
+    /**
+     * @param referenceDateTime supplies the date-time to subtract from
+     * @param amountToSubtract  supplies the amount to subtract
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateTimeBefore}
+     * @see DateTimeBefore
+     */
+    public static <S extends Scope> DateTimeBeforeFactory<S> dateTimeBefore(
+        final Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime,
+        final Factory<? super S, ? extends Supplier<? extends TemporalAmount>> amountToSubtract
+    ) {
+        return new DateTimeBeforeFactory<>(referenceDateTime, amountToSubtract);
+    }
+
+    /**
+     * @param referenceDateTime supplies the date-time to subtract from
+     * @param amountToSubtract  the amount to subtract
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateTimeBefore}
+     * over a constant amount
+     * @see DateTimeBefore
+     */
+    public static <S extends Scope> DateTimeBeforeFactory<S> dateTimeBefore(
+        final Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime,
+        final DurationFactory amountToSubtract
+    ) {
+        return dateTimeBefore(referenceDateTime, constant(amountToSubtract));
+    }
+
+    /**
+     * @param referenceDateTime supplies the date-time to subtract from
+     * @param amountToSubtract  the amount to subtract
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateTimeBefore}
+     * over a constant amount
+     * @see DateTimeBefore
+     */
+    public static <S extends Scope> DateTimeBeforeFactory<S> dateTimeBefore(
+        final Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime,
+        final PeriodFactory amountToSubtract
+    ) {
+        return dateTimeBefore(referenceDateTime, constant(amountToSubtract));
     }
 }

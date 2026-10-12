@@ -27,30 +27,27 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link DurationUntil}, built via
+ * A {@link RelativeScopeFactory} counterpart of {@link DurationUntil}, built via
  * {@link Factories#durationUntil(Factory)}.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DurationUntilFactory extends SimulationScopeFactory<DurationUntil> {
+public class DurationUntilFactory<S extends Scope> extends RelativeScopeFactory<S, DurationUntil> {
 
-    private Factory<? super SimulationScope, ? extends Supplier<LocalDateTime>> referenceDateTime;
+    private Factory<? super S, ? extends Supplier<LocalDateTime>> currentDateTime;
+    private Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime;
 
     @Override
-    protected DurationUntil newInstance(final SimulationScope scope) {
-        return new DurationUntil(
-            scope.getSimulation().getTemporalSchedule(),
-            referenceDateTime.get(scope)
-        );
+    protected DurationUntil newInstance(final S scope) {
+        return new DurationUntil(currentDateTime.get(scope), referenceDateTime.get(scope));
     }
-
 }

@@ -22,38 +22,28 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.Provider;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkState;
-
 /**
- * A {@link Provider} that returns the {@link Duration} between the simulation's current date-time
- * and a reference date-time supplied at construction, recomputed on every call. Throws if the
- * reference date-time is not after the current one. Built via
- * {@link Factories#durationUntil(Factory)} in this package.
+ * A {@link Provider} of the time left from the current date-time until a reference date-time, both
+ * read anew on every call: negative once the reference has passed, so a deadline that has gone by
+ * leaves no time. Built via {@link Factories#durationUntil(uk.ac.ox.poseidon.core.Factory)} in this
+ * package.
  */
 @RequiredArgsConstructor
 public class DurationUntil implements Provider<Duration> {
 
-    private final TemporalSchedule schedule;
-    private final Supplier<? extends LocalDateTime> referenceDateTimeSupplier;
+    private final @NonNull Supplier<? extends LocalDateTime> currentDateTime;
+    private final @NonNull Supplier<? extends LocalDateTime> referenceDateTime;
 
     @Override
     public Duration get() {
-        final LocalDateTime currentDateTime = schedule.getDateTime();
-        final LocalDateTime referenceDateTime = referenceDateTimeSupplier.get();
-        checkState(
-            referenceDateTime.isAfter(currentDateTime),
-            "Reference date-time (%s) must be after current date-time (%s)",
-            referenceDateTime,
-            currentDateTime
-        );
-        return Duration.between(currentDateTime, referenceDateTime);
+        return Duration.between(currentDateTime.get(), referenceDateTime.get());
     }
 }

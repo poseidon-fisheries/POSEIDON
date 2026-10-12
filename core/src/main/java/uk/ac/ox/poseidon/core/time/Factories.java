@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.core.time;
 
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 import java.time.Duration;
@@ -35,8 +34,9 @@ import java.time.temporal.TemporalAmount;
 import static java.time.Period.*;
 
 /**
- * Factories for fixed dates, times, durations, and periods, and for
- * {@link java.time.LocalDateTime}s computed relative to a reference point.
+ * Factories for fixed dates, times, durations, and periods, and for a
+ * {@link java.time.LocalDateTime} computed relative to the simulation's start. Date-times that
+ * move with the simulation are in {@link uk.ac.ox.poseidon.core.providers.temporal.Factories}.
  */
 public class Factories {
 
@@ -203,34 +203,6 @@ public class Factories {
      */
     public static DateFactory date(final LocalDate date) {
         return date(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-    }
-
-    /**
-     * @param referenceDateTime factory for the date-time to subtract from
-     * @param temporalAmount    factory for the amount to subtract
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-     * {@link DateTimeBeforeFactory} over the resolved reference and amount
-     * @see DateTimeBeforeFactory
-     */
-    public static <S extends Scope> DateTimeBeforeFactory<S> dateTimeBefore(
-        final Factory<? super S, ? extends LocalDateTime> referenceDateTime,
-        final Factory<? super S, ? extends TemporalAmount> temporalAmount
-    ) {
-        return new DateTimeBeforeFactory<>(referenceDateTime, temporalAmount);
-    }
-
-    /**
-     * @param referenceDateTime factory for the date-time to add to
-     * @param amountToAdd       factory for the amount to add
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-     * {@link DateTimeAfterFactory} over the resolved reference and amount
-     * @see DateTimeAfterFactory
-     */
-    public static <S extends Scope> DateTimeAfterFactory<S> dateTimeAfter(
-        final Factory<? super S, ? extends LocalDateTime> referenceDateTime,
-        final Factory<? super S, ? extends TemporalAmount> amountToAdd
-    ) {
-        return new DateTimeAfterFactory<>(referenceDateTime, amountToAdd);
     }
 
     /**

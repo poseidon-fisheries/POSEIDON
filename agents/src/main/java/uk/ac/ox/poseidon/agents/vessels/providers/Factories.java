@@ -78,6 +78,14 @@ public class Factories {
     }
 
     /**
+     * @return a {@link VesselScope}-relative factory for a {@link CurrentTripStartDateTime}
+     * @see CurrentTripStartDateTime
+     */
+    public static CurrentTripStartDateTimeFactory currentTripStartDateTime() {
+        return new CurrentTripStartDateTimeFactory();
+    }
+
+    /**
      * @return a {@link VesselScope}-relative factory for a {@link VesselEventManager}
      * @see VesselEventManager
      */
