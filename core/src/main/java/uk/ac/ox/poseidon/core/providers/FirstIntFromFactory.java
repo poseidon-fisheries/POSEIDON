@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.providers.constant.ConstantIntProvider;
+import uk.ac.ox.poseidon.core.providers.constant.ConstantInt;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.IntSupplier;
@@ -37,7 +37,7 @@ import java.util.function.IntSupplier;
  * A {@link RelativeScopeFactory} that resolves the given delegate {@link IntSupplier} once, when
  * built, and returns an {@link IntProvider} that keeps handing out that same first-resolved value
  * thereafter — a snapshot, not a live pass-through to the delegate. No separate plain component
- * class here: the produced value is a {@link ConstantIntProvider} wrapping the snapshot, built via
+ * class here: the produced value is a {@link ConstantInt} wrapping the snapshot, built via
  * {@link Factories#firstIntFrom(Factory)}.
  */
 @Data
@@ -51,6 +51,6 @@ public class FirstIntFromFactory<S extends Scope>
 
     @Override
     protected IntProvider newInstance(final S scope) {
-        return new ConstantIntProvider(delegate.get(scope).getAsInt());
+        return new ConstantInt(delegate.get(scope).getAsInt());
     }
 }

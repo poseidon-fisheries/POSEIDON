@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.core.providers;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.providers.constant.ConstantProvider;
+import uk.ac.ox.poseidon.core.providers.constant.Constant;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -83,7 +83,7 @@ class FirstValueFromFactoryTest {
             );
 
         assertThat(factory.get(Scope.GLOBAL_SCOPE))
-            .isInstanceOf(ConstantProvider.class)
+            .isInstanceOf(Constant.class)
             .extracting(Provider::get)
             .isEqualTo("hello");
     }

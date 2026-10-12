@@ -40,59 +40,47 @@ public class Factories {
 
     /**
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link CurrentDateProvider}
-     * @see CurrentDateProvider
+     * a {@link CurrentDate}
+     * @see CurrentDate
      */
-    public static CurrentDateProviderFactory currentDate() {
-        return new CurrentDateProviderFactory();
+    public static CurrentDateFactory currentDate() {
+        return new CurrentDateFactory();
     }
 
     /**
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link CurrentYearProvider}
-     * @see CurrentYearProvider
+     * a {@link CurrentYear}
+     * @see CurrentYear
      */
-    public static CurrentYearProviderFactory currentYear() {
-        return new CurrentYearProviderFactory();
+    public static CurrentYearFactory currentYear() {
+        return new CurrentYearFactory();
     }
 
     /**
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link CurrentDateTimeProvider}
-     * @see CurrentDateTimeProvider
+     * a {@link CurrentDateTime}
+     * @see CurrentDateTime
      */
-    public static CurrentDateTimeProviderFactory currentDateTime() {
-        return new CurrentDateTimeProviderFactory();
+    public static CurrentDateTimeFactory currentDateTime() {
+        return new CurrentDateTimeFactory();
     }
 
     /**
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link CurrentDayOfWeekProvider}
-     * @see CurrentDayOfWeekProvider
+     * a {@link CurrentDayOfWeek}
+     * @see CurrentDayOfWeek
      */
-    public static CurrentDayOfWeekProviderFactory currentDayOfWeek() {
-        return new CurrentDayOfWeekProviderFactory();
+    public static CurrentDayOfWeekFactory currentDayOfWeek() {
+        return new CurrentDayOfWeekFactory();
     }
 
     /**
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link CurrentTimeProvider}
-     * @see CurrentTimeProvider
+     * a {@link CurrentTime}
+     * @see CurrentTime
      */
-    public static CurrentTimeProviderFactory currentTime() {
-        return new CurrentTimeProviderFactory();
-    }
-
-    /**
-     * @param time the time of day the resulting provider will resolve to on the following day
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link NextDayAtTimeProvider}
-     * @see NextDayAtTimeProvider
-     */
-    public static NextDayAtTimeProviderFactory nextDayAtTime(
-        final Factory<? super SimulationScope, ? extends LocalTime> time
-    ) {
-        return new NextDayAtTimeProviderFactory(time);
+    public static CurrentTimeFactory currentTime() {
+        return new CurrentTimeFactory();
     }
 
     /**
@@ -112,12 +100,12 @@ public class Factories {
      * @param referenceDateTime factory for the date-time the resulting provider computes the
      *                          duration until; must resolve to a value after the current time
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link DurationUntilProvider}
-     * @see DurationUntilProvider
+     * a {@link DurationUntil}
+     * @see DurationUntil
      */
-    public static DurationUntilProviderFactory durationUntil(
+    public static DurationUntilFactory durationUntil(
         final Factory<? super SimulationScope, ? extends Supplier<LocalDateTime>> referenceDateTime
     ) {
-        return new DurationUntilProviderFactory(referenceDateTime);
+        return new DurationUntilFactory(referenceDateTime);
     }
 }

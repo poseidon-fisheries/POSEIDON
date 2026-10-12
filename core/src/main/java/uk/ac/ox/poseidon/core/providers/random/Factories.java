@@ -34,61 +34,61 @@ public class Factories {
 
     /**
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link RandomBooleanProvider} with an even (0.5) probability of returning {@code true}
-     * @see RandomBooleanProvider
+     * a {@link RandomBoolean} with an even (0.5) probability of returning {@code true}
+     * @see RandomBoolean
      */
-    public static RandomBooleanProviderFactory randomBoolean() {
-        return new RandomBooleanProviderFactory(0.5);
+    public static RandomBooleanFactory randomBoolean() {
+        return new RandomBooleanFactory(0.5);
     }
 
     /**
      * @param probability the probability, in {@code [0, 1]}, that the resulting provider returns
      *                    {@code true}
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link RandomBooleanProvider} with the given probability
-     * @see RandomBooleanProvider
+     * a {@link RandomBoolean} with the given probability
+     * @see RandomBoolean
      */
-    public static RandomBooleanProviderFactory randomBoolean(final double probability) {
-        return new RandomBooleanProviderFactory(probability);
+    public static RandomBooleanFactory randomBoolean(final double probability) {
+        return new RandomBooleanFactory(probability);
     }
 
     /**
      * @param minimum inclusive lower bound of the returned values
      * @param maximum exclusive upper bound of the returned values
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link RandomDoubleProvider} uniformly distributed over the range
-     * @see RandomDoubleProvider
+     * a {@link RandomDouble} uniformly distributed over the range
+     * @see RandomDouble
      */
-    public static RandomDoubleProviderFactory randomDouble(
+    public static RandomDoubleFactory randomDouble(
         final double minimum,
         final double maximum
     ) {
-        return new RandomDoubleProviderFactory(minimum, maximum);
+        return new RandomDoubleFactory(minimum, maximum);
     }
 
     /**
      * @param minimum inclusive lower bound of the returned values
      * @param maximum inclusive upper bound of the returned values
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link RandomIntProvider} uniformly distributed over the range
-     * @see RandomIntProvider
+     * a {@link RandomInt} uniformly distributed over the range
+     * @see RandomInt
      */
-    public static RandomIntProviderFactory randomInt(
+    public static RandomIntFactory randomInt(
         final int minimum,
         final int maximum
     ) {
-        return new RandomIntProviderFactory(minimum, maximum);
+        return new RandomIntFactory(minimum, maximum);
     }
 
     /**
      * @param mean the mean of the Poisson distribution the resulting provider draws from
      * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link RandomPoissonProvider} with the given mean
-     * @see RandomPoissonProvider
+     * a {@link RandomPoisson} with the given mean
+     * @see RandomPoisson
      */
-    public static RandomPoissonProviderFactory randomPoisson(
+    public static RandomPoissonFactory randomPoisson(
         final double mean
     ) {
-        return new RandomPoissonProviderFactory(mean);
+        return new RandomPoissonFactory(mean);
     }
 }
