@@ -78,7 +78,8 @@ public class Trip {
         this.destination = checkInGrid(destination);
         this.eventManager = new ForwardingEventManager(vessel.getEventManager());
         // Registered on the trip's own event manager, which delivers to its listeners before
-        // forwarding to the vessel's, so the record is complete before vessel-level listeners react.
+        // forwarding to the vessel's, so the record is complete before vessel-level listeners
+        // react.
         this.eventManager.addListener(new SimpleListener<>(FishingEvent.class, fishingEvents::add));
         this.origin = vessel.getCell();
         this.startDateTime = vessel.getSchedule().getDateTime();
@@ -104,7 +105,9 @@ public class Trip {
         this.eventManager.broadcast(new TripEndEvent(this));
     }
 
-    /** @return an unmodifiable view of the fishing events of this trip, in the order they happened */
+    /**
+     * @return an unmodifiable view of the fishing events of this trip, in the order they happened
+     */
     public List<FishingEvent> getFishingEvents() {
         return Collections.unmodifiableList(fishingEvents);
     }

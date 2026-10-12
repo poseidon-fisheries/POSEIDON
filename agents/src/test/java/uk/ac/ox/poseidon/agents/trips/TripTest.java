@@ -111,7 +111,8 @@ class TripTest {
 
     @Test
     void recordsFishingEventsBroadcastOnItsEventManagerInOrder() {
-        final Trip trip = new Trip(newVessel(new Int2D(0, 0), mock(ModelGrid.class)), new Int2D(1, 1));
+        final Trip trip =
+            new Trip(newVessel(new Int2D(0, 0), mock(ModelGrid.class)), new Int2D(1, 1));
         final FishingEvent first = newFishingEvent();
         final FishingEvent second = newFishingEvent();
 
@@ -142,7 +143,8 @@ class TripTest {
 
     @Test
     void fishingEventsCannotBeModifiedFromOutside() {
-        final Trip trip = new Trip(newVessel(new Int2D(0, 0), mock(ModelGrid.class)), new Int2D(1, 1));
+        final Trip trip =
+            new Trip(newVessel(new Int2D(0, 0), mock(ModelGrid.class)), new Int2D(1, 1));
 
         assertThatThrownBy(() -> trip.getFishingEvents().add(newFishingEvent()))
             .isInstanceOf(UnsupportedOperationException.class);
