@@ -112,6 +112,16 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
     @Singular
     private Map<String, String> dataMappings;
 
+    private Object getProperty(final String propertyName) {
+        try {
+            return PropertyUtils.getProperty(this, propertyName);
+        } catch (
+            final IllegalAccessException | InvocationTargetException | NoSuchMethodException e
+        ) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void setProperty(
         final String propertyName,
         final Object propertyValue
@@ -157,11 +167,23 @@ public class FleetFromVesselRegisterFactory extends SimulationScopeFactory<Fleet
             return __ -> null;
         } else {
             return vessel -> {
+                // The mapped values are set on this factory (and the factories it holds) only for
+                // the time of the call, then the original values are put back: factories cache
+                // their products by hash code, which depends on these values, and other
+                // simulations of the same scenario may be using this factory at the same time.
                 synchronized (this) {
-                    mappings.forEach((propertyName, columnName) ->
-                        setProperty(propertyName, valuesFromRow.get(columnName))
+                    final Map<String, Object> originalValues = new LinkedHashMap<>();
+                    mappings.keySet().forEach(propertyName ->
+                        originalValues.put(propertyName, getProperty(propertyName))
                     );
-                    return factory.get(new VesselScope(scope, vessel));
+                    try {
+                        mappings.forEach((propertyName, columnName) ->
+                            setProperty(propertyName, valuesFromRow.get(columnName))
+                        );
+                        return factory.get(new VesselScope(scope, vessel));
+                    } finally {
+                        originalValues.forEach(this::setProperty);
+                    }
                 }
             };
         }
