@@ -7,7 +7,7 @@ before touching code it covers:
 - `docs/agents/architecture.md` — the Factory + Scenario pattern, `*Factory` class shape.
 - `docs/agents/javadoc.md` — Javadoc conventions for the component/`Factory`/`Factories` triplet.
 - `docs/agents/lombok.md` — which Lombok annotation shape to use per class role.
-- `docs/agents/conceptual-correctness.md` — don't collapse distinct concepts for a smaller diff.
+- `docs/agents/conceptual-correctness.md` — don't collapse distinct concepts for a smaller diff; absence is not a default.
 
 ## What this is
 
