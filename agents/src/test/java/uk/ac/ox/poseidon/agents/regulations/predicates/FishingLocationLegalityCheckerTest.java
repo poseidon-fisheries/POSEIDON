@@ -33,6 +33,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.distance.CartesianDistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
@@ -119,6 +120,26 @@ class FishingLocationLegalityCheckerTest {
             assertThat(action.getStartDateTime()).isEqualTo(LocalDateTime.of(2013, 1, 19, 22, 30));
             assertThat(action.getEndDateTime()).isEqualTo(LocalDateTime.of(2013, 1, 19, 23, 30));
         });
+    }
+
+    @Test
+    void aCandidateInTheVesselsOwnCellIsReachedWithoutTravel() {
+        when(vessel.getCell()).thenReturn(CANDIDATE);
+        when(pathFinder.getPath(CANDIDATE, CANDIDATE))
+            .thenReturn(Optional.of(ImmutableList.of(CANDIDATE)));
+        final List<ExtendedFishingAction> checked = new ArrayList<>();
+        final LocalDateTime now = LocalDateTime.of(2013, 1, 19, 20, 30);
+        new FishingLocationLegalityChecker(
+            action -> checked.add(action),
+            pathFinder,
+            new CartesianDistanceCalculator(MODEL_GRID, 1.0),
+            TYPICAL_SET,
+            () -> now,
+            vessel
+        ).test(CANDIDATE);
+        assertThat(checked).singleElement().satisfies(action ->
+            assertThat(action.getStartDateTime()).isEqualTo(now)
+        );
     }
 
     @Test

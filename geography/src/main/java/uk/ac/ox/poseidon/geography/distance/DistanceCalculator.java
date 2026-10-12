@@ -114,21 +114,17 @@ public interface DistanceCalculator {
     }
 
     /**
-     * @param path              the waypoints to travel through in order, at least two
+     * @param path              the waypoints to travel through in order, at least one
      * @param cruisingSpeedInKph the constant travel speed, in km/h
      * @return the time to travel the full path at {@code cruisingSpeedInKph}, summing the
-     * distance of each leg
-     * @throws IllegalArgumentException if {@code path} has fewer than two waypoints
+     * distance of each leg; zero for a path of a single waypoint
+     * @throws IllegalArgumentException if {@code path} is empty
      */
     default Duration travelDuration(
         final List<? extends Number2D> path,
         final double cruisingSpeedInKph
     ) {
-        checkArgument(
-            path.size() > 1,
-            "Path must contain at least two cells but was: %s",
-            path
-        );
+        checkArgument(!path.isEmpty(), "Path must contain at least one cell but was empty");
         return travelDuration(distanceInKm(path), cruisingSpeedInKph);
     }
 
