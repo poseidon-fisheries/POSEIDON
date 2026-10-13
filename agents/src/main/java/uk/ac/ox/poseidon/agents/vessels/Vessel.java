@@ -259,6 +259,11 @@ public class Vessel extends Agent implements Oriented2D {
         this.currentTrip = new Trip(this, destination);
     }
 
+    /** Records the current trip's arrival in port; see {@link Trip#arriveInPort()}. */
+    public void arriveInPort() {
+        currentTrip.arriveInPort();
+    }
+
     /**
      * Ends the current trip, folding its account into the vessel's own, and keeps it as the
      * {@link #previousTrip}.

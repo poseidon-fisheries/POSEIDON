@@ -35,9 +35,11 @@ import uk.ac.ox.poseidon.core.events.SimpleListener;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -47,6 +49,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class TripTest {
+
+    private static final LocalDateTime START = LocalDateTime.of(2026, 1, 1, 6, 0);
 
     private static Vessel newVessel(
         final Int2D cell,
@@ -148,6 +152,91 @@ class TripTest {
 
         assertThatThrownBy(() -> trip.getFishingEvents().add(newFishingEvent()))
             .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void recordsWhenItArrivedInPort() {
+        final AtomicReference<LocalDateTime> now = new AtomicReference<>(START);
+        final Trip trip = newTripStartingAt(now);
+
+        now.set(START.plusHours(8));
+        trip.arriveInPort();
+
+        assertThat(trip.getPortArrivalDateTime()).isEqualTo(START.plusHours(8));
+    }
+
+    @Test
+    void cannotArriveInPortAwayFromAPort() {
+        final AtomicReference<LocalDateTime> now = new AtomicReference<>(START);
+        final Trip trip = newTripStartingAt(now);
+        when(trip.getVessel().isAtPort()).thenReturn(false);
+
+        assertThatThrownBy(trip::arriveInPort).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void cannotArriveInPortTwice() {
+        final AtomicReference<LocalDateTime> now = new AtomicReference<>(START);
+        final Trip trip = newTripStartingAt(now);
+        trip.arriveInPort();
+
+        assertThatThrownBy(trip::arriveInPort).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void timeAtSeaRunsToNowWhileAtSea() {
+        final AtomicReference<LocalDateTime> now = new AtomicReference<>(START);
+        final Trip trip = newTripStartingAt(now);
+
+        now.set(START.plusHours(5));
+
+        assertThat(trip.getTimeAtSea()).isEqualTo(Duration.ofHours(5));
+    }
+
+    @Test
+    void timeAtSeaStopsAtArrivalInPort() {
+        final AtomicReference<LocalDateTime> now = new AtomicReference<>(START);
+        final Trip trip = newTripStartingAt(now);
+        now.set(START.plusHours(8));
+        trip.arriveInPort();
+
+        now.set(START.plusHours(9));
+
+        assertThat(trip.getTimeAtSea()).isEqualTo(Duration.ofHours(8));
+    }
+
+    @Test
+    void totalDurationRunsToNowWhileTheTripIsOpen() {
+        final AtomicReference<LocalDateTime> now = new AtomicReference<>(START);
+        final Trip trip = newTripStartingAt(now);
+        now.set(START.plusHours(8));
+        trip.arriveInPort();
+
+        now.set(START.plusHours(9));
+
+        assertThat(trip.getTotalDuration()).isEqualTo(Duration.ofHours(9));
+    }
+
+    @Test
+    void totalDurationRunsToTheEndOfTheTrip() {
+        final AtomicReference<LocalDateTime> now = new AtomicReference<>(START);
+        final Trip trip = newTripStartingAt(now);
+        now.set(START.plusHours(8));
+        trip.arriveInPort();
+        now.set(START.plusHours(9));
+        trip.endTrip();
+
+        now.set(START.plusHours(20));
+
+        assertThat(trip.getTotalDuration()).isEqualTo(Duration.ofHours(9));
+    }
+
+    /** A trip starting in port at {@code now}'s value, its vessel reading the time from {@code now}. */
+    private static Trip newTripStartingAt(final AtomicReference<LocalDateTime> now) {
+        final Vessel vessel = newVessel(new Int2D(0, 0), mock(ModelGrid.class));
+        when(vessel.getSchedule().getDateTime()).thenAnswer(invocation -> now.get());
+        when(vessel.isAtPort()).thenReturn(true);
+        return new Trip(vessel, new Int2D(1, 1));
     }
 
     private static FishingEvent newFishingEvent() {
