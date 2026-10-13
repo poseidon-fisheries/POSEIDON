@@ -290,6 +290,9 @@ components:
                   }
                 guard: null
                 pathFinder: *id013
+              - !!uk.ac.ox.poseidon.agents.tasks.travel.ArriveInPortFactory {
+                guard: null
+              }
               - !!uk.ac.ox.poseidon.agents.tasks.landings.LandCatchesFactory
                 durationSupplier: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory
                   object: *id015

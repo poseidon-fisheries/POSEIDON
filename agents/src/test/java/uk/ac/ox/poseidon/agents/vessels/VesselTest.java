@@ -47,20 +47,23 @@ class VesselTest {
         final TemporalSchedule schedule = mock(TemporalSchedule.class);
         when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 7, 0));
         final VesselField vesselField = mock(VesselField.class, RETURNS_DEEP_STUBS);
+        final PortGrid portGrid = mock(PortGrid.class);
         final Vessel vessel = new Vessel(
             schedule,
             mock(EventManager.class),
             "vessel",
             vesselField,
-            mock(PortGrid.class),
+            portGrid,
             mock(MarketGrid.class)
         );
         when(vesselField.getCell(vessel)).thenReturn(new Int2D(0, 0));
+        when(portGrid.anyObjectsAt(new Int2D(0, 0))).thenReturn(true);
         vessel.setAccount(new Account());
 
         assertNull(vessel.getPreviousTrip());
         vessel.startTrip(new Int2D(1, 0));
         final Trip trip = vessel.getCurrentTrip();
+        vessel.arriveInPort();
         vessel.endTrip();
 
         assertNull(vessel.getCurrentTrip());

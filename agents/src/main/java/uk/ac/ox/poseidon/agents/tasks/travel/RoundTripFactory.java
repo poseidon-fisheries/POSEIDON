@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * start trip, travel out, fish, turn back, travel back (reusing the same resolved
  * {@code travelTask} instance for both legs — safe because every task here fully re-initializes
  * its own state in {@code start()}, which gdx-ai calls fresh each time a {@link Sequence} enters
- * a child, regardless of that child's previous run), land the catch, end trip. Built via
- * {@link Factories#roundTrip}.
+ * a child, regardless of that child's previous run), arrive in port, land the catch, end trip.
+ * Built via {@link Factories#roundTrip}.
  */
 @Data
 @NoArgsConstructor
@@ -55,7 +55,7 @@ public class RoundTripFactory extends VesselTaskFactory<Sequence<Vessel>> {
     /**
      * @return a {@link Sequence} of: {@code startTripTask}, {@code travelTask} (outbound),
      * {@code fishingTask}, a {@link SetDestinationToOrigin}, {@code travelTask} again (inbound),
-     * {@code landingTask}, and an {@link EndTrip}
+     * an {@link ArriveInPort}, {@code landingTask}, and an {@link EndTrip}
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -70,6 +70,7 @@ public class RoundTripFactory extends VesselTaskFactory<Sequence<Vessel>> {
             fishingTask,
             new SetDestinationToOrigin(),
             travelTask,
+            new ArriveInPort(),
             landingTask,
             new EndTrip()
         );

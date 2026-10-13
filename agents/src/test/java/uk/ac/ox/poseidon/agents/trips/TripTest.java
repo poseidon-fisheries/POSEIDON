@@ -184,6 +184,25 @@ class TripTest {
     }
 
     @Test
+    void hasArrivedInPortOnlyOnceItArrives() {
+        final AtomicReference<LocalDateTime> now = new AtomicReference<>(START);
+        final Trip trip = newTripStartingAt(now);
+        assertThat(trip.hasArrivedInPort()).isFalse();
+
+        trip.arriveInPort();
+
+        assertThat(trip.hasArrivedInPort()).isTrue();
+    }
+
+    @Test
+    void cannotEndBeforeArrivingInPort() {
+        final AtomicReference<LocalDateTime> now = new AtomicReference<>(START);
+        final Trip trip = newTripStartingAt(now);
+
+        assertThatThrownBy(trip::endTrip).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
     void timeAtSeaRunsToNowWhileAtSea() {
         final AtomicReference<LocalDateTime> now = new AtomicReference<>(START);
         final Trip trip = newTripStartingAt(now);

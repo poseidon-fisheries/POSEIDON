@@ -74,6 +74,7 @@ class LandCatchesTest {
         when(vessel.getHold()).thenReturn(mock(Hold.class));
         when(vessel.getSchedule()).thenReturn(mock(TemporalSchedule.class));
         when(trip.getAccount()).thenReturn(mock(Account.class));
+        when(trip.hasArrivedInPort()).thenReturn(true);
         setTaskObject(landCatches, vessel);
         final Field tripField = LandCatches.class.getSuperclass().getDeclaredField("trip");
         tripField.setAccessible(true);
@@ -96,6 +97,15 @@ class LandCatchesTest {
 
         assertThatThrownBy(landCatches::complete).isInstanceOf(IllegalStateException.class);
         verify(otherPortMarket, never()).sell(any(), any(), any());
+    }
+
+    @Test
+    void throwsWhenTheTripHasNotArrivedInPort() {
+        when(trip.hasArrivedInPort()).thenReturn(false);
+        when(marketGrid.getMarket(homePort)).thenReturn(homePortMarket);
+
+        assertThatThrownBy(landCatches::complete).isInstanceOf(IllegalStateException.class);
+        verify(homePortMarket, never()).sell(any(), any(), any());
     }
 
     @Test

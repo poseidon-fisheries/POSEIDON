@@ -23,7 +23,12 @@
 package uk.ac.ox.poseidon.examples.petersnapper;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.events.SimpleListener;
+
+import java.time.Period;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,5 +39,20 @@ class PeterSnapperScenarioTest {
         final Simulation simulation = new PeterSnapperScenario().get().startNewSimulation();
         simulation.step();
         assertThat(simulation.schedule.getSteps()).isEqualTo(1);
+    }
+
+    // Runs whole trips, so that the checks made along a trip (arrival in port before landing and
+    // before the trip ends) catch tasks missing from, or misplaced in, the behaviour tree.
+    @Test
+    void endsATrip() {
+        final Simulation simulation = new PeterSnapperScenario().get().startNewSimulation();
+        final AtomicBoolean tripEnded = new AtomicBoolean(false);
+        simulation.getEventManager().addListener(
+            new SimpleListener<>(TripEndEvent.class, event -> tripEnded.set(true))
+        );
+        for (int day = 0; day < 30 && !tripEnded.get(); day++) {
+            simulation.getTemporalSchedule().stepFor(simulation, Period.ofDays(1));
+        }
+        assertThat(tripEnded).isTrue();
     }
 }

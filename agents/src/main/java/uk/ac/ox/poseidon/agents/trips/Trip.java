@@ -116,12 +116,17 @@ public class Trip {
      */
     public void arriveInPort() {
         checkState(
-            portArrivalDateTime == null,
+            !hasArrivedInPort(),
             "The trip of vessel %s has already arrived in port.",
             vessel.getId()
         );
         checkState(vessel.isAtPort(), "Vessel %s is not at a port.", vessel.getId());
         this.portArrivalDateTime = vessel.getSchedule().getDateTime();
+    }
+
+    /** @return whether the trip has arrived in port; see {@link #arriveInPort()} */
+    public boolean hasArrivedInPort() {
+        return portArrivalDateTime != null;
     }
 
     /**
@@ -146,8 +151,18 @@ public class Trip {
         );
     }
 
-    /** Marks the trip as ended at the vessel's current simulation time and broadcasts a {@link TripEndEvent}. */
+    /**
+     * Marks the trip as ended at the vessel's current simulation time and broadcasts a
+     * {@link TripEndEvent}.
+     *
+     * @throws IllegalStateException if the trip has not arrived in port
+     */
     public void endTrip() {
+        checkState(
+            hasArrivedInPort(),
+            "The trip of vessel %s cannot end before arriving in port.",
+            vessel.getId()
+        );
         this.endDateTime = vessel.getSchedule().getDateTime();
         this.eventManager.broadcast(new TripEndEvent(this));
     }

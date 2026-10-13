@@ -53,12 +53,18 @@ public class LandCatches extends ExtendedTripTask {
      * (by currency) to the trip's account.
      *
      * @return {@link Status#SUCCEEDED}
-     * @throws IllegalStateException if the vessel has no home port, is not at its home port, or
-     *                               its home port does not have exactly one market
+     * @throws IllegalStateException if the trip has not arrived in port, the vessel has no home
+     *                               port or is not at it, or its home port does not have exactly
+     *                               one market
      */
     @Override
     protected Status complete() {
         final Vessel vessel = getAgent();
+        checkState(
+            getTrip().hasArrivedInPort(),
+            "Vessel %s is landing before its trip arrived in port.",
+            vessel.getId()
+        );
         checkState(vessel.getHomePort() != null, "Vessel %s has no home port.", vessel.getId());
         checkState(
             vessel.getCell().equals(vessel.getHomePortLocation()),

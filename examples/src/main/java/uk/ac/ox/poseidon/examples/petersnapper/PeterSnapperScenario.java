@@ -424,6 +424,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                     ),
                     setDestinationToOrigin(),
                     travelAlongPathTo(pathFinder, distance, currentTripDestinationCell(), currentTripEventManager()),
+                    arriveInPort(),
                     landCatches(constant(ONE_HOUR)),
                     refuel(fuelStationGrid),
                     endTrip(),
