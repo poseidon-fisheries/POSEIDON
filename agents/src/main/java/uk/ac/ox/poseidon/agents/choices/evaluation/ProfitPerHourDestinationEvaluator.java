@@ -31,14 +31,13 @@ import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.Listener;
 
-import java.time.Duration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
  * An {@link Evaluator} that scores a destination by the vessel's trip profit (in a fixed
- * currency), divided by the trip's wall-clock duration in hours.
+ * currency), divided by the trip's time at sea ({@link Trip#getTimeAtSea()}) in hours.
  */
 public class ProfitPerHourDestinationEvaluator implements Evaluator<Int2D> {
 
@@ -102,11 +101,8 @@ public class ProfitPerHourDestinationEvaluator implements Evaluator<Int2D> {
                     .getAccount()
                     .getBalances()
                     .getOrDefault(currencyUnit, Money.zero(currencyUnit));
-            final double hours =
-                Duration
-                    .between(trip.getStartDateTime(), trip.getEndDateTime())
-                    .toSeconds() / 3600.0;
-            checkState(hours > 0, "Trip duration must be positive.");
+            final double hours = trip.getTimeAtSea().toSeconds() / 3600.0;
+            checkState(hours > 0, "Time at sea must be positive.");
             return profit.getAmount().doubleValue() / hours;
         }
     }

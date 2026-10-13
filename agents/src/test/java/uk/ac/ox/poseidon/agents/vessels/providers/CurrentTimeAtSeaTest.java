@@ -25,42 +25,36 @@ package uk.ac.ox.poseidon.agents.vessels.providers;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class CurrentTripDurationTest {
+class CurrentTimeAtSeaTest {
 
     @Test
     void throwsWhenNoTripIsInProgress() {
         final Vessel vessel = mock(Vessel.class);
         when(vessel.getCurrentTrip()).thenReturn(null);
 
-        final CurrentTripDuration currentTripDuration = new CurrentTripDuration(vessel);
+        final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea(vessel);
 
-        assertThrows(IllegalStateException.class, currentTripDuration::get);
+        assertThrows(IllegalStateException.class, currentTimeAtSea::get);
     }
 
     @Test
-    void isElapsedTimeSinceTripStartWhenATripIsInProgress() {
+    void isTheCurrentTripsTimeAtSea() {
         final Vessel vessel = mock(Vessel.class);
         final Trip trip = mock(Trip.class);
-        final TemporalSchedule schedule = mock(TemporalSchedule.class);
-        final LocalDateTime start = LocalDateTime.of(2026, 1, 1, 0, 0);
 
         when(vessel.getCurrentTrip()).thenReturn(trip);
-        when(trip.getStartDateTime()).thenReturn(start);
-        when(vessel.getSchedule()).thenReturn(schedule);
-        when(schedule.getDateTime()).thenReturn(start.plusHours(3));
+        when(trip.getTimeAtSea()).thenReturn(Duration.ofHours(3));
 
-        final CurrentTripDuration currentTripDuration = new CurrentTripDuration(vessel);
+        final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea(vessel);
 
-        assertEquals(Duration.ofHours(3), currentTripDuration.get());
+        assertEquals(Duration.ofHours(3), currentTimeAtSea.get());
     }
 }

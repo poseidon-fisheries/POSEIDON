@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels.extractors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.joda.money.Money;
+import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 import java.math.RoundingMode;
@@ -32,23 +33,23 @@ import java.time.Duration;
 import java.util.function.Function;
 
 /**
- * Extracts the cost of a vessel's current trip so far, as its elapsed duration times an hourly
- * rate from {@code hourlyCostsExtractor}.
+ * Extracts the cost of a vessel's current trip so far, as its time at sea
+ * ({@link Trip#getTimeAtSea()}) times an hourly rate from {@code hourlyCostsExtractor}.
  */
 @RequiredArgsConstructor
 public class TripCostFromHourlyCosts implements Function<Vessel, Money> {
 
     @NonNull private final Function<? super Vessel, ? extends Money> hourlyCostsExtractor;
 
-    /** @return {@code hourlyCostsExtractor}'s rate for {@code vessel}, times elapsed trip hours */
+    /**
+     * @return {@code hourlyCostsExtractor}'s rate for {@code vessel}, times its current trip's
+     * hours at sea
+     */
     @Override
     public Money apply(final Vessel vessel) {
-        final Duration tripDuration = Duration.between(
-            vessel.getCurrentTrip().getStartDateTime(),
-            vessel.getSchedule().getDateTime()
-        );
+        final Duration timeAtSea = vessel.getCurrentTrip().getTimeAtSea();
         return hourlyCostsExtractor.apply(vessel).multipliedBy(
-            tripDuration.toSeconds() / 3600.0,
+            timeAtSea.toSeconds() / 3600.0,
             RoundingMode.HALF_EVEN
         );
     }

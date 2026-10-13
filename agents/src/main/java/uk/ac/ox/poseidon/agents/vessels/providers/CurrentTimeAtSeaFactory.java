@@ -26,14 +26,14 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link CurrentTripDuration}, built via
- * {@link Factories#currentTripDuration()}.
+ * A {@link VesselScopeFactory} counterpart of {@link CurrentTimeAtSea}, built via
+ * {@link Factories#currentTimeAtSea()}.
  */
-public class CurrentTripDurationFactory extends VesselScopeFactory<CurrentTripDuration> {
+public class CurrentTimeAtSeaFactory extends VesselScopeFactory<CurrentTimeAtSea> {
 
     @Override
-    protected CurrentTripDuration newInstance(final VesselScope scope) {
-        return new CurrentTripDuration(scope.getVessel());
+    protected CurrentTimeAtSea newInstance(final VesselScope scope) {
+        return new CurrentTimeAtSea(scope.getVessel());
     }
 
 }

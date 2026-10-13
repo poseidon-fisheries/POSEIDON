@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
@@ -43,7 +43,7 @@ class ProfitPerHourDestinationEvaluatorTest {
     private static final CurrencyUnit EUR = CurrencyUnit.of("EUR");
 
     @Test
-    void evaluatesNetAccountBalancePerTripHour() {
+    void evaluatesNetAccountBalancePerHourAtSea() {
         final Int2D option = new Int2D(1, 2);
         final SimpleEventManager eventManager = new SimpleEventManager();
         final Evaluation<Int2D> evaluation =
@@ -56,8 +56,8 @@ class ProfitPerHourDestinationEvaluatorTest {
 
         final Trip trip = mock(Trip.class);
         when(trip.getAccount()).thenReturn(account);
-        when(trip.getStartDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 6, 0));
-        when(trip.getEndDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 9, 0));
+        when(trip.getTimeAtSea()).thenReturn(Duration.ofHours(3));
+        when(trip.getTotalDuration()).thenReturn(Duration.ofHours(4));
 
         eventManager.broadcast(new TripEndEvent(trip));
 

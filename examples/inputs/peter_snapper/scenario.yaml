@@ -267,7 +267,7 @@ components:
                               value: 1.0
                             }
                       - !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
-                        extractor: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripDurationFactory {
+                        extractor: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTimeAtSeaFactory {
                           }
                         predicate: !!uk.ac.ox.poseidon.core.predicates.comparable.LessThanFactory
                           value: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory

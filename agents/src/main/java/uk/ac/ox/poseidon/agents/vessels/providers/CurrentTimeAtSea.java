@@ -32,23 +32,23 @@ import java.time.Duration;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Provides how long a vessel's current trip has been running; only checks made during a trip read
- * it.
+ * Provides the time at sea of a vessel's current trip ({@link Trip#getTimeAtSea()}); only checks
+ * made during a trip read it.
  */
 @RequiredArgsConstructor
-public class CurrentTripDuration implements Provider<Duration> {
+public class CurrentTimeAtSea implements Provider<Duration> {
 
     private final Vessel vessel;
 
     /**
-     * @return the elapsed time since the current trip's start
+     * @return the current trip's time at sea
      * @throws IllegalStateException if the vessel is not on a trip
      */
     @Override
     public Duration get() {
         final Trip currentTrip = vessel.getCurrentTrip();
         checkState(currentTrip != null, "Vessel %s is not on a trip.", vessel.getId());
-        return Duration.between(currentTrip.getStartDateTime(), vessel.getSchedule().getDateTime());
+        return currentTrip.getTimeAtSea();
     }
 
 }

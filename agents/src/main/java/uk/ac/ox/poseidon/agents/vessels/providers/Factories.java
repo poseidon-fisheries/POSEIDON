@@ -70,11 +70,11 @@ public class Factories {
     }
 
     /**
-     * @return a {@link VesselScope}-relative factory for a {@link CurrentTripDuration}
-     * @see CurrentTripDuration
+     * @return a {@link VesselScope}-relative factory for a {@link CurrentTimeAtSea}
+     * @see CurrentTimeAtSea
      */
-    public static CurrentTripDurationFactory currentTripDuration() {
-        return new CurrentTripDurationFactory();
+    public static CurrentTimeAtSeaFactory currentTimeAtSea() {
+        return new CurrentTimeAtSeaFactory();
     }
 
     /**
