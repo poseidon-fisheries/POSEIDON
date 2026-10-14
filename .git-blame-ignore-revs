@@ -3,3 +3,6 @@
 
 # Reformat Java sources with Prettier
 308d376d25438119a12ec26b1c65c7499a4e9bb7
+
+# Reflow Javadoc to 80 columns
+bfb6b6304464bc7bd781756e066b7d943b218078
