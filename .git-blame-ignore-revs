@@ -1,0 +1,5 @@
+# Commits that only reformat code, skipped by `git blame` and GitHub.
+# Locally: git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Reformat Java sources with Prettier
+308d376d25438119a12ec26b1c65c7499a4e9bb7
