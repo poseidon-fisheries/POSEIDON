@@ -26,14 +26,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPerYearAccumulator;
 
 import java.time.Period;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationStartOptions;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
+import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 class PeterSnapperScenarioTest {
 
@@ -77,6 +80,28 @@ class PeterSnapperScenarioTest {
     assertThat(landingsForAYear(new PeterSnapperScenario().get())).isEqualTo(
       firstLandings
     );
+  }
+
+  @Test
+  void simulationsRunInParallelGiveTheirSequentialLandings() {
+    final Scenario scenario = new PeterSnapperScenario().get();
+    final Map<Integer, Double> sequentialLandings = landingsForAYear(scenario);
+    final List<Map<Integer, Double>> parallelLandings = IntStream.range(0, 4)
+      .parallel()
+      .mapToObj(_ -> landingsForAYear(scenario))
+      .toList();
+    assertThat(parallelLandings).containsOnly(sequentialLandings);
+  }
+
+  // Building and stepping a simulation must not change the scenario's
+  // factories, which every simulation of the scenario shares.
+  @Test
+  void runningASimulationLeavesTheScenarioUnchanged() {
+    final Scenario scenario = new PeterSnapperScenario().get();
+    // A new writer each time: one writer keeps numbering its anchors
+    final String before = new ScenarioWriter().write(scenario);
+    landingsForAYear(scenario);
+    assertThat(new ScenarioWriter().write(scenario)).isEqualTo(before);
   }
 
   private static Map<Integer, Double> landingsForAYear(
