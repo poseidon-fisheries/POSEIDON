@@ -35,9 +35,12 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CurrentDateTimeFactory extends SimulationScopeFactory<CurrentDateTime> {
-    @Override
-    protected CurrentDateTime newInstance(final SimulationScope scope) {
-        return new CurrentDateTime(scope.getSimulation().getTemporalSchedule());
-    }
+public class CurrentDateTimeFactory
+  extends SimulationScopeFactory<CurrentDateTime>
+{
+
+  @Override
+  protected CurrentDateTime newInstance(final SimulationScope scope) {
+    return new CurrentDateTime(scope.getSimulation().getTemporalSchedule());
+  }
 }

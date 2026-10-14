@@ -36,8 +36,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class MaxAggregatorFactory extends GlobalScopeFactory<MaxAggregator> {
-    @Override
-    protected MaxAggregator newInstance(final Scope scope) {
-        return new MaxAggregator();
-    }
+
+  @Override
+  protected MaxAggregator newInstance(final Scope scope) {
+    return new MaxAggregator();
+  }
 }

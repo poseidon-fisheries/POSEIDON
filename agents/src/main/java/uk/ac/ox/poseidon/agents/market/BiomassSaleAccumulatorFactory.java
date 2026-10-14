@@ -37,10 +37,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class BiomassSaleAccumulatorFactory
-    extends SimulationEventListenerFactory<BiomassSaleAccumulator> {
+  extends SimulationEventListenerFactory<BiomassSaleAccumulator>
+{
 
-    @Override
-    protected BiomassSaleAccumulator newListener(final SimulationScope scope) {
-        return new BiomassSaleAccumulator();
-    }
+  @Override
+  protected BiomassSaleAccumulator newListener(final SimulationScope scope) {
+    return new BiomassSaleAccumulator();
+  }
 }

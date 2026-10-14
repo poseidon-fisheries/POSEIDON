@@ -38,13 +38,15 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UniformCatchCategoriserFactory<S extends Scope>
-    extends RelativeScopeFactory<S, CatchCategoriser> {
+public class UniformCatchCategoriserFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  CatchCategoriser
+> {
 
-    private Factory<? super S, ? extends CatchCategory> catchCategory;
+  private Factory<? super S, ? extends CatchCategory> catchCategory;
 
-    @Override
-    protected CatchCategoriser newInstance(final S scope) {
-        return new UniformCatchCategoriser(catchCategory.get(scope));
-    }
+  @Override
+  protected CatchCategoriser newInstance(final S scope) {
+    return new UniformCatchCategoriser(catchCategory.get(scope));
+  }
 }

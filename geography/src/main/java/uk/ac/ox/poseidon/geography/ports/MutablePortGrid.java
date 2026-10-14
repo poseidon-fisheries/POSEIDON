@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.stream.Collectors.toSet;
+
+import java.util.Map;
 import lombok.Getter;
 import lombok.NonNull;
 import sim.field.grid.SparseGrid2D;
@@ -30,79 +34,78 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableGrid;
 
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkState;
-import static java.util.stream.Collectors.toSet;
-
 /**
  * A {@link PortGrid} that ports can be added to after construction, via {@link #createPort}.
  */
 @Getter
-public class MutablePortGrid extends AbstractPortGrid implements MutableGrid<SparseGrid2D> {
+public class MutablePortGrid
+  extends AbstractPortGrid
+  implements MutableGrid<SparseGrid2D>
+{
 
-    /** @return a new, independent {@code MutablePortGrid} with the same ports as {@code source} */
-    public static MutablePortGrid copyOf(final @NonNull PortGrid source) {
-        final SparseGrid2D sparseGrid2D = new SparseGrid2D(
-            source.getModelGrid().getGridWidth(),
-            source.getModelGrid().getGridHeight()
-        );
-        source.getPorts()
-            .forEach(port -> sparseGrid2D.setObjectLocation(port, source.getLocation(port)));
-        return new MutablePortGrid(source.getBathymetricGrid(), sparseGrid2D);
-    }
+  /** @return a new, independent {@code MutablePortGrid} with the same ports as {@code source} */
+  public static MutablePortGrid copyOf(final @NonNull PortGrid source) {
+    final SparseGrid2D sparseGrid2D = new SparseGrid2D(
+      source.getModelGrid().getGridWidth(),
+      source.getModelGrid().getGridHeight()
+    );
+    source
+      .getPorts()
+      .forEach(port ->
+        sparseGrid2D.setObjectLocation(port, source.getLocation(port))
+      );
+    return new MutablePortGrid(source.getBathymetricGrid(), sparseGrid2D);
+  }
 
-    /**
-     * @param bathymetricGrid the bathymetric grid ports are placed relative to
-     * @param sparseGrid2D    the field to use directly (not copied)
-     */
-    public MutablePortGrid(
-        final @NonNull BathymetricGrid bathymetricGrid,
-        final @NonNull SparseGrid2D sparseGrid2D
-    ) {
-        super(bathymetricGrid.getModelGrid(), sparseGrid2D, bathymetricGrid);
-    }
+  /**
+   * @param bathymetricGrid the bathymetric grid ports are placed relative to
+   * @param sparseGrid2D    the field to use directly (not copied)
+   */
+  public MutablePortGrid(
+    final @NonNull BathymetricGrid bathymetricGrid,
+    final @NonNull SparseGrid2D sparseGrid2D
+  ) {
+    super(bathymetricGrid.getModelGrid(), sparseGrid2D, bathymetricGrid);
+  }
 
-    /**
-     * @param bathymetricGrid  the bathymetric grid ports are placed relative to
-     * @param portCoordinates  the ports to place, each at its given coordinate
-     * @throws IllegalArgumentException if any port's coordinate isn't a valid port location
-     */
-    public MutablePortGrid(
-        final BathymetricGrid bathymetricGrid,
-        final Map<Port, ? extends Coordinate> portCoordinates
-    ) {
-        this(
-            bathymetricGrid,
-            makeField(bathymetricGrid, portCoordinates)
-        );
-    }
+  /**
+   * @param bathymetricGrid  the bathymetric grid ports are placed relative to
+   * @param portCoordinates  the ports to place, each at its given coordinate
+   * @throws IllegalArgumentException if any port's coordinate isn't a valid port location
+   */
+  public MutablePortGrid(
+    final BathymetricGrid bathymetricGrid,
+    final Map<Port, ? extends Coordinate> portCoordinates
+  ) {
+    this(bathymetricGrid, makeField(bathymetricGrid, portCoordinates));
+  }
 
-    Port createPort(
-        final String portCode,
-        final String portName,
-        final Coordinate coordinate
-    ) {
-        return createPort(portCode, portName, getModelGrid().toCell(coordinate));
-    }
+  Port createPort(
+    final String portCode,
+    final String portName,
+    final Coordinate coordinate
+  ) {
+    return createPort(portCode, portName, getModelGrid().toCell(coordinate));
+  }
 
-    Port createPort(
-        final String portCode,
-        final String portName,
-        final Int2D cell
-    ) {
-        checkState(
-            !getPorts().map(Port::getCode).collect(toSet()).contains(portCode),
-            "Port code %s already exists", portCode
-        );
-        validateLocation(cell);
-        final Port port = new Port(portCode, portName);
-        field.setObjectLocation(port, cell);
-        return port;
-    }
+  Port createPort(
+    final String portCode,
+    final String portName,
+    final Int2D cell
+  ) {
+    checkState(
+      !getPorts().map(Port::getCode).collect(toSet()).contains(portCode),
+      "Port code %s already exists",
+      portCode
+    );
+    validateLocation(cell);
+    final Port port = new Port(portCode, portName);
+    field.setObjectLocation(port, cell);
+    return port;
+  }
 
-    @Override
-    public SparseGrid2D getField() {
-        return field;
-    }
+  @Override
+  public SparseGrid2D getField() {
+    return field;
+  }
 }

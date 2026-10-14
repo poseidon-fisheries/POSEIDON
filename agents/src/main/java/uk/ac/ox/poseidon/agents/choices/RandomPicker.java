@@ -22,30 +22,34 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import ec.util.MersenneTwisterFast;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
+import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
+import ec.util.MersenneTwisterFast;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.providers.Provider;
 
 /** Picks a uniformly random option from a supplied list, subject to a predicate, or {@code null} if none qualify. */
 @RequiredArgsConstructor
 public class RandomPicker<O> implements Provider<O> {
 
-    @NonNull private final Supplier<? extends List<? extends O>> options;
-    @NonNull private final Predicate<? super O> optionPredicate;
-    @NonNull private final MersenneTwisterFast rng;
+  @NonNull
+  private final Supplier<? extends List<? extends O>> options;
 
-    @Override
-    public O get() {
-        return shuffledStream(options.get(), rng)
-            .filter(optionPredicate)
-            .findFirst()
-            .orElse(null);
-    }
+  @NonNull
+  private final Predicate<? super O> optionPredicate;
+
+  @NonNull
+  private final MersenneTwisterFast rng;
+
+  @Override
+  public O get() {
+    return shuffledStream(options.get(), rng)
+      .filter(optionPredicate)
+      .findFirst()
+      .orElse(null);
+  }
 }

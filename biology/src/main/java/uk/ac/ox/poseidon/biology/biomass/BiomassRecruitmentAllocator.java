@@ -28,14 +28,14 @@ package uk.ac.ox.poseidon.biology.biomass;
  * step to turn that total back into per-cell biomass.
  */
 public interface BiomassRecruitmentAllocator {
-    /**
-     * @param recruitedBiomassInKg the non-negative total biomass, in kilograms, to allocate
-     * @param biomassGrid          the grid to add the allocated biomass into
-     * @param carryingCapacityGrid the grid bounding how much each cell can receive
-     */
-    void allocate(
-        double recruitedBiomassInKg,
-        BiomassGrid biomassGrid,
-        CarryingCapacityGrid carryingCapacityGrid
-    );
+  /**
+   * @param recruitedBiomassInKg the non-negative total biomass, in kilograms, to allocate
+   * @param biomassGrid          the grid to add the allocated biomass into
+   * @param carryingCapacityGrid the grid bounding how much each cell can receive
+   */
+  void allocate(
+    double recruitedBiomassInKg,
+    BiomassGrid biomassGrid,
+    CarryingCapacityGrid carryingCapacityGrid
+  );
 }

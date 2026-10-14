@@ -29,8 +29,9 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
  * cell, with its current gear.
  */
 public class DepartNow extends InstantFishingAction {
-    /** @param vessel the vessel departing */
-    public DepartNow(final Vessel vessel) {
-        super(vessel);
-    }
+
+  /** @param vessel the vessel departing */
+  public DepartNow(final Vessel vessel) {
+    super(vessel);
+  }
 }

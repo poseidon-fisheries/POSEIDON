@@ -22,46 +22,39 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.bathymetry.DefaultBathymetricGrid;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.bathymetry.DefaultBathymetricGrid;
 
 class MutablePortGridTest {
 
-    @Test
-    void copyOfKeepsLocations() {
-        final DefaultBathymetricGrid bathymetricGrid =
-            new DefaultBathymetricGrid(new double[][]{
-                {+1d, -1d, -1d},
-                {+1d, +1d, -1d},
-                {-1d, -1d, -1d},
-            });
-        final Port portA = new Port("PA", "Port A");
-        final Port portB = new Port("PB", "Port B");
-        final MutablePortGrid source = new MutablePortGrid(
-            bathymetricGrid,
-            Map.of(
-                portA, new Coordinate(0.5, 2.5),
-                portB, new Coordinate(1.5, 1.5)
-            )
-        );
+  @Test
+  void copyOfKeepsLocations() {
+    final DefaultBathymetricGrid bathymetricGrid = new DefaultBathymetricGrid(
+      new double[][] { { +1d, -1d, -1d }, { +1d, +1d, -1d }, { -1d, -1d, -1d } }
+    );
+    final Port portA = new Port("PA", "Port A");
+    final Port portB = new Port("PB", "Port B");
+    final MutablePortGrid source = new MutablePortGrid(
+      bathymetricGrid,
+      Map.of(portA, new Coordinate(0.5, 2.5), portB, new Coordinate(1.5, 1.5))
+    );
 
-        final MutablePortGrid copy = MutablePortGrid.copyOf(source);
+    final MutablePortGrid copy = MutablePortGrid.copyOf(source);
 
-        assertNotSame(source, copy);
-        assertEquals(
-            source.getPorts().collect(Collectors.toSet()),
-            copy.getPorts().collect(Collectors.toSet())
-        );
-        Set.of(portA, portB).forEach(port ->
-            assertEquals(source.getLocation(port), copy.getLocation(port))
-        );
-    }
+    assertNotSame(source, copy);
+    assertEquals(
+      source.getPorts().collect(Collectors.toSet()),
+      copy.getPorts().collect(Collectors.toSet())
+    );
+    Set.of(portA, portB).forEach(port ->
+      assertEquals(source.getLocation(port), copy.getLocation(port))
+    );
+  }
 }

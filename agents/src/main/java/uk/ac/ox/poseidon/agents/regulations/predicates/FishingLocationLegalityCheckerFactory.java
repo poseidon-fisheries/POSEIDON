@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.regulations.predicates;
 
+import java.time.Duration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,8 +35,6 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
-import java.time.Duration;
-
 /**
  * A {@link VesselScopeFactory} for a {@link FishingLocationLegalityChecker}. Built via
  * {@link Factories#fishingLocationLegalityChecker}.
@@ -45,26 +44,29 @@ import java.time.Duration;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class FishingLocationLegalityCheckerFactory
-    extends VesselScopeFactory<FishingLocationLegalityChecker> {
+  extends VesselScopeFactory<FishingLocationLegalityChecker>
+{
 
-    private Factory<
-        ? super VesselScope,
-        ? extends Regulations<? super ExtendedFishingAction>
-        > regulations;
+  private Factory<
+    ? super VesselScope,
+    ? extends Regulations<? super ExtendedFishingAction>
+  > regulations;
 
-    private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
-    private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
-    private Factory<? super VesselScope, ? extends Duration> fishingDuration;
+  private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
+  private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
+  private Factory<? super VesselScope, ? extends Duration> fishingDuration;
 
-    @Override
-    protected FishingLocationLegalityChecker newInstance(final VesselScope scope) {
-        return new FishingLocationLegalityChecker(
-            regulations.get(scope),
-            pathFinder.get(scope),
-            distance.get(scope),
-            fishingDuration.get(scope),
-            () -> scope.getSimulation().getTemporalSchedule().getDateTime(),
-            scope.getVessel()
-        );
-    }
+  @Override
+  protected FishingLocationLegalityChecker newInstance(
+    final VesselScope scope
+  ) {
+    return new FishingLocationLegalityChecker(
+      regulations.get(scope),
+      pathFinder.get(scope),
+      distance.get(scope),
+      fishingDuration.get(scope),
+      () -> scope.getSimulation().getTemporalSchedule().getDateTime(),
+      scope.getVessel()
+    );
+  }
 }

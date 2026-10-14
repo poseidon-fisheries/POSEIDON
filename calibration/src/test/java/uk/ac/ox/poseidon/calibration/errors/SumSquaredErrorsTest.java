@@ -22,52 +22,53 @@
 
 package uk.ac.ox.poseidon.calibration.errors;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
 class SumSquaredErrorsTest {
 
-    @Test
-    void sumsTheSquaredErrorsOverTheKeysOfEitherMap() {
-        final SumSquaredErrors<String> errors = new SumSquaredErrors<>(
-            Map.of("a", 3.0, "b", 1.0),
-            _ -> Map.of("a", 1.0, "c", 2.0)
-        );
-        // a: (3 - 1)², b: (1 - 0)², c: (0 - 2)²
-        assertThat(errors.applyAsDouble(null)).isEqualTo(9.0);
-    }
+  @Test
+  void sumsTheSquaredErrorsOverTheKeysOfEitherMap() {
+    final SumSquaredErrors<String> errors = new SumSquaredErrors<>(
+      Map.of("a", 3.0, "b", 1.0),
+      _ -> Map.of("a", 1.0, "c", 2.0)
+    );
+    // a: (3 - 1)², b: (1 - 0)², c: (0 - 2)²
+    assertThat(errors.applyAsDouble(null)).isEqualTo(9.0);
+  }
 
-    @Test
-    void refusesANanTarget() {
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> new SumSquaredErrors<>(
-                Map.of("a", 1.0, "b", Double.NaN),
-                _ -> Map.of()
-            ))
-            .withMessage("Target values must be finite numbers, but 1 of 2 are not: [b]");
-    }
+  @Test
+  void refusesANanTarget() {
+    assertThatIllegalArgumentException()
+      .isThrownBy(() ->
+        new SumSquaredErrors<>(Map.of("a", 1.0, "b", Double.NaN), _ -> Map.of())
+      )
+      .withMessage(
+        "Target values must be finite numbers, but 1 of 2 are not: [b]"
+      );
+  }
 
-    @Test
-    void refusesAnInfiniteTarget() {
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> new SumSquaredErrors<>(
-                Map.of("a", Double.POSITIVE_INFINITY),
-                _ -> Map.of()
-            ))
-            .withMessageContaining("[a]");
-    }
+  @Test
+  void refusesAnInfiniteTarget() {
+    assertThatIllegalArgumentException()
+      .isThrownBy(() ->
+        new SumSquaredErrors<>(Map.of("a", Double.POSITIVE_INFINITY), _ ->
+          Map.of()
+        )
+      )
+      .withMessageContaining("[a]");
+  }
 
-    @Test
-    void refusesAMissingTarget() {
-        final Map<String, Double> targets = new HashMap<>();
-        targets.put("a", null);
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> new SumSquaredErrors<>(targets, _ -> Map.of()))
-            .withMessageContaining("[a]");
-    }
+  @Test
+  void refusesAMissingTarget() {
+    final Map<String, Double> targets = new HashMap<>();
+    targets.put("a", null);
+    assertThatIllegalArgumentException()
+      .isThrownBy(() -> new SumSquaredErrors<>(targets, _ -> Map.of()))
+      .withMessageContaining("[a]");
+  }
 }

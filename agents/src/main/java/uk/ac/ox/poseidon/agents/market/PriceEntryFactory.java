@@ -40,18 +40,21 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PriceEntryFactory<S extends Scope> extends RelativeScopeFactory<S, PriceEntry> {
+public class PriceEntryFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  PriceEntry
+> {
 
-    private Factory<? super S, ? extends CatchCategory> catchCategory;
-    private Factory<? super S, ? extends Species> species;
-    private Factory<? super S, ? extends Price> price;
+  private Factory<? super S, ? extends CatchCategory> catchCategory;
+  private Factory<? super S, ? extends Species> species;
+  private Factory<? super S, ? extends Price> price;
 
-    @Override
-    protected PriceEntry newInstance(final S scope) {
-        return new PriceEntry(
-            catchCategory.get(scope),
-            species.get(scope),
-            price.get(scope)
-        );
-    }
+  @Override
+  protected PriceEntry newInstance(final S scope) {
+    return new PriceEntry(
+      catchCategory.get(scope),
+      species.get(scope),
+      price.get(scope)
+    );
+  }
 }

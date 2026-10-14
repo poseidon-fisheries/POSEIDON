@@ -22,6 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static java.math.RoundingMode.HALF_EVEN;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Value;
@@ -33,66 +40,66 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.species.Species;
 
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static java.math.RoundingMode.HALF_EVEN;
-
 /** The record of one vessel's completed sale: what sold (as line {@link Item}s) and what didn't. */
 @Data
 public class Sale {
-    /** When the sale happened. */
-    private final LocalDateTime dateTime;
-    /** This sale's identifying ID. */
-    private final String id;
-    /** The market the sale happened at. */
-    private final Market market;
-    /** The selling vessel. */
-    private final Vessel vessel;
-    /** What sold, one item per (category, species) combination. */
-    private final List<Item> items;
-    /** What was offered but didn't sell. */
-    private final CategorisedCatch unsold;
 
-    /** @return the total sale value, per currency, summed across {@link #items} */
-    public Map<CurrencyUnit, Money> summary() {
-        return summarise(items);
+  /** When the sale happened. */
+  private final LocalDateTime dateTime;
+  /** This sale's identifying ID. */
+  private final String id;
+  /** The market the sale happened at. */
+  private final Market market;
+  /** The selling vessel. */
+  private final Vessel vessel;
+  /** What sold, one item per (category, species) combination. */
+  private final List<Item> items;
+  /** What was offered but didn't sell. */
+  private final CategorisedCatch unsold;
+
+  /** @return the total sale value, per currency, summed across {@link #items} */
+  public Map<CurrencyUnit, Money> summary() {
+    return summarise(items);
+  }
+
+  /** @return the total value of {@code items}, per currency */
+  public static Map<CurrencyUnit, Money> summarise(
+    final Collection<Item> items
+  ) {
+    // Aggregate as doubles to avoid per-item Money creation; round once per currency.
+    final Map<CurrencyUnit, Double> totals = new HashMap<>();
+    for (final Item item : items) {
+      final CurrencyUnit currency = item
+        .getPrice()
+        .getAmount()
+        .getCurrencyUnit();
+      final double value = item
+        .getPrice()
+        .valueForKgDouble(item.getContent().asKg());
+      totals.merge(currency, value, Double::sum);
     }
+    final Map<CurrencyUnit, Money> result = new HashMap<>();
+    totals.forEach((currency, total) ->
+      result.put(currency, Money.of(currency, total, HALF_EVEN))
+    );
+    return result;
+  }
 
-    /** @return the total value of {@code items}, per currency */
-    public static Map<CurrencyUnit, Money> summarise(final Collection<Item> items) {
-        // Aggregate as doubles to avoid per-item Money creation; round once per currency.
-        final Map<CurrencyUnit, Double> totals = new HashMap<>();
-        for (final Item item : items) {
-            final CurrencyUnit currency = item.getPrice().getAmount().getCurrencyUnit();
-            final double value =
-                item.getPrice().valueForKgDouble(item.getContent().asKg());
-            totals.merge(currency, value, Double::sum);
-        }
-        final Map<CurrencyUnit, Money> result = new HashMap<>();
-        totals.forEach((currency, total) ->
-            result.put(currency, Money.of(currency, total, HALF_EVEN))
-        );
-        return result;
-    }
+  /** One sold line: a (category, species) combination, how much, and at what price. */
+  @Value
+  public static class Item {
 
-    /** One sold line: a (category, species) combination, how much, and at what price. */
-    @Value
-    public static class Item {
-        /** The item's catch category. */
-        CatchCategory category;
-        /** The item's species. */
-        Species species;
-        /** How much sold. */
-        Content content;
-        /** The price it sold at. */
-        Price price;
+    /** The item's catch category. */
+    CatchCategory category;
+    /** The item's species. */
+    Species species;
+    /** How much sold. */
+    Content content;
+    /** The price it sold at. */
+    Price price;
 
-        /** The total value of this line, computed lazily on first access. */
-        @Getter(lazy = true)
-        Money saleValue = price.valueFor(content);
-    }
+    /** The total value of this line, computed lazily on first access. */
+    @Getter(lazy = true)
+    Money saleValue = price.valueFor(content);
+  }
 }

@@ -29,11 +29,12 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
  * A {@link VesselScopeFactory} counterpart of {@link CurrentTripStartDateTime}, built via
  * {@link Factories#currentTripStartDateTime()}.
  */
-public class CurrentTripStartDateTimeFactory extends VesselScopeFactory<CurrentTripStartDateTime> {
+public class CurrentTripStartDateTimeFactory
+  extends VesselScopeFactory<CurrentTripStartDateTime>
+{
 
-    @Override
-    protected CurrentTripStartDateTime newInstance(final VesselScope scope) {
-        return new CurrentTripStartDateTime(scope.getVessel());
-    }
-
+  @Override
+  protected CurrentTripStartDateTime newInstance(final VesselScope scope) {
+    return new CurrentTripStartDateTime(scope.getVessel());
+  }
 }

@@ -38,45 +38,38 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @Getter
 public class VesselField {
 
-    private final Continuous2D field;
-    private final ModelGrid modelGrid;
+  private final Continuous2D field;
+  private final ModelGrid modelGrid;
 
-    VesselField(final ModelGrid modelGrid) {
-        this.field = new Continuous2D(
-            1,
-            modelGrid.getGridWidth(),
-            modelGrid.getGridHeight()
-        );
-        this.modelGrid = modelGrid;
-    }
+  VesselField(final ModelGrid modelGrid) {
+    this.field = new Continuous2D(
+      1,
+      modelGrid.getGridWidth(),
+      modelGrid.getGridHeight()
+    );
+    this.modelGrid = modelGrid;
+  }
 
-    /** Places {@code vessel} at the continuous-space point corresponding to {@code cell}. */
-    @SuppressWarnings("UnusedReturnValue")
-    public boolean setCell(
-        final Vessel vessel,
-        final Int2D cell
-    ) {
-        return setPoint(vessel, modelGrid.toPoint(cell));
-    }
+  /** Places {@code vessel} at the continuous-space point corresponding to {@code cell}. */
+  @SuppressWarnings("UnusedReturnValue")
+  public boolean setCell(final Vessel vessel, final Int2D cell) {
+    return setPoint(vessel, modelGrid.toPoint(cell));
+  }
 
-    /** Places {@code vessel} at {@code location}. */
-    @SuppressWarnings("WeakerAccess")
-    public boolean setPoint(
-        final Vessel vessel,
-        final Double2D location
-    ) {
-        return field.setObjectLocation(vessel, location);
-    }
+  /** Places {@code vessel} at {@code location}. */
+  @SuppressWarnings("WeakerAccess")
+  public boolean setPoint(final Vessel vessel, final Double2D location) {
+    return field.setObjectLocation(vessel, location);
+  }
 
-    /** @return {@code vessel}'s recorded location, or {@code null} if it has none */
-    public Double2D getPoint(final Vessel vessel) {
-        return field.getObjectLocation(vessel);
-    }
+  /** @return {@code vessel}'s recorded location, or {@code null} if it has none */
+  public Double2D getPoint(final Vessel vessel) {
+    return field.getObjectLocation(vessel);
+  }
 
-    /** @return the cell containing {@code vessel}'s recorded location, or {@code null} if it has none */
-    public Int2D getCell(final Vessel vessel) {
-        final Double2D point = getPoint(vessel);
-        return point != null ? modelGrid.toCell(point) : null;
-    }
-
+  /** @return the cell containing {@code vessel}'s recorded location, or {@code null} if it has none */
+  public Int2D getCell(final Vessel vessel) {
+    final Double2D point = getPoint(vessel);
+    return point != null ? modelGrid.toCell(point) : null;
+  }
 }

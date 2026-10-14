@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import java.nio.file.Path;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +31,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.nio.file.Path;
-import java.util.function.Supplier;
 
 /**
  * Resolves {@code ncFilePath} against scope once (cheap — no file I/O),
@@ -43,19 +42,23 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class StaticNetCdfGridReaderFactory<S extends Scope>
-    extends RelativeScopeFactory<S, Supplier<StaticNetCdfGridReader>> {
+public class StaticNetCdfGridReaderFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  Supplier<StaticNetCdfGridReader>
+> {
 
-    private Factory<? super S, ? extends Path> ncFilePath;
-    private String latitudeDimensionName;
-    private String longitudeDimensionName;
+  private Factory<? super S, ? extends Path> ncFilePath;
+  private String latitudeDimensionName;
+  private String longitudeDimensionName;
 
-    @Override
-    protected Supplier<StaticNetCdfGridReader> newInstance(final S scope) {
-        final Path resolvedPath = ncFilePath.get(scope);
-        return () -> new StaticNetCdfGridReader(
-            resolvedPath, latitudeDimensionName, longitudeDimensionName
-        );
-    }
-
+  @Override
+  protected Supplier<StaticNetCdfGridReader> newInstance(final S scope) {
+    final Path resolvedPath = ncFilePath.get(scope);
+    return () ->
+      new StaticNetCdfGridReader(
+        resolvedPath,
+        latitudeDimensionName,
+        longitudeDimensionName
+      );
+  }
 }

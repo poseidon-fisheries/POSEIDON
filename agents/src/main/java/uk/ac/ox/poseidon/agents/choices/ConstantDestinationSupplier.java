@@ -22,25 +22,24 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.Optional;
 import lombok.NonNull;
 import sim.util.Int2D;
-
-import java.util.Optional;
 
 /** A {@link DestinationSupplier} that always returns the same fixed cell. */
 public class ConstantDestinationSupplier implements DestinationSupplier {
 
-    @NonNull
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private final Optional<Int2D> destination;
+  @NonNull
+  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+  private final Optional<Int2D> destination;
 
-    /** @param destination the cell to always return; may be {@code null} */
-    public ConstantDestinationSupplier(final Int2D destination) {
-        this.destination = Optional.ofNullable(destination);
-    }
+  /** @param destination the cell to always return; may be {@code null} */
+  public ConstantDestinationSupplier(final Int2D destination) {
+    this.destination = Optional.ofNullable(destination);
+  }
 
-    @Override
-    public Optional<Int2D> get() {
-        return destination;
-    }
+  @Override
+  public Optional<Int2D> get() {
+    return destination;
+  }
 }

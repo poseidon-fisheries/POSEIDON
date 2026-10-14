@@ -39,12 +39,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @EqualsAndHashCode(callSuper = true)
 public class CoordinateFactory extends GlobalScopeFactory<Coordinate> {
 
-    private double longitude;
-    private double latitude;
+  private double longitude;
+  private double latitude;
 
-    @Override
-    protected Coordinate newInstance(final Scope scope) {
-        return new Coordinate(longitude, latitude);
-    }
-
+  @Override
+  protected Coordinate newInstance(final Scope scope) {
+    return new Coordinate(longitude, latitude);
+  }
 }

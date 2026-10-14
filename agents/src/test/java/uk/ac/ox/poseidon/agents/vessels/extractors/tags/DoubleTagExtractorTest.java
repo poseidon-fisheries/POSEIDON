@@ -22,51 +22,52 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors.tags;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+
 class DoubleTagExtractorTest {
 
-    private static Vessel vesselWithTag(final Object tagValue) {
-        final Vessel vessel = mock(Vessel.class);
-        when(vessel.getTag("loa")).thenReturn(Optional.ofNullable(tagValue));
-        return vessel;
-    }
+  private static Vessel vesselWithTag(final Object tagValue) {
+    final Vessel vessel = mock(Vessel.class);
+    when(vessel.getTag("loa")).thenReturn(Optional.ofNullable(tagValue));
+    return vessel;
+  }
 
-    @Test
-    void extractsDoubleFromNumberTag() {
-        final DoubleTagExtractor extractor = new DoubleTagExtractor("loa");
-        assertThat(extractor.apply(vesselWithTag(12.5))).isEqualTo(12.5);
-    }
+  @Test
+  void extractsDoubleFromNumberTag() {
+    final DoubleTagExtractor extractor = new DoubleTagExtractor("loa");
+    assertThat(extractor.apply(vesselWithTag(12.5))).isEqualTo(12.5);
+  }
 
-    @Test
-    void extractsDoubleFromNumericStringTag() {
-        final DoubleTagExtractor extractor = new DoubleTagExtractor("loa");
-        assertThat(extractor.apply(vesselWithTag(" 12.5 "))).isEqualTo(12.5);
-    }
+  @Test
+  void extractsDoubleFromNumericStringTag() {
+    final DoubleTagExtractor extractor = new DoubleTagExtractor("loa");
+    assertThat(extractor.apply(vesselWithTag(" 12.5 "))).isEqualTo(12.5);
+  }
 
-    @Test
-    void returnsNullForNonNumericStringTag() {
-        final DoubleTagExtractor extractor = new DoubleTagExtractor("loa");
-        assertThat(extractor.apply(vesselWithTag("not-a-number"))).isNull();
-    }
+  @Test
+  void returnsNullForNonNumericStringTag() {
+    final DoubleTagExtractor extractor = new DoubleTagExtractor("loa");
+    assertThat(extractor.apply(vesselWithTag("not-a-number"))).isNull();
+  }
 
-    @Test
-    void returnsNullForNonFiniteNumberTag() {
-        final DoubleTagExtractor extractor = new DoubleTagExtractor("loa");
-        assertThat(extractor.apply(vesselWithTag(Double.NaN))).isNull();
-        assertThat(extractor.apply(vesselWithTag(Double.POSITIVE_INFINITY))).isNull();
-    }
+  @Test
+  void returnsNullForNonFiniteNumberTag() {
+    final DoubleTagExtractor extractor = new DoubleTagExtractor("loa");
+    assertThat(extractor.apply(vesselWithTag(Double.NaN))).isNull();
+    assertThat(
+      extractor.apply(vesselWithTag(Double.POSITIVE_INFINITY))
+    ).isNull();
+  }
 
-    @Test
-    void returnsNullWhenTagIsAbsent() {
-        final DoubleTagExtractor extractor = new DoubleTagExtractor("loa");
-        assertThat(extractor.apply(vesselWithTag(null))).isNull();
-    }
+  @Test
+  void returnsNullWhenTagIsAbsent() {
+    final DoubleTagExtractor extractor = new DoubleTagExtractor("loa");
+    assertThat(extractor.apply(vesselWithTag(null))).isNull();
+  }
 }

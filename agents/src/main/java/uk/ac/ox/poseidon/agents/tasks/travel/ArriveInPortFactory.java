@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 @EqualsAndHashCode(callSuper = true)
 public class ArriveInPortFactory extends VesselTaskFactory<ArriveInPort> {
 
-    @Override
-    protected ArriveInPort newTask(final VesselScope scope) {
-        return new ArriveInPort();
-    }
+  @Override
+  protected ArriveInPort newTask(final VesselScope scope) {
+    return new ArriveInPort();
+  }
 }

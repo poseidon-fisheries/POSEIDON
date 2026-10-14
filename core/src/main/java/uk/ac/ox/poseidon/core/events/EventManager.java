@@ -29,17 +29,12 @@ package uk.ac.ox.poseidon.core.events;
  * consumers across the simulation.
  */
 public interface EventManager {
+  /** @param listener the listener to register, for its {@link Listener#getEventClass()} */
+  void addListener(Listener<?> listener);
 
-    /** @param listener the listener to register, for its {@link Listener#getEventClass()} */
-    void addListener(
-        Listener<?> listener
-    );
+  /** @param listener the listener to unregister */
+  void removeListener(Listener<?> listener);
 
-    /** @param listener the listener to unregister */
-    void removeListener(
-        Listener<?> listener
-    );
-
-    /** @param event the event to dispatch to every matching registered listener */
-    <E> void broadcast(E event);
+  /** @param event the event to dispatch to every matching registered listener */
+  <E> void broadcast(E event);
 }

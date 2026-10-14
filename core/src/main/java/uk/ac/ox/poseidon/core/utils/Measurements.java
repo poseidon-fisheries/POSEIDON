@@ -22,56 +22,55 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
-import si.uom.NonSI;
-import tech.units.indriya.format.SimpleUnitFormat;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static tech.units.indriya.unit.UnitDimension.MASS;
 
 import javax.measure.Dimension;
 import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static tech.units.indriya.unit.UnitDimension.MASS;
+import si.uom.NonSI;
+import tech.units.indriya.format.SimpleUnitFormat;
 
 /** Helpers for parsing and validating JSR-385 {@link Unit}s. */
 public class Measurements {
 
-    static {
-        // We need to trigger static initialization of the NonSI class
-        // in order for non-SI unit string formats to be registered
-        // noinspection ResultOfMethodCallIgnored
-        NonSI.getInstance();
-    }
+  static {
+    // We need to trigger static initialization of the NonSI class
+    // in order for non-SI unit string formats to be registered
+    // noinspection ResultOfMethodCallIgnored
+    NonSI.getInstance();
+  }
 
-    private Measurements() {
-    }
+  private Measurements() {}
 
-    /**
-     * @param unitString    the unit string to parse
-     * @param quantityClass the quantity type to type the parsed unit as
-     * @param dimension     the dimension the parsed unit must have
-     * @return the parsed unit typed as {@code Q}, or {@code null} if its dimension doesn't match
-     * {@code dimension}
-     */
-    public static <Q extends Quantity<Q>> Unit<Q> parseUnit(
-        final String unitString,
-        final Class<Q> quantityClass,
-        final Dimension dimension
-    ) {
-        final Unit<?> unit = SimpleUnitFormat.getInstance().parse(unitString);
-        return unit.getDimension() == dimension
-            ? unit.asType(quantityClass)
-            : null;
-    }
+  /**
+   * @param unitString    the unit string to parse
+   * @param quantityClass the quantity type to type the parsed unit as
+   * @param dimension     the dimension the parsed unit must have
+   * @return the parsed unit typed as {@code Q}, or {@code null} if its dimension doesn't match
+   * {@code dimension}
+   */
+  public static <Q extends Quantity<Q>> Unit<Q> parseUnit(
+    final String unitString,
+    final Class<Q> quantityClass,
+    final Dimension dimension
+  ) {
+    final Unit<?> unit = SimpleUnitFormat.getInstance().parse(unitString);
+    return unit.getDimension() == dimension ? unit.asType(quantityClass) : null;
+  }
 
-    /**
-     * @param unitString a non-null, non-empty unit string
-     * @return the parsed unit, typed as {@link Mass}, or {@code null} if its dimension isn't mass
-     */
-    public static Unit<Mass> parseMassUnit(final String unitString) {
-        checkNotNull(unitString, "Trying to parse null as a unit of mass");
-        checkArgument(!unitString.isEmpty(), "Trying to parse an empty string as a unit of mass");
-        return parseUnit(unitString, Mass.class, MASS);
-    }
+  /**
+   * @param unitString a non-null, non-empty unit string
+   * @return the parsed unit, typed as {@link Mass}, or {@code null} if its dimension isn't mass
+   */
+  public static Unit<Mass> parseMassUnit(final String unitString) {
+    checkNotNull(unitString, "Trying to parse null as a unit of mass");
+    checkArgument(
+      !unitString.isEmpty(),
+      "Trying to parse an empty string as a unit of mass"
+    );
+    return parseUnit(unitString, Mass.class, MASS);
+  }
 }

@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.vessels.holds;
 
+import static tech.units.indriya.unit.Units.KILOGRAM;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,11 +35,6 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-
-import static tech.units.indriya.unit.Units.KILOGRAM;
-
 /**
  * A {@link VesselScopeFactory} counterpart of {@link StandardBiomassHold}, built via
  * {@link Factories#standardBiomassHold}.
@@ -44,18 +43,23 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class StandardBiomassHoldFactory extends VesselScopeFactory<StandardBiomassHold> {
+public class StandardBiomassHoldFactory
+  extends VesselScopeFactory<StandardBiomassHold>
+{
 
-    private Factory<? super VesselScope, ? extends Quantity<Mass>> capacity;
-    private Factory<? super VesselScope, ? extends Quantity<Mass>> tolerance;
-    private Factory<? super VesselScope, ? extends CatchCategoriser> catchCategoriser;
+  private Factory<? super VesselScope, ? extends Quantity<Mass>> capacity;
+  private Factory<? super VesselScope, ? extends Quantity<Mass>> tolerance;
+  private Factory<
+    ? super VesselScope,
+    ? extends CatchCategoriser
+  > catchCategoriser;
 
-    @Override
-    protected StandardBiomassHold newInstance(final VesselScope scope) {
-        return new StandardBiomassHold(
-            catchCategoriser.get(scope),
-            capacity.get(scope).to(KILOGRAM).getValue().doubleValue(),
-            tolerance.get(scope).to(KILOGRAM).getValue().doubleValue()
-        );
-    }
+  @Override
+  protected StandardBiomassHold newInstance(final VesselScope scope) {
+    return new StandardBiomassHold(
+      catchCategoriser.get(scope),
+      capacity.get(scope).to(KILOGRAM).getValue().doubleValue(),
+      tolerance.get(scope).to(KILOGRAM).getValue().doubleValue()
+    );
+  }
 }

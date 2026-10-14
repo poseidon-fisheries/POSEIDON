@@ -22,12 +22,12 @@
 
 package uk.ac.ox.poseidon.core.providers.random;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import ec.util.MersenneTwisterFast;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.NonNull;
 import uk.ac.ox.poseidon.core.providers.IntProvider;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * An {@link IntProvider} that returns a uniformly distributed random integer in the inclusive
@@ -36,38 +36,40 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class RandomInt implements IntProvider {
 
-    private final @NonNull MersenneTwisterFast rng;
-    private final int minimum;
-    private final int range;
+  private final @NonNull MersenneTwisterFast rng;
+  private final int minimum;
+  private final int range;
 
-    /**
-     * @param rng     the shared RNG to draw from
-     * @param minimum the inclusive lower bound
-     * @param maximum the inclusive upper bound, must be greater than or equal to {@code minimum}
-     */
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public RandomInt(
-        @NonNull final MersenneTwisterFast rng,
-        final int minimum,
-        final int maximum
-    ) {
-        checkArgument(
-            maximum >= minimum,
-            "Maximum (%s) must be greater or equal to minimum (%s)".formatted(maximum, minimum)
-        );
-        final long rangeLong = (long) maximum - minimum + 1;
-        checkArgument(
-            rangeLong > 0 && rangeLong <= Integer.MAX_VALUE,
-            "Range must be within integer bounds"
-        );
-        this.rng = rng;
-        this.minimum = minimum;
-        this.range = (int) rangeLong;
-    }
+  /**
+   * @param rng     the shared RNG to draw from
+   * @param minimum the inclusive lower bound
+   * @param maximum the inclusive upper bound, must be greater than or equal to {@code minimum}
+   */
+  @SuppressFBWarnings("EI_EXPOSE_REP2")
+  public RandomInt(
+    @NonNull final MersenneTwisterFast rng,
+    final int minimum,
+    final int maximum
+  ) {
+    checkArgument(
+      maximum >= minimum,
+      "Maximum (%s) must be greater or equal to minimum (%s)".formatted(
+        maximum,
+        minimum
+      )
+    );
+    final long rangeLong = (long) maximum - minimum + 1;
+    checkArgument(
+      rangeLong > 0 && rangeLong <= Integer.MAX_VALUE,
+      "Range must be within integer bounds"
+    );
+    this.rng = rng;
+    this.minimum = minimum;
+    this.range = (int) rangeLong;
+  }
 
-    @Override
-    public int getAsInt() {
-        return minimum + rng.nextInt(range);
-    }
-
+  @Override
+  public int getAsInt() {
+    return minimum + rng.nextInt(range);
+  }
 }

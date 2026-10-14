@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import java.time.Duration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.time.Duration;
 
 /**
  * A {@link GlobalScopeFactory} for a fixed {@link Duration}. No separate plain component class
@@ -43,31 +42,34 @@ import java.time.Duration;
 @EqualsAndHashCode(callSuper = true)
 public class DurationFactory extends GlobalScopeFactory<Duration> {
 
-    private long days;
-    private long hours;
-    private long minutes;
-    private long seconds;
+  private long days;
+  private long hours;
+  private long minutes;
+  private long seconds;
 
-    /**
-     * @param duration the duration to decompose into days/hours/minutes/seconds
-     */
-    public DurationFactory(final Duration duration) {
-        days = duration.toDaysPart();
-        hours = duration.toHoursPart();
-        minutes = duration.toMinutesPart();
-        seconds = duration.toSecondsPart();
-    }
+  /**
+   * @param duration the duration to decompose into days/hours/minutes/seconds
+   */
+  public DurationFactory(final Duration duration) {
+    days = duration.toDaysPart();
+    hours = duration.toHoursPart();
+    minutes = duration.toMinutesPart();
+    seconds = duration.toSecondsPart();
+  }
 
-    /**
-     * @param iso8601Duration an ISO-8601 duration string (e.g. {@code "PT1H30M"}), as accepted by
-     *                        {@link Duration#parse}
-     */
-    public DurationFactory(final String iso8601Duration) {
-        this(Duration.parse(iso8601Duration));
-    }
+  /**
+   * @param iso8601Duration an ISO-8601 duration string (e.g. {@code "PT1H30M"}), as accepted by
+   *                        {@link Duration#parse}
+   */
+  public DurationFactory(final String iso8601Duration) {
+    this(Duration.parse(iso8601Duration));
+  }
 
-    @Override
-    protected Duration newInstance(final Scope scope) {
-        return Duration.ofDays(days).plusHours(hours).plusMinutes(minutes).plusSeconds(seconds);
-    }
+  @Override
+  protected Duration newInstance(final Scope scope) {
+    return Duration.ofDays(days)
+      .plusHours(hours)
+      .plusMinutes(minutes)
+      .plusSeconds(seconds);
+  }
 }

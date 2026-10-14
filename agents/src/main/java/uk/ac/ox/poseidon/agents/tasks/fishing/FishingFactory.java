@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,8 +33,6 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
 
-import java.util.function.Supplier;
-
 /**
  * A {@link VesselTaskFactory} counterpart of {@link Fishing}, built via {@link Factories#fishing}.
  */
@@ -43,15 +42,20 @@ import java.util.function.Supplier;
 @EqualsAndHashCode(callSuper = true)
 public class FishingFactory extends VesselTaskFactory<Fishing> {
 
-    private Factory<? super VesselScope, ? extends Supplier<Fisheable>> fisheableSupplier;
-    private Factory<? super VesselScope, ? extends DispositionProcess> dispositionProcess;
+  private Factory<
+    ? super VesselScope,
+    ? extends Supplier<Fisheable>
+  > fisheableSupplier;
+  private Factory<
+    ? super VesselScope,
+    ? extends DispositionProcess
+  > dispositionProcess;
 
-    @Override
-    protected Fishing newTask(final VesselScope scope) {
-        return new Fishing(
-            fisheableSupplier.get(scope),
-            dispositionProcess.get(scope)
-        );
-    }
-
+  @Override
+  protected Fishing newTask(final VesselScope scope) {
+    return new Fishing(
+      fisheableSupplier.get(scope),
+      dispositionProcess.get(scope)
+    );
+  }
 }

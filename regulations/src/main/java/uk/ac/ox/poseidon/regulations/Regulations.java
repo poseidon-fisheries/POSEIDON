@@ -37,19 +37,17 @@ import java.util.function.Predicate;
  */
 @FunctionalInterface
 public interface Regulations<A extends Action<?>> extends Predicate<A> {
+  /** @return whether {@code action} is allowed under this rule */
+  boolean isPermitted(A action);
 
-    /** @return whether {@code action} is allowed under this rule */
-    boolean isPermitted(A action);
+  /** @return the negation of {@link #isPermitted} */
+  default boolean isForbidden(final A action) {
+    return !isPermitted(action);
+  }
 
-    /** @return the negation of {@link #isPermitted} */
-    default boolean isForbidden(final A action) {
-        return !isPermitted(action);
-    }
-
-    /** @return whether {@code action} is allowed under this rule, as {@link #isPermitted} */
-    @Override
-    default boolean test(final A action) {
-        return isPermitted(action);
-    }
-
+  /** @return whether {@code action} is allowed under this rule, as {@link #isPermitted} */
+  @Override
+  default boolean test(final A action) {
+    return isPermitted(action);
+  }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.predicates.comparable;
 
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Supplier;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link Between}, built via
@@ -40,21 +39,23 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BetweenFactory<S extends Scope, T> extends RelativeScopeFactory<S, Between<T>> {
+public class BetweenFactory<
+  S extends Scope,
+  T
+> extends RelativeScopeFactory<S, Between<T>> {
 
-    private Factory<? super S, ? extends Supplier<? extends T>> minimum;
-    private Factory<? super S, ? extends Supplier<? extends T>> maximum;
-    private boolean includeMinimum = true;
-    private boolean includeMaximum = true;
+  private Factory<? super S, ? extends Supplier<? extends T>> minimum;
+  private Factory<? super S, ? extends Supplier<? extends T>> maximum;
+  private boolean includeMinimum = true;
+  private boolean includeMaximum = true;
 
-    @Override
-    protected Between<T> newInstance(final S scope) {
-        return new Between<>(
-            minimum.get(scope),
-            maximum.get(scope),
-            includeMinimum,
-            includeMaximum
-        );
-    }
-
+  @Override
+  protected Between<T> newInstance(final S scope) {
+    return new Between<>(
+      minimum.get(scope),
+      maximum.get(scope),
+      includeMinimum,
+      includeMaximum
+    );
+  }
 }

@@ -29,17 +29,17 @@ import sim.util.Double2D;
  * for one diffusion step, given each cell's current biomass and carrying capacity.
  */
 public interface BiomassDiffusionRule {
-    /**
-     * @param currentBiomassX   cell X's current biomass
-     * @param carryingCapacityX cell X's carrying capacity
-     * @param currentBiomassY   cell Y's current biomass
-     * @param carryingCapacityY cell Y's carrying capacity
-     * @return the (X, Y) biomasses after this diffusion step
-     */
-    Double2D updatedBiomasses(
-        double currentBiomassX,
-        double carryingCapacityX,
-        double currentBiomassY,
-        double carryingCapacityY
-    );
+  /**
+   * @param currentBiomassX   cell X's current biomass
+   * @param carryingCapacityX cell X's carrying capacity
+   * @param currentBiomassY   cell Y's current biomass
+   * @param carryingCapacityY cell Y's carrying capacity
+   * @return the (X, Y) biomasses after this diffusion step
+   */
+  Double2D updatedBiomasses(
+    double currentBiomassX,
+    double carryingCapacityX,
+    double currentBiomassY,
+    double carryingCapacityY
+  );
 }

@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.math.DoubleMath.isMathematicalInteger;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +32,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
-
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.math.DoubleMath.isMathematicalInteger;
 
 /**
  * A {@link GlobalScopeFactory} for a {@link ModelGrid} covering a fixed geographic bounding box,
@@ -45,48 +45,54 @@ import static com.google.common.math.DoubleMath.isMathematicalInteger;
 @EqualsAndHashCode(callSuper = true)
 public class ModelGridFactory extends GlobalScopeFactory<ModelGrid> {
 
-    private double resolutionInDegrees;
-    private double westLongitude;
-    private double eastLongitude;
-    private double southLatitude;
-    private double northLatitude;
+  private double resolutionInDegrees;
+  private double westLongitude;
+  private double eastLongitude;
+  private double southLatitude;
+  private double northLatitude;
 
-    /**
-     * @throws IllegalStateException if the width or height (in degrees) isn't an exact multiple
-     *                                of {@code resolutionInDegrees}
-     */
-    @Override
-    protected ModelGrid newInstance(final Scope scope) {
-        final double widthInDegrees = eastLongitude - westLongitude;
-        final double heightInDegrees = northLatitude - southLatitude;
-        final int gridWidth = validateDimension("Width", widthInDegrees, resolutionInDegrees);
-        final int gridHeight = validateDimension("Height", heightInDegrees, resolutionInDegrees);
-        return ModelGrid.create(
-            gridWidth,
-            gridHeight,
-            new Envelope(
-                westLongitude,
-                eastLongitude,
-                southLatitude,
-                northLatitude
-            )
-        );
-    }
+  /**
+   * @throws IllegalStateException if the width or height (in degrees) isn't an exact multiple
+   *                                of {@code resolutionInDegrees}
+   */
+  @Override
+  protected ModelGrid newInstance(final Scope scope) {
+    final double widthInDegrees = eastLongitude - westLongitude;
+    final double heightInDegrees = northLatitude - southLatitude;
+    final int gridWidth = validateDimension(
+      "Width",
+      widthInDegrees,
+      resolutionInDegrees
+    );
+    final int gridHeight = validateDimension(
+      "Height",
+      heightInDegrees,
+      resolutionInDegrees
+    );
+    return ModelGrid.create(
+      gridWidth,
+      gridHeight,
+      new Envelope(westLongitude, eastLongitude, southLatitude, northLatitude)
+    );
+  }
 
-    private int validateDimension(
-        final String dimensionName,
-        final double dimensionSize,
-        final double resolution
-    ) {
-        final double gridDimension = dimensionSize / resolution;
-        checkState(
-            isMathematicalInteger(gridDimension),
-            String.format(
-                "%s must be an exact multiple of the resolution. " +
-                    "%s: %s degrees, Resolution: %s degrees.",
-                dimensionName, dimensionName, dimensionSize, resolution
-            )
-        );
-        return (int) gridDimension;
-    }
+  private int validateDimension(
+    final String dimensionName,
+    final double dimensionSize,
+    final double resolution
+  ) {
+    final double gridDimension = dimensionSize / resolution;
+    checkState(
+      isMathematicalInteger(gridDimension),
+      String.format(
+        "%s must be an exact multiple of the resolution. " +
+          "%s: %s degrees, Resolution: %s degrees.",
+        dimensionName,
+        dimensionName,
+        dimensionSize,
+        resolution
+      )
+    );
+    return (int) gridDimension;
+  }
 }

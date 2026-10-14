@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core.scopes;
 
+import java.lang.ref.WeakReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import uk.ac.ox.poseidon.core.Simulation;
-
-import java.lang.ref.WeakReference;
 
 /**
  * A {@link Scope} tied to a single {@link Simulation} run, used by factories whose output must
@@ -40,29 +39,26 @@ import java.lang.ref.WeakReference;
 @EqualsAndHashCode(callSuper = true)
 public class SimulationScope extends Scope {
 
-    private final WeakReference<Simulation> simulation;
+  private final WeakReference<Simulation> simulation;
 
-    /**
-     * Copy constructor: shares the same underlying simulation reference as {@code simulationScope}.
-     */
-    public SimulationScope(final SimulationScope simulationScope) {
-        this.simulation = simulationScope.simulation;
-    }
+  /**
+   * Copy constructor: shares the same underlying simulation reference as {@code simulationScope}.
+   */
+  public SimulationScope(final SimulationScope simulationScope) {
+    this.simulation = simulationScope.simulation;
+  }
 
-    /**
-     * @param simulation the simulation this scope is tied to, held via a {@link WeakReference}
-     */
-    public SimulationScope(
-        final Simulation simulation
-    ) {
-        this.simulation = new WeakReference<>(simulation);
-    }
+  /**
+   * @param simulation the simulation this scope is tied to, held via a {@link WeakReference}
+   */
+  public SimulationScope(final Simulation simulation) {
+    this.simulation = new WeakReference<>(simulation);
+  }
 
-    /**
-     * @return the scoped simulation, or {@code null} if it has already been garbage-collected.
-     */
-    public Simulation getSimulation() {
-        return simulation.get();
-    }
-
+  /**
+   * @return the scoped simulation, or {@code null} if it has already been garbage-collected.
+   */
+  public Simulation getSimulation() {
+    return simulation.get();
+  }
 }

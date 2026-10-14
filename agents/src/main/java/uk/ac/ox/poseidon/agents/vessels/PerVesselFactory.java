@@ -44,15 +44,15 @@ import uk.ac.ox.poseidon.core.PerScopeFactory;
 @EqualsAndHashCode(callSuper = true)
 public class PerVesselFactory<T> extends PerScopeFactory<VesselScope, T> {
 
-    private Factory<? super VesselScope, ? extends T> delegate;
+  private Factory<? super VesselScope, ? extends T> delegate;
 
-    @Override
-    protected Object makeKey(final VesselScope scope) {
-        return scope.getVessel();
-    }
+  @Override
+  protected Object makeKey(final VesselScope scope) {
+    return scope.getVessel();
+  }
 
-    @Override
-    protected Class<VesselScope> scopeClass() {
-        return VesselScope.class;
-    }
+  @Override
+  protected Class<VesselScope> scopeClass() {
+    return VesselScope.class;
+  }
 }

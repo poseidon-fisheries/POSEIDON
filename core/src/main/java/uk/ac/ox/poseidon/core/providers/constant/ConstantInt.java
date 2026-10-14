@@ -32,11 +32,10 @@ import uk.ac.ox.poseidon.core.providers.IntProvider;
 @RequiredArgsConstructor
 public class ConstantInt implements IntProvider {
 
-    private final int value;
+  private final int value;
 
-    @Override
-    public int getAsInt() {
-        return value;
-    }
-
+  @Override
+  public int getAsInt() {
+    return value;
+  }
 }

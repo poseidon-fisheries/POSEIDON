@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.allocators;
 
+import java.util.function.DoubleSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.DoubleSupplier;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link SupplierAllocator}, built via
@@ -40,13 +39,15 @@ import java.util.function.DoubleSupplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SupplierAllocatorFactory<S extends Scope>
-    extends RelativeScopeFactory<S, SupplierAllocator> {
+public class SupplierAllocatorFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  SupplierAllocator
+> {
 
-    private Factory<? super S, ? extends DoubleSupplier> doubleSupplier;
+  private Factory<? super S, ? extends DoubleSupplier> doubleSupplier;
 
-    @Override
-    protected SupplierAllocator newInstance(final S scope) {
-        return new SupplierAllocator(doubleSupplier.get(scope));
-    }
+  @Override
+  protected SupplierAllocator newInstance(final S scope) {
+    return new SupplierAllocator(doubleSupplier.get(scope));
+  }
 }

@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.NoArgsConstructor;
+import static lombok.AccessLevel.PACKAGE;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static lombok.AccessLevel.PACKAGE;
+import lombok.NoArgsConstructor;
 
 /**
  * A separate {@link Memory} for each key, such as the code of the gear the observations were made
@@ -41,16 +40,16 @@ import static lombok.AccessLevel.PACKAGE;
 @NoArgsConstructor(access = PACKAGE)
 public class KeyedMemory<K, O, M> {
 
-    private final Map<K, Memory<O, M>> memories = new HashMap<>();
+  private final Map<K, Memory<O, M>> memories = new HashMap<>();
 
-    /**
-     * Gives the memory for {@code key}, to remember observations in or to read from. A key not
-     * seen before gets a new, empty memory, which is kept from then on.
-     *
-     * @param key the key to look up; may be {@code null}
-     * @return the memory for {@code key}, always the same one for the same key
-     */
-    public Memory<O, M> get(final K key) {
-        return memories.computeIfAbsent(key, k -> new Memory<>());
-    }
+  /**
+   * Gives the memory for {@code key}, to remember observations in or to read from. A key not
+   * seen before gets a new, empty memory, which is kept from then on.
+   *
+   * @param key the key to look up; may be {@code null}
+   * @return the memory for {@code key}, always the same one for the same key
+   */
+  public Memory<O, M> get(final K key) {
+    return memories.computeIfAbsent(key, k -> new Memory<>());
+  }
 }

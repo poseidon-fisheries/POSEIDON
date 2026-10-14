@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
+import java.util.function.DoubleSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,8 +31,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.providers.constant.ConstantDouble;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.DoubleSupplier;
 
 /**
  * A {@link RelativeScopeFactory} that resolves the given delegate {@link DoubleSupplier} once,
@@ -44,13 +43,15 @@ import java.util.function.DoubleSupplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FirstDoubleFromFactory<S extends Scope>
-    extends RelativeScopeFactory<S, DoubleProvider> {
+public class FirstDoubleFromFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  DoubleProvider
+> {
 
-    private Factory<? super S, ? extends DoubleSupplier> delegate;
+  private Factory<? super S, ? extends DoubleSupplier> delegate;
 
-    @Override
-    protected DoubleProvider newInstance(final S scope) {
-        return new ConstantDouble(delegate.get(scope).getAsDouble());
-    }
+  @Override
+  protected DoubleProvider newInstance(final S scope) {
+    return new ConstantDouble(delegate.get(scope).getAsDouble());
+  }
 }

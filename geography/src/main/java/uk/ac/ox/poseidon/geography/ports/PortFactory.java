@@ -42,12 +42,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @EqualsAndHashCode(callSuper = true)
 public class PortFactory extends GlobalScopeFactory<Port> {
 
-    private String code;
-    private String name;
+  private String code;
+  private String name;
 
-    @Override
-    protected Port newInstance(final Scope scope) {
-        return new Port(code, name);
-    }
-
+  @Override
+  protected Port newInstance(final Scope scope) {
+    return new Port(code, name);
+  }
 }

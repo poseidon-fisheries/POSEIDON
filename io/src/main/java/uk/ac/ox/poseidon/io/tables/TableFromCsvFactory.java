@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import java.io.IOException;
+import java.io.Reader;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,9 +34,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.io.sources.DataSource;
-
-import java.io.IOException;
-import java.io.Reader;
 
 /**
  * A {@link RelativeScopeFactory} that parses a resolved {@link DataSource}'s content as CSV into
@@ -50,19 +49,21 @@ import java.io.Reader;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TableFromCsvFactory<S extends Scope> extends RelativeScopeFactory<S, Table> {
+public class TableFromCsvFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  Table
+> {
 
-    private Factory<? super S, ? extends DataSource> dataSource;
+  private Factory<? super S, ? extends DataSource> dataSource;
 
-    @Override
-    protected Table newInstance(final S scope) {
-        try (final Reader reader = dataSource.get(scope).getReader()) {
-            return Table
-                .read()
-                .usingOptions(CsvReadOptions.builder(reader).sample(false));
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+  @Override
+  protected Table newInstance(final S scope) {
+    try (final Reader reader = dataSource.get(scope).getReader()) {
+      return Table.read().usingOptions(
+        CsvReadOptions.builder(reader).sample(false)
+      );
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
     }
-
+  }
 }

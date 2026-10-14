@@ -22,30 +22,27 @@
 
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
+import java.time.Duration;
+import java.util.function.Supplier;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
-import java.time.Duration;
-import java.util.function.Supplier;
-
 /** A vessel's fishing gear: how it catches, how long that takes, and what it costs in fuel. */
 public interface Gear {
+  /** @return this gear's identifying code */
+  String getCode();
 
-    /** @return this gear's identifying code */
-    String getCode();
+  /** @return litres of fuel burned per hour of fishing; {@code 0} unless overridden */
+  default double getLitresOfFuelConsumedPerHourOfFishing() {
+    return 0;
+  }
 
-    /** @return litres of fuel burned per hour of fishing; {@code 0} unless overridden */
-    default double getLitresOfFuelConsumedPerHourOfFishing() {
-        return 0;
-    }
+  /** @return supplies how long one fishing event with this gear takes */
+  Supplier<Duration> getDurationSupplier();
 
-    /** @return supplies how long one fishing event with this gear takes */
-    Supplier<Duration> getDurationSupplier();
+  /** @return what this gear catches from {@code fisheable}, removed from it in the process */
+  Bucket fish(Fisheable fisheable);
 
-    /** @return what this gear catches from {@code fisheable}, removed from it in the process */
-    Bucket fish(Fisheable fisheable);
-
-    /** @return {@code true} if this gear can actually be fished with */
-    boolean isActive();
-
+  /** @return {@code true} if this gear can actually be fished with */
+  boolean isActive();
 }

@@ -22,34 +22,38 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 class IndexedDiscardMortalityTest {
 
-    @Test
-    void appliesMortalityRatesToDiscardedAlive() {
-        final Species a = new Species("A", null, null);
-        final Species b = new Species("B", null, null);
-        final SpeciesIndex index = SpeciesIndex.of(a, b);
-        final Bucket discardedAlive = Bucket.of(new double[]{10.0, 20.0}, index);
-        final SpeciesIndexedDoubleArray rates =
-            SpeciesIndexedDoubleArray.of(new double[]{0.1, 0.0}, index);
-        final Disposition disposition =
-            new Disposition(Bucket.empty(), discardedAlive, Bucket.empty());
+  @Test
+  void appliesMortalityRatesToDiscardedAlive() {
+    final Species a = new Species("A", null, null);
+    final Species b = new Species("B", null, null);
+    final SpeciesIndex index = SpeciesIndex.of(a, b);
+    final Bucket discardedAlive = Bucket.of(new double[] { 10.0, 20.0 }, index);
+    final SpeciesIndexedDoubleArray rates = SpeciesIndexedDoubleArray.of(
+      new double[] { 0.1, 0.0 },
+      index
+    );
+    final Disposition disposition = new Disposition(
+      Bucket.empty(),
+      discardedAlive,
+      Bucket.empty()
+    );
 
-        final IndexedDiscardMortality process =
-            new IndexedDiscardMortality(rates);
-        final Disposition updated = process.partition(disposition, 0.0);
+    final IndexedDiscardMortality process = new IndexedDiscardMortality(rates);
+    final Disposition updated = process.partition(disposition, 0.0);
 
-        assertThat(updated.getDiscardedAlive().getKg(a)).isEqualTo(9.0);
-        assertThat(updated.getDiscardedAlive().getKg(b)).isEqualTo(20.0);
-        assertThat(updated.getDiscardedDead().getKg(a)).isEqualTo(1.0);
-        assertThat(updated.getDiscardedDead().getKg(b)).isEqualTo(0.0);
-    }
+    assertThat(updated.getDiscardedAlive().getKg(a)).isEqualTo(9.0);
+    assertThat(updated.getDiscardedAlive().getKg(b)).isEqualTo(20.0);
+    assertThat(updated.getDiscardedDead().getKg(a)).isEqualTo(1.0);
+    assertThat(updated.getDiscardedDead().getKg(b)).isEqualTo(0.0);
+  }
 }

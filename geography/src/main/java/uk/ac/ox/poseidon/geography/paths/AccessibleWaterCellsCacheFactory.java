@@ -43,14 +43,16 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AccessibleWaterCellsCacheFactory<S extends Scope>
-    extends RelativeScopeFactory<S, AccessibleWaterCellsCache> {
+public class AccessibleWaterCellsCacheFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  AccessibleWaterCellsCache
+> {
 
-    private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
-    private Factory<? super S, ? extends PortGrid> portGrid;
+  private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+  private Factory<? super S, ? extends PortGrid> portGrid;
 
-    @Override
-    protected AccessibleWaterCellsCache newInstance(final S scope) {
-        return new AccessibleWaterCellsCache();
-    }
+  @Override
+  protected AccessibleWaterCellsCache newInstance(final S scope) {
+    return new AccessibleWaterCellsCache();
+  }
 }

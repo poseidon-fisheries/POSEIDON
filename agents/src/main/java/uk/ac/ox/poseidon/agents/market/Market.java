@@ -22,49 +22,46 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
 /** A place, at a {@link Port}, where a vessel sells its catch. */
 public interface Market {
+  /** @return this market's identifying code */
+  String getCode();
 
-    /** @return this market's identifying code */
-    String getCode();
+  /** @return the port this market is located at */
+  Port getPort();
 
-    /** @return the port this market is located at */
-    Port getPort();
+  /**
+   * @param vessel            the selling vessel
+   * @param categorisedCatch  the catch offered for sale
+   * @param dateTime          when the sale happens
+   * @return the resulting sale, recording what sold and what didn't
+   */
+  Sale sell(
+    Vessel vessel,
+    CategorisedCatch categorisedCatch,
+    LocalDateTime dateTime
+  );
 
-    /**
-     * @param vessel            the selling vessel
-     * @param categorisedCatch  the catch offered for sale
-     * @param dateTime          when the sale happens
-     * @return the resulting sale, recording what sold and what didn't
-     */
-    Sale sell(
-        Vessel vessel,
-        CategorisedCatch categorisedCatch,
-        LocalDateTime dateTime
-    );
+  /**
+   * Prices {@code categorisedCatch} as {@link #sell} would, without selling it: nothing is
+   * broadcast and no sale ID is used.
+   *
+   * @param categorisedCatch the catch to price
+   * @return the items that would sell, one per priced (category, species) combination; what
+   * has no price is left out
+   */
+  List<Sale.Item> quote(CategorisedCatch categorisedCatch);
 
-    /**
-     * Prices {@code categorisedCatch} as {@link #sell} would, without selling it: nothing is
-     * broadcast and no sale ID is used.
-     *
-     * @param categorisedCatch the catch to price
-     * @return the items that would sell, one per priced (category, species) combination; what
-     * has no price is left out
-     */
-    List<Sale.Item> quote(CategorisedCatch categorisedCatch);
-
-    /**
-     * @return when this market's prices last changed, or empty if they never have: a
-     * {@link #quote} made strictly after that still holds
-     */
-    Optional<LocalDateTime> getLastPriceChangeDateTime();
-
+  /**
+   * @return when this market's prices last changed, or empty if they never have: a
+   * {@link #quote} made strictly after that still holds
+   */
+  Optional<LocalDateTime> getLastPriceChangeDateTime();
 }

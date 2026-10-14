@@ -37,46 +37,48 @@ import uk.ac.ox.poseidon.core.events.Listener;
  */
 public class TripEvaluator implements Listener<TripEvent> {
 
-    private final MutableOptionValues<Int2D> optionValues;
-    private final Evaluator<Int2D> evaluator;
-    private Evaluation<Int2D> currentEvaluation;
+  private final MutableOptionValues<Int2D> optionValues;
+  private final Evaluator<Int2D> evaluator;
+  private Evaluation<Int2D> currentEvaluation;
 
-    /**
-     * @param eventManager the event manager to listen on for trip start/end events
-     * @param optionValues where each completed trip's (destination, score) observation is fed
-     * @param evaluator    starts a fresh {@link Evaluation} for each trip's destination
-     */
-    public TripEvaluator(
-        final EventManager eventManager,
-        final MutableOptionValues<Int2D> optionValues,
-        final Evaluator<Int2D> evaluator
-    ) {
-        this.optionValues = optionValues;
-        this.evaluator = evaluator;
-        eventManager.addListener(this);
-    }
+  /**
+   * @param eventManager the event manager to listen on for trip start/end events
+   * @param optionValues where each completed trip's (destination, score) observation is fed
+   * @param evaluator    starts a fresh {@link Evaluation} for each trip's destination
+   */
+  public TripEvaluator(
+    final EventManager eventManager,
+    final MutableOptionValues<Int2D> optionValues,
+    final Evaluator<Int2D> evaluator
+  ) {
+    this.optionValues = optionValues;
+    this.evaluator = evaluator;
+    eventManager.addListener(this);
+  }
 
-    /** @return {@link TripEvent}{@code .class} */
-    @Override
-    public Class<? extends TripEvent> getEventClass() {
-        return TripEvent.class;
-    }
+  /** @return {@link TripEvent}{@code .class} */
+  @Override
+  public Class<? extends TripEvent> getEventClass() {
+    return TripEvent.class;
+  }
 
-    /**
-     * On a {@link TripStartEvent}, starts a fresh evaluation of the trip's destination. On a
-     * {@link TripEndEvent}, feeds that evaluation's (option, result) pair into
-     * {@link #optionValues}.
-     */
-    @Override
-    public void receive(final TripEvent event) {
-        if (event instanceof TripStartEvent) {
-            currentEvaluation =
-                evaluator.newEvaluation(
-                    event.getTrip().getDestination(),
-                    event.getTrip().getEventManager()
-                );
-        } else if (event instanceof TripEndEvent) {
-            optionValues.observe(currentEvaluation.getOption(), currentEvaluation.getResult());
-        }
+  /**
+   * On a {@link TripStartEvent}, starts a fresh evaluation of the trip's destination. On a
+   * {@link TripEndEvent}, feeds that evaluation's (option, result) pair into
+   * {@link #optionValues}.
+   */
+  @Override
+  public void receive(final TripEvent event) {
+    if (event instanceof TripStartEvent) {
+      currentEvaluation = evaluator.newEvaluation(
+        event.getTrip().getDestination(),
+        event.getTrip().getEventManager()
+      );
+    } else if (event instanceof TripEndEvent) {
+      optionValues.observe(
+        currentEvaluation.getOption(),
+        currentEvaluation.getResult()
+      );
     }
+  }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,8 +31,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.providers.constant.Constant;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Supplier;
 
 /**
  * A {@link RelativeScopeFactory} that resolves the given delegate {@link Supplier} once, when
@@ -44,13 +43,15 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FirstValueFromFactory<S extends Scope, T>
-    extends RelativeScopeFactory<S, Provider<T>> {
+public class FirstValueFromFactory<
+  S extends Scope,
+  T
+> extends RelativeScopeFactory<S, Provider<T>> {
 
-    private Factory<? super S, ? extends Supplier<? extends T>> delegate;
+  private Factory<? super S, ? extends Supplier<? extends T>> delegate;
 
-    @Override
-    protected Provider<T> newInstance(final S scope) {
-        return new Constant<>(delegate.get(scope).get());
-    }
+  @Override
+  protected Provider<T> newInstance(final S scope) {
+    return new Constant<>(delegate.get(scope).get());
+  }
 }

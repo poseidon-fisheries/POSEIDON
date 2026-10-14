@@ -22,10 +22,9 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import lombok.RequiredArgsConstructor;
 
 /**
  * A {@link Predicate} that is true iff the tested value {@link Object#equals(Object) equals} a
@@ -36,11 +35,10 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class Equal<T> implements Predicate<T> {
 
-    private final Supplier<? extends T> value;
+  private final Supplier<? extends T> value;
 
-    @Override
-    public boolean test(final T t) {
-        return value.get().equals(t);
-    }
-
+  @Override
+  public boolean test(final T t) {
+    return value.get().equals(t);
+  }
 }

@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.List;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of {@link NumericIntervalMapper} (specialized to
@@ -41,45 +40,47 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class NumericIntervalToStringMapperFactory
-    extends GlobalScopeFactory<NumericIntervalMapper<String>> {
+  extends GlobalScopeFactory<NumericIntervalMapper<String>>
+{
 
-    private List<Interval> intervals;
+  private List<Interval> intervals;
 
-    /**
-     * @return an {@link Interval} literal, for use as a
-     * {@link Factories#numericIntervalToStringMapper(Interval...)} argument
-     */
-    public static Interval interval(
-        final Double lowerBoundInclusive,
-        final Double upperBoundExclusive,
-        final String value
-    ) {
-        return new Interval(lowerBoundInclusive, upperBoundExclusive, value);
-    }
+  /**
+   * @return an {@link Interval} literal, for use as a
+   * {@link Factories#numericIntervalToStringMapper(Interval...)} argument
+   */
+  public static Interval interval(
+    final Double lowerBoundInclusive,
+    final Double upperBoundExclusive,
+    final String value
+  ) {
+    return new Interval(lowerBoundInclusive, upperBoundExclusive, value);
+  }
 
-    @Override
-    protected NumericIntervalMapper<String> newInstance(final Scope scope) {
-        return new NumericIntervalMapper<>(
-            intervals.stream()
-                .map(interval ->
-                    new NumericIntervalMapper.Interval<>(
-                        interval.getLowerBoundInclusive(),
-                        interval.getUpperBoundExclusive(),
-                        interval.getValue()
-                    )
-                )
-                .toList()
-        );
-    }
+  @Override
+  protected NumericIntervalMapper<String> newInstance(final Scope scope) {
+    return new NumericIntervalMapper<>(
+      intervals
+        .stream()
+        .map(interval ->
+          new NumericIntervalMapper.Interval<>(
+            interval.getLowerBoundInclusive(),
+            interval.getUpperBoundExclusive(),
+            interval.getValue()
+          )
+        )
+        .toList()
+    );
+  }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Interval {
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Interval {
 
-        // Null means unbounded, matching the runtime mapper interval semantics.
-        private Double lowerBoundInclusive;
-        private Double upperBoundExclusive;
-        private String value;
-    }
+    // Null means unbounded, matching the runtime mapper interval semantics.
+    private Double lowerBoundInclusive;
+    private Double upperBoundExclusive;
+    private String value;
+  }
 }

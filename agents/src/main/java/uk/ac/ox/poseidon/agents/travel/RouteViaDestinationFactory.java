@@ -40,17 +40,19 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class RouteViaDestinationFactory extends VesselScopeFactory<RouteViaDestination> {
+public class RouteViaDestinationFactory
+  extends VesselScopeFactory<RouteViaDestination>
+{
 
-    private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
-    private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
+  private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
+  private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
 
-    @Override
-    protected RouteViaDestination newInstance(final VesselScope scope) {
-        return new RouteViaDestination(
-            scope.getVessel(),
-            pathFinder.get(scope),
-            distance.get(scope)
-        );
-    }
+  @Override
+  protected RouteViaDestination newInstance(final VesselScope scope) {
+    return new RouteViaDestination(
+      scope.getVessel(),
+      pathFinder.get(scope),
+      distance.get(scope)
+    );
+  }
 }

@@ -27,16 +27,18 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 /** A {@link DispositionProcess} that moves all currently discarded-alive catch into discarded-dead. */
 public class FullDiscardMortality implements DispositionProcess {
 
-    /** @return {@code currentDisposition} with all of its discarded-alive catch moved to discarded-dead */
-    @Override
-    public Disposition partition(
-        final Disposition currentDisposition,
-        final double availableCapacityInKg
-    ) {
-        return new Disposition(
-            currentDisposition.getRetained(),
-            Bucket.empty(),
-            currentDisposition.getDiscardedDead().add(currentDisposition.getDiscardedAlive())
-        );
-    }
+  /** @return {@code currentDisposition} with all of its discarded-alive catch moved to discarded-dead */
+  @Override
+  public Disposition partition(
+    final Disposition currentDisposition,
+    final double availableCapacityInKg
+  ) {
+    return new Disposition(
+      currentDisposition.getRetained(),
+      Bucket.empty(),
+      currentDisposition
+        .getDiscardedDead()
+        .add(currentDisposition.getDiscardedAlive())
+    );
+  }
 }

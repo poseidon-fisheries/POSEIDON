@@ -22,10 +22,9 @@
 
 package uk.ac.ox.poseidon.geography.grids.suppliers;
 
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-
-import java.util.function.Supplier;
 
 /**
  * A {@link Supplier} of a fixed, resolved {@link DoubleGrid}'s current sum. Built via
@@ -34,11 +33,10 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class GridSumSupplier implements Supplier<Double> {
 
-    private final DoubleGrid grid;
+  private final DoubleGrid grid;
 
-    @Override
-    public Double get() {
-        return grid.getSum();
-    }
-
+  @Override
+  public Double get() {
+    return grid.getSum();
+  }
 }

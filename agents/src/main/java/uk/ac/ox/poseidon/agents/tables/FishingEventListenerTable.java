@@ -24,6 +24,8 @@ package uk.ac.ox.poseidon.agents.tables;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import java.util.Map;
+import java.util.Optional;
 import tech.tablesaw.api.DateTimeColumn;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
@@ -31,9 +33,6 @@ import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
-
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * A {@link ListenerTable} that records one row per species per {@link FishingEvent}: the
@@ -43,89 +42,100 @@ import java.util.Optional;
 @SuppressWarnings("FieldCanBeLocal")
 public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
 
-    /** Name of the vessel-ID column. */
-    public static final String VESSEL_ID = "vessel_id";
-    /** Name of the event start-time column. */
-    public static final String START_DATE_TIME = "start_date_time";
-    /** Name of the event end-time column. */
-    public static final String END_DATE_TIME = "end_date_time";
-    /** Name of the event's end-location longitude column. */
-    public static final String LONGITUDE = "longitude";
-    /** Name of the event's end-location latitude column. */
-    public static final String LATITUDE = "latitude";
-    /** Name of the species-code column. */
-    public static final String SPECIES_CODE = "species_code";
-    /** Name of the gross-catch column. */
-    public static final String GROSS_CATCH = "gross_catch";
-    /** Name of the retained-biomass column. */
-    public static final String RETAINED = "retained";
-    /** Name of the discarded-alive-biomass column. */
-    public static final String DISCARDED_ALIVE = "discarded_alive";
-    /** Name of the discarded-dead-biomass column. */
-    public static final String DISCARDED_DEAD = "discarded_dead";
+  /** Name of the vessel-ID column. */
+  public static final String VESSEL_ID = "vessel_id";
+  /** Name of the event start-time column. */
+  public static final String START_DATE_TIME = "start_date_time";
+  /** Name of the event end-time column. */
+  public static final String END_DATE_TIME = "end_date_time";
+  /** Name of the event's end-location longitude column. */
+  public static final String LONGITUDE = "longitude";
+  /** Name of the event's end-location latitude column. */
+  public static final String LATITUDE = "latitude";
+  /** Name of the species-code column. */
+  public static final String SPECIES_CODE = "species_code";
+  /** Name of the gross-catch column. */
+  public static final String GROSS_CATCH = "gross_catch";
+  /** Name of the retained-biomass column. */
+  public static final String RETAINED = "retained";
+  /** Name of the discarded-alive-biomass column. */
+  public static final String DISCARDED_ALIVE = "discarded_alive";
+  /** Name of the discarded-dead-biomass column. */
+  public static final String DISCARDED_DEAD = "discarded_dead";
 
-    private final StringColumn vesselId = StringColumn.create(VESSEL_ID);
-    private final DateTimeColumn startDateTime = DateTimeColumn.create(START_DATE_TIME);
-    private final DateTimeColumn endDateTime = DateTimeColumn.create(END_DATE_TIME);
-    private final DoubleColumn lon = DoubleColumn.create(LONGITUDE);
-    private final DoubleColumn lat = DoubleColumn.create(LATITUDE);
-    private final StringColumn speciesCode = StringColumn.create(SPECIES_CODE);
-    private final DoubleColumn grossCatch = DoubleColumn.create(GROSS_CATCH);
-    private final DoubleColumn retained = DoubleColumn.create(RETAINED);
-    private final DoubleColumn discardedAlive = DoubleColumn.create(DISCARDED_ALIVE);
-    private final DoubleColumn discardedDead = DoubleColumn.create(DISCARDED_DEAD);
+  private final StringColumn vesselId = StringColumn.create(VESSEL_ID);
+  private final DateTimeColumn startDateTime = DateTimeColumn.create(
+    START_DATE_TIME
+  );
+  private final DateTimeColumn endDateTime = DateTimeColumn.create(
+    END_DATE_TIME
+  );
+  private final DoubleColumn lon = DoubleColumn.create(LONGITUDE);
+  private final DoubleColumn lat = DoubleColumn.create(LATITUDE);
+  private final StringColumn speciesCode = StringColumn.create(SPECIES_CODE);
+  private final DoubleColumn grossCatch = DoubleColumn.create(GROSS_CATCH);
+  private final DoubleColumn retained = DoubleColumn.create(RETAINED);
+  private final DoubleColumn discardedAlive = DoubleColumn.create(
+    DISCARDED_ALIVE
+  );
+  private final DoubleColumn discardedDead = DoubleColumn.create(
+    DISCARDED_DEAD
+  );
 
-    /** Creates the table with all ten columns, empty. */
-    public FishingEventListenerTable() {
-        super(FishingEvent.class);
-        get().addColumns(
-            vesselId,
-            startDateTime,
-            endDateTime,
-            lon,
-            lat,
-            speciesCode,
-            grossCatch,
-            retained,
-            discardedAlive,
-            discardedDead
-        );
-    }
+  /** Creates the table with all ten columns, empty. */
+  public FishingEventListenerTable() {
+    super(FishingEvent.class);
+    get().addColumns(
+      vesselId,
+      startDateTime,
+      endDateTime,
+      lon,
+      lat,
+      speciesCode,
+      grossCatch,
+      retained,
+      discardedAlive,
+      discardedDead
+    );
+  }
 
-    /** Appends one row per species involved in {@code event} to {@link #table}. */
-    @Override
-    public void receive(final FishingEvent event) {
-        final Disposition disposition = event.getOutcome().getDisposition();
-        final Map<String, Bucket> buckets = Map.of(
-            GROSS_CATCH, event.getOutcome().getGrossCatch(),
-            RETAINED, disposition.getRetained(),
-            DISCARDED_ALIVE, disposition.getDiscardedAlive(),
-            DISCARDED_DEAD, disposition.getDiscardedDead()
-        );
-        final Table<Species, String, Double> table = HashBasedTable.create();
-        buckets.forEach((columnName, bucket) ->
-            bucket.forEachBiomassValue((species, biomass) ->
-                table.put(species, columnName, biomass)
-            )
-        );
-        table.rowKeySet().forEach(species -> {
-            // FIXME: this repeats the event info for each species, which is a colossal waste
-            //  of space. We should have some kind of event id (which needs to be implemented) and
-            //  store the catch data in a separate table.
-            vesselId.append(event.getAction().getAgent().getId());
-            startDateTime.append(event.getStartDateTime());
-            endDateTime.append(event.getEndDateTime());
-            lon.append(event.getAction().getEndCoordinate().lon);
-            lat.append(event.getAction().getEndCoordinate().lat);
-            speciesCode.append(species.getCode());
-            buckets.keySet().forEach(columnName ->
-                get()
-                    .doubleColumn(columnName)
-                    .append(
-                        Optional.ofNullable(table.get(species, columnName)).orElse(0.0)
-                    )
-            );
-        });
-
-    }
+  /** Appends one row per species involved in {@code event} to {@link #table}. */
+  @Override
+  public void receive(final FishingEvent event) {
+    final Disposition disposition = event.getOutcome().getDisposition();
+    final Map<String, Bucket> buckets = Map.of(
+      GROSS_CATCH,
+      event.getOutcome().getGrossCatch(),
+      RETAINED,
+      disposition.getRetained(),
+      DISCARDED_ALIVE,
+      disposition.getDiscardedAlive(),
+      DISCARDED_DEAD,
+      disposition.getDiscardedDead()
+    );
+    final Table<Species, String, Double> table = HashBasedTable.create();
+    buckets.forEach((columnName, bucket) ->
+      bucket.forEachBiomassValue((species, biomass) ->
+        table.put(species, columnName, biomass)
+      )
+    );
+    table.rowKeySet().forEach(species -> {
+      // FIXME: this repeats the event info for each species, which is a colossal waste
+      //  of space. We should have some kind of event id (which needs to be implemented) and
+      //  store the catch data in a separate table.
+      vesselId.append(event.getAction().getAgent().getId());
+      startDateTime.append(event.getStartDateTime());
+      endDateTime.append(event.getEndDateTime());
+      lon.append(event.getAction().getEndCoordinate().lon);
+      lat.append(event.getAction().getEndCoordinate().lat);
+      speciesCode.append(species.getCode());
+      buckets.keySet().forEach(columnName ->
+        get()
+          .doubleColumn(columnName)
+          .append(
+            Optional.ofNullable(table.get(species, columnName)).orElse(0.0)
+          )
+      );
+    });
+  }
 }

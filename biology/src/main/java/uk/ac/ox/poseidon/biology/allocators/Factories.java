@@ -22,52 +22,55 @@
 
 package uk.ac.ox.poseidon.biology.allocators;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
+
+import java.util.function.DoubleSupplier;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.function.DoubleSupplier;
-
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
-
 /** Factories for {@link uk.ac.ox.poseidon.geography.allocators.Allocator}s over biomass grids. */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @param carryingCapacityGrid factory for the grid to weigh cells by
-     * @param proportionSupplier   factory for the supplier of the proportion (in {@code [0, 1]})
-     *                             to weigh each cell by
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-     * {@link ProportionOfCarryingCapacityAllocator}
-     * @see ProportionOfCarryingCapacityAllocator
-     */
-    public static <S extends Scope> ProportionOfCarryingCapacityAllocatorFactory<S>
-    proportionOfCarryingCapacityAllocator(
-        final Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid,
-        final Factory<? super S, ? extends DoubleSupplier> proportionSupplier
-    ) {
-        return new ProportionOfCarryingCapacityAllocatorFactory<>(
-            carryingCapacityGrid,
-            proportionSupplier
-        );
-    }
+  /**
+   * @param carryingCapacityGrid factory for the grid to weigh cells by
+   * @param proportionSupplier   factory for the supplier of the proportion (in {@code [0, 1]})
+   *                             to weigh each cell by
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * {@link ProportionOfCarryingCapacityAllocator}
+   * @see ProportionOfCarryingCapacityAllocator
+   */
+  public static <S extends Scope> ProportionOfCarryingCapacityAllocatorFactory<S> proportionOfCarryingCapacityAllocator(
+    final Factory<
+      ? super S,
+      ? extends CarryingCapacityGrid
+    > carryingCapacityGrid,
+    final Factory<? super S, ? extends DoubleSupplier> proportionSupplier
+  ) {
+    return new ProportionOfCarryingCapacityAllocatorFactory<>(
+      carryingCapacityGrid,
+      proportionSupplier
+    );
+  }
 
-    /**
-     * @param carryingCapacityGrid factory for the grid to weigh cells by
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-     * {@link ProportionOfCarryingCapacityAllocator} weighing every cell by its full carrying
-     * capacity
-     * @see ProportionOfCarryingCapacityAllocator
-     */
-    public static <S extends Scope> ProportionOfCarryingCapacityAllocatorFactory<S>
-    fullCarryingCapacityAllocator(
-        final Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid
-    ) {
-        return new ProportionOfCarryingCapacityAllocatorFactory<>(
-            carryingCapacityGrid,
-            constantDouble(1.0)
-        );
-    }
+  /**
+   * @param carryingCapacityGrid factory for the grid to weigh cells by
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * {@link ProportionOfCarryingCapacityAllocator} weighing every cell by its full carrying
+   * capacity
+   * @see ProportionOfCarryingCapacityAllocator
+   */
+  public static <S extends Scope> ProportionOfCarryingCapacityAllocatorFactory<S> fullCarryingCapacityAllocator(
+    final Factory<
+      ? super S,
+      ? extends CarryingCapacityGrid
+    > carryingCapacityGrid
+  ) {
+    return new ProportionOfCarryingCapacityAllocatorFactory<>(
+      carryingCapacityGrid,
+      constantDouble(1.0)
+    );
+  }
 }

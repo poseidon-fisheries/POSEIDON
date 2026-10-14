@@ -34,51 +34,58 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * delegate computes the result. Not built directly — see
  * {@link DefaultPathFinderFactory}/{@link uk.ac.ox.poseidon.geography.paths.Factories}.
  */
-public class CachingGridPathFinder extends CachingPathFinder<Int2D> implements GridPathFinder {
+public class CachingGridPathFinder
+  extends CachingPathFinder<Int2D>
+  implements GridPathFinder
+{
 
-    private final GridPathFinder pathFinder;
-    private final AccessibleWaterCellsCache accessibleWaterCellsCache;
+  private final GridPathFinder pathFinder;
+  private final AccessibleWaterCellsCache accessibleWaterCellsCache;
 
-    CachingGridPathFinder(
-        final GridPathFinder pathFinder,
-        final PathCache<Int2D> cache,
-        final AccessibleWaterCellsCache accessibleWaterCellsCache
-    ) {
-        super(pathFinder, cache);
-        this.pathFinder = pathFinder;
-        this.accessibleWaterCellsCache = accessibleWaterCellsCache;
-    }
+  CachingGridPathFinder(
+    final GridPathFinder pathFinder,
+    final PathCache<Int2D> cache,
+    final AccessibleWaterCellsCache accessibleWaterCellsCache
+  ) {
+    super(pathFinder, cache);
+    this.pathFinder = pathFinder;
+    this.accessibleWaterCellsCache = accessibleWaterCellsCache;
+  }
 
-    @Override
-    public ImmutableList<Int2D> getAccessibleWaterCells(final Int2D startingCell) {
-        return accessibleWaterCellsCache.getAccessibleWaterCells(startingCell, pathFinder);
-    }
+  @Override
+  public ImmutableList<Int2D> getAccessibleWaterCells(
+    final Int2D startingCell
+  ) {
+    return accessibleWaterCellsCache.getAccessibleWaterCells(
+      startingCell,
+      pathFinder
+    );
+  }
 
-    @Override
-    public ImmutableList<Int2D> getAccessibleWaterNeighbours(
-        final Int2D startingCell,
-        final int neighbourhoodSize
-    ) {
-        return accessibleWaterCellsCache.getAccessibleWaterNeighbours(
-            startingCell,
-            neighbourhoodSize,
-            pathFinder
-        );
-    }
+  @Override
+  public ImmutableList<Int2D> getAccessibleWaterNeighbours(
+    final Int2D startingCell,
+    final int neighbourhoodSize
+  ) {
+    return accessibleWaterCellsCache.getAccessibleWaterNeighbours(
+      startingCell,
+      neighbourhoodSize,
+      pathFinder
+    );
+  }
 
-    @Override
-    public ModelGrid getModelGrid() {
-        return pathFinder.getModelGrid();
-    }
+  @Override
+  public ModelGrid getModelGrid() {
+    return pathFinder.getModelGrid();
+  }
 
-    @Override
-    public boolean isWater(final Int2D cell) {
-        return pathFinder.isWater(cell);
-    }
+  @Override
+  public boolean isWater(final Int2D cell) {
+    return pathFinder.isWater(cell);
+  }
 
-    @Override
-    public boolean isNavigable(final Int2D cell) {
-        return pathFinder.isNavigable(cell);
-    }
-
+  @Override
+  public boolean isNavigable(final Int2D cell) {
+    return pathFinder.isNavigable(cell);
+  }
 }

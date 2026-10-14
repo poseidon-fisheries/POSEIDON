@@ -22,20 +22,19 @@
 
 package uk.ac.ox.poseidon.agents.vessels.friends;
 
-import ec.util.MersenneTwisterFast;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
+import static java.util.function.Predicate.not;
+import static uk.ac.ox.poseidon.core.MasonUtils.reservoirSample;
 
+import ec.util.MersenneTwisterFast;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import static java.util.function.Predicate.not;
-import static uk.ac.ox.poseidon.core.MasonUtils.reservoirSample;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 
 /**
  * A per-vessel supplier that maintains a bounded, randomly sampled set of "friends" from a pool of
@@ -52,31 +51,38 @@ import static uk.ac.ox.poseidon.core.MasonUtils.reservoirSample;
 @RequiredArgsConstructor
 public class DynamicFriendsSupplier implements Supplier<Set<Vessel>> {
 
-    private final int targetNumberOfFriends;
-    @NonNull private final VesselsGetter potentialFriends;
-    @NonNull private final Predicate<? super Vessel> friendshipCondition;
-    @NonNull private final Vessel vessel;
-    @NonNull private final MersenneTwisterFast rng;
+  private final int targetNumberOfFriends;
 
-    private final Set<Vessel> currentFriends = new HashSet<>();
+  @NonNull
+  private final VesselsGetter potentialFriends;
 
-    @Override
-    public Set<Vessel> get() {
+  @NonNull
+  private final Predicate<? super Vessel> friendshipCondition;
 
-        currentFriends.removeIf(not(friendshipCondition));
+  @NonNull
+  private final Vessel vessel;
 
-        if (currentFriends.size() < targetNumberOfFriends) {
-            reservoirSample(
-                potentialFriends.getVessels(),
-                targetNumberOfFriends - currentFriends.size(),
-                v -> v != this.vessel
-                    && !currentFriends.contains(v)
-                    && friendshipCondition.test(v),
-                rng
-            )
-                .forEach(currentFriends::add);
-        }
+  @NonNull
+  private final MersenneTwisterFast rng;
 
-        return Collections.unmodifiableSet(currentFriends);
+  private final Set<Vessel> currentFriends = new HashSet<>();
+
+  @Override
+  public Set<Vessel> get() {
+    currentFriends.removeIf(not(friendshipCondition));
+
+    if (currentFriends.size() < targetNumberOfFriends) {
+      reservoirSample(
+        potentialFriends.getVessels(),
+        targetNumberOfFriends - currentFriends.size(),
+        v ->
+          v != this.vessel &&
+          !currentFriends.contains(v) &&
+          friendshipCondition.test(v),
+        rng
+      ).forEach(currentFriends::add);
     }
+
+    return Collections.unmodifiableSet(currentFriends);
+  }
 }

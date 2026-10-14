@@ -39,12 +39,17 @@ import uk.ac.ox.poseidon.core.Factory;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class InfiniteBiomassHoldFactory extends VesselScopeFactory<InfiniteBiomassHold> {
+public class InfiniteBiomassHoldFactory
+  extends VesselScopeFactory<InfiniteBiomassHold>
+{
 
-    private Factory<? super VesselScope, ? extends CatchCategoriser> catchCategoriser;
+  private Factory<
+    ? super VesselScope,
+    ? extends CatchCategoriser
+  > catchCategoriser;
 
-    @Override
-    protected InfiniteBiomassHold newInstance(final VesselScope scope) {
-        return new InfiniteBiomassHold(catchCategoriser.get(scope));
-    }
+  @Override
+  protected InfiniteBiomassHold newInstance(final VesselScope scope) {
+    return new InfiniteBiomassHold(catchCategoriser.get(scope));
+  }
 }

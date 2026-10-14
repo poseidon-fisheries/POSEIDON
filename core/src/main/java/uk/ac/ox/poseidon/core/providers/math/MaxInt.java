@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
+import java.util.function.IntSupplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.IntProvider;
-
-import java.util.function.IntSupplier;
 
 /**
  * An {@link IntProvider} that returns the greater of two supplied int values, recomputed on every
@@ -36,11 +35,14 @@ import java.util.function.IntSupplier;
 @RequiredArgsConstructor
 public class MaxInt implements IntProvider {
 
-    @NonNull private final IntSupplier a;
-    @NonNull private final IntSupplier b;
+  @NonNull
+  private final IntSupplier a;
 
-    @Override
-    public int getAsInt() {
-        return Math.max(a.getAsInt(), b.getAsInt());
-    }
+  @NonNull
+  private final IntSupplier b;
+
+  @Override
+  public int getAsInt() {
+    return Math.max(a.getAsInt(), b.getAsInt());
+  }
 }

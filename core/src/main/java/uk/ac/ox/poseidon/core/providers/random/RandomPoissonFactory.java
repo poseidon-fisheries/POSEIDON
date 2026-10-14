@@ -38,13 +38,14 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class RandomPoissonFactory extends SimulationScopeFactory<RandomPoisson> {
+public class RandomPoissonFactory
+  extends SimulationScopeFactory<RandomPoisson>
+{
 
-    private double mean;
+  private double mean;
 
-    @Override
-    protected RandomPoisson newInstance(final SimulationScope scope) {
-        return new RandomPoisson(new Poisson(mean, scope.getSimulation().random));
-    }
-
+  @Override
+  protected RandomPoisson newInstance(final SimulationScope scope) {
+    return new RandomPoisson(new Poisson(mean, scope.getSimulation().random));
+  }
 }

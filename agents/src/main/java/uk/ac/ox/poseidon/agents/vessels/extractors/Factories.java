@@ -22,40 +22,43 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors;
 
+import java.util.function.Function;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Function;
 
 /**
  * Factories for functions extracting a value from a vessel.
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-     * {@link TripCostFromHourlyCosts}
-     * @see TripCostFromHourlyCostsFactory
-     */
-    public static <S extends Scope> TripCostFromHourlyCostsFactory<S> tripCostFromHourlyCosts(
-        final Factory<? super S, ? extends Function<? super Vessel, ? extends Money>>
-            hourlyCostsExtractor
-    ) {
-        return new TripCostFromHourlyCostsFactory<>(hourlyCostsExtractor);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * {@link TripCostFromHourlyCosts}
+   * @see TripCostFromHourlyCostsFactory
+   */
+  public static <S extends Scope> TripCostFromHourlyCostsFactory<S> tripCostFromHourlyCosts(
+    final Factory<
+      ? super S,
+      ? extends Function<? super Vessel, ? extends Money>
+    > hourlyCostsExtractor
+  ) {
+    return new TripCostFromHourlyCostsFactory<>(hourlyCostsExtractor);
+  }
 
-    /**
-     * @param propertyPath the dotted path of properties to follow from the vessel, e.g.
-     *                     {@code "gear.code"} for the code of the vessel's current gear
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
-     * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a vessel
-     * @see VesselPropertyFactory
-     */
-    public static <R> VesselPropertyFactory<R> vesselProperty(final String propertyPath) {
-        return new VesselPropertyFactory<>(propertyPath);
-    }
+  /**
+   * @param propertyPath the dotted path of properties to follow from the vessel, e.g.
+   *                     {@code "gear.code"} for the code of the vessel's current gear
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
+   * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a vessel
+   * @see VesselPropertyFactory
+   */
+  public static <R> VesselPropertyFactory<R> vesselProperty(
+    final String propertyPath
+  ) {
+    return new VesselPropertyFactory<>(propertyPath);
+  }
 }

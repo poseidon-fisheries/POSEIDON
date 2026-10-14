@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import java.util.Map;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +31,6 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link TableFromMap}, built via
@@ -41,17 +40,20 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TableFromMapFactory<S extends Scope, K, V>
-    extends RelativeScopeFactory<S, TableFromMap<K, V>> {
+public class TableFromMapFactory<
+  S extends Scope,
+  K,
+  V
+> extends RelativeScopeFactory<S, TableFromMap<K, V>> {
 
-    private Factory<? super S, ? extends TableDefinition> tableDefinition;
-    private Factory<? super S, ? extends Supplier<Map<K, V>>> mapSupplier;
+  private Factory<? super S, ? extends TableDefinition> tableDefinition;
+  private Factory<? super S, ? extends Supplier<Map<K, V>>> mapSupplier;
 
-    @Override
-    protected TableFromMap<K, V> newInstance(final S scope) {
-        return new TableFromMap<>(
-            tableDefinition.get(scope),
-            mapSupplier.get(scope)
-        );
-    }
+  @Override
+  protected TableFromMap<K, V> newInstance(final S scope) {
+    return new TableFromMap<>(
+      tableDefinition.get(scope),
+      mapSupplier.get(scope)
+    );
+  }
 }

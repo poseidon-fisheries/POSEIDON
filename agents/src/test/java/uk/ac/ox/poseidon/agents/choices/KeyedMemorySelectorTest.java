@@ -22,24 +22,35 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 class KeyedMemorySelectorTest {
 
-    private final KeyedMemory<String, String, Double> keyedMemory = new KeyedMemory<>();
-    private final KeyedMemorySelector<String, String, String, Double> memorySelector =
-        new KeyedMemorySelector<>(keyedMemory, input -> input.substring(0, 1));
+  private final KeyedMemory<String, String, Double> keyedMemory =
+    new KeyedMemory<>();
+  private final KeyedMemorySelector<
+    String,
+    String,
+    String,
+    Double
+  > memorySelector = new KeyedMemorySelector<>(keyedMemory, input ->
+    input.substring(0, 1)
+  );
 
-    @Test
-    void selectsTheMemoryForTheKeyOfTheInput() {
-        assertThat(memorySelector.apply("trawl")).isSameAs(keyedMemory.get("t"));
-    }
+  @Test
+  void selectsTheMemoryForTheKeyOfTheInput() {
+    assertThat(memorySelector.apply("trawl")).isSameAs(keyedMemory.get("t"));
+  }
 
-    @Test
-    void inputsWithTheSameKeySelectTheSameMemory() {
-        assertThat(memorySelector.apply("trawl")).isSameAs(memorySelector.apply("troll"));
-        assertThat(memorySelector.apply("trawl")).isNotSameAs(memorySelector.apply("seine"));
-    }
+  @Test
+  void inputsWithTheSameKeySelectTheSameMemory() {
+    assertThat(memorySelector.apply("trawl")).isSameAs(
+      memorySelector.apply("troll")
+    );
+    assertThat(memorySelector.apply("trawl")).isNotSameAs(
+      memorySelector.apply("seine")
+    );
+  }
 }

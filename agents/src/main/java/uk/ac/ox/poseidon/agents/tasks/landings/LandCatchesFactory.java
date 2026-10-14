@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.tasks.landings;
 
+import java.time.Duration;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +31,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
-
-import java.time.Duration;
-import java.util.function.Supplier;
 
 /**
  * A {@link VesselTaskFactory} for a {@link LandCatches}. Built via {@link Factories#landCatches}.
@@ -42,10 +41,13 @@ import java.util.function.Supplier;
 @EqualsAndHashCode(callSuper = true)
 public class LandCatchesFactory extends VesselTaskFactory<LandCatches> {
 
-    private Factory<? super VesselScope, ? extends Supplier<Duration>> durationSupplier;
+  private Factory<
+    ? super VesselScope,
+    ? extends Supplier<Duration>
+  > durationSupplier;
 
-    @Override
-    protected LandCatches newTask(final VesselScope scope) {
-        return new LandCatches(durationSupplier.get(scope));
-    }
+  @Override
+  protected LandCatches newTask(final VesselScope scope) {
+    return new LandCatches(durationSupplier.get(scope));
+  }
 }

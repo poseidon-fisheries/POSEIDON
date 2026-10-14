@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.io.paths;
 
+import java.nio.file.Path;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.nio.file.Path;
 
 /**
  * A {@link GlobalScopeFactory} for a fixed, absolute {@link Path}, built via
@@ -38,18 +37,19 @@ import java.nio.file.Path;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class RootPathFactory
-    extends GlobalScopeFactory<Path>
-    implements PathFactory<Scope> {
+  extends GlobalScopeFactory<Path>
+  implements PathFactory<Scope>
+{
 
-    /** @param path the literal path, with any {@code "\\"} separators normalized to {@code "/"} */
-    public RootPathFactory(final String path) {
-        this.path = path.replace("\\", "/");
-    }
+  /** @param path the literal path, with any {@code "\\"} separators normalized to {@code "/"} */
+  public RootPathFactory(final String path) {
+    this.path = path.replace("\\", "/");
+  }
 
-    private String path;
+  private String path;
 
-    @Override
-    protected Path newInstance(final Scope scope) {
-        return Path.of(path);
-    }
+  @Override
+  protected Path newInstance(final Scope scope) {
+    return Path.of(path);
+  }
 }

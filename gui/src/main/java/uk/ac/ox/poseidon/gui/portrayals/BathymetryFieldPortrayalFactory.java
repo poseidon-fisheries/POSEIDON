@@ -22,14 +22,14 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
+import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
-
-import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
 
 @Data
 @NoArgsConstructor
@@ -38,32 +38,40 @@ import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
  * A {@link SimpleFieldPortrayalFactory} preset for a {@link BathymetricGrid}: labelled
  * "Bathymetry", diverging colour range around zero elevation.
  */
-public class BathymetryFieldPortrayalFactory extends SimpleFieldPortrayalFactory<SimulationScope> {
+public class BathymetryFieldPortrayalFactory
+  extends SimpleFieldPortrayalFactory<SimulationScope>
+{
 
-    /** @param bathymetricGrid the grid to portray; starts visible */
-    public BathymetryFieldPortrayalFactory(
-        final Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid
-    ) {
-        this(bathymetricGrid, true);
-    }
+  /** @param bathymetricGrid the grid to portray; starts visible */
+  public BathymetryFieldPortrayalFactory(
+    final Factory<
+      ? super SimulationScope,
+      ? extends BathymetricGrid
+    > bathymetricGrid
+  ) {
+    this(bathymetricGrid, true);
+  }
 
-    /**
-     * @param bathymetricGrid the grid to portray
-     * @param visible         whether this layer starts visible
-     */
-    public BathymetryFieldPortrayalFactory(
-        final Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid,
-        final boolean visible
-    ) {
-        super(
-            "Bathymetry",
-            new DivergingNumberGridPortrayalFactory(
-                OLERON,
-                "Elevation",
-                true,
-                bathymetricGrid
-            ),
-            visible
-        );
-    }
+  /**
+   * @param bathymetricGrid the grid to portray
+   * @param visible         whether this layer starts visible
+   */
+  public BathymetryFieldPortrayalFactory(
+    final Factory<
+      ? super SimulationScope,
+      ? extends BathymetricGrid
+    > bathymetricGrid,
+    final boolean visible
+  ) {
+    super(
+      "Bathymetry",
+      new DivergingNumberGridPortrayalFactory(
+        OLERON,
+        "Elevation",
+        true,
+        bathymetricGrid
+      ),
+      visible
+    );
+  }
 }

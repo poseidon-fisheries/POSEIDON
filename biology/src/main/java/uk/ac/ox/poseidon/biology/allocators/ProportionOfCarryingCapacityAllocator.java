@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.biology.allocators;
 
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
+
+import java.util.function.DoubleSupplier;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
-
-import java.util.function.DoubleSupplier;
-
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 /**
  * An {@link Allocator} that weighs a cell by a fixed proportion of its carrying capacity — e.g.
@@ -40,14 +39,14 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 @RequiredArgsConstructor
 public class ProportionOfCarryingCapacityAllocator implements Allocator {
 
-    private final CarryingCapacityGrid carryingCapacityGrid;
-    private final DoubleSupplier proportionSupplier;
+  private final CarryingCapacityGrid carryingCapacityGrid;
+  private final DoubleSupplier proportionSupplier;
 
-    /** @throws IllegalArgumentException if the resolved proportion isn't in {@code [0, 1]} */
-    @Override
-    public double applyAsDouble(final Int2D cell) {
-        final double proportion = proportionSupplier.getAsDouble();
-        checkUnitRange(proportion, "proportion of carrying capacity");
-        return proportion * carryingCapacityGrid.getCarryingCapacity(cell);
-    }
+  /** @throws IllegalArgumentException if the resolved proportion isn't in {@code [0, 1]} */
+  @Override
+  public double applyAsDouble(final Int2D cell) {
+    final double proportion = proportionSupplier.getAsDouble();
+    checkUnitRange(proportion, "proportion of carrying capacity");
+    return proportion * carryingCapacityGrid.getCarryingCapacity(cell);
+  }
 }

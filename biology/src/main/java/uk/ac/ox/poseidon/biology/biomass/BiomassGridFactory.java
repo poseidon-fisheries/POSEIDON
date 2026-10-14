@@ -43,19 +43,24 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @EqualsAndHashCode(callSuper = true)
 public class BiomassGridFactory extends SimulationScopeFactory<BiomassGrid> {
 
-    private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
-    private Factory<? super SimulationScope, ? extends Species> species;
-    private Factory<? super SimulationScope, ? extends Allocator> biomassAllocator;
+  private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
+  private Factory<? super SimulationScope, ? extends Species> species;
+  private Factory<
+    ? super SimulationScope,
+    ? extends Allocator
+  > biomassAllocator;
 
-    @Override
-    protected BiomassGrid newInstance(final SimulationScope scope) {
-        final Allocator biomassAllocator = this.biomassAllocator.get(scope);
-        final ModelGrid modelGrid = this.modelGrid.get(scope);
-        final double[][] biomassArray = modelGrid.makeDoubleArray();
-        modelGrid.getAllCells().forEach(cell ->
-            biomassArray[cell.x][cell.y] = biomassAllocator.applyAsDouble(cell)
-        );
-        return new DefaultBiomassGrid(modelGrid, species.get(scope), biomassArray);
-    }
-
+  @Override
+  protected BiomassGrid newInstance(final SimulationScope scope) {
+    final Allocator biomassAllocator = this.biomassAllocator.get(scope);
+    final ModelGrid modelGrid = this.modelGrid.get(scope);
+    final double[][] biomassArray = modelGrid.makeDoubleArray();
+    modelGrid
+      .getAllCells()
+      .forEach(
+        cell ->
+          biomassArray[cell.x][cell.y] = biomassAllocator.applyAsDouble(cell)
+      );
+    return new DefaultBiomassGrid(modelGrid, species.get(scope), biomassArray);
+  }
 }

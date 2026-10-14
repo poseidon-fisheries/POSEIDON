@@ -22,8 +22,13 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.geography.bathymetry.Factories.bathymetricGridFromElevationValues;
 
+import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
@@ -31,60 +36,53 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFactory;
 
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-
 class BathymetricGridFromElevationValuesFactoryTest {
 
-    final Simulation simulation = mock(Simulation.class);
-    BathymetricGridFromElevationValuesFactory<Scope> factory;
+  final Simulation simulation = mock(Simulation.class);
+  BathymetricGridFromElevationValuesFactory<Scope> factory;
 
-    @BeforeEach
-    void setUp() {
-        factory = bathymetricGridFromElevationValues(null, null);
-        factory.setModelGrid(
-            new ModelGridFactory(1, -1, 1, -1, 1)
+  @BeforeEach
+  void setUp() {
+    factory = bathymetricGridFromElevationValues(null, null);
+    factory.setModelGrid(new ModelGridFactory(1, -1, 1, -1, 1));
+  }
+
+  @Test
+  void elevationsValuesMustNotBeNull() {
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE)).isInstanceOf(
+      NullPointerException.class
+    );
+  }
+
+  @Test
+  void incorrectNumberOfElevationValuesFails() {
+    Stream.of(0, 3, 5)
+      .map(n ->
+        Stream.generate(() -> 0.0)
+          .limit(n)
+          .toList()
+      )
+      .forEach(_ -> {
+        factory.setElevationValues(List.of(0.0, 0.0, 0.0));
+        assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE)).isInstanceOf(
+          IllegalArgumentException.class
         );
-    }
+      });
+  }
 
-    @Test
-    void elevationsValuesMustNotBeNull() {
-        assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
-            .isInstanceOf(NullPointerException.class);
-    }
+  @Test
+  void correctNumberOfElevationValuesSucceeds() {
+    factory.setElevationValues(List.of(0.0, 0.0, 0.0, 0.0));
+    factory.get(Scope.GLOBAL_SCOPE);
+  }
 
-    @Test
-    void incorrectNumberOfElevationValuesFails() {
-        Stream
-            .of(0, 3, 5)
-            .map(n -> Stream.generate(() -> 0.0).limit(n).toList())
-            .forEach(_ -> {
-                factory.setElevationValues(List.of(0.0, 0.0, 0.0));
-                assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
-                    .isInstanceOf(IllegalArgumentException.class);
-            });
-    }
-
-    @Test
-    void correctNumberOfElevationValuesSucceeds() {
-        factory.setElevationValues(List.of(0.0, 0.0, 0.0, 0.0));
-        factory.get(Scope.GLOBAL_SCOPE);
-    }
-
-    @Test
-    void valuesAreMappedIntuitively() {
-        factory.setElevationValues(List.of(
-            0.0, 1.0,
-            2.0, 3.0
-        ));
-        final BathymetricGrid bathymetricGrid = factory.get(Scope.GLOBAL_SCOPE);
-        assertEquals(0.0, bathymetricGrid.getElevation(new Int2D(0, 0)));
-        assertEquals(1.0, bathymetricGrid.getElevation(new Int2D(1, 0)));
-        assertEquals(2.0, bathymetricGrid.getElevation(new Int2D(0, 1)));
-        assertEquals(3.0, bathymetricGrid.getElevation(new Int2D(1, 1)));
-    }
+  @Test
+  void valuesAreMappedIntuitively() {
+    factory.setElevationValues(List.of(0.0, 1.0, 2.0, 3.0));
+    final BathymetricGrid bathymetricGrid = factory.get(Scope.GLOBAL_SCOPE);
+    assertEquals(0.0, bathymetricGrid.getElevation(new Int2D(0, 0)));
+    assertEquals(1.0, bathymetricGrid.getElevation(new Int2D(1, 0)));
+    assertEquals(2.0, bathymetricGrid.getElevation(new Int2D(0, 1)));
+    assertEquals(3.0, bathymetricGrid.getElevation(new Int2D(1, 1)));
+  }
 }

@@ -22,59 +22,61 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import lombok.Getter;
 import lombok.NonNull;
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Lightweight array-backed implementation indexed by {@link SpeciesIndex}.
  */
-public class SpeciesIndexedDoubleArray implements SpeciesIndexedDoubles<SpeciesIndexedDoubleArray> {
+public class SpeciesIndexedDoubleArray
+  implements SpeciesIndexedDoubles<SpeciesIndexedDoubleArray>
+{
 
-    private final double @NonNull [] a;
+  private final double @NonNull [] a;
 
-    @Getter
-    private final @NonNull SpeciesIndex speciesIndex;
+  @Getter
+  private final @NonNull SpeciesIndex speciesIndex;
 
-    /**
-     * The array must be aligned with {@code speciesIndex} (same size and ordering).
-     */
-    private SpeciesIndexedDoubleArray(
-        final double @NonNull [] a,
-        @NonNull final SpeciesIndex speciesIndex
-    ) {
-        this.a = a;
-        this.speciesIndex = speciesIndex;
-    }
+  /**
+   * The array must be aligned with {@code speciesIndex} (same size and ordering).
+   */
+  private SpeciesIndexedDoubleArray(
+    final double @NonNull [] a,
+    @NonNull final SpeciesIndex speciesIndex
+  ) {
+    this.a = a;
+    this.speciesIndex = speciesIndex;
+  }
 
-    /**
-     * @param a            the values, aligned with {@code speciesIndex}; copied
-     * @param speciesIndex the index the array is aligned with
-     * @return a new instance holding a copy of {@code a}
-     * @throws IllegalArgumentException if {@code a}'s length doesn't match the index's size
-     */
-    public static SpeciesIndexedDoubleArray of(
-        final double @NonNull [] a,
-        @NonNull final SpeciesIndex speciesIndex
-    ) {
-        checkArgument(
-            a.length == speciesIndex.size(),
-            "Array length must match species index size"
-        );
-        return new SpeciesIndexedDoubleArray(a.clone(), speciesIndex);
-    }
+  /**
+   * @param a            the values, aligned with {@code speciesIndex}; copied
+   * @param speciesIndex the index the array is aligned with
+   * @return a new instance holding a copy of {@code a}
+   * @throws IllegalArgumentException if {@code a}'s length doesn't match the index's size
+   */
+  public static SpeciesIndexedDoubleArray of(
+    final double @NonNull [] a,
+    @NonNull final SpeciesIndex speciesIndex
+  ) {
+    checkArgument(
+      a.length == speciesIndex.size(),
+      "Array length must match species index size"
+    );
+    return new SpeciesIndexedDoubleArray(a.clone(), speciesIndex);
+  }
 
-    /**
-     * Returns the value at a valid index for {@code speciesIndex}.
-     */
-    @Override
-    public double getDouble(final int i) {
-        return a[i];
-    }
+  /**
+   * Returns the value at a valid index for {@code speciesIndex}.
+   */
+  @Override
+  public double getDouble(final int i) {
+    return a[i];
+  }
 
-    @Override
-    public SpeciesIndexedDoubleArray newInstance(final double[] values) {
-        return new SpeciesIndexedDoubleArray(values, speciesIndex);
-    }
-
+  @Override
+  public SpeciesIndexedDoubleArray newInstance(final double[] values) {
+    return new SpeciesIndexedDoubleArray(values, speciesIndex);
+  }
 }

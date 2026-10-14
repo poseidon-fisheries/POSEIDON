@@ -22,16 +22,15 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import tech.tablesaw.api.Table;
+import static com.google.common.base.Preconditions.checkArgument;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serial;
 import java.util.List;
 import java.util.function.Supplier;
-
-import static com.google.common.base.Preconditions.checkArgument;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import tech.tablesaw.api.Table;
 
 /**
  * A {@link Table} that grows one row per simulation step: each {@link #step} call appends the
@@ -40,38 +39,40 @@ import static com.google.common.base.Preconditions.checkArgument;
  * uk.ac.ox.poseidon.core.Factory[])} in this package.
  */
 public class SteppableTable implements Steppable, Supplier<Table> {
-    @Serial private static final long serialVersionUID = 1L;
 
-    private final transient Table table;
-    private final List<? extends Supplier<?>> valueSuppliers;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    /**
-     * @param tableDefinition the shape of the table to create
-     * @param valueSuppliers  one value supplier per column, in column order
-     * @throws IllegalArgumentException if the number of suppliers doesn't match the number of
-     *                                   columns in {@code tableDefinition}
-     */
-    public SteppableTable(
-        final TableDefinition tableDefinition,
-        final List<? extends Supplier<?>> valueSuppliers
-    ) {
-        this.table = tableDefinition.get();
-        checkArgument(table.columnCount() == valueSuppliers.size());
-        this.valueSuppliers = List.copyOf(valueSuppliers);
+  private final transient Table table;
+  private final List<? extends Supplier<?>> valueSuppliers;
+
+  /**
+   * @param tableDefinition the shape of the table to create
+   * @param valueSuppliers  one value supplier per column, in column order
+   * @throws IllegalArgumentException if the number of suppliers doesn't match the number of
+   *                                   columns in {@code tableDefinition}
+   */
+  public SteppableTable(
+    final TableDefinition tableDefinition,
+    final List<? extends Supplier<?>> valueSuppliers
+  ) {
+    this.table = tableDefinition.get();
+    checkArgument(table.columnCount() == valueSuppliers.size());
+    this.valueSuppliers = List.copyOf(valueSuppliers);
+  }
+
+  /** @return the underlying, growing {@link Table} */
+  @Override
+  @SuppressFBWarnings("EI_EXPOSE_REP")
+  public Table get() {
+    return table;
+  }
+
+  /** Appends one row: the current value of each of {@code valueSuppliers}, in column order. */
+  @Override
+  public void step(final SimState simState) {
+    for (int i = 0; i < valueSuppliers.size(); i++) {
+      table.column(i).appendObj(valueSuppliers.get(i).get());
     }
-
-    /** @return the underlying, growing {@link Table} */
-    @Override
-    @SuppressFBWarnings("EI_EXPOSE_REP")
-    public Table get() {
-        return table;
-    }
-
-    /** Appends one row: the current value of each of {@code valueSuppliers}, in column order. */
-    @Override
-    public void step(final SimState simState) {
-        for (int i = 0; i < valueSuppliers.size(); i++) {
-            table.column(i).appendObj(valueSuppliers.get(i).get());
-        }
-    }
+  }
 }

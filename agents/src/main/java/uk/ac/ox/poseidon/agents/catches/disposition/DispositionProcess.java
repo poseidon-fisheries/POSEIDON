@@ -30,30 +30,28 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
  * {@link Disposition}.
  */
 public interface DispositionProcess {
+  /**
+   * @param currentDisposition   the disposition so far, refined further by this step
+   * @param availableCapacityInKg how much hold capacity remains
+   * @return the refined disposition
+   */
+  Disposition partition(
+    Disposition currentDisposition,
+    double availableCapacityInKg
+  );
 
-    /**
-     * @param currentDisposition   the disposition so far, refined further by this step
-     * @param availableCapacityInKg how much hold capacity remains
-     * @return the refined disposition
-     */
-    Disposition partition(
-        Disposition currentDisposition,
-        double availableCapacityInKg
+  /**
+   * @param grossCatch            the whole gross catch, treated as fully retained to start with
+   * @param availableCapacityInKg how much hold capacity remains
+   * @return the disposition after this step, starting from {@code grossCatch} entirely retained
+   */
+  default Disposition partition(
+    final Bucket grossCatch,
+    final double availableCapacityInKg
+  ) {
+    return partition(
+      new Disposition(grossCatch, Bucket.empty(), Bucket.empty()),
+      availableCapacityInKg
     );
-
-    /**
-     * @param grossCatch            the whole gross catch, treated as fully retained to start with
-     * @param availableCapacityInKg how much hold capacity remains
-     * @return the disposition after this step, starting from {@code grossCatch} entirely retained
-     */
-    default Disposition partition(
-        final Bucket grossCatch,
-        final double availableCapacityInKg
-    ) {
-        return partition(
-            new Disposition(grossCatch, Bucket.empty(), Bucket.empty()),
-            availableCapacityInKg
-        );
-    }
-
+  }
 }

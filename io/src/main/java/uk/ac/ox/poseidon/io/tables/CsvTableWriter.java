@@ -22,11 +22,7 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import lombok.RequiredArgsConstructor;
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import tech.tablesaw.api.Table;
-import tech.tablesaw.io.csv.CsvWriteOptions;
+import static java.lang.System.Logger.Level.INFO;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
@@ -36,8 +32,11 @@ import java.lang.System.Logger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.function.Supplier;
-
-import static java.lang.System.Logger.Level.INFO;
+import lombok.RequiredArgsConstructor;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import tech.tablesaw.api.Table;
+import tech.tablesaw.io.csv.CsvWriteOptions;
 
 /**
  * A {@link Steppable} that writes a resolved {@link Table} to a CSV file when stepped, optionally
@@ -49,34 +48,35 @@ import static java.lang.System.Logger.Level.INFO;
 @RequiredArgsConstructor
 public class CsvTableWriter implements Steppable {
 
-    private static final Logger logger = System.getLogger(CsvTableWriter.class.getName());
+  private static final Logger logger = System.getLogger(
+    CsvTableWriter.class.getName()
+  );
 
-    private final Supplier<Table> tableSupplier;
-    private final Path path;
-    private final boolean append;
-    private final boolean clearAfterWriting;
+  private final Supplier<Table> tableSupplier;
+  private final Path path;
+  private final boolean append;
+  private final boolean clearAfterWriting;
 
-    /** @throws RuntimeException if an I/O error occurs while writing */
-    @Override
-    public void step(final SimState state) {
-        final boolean fileExists = path.toFile().exists();
-        try (
-            final var fos = new FileOutputStream(path.toFile(), append);
-            final var osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-            final var bw = new BufferedWriter(osw)
-        ) {
-            final Table table = tableSupplier.get();
-            final CsvWriteOptions csvWriteOptions = CsvWriteOptions
-                .builder(bw)
-                .header(!append || !fileExists)
-                .build();
-            table.write().csv(csvWriteOptions);
-            if (clearAfterWriting) {
-                table.clear();
-            }
-            logger.log(INFO, "Written " + path.toAbsolutePath());
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+  /** @throws RuntimeException if an I/O error occurs while writing */
+  @Override
+  public void step(final SimState state) {
+    final boolean fileExists = path.toFile().exists();
+    try (
+      final var fos = new FileOutputStream(path.toFile(), append);
+      final var osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+      final var bw = new BufferedWriter(osw)
+    ) {
+      final Table table = tableSupplier.get();
+      final CsvWriteOptions csvWriteOptions = CsvWriteOptions.builder(bw)
+        .header(!append || !fileExists)
+        .build();
+      table.write().csv(csvWriteOptions);
+      if (clearAfterWriting) {
+        table.clear();
+      }
+      logger.log(INFO, "Written " + path.toAbsolutePath());
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 }

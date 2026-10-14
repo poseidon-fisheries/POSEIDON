@@ -28,11 +28,9 @@ package uk.ac.ox.poseidon.core.events;
  * @param <E> the type of event received
  */
 public interface Listener<E> {
+  /** @return the event type this listener is registered for */
+  Class<? extends E> getEventClass();
 
-    /** @return the event type this listener is registered for */
-    Class<? extends E> getEventClass();
-
-    /** @param event the received event */
-    void receive(E event);
-
+  /** @param event the received event */
+  void receive(E event);
 }

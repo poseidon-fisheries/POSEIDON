@@ -52,15 +52,17 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DefaultPathCacheFactory<S extends Scope>
-    extends RelativeScopeFactory<S, PathCache<Int2D>> {
+public class DefaultPathCacheFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  PathCache<Int2D>
+> {
 
-    private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
-    private Factory<? super S, ? extends PortGrid> portGrid;
-    private Factory<? super S, ? extends DistanceCalculator> distance;
+  private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+  private Factory<? super S, ? extends PortGrid> portGrid;
+  private Factory<? super S, ? extends DistanceCalculator> distance;
 
-    @Override
-    protected PathCache<Int2D> newInstance(final S scope) {
-        return new DefaultPathCache<>();
-    }
+  @Override
+  protected PathCache<Int2D> newInstance(final S scope) {
+    return new DefaultPathCache<>();
+  }
 }

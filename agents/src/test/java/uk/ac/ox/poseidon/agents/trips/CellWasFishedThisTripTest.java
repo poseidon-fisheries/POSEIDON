@@ -22,6 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.trips;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -31,75 +38,69 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 class CellWasFishedThisTripTest {
 
-    private static final Coordinate FIRST_COORDINATE = new Coordinate(1.5, 41.5);
-    private static final Coordinate SECOND_COORDINATE = new Coordinate(2.5, 41.5);
-    private static final Int2D FIRST_CELL = new Int2D(1, 1);
-    private static final Int2D SECOND_CELL = new Int2D(2, 1);
-    private static final Int2D UNFISHED_CELL = new Int2D(3, 3);
+  private static final Coordinate FIRST_COORDINATE = new Coordinate(1.5, 41.5);
+  private static final Coordinate SECOND_COORDINATE = new Coordinate(2.5, 41.5);
+  private static final Int2D FIRST_CELL = new Int2D(1, 1);
+  private static final Int2D SECOND_CELL = new Int2D(2, 1);
+  private static final Int2D UNFISHED_CELL = new Int2D(3, 3);
 
-    private final Vessel vessel = mock(Vessel.class);
-    private final CellWasFishedThisTrip cellWasFishedThisTrip = new CellWasFishedThisTrip(vessel);
+  private final Vessel vessel = mock(Vessel.class);
+  private final CellWasFishedThisTrip cellWasFishedThisTrip =
+    new CellWasFishedThisTrip(vessel);
 
-    CellWasFishedThisTripTest() {
-        final VesselField vesselField = mock(VesselField.class);
-        final ModelGrid modelGrid = mock(ModelGrid.class);
-        when(vessel.getVesselField()).thenReturn(vesselField);
-        when(vesselField.getModelGrid()).thenReturn(modelGrid);
-        when(modelGrid.toCell(FIRST_COORDINATE)).thenReturn(FIRST_CELL);
-        when(modelGrid.toCell(SECOND_COORDINATE)).thenReturn(SECOND_CELL);
-    }
+  CellWasFishedThisTripTest() {
+    final VesselField vesselField = mock(VesselField.class);
+    final ModelGrid modelGrid = mock(ModelGrid.class);
+    when(vessel.getVesselField()).thenReturn(vesselField);
+    when(vesselField.getModelGrid()).thenReturn(modelGrid);
+    when(modelGrid.toCell(FIRST_COORDINATE)).thenReturn(FIRST_CELL);
+    when(modelGrid.toCell(SECOND_COORDINATE)).thenReturn(SECOND_CELL);
+  }
 
-    @Test
-    void neverHoldsWhenTheVesselIsNotOnATrip() {
-        when(vessel.getCurrentTrip()).thenReturn(null);
+  @Test
+  void neverHoldsWhenTheVesselIsNotOnATrip() {
+    when(vessel.getCurrentTrip()).thenReturn(null);
 
-        assertFalse(cellWasFishedThisTrip.test(FIRST_CELL));
-    }
+    assertFalse(cellWasFishedThisTrip.test(FIRST_CELL));
+  }
 
-    @Test
-    void holdsForTheCellOfAFishingEventOfTheCurrentTrip() {
-        onTripWithFishingEventsAt(FIRST_COORDINATE);
+  @Test
+  void holdsForTheCellOfAFishingEventOfTheCurrentTrip() {
+    onTripWithFishingEventsAt(FIRST_COORDINATE);
 
-        assertTrue(cellWasFishedThisTrip.test(FIRST_CELL));
-    }
+    assertTrue(cellWasFishedThisTrip.test(FIRST_CELL));
+  }
 
-    @Test
-    void doesNotHoldForACellNotFishedThisTrip() {
-        onTripWithFishingEventsAt(FIRST_COORDINATE);
+  @Test
+  void doesNotHoldForACellNotFishedThisTrip() {
+    onTripWithFishingEventsAt(FIRST_COORDINATE);
 
-        assertFalse(cellWasFishedThisTrip.test(UNFISHED_CELL));
-    }
+    assertFalse(cellWasFishedThisTrip.test(UNFISHED_CELL));
+  }
 
-    @Test
-    void holdsForTheCellsOfEveryFishingEventOfTheCurrentTrip() {
-        onTripWithFishingEventsAt(FIRST_COORDINATE, SECOND_COORDINATE);
+  @Test
+  void holdsForTheCellsOfEveryFishingEventOfTheCurrentTrip() {
+    onTripWithFishingEventsAt(FIRST_COORDINATE, SECOND_COORDINATE);
 
-        assertTrue(cellWasFishedThisTrip.test(FIRST_CELL));
-        assertTrue(cellWasFishedThisTrip.test(SECOND_CELL));
-        assertFalse(cellWasFishedThisTrip.test(UNFISHED_CELL));
-    }
+    assertTrue(cellWasFishedThisTrip.test(FIRST_CELL));
+    assertTrue(cellWasFishedThisTrip.test(SECOND_CELL));
+    assertFalse(cellWasFishedThisTrip.test(UNFISHED_CELL));
+  }
 
-    private void onTripWithFishingEventsAt(final Coordinate... coordinates) {
-        final List<FishingEvent> fishingEvents =
-            Stream.of(coordinates).map(CellWasFishedThisTripTest::fishingEventAt).toList();
-        final Trip trip = mock(Trip.class);
-        when(trip.getFishingEvents()).thenReturn(fishingEvents);
-        when(vessel.getCurrentTrip()).thenReturn(trip);
-    }
+  private void onTripWithFishingEventsAt(final Coordinate... coordinates) {
+    final List<FishingEvent> fishingEvents = Stream.of(coordinates)
+      .map(CellWasFishedThisTripTest::fishingEventAt)
+      .toList();
+    final Trip trip = mock(Trip.class);
+    when(trip.getFishingEvents()).thenReturn(fishingEvents);
+    when(vessel.getCurrentTrip()).thenReturn(trip);
+  }
 
-    private static FishingEvent fishingEventAt(final Coordinate coordinate) {
-        final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
-        when(action.getStartCoordinate()).thenReturn(coordinate);
-        return new FishingEvent(action, null);
-    }
+  private static FishingEvent fishingEventAt(final Coordinate coordinate) {
+    final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
+    when(action.getStartCoordinate()).thenReturn(coordinate);
+    return new FishingEvent(action, null);
+  }
 }

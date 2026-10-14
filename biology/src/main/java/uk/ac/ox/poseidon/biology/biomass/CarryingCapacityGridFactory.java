@@ -40,14 +40,15 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CarryingCapacityGridFactory<S extends Scope>
-    extends RelativeScopeFactory<S, CarryingCapacityGrid> {
+public class CarryingCapacityGridFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  CarryingCapacityGrid
+> {
 
-    private Factory<? super S, ? extends DoubleGrid> grid;
+  private Factory<? super S, ? extends DoubleGrid> grid;
 
-    @Override
-    protected CarryingCapacityGrid newInstance(final S scope) {
-        return new CarryingCapacityGrid(grid.get(scope));
-    }
-
+  @Override
+  protected CarryingCapacityGrid newInstance(final S scope) {
+    return new CarryingCapacityGrid(grid.get(scope));
+  }
 }

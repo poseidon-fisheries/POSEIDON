@@ -22,6 +22,12 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
+import static com.google.common.base.Preconditions.checkState;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+
 import ec.util.MersenneTwisterFast;
 import lombok.*;
 import sim.field.grid.DoubleGrid2D;
@@ -29,12 +35,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
-import static com.google.common.base.Preconditions.checkState;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * A {@link SimulationScopeFactory} for a synthetic {@link DefaultBathymetricGrid}, generated
@@ -55,98 +55,111 @@ import static java.util.stream.Collectors.toMap;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class RoughCoastalBathymetricGridFactory
-    extends SimulationScopeFactory<BathymetricGrid> {
+  extends SimulationScopeFactory<BathymetricGrid>
+{
 
-    @NonNull private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
-    private int coastalRoughness;
-    private int smoothingIterations;
-    private double smoothingStrength;
-    private int maximumLandWidth;
-    private double minimumElevation;
-    private double maximumElevation;
-    private double probabilityOfFlippingLandToWater;
+  @NonNull
+  private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
 
-    /**
-     * @throws IllegalStateException if {@code minimumElevation >= 0} or
-     *                                {@code maximumElevation <= 0}
-     */
-    @Override
-    protected BathymetricGrid newInstance(final SimulationScope scope) {
-        checkState(minimumElevation < 0);
-        checkState(maximumElevation > 0);
+  private int coastalRoughness;
+  private int smoothingIterations;
+  private double smoothingStrength;
+  private int maximumLandWidth;
+  private double minimumElevation;
+  private double maximumElevation;
+  private double probabilityOfFlippingLandToWater;
 
-        final ModelGrid modelGrid = this.modelGrid.get(scope);
-        final MersenneTwisterFast rng = scope.getSimulation().random;
-        final DoubleGrid2D doubleGrid2D = new DoubleGrid2D(
-            modelGrid.getGridWidth(),
-            modelGrid.getGridHeight()
-        );
+  /**
+   * @throws IllegalStateException if {@code minimumElevation >= 0} or
+   *                                {@code maximumElevation <= 0}
+   */
+  @Override
+  protected BathymetricGrid newInstance(final SimulationScope scope) {
+    checkState(minimumElevation < 0);
+    checkState(maximumElevation > 0);
 
-        for (int x = 0; x < doubleGrid2D.width; x++)
-            for (int y = 0; y < doubleGrid2D.height; y++)
-                doubleGrid2D.field[x][y] =
-                    x < doubleGrid2D.width - maximumLandWidth
-                        ? rng.nextDouble() * minimumElevation
-                        : rng.nextDouble() * maximumElevation;
+    final ModelGrid modelGrid = this.modelGrid.get(scope);
+    final MersenneTwisterFast rng = scope.getSimulation().random;
+    final DoubleGrid2D doubleGrid2D = new DoubleGrid2D(
+      modelGrid.getGridWidth(),
+      modelGrid.getGridHeight()
+    );
 
-        // The "roughing" of the coast consist in taking all land
-        // locations and giving them a chance to flip to water if
-        // at least one of their neighbours is water.
-        for (int i = 0; i < coastalRoughness; i++) {
-            // We wrap our doubleGrid2D in a temporary DefaultBathymetricGrid
-            // just to take advantage of `getLandCells()` and
-            // `getMooreLocations()`. We don't want to hold on to any
-            // of those instances because we are directly mutating the
-            // underlying array, which messes up the cached land/water
-            // tile lists.
-            final DefaultBathymetricGrid bathymetricGrid =
-                new DefaultBathymetricGrid(modelGrid, doubleGrid2D);
-            bathymetricGrid
-                .getLandCells()
-                .filter(cell ->
-                    modelGrid
-                        .getActiveNeighbours(cell)
-                        .stream()
-                        .anyMatch(bathymetricGrid::isWater)
-                        && rng.nextBoolean(probabilityOfFlippingLandToWater)
-                )
-                .toList()
-                .forEach(cell ->
-                    doubleGrid2D.field[cell.x][cell.y] = rng.nextDouble() * minimumElevation
-                );
-        }
+    for (int x = 0; x < doubleGrid2D.width; x++) for (
+      int y = 0;
+      y < doubleGrid2D.height;
+      y++
+    ) doubleGrid2D.field[x][y] =
+      x < doubleGrid2D.width - maximumLandWidth
+        ? rng.nextDouble() * minimumElevation
+        : rng.nextDouble() * maximumElevation;
 
-        for (int i = 0; i < smoothingIterations; i++) {
-            final BathymetricGrid bathymetricGrid = new DefaultBathymetricGrid(
-                modelGrid,
-                doubleGrid2D
-            );
+    // The "roughing" of the coast consist in taking all land
+    // locations and giving them a chance to flip to water if
+    // at least one of their neighbours is water.
+    for (int i = 0; i < coastalRoughness; i++) {
+      // We wrap our doubleGrid2D in a temporary DefaultBathymetricGrid
+      // just to take advantage of `getLandCells()` and
+      // `getMooreLocations()`. We don't want to hold on to any
+      // of those instances because we are directly mutating the
+      // underlying array, which messes up the cached land/water
+      // tile lists.
+      final DefaultBathymetricGrid bathymetricGrid = new DefaultBathymetricGrid(
+        modelGrid,
+        doubleGrid2D
+      );
+      bathymetricGrid
+        .getLandCells()
+        .filter(
+          cell ->
             modelGrid
-                .getAllCells()
-                .collect(toMap(
-                    identity(),
-                    target -> {
-                        final double oldElevation = bathymetricGrid.getElevation(target);
-                        final double neighbourElevation = modelGrid
-                            .getActiveNeighbours(target)
-                            .stream()
-                            .mapToDouble(bathymetricGrid::getElevation)
-                            .average()
-                            .orElseThrow();
-                        final double boundedNeighbourElevation =
-                            bathymetricGrid.isWater(target)
-                                ? min(0, neighbourElevation)
-                                : max(0, neighbourElevation);
-                        return oldElevation +
-                            rng.nextDouble() * smoothingStrength *
-                                (boundedNeighbourElevation - oldElevation);
-                    }
-                ))
-                .forEach((cell, newElevation) ->
-                    doubleGrid2D.field[cell.x][cell.y] = newElevation
-                );
-        }
-        return new DefaultBathymetricGrid(modelGrid, doubleGrid2D);
+              .getActiveNeighbours(cell)
+              .stream()
+              .anyMatch(bathymetricGrid::isWater) &&
+            rng.nextBoolean(probabilityOfFlippingLandToWater)
+        )
+        .toList()
+        .forEach(
+          cell ->
+            doubleGrid2D.field[cell.x][cell.y] =
+              rng.nextDouble() * minimumElevation
+        );
     }
 
+    for (int i = 0; i < smoothingIterations; i++) {
+      final BathymetricGrid bathymetricGrid = new DefaultBathymetricGrid(
+        modelGrid,
+        doubleGrid2D
+      );
+      modelGrid
+        .getAllCells()
+        .collect(
+          toMap(identity(), target -> {
+            final double oldElevation = bathymetricGrid.getElevation(target);
+            final double neighbourElevation = modelGrid
+              .getActiveNeighbours(target)
+              .stream()
+              .mapToDouble(bathymetricGrid::getElevation)
+              .average()
+              .orElseThrow();
+            final double boundedNeighbourElevation = bathymetricGrid.isWater(
+              target
+            )
+              ? min(0, neighbourElevation)
+              : max(0, neighbourElevation);
+            return (
+              oldElevation +
+              rng.nextDouble() *
+                smoothingStrength *
+                (boundedNeighbourElevation - oldElevation)
+            );
+          })
+        )
+        .forEach(
+          (cell, newElevation) ->
+            doubleGrid2D.field[cell.x][cell.y] = newElevation
+        );
+    }
+    return new DefaultBathymetricGrid(modelGrid, doubleGrid2D);
+  }
 }

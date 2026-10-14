@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.time.LocalDateTime;
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.time.LocalDateTime;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An {@link ExtendedTask} run as part of the vessel's current {@link Trip}, capturing that trip
@@ -37,15 +36,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Getter
 public abstract class ExtendedTripTask extends ExtendedTask<Vessel> {
 
-    private Trip trip;
-    private LocalDateTime startDateTime;
+  private Trip trip;
+  private LocalDateTime startDateTime;
 
-    /**
-     * Captures the vessel's current trip (must not be {@code null}) and the current date/time.
-     */
-    @Override
-    public void start() {
-        trip = checkNotNull(getAgent().getCurrentTrip());
-        startDateTime = getAgent().getSchedule().getDateTime();
-    }
+  /**
+   * Captures the vessel's current trip (must not be {@code null}) and the current date/time.
+   */
+  @Override
+  public void start() {
+    trip = checkNotNull(getAgent().getCurrentTrip());
+    startDateTime = getAgent().getSchedule().getDateTime();
+  }
 }

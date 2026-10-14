@@ -31,8 +31,9 @@ import java.util.stream.DoubleStream;
  * {@link Factories#maxAggregator()} in this package.
  */
 public class MaxAggregator implements Aggregator {
-    @Override
-    public OptionalDouble apply(final DoubleStream numbers) {
-        return numbers.max();
-    }
+
+  @Override
+  public OptionalDouble apply(final DoubleStream numbers) {
+    return numbers.max();
+  }
 }

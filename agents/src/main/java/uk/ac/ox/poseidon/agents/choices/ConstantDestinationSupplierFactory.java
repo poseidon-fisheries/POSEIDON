@@ -40,21 +40,23 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantDestinationSupplierFactory<S extends Scope>
-    extends RelativeScopeFactory<S, DestinationSupplier> {
+public class ConstantDestinationSupplierFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  DestinationSupplier
+> {
 
-    private Factory<? super S, ? extends ModelGrid> modelGrid;
-    private Factory<? super S, ? extends Coordinate> coordinate;
+  private Factory<? super S, ? extends ModelGrid> modelGrid;
+  private Factory<? super S, ? extends Coordinate> coordinate;
 
-    /**
-     * @return a {@link ConstantDestinationSupplier} for {@link #coordinate}'s cell in {@link #modelGrid}
-     * @throws IllegalArgumentException if {@link #coordinate} falls outside {@link #modelGrid}
-     */
-    @Override
-    protected DestinationSupplier newInstance(final S scope) {
-        final ModelGrid modelGrid = this.modelGrid.get(scope);
-        final Coordinate coordinate = this.coordinate.get(scope);
-        modelGrid.checkIsInGrid(coordinate);
-        return new ConstantDestinationSupplier(modelGrid.toCell(coordinate));
-    }
+  /**
+   * @return a {@link ConstantDestinationSupplier} for {@link #coordinate}'s cell in {@link #modelGrid}
+   * @throws IllegalArgumentException if {@link #coordinate} falls outside {@link #modelGrid}
+   */
+  @Override
+  protected DestinationSupplier newInstance(final S scope) {
+    final ModelGrid modelGrid = this.modelGrid.get(scope);
+    final Coordinate coordinate = this.coordinate.get(scope);
+    modelGrid.checkIsInGrid(coordinate);
+    return new ConstantDestinationSupplier(modelGrid.toCell(coordinate));
+  }
 }

@@ -22,20 +22,19 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.events.EventManager;
-
-import java.util.function.Supplier;
 
 /** Supplies a vessel's own event manager (as opposed to its current trip's, see {@link CurrentTripEventManager}). */
 @RequiredArgsConstructor
 public class VesselEventManager implements Supplier<EventManager> {
 
-    private final Vessel vessel;
+  private final Vessel vessel;
 
-    @Override
-    public EventManager get() {
-        return vessel.getEventManager();
-    }
+  @Override
+  public EventManager get() {
+    return vessel.getEventManager();
+  }
 }

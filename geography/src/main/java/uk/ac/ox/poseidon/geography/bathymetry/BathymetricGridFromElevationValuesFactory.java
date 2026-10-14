@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,11 +34,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
-import java.util.List;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link DefaultBathymetricGrid} built directly from one
@@ -47,30 +46,33 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BathymetricGridFromElevationValuesFactory<S extends Scope>
-    extends RelativeScopeFactory<S, BathymetricGrid> {
+public class BathymetricGridFromElevationValuesFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  BathymetricGrid
+> {
 
-    private Factory<? super S, ? extends ModelGrid> modelGrid;
-    private List<Number> elevationValues;
+  private Factory<? super S, ? extends ModelGrid> modelGrid;
+  private List<Number> elevationValues;
 
-    @Override
-    protected BathymetricGrid newInstance(final S scope) {
-        final ModelGrid modelGrid = checkNotNull(this.modelGrid).get(scope);
-        final List<Number> elevationValues = checkNotNull(this.elevationValues);
-        final int height = modelGrid.getGridHeight();
-        final int width = modelGrid.getGridWidth();
-        final int expectedCells = height * width;
-        checkArgument(
-            elevationValues.size() == expectedCells,
-            "The model grid has %s cells but only %s elevation values were provided.",
-            expectedCells, elevationValues.size()
-        );
-        final double[][] elevationGrid = new double[height][width];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                elevationGrid[x][y] = elevationValues.get(x + y * width).doubleValue();
-            }
-        }
-        return new DefaultBathymetricGrid(modelGrid, elevationGrid);
+  @Override
+  protected BathymetricGrid newInstance(final S scope) {
+    final ModelGrid modelGrid = checkNotNull(this.modelGrid).get(scope);
+    final List<Number> elevationValues = checkNotNull(this.elevationValues);
+    final int height = modelGrid.getGridHeight();
+    final int width = modelGrid.getGridWidth();
+    final int expectedCells = height * width;
+    checkArgument(
+      elevationValues.size() == expectedCells,
+      "The model grid has %s cells but only %s elevation values were provided.",
+      expectedCells,
+      elevationValues.size()
+    );
+    final double[][] elevationGrid = new double[height][width];
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        elevationGrid[x][y] = elevationValues.get(x + y * width).doubleValue();
+      }
     }
+    return new DefaultBathymetricGrid(modelGrid, elevationGrid);
+  }
 }

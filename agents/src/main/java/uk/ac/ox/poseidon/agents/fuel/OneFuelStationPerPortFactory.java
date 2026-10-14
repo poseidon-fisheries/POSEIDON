@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.fuel;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,8 +34,6 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.util.List;
-
 /**
  * A {@link SimulationScopeFactory} creating one {@link FuelStation} per port in {@code portGrid},
  * all sharing the same price and pump rate. Built via {@link Factories#oneFuelStationPerPort}.
@@ -44,25 +43,28 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class OneFuelStationPerPortFactory
-    extends SimulationScopeFactory<List<FuelStation>> {
+  extends SimulationScopeFactory<List<FuelStation>>
+{
 
-    private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
-    private Factory<? super SimulationScope, ? extends Money> pricePerLitres;
-    private double pumpRateInLitresPerMinute;
+  private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+  private Factory<? super SimulationScope, ? extends Money> pricePerLitres;
+  private double pumpRateInLitresPerMinute;
 
-    @Override
-    protected List<FuelStation> newInstance(final SimulationScope scope) {
-        final EventManager eventManager = scope.getSimulation().getEventManager();
-        return portGrid.get(scope).getPorts()
-            .map(port ->
-                new FuelStation(
-                    port,
-                    port.getCode(),
-                    eventManager,
-                    pricePerLitres.get(scope),
-                    pumpRateInLitresPerMinute
-                )
-            )
-            .toList();
-    }
+  @Override
+  protected List<FuelStation> newInstance(final SimulationScope scope) {
+    final EventManager eventManager = scope.getSimulation().getEventManager();
+    return portGrid
+      .get(scope)
+      .getPorts()
+      .map(port ->
+        new FuelStation(
+          port,
+          port.getCode(),
+          eventManager,
+          pricePerLitres.get(scope),
+          pumpRateInLitresPerMinute
+        )
+      )
+      .toList();
+  }
 }

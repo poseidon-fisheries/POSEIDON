@@ -22,6 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
@@ -38,157 +48,152 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 class PriceUpdatesFromTableFactoryTest {
 
-    private static final CatchCategory CATCH_CATEGORY = new CatchCategory("Fresh - Whole");
+  private static final CatchCategory CATCH_CATEGORY = new CatchCategory(
+    "Fresh - Whole"
+  );
 
-    private final Simulation simulation = mock(Simulation.class);
-    private final TemporalSchedule schedule = mock(TemporalSchedule.class);
+  private final Simulation simulation = mock(Simulation.class);
+  private final TemporalSchedule schedule = mock(TemporalSchedule.class);
 
-    @BeforeEach
-    void setUp() {
-        when(simulation.getTemporalSchedule()).thenReturn(schedule);
-        when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 0, 0));
-    }
+  @BeforeEach
+  void setUp() {
+    when(simulation.getTemporalSchedule()).thenReturn(schedule);
+    when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 0, 0));
+  }
 
-    @Test
-    void setsPricesOnExistingMarket() {
-        final BiomassMarket market = market("M1");
-        final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
-            priceTable("M1", "HKE"),
-            marketGrid(market),
-            List.of(new Species("HKE", null, "Hake"))
-        );
+  @Test
+  void setsPricesOnExistingMarket() {
+    final BiomassMarket market = market("M1");
+    final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
+      priceTable("M1", "HKE"),
+      marketGrid(market),
+      List.of(new Species("HKE", null, "Hake"))
+    );
 
-        applyAll(factory);
+    applyAll(factory);
 
-        assertThat(market.getPrice(CATCH_CATEGORY, new Species("HKE", null, null)))
-            .hasValueSatisfying(price ->
-                assertThat(price.getAmount().getAmount().doubleValue()).isEqualTo(12.5)
-            );
-    }
+    assertThat(
+      market.getPrice(CATCH_CATEGORY, new Species("HKE", null, null))
+    ).hasValueSatisfying(price ->
+      assertThat(price.getAmount().getAmount().doubleValue()).isEqualTo(12.5)
+    );
+  }
 
-    @Test
-    void stagedConfiguredSpeciesUseSingleGenericPriceEntry() {
-        final BiomassMarket market = market("M1");
-        final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
-            priceTable("M1", "HKE"),
-            marketGrid(market),
-            List.of(
-                new Species("HKE", "adult", "Hake"),
-                new Species("HKE", "juvenile", "Hake")
-            )
-        );
+  @Test
+  void stagedConfiguredSpeciesUseSingleGenericPriceEntry() {
+    final BiomassMarket market = market("M1");
+    final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
+      priceTable("M1", "HKE"),
+      marketGrid(market),
+      List.of(
+        new Species("HKE", "adult", "Hake"),
+        new Species("HKE", "juvenile", "Hake")
+      )
+    );
 
-        applyAll(factory);
+    applyAll(factory);
 
-        assertThat(market.getPrices().get(CATCH_CATEGORY))
-            .containsOnlyKeys(new Species("HKE", null, null))
-            .doesNotContainKeys(
-                new Species("HKE", "adult", null),
-                new Species("HKE", "juvenile", null)
-            );
-    }
+    assertThat(market.getPrices().get(CATCH_CATEGORY))
+      .containsOnlyKeys(new Species("HKE", null, null))
+      .doesNotContainKeys(
+        new Species("HKE", "adult", null),
+        new Species("HKE", "juvenile", null)
+      );
+  }
 
-    @Test
-    void rejectsUnknownPriceTableSpecies() {
-        final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
-            priceTable("M1", "XYZ"),
-            marketGrid(market("M1")),
-            List.of(new Species("HKE", "adult", "Hake"))
-        );
+  @Test
+  void rejectsUnknownPriceTableSpecies() {
+    final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
+      priceTable("M1", "XYZ"),
+      marketGrid(market("M1")),
+      List.of(new Species("HKE", "adult", "Hake"))
+    );
 
-        assertThatThrownBy(() -> factory.get(scope()))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("Species XYZ not found.");
-    }
+    assertThatThrownBy(() -> factory.get(scope()))
+      .isInstanceOf(RuntimeException.class)
+      .hasMessage("Species XYZ not found.");
+  }
 
-    @Test
-    void rejectsUnknownMarket() {
-        final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
-            priceTable("M2", "HKE"),
-            marketGrid(market("M1")),
-            List.of(new Species("HKE", null, "Hake"))
-        );
+  @Test
+  void rejectsUnknownMarket() {
+    final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
+      priceTable("M2", "HKE"),
+      marketGrid(market("M1")),
+      List.of(new Species("HKE", null, "Hake"))
+    );
 
-        assertThatThrownBy(() -> factory.get(scope()))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("Market M2 not found in market grid.");
-    }
+    assertThatThrownBy(() -> factory.get(scope()))
+      .isInstanceOf(RuntimeException.class)
+      .hasMessage("Market M2 not found in market grid.");
+  }
 
-    private static PriceUpdatesFromTableFactory<SimulationScope> factory(
-        final Table priceTable,
-        final MarketGrid marketGrid,
-        final List<? extends Species> species
-    ) {
-        return new PriceUpdatesFromTableFactory<>(
-            _ -> priceTable,
-            "date",
-            "market_code",
-            "species_code",
-            "category_code",
-            "price",
-            "currency",
-            "measurement_unit",
-            _ -> marketGrid,
-            _ -> species
-        );
-    }
+  private static PriceUpdatesFromTableFactory<SimulationScope> factory(
+    final Table priceTable,
+    final MarketGrid marketGrid,
+    final List<? extends Species> species
+  ) {
+    return new PriceUpdatesFromTableFactory<>(
+      _ -> priceTable,
+      "date",
+      "market_code",
+      "species_code",
+      "category_code",
+      "price",
+      "currency",
+      "measurement_unit",
+      _ -> marketGrid,
+      _ -> species
+    );
+  }
 
-    private static Table priceTable(final String marketCode, final String speciesCode) {
-        return Table
-            .create("prices")
-            .addColumns(
-                DateColumn.create("date", LocalDate.of(2026, 1, 1)),
-                StringColumn.create("market_code", marketCode),
-                StringColumn.create("species_code", speciesCode),
-                StringColumn.create("category_code", CATCH_CATEGORY.getCode()),
-                DoubleColumn.create("price", 12.5),
-                StringColumn.create("currency", "EUR"),
-                StringColumn.create("measurement_unit", "kg")
-            );
-    }
+  private static Table priceTable(
+    final String marketCode,
+    final String speciesCode
+  ) {
+    return Table.create("prices").addColumns(
+      DateColumn.create("date", LocalDate.of(2026, 1, 1)),
+      StringColumn.create("market_code", marketCode),
+      StringColumn.create("species_code", speciesCode),
+      StringColumn.create("category_code", CATCH_CATEGORY.getCode()),
+      DoubleColumn.create("price", 12.5),
+      StringColumn.create("currency", "EUR"),
+      StringColumn.create("measurement_unit", "kg")
+    );
+  }
 
-    private static BiomassMarket market(final String code) {
-        return new BiomassMarket(mock(Port.class), code, mock(EventManager.class));
-    }
+  private static BiomassMarket market(final String code) {
+    return new BiomassMarket(mock(Port.class), code, mock(EventManager.class));
+  }
 
-    private static MarketGrid marketGrid(final BiomassMarket market) {
-        final ModelGrid modelGrid = mock(ModelGrid.class);
-        when(modelGrid.getGridWidth()).thenReturn(1);
-        when(modelGrid.getGridHeight()).thenReturn(1);
-        return new ImmutableMarketGrid(modelGrid, Map.of(market, new Int2D(0, 0)));
-    }
+  private static MarketGrid marketGrid(final BiomassMarket market) {
+    final ModelGrid modelGrid = mock(ModelGrid.class);
+    when(modelGrid.getGridWidth()).thenReturn(1);
+    when(modelGrid.getGridHeight()).thenReturn(1);
+    return new ImmutableMarketGrid(modelGrid, Map.of(market, new Int2D(0, 0)));
+  }
 
-    @Test
-    void datesEachUpdateAtItsRowDate() {
-        final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
-            priceTable("M1", "HKE"),
-            marketGrid(market("M1")),
-            List.of(new Species("HKE", null, "Hake"))
-        );
+  @Test
+  void datesEachUpdateAtItsRowDate() {
+    final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
+      priceTable("M1", "HKE"),
+      marketGrid(market("M1")),
+      List.of(new Species("HKE", null, "Hake"))
+    );
 
-        assertThat(factory.get(scope()))
-            .extracting(Entry::getKey)
-            .containsExactly(LocalDate.of(2026, 1, 1).atStartOfDay());
-    }
+    assertThat(factory.get(scope()))
+      .extracting(Entry::getKey)
+      .containsExactly(LocalDate.of(2026, 1, 1).atStartOfDay());
+  }
 
-    private void applyAll(final PriceUpdatesFromTableFactory<SimulationScope> factory) {
-        factory.get(scope()).forEach(update -> update.getValue().step(simulation));
-    }
+  private void applyAll(
+    final PriceUpdatesFromTableFactory<SimulationScope> factory
+  ) {
+    factory.get(scope()).forEach(update -> update.getValue().step(simulation));
+  }
 
-    private SimulationScope scope() {
-        return new SimulationScope(simulation);
-    }
+  private SimulationScope scope() {
+    return new SimulationScope(simulation);
+  }
 }

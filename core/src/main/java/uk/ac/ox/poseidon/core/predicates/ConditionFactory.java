@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
+import java.util.function.Function;
+import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +31,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link Condition}, built via
@@ -41,17 +40,20 @@ import java.util.function.Predicate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConditionFactory<S extends Scope, T, U>
-    extends RelativeScopeFactory<S, Condition<T, U>> {
+public class ConditionFactory<
+  S extends Scope,
+  T,
+  U
+> extends RelativeScopeFactory<S, Condition<T, U>> {
 
-    private Factory<? super S, ? extends Function<? super T, ? extends U>> extractor;
-    private Factory<? super S, ? extends Predicate<? super U>> predicate;
+  private Factory<
+    ? super S,
+    ? extends Function<? super T, ? extends U>
+  > extractor;
+  private Factory<? super S, ? extends Predicate<? super U>> predicate;
 
-    @Override
-    protected Condition<T, U> newInstance(final S scope) {
-        return new Condition<>(
-            extractor.get(scope),
-            predicate.get(scope)
-        );
-    }
+  @Override
+  protected Condition<T, U> newInstance(final S scope) {
+    return new Condition<>(extractor.get(scope), predicate.get(scope));
+  }
 }

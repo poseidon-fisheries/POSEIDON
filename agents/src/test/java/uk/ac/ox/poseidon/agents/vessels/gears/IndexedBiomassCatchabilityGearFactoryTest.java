@@ -22,56 +22,56 @@
 
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-import java.time.Duration;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Supplier;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.quantities.Factories.massOf;
 
+import java.time.Duration;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Supplier;
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+
 class IndexedBiomassCatchabilityGearFactoryTest {
 
-    @Test
-    void appliesFunctionPerSpecies() {
-        final Factory<Scope, Supplier<Duration>> durationSupplier =
-            scope -> () -> Duration.ofHours(1);
-        final Factory<Scope, Collection<? extends Species>> species =
-            scope -> List.of(new Species("COD", "adult", "Cod"));
-        final var factory = Factories.indexedBiomassCatchabilityGear(
-            "G1",
-            durationSupplier,
-            species,
-            scope -> s -> 0.5,
-            massOf(1, KILOGRAM)
-        );
-        final var gear = factory.get(Scope.GLOBAL_SCOPE);
-        assertThat(gear.getCode()).isEqualTo("G1");
-    }
+  @Test
+  void appliesFunctionPerSpecies() {
+    final Factory<Scope, Supplier<Duration>> durationSupplier = scope -> () ->
+      Duration.ofHours(1);
+    final Factory<Scope, Collection<? extends Species>> species = scope ->
+      List.of(new Species("COD", "adult", "Cod"));
+    final var factory = Factories.indexedBiomassCatchabilityGear(
+      "G1",
+      durationSupplier,
+      species,
+      scope -> s -> 0.5,
+      massOf(1, KILOGRAM)
+    );
+    final var gear = factory.get(Scope.GLOBAL_SCOPE);
+    assertThat(gear.getCode()).isEqualTo("G1");
+  }
 
-    @Test
-    void rejectsOutOfRangeProportions() {
-        final Factory<Scope, Supplier<Duration>> durationSupplier =
-            scope -> () -> Duration.ofHours(1);
-        final Factory<Scope, Collection<? extends Species>> species =
-            scope -> List.of(new Species("COD", "adult", "Cod"));
-        final var factory = Factories.indexedBiomassCatchabilityGear(
-            "G1",
-            durationSupplier,
-            species,
-            scope -> s -> 1.5,
-            massOf(1, KILOGRAM)
-        );
-        assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+  @Test
+  void rejectsOutOfRangeProportions() {
+    final Factory<Scope, Supplier<Duration>> durationSupplier = scope -> () ->
+      Duration.ofHours(1);
+    final Factory<Scope, Collection<? extends Species>> species = scope ->
+      List.of(new Species("COD", "adult", "Cod"));
+    final var factory = Factories.indexedBiomassCatchabilityGear(
+      "G1",
+      durationSupplier,
+      species,
+      scope -> s -> 1.5,
+      massOf(1, KILOGRAM)
+    );
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+  }
 }

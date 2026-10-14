@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
@@ -34,83 +38,97 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 class FishingEventRecorderTest {
 
-    private final Species species = new Species("A", null, "A");
-    private final Coordinate coordinate = new Coordinate(1.5, 41.5);
-    private final Int2D cell = new Int2D(3, 4);
-    private final KeyedMemory<String, Int2D, Bucket> keyedMemory = new KeyedMemory<>();
-    private final FishingEventRecorder fishingEventRecorder = new FishingEventRecorder(
-        modelGrid(),
-        new KeyedMemorySelector<>(
-            keyedMemory,
-            (FishingEvent event) -> event.getAction().getGear().getCode()
-        ),
-        Bucket::add
+  private final Species species = new Species("A", null, "A");
+  private final Coordinate coordinate = new Coordinate(1.5, 41.5);
+  private final Int2D cell = new Int2D(3, 4);
+  private final KeyedMemory<String, Int2D, Bucket> keyedMemory =
+    new KeyedMemory<>();
+  private final FishingEventRecorder fishingEventRecorder =
+    new FishingEventRecorder(
+      modelGrid(),
+      new KeyedMemorySelector<>(keyedMemory, (FishingEvent event) ->
+        event.getAction().getGear().getCode()
+      ),
+      Bucket::add
     );
 
-    private ModelGrid modelGrid() {
-        final ModelGrid modelGrid = mock(ModelGrid.class);
-        when(modelGrid.toCell(coordinate)).thenReturn(cell);
-        return modelGrid;
-    }
+  private ModelGrid modelGrid() {
+    final ModelGrid modelGrid = mock(ModelGrid.class);
+    when(modelGrid.toCell(coordinate)).thenReturn(cell);
+    return modelGrid;
+  }
 
-    static FishingEvent fishingEvent(
-        final String gearCode,
-        final Coordinate coordinate,
-        final Bucket retained
-    ) {
-        final Gear gear = mock(Gear.class);
-        when(gear.getCode()).thenReturn(gearCode);
-        final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
-        when(action.getGear()).thenReturn(gear);
-        when(action.getStartCoordinate()).thenReturn(coordinate);
-        return new FishingEvent(
-            action,
-            new FishingOutcome(
-                retained,
-                new Disposition(retained, Bucket.empty(), Bucket.empty())
-            )
-        );
-    }
+  static FishingEvent fishingEvent(
+    final String gearCode,
+    final Coordinate coordinate,
+    final Bucket retained
+  ) {
+    final Gear gear = mock(Gear.class);
+    when(gear.getCode()).thenReturn(gearCode);
+    final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
+    when(action.getGear()).thenReturn(gear);
+    when(action.getStartCoordinate()).thenReturn(coordinate);
+    return new FishingEvent(
+      action,
+      new FishingOutcome(
+        retained,
+        new Disposition(retained, Bucket.empty(), Bucket.empty())
+      )
+    );
+  }
 
-    @Test
-    void recordsTheRetainedCatchInTheCellOfTheFishingEventInTheSliceOfItsGear() {
-        fishingEventRecorder.receive(fishingEvent("PS", coordinate, Bucket.of(species, 10)));
+  @Test
+  void recordsTheRetainedCatchInTheCellOfTheFishingEventInTheSliceOfItsGear() {
+    fishingEventRecorder.receive(
+      fishingEvent("PS", coordinate, Bucket.of(species, 10))
+    );
 
-        assertThat(keyedMemory.get("PS").get(cell))
-            .hasValueSatisfying(bucket -> assertThat(bucket.getKg(species)).isEqualTo(10));
-    }
+    assertThat(keyedMemory.get("PS").get(cell)).hasValueSatisfying(bucket ->
+      assertThat(bucket.getKg(species)).isEqualTo(10)
+    );
+  }
 
-    @Test
-    void recordsAnEmptyRetainedCatch() {
-        fishingEventRecorder.receive(fishingEvent("PS", coordinate, Bucket.empty()));
+  @Test
+  void recordsAnEmptyRetainedCatch() {
+    fishingEventRecorder.receive(
+      fishingEvent("PS", coordinate, Bucket.empty())
+    );
 
-        assertThat(keyedMemory.get("PS").get(cell))
-            .hasValueSatisfying(bucket -> assertThat(bucket.isEmpty()).isTrue());
-    }
+    assertThat(keyedMemory.get("PS").get(cell)).hasValueSatisfying(bucket ->
+      assertThat(bucket.isEmpty()).isTrue()
+    );
+  }
 
-    @Test
-    void revisesWhatIsRememberedWithTheUpdateRule() {
-        fishingEventRecorder.receive(fishingEvent("PS", coordinate, Bucket.of(species, 10)));
-        fishingEventRecorder.receive(fishingEvent("PS", coordinate, Bucket.of(species, 4)));
+  @Test
+  void revisesWhatIsRememberedWithTheUpdateRule() {
+    fishingEventRecorder.receive(
+      fishingEvent("PS", coordinate, Bucket.of(species, 10))
+    );
+    fishingEventRecorder.receive(
+      fishingEvent("PS", coordinate, Bucket.of(species, 4))
+    );
 
-        assertThat(keyedMemory.get("PS").get(cell))
-            .hasValueSatisfying(bucket -> assertThat(bucket.getKg(species)).isEqualTo(14));
-    }
+    assertThat(keyedMemory.get("PS").get(cell)).hasValueSatisfying(bucket ->
+      assertThat(bucket.getKg(species)).isEqualTo(14)
+    );
+  }
 
-    @Test
-    void recordsAFishingEventWithAnotherGearInAnotherSlice() {
-        fishingEventRecorder.receive(fishingEvent("PS", coordinate, Bucket.of(species, 10)));
-        fishingEventRecorder.receive(fishingEvent("OTB", coordinate, Bucket.of(species, 4)));
+  @Test
+  void recordsAFishingEventWithAnotherGearInAnotherSlice() {
+    fishingEventRecorder.receive(
+      fishingEvent("PS", coordinate, Bucket.of(species, 10))
+    );
+    fishingEventRecorder.receive(
+      fishingEvent("OTB", coordinate, Bucket.of(species, 4))
+    );
 
-        assertThat(keyedMemory.get("PS").get(cell))
-            .hasValueSatisfying(bucket -> assertThat(bucket.getKg(species)).isEqualTo(10));
-        assertThat(keyedMemory.get("OTB").get(cell))
-            .hasValueSatisfying(bucket -> assertThat(bucket.getKg(species)).isEqualTo(4));
-    }
+    assertThat(keyedMemory.get("PS").get(cell)).hasValueSatisfying(bucket ->
+      assertThat(bucket.getKg(species)).isEqualTo(10)
+    );
+    assertThat(keyedMemory.get("OTB").get(cell)).hasValueSatisfying(bucket ->
+      assertThat(bucket.getKg(species)).isEqualTo(4)
+    );
+  }
 }

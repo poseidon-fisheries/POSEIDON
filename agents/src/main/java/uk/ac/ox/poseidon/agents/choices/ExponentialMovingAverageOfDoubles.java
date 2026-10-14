@@ -22,29 +22,28 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import java.util.function.BinaryOperator;
-
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
+
+import java.util.function.BinaryOperator;
 
 /**
  * A {@link Memory} update rule for {@code Double}s: an exponential moving average, which
  * remembers {@code recollection × (1 − alpha) + observation × alpha}. An {@code alpha} of 1
  * replaces what is remembered with each new observation; an {@code alpha} of 0 keeps it forever.
  */
-public class ExponentialMovingAverageOfDoubles implements BinaryOperator<Double> {
+public class ExponentialMovingAverageOfDoubles
+  implements BinaryOperator<Double>
+{
 
-    private final double alpha;
+  private final double alpha;
 
-    /** @param alpha the weight of a new observation, between 0 and 1 */
-    ExponentialMovingAverageOfDoubles(final double alpha) {
-        this.alpha = checkUnitRange(alpha, "alpha");
-    }
+  /** @param alpha the weight of a new observation, between 0 and 1 */
+  ExponentialMovingAverageOfDoubles(final double alpha) {
+    this.alpha = checkUnitRange(alpha, "alpha");
+  }
 
-    @Override
-    public Double apply(
-        final Double recollection,
-        final Double observation
-    ) {
-        return recollection * (1 - alpha) + observation * alpha;
-    }
+  @Override
+  public Double apply(final Double recollection, final Double observation) {
+    return recollection * (1 - alpha) + observation * alpha;
+  }
 }

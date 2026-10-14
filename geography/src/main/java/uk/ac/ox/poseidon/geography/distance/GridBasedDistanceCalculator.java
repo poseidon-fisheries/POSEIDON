@@ -32,18 +32,17 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * are uniform in size. Subclassed by {@link CartesianDistanceCalculator}, which supplies the
  * actual formula.
  */
-public abstract class GridBasedDistanceCalculator extends AbstractDistanceCalculator {
+public abstract class GridBasedDistanceCalculator
+  extends AbstractDistanceCalculator
+{
 
-    /** @param modelGrid the grid this calculator measures distances over */
-    public GridBasedDistanceCalculator(final ModelGrid modelGrid) {
-        super(modelGrid);
-    }
+  /** @param modelGrid the grid this calculator measures distances over */
+  public GridBasedDistanceCalculator(final ModelGrid modelGrid) {
+    super(modelGrid);
+  }
 
-    @Override
-    public double distanceInKm(
-        final Coordinate a,
-        final Coordinate b
-    ) {
-        return distanceInKm(modelGrid.toPoint(a), modelGrid.toPoint(b));
-    }
+  @Override
+  public double distanceInKm(final Coordinate a, final Coordinate b) {
+    return distanceInKm(modelGrid.toPoint(a), modelGrid.toPoint(b));
+  }
 }

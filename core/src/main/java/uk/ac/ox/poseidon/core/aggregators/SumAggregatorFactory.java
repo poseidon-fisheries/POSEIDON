@@ -36,8 +36,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SumAggregatorFactory extends GlobalScopeFactory<SumAggregator> {
-    @Override
-    protected SumAggregator newInstance(final Scope scope) {
-        return new SumAggregator();
-    }
+
+  @Override
+  protected SumAggregator newInstance(final Scope scope) {
+    return new SumAggregator();
+  }
 }

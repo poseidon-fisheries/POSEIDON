@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.regulations.predicates;
 
+import java.util.function.Function;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.regulations.Action;
 import uk.ac.ox.poseidon.regulations.Regulations;
-
-import java.util.function.Function;
 
 /**
  * Factories for predicates over agents built on top of the {@link Regulations} model: converting a
@@ -35,19 +34,21 @@ import java.util.function.Function;
  */
 public class Factories {
 
-    private Factories() {
-    }
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-     * {@link IsPermittedPredicate}
-     * @see IsPermittedPredicateFactory
-     */
-    public static <S extends Scope, G, A extends Action<G>> IsPermittedPredicateFactory<S, G, A> isPermitted(
-        final Factory<? super S, ? extends Function<G, A>> actionFunction,
-        final Factory<? super S, ? extends Regulations<? super A>> regulations
-    ) {
-        return new IsPermittedPredicateFactory<>(actionFunction, regulations);
-    }
-
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   * {@link IsPermittedPredicate}
+   * @see IsPermittedPredicateFactory
+   */
+  public static <
+    S extends Scope,
+    G,
+    A extends Action<G>
+  > IsPermittedPredicateFactory<S, G, A> isPermitted(
+    final Factory<? super S, ? extends Function<G, A>> actionFunction,
+    final Factory<? super S, ? extends Regulations<? super A>> regulations
+  ) {
+    return new IsPermittedPredicateFactory<>(actionFunction, regulations);
+  }
 }

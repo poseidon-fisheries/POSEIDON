@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import lombok.RequiredArgsConstructor;
-import tech.tablesaw.api.Table;
-
 import java.util.List;
 import java.util.function.Supplier;
+import lombok.RequiredArgsConstructor;
+import tech.tablesaw.api.Table;
 
 /**
  * A named, typed {@code tablesaw} {@link Table} shape that can be created (empty) on demand, from
@@ -36,12 +35,11 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class TableDefinition implements Supplier<Table> {
 
-    private final List<? extends ColumnDefinition> columnDefinitions;
+  private final List<? extends ColumnDefinition> columnDefinitions;
 
-    /** @return a fresh, empty {@link Table} with one column per {@code columnDefinitions} entry */
-    @Override
-    public Table get() {
-        return Table.create(columnDefinitions.stream().map(ColumnDefinition::get));
-    }
-
+  /** @return a fresh, empty {@link Table} with one column per {@code columnDefinitions} entry */
+  @Override
+  public Table get() {
+    return Table.create(columnDefinitions.stream().map(ColumnDefinition::get));
+  }
 }

@@ -29,10 +29,12 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
  * A {@link VesselScopeFactory} counterpart of {@link VesselEventManager}, built via
  * {@link Factories#vesselEventManager()}.
  */
-public class VesselEventManagerFactory extends VesselScopeFactory<VesselEventManager> {
+public class VesselEventManagerFactory
+  extends VesselScopeFactory<VesselEventManager>
+{
 
-    @Override
-    protected VesselEventManager newInstance(final VesselScope scope) {
-        return new VesselEventManager(scope.getVessel());
-    }
+  @Override
+  protected VesselEventManager newInstance(final VesselScope scope) {
+    return new VesselEventManager(scope.getVessel());
+  }
 }

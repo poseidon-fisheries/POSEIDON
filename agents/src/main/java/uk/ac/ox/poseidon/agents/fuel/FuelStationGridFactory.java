@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.fuel;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,11 +34,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
-
-import java.util.List;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * A {@link RelativeScopeFactory} for an {@link ImmutableFuelStationGrid} placing each resolved
@@ -45,21 +44,30 @@ import static java.util.stream.Collectors.toMap;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FuelStationGridFactory<S extends Scope>
-    extends RelativeScopeFactory<S, FuelStationGrid> {
+public class FuelStationGridFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  FuelStationGrid
+> {
 
-    private Factory<? super S, ? extends PortGrid> portGrid;
-    private Factory<? super S, ? extends List<? extends FuelStation>> fuelStations;
+  private Factory<? super S, ? extends PortGrid> portGrid;
+  private Factory<
+    ? super S,
+    ? extends List<? extends FuelStation>
+  > fuelStations;
 
-    @Override
-    protected FuelStationGrid newInstance(final S scope) {
-        final PortGrid portGrid = this.portGrid.get(scope);
-        return new ImmutableFuelStationGrid(
-            portGrid.getModelGrid(),
-            fuelStations.get(scope).stream().collect(toMap(
-                identity(),
-                fuelStation -> portGrid.getLocation(fuelStation.getPort())
-            ))
-        );
-    }
+  @Override
+  protected FuelStationGrid newInstance(final S scope) {
+    final PortGrid portGrid = this.portGrid.get(scope);
+    return new ImmutableFuelStationGrid(
+      portGrid.getModelGrid(),
+      fuelStations
+        .get(scope)
+        .stream()
+        .collect(
+          toMap(identity(), fuelStation ->
+            portGrid.getLocation(fuelStation.getPort())
+          )
+        )
+    );
+  }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.Map;
 
 /**
  * A {@link RelativeScopeFactory} that resolves a fixed key against a resolved {@link Map} and
@@ -44,14 +43,17 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MapEntryFactory<S extends Scope, K, V> extends RelativeScopeFactory<S, V> {
+public class MapEntryFactory<
+  S extends Scope,
+  K,
+  V
+> extends RelativeScopeFactory<S, V> {
 
-    private Factory<? super S, ? extends Map<? super K, ? extends V>> map;
-    private K key;
+  private Factory<? super S, ? extends Map<? super K, ? extends V>> map;
+  private K key;
 
-    @Override
-    protected V newInstance(final S scope) {
-        return map.get(scope).get(key);
-    }
-
+  @Override
+  protected V newInstance(final S scope) {
+    return map.get(scope).get(key);
+  }
 }

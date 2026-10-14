@@ -26,5 +26,5 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.regulations.TemporalAction;
 
 /** A {@link FishingAction} that also carries a {@link TemporalAction} timing. */
-public interface TemporalFishingAction extends FishingAction, TemporalAction<Vessel> {
-}
+public interface TemporalFishingAction
+  extends FishingAction, TemporalAction<Vessel> {}

@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,8 +32,6 @@ import org.joda.money.CurrencyUnit;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of {@link ProfitPerHourDestinationEvaluator}, built
@@ -42,14 +42,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ProfitPerHourDestinationEvaluationProviderFactory
-    extends GlobalScopeFactory<Evaluator<Int2D>> {
+  extends GlobalScopeFactory<Evaluator<Int2D>>
+{
 
-    private String currencyCode;
+  private String currencyCode;
 
-    @Override
-    protected Evaluator<Int2D> newInstance(final Scope scope) {
-        return new ProfitPerHourDestinationEvaluator(
-            CurrencyUnit.of(checkNotNull(currencyCode, "currencyCode"))
-        );
-    }
+  @Override
+  protected Evaluator<Int2D> newInstance(final Scope scope) {
+    return new ProfitPerHourDestinationEvaluator(
+      CurrencyUnit.of(checkNotNull(currencyCode, "currencyCode"))
+    );
+  }
 }

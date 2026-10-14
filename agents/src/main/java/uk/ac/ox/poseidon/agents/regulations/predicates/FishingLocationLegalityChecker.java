@@ -22,6 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.regulations.predicates;
 
+import static lombok.AccessLevel.PACKAGE;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
@@ -29,14 +36,6 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.regulations.Regulations;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
-import static lombok.AccessLevel.PACKAGE;
 
 /**
  * Predicate matching cells the vessel could legally fish at: builds a hypothetical
@@ -53,54 +52,49 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor(access = PACKAGE)
 public class FishingLocationLegalityChecker implements Predicate<Int2D> {
 
-    private final Regulations<? super ExtendedFishingAction> regulations;
-    private final GridPathFinder pathFinder;
-    private final DistanceCalculator distanceCalculator;
-    private final Duration fishingDuration;
-    private final Supplier<LocalDateTime> currentDateTimeSupplier;
-    private final Vessel vessel;
+  private final Regulations<? super ExtendedFishingAction> regulations;
+  private final GridPathFinder pathFinder;
+  private final DistanceCalculator distanceCalculator;
+  private final Duration fishingDuration;
+  private final Supplier<LocalDateTime> currentDateTimeSupplier;
+  private final Vessel vessel;
 
-    /** @return whether fishing at {@code fishingLocation} would currently be permitted */
-    @Override
-    public boolean test(
-        final Int2D fishingLocation
-    ) {
-        return regulations.isPermitted(makeAction(fishingLocation));
-    }
+  /** @return whether fishing at {@code fishingLocation} would currently be permitted */
+  @Override
+  public boolean test(final Int2D fishingLocation) {
+    return regulations.isPermitted(makeAction(fishingLocation));
+  }
 
-    /**
-     * Builds the {@link ExtendedFishingAction} the vessel would plan at {@code fishingLocation}:
-     * starting whenever it would arrive there from its current cell, and lasting
-     * {@code fishingDuration}.
-     *
-     * @throws RuntimeException if no path exists from the vessel's current cell to
-     *                          {@code fishingLocation}
-     */
-    private ExtendedFishingAction makeAction(
-        final Int2D fishingLocation
-    ) {
-        final List<Int2D> pathToFishingLocation =
-            pathFinder.getPath(
-                vessel.getCell(),
-                fishingLocation
-            ).orElseThrow(() -> new RuntimeException(
-                "No path from current vessel location " +
-                    vessel.getCell() +
-                    " to fishing location " +
-                    fishingLocation
-            ));
-        final Duration travelDuration =
-            distanceCalculator.travelDuration(
-                pathToFishingLocation,
-                vessel.getEngine().getCruisingSpeedInKph()
-            );
+  /**
+   * Builds the {@link ExtendedFishingAction} the vessel would plan at {@code fishingLocation}:
+   * starting whenever it would arrive there from its current cell, and lasting
+   * {@code fishingDuration}.
+   *
+   * @throws RuntimeException if no path exists from the vessel's current cell to
+   *                          {@code fishingLocation}
+   */
+  private ExtendedFishingAction makeAction(final Int2D fishingLocation) {
+    final List<Int2D> pathToFishingLocation = pathFinder
+      .getPath(vessel.getCell(), fishingLocation)
+      .orElseThrow(() ->
+        new RuntimeException(
+          "No path from current vessel location " +
+            vessel.getCell() +
+            " to fishing location " +
+            fishingLocation
+        )
+      );
+    final Duration travelDuration = distanceCalculator.travelDuration(
+      pathToFishingLocation,
+      vessel.getEngine().getCruisingSpeedInKph()
+    );
 
-        return new ExtendedFishingAction(
-            vessel,
-            currentDateTimeSupplier.get().plus(travelDuration),
-            fishingDuration,
-            vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation),
-            vessel.getGear()
-        );
-    }
+    return new ExtendedFishingAction(
+      vessel,
+      currentDateTimeSupplier.get().plus(travelDuration),
+      fishingDuration,
+      vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation),
+      vessel.getGear()
+    );
+  }
 }

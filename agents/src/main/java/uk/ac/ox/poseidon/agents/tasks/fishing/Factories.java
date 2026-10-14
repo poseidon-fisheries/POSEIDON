@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
+import java.util.function.Supplier;
 import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -29,61 +30,65 @@ import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
-import java.util.function.Supplier;
-
 /** Factories for fishing behavior-tree tasks and their supporting event accumulator. */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @param regulations the regulations a fishing action started now, here, is checked against
-     * @return a {@link VesselScope}-relative factory for a
-     * {@link CheckIfFishingHereAndNowIsLegal}
-     * @see CheckIfFishingHereAndNowIsLegal
-     */
-    public static CheckIfFishingHereAndNowIsLegalFactory checkIfFishingHereAndNowIsLegal(
-        final Factory<
-            ? super VesselScope,
-            ? extends Regulations<? super ExtendedFishingAction>
-            > regulations
-    ) {
-        return new CheckIfFishingHereAndNowIsLegalFactory(regulations);
-    }
+  /**
+   * @param regulations the regulations a fishing action started now, here, is checked against
+   * @return a {@link VesselScope}-relative factory for a
+   * {@link CheckIfFishingHereAndNowIsLegal}
+   * @see CheckIfFishingHereAndNowIsLegal
+   */
+  public static CheckIfFishingHereAndNowIsLegalFactory checkIfFishingHereAndNowIsLegal(
+    final Factory<
+      ? super VesselScope,
+      ? extends Regulations<? super ExtendedFishingAction>
+    > regulations
+  ) {
+    return new CheckIfFishingHereAndNowIsLegalFactory(regulations);
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
-     * {@link FishingEventAccumulator}
-     * @see FishingEventAccumulator
-     */
-    public static FishingEventAccumulatorFactory fishingEventAccumulator() {
-        return new FishingEventAccumulatorFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   * {@link FishingEventAccumulator}
+   * @see FishingEventAccumulator
+   */
+  public static FishingEventAccumulatorFactory fishingEventAccumulator() {
+    return new FishingEventAccumulatorFactory();
+  }
 
-    /**
-     * @param propertyPath the dotted path of properties to follow from the fishing event, e.g.
-     *                     {@code "action.gear.code"} for the code of the gear the fishing action
-     *                     was made with
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
-     * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a fishing event
-     * @see FishingEventPropertyFactory
-     */
-    public static <R> FishingEventPropertyFactory<R> fishingEventProperty(
-        final String propertyPath
-    ) {
-        return new FishingEventPropertyFactory<>(propertyPath);
-    }
+  /**
+   * @param propertyPath the dotted path of properties to follow from the fishing event, e.g.
+   *                     {@code "action.gear.code"} for the code of the gear the fishing action
+   *                     was made with
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
+   * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a fishing event
+   * @see FishingEventPropertyFactory
+   */
+  public static <R> FishingEventPropertyFactory<R> fishingEventProperty(
+    final String propertyPath
+  ) {
+    return new FishingEventPropertyFactory<>(propertyPath);
+  }
 
-    /**
-     * @param fisheableSupplier supplies the fisheable to fish from
-     * @param dispositionProcess sorts the catch into retained/discarded
-     * @return a {@link VesselScope}-relative factory for a {@link Fishing} task
-     * @see Fishing
-     */
-    public static FishingFactory fishing(
-        final Factory<? super VesselScope, ? extends Supplier<Fisheable>> fisheableSupplier,
-        final Factory<? super VesselScope, ? extends DispositionProcess> dispositionProcess
-    ) {
-        return new FishingFactory(fisheableSupplier, dispositionProcess);
-    }
+  /**
+   * @param fisheableSupplier supplies the fisheable to fish from
+   * @param dispositionProcess sorts the catch into retained/discarded
+   * @return a {@link VesselScope}-relative factory for a {@link Fishing} task
+   * @see Fishing
+   */
+  public static FishingFactory fishing(
+    final Factory<
+      ? super VesselScope,
+      ? extends Supplier<Fisheable>
+    > fisheableSupplier,
+    final Factory<
+      ? super VesselScope,
+      ? extends DispositionProcess
+    > dispositionProcess
+  ) {
+    return new FishingFactory(fisheableSupplier, dispositionProcess);
+  }
 }

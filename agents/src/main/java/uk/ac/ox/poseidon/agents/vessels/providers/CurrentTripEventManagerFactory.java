@@ -29,10 +29,12 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
  * A {@link VesselScopeFactory} counterpart of {@link CurrentTripEventManager}, built via
  * {@link Factories#currentTripEventManager()}.
  */
-public class CurrentTripEventManagerFactory extends VesselScopeFactory<CurrentTripEventManager> {
+public class CurrentTripEventManagerFactory
+  extends VesselScopeFactory<CurrentTripEventManager>
+{
 
-    @Override
-    protected CurrentTripEventManager newInstance(final VesselScope scope) {
-        return new CurrentTripEventManager(scope.getVessel());
-    }
+  @Override
+  protected CurrentTripEventManager newInstance(final VesselScope scope) {
+    return new CurrentTripEventManager(scope.getVessel());
+  }
 }

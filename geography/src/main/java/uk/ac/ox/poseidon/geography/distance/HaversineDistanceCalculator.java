@@ -22,10 +22,10 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
+import static java.lang.Math.*;
+
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
-import static java.lang.Math.*;
 
 /**
  * A {@link CoordinateBasedDistanceCalculator} using the haversine great-circle formula: accurate
@@ -33,27 +33,27 @@ import static java.lang.Math.*;
  * {@link EquirectangularDistanceCalculator}. Built via
  * {@link Factories#haversineDistanceCalculator(uk.ac.ox.poseidon.core.Factory)} in this package.
  */
-public class HaversineDistanceCalculator extends CoordinateBasedDistanceCalculator {
+public class HaversineDistanceCalculator
+  extends CoordinateBasedDistanceCalculator
+{
 
-    /** @param modelGrid the grid this calculator measures distances over */
-    public HaversineDistanceCalculator(final ModelGrid modelGrid) {
-        super(modelGrid);
-    }
+  /** @param modelGrid the grid this calculator measures distances over */
+  public HaversineDistanceCalculator(final ModelGrid modelGrid) {
+    super(modelGrid);
+  }
 
-    @Override
-    public double distanceInKm(
-        final Coordinate a,
-        final Coordinate b
-    ) {
-        final double lat1 = toRadians(a.lat);
-        final double lon1 = toRadians(a.lon);
-        final double lat2 = toRadians(b.lat);
-        final double lon2 = toRadians(b.lon);
-        final double dLat = lat2 - lat1;
-        final double dLon = lon2 - lon1;
-        final double h = sin(dLat / 2) * sin(dLat / 2) +
-            cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2);
-        final double c = 2 * atan2(sqrt(h), sqrt(1 - h));
-        return EARTH_RADIUS_IN_KM * c;
-    }
+  @Override
+  public double distanceInKm(final Coordinate a, final Coordinate b) {
+    final double lat1 = toRadians(a.lat);
+    final double lon1 = toRadians(a.lon);
+    final double lat2 = toRadians(b.lat);
+    final double lon2 = toRadians(b.lon);
+    final double dLat = lat2 - lat1;
+    final double dLon = lon2 - lon1;
+    final double h =
+      sin(dLat / 2) * sin(dLat / 2) +
+      cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2);
+    final double c = 2 * atan2(sqrt(h), sqrt(1 - h));
+    return EARTH_RADIUS_IN_KM * c;
+  }
 }

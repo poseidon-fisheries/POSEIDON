@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.function.IntSupplier;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,10 +35,6 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
-import java.util.function.IntSupplier;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 /**
  * A {@link VesselScopeFactory} counterpart of {@link NeighbourhoodCellPicker}, built via
  * {@link Factories#neighbourhoodGridExplorer}.
@@ -44,24 +43,32 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class NeighbourhoodGridExplorerFactory extends VesselScopeFactory<NeighbourhoodCellPicker> {
+public class NeighbourhoodGridExplorerFactory
+  extends VesselScopeFactory<NeighbourhoodCellPicker>
+{
 
-    private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
-    private Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate;
-    private Factory<? super VesselScope, ? extends IntSupplier> neighbourhoodSizeSupplier;
-    private int maximumWidening;
-    private Factory<? super VesselScope, ? extends Supplier<Int2D>> searchCentre;
+  private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
+  private Factory<
+    ? super VesselScope,
+    ? extends Predicate<? super Int2D>
+  > cellPredicate;
+  private Factory<
+    ? super VesselScope,
+    ? extends IntSupplier
+  > neighbourhoodSizeSupplier;
+  private int maximumWidening;
+  private Factory<? super VesselScope, ? extends Supplier<Int2D>> searchCentre;
 
-    @Override
-    protected NeighbourhoodCellPicker newInstance(final VesselScope scope) {
-        return new NeighbourhoodCellPicker(
-            scope.getVessel(),
-            pathFinder.get(scope),
-            cellPredicate.get(scope),
-            neighbourhoodSizeSupplier.get(scope),
-            maximumWidening,
-            searchCentre.get(scope),
-            scope.getSimulation().random
-        );
-    }
+  @Override
+  protected NeighbourhoodCellPicker newInstance(final VesselScope scope) {
+    return new NeighbourhoodCellPicker(
+      scope.getVessel(),
+      pathFinder.get(scope),
+      cellPredicate.get(scope),
+      neighbourhoodSizeSupplier.get(scope),
+      maximumWidening,
+      searchCentre.get(scope),
+      scope.getSimulation().random
+    );
+  }
 }

@@ -22,22 +22,21 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static lombok.AccessLevel.PRIVATE;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static lombok.AccessLevel.PRIVATE;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * A fixed, sorted set of {@link Species}, assigning each a stable integer position — the shared
@@ -51,109 +50,112 @@ import static lombok.AccessLevel.PRIVATE;
 @RequiredArgsConstructor(access = PRIVATE)
 public final class SpeciesIndex {
 
-    private static final Interner<SpeciesIndex> interner = Interners.newWeakInterner();
+  private static final Interner<SpeciesIndex> interner =
+    Interners.newWeakInterner();
 
-    private final Object2IntOpenHashMap<Species> indices;
-    private final Species[] speciesArray;
-    private transient volatile Map<Species, Integer> cachedMap;
+  private final Object2IntOpenHashMap<Species> indices;
+  private final Species[] speciesArray;
+  private transient volatile Map<Species, Integer> cachedMap;
 
-    /** @return the interned index over {@code species} */
-    public static SpeciesIndex of(final Set<Species> species) {
-        return interner.intern(new SpeciesIndex(species));
+  /** @return the interned index over {@code species} */
+  public static SpeciesIndex of(final Set<Species> species) {
+    return interner.intern(new SpeciesIndex(species));
+  }
+
+  /** @return the interned index over {@code species} */
+  @SuppressWarnings("unchecked")
+  public static SpeciesIndex of(final Collection<? extends Species> species) {
+    return species instanceof Set
+      ? of((Set<Species>) species)
+      : of(Set.copyOf(species));
+  }
+
+  /** @return the interned index over {@code species} */
+  public static SpeciesIndex of(final Species... species) {
+    return interner.intern(new SpeciesIndex(Set.of(species)));
+  }
+
+  private SpeciesIndex(@NonNull final Set<Species> speciesSet) {
+    this.speciesArray = speciesSet.toArray(new Species[0]);
+    this.indices = new Object2IntOpenHashMap<>(speciesArray.length);
+    indices.defaultReturnValue(-1);
+    for (final Species species : speciesArray) {
+      if (species == null) {
+        throw new NullPointerException(
+          "Species set must not contain null entries."
+        );
+      }
     }
-
-    /** @return the interned index over {@code species} */
-    @SuppressWarnings("unchecked")
-    public static SpeciesIndex of(final Collection<? extends Species> species) {
-        return species instanceof Set
-            ? of((Set<Species>) species)
-            : of(Set.copyOf(species));
+    Arrays.sort(this.speciesArray);
+    for (int i = 0; i < speciesArray.length; i++) {
+      indices.put(speciesArray[i], i);
     }
+  }
 
-    /** @return the interned index over {@code species} */
-    public static SpeciesIndex of(final Species... species) {
-        return interner.intern(new SpeciesIndex(Set.of(species)));
-    }
+  /** @return a fresh {@code double} array sized to this index, one slot per species */
+  public double[] newDoubleArray() {
+    return new double[speciesArray.length];
+  }
 
-    private SpeciesIndex(@NonNull final Set<Species> speciesSet) {
-        this.speciesArray = speciesSet.toArray(new Species[0]);
-        this.indices = new Object2IntOpenHashMap<>(speciesArray.length);
-        indices.defaultReturnValue(-1);
-        for (final Species species : speciesArray) {
-            if (species == null) {
-                throw new NullPointerException("Species set must not contain null entries.");
-            }
-        }
-        Arrays.sort(this.speciesArray);
-        for (int i = 0; i < speciesArray.length; i++) {
-            indices.put(speciesArray[i], i);
-        }
+  /**
+   * @param function applied to each species, in index order, to build the array
+   * @return a {@link SpeciesIndexedDoubleArray} over this index, holding {@code function}'s
+   * result for each species
+   * @throws NullPointerException if {@code function} returns {@code null} for any species
+   */
+  public SpeciesIndexedDoubleArray mapToDoubleArray(
+    final Function<? super Species, Double> function
+  ) {
+    checkNotNull(function);
+    final double[] a = newDoubleArray();
+    for (int i = 0; i < a.length; i++) {
+      a[i] = checkNotNull(function.apply(speciesAt(i)));
     }
+    return SpeciesIndexedDoubleArray.of(a, this);
+  }
 
-    /** @return a fresh {@code double} array sized to this index, one slot per species */
-    public double[] newDoubleArray() {
-        return new double[speciesArray.length];
-    }
+  /**
+   * Retrieves the index of the specified {@code Species} in this {@code SpeciesIndex}. If the
+   * species is not found, the method returns -1.
+   *
+   * @param species the {@code Species} whose index is to be retrieved
+   * @return the index of the specified {@code Species}, or -1 if not found
+   */
+  public int indexOf(final Species species) {
+    return indices.getInt(species);
+  }
 
-    /**
-     * @param function applied to each species, in index order, to build the array
-     * @return a {@link SpeciesIndexedDoubleArray} over this index, holding {@code function}'s
-     * result for each species
-     * @throws NullPointerException if {@code function} returns {@code null} for any species
-     */
-    public SpeciesIndexedDoubleArray mapToDoubleArray(
-        final Function<? super Species, Double> function
-    ) {
-        checkNotNull(function);
-        final double[] a = newDoubleArray();
-        for (int i = 0; i < a.length; i++) {
-            a[i] = checkNotNull(function.apply(speciesAt(i)));
-        }
-        return SpeciesIndexedDoubleArray.of(a, this);
-    }
+  /**
+   * Retrieves the {@code Species} object at the specified index in the {@code SpeciesIndex}'s
+   * internal array. If the index is out of bounds, the method returns {@code null}.
+   *
+   * @param index the index of the {@code Species} object to retrieve
+   * @return the {@code Species} object at the specified index, or {@code null} if the index is
+   * out of bounds
+   */
+  public Species speciesAt(final int index) {
+    return index < 0 || index >= speciesArray.length
+      ? null
+      : speciesArray[index];
+  }
 
-    /**
-     * Retrieves the index of the specified {@code Species} in this {@code SpeciesIndex}. If the
-     * species is not found, the method returns -1.
-     *
-     * @param species the {@code Species} whose index is to be retrieved
-     * @return the index of the specified {@code Species}, or -1 if not found
-     */
-    public int indexOf(final Species species) {
-        return indices.getInt(species);
-    }
+  /** @return the number of species in this index */
+  public int size() {
+    return speciesArray.length;
+  }
 
-    /**
-     * Retrieves the {@code Species} object at the specified index in the {@code SpeciesIndex}'s
-     * internal array. If the index is out of bounds, the method returns {@code null}.
-     *
-     * @param index the index of the {@code Species} object to retrieve
-     * @return the {@code Species} object at the specified index, or {@code null} if the index is
-     * out of bounds
-     */
-    public Species speciesAt(final int index) {
-        return (index < 0 || index >= speciesArray.length)
-            ? null
-            : speciesArray[index];
+  /** @return this index's species-to-position mapping. Cached after first access. */
+  public Map<Species, Integer> asMap() {
+    Map<Species, Integer> map = cachedMap;
+    if (map == null) {
+      final ImmutableMap.Builder<Species, Integer> builder =
+        ImmutableMap.builderWithExpectedSize(indices.size());
+      indices
+        .object2IntEntrySet()
+        .forEach(entry -> builder.put(entry.getKey(), entry.getIntValue()));
+      map = builder.build();
+      cachedMap = map;
     }
-
-    /** @return the number of species in this index */
-    public int size() {
-        return speciesArray.length;
-    }
-
-    /** @return this index's species-to-position mapping. Cached after first access. */
-    public Map<Species, Integer> asMap() {
-        Map<Species, Integer> map = cachedMap;
-        if (map == null) {
-            final ImmutableMap.Builder<Species, Integer> builder =
-                ImmutableMap.builderWithExpectedSize(indices.size());
-            indices.object2IntEntrySet().forEach(entry ->
-                builder.put(entry.getKey(), entry.getIntValue())
-            );
-            map = builder.build();
-            cachedMap = map;
-        }
-        return map;
-    }
+    return map;
+  }
 }

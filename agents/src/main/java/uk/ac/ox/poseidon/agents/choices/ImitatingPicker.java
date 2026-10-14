@@ -22,20 +22,19 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import ec.util.MersenneTwisterFast;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
+import static java.lang.Double.NEGATIVE_INFINITY;
+import static lombok.AccessLevel.PACKAGE;
+import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
+import ec.util.MersenneTwisterFast;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import static java.lang.Double.NEGATIVE_INFINITY;
-import static lombok.AccessLevel.PACKAGE;
-import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
  * This picker will look for better options than the current option in a list of candidates to
@@ -50,33 +49,34 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 @RequiredArgsConstructor(access = PACKAGE)
 public class ImitatingPicker<O> implements Provider<O> {
 
-    private final OptionValues<O> optionValues;
-    private final Predicate<? super O> optionPredicate;
-    private final Supplier<OptionValues<O>> candidatesSupplier;
-    private final MersenneTwisterFast rng;
+  private final OptionValues<O> optionValues;
+  private final Predicate<? super O> optionPredicate;
+  private final Supplier<OptionValues<O>> candidatesSupplier;
+  private final MersenneTwisterFast rng;
 
-    /**
-     * @return a uniformly random candidate strictly better than the current best-known option, if
-     * any are accessible; otherwise the current best-known option; {@code null} if there is none
-     */
-    @Override
-    public O get() {
-        final Optional<Entry<O, Double>> currentBestEntry =
-            optionValues.getBestEntry(rng);
+  /**
+   * @return a uniformly random candidate strictly better than the current best-known option, if
+   * any are accessible; otherwise the current best-known option; {@code null} if there is none
+   */
+  @Override
+  public O get() {
+    final Optional<Entry<O, Double>> currentBestEntry =
+      optionValues.getBestEntry(rng);
 
-        final double currentBestValue =
-            currentBestEntry.map(Entry::getValue).orElse(NEGATIVE_INFINITY);
+    final double currentBestValue = currentBestEntry
+      .map(Entry::getValue)
+      .orElse(NEGATIVE_INFINITY);
 
-        final List<O> candidates = new ArrayList<>();
-        candidatesSupplier.get().forEachBestEntry((key, value) -> {
-            if (value > currentBestValue) candidates.add(key);
-        });
+    final List<O> candidates = new ArrayList<>();
+    candidatesSupplier.get().forEachBestEntry((key, value) -> {
+      if (value > currentBestValue) candidates.add(key);
+    });
 
-        return shuffledStream(candidates, rng)
-            .filter(optionPredicate)
-            .findFirst()
-            .or(() -> currentBestEntry.map(Entry::getKey))
-            .filter(optionPredicate)
-            .orElse(null);
-    }
+    return shuffledStream(candidates, rng)
+      .filter(optionPredicate)
+      .findFirst()
+      .or(() -> currentBestEntry.map(Entry::getKey))
+      .filter(optionPredicate)
+      .orElse(null);
+  }
 }

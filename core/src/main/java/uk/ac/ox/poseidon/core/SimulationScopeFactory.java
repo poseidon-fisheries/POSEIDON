@@ -34,15 +34,18 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  */
 @SuperBuilder
 @NoArgsConstructor
-public abstract class SimulationScopeFactory<C>
-    extends AbstractFactory<SimulationScope, C> {
-    @Override
-    protected Object makeKey(final SimulationScope scope) {
-        return scope.getSimulation();
-    }
+public abstract class SimulationScopeFactory<C> extends AbstractFactory<
+  SimulationScope,
+  C
+> {
 
-    @Override
-    protected Class<SimulationScope> scopeClass() {
-        return SimulationScope.class;
-    }
+  @Override
+  protected Object makeKey(final SimulationScope scope) {
+    return scope.getSimulation();
+  }
+
+  @Override
+  protected Class<SimulationScope> scopeClass() {
+    return SimulationScope.class;
+  }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.tasks.accounting;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,8 +33,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.function.Function;
-
 /**
  * A {@link RelativeScopeFactory} for a {@link PayTripCost}. Built via
  * {@link Factories#payTripCost}.
@@ -42,15 +41,18 @@ import java.util.function.Function;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PayTripCostFactory<S extends Scope>
-    extends RelativeScopeFactory<S, PayTripCost> {
+public class PayTripCostFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  PayTripCost
+> {
 
-    private Factory<? super S, ? extends Function<? super Vessel, ? extends Money>>
-        tripCostExtractor;
+  private Factory<
+    ? super S,
+    ? extends Function<? super Vessel, ? extends Money>
+  > tripCostExtractor;
 
-    @Override
-    protected PayTripCost newInstance(final S scope) {
-        return new PayTripCost(tripCostExtractor.get(scope));
-    }
-
+  @Override
+  protected PayTripCost newInstance(final S scope) {
+    return new PayTripCost(tripCostExtractor.get(scope));
+  }
 }

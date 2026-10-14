@@ -22,45 +22,44 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class NetValuationTest {
 
-    @Test
-    void subtractsTheCostValuationFromTheRevenueValuation() {
-        final NetValuation<String, Double> netValuation = new NetValuation<>(
-            (option, recollection) -> 10.0,
-            (option, recollection) -> 4.0
-        );
+  @Test
+  void subtractsTheCostValuationFromTheRevenueValuation() {
+    final NetValuation<String, Double> netValuation = new NetValuation<>(
+      (option, recollection) -> 10.0,
+      (option, recollection) -> 4.0
+    );
 
-        assertThat(netValuation.applyAsDouble("A", 1.0)).isEqualTo(6.0);
-    }
+    assertThat(netValuation.applyAsDouble("A", 1.0)).isEqualTo(6.0);
+  }
 
-    @Test
-    void givesBothValuationsTheSameOptionAndRecollection() {
-        final List<Object> revenueArguments = new ArrayList<>();
-        final List<Object> costArguments = new ArrayList<>();
-        final NetValuation<String, Double> netValuation = new NetValuation<>(
-            (option, recollection) -> {
-                revenueArguments.add(option);
-                revenueArguments.add(recollection);
-                return 0.0;
-            },
-            (option, recollection) -> {
-                costArguments.add(option);
-                costArguments.add(recollection);
-                return 0.0;
-            }
-        );
+  @Test
+  void givesBothValuationsTheSameOptionAndRecollection() {
+    final List<Object> revenueArguments = new ArrayList<>();
+    final List<Object> costArguments = new ArrayList<>();
+    final NetValuation<String, Double> netValuation = new NetValuation<>(
+      (option, recollection) -> {
+        revenueArguments.add(option);
+        revenueArguments.add(recollection);
+        return 0.0;
+      },
+      (option, recollection) -> {
+        costArguments.add(option);
+        costArguments.add(recollection);
+        return 0.0;
+      }
+    );
 
-        netValuation.applyAsDouble("A", 1.0);
+    netValuation.applyAsDouble("A", 1.0);
 
-        assertThat(revenueArguments).containsExactly("A", 1.0);
-        assertThat(costArguments).containsExactly("A", 1.0);
-    }
+    assertThat(revenueArguments).containsExactly("A", 1.0);
+    assertThat(costArguments).containsExactly("A", 1.0);
+  }
 }

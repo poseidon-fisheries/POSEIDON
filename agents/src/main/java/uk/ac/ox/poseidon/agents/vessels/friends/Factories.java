@@ -22,34 +22,39 @@
 
 package uk.ac.ox.poseidon.agents.vessels.friends;
 
+import java.util.function.Predicate;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
-
-import java.util.function.Predicate;
 
 /**
  * Factories for suppliers of a vessel's dynamically-maintained set of "friend" vessels.
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-     * {@link DynamicFriendsSupplier}
-     * @see DynamicFriendsSupplierFactory
-     */
-    public static DynamicFriendsSupplierFactory dynamicFriendsSupplier(
-        final int targetNumberOfFriends,
-        final Factory<? super VesselScope, ? extends VesselsGetter> potentialFriends,
-        final Factory<? super VesselScope, ? extends Predicate<? super Vessel>> friendshipCondition
-    ) {
-        return new DynamicFriendsSupplierFactory(
-            targetNumberOfFriends,
-            potentialFriends,
-            friendshipCondition
-        );
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+   * {@link DynamicFriendsSupplier}
+   * @see DynamicFriendsSupplierFactory
+   */
+  public static DynamicFriendsSupplierFactory dynamicFriendsSupplier(
+    final int targetNumberOfFriends,
+    final Factory<
+      ? super VesselScope,
+      ? extends VesselsGetter
+    > potentialFriends,
+    final Factory<
+      ? super VesselScope,
+      ? extends Predicate<? super Vessel>
+    > friendshipCondition
+  ) {
+    return new DynamicFriendsSupplierFactory(
+      targetNumberOfFriends,
+      potentialFriends,
+      friendshipCondition
+    );
+  }
 }

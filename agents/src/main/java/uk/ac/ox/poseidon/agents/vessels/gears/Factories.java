@@ -22,77 +22,87 @@
 
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
+import java.time.Duration;
+import java.util.Collection;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
 import si.uom.quantity.VolumetricFlowRate;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-import java.time.Duration;
-import java.util.Collection;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 /** Factories for a vessel's {@link Gear}: inactive, a fixed proportion, or a per-species one. */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @param code                   this gear's identifying code
-     * @param proportion             the fraction of available biomass caught per species
-     * @param minimumCatchThreshold  per-species catch below this is discarded down to zero
-     * @param durationSupplier       supplies how long one fishing event takes
-     * @param fuelConsumptionRate    fuel burned per hour of fishing
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-     * {@link FixedBiomassProportionGear}
-     * @see FixedBiomassProportionGear
-     */
-    public static <S extends SimulationScope> FixedBiomassProportionGearFactory<S>
-    fixedBiomassProportionGear(
-        final String code,
-        final double proportion,
-        final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold,
-        final Factory<? super S, ? extends Supplier<Duration>> durationSupplier,
-        final Factory<? super S, ? extends Quantity<VolumetricFlowRate>>
-            fuelConsumptionRate
-    ) {
-        return new FixedBiomassProportionGearFactory<>(
-            code, proportion, minimumCatchThreshold, durationSupplier, fuelConsumptionRate
-        );
-    }
+  /**
+   * @param code                   this gear's identifying code
+   * @param proportion             the fraction of available biomass caught per species
+   * @param minimumCatchThreshold  per-species catch below this is discarded down to zero
+   * @param durationSupplier       supplies how long one fishing event takes
+   * @param fuelConsumptionRate    fuel burned per hour of fishing
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * {@link FixedBiomassProportionGear}
+   * @see FixedBiomassProportionGear
+   */
+  public static <S extends SimulationScope> FixedBiomassProportionGearFactory<S> fixedBiomassProportionGear(
+    final String code,
+    final double proportion,
+    final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold,
+    final Factory<? super S, ? extends Supplier<Duration>> durationSupplier,
+    final Factory<
+      ? super S,
+      ? extends Quantity<VolumetricFlowRate>
+    > fuelConsumptionRate
+  ) {
+    return new FixedBiomassProportionGearFactory<>(
+      code,
+      proportion,
+      minimumCatchThreshold,
+      durationSupplier,
+      fuelConsumptionRate
+    );
+  }
 
-    /**
-     * @param code this gear's identifying code
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an {@link InactiveGear}
-     * @see InactiveGear
-     */
-    public static InactiveGearFactory inactiveGear(final String code) {
-        return new InactiveGearFactory(code);
-    }
+  /**
+   * @param code this gear's identifying code
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an {@link InactiveGear}
+   * @see InactiveGear
+   */
+  public static InactiveGearFactory inactiveGear(final String code) {
+    return new InactiveGearFactory(code);
+  }
 
-    /**
-     * @param code                  this gear's identifying code
-     * @param durationSupplier      supplies how long one fishing event takes
-     * @param species               the species to index proportions over
-     * @param proportionFunction    the fraction of available biomass caught, per species
-     * @param minimumCatchThreshold per-species catch below this is discarded down to zero
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-     * {@link IndexedBiomassCatchabilityGear}
-     * @see IndexedBiomassCatchabilityGear
-     */
-    public static <S extends Scope> IndexedBiomassCatchabilityGearFactory<S>
-    indexedBiomassCatchabilityGear(
-        final String code,
-        final Factory<? super S, ? extends Supplier<Duration>> durationSupplier,
-        final Factory<? super S, ? extends Collection<? extends Species>> species,
-        final Factory<? super S, ? extends Function<? super Species, Double>> proportionFunction,
-        final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold
-    ) {
-        return new IndexedBiomassCatchabilityGearFactory<S>(
-            code, durationSupplier, species, proportionFunction, minimumCatchThreshold
-        );
-    }
+  /**
+   * @param code                  this gear's identifying code
+   * @param durationSupplier      supplies how long one fishing event takes
+   * @param species               the species to index proportions over
+   * @param proportionFunction    the fraction of available biomass caught, per species
+   * @param minimumCatchThreshold per-species catch below this is discarded down to zero
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   * {@link IndexedBiomassCatchabilityGear}
+   * @see IndexedBiomassCatchabilityGear
+   */
+  public static <S extends Scope> IndexedBiomassCatchabilityGearFactory<S> indexedBiomassCatchabilityGear(
+    final String code,
+    final Factory<? super S, ? extends Supplier<Duration>> durationSupplier,
+    final Factory<? super S, ? extends Collection<? extends Species>> species,
+    final Factory<
+      ? super S,
+      ? extends Function<? super Species, Double>
+    > proportionFunction,
+    final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold
+  ) {
+    return new IndexedBiomassCatchabilityGearFactory<S>(
+      code,
+      durationSupplier,
+      species,
+      proportionFunction,
+      minimumCatchThreshold
+    );
+  }
 }

@@ -25,61 +25,64 @@ package uk.ac.ox.poseidon.core.utils;
 /** General-purpose string helpers used across the codebase. */
 public class Utils {
 
-    private Utils() {}
+  private Utils() {}
 
-    /** The separator used to join fields in {@link #multiStringKey(Object...)}. */
-    public static final char STRING_KEY_SEPARATOR = ';';
+  /** The separator used to join fields in {@link #multiStringKey(Object...)}. */
+  public static final char STRING_KEY_SEPARATOR = ';';
 
-    /**
-     * @param value     the value to stringify, or {@code null}
-     * @param nullIfNa  whether {@code ""} and {@code "NA"} (case-insensitive, after trimming)
-     *                  should also be treated as {@code null}
-     * @return {@code value.toString()}, trimmed, or {@code null} per the rules above
-     */
-    public static String toTrimmedString(
-        final Object value,
-        final boolean nullIfNa
-    ) {
-        if (value == null) {
-            return null;
-        }
-        final String trimmed = value.toString().trim();
-        if (nullIfNa && (trimmed.isEmpty() || trimmed.equalsIgnoreCase("NA"))) {
-            return null;
-        }
-        return trimmed;
+  /**
+   * @param value     the value to stringify, or {@code null}
+   * @param nullIfNa  whether {@code ""} and {@code "NA"} (case-insensitive, after trimming)
+   *                  should also be treated as {@code null}
+   * @return {@code value.toString()}, trimmed, or {@code null} per the rules above
+   */
+  public static String toTrimmedString(
+    final Object value,
+    final boolean nullIfNa
+  ) {
+    if (value == null) {
+      return null;
     }
-
-    /**
-     * Joins trimmed non-null fields with {@link #STRING_KEY_SEPARATOR} to produce a map-friendly
-     * compound key. The separator character in any field value is rejected with
-     * {@link IllegalArgumentException}, as is ')' which would otherwise interfere with bean
-     * property syntax.
-     * <p>
-     * Null, empty, and "NA" fields (after trimming) are treated as absent and produce no
-     * contribution beyond their separator.
-     */
-    public static String multiStringKey(final Object... fields) {
-        final var sb = new StringBuilder();
-        for (int i = 0; i < fields.length; i++) {
-            if (i > 0) {
-                sb.append(STRING_KEY_SEPARATOR);
-            }
-            final String s = toTrimmedString(fields[i], true);
-            if (s != null) {
-                if (s.indexOf(STRING_KEY_SEPARATOR) >= 0) {
-                    throw new IllegalArgumentException(
-                        "Field contains reserved character '" +
-                            STRING_KEY_SEPARATOR + "': " + fields[i]);
-                }
-                if (s.indexOf(')') >= 0) {
-                    throw new IllegalArgumentException(
-                        "Field contains reserved character ')': " + fields[i]);
-                }
-                sb.append(s);
-            }
-        }
-        return sb.toString();
+    final String trimmed = value.toString().trim();
+    if (nullIfNa && (trimmed.isEmpty() || trimmed.equalsIgnoreCase("NA"))) {
+      return null;
     }
+    return trimmed;
+  }
 
+  /**
+   * Joins trimmed non-null fields with {@link #STRING_KEY_SEPARATOR} to produce a map-friendly
+   * compound key. The separator character in any field value is rejected with
+   * {@link IllegalArgumentException}, as is ')' which would otherwise interfere with bean
+   * property syntax.
+   * <p>
+   * Null, empty, and "NA" fields (after trimming) are treated as absent and produce no
+   * contribution beyond their separator.
+   */
+  public static String multiStringKey(final Object... fields) {
+    final var sb = new StringBuilder();
+    for (int i = 0; i < fields.length; i++) {
+      if (i > 0) {
+        sb.append(STRING_KEY_SEPARATOR);
+      }
+      final String s = toTrimmedString(fields[i], true);
+      if (s != null) {
+        if (s.indexOf(STRING_KEY_SEPARATOR) >= 0) {
+          throw new IllegalArgumentException(
+            "Field contains reserved character '" +
+              STRING_KEY_SEPARATOR +
+              "': " +
+              fields[i]
+          );
+        }
+        if (s.indexOf(')') >= 0) {
+          throw new IllegalArgumentException(
+            "Field contains reserved character ')': " + fields[i]
+          );
+        }
+        sb.append(s);
+      }
+    }
+    return sb.toString();
+  }
 }

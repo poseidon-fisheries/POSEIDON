@@ -22,68 +22,72 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.trips.Trip;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.trips.Trip;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+
 class VesselHasStartedTripTodayTest {
 
-    private static final LocalDateTime NOW = LocalDateTime.of(2026, 3, 10, 19, 0);
+  private static final LocalDateTime NOW = LocalDateTime.of(2026, 3, 10, 19, 0);
 
-    private final VesselHasStartedTripToday vesselHasStartedTripToday =
-        new VesselHasStartedTripToday();
+  private final VesselHasStartedTripToday vesselHasStartedTripToday =
+    new VesselHasStartedTripToday();
 
-    @Test
-    void isFalseForAVesselThatHasNeverMadeATrip() {
-        assertFalse(vesselHasStartedTripToday.test(vesselWith(null, null)));
-    }
+  @Test
+  void isFalseForAVesselThatHasNeverMadeATrip() {
+    assertFalse(vesselHasStartedTripToday.test(vesselWith(null, null)));
+  }
 
-    @Test
-    void isTrueWhenThePreviousTripStartedToday() {
-        final Trip previousTrip = tripStartedAt(NOW.withHour(7));
-        assertTrue(vesselHasStartedTripToday.test(vesselWith(null, previousTrip)));
-    }
+  @Test
+  void isTrueWhenThePreviousTripStartedToday() {
+    final Trip previousTrip = tripStartedAt(NOW.withHour(7));
+    assertTrue(vesselHasStartedTripToday.test(vesselWith(null, previousTrip)));
+  }
 
-    @Test
-    void isFalseWhenThePreviousTripStartedYesterday() {
-        final Trip previousTrip = tripStartedAt(NOW.minusDays(1).withHour(23));
-        assertFalse(vesselHasStartedTripToday.test(vesselWith(null, previousTrip)));
-    }
+  @Test
+  void isFalseWhenThePreviousTripStartedYesterday() {
+    final Trip previousTrip = tripStartedAt(NOW.minusDays(1).withHour(23));
+    assertFalse(vesselHasStartedTripToday.test(vesselWith(null, previousTrip)));
+  }
 
-    @Test
-    void looksAtTheCurrentTripBeforeThePreviousOne() {
-        final Trip currentTrip = tripStartedAt(NOW.withHour(7));
-        final Trip previousTrip = tripStartedAt(NOW.minusDays(1).withHour(7));
-        assertTrue(vesselHasStartedTripToday.test(vesselWith(currentTrip, previousTrip)));
-    }
+  @Test
+  void looksAtTheCurrentTripBeforeThePreviousOne() {
+    final Trip currentTrip = tripStartedAt(NOW.withHour(7));
+    final Trip previousTrip = tripStartedAt(NOW.minusDays(1).withHour(7));
+    assertTrue(
+      vesselHasStartedTripToday.test(vesselWith(currentTrip, previousTrip))
+    );
+  }
 
-    @Test
-    void isFalseWhenTheCurrentTripStartedYesterday() {
-        final Trip currentTrip = tripStartedAt(NOW.minusDays(1).withHour(22));
-        assertFalse(vesselHasStartedTripToday.test(vesselWith(currentTrip, null)));
-    }
+  @Test
+  void isFalseWhenTheCurrentTripStartedYesterday() {
+    final Trip currentTrip = tripStartedAt(NOW.minusDays(1).withHour(22));
+    assertFalse(vesselHasStartedTripToday.test(vesselWith(currentTrip, null)));
+  }
 
-    private static Trip tripStartedAt(final LocalDateTime startDateTime) {
-        final Trip trip = mock(Trip.class);
-        when(trip.getStartDateTime()).thenReturn(startDateTime);
-        return trip;
-    }
+  private static Trip tripStartedAt(final LocalDateTime startDateTime) {
+    final Trip trip = mock(Trip.class);
+    when(trip.getStartDateTime()).thenReturn(startDateTime);
+    return trip;
+  }
 
-    private static Vessel vesselWith(final Trip currentTrip, final Trip previousTrip) {
-        final Vessel vessel = mock(Vessel.class);
-        final TemporalSchedule schedule = mock(TemporalSchedule.class);
-        when(schedule.getDateTime()).thenReturn(NOW);
-        when(vessel.getSchedule()).thenReturn(schedule);
-        when(vessel.getCurrentTrip()).thenReturn(currentTrip);
-        when(vessel.getPreviousTrip()).thenReturn(previousTrip);
-        return vessel;
-    }
+  private static Vessel vesselWith(
+    final Trip currentTrip,
+    final Trip previousTrip
+  ) {
+    final Vessel vessel = mock(Vessel.class);
+    final TemporalSchedule schedule = mock(TemporalSchedule.class);
+    when(schedule.getDateTime()).thenReturn(NOW);
+    when(vessel.getSchedule()).thenReturn(schedule);
+    when(vessel.getCurrentTrip()).thenReturn(currentTrip);
+    when(vessel.getPreviousTrip()).thenReturn(previousTrip);
+    return vessel;
+  }
 }

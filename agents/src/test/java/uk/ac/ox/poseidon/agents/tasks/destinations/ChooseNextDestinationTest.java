@@ -22,15 +22,6 @@
 
 package uk.ac.ox.poseidon.agents.tasks.destinations;
 
-import com.badlogic.gdx.ai.btree.BehaviorTree;
-import com.badlogic.gdx.ai.btree.Task.Status;
-import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.trips.Trip;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,42 +30,57 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.badlogic.gdx.ai.btree.BehaviorTree;
+import com.badlogic.gdx.ai.btree.Task.Status;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.trips.Trip;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+
 class ChooseNextDestinationTest {
 
-    private static final Int2D NEXT = new Int2D(3, 4);
+  private static final Int2D NEXT = new Int2D(3, 4);
 
-    private final Vessel vessel = mock(Vessel.class);
-    private final Trip trip = mock(Trip.class);
+  private final Vessel vessel = mock(Vessel.class);
+  private final Trip trip = mock(Trip.class);
 
-    /** Runs the task once as the root of a behaviour tree over the vessel. */
-    private Status run(final ChooseNextDestination chooseNextDestination) {
-        final BehaviorTree<Vessel> tree = new BehaviorTree<>(chooseNextDestination, vessel);
-        tree.step();
-        return chooseNextDestination.getStatus();
-    }
+  /** Runs the task once as the root of a behaviour tree over the vessel. */
+  private Status run(final ChooseNextDestination chooseNextDestination) {
+    final BehaviorTree<Vessel> tree = new BehaviorTree<>(
+      chooseNextDestination,
+      vessel
+    );
+    tree.step();
+    return chooseNextDestination.getStatus();
+  }
 
-    @Test
-    void redirectsTheCurrentTripToTheChosenDestinationAndSucceeds() {
-        when(vessel.getCurrentTrip()).thenReturn(trip);
+  @Test
+  void redirectsTheCurrentTripToTheChosenDestinationAndSucceeds() {
+    when(vessel.getCurrentTrip()).thenReturn(trip);
 
-        assertThat(run(new ChooseNextDestination(() -> Optional.of(NEXT))))
-            .isEqualTo(Status.SUCCEEDED);
-        verify(trip).setDestination(NEXT);
-    }
+    assertThat(
+      run(new ChooseNextDestination(() -> Optional.of(NEXT)))
+    ).isEqualTo(Status.SUCCEEDED);
+    verify(trip).setDestination(NEXT);
+  }
 
-    @Test
-    void failsAndLeavesTheTripAloneWhenNoDestinationIsChosen() {
-        when(vessel.getCurrentTrip()).thenReturn(trip);
+  @Test
+  void failsAndLeavesTheTripAloneWhenNoDestinationIsChosen() {
+    when(vessel.getCurrentTrip()).thenReturn(trip);
 
-        assertThat(run(new ChooseNextDestination(Optional::empty))).isEqualTo(Status.FAILED);
-        verify(trip, never()).setDestination(any());
-    }
+    assertThat(run(new ChooseNextDestination(Optional::empty))).isEqualTo(
+      Status.FAILED
+    );
+    verify(trip, never()).setDestination(any());
+  }
 
-    @Test
-    void throwsWhenTheVesselIsNotOnATrip() {
-        when(vessel.getCurrentTrip()).thenReturn(null);
+  @Test
+  void throwsWhenTheVesselIsNotOnATrip() {
+    when(vessel.getCurrentTrip()).thenReturn(null);
 
-        assertThatThrownBy(() -> run(new ChooseNextDestination(() -> Optional.of(NEXT))))
-            .isInstanceOf(IllegalStateException.class);
-    }
+    assertThatThrownBy(() ->
+      run(new ChooseNextDestination(() -> Optional.of(NEXT)))
+    ).isInstanceOf(IllegalStateException.class);
+  }
 }

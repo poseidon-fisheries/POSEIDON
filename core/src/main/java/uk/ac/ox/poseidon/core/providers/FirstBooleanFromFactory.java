@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
+import java.util.function.BooleanSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,8 +31,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.providers.constant.ConstantBoolean;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.BooleanSupplier;
 
 /**
  * A {@link RelativeScopeFactory} that resolves the given delegate {@link BooleanSupplier} once,
@@ -44,13 +43,15 @@ import java.util.function.BooleanSupplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FirstBooleanFromFactory<S extends Scope>
-    extends RelativeScopeFactory<S, BooleanProvider> {
+public class FirstBooleanFromFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  BooleanProvider
+> {
 
-    private Factory<? super S, ? extends BooleanSupplier> delegate;
+  private Factory<? super S, ? extends BooleanSupplier> delegate;
 
-    @Override
-    protected BooleanProvider newInstance(final S scope) {
-        return new ConstantBoolean(delegate.get(scope).getAsBoolean());
-    }
+  @Override
+  protected BooleanProvider newInstance(final S scope) {
+    return new ConstantBoolean(delegate.get(scope).getAsBoolean());
+  }
 }

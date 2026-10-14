@@ -39,13 +39,15 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class IsActiveWaterCellFactory<S extends Scope>
-    extends RelativeScopeFactory<S, IsActiveWaterCell> {
+public class IsActiveWaterCellFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  IsActiveWaterCell
+> {
 
-    private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+  private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
 
-    @Override
-    protected IsActiveWaterCell newInstance(final S scope) {
-        return new IsActiveWaterCell(bathymetricGrid.get(scope));
-    }
+  @Override
+  protected IsActiveWaterCell newInstance(final S scope) {
+    return new IsActiveWaterCell(bathymetricGrid.get(scope));
+  }
 }

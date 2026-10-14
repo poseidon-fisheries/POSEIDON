@@ -23,10 +23,6 @@
 package uk.ac.ox.poseidon.io;
 
 import com.google.common.collect.ImmutableList;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import uk.ac.ox.poseidon.core.Scenario;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,6 +31,9 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import uk.ac.ox.poseidon.core.Scenario;
 
 /**
  * The {@code ScenarioLoader} class provides methods to load {@code Scenario} objects from YAML
@@ -42,91 +41,92 @@ import java.util.List;
  */
 public class ScenarioLoader {
 
-    private static final List<String> DEFAULT_CLASS_PREFIXES =
-        List.of("uk.ac.ox.poseidon", "java");
-    private static final int MAX_ALIASES_FOR_COLLECTIONS = 5000;
-    private final List<String> permittedClassPrefixes;
+  private static final List<String> DEFAULT_CLASS_PREFIXES = List.of(
+    "uk.ac.ox.poseidon",
+    "java"
+  );
+  private static final int MAX_ALIASES_FOR_COLLECTIONS = 5000;
+  private final List<String> permittedClassPrefixes;
 
-    /**
-     * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance, optionally passing
-     * class prefixes that will be permitted in addition to "uk.ac.ox.poseidon" and "java" when
-     * loading factory classes from the YAML scenario.
-     */
-    public ScenarioLoader(final String... extraClassPrefixes) {
-        this(Arrays.asList(extraClassPrefixes));
-    }
+  /**
+   * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance, optionally passing
+   * class prefixes that will be permitted in addition to "uk.ac.ox.poseidon" and "java" when
+   * loading factory classes from the YAML scenario.
+   */
+  public ScenarioLoader(final String... extraClassPrefixes) {
+    this(Arrays.asList(extraClassPrefixes));
+  }
 
-    /**
-     * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance, passing class
-     * prefixes that will be permitted in addition to "uk.ac.ox.poseidon" and "java" when loading
-     * factory classes from the YAML scenario.
-     */
-    public ScenarioLoader(final Collection<String> permittedClassPrefixes) {
-        this.permittedClassPrefixes = ImmutableList
-            .<String>builder()
-            .addAll(DEFAULT_CLASS_PREFIXES)
-            .addAll(permittedClassPrefixes)
-            .build();
-    }
+  /**
+   * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance, passing class
+   * prefixes that will be permitted in addition to "uk.ac.ox.poseidon" and "java" when loading
+   * factory classes from the YAML scenario.
+   */
+  public ScenarioLoader(final Collection<String> permittedClassPrefixes) {
+    this.permittedClassPrefixes = ImmutableList.<String>builder()
+      .addAll(DEFAULT_CLASS_PREFIXES)
+      .addAll(permittedClassPrefixes)
+      .build();
+  }
 
-    private LoaderOptions newLoaderOptions() {
-        final LoaderOptions options = new LoaderOptions();
-        options.setTagInspector(tag ->
-            permittedClassPrefixes
-                .stream()
-                .anyMatch(prefix -> tag.getClassName().startsWith(prefix))
-        );
-        options.setMaxAliasesForCollections(MAX_ALIASES_FOR_COLLECTIONS);
-        return options;
-    }
+  private LoaderOptions newLoaderOptions() {
+    final LoaderOptions options = new LoaderOptions();
+    options.setTagInspector(tag ->
+      permittedClassPrefixes
+        .stream()
+        .anyMatch(prefix -> tag.getClassName().startsWith(prefix))
+    );
+    options.setMaxAliasesForCollections(MAX_ALIASES_FOR_COLLECTIONS);
+    return options;
+  }
 
-    private Yaml newYaml() {
-        return new Yaml(newLoaderOptions());
-    }
+  private Yaml newYaml() {
+    return new Yaml(newLoaderOptions());
+  }
 
-    /**
-     * Loads a {@code Scenario} from a YAML string.
-     *
-     * @param yamlString the YAML string containing the scenario data
-     * @return the loaded {@code Scenario} object
-     */
-    public Scenario load(final String yamlString) {
-        return newYaml().loadAs(yamlString, Scenario.class);
-    }
+  /**
+   * Loads a {@code Scenario} from a YAML string.
+   *
+   * @param yamlString the YAML string containing the scenario data
+   * @return the loaded {@code Scenario} object
+   */
+  public Scenario load(final String yamlString) {
+    return newYaml().loadAs(yamlString, Scenario.class);
+  }
 
-    /**
-     * Loads a {@code Scenario} from a file path.
-     *
-     * @param path the path to the file containing the YAML data
-     * @return the loaded {@code Scenario} object
-     * @throws RuntimeException if an I/O error occurs
-     */
-    public Scenario load(final Path path) {
-        return load(path.toFile());
-    }
+  /**
+   * Loads a {@code Scenario} from a file path.
+   *
+   * @param path the path to the file containing the YAML data
+   * @return the loaded {@code Scenario} object
+   * @throws RuntimeException if an I/O error occurs
+   */
+  public Scenario load(final Path path) {
+    return load(path.toFile());
+  }
 
-    /**
-     * Loads a {@code Scenario} from a file.
-     *
-     * @param file the file containing the YAML data
-     * @return the loaded {@code Scenario} object
-     * @throws RuntimeException if an I/O error occurs
-     */
-    public Scenario load(final File file) {
-        try (final InputStream inputStream = new FileInputStream(file)) {
-            return load(inputStream);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+  /**
+   * Loads a {@code Scenario} from a file.
+   *
+   * @param file the file containing the YAML data
+   * @return the loaded {@code Scenario} object
+   * @throws RuntimeException if an I/O error occurs
+   */
+  public Scenario load(final File file) {
+    try (final InputStream inputStream = new FileInputStream(file)) {
+      return load(inputStream);
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    /**
-     * Loads a {@code Scenario} from an input stream.
-     *
-     * @param inputStream the input stream containing the YAML data
-     * @return the loaded {@code Scenario} object
-     */
-    public Scenario load(final InputStream inputStream) {
-        return newYaml().load(inputStream);
-    }
+  /**
+   * Loads a {@code Scenario} from an input stream.
+   *
+   * @param inputStream the input stream containing the YAML data
+   * @return the loaded {@code Scenario} object
+   */
+  public Scenario load(final InputStream inputStream) {
+    return newYaml().load(inputStream);
+  }
 }

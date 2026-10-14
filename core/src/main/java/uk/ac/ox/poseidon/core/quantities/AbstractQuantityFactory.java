@@ -22,6 +22,11 @@
 
 package uk.ac.ox.poseidon.core.quantities;
 
+import static java.util.Map.entry;
+
+import java.util.Map.Entry;
+import javax.measure.Quantity;
+import javax.measure.Unit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,12 +37,6 @@ import tech.units.indriya.format.SimpleUnitFormat;
 import tech.units.indriya.quantity.Quantities;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import javax.measure.Quantity;
-import javax.measure.Unit;
-import java.util.Map.Entry;
-
-import static java.util.Map.entry;
 
 /**
  * A {@link GlobalScopeFactory} that parses a unit string (e.g. {@code "kg"}, {@code "m/s"}) and a
@@ -54,40 +53,42 @@ import static java.util.Map.entry;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class AbstractQuantityFactory<Q extends Quantity<Q>>
-    extends GlobalScopeFactory<Quantity<Q>> {
+public abstract class AbstractQuantityFactory<Q extends Quantity<Q>> extends GlobalScopeFactory<
+  Quantity<Q>
+> {
 
-    static {
-        // We need to trigger static initialization of the NonSI class
-        // in order for non-SI unit string formats to be registered
-        // noinspection ResultOfMethodCallIgnored
-        NonSI.getInstance();
-    }
+  static {
+    // We need to trigger static initialization of the NonSI class
+    // in order for non-SI unit string formats to be registered
+    // noinspection ResultOfMethodCallIgnored
+    NonSI.getInstance();
+  }
 
-    private final Class<Q> type;
-    private double value;
-    private String unitString;
+  private final Class<Q> type;
+  private double value;
+  private String unitString;
 
-    /**
-     * @param type     the quantity type to parse the string as
-     * @param quantity a quantity string in the format produced by {@code Quantity.toString()}
-     *                 (e.g. {@code "3.5 kg"})
-     * @return the parsed value paired with its unit's string representation
-     */
-    static <Q extends Quantity<Q>> Entry<String, Double> parse(
-        final Class<Q> type,
-        final String quantity
-    ) {
-        final Quantity<Q> q = SimpleQuantityFormat.getInstance().parse(quantity).asType(type);
-        return entry(
-            q.getUnit().toString(),
-            q.getValue().doubleValue()
-        );
-    }
+  /**
+   * @param type     the quantity type to parse the string as
+   * @param quantity a quantity string in the format produced by {@code Quantity.toString()}
+   *                 (e.g. {@code "3.5 kg"})
+   * @return the parsed value paired with its unit's string representation
+   */
+  static <Q extends Quantity<Q>> Entry<String, Double> parse(
+    final Class<Q> type,
+    final String quantity
+  ) {
+    final Quantity<Q> q = SimpleQuantityFormat.getInstance()
+      .parse(quantity)
+      .asType(type);
+    return entry(q.getUnit().toString(), q.getValue().doubleValue());
+  }
 
-    @Override
-    protected Quantity<Q> newInstance(final Scope scope) {
-        final Unit<Q> unit = SimpleUnitFormat.getInstance().parse(unitString).asType(type);
-        return Quantities.getQuantity(value, unit);
-    }
+  @Override
+  protected Quantity<Q> newInstance(final Scope scope) {
+    final Unit<Q> unit = SimpleUnitFormat.getInstance()
+      .parse(unitString)
+      .asType(type);
+    return Quantities.getQuantity(value, unit);
+  }
 }

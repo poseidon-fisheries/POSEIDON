@@ -29,11 +29,9 @@ package uk.ac.ox.poseidon.agents.choices.evaluation;
  * @param <O> the type of option being evaluated
  */
 public interface Evaluation<O> {
+  /** @return the option being evaluated */
+  O getOption();
 
-    /** @return the option being evaluated */
-    O getOption();
-
-    /** @return this option's score, once evaluation is complete */
-    double getResult();
-
+  /** @return this option's score, once evaluation is complete */
+  double getResult();
 }

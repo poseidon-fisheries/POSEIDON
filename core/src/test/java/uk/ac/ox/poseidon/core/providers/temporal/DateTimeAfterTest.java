@@ -22,31 +22,34 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class DateTimeAfterTest {
 
-    private static final LocalDateTime NOW = LocalDateTime.of(2025, 6, 1, 7, 0);
+  private static final LocalDateTime NOW = LocalDateTime.of(2025, 6, 1, 7, 0);
 
-    @Test
-    void addsTheAmountToTheReference() {
-        assertThat(new DateTimeAfter(() -> NOW, () -> Duration.ofHours(3)).get())
-            .isEqualTo(NOW.plusHours(3));
-    }
+  @Test
+  void addsTheAmountToTheReference() {
+    assertThat(
+      new DateTimeAfter(() -> NOW, () -> Duration.ofHours(3)).get()
+    ).isEqualTo(NOW.plusHours(3));
+  }
 
-    @Test
-    void readsTheReferenceAnewOnEveryCall() {
-        final AtomicReference<LocalDateTime> referenceDateTime = new AtomicReference<>(NOW);
-        final DateTimeAfter dateTimeAfter =
-            new DateTimeAfter(referenceDateTime::get, () -> Duration.ofHours(3));
-        dateTimeAfter.get();
-        referenceDateTime.set(NOW.plusHours(1));
-        assertThat(dateTimeAfter.get()).isEqualTo(NOW.plusHours(4));
-    }
+  @Test
+  void readsTheReferenceAnewOnEveryCall() {
+    final AtomicReference<LocalDateTime> referenceDateTime =
+      new AtomicReference<>(NOW);
+    final DateTimeAfter dateTimeAfter = new DateTimeAfter(
+      referenceDateTime::get,
+      () -> Duration.ofHours(3)
+    );
+    dateTimeAfter.get();
+    referenceDateTime.set(NOW.plusHours(1));
+    assertThat(dateTimeAfter.get()).isEqualTo(NOW.plusHours(4));
+  }
 }

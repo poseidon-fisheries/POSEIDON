@@ -46,25 +46,30 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * @param <C> the type of object produced
  */
 @NoArgsConstructor
-public abstract class PerScopeFactory<S extends Scope, C> extends AbstractFactory<S, C> {
+public abstract class PerScopeFactory<
+  S extends Scope,
+  C
+> extends AbstractFactory<S, C> {
 
-    /** @return the factory whose product is built once per scope */
-    protected abstract Factory<? super S, ? extends C> getDelegate();
+  /** @return the factory whose product is built once per scope */
+  protected abstract Factory<? super S, ? extends C> getDelegate();
 
-    /** Builds the delegate's product, bypassing the delegate's cache. */
-    @Override
-    protected final C newInstance(final S scope) {
-        final Factory<? super S, ? extends C> delegate = getDelegate();
-        return delegate instanceof final AbstractFactory<?, ?> abstractFactory
-            ? newInstanceOf(abstractFactory, scope)
-            : delegate.get(scope);
-    }
+  /** Builds the delegate's product, bypassing the delegate's cache. */
+  @Override
+  protected final C newInstance(final S scope) {
+    final Factory<? super S, ? extends C> delegate = getDelegate();
+    return delegate instanceof final AbstractFactory<?, ?> abstractFactory
+      ? newInstanceOf(abstractFactory, scope)
+      : delegate.get(scope);
+  }
 
-    @SuppressWarnings("unchecked")
-    private static <S extends Scope, C> C newInstanceOf(
-        final AbstractFactory<?, ?> factory,
-        final S scope
-    ) {
-        return ((AbstractFactory<? super S, ? extends C>) factory).newInstance(scope);
-    }
+  @SuppressWarnings("unchecked")
+  private static <S extends Scope, C> C newInstanceOf(
+    final AbstractFactory<?, ?> factory,
+    final S scope
+  ) {
+    return ((AbstractFactory<? super S, ? extends C>) factory).newInstance(
+      scope
+    );
+  }
 }

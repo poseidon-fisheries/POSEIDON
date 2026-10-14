@@ -22,9 +22,9 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import lombok.Data;
-
 import static java.lang.Math.min;
+
+import lombok.Data;
 
 /**
  * Logistic (Verhulst) growth: biomass grows fastest at half of carrying capacity and approaches
@@ -32,19 +32,18 @@ import static java.lang.Math.min;
  */
 @Data
 public class LogisticGrowthRule implements BiomassGrowthRule {
-    private final double growthRate;
 
-    @Override
-    public double newBiomass(
-        final double currentBiomass,
-        final double carryingCapacity
-    ) {
-        return min(
-            carryingCapacity,
-            currentBiomass + (
-                growthRate * currentBiomass *
-                    (1.0 - currentBiomass / carryingCapacity)
-            )
-        );
-    }
+  private final double growthRate;
+
+  @Override
+  public double newBiomass(
+    final double currentBiomass,
+    final double carryingCapacity
+  ) {
+    return min(
+      carryingCapacity,
+      currentBiomass +
+        growthRate * currentBiomass * (1.0 - currentBiomass / carryingCapacity)
+    );
+  }
 }

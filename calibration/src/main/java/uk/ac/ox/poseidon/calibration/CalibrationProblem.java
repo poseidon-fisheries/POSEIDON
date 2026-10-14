@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.calibration;
 
+import static java.util.stream.Collectors.toMap;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.ImmutableLongArray;
 import io.jenetics.DoubleChromosome;
@@ -30,6 +32,15 @@ import io.jenetics.Genotype;
 import io.jenetics.engine.Codec;
 import io.jenetics.engine.Problem;
 import io.jenetics.util.DoubleRange;
+import java.time.Duration;
+import java.time.temporal.TemporalAmount;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.SequencedMap;
+import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -40,18 +51,6 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationStartOptions;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.time.Duration;
-import java.time.temporal.TemporalAmount;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.SequencedMap;
-import java.util.concurrent.atomic.LongAdder;
-import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
-import java.util.stream.IntStream;
-
-import static java.util.stream.Collectors.toMap;
 
 /**
  * A jenetics {@link Problem} that calibrates a subset of a {@link Scenario}'s properties by
@@ -67,121 +66,127 @@ import static java.util.stream.Collectors.toMap;
 @RequiredArgsConstructor
 @Accessors(fluent = true)
 public class CalibrationProblem
-    implements Problem<SequencedMap<String, Double>, DoubleGene, Double> {
+  implements Problem<SequencedMap<String, Double>, DoubleGene, Double>
+{
 
-    /** The scenario being calibrated; started fresh, with property overrides, for each seed. */
-    protected final @NonNull Scenario scenario;
-    private final @NonNull TemporalAmount duration;
-    private final @NonNull ImmutableMap<String, ? extends Factory<? super SimulationScope, ?>>
-        extraComponents;
-    private final @NonNull ImmutableMap<String, DoubleRange> parameterRanges;
-    private final @NonNull ToDoubleFunction<Simulation> evaluator;
-    private final @NonNull ImmutableLongArray seeds;
-    private final LongAdder simulations = new LongAdder();
-    private final LongAdder simulationNanos = new LongAdder();
-    private final LongAdder buildingNanos = new LongAdder();
+  /** The scenario being calibrated; started fresh, with property overrides, for each seed. */
+  protected final @NonNull Scenario scenario;
+  private final @NonNull TemporalAmount duration;
+  private final @NonNull ImmutableMap<
+    String,
+    ? extends Factory<? super SimulationScope, ?>
+  > extraComponents;
+  private final @NonNull ImmutableMap<String, DoubleRange> parameterRanges;
+  private final @NonNull ToDoubleFunction<Simulation> evaluator;
+  private final @NonNull ImmutableLongArray seeds;
+  private final LongAdder simulations = new LongAdder();
+  private final LongAdder simulationNanos = new LongAdder();
+  private final LongAdder buildingNanos = new LongAdder();
 
-    /**
-     * Encodes/decodes a genotype of {@code parameterRanges.size()} alleles in {@code [0.0, 1.0]}
-     * to/from a map of property name to value, by linearly rescaling each allele to its
-     * corresponding entry in {@code parameterRanges}. Computed lazily, once, on first access.
-     */
-    @Getter(lazy = true)
-    private final Codec<SequencedMap<String, Double>, DoubleGene> codec =
-        Codec.of(
-            Genotype.of(DoubleChromosome.of(0.0, 1.0, this.parameterRanges.size())),
-            genotype -> {
-                final var entries = this.parameterRanges.entrySet().stream().toList();
-                final var chromosome = genotype.chromosome();
-                return IntStream
-                    .range(0, this.parameterRanges.size())
-                    .mapToObj(i -> {
-                        final var entry = entries.get(i);
-                        final DoubleRange range = entry.getValue();
-                        final double allele = chromosome.get(i).allele();
-                        return java.util.Map.entry(
-                            entry.getKey(),
-                            range.min() + allele * (range.max() - range.min())
-                        );
-                    })
-                    .collect(toMap(
-                        java.util.Map.Entry::getKey,
-                        java.util.Map.Entry::getValue,
-                        (_, b) -> b,
-                        LinkedHashMap::new
-                    ));
-            }
-        );
+  /**
+   * Encodes/decodes a genotype of {@code parameterRanges.size()} alleles in {@code [0.0, 1.0]}
+   * to/from a map of property name to value, by linearly rescaling each allele to its
+   * corresponding entry in {@code parameterRanges}. Computed lazily, once, on first access.
+   */
+  @Getter(lazy = true)
+  private final Codec<SequencedMap<String, Double>, DoubleGene> codec =
+    Codec.of(
+      Genotype.of(DoubleChromosome.of(0.0, 1.0, this.parameterRanges.size())),
+      genotype -> {
+        final var entries = this.parameterRanges.entrySet().stream().toList();
+        final var chromosome = genotype.chromosome();
+        return IntStream.range(0, this.parameterRanges.size())
+          .mapToObj(i -> {
+            final var entry = entries.get(i);
+            final DoubleRange range = entry.getValue();
+            final double allele = chromosome.get(i).allele();
+            return java.util.Map.entry(
+              entry.getKey(),
+              range.min() + allele * (range.max() - range.min())
+            );
+          })
+          .collect(
+            toMap(
+              java.util.Map.Entry::getKey,
+              java.util.Map.Entry::getValue,
+              (_, b) -> b,
+              LinkedHashMap::new
+            )
+          );
+      }
+    );
 
-    /**
-     * @return a function that runs {@link #scenario} once per seed in {@code seeds}, with the
-     * given property overrides, and returns the average of {@code evaluator}'s score across seeds
-     */
-    public Function<SequencedMap<String, Double>, Double> fitness() {
-        return this::evaluate;
+  /**
+   * @return a function that runs {@link #scenario} once per seed in {@code seeds}, with the
+   * given property overrides, and returns the average of {@code evaluator}'s score across seeds
+   */
+  public Function<SequencedMap<String, Double>, Double> fitness() {
+    return this::evaluate;
+  }
+
+  /**
+   * @return the number of simulations run, and their total time, since the previous call (or
+   * since this problem was created); meant to be read between generations, when no simulation
+   * is running
+   */
+  public SimulationTimes takeSimulationTimes() {
+    return new SimulationTimes(
+      simulations.sumThenReset(),
+      Duration.ofNanos(simulationNanos.sumThenReset()),
+      Duration.ofNanos(buildingNanos.sumThenReset())
+    );
+  }
+
+  private double evaluate(final SequencedMap<String, Double> parameters) {
+    // Scores are collected in seed order and averaged sequentially, so the result does not
+    // depend on which simulation finishes first
+    final double[] scores = seeds
+      .stream()
+      .parallel()
+      .mapToDouble(seed -> evaluate(parameters, seed))
+      .toArray();
+    return Arrays.stream(scores).average().orElseThrow();
+  }
+
+  private double evaluate(
+    final SequencedMap<String, Double> parameters,
+    final long seed
+  ) {
+    final long start = System.nanoTime();
+    try {
+      final Simulation simulation = scenario.startNewSimulation(
+        SimulationStartOptions.builder()
+          .seed(seed)
+          .propertyOverrides(parameters)
+          .extraComponents(extraComponents)
+          .build()
+      );
+      buildingNanos.add(System.nanoTime() - start);
+      try {
+        final TemporalSchedule temporalSchedule =
+          simulation.getTemporalSchedule();
+        temporalSchedule.stepFor(simulation, duration);
+        return evaluator.applyAsDouble(simulation);
+      } finally {
+        simulation.finish();
+      }
+    } finally {
+      simulations.increment();
+      simulationNanos.add(System.nanoTime() - start);
     }
+  }
 
-    /**
-     * @return the number of simulations run, and their total time, since the previous call (or
-     * since this problem was created); meant to be read between generations, when no simulation
-     * is running
-     */
-    public SimulationTimes takeSimulationTimes() {
-        return new SimulationTimes(
-            simulations.sumThenReset(),
-            Duration.ofNanos(simulationNanos.sumThenReset()),
-            Duration.ofNanos(buildingNanos.sumThenReset())
-        );
-    }
-
-    private double evaluate(final SequencedMap<String, Double> parameters) {
-        // Scores are collected in seed order and averaged sequentially, so the result does not
-        // depend on which simulation finishes first
-        final double[] scores = seeds
-            .stream()
-            .parallel()
-            .mapToDouble(seed -> evaluate(parameters, seed))
-            .toArray();
-        return Arrays.stream(scores).average().orElseThrow();
-    }
-
-    private double evaluate(
-        final SequencedMap<String, Double> parameters,
-        final long seed
-    ) {
-        final long start = System.nanoTime();
-        try {
-            final Simulation simulation =
-                scenario.startNewSimulation(
-                    SimulationStartOptions
-                        .builder()
-                        .seed(seed)
-                        .propertyOverrides(parameters)
-                        .extraComponents(extraComponents)
-                        .build()
-                );
-            buildingNanos.add(System.nanoTime() - start);
-            try {
-                final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
-                temporalSchedule.stepFor(simulation, duration);
-                return evaluator.applyAsDouble(simulation);
-            } finally {
-                simulation.finish();
-            }
-        } finally {
-            simulations.increment();
-            simulationNanos.add(System.nanoTime() - start);
-        }
-    }
-
-    /**
-     * Simulations run over some period, with their total time.
-     *
-     * @param simulations the number of simulations run
-     * @param total       their total time, from building each one to finishing it
-     * @param building    the part of {@code total} spent building them, which
-     *                    {@link Scenario#startNewSimulation} does one at a time
-     */
-    public record SimulationTimes(long simulations, Duration total, Duration building) {}
-
+  /**
+   * Simulations run over some period, with their total time.
+   *
+   * @param simulations the number of simulations run
+   * @param total       their total time, from building each one to finishing it
+   * @param building    the part of {@code total} spent building them, which
+   *                    {@link Scenario#startNewSimulation} does one at a time
+   */
+  public record SimulationTimes(
+    long simulations,
+    Duration total,
+    Duration building
+  ) {}
 }

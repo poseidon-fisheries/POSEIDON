@@ -25,14 +25,14 @@ package uk.ac.ox.poseidon.agents.trips;
 /** Factories for predicates about a vessel's trips. */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-     * {@link CellWasFishedThisTrip} of the scoped vessel
-     * @see CellWasFishedThisTrip
-     */
-    public static CellWasFishedThisTripFactory cellWasFishedThisTrip() {
-        return new CellWasFishedThisTripFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+   * {@link CellWasFishedThisTrip} of the scoped vessel
+   * @see CellWasFishedThisTrip
+   */
+  public static CellWasFishedThisTripFactory cellWasFishedThisTrip() {
+    return new CellWasFishedThisTripFactory();
+  }
 }

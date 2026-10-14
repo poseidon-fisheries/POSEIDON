@@ -31,16 +31,16 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link VesselField}
-     * over the resolved grid
-     * @see VesselFieldFactory
-     */
-    public static VesselFieldFactory vesselField(
-        final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid
-    ) {
-        return new VesselFieldFactory(modelGrid);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link VesselField}
+   * over the resolved grid
+   * @see VesselFieldFactory
+   */
+  public static VesselFieldFactory vesselField(
+    final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid
+  ) {
+    return new VesselFieldFactory(modelGrid);
+  }
 }

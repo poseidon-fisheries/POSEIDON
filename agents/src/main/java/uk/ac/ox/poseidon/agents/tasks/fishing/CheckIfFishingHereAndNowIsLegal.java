@@ -22,15 +22,15 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
+import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.regulations.Regulations;
-
-import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 /**
  * A leaf {@link AgentTask} that succeeds if a fishing action started now, at the vessel's
@@ -39,16 +39,16 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 @RequiredArgsConstructor
 public class CheckIfFishingHereAndNowIsLegal extends AgentTask<Vessel> {
 
-    @NonNull private final Regulations<? super ExtendedFishingAction> regulations;
+  @NonNull
+  private final Regulations<? super ExtendedFishingAction> regulations;
 
-    /**
-     * @return {@code SUCCEEDED} if a fishing action started now, here, would be permitted,
-     * {@code FAILED} otherwise
-     */
-    @Override
-    public Status execute() {
-        final ExtendedFishingAction action = new ExtendedFishingAction(getAgent());
-        return regulations.isPermitted(action) ? SUCCEEDED : FAILED;
-    }
-
+  /**
+   * @return {@code SUCCEEDED} if a fishing action started now, here, would be permitted,
+   * {@code FAILED} otherwise
+   */
+  @Override
+  public Status execute() {
+    final ExtendedFishingAction action = new ExtendedFishingAction(getAgent());
+    return regulations.isPermitted(action) ? SUCCEEDED : FAILED;
+  }
 }

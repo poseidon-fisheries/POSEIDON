@@ -22,7 +22,15 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static java.util.stream.Collectors.toMap;
+
 import com.google.common.collect.Maps;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.ToString;
@@ -36,15 +44,6 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplier;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import static java.util.stream.Collectors.toMap;
-
 /**
  * A {@link Market} with prices keyed by (catch category, species), with a fallback lookup via
  * {@link Species#covers}. A market starts with no prices: they are set through
@@ -55,203 +54,196 @@ import static java.util.stream.Collectors.toMap;
 @ToString
 public class BiomassMarket implements Market {
 
-    private final Port port;
-    private final String code;
-    @Getter(AccessLevel.NONE)
-    private final Map<CatchCategory, Map<Species, Price>> prices;
-    // Cache resolved prices (including misses) to avoid repeated covers() scans.
-    @Getter(AccessLevel.NONE)
-    private final Map<CatchCategory, Map<Species, Optional<Price>>> priceCache = new HashMap<>();
-    // Absent until the first price is set.
-    @Getter(AccessLevel.NONE)
-    private LocalDateTime lastPriceChangeDateTime;
-    private final Supplier<String> saleIdSupplier;
-    private final EventManager eventManager;
+  private final Port port;
+  private final String code;
 
-    BiomassMarket(
-        final Port port,
-        final String code,
-        final EventManager eventManager
-    ) {
-        this.port = port;
-        this.code = code;
-        this.prices = new HashMap<>();
-        this.saleIdSupplier = new PrefixedIdSupplier(code);
-        this.eventManager = eventManager;
-    }
+  @Getter(AccessLevel.NONE)
+  private final Map<CatchCategory, Map<Species, Price>> prices;
 
-    /**
-     * Splits {@code categorisedCatch} into sold items (priced via {@link #getPrice}) and unsold
-     * remainder (no price for that category, or that species within it), broadcasts the
-     * resulting {@link Sale} on {@link #eventManager}, and returns it.
-     */
-    @Override
-    public Sale sell(
-        final Vessel vessel,
-        final CategorisedCatch categorisedCatch,
-        final LocalDateTime dateTime
-    ) {
-        final List<Sale.Item> soldItems = new ArrayList<>();
-        final Map<CatchCategory, BucketBuilder> unsoldByCategory = new HashMap<>();
-        split(
-            categorisedCatch,
-            soldItems::add,
-            (catchCategory, bucket) -> unsoldByCategory
-                .computeIfAbsent(catchCategory, key -> Bucket.newBuilder())
-                .add(bucket)
+  // Cache resolved prices (including misses) to avoid repeated covers() scans.
+  @Getter(AccessLevel.NONE)
+  private final Map<CatchCategory, Map<Species, Optional<Price>>> priceCache =
+    new HashMap<>();
+
+  // Absent until the first price is set.
+  @Getter(AccessLevel.NONE)
+  private LocalDateTime lastPriceChangeDateTime;
+
+  private final Supplier<String> saleIdSupplier;
+  private final EventManager eventManager;
+
+  BiomassMarket(
+    final Port port,
+    final String code,
+    final EventManager eventManager
+  ) {
+    this.port = port;
+    this.code = code;
+    this.prices = new HashMap<>();
+    this.saleIdSupplier = new PrefixedIdSupplier(code);
+    this.eventManager = eventManager;
+  }
+
+  /**
+   * Splits {@code categorisedCatch} into sold items (priced via {@link #getPrice}) and unsold
+   * remainder (no price for that category, or that species within it), broadcasts the
+   * resulting {@link Sale} on {@link #eventManager}, and returns it.
+   */
+  @Override
+  public Sale sell(
+    final Vessel vessel,
+    final CategorisedCatch categorisedCatch,
+    final LocalDateTime dateTime
+  ) {
+    final List<Sale.Item> soldItems = new ArrayList<>();
+    final Map<CatchCategory, BucketBuilder> unsoldByCategory = new HashMap<>();
+    split(categorisedCatch, soldItems::add, (catchCategory, bucket) ->
+      unsoldByCategory
+        .computeIfAbsent(catchCategory, key -> Bucket.newBuilder())
+        .add(bucket)
+    );
+    final CategorisedCatch unsold = unsoldByCategory.isEmpty()
+      ? CategorisedCatch.empty()
+      : new CategorisedCatch(
+          unsoldByCategory
+            .entrySet()
+            .stream()
+            .collect(toMap(Entry::getKey, entry -> entry.getValue().build()))
         );
-        final CategorisedCatch unsold = unsoldByCategory.isEmpty()
-            ? CategorisedCatch.empty()
-            : new CategorisedCatch(
-                unsoldByCategory
-                    .entrySet()
-                    .stream()
-                    .collect(toMap(
-                        Entry::getKey,
-                        entry -> entry.getValue().build()
-                    ))
-            );
-        final Sale sale = new Sale(
-            dateTime,
-            saleIdSupplier.get(),
-            this,
-            vessel,
-            soldItems,
-            unsold
-        );
-        eventManager.broadcast(sale);
-        return sale;
-    }
+    final Sale sale = new Sale(
+      dateTime,
+      saleIdSupplier.get(),
+      this,
+      vessel,
+      soldItems,
+      unsold
+    );
+    eventManager.broadcast(sale);
+    return sale;
+  }
 
-    /** Prices {@code categorisedCatch} via {@link #getPrice}, as {@link #sell} does. */
-    @Override
-    public List<Sale.Item> quote(final CategorisedCatch categorisedCatch) {
-        final List<Sale.Item> items = new ArrayList<>();
-        split(categorisedCatch, items::add, (catchCategory, bucket) -> {});
-        return items;
-    }
+  /** Prices {@code categorisedCatch} via {@link #getPrice}, as {@link #sell} does. */
+  @Override
+  public List<Sale.Item> quote(final CategorisedCatch categorisedCatch) {
+    final List<Sale.Item> items = new ArrayList<>();
+    split(categorisedCatch, items::add, (catchCategory, bucket) -> {});
+    return items;
+  }
 
-    /**
-     * Splits {@code categorisedCatch} into priced items (priced via {@link #getPrice}), passed to
-     * {@code pricedItemConsumer}, and unpriced catch (no price for that category, or that species
-     * within it), passed to {@code unpricedCatchConsumer}. Species with no biomass are skipped,
-     * except within a wholly unpriced category.
-     */
-    private void split(
-        final CategorisedCatch categorisedCatch,
-        final Consumer<Sale.Item> pricedItemConsumer,
-        final BiConsumer<CatchCategory, Bucket> unpricedCatchConsumer
-    ) {
-        categorisedCatch.getBuckets().forEach((catchCategory, bucket) -> {
-            if (prices.get(catchCategory) == null) {
-                unpricedCatchConsumer.accept(catchCategory, bucket);
-            } else {
-                bucket.forEach((species, biomass) -> {
-                    if (biomass.asKg() <= 0.0) return;
-                    getPrice(catchCategory, species).ifPresentOrElse(
-                        price -> pricedItemConsumer.accept(new Sale.Item(
-                            catchCategory,
-                            species,
-                            biomass,
-                            price
-                        )),
-                        () -> unpricedCatchConsumer.accept(
-                            catchCategory,
-                            Bucket.of(species, biomass)
-                        )
-                    );
-                });
-            }
+  /**
+   * Splits {@code categorisedCatch} into priced items (priced via {@link #getPrice}), passed to
+   * {@code pricedItemConsumer}, and unpriced catch (no price for that category, or that species
+   * within it), passed to {@code unpricedCatchConsumer}. Species with no biomass are skipped,
+   * except within a wholly unpriced category.
+   */
+  private void split(
+    final CategorisedCatch categorisedCatch,
+    final Consumer<Sale.Item> pricedItemConsumer,
+    final BiConsumer<CatchCategory, Bucket> unpricedCatchConsumer
+  ) {
+    categorisedCatch.getBuckets().forEach((catchCategory, bucket) -> {
+      if (prices.get(catchCategory) == null) {
+        unpricedCatchConsumer.accept(catchCategory, bucket);
+      } else {
+        bucket.forEach((species, biomass) -> {
+          if (biomass.asKg() <= 0.0) return;
+          getPrice(catchCategory, species).ifPresentOrElse(
+            price ->
+              pricedItemConsumer.accept(
+                new Sale.Item(catchCategory, species, biomass, price)
+              ),
+            () ->
+              unpricedCatchConsumer.accept(
+                catchCategory,
+                Bucket.of(species, biomass)
+              )
+          );
         });
-    }
+      }
+    });
+  }
 
-    /** @return this market's prices, by catch category then species, as a read-only view */
-    public Map<CatchCategory, Map<Species, Price>> getPrices() {
-        return Collections.unmodifiableMap(
-            Maps.transformValues(prices, Collections::unmodifiableMap)
-        );
-    }
+  /** @return this market's prices, by catch category then species, as a read-only view */
+  public Map<CatchCategory, Map<Species, Price>> getPrices() {
+    return Collections.unmodifiableMap(
+      Maps.transformValues(prices, Collections::unmodifiableMap)
+    );
+  }
 
-    /**
-     * Iterates prices without exposing the mutable backing maps.
-     */
-    public void forEachPrice(final PriceConsumer consumer) {
-        prices.forEach((catchCategory, pricePerSpecies) ->
-            pricePerSpecies.forEach((species, price) ->
-                consumer.accept(catchCategory, species, price)
-            )
-        );
-    }
+  /**
+   * Iterates prices without exposing the mutable backing maps.
+   */
+  public void forEachPrice(final PriceConsumer consumer) {
+    prices.forEach((catchCategory, pricePerSpecies) ->
+      pricePerSpecies.forEach((species, price) ->
+        consumer.accept(catchCategory, species, price)
+      )
+    );
+  }
 
-    /**
-     * @return this market's price for {@code species} under {@code catchCategory}: a direct
-     * match if one is set, otherwise the first priced species whose {@link Species#covers} the
-     * requested species, otherwise empty
-     */
-    public Optional<Price> getPrice(
-        final CatchCategory catchCategory,
-        final Species species
-    ) {
-        final Map<Species, Price> pricePerSpecies = prices.get(catchCategory);
-        if (pricePerSpecies == null) {
-            return Optional.empty();
-        }
-        final Map<Species, Optional<Price>> priceCacheBySpecies =
-            priceCache.computeIfAbsent(catchCategory, key -> new HashMap<>());
-        return priceCacheBySpecies.computeIfAbsent(
-            species,
-            key -> resolvePrice(pricePerSpecies, key)
-        );
+  /**
+   * @return this market's price for {@code species} under {@code catchCategory}: a direct
+   * match if one is set, otherwise the first priced species whose {@link Species#covers} the
+   * requested species, otherwise empty
+   */
+  public Optional<Price> getPrice(
+    final CatchCategory catchCategory,
+    final Species species
+  ) {
+    final Map<Species, Price> pricePerSpecies = prices.get(catchCategory);
+    if (pricePerSpecies == null) {
+      return Optional.empty();
     }
+    final Map<Species, Optional<Price>> priceCacheBySpecies =
+      priceCache.computeIfAbsent(catchCategory, key -> new HashMap<>());
+    return priceCacheBySpecies.computeIfAbsent(species, key ->
+      resolvePrice(pricePerSpecies, key)
+    );
+  }
 
-    @Override
-    public Optional<LocalDateTime> getLastPriceChangeDateTime() {
-        return Optional.ofNullable(lastPriceChangeDateTime);
+  @Override
+  public Optional<LocalDateTime> getLastPriceChangeDateTime() {
+    return Optional.ofNullable(lastPriceChangeDateTime);
+  }
+
+  /**
+   * Sets (or replaces) this market's price for {@code species} under {@code catchCategory}.
+   *
+   * @param dateTime when the price changes
+   */
+  public void setPrice(
+    final CatchCategory catchCategory,
+    final Species species,
+    final Price price,
+    final LocalDateTime dateTime
+  ) {
+    prices
+      .computeIfAbsent(catchCategory, k -> new HashMap<>())
+      .put(species, price);
+    priceCache.remove(catchCategory);
+    lastPriceChangeDateTime = dateTime;
+  }
+
+  private Optional<Price> resolvePrice(
+    final Map<Species, Price> pricePerSpecies,
+    final Species species
+  ) {
+    // Try direct match first, then fall back to a covers() scan.
+    final Price directMatch = pricePerSpecies.get(species);
+    if (directMatch != null) {
+      return Optional.of(directMatch);
     }
-
-    /**
-     * Sets (or replaces) this market's price for {@code species} under {@code catchCategory}.
-     *
-     * @param dateTime when the price changes
-     */
-    public void setPrice(
-        final CatchCategory catchCategory,
-        final Species species,
-        final Price price,
-        final LocalDateTime dateTime
-    ) {
-        prices
-            .computeIfAbsent(catchCategory, k -> new HashMap<>())
-            .put(species, price);
-        priceCache.remove(catchCategory);
-        lastPriceChangeDateTime = dateTime;
+    for (final Entry<Species, Price> entry : pricePerSpecies.entrySet()) {
+      if (entry.getKey().covers(species)) {
+        return Optional.of(entry.getValue());
+      }
     }
+    return Optional.empty();
+  }
 
-    private Optional<Price> resolvePrice(
-        final Map<Species, Price> pricePerSpecies,
-        final Species species
-    ) {
-        // Try direct match first, then fall back to a covers() scan.
-        final Price directMatch = pricePerSpecies.get(species);
-        if (directMatch != null) {
-            return Optional.of(directMatch);
-        }
-        for (final Entry<Species, Price> entry : pricePerSpecies.entrySet()) {
-            if (entry.getKey().covers(species)) {
-                return Optional.of(entry.getValue());
-            }
-        }
-        return Optional.empty();
-    }
-
-    /** Receives one (catch category, species, price) triple, as passed to {@link #forEachPrice}. */
-    @FunctionalInterface
-    public interface PriceConsumer {
-        void accept(
-            CatchCategory catchCategory,
-            Species species,
-            Price price
-        );
-    }
-
+  /** Receives one (catch category, species, price) triple, as passed to {@link #forEachPrice}. */
+  @FunctionalInterface
+  public interface PriceConsumer {
+    void accept(CatchCategory catchCategory, Species species, Price price);
+  }
 }

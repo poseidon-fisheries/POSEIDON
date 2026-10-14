@@ -38,26 +38,30 @@ import uk.ac.ox.poseidon.core.Factory;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UntilSuccessTaskFactory extends DecoratorTaskFactory<UntilSuccess<Vessel>> {
+public class UntilSuccessTaskFactory
+  extends DecoratorTaskFactory<UntilSuccess<Vessel>>
+{
 
-    /** @param child factory for the child task to re-run until it succeeds */
-    public UntilSuccessTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> child) {
-        super(child);
-    }
+  /** @param child factory for the child task to re-run until it succeeds */
+  public UntilSuccessTaskFactory(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> child
+  ) {
+    super(child);
+  }
 
-    /**
-     * @param guard optional task guarding whether this decorator runs at all
-     * @param child factory for the child task to re-run until it succeeds
-     */
-    public UntilSuccessTaskFactory(
-        final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
-        final Factory<? super VesselScope, ? extends Task<Vessel>> child
-    ) {
-        super(guard, child);
-    }
+  /**
+   * @param guard optional task guarding whether this decorator runs at all
+   * @param child factory for the child task to re-run until it succeeds
+   */
+  public UntilSuccessTaskFactory(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
+    final Factory<? super VesselScope, ? extends Task<Vessel>> child
+  ) {
+    super(guard, child);
+  }
 
-    @Override
-    protected UntilSuccess<Vessel> newTask(final VesselScope scope) {
-        return new UntilSuccess<>();
-    }
+  @Override
+  protected UntilSuccess<Vessel> newTask(final VesselScope scope) {
+    return new UntilSuccess<>();
+  }
 }

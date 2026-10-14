@@ -22,16 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.regulations.actions;
 
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.function.Function;
 
 /** Builds a {@link DepartNow} action for a given vessel. */
 @RequiredArgsConstructor
 public class DepartNowActionFunction implements Function<Vessel, DepartNow> {
-    @Override
-    public DepartNow apply(final Vessel vessel) {
-        return new DepartNow(vessel);
-    }
+
+  @Override
+  public DepartNow apply(final Vessel vessel) {
+    return new DepartNow(vessel);
+  }
 }

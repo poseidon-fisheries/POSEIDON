@@ -22,12 +22,6 @@
 
 package uk.ac.ox.poseidon.regulations;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.alwaysFalse;
@@ -37,48 +31,68 @@ import static uk.ac.ox.poseidon.regulations.Factories.allOf;
 import static uk.ac.ox.poseidon.regulations.Factories.forbiddenIf;
 import static uk.ac.ox.poseidon.regulations.Factories.permittedIf;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+
 class AllOfRegulationsTest {
 
-    @SuppressWarnings("unchecked")
-    private final Action<Object> action = mock(Action.class);
+  @SuppressWarnings("unchecked")
+  private final Action<Object> action = mock(Action.class);
 
-    private static final Regulations<Action<Object>> PERMITTING = a -> true;
-    private static final Regulations<Action<Object>> FORBIDDING = a -> false;
+  private static final Regulations<Action<Object>> PERMITTING = a -> true;
+  private static final Regulations<Action<Object>> FORBIDDING = a -> false;
 
-    @Test
-    void permitsAnActionOnlyWhenEveryRulePermitsIt() {
-        assertThat(new AllOfRegulations<>(List.of(PERMITTING, PERMITTING)).isPermitted(action))
-            .isTrue();
-        assertThat(new AllOfRegulations<>(List.of(PERMITTING, FORBIDDING)).isPermitted(action))
-            .isFalse();
-        assertThat(new AllOfRegulations<>(List.of(FORBIDDING, PERMITTING)).isPermitted(action))
-            .isFalse();
-    }
+  @Test
+  void permitsAnActionOnlyWhenEveryRulePermitsIt() {
+    assertThat(
+      new AllOfRegulations<>(List.of(PERMITTING, PERMITTING)).isPermitted(
+        action
+      )
+    ).isTrue();
+    assertThat(
+      new AllOfRegulations<>(List.of(PERMITTING, FORBIDDING)).isPermitted(
+        action
+      )
+    ).isFalse();
+    assertThat(
+      new AllOfRegulations<>(List.of(FORBIDDING, PERMITTING)).isPermitted(
+        action
+      )
+    ).isFalse();
+  }
 
-    @Test
-    void permitsEveryActionWhenThereAreNoRules() {
-        assertThat(new AllOfRegulations<Action<Object>>(List.of()).isPermitted(action)).isTrue();
-    }
+  @Test
+  void permitsEveryActionWhenThereAreNoRules() {
+    assertThat(
+      new AllOfRegulations<Action<Object>>(List.of()).isPermitted(action)
+    ).isTrue();
+  }
 
-    @Test
-    void stopsAtTheFirstRuleThatForbids() {
-        final List<String> asked = new ArrayList<>();
-        final Regulations<Action<Object>> first = a -> asked.add("first") && false;
-        final Regulations<Action<Object>> second = a -> asked.add("second");
+  @Test
+  void stopsAtTheFirstRuleThatForbids() {
+    final List<String> asked = new ArrayList<>();
+    final Regulations<Action<Object>> first = a -> asked.add("first") && false;
+    final Regulations<Action<Object>> second = a -> asked.add("second");
 
-        new AllOfRegulations<>(List.of(first, second)).isPermitted(action);
+    new AllOfRegulations<>(List.of(first, second)).isPermitted(action);
 
-        assertThat(asked).containsExactly("first");
-    }
+    assertThat(asked).containsExactly("first");
+  }
 
-    @Test
-    void allOfRulesGivesRules() {
-        final AllOfRegulationsFactory<Scope, Action<Object>> permitting =
-            allOf(permittedIf(alwaysTrue()), forbiddenIf(alwaysFalse()));
-        final AllOfRegulationsFactory<Scope, Action<Object>> forbidding =
-            allOf(permittedIf(alwaysTrue()), forbiddenIf(alwaysTrue()));
+  @Test
+  void allOfRulesGivesRules() {
+    final AllOfRegulationsFactory<Scope, Action<Object>> permitting = allOf(
+      permittedIf(alwaysTrue()),
+      forbiddenIf(alwaysFalse())
+    );
+    final AllOfRegulationsFactory<Scope, Action<Object>> forbidding = allOf(
+      permittedIf(alwaysTrue()),
+      forbiddenIf(alwaysTrue())
+    );
 
-        assertThat(permitting.get(GLOBAL_SCOPE).isPermitted(action)).isTrue();
-        assertThat(forbidding.get(GLOBAL_SCOPE).isPermitted(action)).isFalse();
-    }
+    assertThat(permitting.get(GLOBAL_SCOPE).isPermitted(action)).isTrue();
+    assertThat(forbidding.get(GLOBAL_SCOPE).isPermitted(action)).isFalse();
+  }
 }

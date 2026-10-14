@@ -30,28 +30,33 @@ import uk.ac.ox.poseidon.geography.Envelope;
 /** An {@link AbstractModelGrid} where every cell is active. Built via {@link ModelGrid#create}. */
 class ModelGridWithAllCellsActive extends AbstractModelGrid {
 
-    @Getter(lazy = true)
-    private final ImmutableSet<Int2D> activeCells = ImmutableSet.copyOf(allCells);
+  @Getter(lazy = true)
+  private final ImmutableSet<Int2D> activeCells = ImmutableSet.copyOf(allCells);
 
-    ModelGridWithAllCellsActive(
-        final int gridWidth,
-        final int gridHeight,
-        final Envelope envelope
-    ) {
-        this(gridWidth, gridHeight, envelope, makeAllCellsArray(gridWidth, gridHeight));
-    }
+  ModelGridWithAllCellsActive(
+    final int gridWidth,
+    final int gridHeight,
+    final Envelope envelope
+  ) {
+    this(
+      gridWidth,
+      gridHeight,
+      envelope,
+      makeAllCellsArray(gridWidth, gridHeight)
+    );
+  }
 
-    private ModelGridWithAllCellsActive(
-        final int gridWidth,
-        final int gridHeight,
-        final Envelope envelope,
-        final Int2D[] allCells
-    ) {
-        super(gridWidth, gridHeight, envelope, allCells);
-    }
+  private ModelGridWithAllCellsActive(
+    final int gridWidth,
+    final int gridHeight,
+    final Envelope envelope,
+    final Int2D[] allCells
+  ) {
+    super(gridWidth, gridHeight, envelope, allCells);
+  }
 
-    @Override
-    public boolean isActive(final Int2D cell) {
-        return true;
-    }
+  @Override
+  public boolean isActive(final Int2D cell) {
+    return true;
+  }
 }

@@ -46,28 +46,27 @@ import uk.ac.ox.poseidon.core.Factory;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class DecoratorTaskFactory<T extends Decorator<Vessel>>
-    extends VesselTaskFactory<T> {
+public abstract class DecoratorTaskFactory<T extends Decorator<Vessel>> extends VesselTaskFactory<T> {
 
-    private Factory<? super VesselScope, ? extends Task<Vessel>> child;
+  private Factory<? super VesselScope, ? extends Task<Vessel>> child;
 
-    /**
-     * @param guard optional task guarding whether this decorator runs at all
-     * @param child factory for the decorator's single child task
-     */
-    public DecoratorTaskFactory(
-        final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
-        final Factory<? super VesselScope, ? extends Task<Vessel>> child
-    ) {
-        super(guard);
-        this.child = child;
-    }
+  /**
+   * @param guard optional task guarding whether this decorator runs at all
+   * @param child factory for the decorator's single child task
+   */
+  public DecoratorTaskFactory(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
+    final Factory<? super VesselScope, ? extends Task<Vessel>> child
+  ) {
+    super(guard);
+    this.child = child;
+  }
 
-    /** @return a decorator node built by {@link #newTask} with {@link #child} attached */
-    @Override
-    protected T newInstance(final VesselScope scope) {
-        final T task = super.newInstance(scope);
-        task.addChild(child.get(scope));
-        return task;
-    }
+  /** @return a decorator node built by {@link #newTask} with {@link #child} attached */
+  @Override
+  protected T newInstance(final VesselScope scope) {
+    final T task = super.newInstance(scope);
+    task.addChild(child.get(scope));
+    return task;
+  }
 }

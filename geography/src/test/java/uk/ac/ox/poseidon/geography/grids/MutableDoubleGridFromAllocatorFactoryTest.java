@@ -22,36 +22,41 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import static java.lang.Double.isNaN;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.allocators.FilteredAllocator;
 
-import static java.lang.Double.isNaN;
-import static org.assertj.core.api.Assertions.assertThat;
-
 class MutableDoubleGridFromAllocatorFactoryTest {
 
-    @Test
-    void buildsGridFromAllocatorAndPredicateThenAllowsMutation() {
-        final ModelGrid modelGrid = ModelGrid.create(2, 2, new Envelope(0, 2, 0, 2));
-        final MutableDoubleGridFromAllocatorFactory<Scope> factory =
-            new MutableDoubleGridFromAllocatorFactory<>(
-                scope -> modelGrid,
-                scope -> new FilteredAllocator(
-                    cell -> cell.x + cell.y,
-                    cell -> !(cell.x == 1 && cell.y == 0)
-                )
-            );
+  @Test
+  void buildsGridFromAllocatorAndPredicateThenAllowsMutation() {
+    final ModelGrid modelGrid = ModelGrid.create(
+      2,
+      2,
+      new Envelope(0, 2, 0, 2)
+    );
+    final MutableDoubleGridFromAllocatorFactory<Scope> factory =
+      new MutableDoubleGridFromAllocatorFactory<>(
+        scope -> modelGrid,
+        scope ->
+          new FilteredAllocator(
+            cell -> cell.x + cell.y,
+            cell -> !(cell.x == 1 && cell.y == 0)
+          )
+      );
 
-        final MutableDoubleGrid grid = factory.get(Scope.GLOBAL_SCOPE);
+    final MutableDoubleGrid grid = factory.get(Scope.GLOBAL_SCOPE);
 
-        assertThat(isNaN(grid.getValue(new Int2D(1, 0)))).isTrue();
-        assertThat(grid.getValue(new Int2D(0, 0))).isEqualTo(0.0);
-        assertThat(grid.getValue(new Int2D(1, 1))).isEqualTo(2.0);
+    assertThat(isNaN(grid.getValue(new Int2D(1, 0)))).isTrue();
+    assertThat(grid.getValue(new Int2D(0, 0))).isEqualTo(0.0);
+    assertThat(grid.getValue(new Int2D(1, 1))).isEqualTo(2.0);
 
-        grid.setValue(new Int2D(0, 0), 42.0);
-        assertThat(grid.getValue(new Int2D(0, 0))).isEqualTo(42.0);
-    }
+    grid.setValue(new Int2D(0, 0), 42.0);
+    assertThat(grid.getValue(new Int2D(0, 0))).isEqualTo(42.0);
+  }
 }

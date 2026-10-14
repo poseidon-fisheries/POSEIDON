@@ -33,13 +33,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  */
 @NoArgsConstructor
 public abstract class GlobalScopeFactory<C> extends AbstractFactory<Scope, C> {
-    @Override
-    protected Object makeKey(final Scope scope) {
-        return Scope.GLOBAL_SCOPE;
-    }
 
-    @Override
-    protected Class<Scope> scopeClass() {
-        return Scope.class;
-    }
+  @Override
+  protected Object makeKey(final Scope scope) {
+    return Scope.GLOBAL_SCOPE;
+  }
+
+  @Override
+  protected Class<Scope> scopeClass() {
+    return Scope.class;
+  }
 }

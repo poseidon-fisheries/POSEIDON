@@ -39,11 +39,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @EqualsAndHashCode(callSuper = true)
 public class RandomIntFactory extends SimulationScopeFactory<RandomInt> {
 
-    private int minimum;
-    private int maximum;
+  private int minimum;
+  private int maximum;
 
-    @Override
-    protected RandomInt newInstance(final SimulationScope scope) {
-        return new RandomInt(scope.getSimulation().random, minimum, maximum);
-    }
+  @Override
+  protected RandomInt newInstance(final SimulationScope scope) {
+    return new RandomInt(scope.getSimulation().random, minimum, maximum);
+  }
 }

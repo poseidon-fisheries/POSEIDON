@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
  * A {@link Provider} of the time left from the current date-time until a reference date-time, both
@@ -39,11 +38,11 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class DurationUntil implements Provider<Duration> {
 
-    private final @NonNull Supplier<? extends LocalDateTime> currentDateTime;
-    private final @NonNull Supplier<? extends LocalDateTime> referenceDateTime;
+  private final @NonNull Supplier<? extends LocalDateTime> currentDateTime;
+  private final @NonNull Supplier<? extends LocalDateTime> referenceDateTime;
 
-    @Override
-    public Duration get() {
-        return Duration.between(currentDateTime.get(), referenceDateTime.get());
-    }
+  @Override
+  public Duration get() {
+    return Duration.between(currentDateTime.get(), referenceDateTime.get());
+  }
 }

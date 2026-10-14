@@ -39,15 +39,18 @@ import uk.ac.ox.poseidon.core.Factory;
 @EqualsAndHashCode(callSuper = true)
 public class RegisteredVesselComponentFactory<C> extends VesselScopeFactory<C> {
 
-    private Factory<? super VesselScope, ? extends C> componentFactory;
-    private Factory<? super VesselScope, ? extends VesselComponentRegister<C>> componentRegister;
+  private Factory<? super VesselScope, ? extends C> componentFactory;
+  private Factory<
+    ? super VesselScope,
+    ? extends VesselComponentRegister<C>
+  > componentRegister;
 
-    @Override
-    protected C newInstance(final VesselScope scope) {
-        final C component = componentFactory.get(scope);
-        final VesselComponentRegister<C> vesselComponentRegister =
-            this.componentRegister.get(scope);
-        vesselComponentRegister.putComponent(scope.getVessel(), component);
-        return component;
-    }
+  @Override
+  protected C newInstance(final VesselScope scope) {
+    final C component = componentFactory.get(scope);
+    final VesselComponentRegister<C> vesselComponentRegister =
+      this.componentRegister.get(scope);
+    vesselComponentRegister.putComponent(scope.getVessel(), component);
+    return component;
+  }
 }

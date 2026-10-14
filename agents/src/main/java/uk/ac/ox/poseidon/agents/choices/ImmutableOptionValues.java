@@ -23,19 +23,17 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import com.google.common.collect.ImmutableMap;
-import lombok.Getter;
-
 import java.util.Map;
+import lombok.Getter;
 
 /** A {@link MapBasedOptionValues} over a fixed, defensively-copied map; never mutated after construction. */
 @Getter
 public class ImmutableOptionValues<O> extends MapBasedOptionValues<O> {
 
-    private final ImmutableMap<O, Double> values;
+  private final ImmutableMap<O, Double> values;
 
-    /** @param values the fixed option-to-value map, defensively copied */
-    ImmutableOptionValues(final Map<O, Double> values) {
-        this.values = ImmutableMap.copyOf(values);
-    }
-
+  /** @param values the fixed option-to-value map, defensively copied */
+  ImmutableOptionValues(final Map<O, Double> values) {
+    this.values = ImmutableMap.copyOf(values);
+  }
 }

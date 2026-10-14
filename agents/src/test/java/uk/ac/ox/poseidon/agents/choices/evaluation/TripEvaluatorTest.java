@@ -22,8 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import ec.util.MersenneTwisterFast;
 import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
@@ -32,92 +40,79 @@ import uk.ac.ox.poseidon.agents.trips.TripStartEvent;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 class TripEvaluatorTest {
 
-    @Test
-    void startsEvaluationsOnTripEventManager() {
-        final SimpleEventManager vesselEventManager = new SimpleEventManager();
-        final SimpleEventManager tripEventManager = new SimpleEventManager();
-        final AtomicReference<EventManager> evaluationEventManager =
-            new AtomicReference<>();
-        final Evaluator<Int2D> evaluator = (option, eventManager) -> {
-            evaluationEventManager.set(eventManager);
-            return new Evaluation<>() {
-                @Override
-                public Int2D getOption() {
-                    return option;
-                }
+  @Test
+  void startsEvaluationsOnTripEventManager() {
+    final SimpleEventManager vesselEventManager = new SimpleEventManager();
+    final SimpleEventManager tripEventManager = new SimpleEventManager();
+    final AtomicReference<EventManager> evaluationEventManager =
+      new AtomicReference<>();
+    final Evaluator<Int2D> evaluator = (option, eventManager) -> {
+      evaluationEventManager.set(eventManager);
+      return new Evaluation<>() {
+        @Override
+        public Int2D getOption() {
+          return option;
+        }
 
-                @Override
-                public double getResult() {
-                    return 0;
-                }
-            };
-        };
-        final Trip trip = mock(Trip.class);
-        final Int2D destination = new Int2D(1, 2);
-        when(trip.getDestination()).thenReturn(destination);
-        when(trip.getEventManager()).thenReturn(tripEventManager);
+        @Override
+        public double getResult() {
+          return 0;
+        }
+      };
+    };
+    final Trip trip = mock(Trip.class);
+    final Int2D destination = new Int2D(1, 2);
+    when(trip.getDestination()).thenReturn(destination);
+    when(trip.getEventManager()).thenReturn(tripEventManager);
 
-        new TripEvaluator(
-            vesselEventManager,
-            new StubOptionValues(),
-            evaluator
-        );
-        vesselEventManager.broadcast(new TripStartEvent(trip));
+    new TripEvaluator(vesselEventManager, new StubOptionValues(), evaluator);
+    vesselEventManager.broadcast(new TripStartEvent(trip));
 
-        assertThat(evaluationEventManager).hasValue(tripEventManager);
+    assertThat(evaluationEventManager).hasValue(tripEventManager);
+  }
+
+  private static class StubOptionValues implements MutableOptionValues<Int2D> {
+
+    @Override
+    public void observe(final Int2D option, final double value) {}
+
+    @Override
+    public Optional<Double> getValue(final Int2D option) {
+      return Optional.empty();
     }
 
-    private static class StubOptionValues implements MutableOptionValues<Int2D> {
-        @Override
-        public void observe(
-            final Int2D option,
-            final double value
-        ) {
-        }
+    @Override
+    public void forEachEntry(
+      final ObjectDoubleBiConsumer<? super Int2D> consumer
+    ) {}
 
-        @Override
-        public Optional<Double> getValue(final Int2D option) {
-            return Optional.empty();
-        }
-
-        @Override
-        public void forEachEntry(final ObjectDoubleBiConsumer<? super Int2D> consumer) {
-        }
-
-        @Override
-        public List<Int2D> getBestOptions() {
-            return List.of();
-        }
-
-        @Override
-        public Optional<Int2D> getBestOption(final MersenneTwisterFast rng) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Double> getBestValue() {
-            return Optional.empty();
-        }
-
-        @Override
-        public List<Entry<Int2D, Double>> getBestEntries() {
-            return List.of();
-        }
-
-        @Override
-        public Optional<Entry<Int2D, Double>> getBestEntry(final MersenneTwisterFast rng) {
-            return Optional.empty();
-        }
+    @Override
+    public List<Int2D> getBestOptions() {
+      return List.of();
     }
+
+    @Override
+    public Optional<Int2D> getBestOption(final MersenneTwisterFast rng) {
+      return Optional.empty();
+    }
+
+    @Override
+    public Optional<Double> getBestValue() {
+      return Optional.empty();
+    }
+
+    @Override
+    public List<Entry<Int2D, Double>> getBestEntries() {
+      return List.of();
+    }
+
+    @Override
+    public Optional<Entry<Int2D, Double>> getBestEntry(
+      final MersenneTwisterFast rng
+    ) {
+      return Optional.empty();
+    }
+  }
 }

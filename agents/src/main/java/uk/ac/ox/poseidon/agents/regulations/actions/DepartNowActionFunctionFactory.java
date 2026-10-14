@@ -33,9 +33,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DepartNowActionFunctionFactory extends GlobalScopeFactory<DepartNowActionFunction> {
-    @Override
-    protected DepartNowActionFunction newInstance(final Scope scope) {
-        return new DepartNowActionFunction();
-    }
+public class DepartNowActionFunctionFactory
+  extends GlobalScopeFactory<DepartNowActionFunction>
+{
+
+  @Override
+  protected DepartNowActionFunction newInstance(final Scope scope) {
+    return new DepartNowActionFunction();
+  }
 }

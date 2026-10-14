@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.io.tables;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,8 +33,6 @@ import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Function;
 
 /**
  * A {@link RelativeScopeFactory} that builds an {@link ImmutableMap} from a resolved
@@ -47,32 +46,37 @@ import java.util.function.Function;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MapFromTableFactory<S extends Scope, K, V>
-    extends RelativeScopeFactory<S, ImmutableMap<K, V>> {
+public class MapFromTableFactory<
+  S extends Scope,
+  K,
+  V
+> extends RelativeScopeFactory<S, ImmutableMap<K, V>> {
 
-    private Factory<? super S, Table> table;
+  private Factory<? super S, Table> table;
 
-    private Factory<? super S, ? extends Function<? super Row, ? extends K>>
-        keyBuilder;
+  private Factory<
+    ? super S,
+    ? extends Function<? super Row, ? extends K>
+  > keyBuilder;
 
-    private Factory<? super S, ? extends Function<? super Row, ? extends V>>
-        valueBuilder;
+  private Factory<
+    ? super S,
+    ? extends Function<? super Row, ? extends V>
+  > valueBuilder;
 
-    @Override
-    protected ImmutableMap<K, V> newInstance(final S scope) {
+  @Override
+  protected ImmutableMap<K, V> newInstance(final S scope) {
+    final var keyBuilder = this.keyBuilder.get(scope);
+    final var valueBuilder = this.valueBuilder.get(scope);
+    final var table = this.table.get(scope);
+    final int rowCount = table.rowCount();
+    final var builder = ImmutableMap.<K, V>builderWithExpectedSize(rowCount);
 
-        final var keyBuilder = this.keyBuilder.get(scope);
-        final var valueBuilder = this.valueBuilder.get(scope);
-        final var table = this.table.get(scope);
-        final int rowCount = table.rowCount();
-        final var builder = ImmutableMap.<K, V>builderWithExpectedSize(rowCount);
-
-        for (int r = 0; r < rowCount; r++) {
-            final Row row = table.row(r);
-            builder.put(keyBuilder.apply(row), valueBuilder.apply(row));
-        }
-
-        return builder.build();
+    for (int r = 0; r < rowCount; r++) {
+      final Row row = table.row(r);
+      builder.put(keyBuilder.apply(row), valueBuilder.apply(row));
     }
 
+    return builder.build();
+  }
 }

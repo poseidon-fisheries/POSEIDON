@@ -30,37 +30,36 @@ import sim.util.Int2D;
  */
 public class DoubleGridWrapper implements DoubleGrid {
 
-    /** The wrapped grid every method delegates to by default. */
-    protected final DoubleGrid grid;
+  /** The wrapped grid every method delegates to by default. */
+  protected final DoubleGrid grid;
 
-    /** @param grid the grid to wrap */
-    public DoubleGridWrapper(final DoubleGrid grid) {
-        this.grid = grid;
-    }
+  /** @param grid the grid to wrap */
+  public DoubleGridWrapper(final DoubleGrid grid) {
+    this.grid = grid;
+  }
 
-    @Override
-    public ModelGrid getModelGrid() {
-        return grid.getModelGrid();
-    }
+  @Override
+  public ModelGrid getModelGrid() {
+    return grid.getModelGrid();
+  }
 
-    @Override
-    public double getValue(final Int2D cell) {
-        return grid.getValue(cell);
-    }
+  @Override
+  public double getValue(final Int2D cell) {
+    return grid.getValue(cell);
+  }
 
-    @Override
-    public double getMinimumValue() {
-        return grid.getMinimumValue();
-    }
+  @Override
+  public double getMinimumValue() {
+    return grid.getMinimumValue();
+  }
 
-    @Override
-    public double getMaximumValue() {
-        return grid.getMaximumValue();
-    }
+  @Override
+  public double getMaximumValue() {
+    return grid.getMaximumValue();
+  }
 
-    @Override
-    public double getSum() {
-        return grid.getSum();
-    }
-
+  @Override
+  public double getSum() {
+    return grid.getSum();
+  }
 }

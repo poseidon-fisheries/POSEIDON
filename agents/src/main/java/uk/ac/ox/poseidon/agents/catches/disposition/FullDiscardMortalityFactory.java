@@ -36,9 +36,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class FullDiscardMortalityFactory
-    extends GlobalScopeFactory<FullDiscardMortality> {
-    @Override
-    protected FullDiscardMortality newInstance(final Scope scope) {
-        return new FullDiscardMortality();
-    }
+  extends GlobalScopeFactory<FullDiscardMortality>
+{
+
+  @Override
+  protected FullDiscardMortality newInstance(final Scope scope) {
+    return new FullDiscardMortality();
+  }
 }

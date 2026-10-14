@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
+import java.util.function.IntSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,8 +31,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.providers.constant.ConstantInt;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.IntSupplier;
 
 /**
  * A {@link RelativeScopeFactory} that resolves the given delegate {@link IntSupplier} once, when
@@ -44,13 +43,15 @@ import java.util.function.IntSupplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FirstIntFromFactory<S extends Scope>
-    extends RelativeScopeFactory<S, IntProvider> {
+public class FirstIntFromFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  IntProvider
+> {
 
-    private Factory<? super S, ? extends IntSupplier> delegate;
+  private Factory<? super S, ? extends IntSupplier> delegate;
 
-    @Override
-    protected IntProvider newInstance(final S scope) {
-        return new ConstantInt(delegate.get(scope).getAsInt());
-    }
+  @Override
+  protected IntProvider newInstance(final S scope) {
+    return new ConstantInt(delegate.get(scope).getAsInt());
+  }
 }

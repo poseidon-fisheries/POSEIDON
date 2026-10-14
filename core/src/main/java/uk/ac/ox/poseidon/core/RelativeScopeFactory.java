@@ -22,11 +22,12 @@
 
 package uk.ac.ox.poseidon.core;
 
+import static com.google.common.base.Preconditions.checkState;
+import static java.beans.Introspector.getBeanInfo;
+import static java.util.stream.Collectors.toMap;
+
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
@@ -34,10 +35,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
-import static com.google.common.base.Preconditions.checkState;
-import static java.beans.Introspector.getBeanInfo;
-import static java.util.stream.Collectors.toMap;
+import lombok.NoArgsConstructor;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * A {@link Factory} whose effective scope is derived from its own {@link Factory}-typed fields
@@ -49,121 +48,128 @@ import static java.util.stream.Collectors.toMap;
  * of silently sharing stale state if an input ever isn't global.
  */
 @NoArgsConstructor
-public abstract class RelativeScopeFactory<S extends Scope, C> extends AbstractFactory<S, C> {
+public abstract class RelativeScopeFactory<
+  S extends Scope,
+  C
+> extends AbstractFactory<S, C> {
 
-    private final transient Supplier<List<Method>> readMethods = Suppliers.memoize(() -> {
-        final PropertyDescriptor[] props;
-        try {
-            props = getBeanInfo(this.getClass(), Object.class).getPropertyDescriptors();
-        } catch (final IntrospectionException e) {
-            throw new IllegalStateException(e);
-        }
-        return Arrays
-            .stream(props)
-            .map(PropertyDescriptor::getReadMethod)
-            .filter(Objects::nonNull)
-            .toList();
+  private final transient Supplier<List<Method>> readMethods =
+    Suppliers.memoize(() -> {
+      final PropertyDescriptor[] props;
+      try {
+        props = getBeanInfo(
+          this.getClass(),
+          Object.class
+        ).getPropertyDescriptors();
+      } catch (final IntrospectionException e) {
+        throw new IllegalStateException(e);
+      }
+      return Arrays.stream(props)
+        .map(PropertyDescriptor::getReadMethod)
+        .filter(Objects::nonNull)
+        .toList();
     });
 
-    /**
-     * Finds this factory's member {@link Factory}-typed fields (recursing into nested
-     * {@link Map}s, {@link Collection}s, and other {@link RelativeScopeFactory}s), determines
-     * their single common leaf scope class, and delegates key generation to one of the member
-     * factories that has that leaf scope — so this factory's cache key matches whichever scope
-     * its inputs are ultimately rooted in. Falls back to {@link Scope#GLOBAL_SCOPE} if there are
-     * no member factories.
-     *
-     * @param scope the scope being resolved against
-     * @return the delegated cache key
-     * @throws IllegalStateException if member factories are rooted in more than one leaf scope
-     *                                class
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @Override
-    protected Object makeKey(final S scope) {
+  /**
+   * Finds this factory's member {@link Factory}-typed fields (recursing into nested
+   * {@link Map}s, {@link Collection}s, and other {@link RelativeScopeFactory}s), determines
+   * their single common leaf scope class, and delegates key generation to one of the member
+   * factories that has that leaf scope — so this factory's cache key matches whichever scope
+   * its inputs are ultimately rooted in. Falls back to {@link Scope#GLOBAL_SCOPE} if there are
+   * no member factories.
+   *
+   * @param scope the scope being resolved against
+   * @return the delegated cache key
+   * @throws IllegalStateException if member factories are rooted in more than one leaf scope
+   *                                class
+   */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @Override
+  protected Object makeKey(final S scope) {
+    final Map<AbstractFactory, Class> scopesByFactory =
+      memberFactories().collect(
+        toMap(Function.identity(), AbstractFactory::scopeClass)
+      );
 
-        final Map<AbstractFactory, Class> scopesByFactory =
-            memberFactories().collect(toMap(
-                Function.identity(),
-                AbstractFactory::scopeClass
-            ));
+    if (scopesByFactory.isEmpty()) {
+      return Scope.GLOBAL_SCOPE;
+    }
 
-        if (scopesByFactory.isEmpty()) {
-            return Scope.GLOBAL_SCOPE;
+    final Set<Class> scopeClasses = Set.copyOf(scopesByFactory.values());
+
+    final List<Class> leafScopes = scopeClasses
+      .stream()
+      .filter(c ->
+        scopeClasses.stream().noneMatch(d -> c != d && c.isAssignableFrom(d))
+      )
+      .toList();
+
+    checkState(
+      leafScopes.size() == 1,
+      "More than one leaf scope classes found amongst member factories: %s",
+      leafScopes
+    );
+
+    final Class leafScope = leafScopes.getFirst();
+    return scopesByFactory
+      .entrySet()
+      .stream()
+      .filter(e -> e.getValue().equals(leafScope))
+      .findFirst()
+      .map(Map.Entry::getKey)
+      .map(af -> af.makeKey(scope))
+      .orElseThrow();
+  }
+
+  /**
+   * @throws UnsupportedOperationException always — a relative scope factory's effective scope
+   * class is derived per call from its member factories (see {@link #makeKey}), not fixed, so
+   * there is no single answer to give here
+   */
+  @Override
+  protected Class<S> scopeClass() {
+    throw new UnsupportedOperationException(
+      "Relative scope factories do not provide a scope class"
+    );
+  }
+
+  /**
+   * @return this factory's distinct leaf {@link AbstractFactory} inputs: its own
+   * {@code Factory}-typed bean properties, with any nested {@link RelativeScopeFactory}s
+   * expanded recursively into their own member factories (so only genuine leaves are returned)
+   */
+  @SuppressWarnings("rawtypes")
+  protected synchronized Stream<AbstractFactory> memberFactories() {
+    return leafFactories(
+      readMethods
+        .get()
+        .stream()
+        .map(readMethod -> {
+          try {
+            return readMethod.invoke(this);
+          } catch (final IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+          }
+        })
+    ).distinct();
+  }
+
+  @SuppressWarnings("rawtypes")
+  private <T> Stream<AbstractFactory> leafFactories(final Stream<T> objects) {
+    return objects.flatMap(
+      o ->
+        switch (o) {
+          case final Map<?, ?> map -> leafFactories(map.values().stream());
+          case final Collection<?> collection -> leafFactories(
+            collection.stream()
+          );
+          case final RelativeScopeFactory<
+            ?,
+            ?
+          > factory -> factory.memberFactories();
+          case final AbstractFactory factory -> Stream.of(factory);
+          case null, default -> Stream.empty();
         }
-
-        final Set<Class> scopeClasses = Set.copyOf(scopesByFactory.values());
-
-        final List<Class> leafScopes =
-            scopeClasses
-                .stream()
-                .filter(c ->
-                    scopeClasses
-                        .stream()
-                        .noneMatch(d -> c != d && c.isAssignableFrom(d))
-                )
-                .toList();
-
-        checkState(
-            leafScopes.size() == 1,
-            "More than one leaf scope classes found amongst member factories: %s",
-            leafScopes
-        );
-
-        final Class leafScope = leafScopes.getFirst();
-        return scopesByFactory
-            .entrySet()
-            .stream()
-            .filter(e -> e.getValue().equals(leafScope))
-            .findFirst()
-            .map(Map.Entry::getKey)
-            .map(af -> af.makeKey(scope))
-            .orElseThrow();
-    }
-
-    /**
-     * @throws UnsupportedOperationException always — a relative scope factory's effective scope
-     * class is derived per call from its member factories (see {@link #makeKey}), not fixed, so
-     * there is no single answer to give here
-     */
-    @Override
-    protected Class<S> scopeClass() {
-        throw new UnsupportedOperationException(
-            "Relative scope factories do not provide a scope class");
-    }
-
-    /**
-     * @return this factory's distinct leaf {@link AbstractFactory} inputs: its own
-     * {@code Factory}-typed bean properties, with any nested {@link RelativeScopeFactory}s
-     * expanded recursively into their own member factories (so only genuine leaves are returned)
-     */
-    @SuppressWarnings("rawtypes")
-    synchronized protected Stream<AbstractFactory> memberFactories() {
-        return leafFactories(
-            readMethods
-                .get()
-                .stream()
-                .map(readMethod -> {
-                    try {
-                        return readMethod.invoke(this);
-                    } catch (final IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-        ).distinct();
-    }
-
-    @SuppressWarnings("rawtypes")
-    private <T> Stream<AbstractFactory> leafFactories(final Stream<T> objects) {
-        return objects.flatMap(o ->
-            switch (o) {
-                case final Map<?, ?> map -> leafFactories(map.values().stream());
-                case final Collection<?> collection -> leafFactories(collection.stream());
-                case final RelativeScopeFactory<?, ?> factory -> factory.memberFactories();
-                case final AbstractFactory factory -> Stream.of(factory);
-                case null, default -> Stream.empty();
-            }
-        );
-    }
-
+    );
+  }
 }

@@ -24,6 +24,11 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.awt.geom.Point2D;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -38,12 +43,6 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.CoverageWrapper;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.awt.geom.Point2D;
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Map;
-
 /**
  * A {@link BathymetricGridFactory} whose elevation samples come from a raster grid file (e.g.
  * GeoTIFF, via GeoTools' {@link CoverageWrapper}), reprojected cell-by-cell into this codebase's
@@ -54,51 +53,51 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BathymetricGridFromGridFileFactory<S extends Scope>
-    extends BathymetricGridFactory<S> {
+public class BathymetricGridFromGridFileFactory<S extends Scope> extends BathymetricGridFactory<S> {
 
-    private Factory<? super S, ? extends Path> path;
+  private Factory<? super S, ? extends Path> path;
 
-    /**
-     * @param path       factory for the raster grid file to read
-     * @param modelGrid  factory for the grid this bathymetry is defined over
-     * @param aggregator factory for the aggregator combining a cell's samples
-     * @param inverted   whether to negate every sample value
-     */
-    public BathymetricGridFromGridFileFactory(
-        final Factory<? super S, ? extends Path> path,
-        final Factory<? super S, ? extends ModelGrid> modelGrid,
-        final Factory<? super S, ? extends Aggregator> aggregator,
-        final boolean inverted
-    ) {
-        super(modelGrid, aggregator, inverted);
-        this.path = path;
-    }
+  /**
+   * @param path       factory for the raster grid file to read
+   * @param modelGrid  factory for the grid this bathymetry is defined over
+   * @param aggregator factory for the aggregator combining a cell's samples
+   * @param inverted   whether to negate every sample value
+   */
+  public BathymetricGridFromGridFileFactory(
+    final Factory<? super S, ? extends Path> path,
+    final Factory<? super S, ? extends ModelGrid> modelGrid,
+    final Factory<? super S, ? extends Aggregator> aggregator,
+    final boolean inverted
+  ) {
+    super(modelGrid, aggregator, inverted);
+    this.path = path;
+  }
 
-    @Override
-    protected Map<Int2D, Collection<Double>> readElevationValues(
-        final ModelGrid modelGrid,
-        final S scope
-    ) {
-        final File gridFile = path.get(scope).toFile();
-        final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
-        final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
-        final MathTransform2D gridToCRS2D =
-            coverageWrapper.getCoverage().getGridGeometry().getGridToCRS2D();
+  @Override
+  protected Map<Int2D, Collection<Double>> readElevationValues(
+    final ModelGrid modelGrid,
+    final S scope
+  ) {
+    final File gridFile = path.get(scope).toFile();
+    final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
+    final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
+    final MathTransform2D gridToCRS2D = coverageWrapper
+      .getCoverage()
+      .getGridGeometry()
+      .getGridToCRS2D();
 
-        // worldPos will be mutated while reading
-        final Point2D.Double worldPos = new Point2D.Double();
-        coverageWrapper.processGrid((int2D, value) -> {
-            try {
-                gridToCRS2D.transform(new Point2D.Double(int2D.x, int2D.y), worldPos);
-                final Int2D cell = modelGrid.toCell(Coordinate.fromPoint2D(worldPos));
-                final double elevation = isInverted() ? -value : value;
-                elevationValues.put(cell, elevation);
-            } catch (final TransformException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        return elevationValues.asMap();
-    }
-
+    // worldPos will be mutated while reading
+    final Point2D.Double worldPos = new Point2D.Double();
+    coverageWrapper.processGrid((int2D, value) -> {
+      try {
+        gridToCRS2D.transform(new Point2D.Double(int2D.x, int2D.y), worldPos);
+        final Int2D cell = modelGrid.toCell(Coordinate.fromPoint2D(worldPos));
+        final double elevation = isInverted() ? -value : value;
+        elevationValues.put(cell, elevation);
+      } catch (final TransformException e) {
+        throw new RuntimeException(e);
+      }
+    });
+    return elevationValues.asMap();
+  }
 }

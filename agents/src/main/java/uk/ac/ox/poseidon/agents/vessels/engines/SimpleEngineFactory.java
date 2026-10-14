@@ -22,6 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
+import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
+import static tech.units.indriya.unit.Units.LITRE;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Speed;
+import javax.measure.quantity.Volume;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,13 +35,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Speed;
-import javax.measure.quantity.Volume;
-
-import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
-import static tech.units.indriya.unit.Units.LITRE;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link SimpleEngine}, built via
@@ -45,19 +44,21 @@ import static tech.units.indriya.unit.Units.LITRE;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SimpleEngineFactory<S extends Scope> extends RelativeScopeFactory<S, Engine> {
+public class SimpleEngineFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  Engine
+> {
 
-    private Factory<? super S, ? extends FuelTank> fuelTank;
-    private Factory<? super S, ? extends Quantity<Speed>> cruisingSpeed;
-    private Factory<? super S, ? extends Quantity<Volume>> fuelConsumedPerKm;
+  private Factory<? super S, ? extends FuelTank> fuelTank;
+  private Factory<? super S, ? extends Quantity<Speed>> cruisingSpeed;
+  private Factory<? super S, ? extends Quantity<Volume>> fuelConsumedPerKm;
 
-    @Override
-    protected Engine newInstance(final S scope) {
-        return new SimpleEngine(
-            fuelTank.get(scope),
-            cruisingSpeed.get(scope).to(KILOMETRE_PER_HOUR).getValue().doubleValue(),
-            fuelConsumedPerKm.get(scope).to(LITRE).getValue().doubleValue()
-        );
-    }
-
+  @Override
+  protected Engine newInstance(final S scope) {
+    return new SimpleEngine(
+      fuelTank.get(scope),
+      cruisingSpeed.get(scope).to(KILOMETRE_PER_HOUR).getValue().doubleValue(),
+      fuelConsumedPerKm.get(scope).to(LITRE).getValue().doubleValue()
+    );
+  }
 }

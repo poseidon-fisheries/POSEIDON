@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,11 +33,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * A {@link SimulationScopeFactory} that applies the resolved {@link MarketPrice}s as soon as it is
@@ -47,18 +46,25 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class InitialPricesFactory extends SimulationScopeFactory<List<MarketPrice>> {
+public class InitialPricesFactory
+  extends SimulationScopeFactory<List<MarketPrice>>
+{
 
-    private List<Factory<? super SimulationScope, ? extends List<MarketPrice>>> marketPrices;
+  private List<
+    Factory<? super SimulationScope, ? extends List<MarketPrice>>
+  > marketPrices;
 
-    @Override
-    protected List<MarketPrice> newInstance(final SimulationScope scope) {
-        final List<MarketPrice> resolved = marketPrices
-            .stream()
-            .flatMap(factory -> factory.get(scope).stream())
-            .collect(toImmutableList());
-        final LocalDateTime dateTime = scope.getSimulation().getTemporalSchedule().getDateTime();
-        resolved.forEach(marketPrice -> marketPrice.apply(dateTime));
-        return resolved;
-    }
+  @Override
+  protected List<MarketPrice> newInstance(final SimulationScope scope) {
+    final List<MarketPrice> resolved = marketPrices
+      .stream()
+      .flatMap(factory -> factory.get(scope).stream())
+      .collect(toImmutableList());
+    final LocalDateTime dateTime = scope
+      .getSimulation()
+      .getTemporalSchedule()
+      .getDateTime();
+    resolved.forEach(marketPrice -> marketPrice.apply(dateTime));
+    return resolved;
+  }
 }

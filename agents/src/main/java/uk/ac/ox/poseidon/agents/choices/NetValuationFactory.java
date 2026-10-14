@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.function.ToDoubleBiFunction;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.ToDoubleBiFunction;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link NetValuation}, built via
@@ -40,16 +39,26 @@ import java.util.function.ToDoubleBiFunction;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class NetValuationFactory<S extends Scope, O, M>
-    extends RelativeScopeFactory<S, NetValuation<O, M>> {
+public class NetValuationFactory<
+  S extends Scope,
+  O,
+  M
+> extends RelativeScopeFactory<S, NetValuation<O, M>> {
 
-    private Factory<? super S, ? extends ToDoubleBiFunction<? super O, ? super M>>
-        revenueValuation;
-    private Factory<? super S, ? extends ToDoubleBiFunction<? super O, ? super M>>
-        costValuation;
+  private Factory<
+    ? super S,
+    ? extends ToDoubleBiFunction<? super O, ? super M>
+  > revenueValuation;
+  private Factory<
+    ? super S,
+    ? extends ToDoubleBiFunction<? super O, ? super M>
+  > costValuation;
 
-    @Override
-    protected NetValuation<O, M> newInstance(final S scope) {
-        return new NetValuation<>(revenueValuation.get(scope), costValuation.get(scope));
-    }
+  @Override
+  protected NetValuation<O, M> newInstance(final S scope) {
+    return new NetValuation<>(
+      revenueValuation.get(scope),
+      costValuation.get(scope)
+    );
+  }
 }

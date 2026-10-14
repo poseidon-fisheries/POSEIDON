@@ -40,18 +40,21 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class ObjectPropertyFactory<T, R> extends GlobalScopeFactory<ObjectProperty<T, R>> {
+public abstract class ObjectPropertyFactory<
+  T,
+  R
+> extends GlobalScopeFactory<ObjectProperty<T, R>> {
 
-    private String propertyPath;
+  private String propertyPath;
 
-    /**
-     * @return the class the property path starts from; deliberately not named as a getter, so
-     * that it isn't taken for a property when the scenario is written out
-     */
-    protected abstract Class<T> rootClass();
+  /**
+   * @return the class the property path starts from; deliberately not named as a getter, so
+   * that it isn't taken for a property when the scenario is written out
+   */
+  protected abstract Class<T> rootClass();
 
-    @Override
-    protected ObjectProperty<T, R> newInstance(final Scope scope) {
-        return new ObjectProperty<>(rootClass(), propertyPath);
-    }
+  @Override
+  protected ObjectProperty<T, R> newInstance(final Scope scope) {
+    return new ObjectProperty<>(rootClass(), propertyPath);
+  }
 }

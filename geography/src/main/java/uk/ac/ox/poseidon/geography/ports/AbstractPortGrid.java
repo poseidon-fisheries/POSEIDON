@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
+import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
+
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.NonNull;
 import sim.field.grid.SparseGrid2D;
@@ -29,41 +32,39 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
 
-import java.util.stream.Stream;
-
-import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
-
 /**
  * A {@link PortGrid} base class, shared by {@link ImmutablePortGrid} and {@link MutablePortGrid}.
  */
 @Getter
-public abstract class AbstractPortGrid extends ObjectGrid<Port> implements PortGrid {
+public abstract class AbstractPortGrid
+  extends ObjectGrid<Port>
+  implements PortGrid
+{
 
-    @NonNull
-    protected final BathymetricGrid bathymetricGrid;
+  @NonNull
+  protected final BathymetricGrid bathymetricGrid;
 
-    /**
-     * @param modelGrid       the grid ports are placed on
-     * @param field           the underlying MASON sparse field
-     * @param bathymetricGrid the bathymetric grid ports are placed relative to
-     */
-    public AbstractPortGrid(
-        final ModelGrid modelGrid,
-        final SparseGrid2D field,
-        final @NonNull BathymetricGrid bathymetricGrid
-    ) {
-        super(modelGrid, field);
-        this.bathymetricGrid = bathymetricGrid;
-    }
+  /**
+   * @param modelGrid       the grid ports are placed on
+   * @param field           the underlying MASON sparse field
+   * @param bathymetricGrid the bathymetric grid ports are placed relative to
+   */
+  public AbstractPortGrid(
+    final ModelGrid modelGrid,
+    final SparseGrid2D field,
+    final @NonNull BathymetricGrid bathymetricGrid
+  ) {
+    super(modelGrid, field);
+    this.bathymetricGrid = bathymetricGrid;
+  }
 
-    @Override
-    public String getObjectId(final Port port) {
-        return port.getCode();
-    }
+  @Override
+  public String getObjectId(final Port port) {
+    return port.getCode();
+  }
 
-    @Override
-    public Stream<Port> getPorts() {
-        return bagToStream(field.getAllObjects());
-    }
-
+  @Override
+  public Stream<Port> getPorts() {
+    return bagToStream(field.getAllObjects());
+  }
 }

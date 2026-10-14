@@ -22,10 +22,18 @@
 
 package uk.ac.ox.poseidon.examples;
 
+import static java.lang.System.Logger.Level.INFO;
+
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
+import java.lang.System.Logger;
+import java.nio.file.Path;
+import java.time.Period;
+import java.time.temporal.TemporalAmount;
+import java.util.Arrays;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Scenario;
@@ -33,15 +41,6 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.utils.CustomPathConverter;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
-
-import java.lang.System.Logger;
-import java.nio.file.Path;
-import java.time.Period;
-import java.time.temporal.TemporalAmount;
-import java.util.Arrays;
-import java.util.List;
-
-import static java.lang.System.Logger.Level.INFO;
 
 /**
  * A JCommander-driven CLI entry point that loads a {@link Scenario} from a YAML file, runs it for
@@ -52,80 +51,86 @@ import static java.lang.System.Logger.Level.INFO;
 @AllArgsConstructor
 public class QuickRunner implements Runnable {
 
-    private static final Logger logger = System.getLogger(QuickRunner.class.getName());
+  private static final Logger logger = System.getLogger(
+    QuickRunner.class.getName()
+  );
 
-    @Parameter(
-        names = {"-s", "--scenario"},
-        description = "Path to the scenario file in YAML format.",
-        converter = CustomPathConverter.class,
-        required = true
-    )
-    private Path scenarioPath;
+  @Parameter(
+    names = { "-s", "--scenario" },
+    description = "Path to the scenario file in YAML format.",
+    converter = CustomPathConverter.class,
+    required = true
+  )
+  private Path scenarioPath;
 
-    @Parameter(
-        names = {"-p", "--period"},
-        description =
-            "Period to run the simulation for in ISO-8601 format (e.g., P2Y for two years). " +
-                "See https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/" +
-                "Period.html#parse%28java.lang.CharSequence%29.",
-        converter = PeriodConverter.class,
-        required = true
-    )
-    private Period period;
+  @Parameter(
+    names = { "-p", "--period" },
+    description = "Period to run the simulation for in ISO-8601 format (e.g., P2Y for two years). " +
+      "See https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/" +
+      "Period.html#parse%28java.lang.CharSequence%29.",
+    converter = PeriodConverter.class,
+    required = true
+  )
+  private Period period;
 
-    @Parameter(
-        names = {"-x", "--extra_class_prefixes"},
-        description =
-            "Class prefixes that will be permitted in addition to \"uk.ac.ox.poseidon\" and " +
-                "\"java\" when loading factory classes from the YAML scenario.",
-        required = false
-    )
-    private List<String> extraClassPrefixes = List.of();
+  @Parameter(
+    names = { "-x", "--extra_class_prefixes" },
+    description = "Class prefixes that will be permitted in addition to \"uk.ac.ox.poseidon\" and " +
+      "\"java\" when loading factory classes from the YAML scenario.",
+    required = false
+  )
+  private List<String> extraClassPrefixes = List.of();
 
-    static void main(final String[] args) {
-        logger.log(INFO, () -> "Received arguments: " + Arrays.toString(args));
-        final QuickRunner quickRunner = new QuickRunner();
-        final JCommander jCommander = JCommander
-            .newBuilder()
-            .addObject(quickRunner)
-            .build();
-        try {
-            jCommander.parse(args);
-            quickRunner.run();
-        } catch (final ParameterException e) {
-            System.err.println(e.getMessage());
-        }
+  static void main(final String[] args) {
+    logger.log(INFO, () -> "Received arguments: " + Arrays.toString(args));
+    final QuickRunner quickRunner = new QuickRunner();
+    final JCommander jCommander = JCommander.newBuilder()
+      .addObject(quickRunner)
+      .build();
+    try {
+      jCommander.parse(args);
+      quickRunner.run();
+    } catch (final ParameterException e) {
+      System.err.println(e.getMessage());
     }
+  }
 
-    private void run(
-        final Scenario scenario,
-        final TemporalAmount temporalAmount
-    ) {
-        final Simulation simulation = scenario.startNewSimulation();
-        final TemporalSchedule schedule = simulation.getTemporalSchedule();
-        logger.log(INFO, () -> "Simulation started (" + schedule.getDateTime() + ")");
-        final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
-        temporalSchedule.stepFor(simulation, temporalAmount);
-        simulation.finish();
-        logger.log(INFO, () -> "Simulation completed (" + schedule.getDateTime() + ")");
-    }
+  private void run(
+    final Scenario scenario,
+    final TemporalAmount temporalAmount
+  ) {
+    final Simulation simulation = scenario.startNewSimulation();
+    final TemporalSchedule schedule = simulation.getTemporalSchedule();
+    logger.log(
+      INFO,
+      () -> "Simulation started (" + schedule.getDateTime() + ")"
+    );
+    final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
+    temporalSchedule.stepFor(simulation, temporalAmount);
+    simulation.finish();
+    logger.log(
+      INFO,
+      () -> "Simulation completed (" + schedule.getDateTime() + ")"
+    );
+  }
 
-    /**
-     * Loads the scenario from {@code scenarioPath} and runs it for {@code period}.
-     */
+  /**
+   * Loads the scenario from {@code scenarioPath} and runs it for {@code period}.
+   */
+  @Override
+  public void run() {
+    logger.log(INFO, () -> "Loading scenario: " + scenarioPath);
+    run(
+      new ScenarioLoader(extraClassPrefixes).load(scenarioPath.toFile()),
+      period
+    );
+  }
+
+  private static class PeriodConverter implements IStringConverter<Period> {
+
     @Override
-    public void run() {
-        logger.log(INFO, () -> "Loading scenario: " + scenarioPath);
-        run(
-            new ScenarioLoader(extraClassPrefixes).load(scenarioPath.toFile()),
-            period
-        );
+    public Period convert(final String value) {
+      return Period.parse(value);
     }
-
-    private static class PeriodConverter implements IStringConverter<Period> {
-        @Override
-        public Period convert(final String value) {
-            return Period.parse(value);
-        }
-    }
+  }
 }

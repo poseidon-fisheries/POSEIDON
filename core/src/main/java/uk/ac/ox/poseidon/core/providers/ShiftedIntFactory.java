@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
+import java.util.function.IntSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.IntSupplier;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link ShiftedInt}, built via
@@ -40,14 +39,16 @@ import java.util.function.IntSupplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ShiftedIntFactory<S extends Scope>
-    extends RelativeScopeFactory<S, IntProvider> {
+public class ShiftedIntFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  IntProvider
+> {
 
-    private Factory<? super S, ? extends IntSupplier> delegateIntProvider;
-    private int shift;
+  private Factory<? super S, ? extends IntSupplier> delegateIntProvider;
+  private int shift;
 
-    @Override
-    protected IntProvider newInstance(final S scope) {
-        return new ShiftedInt(delegateIntProvider.get(scope), shift);
-    }
+  @Override
+  protected IntProvider newInstance(final S scope) {
+    return new ShiftedInt(delegateIntProvider.get(scope), shift);
+  }
 }

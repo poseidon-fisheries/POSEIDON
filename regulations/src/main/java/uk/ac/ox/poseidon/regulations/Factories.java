@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.regulations;
 
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 import java.util.List;
 import java.util.function.Predicate;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * Factories for {@link Regulations} rules: the two base rules, {@link ForbiddenIf} and
@@ -35,39 +34,47 @@ import java.util.function.Predicate;
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link ForbiddenIf}
-     * @see ForbiddenIfFactory
-     */
-    public static <S extends Scope, A extends Action<?>> ForbiddenIfFactory<S, A> forbiddenIf(
-        final Factory<? super S, ? extends Predicate<? super A>> actionPredicate
-    ) {
-        return new ForbiddenIfFactory<S, A>(actionPredicate);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link ForbiddenIf}
+   * @see ForbiddenIfFactory
+   */
+  public static <S extends Scope, A extends Action<?>> ForbiddenIfFactory<
+    S,
+    A
+  > forbiddenIf(
+    final Factory<? super S, ? extends Predicate<? super A>> actionPredicate
+  ) {
+    return new ForbiddenIfFactory<S, A>(actionPredicate);
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link PermittedIf}
-     * @see PermittedIfFactory
-     */
-    public static <S extends Scope, A extends Action<?>> PermittedIfFactory<S, A> permittedIf(
-        final Factory<? super S, ? extends Predicate<? super A>> actionPredicate
-    ) {
-        return new PermittedIfFactory<S, A>(actionPredicate);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link PermittedIf}
+   * @see PermittedIfFactory
+   */
+  public static <S extends Scope, A extends Action<?>> PermittedIfFactory<
+    S,
+    A
+  > permittedIf(
+    final Factory<? super S, ? extends Predicate<? super A>> actionPredicate
+  ) {
+    return new PermittedIfFactory<S, A>(actionPredicate);
+  }
 
-    /**
-     * @param regulations the rules to combine
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-     * {@link AllOfRegulations} of the given rules, itself a rule
-     * @see AllOfRegulations
-     */
-    @SafeVarargs
-    public static <S extends Scope, A extends Action<?>> AllOfRegulationsFactory<S, A> allOf(
-        final Factory<? super S, ? extends Regulations<? super A>>... regulations
-    ) {
-        return new AllOfRegulationsFactory<S, A>(List.of(regulations));
-    }
-
+  /**
+   * @param regulations the rules to combine
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   * {@link AllOfRegulations} of the given rules, itself a rule
+   * @see AllOfRegulations
+   */
+  @SafeVarargs
+  public static <S extends Scope, A extends Action<?>> AllOfRegulationsFactory<
+    S,
+    A
+  > allOf(
+    final Factory<? super S, ? extends Regulations<? super A>>... regulations
+  ) {
+    return new AllOfRegulationsFactory<S, A>(List.of(regulations));
+  }
 }

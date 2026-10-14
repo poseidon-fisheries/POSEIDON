@@ -22,6 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.fuel;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.math.RoundingMode.CEILING;
+import static lombok.AccessLevel.NONE;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
+
+import java.time.Duration;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.Setter;
@@ -30,14 +37,6 @@ import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.vessels.engines.FuelTank;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.ports.Port;
-
-import java.time.Duration;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.math.RoundingMode.CEILING;
-import static lombok.AccessLevel.NONE;
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 
 /**
  * A single fuel station at a {@link Port}, selling fuel at a per-litre price and a fixed pump
@@ -48,87 +47,94 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 @Data
 public class FuelStation {
 
-    private final @NonNull Port port;
-    private final @NonNull String code;
-    private final @NonNull EventManager eventManager;
-    // suppresses @Data's unchecked setter; setPricePerLitre below enforces non-negativity instead
-    @Setter(NONE)
-    private @NonNull Money pricePerLitre;
-    private final double pumpRateInLitresPerMinute;
+  private final @NonNull Port port;
+  private final @NonNull String code;
+  private final @NonNull EventManager eventManager;
 
-    /**
-     * @param port                      the port this station is located at
-     * @param code                      this station's unique identifier
-     * @param eventManager              the event manager this station reports through
-     * @param pricePerLitre             the non-negative initial price per litre
-     * @param pumpRateInLitresPerMinute the strictly positive pump rate
-     */
-    public FuelStation(
-        final @NonNull Port port,
-        final @NonNull String code,
-        final @NonNull EventManager eventManager,
-        final @NonNull Money pricePerLitre,
-        final double pumpRateInLitresPerMinute
-    ) {
-        this.port = checkNotNull(port, "port must not be null");
-        this.code = checkNotNull(code, "code must not be null");
-        this.eventManager = checkNotNull(eventManager, "eventManager must not be null");
-        this.pricePerLitre = checkPrice(pricePerLitre);
-        this.pumpRateInLitresPerMinute =
-            checkPositive(pumpRateInLitresPerMinute, "pumpRateInLitresPerMinute");
-    }
+  // suppresses @Data's unchecked setter; setPricePerLitre below enforces non-negativity instead
+  @Setter(NONE)
+  private @NonNull Money pricePerLitre;
 
-    /** @param pricePerLitre the new, non-negative price per litre */
-    public void setPricePerLitre(final @NonNull Money pricePerLitre) {
-        this.pricePerLitre = checkPrice(pricePerLitre);
-    }
+  private final double pumpRateInLitresPerMinute;
 
-    private static Money checkPrice(final Money pricePerLitre) {
-        checkArgument(
-            !pricePerLitre.isNegative(),
-            "pricePerLitre must not be negative but was %s",
-            pricePerLitre
-        );
-        return pricePerLitre;
-    }
+  /**
+   * @param port                      the port this station is located at
+   * @param code                      this station's unique identifier
+   * @param eventManager              the event manager this station reports through
+   * @param pricePerLitre             the non-negative initial price per litre
+   * @param pumpRateInLitresPerMinute the strictly positive pump rate
+   */
+  public FuelStation(
+    final @NonNull Port port,
+    final @NonNull String code,
+    final @NonNull EventManager eventManager,
+    final @NonNull Money pricePerLitre,
+    final double pumpRateInLitresPerMinute
+  ) {
+    this.port = checkNotNull(port, "port must not be null");
+    this.code = checkNotNull(code, "code must not be null");
+    this.eventManager = checkNotNull(
+      eventManager,
+      "eventManager must not be null"
+    );
+    this.pricePerLitre = checkPrice(pricePerLitre);
+    this.pumpRateInLitresPerMinute = checkPositive(
+      pumpRateInLitresPerMinute,
+      "pumpRateInLitresPerMinute"
+    );
+  }
 
-    /**
-     * Tops {@code fuelTank} up to full, charges for and times the fill, and broadcasts the
-     * resulting {@link Purchase} through {@link #eventManager}.
-     *
-     * @return the completed purchase: litres added, price charged, and time taken
-     */
-    public Purchase refill(final FuelTank fuelTank) {
-        final double litresToAdd =
-            fuelTank.getCapacityInLitres() - fuelTank.getCurrentFuelInLitres();
-        fuelTank.addFuel(litresToAdd);
-        final Purchase purchase = new Purchase(
-            litresToAdd,
-            priceFor(litresToAdd),
-            durationFor(litresToAdd)
-        );
-        eventManager.broadcast(purchase);
-        return purchase;
-    }
+  /** @param pricePerLitre the new, non-negative price per litre */
+  public void setPricePerLitre(final @NonNull Money pricePerLitre) {
+    this.pricePerLitre = checkPrice(pricePerLitre);
+  }
 
-    /** The outcome of a single {@link #refill}. */
-    @Value
-    public static class Purchase {
-        double litres;
-        Money price;
-        Duration duration;
-    }
+  private static Money checkPrice(final Money pricePerLitre) {
+    checkArgument(
+      !pricePerLitre.isNegative(),
+      "pricePerLitre must not be negative but was %s",
+      pricePerLitre
+    );
+    return pricePerLitre;
+  }
 
-    /** @return how long pumping {@code litres} takes, at {@link #pumpRateInLitresPerMinute} */
-    public Duration durationFor(final double litres) {
-        final double seconds = litres * 60.0 / pumpRateInLitresPerMinute;
-        final long durationInSeconds = (long) Math.ceil(seconds);
-        return Duration.ofSeconds(durationInSeconds);
-    }
+  /**
+   * Tops {@code fuelTank} up to full, charges for and times the fill, and broadcasts the
+   * resulting {@link Purchase} through {@link #eventManager}.
+   *
+   * @return the completed purchase: litres added, price charged, and time taken
+   */
+  public Purchase refill(final FuelTank fuelTank) {
+    final double litresToAdd =
+      fuelTank.getCapacityInLitres() - fuelTank.getCurrentFuelInLitres();
+    fuelTank.addFuel(litresToAdd);
+    final Purchase purchase = new Purchase(
+      litresToAdd,
+      priceFor(litresToAdd),
+      durationFor(litresToAdd)
+    );
+    eventManager.broadcast(purchase);
+    return purchase;
+  }
 
-    /** @return the price of {@code litres}, at {@link #pricePerLitre} */
-    public Money priceFor(final double litres) {
-        return pricePerLitre.multipliedBy(litres, CEILING);
-    }
+  /** The outcome of a single {@link #refill}. */
+  @Value
+  public static class Purchase {
 
+    double litres;
+    Money price;
+    Duration duration;
+  }
+
+  /** @return how long pumping {@code litres} takes, at {@link #pumpRateInLitresPerMinute} */
+  public Duration durationFor(final double litres) {
+    final double seconds = (litres * 60.0) / pumpRateInLitresPerMinute;
+    final long durationInSeconds = (long) Math.ceil(seconds);
+    return Duration.ofSeconds(durationInSeconds);
+  }
+
+  /** @return the price of {@code litres}, at {@link #pricePerLitre} */
+  public Money priceFor(final double litres) {
+    return pricePerLitre.multipliedBy(litres, CEILING);
+  }
 }

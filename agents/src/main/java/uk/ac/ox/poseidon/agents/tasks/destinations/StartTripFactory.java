@@ -40,10 +40,13 @@ import uk.ac.ox.poseidon.core.Factory;
 @EqualsAndHashCode(callSuper = true)
 public class StartTripFactory extends VesselTaskFactory<StartTrip> {
 
-    private Factory<? super VesselScope, ? extends DestinationSupplier> destinationSupplier;
+  private Factory<
+    ? super VesselScope,
+    ? extends DestinationSupplier
+  > destinationSupplier;
 
-    @Override
-    protected StartTrip newTask(final VesselScope scope) {
-        return new StartTrip(destinationSupplier.get(scope));
-    }
+  @Override
+  protected StartTrip newTask(final VesselScope scope) {
+    return new StartTrip(destinationSupplier.get(scope));
+  }
 }

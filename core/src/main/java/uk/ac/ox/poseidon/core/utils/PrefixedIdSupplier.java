@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * A {@link Supplier} of unique string ids, each the given prefix followed by an incrementing
@@ -35,21 +34,21 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class PrefixedIdSupplier implements Supplier<String> {
 
-    @Getter
-    private final String prefix;
+  @Getter
+  private final String prefix;
 
-    private final AtomicLong counter;
+  private final AtomicLong counter;
 
-    /**
-     * @param prefix the prefix prepended to every generated id, with a fresh counter starting at 0
-     */
-    public PrefixedIdSupplier(final String prefix) {
-        this.prefix = prefix;
-        this.counter = new AtomicLong();
-    }
+  /**
+   * @param prefix the prefix prepended to every generated id, with a fresh counter starting at 0
+   */
+  public PrefixedIdSupplier(final String prefix) {
+    this.prefix = prefix;
+    this.counter = new AtomicLong();
+  }
 
-    @Override
-    public String get() {
-        return prefix + counter.getAndIncrement();
-    }
+  @Override
+  public String get() {
+    return prefix + counter.getAndIncrement();
+  }
 }

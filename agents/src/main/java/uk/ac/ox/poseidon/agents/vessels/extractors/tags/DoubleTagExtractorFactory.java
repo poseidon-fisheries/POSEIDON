@@ -37,13 +37,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DoubleTagExtractorFactory extends GlobalScopeFactory<DoubleTagExtractor> {
+public class DoubleTagExtractorFactory
+  extends GlobalScopeFactory<DoubleTagExtractor>
+{
 
-    private String tagName;
+  private String tagName;
 
-    @Override
-    protected DoubleTagExtractor newInstance(final Scope scope) {
-        return new DoubleTagExtractor(tagName);
-    }
-
+  @Override
+  protected DoubleTagExtractor newInstance(final Scope scope) {
+    return new DoubleTagExtractor(tagName);
+  }
 }

@@ -26,6 +26,6 @@ import sim.util.Int2D;
 
 /** A grid whose cells can be fished from. */
 public interface FisheableGrid {
-    /** @return the fisheable content at {@code cell} */
-    Fisheable getFisheableCell(Int2D cell);
+  /** @return the fisheable content at {@code cell} */
+  Fisheable getFisheableCell(Int2D cell);
 }

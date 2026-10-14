@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,10 +32,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.List;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * A {@link RelativeScopeFactory} for the same {@link MarketPrice}s at every
@@ -43,23 +42,27 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UniformMarketPricesFactory<S extends Scope>
-    extends RelativeScopeFactory<S, List<MarketPrice>> {
+public class UniformMarketPricesFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  List<MarketPrice>
+> {
 
-    private Factory<? super S, ? extends MarketGrid> marketGrid;
-    private Factory<? super S, ? extends List<PriceEntry>> priceEntries;
+  private Factory<? super S, ? extends MarketGrid> marketGrid;
+  private Factory<? super S, ? extends List<PriceEntry>> priceEntries;
 
-    @Override
-    protected List<MarketPrice> newInstance(final S scope) {
-        final List<PriceEntry> priceEntries = this.priceEntries.get(scope);
-        return marketGrid
-            .get(scope)
-            .stream()
-            .filter(BiomassMarket.class::isInstance)
-            .map(BiomassMarket.class::cast)
-            .flatMap(market ->
-                priceEntries.stream().map(priceEntry -> new MarketPrice(market, priceEntry))
-            )
-            .collect(toImmutableList());
-    }
+  @Override
+  protected List<MarketPrice> newInstance(final S scope) {
+    final List<PriceEntry> priceEntries = this.priceEntries.get(scope);
+    return marketGrid
+      .get(scope)
+      .stream()
+      .filter(BiomassMarket.class::isInstance)
+      .map(BiomassMarket.class::cast)
+      .flatMap(market ->
+        priceEntries
+          .stream()
+          .map(priceEntry -> new MarketPrice(market, priceEntry))
+      )
+      .collect(toImmutableList());
+  }
 }

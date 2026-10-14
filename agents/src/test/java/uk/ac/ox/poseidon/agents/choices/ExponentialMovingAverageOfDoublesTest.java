@@ -22,35 +22,42 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.within;
 
+import org.junit.jupiter.api.Test;
+
 class ExponentialMovingAverageOfDoublesTest {
 
-    @Test
-    void alphaOfOneReplacesWhatIsRemembered() {
-        assertThat(new ExponentialMovingAverageOfDoubles(1).apply(10.0, 4.0)).isEqualTo(4.0);
-    }
+  @Test
+  void alphaOfOneReplacesWhatIsRemembered() {
+    assertThat(
+      new ExponentialMovingAverageOfDoubles(1).apply(10.0, 4.0)
+    ).isEqualTo(4.0);
+  }
 
-    @Test
-    void alphaOfZeroKeepsWhatIsRemembered() {
-        assertThat(new ExponentialMovingAverageOfDoubles(0).apply(10.0, 4.0)).isEqualTo(10.0);
-    }
+  @Test
+  void alphaOfZeroKeepsWhatIsRemembered() {
+    assertThat(
+      new ExponentialMovingAverageOfDoubles(0).apply(10.0, 4.0)
+    ).isEqualTo(10.0);
+  }
 
-    @Test
-    void intermediateAlphaWeighsTheObservationByAlpha() {
-        assertThat(new ExponentialMovingAverageOfDoubles(0.25).apply(10.0, 4.0))
-            .isCloseTo(10.0 * 0.75 + 4.0 * 0.25, within(1e-12));
-    }
+  @Test
+  void intermediateAlphaWeighsTheObservationByAlpha() {
+    assertThat(
+      new ExponentialMovingAverageOfDoubles(0.25).apply(10.0, 4.0)
+    ).isCloseTo(10.0 * 0.75 + 4.0 * 0.25, within(1e-12));
+  }
 
-    @Test
-    void alphaOutsideTheUnitRangeIsRejected() {
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> new ExponentialMovingAverageOfDoubles(-0.1));
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> new ExponentialMovingAverageOfDoubles(1.1));
-    }
+  @Test
+  void alphaOutsideTheUnitRangeIsRejected() {
+    assertThatIllegalArgumentException().isThrownBy(() ->
+      new ExponentialMovingAverageOfDoubles(-0.1)
+    );
+    assertThatIllegalArgumentException().isThrownBy(() ->
+      new ExponentialMovingAverageOfDoubles(1.1)
+    );
+  }
 }

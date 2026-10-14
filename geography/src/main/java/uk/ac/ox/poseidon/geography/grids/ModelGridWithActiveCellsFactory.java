@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,8 +31,6 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.Collection;
 
 /**
  * A {@link RelativeScopeFactory} for a resolved {@link ModelGrid} narrowed to a fixed set of
@@ -42,14 +41,16 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ModelGridWithActiveCellsFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ModelGrid> {
+public class ModelGridWithActiveCellsFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  ModelGrid
+> {
 
-    private Factory<? super S, ? extends ModelGrid> modelGrid;
-    private Factory<? super S, ? extends Collection<Int2D>> activeCells;
+  private Factory<? super S, ? extends ModelGrid> modelGrid;
+  private Factory<? super S, ? extends Collection<Int2D>> activeCells;
 
-    @Override
-    protected ModelGrid newInstance(final S scope) {
-        return modelGrid.get(scope).withActiveCells(activeCells.get(scope));
-    }
+  @Override
+  protected ModelGrid newInstance(final S scope) {
+    return modelGrid.get(scope).withActiveCells(activeCells.get(scope));
+  }
 }

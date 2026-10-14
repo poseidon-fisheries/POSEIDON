@@ -22,15 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
-import com.google.common.collect.ImmutableList;
-import org.joda.money.Money;
-import sim.util.Int2D;
+import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.ToDoubleBiFunction;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.joda.money.Money;
+import sim.util.Int2D;
 
 /**
  * Values the cost of travelling to fish at a cell: computes the {@link Route} via the cell once,
@@ -40,39 +39,37 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TravelCost implements ToDoubleBiFunction<Int2D, Object> {
 
-    private final Function<? super Int2D, ? extends Route> routeFunction;
-    private final List<Function<? super Route, ? extends Money>> routeCosts;
+  private final Function<? super Int2D, ? extends Route> routeFunction;
+  private final List<Function<? super Route, ? extends Money>> routeCosts;
 
-    /**
-     * @param routeFunction gives the route via a cell
-     * @param routeCosts    what is charged for a route, each in money
-     */
-    TravelCost(
-        final Function<? super Int2D, ? extends Route> routeFunction,
-        final List<? extends Function<? super Route, ? extends Money>> routeCosts
-    ) {
-        this.routeFunction = checkNotNull(routeFunction);
-        this.routeCosts = ImmutableList.copyOf(routeCosts);
-    }
+  /**
+   * @param routeFunction gives the route via a cell
+   * @param routeCosts    what is charged for a route, each in money
+   */
+  TravelCost(
+    final Function<? super Int2D, ? extends Route> routeFunction,
+    final List<? extends Function<? super Route, ? extends Money>> routeCosts
+  ) {
+    this.routeFunction = checkNotNull(routeFunction);
+    this.routeCosts = ImmutableList.copyOf(routeCosts);
+  }
 
-    /**
-     * @param cell         the cell to fish at
-     * @param recollection ignored
-     * @return the sum of the route costs of the route via {@code cell}, as an amount in their
-     * currency; zero without route costs
-     * @throws org.joda.money.CurrencyMismatchException if the route costs are in different
-     *                                                  currencies
-     */
-    @Override
-    public double applyAsDouble(
-        final Int2D cell,
-        final Object recollection
-    ) {
-        final Route route = routeFunction.apply(cell);
-        return routeCosts.stream()
-            .<Money>map(routeCost -> routeCost.apply(route))
-            .reduce(Money::plus)
-            .map(money -> money.getAmount().doubleValue())
-            .orElse(0.0);
-    }
+  /**
+   * @param cell         the cell to fish at
+   * @param recollection ignored
+   * @return the sum of the route costs of the route via {@code cell}, as an amount in their
+   * currency; zero without route costs
+   * @throws org.joda.money.CurrencyMismatchException if the route costs are in different
+   *                                                  currencies
+   */
+  @Override
+  public double applyAsDouble(final Int2D cell, final Object recollection) {
+    final Route route = routeFunction.apply(cell);
+    return routeCosts
+      .stream()
+      .<Money>map(routeCost -> routeCost.apply(route))
+      .reduce(Money::plus)
+      .map(money -> money.getAmount().doubleValue())
+      .orElse(0.0);
+  }
 }

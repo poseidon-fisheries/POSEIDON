@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.time.LocalDateTime;
 
 /**
  * A {@link GlobalScopeFactory} for a fixed {@link LocalDateTime}. No separate plain component
@@ -43,16 +42,15 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 public class DateTimeFactory extends GlobalScopeFactory<LocalDateTime> {
 
-    private Integer year;
-    private Integer month;
-    private Integer day;
-    private Integer hour;
-    private Integer minute;
-    private Integer second;
+  private Integer year;
+  private Integer month;
+  private Integer day;
+  private Integer hour;
+  private Integer minute;
+  private Integer second;
 
-    @Override
-    protected LocalDateTime newInstance(final Scope scope) {
-        return LocalDateTime.of(year, month, day, hour, minute, second);
-    }
-
+  @Override
+  protected LocalDateTime newInstance(final Scope scope) {
+    return LocalDateTime.of(year, month, day, hour, minute, second);
+  }
 }

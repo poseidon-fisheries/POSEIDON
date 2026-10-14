@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
+import java.time.LocalDate;
+import java.time.MonthDay;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.time.MonthDayFactory;
-
-import java.time.LocalDate;
-import java.time.MonthDay;
 
 /**
  * Factories for predicates over a {@link uk.ac.ox.poseidon.regulations.TemporalAction}'s
@@ -35,54 +34,53 @@ import java.time.MonthDay;
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link BetweenDates}
-     * @see BetweenDatesFactory
-     */
-    public static <S extends Scope> BetweenDatesFactory<S> betweenDates(
-        final Factory<? super S, ? extends LocalDate> startDate,
-        final Factory<? super S, ? extends LocalDate> endDate
-    ) {
-        return new BetweenDatesFactory<>(startDate, endDate);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link BetweenDates}
+   * @see BetweenDatesFactory
+   */
+  public static <S extends Scope> BetweenDatesFactory<S> betweenDates(
+    final Factory<? super S, ? extends LocalDate> startDate,
+    final Factory<? super S, ? extends LocalDate> endDate
+  ) {
+    return new BetweenDatesFactory<>(startDate, endDate);
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-     * {@link BetweenYearlyDates}
-     * @see BetweenYearlyDatesFactory
-     */
-    public static <S extends Scope> BetweenYearlyDatesFactory<S> betweenYearlyDates(
-        final Factory<? super S, ? extends MonthDay> start,
-        final Factory<? super S, ? extends MonthDay> end
-    ) {
-        return new BetweenYearlyDatesFactory<>(start, end);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * {@link BetweenYearlyDates}
+   * @see BetweenYearlyDatesFactory
+   */
+  public static <S extends Scope> BetweenYearlyDatesFactory<S> betweenYearlyDates(
+    final Factory<? super S, ? extends MonthDay> start,
+    final Factory<? super S, ? extends MonthDay> end
+  ) {
+    return new BetweenYearlyDatesFactory<>(start, end);
+  }
 
-    /**
-     * @param start the inclusive start of the range, parsed via {@link MonthDayFactory#parse}
-     * @param end   the inclusive end of the range, parsed via {@link MonthDayFactory#parse}
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-     * {@link BetweenYearlyDates}, resolvable against any {@link Scope}
-     * @see BetweenYearlyDatesFactory
-     */
-    public static BetweenYearlyDatesFactory<Scope> betweenYearlyDates(
-        final CharSequence start,
-        final CharSequence end
-    ) {
-        return new BetweenYearlyDatesFactory<>(
-            MonthDayFactory.parse(start),
-            MonthDayFactory.parse(end)
-        );
-    }
+  /**
+   * @param start the inclusive start of the range, parsed via {@link MonthDayFactory#parse}
+   * @param end   the inclusive end of the range, parsed via {@link MonthDayFactory#parse}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * {@link BetweenYearlyDates}, resolvable against any {@link Scope}
+   * @see BetweenYearlyDatesFactory
+   */
+  public static BetweenYearlyDatesFactory<Scope> betweenYearlyDates(
+    final CharSequence start,
+    final CharSequence end
+  ) {
+    return new BetweenYearlyDatesFactory<>(
+      MonthDayFactory.parse(start),
+      MonthDayFactory.parse(end)
+    );
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an {@link InYear}
-     * @see InYearFactory
-     */
-    public static InYearFactory inYear(final int year) {
-        return new InYearFactory(year);
-    }
-
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an {@link InYear}
+   * @see InYearFactory
+   */
+  public static InYearFactory inYear(final int year) {
+    return new InYearFactory(year);
+  }
 }

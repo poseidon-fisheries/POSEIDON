@@ -22,15 +22,14 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import java.util.List;
+import java.util.function.Predicate;
 import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.List;
-import java.util.function.Predicate;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link AllOf}, built via
@@ -40,17 +39,21 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AllOfFactory<S extends Scope, T> extends RelativeScopeFactory<S, AllOf<T>> {
+public class AllOfFactory<
+  S extends Scope,
+  T
+> extends RelativeScopeFactory<S, AllOf<T>> {
 
-    @Singular private List<Factory<? super S, ? extends Predicate<? super T>>> predicates;
+  @Singular
+  private List<Factory<? super S, ? extends Predicate<? super T>>> predicates;
 
-    @Override
-    protected AllOf<T> newInstance(final S scope) {
-        return new AllOf<>(
-            predicates
-                .stream()
-                .map(f -> f.get(scope))
-                .collect(toImmutableList())
-        );
-    }
+  @Override
+  protected AllOf<T> newInstance(final S scope) {
+    return new AllOf<>(
+      predicates
+        .stream()
+        .map(f -> f.get(scope))
+        .collect(toImmutableList())
+    );
+  }
 }

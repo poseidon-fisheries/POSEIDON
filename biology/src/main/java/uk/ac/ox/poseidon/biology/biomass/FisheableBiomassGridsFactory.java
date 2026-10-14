@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.List;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link FisheableBiomassGrids} over the resolved
@@ -40,14 +39,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FisheableBiomassGridsFactory<S extends Scope>
-    extends RelativeScopeFactory<S, FisheableBiomassGrids> {
+public class FisheableBiomassGridsFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  FisheableBiomassGrids
+> {
 
-    private Factory<? super S, ? extends List<? extends BiomassGrid>> biomassGrids;
+  private Factory<
+    ? super S,
+    ? extends List<? extends BiomassGrid>
+  > biomassGrids;
 
-    @Override
-    protected FisheableBiomassGrids newInstance(final S scope) {
-        return new FisheableBiomassGrids(biomassGrids.get(scope));
-    }
-
+  @Override
+  protected FisheableBiomassGrids newInstance(final S scope) {
+    return new FisheableBiomassGrids(biomassGrids.get(scope));
+  }
 }

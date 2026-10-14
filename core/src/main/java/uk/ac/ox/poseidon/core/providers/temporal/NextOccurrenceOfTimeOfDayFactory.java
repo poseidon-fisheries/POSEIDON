@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,11 +33,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link NextOccurrenceOfTimeOfDay}, built via
@@ -43,19 +42,25 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class NextOccurrenceOfTimeOfDayFactory<S extends Scope>
-    extends RelativeScopeFactory<S, NextOccurrenceOfTimeOfDay> {
+public class NextOccurrenceOfTimeOfDayFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  NextOccurrenceOfTimeOfDay
+> {
 
-    private Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime;
-    private List<Factory<? super S, ? extends LocalTime>> times;
+  private Factory<
+    ? super S,
+    ? extends Supplier<LocalDateTime>
+  > referenceDateTime;
+  private List<Factory<? super S, ? extends LocalTime>> times;
 
-    @Override
-    protected NextOccurrenceOfTimeOfDay newInstance(final S scope) {
-        return new NextOccurrenceOfTimeOfDay(
-            referenceDateTime.get(scope),
-            times.stream()
-                .map(time -> time.get(scope))
-                .toArray(LocalTime[]::new)
-        );
-    }
+  @Override
+  protected NextOccurrenceOfTimeOfDay newInstance(final S scope) {
+    return new NextOccurrenceOfTimeOfDay(
+      referenceDateTime.get(scope),
+      times
+        .stream()
+        .map(time -> time.get(scope))
+        .toArray(LocalTime[]::new)
+    );
+  }
 }

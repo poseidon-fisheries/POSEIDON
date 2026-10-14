@@ -36,16 +36,18 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SimpleFieldPortrayalFactory<S extends Scope>
-    extends RelativeScopeFactory<S, NamedPortrayal> {
+public class SimpleFieldPortrayalFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  NamedPortrayal
+> {
 
-    private String name;
-    private Factory<? super S, ? extends FieldPortrayal2D> portrayal;
-    private boolean visible;
+  private String name;
+  private Factory<? super S, ? extends FieldPortrayal2D> portrayal;
+  private boolean visible;
 
-    /** @return {@link #name}, the resolved {@link #portrayal}, and {@link #visible}, wrapped as a {@link NamedPortrayal} */
-    @Override
-    protected NamedPortrayal newInstance(final S scope) {
-        return new NamedPortrayal(name, portrayal.get(scope), visible);
-    }
+  /** @return {@link #name}, the resolved {@link #portrayal}, and {@link #visible}, wrapped as a {@link NamedPortrayal} */
+  @Override
+  protected NamedPortrayal newInstance(final S scope) {
+    return new NamedPortrayal(name, portrayal.get(scope), visible);
+  }
 }

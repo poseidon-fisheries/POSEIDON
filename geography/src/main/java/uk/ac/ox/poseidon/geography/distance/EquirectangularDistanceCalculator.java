@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import static java.lang.System.Logger.Level.WARNING;
+import static org.apache.commons.math3.util.FastMath.*;
 
 import java.lang.System.Logger;
 import java.text.MessageFormat;
-
-import static java.lang.System.Logger.Level.WARNING;
-import static org.apache.commons.math3.util.FastMath.*;
+import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
  * A {@link CoordinateBasedDistanceCalculator} using the equirectangular approximation: fast, but
@@ -38,40 +37,43 @@ import static org.apache.commons.math3.util.FastMath.*;
  * {@link Factories#equirectangularDistanceCalculator(uk.ac.ox.poseidon.core.Factory)} in this
  * package.
  */
-public class EquirectangularDistanceCalculator extends CoordinateBasedDistanceCalculator {
+public class EquirectangularDistanceCalculator
+  extends CoordinateBasedDistanceCalculator
+{
 
-    private static final Logger logger =
-        System.getLogger(EquirectangularDistanceCalculator.class.getName());
-    private static final double WARNING_THRESHOLD = 250;
+  private static final Logger logger = System.getLogger(
+    EquirectangularDistanceCalculator.class.getName()
+  );
+  private static final double WARNING_THRESHOLD = 250;
 
-    /** @param modelGrid the grid this calculator measures distances over */
-    public EquirectangularDistanceCalculator(final ModelGrid modelGrid) {
-        super(modelGrid);
+  /** @param modelGrid the grid this calculator measures distances over */
+  public EquirectangularDistanceCalculator(final ModelGrid modelGrid) {
+    super(modelGrid);
+  }
+
+  @Override
+  public double distanceInKm(final Coordinate a, final Coordinate b) {
+    final double x1 = toRadians(a.lon);
+    final double y1 = toRadians(a.lat);
+    final double x2 = toRadians(b.lon);
+    final double y2 = toRadians(b.lat);
+    final double x = (x2 - x1) * cos((y1 + y2) / 2d);
+    final double y = y2 - y1;
+    final double result = EARTH_RADIUS_IN_KM * sqrt(x * x + y * y);
+
+    if (result > WARNING_THRESHOLD) {
+      logger.log(
+        WARNING,
+        MessageFormat.format(
+          "Equirectangular distance calculator is not accurate for distances " +
+            "over {0} km. (Calculated {1} km between {2} and {3}.)",
+          WARNING_THRESHOLD,
+          result,
+          a,
+          b
+        )
+      );
     }
-
-    @Override
-    public double distanceInKm(
-        final Coordinate a,
-        final Coordinate b
-    ) {
-        final double x1 = toRadians(a.lon);
-        final double y1 = toRadians(a.lat);
-        final double x2 = toRadians(b.lon);
-        final double y2 = toRadians(b.lat);
-        final double x = (x2 - x1) * cos((y1 + y2) / 2d);
-        final double y = y2 - y1;
-        final double result = EARTH_RADIUS_IN_KM * sqrt(x * x + y * y);
-
-        if (result > WARNING_THRESHOLD) {
-            logger.log(
-                WARNING, MessageFormat.format(
-                    "Equirectangular distance calculator is not accurate for distances " +
-                        "over {0} km. (Calculated {1} km between {2} and {3}.)",
-                    WARNING_THRESHOLD, result, a, b
-                )
-            );
-        }
-        return result;
-    }
-
+    return result;
+  }
 }

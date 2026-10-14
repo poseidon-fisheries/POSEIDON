@@ -22,6 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.Duration;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
@@ -31,48 +37,41 @@ import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 class ProfitPerHourDestinationEvaluatorTest {
 
-    private static final CurrencyUnit EUR = CurrencyUnit.of("EUR");
+  private static final CurrencyUnit EUR = CurrencyUnit.of("EUR");
 
-    @Test
-    void evaluatesNetAccountBalancePerHourAtSea() {
-        final Int2D option = new Int2D(1, 2);
-        final SimpleEventManager eventManager = new SimpleEventManager();
-        final Evaluation<Int2D> evaluation =
-            new ProfitPerHourDestinationEvaluator(EUR)
-                .newEvaluation(option, eventManager);
+  @Test
+  void evaluatesNetAccountBalancePerHourAtSea() {
+    final Int2D option = new Int2D(1, 2);
+    final SimpleEventManager eventManager = new SimpleEventManager();
+    final Evaluation<Int2D> evaluation = new ProfitPerHourDestinationEvaluator(
+      EUR
+    ).newEvaluation(option, eventManager);
 
-        final Account account = new Account();
-        account.add(Money.of(EUR, 120));
-        account.subtract(Money.of(EUR, 30));
+    final Account account = new Account();
+    account.add(Money.of(EUR, 120));
+    account.subtract(Money.of(EUR, 30));
 
-        final Trip trip = mock(Trip.class);
-        when(trip.getAccount()).thenReturn(account);
-        when(trip.getTimeAtSea()).thenReturn(Duration.ofHours(3));
-        when(trip.getTotalDuration()).thenReturn(Duration.ofHours(4));
+    final Trip trip = mock(Trip.class);
+    when(trip.getAccount()).thenReturn(account);
+    when(trip.getTimeAtSea()).thenReturn(Duration.ofHours(3));
+    when(trip.getTotalDuration()).thenReturn(Duration.ofHours(4));
 
-        eventManager.broadcast(new TripEndEvent(trip));
+    eventManager.broadcast(new TripEndEvent(trip));
 
-        assertThat(evaluation.getOption()).isEqualTo(option);
-        assertThat(evaluation.getResult()).isEqualTo(30.0);
-    }
+    assertThat(evaluation.getOption()).isEqualTo(option);
+    assertThat(evaluation.getResult()).isEqualTo(30.0);
+  }
 
-    @Test
-    void failsIfResultIsRequestedBeforeTripEnds() {
-        final Evaluation<Int2D> evaluation =
-            new ProfitPerHourDestinationEvaluator(EUR)
-                .newEvaluation(new Int2D(1, 2), new SimpleEventManager());
+  @Test
+  void failsIfResultIsRequestedBeforeTripEnds() {
+    final Evaluation<Int2D> evaluation = new ProfitPerHourDestinationEvaluator(
+      EUR
+    ).newEvaluation(new Int2D(1, 2), new SimpleEventManager());
 
-        assertThatIllegalStateException()
-            .isThrownBy(evaluation::getResult)
-            .withMessage("Trip evaluation is not complete.");
-    }
+    assertThatIllegalStateException()
+      .isThrownBy(evaluation::getResult)
+      .withMessage("Trip evaluation is not complete.");
+  }
 }

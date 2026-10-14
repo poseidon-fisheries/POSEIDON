@@ -22,8 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -34,61 +39,53 @@ import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkState;
-
 /** The set of vessels operating out of a set of ports, indexed by id, and the markets they sell into. */
 @AllArgsConstructor
 public class Fleet implements VesselsGetter {
 
-    private final BiMap<String, Vessel> vesselsById = HashBiMap.create();
-    private final TemporalSchedule schedule;
-    private final EventManager eventManager;
-    private final VesselField vesselField;
+  private final BiMap<String, Vessel> vesselsById = HashBiMap.create();
+  private final TemporalSchedule schedule;
+  private final EventManager eventManager;
+  private final VesselField vesselField;
 
-    @Getter
-    private final PortGrid portGrid;
+  @Getter
+  private final PortGrid portGrid;
 
-    @Getter
-    private final MarketGrid marketGrid;
+  @Getter
+  private final MarketGrid marketGrid;
 
-    /** @return the vessel registered under {@code vesselId}, if any */
-    public Optional<Vessel> getVessel(final String vesselId) {
-        return Optional.ofNullable(vesselsById.get(vesselId));
-    }
+  /** @return the vessel registered under {@code vesselId}, if any */
+  public Optional<Vessel> getVessel(final String vesselId) {
+    return Optional.ofNullable(vesselsById.get(vesselId));
+  }
 
-    /** @return every vessel in this fleet, unmodifiable */
-    @Override
-    public Set<Vessel> getVessels() {
-        return Collections.unmodifiableSet(vesselsById.values());
-    }
+  /** @return every vessel in this fleet, unmodifiable */
+  @Override
+  public Set<Vessel> getVessels() {
+    return Collections.unmodifiableSet(vesselsById.values());
+  }
 
-    /**
-     * @param vesselId the new vessel's id
-     * @return a freshly created, inactive vessel with no home port, gear, hold or engine yet set
-     * @throws IllegalStateException if {@code vesselId} is already in use
-     */
-    public Vessel createVessel(
-        final String vesselId
-    ) {
-        checkState(
-            !vesselsById.containsKey(vesselId),
-            "Vessel %s already exists", vesselId
-        );
-        final Vessel vessel = new Vessel(
-            schedule,
-            new ForwardingEventManager(eventManager),
-            vesselId,
-            vesselField,
-            portGrid,
-            marketGrid
-        );
-        vessel.setAccount(new Account());
-        vesselsById.put(vesselId, vessel);
-        return vessel;
-    }
-
+  /**
+   * @param vesselId the new vessel's id
+   * @return a freshly created, inactive vessel with no home port, gear, hold or engine yet set
+   * @throws IllegalStateException if {@code vesselId} is already in use
+   */
+  public Vessel createVessel(final String vesselId) {
+    checkState(
+      !vesselsById.containsKey(vesselId),
+      "Vessel %s already exists",
+      vesselId
+    );
+    final Vessel vessel = new Vessel(
+      schedule,
+      new ForwardingEventManager(eventManager),
+      vesselId,
+      vesselField,
+      portGrid,
+      marketGrid
+    );
+    vessel.setAccount(new Account());
+    vesselsById.put(vesselId, vessel);
+    return vessel;
+  }
 }

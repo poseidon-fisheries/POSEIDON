@@ -30,8 +30,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@link Factories#vesselIsActive()}.
  */
 public class VesselIsActiveFactory extends GlobalScopeFactory<VesselIsActive> {
-    @Override
-    protected VesselIsActive newInstance(final Scope scope) {
-        return new VesselIsActive();
-    }
+
+  @Override
+  protected VesselIsActive newInstance(final Scope scope) {
+    return new VesselIsActive();
+  }
 }

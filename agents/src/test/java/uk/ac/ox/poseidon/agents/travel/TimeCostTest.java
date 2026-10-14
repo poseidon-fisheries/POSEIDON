@@ -22,47 +22,49 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicReference;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-import java.time.Duration;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-
 class TimeCostTest {
 
-    private static final CurrencyUnit EUR = CurrencyUnit.of("EUR");
+  private static final CurrencyUnit EUR = CurrencyUnit.of("EUR");
 
-    private final Vessel vessel = mock(Vessel.class);
-    private final AtomicReference<Money> hourlyCost = new AtomicReference<>(Money.of(EUR, 10));
-    private final TimeCost timeCost = new TimeCost(vessel, _ -> hourlyCost.get());
-    private final Route route = new Route(15.0, Duration.ofMinutes(90));
+  private final Vessel vessel = mock(Vessel.class);
+  private final AtomicReference<Money> hourlyCost = new AtomicReference<>(
+    Money.of(EUR, 10)
+  );
+  private final TimeCost timeCost = new TimeCost(vessel, _ -> hourlyCost.get());
+  private final Route route = new Route(15.0, Duration.ofMinutes(90));
 
-    @Test
-    void chargesTheHourlyCostForEachHourOfTheRoute() {
-        assertThat(timeCost.apply(route)).isEqualTo(Money.of(EUR, 15));
-    }
+  @Test
+  void chargesTheHourlyCostForEachHourOfTheRoute() {
+    assertThat(timeCost.apply(route)).isEqualTo(Money.of(EUR, 15));
+  }
 
-    @Test
-    void readsTheVesselsHourlyCostAtEachCall() {
-        final Money costBefore = timeCost.apply(route);
-        hourlyCost.set(Money.of(EUR, 20));
-        final Money costAfter = timeCost.apply(route);
+  @Test
+  void readsTheVesselsHourlyCostAtEachCall() {
+    final Money costBefore = timeCost.apply(route);
+    hourlyCost.set(Money.of(EUR, 20));
+    final Money costAfter = timeCost.apply(route);
 
-        assertThat(costBefore).isEqualTo(Money.of(EUR, 15));
-        assertThat(costAfter).isEqualTo(Money.of(EUR, 30));
-    }
+    assertThat(costBefore).isEqualTo(Money.of(EUR, 15));
+    assertThat(costAfter).isEqualTo(Money.of(EUR, 30));
+  }
 
-    @Test
-    void throwsWithoutAnHourlyCost() {
-        hourlyCost.set(null);
+  @Test
+  void throwsWithoutAnHourlyCost() {
+    hourlyCost.set(null);
 
-        assertThatThrownBy(() -> timeCost.apply(route))
-            .isInstanceOf(NullPointerException.class);
-    }
+    assertThatThrownBy(() -> timeCost.apply(route)).isInstanceOf(
+      NullPointerException.class
+    );
+  }
 }

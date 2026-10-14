@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import lombok.NonNull;
-
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import lombok.NonNull;
 
 /**
  * A {@link Predicate} that is true iff at least one of its component predicates is true for the
@@ -37,27 +36,28 @@ import java.util.stream.Stream;
  */
 public class AnyOf<T> implements Predicate<T> {
 
-    // Using an array for performance reasons
-    @NonNull private final Predicate<? super T>[] predicates;
+  // Using an array for performance reasons
+  @NonNull
+  private final Predicate<? super T>[] predicates;
 
-    /** @param predicates the component predicates, at least one of which must pass */
-    @SuppressWarnings("unchecked")
-    public AnyOf(final Collection<? extends Predicate<? super T>> predicates) {
-        this.predicates = predicates.toArray(Predicate[]::new);
-    }
+  /** @param predicates the component predicates, at least one of which must pass */
+  @SuppressWarnings("unchecked")
+  public AnyOf(final Collection<? extends Predicate<? super T>> predicates) {
+    this.predicates = predicates.toArray(Predicate[]::new);
+  }
 
-    /** @return the component predicates */
-    public Stream<Predicate<? super T>> getPredicates() {
-        return Stream.of(predicates);
-    }
+  /** @return the component predicates */
+  public Stream<Predicate<? super T>> getPredicates() {
+    return Stream.of(predicates);
+  }
 
-    @Override
-    public boolean test(final T t) {
-        for (final Predicate<? super T> predicate : predicates) {
-            if (predicate.test(t)) {
-                return true;
-            }
-        }
-        return false;
+  @Override
+  public boolean test(final T t) {
+    for (final Predicate<? super T> predicate : predicates) {
+      if (predicate.test(t)) {
+        return true;
+      }
     }
+    return false;
+  }
 }

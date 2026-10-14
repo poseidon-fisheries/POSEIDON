@@ -38,19 +38,24 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class IndependentBiomassGrowerFactory<S extends Scope>
-    extends RelativeScopeFactory<S, IndependentBiomassGrower> {
+public class IndependentBiomassGrowerFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  IndependentBiomassGrower
+> {
 
-    private Factory<? super S, ? extends BiomassGrid> biomassGrid;
-    private Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid;
-    private Factory<? super S, ? extends BiomassGrowthRule> biomassGrowthRule;
+  private Factory<? super S, ? extends BiomassGrid> biomassGrid;
+  private Factory<
+    ? super S,
+    ? extends CarryingCapacityGrid
+  > carryingCapacityGrid;
+  private Factory<? super S, ? extends BiomassGrowthRule> biomassGrowthRule;
 
-    @Override
-    protected IndependentBiomassGrower newInstance(final S scope) {
-        return new IndependentBiomassGrower(
-            biomassGrid.get(scope),
-            carryingCapacityGrid.get(scope),
-            biomassGrowthRule.get(scope)
-        );
-    }
+  @Override
+  protected IndependentBiomassGrower newInstance(final S scope) {
+    return new IndependentBiomassGrower(
+      biomassGrid.get(scope),
+      carryingCapacityGrid.get(scope),
+      biomassGrowthRule.get(scope)
+    );
+  }
 }

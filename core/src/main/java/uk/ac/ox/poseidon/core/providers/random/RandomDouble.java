@@ -22,12 +22,12 @@
 
 package uk.ac.ox.poseidon.core.providers.random;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import ec.util.MersenneTwisterFast;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.NonNull;
 import uk.ac.ox.poseidon.core.providers.DoubleProvider;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * A {@link DoubleProvider} that returns a uniformly distributed random value in
@@ -36,32 +36,29 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class RandomDouble implements DoubleProvider {
 
-    private final MersenneTwisterFast rng;
-    private final double minimum;
-    private final double maximum;
+  private final MersenneTwisterFast rng;
+  private final double minimum;
+  private final double maximum;
 
-    /**
-     * @param rng     the shared RNG to draw from
-     * @param minimum the inclusive lower bound
-     * @param maximum the exclusive upper bound, must be greater than {@code minimum}
-     */
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public RandomDouble(
-        final @NonNull MersenneTwisterFast rng,
-        final double minimum,
-        final double maximum
-    ) {
-        checkArgument(
-            minimum < maximum,
-            "minimum must be less than maximum"
-        );
-        this.rng = rng;
-        this.minimum = minimum;
-        this.maximum = maximum;
-    }
+  /**
+   * @param rng     the shared RNG to draw from
+   * @param minimum the inclusive lower bound
+   * @param maximum the exclusive upper bound, must be greater than {@code minimum}
+   */
+  @SuppressFBWarnings("EI_EXPOSE_REP2")
+  public RandomDouble(
+    final @NonNull MersenneTwisterFast rng,
+    final double minimum,
+    final double maximum
+  ) {
+    checkArgument(minimum < maximum, "minimum must be less than maximum");
+    this.rng = rng;
+    this.minimum = minimum;
+    this.maximum = maximum;
+  }
 
-    @Override
-    public double getAsDouble() {
-        return minimum + rng.nextDouble() * (maximum - minimum);
-    }
+  @Override
+  public double getAsDouble() {
+    return minimum + rng.nextDouble() * (maximum - minimum);
+  }
 }

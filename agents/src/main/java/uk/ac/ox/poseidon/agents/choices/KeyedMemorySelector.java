@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.RequiredArgsConstructor;
+import static lombok.AccessLevel.PACKAGE;
 
 import java.util.function.Function;
-
-import static lombok.AccessLevel.PACKAGE;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Selects, from a {@link KeyedMemory}, the {@link Memory} for the key extracted from its input,
@@ -40,13 +39,18 @@ import static lombok.AccessLevel.PACKAGE;
  * @param <M> the type of what is remembered about an option
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class KeyedMemorySelector<T, K, O, M> implements Function<T, Memory<O, M>> {
+public class KeyedMemorySelector<
+  T,
+  K,
+  O,
+  M
+> implements Function<T, Memory<O, M>> {
 
-    private final KeyedMemory<K, O, M> keyedMemory;
-    private final Function<? super T, ? extends K> keyExtractor;
+  private final KeyedMemory<K, O, M> keyedMemory;
+  private final Function<? super T, ? extends K> keyExtractor;
 
-    @Override
-    public Memory<O, M> apply(final T input) {
-        return keyedMemory.get(keyExtractor.apply(input));
-    }
+  @Override
+  public Memory<O, M> apply(final T input) {
+    return keyedMemory.get(keyExtractor.apply(input));
+  }
 }

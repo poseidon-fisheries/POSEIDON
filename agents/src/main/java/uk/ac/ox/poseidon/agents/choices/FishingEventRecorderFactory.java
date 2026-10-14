@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,9 +36,6 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link FishingEventRecorder}, built via
  * {@link Factories#fishingEventRecorder(Factory, Factory, Factory)}. It only builds the recorder:
@@ -47,22 +46,24 @@ import java.util.function.Function;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FishingEventRecorderFactory<S extends Scope>
-    extends RelativeScopeFactory<S, FishingEventRecorder> {
+public class FishingEventRecorderFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  FishingEventRecorder
+> {
 
-    private Factory<? super S, ? extends ModelGrid> modelGrid;
-    private Factory<
-        ? super S,
-        ? extends Function<? super FishingEvent, ? extends Memory<Int2D, Bucket>>
-        > memorySelector;
-    private Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule;
+  private Factory<? super S, ? extends ModelGrid> modelGrid;
+  private Factory<
+    ? super S,
+    ? extends Function<? super FishingEvent, ? extends Memory<Int2D, Bucket>>
+  > memorySelector;
+  private Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule;
 
-    @Override
-    protected FishingEventRecorder newInstance(final S scope) {
-        return new FishingEventRecorder(
-            modelGrid.get(scope),
-            memorySelector.get(scope),
-            updateRule.get(scope)
-        );
-    }
+  @Override
+  protected FishingEventRecorder newInstance(final S scope) {
+    return new FishingEventRecorder(
+      modelGrid.get(scope),
+      memorySelector.get(scope),
+      updateRule.get(scope)
+    );
+  }
 }

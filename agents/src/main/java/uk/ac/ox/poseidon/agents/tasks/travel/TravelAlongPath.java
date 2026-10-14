@@ -22,6 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static lombok.AccessLevel.PACKAGE;
+import static uk.ac.ox.poseidon.geography.distance.DistanceCalculator.travelDuration;
+
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
@@ -29,17 +39,6 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
-
-import java.text.MessageFormat;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.function.Supplier;
-
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static lombok.AccessLevel.PACKAGE;
-import static uk.ac.ox.poseidon.geography.distance.DistanceCalculator.travelDuration;
 
 /**
  * A leaf {@link AgentTask} that moves the vessel cell by cell along a path from its current cell
@@ -49,89 +48,95 @@ import static uk.ac.ox.poseidon.geography.distance.DistanceCalculator.travelDura
 @RequiredArgsConstructor(access = PACKAGE)
 public class TravelAlongPath extends AgentTask<Vessel> {
 
-    private final PathFinder<Int2D> pathFinder;
-    private final DistanceCalculator distanceCalculator;
-    private final Supplier<Int2D> destinationCell;
-    private final Supplier<EventManager> eventManagerSupplier;
-    private List<Int2D> currentPath;
-    private EventManager eventManager;
+  private final PathFinder<Int2D> pathFinder;
+  private final DistanceCalculator distanceCalculator;
+  private final Supplier<Int2D> destinationCell;
+  private final Supplier<EventManager> eventManagerSupplier;
+  private List<Int2D> currentPath;
+  private EventManager eventManager;
 
-    private LocalDateTime startDateTime;
-    private Int2D origin;
-    private Int2D destination;
-    private double cruisingSpeedInKph;
-    private double distanceToNextCell;
+  private LocalDateTime startDateTime;
+  private Int2D origin;
+  private Int2D destination;
+  private double cruisingSpeedInKph;
+  private double distanceToNextCell;
 
-    /** Clears the remaining path and event manager, so the next run resolves them afresh. */
-    @Override
-    public void resetTask() {
-        currentPath = null;
-        eventManager = null;
-        super.resetTask();
-    }
+  /** Clears the remaining path and event manager, so the next run resolves them afresh. */
+  @Override
+  public void resetTask() {
+    currentPath = null;
+    eventManager = null;
+    super.resetTask();
+  }
 
-    /**
-     * Resolves the destination and a path to it from the vessel's current cell.
-     *
-     * @throws IllegalStateException if no path to the destination exists
-     */
-    @Override
-    public void start() {
-        final Vessel vessel = getAgent();
-        destination = checkNotNull(destinationCell.get());
-        eventManager = eventManagerSupplier.get();
-        startDateTime = vessel.getSchedule().getDateTime();
-        origin = vessel.getCell();
-        currentPath =
-            pathFinder
-                .getPath(vessel.getCell(), destination)
-                .orElseThrow(() -> new IllegalStateException(
-                    MessageFormat.format(
-                        "No path found from {0} to {1} for vessel {2}.",
-                        vessel.getCell(),
-                        destination,
-                        vessel
-                    )
-                ));
-        distanceToNextCell = 0;
-        cruisingSpeedInKph = vessel.getEngine().getCruisingSpeedInKph();
-        super.start();
-    }
-
-    /**
-     * Moves the vessel to the next cell on the path, consuming the fuel for the hop just
-     * completed. Broadcasts a {@link TravelEvent} and succeeds once the destination is reached;
-     * otherwise computes the next hop's distance/duration and reports {@code RUNNING}.
-     */
-    @Override
-    public Status execute() {
-        final Vessel vessel = getAgent();
-        checkState(
-            currentPath.getLast().equals(destination),
-            "Current path %s does not match current destination %s for vessel %s.",
-            currentPath,
+  /**
+   * Resolves the destination and a path to it from the vessel's current cell.
+   *
+   * @throws IllegalStateException if no path to the destination exists
+   */
+  @Override
+  public void start() {
+    final Vessel vessel = getAgent();
+    destination = checkNotNull(destinationCell.get());
+    eventManager = eventManagerSupplier.get();
+    startDateTime = vessel.getSchedule().getDateTime();
+    origin = vessel.getCell();
+    currentPath = pathFinder
+      .getPath(vessel.getCell(), destination)
+      .orElseThrow(() ->
+        new IllegalStateException(
+          MessageFormat.format(
+            "No path found from {0} to {1} for vessel {2}.",
+            vessel.getCell(),
             destination,
             vessel
-        );
+          )
+        )
+      );
+    distanceToNextCell = 0;
+    cruisingSpeedInKph = vessel.getEngine().getCruisingSpeedInKph();
+    super.start();
+  }
 
-        vessel.setCurrentCell(currentPath.getFirst());
-        vessel.getEngine().consumeFuelForDistance(distanceToNextCell);
+  /**
+   * Moves the vessel to the next cell on the path, consuming the fuel for the hop just
+   * completed. Broadcasts a {@link TravelEvent} and succeeds once the destination is reached;
+   * otherwise computes the next hop's distance/duration and reports {@code RUNNING}.
+   */
+  @Override
+  public Status execute() {
+    final Vessel vessel = getAgent();
+    checkState(
+      currentPath.getLast().equals(destination),
+      "Current path %s does not match current destination %s for vessel %s.",
+      currentPath,
+      destination,
+      vessel
+    );
 
-        currentPath = currentPath.subList(1, currentPath.size());
-        if (currentPath.isEmpty()) {
-            eventManager.broadcast(new TravelEvent(
-                getAgent(),
-                startDateTime,
-                getAgent().getSchedule().getDateTime(),
-                origin,
-                destination
-            ));
-            return SUCCEEDED;
-        } else {
-            final Int2D nextCell = currentPath.getFirst();
-            distanceToNextCell = distanceCalculator.distanceInKm(vessel.getCell(), nextCell);
-            vessel.setHeadingTowards(nextCell);
-            return runFor(travelDuration(distanceToNextCell, cruisingSpeedInKph));
-        }
+    vessel.setCurrentCell(currentPath.getFirst());
+    vessel.getEngine().consumeFuelForDistance(distanceToNextCell);
+
+    currentPath = currentPath.subList(1, currentPath.size());
+    if (currentPath.isEmpty()) {
+      eventManager.broadcast(
+        new TravelEvent(
+          getAgent(),
+          startDateTime,
+          getAgent().getSchedule().getDateTime(),
+          origin,
+          destination
+        )
+      );
+      return SUCCEEDED;
+    } else {
+      final Int2D nextCell = currentPath.getFirst();
+      distanceToNextCell = distanceCalculator.distanceInKm(
+        vessel.getCell(),
+        nextCell
+      );
+      vessel.setHeadingTowards(nextCell);
+      return runFor(travelDuration(distanceToNextCell, cruisingSpeedInKph));
     }
+  }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
+import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,8 +32,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.Collection;
-
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link SelectedSpeciesRetention}, built via
  * {@link Factories#selectedSpeciesRetention}.
@@ -41,14 +40,18 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SelectedSpeciesRetentionFactory<S extends Scope>
-    extends RelativeScopeFactory<S, SelectedSpeciesRetention> {
+public class SelectedSpeciesRetentionFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  SelectedSpeciesRetention
+> {
 
-    private Factory<? super S, ? extends Collection<? extends Species>> selectedSpecies;
+  private Factory<
+    ? super S,
+    ? extends Collection<? extends Species>
+  > selectedSpecies;
 
-    @Override
-    protected SelectedSpeciesRetention newInstance(final S scope) {
-        return new SelectedSpeciesRetention(selectedSpecies.get(scope));
-    }
-
+  @Override
+  protected SelectedSpeciesRetention newInstance(final S scope) {
+    return new SelectedSpeciesRetention(selectedSpecies.get(scope));
+  }
 }

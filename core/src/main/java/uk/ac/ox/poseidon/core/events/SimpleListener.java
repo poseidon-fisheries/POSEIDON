@@ -30,22 +30,20 @@ import java.util.function.Consumer;
  * @param <E> the type of event received
  */
 public class SimpleListener<E> extends AbstractListener<E> {
-    private final Consumer<E> consumer;
 
-    /**
-     * @param eventClass the event type this listener is registered for
-     * @param consumer   the consumer invoked with every received event
-     */
-    public SimpleListener(
-        final Class<E> eventClass,
-        final Consumer<E> consumer
-    ) {
-        super(eventClass);
-        this.consumer = consumer;
-    }
+  private final Consumer<E> consumer;
 
-    @Override
-    public void receive(final E event) {
-        consumer.accept(event);
-    }
+  /**
+   * @param eventClass the event type this listener is registered for
+   * @param consumer   the consumer invoked with every received event
+   */
+  public SimpleListener(final Class<E> eventClass, final Consumer<E> consumer) {
+    super(eventClass);
+    this.consumer = consumer;
+  }
+
+  @Override
+  public void receive(final E event) {
+    consumer.accept(event);
+  }
 }

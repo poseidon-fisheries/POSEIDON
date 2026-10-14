@@ -41,10 +41,10 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @EqualsAndHashCode(callSuper = true)
 public class VesselFieldFactory extends SimulationScopeFactory<VesselField> {
 
-    private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
+  private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
 
-    @Override
-    protected VesselField newInstance(final SimulationScope scope) {
-        return new VesselField(modelGrid.get(scope));
-    }
+  @Override
+  protected VesselField newInstance(final SimulationScope scope) {
+    return new VesselField(modelGrid.get(scope));
+  }
 }

@@ -36,15 +36,18 @@ import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
  */
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SpeciesPropertyFactory<R> extends ObjectPropertyFactory<Species, R> {
+public class SpeciesPropertyFactory<R> extends ObjectPropertyFactory<
+  Species,
+  R
+> {
 
-    /** @param propertyPath the dotted path of properties to follow from the species */
-    public SpeciesPropertyFactory(final String propertyPath) {
-        super(propertyPath);
-    }
+  /** @param propertyPath the dotted path of properties to follow from the species */
+  public SpeciesPropertyFactory(final String propertyPath) {
+    super(propertyPath);
+  }
 
-    @Override
-    protected Class<Species> rootClass() {
-        return Species.class;
-    }
+  @Override
+  protected Class<Species> rootClass() {
+    return Species.class;
+  }
 }

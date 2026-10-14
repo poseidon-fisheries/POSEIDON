@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+import static com.google.common.base.Preconditions.checkState;
+
+import java.util.List;
+import java.util.stream.IntStream;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,11 +37,6 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.util.List;
-import java.util.stream.IntStream;
-
-import static com.google.common.base.Preconditions.checkState;
-
 /**
  * A {@link SimulationScopeFactory} for one {@link BiomassGrid} per configured species.
  * {@code biomassAllocators} must have either one entry (reused for every species) or exactly one
@@ -47,46 +46,58 @@ import static com.google.common.base.Preconditions.checkState;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BiomassGridsFactory extends SimulationScopeFactory<List<BiomassGrid>> {
+public class BiomassGridsFactory
+  extends SimulationScopeFactory<List<BiomassGrid>>
+{
 
-    private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
-    private Factory<? super SimulationScope, ? extends List<? extends Species>> species;
-    private Factory<? super SimulationScope, ? extends List<? extends Allocator>> biomassAllocators;
+  private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
+  private Factory<
+    ? super SimulationScope,
+    ? extends List<? extends Species>
+  > species;
+  private Factory<
+    ? super SimulationScope,
+    ? extends List<? extends Allocator>
+  > biomassAllocators;
 
-    @Override
-    protected List<BiomassGrid> newInstance(final SimulationScope scope) {
+  @Override
+  protected List<BiomassGrid> newInstance(final SimulationScope scope) {
+    final ModelGrid modelGrid = this.modelGrid.get(scope);
+    final List<? extends Species> species = this.species.get(scope);
+    final List<? extends Allocator> biomassAllocators =
+      this.biomassAllocators.get(scope);
 
-        final ModelGrid modelGrid = this.modelGrid.get(scope);
-        final List<? extends Species> species = this.species.get(scope);
-        final List<? extends Allocator> biomassAllocators = this.biomassAllocators.get(scope);
-
-        final int numAllocators = biomassAllocators.size();
-        if (numAllocators != 1) {
-            checkState(
-                numAllocators == species.size(),
-                "Number of biomass allocators must either be 1 " +
-                    "or %s (the same size as species) but was %s.",
-                species.size(),
-                numAllocators
-            );
-        }
-
-        return IntStream
-            .range(0, species.size())
-            .mapToObj(i -> {
-                final Allocator biomassAllocator =
-                    biomassAllocators.get(numAllocators == 1 ? 0 : i);
-                final double[][] biomassArray = modelGrid.makeDoubleArray();
-                modelGrid.getAllCells().forEach(cell ->
-                    biomassArray[cell.x][cell.y] = biomassAllocator.applyAsDouble(cell)
-                );
-                return ((BiomassGrid) new DefaultBiomassGrid(
-                    modelGrid,
-                    species.get(i),
-                    biomassArray
-                ));
-            })
-            .toList();
+    final int numAllocators = biomassAllocators.size();
+    if (numAllocators != 1) {
+      checkState(
+        numAllocators == species.size(),
+        "Number of biomass allocators must either be 1 " +
+          "or %s (the same size as species) but was %s.",
+        species.size(),
+        numAllocators
+      );
     }
 
+    return IntStream.range(0, species.size())
+      .mapToObj(i -> {
+        final Allocator biomassAllocator = biomassAllocators.get(
+          numAllocators == 1 ? 0 : i
+        );
+        final double[][] biomassArray = modelGrid.makeDoubleArray();
+        modelGrid
+          .getAllCells()
+          .forEach(
+            cell ->
+              biomassArray[cell.x][cell.y] = biomassAllocator.applyAsDouble(
+                cell
+              )
+          );
+        return (BiomassGrid) new DefaultBiomassGrid(
+          modelGrid,
+          species.get(i),
+          biomassArray
+        );
+      })
+      .toList();
+  }
 }

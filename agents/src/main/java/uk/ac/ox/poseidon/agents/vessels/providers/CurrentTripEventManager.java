@@ -22,21 +22,20 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.events.EventManager;
-
-import java.util.function.Supplier;
 
 /** Supplies a vessel's current trip's event manager; the vessel must have a current trip. */
 @RequiredArgsConstructor
 public class CurrentTripEventManager implements Supplier<EventManager> {
 
-    private final Vessel vessel;
+  private final Vessel vessel;
 
-    /** @throws NullPointerException if the vessel has no current trip */
-    @Override
-    public EventManager get() {
-        return vessel.getCurrentTrip().getEventManager();
-    }
+  /** @throws NullPointerException if the vessel has no current trip */
+  @Override
+  public EventManager get() {
+    return vessel.getCurrentTrip().getEventManager();
+  }
 }

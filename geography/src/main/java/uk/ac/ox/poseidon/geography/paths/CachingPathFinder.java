@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.geography.paths;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.Optional;
 
 /**
@@ -33,33 +32,29 @@ import java.util.Optional;
  * {@link uk.ac.ox.poseidon.geography.paths.Factories}.
  */
 public class CachingPathFinder<P> implements PathFinder<P> {
-    private final PathFinder<P> pathFinder;
-    private final PathCache<P> cache;
 
-    /**
-     * @param pathFinder the delegate consulted on a cache miss
-     * @param cache      the cache consulted first, and updated with any new result
-     */
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public CachingPathFinder(
-        final PathFinder<P> pathFinder,
-        final PathCache<P> cache
-    ) {
-        this.pathFinder = pathFinder;
-        this.cache = cache;
-    }
+  private final PathFinder<P> pathFinder;
+  private final PathCache<P> cache;
 
-    @Override
-    public Optional<ImmutableList<P>> getPath(
-        final P start,
-        final P end
-    ) {
-        return Optional
-            .ofNullable(cache.getPath(start, end))
-            .orElseGet(() -> {
-                final Optional<ImmutableList<P>> newPath = pathFinder.getPath(start, end);
-                cache.putPath(start, end, newPath);
-                return newPath;
-            });
-    }
+  /**
+   * @param pathFinder the delegate consulted on a cache miss
+   * @param cache      the cache consulted first, and updated with any new result
+   */
+  @SuppressFBWarnings("EI_EXPOSE_REP2")
+  public CachingPathFinder(
+    final PathFinder<P> pathFinder,
+    final PathCache<P> cache
+  ) {
+    this.pathFinder = pathFinder;
+    this.cache = cache;
+  }
+
+  @Override
+  public Optional<ImmutableList<P>> getPath(final P start, final P end) {
+    return Optional.ofNullable(cache.getPath(start, end)).orElseGet(() -> {
+      final Optional<ImmutableList<P>> newPath = pathFinder.getPath(start, end);
+      cache.putPath(start, end, newPath);
+      return newPath;
+    });
+  }
 }

@@ -31,14 +31,12 @@ package uk.ac.ox.poseidon.agents.tasks;
  * at the end of each trip or of each failed departure attempt.
  */
 public interface Behaviour {
+  /** @return {@code true} if this behaviour actually runs a tree (see {@link ActiveBehaviour}) */
+  boolean isActive();
 
-    /** @return {@code true} if this behaviour actually runs a tree (see {@link ActiveBehaviour}) */
-    boolean isActive();
+  /** @return {@code true} if the underlying tree is currently {@code RUNNING} */
+  boolean isRunning();
 
-    /** @return {@code true} if the underlying tree is currently {@code RUNNING} */
-    boolean isRunning();
-
-    /** Advances the behaviour by one simulation tick. */
-    void step();
-
+  /** Advances the behaviour by one simulation tick. */
+  void step();
 }

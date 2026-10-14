@@ -39,14 +39,15 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class HaversineDistanceCalculatorFactory<S extends Scope>
-    extends RelativeScopeFactory<S, HaversineDistanceCalculator> {
+public class HaversineDistanceCalculatorFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  HaversineDistanceCalculator
+> {
 
-    private Factory<? super S, ? extends ModelGrid> modelGrid;
+  private Factory<? super S, ? extends ModelGrid> modelGrid;
 
-    @Override
-    protected HaversineDistanceCalculator newInstance(final S scope) {
-        return new HaversineDistanceCalculator(modelGrid.get(scope));
-    }
-
+  @Override
+  protected HaversineDistanceCalculator newInstance(final S scope) {
+    return new HaversineDistanceCalculator(modelGrid.get(scope));
+  }
 }

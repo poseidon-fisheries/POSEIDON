@@ -22,6 +22,11 @@
 
 package uk.ac.ox.poseidon.geography.paths;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
+import static uk.ac.ox.poseidon.geography.paths.Factories.accessibleWaterCellsCache;
+
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -29,50 +34,54 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
-import static uk.ac.ox.poseidon.geography.paths.Factories.accessibleWaterCellsCache;
-
 class AccessibleWaterCellsCacheFactoryTest {
 
-    private final Simulation simulation = mock(Simulation.class);
-    private final Simulation otherSimulation = mock(Simulation.class);
+  private final Simulation simulation = mock(Simulation.class);
+  private final Simulation otherSimulation = mock(Simulation.class);
 
-    @Test
-    void sharesCacheWhenGridsAreGlobal() {
-        final AccessibleWaterCellsCacheFactory<SimulationScope> factory =
-            accessibleWaterCellsCache(
-                object(mock(BathymetricGrid.class)),
-                object(mock(PortGrid.class))
-            );
+  @Test
+  void sharesCacheWhenGridsAreGlobal() {
+    final AccessibleWaterCellsCacheFactory<SimulationScope> factory =
+      accessibleWaterCellsCache(
+        object(mock(BathymetricGrid.class)),
+        object(mock(PortGrid.class))
+      );
 
-        final AccessibleWaterCellsCache first = factory.get(new SimulationScope(simulation));
-        final AccessibleWaterCellsCache second = factory.get(new SimulationScope(otherSimulation));
+    final AccessibleWaterCellsCache first = factory.get(
+      new SimulationScope(simulation)
+    );
+    final AccessibleWaterCellsCache second = factory.get(
+      new SimulationScope(otherSimulation)
+    );
 
-        assertThat(first).isSameAs(second);
+    assertThat(first).isSameAs(second);
+  }
+
+  @Test
+  void separatesCacheWhenGridsAreSimulationScoped() {
+    final AccessibleWaterCellsCacheFactory<SimulationScope> factory =
+      accessibleWaterCellsCache(
+        new SimulationBathymetricGridFactory(),
+        object(mock(PortGrid.class))
+      );
+
+    final AccessibleWaterCellsCache first = factory.get(
+      new SimulationScope(simulation)
+    );
+    final AccessibleWaterCellsCache second = factory.get(
+      new SimulationScope(otherSimulation)
+    );
+
+    assertThat(first).isNotSameAs(second);
+  }
+
+  private static final class SimulationBathymetricGridFactory
+    extends SimulationScopeFactory<BathymetricGrid>
+  {
+
+    @Override
+    protected BathymetricGrid newInstance(final SimulationScope scope) {
+      return mock(BathymetricGrid.class);
     }
-
-    @Test
-    void separatesCacheWhenGridsAreSimulationScoped() {
-        final AccessibleWaterCellsCacheFactory<SimulationScope> factory =
-            accessibleWaterCellsCache(
-                new SimulationBathymetricGridFactory(),
-                object(mock(PortGrid.class))
-            );
-
-        final AccessibleWaterCellsCache first = factory.get(new SimulationScope(simulation));
-        final AccessibleWaterCellsCache second = factory.get(new SimulationScope(otherSimulation));
-
-        assertThat(first).isNotSameAs(second);
-    }
-
-    private static final class SimulationBathymetricGridFactory
-        extends SimulationScopeFactory<BathymetricGrid> {
-
-        @Override
-        protected BathymetricGrid newInstance(final SimulationScope scope) {
-            return mock(BathymetricGrid.class);
-        }
-    }
+  }
 }

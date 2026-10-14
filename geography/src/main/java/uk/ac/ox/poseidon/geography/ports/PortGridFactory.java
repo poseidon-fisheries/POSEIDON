@@ -22,6 +22,11 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
+import static java.text.MessageFormat.format;
+import static java.util.Comparator.comparingDouble;
+
+import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,12 +42,6 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.util.List;
-import java.util.Optional;
-
-import static java.text.MessageFormat.format;
-import static java.util.Comparator.comparingDouble;
-
 /**
  * A {@link RelativeScopeFactory} for an {@link ImmutablePortGrid} built from a fixed list of
  * (port, coordinate) pairs: each port's coordinate is snapped to a valid land cell — its own cell
@@ -54,70 +53,82 @@ import static java.util.Comparator.comparingDouble;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PortGridFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ImmutablePortGrid> {
+public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  ImmutablePortGrid
+> {
 
-    private static final System.Logger logger =
-        System.getLogger(PortGridFactory.class.getName());
+  private static final System.Logger logger = System.getLogger(
+    PortGridFactory.class.getName()
+  );
 
-    private Factory<? super S, ? extends List<Pair<Port, Coordinate>>> ports;
-    private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
-    private Factory<? super S, ? extends DistanceCalculator> distanceCalculator;
+  private Factory<? super S, ? extends List<Pair<Port, Coordinate>>> ports;
+  private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+  private Factory<? super S, ? extends DistanceCalculator> distanceCalculator;
 
-    @Override
-    protected ImmutablePortGrid newInstance(final S scope) {
-        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
-        final DistanceCalculator distanceCalculator = this.distanceCalculator.get(scope);
-        final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
-        final SparseGrid2D sparseGrid2D =
-            new SparseGrid2D(
-                modelGrid.getGridWidth(),
-                modelGrid.getGridHeight()
-            );
-        ports.get(scope).forEach(pair -> {
-            final Port port = pair.getFirst();
-            final Coordinate coordinate = pair.getSecond();
-            final Int2D cell = coordinateToCell(
-                bathymetricGrid,
-                coordinate,
-                distanceCalculator
-            ).orElseThrow(() -> new RuntimeException(format(
-                "No suitable land cell found for port {0} near {1}",
-                port, coordinate
-            )));
-            sparseGrid2D.setObjectLocation(port, cell);
-        });
-        return new ImmutablePortGrid(sparseGrid2D, bathymetricGrid);
+  @Override
+  protected ImmutablePortGrid newInstance(final S scope) {
+    final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
+    final DistanceCalculator distanceCalculator = this.distanceCalculator.get(
+      scope
+    );
+    final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
+    final SparseGrid2D sparseGrid2D = new SparseGrid2D(
+      modelGrid.getGridWidth(),
+      modelGrid.getGridHeight()
+    );
+    ports.get(scope).forEach(pair -> {
+      final Port port = pair.getFirst();
+      final Coordinate coordinate = pair.getSecond();
+      final Int2D cell = coordinateToCell(
+        bathymetricGrid,
+        coordinate,
+        distanceCalculator
+      ).orElseThrow(() ->
+        new RuntimeException(
+          format(
+            "No suitable land cell found for port {0} near {1}",
+            port,
+            coordinate
+          )
+        )
+      );
+      sparseGrid2D.setObjectLocation(port, cell);
+    });
+    return new ImmutablePortGrid(sparseGrid2D, bathymetricGrid);
+  }
+
+  private Optional<Int2D> coordinateToCell(
+    final BathymetricGrid bathymetricGrid,
+    final Coordinate coordinate,
+    final DistanceCalculator distanceCalculator
+  ) {
+    final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
+    final Int2D cell = modelGrid.toCell(coordinate);
+    if (validPortLocation(bathymetricGrid, cell)) {
+      return Optional.of(cell);
+    } else {
+      return bathymetricGrid
+        .getActiveLandNeighbours(cell)
+        .min(
+          comparingDouble(landNeighbour ->
+            distanceCalculator.distanceInKm(
+              coordinate,
+              modelGrid.toCoordinate(landNeighbour)
+            )
+          )
+        );
     }
+  }
 
-    private Optional<Int2D> coordinateToCell(
-        final BathymetricGrid bathymetricGrid,
-        final Coordinate coordinate,
-        final DistanceCalculator distanceCalculator
-    ) {
-        final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
-        final Int2D cell = modelGrid.toCell(coordinate);
-        if (validPortLocation(bathymetricGrid, cell)) {
-            return Optional.of(cell);
-        } else {
-            return bathymetricGrid
-                .getActiveLandNeighbours(cell)
-                .min(comparingDouble(landNeighbour ->
-                    distanceCalculator.distanceInKm(
-                        coordinate,
-                        modelGrid.toCoordinate(landNeighbour)
-                    ))
-                );
-        }
-    }
-
-    private boolean validPortLocation(
-        final BathymetricGrid bathymetricGrid,
-        final Int2D cell
-    ) {
-        return bathymetricGrid.getModelGrid().isInGrid(cell) &&
-            bathymetricGrid.isLand(cell) &&
-            bathymetricGrid.getWaterNeighbours(cell).findAny().isPresent();
-    }
-
+  private boolean validPortLocation(
+    final BathymetricGrid bathymetricGrid,
+    final Int2D cell
+  ) {
+    return (
+      bathymetricGrid.getModelGrid().isInGrid(cell) &&
+      bathymetricGrid.isLand(cell) &&
+      bathymetricGrid.getWaterNeighbours(cell).findAny().isPresent()
+    );
+  }
 }

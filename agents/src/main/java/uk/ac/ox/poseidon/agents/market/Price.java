@@ -22,7 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static java.math.RoundingMode.HALF_EVEN;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import javax.measure.Unit;
+import javax.measure.quantity.Mass;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -30,57 +36,55 @@ import lombok.Value;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.biology.Content;
 
-import javax.measure.Unit;
-import javax.measure.quantity.Mass;
-
-import static java.math.RoundingMode.HALF_EVEN;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-
 /** A price per unit of biomass, e.g. "40000 IDR / kg". */
 @Value
 public class Price {
 
-    /** The amount paid per {@link #biomassUnit}. */
-    @NonNull Money amount;
-    /** The unit of mass {@link #amount} is quoted per. */
-    @NonNull Unit<Mass> biomassUnit;
+  /** The amount paid per {@link #biomassUnit}. */
+  @NonNull
+  Money amount;
 
-    @Getter(AccessLevel.NONE)
-    double amountPerKg;
+  /** The unit of mass {@link #amount} is quoted per. */
+  @NonNull
+  Unit<Mass> biomassUnit;
 
-    /**
-     * @param amount      the amount paid per {@code biomassUnit}
-     * @param biomassUnit the unit of mass {@code amount} is quoted per
-     */
-    @SuppressFBWarnings(
-        value = "EI2",
-        justification = "Price stores Money/Unit references by design; they are treated as value objects."
-    )
-    public Price(
-        final @NonNull Money amount,
-        final @NonNull Unit<Mass> biomassUnit
-    ) {
-        this.amount = amount;
-        this.biomassUnit = biomassUnit;
-        final double kgPerUnit =
-            getQuantity(1, biomassUnit).to(KILOGRAM).getValue().doubleValue();
-        this.amountPerKg = amount.getAmount().doubleValue() / kgPerUnit;
-    }
+  @Getter(AccessLevel.NONE)
+  double amountPerKg;
 
-    /** @return this price's value for {@code content}'s biomass */
-    public Money valueFor(final Content content) {
-        final double value = amountPerKg * content.asKg();
-        return Money.of(amount.getCurrencyUnit(), value, HALF_EVEN);
-    }
+  /**
+   * @param amount      the amount paid per {@code biomassUnit}
+   * @param biomassUnit the unit of mass {@code amount} is quoted per
+   */
+  @SuppressFBWarnings(
+    value = "EI2",
+    justification = "Price stores Money/Unit references by design; they are treated as value objects."
+  )
+  public Price(
+    final @NonNull Money amount,
+    final @NonNull Unit<Mass> biomassUnit
+  ) {
+    this.amount = amount;
+    this.biomassUnit = biomassUnit;
+    final double kgPerUnit = getQuantity(1, biomassUnit)
+      .to(KILOGRAM)
+      .getValue()
+      .doubleValue();
+    this.amountPerKg = amount.getAmount().doubleValue() / kgPerUnit;
+  }
 
-    /** @return this price's value for {@code kg} kilograms, as a raw double (no rounding) */
-    public double valueForKgDouble(final double kg) {
-        return amountPerKg * kg;
-    }
+  /** @return this price's value for {@code content}'s biomass */
+  public Money valueFor(final Content content) {
+    final double value = amountPerKg * content.asKg();
+    return Money.of(amount.getCurrencyUnit(), value, HALF_EVEN);
+  }
 
-    @java.lang.Override
-    public String toString() {
-        return amount + " / " + biomassUnit;
-    }
+  /** @return this price's value for {@code kg} kilograms, as a raw double (no rounding) */
+  public double valueForKgDouble(final double kg) {
+    return amountPerKg * kg;
+  }
+
+  @java.lang.Override
+  public String toString() {
+    return amount + " / " + biomassUnit;
+  }
 }

@@ -39,10 +39,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @EqualsAndHashCode(callSuper = true)
 public class CatchCategoryFactory extends GlobalScopeFactory<CatchCategory> {
 
-    private String code;
+  private String code;
 
-    @Override
-    protected CatchCategory newInstance(final Scope scope) {
-        return new CatchCategory(code);
-    }
+  @Override
+  protected CatchCategory newInstance(final Scope scope) {
+    return new CatchCategory(code);
+  }
 }

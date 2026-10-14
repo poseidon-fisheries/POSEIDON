@@ -37,12 +37,11 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class PrefixedIdFactory extends VesselScopeFactory<String> {
 
-    private String prefix;
+  private String prefix;
 
-    /** @return {@link #prefix} followed by the scoped vessel's id */
-    @Override
-    protected String newInstance(final VesselScope scope) {
-        return prefix + scope.getVessel().getId();
-    }
-
+  /** @return {@link #prefix} followed by the scoped vessel's id */
+  @Override
+  protected String newInstance(final VesselScope scope) {
+    return prefix + scope.getVessel().getId();
+  }
 }

@@ -25,23 +25,23 @@ package uk.ac.ox.poseidon.agents.tables;
 /** Factories for {@link ListenerTable}s that accumulate simulation events into a tablesaw table. */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
-     * {@link FishingEventListenerTable}
-     * @see FishingEventListenerTable
-     */
-    public static FishingEventListenerTableFactory fishingEventListenerTable() {
-        return new FishingEventListenerTableFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   * {@link FishingEventListenerTable}
+   * @see FishingEventListenerTable
+   */
+  public static FishingEventListenerTableFactory fishingEventListenerTable() {
+    return new FishingEventListenerTableFactory();
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
-     * {@link MarketSalesListenerTable}
-     * @see MarketSalesListenerTable
-     */
-    public static MarketSalesListenerTableFactory marketSalesListenerTable() {
-        return new MarketSalesListenerTableFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   * {@link MarketSalesListenerTable}
+   * @see MarketSalesListenerTable
+   */
+  public static MarketSalesListenerTableFactory marketSalesListenerTable() {
+    return new MarketSalesListenerTableFactory();
+  }
 }

@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.core.predicates.temporal;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * A {@link Predicate} that is true iff the tested date-time is strictly before a supplied
@@ -38,10 +37,10 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class DateTimeIsBefore implements Predicate<LocalDateTime> {
 
-    private final Supplier<? extends LocalDateTime> referenceDateTime;
+  private final Supplier<? extends LocalDateTime> referenceDateTime;
 
-    @Override
-    public boolean test(final LocalDateTime dateTime) {
-        return dateTime.isBefore(referenceDateTime.get());
-    }
+  @Override
+  public boolean test(final LocalDateTime dateTime) {
+    return dateTime.isBefore(referenceDateTime.get());
+  }
 }

@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import java.util.DoubleSummaryStatistics;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,9 +34,6 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.utils.LonLatTable;
-
-import java.util.DoubleSummaryStatistics;
-import java.util.List;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link ModelGrid} sized to fit a resolved
@@ -47,33 +46,43 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ModelGridFromLonLatTableFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ModelGrid> {
+public class ModelGridFromLonLatTableFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  ModelGrid
+> {
 
-    private Factory<? super S, ? extends LonLatTable> lonLatTable;
-    private int gridWidthInCells;
-    private double mapPaddingInDegrees;
+  private Factory<? super S, ? extends LonLatTable> lonLatTable;
+  private int gridWidthInCells;
+  private double mapPaddingInDegrees;
 
-    @Override
-    protected ModelGrid newInstance(final S scope) {
+  @Override
+  protected ModelGrid newInstance(final S scope) {
+    final List<Coordinate> coordinates = lonLatTable
+      .get(scope)
+      .coordinateStream()
+      .toList();
 
-        final List<Coordinate> coordinates = lonLatTable.get(scope).coordinateStream().toList();
+    final DoubleSummaryStatistics longitudeStats = coordinates
+      .stream()
+      .mapToDouble(Coordinate::getLon)
+      .summaryStatistics();
 
-        final DoubleSummaryStatistics longitudeStats =
-            coordinates.stream().mapToDouble(Coordinate::getLon).summaryStatistics();
+    final DoubleSummaryStatistics latitudeStats = coordinates
+      .stream()
+      .mapToDouble(Coordinate::getLat)
+      .summaryStatistics();
 
-        final DoubleSummaryStatistics latitudeStats =
-            coordinates.stream().mapToDouble(Coordinate::getLat).summaryStatistics();
+    final Envelope envelope = new Envelope(
+      longitudeStats.getMin() - mapPaddingInDegrees,
+      longitudeStats.getMax() + mapPaddingInDegrees,
+      latitudeStats.getMin() - mapPaddingInDegrees,
+      latitudeStats.getMax() + mapPaddingInDegrees
+    );
+    final double heightToWidth = envelope.getHeight() / envelope.getWidth();
+    final int gridHeightInCells = (int) Math.round(
+      gridWidthInCells * heightToWidth
+    );
 
-        final Envelope envelope = new Envelope(
-            longitudeStats.getMin() - mapPaddingInDegrees,
-            longitudeStats.getMax() + mapPaddingInDegrees,
-            latitudeStats.getMin() - mapPaddingInDegrees,
-            latitudeStats.getMax() + mapPaddingInDegrees
-        );
-        final double heightToWidth = envelope.getHeight() / envelope.getWidth();
-        final int gridHeightInCells = (int) Math.round(gridWidthInCells * heightToWidth);
-
-        return ModelGrid.create(gridWidthInCells, gridHeightInCells, envelope);
-    }
+    return ModelGrid.create(gridWidthInCells, gridHeightInCells, envelope);
+  }
 }

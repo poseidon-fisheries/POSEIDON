@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import java.time.Period;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.time.Period;
 
 /**
  * A {@link GlobalScopeFactory} for a fixed {@link Period}. No separate plain component class
@@ -43,29 +42,29 @@ import java.time.Period;
 @EqualsAndHashCode(callSuper = true)
 public class PeriodFactory extends GlobalScopeFactory<Period> {
 
-    private int years;
-    private int months;
-    private int days;
+  private int years;
+  private int months;
+  private int days;
 
-    /**
-     * @param period the period to decompose into years/months/days
-     */
-    public PeriodFactory(final Period period) {
-        this.years = period.getYears();
-        this.months = period.getMonths();
-        this.days = period.getDays();
-    }
+  /**
+   * @param period the period to decompose into years/months/days
+   */
+  public PeriodFactory(final Period period) {
+    this.years = period.getYears();
+    this.months = period.getMonths();
+    this.days = period.getDays();
+  }
 
-    /**
-     * @param iso8601Period an ISO-8601 period string (e.g. {@code "P1Y2M"}), as accepted by
-     *                      {@link Period#parse}
-     */
-    public PeriodFactory(final String iso8601Period) {
-        this(Period.parse(iso8601Period));
-    }
+  /**
+   * @param iso8601Period an ISO-8601 period string (e.g. {@code "P1Y2M"}), as accepted by
+   *                      {@link Period#parse}
+   */
+  public PeriodFactory(final String iso8601Period) {
+    this(Period.parse(iso8601Period));
+  }
 
-    @Override
-    protected Period newInstance(final Scope scope) {
-        return Period.of(years, months, days);
-    }
+  @Override
+  protected Period newInstance(final Scope scope) {
+    return Period.of(years, months, days);
+  }
 }

@@ -24,17 +24,15 @@ package uk.ac.ox.poseidon.biology.species;
 
 /** Something whose data is ordered by a {@link SpeciesIndex}. */
 public interface SpeciesIndexed {
+  /**
+   * Returns the index that defines the ordering for this instance.
+   */
+  SpeciesIndex getSpeciesIndex();
 
-    /**
-     * Returns the index that defines the ordering for this instance.
-     */
-    SpeciesIndex getSpeciesIndex();
-
-    /**
-     * Returns {@code true} if both instances share the same {@link SpeciesIndex}.
-     */
-    default boolean sameIndex(final SpeciesIndexed other) {
-        return getSpeciesIndex().equals(other.getSpeciesIndex());
-    }
-
+  /**
+   * Returns {@code true} if both instances share the same {@link SpeciesIndex}.
+   */
+  default boolean sameIndex(final SpeciesIndexed other) {
+    return getSpeciesIndex().equals(other.getSpeciesIndex());
+  }
 }

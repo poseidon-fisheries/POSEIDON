@@ -22,6 +22,17 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.poseidon.agents.market.Factories.initialPrices;
+import static uk.ac.ox.poseidon.agents.market.Factories.marketPrices;
+import static uk.ac.ox.poseidon.agents.market.Factories.uniformMarketPrices;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,89 +47,77 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.poseidon.agents.market.Factories.initialPrices;
-import static uk.ac.ox.poseidon.agents.market.Factories.marketPrices;
-import static uk.ac.ox.poseidon.agents.market.Factories.uniformMarketPrices;
-
 class InitialPricesFactoryTest {
 
-    private static final CatchCategory CATEGORY = new CatchCategory("C");
-    private static final Species HKE = new Species("HKE", null, "Hake");
+  private static final CatchCategory CATEGORY = new CatchCategory("C");
+  private static final Species HKE = new Species("HKE", null, "Hake");
 
-    private final Simulation simulation = mock(Simulation.class);
-    private final TemporalSchedule schedule = mock(TemporalSchedule.class);
+  private final Simulation simulation = mock(Simulation.class);
+  private final TemporalSchedule schedule = mock(TemporalSchedule.class);
 
-    @BeforeEach
-    void setUp() {
-        when(simulation.getTemporalSchedule()).thenReturn(schedule);
-        when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 0, 0));
-    }
+  @BeforeEach
+  void setUp() {
+    when(simulation.getTemporalSchedule()).thenReturn(schedule);
+    when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 0, 0));
+  }
 
-    @Test
-    void appliesMarketSpecificPricesWhenBuilt() {
-        final BiomassMarket m1 = market("M1");
-        final BiomassMarket m2 = market("M2");
+  @Test
+  void appliesMarketSpecificPricesWhenBuilt() {
+    final BiomassMarket m1 = market("M1");
+    final BiomassMarket m2 = market("M2");
 
-        initialPrices(
-            marketPrices(_ -> m1, _ -> List.of(entry(1.0))),
-            marketPrices(_ -> m2, _ -> List.of(entry(2.0)))
-        ).get(scope());
+    initialPrices(
+      marketPrices(_ -> m1, _ -> List.of(entry(1.0))),
+      marketPrices(_ -> m2, _ -> List.of(entry(2.0)))
+    ).get(scope());
 
-        assertThat(amount(m1)).isEqualTo(1.0);
-        assertThat(amount(m2)).isEqualTo(2.0);
-    }
+    assertThat(amount(m1)).isEqualTo(1.0);
+    assertThat(amount(m2)).isEqualTo(2.0);
+  }
 
-    @Test
-    void appliesUniformPricesWhenBuilt() {
-        final BiomassMarket m1 = market("M1");
-        final BiomassMarket m2 = market("M2");
-        final ModelGrid modelGrid = mock(ModelGrid.class);
-        when(modelGrid.getGridWidth()).thenReturn(2);
-        when(modelGrid.getGridHeight()).thenReturn(1);
-        final MarketGrid marketGrid = new ImmutableMarketGrid(
-            modelGrid,
-            Map.of(m1, new Int2D(0, 0), m2, new Int2D(1, 0))
-        );
+  @Test
+  void appliesUniformPricesWhenBuilt() {
+    final BiomassMarket m1 = market("M1");
+    final BiomassMarket m2 = market("M2");
+    final ModelGrid modelGrid = mock(ModelGrid.class);
+    when(modelGrid.getGridWidth()).thenReturn(2);
+    when(modelGrid.getGridHeight()).thenReturn(1);
+    final MarketGrid marketGrid = new ImmutableMarketGrid(
+      modelGrid,
+      Map.of(m1, new Int2D(0, 0), m2, new Int2D(1, 0))
+    );
 
-        final List<MarketPrice> applied = initialPrices(
-            uniformMarketPrices(_ -> marketGrid, _ -> List.of(entry(3.0)))
-        ).get(scope());
+    final List<MarketPrice> applied = initialPrices(
+      uniformMarketPrices(_ -> marketGrid, _ -> List.of(entry(3.0)))
+    ).get(scope());
 
-        assertThat(applied).hasSize(2);
-        assertThat(amount(m1)).isEqualTo(3.0);
-        assertThat(amount(m2)).isEqualTo(3.0);
-    }
+    assertThat(applied).hasSize(2);
+    assertThat(amount(m1)).isEqualTo(3.0);
+    assertThat(amount(m2)).isEqualTo(3.0);
+  }
 
-    private static PriceEntry entry(final double amount) {
-        return new PriceEntry(
-            CATEGORY,
-            HKE,
-            new Price(Money.of(CurrencyUnit.of("EUR"), amount), KILOGRAM)
-        );
-    }
+  private static PriceEntry entry(final double amount) {
+    return new PriceEntry(
+      CATEGORY,
+      HKE,
+      new Price(Money.of(CurrencyUnit.of("EUR"), amount), KILOGRAM)
+    );
+  }
 
-    private static double amount(final BiomassMarket market) {
-        return market
-            .getPrice(CATEGORY, HKE)
-            .orElseThrow()
-            .getAmount()
-            .getAmount()
-            .doubleValue();
-    }
+  private static double amount(final BiomassMarket market) {
+    return market
+      .getPrice(CATEGORY, HKE)
+      .orElseThrow()
+      .getAmount()
+      .getAmount()
+      .doubleValue();
+  }
 
-    private static BiomassMarket market(final String code) {
-        return new BiomassMarket(mock(Port.class), code, mock(EventManager.class));
-    }
+  private static BiomassMarket market(final String code) {
+    return new BiomassMarket(mock(Port.class), code, mock(EventManager.class));
+  }
 
-    private SimulationScope scope() {
-        return new SimulationScope(simulation);
-    }
+  private SimulationScope scope() {
+    return new SimulationScope(simulation);
+  }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.time.LocalDate;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link BetweenDates}. Built via
@@ -40,13 +39,16 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BetweenDatesFactory<S extends Scope> extends RelativeScopeFactory<S, BetweenDates> {
+public class BetweenDatesFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  BetweenDates
+> {
 
-    private Factory<? super S, ? extends LocalDate> startDate;
-    private Factory<? super S, ? extends LocalDate> endDate;
+  private Factory<? super S, ? extends LocalDate> startDate;
+  private Factory<? super S, ? extends LocalDate> endDate;
 
-    @Override
-    protected BetweenDates newInstance(final S scope) {
-        return new BetweenDates(startDate.get(scope), endDate.get(scope));
-    }
+  @Override
+  protected BetweenDates newInstance(final S scope) {
+    return new BetweenDates(startDate.get(scope), endDate.get(scope));
+  }
 }

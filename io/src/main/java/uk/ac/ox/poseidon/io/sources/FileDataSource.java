@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.io.sources;
 
-import lombok.Value;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import lombok.Value;
 
 /**
  * A {@link DataSource} over a plain file, read with a fixed {@link Charset}. Built via
@@ -39,16 +38,15 @@ import java.nio.file.Files;
 @Value
 public class FileDataSource implements DataSource {
 
-    File file;
-    Charset charset;
+  File file;
+  Charset charset;
 
-    @Override
-    public Reader getReader() {
-        try {
-            return Files.newBufferedReader(file.toPath(), charset);
-        } catch (final IOException e) {
-            throw new UncheckedIOException(e);
-        }
+  @Override
+  public Reader getReader() {
+    try {
+      return Files.newBufferedReader(file.toPath(), charset);
+    } catch (final IOException e) {
+      throw new UncheckedIOException(e);
     }
-
+  }
 }

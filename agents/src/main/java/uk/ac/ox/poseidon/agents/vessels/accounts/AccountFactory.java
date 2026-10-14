@@ -36,8 +36,9 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class AccountFactory extends VesselScopeFactory<Account> {
-    @Override
-    protected Account newInstance(final VesselScope scope) {
-        return new Account();
-    }
+
+  @Override
+  protected Account newInstance(final VesselScope scope) {
+    return new Account();
+  }
 }

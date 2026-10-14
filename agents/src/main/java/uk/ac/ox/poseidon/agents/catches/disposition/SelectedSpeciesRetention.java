@@ -23,13 +23,12 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import com.google.common.collect.ImmutableSet;
-import lombok.Getter;
-import uk.ac.ox.poseidon.biology.buckets.Bucket;
-import uk.ac.ox.poseidon.biology.species.Species;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import lombok.Getter;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.biology.species.Species;
 
 /**
  * A {@link DispositionProcess} that discards (alive) any retained catch whose species isn't in
@@ -38,29 +37,30 @@ import java.util.Set;
 @Getter
 public class SelectedSpeciesRetention implements DispositionProcess {
 
-    private final Set<Species> selectedSpecies;
+  private final Set<Species> selectedSpecies;
 
-    SelectedSpeciesRetention(final Collection<? extends Species> selectedSpecies) {
-        this.selectedSpecies = ImmutableSet.copyOf(selectedSpecies);
-    }
+  SelectedSpeciesRetention(
+    final Collection<? extends Species> selectedSpecies
+  ) {
+    this.selectedSpecies = ImmutableSet.copyOf(selectedSpecies);
+  }
 
-    /**
-     * @return {@code currentDisposition} with its retained catch split by species membership in
-     * {@link #selectedSpecies}: selected species stay retained, the rest move to discarded-alive
-     */
-    @Override
-    public Disposition partition(
-        final Disposition currentDisposition,
-        final double availableCapacityInKg
-    ) {
-        final Map<Boolean, Bucket> partition =
-            currentDisposition.getRetained().partitionBy((species, _) ->
-                selectedSpecies.contains(species)
-            );
-        return new Disposition(
-            partition.get(true),
-            currentDisposition.getDiscardedAlive().add(partition.get(false)),
-            currentDisposition.getDiscardedDead()
-        );
-    }
+  /**
+   * @return {@code currentDisposition} with its retained catch split by species membership in
+   * {@link #selectedSpecies}: selected species stay retained, the rest move to discarded-alive
+   */
+  @Override
+  public Disposition partition(
+    final Disposition currentDisposition,
+    final double availableCapacityInKg
+  ) {
+    final Map<Boolean, Bucket> partition = currentDisposition
+      .getRetained()
+      .partitionBy((species, _) -> selectedSpecies.contains(species));
+    return new Disposition(
+      partition.get(true),
+      currentDisposition.getDiscardedAlive().add(partition.get(false)),
+      currentDisposition.getDiscardedDead()
+    );
+  }
 }

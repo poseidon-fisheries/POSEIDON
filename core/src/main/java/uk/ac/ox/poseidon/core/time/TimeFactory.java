@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.time.LocalTime;
 
 /**
  * A {@link GlobalScopeFactory} for a fixed {@link LocalTime}. No separate plain component class
@@ -42,12 +41,12 @@ import java.time.LocalTime;
 @EqualsAndHashCode(callSuper = true)
 public class TimeFactory extends GlobalScopeFactory<LocalTime> {
 
-    private int hour;
-    private int minute;
-    private int second;
+  private int hour;
+  private int minute;
+  private int second;
 
-    @Override
-    protected LocalTime newInstance(final Scope scope) {
-        return LocalTime.of(hour, minute, second);
-    }
+  @Override
+  protected LocalTime newInstance(final Scope scope) {
+    return LocalTime.of(hour, minute, second);
+  }
 }

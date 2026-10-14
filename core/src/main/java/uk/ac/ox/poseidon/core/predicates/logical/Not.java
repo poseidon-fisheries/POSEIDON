@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
+import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
-import java.util.function.Predicate;
 
 /**
  * A {@link Predicate} that negates the result of a wrapped predicate. Built via
@@ -38,11 +37,11 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class Not<T> implements Predicate<T> {
 
-    @NonNull
-    private final Predicate<? super T> predicate;
+  @NonNull
+  private final Predicate<? super T> predicate;
 
-    @Override
-    public boolean test(final T t) {
-        return !predicate.test(t);
-    }
+  @Override
+  public boolean test(final T t) {
+    return !predicate.test(t);
+  }
 }

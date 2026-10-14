@@ -30,13 +30,12 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 @Value
 public class UniformCatchCategoriser implements CatchCategoriser {
 
-    /** The category every bucket is sorted into. */
-    CatchCategory catchCategory;
+  /** The category every bucket is sorted into. */
+  CatchCategory catchCategory;
 
-    /** @return a categorised catch with a single bucket, under {@link #catchCategory} */
-    @Override
-    public CategorisedCatch apply(final Bucket bucket) {
-        return new CategorisedCatch(ImmutableMap.of(catchCategory, bucket));
-    }
-
+  /** @return a categorised catch with a single bucket, under {@link #catchCategory} */
+  @Override
+  public CategorisedCatch apply(final Bucket bucket) {
+    return new CategorisedCatch(ImmutableMap.of(catchCategory, bucket));
+  }
 }

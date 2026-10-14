@@ -37,13 +37,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class StringTagExtractorFactory extends GlobalScopeFactory<StringTagExtractor> {
+public class StringTagExtractorFactory
+  extends GlobalScopeFactory<StringTagExtractor>
+{
 
-    private String tagName;
+  private String tagName;
 
-    @Override
-    protected StringTagExtractor newInstance(final Scope scope) {
-        return new StringTagExtractor(tagName);
-    }
-
+  @Override
+  protected StringTagExtractor newInstance(final Scope scope) {
+    return new StringTagExtractor(tagName);
+  }
 }

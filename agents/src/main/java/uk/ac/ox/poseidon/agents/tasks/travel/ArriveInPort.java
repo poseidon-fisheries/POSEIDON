@@ -22,20 +22,21 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 /**
  * A leaf {@link AgentTask} that records the vessel's arrival in port, ending its current trip's
  * time at sea, and always succeeds.
  */
 public class ArriveInPort extends AgentTask<Vessel> {
-    /** Records the vessel's arrival in port. */
-    @Override
-    public Status execute() {
-        getAgent().arriveInPort();
-        return SUCCEEDED;
-    }
+
+  /** Records the vessel's arrival in port. */
+  @Override
+  public Status execute() {
+    getAgent().arriveInPort();
+    return SUCCEEDED;
+  }
 }

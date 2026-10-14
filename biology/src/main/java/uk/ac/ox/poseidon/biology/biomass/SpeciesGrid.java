@@ -32,5 +32,5 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
  * this common type instead of on either concrete flavor.
  */
 public interface SpeciesGrid extends DoubleGrid {
-    Species getSpecies();
+  Species getSpecies();
 }

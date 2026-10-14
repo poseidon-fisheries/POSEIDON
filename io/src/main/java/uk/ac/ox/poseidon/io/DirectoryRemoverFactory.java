@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.io;
 
+import java.nio.file.Path;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,8 +32,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.nio.file.Path;
-
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link DirectoryRemover}, built via
  * {@link Factories#directoryRemover(Factory, boolean)}.
@@ -41,13 +40,16 @@ import java.nio.file.Path;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DirectoryRemoverFactory<S extends Scope> extends RelativeScopeFactory<S, Steppable> {
+public class DirectoryRemoverFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  Steppable
+> {
 
-    private Factory<? super S, ? extends Path> target;
-    private boolean ignoreIfAbsent;
+  private Factory<? super S, ? extends Path> target;
+  private boolean ignoreIfAbsent;
 
-    @Override
-    protected Steppable newInstance(final S scope) {
-        return new DirectoryRemover(target.get(scope), ignoreIfAbsent);
-    }
+  @Override
+  protected Steppable newInstance(final S scope) {
+    return new DirectoryRemover(target.get(scope), ignoreIfAbsent);
+  }
 }

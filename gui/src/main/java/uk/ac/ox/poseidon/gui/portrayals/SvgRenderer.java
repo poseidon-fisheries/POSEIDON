@@ -23,6 +23,10 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.transcoder.TranscoderInput;
@@ -31,98 +35,89 @@ import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.svg.SVGDocument;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-
 /** Rasterises a parsed SVG document, via Apache Batik, to a given pixel size on demand. */
 @RequiredArgsConstructor
 public class SvgRenderer {
 
-    private final SVGDocument svgDocument;
+  private final SVGDocument svgDocument;
 
-    /**
-     * @param svgInputStream the SVG document to parse
-     * @throws RuntimeException if the document can't be parsed
-     */
-    public static SvgRenderer from(final InputStream svgInputStream) {
-        final String parser = XMLResourceDescriptor.getXMLParserClassName();
-        final SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
-        try {
-            return new SvgRenderer(factory.createSVGDocument(null, svgInputStream));
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+  /**
+   * @param svgInputStream the SVG document to parse
+   * @throws RuntimeException if the document can't be parsed
+   */
+  public static SvgRenderer from(final InputStream svgInputStream) {
+    final String parser = XMLResourceDescriptor.getXMLParserClassName();
+    final SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
+    try {
+      return new SvgRenderer(factory.createSVGDocument(null, svgInputStream));
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * @param width  the rasterised image's width, in pixels
+   * @param height the rasterised image's height, in pixels
+   * @return a freshly rasterised image, at {@code width x height}
+   */
+  public BufferedImage render(final int width, final int height)
+    throws Exception {
+    final CustomImageTranscoder transcoder = new CustomImageTranscoder(
+      width,
+      height
+    );
+    final TranscoderInput input = new TranscoderInput(svgDocument);
+    transcoder.transcode(input, null);
+    return transcoder.getBufferedImage();
+  }
+
+  /**
+   * Rasterises the SVG at {@code width x height} and draws it at {@code (x, y)}.
+   *
+   * @throws RuntimeException if rasterising fails
+   */
+  public void draw(
+    final Graphics2D g,
+    final int x,
+    final int y,
+    final int width,
+    final int height
+  ) {
+    try {
+      final BufferedImage image = render(width, height);
+      g.drawImage(image, x, y, null);
+    } catch (final Exception e) {
+      throw new RuntimeException("Failed to draw SVG document", e);
+    }
+  }
+
+  // Inner class for handling the image transcoding
+  private static class CustomImageTranscoder extends ImageTranscoder {
+
+    private BufferedImage image;
+
+    public CustomImageTranscoder(final int width, final int height) {
+      this.addTranscodingHint(ImageTranscoder.KEY_WIDTH, (float) width);
+      this.addTranscodingHint(ImageTranscoder.KEY_HEIGHT, (float) height);
     }
 
-    /**
-     * @param width  the rasterised image's width, in pixels
-     * @param height the rasterised image's height, in pixels
-     * @return a freshly rasterised image, at {@code width x height}
-     */
-    public BufferedImage render(
-        final int width,
-        final int height
-    ) throws Exception {
-        final CustomImageTranscoder transcoder = new CustomImageTranscoder(width, height);
-        final TranscoderInput input = new TranscoderInput(svgDocument);
-        transcoder.transcode(input, null);
-        return transcoder.getBufferedImage();
+    @Override
+    @SuppressFBWarnings("EI_EXPOSE_REP")
+    public BufferedImage createImage(final int width, final int height) {
+      image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+      return image;
     }
 
-    /**
-     * Rasterises the SVG at {@code width x height} and draws it at {@code (x, y)}.
-     *
-     * @throws RuntimeException if rasterising fails
-     */
-    public void draw(
-        final Graphics2D g,
-        final int x,
-        final int y,
-        final int width,
-        final int height
+    @Override
+    public void writeImage(
+      final BufferedImage img,
+      final TranscoderOutput output
     ) {
-        try {
-            final BufferedImage image = render(width, height);
-            g.drawImage(image, x, y, null);
-        } catch (final Exception e) {
-            throw new RuntimeException("Failed to draw SVG document", e);
-        }
+      // Image is already captured in createImage(), so no need to do anything here
     }
 
-    // Inner class for handling the image transcoding
-    private static class CustomImageTranscoder extends ImageTranscoder {
-        private BufferedImage image;
-
-        public CustomImageTranscoder(
-            final int width,
-            final int height
-        ) {
-            this.addTranscodingHint(ImageTranscoder.KEY_WIDTH, (float) width);
-            this.addTranscodingHint(ImageTranscoder.KEY_HEIGHT, (float) height);
-        }
-
-        @Override
-        @SuppressFBWarnings("EI_EXPOSE_REP")
-        public BufferedImage createImage(
-            final int width,
-            final int height
-        ) {
-            image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            return image;
-        }
-
-        @Override
-        public void writeImage(
-            final BufferedImage img,
-            final TranscoderOutput output
-        ) {
-            // Image is already captured in createImage(), so no need to do anything here
-        }
-
-        public BufferedImage getBufferedImage() {
-            return image;
-        }
+    public BufferedImage getBufferedImage() {
+      return image;
     }
+  }
 }

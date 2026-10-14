@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
+import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.Collection;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link SpeciesIndex} over a resolved collection of
@@ -41,12 +40,15 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SpeciesIndexFactory<S extends Scope> extends RelativeScopeFactory<S, SpeciesIndex> {
+public class SpeciesIndexFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  SpeciesIndex
+> {
 
-    private Factory<S, ? extends Collection<? extends Species>> speciesFactory;
+  private Factory<S, ? extends Collection<? extends Species>> speciesFactory;
 
-    @Override
-    protected SpeciesIndex newInstance(final S scope) {
-        return SpeciesIndex.of(speciesFactory.get(scope));
-    }
+  @Override
+  protected SpeciesIndex newInstance(final S scope) {
+    return SpeciesIndex.of(speciesFactory.get(scope));
+  }
 }

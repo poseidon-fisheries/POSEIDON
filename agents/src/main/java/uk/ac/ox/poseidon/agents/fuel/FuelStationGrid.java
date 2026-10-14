@@ -28,12 +28,12 @@ import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
 /** A grid of {@link FuelStation}s, keyed by each station's {@code getCode()}. */
 public class FuelStationGrid extends ObjectGrid<FuelStation> {
 
-    public FuelStationGrid(final ModelGrid modelGrid) {
-        super(modelGrid);
-    }
+  public FuelStationGrid(final ModelGrid modelGrid) {
+    super(modelGrid);
+  }
 
-    @Override
-    protected String getObjectId(final FuelStation object) {
-        return object.getCode();
-    }
+  @Override
+  protected String getObjectId(final FuelStation object) {
+    return object.getCode();
+  }
 }

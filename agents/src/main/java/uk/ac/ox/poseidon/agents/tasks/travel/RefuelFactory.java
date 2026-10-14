@@ -40,11 +40,13 @@ import uk.ac.ox.poseidon.core.Factory;
 @EqualsAndHashCode(callSuper = true)
 public class RefuelFactory extends VesselTaskFactory<Refuel> {
 
-    private Factory<? super VesselScope, ? extends FuelStationGrid> fuelStationGrid;
+  private Factory<
+    ? super VesselScope,
+    ? extends FuelStationGrid
+  > fuelStationGrid;
 
-    @Override
-    protected Refuel newTask(final VesselScope scope) {
-        return new Refuel(fuelStationGrid.get(scope));
-    }
-    
+  @Override
+  protected Refuel newTask(final VesselScope scope) {
+    return new Refuel(fuelStationGrid.get(scope));
+  }
 }

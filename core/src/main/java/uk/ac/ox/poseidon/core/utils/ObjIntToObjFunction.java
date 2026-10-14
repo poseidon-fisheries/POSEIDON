@@ -30,12 +30,10 @@ package uk.ac.ox.poseidon.core.utils;
  */
 @FunctionalInterface
 public interface ObjIntToObjFunction<T, R> {
-
-    /**
-     * @param value the object argument
-     * @param index the associated index
-     * @return the computed result
-     */
-    R apply(T value, int index);
-
+  /**
+   * @param value the object argument
+   * @param index the associated index
+   * @return the computed result
+   */
+  R apply(T value, int index);
 }

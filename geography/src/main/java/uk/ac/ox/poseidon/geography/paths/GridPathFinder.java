@@ -22,65 +22,60 @@
 
 package uk.ac.ox.poseidon.geography.paths;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 import com.google.common.collect.ImmutableList;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * A {@link PathFinder} specialized to grid cells ({@link Int2D}). Built via
  * {@link uk.ac.ox.poseidon.geography.paths.Factories}.
  */
 public interface GridPathFinder extends PathFinder<Int2D> {
+  /** @return whether {@code cell} can be part of a path (water, or a port cell) */
+  boolean isNavigable(final Int2D cell);
 
-    /** @return whether {@code cell} can be part of a path (water, or a port cell) */
-    boolean isNavigable(final Int2D cell);
+  /**
+   * @param startingCell the cell to search from
+   * @return every water cell reachable from {@code startingCell} by an existing path
+   */
+  default ImmutableList<Int2D> getAccessibleWaterCells(
+    final Int2D startingCell
+  ) {
+    return getModelGrid()
+      .getAllCells()
+      .filter(this::isWater)
+      .filter(cell -> isAccessible(startingCell, cell))
+      .collect(toImmutableList());
+  }
 
-    /**
-     * @param startingCell the cell to search from
-     * @return every water cell reachable from {@code startingCell} by an existing path
-     */
-    default ImmutableList<Int2D> getAccessibleWaterCells(
-        final Int2D startingCell
-    ) {
-        return getModelGrid()
-            .getAllCells()
-            .filter(this::isWater)
-            .filter(cell -> isAccessible(startingCell, cell))
-            .collect(toImmutableList());
-    }
+  /** @return the grid this pathfinder finds paths over */
+  ModelGrid getModelGrid();
 
-    /** @return the grid this pathfinder finds paths over */
-    ModelGrid getModelGrid();
+  /** @return whether {@code cell} is water */
+  boolean isWater(final Int2D cell);
 
-    /** @return whether {@code cell} is water */
-    boolean isWater(final Int2D cell);
+  /** @return whether a path exists between {@code start} and {@code end} */
+  default boolean isAccessible(final Int2D start, final Int2D end) {
+    return getPath(start, end).isPresent();
+  }
 
-    /** @return whether a path exists between {@code start} and {@code end} */
-    default boolean isAccessible(
-        final Int2D start,
-        final Int2D end
-    ) {
-        return getPath(start, end).isPresent();
-    }
-
-    /**
-     * @param startingCell      the cell to search from
-     * @param neighbourhoodSize how far out to look for neighbours
-     * @return {@code startingCell}'s water neighbours, within {@code neighbourhoodSize}, that are
-     * reachable from it by an existing path
-     */
-    default ImmutableList<Int2D> getAccessibleWaterNeighbours(
-        final Int2D startingCell,
-        final int neighbourhoodSize
-    ) {
-        return getModelGrid()
-            .getActiveNeighbours(startingCell, neighbourhoodSize)
-            .stream()
-            .filter(this::isWater)
-            .filter(cell -> isAccessible(startingCell, cell))
-            .collect(toImmutableList());
-    }
-
+  /**
+   * @param startingCell      the cell to search from
+   * @param neighbourhoodSize how far out to look for neighbours
+   * @return {@code startingCell}'s water neighbours, within {@code neighbourhoodSize}, that are
+   * reachable from it by an existing path
+   */
+  default ImmutableList<Int2D> getAccessibleWaterNeighbours(
+    final Int2D startingCell,
+    final int neighbourhoodSize
+  ) {
+    return getModelGrid()
+      .getActiveNeighbours(startingCell, neighbourhoodSize)
+      .stream()
+      .filter(this::isWater)
+      .filter(cell -> isAccessible(startingCell, cell))
+      .collect(toImmutableList());
+  }
 }

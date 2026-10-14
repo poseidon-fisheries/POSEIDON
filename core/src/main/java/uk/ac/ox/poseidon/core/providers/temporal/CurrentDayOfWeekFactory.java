@@ -35,11 +35,12 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CurrentDayOfWeekFactory extends SimulationScopeFactory<CurrentDayOfWeek> {
+public class CurrentDayOfWeekFactory
+  extends SimulationScopeFactory<CurrentDayOfWeek>
+{
 
-    @Override
-    protected CurrentDayOfWeek newInstance(final SimulationScope scope) {
-        return new CurrentDayOfWeek(scope.getSimulation().getTemporalSchedule());
-    }
-
+  @Override
+  protected CurrentDayOfWeek newInstance(final SimulationScope scope) {
+    return new CurrentDayOfWeek(scope.getSimulation().getTemporalSchedule());
+  }
 }

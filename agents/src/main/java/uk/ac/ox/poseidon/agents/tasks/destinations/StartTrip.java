@@ -22,13 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.tasks.destinations;
 
+import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 /**
  * Starts a vessel's trip towards whatever destination {@code destinationSupplier} yields; fails,
@@ -37,17 +37,17 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 @RequiredArgsConstructor
 public class StartTrip extends AgentTask<Vessel> {
 
-    private final DestinationSupplier destinationSupplier;
+  private final DestinationSupplier destinationSupplier;
 
-    /** @return {@link Status#SUCCEEDED} if a destination was found and the trip started, else {@link Status#FAILED} */
-    @Override
-    public Status execute() {
-        return destinationSupplier
-            .get()
-            .map(destination -> {
-                getAgent().startTrip(destination);
-                return SUCCEEDED;
-            })
-            .orElse(FAILED);
-    }
+  /** @return {@link Status#SUCCEEDED} if a destination was found and the trip started, else {@link Status#FAILED} */
+  @Override
+  public Status execute() {
+    return destinationSupplier
+      .get()
+      .map(destination -> {
+        getAgent().startTrip(destination);
+        return SUCCEEDED;
+      })
+      .orElse(FAILED);
+  }
 }

@@ -22,9 +22,8 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
 
 /**
  * A {@link Function} that delegates to another function and substitutes a fixed default whenever
@@ -37,12 +36,12 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class DefaultIfNull<T, R> implements Function<T, R> {
 
-    private final Function<? super T, ? extends R> delegate;
-    private final R defaultValue;
+  private final Function<? super T, ? extends R> delegate;
+  private final R defaultValue;
 
-    @Override
-    public R apply(final T value) {
-        final R result = delegate.apply(value);
-        return result == null ? defaultValue : result;
-    }
+  @Override
+  public R apply(final T value) {
+    final R result = delegate.apply(value);
+    return result == null ? defaultValue : result;
+  }
 }

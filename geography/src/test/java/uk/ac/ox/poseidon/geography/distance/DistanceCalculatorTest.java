@@ -22,55 +22,77 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
-
-import java.time.Duration;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Duration;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import sim.util.Int2D;
+
 class DistanceCalculatorTest {
 
-    @Test
-    void travelDurationIsDistanceOverSpeed() {
-        assertThat(DistanceCalculator.travelDuration(5.0, 10.0))
-            .isEqualTo(Duration.ofMinutes(30));
-    }
+  @Test
+  void travelDurationIsDistanceOverSpeed() {
+    assertThat(DistanceCalculator.travelDuration(5.0, 10.0)).isEqualTo(
+      Duration.ofMinutes(30)
+    );
+  }
 
-    @Test
-    void travelDurationAlongAPathIsItsLengthOverSpeed() {
-        final DistanceCalculator calculator = new CartesianDistanceCalculator(null, 1.0);
-        assertThat(calculator.travelDuration(List.of(new Int2D(0, 0), new Int2D(3, 4)), 10.0))
-            .isEqualTo(Duration.ofMinutes(30));
-    }
+  @Test
+  void travelDurationAlongAPathIsItsLengthOverSpeed() {
+    final DistanceCalculator calculator = new CartesianDistanceCalculator(
+      null,
+      1.0
+    );
+    assertThat(
+      calculator.travelDuration(List.of(new Int2D(0, 0), new Int2D(3, 4)), 10.0)
+    ).isEqualTo(Duration.ofMinutes(30));
+  }
 
-    @Test
-    void travelDurationAlongAOneCellPathIsZero() {
-        final DistanceCalculator calculator = new CartesianDistanceCalculator(null, 1.0);
-        assertThat(calculator.travelDuration(List.of(new Int2D(3, 4)), 10.0))
-            .isEqualTo(Duration.ZERO);
-    }
+  @Test
+  void travelDurationAlongAOneCellPathIsZero() {
+    final DistanceCalculator calculator = new CartesianDistanceCalculator(
+      null,
+      1.0
+    );
+    assertThat(
+      calculator.travelDuration(List.of(new Int2D(3, 4)), 10.0)
+    ).isEqualTo(Duration.ZERO);
+  }
 
-    @Test
-    void travelDurationAlongAnEmptyPathIsRefused() {
-        final DistanceCalculator calculator = new CartesianDistanceCalculator(null, 1.0);
-        assertThatThrownBy(() -> calculator.travelDuration(List.of(), 10.0))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+  @Test
+  void travelDurationAlongAnEmptyPathIsRefused() {
+    final DistanceCalculator calculator = new CartesianDistanceCalculator(
+      null,
+      1.0
+    );
+    assertThatThrownBy(() ->
+      calculator.travelDuration(List.of(), 10.0)
+    ).isInstanceOf(IllegalArgumentException.class);
+  }
 
-    @Test
-    void distanceAlongAPathSumsItsLegs() {
-        final DistanceCalculator calculator = new CartesianDistanceCalculator(null, 1.0);
-        assertThat(calculator.distanceInKm(
-            List.of(new Int2D(0, 0), new Int2D(3, 4), new Int2D(3, 8))
-        )).isEqualTo(9.0);
-    }
+  @Test
+  void distanceAlongAPathSumsItsLegs() {
+    final DistanceCalculator calculator = new CartesianDistanceCalculator(
+      null,
+      1.0
+    );
+    assertThat(
+      calculator.distanceInKm(
+        List.of(new Int2D(0, 0), new Int2D(3, 4), new Int2D(3, 8))
+      )
+    ).isEqualTo(9.0);
+  }
 
-    @Test
-    void distanceAlongAOneCellPathIsZero() {
-        final DistanceCalculator calculator = new CartesianDistanceCalculator(null, 1.0);
-        assertThat(calculator.distanceInKm(List.of(new Int2D(3, 4)))).isEqualTo(0.0);
-    }
+  @Test
+  void distanceAlongAOneCellPathIsZero() {
+    final DistanceCalculator calculator = new CartesianDistanceCalculator(
+      null,
+      1.0
+    );
+    assertThat(calculator.distanceInKm(List.of(new Int2D(3, 4)))).isEqualTo(
+      0.0
+    );
+  }
 }

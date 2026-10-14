@@ -22,9 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
-import lombok.Value;
-
 import java.time.LocalDateTime;
+import lombok.Value;
 
 /**
  * A price at one market: the price of a species in a catch category there. This is a price
@@ -34,22 +33,22 @@ import java.time.LocalDateTime;
 @Value
 public class MarketPrice {
 
-    /** The market the price applies to. */
-    BiomassMarket market;
-    /** The (category, species, price) entry. */
-    PriceEntry priceEntry;
+  /** The market the price applies to. */
+  BiomassMarket market;
+  /** The (category, species, price) entry. */
+  PriceEntry priceEntry;
 
-    /**
-     * Sets this price on {@link #market}, replacing any price it had for the same entry.
-     *
-     * @param dateTime when the price changes
-     */
-    public void apply(final LocalDateTime dateTime) {
-        market.setPrice(
-            priceEntry.getCatchCategory(),
-            priceEntry.getSpecies(),
-            priceEntry.getPrice(),
-            dateTime
-        );
-    }
+  /**
+   * Sets this price on {@link #market}, replacing any price it had for the same entry.
+   *
+   * @param dateTime when the price changes
+   */
+  public void apply(final LocalDateTime dateTime) {
+    market.setPrice(
+      priceEntry.getCatchCategory(),
+      priceEntry.getSpecies(),
+      priceEntry.getPrice(),
+      dateTime
+    );
+  }
 }

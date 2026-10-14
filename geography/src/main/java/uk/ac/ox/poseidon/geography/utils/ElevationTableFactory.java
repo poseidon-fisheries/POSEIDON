@@ -39,22 +39,23 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ElevationTableFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ElevationTable> {
+public class ElevationTableFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  ElevationTable
+> {
 
-    private Factory<? super S, ? extends Table> table;
-    private String longitudeColumnName;
-    private String latitudeColumnName;
-    private String elevationColumnName;
+  private Factory<? super S, ? extends Table> table;
+  private String longitudeColumnName;
+  private String latitudeColumnName;
+  private String elevationColumnName;
 
-    @Override
-    protected ElevationTable newInstance(final S scope) {
-        return new ElevationTable(
-            table.get(scope),
-            longitudeColumnName,
-            latitudeColumnName,
-            elevationColumnName
-        );
-    }
-
+  @Override
+  protected ElevationTable newInstance(final S scope) {
+    return new ElevationTable(
+      table.get(scope),
+      longitudeColumnName,
+      latitudeColumnName,
+      elevationColumnName
+    );
+  }
 }

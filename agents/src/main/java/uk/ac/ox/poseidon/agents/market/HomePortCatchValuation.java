@@ -22,20 +22,19 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static com.google.common.base.Preconditions.checkState;
+import static lombok.AccessLevel.PACKAGE;
+
+import java.time.LocalDateTime;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.function.ToDoubleBiFunction;
 import lombok.RequiredArgsConstructor;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
-
-import java.time.LocalDateTime;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.function.ToDoubleBiFunction;
-
-import static com.google.common.base.Preconditions.checkState;
-import static lombok.AccessLevel.PACKAGE;
 
 /**
  * Values a catch at the prices of the market at a vessel's home port, as it would sell there now:
@@ -51,69 +50,75 @@ import static lombok.AccessLevel.PACKAGE;
  * always sorts the same catch the same way.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class HomePortCatchValuation implements ToDoubleBiFunction<Object, Bucket> {
+public class HomePortCatchValuation
+  implements ToDoubleBiFunction<Object, Bucket>
+{
 
-    // Catches no longer remembered would pile up here, so it is cleared past this size. Weak keys
-    // would drop them precisely, but made NW Med runs 10% slower.
-    private static final int MAXIMUM_NUMBER_OF_VALUES = 10_000;
+  // Catches no longer remembered would pile up here, so it is cleared past this size. Weak keys
+  // would drop them precisely, but made NW Med runs 10% slower.
+  private static final int MAXIMUM_NUMBER_OF_VALUES = 10_000;
 
-    private final Vessel vessel;
-    private final CatchCategoriser catchCategoriser;
-    // By identity: cheaper than comparing catches, and a catch never changes.
-    private final Map<Bucket, Double> values = new IdentityHashMap<>();
-    // The market and the time from which the values above hold.
-    private Market valuedMarket;
-    private LocalDateTime valuedSince;
+  private final Vessel vessel;
+  private final CatchCategoriser catchCategoriser;
+  // By identity: cheaper than comparing catches, and a catch never changes.
+  private final Map<Bucket, Double> values = new IdentityHashMap<>();
+  // The market and the time from which the values above hold.
+  private Market valuedMarket;
+  private LocalDateTime valuedSince;
 
-    /**
-     * @throws IllegalStateException if the vessel has no home port, its home port does not have
-     *                               exactly one market, or the catch is priced in more than one
-     *                               currency
-     */
-    @Override
-    public double applyAsDouble(
-        final Object option,
-        final Bucket bucket
-    ) {
-        checkState(vessel.getHomePort() != null, "Vessel %s has no home port.", vessel.getId());
-        final Market market = vessel.getMarketGrid().getMarket(vessel.getHomePort());
-        final boolean valuesHold = market == valuedMarket &&
-            !pricesChangedSince(market, valuedSince) &&
-            values.size() <= MAXIMUM_NUMBER_OF_VALUES;
-        if (!valuesHold) {
-            values.clear();
-            valuedMarket = market;
-            valuedSince = vessel.getSchedule().getDateTime();
-        }
-        return values.computeIfAbsent(bucket, key -> valueAt(market, key));
+  /**
+   * @throws IllegalStateException if the vessel has no home port, its home port does not have
+   *                               exactly one market, or the catch is priced in more than one
+   *                               currency
+   */
+  @Override
+  public double applyAsDouble(final Object option, final Bucket bucket) {
+    checkState(
+      vessel.getHomePort() != null,
+      "Vessel %s has no home port.",
+      vessel.getId()
+    );
+    final Market market = vessel
+      .getMarketGrid()
+      .getMarket(vessel.getHomePort());
+    final boolean valuesHold =
+      market == valuedMarket &&
+      !pricesChangedSince(market, valuedSince) &&
+      values.size() <= MAXIMUM_NUMBER_OF_VALUES;
+    if (!valuesHold) {
+      values.clear();
+      valuedMarket = market;
+      valuedSince = vessel.getSchedule().getDateTime();
     }
+    return values.computeIfAbsent(bucket, key -> valueAt(market, key));
+  }
 
-    // Strictly before: a price set in the same second as a valuation may have come after it.
-    private static boolean pricesChangedSince(
-        final Market market,
-        final LocalDateTime dateTime
-    ) {
-        return market
-            .getLastPriceChangeDateTime()
-            .map(lastPriceChange -> !lastPriceChange.isBefore(dateTime))
-            .orElse(false);
-    }
+  // Strictly before: a price set in the same second as a valuation may have come after it.
+  private static boolean pricesChangedSince(
+    final Market market,
+    final LocalDateTime dateTime
+  ) {
+    return market
+      .getLastPriceChangeDateTime()
+      .map(lastPriceChange -> !lastPriceChange.isBefore(dateTime))
+      .orElse(false);
+  }
 
-    private double valueAt(
-        final Market market,
-        final Bucket bucket
-    ) {
-        final Map<CurrencyUnit, Money> summary =
-            Sale.summarise(market.quote(catchCategoriser.apply(bucket)));
-        checkState(
-            summary.size() <= 1,
-            "Catch of vessel %s priced in more than one currency: %s.",
-            vessel.getId(),
-            summary.keySet()
-        );
-        return summary.values().stream()
-            .findAny()
-            .map(money -> money.getAmount().doubleValue())
-            .orElse(0.0);
-    }
+  private double valueAt(final Market market, final Bucket bucket) {
+    final Map<CurrencyUnit, Money> summary = Sale.summarise(
+      market.quote(catchCategoriser.apply(bucket))
+    );
+    checkState(
+      summary.size() <= 1,
+      "Catch of vessel %s priced in more than one currency: %s.",
+      vessel.getId(),
+      summary.keySet()
+    );
+    return summary
+      .values()
+      .stream()
+      .findAny()
+      .map(money -> money.getAmount().doubleValue())
+      .orElse(0.0);
+  }
 }

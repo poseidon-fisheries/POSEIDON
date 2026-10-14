@@ -25,13 +25,12 @@ package uk.ac.ox.poseidon.agents.tasks.branches;
 import com.badlogic.gdx.ai.btree.BranchTask;
 import com.badlogic.gdx.ai.btree.Task;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import lombok.*;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
-
-import java.util.List;
 
 /**
  * A {@link VesselTaskFactory} for a gdx-ai {@link BranchTask}: builds the branch node via
@@ -47,35 +46,39 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends VesselTaskFactory<T> {
 
-    @Singular
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP")
-    private List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children;
+  @Singular
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP")
+  private List<
+    ? extends Factory<? super VesselScope, ? extends Task<Vessel>>
+  > children;
 
-    /**
-     * @param guard    optional task guarding whether this branch runs at all
-     * @param children factories for the branch's child tasks, resolved and attached in order
-     */
-    public BranchTaskFactory(
-        final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
-        final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
-    ) {
-        super(guard);
-        this.children = children;
+  /**
+   * @param guard    optional task guarding whether this branch runs at all
+   * @param children factories for the branch's child tasks, resolved and attached in order
+   */
+  public BranchTaskFactory(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
+    final List<
+      ? extends Factory<? super VesselScope, ? extends Task<Vessel>>
+    > children
+  ) {
+    super(guard);
+    this.children = children;
+  }
+
+  /** @return a branch node built by {@link #newTask()} with every child in {@code children} attached */
+  @Override
+  protected T newTask(final VesselScope scope) {
+    final T task = newTask();
+    if (children != null) {
+      this.children
+        .stream()
+        .map(t -> t.get(scope))
+        .forEach(task::addChild);
     }
+    return task;
+  }
 
-    /** @return a branch node built by {@link #newTask()} with every child in {@code children} attached */
-    @Override
-    protected T newTask(final VesselScope scope) {
-        final T task = newTask();
-        if (children != null) {
-            this.children
-                .stream()
-                .map(t -> t.get(scope))
-                .forEach(task::addChild);
-        }
-        return task;
-    }
-
-    /** @return a freshly built, still childless branch node */
-    protected abstract T newTask();
+  /** @return a freshly built, still childless branch node */
+  protected abstract T newTask();
 }

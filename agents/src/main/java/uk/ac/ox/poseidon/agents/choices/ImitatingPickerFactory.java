@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +31,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link ImitatingPicker}, built via
@@ -41,19 +40,27 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ImitatingPickerFactory<O> extends VesselScopeFactory<ImitatingPicker<O>> {
+public class ImitatingPickerFactory<O> extends VesselScopeFactory<
+  ImitatingPicker<O>
+> {
 
-    private Factory<? super VesselScope, ? extends OptionValues<O>> optionValues;
-    private Factory<? super VesselScope, ? extends Predicate<? super O>> optionPredicate;
-    private Factory<? super VesselScope, ? extends Supplier<OptionValues<O>>> optionValuesSupplier;
+  private Factory<? super VesselScope, ? extends OptionValues<O>> optionValues;
+  private Factory<
+    ? super VesselScope,
+    ? extends Predicate<? super O>
+  > optionPredicate;
+  private Factory<
+    ? super VesselScope,
+    ? extends Supplier<OptionValues<O>>
+  > optionValuesSupplier;
 
-    @Override
-    protected ImitatingPicker<O> newInstance(final VesselScope scope) {
-        return new ImitatingPicker<>(
-            optionValues.get(scope),
-            optionPredicate.get(scope),
-            optionValuesSupplier.get(scope),
-            scope.getSimulation().random
-        );
-    }
+  @Override
+  protected ImitatingPicker<O> newInstance(final VesselScope scope) {
+    return new ImitatingPicker<>(
+      optionValues.get(scope),
+      optionPredicate.get(scope),
+      optionValuesSupplier.get(scope),
+      scope.getSimulation().random
+    );
+  }
 }

@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.Provider;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-
-import java.time.LocalDate;
 
 /**
  * A {@link Provider} that returns the simulation's current date, read live from the
@@ -36,10 +35,10 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class CurrentDate implements Provider<LocalDate> {
 
-    private final TemporalSchedule temporalSchedule;
+  private final TemporalSchedule temporalSchedule;
 
-    @Override
-    public LocalDate get() {
-        return temporalSchedule.getDate();
-    }
+  @Override
+  public LocalDate get() {
+    return temporalSchedule.getDate();
+  }
 }

@@ -22,6 +22,13 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
+import static com.google.common.base.Preconditions.checkState;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
+import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.IntStream;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,14 +39,6 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.IntStream;
-
-import static com.google.common.base.Preconditions.checkState;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
-import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
 
 @Data
 @NoArgsConstructor
@@ -52,56 +51,60 @@ import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
  * species) or as many grids as there are species.
  */
 public class SpeciesBiomassFieldsPortrayalFactory
-    extends SimulationScopeFactory<List<NamedPortrayal>> {
+  extends SimulationScopeFactory<List<NamedPortrayal>>
+{
 
-    private Factory<? super SimulationScope, List<? extends BiomassGrid>> biomassGrids;
-    private Factory<? super SimulationScope, List<? extends CarryingCapacityGrid>>
-        carryingCapacityGrids;
-    private boolean visible;
+  private Factory<
+    ? super SimulationScope,
+    List<? extends BiomassGrid>
+  > biomassGrids;
+  private Factory<
+    ? super SimulationScope,
+    List<? extends CarryingCapacityGrid>
+  > carryingCapacityGrids;
+  private boolean visible;
 
-    /**
-     * @return one named portrayal per species, pairing each biomass grid with its (possibly
-     * broadcast) carrying capacity grid
-     * @throws IllegalStateException if the two lists' sizes are incompatible
-     */
-    @Override
-    protected List<NamedPortrayal> newInstance(final SimulationScope scope) {
+  /**
+   * @return one named portrayal per species, pairing each biomass grid with its (possibly
+   * broadcast) carrying capacity grid
+   * @throws IllegalStateException if the two lists' sizes are incompatible
+   */
+  @Override
+  protected List<NamedPortrayal> newInstance(final SimulationScope scope) {
+    final List<? extends BiomassGrid> biomassGrids = this.biomassGrids.get(
+      scope
+    );
 
-        final List<? extends BiomassGrid> biomassGrids =
-            this.biomassGrids.get(scope);
+    final List<? extends CarryingCapacityGrid> carryingCapacityGrids =
+      this.carryingCapacityGrids.get(scope);
 
-        final List<? extends CarryingCapacityGrid> carryingCapacityGrids =
-            this.carryingCapacityGrids.get(scope);
+    final int n = Math.max(biomassGrids.size(), carryingCapacityGrids.size());
 
-        final int n = Math.max(biomassGrids.size(), carryingCapacityGrids.size());
+    checkState(Set.of(1, n).contains(biomassGrids.size()));
+    checkState(Set.of(1, n).contains(carryingCapacityGrids.size()));
 
-        checkState(Set.of(1, n).contains(biomassGrids.size()));
-        checkState(Set.of(1, n).contains(carryingCapacityGrids.size()));
+    return IntStream.range(0, n)
+      .mapToObj(i -> {
+        final BiomassGrid biomassGrid = biomassGrids.get(
+          biomassGrids.size() == 1 ? 0 : i
+        );
+        final CarryingCapacityGrid carryingCapacityGrid =
+          carryingCapacityGrids.get(carryingCapacityGrids.size() == 1 ? 0 : i);
 
-        return IntStream
-            .range(0, n)
-            .mapToObj(i -> {
-                final BiomassGrid biomassGrid =
-                    biomassGrids.get(biomassGrids.size() == 1 ? 0 : i);
-                final CarryingCapacityGrid carryingCapacityGrid =
-                    carryingCapacityGrids.get(carryingCapacityGrids.size() == 1 ? 0 : i);
-
-                final Species species = biomassGrid.getSpecies();
-                final String name = species.toString() + " biomass";
-                return new NamedPortrayal(
-                    name,
-                    new NumberGridWithCapacityPortrayalFactory(
-                        LAJOLLA,
-                        name,
-                        false,
-                        object(biomassGrid),
-                        object(carryingCapacityGrid)
-                    ).get(scope),
-                    visible
-                );
-
-            })
-            .toList();
-
-    }
+        final Species species = biomassGrid.getSpecies();
+        final String name = species.toString() + " biomass";
+        return new NamedPortrayal(
+          name,
+          new NumberGridWithCapacityPortrayalFactory(
+            LAJOLLA,
+            name,
+            false,
+            object(biomassGrid),
+            object(carryingCapacityGrid)
+          ).get(scope),
+          visible
+        );
+      })
+      .toList();
+  }
 }

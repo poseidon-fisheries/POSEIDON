@@ -38,22 +38,29 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CommonBiomassGrowerFactory<S extends Scope>
-    extends RelativeScopeFactory<S, CommonBiomassGrower> {
+public class CommonBiomassGrowerFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  CommonBiomassGrower
+> {
 
-    private Factory<? super S, ? extends BiomassGrid> biomassGrid;
-    private Factory<? super S, ? extends CarryingCapacityGrid> carryingCapacityGrid;
-    private Factory<? super S, ? extends BiomassGrowthRule> biomassGrowthRule;
-    private Factory<? super S, ? extends BiomassRecruitmentAllocator>
-        biomassRecruitmentAllocator;
+  private Factory<? super S, ? extends BiomassGrid> biomassGrid;
+  private Factory<
+    ? super S,
+    ? extends CarryingCapacityGrid
+  > carryingCapacityGrid;
+  private Factory<? super S, ? extends BiomassGrowthRule> biomassGrowthRule;
+  private Factory<
+    ? super S,
+    ? extends BiomassRecruitmentAllocator
+  > biomassRecruitmentAllocator;
 
-    @Override
-    protected CommonBiomassGrower newInstance(final S scope) {
-        return new CommonBiomassGrower(
-            biomassGrid.get(scope),
-            carryingCapacityGrid.get(scope),
-            biomassGrowthRule.get(scope),
-            biomassRecruitmentAllocator.get(scope)
-        );
-    }
+  @Override
+  protected CommonBiomassGrower newInstance(final S scope) {
+    return new CommonBiomassGrower(
+      biomassGrid.get(scope),
+      carryingCapacityGrid.get(scope),
+      biomassGrowthRule.get(scope),
+      biomassRecruitmentAllocator.get(scope)
+    );
+  }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,8 +33,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.function.Function;
-
 /**
  * A {@link RelativeScopeFactory} for a {@link TripCostFromHourlyCosts}. Built via
  * {@link Factories#tripCostFromHourlyCosts}.
@@ -42,14 +41,18 @@ import java.util.function.Function;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TripCostFromHourlyCostsFactory<S extends Scope>
-    extends RelativeScopeFactory<S, TripCostFromHourlyCosts> {
+public class TripCostFromHourlyCostsFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  TripCostFromHourlyCosts
+> {
 
-    private Factory<? super S, ? extends Function<? super Vessel, ? extends Money>>
-        hourlyCostsExtractor;
+  private Factory<
+    ? super S,
+    ? extends Function<? super Vessel, ? extends Money>
+  > hourlyCostsExtractor;
 
-    @Override
-    protected TripCostFromHourlyCosts newInstance(final S scope) {
-        return new TripCostFromHourlyCosts(hourlyCostsExtractor.get(scope));
-    }
+  @Override
+  protected TripCostFromHourlyCosts newInstance(final S scope) {
+    return new TripCostFromHourlyCosts(hourlyCostsExtractor.get(scope));
+  }
 }

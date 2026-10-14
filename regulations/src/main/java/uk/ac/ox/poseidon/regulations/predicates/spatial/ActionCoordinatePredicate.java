@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.regulations.SpatialAction;
-
-import java.util.function.Predicate;
 
 /**
  * Matches a {@link SpatialAction} whose start coordinate or end coordinate satisfies
@@ -36,12 +35,13 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class ActionCoordinatePredicate implements Predicate<SpatialAction<?>> {
 
-    private final Predicate<Coordinate> coordinatePredicate;
+  private final Predicate<Coordinate> coordinatePredicate;
 
-    @Override
-    public boolean test(final SpatialAction<?> action) {
-        return coordinatePredicate.test(action.getStartCoordinate()) ||
-            coordinatePredicate.test(action.getEndCoordinate());
-    }
-
+  @Override
+  public boolean test(final SpatialAction<?> action) {
+    return (
+      coordinatePredicate.test(action.getStartCoordinate()) ||
+      coordinatePredicate.test(action.getEndCoordinate())
+    );
+  }
 }

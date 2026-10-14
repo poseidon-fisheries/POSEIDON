@@ -39,10 +39,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @EqualsAndHashCode(callSuper = true)
 public class DoubleFromRowFactory extends GlobalScopeFactory<DoubleFromRow> {
 
-    private String columnName;
+  private String columnName;
 
-    @Override
-    protected DoubleFromRow newInstance(final Scope scope) {
-        return new DoubleFromRow(columnName);
-    }
+  @Override
+  protected DoubleFromRow newInstance(final Scope scope) {
+    return new DoubleFromRow(columnName);
+  }
 }

@@ -45,28 +45,28 @@ import uk.ac.ox.poseidon.core.Factory;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class TaskFactory<G extends Agent, S extends AgentScope<G>, T extends Task<G>>
-    extends AbstractFactory<S, T> {
+public abstract class TaskFactory<
+  G extends Agent,
+  S extends AgentScope<G>,
+  T extends Task<G>
+> extends AbstractFactory<S, T> {
 
-    private Factory<? super S, ? extends Task<G>> guard;
+  private Factory<? super S, ? extends Task<G>> guard;
 
-    /** @return a freshly built, unguarded task */
-    protected abstract T newTask(
-        final S scope
-    );
+  /** @return a freshly built, unguarded task */
+  protected abstract T newTask(final S scope);
 
-    /** @return {@code scope}'s agent, so each agent gets its own resolved task */
-    @Override
-    protected Object makeKey(final S scope) {
-        return scope.getAgent();
-    }
+  /** @return {@code scope}'s agent, so each agent gets its own resolved task */
+  @Override
+  protected Object makeKey(final S scope) {
+    return scope.getAgent();
+  }
 
-    /** @return a task built by {@link #newTask}, with {@link #guard} attached if set */
-    @Override
-    protected T newInstance(final S scope) {
-        final T task = newTask(scope);
-        if (guard != null) task.setGuard(guard.get(scope));
-        return task;
-    }
-
+  /** @return a task built by {@link #newTask}, with {@link #guard} attached if set */
+  @Override
+  protected T newInstance(final S scope) {
+    final T task = newTask(scope);
+    if (guard != null) task.setGuard(guard.get(scope));
+    return task;
+  }
 }

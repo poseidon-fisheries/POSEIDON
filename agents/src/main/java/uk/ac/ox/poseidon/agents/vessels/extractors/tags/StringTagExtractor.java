@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors.tags;
 
+import static uk.ac.ox.poseidon.core.utils.Utils.toTrimmedString;
+
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.function.Function;
-
-import static uk.ac.ox.poseidon.core.utils.Utils.toTrimmedString;
 
 /**
  * Extracts a vessel's tag named {@code tagName} as a trimmed string. Returns {@code null} if the
@@ -37,12 +36,14 @@ import static uk.ac.ox.poseidon.core.utils.Utils.toTrimmedString;
 @RequiredArgsConstructor
 public class StringTagExtractor implements Function<Vessel, String> {
 
-    @NonNull private final String tagName;
+  @NonNull
+  private final String tagName;
 
-    @Override
-    public String apply(final Vessel vessel) {
-        return vessel.getTag(tagName)
-            .map(v -> toTrimmedString(v, true))
-            .orElse(null);
-    }
+  @Override
+  public String apply(final Vessel vessel) {
+    return vessel
+      .getTag(tagName)
+      .map(v -> toTrimmedString(v, true))
+      .orElse(null);
+  }
 }

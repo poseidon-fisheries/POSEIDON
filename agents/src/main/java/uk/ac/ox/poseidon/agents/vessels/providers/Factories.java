@@ -22,82 +22,81 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
+import java.util.function.Supplier;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
-import java.util.function.Supplier;
-
 /** Factories for values and services derived from a vessel's current state. */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link VesselScope}-relative factory for a {@link CurrentCell}
-     * @see CurrentCell
-     */
-    public static CurrentCellFactory currentCell() {
-        return new CurrentCellFactory();
-    }
+  /**
+   * @return a {@link VesselScope}-relative factory for a {@link CurrentCell}
+   * @see CurrentCell
+   */
+  public static CurrentCellFactory currentCell() {
+    return new CurrentCellFactory();
+  }
 
-    /**
-     * @param pathFinder finds which cells are reachable, and by what path
-     * @return a {@link VesselScope}-relative factory for an {@link AccessibleWaterCells}
-     * @see AccessibleWaterCells
-     */
-    public static AccessibleWaterCellsFactory accessibleWaterCells(
-        final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder
-    ) {
-        return new AccessibleWaterCellsFactory(pathFinder);
-    }
+  /**
+   * @param pathFinder finds which cells are reachable, and by what path
+   * @return a {@link VesselScope}-relative factory for an {@link AccessibleWaterCells}
+   * @see AccessibleWaterCells
+   */
+  public static AccessibleWaterCellsFactory accessibleWaterCells(
+    final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder
+  ) {
+    return new AccessibleWaterCellsFactory(pathFinder);
+  }
 
-    /**
-     * @return a {@link VesselScope}-relative factory for a {@link HomePortCell}
-     * @see HomePortCell
-     */
-    public static HomePortCellFactory homePortCell() {
-        return new HomePortCellFactory();
-    }
+  /**
+   * @return a {@link VesselScope}-relative factory for a {@link HomePortCell}
+   * @see HomePortCell
+   */
+  public static HomePortCellFactory homePortCell() {
+    return new HomePortCellFactory();
+  }
 
-    /**
-     * @return a {@link VesselScope}-relative factory for a {@link CurrentTripDestinationCell}
-     * @see CurrentTripDestinationCell
-     */
-    public static CurrentTripDestinationCellFactory currentTripDestinationCell() {
-        return new CurrentTripDestinationCellFactory();
-    }
+  /**
+   * @return a {@link VesselScope}-relative factory for a {@link CurrentTripDestinationCell}
+   * @see CurrentTripDestinationCell
+   */
+  public static CurrentTripDestinationCellFactory currentTripDestinationCell() {
+    return new CurrentTripDestinationCellFactory();
+  }
 
-    /**
-     * @return a {@link VesselScope}-relative factory for a {@link CurrentTimeAtSea}
-     * @see CurrentTimeAtSea
-     */
-    public static CurrentTimeAtSeaFactory currentTimeAtSea() {
-        return new CurrentTimeAtSeaFactory();
-    }
+  /**
+   * @return a {@link VesselScope}-relative factory for a {@link CurrentTimeAtSea}
+   * @see CurrentTimeAtSea
+   */
+  public static CurrentTimeAtSeaFactory currentTimeAtSea() {
+    return new CurrentTimeAtSeaFactory();
+  }
 
-    /**
-     * @return a {@link VesselScope}-relative factory for a {@link CurrentTripStartDateTime}
-     * @see CurrentTripStartDateTime
-     */
-    public static CurrentTripStartDateTimeFactory currentTripStartDateTime() {
-        return new CurrentTripStartDateTimeFactory();
-    }
+  /**
+   * @return a {@link VesselScope}-relative factory for a {@link CurrentTripStartDateTime}
+   * @see CurrentTripStartDateTime
+   */
+  public static CurrentTripStartDateTimeFactory currentTripStartDateTime() {
+    return new CurrentTripStartDateTimeFactory();
+  }
 
-    /**
-     * @return a {@link VesselScope}-relative factory for a {@link VesselEventManager}
-     * @see VesselEventManager
-     */
-    public static VesselEventManagerFactory vesselEventManager() {
-        return new VesselEventManagerFactory();
-    }
+  /**
+   * @return a {@link VesselScope}-relative factory for a {@link VesselEventManager}
+   * @see VesselEventManager
+   */
+  public static VesselEventManagerFactory vesselEventManager() {
+    return new VesselEventManagerFactory();
+  }
 
-    /**
-     * @return a {@link VesselScope}-relative factory for a {@link CurrentTripEventManager}
-     * @see CurrentTripEventManager
-     */
-    public static CurrentTripEventManagerFactory currentTripEventManager() {
-        return new CurrentTripEventManagerFactory();
-    }
+  /**
+   * @return a {@link VesselScope}-relative factory for a {@link CurrentTripEventManager}
+   * @see CurrentTripEventManager
+   */
+  public static CurrentTripEventManagerFactory currentTripEventManager() {
+    return new CurrentTripEventManagerFactory();
+  }
 }

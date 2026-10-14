@@ -22,10 +22,9 @@
 
 package uk.ac.ox.poseidon.agents.fuel;
 
+import java.util.Map;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
-import java.util.Map;
 
 /**
  * A {@link FuelStationGrid} whose station locations are fixed at construction, from a
@@ -33,12 +32,11 @@ import java.util.Map;
  */
 public class ImmutableFuelStationGrid extends FuelStationGrid {
 
-    ImmutableFuelStationGrid(
-        final ModelGrid modelGrid,
-        final Map<FuelStation, Int2D> fuelStationLocations
-    ) {
-        super(modelGrid);
-        fuelStationLocations.forEach(field::setObjectLocation);
-    }
-
+  ImmutableFuelStationGrid(
+    final ModelGrid modelGrid,
+    final Map<FuelStation, Int2D> fuelStationLocations
+  ) {
+    super(modelGrid);
+    fuelStationLocations.forEach(field::setObjectLocation);
+  }
 }

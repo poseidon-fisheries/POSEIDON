@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.io.paths;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,11 +33,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A {@link SimulationScopeFactory} for a per-simulation subdirectory of a resolved parent path,
@@ -45,24 +44,24 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SimulationFolderFactory
-    extends SimulationScopeFactory<Path>
-    implements PathFactory<SimulationScope> {
+  extends SimulationScopeFactory<Path>
+  implements PathFactory<SimulationScope>
+{
 
-    private Factory<? super SimulationScope, ? extends Path> parent;
+  private Factory<? super SimulationScope, ? extends Path> parent;
 
-    @Override
-    protected Path newInstance(final SimulationScope scope) {
-        final Path path =
-            checkNotNull(parent, "Parent path factory is null")
-                .get(scope)
-                .resolve(scope.getSimulation().getId().toString());
-        if (Files.notExists(path)) {
-            try {
-                Files.createDirectories(path);
-            } catch (final Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return path;
+  @Override
+  protected Path newInstance(final SimulationScope scope) {
+    final Path path = checkNotNull(parent, "Parent path factory is null")
+      .get(scope)
+      .resolve(scope.getSimulation().getId().toString());
+    if (Files.notExists(path)) {
+      try {
+        Files.createDirectories(path);
+      } catch (final Exception e) {
+        throw new RuntimeException(e);
+      }
     }
+    return path;
+  }
 }

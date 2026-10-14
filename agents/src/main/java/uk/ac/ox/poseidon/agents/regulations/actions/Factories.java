@@ -25,12 +25,12 @@ package uk.ac.ox.poseidon.agents.regulations.actions;
 /** Factories for {@link FishingAction}s tested against the regulations engine. */
 public class Factories {
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-     * {@link DepartNowActionFunction}
-     * @see DepartNow
-     */
-    public static DepartNowActionFunctionFactory departNow() {
-        return new DepartNowActionFunctionFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   * {@link DepartNowActionFunction}
+   * @see DepartNow
+   */
+  public static DepartNowActionFunctionFactory departNow() {
+    return new DepartNowActionFunctionFactory();
+  }
 }

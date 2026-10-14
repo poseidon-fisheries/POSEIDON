@@ -39,13 +39,14 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AccessibleWaterCellsFactory extends VesselScopeFactory<AccessibleWaterCells> {
+public class AccessibleWaterCellsFactory
+  extends VesselScopeFactory<AccessibleWaterCells>
+{
 
-    private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
+  private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
 
-    @Override
-    protected AccessibleWaterCells newInstance(final VesselScope scope) {
-        return new AccessibleWaterCells(scope.getVessel(), pathFinder.get(scope));
-    }
-
+  @Override
+  protected AccessibleWaterCells newInstance(final VesselScope scope) {
+    return new AccessibleWaterCells(scope.getVessel(), pathFinder.get(scope));
+  }
 }

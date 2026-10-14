@@ -44,12 +44,12 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @EqualsAndHashCode(callSuper = true)
 public class FinalProcessFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
-    private Factory<? super SimulationScope, C> process;
+  private Factory<? super SimulationScope, C> process;
 
-    @Override
-    protected C newInstance(final SimulationScope scope) {
-        final C process = this.process.get(scope);
-        scope.getSimulation().addFinalProcess(process);
-        return process;
-    }
+  @Override
+  protected C newInstance(final SimulationScope scope) {
+    final C process = this.process.get(scope);
+    scope.getSimulation().addFinalProcess(process);
+    return process;
+  }
 }

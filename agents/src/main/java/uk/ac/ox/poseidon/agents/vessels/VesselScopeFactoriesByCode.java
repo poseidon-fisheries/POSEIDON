@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
 import java.util.Optional;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
 
 /**
  * A {@link VesselScopeFactory} that picks which of several factories to resolve based on
@@ -44,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @EqualsAndHashCode(callSuper = true)
 public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
 
-    /* FIXME: Ultimately, I think that VesselScopeFactoriesByCode might broken because changing
+  /* FIXME: Ultimately, I think that VesselScopeFactoriesByCode might broken because changing
         the code associated with the "default factory" changes the key of the main factory.
         Maybe that's fine because that code will always be the same as the code of the main
         factory, but I'm still uneasy about it. Also, this is the main place where having
@@ -52,33 +51,36 @@ public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
         default factory) can cause problems.
     */
 
-    @Singular private Map<String, ? extends Factory<? super VesselScope, ? extends C>> factories;
-    private Factory<? super VesselScope, ? extends C> defaultFactory;
-    private String code;
+  @Singular
+  private Map<
+    String,
+    ? extends Factory<? super VesselScope, ? extends C>
+  > factories;
 
-    /**
-     * @return the resolved value from {@link #factories}' entry for {@link #code}, or
-     * {@link #defaultFactory}'s if there's no entry for {@link #code}
-     * @throws NullPointerException     if {@link #code} isn't set
-     * @throws IllegalArgumentException if neither {@link #factories} nor
-     *                                   {@link #defaultFactory} has an answer for {@link #code}
-     */
-    @Override
-    protected C newInstance(final VesselScope scope) {
-        checkNotNull(
-            code,
-            "Cannot create new instance unless code is set."
-        );
-        return Optional
-            .ofNullable(factories.get(code))
-            .map(factory -> (C) factory.get(scope))
-            .or(() ->
-                Optional
-                    .ofNullable(defaultFactory)
-                    .map(factory -> factory.get(scope))
-            )
-            .orElseThrow(() -> new IllegalArgumentException(
-                "No factory found for code %s and no default factory provided.".formatted(code)
-            ));
-    }
+  private Factory<? super VesselScope, ? extends C> defaultFactory;
+  private String code;
+
+  /**
+   * @return the resolved value from {@link #factories}' entry for {@link #code}, or
+   * {@link #defaultFactory}'s if there's no entry for {@link #code}
+   * @throws NullPointerException     if {@link #code} isn't set
+   * @throws IllegalArgumentException if neither {@link #factories} nor
+   *                                   {@link #defaultFactory} has an answer for {@link #code}
+   */
+  @Override
+  protected C newInstance(final VesselScope scope) {
+    checkNotNull(code, "Cannot create new instance unless code is set.");
+    return Optional.ofNullable(factories.get(code))
+      .map(factory -> (C) factory.get(scope))
+      .or(() ->
+        Optional.ofNullable(defaultFactory).map(factory -> factory.get(scope))
+      )
+      .orElseThrow(() ->
+        new IllegalArgumentException(
+          "No factory found for code %s and no default factory provided.".formatted(
+            code
+          )
+        )
+      );
+  }
 }

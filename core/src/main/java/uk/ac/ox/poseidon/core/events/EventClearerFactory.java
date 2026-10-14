@@ -38,13 +38,15 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class EventClearerFactory<S extends Scope> extends RelativeScopeFactory<S, EventClearer> {
+public class EventClearerFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  EventClearer
+> {
 
-    private Factory<? super S, ? extends EventAccumulator<?>> eventAccumulator;
+  private Factory<? super S, ? extends EventAccumulator<?>> eventAccumulator;
 
-    @Override
-    protected EventClearer newInstance(final S scope) {
-        return new EventClearer(eventAccumulator.get(scope));
-    }
-
+  @Override
+  protected EventClearer newInstance(final S scope) {
+    return new EventClearer(eventAccumulator.get(scope));
+  }
 }

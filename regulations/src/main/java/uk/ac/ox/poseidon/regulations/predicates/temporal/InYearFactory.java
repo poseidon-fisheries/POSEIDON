@@ -38,11 +38,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @EqualsAndHashCode(callSuper = true)
 public class InYearFactory extends GlobalScopeFactory<InYear> {
 
-    private int year;
+  private int year;
 
-    @Override
-    protected InYear newInstance(final Scope scope) {
-        return new InYear(year);
-    }
-
+  @Override
+  protected InYear newInstance(final Scope scope) {
+    return new InYear(year);
+  }
 }

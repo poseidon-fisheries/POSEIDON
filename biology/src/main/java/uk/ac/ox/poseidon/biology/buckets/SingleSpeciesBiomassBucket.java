@@ -22,13 +22,9 @@
 
 package uk.ac.ox.poseidon.biology.buckets;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.ToString;
-import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
-import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 
 import java.util.Map;
 import java.util.Optional;
@@ -37,10 +33,13 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.ObjDoubleConsumer;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.ToString;
+import uk.ac.ox.poseidon.biology.Content;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
+import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
 /**
  * A {@link Bucket} holding a positive biomass of exactly one species — by far the most common
@@ -52,76 +51,73 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 @ToString
 class SingleSpeciesBiomassBucket implements Bucket {
 
-    private final Species species;
-    private final double biomassInKg;
+  private final Species species;
+  private final double biomassInKg;
 
-    @Override
-    public boolean equals(final Object obj) {
-        return Bucket.contentEquals(this, obj);
-    }
+  @Override
+  public boolean equals(final Object obj) {
+    return Bucket.contentEquals(this, obj);
+  }
 
-    @Override
-    public int hashCode() {
-        return Bucket.contentHashCode(this);
-    }
+  @Override
+  public int hashCode() {
+    return Bucket.contentHashCode(this);
+  }
 
-    /**
-     * @param species     the species held
-     * @param biomassInKg the amount held, in kilograms; must be positive, since an empty bucket
-     *                    is represented by {@link EmptyBucket} instead
-     */
-    SingleSpeciesBiomassBucket(
-        final Species species,
-        final double biomassInKg
-    ) {
-        this.species = checkNotNull(species, "species");
-        this.biomassInKg = checkPositive(biomassInKg, "biomass");
-    }
+  /**
+   * @param species     the species held
+   * @param biomassInKg the amount held, in kilograms; must be positive, since an empty bucket
+   *                    is represented by {@link EmptyBucket} instead
+   */
+  SingleSpeciesBiomassBucket(final Species species, final double biomassInKg) {
+    this.species = checkNotNull(species, "species");
+    this.biomassInKg = checkPositive(biomassInKg, "biomass");
+  }
 
-    @Getter(lazy = true)
-    private final Biomass content = new Biomass(biomassInKg);
+  @Getter(lazy = true)
+  private final Biomass content = new Biomass(biomassInKg);
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    @Getter(value = AccessLevel.PRIVATE, lazy = true)
-    private final Optional<Biomass> optionalContent = Optional.of(getContent());
+  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+  @Getter(value = AccessLevel.PRIVATE, lazy = true)
+  private final Optional<Biomass> optionalContent = Optional.of(getContent());
 
-    @Getter(value = AccessLevel.PRIVATE, lazy = true)
-    private final Map<Species, Content> cachedMap = Map.of(species, getContent());
+  @Getter(value = AccessLevel.PRIVATE, lazy = true)
+  private final Map<Species, Content> cachedMap = Map.of(species, getContent());
 
-    @Getter(value = AccessLevel.PRIVATE, lazy = true)
-    private final Set<Species> cachedSpecies = Set.of(species);
+  @Getter(value = AccessLevel.PRIVATE, lazy = true)
+  private final Set<Species> cachedSpecies = Set.of(species);
 
-    @Override
-    public Optional<? extends Content> getContent(final Species species) {
-        return species.equals(this.species) ?
-            getOptionalContent() :
-            Optional.empty();
-    }
+  @Override
+  public Optional<? extends Content> getContent(final Species species) {
+    return species.equals(this.species)
+      ? getOptionalContent()
+      : Optional.empty();
+  }
 
-    @Override
-    public double getKg(final Species species) {
-        return species.equals(this.species) ? biomassInKg : 0.0;
-    }
+  @Override
+  public double getKg(final Species species) {
+    return species.equals(this.species) ? biomassInKg : 0.0;
+  }
 
-    @Override
-    public Bucket add(final Bucket other) {
-        return switch (other) {
-            //@formatter:off
-            case final SingleSpeciesBiomassBucket otherBucket
+  @Override
+  public Bucket add(final Bucket other) {
+    return switch (other) {
+      //@formatter:off
+      case final SingleSpeciesBiomassBucket otherBucket
                 when otherBucket.species.equals(species) ->
                     new SingleSpeciesBiomassBucket(
                         species, biomassInKg + otherBucket.biomassInKg
                     );
-            //@formatter:on
-            default -> Bucket.super.add(other);
-        };
-    }
+      //@formatter:on
+      default -> Bucket.super.add(other);
+    };
+  }
 
-    @Override
-    public Bucket subtract(final Bucket other) {
-        return switch (other) {
-            //@formatter:off
-            case final SingleSpeciesBiomassBucket otherBucket
+  @Override
+  public Bucket subtract(final Bucket other) {
+    return switch (other) {
+      //@formatter:off
+      case final SingleSpeciesBiomassBucket otherBucket
                 when otherBucket.species.equals(species) -> {
                     final double newBiomass = checkNonNegative(
                         biomassInKg - otherBucket.biomassInKg,
@@ -131,83 +127,87 @@ class SingleSpeciesBiomassBucket implements Bucket {
                         ? Bucket.empty()
                         : new SingleSpeciesBiomassBucket(species, newBiomass);
                 }
-            //@formatter:on
-            default -> Bucket.super.subtract(other);
-        };
-    }
+      //@formatter:on
+      default -> Bucket.super.subtract(other);
+    };
+  }
 
-    @Override
-    public Bucket replaceContent(
-        final Species species,
-        final Content newContent
-    ) {
-        if (species.equals(this.species) && newContent instanceof Biomass) {
-            final double newBiomass = newContent.asKg();
-            if (Double.isNaN(newBiomass) || newBiomass == 0) return Bucket.empty();
-            return new SingleSpeciesBiomassBucket(species, newBiomass);
-        } else {
-            return Bucket.super.replaceContent(species, newContent);
-        }
+  @Override
+  public Bucket replaceContent(
+    final Species species,
+    final Content newContent
+  ) {
+    if (species.equals(this.species) && newContent instanceof Biomass) {
+      final double newBiomass = newContent.asKg();
+      if (Double.isNaN(newBiomass) || newBiomass == 0) return Bucket.empty();
+      return new SingleSpeciesBiomassBucket(species, newBiomass);
+    } else {
+      return Bucket.super.replaceContent(species, newContent);
     }
+  }
 
-    @Override
-    public Bucket mapContent(final BiFunction<Species, Content, Content> mapper) {
-        final Content mapped = mapper.apply(species, getContent());
-        if (mapped instanceof Biomass) {
-            final double mappedKg = mapped.asKg();
-            if (Double.isNaN(mappedKg) || mappedKg == 0) return Bucket.empty();
-            return new SingleSpeciesBiomassBucket(species, mappedKg);
-        }
-        return Bucket.super.mapContent(mapper);
+  @Override
+  public Bucket mapContent(final BiFunction<Species, Content, Content> mapper) {
+    final Content mapped = mapper.apply(species, getContent());
+    if (mapped instanceof Biomass) {
+      final double mappedKg = mapped.asKg();
+      if (Double.isNaN(mappedKg) || mappedKg == 0) return Bucket.empty();
+      return new SingleSpeciesBiomassBucket(species, mappedKg);
     }
+    return Bucket.super.mapContent(mapper);
+  }
 
-    @Override
-    public Bucket mapBiomassValue(final ObjDoubleToDoubleFunction<Species> mapper) {
-        final double mappedKg = mapper.applyAsDouble(species, biomassInKg);
-        return Double.isNaN(mappedKg) || mappedKg == 0
-            ? Bucket.empty()
-            : new SingleSpeciesBiomassBucket(species, mappedKg);
-    }
+  @Override
+  public Bucket mapBiomassValue(
+    final ObjDoubleToDoubleFunction<Species> mapper
+  ) {
+    final double mappedKg = mapper.applyAsDouble(species, biomassInKg);
+    return Double.isNaN(mappedKg) || mappedKg == 0
+      ? Bucket.empty()
+      : new SingleSpeciesBiomassBucket(species, mappedKg);
+  }
 
-    @Override
-    public Map<Boolean, Bucket> partitionBy(final BiPredicate<Species, Content> predicate) {
-        return (predicate.test(species, getContent()))
-            ? Map.of(true, this, false, Bucket.empty())
-            : Map.of(true, Bucket.empty(), false, this);
-    }
+  @Override
+  public Map<Boolean, Bucket> partitionBy(
+    final BiPredicate<Species, Content> predicate
+  ) {
+    return predicate.test(species, getContent())
+      ? Map.of(true, this, false, Bucket.empty())
+      : Map.of(true, Bucket.empty(), false, this);
+  }
 
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
+  @Override
+  public boolean isEmpty() {
+    return false;
+  }
 
-    @Override
-    public Biomass getTotalBiomass() {
-        return getContent();
-    }
+  @Override
+  public Biomass getTotalBiomass() {
+    return getContent();
+  }
 
-    @Override
-    public double getTotalBiomassInKg() {
-        return biomassInKg;
-    }
+  @Override
+  public double getTotalBiomassInKg() {
+    return biomassInKg;
+  }
 
-    @Override
-    public Map<Species, Content> getMap() {
-        return getCachedMap();
-    }
+  @Override
+  public Map<Species, Content> getMap() {
+    return getCachedMap();
+  }
 
-    @Override
-    public Set<Species> getSpecies() {
-        return getCachedSpecies();
-    }
+  @Override
+  public Set<Species> getSpecies() {
+    return getCachedSpecies();
+  }
 
-    @Override
-    public void forEach(final BiConsumer<Species, Content> action) {
-        action.accept(species, getContent());
-    }
+  @Override
+  public void forEach(final BiConsumer<Species, Content> action) {
+    action.accept(species, getContent());
+  }
 
-    @Override
-    public void forEachBiomassValue(final ObjDoubleConsumer<Species> action) {
-        action.accept(species, biomassInKg);
-    }
+  @Override
+  public void forEachBiomassValue(final ObjDoubleConsumer<Species> action) {
+    action.accept(species, biomassInKg);
+  }
 }

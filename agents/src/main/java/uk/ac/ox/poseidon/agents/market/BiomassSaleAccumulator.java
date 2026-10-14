@@ -26,7 +26,8 @@ import uk.ac.ox.poseidon.core.events.EventAccumulator;
 
 /** An {@link EventAccumulator} of {@link Sale}s. */
 public class BiomassSaleAccumulator extends EventAccumulator<Sale> {
-    BiomassSaleAccumulator() {
-        super(Sale.class);
-    }
+
+  BiomassSaleAccumulator() {
+    super(Sale.class);
+  }
 }

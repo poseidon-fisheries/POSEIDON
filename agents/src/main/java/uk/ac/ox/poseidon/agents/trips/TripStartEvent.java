@@ -27,5 +27,6 @@ import lombok.Value;
 /** Broadcast when a {@link Trip} begins. */
 @Value
 public class TripStartEvent implements TripEvent {
-    Trip trip;
+
+  Trip trip;
 }

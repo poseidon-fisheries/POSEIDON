@@ -27,52 +27,50 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /** A vessel's storage for caught biomass, with a fixed total capacity. */
 public interface Hold {
+  /**
+   * Adds the specified bucket of content to the current hold.
+   *
+   * @param categorisedCatch the content to add
+   */
+  void addContent(CategorisedCatch categorisedCatch);
 
-    /**
-     * Adds the specified bucket of content to the current hold.
-     *
-     * @param categorisedCatch the content to add
-     */
-    void addContent(CategorisedCatch categorisedCatch);
+  /**
+   * Adds the specified bucket of content to the current hold.
+   *
+   * @param uncategorisedCatch the content to add
+   */
+  void addContent(Bucket uncategorisedCatch);
 
-    /**
-     * Adds the specified bucket of content to the current hold.
-     *
-     * @param uncategorisedCatch the content to add
-     */
-    void addContent(Bucket uncategorisedCatch);
+  /**
+   * Retrieves the content held in the container without removing it.
+   *
+   * @return the current content.
+   */
+  CategorisedCatch getContent();
 
-    /**
-     * Retrieves the content held in the container without removing it.
-     *
-     * @return the current content.
-     */
-    CategorisedCatch getContent();
+  /** @return {@code true} if there's no available capacity left */
+  default boolean isFull() {
+    return getAvailableCapacityInKg() <= 0;
+  }
 
-    /** @return {@code true} if there's no available capacity left */
-    default boolean isFull() {
-        return getAvailableCapacityInKg() <= 0;
-    }
+  /**
+   * Removes all content currently held in the container and returns it.
+   *
+   * @return the removed content. If the container was empty, returns an empty
+   * {@link CategorisedCatch}.
+   */
+  CategorisedCatch extractContent();
 
-    /**
-     * Removes all content currently held in the container and returns it.
-     *
-     * @return the removed content. If the container was empty, returns an empty
-     * {@link CategorisedCatch}.
-     */
-    CategorisedCatch extractContent();
+  /** @return {@code true} if the current content is empty */
+  default boolean isEmpty() {
+    return getContent().isEmpty();
+  }
 
-    /** @return {@code true} if the current content is empty */
-    default boolean isEmpty() {
-        return getContent().isEmpty();
-    }
+  /** @return this hold's fixed total capacity, in kilograms */
+  double getTotalCapacityInKg();
 
-    /** @return this hold's fixed total capacity, in kilograms */
-    double getTotalCapacityInKg();
-
-    /** @return {@link #getTotalCapacityInKg()} minus the current content's total biomass */
-    default double getAvailableCapacityInKg() {
-        return getTotalCapacityInKg() - getContent().getTotalBiomassInKg();
-    }
-
+  /** @return {@link #getTotalCapacityInKg()} minus the current content's total biomass */
+  default double getAvailableCapacityInKg() {
+    return getTotalCapacityInKg() - getContent().getTotalBiomassInKg();
+  }
 }

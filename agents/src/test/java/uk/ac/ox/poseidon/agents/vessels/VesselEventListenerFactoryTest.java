@@ -22,86 +22,91 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.events.AbstractListener;
-import uk.ac.ox.poseidon.core.events.EventManager;
-import uk.ac.ox.poseidon.core.events.SimpleEventManager;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
 
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.events.AbstractListener;
+import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.core.events.SimpleEventManager;
+
 class VesselEventListenerFactoryTest {
 
-    private final VesselScope scopeA = scopeOfNewVessel();
-    private final VesselScope scopeB = scopeOfNewVessel();
-    private final CountingListenerFactory listener = new CountingListenerFactory();
-    private final VesselEventListenerFactory<CountingListener> factory =
-        vesselEventListener(listener);
+  private final VesselScope scopeA = scopeOfNewVessel();
+  private final VesselScope scopeB = scopeOfNewVessel();
+  private final CountingListenerFactory listener =
+    new CountingListenerFactory();
+  private final VesselEventListenerFactory<CountingListener> factory =
+    vesselEventListener(listener);
 
-    private static VesselScope scopeOfNewVessel() {
-        final EventManager eventManager = new SimpleEventManager();
-        final Vessel vessel = mock(Vessel.class);
-        when(vessel.getEventManager()).thenReturn(eventManager);
-        final VesselScope scope = mock(VesselScope.class);
-        when(scope.getVessel()).thenReturn(vessel);
-        return scope;
+  private static VesselScope scopeOfNewVessel() {
+    final EventManager eventManager = new SimpleEventManager();
+    final Vessel vessel = mock(Vessel.class);
+    when(vessel.getEventManager()).thenReturn(eventManager);
+    final VesselScope scope = mock(VesselScope.class);
+    when(scope.getVessel()).thenReturn(vessel);
+    return scope;
+  }
+
+  private static class CountingListener extends AbstractListener<String> {
+
+    private int count = 0;
+
+    CountingListener() {
+      super(String.class);
     }
 
-    private static class CountingListener extends AbstractListener<String> {
-        private int count = 0;
-
-        CountingListener() {
-            super(String.class);
-        }
-
-        @Override
-        public void receive(final String event) {
-            count++;
-        }
+    @Override
+    public void receive(final String event) {
+      count++;
     }
+  }
 
-    private static class CountingListenerFactory extends VesselScopeFactory<CountingListener> {
-        @Override
-        protected CountingListener newInstance(final VesselScope scope) {
-            return new CountingListener();
-        }
+  private static class CountingListenerFactory
+    extends VesselScopeFactory<CountingListener>
+  {
+
+    @Override
+    protected CountingListener newInstance(final VesselScope scope) {
+      return new CountingListener();
     }
+  }
 
-    private static void broadcastOnVessel(final VesselScope scope) {
-        scope.getVessel().getEventManager().broadcast("event");
-    }
+  private static void broadcastOnVessel(final VesselScope scope) {
+    scope.getVessel().getEventManager().broadcast("event");
+  }
 
-    @Test
-    void registersTheListenerOnTheVesselsEventManager() {
-        factory.get(scopeA);
-        broadcastOnVessel(scopeA);
+  @Test
+  void registersTheListenerOnTheVesselsEventManager() {
+    factory.get(scopeA);
+    broadcastOnVessel(scopeA);
 
-        assertThat(listener.get(scopeA).count).isEqualTo(1);
-    }
+    assertThat(listener.get(scopeA).count).isEqualTo(1);
+  }
 
-    @Test
-    void registersTheListenerOnlyOnceForAVessel() {
-        factory.get(scopeA);
-        factory.get(scopeA);
-        broadcastOnVessel(scopeA);
+  @Test
+  void registersTheListenerOnlyOnceForAVessel() {
+    factory.get(scopeA);
+    factory.get(scopeA);
+    broadcastOnVessel(scopeA);
 
-        assertThat(listener.get(scopeA).count).isEqualTo(1);
-    }
+    assertThat(listener.get(scopeA).count).isEqualTo(1);
+  }
 
-    @Test
-    void registersEachVesselsListenerOnItsOwnEventManager() {
-        factory.get(scopeA);
-        factory.get(scopeB);
-        broadcastOnVessel(scopeB);
+  @Test
+  void registersEachVesselsListenerOnItsOwnEventManager() {
+    factory.get(scopeA);
+    factory.get(scopeB);
+    broadcastOnVessel(scopeB);
 
-        assertThat(listener.get(scopeA).count).isZero();
-        assertThat(listener.get(scopeB).count).isEqualTo(1);
-    }
+    assertThat(listener.get(scopeA).count).isZero();
+    assertThat(listener.get(scopeB).count).isEqualTo(1);
+  }
 
-    @Test
-    void givesTheListenerTheListenersFactoryGivesForTheVessel() {
-        assertThat(factory.get(scopeA)).isNotNull().isSameAs(listener.get(scopeA));
-    }
+  @Test
+  void givesTheListenerTheListenersFactoryGivesForTheVessel() {
+    assertThat(factory.get(scopeA)).isNotNull().isSameAs(listener.get(scopeA));
+  }
 }

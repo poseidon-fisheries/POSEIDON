@@ -22,40 +22,40 @@
 
 package uk.ac.ox.poseidon.agents.components;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-
 class VesselComponentRegisterFactoryTest {
 
-    private final Simulation simulation = mock(Simulation.class);
-    private final Simulation otherSimulation = mock(Simulation.class);
+  private final Simulation simulation = mock(Simulation.class);
+  private final Simulation otherSimulation = mock(Simulation.class);
 
-    @Test
-    void returnsSameRegisterForSameSimulation() {
-        final VesselComponentRegisterFactory<String> factory =
-            new VesselComponentRegisterFactory<>();
-        final SimulationScope scope = new SimulationScope(simulation);
+  @Test
+  void returnsSameRegisterForSameSimulation() {
+    final VesselComponentRegisterFactory<String> factory =
+      new VesselComponentRegisterFactory<>();
+    final SimulationScope scope = new SimulationScope(simulation);
 
-        final VesselComponentRegister<String> first = factory.get(scope);
-        final VesselComponentRegister<String> second = factory.get(scope);
+    final VesselComponentRegister<String> first = factory.get(scope);
+    final VesselComponentRegister<String> second = factory.get(scope);
 
-        assertThat(first).isSameAs(second);
-    }
+    assertThat(first).isSameAs(second);
+  }
 
-    @Test
-    void returnsDifferentRegistersForDifferentSimulations() {
-        final VesselComponentRegisterFactory<String> factory =
-            new VesselComponentRegisterFactory<>();
-        final SimulationScope firstScope = new SimulationScope(simulation);
-        final SimulationScope secondScope = new SimulationScope(otherSimulation);
+  @Test
+  void returnsDifferentRegistersForDifferentSimulations() {
+    final VesselComponentRegisterFactory<String> factory =
+      new VesselComponentRegisterFactory<>();
+    final SimulationScope firstScope = new SimulationScope(simulation);
+    final SimulationScope secondScope = new SimulationScope(otherSimulation);
 
-        final VesselComponentRegister<String> first = factory.get(firstScope);
-        final VesselComponentRegister<String> second = factory.get(secondScope);
+    final VesselComponentRegister<String> first = factory.get(firstScope);
+    final VesselComponentRegister<String> second = factory.get(secondScope);
 
-        assertThat(first).isNotSameAs(second);
-    }
+    assertThat(first).isNotSameAs(second);
+  }
 }

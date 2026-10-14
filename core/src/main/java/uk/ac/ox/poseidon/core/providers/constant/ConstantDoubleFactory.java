@@ -38,13 +38,15 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantDoubleFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ConstantDouble> {
+public class ConstantDoubleFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  ConstantDouble
+> {
 
-    private Factory<? super S, ? extends Double> doubleFactory;
+  private Factory<? super S, ? extends Double> doubleFactory;
 
-    @Override
-    protected ConstantDouble newInstance(final S scope) {
-        return new ConstantDouble(doubleFactory.get(scope));
-    }
+  @Override
+  protected ConstantDouble newInstance(final S scope) {
+    return new ConstantDouble(doubleFactory.get(scope));
+  }
 }

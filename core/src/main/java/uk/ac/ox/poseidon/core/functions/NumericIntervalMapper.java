@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import lombok.Value;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.nullsFirst;
 
 import java.util.List;
 import java.util.function.Function;
-
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.nullsFirst;
+import lombok.Value;
 
 /**
  * A {@link Function} that maps numeric values to labels using non-overlapping intervals. Bounds
@@ -40,87 +39,101 @@ import static java.util.Comparator.nullsFirst;
 @Value
 public class NumericIntervalMapper<T> implements Function<Double, T> {
 
-    List<Interval<T>> intervals;
+  List<Interval<T>> intervals;
 
-    /**
-     * @param intervals the non-overlapping intervals to map values through; each must have at
-     *                  least one bound, and a lower bound strictly less than its upper bound
-     */
-    public NumericIntervalMapper(final List<Interval<T>> intervals) {
-        this.intervals = List.copyOf(intervals);
-        validateIntervals(this.intervals);
+  /**
+   * @param intervals the non-overlapping intervals to map values through; each must have at
+   *                  least one bound, and a lower bound strictly less than its upper bound
+   */
+  public NumericIntervalMapper(final List<Interval<T>> intervals) {
+    this.intervals = List.copyOf(intervals);
+    validateIntervals(this.intervals);
+  }
+
+  /** @return the mapped value for the interval containing {@code value}, or {@code null} if no
+   * interval contains it */
+  @Override
+  public T apply(final Double value) {
+    // A loop, not a stream: this runs for every cell valued, and the stream's overhead showed
+    // in profiles.
+    for (final Interval<T> interval : intervals) {
+      if (interval.contains(value)) return interval.getMappedValue();
     }
+    return null;
+  }
 
-    /** @return the mapped value for the interval containing {@code value}, or {@code null} if no
-     * interval contains it */
-    @Override
-    public T apply(final Double value) {
-        // A loop, not a stream: this runs for every cell valued, and the stream's overhead showed
-        // in profiles.
-        for (final Interval<T> interval : intervals) {
-            if (interval.contains(value)) return interval.getMappedValue();
-        }
-        return null;
+  private static void validateIntervals(
+    final List<? extends Interval<?>> intervals
+  ) {
+    intervals.forEach(NumericIntervalMapper::validateBounds);
+    final List<? extends Interval<?>> sortedIntervals = intervals
+      .stream()
+      .sorted(
+        comparing(
+          Interval::getLowerBoundInclusive,
+          nullsFirst(Double::compareTo)
+        )
+      )
+      .toList();
+    for (int i = 1; i < sortedIntervals.size(); i++) {
+      final Interval<?> previous = sortedIntervals.get(i - 1);
+      final Interval<?> current = sortedIntervals.get(i);
+      if (overlaps(previous, current)) {
+        throw new IllegalArgumentException("Intervals overlap.");
+      }
     }
+  }
 
-    private static void validateIntervals(final List<? extends Interval<?>> intervals) {
-        intervals.forEach(NumericIntervalMapper::validateBounds);
-        final List<? extends Interval<?>> sortedIntervals =
-            intervals.stream()
-                .sorted(comparing(Interval::getLowerBoundInclusive, nullsFirst(Double::compareTo)))
-                .toList();
-        for (int i = 1; i < sortedIntervals.size(); i++) {
-            final Interval<?> previous = sortedIntervals.get(i - 1);
-            final Interval<?> current = sortedIntervals.get(i);
-            if (overlaps(previous, current)) {
-                throw new IllegalArgumentException("Intervals overlap.");
-            }
-        }
-    }
-
-    private static void validateBounds(final Interval<?> interval) {
-        if (interval.lowerBoundInclusive == null && interval.upperBoundExclusive == null) {
-            throw new IllegalArgumentException("Interval must have at least one bound.");
-        }
-        if (
-            interval.lowerBoundInclusive != null &&
-                interval.upperBoundExclusive != null &&
-                interval.lowerBoundInclusive >= interval.upperBoundExclusive
-        ) {
-            throw new IllegalArgumentException(
-                "Interval lower bound must be strictly less than upper bound."
-            );
-        }
-    }
-
-    private static boolean overlaps(
-        final Interval<?> previous,
-        final Interval<?> current
+  private static void validateBounds(final Interval<?> interval) {
+    if (
+      interval.lowerBoundInclusive == null &&
+      interval.upperBoundExclusive == null
     ) {
-        return previous.upperBoundExclusive == null ||
-            current.lowerBoundInclusive == null ||
-            current.lowerBoundInclusive < previous.upperBoundExclusive;
+      throw new IllegalArgumentException(
+        "Interval must have at least one bound."
+      );
+    }
+    if (
+      interval.lowerBoundInclusive != null &&
+      interval.upperBoundExclusive != null &&
+      interval.lowerBoundInclusive >= interval.upperBoundExclusive
+    ) {
+      throw new IllegalArgumentException(
+        "Interval lower bound must be strictly less than upper bound."
+      );
+    }
+  }
+
+  private static boolean overlaps(
+    final Interval<?> previous,
+    final Interval<?> current
+  ) {
+    return (
+      previous.upperBoundExclusive == null ||
+      current.lowerBoundInclusive == null ||
+      current.lowerBoundInclusive < previous.upperBoundExclusive
+    );
+  }
+
+  @Value
+  public static class Interval<T> {
+
+    // Null means the interval is unbounded on that side.
+    Double lowerBoundInclusive;
+    Double upperBoundExclusive;
+    T mappedValue;
+
+    /** @return whether {@code value} falls within this interval's bounds */
+    public boolean contains(final double value) {
+      return lowerBoundContains(value) && upperBoundContains(value);
     }
 
-    @Value
-    public static class Interval<T> {
-
-        // Null means the interval is unbounded on that side.
-        Double lowerBoundInclusive;
-        Double upperBoundExclusive;
-        T mappedValue;
-
-        /** @return whether {@code value} falls within this interval's bounds */
-        public boolean contains(final double value) {
-            return lowerBoundContains(value) && upperBoundContains(value);
-        }
-
-        private boolean lowerBoundContains(final double value) {
-            return lowerBoundInclusive == null || lowerBoundInclusive <= value;
-        }
-
-        private boolean upperBoundContains(final double value) {
-            return upperBoundExclusive == null || value < upperBoundExclusive;
-        }
+    private boolean lowerBoundContains(final double value) {
+      return lowerBoundInclusive == null || lowerBoundInclusive <= value;
     }
+
+    private boolean upperBoundContains(final double value) {
+      return upperBoundExclusive == null || value < upperBoundExclusive;
+    }
+  }
 }

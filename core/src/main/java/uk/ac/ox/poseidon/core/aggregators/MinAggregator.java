@@ -31,8 +31,9 @@ import java.util.stream.DoubleStream;
  * {@link Factories#minAggregator()} in this package.
  */
 public class MinAggregator implements Aggregator {
-    @Override
-    public OptionalDouble apply(final DoubleStream doubleStream) {
-        return doubleStream.min();
-    }
+
+  @Override
+  public OptionalDouble apply(final DoubleStream doubleStream) {
+    return doubleStream.min();
+  }
 }

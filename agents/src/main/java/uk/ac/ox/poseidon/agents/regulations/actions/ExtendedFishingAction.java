@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.regulations.actions;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NonNull;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -29,52 +31,51 @@ import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.regulations.ExtendedAction;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 /**
  * A {@link FishingAction} spanning a fixed {@link Duration}, starting at a given time and place,
  * fishing with a given {@link Gear}.
  */
 @Getter
 public class ExtendedFishingAction
-    extends ExtendedAction<Vessel>
-    implements TemporalFishingAction, SpatialFishingAction {
+  extends ExtendedAction<Vessel>
+  implements TemporalFishingAction, SpatialFishingAction
+{
 
-    /** The gear the vessel fishes with over the action's duration. */
-    @NonNull private final Gear gear;
+  /** The gear the vessel fishes with over the action's duration. */
+  @NonNull
+  private final Gear gear;
 
-    /**
-     * @param vessel        the vessel taking the action
-     * @param startDateTime when the action starts
-     * @param duration      how long the action lasts
-     * @param coordinate    where the action takes place
-     * @param gear          the gear the vessel fishes with
-     */
-    public ExtendedFishingAction(
-        @NonNull final Vessel vessel,
-        @NonNull final LocalDateTime startDateTime,
-        @NonNull final Duration duration,
-        @NonNull final Coordinate coordinate,
-        @NonNull final Gear gear
-    ) {
-        super(vessel, startDateTime, duration, coordinate);
-        this.gear = gear;
-    }
+  /**
+   * @param vessel        the vessel taking the action
+   * @param startDateTime when the action starts
+   * @param duration      how long the action lasts
+   * @param coordinate    where the action takes place
+   * @param gear          the gear the vessel fishes with
+   */
+  public ExtendedFishingAction(
+    @NonNull final Vessel vessel,
+    @NonNull final LocalDateTime startDateTime,
+    @NonNull final Duration duration,
+    @NonNull final Coordinate coordinate,
+    @NonNull final Gear gear
+  ) {
+    super(vessel, startDateTime, duration, coordinate);
+    this.gear = gear;
+  }
 
-    /**
-     * Starts now, at the vessel's current cell, for the vessel's gear's own duration, fishing
-     * with the vessel's current gear.
-     *
-     * @param vessel the vessel taking the action
-     */
-    public ExtendedFishingAction(final Vessel vessel) {
-        this(
-            vessel,
-            vessel.getSchedule().getDateTime(),
-            vessel.getGear().getDurationSupplier().get(),
-            vessel.getVesselField().getModelGrid().toCoordinate(vessel.getCell()),
-            vessel.getGear()
-        );
-    }
+  /**
+   * Starts now, at the vessel's current cell, for the vessel's gear's own duration, fishing
+   * with the vessel's current gear.
+   *
+   * @param vessel the vessel taking the action
+   */
+  public ExtendedFishingAction(final Vessel vessel) {
+    this(
+      vessel,
+      vessel.getSchedule().getDateTime(),
+      vessel.getGear().getDurationSupplier().get(),
+      vessel.getVesselField().getModelGrid().toCoordinate(vessel.getCell()),
+      vessel.getGear()
+    );
+  }
 }

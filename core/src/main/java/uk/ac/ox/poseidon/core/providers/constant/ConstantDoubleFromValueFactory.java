@@ -37,14 +37,15 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantDoubleFromValueFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ConstantDouble> {
+public class ConstantDoubleFromValueFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  ConstantDouble
+> {
 
-    private double value;
+  private double value;
 
-    @Override
-    protected ConstantDouble newInstance(final S scope) {
-        return new ConstantDouble(value);
-    }
-
+  @Override
+  protected ConstantDouble newInstance(final S scope) {
+    return new ConstantDouble(value);
+  }
 }

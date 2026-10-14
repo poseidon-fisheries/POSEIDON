@@ -22,74 +22,77 @@
 
 package uk.ac.ox.poseidon.agents.tasks.general;
 
-import com.badlogic.gdx.ai.btree.Task;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
+import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
 
+import com.badlogic.gdx.ai.btree.Task;
 import java.time.Duration;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.Factory;
 
 /** Factories for general-purpose vessel behavior-tree leaves: checks, waits, and retry glue. */
 public class Factories {
 
-    private Factories() {
-    }
+  private Factories() {}
 
-    /**
-     * @param predicate the condition to test against the vessel
-     * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for an {@link AgentPredicateTask}
-     * @see AgentPredicateTask
-     */
-    public static VesselPredicateTaskFactory checkThat(
-        final Factory<? super VesselScope, ? extends Predicate<Vessel>> predicate
-    ) {
-        return new VesselPredicateTaskFactory(predicate);
-    }
+  /**
+   * @param predicate the condition to test against the vessel
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for an {@link AgentPredicateTask}
+   * @see AgentPredicateTask
+   */
+  public static VesselPredicateTaskFactory checkThat(
+    final Factory<? super VesselScope, ? extends Predicate<Vessel>> predicate
+  ) {
+    return new VesselPredicateTaskFactory(predicate);
+  }
 
-    /**
-     * @param extractor pulls a value off the vessel
-     * @param predicate the condition to test the extracted value against
-     * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for an {@link AgentPredicateTask} testing
-     * {@code predicate} against the value {@code extractor} pulls off the vessel
-     * @see AgentPredicateTask
-     */
-    public static <T> VesselPredicateTaskFactory checkThat(
-        final Factory<? super VesselScope, ? extends Function<? super Vessel, T>> extractor,
-        final Factory<? super VesselScope, ? extends Predicate<? super T>> predicate
-    ) {
-        return checkThat(condition(extractor, predicate));
-    }
+  /**
+   * @param extractor pulls a value off the vessel
+   * @param predicate the condition to test the extracted value against
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for an {@link AgentPredicateTask} testing
+   * {@code predicate} against the value {@code extractor} pulls off the vessel
+   * @see AgentPredicateTask
+   */
+  public static <T> VesselPredicateTaskFactory checkThat(
+    final Factory<
+      ? super VesselScope,
+      ? extends Function<? super Vessel, T>
+    > extractor,
+    final Factory<? super VesselScope, ? extends Predicate<? super T>> predicate
+  ) {
+    return checkThat(condition(extractor, predicate));
+  }
 
-    /**
-     * @param durationSupplier supplies the duration to wait, resolved fresh each time the task
-     *                         starts
-     * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a {@link WaitFor}
-     * @see WaitFor
-     */
-    public static WaitForFactory waitFor(
-        final Factory<? super VesselScope, ? extends Supplier<Duration>> durationSupplier
-    ) {
-        return new WaitForFactory(durationSupplier);
-    }
+  /**
+   * @param durationSupplier supplies the duration to wait, resolved fresh each time the task
+   *                         starts
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a {@link WaitFor}
+   * @see WaitFor
+   */
+  public static WaitForFactory waitFor(
+    final Factory<
+      ? super VesselScope,
+      ? extends Supplier<Duration>
+    > durationSupplier
+  ) {
+    return new WaitForFactory(durationSupplier);
+  }
 
-    /**
-     * @param mainTask the task to try first
-     * @param waitTask the task to fall back to, every step, until {@code mainTask} succeeds
-     * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
-     * {@link com.badlogic.gdx.ai.btree.branch.Selector} combining the two, see
-     * {@link SucceedOrWaitFactory} for the exact semantics
-     * @see SucceedOrWaitFactory
-     */
-    public static SucceedOrWaitFactory succeedOrWait(
-        final Factory<? super VesselScope, ? extends Task<Vessel>> mainTask,
-        final Factory<? super VesselScope, ? extends Task<Vessel>> waitTask
-    ) {
-        return new SucceedOrWaitFactory(mainTask, waitTask);
-    }
-
+  /**
+   * @param mainTask the task to try first
+   * @param waitTask the task to fall back to, every step, until {@code mainTask} succeeds
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
+   * {@link com.badlogic.gdx.ai.btree.branch.Selector} combining the two, see
+   * {@link SucceedOrWaitFactory} for the exact semantics
+   * @see SucceedOrWaitFactory
+   */
+  public static SucceedOrWaitFactory succeedOrWait(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> mainTask,
+    final Factory<? super VesselScope, ? extends Task<Vessel>> waitTask
+  ) {
+    return new SucceedOrWaitFactory(mainTask, waitTask);
+  }
 }

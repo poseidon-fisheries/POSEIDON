@@ -35,399 +35,385 @@ import lombok.Data;
 @Data
 public final class Envelope {
 
-    private final double minX;
-    private final double maxX;
-    private final double minY;
-    private final double maxY;
+  private final double minX;
+  private final double maxX;
+  private final double minY;
+  private final double maxY;
 
-    /**
-     * Constructs a null Envelope, i.e. minx > maxx, miny > maxy.
-     */
-    public Envelope() {
-        // Same "setToNull" logic:
-        this.minX = 0.0;
-        this.maxX = -1.0;
-        this.minY = 0.0;
-        this.maxY = -1.0;
+  /**
+   * Constructs a null Envelope, i.e. minx > maxx, miny > maxy.
+   */
+  public Envelope() {
+    // Same "setToNull" logic:
+    this.minX = 0.0;
+    this.maxX = -1.0;
+    this.minY = 0.0;
+    this.maxY = -1.0;
+  }
+
+  /**
+   * Constructs an Envelope by ordering (x1, x2) and (y1, y2) so {@code min <= max}.
+   */
+  public Envelope(
+    final double x1,
+    final double x2,
+    final double y1,
+    final double y2
+  ) {
+    if (x1 < x2) {
+      this.minX = x1;
+      this.maxX = x2;
+    } else {
+      this.minX = x2;
+      this.maxX = x1;
     }
-
-    /**
-     * Constructs an Envelope by ordering (x1, x2) and (y1, y2) so {@code min <= max}.
-     */
-    public Envelope(
-        final double x1,
-        final double x2,
-        final double y1,
-        final double y2
-    ) {
-        if (x1 < x2) {
-            this.minX = x1;
-            this.maxX = x2;
-        } else {
-            this.minX = x2;
-            this.maxX = x1;
-        }
-        if (y1 < y2) {
-            this.minY = y1;
-            this.maxY = y2;
-        } else {
-            this.minY = y2;
-            this.maxY = y1;
-        }
+    if (y1 < y2) {
+      this.minY = y1;
+      this.maxY = y2;
+    } else {
+      this.minY = y2;
+      this.maxY = y1;
     }
+  }
 
-    /**
-     * Constructs an Envelope from two coordinates.
-     */
-    public Envelope(
-        final Coordinate p1,
-        final Coordinate p2
-    ) {
-        this(p1.lon, p2.lon, p1.lat, p2.lat);
+  /**
+   * Constructs an Envelope from two coordinates.
+   */
+  public Envelope(final Coordinate p1, final Coordinate p2) {
+    this(p1.lon, p2.lon, p1.lat, p2.lat);
+  }
+
+  /**
+   * Constructs an Envelope covering a single point.
+   */
+  public Envelope(final Coordinate p) {
+    this(p.lon, p.lon, p.lat, p.lat);
+  }
+
+  /**
+   * Copy constructor.
+   */
+  public Envelope(final Envelope env) {
+    this(env.minX, env.maxX, env.minY, env.maxY);
+  }
+
+  /**
+   * @return whether the envelope defined by {@code p1}/{@code p2} intersects the point {@code q}
+   */
+  public static boolean intersects(
+    final Coordinate p1,
+    final Coordinate p2,
+    final Coordinate q
+  ) {
+    return (
+      q.lon >= Math.min(p1.lon, p2.lon) &&
+      q.lon <= Math.max(p1.lon, p2.lon) &&
+      q.lat >= Math.min(p1.lat, p2.lat) &&
+      q.lat <= Math.max(p1.lat, p2.lat)
+    );
+  }
+
+  /**
+   * @return whether the envelope defined by {@code p1}/{@code p2} intersects the envelope
+   * defined by {@code q1}/{@code q2}
+   */
+  public static boolean intersects(
+    final Coordinate p1,
+    final Coordinate p2,
+    final Coordinate q1,
+    final Coordinate q2
+  ) {
+    double minQ = Math.min(q1.lon, q2.lon);
+    double maxQ = Math.max(q1.lon, q2.lon);
+    double minP = Math.min(p1.lon, p2.lon);
+    double maxP = Math.max(p1.lon, p2.lon);
+    if (minP > maxQ) return false;
+    if (maxP < minQ) return false;
+
+    minQ = Math.min(q1.lat, q2.lat);
+    maxQ = Math.max(q1.lat, q2.lat);
+    minP = Math.min(p1.lat, p2.lat);
+    maxP = Math.max(p1.lat, p2.lat);
+
+    if (minP > maxQ) return false;
+    return maxP >= minQ;
+  }
+
+  /**
+   * Creates an immutable Envelope from a JTS Envelope.
+   */
+  public static Envelope fromJTS(
+    final org.locationtech.jts.geom.Envelope jtsEnv
+  ) {
+    if (jtsEnv == null) {
+      return new Envelope(); // null envelope
     }
+    return new Envelope(
+      jtsEnv.getMinX(),
+      jtsEnv.getMaxX(),
+      jtsEnv.getMinY(),
+      jtsEnv.getMaxY()
+    );
+  }
 
-    /**
-     * Constructs an Envelope covering a single point.
-     */
-    public Envelope(final Coordinate p) {
-        this(p.lon, p.lon, p.lat, p.lat);
+  /** @return whether this envelope is empty (i.e. {@code maxX < minX} or {@code maxY < minY}) */
+  public boolean isNull() {
+    return maxX < minX || maxY < minY;
+  }
+
+  /** @return {@code maxX - minX}, or {@code 0} if this envelope is {@link #isNull() null} */
+  public double getWidth() {
+    return isNull() ? 0.0 : maxX - minX;
+  }
+
+  /** @return {@code maxY - minY}, or {@code 0} if this envelope is {@link #isNull() null} */
+  public double getHeight() {
+    return isNull() ? 0.0 : maxY - minY;
+  }
+
+  /** @return {@link #getWidth()} times {@link #getHeight()} */
+  public double getArea() {
+    return getWidth() * getHeight();
+  }
+
+  /**
+   * @return the smaller of {@link #getWidth()} and {@link #getHeight()}, or {@code 0} if this
+   * envelope is {@link #isNull() null}
+   */
+  public double minExtent() {
+    if (isNull()) return 0.0;
+    return Math.min(getWidth(), getHeight());
+  }
+
+  /**
+   * @return the larger of {@link #getWidth()} and {@link #getHeight()}, or {@code 0} if this
+   * envelope is {@link #isNull() null}
+   */
+  public double maxExtent() {
+    if (isNull()) return 0.0;
+    return Math.max(getWidth(), getHeight());
+  }
+
+  /**
+   * Returns a new Envelope expanded by the same distance in both x and y.
+   */
+  public Envelope expandBy(final double distance) {
+    return expandBy(distance, distance);
+  }
+
+  /**
+   * Returns a new Envelope expanded by deltaX in x direction and deltaY in y direction.
+   */
+  public Envelope expandBy(final double deltaX, final double deltaY) {
+    if (isNull()) {
+      return this;
     }
-
-    /**
-     * Copy constructor.
-     */
-    public Envelope(final Envelope env) {
-        this(env.minX, env.maxX, env.minY, env.maxY);
+    final double newMinX = minX - deltaX;
+    final double newMaxX = maxX + deltaX;
+    final double newMinY = minY - deltaY;
+    final double newMaxY = maxY + deltaY;
+    if (newMinX > newMaxX || newMinY > newMaxY) {
+      // This yields a null envelope
+      return new Envelope();
     }
+    return new Envelope(newMinX, newMaxX, newMinY, newMaxY);
+  }
 
-    /**
-     * @return whether the envelope defined by {@code p1}/{@code p2} intersects the point {@code q}
-     */
-    public static boolean intersects(
-        final Coordinate p1,
-        final Coordinate p2,
-        final Coordinate q
-    ) {
-        return q.lon >= Math.min(p1.lon, p2.lon)
-            && q.lon <= Math.max(p1.lon, p2.lon)
-            && q.lat >= Math.min(p1.lat, p2.lat)
-            && q.lat <= Math.max(p1.lat, p2.lat);
+  /**
+   * Returns a new Envelope expanded to include (x, y).
+   */
+  public Envelope expandToInclude(final double x, final double y) {
+    if (isNull()) {
+      return new Envelope(x, x, y, y);
     }
+    final double newMinX = Math.min(minX, x);
+    final double newMaxX = Math.max(maxX, x);
+    final double newMinY = Math.min(minY, y);
+    final double newMaxY = Math.max(maxY, y);
+    return new Envelope(newMinX, newMaxX, newMinY, newMaxY);
+  }
 
-    /**
-     * @return whether the envelope defined by {@code p1}/{@code p2} intersects the envelope
-     * defined by {@code q1}/{@code q2}
-     */
-    public static boolean intersects(
-        final Coordinate p1,
-        final Coordinate p2,
-        final Coordinate q1,
-        final Coordinate q2
-    ) {
-        double minQ = Math.min(q1.lon, q2.lon);
-        double maxQ = Math.max(q1.lon, q2.lon);
-        double minP = Math.min(p1.lon, p2.lon);
-        double maxP = Math.max(p1.lon, p2.lon);
-        if (minP > maxQ) return false;
-        if (maxP < minQ) return false;
+  /**
+   * Returns a new Envelope expanded to include the coordinate p.
+   */
+  public Envelope expandToInclude(final Coordinate p) {
+    return expandToInclude(p.lon, p.lat);
+  }
 
-        minQ = Math.min(q1.lat, q2.lat);
-        maxQ = Math.max(q1.lat, q2.lat);
-        minP = Math.min(p1.lat, p2.lat);
-        maxP = Math.max(p1.lat, p2.lat);
-
-        if (minP > maxQ) return false;
-        return maxP >= minQ;
+  /**
+   * Returns a new Envelope expanded to include another Envelope.
+   */
+  public Envelope expandToInclude(final Envelope other) {
+    if (other.isNull()) {
+      return this;
     }
-
-    /**
-     * Creates an immutable Envelope from a JTS Envelope.
-     */
-    public static Envelope fromJTS(final org.locationtech.jts.geom.Envelope jtsEnv) {
-        if (jtsEnv == null) {
-            return new Envelope(); // null envelope
-        }
-        return new Envelope(
-            jtsEnv.getMinX(),
-            jtsEnv.getMaxX(),
-            jtsEnv.getMinY(),
-            jtsEnv.getMaxY()
-        );
+    if (this.isNull()) {
+      return new Envelope(other);
     }
+    final double newMinX = Math.min(this.minX, other.minX);
+    final double newMaxX = Math.max(this.maxX, other.maxX);
+    final double newMinY = Math.min(this.minY, other.minY);
+    final double newMaxY = Math.max(this.maxY, other.maxY);
+    return new Envelope(newMinX, newMaxX, newMinY, newMaxY);
+  }
 
-    /** @return whether this envelope is empty (i.e. {@code maxX < minX} or {@code maxY < minY}) */
-    public boolean isNull() {
-        return (maxX < minX) || (maxY < minY);
+  /**
+   * Returns a new Envelope translated by transX, transY.
+   */
+  public Envelope translate(final double transX, final double transY) {
+    if (isNull()) {
+      return this;
     }
+    return new Envelope(
+      minX + transX,
+      maxX + transX,
+      minY + transY,
+      maxY + transY
+    );
+  }
 
-    /** @return {@code maxX - minX}, or {@code 0} if this envelope is {@link #isNull() null} */
-    public double getWidth() {
-        return isNull() ? 0.0 : (maxX - minX);
+  /** @return the midpoint of this envelope, or {@code null} if it is {@link #isNull() null} */
+  public Coordinate centre() {
+    if (isNull()) {
+      return null;
     }
+    return new Coordinate((minX + maxX) / 2.0, (minY + maxY) / 2.0);
+  }
 
-    /** @return {@code maxY - minY}, or {@code 0} if this envelope is {@link #isNull() null} */
-    public double getHeight() {
-        return isNull() ? 0.0 : (maxY - minY);
+  /**
+   * @return the overlapping region of this envelope and {@code env}, or a {@link #isNull() null}
+   * envelope if they don't overlap
+   */
+  public Envelope intersection(final Envelope env) {
+    if (this.isNull() || env.isNull() || !this.intersects(env)) {
+      return new Envelope();
     }
+    final double intMinX = Math.max(this.minX, env.minX);
+    final double intMaxX = Math.min(this.maxX, env.maxX);
+    final double intMinY = Math.max(this.minY, env.minY);
+    final double intMaxY = Math.min(this.maxY, env.maxY);
+    return new Envelope(intMinX, intMaxX, intMinY, intMaxY);
+  }
 
-    /** @return {@link #getWidth()} times {@link #getHeight()} */
-    public double getArea() {
-        return getWidth() * getHeight();
-    }
+  /** @return whether this envelope and {@code other} overlap (touching counts as overlapping) */
+  public boolean intersects(final Envelope other) {
+    if (this.isNull() || other.isNull()) return false;
+    if (other.minX > this.maxX) return false;
+    if (other.maxX < this.minX) return false;
+    if (other.minY > this.maxY) return false;
+    return !(other.maxY < this.minY);
+  }
 
-    /**
-     * @return the smaller of {@link #getWidth()} and {@link #getHeight()}, or {@code 0} if this
-     * envelope is {@link #isNull() null}
-     */
-    public double minExtent() {
-        if (isNull()) return 0.0;
-        return Math.min(getWidth(), getHeight());
-    }
+  /** @deprecated use {@link #intersects(Envelope)} */
+  @Deprecated
+  public boolean overlaps(final Envelope other) {
+    return intersects(other);
+  }
 
-    /**
-     * @return the larger of {@link #getWidth()} and {@link #getHeight()}, or {@code 0} if this
-     * envelope is {@link #isNull() null}
-     */
-    public double maxExtent() {
-        if (isNull()) return 0.0;
-        return Math.max(getWidth(), getHeight());
-    }
+  /** @return whether this envelope contains or touches the point {@code p} */
+  public boolean intersects(final Coordinate p) {
+    return intersects(p.lon, p.lat);
+  }
 
-    /**
-     * Returns a new Envelope expanded by the same distance in both x and y.
-     */
-    public Envelope expandBy(final double distance) {
-        return expandBy(distance, distance);
-    }
+  /** @deprecated use {@link #intersects(Coordinate)} */
+  @Deprecated
+  public boolean overlaps(final Coordinate p) {
+    return intersects(p);
+  }
 
-    /**
-     * Returns a new Envelope expanded by deltaX in x direction and deltaY in y direction.
-     */
-    public Envelope expandBy(
-        final double deltaX,
-        final double deltaY
-    ) {
-        if (isNull()) {
-            return this;
-        }
-        final double newMinX = minX - deltaX;
-        final double newMaxX = maxX + deltaX;
-        final double newMinY = minY - deltaY;
-        final double newMaxY = maxY + deltaY;
-        if (newMinX > newMaxX || newMinY > newMaxY) {
-            // This yields a null envelope
-            return new Envelope();
-        }
-        return new Envelope(newMinX, newMaxX, newMinY, newMaxY);
-    }
+  /** @return whether this envelope contains or touches the point {@code (x, y)} */
+  public boolean intersects(final double x, final double y) {
+    if (isNull()) return false;
+    if (x > maxX) return false;
+    if (x < minX) return false;
+    if (y > maxY) return false;
+    return !(y < minY);
+  }
 
-    /**
-     * Returns a new Envelope expanded to include (x, y).
-     */
-    public Envelope expandToInclude(
-        final double x,
-        final double y
-    ) {
-        if (isNull()) {
-            return new Envelope(x, x, y, y);
-        }
-        final double newMinX = Math.min(minX, x);
-        final double newMaxX = Math.max(maxX, x);
-        final double newMinY = Math.min(minY, y);
-        final double newMaxY = Math.max(maxY, y);
-        return new Envelope(newMinX, newMaxX, newMinY, newMaxY);
-    }
+  /** @deprecated use {@link #intersects(double, double)} */
+  @Deprecated
+  public boolean overlaps(final double x, final double y) {
+    return intersects(x, y);
+  }
 
-    /**
-     * Returns a new Envelope expanded to include the coordinate p.
-     */
-    public Envelope expandToInclude(final Coordinate p) {
-        return expandToInclude(p.lon, p.lat);
-    }
+  /**
+   * @return whether this envelope fully covers {@code other} (alias for
+   * {@link #covers(Envelope)})
+   */
+  public boolean contains(final Envelope other) {
+    return covers(other);
+  }
 
-    /**
-     * Returns a new Envelope expanded to include another Envelope.
-     */
-    public Envelope expandToInclude(final Envelope other) {
-        if (other.isNull()) {
-            return this;
-        }
-        if (this.isNull()) {
-            return new Envelope(other);
-        }
-        final double newMinX = Math.min(this.minX, other.minX);
-        final double newMaxX = Math.max(this.maxX, other.maxX);
-        final double newMinY = Math.min(this.minY, other.minY);
-        final double newMaxY = Math.max(this.maxY, other.maxY);
-        return new Envelope(newMinX, newMaxX, newMinY, newMaxY);
-    }
+  /**
+   * @return whether this envelope covers the point {@code p} (alias for
+   * {@link #covers(Coordinate)})
+   */
+  public boolean contains(final Coordinate p) {
+    return covers(p);
+  }
 
-    /**
-     * Returns a new Envelope translated by transX, transY.
-     */
-    public Envelope translate(
-        final double transX,
-        final double transY
-    ) {
-        if (isNull()) {
-            return this;
-        }
-        return new Envelope(
-            minX + transX, maxX + transX,
-            minY + transY, maxY + transY
-        );
-    }
+  /**
+   * @return whether this envelope covers the point {@code (x, y)} (alias for
+   * {@link #covers(double, double)})
+   */
+  public boolean contains(final double x, final double y) {
+    return covers(x, y);
+  }
 
-    /** @return the midpoint of this envelope, or {@code null} if it is {@link #isNull() null} */
-    public Coordinate centre() {
-        if (isNull()) {
-            return null;
-        }
-        return new Coordinate((minX + maxX) / 2.0, (minY + maxY) / 2.0);
-    }
+  /**
+   * @return whether this envelope covers the point {@code (x, y)}; unlike
+   * {@link #intersects(double, double)}, a {@link #isNull() null} envelope covers nothing
+   */
+  public boolean covers(final double x, final double y) {
+    if (isNull()) return false;
+    return x >= minX && x <= maxX && y >= minY && y <= maxY;
+  }
 
-    /**
-     * @return the overlapping region of this envelope and {@code env}, or a {@link #isNull() null}
-     * envelope if they don't overlap
-     */
-    public Envelope intersection(final Envelope env) {
-        if (this.isNull() || env.isNull() || !this.intersects(env)) {
-            return new Envelope();
-        }
-        final double intMinX = Math.max(this.minX, env.minX);
-        final double intMaxX = Math.min(this.maxX, env.maxX);
-        final double intMinY = Math.max(this.minY, env.minY);
-        final double intMaxY = Math.min(this.maxY, env.maxY);
-        return new Envelope(intMinX, intMaxX, intMinY, intMaxY);
-    }
+  /** @return whether this envelope covers the point {@code p} */
+  public boolean covers(final Coordinate p) {
+    return covers(p.lon, p.lat);
+  }
 
-    /** @return whether this envelope and {@code other} overlap (touching counts as overlapping) */
-    public boolean intersects(final Envelope other) {
-        if (this.isNull() || other.isNull()) return false;
-        if (other.minX > this.maxX) return false;
-        if (other.maxX < this.minX) return false;
-        if (other.minY > this.maxY) return false;
-        return !(other.maxY < this.minY);
-    }
+  /** @return whether this envelope fully covers {@code other} */
+  public boolean covers(final Envelope other) {
+    if (this.isNull() || other.isNull()) return false;
+    return (
+      other.minX >= this.minX &&
+      other.maxX <= this.maxX &&
+      other.minY >= this.minY &&
+      other.maxY <= this.maxY
+    );
+  }
 
-    /** @deprecated use {@link #intersects(Envelope)} */
-    @Deprecated
-    public boolean overlaps(final Envelope other) {
-        return intersects(other);
+  /**
+   * @return the shortest distance between this envelope and {@code env}, or {@code 0} if they
+   * overlap
+   */
+  public double distance(final Envelope env) {
+    if (this.intersects(env)) {
+      return 0.0;
     }
+    double dx = 0.0;
+    if (this.maxX < env.minX) {
+      dx = env.minX - this.maxX;
+    } else if (this.minX > env.maxX) {
+      dx = this.minX - env.maxX;
+    }
+    double dy = 0.0;
+    if (this.maxY < env.minY) {
+      dy = env.minY - this.maxY;
+    } else if (this.minY > env.maxY) {
+      dy = this.minY - env.maxY;
+    }
+    if (dx == 0.0) return dy;
+    if (dy == 0.0) return dx;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
 
-    /** @return whether this envelope contains or touches the point {@code p} */
-    public boolean intersects(final Coordinate p) {
-        return intersects(p.lon, p.lat);
-    }
-
-    /** @deprecated use {@link #intersects(Coordinate)} */
-    @Deprecated
-    public boolean overlaps(final Coordinate p) {
-        return intersects(p);
-    }
-
-    /** @return whether this envelope contains or touches the point {@code (x, y)} */
-    public boolean intersects(
-        final double x,
-        final double y
-    ) {
-        if (isNull()) return false;
-        if (x > maxX) return false;
-        if (x < minX) return false;
-        if (y > maxY) return false;
-        return !(y < minY);
-    }
-
-    /** @deprecated use {@link #intersects(double, double)} */
-    @Deprecated
-    public boolean overlaps(
-        final double x,
-        final double y
-    ) {
-        return intersects(x, y);
-    }
-
-    /**
-     * @return whether this envelope fully covers {@code other} (alias for
-     * {@link #covers(Envelope)})
-     */
-    public boolean contains(final Envelope other) {
-        return covers(other);
-    }
-
-    /**
-     * @return whether this envelope covers the point {@code p} (alias for
-     * {@link #covers(Coordinate)})
-     */
-    public boolean contains(final Coordinate p) {
-        return covers(p);
-    }
-
-    /**
-     * @return whether this envelope covers the point {@code (x, y)} (alias for
-     * {@link #covers(double, double)})
-     */
-    public boolean contains(
-        final double x,
-        final double y
-    ) {
-        return covers(x, y);
-    }
-
-    /**
-     * @return whether this envelope covers the point {@code (x, y)}; unlike
-     * {@link #intersects(double, double)}, a {@link #isNull() null} envelope covers nothing
-     */
-    public boolean covers(
-        final double x,
-        final double y
-    ) {
-        if (isNull()) return false;
-        return x >= minX && x <= maxX && y >= minY && y <= maxY;
-    }
-
-    /** @return whether this envelope covers the point {@code p} */
-    public boolean covers(final Coordinate p) {
-        return covers(p.lon, p.lat);
-    }
-
-    /** @return whether this envelope fully covers {@code other} */
-    public boolean covers(final Envelope other) {
-        if (this.isNull() || other.isNull()) return false;
-        return other.minX >= this.minX && other.maxX <= this.maxX
-            && other.minY >= this.minY && other.maxY <= this.maxY;
-    }
-
-    /**
-     * @return the shortest distance between this envelope and {@code env}, or {@code 0} if they
-     * overlap
-     */
-    public double distance(final Envelope env) {
-        if (this.intersects(env)) {
-            return 0.0;
-        }
-        double dx = 0.0;
-        if (this.maxX < env.minX) {
-            dx = env.minX - this.maxX;
-        } else if (this.minX > env.maxX) {
-            dx = this.minX - env.maxX;
-        }
-        double dy = 0.0;
-        if (this.maxY < env.minY) {
-            dy = env.minY - this.maxY;
-        } else if (this.minY > env.maxY) {
-            dy = this.minY - env.maxY;
-        }
-        if (dx == 0.0) return dy;
-        if (dy == 0.0) return dx;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    /**
-     * Converts this immutable Envelope to a JTS Envelope.
-     */
-    public org.locationtech.jts.geom.Envelope toJTS() {
-        return new org.locationtech.jts.geom.Envelope(minX, maxX, minY, maxY);
-    }
+  /**
+   * Converts this immutable Envelope to a JTS Envelope.
+   */
+  public org.locationtech.jts.geom.Envelope toJTS() {
+    return new org.locationtech.jts.geom.Envelope(minX, maxX, minY, maxY);
+  }
 }

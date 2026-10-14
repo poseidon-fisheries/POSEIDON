@@ -39,11 +39,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @EqualsAndHashCode(callSuper = true)
 public class InactiveGearFactory extends GlobalScopeFactory<InactiveGear> {
 
-    private String code;
+  private String code;
 
-    @Override
-    protected InactiveGear newInstance(final Scope scope) {
-        return new InactiveGear(code);
-    }
-
+  @Override
+  protected InactiveGear newInstance(final Scope scope) {
+    return new InactiveGear(code);
+  }
 }

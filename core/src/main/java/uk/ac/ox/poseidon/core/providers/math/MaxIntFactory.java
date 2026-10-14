@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
+import java.util.function.IntSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.IntSupplier;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link MaxInt}, built via
@@ -40,14 +39,16 @@ import java.util.function.IntSupplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MaxIntFactory<S extends Scope> extends RelativeScopeFactory<S, MaxInt> {
+public class MaxIntFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  MaxInt
+> {
 
-    private Factory<? super S, ? extends IntSupplier> a;
-    private Factory<? super S, ? extends IntSupplier> b;
+  private Factory<? super S, ? extends IntSupplier> a;
+  private Factory<? super S, ? extends IntSupplier> b;
 
-    @Override
-    protected MaxInt newInstance(final S scope) {
-        return new MaxInt(a.get(scope), b.get(scope));
-    }
-
+  @Override
+  protected MaxInt newInstance(final S scope) {
+    return new MaxInt(a.get(scope), b.get(scope));
+  }
 }

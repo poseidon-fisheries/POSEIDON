@@ -19,18 +19,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package uk.ac.ox.poseidon.agents.social;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
+import java.util.HashMap;
+import java.util.Map;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
 import uk.ac.ox.poseidon.core.events.Listener;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Shares every fishing event it hears with the recipients of the vessel that made it: for each
@@ -41,42 +41,47 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class FishingEventSharer extends AbstractListener<FishingEvent> {
 
-    private final SocialNetwork network;
-    private final Map<Vessel, Listener<? super FishingEvent>> sharedFishingEventListeners =
-        new HashMap<>();
+  private final SocialNetwork network;
+  private final Map<
+    Vessel,
+    Listener<? super FishingEvent>
+  > sharedFishingEventListeners = new HashMap<>();
 
-    FishingEventSharer(final SocialNetwork network) {
-        super(FishingEvent.class);
-        this.network = checkNotNull(network);
-    }
+  FishingEventSharer(final SocialNetwork network) {
+    super(FishingEvent.class);
+    this.network = checkNotNull(network);
+  }
 
-    /**
-     * @param vessel                     the vessel the listener hears shared fishing events for
-     * @param sharedFishingEventListener hears the fishing events shared with {@code vessel}
-     * @throws IllegalStateException if {@code vessel} already has a shared fishing event listener
-     */
-    public void registerSharedFishingEventListener(
-        final Vessel vessel,
-        final Listener<? super FishingEvent> sharedFishingEventListener
-    ) {
-        checkState(
-            !sharedFishingEventListeners.containsKey(vessel),
-            "Vessel %s already has a shared fishing event listener.", vessel.getId()
-        );
-        sharedFishingEventListeners.put(
-            checkNotNull(vessel),
-            checkNotNull(sharedFishingEventListener)
-        );
-    }
+  /**
+   * @param vessel                     the vessel the listener hears shared fishing events for
+   * @param sharedFishingEventListener hears the fishing events shared with {@code vessel}
+   * @throws IllegalStateException if {@code vessel} already has a shared fishing event listener
+   */
+  public void registerSharedFishingEventListener(
+    final Vessel vessel,
+    final Listener<? super FishingEvent> sharedFishingEventListener
+  ) {
+    checkState(
+      !sharedFishingEventListeners.containsKey(vessel),
+      "Vessel %s already has a shared fishing event listener.",
+      vessel.getId()
+    );
+    sharedFishingEventListeners.put(
+      checkNotNull(vessel),
+      checkNotNull(sharedFishingEventListener)
+    );
+  }
 
-    @Override
-    public void receive(final FishingEvent event) {
-        for (final Vessel recipient : network.getRecipients(event.getAction().getAgent())) {
-            final Listener<? super FishingEvent> sharedFishingEventListener =
-                sharedFishingEventListeners.get(recipient);
-            if (sharedFishingEventListener != null) {
-                sharedFishingEventListener.receive(event);
-            }
-        }
+  @Override
+  public void receive(final FishingEvent event) {
+    for (final Vessel recipient : network.getRecipients(
+      event.getAction().getAgent()
+    )) {
+      final Listener<? super FishingEvent> sharedFishingEventListener =
+        sharedFishingEventListeners.get(recipient);
+      if (sharedFishingEventListener != null) {
+        sharedFishingEventListener.receive(event);
+      }
     }
+  }
 }

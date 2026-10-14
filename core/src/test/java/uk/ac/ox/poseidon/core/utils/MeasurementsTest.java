@@ -22,18 +22,19 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.utils.Measurements.parseMassUnit;
 
+import org.junit.jupiter.api.Test;
+
 class MeasurementsTest {
 
-    // Must not touch si.uom.NonSI before parsing: the point is that parsing alone registers it.
-    @Test
-    void parsesTonneWithoutPriorUseOfNonSi() {
-        assertThat(parseMassUnit("t").getConverterTo(KILOGRAM).convert(1.0))
-            .isEqualTo(1000.0);
-    }
+  // Must not touch si.uom.NonSI before parsing: the point is that parsing alone registers it.
+  @Test
+  void parsesTonneWithoutPriorUseOfNonSi() {
+    assertThat(
+      parseMassUnit("t").getConverterTo(KILOGRAM).convert(1.0)
+    ).isEqualTo(1000.0);
+  }
 }

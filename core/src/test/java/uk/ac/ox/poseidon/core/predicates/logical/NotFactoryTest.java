@@ -22,55 +22,56 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
-import java.util.function.Predicate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 @SuppressWarnings("unchecked")
 class NotFactoryTest {
 
-    /**
-     * Tests the `newInstance` method of the NotFactory class. Verifies that the method creates a
-     * `Not` instance correctly when a valid `Factory` for a `Predicate<Object>` is provided and is
-     * functional.
-     */
-    @Test
-    void testNewInstanceWithValidPredicateFactory() {
-        // Arrange
-        final Predicate<Object> predicate = value -> true;
-        final ObjectFactory<Predicate<Object>> factory = new ObjectFactory<>(predicate);
+  /**
+   * Tests the `newInstance` method of the NotFactory class. Verifies that the method creates a
+   * `Not` instance correctly when a valid `Factory` for a `Predicate<Object>` is provided and is
+   * functional.
+   */
+  @Test
+  void testNewInstanceWithValidPredicateFactory() {
+    // Arrange
+    final Predicate<Object> predicate = value -> true;
+    final ObjectFactory<Predicate<Object>> factory = new ObjectFactory<>(
+      predicate
+    );
 
-        final NotFactory<Scope, Object> notFactory = new NotFactory<>(factory);
+    final NotFactory<Scope, Object> notFactory = new NotFactory<>(factory);
 
-        // Act
-        final Not<Object> result = notFactory.get(Scope.GLOBAL_SCOPE);
+    // Act
+    final Not<Object> result = notFactory.get(Scope.GLOBAL_SCOPE);
 
-        // Assert
-        assertThat(result.test("value"))
-            .as("Not should negate the underlying predicate result")
-            .isFalse();
-    }
+    // Assert
+    assertThat(result.test("value"))
+      .as("Not should negate the underlying predicate result")
+      .isFalse();
+  }
 
-    /**
-     * Tests the `newInstance` method to ensure it throws a NullPointerException when the factory
-     * provides a null predicate.
-     */
-    @Test
-    void testNewInstanceWithNullPredicateThrowsException() {
-        // Arrange
-        final Factory<Scope, Predicate<Object>> nullFactory = scope -> null;
+  /**
+   * Tests the `newInstance` method to ensure it throws a NullPointerException when the factory
+   * provides a null predicate.
+   */
+  @Test
+  void testNewInstanceWithNullPredicateThrowsException() {
+    // Arrange
+    final Factory<Scope, Predicate<Object>> nullFactory = scope -> null;
 
-        final NotFactory<Scope, Object> notFactory = new NotFactory<>(nullFactory);
+    final NotFactory<Scope, Object> notFactory = new NotFactory<>(nullFactory);
 
-        // Act & Assert
-        assertThatThrownBy(() -> notFactory.get(Scope.GLOBAL_SCOPE))
-            .as("Expected Not to fail when the predicate factory returns null.")
-            .isInstanceOf(NullPointerException.class);
-    }
+    // Act & Assert
+    assertThatThrownBy(() -> notFactory.get(Scope.GLOBAL_SCOPE))
+      .as("Expected Not to fail when the predicate factory returns null.")
+      .isInstanceOf(NullPointerException.class);
+  }
 }

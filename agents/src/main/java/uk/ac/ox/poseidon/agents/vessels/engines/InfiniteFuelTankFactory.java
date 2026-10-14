@@ -31,9 +31,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@link Factories#infiniteTank()}.
  */
 @EqualsAndHashCode(callSuper = true)
-public class InfiniteFuelTankFactory extends GlobalScopeFactory<InfiniteFuelTank> {
-    @Override
-    protected InfiniteFuelTank newInstance(final Scope scope) {
-        return new InfiniteFuelTank();
-    }
+public class InfiniteFuelTankFactory
+  extends GlobalScopeFactory<InfiniteFuelTank>
+{
+
+  @Override
+  protected InfiniteFuelTank newInstance(final Scope scope) {
+    return new InfiniteFuelTank();
+  }
 }

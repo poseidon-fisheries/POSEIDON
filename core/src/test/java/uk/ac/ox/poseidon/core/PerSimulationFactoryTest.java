@@ -22,54 +22,60 @@
 
 package uk.ac.ox.poseidon.core;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+
 class PerSimulationFactoryTest {
 
-    private static SimulationScope scopeOfNewSimulation() {
-        final Simulation simulation = mock(Simulation.class);
-        final SimulationScope scope = mock(SimulationScope.class);
-        when(scope.getSimulation()).thenReturn(simulation);
-        return scope;
+  private static SimulationScope scopeOfNewSimulation() {
+    final Simulation simulation = mock(Simulation.class);
+    final SimulationScope scope = mock(SimulationScope.class);
+    when(scope.getSimulation()).thenReturn(simulation);
+    return scope;
+  }
+
+  private static class NewObjectFactory extends GlobalScopeFactory<Object> {
+
+    @Override
+    protected Object newInstance(final Scope scope) {
+      return new Object();
     }
+  }
 
-    private static class NewObjectFactory extends GlobalScopeFactory<Object> {
-        @Override
-        protected Object newInstance(final Scope scope) {
-            return new Object();
-        }
-    }
+  @Test
+  void sameSimulationGetsTheSameInstance() {
+    final PerSimulationFactory<Object> factory = new PerSimulationFactory<>(
+      new NewObjectFactory()
+    );
+    final SimulationScope scope = scopeOfNewSimulation();
 
-    @Test
-    void sameSimulationGetsTheSameInstance() {
-        final PerSimulationFactory<Object> factory =
-            new PerSimulationFactory<>(new NewObjectFactory());
-        final SimulationScope scope = scopeOfNewSimulation();
+    assertThat(factory.get(scope)).isSameAs(factory.get(scope));
+  }
 
-        assertThat(factory.get(scope)).isSameAs(factory.get(scope));
-    }
+  @Test
+  void eachSimulationGetsItsOwnInstanceEvenFromASharedDelegate() {
+    final PerSimulationFactory<Object> factory = new PerSimulationFactory<>(
+      new NewObjectFactory()
+    );
 
-    @Test
-    void eachSimulationGetsItsOwnInstanceEvenFromASharedDelegate() {
-        final PerSimulationFactory<Object> factory =
-            new PerSimulationFactory<>(new NewObjectFactory());
+    assertThat(factory.get(scopeOfNewSimulation())).isNotSameAs(
+      factory.get(scopeOfNewSimulation())
+    );
+  }
 
-        assertThat(factory.get(scopeOfNewSimulation()))
-            .isNotSameAs(factory.get(scopeOfNewSimulation()));
-    }
+  @Test
+  void theDelegatesOwnInstanceIsLeftAlone() {
+    final NewObjectFactory delegate = new NewObjectFactory();
+    final PerSimulationFactory<Object> factory = new PerSimulationFactory<>(
+      delegate
+    );
+    final SimulationScope scope = scopeOfNewSimulation();
 
-    @Test
-    void theDelegatesOwnInstanceIsLeftAlone() {
-        final NewObjectFactory delegate = new NewObjectFactory();
-        final PerSimulationFactory<Object> factory = new PerSimulationFactory<>(delegate);
-        final SimulationScope scope = scopeOfNewSimulation();
-
-        assertThat(factory.get(scope)).isNotSameAs(delegate.get(scope));
-    }
+    assertThat(factory.get(scope)).isNotSameAs(delegate.get(scope));
+  }
 }

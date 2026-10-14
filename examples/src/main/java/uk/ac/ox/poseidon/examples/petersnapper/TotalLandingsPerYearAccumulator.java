@@ -22,47 +22,46 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
-import uk.ac.ox.poseidon.agents.market.Sale;
-import uk.ac.ox.poseidon.core.events.AbstractListener;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Supplier;
+import uk.ac.ox.poseidon.agents.market.Sale;
+import uk.ac.ox.poseidon.core.events.AbstractListener;
 
 /**
  * An {@link AbstractListener} that accumulates total biomass sold (in kg), per calendar year,
  * across every {@link Sale} it receives.
  */
 public class TotalLandingsPerYearAccumulator
-    extends AbstractListener<Sale>
-    implements Supplier<Map<Integer, Double>> {
+  extends AbstractListener<Sale>
+  implements Supplier<Map<Integer, Double>>
+{
 
-    private final Map<Integer, Double> totalLandingsPerYear = new TreeMap<>();
+  private final Map<Integer, Double> totalLandingsPerYear = new TreeMap<>();
 
-    protected TotalLandingsPerYearAccumulator() {
-        super(Sale.class);
-    }
+  protected TotalLandingsPerYearAccumulator() {
+    super(Sale.class);
+  }
 
-    /** Adds {@code sale}'s total biomass to the running total for its year. */
-    @Override
-    public void receive(final Sale sale) {
-        final int year = sale.getDateTime().getYear();
-        final double kgSold = sale
-            .getItems()
-            .stream()
-            .mapToDouble(item -> item.getContent().asKg())
-            .sum();
-        totalLandingsPerYear.put(
-            year,
-            totalLandingsPerYear.getOrDefault(year, 0.0) + kgSold
-        );
-    }
+  /** Adds {@code sale}'s total biomass to the running total for its year. */
+  @Override
+  public void receive(final Sale sale) {
+    final int year = sale.getDateTime().getYear();
+    final double kgSold = sale
+      .getItems()
+      .stream()
+      .mapToDouble(item -> item.getContent().asKg())
+      .sum();
+    totalLandingsPerYear.put(
+      year,
+      totalLandingsPerYear.getOrDefault(year, 0.0) + kgSold
+    );
+  }
 
-    /** @return the accumulated total landings (in kg), by year, unmodifiable */
-    @Override
-    public Map<Integer, Double> get() {
-        return Collections.unmodifiableMap(totalLandingsPerYear);
-    }
-
+  /** @return the accumulated total landings (in kg), by year, unmodifiable */
+  @Override
+  public Map<Integer, Double> get() {
+    return Collections.unmodifiableMap(totalLandingsPerYear);
+  }
 }

@@ -22,19 +22,18 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.function.Predicate;
 
 /** Holds for a vessel that shares {@code vessel}'s home port. */
 @RequiredArgsConstructor
 public class VesselHasSameHomePort implements Predicate<Vessel> {
 
-    private final Vessel vessel;
+  private final Vessel vessel;
 
-    @Override
-    public boolean test(final Vessel otherVessel) {
-        return otherVessel.getHomePort().equals(vessel.getHomePort());
-    }
+  @Override
+  public boolean test(final Vessel otherVessel) {
+    return otherVessel.getHomePort().equals(vessel.getHomePort());
+  }
 }

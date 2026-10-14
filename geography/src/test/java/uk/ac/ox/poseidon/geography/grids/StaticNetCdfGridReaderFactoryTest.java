@@ -22,6 +22,14 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.Mockito.mock;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import ucar.ma2.Array;
@@ -32,71 +40,87 @@ import ucar.nc2.NetcdfFileWriter;
 import ucar.nc2.Variable;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.function.Supplier;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.Mockito.mock;
-
 class StaticNetCdfGridReaderFactoryTest {
 
-    private static final float FILL_VALUE = -1f;
+  private static final float FILL_VALUE = -1f;
 
-    @TempDir
-    private Path tempDir;
+  @TempDir
+  private Path tempDir;
 
-    @Test
-    void resolvingTheFactoryDoesNoFileIO() {
-        final StaticNetCdfGridReaderFactory<Scope> factory = new StaticNetCdfGridReaderFactory<>(
-            scope -> tempDir.resolve("does-not-exist.nc"),
-            "latitude", "longitude"
-        );
+  @Test
+  void resolvingTheFactoryDoesNoFileIO() {
+    final StaticNetCdfGridReaderFactory<Scope> factory =
+      new StaticNetCdfGridReaderFactory<>(
+        scope -> tempDir.resolve("does-not-exist.nc"),
+        "latitude",
+        "longitude"
+      );
 
-        assertThatCode(() -> factory.get(mock(Scope.class))).doesNotThrowAnyException();
+    assertThatCode(() ->
+      factory.get(mock(Scope.class))
+    ).doesNotThrowAnyException();
+  }
+
+  @Test
+  void supplierGetProducesTwoIndependentUsableReaders() throws IOException {
+    final Path fixture = writeFixture();
+
+    final StaticNetCdfGridReaderFactory<Scope> factory =
+      new StaticNetCdfGridReaderFactory<>(
+        scope -> fixture,
+        "latitude",
+        "longitude"
+      );
+    final Supplier<StaticNetCdfGridReader> supplier = factory.get(
+      mock(Scope.class)
+    );
+
+    try (
+      final StaticNetCdfGridReader first = supplier.get();
+      final StaticNetCdfGridReader second = supplier.get()
+    ) {
+      assertThat(first).isNotSameAs(second);
+      assertThat(first.getDataVariableNames()).containsExactly("mpa_4");
+      assertThat(second.getDataVariableNames()).containsExactly("mpa_4");
     }
+  }
 
-    @Test
-    void supplierGetProducesTwoIndependentUsableReaders() throws IOException {
-        final Path fixture = writeFixture();
-
-        final StaticNetCdfGridReaderFactory<Scope> factory = new StaticNetCdfGridReaderFactory<>(
-            scope -> fixture,
-            "latitude", "longitude"
-        );
-        final Supplier<StaticNetCdfGridReader> supplier = factory.get(mock(Scope.class));
-
-        try (
-            final StaticNetCdfGridReader first = supplier.get();
-            final StaticNetCdfGridReader second = supplier.get()
-        ) {
-            assertThat(first).isNotSameAs(second);
-            assertThat(first.getDataVariableNames()).containsExactly("mpa_4");
-            assertThat(second.getDataVariableNames()).containsExactly("mpa_4");
-        }
+  private Path writeFixture() throws IOException {
+    final Path file = tempDir.resolve("fixture.nc");
+    try (
+      NetcdfFileWriter writer = NetcdfFileWriter.createNew(
+        NetcdfFileWriter.Version.netcdf3,
+        file.toString()
+      )
+    ) {
+      final Dimension latDim = writer.addDimension("latitude", 1);
+      final Dimension lonDim = writer.addDimension("longitude", 1);
+      final Variable latVar = writer.addVariable(
+        "latitude",
+        DataType.DOUBLE,
+        List.of(latDim)
+      );
+      final Variable lonVar = writer.addVariable(
+        "longitude",
+        DataType.DOUBLE,
+        List.of(lonDim)
+      );
+      final Variable dataVar = writer.addVariable(
+        "mpa_4",
+        DataType.FLOAT,
+        List.of(latDim, lonDim)
+      );
+      writer.addVariableAttribute(
+        dataVar,
+        new Attribute("_FillValue", FILL_VALUE)
+      );
+      writer.create();
+      writer.write(latVar, Array.makeFromJavaArray(new double[] { 1.0 }));
+      writer.write(lonVar, Array.makeFromJavaArray(new double[] { 2.0 }));
+      writer.write(dataVar, Array.makeFromJavaArray(new float[][] { { 1f } }));
+    } catch (final ucar.ma2.InvalidRangeException e) {
+      throw new RuntimeException(e);
     }
-
-    private Path writeFixture() throws IOException {
-        final Path file = tempDir.resolve("fixture.nc");
-        try (NetcdfFileWriter writer =
-                 NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, file.toString())) {
-            final Dimension latDim = writer.addDimension("latitude", 1);
-            final Dimension lonDim = writer.addDimension("longitude", 1);
-            final Variable latVar = writer.addVariable("latitude", DataType.DOUBLE, List.of(latDim));
-            final Variable lonVar = writer.addVariable("longitude", DataType.DOUBLE, List.of(lonDim));
-            final Variable dataVar =
-                writer.addVariable("mpa_4", DataType.FLOAT, List.of(latDim, lonDim));
-            writer.addVariableAttribute(dataVar, new Attribute("_FillValue", FILL_VALUE));
-            writer.create();
-            writer.write(latVar, Array.makeFromJavaArray(new double[]{1.0}));
-            writer.write(lonVar, Array.makeFromJavaArray(new double[]{2.0}));
-            writer.write(dataVar, Array.makeFromJavaArray(new float[][]{{1f}}));
-        } catch (final ucar.ma2.InvalidRangeException e) {
-            throw new RuntimeException(e);
-        }
-        return file;
-    }
-
+    return file;
+  }
 }

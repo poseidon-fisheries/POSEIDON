@@ -22,17 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import it.unimi.dsi.fastutil.longs.Long2DoubleMap;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
+import java.util.function.Function;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
-
-import java.util.function.Function;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The {@link Route} a vessel would sail to fish at a destination cell: from its current cell to
@@ -43,74 +42,76 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RouteViaDestination implements Function<Int2D, Route> {
 
-    private final Vessel vessel;
-    private final GridPathFinder pathFinder;
-    private final DistanceCalculator distanceCalculator;
-    // Keyed by the two cells packed into a long (see cellPairKey): the map grows with every
-    // (vessel cell, destination) pair valued, and object keys made lookups a sixth of a NW Med run.
-    private final Long2DoubleMap pathLengthsInKm = new Long2DoubleOpenHashMap();
+  private final Vessel vessel;
+  private final GridPathFinder pathFinder;
+  private final DistanceCalculator distanceCalculator;
+  // Keyed by the two cells packed into a long (see cellPairKey): the map grows with every
+  // (vessel cell, destination) pair valued, and object keys made lookups a sixth of a NW Med run.
+  private final Long2DoubleMap pathLengthsInKm = new Long2DoubleOpenHashMap();
 
-    /**
-     * @param vessel             the vessel that would sail the route
-     * @param pathFinder         finds the paths of the route's two legs
-     * @param distanceCalculator measures the paths
-     */
-    RouteViaDestination(
-        final Vessel vessel,
-        final GridPathFinder pathFinder,
-        final DistanceCalculator distanceCalculator
-    ) {
-        this.vessel = checkNotNull(vessel);
-        this.pathFinder = checkNotNull(pathFinder);
-        this.distanceCalculator = checkNotNull(distanceCalculator);
-    }
+  /**
+   * @param vessel             the vessel that would sail the route
+   * @param pathFinder         finds the paths of the route's two legs
+   * @param distanceCalculator measures the paths
+   */
+  RouteViaDestination(
+    final Vessel vessel,
+    final GridPathFinder pathFinder,
+    final DistanceCalculator distanceCalculator
+  ) {
+    this.vessel = checkNotNull(vessel);
+    this.pathFinder = checkNotNull(pathFinder);
+    this.distanceCalculator = checkNotNull(distanceCalculator);
+  }
 
-    /**
-     * @param destination the cell to fish at
-     * @return the route from the vessel's current cell to {@code destination}, then back to its
-     * home port
-     * @throws IllegalStateException if either leg has no path
-     */
-    @Override
-    public Route apply(final Int2D destination) {
-        final double distanceInKm =
-            distanceInKm(vessel.getCell(), destination) +
-                distanceInKm(destination, vessel.getHomePortLocation());
-        return new Route(
-            distanceInKm,
-            DistanceCalculator.travelDuration(
-                distanceInKm,
-                vessel.getEngine().getCruisingSpeedInKph()
-            )
-        );
-    }
+  /**
+   * @param destination the cell to fish at
+   * @return the route from the vessel's current cell to {@code destination}, then back to its
+   * home port
+   * @throws IllegalStateException if either leg has no path
+   */
+  @Override
+  public Route apply(final Int2D destination) {
+    final double distanceInKm =
+      distanceInKm(vessel.getCell(), destination) +
+      distanceInKm(destination, vessel.getHomePortLocation());
+    return new Route(
+      distanceInKm,
+      DistanceCalculator.travelDuration(
+        distanceInKm,
+        vessel.getEngine().getCruisingSpeedInKph()
+      )
+    );
+  }
 
-    private double distanceInKm(
-        final Int2D start,
-        final Int2D end
-    ) {
-        return pathLengthsInKm.computeIfAbsent(cellPairKey(start, end), _ ->
-            distanceCalculator.distanceInKm(
-                pathFinder.getPath(start, end).orElseThrow(() ->
-                    new IllegalStateException("No path from " + start + " to " + end)
-                )
-            )
-        );
-    }
+  private double distanceInKm(final Int2D start, final Int2D end) {
+    return pathLengthsInKm.computeIfAbsent(cellPairKey(start, end), _ ->
+      distanceCalculator.distanceInKm(
+        pathFinder
+          .getPath(start, end)
+          .orElseThrow(() ->
+            new IllegalStateException("No path from " + start + " to " + end)
+          )
+      )
+    );
+  }
 
-    // Each coordinate in 16 bits: grids are far smaller than 65,536 cells a side.
-    private static long cellPairKey(
-        final Int2D start,
-        final Int2D end
-    ) {
-        return (long) coordinate(start.x) << 48 |
-            (long) coordinate(start.y) << 32 |
-            (long) coordinate(end.x) << 16 |
-            coordinate(end.y);
-    }
+  // Each coordinate in 16 bits: grids are far smaller than 65,536 cells a side.
+  private static long cellPairKey(final Int2D start, final Int2D end) {
+    return (
+      ((long) coordinate(start.x) << 48) |
+      ((long) coordinate(start.y) << 32) |
+      ((long) coordinate(end.x) << 16) |
+      coordinate(end.y)
+    );
+  }
 
-    private static int coordinate(final int value) {
-        checkArgument(value >= 0 && value < 1 << 16, "Cell coordinate out of range: %s.", value);
-        return value;
-    }
+  private static int coordinate(final int value) {
+    checkArgument(
+      value >= 0 && value < 1 << 16,
+      "Cell coordinate out of range: %s.",
+      value
+    );
+    return value;
+  }
 }

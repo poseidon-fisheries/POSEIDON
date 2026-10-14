@@ -32,27 +32,33 @@ import uk.ac.ox.poseidon.core.Factory;
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a {@link StartTrip}
-     * @see StartTripFactory
-     */
-    public static StartTripFactory startTrip(
-        final Factory<? super VesselScope, ? extends DestinationSupplier> destinationSupplier
-    ) {
-        return new StartTripFactory(destinationSupplier);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a {@link StartTrip}
+   * @see StartTripFactory
+   */
+  public static StartTripFactory startTrip(
+    final Factory<
+      ? super VesselScope,
+      ? extends DestinationSupplier
+    > destinationSupplier
+  ) {
+    return new StartTripFactory(destinationSupplier);
+  }
 
-    /**
-     * @param destinationSupplier chooses the trip's next destination
-     * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
-     * {@link ChooseNextDestination}
-     * @see ChooseNextDestination
-     */
-    public static ChooseNextDestinationFactory chooseNextDestination(
-        final Factory<? super VesselScope, ? extends DestinationSupplier> destinationSupplier
-    ) {
-        return new ChooseNextDestinationFactory(destinationSupplier);
-    }
+  /**
+   * @param destinationSupplier chooses the trip's next destination
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
+   * {@link ChooseNextDestination}
+   * @see ChooseNextDestination
+   */
+  public static ChooseNextDestinationFactory chooseNextDestination(
+    final Factory<
+      ? super VesselScope,
+      ? extends DestinationSupplier
+    > destinationSupplier
+  ) {
+    return new ChooseNextDestinationFactory(destinationSupplier);
+  }
 }

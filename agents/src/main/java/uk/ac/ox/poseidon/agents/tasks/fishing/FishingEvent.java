@@ -22,30 +22,29 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
+import java.time.LocalDateTime;
 import lombok.Value;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
-
-import java.time.LocalDateTime;
 
 /** An {@link ExtendedEvent} recording one completed fishing action and what it caught. */
 @Value
 public class FishingEvent implements ExtendedEvent {
 
-    /** The fishing action taken. */
-    ExtendedFishingAction action;
-    /** What the action caught, and how it was disposed of. */
-    FishingOutcome outcome;
+  /** The fishing action taken. */
+  ExtendedFishingAction action;
+  /** What the action caught, and how it was disposed of. */
+  FishingOutcome outcome;
 
-    /** @return {@link #action}'s start time */
-    @Override
-    public LocalDateTime getStartDateTime() {
-        return action.getStartDateTime();
-    }
+  /** @return {@link #action}'s start time */
+  @Override
+  public LocalDateTime getStartDateTime() {
+    return action.getStartDateTime();
+  }
 
-    /** @return {@link #action}'s end time */
-    @Override
-    public LocalDateTime getEndDateTime() {
-        return action.getEndDateTime();
-    }
+  /** @return {@link #action}'s end time */
+  @Override
+  public LocalDateTime getEndDateTime() {
+    return action.getEndDateTime();
+  }
 }

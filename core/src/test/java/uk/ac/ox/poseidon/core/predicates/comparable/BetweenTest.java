@@ -22,51 +22,67 @@
 
 package uk.ac.ox.poseidon.core.predicates.comparable;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 class BetweenTest {
 
-    @Test
-    void inclusiveBoundsIncludeEndpoints() {
-        final Between<Double> between =
-            new Between<>(() -> 0.0, () -> 10.0, true, true);
+  @Test
+  void inclusiveBoundsIncludeEndpoints() {
+    final Between<Double> between = new Between<>(
+      () -> 0.0,
+      () -> 10.0,
+      true,
+      true
+    );
 
-        assertTrue(between.test(0.0));
-        assertTrue(between.test(5.0));
-        assertTrue(between.test(10.0));
-        assertFalse(between.test(-0.1));
-        assertFalse(between.test(10.1));
-    }
+    assertTrue(between.test(0.0));
+    assertTrue(between.test(5.0));
+    assertTrue(between.test(10.0));
+    assertFalse(between.test(-0.1));
+    assertFalse(between.test(10.1));
+  }
 
-    @Test
-    void exclusiveMinimumExcludesLowerEndpointOnly() {
-        final Between<Double> between =
-            new Between<>(() -> 0.0, () -> 10.0, false, true);
+  @Test
+  void exclusiveMinimumExcludesLowerEndpointOnly() {
+    final Between<Double> between = new Between<>(
+      () -> 0.0,
+      () -> 10.0,
+      false,
+      true
+    );
 
-        assertFalse(between.test(0.0));
-        assertTrue(between.test(5.0));
-        assertTrue(between.test(10.0));
-    }
+    assertFalse(between.test(0.0));
+    assertTrue(between.test(5.0));
+    assertTrue(between.test(10.0));
+  }
 
-    @Test
-    void exclusiveMaximumExcludesUpperEndpointOnly() {
-        final Between<Double> between =
-            new Between<>(() -> 0.0, () -> 10.0, true, false);
+  @Test
+  void exclusiveMaximumExcludesUpperEndpointOnly() {
+    final Between<Double> between = new Between<>(
+      () -> 0.0,
+      () -> 10.0,
+      true,
+      false
+    );
 
-        assertTrue(between.test(0.0));
-        assertTrue(between.test(5.0));
-        assertFalse(between.test(10.0));
-    }
+    assertTrue(between.test(0.0));
+    assertTrue(between.test(5.0));
+    assertFalse(between.test(10.0));
+  }
 
-    @Test
-    void exclusiveBothBoundsExcludeBothEndpoints() {
-        final Between<Double> between =
-            new Between<>(() -> 0.0, () -> 10.0, false, false);
+  @Test
+  void exclusiveBothBoundsExcludeBothEndpoints() {
+    final Between<Double> between = new Between<>(
+      () -> 0.0,
+      () -> 10.0,
+      false,
+      false
+    );
 
-        assertFalse(between.test(0.0));
-        assertTrue(between.test(5.0));
-        assertFalse(between.test(10.0));
-    }
+    assertFalse(between.test(0.0));
+    assertTrue(between.test(5.0));
+    assertFalse(between.test(10.0));
+  }
 }

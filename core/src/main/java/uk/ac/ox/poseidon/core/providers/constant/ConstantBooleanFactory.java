@@ -38,12 +38,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantBooleanFactory extends GlobalScopeFactory<BooleanProvider> {
+public class ConstantBooleanFactory
+  extends GlobalScopeFactory<BooleanProvider>
+{
 
-    private boolean value;
+  private boolean value;
 
-    @Override
-    protected BooleanProvider newInstance(final Scope scope) {
-        return new ConstantBoolean(value);
-    }
+  @Override
+  protected BooleanProvider newInstance(final Scope scope) {
+    return new ConstantBoolean(value);
+  }
 }

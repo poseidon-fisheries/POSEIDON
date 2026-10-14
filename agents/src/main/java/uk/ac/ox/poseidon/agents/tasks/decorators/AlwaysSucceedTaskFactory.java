@@ -38,25 +38,30 @@ import uk.ac.ox.poseidon.core.Factory;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AlwaysSucceedTaskFactory extends DecoratorTaskFactory<AlwaysSucceed<Vessel>> {
-    /** @param child factory for the child task to always report success for */
-    public AlwaysSucceedTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> child) {
-        super(child);
-    }
+public class AlwaysSucceedTaskFactory
+  extends DecoratorTaskFactory<AlwaysSucceed<Vessel>>
+{
 
-    /**
-     * @param guard optional task guarding whether this decorator runs at all
-     * @param child factory for the child task to always report success for
-     */
-    public AlwaysSucceedTaskFactory(
-        final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
-        final Factory<? super VesselScope, ? extends Task<Vessel>> child
-    ) {
-        super(guard, child);
-    }
+  /** @param child factory for the child task to always report success for */
+  public AlwaysSucceedTaskFactory(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> child
+  ) {
+    super(child);
+  }
 
-    @Override
-    protected AlwaysSucceed<Vessel> newTask(final VesselScope scope) {
-        return new AlwaysSucceed<>();
-    }
+  /**
+   * @param guard optional task guarding whether this decorator runs at all
+   * @param child factory for the child task to always report success for
+   */
+  public AlwaysSucceedTaskFactory(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
+    final Factory<? super VesselScope, ? extends Task<Vessel>> child
+  ) {
+    super(guard, child);
+  }
+
+  @Override
+  protected AlwaysSucceed<Vessel> newTask(final VesselScope scope) {
+    return new AlwaysSucceed<>();
+  }
 }

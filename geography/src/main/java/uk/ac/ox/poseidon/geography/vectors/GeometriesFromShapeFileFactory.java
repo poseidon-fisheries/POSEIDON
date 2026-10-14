@@ -23,6 +23,12 @@
 package uk.ac.ox.poseidon.geography.vectors;
 
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import lombok.*;
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
@@ -32,13 +38,6 @@ import org.locationtech.jts.geom.Geometry;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A {@link RelativeScopeFactory} that reads every feature's geometry out of an ESRI shapefile
@@ -51,36 +50,45 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class GeometriesFromShapeFileFactory<S extends Scope>
-    extends RelativeScopeFactory<S, Collection<Geometry>> {
+public class GeometriesFromShapeFileFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  Collection<Geometry>
+> {
 
-    @NonNull
-    private Factory<? super S, ? extends Path> path;
+  @NonNull
+  private Factory<? super S, ? extends Path> path;
 
-    @Override
-    protected List<Geometry> newInstance(final S scope) {
-        final Path filePath = this.path.get(scope);
-        return readShapeFile(filePath);
+  @Override
+  protected List<Geometry> newInstance(final S scope) {
+    final Path filePath = this.path.get(scope);
+    return readShapeFile(filePath);
+  }
+
+  private List<Geometry> readShapeFile(final Path path) {
+    try {
+      final Map<String, URL> params = Map.of(
+        "url",
+        path.toFile().toURI().toURL()
+      );
+      final DataStore dataStore = DataStoreFinder.getDataStore(params);
+      final SimpleFeatureCollection featureCollection = dataStore
+        .getFeatureSource(dataStore.getTypeNames()[0])
+        .getFeatures();
+      final ImmutableList.Builder<Geometry> geometries =
+        ImmutableList.builder();
+      try (
+        final SimpleFeatureIterator iterator = featureCollection.features()
+      ) {
+        while (iterator.hasNext())
+          if (
+            iterator.next().getDefaultGeometry() instanceof
+              final Geometry geometry
+          ) geometries.add(geometry);
+      }
+      dataStore.dispose();
+      return geometries.build();
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
     }
-
-    private List<Geometry> readShapeFile(
-        final Path path
-    ) {
-        try {
-            final Map<String, URL> params = Map.of("url", path.toFile().toURI().toURL());
-            final DataStore dataStore = DataStoreFinder.getDataStore(params);
-            final SimpleFeatureCollection featureCollection =
-                dataStore.getFeatureSource(dataStore.getTypeNames()[0]).getFeatures();
-            final ImmutableList.Builder<Geometry> geometries = ImmutableList.builder();
-            try (final SimpleFeatureIterator iterator = featureCollection.features()) {
-                while (iterator.hasNext())
-                    if (iterator.next().getDefaultGeometry() instanceof final Geometry geometry)
-                        geometries.add(geometry);
-            }
-            dataStore.dispose();
-            return geometries.build();
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+  }
 }

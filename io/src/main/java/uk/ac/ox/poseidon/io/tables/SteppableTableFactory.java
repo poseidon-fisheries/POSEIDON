@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import java.util.List;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +31,6 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link SteppableTable}, built via
@@ -43,14 +42,20 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SteppableTableFactory
-    extends SimulationScopeFactory<SteppableTable> {
+  extends SimulationScopeFactory<SteppableTable>
+{
 
-    private Factory<? super SimulationScope, TableDefinition> tableDefinition;
-    private Factory<? super SimulationScope, ? extends List<? extends Supplier<?>>> valueSuppliers;
+  private Factory<? super SimulationScope, TableDefinition> tableDefinition;
+  private Factory<
+    ? super SimulationScope,
+    ? extends List<? extends Supplier<?>>
+  > valueSuppliers;
 
-    @Override
-    protected SteppableTable newInstance(final SimulationScope scope) {
-        return new SteppableTable(tableDefinition.get(scope), valueSuppliers.get(scope));
-    }
-
+  @Override
+  protected SteppableTable newInstance(final SimulationScope scope) {
+    return new SteppableTable(
+      tableDefinition.get(scope),
+      valueSuppliers.get(scope)
+    );
+  }
 }

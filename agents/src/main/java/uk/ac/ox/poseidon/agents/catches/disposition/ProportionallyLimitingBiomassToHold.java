@@ -22,11 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
-import lombok.NoArgsConstructor;
-import uk.ac.ox.poseidon.biology.buckets.Bucket;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static lombok.AccessLevel.PACKAGE;
+
+import lombok.NoArgsConstructor;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /**
  * A {@link DispositionProcess} that discards (alive) whatever retained catch doesn't fit in the
@@ -34,43 +34,44 @@ import static lombok.AccessLevel.PACKAGE;
  * whole species.
  */
 @NoArgsConstructor(access = PACKAGE)
-public class ProportionallyLimitingBiomassToHold
-    implements DispositionProcess {
+public class ProportionallyLimitingBiomassToHold implements DispositionProcess {
 
-    /**
-     * @return {@code currentDisposition} unchanged if its retained catch already fits in
-     * {@code availableCapacityInKg}; otherwise every species' retained biomass scaled down by
-     * the same factor to fit, with the rest moved to discarded-alive
-     * @throws IllegalArgumentException if {@code availableCapacityInKg} is negative or NaN
-     */
-    @Override
-    public Disposition partition(
-        final Disposition currentDisposition,
-        final double availableCapacityInKg
-    ) {
-        checkArgument(
-            !Double.isNaN(availableCapacityInKg) && availableCapacityInKg >= 0,
-            "availableCapacityInKg must be a non-negative value, got %s",
-            availableCapacityInKg
-        );
-        final double currentlyRetainedInKg =
-            currentDisposition.getRetained().getTotalBiomass().asKg();
-        if (currentlyRetainedInKg <= availableCapacityInKg) {
-            return currentDisposition;
-        } else {
-            final double proportionToKeep = availableCapacityInKg / currentlyRetainedInKg;
-            final Bucket updatedRetained =
-                currentDisposition.getRetained().mapContent((species, biomass) ->
-                    biomass.multiply(proportionToKeep)
-                );
-            final Bucket newlyDiscarded =
-                currentDisposition.getRetained().subtract(updatedRetained);
-            return new Disposition(
-                updatedRetained,
-                currentDisposition.getDiscardedAlive().add(newlyDiscarded),
-                currentDisposition.getDiscardedDead()
-            );
-        }
+  /**
+   * @return {@code currentDisposition} unchanged if its retained catch already fits in
+   * {@code availableCapacityInKg}; otherwise every species' retained biomass scaled down by
+   * the same factor to fit, with the rest moved to discarded-alive
+   * @throws IllegalArgumentException if {@code availableCapacityInKg} is negative or NaN
+   */
+  @Override
+  public Disposition partition(
+    final Disposition currentDisposition,
+    final double availableCapacityInKg
+  ) {
+    checkArgument(
+      !Double.isNaN(availableCapacityInKg) && availableCapacityInKg >= 0,
+      "availableCapacityInKg must be a non-negative value, got %s",
+      availableCapacityInKg
+    );
+    final double currentlyRetainedInKg = currentDisposition
+      .getRetained()
+      .getTotalBiomass()
+      .asKg();
+    if (currentlyRetainedInKg <= availableCapacityInKg) {
+      return currentDisposition;
+    } else {
+      final double proportionToKeep =
+        availableCapacityInKg / currentlyRetainedInKg;
+      final Bucket updatedRetained = currentDisposition
+        .getRetained()
+        .mapContent((species, biomass) -> biomass.multiply(proportionToKeep));
+      final Bucket newlyDiscarded = currentDisposition
+        .getRetained()
+        .subtract(updatedRetained);
+      return new Disposition(
+        updatedRetained,
+        currentDisposition.getDiscardedAlive().add(newlyDiscarded),
+        currentDisposition.getDiscardedDead()
+      );
     }
-
+  }
 }

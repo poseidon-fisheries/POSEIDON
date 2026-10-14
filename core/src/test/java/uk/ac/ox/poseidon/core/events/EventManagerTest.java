@@ -22,232 +22,257 @@
 
 package uk.ac.ox.poseidon.core.events;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class EventManagerTest {
 
-    private EventManager eventManager;
+  private EventManager eventManager;
 
-    @BeforeEach
-    void setUp() {
-        eventManager = new SimpleEventManager();
-    }
+  @BeforeEach
+  void setUp() {
+    eventManager = new SimpleEventManager();
+  }
 
-    @Test
-    void testAddAndBroadcastListener() {
-        // Create a list to hold received events
-        final List<String> receivedEvents = new ArrayList<>();
+  @Test
+  void testAddAndBroadcastListener() {
+    // Create a list to hold received events
+    final List<String> receivedEvents = new ArrayList<>();
 
-        // Add a listener using a lambda that adds events to the list
-        eventManager.addListener(new SimpleListener<>(String.class, receivedEvents::add));
+    // Add a listener using a lambda that adds events to the list
+    eventManager.addListener(
+      new SimpleListener<>(String.class, receivedEvents::add)
+    );
 
-        // Broadcast a String event
-        final String event = "Test Event";
-        eventManager.broadcast(event);
+    // Broadcast a String event
+    final String event = "Test Event";
+    eventManager.broadcast(event);
 
-        // Verify the event was received
-        assertEquals(1, receivedEvents.size());
-        assertEquals(event, receivedEvents.getFirst());
-    }
+    // Verify the event was received
+    assertEquals(1, receivedEvents.size());
+    assertEquals(event, receivedEvents.getFirst());
+  }
 
-    @Test
-    void testRemoveListener() {
-        // Create a list to hold received events
-        final List<String> receivedEvents = new ArrayList<>();
+  @Test
+  void testRemoveListener() {
+    // Create a list to hold received events
+    final List<String> receivedEvents = new ArrayList<>();
 
-        // Add and then remove a listener
-        final Listener<String> listener = new SimpleListener<>(String.class, receivedEvents::add);
-        eventManager.addListener(listener);
-        eventManager.removeListener(listener);
+    // Add and then remove a listener
+    final Listener<String> listener = new SimpleListener<>(
+      String.class,
+      receivedEvents::add
+    );
+    eventManager.addListener(listener);
+    eventManager.removeListener(listener);
 
-        // Broadcast a String event
-        final String event = "Test Event";
-        eventManager.broadcast(event);
+    // Broadcast a String event
+    final String event = "Test Event";
+    eventManager.broadcast(event);
 
-        // Verify the event was NOT received
-        assertTrue(receivedEvents.isEmpty());
-    }
+    // Verify the event was NOT received
+    assertTrue(receivedEvents.isEmpty());
+  }
 
-    @Test
-    void testMultipleListenersForSameEventType() {
-        // Create lists to hold received events for each listener
-        final List<String> receivedEvents1 = new ArrayList<>();
-        final List<String> receivedEvents2 = new ArrayList<>();
+  @Test
+  void testMultipleListenersForSameEventType() {
+    // Create lists to hold received events for each listener
+    final List<String> receivedEvents1 = new ArrayList<>();
+    final List<String> receivedEvents2 = new ArrayList<>();
 
-        // Register both listeners
-        eventManager.addListener(new SimpleListener<>(String.class, receivedEvents1::add));
-        eventManager.addListener(new SimpleListener<>(String.class, receivedEvents2::add));
+    // Register both listeners
+    eventManager.addListener(
+      new SimpleListener<>(String.class, receivedEvents1::add)
+    );
+    eventManager.addListener(
+      new SimpleListener<>(String.class, receivedEvents2::add)
+    );
 
-        // Broadcast a String event
-        final String event = "Test Event";
-        eventManager.broadcast(event);
+    // Broadcast a String event
+    final String event = "Test Event";
+    eventManager.broadcast(event);
 
-        // Verify both listeners received the event
-        assertEquals(1, receivedEvents1.size());
-        assertEquals(event, receivedEvents1.getFirst());
-        assertEquals(1, receivedEvents2.size());
-        assertEquals(event, receivedEvents2.getFirst());
-    }
+    // Verify both listeners received the event
+    assertEquals(1, receivedEvents1.size());
+    assertEquals(event, receivedEvents1.getFirst());
+    assertEquals(1, receivedEvents2.size());
+    assertEquals(event, receivedEvents2.getFirst());
+  }
 
-    @Test
-    void testNoListenersForEventType() {
-        // Broadcast an event when no listeners are registered
-        final String event = "Test Event";
-        assertDoesNotThrow(
-            () -> eventManager.broadcast(event),
-            "Broadcasting with no listeners should not throw exceptions"
-        );
-    }
+  @Test
+  void testNoListenersForEventType() {
+    // Broadcast an event when no listeners are registered
+    final String event = "Test Event";
+    assertDoesNotThrow(
+      () -> eventManager.broadcast(event),
+      "Broadcasting with no listeners should not throw exceptions"
+    );
+  }
 
-    @Test
-    void testListenerForSuperclass() {
-        // Create a list to hold received events
-        final List<Number> receivedEvents = new ArrayList<>();
+  @Test
+  void testListenerForSuperclass() {
+    // Create a list to hold received events
+    final List<Number> receivedEvents = new ArrayList<>();
 
-        // Add listener for the superclass Number
-        eventManager.addListener(new SimpleListener<>(Number.class, receivedEvents::add));
+    // Add listener for the superclass Number
+    eventManager.addListener(
+      new SimpleListener<>(Number.class, receivedEvents::add)
+    );
 
-        // Broadcast an Integer event (subclass of Number)
-        final Integer event = 42;
-        eventManager.broadcast(event);
+    // Broadcast an Integer event (subclass of Number)
+    final Integer event = 42;
+    eventManager.broadcast(event);
 
-        // Verify that the Number listener receives the Integer event
-        assertEquals(1, receivedEvents.size());
-        assertEquals(event, receivedEvents.getFirst());
-    }
+    // Verify that the Number listener receives the Integer event
+    assertEquals(1, receivedEvents.size());
+    assertEquals(event, receivedEvents.getFirst());
+  }
 
-    @Test
-    void testListenerForInterface() {
-        // Create a list to hold received events
-        final List<CharSequence> receivedEvents = new ArrayList<>();
+  @Test
+  void testListenerForInterface() {
+    // Create a list to hold received events
+    final List<CharSequence> receivedEvents = new ArrayList<>();
 
-        // Add listener for the interface CharSequence
-        eventManager.addListener(new SimpleListener<>(CharSequence.class, receivedEvents::add));
+    // Add listener for the interface CharSequence
+    eventManager.addListener(
+      new SimpleListener<>(CharSequence.class, receivedEvents::add)
+    );
 
-        // Broadcast a String event (implements CharSequence)
-        final String event = "Test Event";
-        eventManager.broadcast(event);
+    // Broadcast a String event (implements CharSequence)
+    final String event = "Test Event";
+    eventManager.broadcast(event);
 
-        // Verify that the CharSequence listener receives the String event
-        assertEquals(1, receivedEvents.size());
-        assertEquals(event, receivedEvents.getFirst());
-    }
+    // Verify that the CharSequence listener receives the String event
+    assertEquals(1, receivedEvents.size());
+    assertEquals(event, receivedEvents.getFirst());
+  }
 
-    @Test
-    void testListenerForSuperInterface() {
-        // Create a list to hold received events
-        final List<CharSequence> receivedEvents = new ArrayList<>();
+  @Test
+  void testListenerForSuperInterface() {
+    // Create a list to hold received events
+    final List<CharSequence> receivedEvents = new ArrayList<>();
 
-        // Add listener for the superinterface CharSequence
-        eventManager.addListener(new SimpleListener<>(CharSequence.class, receivedEvents::add));
+    // Add listener for the superinterface CharSequence
+    eventManager.addListener(
+      new SimpleListener<>(CharSequence.class, receivedEvents::add)
+    );
 
-        // Broadcast a StringBuilder event (implements Appendable, which extends CharSequence)
-        final StringBuilder event = new StringBuilder("Test Event");
-        eventManager.broadcast(event);
+    // Broadcast a StringBuilder event (implements Appendable, which extends CharSequence)
+    final StringBuilder event = new StringBuilder("Test Event");
+    eventManager.broadcast(event);
 
-        // Verify that the CharSequence listener receives the StringBuilder event
-        assertEquals(1, receivedEvents.size());
-        assertEquals(event, receivedEvents.getFirst());
-    }
+    // Verify that the CharSequence listener receives the StringBuilder event
+    assertEquals(1, receivedEvents.size());
+    assertEquals(event, receivedEvents.getFirst());
+  }
 
-    @Test
-    void testListenerForMultipleLevelsInHierarchy() {
-        // Create lists to hold received events for each listener
-        final List<Object> objectEvents = new ArrayList<>();
-        final List<Number> numberEvents = new ArrayList<>();
-        final List<Integer> integerEvents = new ArrayList<>();
+  @Test
+  void testListenerForMultipleLevelsInHierarchy() {
+    // Create lists to hold received events for each listener
+    final List<Object> objectEvents = new ArrayList<>();
+    final List<Number> numberEvents = new ArrayList<>();
+    final List<Integer> integerEvents = new ArrayList<>();
 
-        // Add listeners at different levels in the hierarchy
-        eventManager.addListener(new SimpleListener<>(Object.class, objectEvents::add));
-        eventManager.addListener(new SimpleListener<>(Number.class, numberEvents::add));
-        eventManager.addListener(new SimpleListener<>(Integer.class, integerEvents::add));
+    // Add listeners at different levels in the hierarchy
+    eventManager.addListener(
+      new SimpleListener<>(Object.class, objectEvents::add)
+    );
+    eventManager.addListener(
+      new SimpleListener<>(Number.class, numberEvents::add)
+    );
+    eventManager.addListener(
+      new SimpleListener<>(Integer.class, integerEvents::add)
+    );
 
-        // Broadcast an Integer event
-        final Integer event = 100;
-        eventManager.broadcast(event);
+    // Broadcast an Integer event
+    final Integer event = 100;
+    eventManager.broadcast(event);
 
-        // Verify all relevant listeners received the event
-        assertEquals(1, objectEvents.size());
-        assertEquals(event, objectEvents.getFirst());
-        assertEquals(1, numberEvents.size());
-        assertEquals(event, numberEvents.getFirst());
-        assertEquals(1, integerEvents.size());
-        assertEquals(event, integerEvents.getFirst());
-    }
+    // Verify all relevant listeners received the event
+    assertEquals(1, objectEvents.size());
+    assertEquals(event, objectEvents.getFirst());
+    assertEquals(1, numberEvents.size());
+    assertEquals(event, numberEvents.getFirst());
+    assertEquals(1, integerEvents.size());
+    assertEquals(event, integerEvents.getFirst());
+  }
 
-    @Test
-    void testBroadcastNullEvent() {
-        // Ensure that broadcasting a null event does not throw exceptions
-        assertDoesNotThrow(
-            () -> eventManager.broadcast(null),
-            "Broadcasting a null event should not throw exceptions"
-        );
-    }
+  @Test
+  void testBroadcastNullEvent() {
+    // Ensure that broadcasting a null event does not throw exceptions
+    assertDoesNotThrow(
+      () -> eventManager.broadcast(null),
+      "Broadcasting a null event should not throw exceptions"
+    );
+  }
 
-    @Test
-    void testDiamondInterfaceHierarchyNotifiedOnce() {
-        final List<BaseEvent> receivedEvents = new ArrayList<>();
-        eventManager.addListener(new SimpleListener<>(BaseEvent.class, receivedEvents::add));
+  @Test
+  void testDiamondInterfaceHierarchyNotifiedOnce() {
+    final List<BaseEvent> receivedEvents = new ArrayList<>();
+    eventManager.addListener(
+      new SimpleListener<>(BaseEvent.class, receivedEvents::add)
+    );
 
-        final DiamondEvent event = new DiamondEvent();
-        eventManager.broadcast(event);
+    final DiamondEvent event = new DiamondEvent();
+    eventManager.broadcast(event);
 
-        assertEquals(1, receivedEvents.size());
-        assertEquals(event, receivedEvents.getFirst());
-    }
+    assertEquals(1, receivedEvents.size());
+    assertEquals(event, receivedEvents.getFirst());
+  }
 
-    @Test
-    void testSameListenerAddedTwiceGetsTwoCallbacksAndRemoveRemovesAllIdenticalRegistrations() {
-        final List<String> receivedEvents = new ArrayList<>();
-        final Listener<String> listener = new SimpleListener<>(String.class, receivedEvents::add);
-        eventManager.addListener(listener);
-        eventManager.addListener(listener);
+  @Test
+  void testSameListenerAddedTwiceGetsTwoCallbacksAndRemoveRemovesAllIdenticalRegistrations() {
+    final List<String> receivedEvents = new ArrayList<>();
+    final Listener<String> listener = new SimpleListener<>(
+      String.class,
+      receivedEvents::add
+    );
+    eventManager.addListener(listener);
+    eventManager.addListener(listener);
 
-        eventManager.broadcast("first");
-        assertEquals(2, receivedEvents.size());
+    eventManager.broadcast("first");
+    assertEquals(2, receivedEvents.size());
 
-        eventManager.removeListener(listener);
-        eventManager.broadcast("second");
-        assertEquals(2, receivedEvents.size());
-    }
+    eventManager.removeListener(listener);
+    eventManager.broadcast("second");
+    assertEquals(2, receivedEvents.size());
+  }
 
-    @Test
-    void testRemovingListenerDuringBroadcastDoesNotThrow() {
-        final List<String> receivedEvents = new ArrayList<>();
+  @Test
+  void testRemovingListenerDuringBroadcastDoesNotThrow() {
+    final List<String> receivedEvents = new ArrayList<>();
 
-        final AtomicReference<Listener<String>> listener2Ref = new AtomicReference<>();
-        final Listener<String> listener1 = new SimpleListener<>(
-            String.class,
-            event -> {
-                receivedEvents.add("l1:" + event);
-                eventManager.removeListener(listener2Ref.get());
-            }
-        );
-        final Listener<String> listener2 = new SimpleListener<>(
-            String.class,
-            event -> receivedEvents.add("l2:" + event)
-        );
-        listener2Ref.set(listener2);
+    final AtomicReference<Listener<String>> listener2Ref =
+      new AtomicReference<>();
+    final Listener<String> listener1 = new SimpleListener<>(
+      String.class,
+      event -> {
+        receivedEvents.add("l1:" + event);
+        eventManager.removeListener(listener2Ref.get());
+      }
+    );
+    final Listener<String> listener2 = new SimpleListener<>(
+      String.class,
+      event -> receivedEvents.add("l2:" + event)
+    );
+    listener2Ref.set(listener2);
 
-        eventManager.addListener(listener1);
-        eventManager.addListener(listener2);
+    eventManager.addListener(listener1);
+    eventManager.addListener(listener2);
 
-        assertDoesNotThrow(() -> eventManager.broadcast("event"));
-    }
+    assertDoesNotThrow(() -> eventManager.broadcast("event"));
+  }
 
-    interface BaseEvent {}
+  interface BaseEvent {}
 
-    interface LeftEvent extends BaseEvent {}
+  interface LeftEvent extends BaseEvent {}
 
-    interface RightEvent extends BaseEvent {}
+  interface RightEvent extends BaseEvent {}
 
-    static class DiamondEvent implements LeftEvent, RightEvent {}
-
+  static class DiamondEvent implements LeftEvent, RightEvent {}
 }

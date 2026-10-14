@@ -22,15 +22,14 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
+import static java.awt.Color.WHITE;
+import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.IMOLA;
+
+import java.util.List;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.gui.DisplayWrapper2D;
 import uk.ac.ox.poseidon.gui.ScenarioWithUI;
 import uk.ac.ox.poseidon.gui.portrayals.*;
-
-import java.util.List;
-
-import static java.awt.Color.WHITE;
-import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.IMOLA;
 
 /**
  * A {@link ScenarioWithUI} for the Peter Snapper example fishery: a single 2D display showing
@@ -38,75 +37,70 @@ import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.IMOLA;
  */
 public class PeterSnapperScenarioWithUI extends ScenarioWithUI {
 
-    /** @param scenario the scenario to run, wired up as the display's data source */
-    public PeterSnapperScenarioWithUI(
-        final Scenario scenario
-    ) {
-        super(
-            scenario,
-            List.of(
-                new DisplayWrapper2D(
-                    "The Peter Snapper Fishery",
-                    List.of(
-                        new BathymetryFieldPortrayalFactory(
-                            scenario.component("bathymetricGrid")
-                        ),
-                        new SimpleFieldPortrayalFactory<>(
-                            "Carrying capacity",
-                            new NumberGridPortrayalFactory(
-                                IMOLA,
-                                "Carrying capacity",
-                                true,
-                                scenario.component("carryingCapacityGrid")
-                            ),
-                            false
-                        ),
-                        new SpeciesBiomassFieldPortrayalFactory(
-                            scenario.component("biomassGrid"),
-                            scenario.component("carryingCapacityGrid"),
-                            false
-                        ),
-                        new SimpleFieldPortrayalFactory<>(
-                            "Markets",
-                            new MarketGridPortrayalFactory(
-                                scenario.component("marketGrid")
-                            ),
-                            true
-                        ),
-                        new SimpleFieldPortrayalFactory<>(
-                            "Ports",
-                            new PortGridPortrayalFactory(
-                                scenario.component("portGrid")
-                            ),
-                            true
-                        ),
-                        new SimpleFieldPortrayalFactory<>(
-                            "Vessels",
-                            new VesselFieldPortrayalFactory(
-                                scenario.component("vesselField")
-                            ),
-                            true
-                        ),
-                        new SimpleFieldPortrayalFactory<>(
-                            "Coordinates",
-                            new CoordinatesPortrayalFactory(
-                                scenario.component("modelGrid"),
-                                3
-                            ),
-                            true
-                        )
-                    ),
-                    700,
-                    320,
-                    WHITE
-                )
+  /** @param scenario the scenario to run, wired up as the display's data source */
+  public PeterSnapperScenarioWithUI(final Scenario scenario) {
+    super(
+      scenario,
+      List.of(
+        new DisplayWrapper2D(
+          "The Peter Snapper Fishery",
+          List.of(
+            new BathymetryFieldPortrayalFactory(
+              scenario.component("bathymetricGrid")
+            ),
+            new SimpleFieldPortrayalFactory<>(
+              "Carrying capacity",
+              new NumberGridPortrayalFactory(
+                IMOLA,
+                "Carrying capacity",
+                true,
+                scenario.component("carryingCapacityGrid")
+              ),
+              false
+            ),
+            new SpeciesBiomassFieldPortrayalFactory(
+              scenario.component("biomassGrid"),
+              scenario.component("carryingCapacityGrid"),
+              false
+            ),
+            new SimpleFieldPortrayalFactory<>(
+              "Markets",
+              new MarketGridPortrayalFactory(scenario.component("marketGrid")),
+              true
+            ),
+            new SimpleFieldPortrayalFactory<>(
+              "Ports",
+              new PortGridPortrayalFactory(scenario.component("portGrid")),
+              true
+            ),
+            new SimpleFieldPortrayalFactory<>(
+              "Vessels",
+              new VesselFieldPortrayalFactory(
+                scenario.component("vesselField")
+              ),
+              true
+            ),
+            new SimpleFieldPortrayalFactory<>(
+              "Coordinates",
+              new CoordinatesPortrayalFactory(
+                scenario.component("modelGrid"),
+                3
+              ),
+              true
             )
-        );
-    }
+          ),
+          700,
+          320,
+          WHITE
+        )
+      )
+    );
+  }
 
-    static void main(final String[] args) {
-        final var scenarioWithUI = new PeterSnapperScenarioWithUI(new PeterSnapperScenario().get());
-        scenarioWithUI.createController();
-    }
+  static void main(final String[] args) {
+    final var scenarioWithUI = new PeterSnapperScenarioWithUI(
+      new PeterSnapperScenario().get()
+    );
+    scenarioWithUI.createController();
+  }
 }
-

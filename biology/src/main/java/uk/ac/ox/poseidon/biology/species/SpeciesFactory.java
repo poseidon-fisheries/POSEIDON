@@ -22,14 +22,14 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of {@link Species}. Note the field order here
@@ -45,23 +45,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @EqualsAndHashCode(callSuper = true)
 public class SpeciesFactory extends GlobalScopeFactory<Species> {
 
-    private static final String PREFIX = "Species";
+  private static final String PREFIX = "Species";
 
-    private String code;
-    private String name;
-    private String lifeStage;
+  private String code;
+  private String name;
+  private String lifeStage;
 
-    /** @param code the species' code; {@code name} defaults to {@code "Species <code>"} */
-    public SpeciesFactory(final String code) {
-        this(code, PREFIX + " " + code, null);
-    }
+  /** @param code the species' code; {@code name} defaults to {@code "Species <code>"} */
+  public SpeciesFactory(final String code) {
+    this(code, PREFIX + " " + code, null);
+  }
 
-    @Override
-    protected Species newInstance(final Scope scope) {
-        return new Species(
-            checkNotNull(code),
-            lifeStage != null ? lifeStage : null,
-            name != null ? name : PREFIX + " " + code
-        );
-    }
+  @Override
+  protected Species newInstance(final Scope scope) {
+    return new Species(
+      checkNotNull(code),
+      lifeStage != null ? lifeStage : null,
+      name != null ? name : PREFIX + " " + code
+    );
+  }
 }

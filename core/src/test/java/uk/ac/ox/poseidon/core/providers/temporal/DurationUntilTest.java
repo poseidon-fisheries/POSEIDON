@@ -22,33 +22,34 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class DurationUntilTest {
 
-    private static final LocalDateTime NOW = LocalDateTime.of(2025, 6, 1, 7, 0);
+  private static final LocalDateTime NOW = LocalDateTime.of(2025, 6, 1, 7, 0);
 
-    private static Duration durationUntil(final LocalDateTime referenceDateTime) {
-        return new DurationUntil(() -> NOW, () -> referenceDateTime).get();
-    }
+  private static Duration durationUntil(final LocalDateTime referenceDateTime) {
+    return new DurationUntil(() -> NOW, () -> referenceDateTime).get();
+  }
 
-    @Test
-    void isTheTimeLeftUntilALaterReference() {
-        assertThat(durationUntil(NOW.plusHours(3))).isEqualTo(Duration.ofHours(3));
-    }
+  @Test
+  void isTheTimeLeftUntilALaterReference() {
+    assertThat(durationUntil(NOW.plusHours(3))).isEqualTo(Duration.ofHours(3));
+  }
 
-    @Test
-    void isZeroAtTheReference() {
-        assertThat(durationUntil(NOW)).isEqualTo(Duration.ZERO);
-    }
+  @Test
+  void isZeroAtTheReference() {
+    assertThat(durationUntil(NOW)).isEqualTo(Duration.ZERO);
+  }
 
-    @Test
-    void isNegativeOnceTheReferenceHasPassed() {
-        assertThat(durationUntil(NOW.minusMinutes(30))).isEqualTo(Duration.ofMinutes(-30));
-    }
+  @Test
+  void isNegativeOnceTheReferenceHasPassed() {
+    assertThat(durationUntil(NOW.minusMinutes(30))).isEqualTo(
+      Duration.ofMinutes(-30)
+    );
+  }
 }

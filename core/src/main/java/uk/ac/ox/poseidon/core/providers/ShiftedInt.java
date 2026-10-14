@@ -22,9 +22,8 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.function.IntSupplier;
+import lombok.RequiredArgsConstructor;
 
 /**
  * An {@link IntProvider} that adds a fixed integer shift to a delegate {@link IntSupplier}'s value
@@ -33,11 +32,11 @@ import java.util.function.IntSupplier;
 @RequiredArgsConstructor
 public class ShiftedInt implements IntProvider {
 
-    private final IntSupplier delegateIntSupplier;
-    private final int shift;
+  private final IntSupplier delegateIntSupplier;
+  private final int shift;
 
-    @Override
-    public int getAsInt() {
-        return delegateIntSupplier.getAsInt() + shift;
-    }
+  @Override
+  public int getAsInt() {
+    return delegateIntSupplier.getAsInt() + shift;
+  }
 }

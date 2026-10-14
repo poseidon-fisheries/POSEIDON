@@ -22,7 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.choices.Factories.greedyPicker;
+
 import ec.util.MersenneTwisterFast;
+import java.util.Map;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -30,56 +37,55 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.Map;
-import java.util.function.Predicate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.choices.Factories.greedyPicker;
-
 class GreedyPickerFactoryTest {
 
-    private final Simulation simulation = simulation();
-    private final VesselScope scopeA = scopeOfNewVessel(simulation);
-    private final VesselScope scopeB = scopeOfNewVessel(simulation);
+  private final Simulation simulation = simulation();
+  private final VesselScope scopeA = scopeOfNewVessel(simulation);
+  private final VesselScope scopeB = scopeOfNewVessel(simulation);
 
-    private static Simulation simulation() {
-        final Simulation simulation = mock(Simulation.class);
-        simulation.random = new MersenneTwisterFast(0);
-        return simulation;
+  private static Simulation simulation() {
+    final Simulation simulation = mock(Simulation.class);
+    simulation.random = new MersenneTwisterFast(0);
+    return simulation;
+  }
+
+  private static VesselScope scopeOfNewVessel(final Simulation simulation) {
+    final Vessel vessel = mock(Vessel.class);
+    final VesselScope scope = mock(VesselScope.class);
+    when(scope.getVessel()).thenReturn(vessel);
+    when(scope.getSimulation()).thenReturn(simulation);
+    return scope;
+  }
+
+  private static class OptionValuesFactory
+    extends GlobalScopeFactory<OptionValues<String>>
+  {
+
+    @Override
+    protected OptionValues<String> newInstance(final Scope scope) {
+      return new ImmutableOptionValues<>(Map.of("A", 1.0, "B", 3.0));
     }
+  }
 
-    private static VesselScope scopeOfNewVessel(final Simulation simulation) {
-        final Vessel vessel = mock(Vessel.class);
-        final VesselScope scope = mock(VesselScope.class);
-        when(scope.getVessel()).thenReturn(vessel);
-        when(scope.getSimulation()).thenReturn(simulation);
-        return scope;
+  private static class AnyOptionFactory
+    extends GlobalScopeFactory<Predicate<String>>
+  {
+
+    @Override
+    protected Predicate<String> newInstance(final Scope scope) {
+      return option -> true;
     }
+  }
 
-    private static class OptionValuesFactory
-        extends GlobalScopeFactory<OptionValues<String>> {
-        @Override
-        protected OptionValues<String> newInstance(final Scope scope) {
-            return new ImmutableOptionValues<>(Map.of("A", 1.0, "B", 3.0));
-        }
-    }
+  @Test
+  void givesOnePickerPerVessel() {
+    final GreedyPickerFactory<String> factory = greedyPicker(
+      new OptionValuesFactory(),
+      new AnyOptionFactory()
+    );
 
-    private static class AnyOptionFactory extends GlobalScopeFactory<Predicate<String>> {
-        @Override
-        protected Predicate<String> newInstance(final Scope scope) {
-            return option -> true;
-        }
-    }
-
-    @Test
-    void givesOnePickerPerVessel() {
-        final GreedyPickerFactory<String> factory =
-            greedyPicker(new OptionValuesFactory(), new AnyOptionFactory());
-
-        assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
-        assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
-        assertThat(factory.get(scopeA).get()).isEqualTo("B");
-    }
+    assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
+    assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
+    assertThat(factory.get(scopeA).get()).isEqualTo("B");
+  }
 }

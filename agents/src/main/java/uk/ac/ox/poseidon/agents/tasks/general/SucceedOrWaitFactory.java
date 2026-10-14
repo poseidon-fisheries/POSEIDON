@@ -46,18 +46,18 @@ import uk.ac.ox.poseidon.core.Factory;
 @EqualsAndHashCode(callSuper = true)
 public class SucceedOrWaitFactory extends VesselTaskFactory<Selector<Vessel>> {
 
-    private Factory<? super VesselScope, ? extends Task<Vessel>> mainTask;
-    private Factory<? super VesselScope, ? extends Task<Vessel>> waitTask;
+  private Factory<? super VesselScope, ? extends Task<Vessel>> mainTask;
+  private Factory<? super VesselScope, ? extends Task<Vessel>> waitTask;
 
-    /**
-     * @return a {@link Selector} with {@code mainTask} as its first child and an
-     * {@link AlwaysFail}-wrapped {@code waitTask} as its second
-     */
-    @Override
-    protected Selector<Vessel> newTask(final VesselScope scope) {
-        final Selector<Vessel> selector = new Selector<>();
-        selector.addChild(mainTask.get(scope));
-        selector.addChild(new AlwaysFail<>(waitTask.get(scope)));
-        return selector;
-    }
+  /**
+   * @return a {@link Selector} with {@code mainTask} as its first child and an
+   * {@link AlwaysFail}-wrapped {@code waitTask} as its second
+   */
+  @Override
+  protected Selector<Vessel> newTask(final VesselScope scope) {
+    final Selector<Vessel> selector = new Selector<>();
+    selector.addChild(mainTask.get(scope));
+    selector.addChild(new AlwaysFail<>(waitTask.get(scope)));
+    return selector;
+  }
 }

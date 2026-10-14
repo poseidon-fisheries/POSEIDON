@@ -38,26 +38,30 @@ import uk.ac.ox.poseidon.core.Factory;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AlwaysFailTaskFactory extends DecoratorTaskFactory<AlwaysFail<Vessel>> {
+public class AlwaysFailTaskFactory
+  extends DecoratorTaskFactory<AlwaysFail<Vessel>>
+{
 
-    /** @param child factory for the child task to always report failure for */
-    public AlwaysFailTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> child) {
-        super(child);
-    }
+  /** @param child factory for the child task to always report failure for */
+  public AlwaysFailTaskFactory(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> child
+  ) {
+    super(child);
+  }
 
-    /**
-     * @param guard optional task guarding whether this decorator runs at all
-     * @param child factory for the child task to always report failure for
-     */
-    public AlwaysFailTaskFactory(
-        final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
-        final Factory<? super VesselScope, ? extends Task<Vessel>> child
-    ) {
-        super(guard, child);
-    }
+  /**
+   * @param guard optional task guarding whether this decorator runs at all
+   * @param child factory for the child task to always report failure for
+   */
+  public AlwaysFailTaskFactory(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
+    final Factory<? super VesselScope, ? extends Task<Vessel>> child
+  ) {
+    super(guard, child);
+  }
 
-    @Override
-    protected AlwaysFail<Vessel> newTask(final VesselScope scope) {
-        return new AlwaysFail<>();
-    }
+  @Override
+  protected AlwaysFail<Vessel> newTask(final VesselScope scope) {
+    return new AlwaysFail<>();
+  }
 }

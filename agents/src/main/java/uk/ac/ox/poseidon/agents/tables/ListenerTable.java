@@ -23,10 +23,9 @@
 package uk.ac.ox.poseidon.agents.tables;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.function.Supplier;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
-
-import java.util.function.Supplier;
 
 /**
  * An {@link AbstractListener} that accumulates the events it receives into a tablesaw
@@ -37,26 +36,25 @@ import java.util.function.Supplier;
  * @param <E> the type of event this table listens for
  */
 public abstract class ListenerTable<E>
-    extends AbstractListener<E>
-    implements Supplier<Table> {
+  extends AbstractListener<E>
+  implements Supplier<Table>
+{
 
-    /** The accumulated table; columns are added by subclasses in their constructor. */
-    protected final Table table = Table.create();
+  /** The accumulated table; columns are added by subclasses in their constructor. */
+  protected final Table table = Table.create();
 
-    /** @param eventClass the type of event this table listens for */
-    protected ListenerTable(
-        final Class<E> eventClass
-    ) {
-        super(eventClass);
-    }
+  /** @param eventClass the type of event this table listens for */
+  protected ListenerTable(final Class<E> eventClass) {
+    super(eventClass);
+  }
 
-    /** @return the live, mutable table this listener has been accumulating rows into */
-    @SuppressFBWarnings(
-        value = "EI",
-        justification = "Mutable table willfully exposed; just be careful with it."
-    )
-    @Override
-    public Table get() {
-        return table;
-    }
+  /** @return the live, mutable table this listener has been accumulating rows into */
+  @SuppressFBWarnings(
+    value = "EI",
+    justification = "Mutable table willfully exposed; just be careful with it."
+  )
+  @Override
+  public Table get() {
+    return table;
+  }
 }

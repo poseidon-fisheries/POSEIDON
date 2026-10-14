@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.agents;
 
+import java.lang.ref.WeakReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.lang.ref.WeakReference;
 
 /**
  * A {@link SimulationScope} narrowed to a single agent, for factories building agent-owned
@@ -38,24 +37,20 @@ import java.lang.ref.WeakReference;
 @EqualsAndHashCode(callSuper = true)
 public class AgentScope<G extends Agent> extends SimulationScope {
 
-    private final WeakReference<G> agent;
+  private final WeakReference<G> agent;
 
-    public AgentScope(final AgentScope<G> agentScope) {
-        super(agentScope);
-        this.agent = agentScope.agent;
-    }
+  public AgentScope(final AgentScope<G> agentScope) {
+    super(agentScope);
+    this.agent = agentScope.agent;
+  }
 
-    public AgentScope(
-        final SimulationScope simulationScope,
-        final G agent
-    ) {
-        super(simulationScope);
-        this.agent = new WeakReference<>(agent);
-    }
+  public AgentScope(final SimulationScope simulationScope, final G agent) {
+    super(simulationScope);
+    this.agent = new WeakReference<>(agent);
+  }
 
-    /** @return the scoped agent, or {@code null} if it has since been garbage-collected */
-    public G getAgent() {
-        return agent.get();
-    }
-
+  /** @return the scoped agent, or {@code null} if it has since been garbage-collected */
+  public G getAgent() {
+    return agent.get();
+  }
 }

@@ -29,8 +29,9 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 /** The result of one fishing event: the raw catch, and how it was disposed of. */
 @Value
 public class FishingOutcome {
-    /** Everything caught, before any disposition. */
-    Bucket grossCatch;
-    /** How {@link #grossCatch} was split between retained, discarded alive and discarded dead. */
-    Disposition disposition;
+
+  /** Everything caught, before any disposition. */
+  Bucket grossCatch;
+  /** How {@link #grossCatch} was split between retained, discarded alive and discarded dead. */
+  Disposition disposition;
 }

@@ -38,18 +38,19 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 /** A {@link SimulationScopeFactory} that portrays a {@link MarketGrid} as ovals, one per market cell. */
-public final class MarketGridPortrayalFactory extends SimulationScopeFactory<SparseGridPortrayal2D> {
+public final class MarketGridPortrayalFactory
+  extends SimulationScopeFactory<SparseGridPortrayal2D>
+{
 
-    private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;
+  private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;
 
-    /** @return a sparse grid portrayal showing {@link #marketGrid}'s cells as ovals */
-    @Override
-    protected SparseGridPortrayal2D newInstance(final SimulationScope scope) {
-        final SparseGridPortrayal2D sparseGridPortrayal2D = new SparseGridPortrayal2D();
-        sparseGridPortrayal2D.setField(marketGrid.get(scope).copyOfField());
-        sparseGridPortrayal2D.setPortrayalForAll(
-            new OvalPortrayal2D()
-        );
-        return sparseGridPortrayal2D;
-    }
+  /** @return a sparse grid portrayal showing {@link #marketGrid}'s cells as ovals */
+  @Override
+  protected SparseGridPortrayal2D newInstance(final SimulationScope scope) {
+    final SparseGridPortrayal2D sparseGridPortrayal2D =
+      new SparseGridPortrayal2D();
+    sparseGridPortrayal2D.setField(marketGrid.get(scope).copyOfField());
+    sparseGridPortrayal2D.setPortrayalForAll(new OvalPortrayal2D());
+    return sparseGridPortrayal2D;
+  }
 }

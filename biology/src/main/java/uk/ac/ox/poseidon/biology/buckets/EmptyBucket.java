@@ -23,10 +23,6 @@
 package uk.ac.ox.poseidon.biology.buckets;
 
 import com.google.common.collect.ImmutableMap;
-import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
-import uk.ac.ox.poseidon.biology.species.Species;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -34,6 +30,9 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.ObjDoubleConsumer;
+import uk.ac.ox.poseidon.biology.Content;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
+import uk.ac.ox.poseidon.biology.species.Species;
 
 /**
  * The shared, contentless {@link Bucket}, obtained from {@link Bucket#empty()}. A singleton (a
@@ -44,85 +43,86 @@ import java.util.function.ObjDoubleConsumer;
  */
 final class EmptyBucket implements Bucket {
 
-    static final EmptyBucket INSTANCE = new EmptyBucket();
+  static final EmptyBucket INSTANCE = new EmptyBucket();
 
-    private EmptyBucket() {
-    }
+  private EmptyBucket() {}
 
-    @Override
-    public boolean equals(final Object obj) {
-        return Bucket.contentEquals(this, obj);
-    }
+  @Override
+  public boolean equals(final Object obj) {
+    return Bucket.contentEquals(this, obj);
+  }
 
-    @Override
-    public int hashCode() {
-        return Bucket.contentHashCode(this);
-    }
+  @Override
+  public int hashCode() {
+    return Bucket.contentHashCode(this);
+  }
 
-    @Override
-    public Optional<Content> getContent(final Species species) {
-        return Optional.empty();
-    }
+  @Override
+  public Optional<Content> getContent(final Species species) {
+    return Optional.empty();
+  }
 
-    @Override
-    public double getKg(final Species species) {
-        return 0.0;
-    }
+  @Override
+  public double getKg(final Species species) {
+    return 0.0;
+  }
 
-    @Override
-    public Bucket add(final Bucket other) {
-        return other;
-    }
+  @Override
+  public Bucket add(final Bucket other) {
+    return other;
+  }
 
-    /** @throws IllegalArgumentException unless {@code other} is itself empty */
-    @Override
-    public Bucket subtract(final Bucket other) {
-        if (other.isEmpty()) return this;
-        throw new IllegalArgumentException("Cannot subtract from empty bucket");
-    }
+  /** @throws IllegalArgumentException unless {@code other} is itself empty */
+  @Override
+  public Bucket subtract(final Bucket other) {
+    if (other.isEmpty()) return this;
+    throw new IllegalArgumentException("Cannot subtract from empty bucket");
+  }
 
-    @Override
-    public Bucket mapContent(final BiFunction<Species, Content, Content> mapper) {
-        return this;
-    }
+  @Override
+  public Bucket mapContent(final BiFunction<Species, Content, Content> mapper) {
+    return this;
+  }
 
-    @Override
-    public Map<Boolean, Bucket> partitionBy(final BiPredicate<Species, Content> predicate) {
-        return Map.of(true, this, false, this);
-    }
+  @Override
+  public Map<Boolean, Bucket> partitionBy(
+    final BiPredicate<Species, Content> predicate
+  ) {
+    return Map.of(true, this, false, this);
+  }
 
-    @Override
-    public boolean isEmpty() {
-        return true;
-    }
+  @Override
+  public boolean isEmpty() {
+    return true;
+  }
 
-    @Override
-    public Biomass getTotalBiomass() {
-        return Biomass.ofKg(0.0);
-    }
+  @Override
+  public Biomass getTotalBiomass() {
+    return Biomass.ofKg(0.0);
+  }
 
-    @Override
-    public ImmutableMap<Species, Content> getMap() {
-        return ImmutableMap.of();
-    }
+  @Override
+  public ImmutableMap<Species, Content> getMap() {
+    return ImmutableMap.of();
+  }
 
-    @Override
-    public Set<Species> getSpecies() {
-        return Set.of();
-    }
+  @Override
+  public Set<Species> getSpecies() {
+    return Set.of();
+  }
 
-    @Override
-    public BucketBuilder toBuilder() {
-        return Bucket.newBuilder();
-    }
+  @Override
+  public BucketBuilder toBuilder() {
+    return Bucket.newBuilder();
+  }
 
-    @Override
-    public void forEach(final BiConsumer<Species, Content> action) {
-        // noop
-    }
+  @Override
+  public void forEach(final BiConsumer<Species, Content> action) {
+    // noop
+  }
 
-    @Override
-    public void forEachBiomassValue(final ObjDoubleConsumer<Species> action) {
-        // noop
-    }
+  @Override
+  public void forEachBiomassValue(final ObjDoubleConsumer<Species> action) {
+    // noop
+  }
 }

@@ -22,15 +22,14 @@
 
 package uk.ac.ox.poseidon.regulations;
 
+import static java.time.ZoneOffset.UTC;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.threeten.extra.Interval;
 import uk.ac.ox.poseidon.geography.Coordinate;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-
-import static java.time.ZoneOffset.UTC;
 
 /**
  * A convenience base {@link Action} combining {@link TemporalAction} and {@link SpatialAction},
@@ -39,66 +38,61 @@ import static java.time.ZoneOffset.UTC;
  */
 @Data
 @AllArgsConstructor
-public abstract class ExtendedAction<G> implements TemporalAction<G>, SpatialAction<G> {
+public abstract class ExtendedAction<G> implements
+  TemporalAction<G>,
+  SpatialAction<G> {
 
-    private final G agent;
-    private final Interval interval;
-    private final Coordinate startCoordinate;
-    private final Coordinate endCoordinate;
+  private final G agent;
+  private final Interval interval;
+  private final Coordinate startCoordinate;
+  private final Coordinate endCoordinate;
 
-    /** A stationary action running from {@code startDateTime} to {@code endDateTime}. */
-    public ExtendedAction(
-        final G agent,
-        final LocalDateTime startDateTime,
-        final LocalDateTime endDateTime,
-        final Coordinate coordinate
-    ) {
-        this(
-            agent,
-            Interval.of(startDateTime.toInstant(UTC), endDateTime.toInstant(UTC)),
-            coordinate,
-            coordinate
-        );
-    }
+  /** A stationary action running from {@code startDateTime} to {@code endDateTime}. */
+  public ExtendedAction(
+    final G agent,
+    final LocalDateTime startDateTime,
+    final LocalDateTime endDateTime,
+    final Coordinate coordinate
+  ) {
+    this(
+      agent,
+      Interval.of(startDateTime.toInstant(UTC), endDateTime.toInstant(UTC)),
+      coordinate,
+      coordinate
+    );
+  }
 
-    /** A stationary action of length {@code duration}, starting at {@code startDateTime}. */
-    public ExtendedAction(
-        final G agent,
-        final LocalDateTime startDateTime,
-        final Duration duration,
-        final Coordinate coordinate
-    ) {
-        this(
-            agent,
-            startDateTime,
-            duration,
-            coordinate,
-            coordinate
-        );
-    }
+  /** A stationary action of length {@code duration}, starting at {@code startDateTime}. */
+  public ExtendedAction(
+    final G agent,
+    final LocalDateTime startDateTime,
+    final Duration duration,
+    final Coordinate coordinate
+  ) {
+    this(agent, startDateTime, duration, coordinate, coordinate);
+  }
 
-    /**
-     * An action of length {@code duration}, starting at {@code startDateTime}, moving from
-     * {@code startCoordinate} to {@code endCoordinate}.
-     */
-    public ExtendedAction(
-        final G agent,
-        final LocalDateTime startDateTime,
-        final Duration duration,
-        final Coordinate startCoordinate,
-        final Coordinate endCoordinate
-    ) {
-        this(
-            agent,
-            Interval.of(startDateTime.toInstant(UTC), duration),
-            startCoordinate,
-            endCoordinate
-        );
-    }
+  /**
+   * An action of length {@code duration}, starting at {@code startDateTime}, moving from
+   * {@code startCoordinate} to {@code endCoordinate}.
+   */
+  public ExtendedAction(
+    final G agent,
+    final LocalDateTime startDateTime,
+    final Duration duration,
+    final Coordinate startCoordinate,
+    final Coordinate endCoordinate
+  ) {
+    this(
+      agent,
+      Interval.of(startDateTime.toInstant(UTC), duration),
+      startCoordinate,
+      endCoordinate
+    );
+  }
 
-    /** @return this action's length */
-    public Duration getDuration() {
-        return interval.toDuration();
-    }
-
+  /** @return this action's length */
+  public Duration getDuration() {
+    return interval.toDuration();
+  }
 }

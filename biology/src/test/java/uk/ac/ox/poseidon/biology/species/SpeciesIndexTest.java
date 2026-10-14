@@ -22,92 +22,110 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Test;
 
 class SpeciesIndexTest {
 
-    @Test
-    void makeSpeciesIndices() {
-        final Set<Species> species = Set.of(
-            new Species("S1", null, "Species 1"),
-            new Species("S2", "Adult", "Species 2"),
-            new Species("S3", "Juvenile", "Species 3")
-        );
-        final Map<Species, Integer> speciesIndices = SpeciesIndex.of(species).asMap();
-        assertThat(speciesIndices).hasSize(3);
-        assertThat(speciesIndices).containsEntry(new Species("S1", null, "Species 1"), 0);
-        assertThat(speciesIndices).containsEntry(new Species("S2", "Adult", "Species 2"), 1);
-        assertThat(speciesIndices).containsEntry(new Species("S3", "Juvenile", "Species 3"), 2);
-    }
+  @Test
+  void makeSpeciesIndices() {
+    final Set<Species> species = Set.of(
+      new Species("S1", null, "Species 1"),
+      new Species("S2", "Adult", "Species 2"),
+      new Species("S3", "Juvenile", "Species 3")
+    );
+    final Map<Species, Integer> speciesIndices = SpeciesIndex.of(
+      species
+    ).asMap();
+    assertThat(speciesIndices).hasSize(3);
+    assertThat(speciesIndices).containsEntry(
+      new Species("S1", null, "Species 1"),
+      0
+    );
+    assertThat(speciesIndices).containsEntry(
+      new Species("S2", "Adult", "Species 2"),
+      1
+    );
+    assertThat(speciesIndices).containsEntry(
+      new Species("S3", "Juvenile", "Species 3"),
+      2
+    );
+  }
 
-    @Test
-    void makeSpeciesIndicesWithDuplicateKeys() {
-        assertThatThrownBy(() -> SpeciesIndex.of(Set.of(
-            new Species("S1", "Adult", "Species 1 (juvenile)"), // deliberately inconsistent
-            new Species("S1", "Adult", "Species 1 (adult)"),
-            new Species("S3", "Juvenile", "Species 3")
-        ))).isInstanceOf(IllegalArgumentException.class);
-    }
+  @Test
+  void makeSpeciesIndicesWithDuplicateKeys() {
+    assertThatThrownBy(() ->
+      SpeciesIndex.of(
+        Set.of(
+          new Species("S1", "Adult", "Species 1 (juvenile)"), // deliberately inconsistent
+          new Species("S1", "Adult", "Species 1 (adult)"),
+          new Species("S3", "Juvenile", "Species 3")
+        )
+      )
+    ).isInstanceOf(IllegalArgumentException.class);
+  }
 
-    @Test
-    void nullSpeciesSetIsRejected() {
-        assertThatThrownBy(() -> SpeciesIndex.of((Set<Species>) null))
-            .isInstanceOf(NullPointerException.class);
-    }
+  @Test
+  void nullSpeciesSetIsRejected() {
+    assertThatThrownBy(() -> SpeciesIndex.of((Set<Species>) null)).isInstanceOf(
+      NullPointerException.class
+    );
+  }
 
-    @Test
-    void nullSpeciesEntryIsRejected() {
-        final Set<Species> species = new HashSet<>(Arrays.asList(
-            new Species("S1", null, "Species 1"),
-            null
-        ));
-        assertThatThrownBy(() -> SpeciesIndex.of(species))
-            .isInstanceOf(NullPointerException.class);
-    }
+  @Test
+  void nullSpeciesEntryIsRejected() {
+    final Set<Species> species = new HashSet<>(
+      Arrays.asList(new Species("S1", null, "Species 1"), null)
+    );
+    assertThatThrownBy(() -> SpeciesIndex.of(species)).isInstanceOf(
+      NullPointerException.class
+    );
+  }
 
-    @Test
-    void speciesAreStoredInNaturalOrder() {
-        final Set<Species> species = new HashSet<>(Arrays.asList(
-            new Species("S2", "Adult", "Species 2"),
-            new Species("S1", null, "Species 1"),
-            new Species("S1", "Juvenile", "Species 1 (juvenile)")
-        ));
-        final SpeciesIndex index = SpeciesIndex.of(species);
-        assertThat(index.speciesAt(0)).isEqualTo(new Species("S1", null, "Species 1"));
-        assertThat(index.speciesAt(1)).isEqualTo(new Species(
-            "S1",
-            "Juvenile",
-            "Species 1 (juvenile)"
-        ));
-        assertThat(index.speciesAt(2)).isEqualTo(new Species("S2", "Adult", "Species 2"));
-    }
+  @Test
+  void speciesAreStoredInNaturalOrder() {
+    final Set<Species> species = new HashSet<>(
+      Arrays.asList(
+        new Species("S2", "Adult", "Species 2"),
+        new Species("S1", null, "Species 1"),
+        new Species("S1", "Juvenile", "Species 1 (juvenile)")
+      )
+    );
+    final SpeciesIndex index = SpeciesIndex.of(species);
+    assertThat(index.speciesAt(0)).isEqualTo(
+      new Species("S1", null, "Species 1")
+    );
+    assertThat(index.speciesAt(1)).isEqualTo(
+      new Species("S1", "Juvenile", "Species 1 (juvenile)")
+    );
+    assertThat(index.speciesAt(2)).isEqualTo(
+      new Species("S2", "Adult", "Species 2")
+    );
+  }
 
-    @Test
-    void indexOfMissingSpeciesReturnsMinusOne() {
-        final Set<Species> species = Set.of(
-            new Species("S1", null, "Species 1")
-        );
-        final SpeciesIndex index = SpeciesIndex.of(species);
-        assertThat(index.indexOf(new Species("S2", null, "Species 2"))).isEqualTo(-1);
-    }
+  @Test
+  void indexOfMissingSpeciesReturnsMinusOne() {
+    final Set<Species> species = Set.of(new Species("S1", null, "Species 1"));
+    final SpeciesIndex index = SpeciesIndex.of(species);
+    assertThat(index.indexOf(new Species("S2", null, "Species 2"))).isEqualTo(
+      -1
+    );
+  }
 
-    @Test
-    void speciesAtOutOfBoundsReturnsNull() {
-        final Set<Species> species = Set.of(
-            new Species("S1", null, "Species 1"),
-            new Species("S2", "Adult", "Species 2")
-        );
-        final SpeciesIndex index = SpeciesIndex.of(species);
-        assertThat(index.speciesAt(-1)).isNull();
-        assertThat(index.speciesAt(index.size())).isNull();
-    }
-
+  @Test
+  void speciesAtOutOfBoundsReturnsNull() {
+    final Set<Species> species = Set.of(
+      new Species("S1", null, "Species 1"),
+      new Species("S2", "Adult", "Species 2")
+    );
+    final SpeciesIndex index = SpeciesIndex.of(species);
+    assertThat(index.speciesAt(-1)).isNull();
+    assertThat(index.speciesAt(index.size())).isNull();
+  }
 }

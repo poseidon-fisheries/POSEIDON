@@ -22,10 +22,9 @@
 
 package uk.ac.ox.poseidon.geography;
 
+import java.awt.geom.Point2D;
 import lombok.Data;
 import lombok.NonNull;
-
-import java.awt.geom.Point2D;
 
 /**
  * Represents a geographic coordinate specified by latitude and longitude. This class provides
@@ -35,35 +34,34 @@ import java.awt.geom.Point2D;
  */
 @Data
 public final class Coordinate {
-    /** The longitude, in degrees. */
-    public final double lon;
-    /** The latitude, in degrees. */
-    public final double lat;
 
-    /**
-     * @return a {@code Coordinate} with {@code lon} and {@code lat} taken from {@code point}'s x/y
-     */
-    public static Coordinate fromPoint2D(
-        @NonNull final Point2D point
-    ) {
-        return new Coordinate(point.getX(), point.getY());
-    }
+  /** The longitude, in degrees. */
+  public final double lon;
+  /** The latitude, in degrees. */
+  public final double lat;
 
-    /** @return a {@code Coordinate} equivalent to the given JTS coordinate */
-    public static Coordinate fromJTS(
-        @NonNull final org.locationtech.jts.geom.Coordinate jtsCoordinate
-    ) {
-        return new Coordinate(jtsCoordinate.x, jtsCoordinate.y);
-    }
+  /**
+   * @return a {@code Coordinate} with {@code lon} and {@code lat} taken from {@code point}'s x/y
+   */
+  public static Coordinate fromPoint2D(@NonNull final Point2D point) {
+    return new Coordinate(point.getX(), point.getY());
+  }
 
-    /** @return this coordinate as a mutable JTS {@code Coordinate} */
-    public org.locationtech.jts.geom.Coordinate toJTS() {
-        return new org.locationtech.jts.geom.Coordinate(lon, lat);
-    }
+  /** @return a {@code Coordinate} equivalent to the given JTS coordinate */
+  public static Coordinate fromJTS(
+    @NonNull final org.locationtech.jts.geom.Coordinate jtsCoordinate
+  ) {
+    return new Coordinate(jtsCoordinate.x, jtsCoordinate.y);
+  }
 
-    /** @return this coordinate as {@code "(lon, lat)"} */
-    @Override
-    public String toString() {
-        return "(" + this.lon + ", " + this.lat + ")";
-    }
+  /** @return this coordinate as a mutable JTS {@code Coordinate} */
+  public org.locationtech.jts.geom.Coordinate toJTS() {
+    return new org.locationtech.jts.geom.Coordinate(lon, lat);
+  }
+
+  /** @return this coordinate as {@code "(lon, lat)"} */
+  @Override
+  public String toString() {
+    return "(" + this.lon + ", " + this.lat + ")";
+  }
 }

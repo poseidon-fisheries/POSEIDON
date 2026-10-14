@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.trips;
 
+import java.util.function.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
-import java.util.function.Predicate;
 
 /**
  * Holds for a cell where the vessel has fished during its current trip: the cell of the start
@@ -38,20 +37,20 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class CellWasFishedThisTrip implements Predicate<Int2D> {
 
-    private final @NonNull Vessel vessel;
+  private final @NonNull Vessel vessel;
 
-    @Override
-    public boolean test(final Int2D cell) {
-        final Trip currentTrip = vessel.getCurrentTrip();
-        if (currentTrip == null) {
-            return false;
-        }
-        final ModelGrid modelGrid = vessel.getVesselField().getModelGrid();
-        return currentTrip
-            .getFishingEvents()
-            .stream()
-            .anyMatch(event ->
-                modelGrid.toCell(event.getAction().getStartCoordinate()).equals(cell)
-            );
+  @Override
+  public boolean test(final Int2D cell) {
+    final Trip currentTrip = vessel.getCurrentTrip();
+    if (currentTrip == null) {
+      return false;
     }
+    final ModelGrid modelGrid = vessel.getVesselField().getModelGrid();
+    return currentTrip
+      .getFishingEvents()
+      .stream()
+      .anyMatch(event ->
+        modelGrid.toCell(event.getAction().getStartCoordinate()).equals(cell)
+      );
+  }
 }

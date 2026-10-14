@@ -22,15 +22,14 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import java.time.Month;
+import java.time.MonthDay;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.time.Month;
-import java.time.MonthDay;
 
 /**
  * A {@link GlobalScopeFactory} for a fixed {@link MonthDay} (a month/day-of-month pair with no
@@ -44,31 +43,31 @@ import java.time.MonthDay;
 @EqualsAndHashCode(callSuper = true)
 public class MonthDayFactory extends GlobalScopeFactory<MonthDay> {
 
-    private int month;
-    private int dayOfMonth;
+  private int month;
+  private int dayOfMonth;
 
-    /**
-     * @param month      the month
-     * @param dayOfMonth the day of the month
-     */
-    public MonthDayFactory(
-        final Month month,
-        final int dayOfMonth
-    ) {
-        this(month.getValue(), dayOfMonth);
-    }
+  /**
+   * @param month      the month
+   * @param dayOfMonth the day of the month
+   */
+  public MonthDayFactory(final Month month, final int dayOfMonth) {
+    this(month.getValue(), dayOfMonth);
+  }
 
-    /**
-     * @param text a month-day string as accepted by {@link MonthDay#parse} (e.g. {@code "--12-03"})
-     * @return a factory for the parsed month-day
-     */
-    public static MonthDayFactory parse(final CharSequence text) {
-        final var monthDay = MonthDay.parse(text);
-        return new MonthDayFactory(monthDay.getMonthValue(), monthDay.getDayOfMonth());
-    }
+  /**
+   * @param text a month-day string as accepted by {@link MonthDay#parse} (e.g. {@code "--12-03"})
+   * @return a factory for the parsed month-day
+   */
+  public static MonthDayFactory parse(final CharSequence text) {
+    final var monthDay = MonthDay.parse(text);
+    return new MonthDayFactory(
+      monthDay.getMonthValue(),
+      monthDay.getDayOfMonth()
+    );
+  }
 
-    @Override
-    protected MonthDay newInstance(final Scope scope) {
-        return MonthDay.of(month, dayOfMonth);
-    }
+  @Override
+  protected MonthDay newInstance(final Scope scope) {
+    return MonthDay.of(month, dayOfMonth);
+  }
 }

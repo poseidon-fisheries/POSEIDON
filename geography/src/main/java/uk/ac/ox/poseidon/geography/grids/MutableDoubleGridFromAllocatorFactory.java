@@ -40,25 +40,27 @@ import uk.ac.ox.poseidon.geography.allocators.Allocator;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MutableDoubleGridFromAllocatorFactory<S extends Scope>
-    extends AbstractDoubleGridFromAllocatorFactory<S, MutableDoubleGrid> {
+public class MutableDoubleGridFromAllocatorFactory<S extends Scope> extends AbstractDoubleGridFromAllocatorFactory<
+  S,
+  MutableDoubleGrid
+> {
 
-    /**
-     * @param modelGrid factory for the grid to build over
-     * @param allocator factory for the allocator assigning each cell's value
-     */
-    public MutableDoubleGridFromAllocatorFactory(
-        final Factory<? super S, ? extends ModelGrid> modelGrid,
-        final Factory<? super S, ? extends Allocator> allocator
-    ) {
-        super(modelGrid, allocator);
-    }
+  /**
+   * @param modelGrid factory for the grid to build over
+   * @param allocator factory for the allocator assigning each cell's value
+   */
+  public MutableDoubleGridFromAllocatorFactory(
+    final Factory<? super S, ? extends ModelGrid> modelGrid,
+    final Factory<? super S, ? extends Allocator> allocator
+  ) {
+    super(modelGrid, allocator);
+  }
 
-    @Override
-    MutableDoubleGrid makeGrid(
-        final ModelGrid modelGrid,
-        final double[][] values
-    ) {
-        return new MutableDoubleGrid(modelGrid, values);
-    }
+  @Override
+  MutableDoubleGrid makeGrid(
+    final ModelGrid modelGrid,
+    final double[][] values
+  ) {
+    return new MutableDoubleGrid(modelGrid, values);
+  }
 }

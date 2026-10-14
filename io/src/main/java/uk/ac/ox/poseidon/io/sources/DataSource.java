@@ -31,6 +31,6 @@ import java.io.Reader;
  */
 @FunctionalInterface
 public interface DataSource {
-    /** @return a fresh {@link Reader} over this source's data */
-    Reader getReader();
+  /** @return a fresh {@link Reader} over this source's data */
+  Reader getReader();
 }

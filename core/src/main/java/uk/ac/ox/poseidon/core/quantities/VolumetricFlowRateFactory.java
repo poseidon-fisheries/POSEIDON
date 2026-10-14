@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.core.quantities;
 
+import static tech.units.indriya.unit.Units.HOUR;
+import static tech.units.indriya.unit.Units.LITRE;
+
+import javax.measure.Unit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import si.uom.quantity.VolumetricFlowRate;
-
-import javax.measure.Unit;
-
-import static tech.units.indriya.unit.Units.HOUR;
-import static tech.units.indriya.unit.Units.LITRE;
 
 /**
  * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link VolumetricFlowRate} quantities,
@@ -37,37 +36,39 @@ import static tech.units.indriya.unit.Units.LITRE;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class VolumetricFlowRateFactory extends AbstractQuantityFactory<VolumetricFlowRate> {
+public class VolumetricFlowRateFactory
+  extends AbstractQuantityFactory<VolumetricFlowRate>
+{
 
-    /** The unit of one litre per hour. */
-    public static final Unit<VolumetricFlowRate> LITRE_PER_HOUR =
-        LITRE.divide(HOUR).asType(VolumetricFlowRate.class);
+  /** The unit of one litre per hour. */
+  public static final Unit<VolumetricFlowRate> LITRE_PER_HOUR = LITRE.divide(
+    HOUR
+  ).asType(VolumetricFlowRate.class);
 
-    /** No-args constructor, used only by SnakeYAML during deserialization. */
-    public VolumetricFlowRateFactory() {
-        super(VolumetricFlowRate.class);
-    }
+  /** No-args constructor, used only by SnakeYAML during deserialization. */
+  public VolumetricFlowRateFactory() {
+    super(VolumetricFlowRate.class);
+  }
 
-    /**
-     * @param value      the numeric flow rate value
-     * @param unitString the unit, in the format produced by {@code Unit.toString()}
-     */
-    public VolumetricFlowRateFactory(
-        final double value,
-        final String unitString
-    ) {
-        super(VolumetricFlowRate.class, value, unitString);
-    }
+  /**
+   * @param value      the numeric flow rate value
+   * @param unitString the unit, in the format produced by {@code Unit.toString()}
+   */
+  public VolumetricFlowRateFactory(
+    final double value,
+    final String unitString
+  ) {
+    super(VolumetricFlowRate.class, value, unitString);
+  }
 
-    /**
-     * @param value the numeric flow rate value
-     * @param unit  the unit the value is expressed in
-     */
-    public VolumetricFlowRateFactory(
-        final double value,
-        final Unit<VolumetricFlowRate> unit
-    ) {
-        super(VolumetricFlowRate.class, value, unit.toString());
-    }
-
+  /**
+   * @param value the numeric flow rate value
+   * @param unit  the unit the value is expressed in
+   */
+  public VolumetricFlowRateFactory(
+    final double value,
+    final Unit<VolumetricFlowRate> unit
+  ) {
+    super(VolumetricFlowRate.class, value, unit.toString());
+  }
 }

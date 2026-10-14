@@ -22,69 +22,73 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import org.joda.money.CurrencyMismatchException;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 
-import java.time.Duration;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 class TravelCostTest {
 
-    private static final CurrencyUnit EUR = CurrencyUnit.of("EUR");
-    private static final CurrencyUnit USD = CurrencyUnit.of("USD");
+  private static final CurrencyUnit EUR = CurrencyUnit.of("EUR");
+  private static final CurrencyUnit USD = CurrencyUnit.of("USD");
 
-    private final Int2D cell = new Int2D(3, 2);
-    private final AtomicInteger routesComputed = new AtomicInteger();
-    private final Function<Int2D, Route> routeFunction = destination -> {
-        routesComputed.incrementAndGet();
-        return new Route(destination.x, Duration.ofHours(destination.y));
-    };
-    private final Function<Route, Money> distanceCost =
-        route -> Money.of(EUR, route.getDistanceInKm());
-    private final Function<Route, Money> durationCost =
-        route -> Money.of(EUR, route.getDuration().toHours());
+  private final Int2D cell = new Int2D(3, 2);
+  private final AtomicInteger routesComputed = new AtomicInteger();
+  private final Function<Int2D, Route> routeFunction = destination -> {
+    routesComputed.incrementAndGet();
+    return new Route(destination.x, Duration.ofHours(destination.y));
+  };
+  private final Function<Route, Money> distanceCost = route ->
+    Money.of(EUR, route.getDistanceInKm());
+  private final Function<Route, Money> durationCost = route ->
+    Money.of(EUR, route.getDuration().toHours());
 
-    @Test
-    void sumsItsCostsOverTheRouteToTheCell() {
-        final TravelCost travelCost =
-            new TravelCost(routeFunction, List.of(distanceCost, durationCost));
+  @Test
+  void sumsItsCostsOverTheRouteToTheCell() {
+    final TravelCost travelCost = new TravelCost(
+      routeFunction,
+      List.of(distanceCost, durationCost)
+    );
 
-        assertThat(travelCost.applyAsDouble(cell, null)).isEqualTo(5.0);
-    }
+    assertThat(travelCost.applyAsDouble(cell, null)).isEqualTo(5.0);
+  }
 
-    @Test
-    void computesTheRouteOncePerValuation() {
-        final TravelCost travelCost =
-            new TravelCost(routeFunction, List.of(distanceCost, durationCost));
+  @Test
+  void computesTheRouteOncePerValuation() {
+    final TravelCost travelCost = new TravelCost(
+      routeFunction,
+      List.of(distanceCost, durationCost)
+    );
 
-        travelCost.applyAsDouble(cell, null);
+    travelCost.applyAsDouble(cell, null);
 
-        assertThat(routesComputed).hasValue(1);
-    }
+    assertThat(routesComputed).hasValue(1);
+  }
 
-    @Test
-    void throwsWhenCostsAreInDifferentCurrencies() {
-        final TravelCost travelCost = new TravelCost(
-            routeFunction,
-            List.of(distanceCost, route -> Money.of(USD, 1))
-        );
+  @Test
+  void throwsWhenCostsAreInDifferentCurrencies() {
+    final TravelCost travelCost = new TravelCost(
+      routeFunction,
+      List.of(distanceCost, route -> Money.of(USD, 1))
+    );
 
-        assertThatThrownBy(() -> travelCost.applyAsDouble(cell, null))
-            .isInstanceOf(CurrencyMismatchException.class);
-    }
+    assertThatThrownBy(() -> travelCost.applyAsDouble(cell, null)).isInstanceOf(
+      CurrencyMismatchException.class
+    );
+  }
 
-    @Test
-    void isZeroWithoutCosts() {
-        final TravelCost travelCost = new TravelCost(routeFunction, List.of());
+  @Test
+  void isZeroWithoutCosts() {
+    final TravelCost travelCost = new TravelCost(routeFunction, List.of());
 
-        assertThat(travelCost.applyAsDouble(cell, null)).isEqualTo(0.0);
-    }
+    assertThat(travelCost.applyAsDouble(cell, null)).isEqualTo(0.0);
+  }
 }

@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -42,9 +44,6 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.util.List;
-import java.util.function.Supplier;
-
 /**
  * A scheduled {@link Steppable} that, when run, creates {@link #numberOfVesselsToCreate}
  * vessels, resolving each one's name/account/home port/hold/gear/engine/behaviour against a
@@ -53,49 +52,49 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class VesselCreator implements Steppable {
 
-    private final EventManager eventManager;
-    private final VesselField vesselField;
-    private final PortGrid portGrid;
-    private final MarketGrid marketGrid;
-    private final Supplier<String> vesselIdSupplier;
+  private final EventManager eventManager;
+  private final VesselField vesselField;
+  private final PortGrid portGrid;
+  private final MarketGrid marketGrid;
+  private final Supplier<String> vesselIdSupplier;
 
-    private final Factory<? super VesselScope, ? extends String> name;
-    private final Factory<? super VesselScope, ? extends Account> account;
-    private final Factory<? super VesselScope, ? extends Port> homePort;
-    private final Factory<? super VesselScope, ? extends Hold> hold;
-    private final Factory<? super VesselScope, ? extends Gear> gear;
-    private final Factory<? super VesselScope, ? extends Engine> engine;
-    private final Factory<? super VesselScope, ? extends Behaviour> behaviour;
-    private final List<Factory<? super VesselScope, ?>> extraFactories;
+  private final Factory<? super VesselScope, ? extends String> name;
+  private final Factory<? super VesselScope, ? extends Account> account;
+  private final Factory<? super VesselScope, ? extends Port> homePort;
+  private final Factory<? super VesselScope, ? extends Hold> hold;
+  private final Factory<? super VesselScope, ? extends Gear> gear;
+  private final Factory<? super VesselScope, ? extends Engine> engine;
+  private final Factory<? super VesselScope, ? extends Behaviour> behaviour;
+  private final List<Factory<? super VesselScope, ?>> extraFactories;
 
-    private final int numberOfVesselsToCreate;
+  private final int numberOfVesselsToCreate;
 
-    /** Creates {@link #numberOfVesselsToCreate} vessels and registers them as active. */
-    @Override
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
-    public void step(final SimState simState) {
-        final Simulation simulation = (Simulation) simState;
-        final SimulationScope simulationScope = new SimulationScope(simulation);
-        final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
-        for (int i = 0; i < numberOfVesselsToCreate; i++) {
-            final Vessel vessel = new Vessel(
-                temporalSchedule,
-                new ForwardingEventManager(eventManager),
-                vesselIdSupplier.get(),
-                vesselField,
-                portGrid,
-                marketGrid
-            );
-            final VesselScope vesselScope = new VesselScope(simulationScope, vessel);
-            vessel.setHomePort(homePort.get(vesselScope));
-            vessel.setAccount(account.get(vesselScope));
-            vessel.setGear(gear.get(vesselScope));
-            vessel.setEngine(engine.get(vesselScope));
-            vessel.setHold(hold.get(vesselScope));
-            vessel.setName(name.get(vesselScope));
-            vessel.setBehaviour(behaviour.get(vesselScope));
-            extraFactories.forEach(factory -> factory.get(vesselScope));
-            vessel.setRegisteredAsActive(true);
-        }
+  /** Creates {@link #numberOfVesselsToCreate} vessels and registers them as active. */
+  @Override
+  @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
+  public void step(final SimState simState) {
+    final Simulation simulation = (Simulation) simState;
+    final SimulationScope simulationScope = new SimulationScope(simulation);
+    final TemporalSchedule temporalSchedule = simulation.getTemporalSchedule();
+    for (int i = 0; i < numberOfVesselsToCreate; i++) {
+      final Vessel vessel = new Vessel(
+        temporalSchedule,
+        new ForwardingEventManager(eventManager),
+        vesselIdSupplier.get(),
+        vesselField,
+        portGrid,
+        marketGrid
+      );
+      final VesselScope vesselScope = new VesselScope(simulationScope, vessel);
+      vessel.setHomePort(homePort.get(vesselScope));
+      vessel.setAccount(account.get(vesselScope));
+      vessel.setGear(gear.get(vesselScope));
+      vessel.setEngine(engine.get(vesselScope));
+      vessel.setHold(hold.get(vesselScope));
+      vessel.setName(name.get(vesselScope));
+      vessel.setBehaviour(behaviour.get(vesselScope));
+      extraFactories.forEach(factory -> factory.get(vesselScope));
+      vessel.setRegisteredAsActive(true);
     }
+  }
 }

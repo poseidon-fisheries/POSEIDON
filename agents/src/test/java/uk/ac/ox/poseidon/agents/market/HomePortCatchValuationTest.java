@@ -22,6 +22,17 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.poseidon.agents.market.MarketGridTest.market;
+import static uk.ac.ox.poseidon.agents.market.MarketGridTest.marketGrid;
+
+import java.time.LocalDateTime;
+import java.util.Map;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,160 +48,183 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
-import java.time.LocalDateTime;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.poseidon.agents.market.MarketGridTest.market;
-import static uk.ac.ox.poseidon.agents.market.MarketGridTest.marketGrid;
-
 class HomePortCatchValuationTest {
 
-    private final CatchCategory category = new CatchCategory("C");
-    private final Species pricedSpecies = new Species("S1", null, null);
-    private final Species unpricedSpecies = new Species("S2", null, null);
-    private final CatchCategoriser catchCategoriser =
-        bucket -> new CategorisedCatch(Map.of(category, bucket));
-    private final Port homePort = mock(Port.class);
-    private final Vessel vessel = mock(Vessel.class);
-    private final TemporalSchedule schedule = mock(TemporalSchedule.class);
-    private LocalDateTime now = LocalDateTime.of(2026, 1, 1, 0, 0);
-    private final BiomassMarket market =
-        new BiomassMarket(homePort, "M", mock(EventManager.class));
-    private final HomePortCatchValuation valuation =
-        new HomePortCatchValuation(vessel, catchCategoriser);
+  private final CatchCategory category = new CatchCategory("C");
+  private final Species pricedSpecies = new Species("S1", null, null);
+  private final Species unpricedSpecies = new Species("S2", null, null);
+  private final CatchCategoriser catchCategoriser = bucket ->
+    new CategorisedCatch(Map.of(category, bucket));
+  private final Port homePort = mock(Port.class);
+  private final Vessel vessel = mock(Vessel.class);
+  private final TemporalSchedule schedule = mock(TemporalSchedule.class);
+  private LocalDateTime now = LocalDateTime.of(2026, 1, 1, 0, 0);
+  private final BiomassMarket market = new BiomassMarket(
+    homePort,
+    "M",
+    mock(EventManager.class)
+  );
+  private final HomePortCatchValuation valuation = new HomePortCatchValuation(
+    vessel,
+    catchCategoriser
+  );
 
-    @BeforeEach
-    void setUp() {
-        when(vessel.getHomePort()).thenReturn(homePort);
-        when(vessel.getSchedule()).thenReturn(schedule);
-        when(schedule.getDateTime()).thenAnswer(invocation -> now);
-        givenMarkets(market);
-    }
+  @BeforeEach
+  void setUp() {
+    when(vessel.getHomePort()).thenReturn(homePort);
+    when(vessel.getSchedule()).thenReturn(schedule);
+    when(schedule.getDateTime()).thenAnswer(invocation -> now);
+    givenMarkets(market);
+  }
 
-    @Test
-    void valuesTheCatchAtHomePortPrices() {
-        market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
-        assertThat(valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0)))
-            .isEqualTo(20.0);
-    }
+  @Test
+  void valuesTheCatchAtHomePortPrices() {
+    market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
+    assertThat(
+      valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0))
+    ).isEqualTo(20.0);
+  }
 
-    @Test
-    void valuesTheCatchAtTheHomePortsMarketWhenAnotherPortSharesItsCell() {
-        final Market otherMarket = market(mock(Port.class));
-        when(otherMarket.quote(any())).thenThrow(new AssertionError("quoted the wrong port"));
-        givenMarkets(market, otherMarket);
-        market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
-        assertThat(valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0)))
-            .isEqualTo(20.0);
-    }
+  @Test
+  void valuesTheCatchAtTheHomePortsMarketWhenAnotherPortSharesItsCell() {
+    final Market otherMarket = market(mock(Port.class));
+    when(otherMarket.quote(any())).thenThrow(
+      new AssertionError("quoted the wrong port")
+    );
+    givenMarkets(market, otherMarket);
+    market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
+    assertThat(
+      valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0))
+    ).isEqualTo(20.0);
+  }
 
-    @Test
-    void unpricedSpeciesCountAsZero() {
-        market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
-        final Bucket bucket = Bucket.of(Map.of(
-            pricedSpecies, Biomass.ofKg(10.0),
-            unpricedSpecies, Biomass.ofKg(30.0)
-        ));
-        assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(20.0);
-    }
+  @Test
+  void unpricedSpeciesCountAsZero() {
+    market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
+    final Bucket bucket = Bucket.of(
+      Map.of(
+        pricedSpecies,
+        Biomass.ofKg(10.0),
+        unpricedSpecies,
+        Biomass.ofKg(30.0)
+      )
+    );
+    assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(20.0);
+  }
 
-    @Test
-    void noPricesAtAllGiveZero() {
-        assertThat(valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0)))
-            .isEqualTo(0.0);
-    }
+  @Test
+  void noPricesAtAllGiveZero() {
+    assertThat(
+      valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0))
+    ).isEqualTo(0.0);
+  }
 
-    @Test
-    void aPriceChangeAfterAValuationShowsLater() {
-        market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
-        final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
-        now = now.plusHours(1);
-        assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(20.0);
-        now = now.plusHours(1);
-        market.setPrice(category, pricedSpecies, eurosPerKg(3.0), now);
-        now = now.plusHours(1);
-        assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(30.0);
-    }
+  @Test
+  void aPriceChangeAfterAValuationShowsLater() {
+    market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
+    final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
+    now = now.plusHours(1);
+    assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(20.0);
+    now = now.plusHours(1);
+    market.setPrice(category, pricedSpecies, eurosPerKg(3.0), now);
+    now = now.plusHours(1);
+    assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(30.0);
+  }
 
-    @Test
-    void aPriceChangeInTheSameSecondAsAValuationShows() {
-        market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now.minusHours(1));
-        final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
-        assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(20.0);
-        market.setPrice(category, pricedSpecies, eurosPerKg(3.0), now);
-        assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(30.0);
-    }
+  @Test
+  void aPriceChangeInTheSameSecondAsAValuationShows() {
+    market.setPrice(
+      category,
+      pricedSpecies,
+      eurosPerKg(2.0),
+      now.minusHours(1)
+    );
+    final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
+    assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(20.0);
+    market.setPrice(category, pricedSpecies, eurosPerKg(3.0), now);
+    assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(30.0);
+  }
 
-    @Test
-    void aChangeOfHomePortShows() {
-        market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
-        final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
-        now = now.plusHours(1);
-        assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(20.0);
-        final Port otherPort = mock(Port.class);
-        final BiomassMarket otherMarket =
-            new BiomassMarket(otherPort, "N", mock(EventManager.class));
-        otherMarket.setPrice(category, pricedSpecies, eurosPerKg(3.0), now.minusHours(1));
-        givenMarkets(market, otherMarket);
-        when(vessel.getHomePort()).thenReturn(otherPort);
-        assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(30.0);
-    }
+  @Test
+  void aChangeOfHomePortShows() {
+    market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
+    final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
+    now = now.plusHours(1);
+    assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(20.0);
+    final Port otherPort = mock(Port.class);
+    final BiomassMarket otherMarket = new BiomassMarket(
+      otherPort,
+      "N",
+      mock(EventManager.class)
+    );
+    otherMarket.setPrice(
+      category,
+      pricedSpecies,
+      eurosPerKg(3.0),
+      now.minusHours(1)
+    );
+    givenMarkets(market, otherMarket);
+    when(vessel.getHomePort()).thenReturn(otherPort);
+    assertThat(valuation.applyAsDouble(new Object(), bucket)).isEqualTo(30.0);
+  }
 
-    @Test
-    void throwsWithoutAHomePort() {
-        when(vessel.getHomePort()).thenReturn(null);
-        assertThatThrownBy(() ->
-            valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0))
-        ).isInstanceOf(IllegalStateException.class);
-    }
+  @Test
+  void throwsWithoutAHomePort() {
+    when(vessel.getHomePort()).thenReturn(null);
+    assertThatThrownBy(() ->
+      valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0))
+    ).isInstanceOf(IllegalStateException.class);
+  }
 
-    @Test
-    void throwsWithoutAMarketForTheHomePort() {
-        givenMarkets(market(mock(Port.class)));
-        assertThatThrownBy(() ->
-            valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0))
-        ).isInstanceOf(IllegalStateException.class);
-    }
+  @Test
+  void throwsWithoutAMarketForTheHomePort() {
+    givenMarkets(market(mock(Port.class)));
+    assertThatThrownBy(() ->
+      valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0))
+    ).isInstanceOf(IllegalStateException.class);
+  }
 
-    @Test
-    void throwsWithMoreThanOneMarketForTheHomePort() {
-        final BiomassMarket otherMarket =
-            new BiomassMarket(homePort, "N", mock(EventManager.class));
-        givenMarkets(market, otherMarket);
-        assertThatThrownBy(() ->
-            valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0))
-        ).isInstanceOf(IllegalStateException.class);
-    }
+  @Test
+  void throwsWithMoreThanOneMarketForTheHomePort() {
+    final BiomassMarket otherMarket = new BiomassMarket(
+      homePort,
+      "N",
+      mock(EventManager.class)
+    );
+    givenMarkets(market, otherMarket);
+    assertThatThrownBy(() ->
+      valuation.applyAsDouble(new Object(), Bucket.of(pricedSpecies, 10.0))
+    ).isInstanceOf(IllegalStateException.class);
+  }
 
-    @Test
-    void throwsWithMoreThanOneCurrency() {
-        market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
-        market.setPrice(
-            category,
-            unpricedSpecies,
-            new Price(Money.of(CurrencyUnit.USD, 3.0), KILOGRAM),
-            now
-        );
-        final Bucket bucket = Bucket.of(Map.of(
-            pricedSpecies, Biomass.ofKg(10.0),
-            unpricedSpecies, Biomass.ofKg(30.0)
-        ));
-        assertThatThrownBy(() -> valuation.applyAsDouble(new Object(), bucket))
-            .isInstanceOf(IllegalStateException.class);
-    }
+  @Test
+  void throwsWithMoreThanOneCurrency() {
+    market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
+    market.setPrice(
+      category,
+      unpricedSpecies,
+      new Price(Money.of(CurrencyUnit.USD, 3.0), KILOGRAM),
+      now
+    );
+    final Bucket bucket = Bucket.of(
+      Map.of(
+        pricedSpecies,
+        Biomass.ofKg(10.0),
+        unpricedSpecies,
+        Biomass.ofKg(30.0)
+      )
+    );
+    assertThatThrownBy(() ->
+      valuation.applyAsDouble(new Object(), bucket)
+    ).isInstanceOf(IllegalStateException.class);
+  }
 
-    private void givenMarkets(final Market... markets) {
-        final MarketGrid marketGrid = marketGrid(markets);
-        when(vessel.getMarketGrid()).thenReturn(marketGrid);
-    }
+  private void givenMarkets(final Market... markets) {
+    final MarketGrid marketGrid = marketGrid(markets);
+    when(vessel.getMarketGrid()).thenReturn(marketGrid);
+  }
 
-    private static Price eurosPerKg(final double amount) {
-        return new Price(Money.of(CurrencyUnit.EUR, amount), KILOGRAM);
-    }
+  private static Price eurosPerKg(final double amount) {
+    return new Price(Money.of(CurrencyUnit.EUR, amount), KILOGRAM);
+  }
 }

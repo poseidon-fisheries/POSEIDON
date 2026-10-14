@@ -42,11 +42,11 @@ import uk.ac.ox.poseidon.core.Factory;
 @EqualsAndHashCode(callSuper = true)
 public class BehaviourFactory extends VesselScopeFactory<Behaviour> {
 
-    private Factory<? super VesselScope, ? extends Task<Vessel>> rootTask;
+  private Factory<? super VesselScope, ? extends Task<Vessel>> rootTask;
 
-    /** @return an {@link ActiveBehaviour} whose tree is rooted at {@link #rootTask} */
-    @Override
-    protected Behaviour newInstance(final VesselScope scope) {
-        return new ActiveBehaviour<>(rootTask.get(scope), scope.getVessel());
-    }
+  /** @return an {@link ActiveBehaviour} whose tree is rooted at {@link #rootTask} */
+  @Override
+  protected Behaviour newInstance(final VesselScope scope) {
+    return new ActiveBehaviour<>(rootTask.get(scope), scope.getVessel());
+  }
 }

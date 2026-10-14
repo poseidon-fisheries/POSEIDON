@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.core;
 
+import java.util.Map;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Per-run overrides passed to {@link Scenario#startNewSimulation(SimulationStartOptions)}: an id
@@ -41,17 +40,22 @@ import java.util.UUID;
 @Builder
 public final class SimulationStartOptions {
 
-    /** The run's ID; a fresh random one if not set. */
-    @Builder.Default
-    private final UUID simulationId = UUID.randomUUID();
+  /** The run's ID; a fresh random one if not set. */
+  @Builder.Default
+  private final UUID simulationId = UUID.randomUUID();
 
-    /** The run's RNG seed; the current time in milliseconds if not set. */
-    @Builder.Default
-    private final long seed = System.currentTimeMillis();
+  /** The run's RNG seed; the current time in milliseconds if not set. */
+  @Builder.Default
+  private final long seed = System.currentTimeMillis();
 
-    /** Bean-property overrides (dotted paths) applied to the scenario for the duration of the build. */
-    @Singular private final Map<String, Object> propertyOverrides;
+  /** Bean-property overrides (dotted paths) applied to the scenario for the duration of the build. */
+  @Singular
+  private final Map<String, Object> propertyOverrides;
 
-    /** Extra components to resolve alongside the scenario's own, keyed by name. */
-    @Singular private Map<String, ? extends Factory<? super SimulationScope, ?>> extraComponents;
+  /** Extra components to resolve alongside the scenario's own, keyed by name. */
+  @Singular
+  private Map<
+    String,
+    ? extends Factory<? super SimulationScope, ?>
+  > extraComponents;
 }

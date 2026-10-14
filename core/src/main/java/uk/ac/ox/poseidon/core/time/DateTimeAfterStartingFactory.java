@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAmount;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +31,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.time.LocalDateTime;
-import java.time.temporal.TemporalAmount;
 
 /**
  * A {@link SimulationScopeFactory} for a {@link LocalDateTime} computed as the simulation's
@@ -43,16 +42,18 @@ import java.time.temporal.TemporalAmount;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DateTimeAfterStartingFactory extends SimulationScopeFactory<LocalDateTime> {
+public class DateTimeAfterStartingFactory
+  extends SimulationScopeFactory<LocalDateTime>
+{
 
-    Factory<? super SimulationScope, ? extends TemporalAmount> amountToAdd;
+  Factory<? super SimulationScope, ? extends TemporalAmount> amountToAdd;
 
-    @Override
-    protected LocalDateTime newInstance(final SimulationScope scope) {
-        return scope
-            .getSimulation()
-            .getTemporalSchedule()
-            .getStartingDateTime()
-            .plus(amountToAdd.get(scope));
-    }
+  @Override
+  protected LocalDateTime newInstance(final SimulationScope scope) {
+    return scope
+      .getSimulation()
+      .getTemporalSchedule()
+      .getStartingDateTime()
+      .plus(amountToAdd.get(scope));
+  }
 }

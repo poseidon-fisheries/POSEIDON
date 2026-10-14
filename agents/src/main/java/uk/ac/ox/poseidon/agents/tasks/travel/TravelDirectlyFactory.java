@@ -41,11 +41,10 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 @EqualsAndHashCode(callSuper = true)
 public class TravelDirectlyFactory extends VesselTaskFactory<TravelDirectly> {
 
-    private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
+  private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
 
-    @Override
-    protected TravelDirectly newTask(final VesselScope scope) {
-        return new TravelDirectly(distance.get(scope));
-    }
-
+  @Override
+  protected TravelDirectly newTask(final VesselScope scope) {
+    return new TravelDirectly(distance.get(scope));
+  }
 }

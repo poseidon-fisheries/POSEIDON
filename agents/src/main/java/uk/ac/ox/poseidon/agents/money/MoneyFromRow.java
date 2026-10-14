@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.money;
 
+import java.math.RoundingMode;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import tech.tablesaw.api.Row;
-
-import java.math.RoundingMode;
-import java.util.function.Function;
 
 /**
  * Reads a {@link Money} amount off a table {@link Row}, from a currency column and an amount
@@ -37,16 +36,15 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class MoneyFromRow implements Function<Row, Money> {
 
-    private final String currencyColumnName;
-    private final String amountColumnName;
+  private final String currencyColumnName;
+  private final String amountColumnName;
 
-    @Override
-    public Money apply(final Row row) {
-        return Money.of(
-            CurrencyUnit.of(row.getString(currencyColumnName)),
-            row.getDouble(amountColumnName),
-            RoundingMode.HALF_EVEN
-        );
-    }
-
+  @Override
+  public Money apply(final Row row) {
+    return Money.of(
+      CurrencyUnit.of(row.getString(currencyColumnName)),
+      row.getDouble(amountColumnName),
+      RoundingMode.HALF_EVEN
+    );
+  }
 }

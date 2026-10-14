@@ -22,18 +22,17 @@
 
 package uk.ac.ox.poseidon.core.predicates.temporal;
 
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.predicates.comparable.GreaterThanFactory;
-import uk.ac.ox.poseidon.core.predicates.comparable.LessThanFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.greaterThan;
+import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.function.Supplier;
-
-import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.greaterThan;
-import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.predicates.comparable.GreaterThanFactory;
+import uk.ac.ox.poseidon.core.predicates.comparable.LessThanFactory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * Factories for {@link java.util.function.Predicate}s that compare a tested date, time, or
@@ -44,77 +43,96 @@ import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
  * implementations.
  */
 public class Factories {
-    private Factories() {}
 
-    /**
-     * @param referenceTime factory for the time the resulting predicate tests against
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a predicate that is true
-     * iff the tested time is strictly after the resolved reference time. Delegates to
-     * {@link uk.ac.ox.poseidon.core.predicates.comparable.Factories#greaterThan(Factory)}.
-     */
-    public static <S extends Scope> GreaterThanFactory<S, LocalTime> afterTime(
-        final Factory<? super S, ? extends Supplier<? extends LocalTime>> referenceTime
-    ) {
-        return greaterThan(referenceTime);
-    }
+  private Factories() {}
 
-    /**
-     * @param referenceDate factory for the date the resulting predicate tests against
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link AfterDate}
-     * predicate over the resolved reference date
-     * @see AfterDate
-     */
-    public static <S extends Scope> AfterDateFactory<S> afterDate(
-        final Factory<? super S, ? extends Supplier<? extends LocalDate>> referenceDate
-    ) {
-        return new AfterDateFactory<>(referenceDate);
-    }
+  /**
+   * @param referenceTime factory for the time the resulting predicate tests against
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a predicate that is true
+   * iff the tested time is strictly after the resolved reference time. Delegates to
+   * {@link uk.ac.ox.poseidon.core.predicates.comparable.Factories#greaterThan(Factory)}.
+   */
+  public static <S extends Scope> GreaterThanFactory<S, LocalTime> afterTime(
+    final Factory<
+      ? super S,
+      ? extends Supplier<? extends LocalTime>
+    > referenceTime
+  ) {
+    return greaterThan(referenceTime);
+  }
 
-    /**
-     * @param referenceDateTime factory for the date-time the resulting predicate tests against
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link AfterDateTime}
-     * predicate over the resolved reference date-time
-     * @see AfterDateTime
-     */
-    public static <S extends Scope> AfterDateTimeFactory<S> afterDateTime(
-        final Factory<? super S, ? extends Supplier<? extends LocalDateTime>> referenceDateTime
-    ) {
-        return new AfterDateTimeFactory<>(referenceDateTime);
-    }
+  /**
+   * @param referenceDate factory for the date the resulting predicate tests against
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link AfterDate}
+   * predicate over the resolved reference date
+   * @see AfterDate
+   */
+  public static <S extends Scope> AfterDateFactory<S> afterDate(
+    final Factory<
+      ? super S,
+      ? extends Supplier<? extends LocalDate>
+    > referenceDate
+  ) {
+    return new AfterDateFactory<>(referenceDate);
+  }
 
-    /**
-     * @param referenceTime factory for the time the resulting predicate tests against
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a predicate that is true
-     * iff the tested time is strictly before the resolved reference time. Delegates to
-     * {@link uk.ac.ox.poseidon.core.predicates.comparable.Factories#lessThan(Factory)}.
-     */
-    public static <S extends Scope> LessThanFactory<S, LocalTime> timeIsBefore(
-        final Factory<? super S, ? extends Supplier<? extends LocalTime>> referenceTime
-    ) {
-        return lessThan(referenceTime);
-    }
+  /**
+   * @param referenceDateTime factory for the date-time the resulting predicate tests against
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link AfterDateTime}
+   * predicate over the resolved reference date-time
+   * @see AfterDateTime
+   */
+  public static <S extends Scope> AfterDateTimeFactory<S> afterDateTime(
+    final Factory<
+      ? super S,
+      ? extends Supplier<? extends LocalDateTime>
+    > referenceDateTime
+  ) {
+    return new AfterDateTimeFactory<>(referenceDateTime);
+  }
 
-    /**
-     * @param referenceDate factory for the date the resulting predicate tests against
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateIsBefore}
-     * predicate over the resolved reference date
-     * @see DateIsBefore
-     */
-    public static <S extends Scope> DateIsBeforeFactory<S> dateIsBefore(
-        final Factory<? super S, ? extends Supplier<? extends LocalDate>> referenceDate
-    ) {
-        return new DateIsBeforeFactory<>(referenceDate);
-    }
+  /**
+   * @param referenceTime factory for the time the resulting predicate tests against
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a predicate that is true
+   * iff the tested time is strictly before the resolved reference time. Delegates to
+   * {@link uk.ac.ox.poseidon.core.predicates.comparable.Factories#lessThan(Factory)}.
+   */
+  public static <S extends Scope> LessThanFactory<S, LocalTime> timeIsBefore(
+    final Factory<
+      ? super S,
+      ? extends Supplier<? extends LocalTime>
+    > referenceTime
+  ) {
+    return lessThan(referenceTime);
+  }
 
-    /**
-     * @param referenceDateTime factory for the date-time the resulting predicate tests against
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-     * {@link DateTimeIsBefore} predicate over the resolved reference date-time
-     * @see DateTimeIsBefore
-     */
-    public static <S extends Scope> DateTimeIsBeforeFactory<S> dateTimeIsBefore(
-        final Factory<? super S, ? extends Supplier<? extends LocalDateTime>> referenceDateTime
-    ) {
-        return new DateTimeIsBeforeFactory<>(referenceDateTime);
-    }
+  /**
+   * @param referenceDate factory for the date the resulting predicate tests against
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateIsBefore}
+   * predicate over the resolved reference date
+   * @see DateIsBefore
+   */
+  public static <S extends Scope> DateIsBeforeFactory<S> dateIsBefore(
+    final Factory<
+      ? super S,
+      ? extends Supplier<? extends LocalDate>
+    > referenceDate
+  ) {
+    return new DateIsBeforeFactory<>(referenceDate);
+  }
+
+  /**
+   * @param referenceDateTime factory for the date-time the resulting predicate tests against
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * {@link DateTimeIsBefore} predicate over the resolved reference date-time
+   * @see DateTimeIsBefore
+   */
+  public static <S extends Scope> DateTimeIsBeforeFactory<S> dateTimeIsBefore(
+    final Factory<
+      ? super S,
+      ? extends Supplier<? extends LocalDateTime>
+    > referenceDateTime
+  ) {
+    return new DateTimeIsBeforeFactory<>(referenceDateTime);
+  }
 }

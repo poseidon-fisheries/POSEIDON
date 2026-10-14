@@ -22,16 +22,15 @@
 
 package uk.ac.ox.poseidon.geography.paths;
 
+import static java.util.Map.entry;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
-import sim.util.Int2D;
-
 import java.util.Map.Entry;
-
-import static java.util.Map.entry;
+import sim.util.Int2D;
 
 /**
  * Remembers the accessible water cells from a starting cell, and the accessible water neighbours
@@ -45,30 +44,33 @@ import static java.util.Map.entry;
  */
 public class AccessibleWaterCellsCache {
 
-    private final Interner<ImmutableList<Int2D>> cellListInterner = Interners.newStrongInterner();
-    private final Cache<Int2D, ImmutableList<Int2D>> accessibleCells =
-        Caffeine.newBuilder().build();
-    private final Cache<Entry<Int2D, Integer>, ImmutableList<Int2D>> accessibleNeighbours =
-        Caffeine.newBuilder().build();
+  private final Interner<ImmutableList<Int2D>> cellListInterner =
+    Interners.newStrongInterner();
+  private final Cache<Int2D, ImmutableList<Int2D>> accessibleCells =
+    Caffeine.newBuilder().build();
+  private final Cache<
+    Entry<Int2D, Integer>,
+    ImmutableList<Int2D>
+  > accessibleNeighbours = Caffeine.newBuilder().build();
 
-    ImmutableList<Int2D> getAccessibleWaterCells(
-        final Int2D startingCell,
-        final GridPathFinder pathFinder
-    ) {
-        return accessibleCells.get(
-            startingCell,
-            cell -> cellListInterner.intern(pathFinder.getAccessibleWaterCells(cell))
-        );
-    }
+  ImmutableList<Int2D> getAccessibleWaterCells(
+    final Int2D startingCell,
+    final GridPathFinder pathFinder
+  ) {
+    return accessibleCells.get(startingCell, cell ->
+      cellListInterner.intern(pathFinder.getAccessibleWaterCells(cell))
+    );
+  }
 
-    ImmutableList<Int2D> getAccessibleWaterNeighbours(
-        final Int2D startingCell,
-        final int neighbourhoodSize,
-        final GridPathFinder pathFinder
-    ) {
-        return accessibleNeighbours.get(
-            entry(startingCell, neighbourhoodSize),
-            key -> pathFinder.getAccessibleWaterNeighbours(key.getKey(), key.getValue())
-        );
-    }
+  ImmutableList<Int2D> getAccessibleWaterNeighbours(
+    final Int2D startingCell,
+    final int neighbourhoodSize,
+    final GridPathFinder pathFinder
+  ) {
+    return accessibleNeighbours.get(
+      entry(startingCell, neighbourhoodSize),
+      key ->
+        pathFinder.getAccessibleWaterNeighbours(key.getKey(), key.getValue())
+    );
+  }
 }

@@ -19,8 +19,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package uk.ac.ox.poseidon.agents.social;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.social.Factories.fishingEventSharer;
+import static uk.ac.ox.poseidon.agents.social.Factories.sharedFishingEventListener;
+import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
@@ -33,87 +44,86 @@ import uk.ac.ox.poseidon.core.events.AbstractListener;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.social.Factories.fishingEventSharer;
-import static uk.ac.ox.poseidon.agents.social.Factories.sharedFishingEventListener;
-import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
-
 class SharedFishingEventListenerFactoryTest {
 
-    private final Simulation simulation = simulation();
-    private final Vessel a = mock(Vessel.class);
-    private final Vessel b = mock(Vessel.class);
-    private final VesselsGetter fleet = () -> List.of(a, b);
-    private final SimulationScope simulationScope = new SimulationScope(simulation);
-    private final VesselScope scopeB = new VesselScope(simulationScope, b);
-    private final SocialNetworkFactory network = socialNetwork(object(fleet));
-    private final FishingEventSharerFactory fishingEventSharer = fishingEventSharer(network);
-    private final RecordingListenerFactory listener = new RecordingListenerFactory();
-    private final SharedFishingEventListenerFactory<RecordingListener> factory =
-        sharedFishingEventListener(listener, fishingEventSharer);
+  private final Simulation simulation = simulation();
+  private final Vessel a = mock(Vessel.class);
+  private final Vessel b = mock(Vessel.class);
+  private final VesselsGetter fleet = () -> List.of(a, b);
+  private final SimulationScope simulationScope = new SimulationScope(
+    simulation
+  );
+  private final VesselScope scopeB = new VesselScope(simulationScope, b);
+  private final SocialNetworkFactory network = socialNetwork(object(fleet));
+  private final FishingEventSharerFactory fishingEventSharer =
+    fishingEventSharer(network);
+  private final RecordingListenerFactory listener =
+    new RecordingListenerFactory();
+  private final SharedFishingEventListenerFactory<RecordingListener> factory =
+    sharedFishingEventListener(listener, fishingEventSharer);
 
-    private static Simulation simulation() {
-        final Simulation simulation = mock(Simulation.class);
-        when(simulation.getEventManager()).thenReturn(new SimpleEventManager());
-        return simulation;
+  private static Simulation simulation() {
+    final Simulation simulation = mock(Simulation.class);
+    when(simulation.getEventManager()).thenReturn(new SimpleEventManager());
+    return simulation;
+  }
+
+  private static class RecordingListener
+    extends AbstractListener<FishingEvent>
+  {
+
+    private final List<FishingEvent> heard = new ArrayList<>();
+
+    RecordingListener() {
+      super(FishingEvent.class);
     }
 
-    private static class RecordingListener extends AbstractListener<FishingEvent> {
-        private final List<FishingEvent> heard = new ArrayList<>();
-
-        RecordingListener() {
-            super(FishingEvent.class);
-        }
-
-        @Override
-        public void receive(final FishingEvent event) {
-            heard.add(event);
-        }
+    @Override
+    public void receive(final FishingEvent event) {
+      heard.add(event);
     }
+  }
 
-    private static class RecordingListenerFactory extends VesselScopeFactory<RecordingListener> {
-        @Override
-        protected RecordingListener newInstance(final VesselScope scope) {
-            return new RecordingListener();
-        }
+  private static class RecordingListenerFactory
+    extends VesselScopeFactory<RecordingListener>
+  {
+
+    @Override
+    protected RecordingListener newInstance(final VesselScope scope) {
+      return new RecordingListener();
     }
+  }
 
-    private static FishingEvent fishingEventBy(final Vessel vessel) {
-        final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
-        when(action.getAgent()).thenReturn(vessel);
-        return new FishingEvent(action, null);
-    }
+  private static FishingEvent fishingEventBy(final Vessel vessel) {
+    final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
+    when(action.getAgent()).thenReturn(vessel);
+    return new FishingEvent(action, null);
+  }
 
-    @Test
-    void aFishingEventByOneOfTheVesselsSourcesReachesItsListener() {
-        factory.get(scopeB);
-        network.get(simulationScope).addTie(a, b);
-        final FishingEvent fishingEventByA = fishingEventBy(a);
+  @Test
+  void aFishingEventByOneOfTheVesselsSourcesReachesItsListener() {
+    factory.get(scopeB);
+    network.get(simulationScope).addTie(a, b);
+    final FishingEvent fishingEventByA = fishingEventBy(a);
 
-        fishingEventSharer.get(simulationScope).receive(fishingEventByA);
+    fishingEventSharer.get(simulationScope).receive(fishingEventByA);
 
-        assertThat(listener.get(scopeB).heard).containsExactly(fishingEventByA);
-    }
+    assertThat(listener.get(scopeB).heard).containsExactly(fishingEventByA);
+  }
 
-    @Test
-    void givesTheListenerTheListenersFactoryGivesForTheVessel() {
-        assertThat(factory.get(scopeB)).isNotNull().isSameAs(listener.get(scopeB));
-    }
+  @Test
+  void givesTheListenerTheListenersFactoryGivesForTheVessel() {
+    assertThat(factory.get(scopeB)).isNotNull().isSameAs(listener.get(scopeB));
+  }
 
-    @Test
-    void buildingItTwiceForAVesselRegistersOnce() {
-        factory.get(scopeB);
-        factory.get(scopeB);
-        network.get(simulationScope).addTie(a, b);
+  @Test
+  void buildingItTwiceForAVesselRegistersOnce() {
+    factory.get(scopeB);
+    factory.get(scopeB);
+    network.get(simulationScope).addTie(a, b);
 
-        fishingEventSharer.get(simulationScope).receive(fishingEventBy(a));
+    fishingEventSharer.get(simulationScope).receive(fishingEventBy(a));
 
-        assertThat(listener.get(scopeB).heard).hasSize(1);
-    }
+    assertThat(listener.get(scopeB).heard).hasSize(1);
+  }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.regulations.predicates;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,8 +33,6 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.regulations.Action;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
-import java.util.function.Function;
-
 /**
  * A {@link RelativeScopeFactory} for an {@link IsPermittedPredicate}. Built via
  * {@link Factories#isPermitted}.
@@ -42,18 +41,20 @@ import java.util.function.Function;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class IsPermittedPredicateFactory<S extends Scope, G, A extends Action<G>>
-    extends RelativeScopeFactory<S, IsPermittedPredicate<G, A>> {
+public class IsPermittedPredicateFactory<
+  S extends Scope,
+  G,
+  A extends Action<G>
+> extends RelativeScopeFactory<S, IsPermittedPredicate<G, A>> {
 
-    private Factory<? super S, ? extends Function<? super G, A>> actionFunction;
-    private Factory<? super S, ? extends Regulations<? super A>> regulations;
+  private Factory<? super S, ? extends Function<? super G, A>> actionFunction;
+  private Factory<? super S, ? extends Regulations<? super A>> regulations;
 
-    @Override
-    protected IsPermittedPredicate<G, A> newInstance(final S scope) {
-        return new IsPermittedPredicate<>(
-            actionFunction.get(scope),
-            regulations.get(scope)
-        );
-    }
-
+  @Override
+  protected IsPermittedPredicate<G, A> newInstance(final S scope) {
+    return new IsPermittedPredicate<>(
+      actionFunction.get(scope),
+      regulations.get(scope)
+    );
+  }
 }

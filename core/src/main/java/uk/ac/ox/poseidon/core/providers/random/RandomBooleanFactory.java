@@ -37,12 +37,14 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class RandomBooleanFactory extends SimulationScopeFactory<RandomBoolean> {
+public class RandomBooleanFactory
+  extends SimulationScopeFactory<RandomBoolean>
+{
 
-    private double probability;
+  private double probability;
 
-    @Override
-    protected RandomBoolean newInstance(final SimulationScope scope) {
-        return new RandomBoolean(probability, scope.getSimulation().random);
-    }
+  @Override
+  protected RandomBoolean newInstance(final SimulationScope scope) {
+    return new RandomBoolean(probability, scope.getSimulation().random);
+  }
 }

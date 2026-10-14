@@ -22,58 +22,68 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import static java.lang.Double.isNaN;
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.allocators.FilteredAllocator;
 
-import static java.lang.Double.isNaN;
-import static org.assertj.core.api.Assertions.*;
-
 class NormalisedDoubleGridFromAllocatorFactoryTest {
 
-    @Test
-    void normalisesToTargetTotalAndKeepsNaNs() {
-        final ModelGrid modelGrid = ModelGrid.create(2, 2, new Envelope(0, 2, 0, 2));
-        final NormalisedDoubleGridFromAllocatorFactory<Scope> factory =
-            new NormalisedDoubleGridFromAllocatorFactory<>(
-                scope -> modelGrid,
-                scope -> new FilteredAllocator(
-                    cell -> 1.0,
-                    cell -> !(cell.x == 0 && cell.y == 0)
-                ),
-                scope -> 12.0
-            );
+  @Test
+  void normalisesToTargetTotalAndKeepsNaNs() {
+    final ModelGrid modelGrid = ModelGrid.create(
+      2,
+      2,
+      new Envelope(0, 2, 0, 2)
+    );
+    final NormalisedDoubleGridFromAllocatorFactory<Scope> factory =
+      new NormalisedDoubleGridFromAllocatorFactory<>(
+        scope -> modelGrid,
+        scope ->
+          new FilteredAllocator(
+            cell -> 1.0,
+            cell -> !(cell.x == 0 && cell.y == 0)
+          ),
+        scope -> 12.0
+      );
 
-        final BaseDoubleGrid grid = factory.get(Scope.GLOBAL_SCOPE);
-        double sum = 0;
-        int nanCount = 0;
-        for (final Int2D cell : modelGrid.getAllCells().toList()) {
-            final double value = grid.getValue(cell);
-            if (isNaN(value)) {
-                nanCount++;
-            } else {
-                sum += value;
-            }
-        }
-
-        assertThat(sum).isCloseTo(12.0, within(1e-9));
-        assertThat(nanCount).isEqualTo(1);
-        assertThat(grid.getValue(new Int2D(1, 1))).isCloseTo(4.0, within(1e-9));
+    final BaseDoubleGrid grid = factory.get(Scope.GLOBAL_SCOPE);
+    double sum = 0;
+    int nanCount = 0;
+    for (final Int2D cell : modelGrid.getAllCells().toList()) {
+      final double value = grid.getValue(cell);
+      if (isNaN(value)) {
+        nanCount++;
+      } else {
+        sum += value;
+      }
     }
 
-    @Test
-    void rejectsNegativeAllocatorValues() {
-        final ModelGrid modelGrid = ModelGrid.create(2, 2, new Envelope(0, 2, 0, 2));
-        final NormalisedDoubleGridFromAllocatorFactory<Scope> factory =
-            new NormalisedDoubleGridFromAllocatorFactory<>(
-                _ -> modelGrid,
-                _ -> cell -> cell.x == 1 ? -1.0 : 1.0,
-                _ -> 4.0
-            );
+    assertThat(sum).isCloseTo(12.0, within(1e-9));
+    assertThat(nanCount).isEqualTo(1);
+    assertThat(grid.getValue(new Int2D(1, 1))).isCloseTo(4.0, within(1e-9));
+  }
 
-        assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+  @Test
+  void rejectsNegativeAllocatorValues() {
+    final ModelGrid modelGrid = ModelGrid.create(
+      2,
+      2,
+      new Envelope(0, 2, 0, 2)
+    );
+    final NormalisedDoubleGridFromAllocatorFactory<Scope> factory =
+      new NormalisedDoubleGridFromAllocatorFactory<>(
+        _ -> modelGrid,
+        _ -> cell -> cell.x == 1 ? -1.0 : 1.0,
+        _ -> 4.0
+      );
+
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+  }
 }

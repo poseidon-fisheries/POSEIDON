@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.regulations.predicates;
 
+import java.util.function.Function;
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.regulations.Action;
 import uk.ac.ox.poseidon.regulations.Regulations;
-
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * Turns a {@link Regulations} rule back into a {@link Predicate} over the agent, by first building
@@ -37,14 +36,16 @@ import java.util.function.Predicate;
  * composing {@code Regulations} instances directly.
  */
 @RequiredArgsConstructor
-public class IsPermittedPredicate<G, A extends Action<G>> implements Predicate<G> {
+public class IsPermittedPredicate<
+  G,
+  A extends Action<G>
+> implements Predicate<G> {
 
-    private final Function<? super G, A> actionFunction;
-    private final Regulations<? super A> regulations;
+  private final Function<? super G, A> actionFunction;
+  private final Regulations<? super A> regulations;
 
-    @Override
-    public boolean test(final G agent) {
-        return regulations.isPermitted(actionFunction.apply(agent));
-    }
-
+  @Override
+  public boolean test(final G agent) {
+    return regulations.isPermitted(actionFunction.apply(agent));
+  }
 }

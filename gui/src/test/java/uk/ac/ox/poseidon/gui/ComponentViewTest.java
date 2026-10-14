@@ -22,26 +22,30 @@
 
 package uk.ac.ox.poseidon.gui;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class ComponentViewTest {
 
-    @Test
-    void summarisesALargeCollectionWithoutItsContents() {
-        final List<String> component = Collections.nCopies(1_000_000, "x".repeat(100));
-        final ComponentView view = new ComponentView("updates", component);
+  @Test
+  void summarisesALargeCollectionWithoutItsContents() {
+    final List<String> component = Collections.nCopies(
+      1_000_000,
+      "x".repeat(100)
+    );
+    final ComponentView view = new ComponentView("updates", component);
 
-        assertThat(view.toString()).isEqualTo("updates: CopiesList (1000000)");
-        assertThat(view.propertiesProxy()).isSameAs(component);
-    }
+    assertThat(view.toString()).isEqualTo("updates: CopiesList (1000000)");
+    assertThat(view.propertiesProxy()).isSameAs(component);
+  }
 
-    @Test
-    void summarisesOtherComponentsByType() {
-        assertThat(new ComponentView("grid", new Object()).toString()).isEqualTo("grid: Object");
-    }
+  @Test
+  void summarisesOtherComponentsByType() {
+    assertThat(new ComponentView("grid", new Object()).toString()).isEqualTo(
+      "grid: Object"
+    );
+  }
 }

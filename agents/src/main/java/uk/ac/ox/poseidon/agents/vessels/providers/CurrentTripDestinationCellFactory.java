@@ -29,10 +29,12 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
  * A {@link VesselScopeFactory} counterpart of {@link CurrentTripDestinationCell}, built via
  * {@link Factories#currentTripDestinationCell()}.
  */
-public class CurrentTripDestinationCellFactory extends VesselScopeFactory<CurrentTripDestinationCell> {
+public class CurrentTripDestinationCellFactory
+  extends VesselScopeFactory<CurrentTripDestinationCell>
+{
 
-    @Override
-    protected CurrentTripDestinationCell newInstance(final VesselScope scope) {
-        return new CurrentTripDestinationCell(scope.getVessel());
-    }
+  @Override
+  protected CurrentTripDestinationCell newInstance(final VesselScope scope) {
+    return new CurrentTripDestinationCell(scope.getVessel());
+  }
 }

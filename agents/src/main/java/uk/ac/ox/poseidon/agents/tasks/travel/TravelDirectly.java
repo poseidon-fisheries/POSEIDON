@@ -22,16 +22,15 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+import static lombok.AccessLevel.PACKAGE;
+import static uk.ac.ox.poseidon.geography.distance.DistanceCalculator.travelDuration;
+
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-
-import java.time.Duration;
-
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
-import static lombok.AccessLevel.PACKAGE;
-import static uk.ac.ox.poseidon.geography.distance.DistanceCalculator.travelDuration;
 
 /**
  * An {@link ExtendedTripTask} that travels straight (as the crow flies) from the vessel's
@@ -41,47 +40,50 @@ import static uk.ac.ox.poseidon.geography.distance.DistanceCalculator.travelDura
 @RequiredArgsConstructor(access = PACKAGE)
 public class TravelDirectly extends ExtendedTripTask {
 
-    private final DistanceCalculator distanceCalculator;
-    private Int2D origin;
-    private Int2D destination;
-    private double distanceInKm;
+  private final DistanceCalculator distanceCalculator;
+  private Int2D origin;
+  private Int2D destination;
+  private double distanceInKm;
 
-    /** Resolves the origin, the trip's destination, and the direct distance between them. */
-    @Override
-    public void start() {
-        super.start();
-        origin = getAgent().getCell();
-        destination = getAgent().getCurrentTrip().getDestination();
-        distanceInKm = distanceCalculator.distanceInKm(origin, destination);
-    }
+  /** Resolves the origin, the trip's destination, and the direct distance between them. */
+  @Override
+  public void start() {
+    super.start();
+    origin = getAgent().getCell();
+    destination = getAgent().getCurrentTrip().getDestination();
+    distanceInKm = distanceCalculator.distanceInKm(origin, destination);
+  }
 
-    /** @return the travel duration for {@link #distanceInKm} at the vessel's cruising speed */
-    @Override
-    protected Duration getDuration() {
-        return travelDuration(
-            distanceInKm,
-            getAgent().getEngine().getCruisingSpeedInKph()
-        );
-    }
+  /** @return the travel duration for {@link #distanceInKm} at the vessel's cruising speed */
+  @Override
+  protected Duration getDuration() {
+    return travelDuration(
+      distanceInKm,
+      getAgent().getEngine().getCruisingSpeedInKph()
+    );
+  }
 
-    /**
-     * Consumes the fuel for {@link #distanceInKm}, moves the vessel to the destination, and
-     * broadcasts a {@link TravelEvent}.
-     *
-     * @return always {@code SUCCEEDED}
-     */
-    @Override
-    protected Status complete() {
-        getAgent().getEngine().consumeFuelForDistance(distanceInKm);
-        getAgent().setCurrentCell(getAgent().getCurrentTrip().getDestination());
-        getTrip().getEventManager().broadcast(new TravelEvent(
-            getAgent(),
-            getStartDateTime(),
-            getAgent().getSchedule().getDateTime(),
-            origin,
-            destination
-        ));
-        return SUCCEEDED;
-    }
-
+  /**
+   * Consumes the fuel for {@link #distanceInKm}, moves the vessel to the destination, and
+   * broadcasts a {@link TravelEvent}.
+   *
+   * @return always {@code SUCCEEDED}
+   */
+  @Override
+  protected Status complete() {
+    getAgent().getEngine().consumeFuelForDistance(distanceInKm);
+    getAgent().setCurrentCell(getAgent().getCurrentTrip().getDestination());
+    getTrip()
+      .getEventManager()
+      .broadcast(
+        new TravelEvent(
+          getAgent(),
+          getStartDateTime(),
+          getAgent().getSchedule().getDateTime(),
+          origin,
+          destination
+        )
+      );
+    return SUCCEEDED;
+  }
 }

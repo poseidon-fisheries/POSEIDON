@@ -31,8 +31,9 @@ import java.util.stream.DoubleStream;
  * {@link Factories#sumAggregator()} in this package.
  */
 public class SumAggregator implements Aggregator {
-    @Override
-    public OptionalDouble apply(final DoubleStream doubleStream) {
-        return OptionalDouble.of(doubleStream.sum());
-    }
+
+  @Override
+  public OptionalDouble apply(final DoubleStream doubleStream) {
+    return OptionalDouble.of(doubleStream.sum());
+  }
 }

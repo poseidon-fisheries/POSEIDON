@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.Agent;
+import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 
 import java.time.Duration;
-
-import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.Agent;
 
 /**
  * An {@link AgentTask} that runs over more than one step: on first execution it sets the agent's
@@ -39,23 +38,20 @@ import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 @RequiredArgsConstructor
 public abstract class ExtendedTask<G extends Agent> extends AgentTask<G> {
 
-    /**
-     * @return {@link #complete()}'s outcome if already {@code RUNNING} (the task's duration has
-     * elapsed), otherwise sets the agent's task duration to {@link #getDuration()} and returns
-     * {@code RUNNING}
-     */
-    @Override
-    public Status execute() {
-        if (getStatus() == RUNNING)
-            return complete();
-        else
-            return runFor(getDuration());
-    }
+  /**
+   * @return {@link #complete()}'s outcome if already {@code RUNNING} (the task's duration has
+   * elapsed), otherwise sets the agent's task duration to {@link #getDuration()} and returns
+   * {@code RUNNING}
+   */
+  @Override
+  public Status execute() {
+    if (getStatus() == RUNNING) return complete();
+    else return runFor(getDuration());
+  }
 
-    /** @return how long this task should run for, computed once, when it starts */
-    protected abstract Duration getDuration();
+  /** @return how long this task should run for, computed once, when it starts */
+  protected abstract Duration getDuration();
 
-    /** @return this task's outcome once {@link #getDuration()} has elapsed */
-    protected abstract Status complete();
-
+  /** @return this task's outcome once {@link #getDuration()} has elapsed */
+  protected abstract Status complete();
 }

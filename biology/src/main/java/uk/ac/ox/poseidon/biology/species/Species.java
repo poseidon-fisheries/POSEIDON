@@ -22,15 +22,14 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
+import static java.util.Comparator.nullsFirst;
+import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
+
+import java.util.Comparator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-
-import java.util.Comparator;
-
-import static java.util.Comparator.nullsFirst;
-import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 
 /**
  * A species, optionally narrowed to a life stage (e.g. "adult"/"juvenile") — the unit of species
@@ -44,76 +43,80 @@ import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Species implements Comparable<Species> {
 
-    @EqualsAndHashCode.Include
-    @NonNull
-    private final String code;
+  @EqualsAndHashCode.Include
+  @NonNull
+  private final String code;
 
-    @EqualsAndHashCode.Include
-    private final String lifeStage;
+  @EqualsAndHashCode.Include
+  private final String lifeStage;
 
-    private final String name;
+  private final String name;
 
-    /** A composite string key combining {@code code} and {@code lifeStage}. */
-    @Getter(lazy = true)
-    private final String key = multiStringKey(code, lifeStage);
+  /** A composite string key combining {@code code} and {@code lifeStage}. */
+  @Getter(lazy = true)
+  private final String key = multiStringKey(code, lifeStage);
 
-    /**
-     * @param code      the species' code; blank-only values aren't specially treated, only
-     *                   {@code null}/blank {@code lifeStage}/{@code name} are normalized
-     * @param lifeStage the life stage, or {@code null} for the species as a whole; a blank string
-     *                  is normalized to {@code null}
-     * @param name      the display name, or {@code null}; a blank string is normalized to
-     *                  {@code null}
-     */
-    public Species(
-        @NonNull final String code,
-        final String lifeStage,
-        final String name
+  /**
+   * @param code      the species' code; blank-only values aren't specially treated, only
+   *                   {@code null}/blank {@code lifeStage}/{@code name} are normalized
+   * @param lifeStage the life stage, or {@code null} for the species as a whole; a blank string
+   *                  is normalized to {@code null}
+   * @param name      the display name, or {@code null}; a blank string is normalized to
+   *                  {@code null}
+   */
+  public Species(
+    @NonNull final String code,
+    final String lifeStage,
+    final String name
+  ) {
+    this.code = code;
+    this.lifeStage =
+      lifeStage != null && lifeStage.trim().isEmpty() ? null : lifeStage;
+    this.name = name != null && name.trim().isEmpty() ? null : name;
+  }
+
+  /**
+   * Returns true if a species "covers" another species, i.e., if it's the same according to its
+   * code and life stage, or if it doesn't specify a life stage and the other does.
+   * <p>
+   * I'm adding this to handle the case where we have a price for a species as a whole, but
+   * vessels catch that species at different life stages.
+   * <p>
+   * FIXME: this is needed, but a bit of a kludge and I'm not sure that this is the right approach
+   *  in general. We probably need some kind of standard species ontology (with the possibility
+   *  of encoding supra-species functional groups as well)
+   *
+   * @param other the species to check against
+   * @return whether this species covers {@code other}
+   */
+  public boolean covers(final Species other) {
+    return (
+      this.code.equals(other.code) &&
+      (this.lifeStage == null || this.lifeStage.equals(other.lifeStage))
+    );
+  }
+
+  /** @return {@code "code"}, plus {@code " - name"} and/or {@code " (lifeStage)"} if present */
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(this.code);
+    if (
+      this.name != null && !this.code.isEmpty() && !this.code.equals(this.name)
     ) {
-        this.code = code;
-        this.lifeStage = lifeStage != null && lifeStage.trim().isEmpty() ? null : lifeStage;
-        this.name = name != null && name.trim().isEmpty() ? null : name;
+      sb.append(" - ").append(this.name);
     }
+    if (this.lifeStage != null && !this.lifeStage.isEmpty()) {
+      sb.append(" (").append(this.lifeStage).append(")");
+    }
+    return sb.toString();
+  }
 
-    /**
-     * Returns true if a species "covers" another species, i.e., if it's the same according to its
-     * code and life stage, or if it doesn't specify a life stage and the other does.
-     * <p>
-     * I'm adding this to handle the case where we have a price for a species as a whole, but
-     * vessels catch that species at different life stages.
-     * <p>
-     * FIXME: this is needed, but a bit of a kludge and I'm not sure that this is the right approach
-     *  in general. We probably need some kind of standard species ontology (with the possibility
-     *  of encoding supra-species functional groups as well)
-     *
-     * @param other the species to check against
-     * @return whether this species covers {@code other}
-     */
-    public boolean covers(final Species other) {
-        return this.code.equals(other.code) &&
-            (this.lifeStage == null || this.lifeStage.equals(other.lifeStage));
-    }
-
-    /** @return {@code "code"}, plus {@code " - name"} and/or {@code " (lifeStage)"} if present */
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(this.code);
-        if (this.name != null && !this.code.isEmpty() && !this.code.equals(this.name)) {
-            sb.append(" - ").append(this.name);
-        }
-        if (this.lifeStage != null && !this.lifeStage.isEmpty()) {
-            sb.append(" (").append(this.lifeStage).append(")");
-        }
-        return sb.toString();
-    }
-
-    /** Orders by {@code code}, then by {@code lifeStage} ({@code null} sorting first). */
-    @Override
-    public int compareTo(final @NonNull Species o) {
-        return Comparator
-            .comparing(Species::getCode)
-            .thenComparing(Species::getLifeStage, nullsFirst(String::compareTo))
-            .compare(this, o);
-    }
+  /** Orders by {@code code}, then by {@code lifeStage} ({@code null} sorting first). */
+  @Override
+  public int compareTo(final @NonNull Species o) {
+    return Comparator.comparing(Species::getCode)
+      .thenComparing(Species::getLifeStage, nullsFirst(String::compareTo))
+      .compare(this, o);
+  }
 }

@@ -22,13 +22,10 @@
 
 package uk.ac.ox.poseidon.core;
 
-import com.google.common.collect.ImmutableMap;
-import lombok.*;
-import org.apache.commons.beanutils.PropertyUtils;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
+import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 
+import com.google.common.collect.ImmutableMap;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,9 +33,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SequencedMap;
 import java.util.stream.Stream;
-
-import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
-import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
+import lombok.*;
+import org.apache.commons.beanutils.PropertyUtils;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * An immutable-by-convention (Lombok {@link Builder}), declarative bag of named component
@@ -55,186 +54,190 @@ import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 @AllArgsConstructor
 public final class Scenario {
 
-    /** The simulation's starting date-time. */
-    private Factory<Scope, LocalDateTime> startingDateTime;
+  /** The simulation's starting date-time. */
+  private Factory<Scope, LocalDateTime> startingDateTime;
 
-    /** The named component factories making up the scenario. */
-    @Singular private Map<String, ? extends Factory<? super SimulationScope, ?>> components;
+  /** The named component factories making up the scenario. */
+  @Singular
+  private Map<String, ? extends Factory<? super SimulationScope, ?>> components;
 
-    /**
-     * @param startingDateTime the simulation's starting date-time
-     * @param components       the named component factories making up the scenario
-     */
-    public Scenario(
-        final LocalDateTime startingDateTime,
-        final Map<String, ? extends Factory<? super SimulationScope, ?>> components
+  /**
+   * @param startingDateTime the simulation's starting date-time
+   * @param components       the named component factories making up the scenario
+   */
+  public Scenario(
+    final LocalDateTime startingDateTime,
+    final Map<String, ? extends Factory<? super SimulationScope, ?>> components
+  ) {
+    this(dateTime(startingDateTime), components);
+  }
+
+  /**
+   * @param startingDate the simulation's starting date, at midnight
+   * @param components   the named component factories making up the scenario
+   */
+  public Scenario(
+    final LocalDate startingDate,
+    final Map<String, ? extends Factory<? super SimulationScope, ?>> components
+  ) {
+    this(startingDate.atStartOfDay(), components);
+  }
+
+  /**
+   * Equivalent to {@link #startNewSimulation(SimulationStartOptions)} with default options (a
+   * random seed, no property overrides, no extra components).
+   *
+   * @return the started {@link Simulation}
+   */
+  public Simulation startNewSimulation() {
+    return startNewSimulation(SimulationStartOptions.builder().build());
+  }
+
+  /**
+   * Builds and starts a new {@link Simulation} by resolving every component factory (plus
+   * {@code options}' extra components) against a fresh {@link SimulationScope}.
+   * <p>
+   * If {@code options} carries property overrides, this method temporarily mutates {@code this}
+   * {@link Scenario}'s bean properties (via reflection, dotted property paths) to the override
+   * values for the duration of the build, then restores the original values in a
+   * {@code finally} block before returning — even though the method is {@code synchronized} on
+   * {@code this}, that only serializes concurrent calls against the same {@link Scenario}
+   * instance; any other code reading this scenario's properties concurrently could observe the
+   * temporarily-overridden values. This is how calibration varies parameters run-to-run without
+   * permanently mutating the original {@link Scenario}.
+   *
+   * @param options seed, property overrides, and extra components for this run
+   * @return the started {@link Simulation}
+   */
+  public synchronized Simulation startNewSimulation(
+    final SimulationStartOptions options
+  ) {
+    if (options.getPropertyOverrides().isEmpty()) {
+      return createSimulation(options);
+    }
+    final SequencedMap<String, Object> originalPropertyValues =
+      getPropertyValues(options.getPropertyOverrides());
+    try {
+      setProperties(options.getPropertyOverrides());
+      return createSimulation(options);
+    } finally {
+      restoreProperties(originalPropertyValues);
+    }
+  }
+
+  private Simulation createSimulation(final SimulationStartOptions options) {
+    final TemporalSchedule schedule = new TemporalSchedule(
+      startingDateTime.get(GLOBAL_SCOPE)
+    );
+    final Simulation simulation = new Simulation(
+      options.getSeed(),
+      schedule,
+      options.getSimulationId()
+    );
+    final SimulationScope simulationScope = new SimulationScope(simulation);
+    simulation.start();
+    final ImmutableMap.Builder<String, Object> resolved =
+      ImmutableMap.builder();
+    Stream.concat(
+      getComponents().entrySet().stream(),
+      options.getExtraComponents().entrySet().stream()
+    ).forEach(entry ->
+      resolved.put(entry.getKey(), entry.getValue().get(simulationScope))
+    );
+    simulation.components = resolved.buildOrThrow();
+    return simulation;
+  }
+
+  private SequencedMap<String, Object> getPropertyValues(
+    final Map<String, Object> properties
+  ) {
+    return properties
+      .entrySet()
+      .stream()
+      .collect(
+        LinkedHashMap::new,
+        (values, entry) ->
+          values.put(entry.getKey(), getProperty(entry.getKey())),
+        Map::putAll
+      );
+  }
+
+  private void restoreProperties(
+    final SequencedMap<String, Object> propertyValues
+  ) {
+    propertyValues.reversed().forEach(this::setProperty);
+  }
+
+  synchronized void setProperties(final Map<String, Object> properties) {
+    properties.forEach(this::setProperty);
+  }
+
+  synchronized Object getProperty(final String propertyName) {
+    try {
+      return PropertyUtils.getProperty(this, propertyName);
+    } catch (
+      final InvocationTargetException
+      | IllegalAccessException
+      | NoSuchMethodException e
     ) {
-        this(dateTime(startingDateTime), components);
+      throw new RuntimeException("Unable to read property " + propertyName, e);
     }
+  }
 
-    /**
-     * @param startingDate the simulation's starting date, at midnight
-     * @param components   the named component factories making up the scenario
-     */
-    public Scenario(
-        final LocalDate startingDate,
-        final Map<String, ? extends Factory<? super SimulationScope, ?>> components
+  synchronized void setProperty(final String propertyName, final Object value) {
+    try {
+      PropertyUtils.setProperty(this, propertyName, value);
+    } catch (
+      final InvocationTargetException
+      | IllegalAccessException
+      | NoSuchMethodException e
     ) {
-        this(startingDate.atStartOfDay(), components);
+      throw new RuntimeException(
+        "Unable to set property " + propertyName + " to " + value,
+        e
+      );
     }
+  }
 
-    /**
-     * Equivalent to {@link #startNewSimulation(SimulationStartOptions)} with default options (a
-     * random seed, no property overrides, no extra components).
-     *
-     * @return the started {@link Simulation}
-     */
-    public Simulation startNewSimulation() {
-        return startNewSimulation(SimulationStartOptions.builder().build());
+  /**
+   * @param componentName the component's name, as registered in {@link #components}
+   * @return the named component's factory, unchecked-cast to a
+   * {@code Factory<SimulationScope, C>}. The type has no wildcards so that the compiler can
+   * infer {@code C}, and the scope of a generic factory method given the component, from where
+   * the component is passed: with wildcards, callers need explicit type arguments. Narrowing
+   * the factory's scope to {@link SimulationScope} is safe, since a factory only takes a scope.
+   * @throws IllegalArgumentException if no component is registered under that name
+   */
+  @SuppressWarnings("unchecked")
+  public <C> Factory<SimulationScope, C> component(final String componentName) {
+    return (Factory<SimulationScope, C>) component(
+      componentName,
+      Factory.class
+    );
+  }
+
+  /**
+   * @param componentName the component's name, as registered in {@link #components}
+   * @param factoryClass  the expected factory type
+   * @return the named component's factory, cast to {@code factoryClass}
+   * @throws IllegalArgumentException if no component is registered under that name, or if it's
+   *                                  not an instance of {@code factoryClass}
+   */
+  public <F extends Factory<?, ?>> F component(
+    final String componentName,
+    final Class<? extends F> factoryClass
+  ) {
+    final var factory = components.get(componentName);
+    if (factory == null) {
+      throw new IllegalArgumentException(
+        "Component not found: " + componentName
+      );
     }
-
-    /**
-     * Builds and starts a new {@link Simulation} by resolving every component factory (plus
-     * {@code options}' extra components) against a fresh {@link SimulationScope}.
-     * <p>
-     * If {@code options} carries property overrides, this method temporarily mutates {@code this}
-     * {@link Scenario}'s bean properties (via reflection, dotted property paths) to the override
-     * values for the duration of the build, then restores the original values in a
-     * {@code finally} block before returning — even though the method is {@code synchronized} on
-     * {@code this}, that only serializes concurrent calls against the same {@link Scenario}
-     * instance; any other code reading this scenario's properties concurrently could observe the
-     * temporarily-overridden values. This is how calibration varies parameters run-to-run without
-     * permanently mutating the original {@link Scenario}.
-     *
-     * @param options seed, property overrides, and extra components for this run
-     * @return the started {@link Simulation}
-     */
-    synchronized public Simulation startNewSimulation(
-        final SimulationStartOptions options
-    ) {
-        if (options.getPropertyOverrides().isEmpty()) {
-            return createSimulation(options);
-        }
-        final SequencedMap<String, Object> originalPropertyValues =
-            getPropertyValues(options.getPropertyOverrides());
-        try {
-            setProperties(options.getPropertyOverrides());
-            return createSimulation(options);
-        } finally {
-            restoreProperties(originalPropertyValues);
-        }
+    if (!factoryClass.isInstance(factory)) {
+      throw new IllegalArgumentException(
+        "Factory is not of type " + factoryClass.getName()
+      );
     }
-
-    private Simulation createSimulation(final SimulationStartOptions options) {
-        final TemporalSchedule schedule =
-            new TemporalSchedule(startingDateTime.get(GLOBAL_SCOPE));
-        final Simulation simulation =
-            new Simulation(options.getSeed(), schedule, options.getSimulationId());
-        final SimulationScope simulationScope = new SimulationScope(simulation);
-        simulation.start();
-        final ImmutableMap.Builder<String, Object> resolved = ImmutableMap.builder();
-        Stream
-            .concat(
-                getComponents().entrySet().stream(),
-                options.getExtraComponents().entrySet().stream()
-            )
-            .forEach(entry -> resolved.put(entry.getKey(), entry.getValue().get(simulationScope)));
-        simulation.components = resolved.buildOrThrow();
-        return simulation;
-    }
-
-    private SequencedMap<String, Object> getPropertyValues(
-        final Map<String, Object> properties
-    ) {
-        return properties
-            .entrySet()
-            .stream()
-            .collect(
-                LinkedHashMap::new,
-                (values, entry) -> values.put(entry.getKey(), getProperty(entry.getKey())),
-                Map::putAll
-            );
-    }
-
-    private void restoreProperties(
-        final SequencedMap<String, Object> propertyValues
-    ) {
-        propertyValues.reversed().forEach(this::setProperty);
-    }
-
-    synchronized void setProperties(final Map<String, Object> properties) {
-        properties.forEach(this::setProperty);
-    }
-
-    synchronized Object getProperty(
-        final String propertyName
-    ) {
-        try {
-            return PropertyUtils.getProperty(this, propertyName);
-        } catch (
-            final InvocationTargetException | IllegalAccessException | NoSuchMethodException e
-        ) {
-            throw new RuntimeException(
-                "Unable to read property " + propertyName,
-                e
-            );
-        }
-    }
-
-    synchronized void setProperty(
-        final String propertyName,
-        final Object value
-    ) {
-        try {
-            PropertyUtils.setProperty(this, propertyName, value);
-        } catch (
-            final InvocationTargetException | IllegalAccessException | NoSuchMethodException e
-        ) {
-            throw new RuntimeException(
-                "Unable to set property " + propertyName + " to " + value,
-                e
-            );
-        }
-    }
-
-    /**
-     * @param componentName the component's name, as registered in {@link #components}
-     * @return the named component's factory, unchecked-cast to a
-     * {@code Factory<SimulationScope, C>}. The type has no wildcards so that the compiler can
-     * infer {@code C}, and the scope of a generic factory method given the component, from where
-     * the component is passed: with wildcards, callers need explicit type arguments. Narrowing
-     * the factory's scope to {@link SimulationScope} is safe, since a factory only takes a scope.
-     * @throws IllegalArgumentException if no component is registered under that name
-     */
-    @SuppressWarnings("unchecked")
-    public <C> Factory<SimulationScope, C> component(
-        final String componentName
-    ) {
-        return (Factory<SimulationScope, C>) component(
-            componentName,
-            Factory.class
-        );
-    }
-
-    /**
-     * @param componentName the component's name, as registered in {@link #components}
-     * @param factoryClass  the expected factory type
-     * @return the named component's factory, cast to {@code factoryClass}
-     * @throws IllegalArgumentException if no component is registered under that name, or if it's
-     *                                  not an instance of {@code factoryClass}
-     */
-    public <F extends Factory<?, ?>> F component(
-        final String componentName,
-        final Class<? extends F> factoryClass
-    ) {
-        final var factory = components.get(componentName);
-        if (factory == null) {
-            throw new IllegalArgumentException("Component not found: " + componentName);
-        }
-        if (!factoryClass.isInstance(factory)) {
-            throw new IllegalArgumentException("Factory is not of type " + factoryClass.getName());
-        }
-        return factoryClass.cast(factory);
-    }
-
+    return factoryClass.cast(factory);
+  }
 }

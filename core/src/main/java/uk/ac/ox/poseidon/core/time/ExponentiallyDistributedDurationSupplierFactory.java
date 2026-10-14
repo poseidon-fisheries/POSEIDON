@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import java.time.Duration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.time.Duration;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link ExponentiallyDistributedDuration}, built
@@ -41,14 +40,18 @@ import java.time.Duration;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ExponentiallyDistributedDurationSupplierFactory
-    extends SimulationScopeFactory<ExponentiallyDistributedDuration> {
+  extends SimulationScopeFactory<ExponentiallyDistributedDuration>
+{
 
-    private Factory<? super SimulationScope, ? extends Duration> meanDuration;
+  private Factory<? super SimulationScope, ? extends Duration> meanDuration;
 
-    @Override
-    protected ExponentiallyDistributedDuration newInstance(final SimulationScope scope) {
-        return new ExponentiallyDistributedDuration(
-            meanDuration.get(scope), scope.getSimulation().random
-        );
-    }
+  @Override
+  protected ExponentiallyDistributedDuration newInstance(
+    final SimulationScope scope
+  ) {
+    return new ExponentiallyDistributedDuration(
+      meanDuration.get(scope),
+      scope.getSimulation().random
+    );
+  }
 }

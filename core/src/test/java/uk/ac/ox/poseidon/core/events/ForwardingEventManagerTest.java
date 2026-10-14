@@ -22,44 +22,50 @@
 
 package uk.ac.ox.poseidon.core.events;
 
-import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Test;
 
 class ForwardingEventManagerTest {
 
-    @Test
-    void broadcastForwardsToBothPrimaryAndSecondaryManagers() {
-        final EventManager secondary = mock(EventManager.class);
-        final ForwardingEventManager forwarding = new ForwardingEventManager(secondary);
+  @Test
+  void broadcastForwardsToBothPrimaryAndSecondaryManagers() {
+    final EventManager secondary = mock(EventManager.class);
+    final ForwardingEventManager forwarding = new ForwardingEventManager(
+      secondary
+    );
 
-        final List<String> received = new ArrayList<>();
-        forwarding.addListener(new SimpleListener<>(String.class, received::add));
+    final List<String> received = new ArrayList<>();
+    forwarding.addListener(new SimpleListener<>(String.class, received::add));
 
-        forwarding.broadcast("event");
+    forwarding.broadcast("event");
 
-        verify(secondary).broadcast("event");
-        org.junit.jupiter.api.Assertions.assertEquals(1, received.size());
-        org.junit.jupiter.api.Assertions.assertEquals("event", received.getFirst());
-    }
+    verify(secondary).broadcast("event");
+    org.junit.jupiter.api.Assertions.assertEquals(1, received.size());
+    org.junit.jupiter.api.Assertions.assertEquals("event", received.getFirst());
+  }
 
-    @Test
-    void addAndRemoveAffectOnlyPrimaryManager() {
-        final EventManager secondary = mock(EventManager.class);
-        final ForwardingEventManager forwarding = new ForwardingEventManager(secondary);
+  @Test
+  void addAndRemoveAffectOnlyPrimaryManager() {
+    final EventManager secondary = mock(EventManager.class);
+    final ForwardingEventManager forwarding = new ForwardingEventManager(
+      secondary
+    );
 
-        final List<String> received = new ArrayList<>();
-        final Listener<String> listener = new SimpleListener<>(String.class, received::add);
-        forwarding.addListener(listener);
-        forwarding.removeListener(listener);
+    final List<String> received = new ArrayList<>();
+    final Listener<String> listener = new SimpleListener<>(
+      String.class,
+      received::add
+    );
+    forwarding.addListener(listener);
+    forwarding.removeListener(listener);
 
-        forwarding.broadcast("event");
+    forwarding.broadcast("event");
 
-        verify(secondary).broadcast("event");
-        org.junit.jupiter.api.Assertions.assertTrue(received.isEmpty());
-        verifyNoMoreInteractions(secondary);
-    }
+    verify(secondary).broadcast("event");
+    org.junit.jupiter.api.Assertions.assertTrue(received.isEmpty());
+    verifyNoMoreInteractions(secondary);
+  }
 }

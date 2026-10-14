@@ -22,15 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.tasks.landings;
 
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.time.Duration;
 import java.util.function.Supplier;
-
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
-import static com.google.common.base.Preconditions.checkState;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * Sells the vessel's hold contents to the market of its home port, where it must be, and credits
@@ -40,51 +39,54 @@ import static com.google.common.base.Preconditions.checkState;
 @RequiredArgsConstructor
 public class LandCatches extends ExtendedTripTask {
 
-    private final Supplier<Duration> durationSupplier;
+  private final Supplier<Duration> durationSupplier;
 
-    /** @return how long landing takes */
-    @Override
-    protected Duration getDuration() {
-        return durationSupplier.get();
-    }
+  /** @return how long landing takes */
+  @Override
+  protected Duration getDuration() {
+    return durationSupplier.get();
+  }
 
-    /**
-     * Sells the vessel's entire hold to the market of its home port, adding the sale's proceeds
-     * (by currency) to the trip's account.
-     *
-     * @return {@link Status#SUCCEEDED}
-     * @throws IllegalStateException if the trip has not arrived in port, the vessel has no home
-     *                               port or is not at it, or its home port does not have exactly
-     *                               one market
-     */
-    @Override
-    protected Status complete() {
-        final Vessel vessel = getAgent();
-        checkState(
-            getTrip().hasArrivedInPort(),
-            "Vessel %s is landing before its trip arrived in port.",
-            vessel.getId()
-        );
-        checkState(vessel.getHomePort() != null, "Vessel %s has no home port.", vessel.getId());
-        checkState(
-            vessel.getCell().equals(vessel.getHomePortLocation()),
-            "Vessel %s is landing at %s, not at its home port %s.",
-            vessel.getId(),
-            vessel.getCell(),
-            vessel.getHomePort()
-        );
-        vessel
-            .getMarketGrid()
-            .getMarket(vessel.getHomePort())
-            .sell(
-                vessel,
-                vessel.getHold().extractContent(),
-                vessel.getSchedule().getDateTime()
-            )
-            .summary()
-            .values()
-            .forEach(getTrip().getAccount()::add);
-        return SUCCEEDED;
-    }
-
+  /**
+   * Sells the vessel's entire hold to the market of its home port, adding the sale's proceeds
+   * (by currency) to the trip's account.
+   *
+   * @return {@link Status#SUCCEEDED}
+   * @throws IllegalStateException if the trip has not arrived in port, the vessel has no home
+   *                               port or is not at it, or its home port does not have exactly
+   *                               one market
+   */
+  @Override
+  protected Status complete() {
+    final Vessel vessel = getAgent();
+    checkState(
+      getTrip().hasArrivedInPort(),
+      "Vessel %s is landing before its trip arrived in port.",
+      vessel.getId()
+    );
+    checkState(
+      vessel.getHomePort() != null,
+      "Vessel %s has no home port.",
+      vessel.getId()
+    );
+    checkState(
+      vessel.getCell().equals(vessel.getHomePortLocation()),
+      "Vessel %s is landing at %s, not at its home port %s.",
+      vessel.getId(),
+      vessel.getCell(),
+      vessel.getHomePort()
+    );
+    vessel
+      .getMarketGrid()
+      .getMarket(vessel.getHomePort())
+      .sell(
+        vessel,
+        vessel.getHold().extractContent(),
+        vessel.getSchedule().getDateTime()
+      )
+      .summary()
+      .values()
+      .forEach(getTrip().getAccount()::add);
+    return SUCCEEDED;
+  }
 }

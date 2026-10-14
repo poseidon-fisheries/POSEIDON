@@ -22,15 +22,14 @@
 
 package uk.ac.ox.poseidon.gui;
 
-import lombok.Value;
-import sim.util.Proxiable;
-import uk.ac.ox.poseidon.core.Simulation;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
+import lombok.Value;
+import sim.util.Proxiable;
+import uk.ac.ox.poseidon.core.Simulation;
 
 /**
  * One row of the model inspector's component list: a named simulation component, shown by a
@@ -42,42 +41,43 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @Value
 public class ComponentView implements Proxiable {
 
-    /** The name the component was registered under. */
-    String name;
-    /** The resolved component. */
-    Object component;
+  /** The name the component was registered under. */
+  String name;
+  /** The resolved component. */
+  Object component;
 
-    /**
-     * @param simulation the simulation whose components to list
-     * @return one view per component of {@code simulation}, in registration order
-     */
-    public static List<ComponentView> of(final Simulation simulation) {
-        return simulation
-            .getComponents()
-            .entrySet()
-            .stream()
-            .map(entry -> new ComponentView(entry.getKey(), entry.getValue()))
-            .collect(toImmutableList());
-    }
+  /**
+   * @param simulation the simulation whose components to list
+   * @return one view per component of {@code simulation}, in registration order
+   */
+  public static List<ComponentView> of(final Simulation simulation) {
+    return simulation
+      .getComponents()
+      .entrySet()
+      .stream()
+      .map(entry -> new ComponentView(entry.getKey(), entry.getValue()))
+      .collect(toImmutableList());
+  }
 
-    /** @return the component, which MASON inspects in place of this view */
-    @Override
-    public Object propertiesProxy() {
-        return component;
-    }
+  /** @return the component, which MASON inspects in place of this view */
+  @Override
+  public Object propertiesProxy() {
+    return component;
+  }
 
-    /**
-     * @return the component's name and type, plus its size if it is a collection or a map; never
-     * the component's own string representation
-     */
-    @Override
-    public String toString() {
-        final String type = component == null ? "null" : component.getClass().getSimpleName();
-        final String size = switch (component) {
-            case final Collection<?> collection -> " (" + collection.size() + ")";
-            case final Map<?, ?> map -> " (" + map.size() + ")";
-            case null, default -> "";
-        };
-        return name + ": " + type + size;
-    }
+  /**
+   * @return the component's name and type, plus its size if it is a collection or a map; never
+   * the component's own string representation
+   */
+  @Override
+  public String toString() {
+    final String type =
+      component == null ? "null" : component.getClass().getSimpleName();
+    final String size = switch (component) {
+      case final Collection<?> collection -> " (" + collection.size() + ")";
+      case final Map<?, ?> map -> " (" + map.size() + ")";
+      case null, default -> "";
+    };
+    return name + ": " + type + size;
+  }
 }

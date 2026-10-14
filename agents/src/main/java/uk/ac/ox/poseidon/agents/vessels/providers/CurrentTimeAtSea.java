@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
+import static com.google.common.base.Preconditions.checkState;
+
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.providers.Provider;
-
-import java.time.Duration;
-
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Provides the time at sea of a vessel's current trip ({@link Trip#getTimeAtSea()}); only checks
@@ -38,17 +37,20 @@ import static com.google.common.base.Preconditions.checkState;
 @RequiredArgsConstructor
 public class CurrentTimeAtSea implements Provider<Duration> {
 
-    private final Vessel vessel;
+  private final Vessel vessel;
 
-    /**
-     * @return the current trip's time at sea
-     * @throws IllegalStateException if the vessel is not on a trip
-     */
-    @Override
-    public Duration get() {
-        final Trip currentTrip = vessel.getCurrentTrip();
-        checkState(currentTrip != null, "Vessel %s is not on a trip.", vessel.getId());
-        return currentTrip.getTimeAtSea();
-    }
-
+  /**
+   * @return the current trip's time at sea
+   * @throws IllegalStateException if the vessel is not on a trip
+   */
+  @Override
+  public Duration get() {
+    final Trip currentTrip = vessel.getCurrentTrip();
+    checkState(
+      currentTrip != null,
+      "Vessel %s is not on a trip.",
+      vessel.getId()
+    );
+    return currentTrip.getTimeAtSea();
+  }
 }

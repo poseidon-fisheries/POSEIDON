@@ -35,10 +35,13 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class InactiveBehaviourFactory extends GlobalScopeFactory<InactiveBehaviour> {
-    /** @return {@link InactiveBehaviour#INACTIVE_BEHAVIOUR} */
-    @Override
-    protected InactiveBehaviour newInstance(final Scope scope) {
-        return InactiveBehaviour.INACTIVE_BEHAVIOUR;
-    }
+public class InactiveBehaviourFactory
+  extends GlobalScopeFactory<InactiveBehaviour>
+{
+
+  /** @return {@link InactiveBehaviour#INACTIVE_BEHAVIOUR} */
+  @Override
+  protected InactiveBehaviour newInstance(final Scope scope) {
+    return InactiveBehaviour.INACTIVE_BEHAVIOUR;
+  }
 }

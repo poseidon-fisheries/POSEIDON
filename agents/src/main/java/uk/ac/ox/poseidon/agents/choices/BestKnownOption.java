@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import static lombok.AccessLevel.PACKAGE;
+
 import ec.util.MersenneTwisterFast;
+import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.Provider;
-
-import java.util.function.Supplier;
-
-import static lombok.AccessLevel.PACKAGE;
 
 /**
  * Gives the option with the highest value, ties broken at random, read anew from the option
@@ -41,12 +40,12 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor(access = PACKAGE)
 public class BestKnownOption<O> implements Provider<O> {
 
-    private final @NonNull OptionValues<O> optionValues;
-    private final @NonNull Supplier<O> fallback;
-    private final @NonNull MersenneTwisterFast rng;
+  private final @NonNull OptionValues<O> optionValues;
+  private final @NonNull Supplier<O> fallback;
+  private final @NonNull MersenneTwisterFast rng;
 
-    @Override
-    public O get() {
-        return optionValues.getBestOption(rng).orElseGet(fallback);
-    }
+  @Override
+  public O get() {
+    return optionValues.getBestOption(rng).orElseGet(fallback);
+  }
 }

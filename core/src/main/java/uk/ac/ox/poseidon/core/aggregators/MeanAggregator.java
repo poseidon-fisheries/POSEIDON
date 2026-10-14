@@ -31,8 +31,9 @@ import java.util.stream.DoubleStream;
  * {@link Factories#meanAggregator()} in this package.
  */
 public class MeanAggregator implements Aggregator {
-    @Override
-    public OptionalDouble apply(final DoubleStream doubleStream) {
-        return doubleStream.average();
-    }
+
+  @Override
+  public OptionalDouble apply(final DoubleStream doubleStream) {
+    return doubleStream.average();
+  }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Supplier;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link Equal}, built via
@@ -40,13 +39,15 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class EqualFactory<S extends Scope, T> extends RelativeScopeFactory<S, Equal<T>> {
+public class EqualFactory<
+  S extends Scope,
+  T
+> extends RelativeScopeFactory<S, Equal<T>> {
 
-    private Factory<? super S, ? extends Supplier<? extends T>> value;
+  private Factory<? super S, ? extends Supplier<? extends T>> value;
 
-    @Override
-    protected Equal<T> newInstance(final S scope) {
-        return new Equal<>(value.get(scope));
-    }
-
+  @Override
+  protected Equal<T> newInstance(final S scope) {
+    return new Equal<>(value.get(scope));
+  }
 }

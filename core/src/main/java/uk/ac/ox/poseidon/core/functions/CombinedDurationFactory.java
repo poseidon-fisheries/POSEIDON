@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
+import java.time.Duration;
+import java.util.List;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,10 +32,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.time.Duration;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link CombinedDuration}, built via
@@ -42,15 +41,22 @@ import java.util.function.Function;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CombinedDurationFactory<S extends Scope, T>
-    extends RelativeScopeFactory<S, CombinedDuration<T>> {
+public class CombinedDurationFactory<
+  S extends Scope,
+  T
+> extends RelativeScopeFactory<S, CombinedDuration<T>> {
 
-    private List<Factory<? super S, ? extends Function<? super T, ? extends Duration>>> durations;
+  private List<
+    Factory<? super S, ? extends Function<? super T, ? extends Duration>>
+  > durations;
 
-    @Override
-    protected CombinedDuration<T> newInstance(final S scope) {
-        return new CombinedDuration<>(
-            durations.stream().map(d -> d.get(scope)).toList()
-        );
-    }
+  @Override
+  protected CombinedDuration<T> newInstance(final S scope) {
+    return new CombinedDuration<>(
+      durations
+        .stream()
+        .map(d -> d.get(scope))
+        .toList()
+    );
+  }
 }

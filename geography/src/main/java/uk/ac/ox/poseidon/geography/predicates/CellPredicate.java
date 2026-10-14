@@ -22,15 +22,14 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
-import sim.util.Int2D;
-
 import java.util.function.Predicate;
+import sim.util.Int2D;
 
 /**
  * A {@link Predicate} over grid cells. Built via
  * {@link uk.ac.ox.poseidon.geography.predicates.Factories}.
  */
 public interface CellPredicate extends Predicate<Int2D> {
-    @Override
-    boolean test(Int2D cell);
+  @Override
+  boolean test(Int2D cell);
 }

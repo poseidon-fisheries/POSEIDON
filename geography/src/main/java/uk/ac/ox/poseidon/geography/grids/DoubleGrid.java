@@ -30,17 +30,15 @@ import sim.util.Int2D;
  * (and its {@link MutableDoubleGrid} subclass) and {@link DoubleGridWrapper}.
  */
 public interface DoubleGrid extends Grid {
+  /** @return {@code cell}'s value */
+  double getValue(final Int2D cell);
 
-    /** @return {@code cell}'s value */
-    double getValue(final Int2D cell);
+  /** @return the smallest value in the grid */
+  double getMinimumValue();
 
-    /** @return the smallest value in the grid */
-    double getMinimumValue();
+  /** @return the largest value in the grid */
+  double getMaximumValue();
 
-    /** @return the largest value in the grid */
-    double getMaximumValue();
-
-    /** @return the sum of every value in the grid */
-    double getSum();
-
+  /** @return the sum of every value in the grid */
+  double getSum();
 }

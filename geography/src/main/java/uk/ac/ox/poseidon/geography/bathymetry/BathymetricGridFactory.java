@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import lombok.*;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -29,10 +32,6 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A {@link RelativeScopeFactory} base for building a {@link DefaultBathymetricGrid} from raw
@@ -47,37 +46,47 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class BathymetricGridFactory<S extends Scope>
-    extends RelativeScopeFactory<S, BathymetricGrid> {
+public abstract class BathymetricGridFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  BathymetricGrid
+> {
 
-    @NonNull private Factory<? super S, ? extends ModelGrid> modelGrid;
-    @NonNull private Factory<? super S, ? extends Aggregator> aggregator;
-    private boolean inverted;
+  @NonNull
+  private Factory<? super S, ? extends ModelGrid> modelGrid;
 
-    @Override
-    protected BathymetricGrid newInstance(final S scope) {
-        final ModelGrid modelGrid = this.modelGrid.get(scope);
-        final Aggregator aggregator = this.aggregator.get(scope);
-        final Map<Int2D, Collection<Double>> elevationValues = readElevationValues(
-            modelGrid,
-            scope
-        );
-        final double[][] array = modelGrid.makeDoubleArray();
-        modelGrid.getAllCells().forEach(int2D ->
-            array[int2D.x][int2D.y] =
-                aggregator.apply(elevationValues.getOrDefault(int2D, List.of())).orElse(0)
-        );
-        return new DefaultBathymetricGrid(modelGrid, array);
-    }
+  @NonNull
+  private Factory<? super S, ? extends Aggregator> aggregator;
 
-    /**
-     * @param modelGrid the resolved grid to read elevation samples for
-     * @param scope     the scope being resolved against
-     * @return every raw elevation sample, grouped by the cell it belongs to (subclasses are
-     * responsible for applying {@code inverted} to their own values)
-     */
-    protected abstract Map<Int2D, Collection<Double>> readElevationValues(
-        ModelGrid modelGrid,
-        S scope
+  private boolean inverted;
+
+  @Override
+  protected BathymetricGrid newInstance(final S scope) {
+    final ModelGrid modelGrid = this.modelGrid.get(scope);
+    final Aggregator aggregator = this.aggregator.get(scope);
+    final Map<Int2D, Collection<Double>> elevationValues = readElevationValues(
+      modelGrid,
+      scope
     );
+    final double[][] array = modelGrid.makeDoubleArray();
+    modelGrid
+      .getAllCells()
+      .forEach(
+        int2D ->
+          array[int2D.x][int2D.y] = aggregator
+            .apply(elevationValues.getOrDefault(int2D, List.of()))
+            .orElse(0)
+      );
+    return new DefaultBathymetricGrid(modelGrid, array);
+  }
+
+  /**
+   * @param modelGrid the resolved grid to read elevation samples for
+   * @param scope     the scope being resolved against
+   * @return every raw elevation sample, grouped by the cell it belongs to (subclasses are
+   * responsible for applying {@code inverted} to their own values)
+   */
+  protected abstract Map<Int2D, Collection<Double>> readElevationValues(
+    ModelGrid modelGrid,
+    S scope
+  );
 }

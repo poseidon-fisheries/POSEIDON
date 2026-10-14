@@ -22,122 +22,128 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
-import uk.ac.ox.poseidon.core.functions.DoubleIntToDoubleFunction;
-import uk.ac.ox.poseidon.core.utils.DoubleIntConsumer;
-import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
-
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.ObjDoubleConsumer;
+import uk.ac.ox.poseidon.core.functions.DoubleIntToDoubleFunction;
+import uk.ac.ox.poseidon.core.utils.DoubleIntConsumer;
+import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
 /**
  * A {@link SpeciesIndexed} array of primitive {@code double} values, one per species. Implemented
  * by {@link SpeciesIndexedDoubleArray} (a plain array) and {@code BiomassBucket} in
  * {@code biology.buckets}.
  */
-public interface SpeciesIndexedDoubles<S extends SpeciesIndexedDoubles<S>> extends SpeciesIndexed {
+public interface SpeciesIndexedDoubles<S extends SpeciesIndexedDoubles<S>> extends
+  SpeciesIndexed {
+  /**
+   * Returns the value at a valid index for {@link #getSpeciesIndex()}.
+   */
+  double getDouble(int i);
 
-    /**
-     * Returns the value at a valid index for {@link #getSpeciesIndex()}.
-     */
-    double getDouble(int i);
+  /**
+   * Creates a new instance with the same {@link SpeciesIndex} as this object.
+   * <p>
+   * Intended for internal use by default methods; callers should prefer implementation-specific
+   * factories (for example, {@code SpeciesIndexedDoubleArray.of}).
+   *
+   * @param values array aligned with {@link #getSpeciesIndex()}
+   * @return a new instance backed by the provided values
+   */
+  S newInstance(double[] values);
 
-    /**
-     * Creates a new instance with the same {@link SpeciesIndex} as this object.
-     * <p>
-     * Intended for internal use by default methods; callers should prefer implementation-specific
-     * factories (for example, {@code SpeciesIndexedDoubleArray.of}).
-     *
-     * @param values array aligned with {@link #getSpeciesIndex()}
-     * @return a new instance backed by the provided values
-     */
-    S newInstance(double[] values);
-
-    /**
-     * Executes an action for each value.
-     */
-    default void forEachValue(final DoubleConsumer consumer) {
-        final int size = getSpeciesIndex().size();
-        for (int i = 0; i < size; i++) {
-            consumer.accept(getDouble(i));
-        }
+  /**
+   * Executes an action for each value.
+   */
+  default void forEachValue(final DoubleConsumer consumer) {
+    final int size = getSpeciesIndex().size();
+    for (int i = 0; i < size; i++) {
+      consumer.accept(getDouble(i));
     }
+  }
 
-    /**
-     * Executes an action for each value/index pair.
-     */
-    default void forEachWithIndex(final DoubleIntConsumer consumer) {
-        final int size = getSpeciesIndex().size();
-        for (int i = 0; i < size; i++) {
-            consumer.accept(getDouble(i), i);
-        }
+  /**
+   * Executes an action for each value/index pair.
+   */
+  default void forEachWithIndex(final DoubleIntConsumer consumer) {
+    final int size = getSpeciesIndex().size();
+    for (int i = 0; i < size; i++) {
+      consumer.accept(getDouble(i), i);
     }
+  }
 
-    /**
-     * Executes an action for each species/value pair.
-     */
-    default void forEachEntry(final ObjDoubleConsumer<Species> consumer) {
-        final SpeciesIndex speciesIndex = getSpeciesIndex();
-        forEachWithIndex((value, index) ->
-            consumer.accept(speciesIndex.speciesAt(index), value)
-        );
-    }
+  /**
+   * Executes an action for each species/value pair.
+   */
+  default void forEachEntry(final ObjDoubleConsumer<Species> consumer) {
+    final SpeciesIndex speciesIndex = getSpeciesIndex();
+    forEachWithIndex((value, index) ->
+      consumer.accept(speciesIndex.speciesAt(index), value)
+    );
+  }
 
-    /**
-     * Returns a mapped copy based on each value.
-     */
-    default S mapValue(final DoubleUnaryOperator mapper) {
-        final SpeciesIndex speciesIndex = getSpeciesIndex();
-        final double[] mapped = new double[speciesIndex.size()];
-        forEachWithIndex((value, index) -> mapped[index] = mapper.applyAsDouble(value));
-        return newInstance(mapped);
-    }
+  /**
+   * Returns a mapped copy based on each value.
+   */
+  default S mapValue(final DoubleUnaryOperator mapper) {
+    final SpeciesIndex speciesIndex = getSpeciesIndex();
+    final double[] mapped = new double[speciesIndex.size()];
+    forEachWithIndex(
+      (value, index) -> mapped[index] = mapper.applyAsDouble(value)
+    );
+    return newInstance(mapped);
+  }
 
-    /**
-     * Returns a mapped copy based on each value/index pair.
-     */
-    default S mapWithIndex(final DoubleIntToDoubleFunction mapper) {
-        final SpeciesIndex speciesIndex = getSpeciesIndex();
-        final double[] mapped = new double[speciesIndex.size()];
-        forEachWithIndex((value, index) -> mapped[index] = mapper.applyAsDouble(value, index));
-        return newInstance(mapped);
-    }
+  /**
+   * Returns a mapped copy based on each value/index pair.
+   */
+  default S mapWithIndex(final DoubleIntToDoubleFunction mapper) {
+    final SpeciesIndex speciesIndex = getSpeciesIndex();
+    final double[] mapped = new double[speciesIndex.size()];
+    forEachWithIndex(
+      (value, index) -> mapped[index] = mapper.applyAsDouble(value, index)
+    );
+    return newInstance(mapped);
+  }
 
-    /**
-     * Returns a mapped copy based on each species/value pair.
-     */
-    default S mapEntry(final ObjDoubleToDoubleFunction<Species> mapper) {
-        final SpeciesIndex speciesIndex = getSpeciesIndex();
-        final double[] mapped = new double[speciesIndex.size()];
-        forEachWithIndex((value, index) ->
-            mapped[index] = mapper.applyAsDouble(speciesIndex.speciesAt(index), value)
-        );
-        return newInstance(mapped);
-    }
+  /**
+   * Returns a mapped copy based on each species/value pair.
+   */
+  default S mapEntry(final ObjDoubleToDoubleFunction<Species> mapper) {
+    final SpeciesIndex speciesIndex = getSpeciesIndex();
+    final double[] mapped = new double[speciesIndex.size()];
+    forEachWithIndex(
+      (value, index) ->
+        mapped[index] = mapper.applyAsDouble(
+          speciesIndex.speciesAt(index),
+          value
+        )
+    );
+    return newInstance(mapped);
+  }
 
-    /**
-     * Retrieves the double value associated with the specified {@code Species}.
-     * <p>
-     * The method uses the species' index within the {@code SpeciesIndex} to retrieve the
-     * corresponding double value. If the species is not found, the implementation of
-     * {@link #getDouble(int)} is expected to throw an exception.
-     *
-     * @param species the {@code Species} for which the double value is to be retrieved
-     * @return the double value associated with the specified {@code Species}
-     */
-    default double getDouble(final Species species) {
-        return getDouble(getSpeciesIndex().indexOf(species));
-    }
+  /**
+   * Retrieves the double value associated with the specified {@code Species}.
+   * <p>
+   * The method uses the species' index within the {@code SpeciesIndex} to retrieve the
+   * corresponding double value. If the species is not found, the implementation of
+   * {@link #getDouble(int)} is expected to throw an exception.
+   *
+   * @param species the {@code Species} for which the double value is to be retrieved
+   * @return the double value associated with the specified {@code Species}
+   */
+  default double getDouble(final Species species) {
+    return getDouble(getSpeciesIndex().indexOf(species));
+  }
 
-    /**
-     * Returns a default if the species is not in {@code speciesIndex}.
-     */
-    default double getDoubleOrDefault(
-        final Species species,
-        final double defaultValue
-    ) {
-        final int i = getSpeciesIndex().indexOf(species);
-        return i == -1 ? defaultValue : getDouble(i);
-    }
-
+  /**
+   * Returns a default if the species is not in {@code speciesIndex}.
+   */
+  default double getDoubleOrDefault(
+    final Species species,
+    final double defaultValue
+  ) {
+    final int i = getSpeciesIndex().indexOf(species);
+    return i == -1 ? defaultValue : getDouble(i);
+  }
 }

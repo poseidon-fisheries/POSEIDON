@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import ec.util.MersenneTwisterFast;
-
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
+
+import ec.util.MersenneTwisterFast;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * With probability {@code epsilon}, explores (calls {@link #explorer}); otherwise exploits
@@ -36,40 +35,40 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
  */
 public class EpsilonGreedyChooser<O> implements Supplier<Optional<O>> {
 
-    private final double epsilon;
-    private final Supplier<O> explorer;
-    private final Supplier<O> exploiter;
-    private final MersenneTwisterFast rng;
+  private final double epsilon;
+  private final Supplier<O> explorer;
+  private final Supplier<O> exploiter;
+  private final MersenneTwisterFast rng;
 
-    /**
-     * @param epsilon   probability of exploring instead of exploiting, in {@code [0, 1]}
-     * @param explorer  supplies an exploratory option
-     * @param exploiter supplies the currently-best-known option
-     * @param rng       the RNG to draw the explore/exploit decision from
-     */
-    EpsilonGreedyChooser(
-        final double epsilon,
-        final Supplier<O> explorer,
-        final Supplier<O> exploiter,
-        final MersenneTwisterFast rng
-    ) {
-        this.epsilon = checkUnitRange(epsilon, "epsilon");
-        this.explorer = checkNotNull(explorer);
-        this.exploiter = checkNotNull(exploiter);
-        this.rng = checkNotNull(rng);
-    }
+  /**
+   * @param epsilon   probability of exploring instead of exploiting, in {@code [0, 1]}
+   * @param explorer  supplies an exploratory option
+   * @param exploiter supplies the currently-best-known option
+   * @param rng       the RNG to draw the explore/exploit decision from
+   */
+  EpsilonGreedyChooser(
+    final double epsilon,
+    final Supplier<O> explorer,
+    final Supplier<O> exploiter,
+    final MersenneTwisterFast rng
+  ) {
+    this.epsilon = checkUnitRange(epsilon, "epsilon");
+    this.explorer = checkNotNull(explorer);
+    this.exploiter = checkNotNull(exploiter);
+    this.rng = checkNotNull(rng);
+  }
 
-    /** @return the exploiter's pick with probability {@code 1 - epsilon} (else the explorer's), falling back to the explorer if the exploiter returns {@code null} */
-    @Override
-    public Optional<O> get() {
-        final boolean exploit = !rng.nextBoolean(epsilon);
-        O result = null;
-        if (exploit) {
-            result = this.exploiter.get();
-        }
-        if (result == null) {
-            result = this.explorer.get();
-        }
-        return Optional.ofNullable(result);
+  /** @return the exploiter's pick with probability {@code 1 - epsilon} (else the explorer's), falling back to the explorer if the exploiter returns {@code null} */
+  @Override
+  public Optional<O> get() {
+    final boolean exploit = !rng.nextBoolean(epsilon);
+    O result = null;
+    if (exploit) {
+      result = this.exploiter.get();
     }
+    if (result == null) {
+      result = this.explorer.get();
+    }
+    return Optional.ofNullable(result);
+  }
 }

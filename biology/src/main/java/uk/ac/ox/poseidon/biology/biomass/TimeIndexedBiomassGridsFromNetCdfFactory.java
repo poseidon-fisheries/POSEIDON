@@ -22,8 +22,24 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,23 +50,6 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.TimeIndexedNetCdfGridReader;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.IntStream;
-
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 
 /**
  * Reads a NetCDF file holding, for each of a number of dates, one biomass raster per species, on a
@@ -72,137 +71,158 @@ import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TimeIndexedBiomassGridsFromNetCdfFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ImmutableMap<LocalDateTime, ImmutableList<ImmutableBiomassGrid>>> {
+public class TimeIndexedBiomassGridsFromNetCdfFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  ImmutableMap<LocalDateTime, ImmutableList<ImmutableBiomassGrid>>
+> {
 
-    private Factory<? super S, ? extends ModelGrid> modelGrid;
-    private Factory<? super S, ? extends List<? extends Species>> species;
-    private String separator;
-    private Factory<? super S, ? extends Supplier<TimeIndexedNetCdfGridReader>> timeIndexedNetCdfGridReader;
+  private Factory<? super S, ? extends ModelGrid> modelGrid;
+  private Factory<? super S, ? extends List<? extends Species>> species;
+  private String separator;
+  private Factory<
+    ? super S,
+    ? extends Supplier<TimeIndexedNetCdfGridReader>
+  > timeIndexedNetCdfGridReader;
 
-    @Override
-    protected ImmutableMap<LocalDateTime, ImmutableList<ImmutableBiomassGrid>> newInstance(final S scope) {
+  @Override
+  protected ImmutableMap<
+    LocalDateTime,
+    ImmutableList<ImmutableBiomassGrid>
+  > newInstance(final S scope) {
+    final ModelGrid modelGrid = this.modelGrid.get(scope);
+    final List<? extends Species> configuredSpecies = this.species.get(scope);
+    checkNoCodeContainsSeparator(configuredSpecies, separator);
 
-        final ModelGrid modelGrid = this.modelGrid.get(scope);
-        final List<? extends Species> configuredSpecies = this.species.get(scope);
-        checkNoCodeContainsSeparator(configuredSpecies, separator);
-
-        try (
-            final TimeIndexedNetCdfGridReader netCdfGridReader = timeIndexedNetCdfGridReader.get(scope).get()
-        ) {
-
-            netCdfGridReader.checkAlignmentWith(modelGrid);
-
-            final Map<String, String> variableNamesBySpeciesKey =
-                matchVariablesToSpecies(
-                    netCdfGridReader.getDataVariableNames(),
-                    configuredSpecies,
-                    separator
-                );
-
-            final List<LocalDateTime> dateTimes = netCdfGridReader.getDateTimes();
-            final Set<LocalDateTime> seenDateTimes = new HashSet<>();
-
-            return IntStream
-                .range(0, dateTimes.size())
-                .boxed()
-                .collect(toImmutableMap(
-                    timeIndex -> {
-                        final LocalDateTime dateTime = dateTimes.get(timeIndex);
-                        checkState(
-                            seenDateTimes.add(dateTime),
-                            "Duplicate date %s at time index %s",
-                            dateTime, timeIndex
-                        );
-                        return dateTime;
-                    },
-                    timeIndex -> configuredSpecies
-                        .stream()
-                        .map(currentSpecies -> {
-                            final String variableName =
-                                variableNamesBySpeciesKey.get(currentSpecies.getKey());
-                            final double[][] values =
-                                netCdfGridReader.readSlice(variableName, timeIndex);
-                            return new ImmutableBiomassGrid(modelGrid, currentSpecies, values);
-                        })
-                        .collect(toImmutableList())
-                ));
-        }
-    }
-
-    /**
-     * Rejects any configured species whose code contains {@code separator}: since variable names
-     * are split on it unconditionally, such a code would be indistinguishable from a code/lifeStage
-     * pair and could never be matched correctly.
-     */
-    private static void checkNoCodeContainsSeparator(
-        final List<? extends Species> configuredSpecies,
-        final String separator
+    try (
+      final TimeIndexedNetCdfGridReader netCdfGridReader =
+        timeIndexedNetCdfGridReader.get(scope).get()
     ) {
-        final List<String> offendingCodes = configuredSpecies
-            .stream()
-            .map(Species::getCode)
-            .filter(code -> code.contains(separator))
-            .toList();
-        checkState(
-            offendingCodes.isEmpty(),
-            "Configured species codes must not contain the separator %s, but found: %s",
-            separator, offendingCodes
-        );
-    }
+      netCdfGridReader.checkAlignmentWith(modelGrid);
 
-    /**
-     * Matches NetCDF variable names to configured species, strictly both ways: every configured
-     * species must have exactly one matching variable and vice versa. A mismatch is treated as a
-     * data-integrity defect (the file and the configured species list are meant to describe the
-     * same species set) and throws, rather than silently skipping or synthesizing a species.
-     */
-    private static Map<String, String> matchVariablesToSpecies(
-        final List<String> variableNames,
-        final List<? extends Species> configuredSpecies,
-        final String separator
-    ) {
-        final Map<String, Species> unmatchedSpeciesByKey =
-            configuredSpecies.stream().collect(toMap(Species::getKey, identity()));
-
-        final Map<String, String> variableNamesBySpeciesKey = new HashMap<>();
-        final List<String> unmatchedVariables = new ArrayList<>();
-
-        for (final String variableName : variableNames) {
-            final String speciesKey = speciesKeyOf(variableName, separator);
-            if (unmatchedSpeciesByKey.remove(speciesKey) == null) {
-                unmatchedVariables.add(variableName);
-            } else {
-                variableNamesBySpeciesKey.put(speciesKey, variableName);
-            }
-        }
-
-        checkState(
-            unmatchedVariables.isEmpty() && unmatchedSpeciesByKey.isEmpty(),
-            "NetCDF variables with no matching configured species: %s; " +
-                "configured species with no matching NetCDF variable: %s",
-            unmatchedVariables, unmatchedSpeciesByKey.keySet()
+      final Map<String, String> variableNamesBySpeciesKey =
+        matchVariablesToSpecies(
+          netCdfGridReader.getDataVariableNames(),
+          configuredSpecies,
+          separator
         );
 
-        return variableNamesBySpeciesKey;
+      final List<LocalDateTime> dateTimes = netCdfGridReader.getDateTimes();
+      final Set<LocalDateTime> seenDateTimes = new HashSet<>();
+
+      return IntStream.range(0, dateTimes.size())
+        .boxed()
+        .collect(
+          toImmutableMap(
+            timeIndex -> {
+              final LocalDateTime dateTime = dateTimes.get(timeIndex);
+              checkState(
+                seenDateTimes.add(dateTime),
+                "Duplicate date %s at time index %s",
+                dateTime,
+                timeIndex
+              );
+              return dateTime;
+            },
+            timeIndex ->
+              configuredSpecies
+                .stream()
+                .map(currentSpecies -> {
+                  final String variableName = variableNamesBySpeciesKey.get(
+                    currentSpecies.getKey()
+                  );
+                  final double[][] values = netCdfGridReader.readSlice(
+                    variableName,
+                    timeIndex
+                  );
+                  return new ImmutableBiomassGrid(
+                    modelGrid,
+                    currentSpecies,
+                    values
+                  );
+                })
+                .collect(toImmutableList())
+          )
+        );
+    }
+  }
+
+  /**
+   * Rejects any configured species whose code contains {@code separator}: since variable names
+   * are split on it unconditionally, such a code would be indistinguishable from a code/lifeStage
+   * pair and could never be matched correctly.
+   */
+  private static void checkNoCodeContainsSeparator(
+    final List<? extends Species> configuredSpecies,
+    final String separator
+  ) {
+    final List<String> offendingCodes = configuredSpecies
+      .stream()
+      .map(Species::getCode)
+      .filter(code -> code.contains(separator))
+      .toList();
+    checkState(
+      offendingCodes.isEmpty(),
+      "Configured species codes must not contain the separator %s, but found: %s",
+      separator,
+      offendingCodes
+    );
+  }
+
+  /**
+   * Matches NetCDF variable names to configured species, strictly both ways: every configured
+   * species must have exactly one matching variable and vice versa. A mismatch is treated as a
+   * data-integrity defect (the file and the configured species list are meant to describe the
+   * same species set) and throws, rather than silently skipping or synthesizing a species.
+   */
+  private static Map<String, String> matchVariablesToSpecies(
+    final List<String> variableNames,
+    final List<? extends Species> configuredSpecies,
+    final String separator
+  ) {
+    final Map<String, Species> unmatchedSpeciesByKey = configuredSpecies
+      .stream()
+      .collect(toMap(Species::getKey, identity()));
+
+    final Map<String, String> variableNamesBySpeciesKey = new HashMap<>();
+    final List<String> unmatchedVariables = new ArrayList<>();
+
+    for (final String variableName : variableNames) {
+      final String speciesKey = speciesKeyOf(variableName, separator);
+      if (unmatchedSpeciesByKey.remove(speciesKey) == null) {
+        unmatchedVariables.add(variableName);
+      } else {
+        variableNamesBySpeciesKey.put(speciesKey, variableName);
+      }
     }
 
-    /**
-     * Splits a variable name into a (code, lifeStage) species key by splitting unconditionally on
-     * the last occurrence of {@code separator}; a name with no {@code separator} at all is a bare
-     * code with a {@code null} life stage.
-     */
-    private static String speciesKeyOf(
-        final String variableName,
-        final String separator
-    ) {
-        final int separatorIndex = variableName.lastIndexOf(separator);
-        if (separatorIndex < 0) {
-            return multiStringKey(variableName, null);
-        }
-        final String code = variableName.substring(0, separatorIndex);
-        final String lifeStage = variableName.substring(separatorIndex + separator.length());
-        return multiStringKey(code, lifeStage);
-    }
+    checkState(
+      unmatchedVariables.isEmpty() && unmatchedSpeciesByKey.isEmpty(),
+      "NetCDF variables with no matching configured species: %s; " +
+        "configured species with no matching NetCDF variable: %s",
+      unmatchedVariables,
+      unmatchedSpeciesByKey.keySet()
+    );
 
+    return variableNamesBySpeciesKey;
+  }
+
+  /**
+   * Splits a variable name into a (code, lifeStage) species key by splitting unconditionally on
+   * the last occurrence of {@code separator}; a name with no {@code separator} at all is a bare
+   * code with a {@code null} life stage.
+   */
+  private static String speciesKeyOf(
+    final String variableName,
+    final String separator
+  ) {
+    final int separatorIndex = variableName.lastIndexOf(separator);
+    if (separatorIndex < 0) {
+      return multiStringKey(variableName, null);
+    }
+    final String code = variableName.substring(0, separatorIndex);
+    final String lifeStage = variableName.substring(
+      separatorIndex + separator.length()
+    );
+    return multiStringKey(code, lifeStage);
+  }
 }

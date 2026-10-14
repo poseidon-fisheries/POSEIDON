@@ -37,27 +37,29 @@ import uk.ac.ox.poseidon.geography.allocators.Allocator;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class NormalisedMutableDoubleGridFromAllocatorFactory<S extends Scope>
-    extends AbstractNormalisedDoubleGridFromAllocatorFactory<S, MutableDoubleGrid> {
+public class NormalisedMutableDoubleGridFromAllocatorFactory<S extends Scope> extends AbstractNormalisedDoubleGridFromAllocatorFactory<
+  S,
+  MutableDoubleGrid
+> {
 
-    /**
-     * @param modelGrid  factory for the grid to build over
-     * @param allocator  factory for the allocator assigning each cell's raw value
-     * @param totalValue factory for the value the grid's values should sum to once normalised
-     */
-    public NormalisedMutableDoubleGridFromAllocatorFactory(
-        final Factory<? super S, ? extends ModelGrid> modelGrid,
-        final Factory<? super S, ? extends Allocator> allocator,
-        final Factory<? super S, ? extends Number> totalValue
-    ) {
-        super(modelGrid, allocator, totalValue);
-    }
+  /**
+   * @param modelGrid  factory for the grid to build over
+   * @param allocator  factory for the allocator assigning each cell's raw value
+   * @param totalValue factory for the value the grid's values should sum to once normalised
+   */
+  public NormalisedMutableDoubleGridFromAllocatorFactory(
+    final Factory<? super S, ? extends ModelGrid> modelGrid,
+    final Factory<? super S, ? extends Allocator> allocator,
+    final Factory<? super S, ? extends Number> totalValue
+  ) {
+    super(modelGrid, allocator, totalValue);
+  }
 
-    @Override
-    MutableDoubleGrid makeGrid(
-        final ModelGrid modelGrid,
-        final double[][] values
-    ) {
-        return new MutableDoubleGrid(modelGrid, values);
-    }
+  @Override
+  MutableDoubleGrid makeGrid(
+    final ModelGrid modelGrid,
+    final double[][] values
+  ) {
+    return new MutableDoubleGrid(modelGrid, values);
+  }
 }

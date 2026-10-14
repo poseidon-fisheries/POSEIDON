@@ -22,43 +22,46 @@
 
 package uk.ac.ox.poseidon.agents.fuel;
 
+import java.util.List;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.util.List;
-
 /**
  * Factories for fuel stations and the grid that locates them.
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-     * {@link uk.ac.ox.poseidon.agents.fuel.FuelStationGrid} over the resolved stations
-     * @see FuelStationGridFactory
-     */
-    public static <S extends Scope> FuelStationGridFactory<S> fuelStationGrid(
-        final Factory<? super S, ? extends PortGrid> portGrid,
-        final Factory<? super S, ? extends List<? extends FuelStation>> fuelStations
-    ) {
-        return new FuelStationGridFactory<>(portGrid, fuelStations);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * {@link uk.ac.ox.poseidon.agents.fuel.FuelStationGrid} over the resolved stations
+   * @see FuelStationGridFactory
+   */
+  public static <S extends Scope> FuelStationGridFactory<S> fuelStationGrid(
+    final Factory<? super S, ? extends PortGrid> portGrid,
+    final Factory<? super S, ? extends List<? extends FuelStation>> fuelStations
+  ) {
+    return new FuelStationGridFactory<>(portGrid, fuelStations);
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for one
-     * {@link FuelStation} per port in {@code portGrid}
-     * @see OneFuelStationPerPortFactory
-     */
-    public static OneFuelStationPerPortFactory oneFuelStationPerPort(
-        final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
-        final Factory<? super SimulationScope, ? extends Money> pricePerLitres,
-        final double pumpRateInLitresPerMinute
-    ) {
-        return new OneFuelStationPerPortFactory(portGrid, pricePerLitres, pumpRateInLitresPerMinute);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for one
+   * {@link FuelStation} per port in {@code portGrid}
+   * @see OneFuelStationPerPortFactory
+   */
+  public static OneFuelStationPerPortFactory oneFuelStationPerPort(
+    final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
+    final Factory<? super SimulationScope, ? extends Money> pricePerLitres,
+    final double pumpRateInLitresPerMinute
+  ) {
+    return new OneFuelStationPerPortFactory(
+      portGrid,
+      pricePerLitres,
+      pumpRateInLitresPerMinute
+    );
+  }
 }

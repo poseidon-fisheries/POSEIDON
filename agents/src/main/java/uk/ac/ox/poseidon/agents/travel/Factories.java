@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
+import java.util.List;
+import java.util.function.Function;
 import org.joda.money.Money;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -31,64 +33,69 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
-import java.util.List;
-import java.util.function.Function;
-
 /** Factories for the routes vessels would sail and what travelling them costs. */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @param pathFinder finds the paths of the route's two legs
-     * @param distance   measures the paths
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-     * {@link RouteViaDestination}
-     * @see RouteViaDestination
-     */
-    public static RouteViaDestinationFactory routeViaDestination(
-        final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
-        final Factory<? super VesselScope, ? extends DistanceCalculator> distance
-    ) {
-        return new RouteViaDestinationFactory(pathFinder, distance);
-    }
+  /**
+   * @param pathFinder finds the paths of the route's two legs
+   * @param distance   measures the paths
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+   * {@link RouteViaDestination}
+   * @see RouteViaDestination
+   */
+  public static RouteViaDestinationFactory routeViaDestination(
+    final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
+    final Factory<? super VesselScope, ? extends DistanceCalculator> distance
+  ) {
+    return new RouteViaDestinationFactory(pathFinder, distance);
+  }
 
-    /**
-     * @param hourlyCost gives the vessel's cost per hour at sea
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a {@link TimeCost}
-     * @see TimeCost
-     */
-    public static TimeCostFactory timeCost(
-        final Factory<? super VesselScope, ? extends Function<? super Vessel, ? extends Money>>
-            hourlyCost
-    ) {
-        return new TimeCostFactory(hourlyCost);
-    }
+  /**
+   * @param hourlyCost gives the vessel's cost per hour at sea
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a {@link TimeCost}
+   * @see TimeCost
+   */
+  public static TimeCostFactory timeCost(
+    final Factory<
+      ? super VesselScope,
+      ? extends Function<? super Vessel, ? extends Money>
+    > hourlyCost
+  ) {
+    return new TimeCostFactory(hourlyCost);
+  }
 
-    /**
-     * @param routeFunction gives the route via a cell
-     * @param routeCosts    what is charged for a route, each in money
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link TravelCost}
-     * @see TravelCost
-     */
-    @SafeVarargs
-    public static <S extends Scope> TravelCostFactory<S> travelCost(
-        final Factory<? super S, ? extends Function<? super Int2D, ? extends Route>>
-            routeFunction,
-        final Factory<? super S, ? extends Function<? super Route, ? extends Money>>...
-            routeCosts
-    ) {
-        return new TravelCostFactory<>(routeFunction, List.of(routeCosts));
-    }
+  /**
+   * @param routeFunction gives the route via a cell
+   * @param routeCosts    what is charged for a route, each in money
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link TravelCost}
+   * @see TravelCost
+   */
+  @SafeVarargs
+  public static <S extends Scope> TravelCostFactory<S> travelCost(
+    final Factory<
+      ? super S,
+      ? extends Function<? super Int2D, ? extends Route>
+    > routeFunction,
+    final Factory<
+      ? super S,
+      ? extends Function<? super Route, ? extends Money>
+    >... routeCosts
+  ) {
+    return new TravelCostFactory<>(routeFunction, List.of(routeCosts));
+  }
 
-    /**
-     * @param propertyPath the dotted path of properties to follow from the route, e.g.
-     *                     {@code "duration"} for how long sailing it takes
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
-     * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a route
-     * @see RoutePropertyFactory
-     */
-    public static <R> RoutePropertyFactory<R> routeProperty(final String propertyPath) {
-        return new RoutePropertyFactory<>(propertyPath);
-    }
+  /**
+   * @param propertyPath the dotted path of properties to follow from the route, e.g.
+   *                     {@code "duration"} for how long sailing it takes
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
+   * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a route
+   * @see RoutePropertyFactory
+   */
+  public static <R> RoutePropertyFactory<R> routeProperty(
+    final String propertyPath
+  ) {
+    return new RoutePropertyFactory<>(propertyPath);
+  }
 }

@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import tech.tablesaw.api.Row;
-
-import java.util.List;
-import java.util.function.Function;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
+
+import java.util.List;
+import java.util.function.Function;
+import tech.tablesaw.api.Row;
 
 /**
  * A {@link Function} that reads several fixed columns' values from a {@code tablesaw} {@link Row}
@@ -38,21 +37,21 @@ import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
  */
 public class MultiStringKeyFromRow implements Function<Row, String> {
 
-    private final String[] keyColumnNames;
+  private final String[] keyColumnNames;
 
-    /** @param keyColumnNames the non-empty list of columns whose values are joined into the key */
-    public MultiStringKeyFromRow(final List<String> keyColumnNames) {
-        checkNotNull(keyColumnNames);
-        checkArgument(!keyColumnNames.isEmpty());
-        this.keyColumnNames = keyColumnNames.toArray(new String[0]);
-    }
+  /** @param keyColumnNames the non-empty list of columns whose values are joined into the key */
+  public MultiStringKeyFromRow(final List<String> keyColumnNames) {
+    checkNotNull(keyColumnNames);
+    checkArgument(!keyColumnNames.isEmpty());
+    this.keyColumnNames = keyColumnNames.toArray(new String[0]);
+  }
 
-    @Override
-    public String apply(final Row row) {
-        final Object[] keyValues = new Object[keyColumnNames.length];
-        for (int k = 0; k < keyColumnNames.length; k++) {
-            keyValues[k] = row.getObject(keyColumnNames[k]);
-        }
-        return multiStringKey(keyValues);
+  @Override
+  public String apply(final Row row) {
+    final Object[] keyValues = new Object[keyColumnNames.length];
+    for (int k = 0; k < keyColumnNames.length; k++) {
+      keyValues[k] = row.getObject(keyColumnNames[k]);
     }
+    return multiStringKey(keyValues);
+  }
 }

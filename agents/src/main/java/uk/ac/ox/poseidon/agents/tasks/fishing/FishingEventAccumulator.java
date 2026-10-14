@@ -26,7 +26,8 @@ import uk.ac.ox.poseidon.core.events.EventAccumulator;
 
 /** An {@link EventAccumulator} of {@link FishingEvent}s. */
 public class FishingEventAccumulator extends EventAccumulator<FishingEvent> {
-    public FishingEventAccumulator() {
-        super(FishingEvent.class);
-    }
+
+  public FishingEventAccumulator() {
+    super(FishingEvent.class);
+  }
 }

@@ -22,107 +22,120 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import ec.util.MersenneTwisterFast;
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
+import ec.util.MersenneTwisterFast;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BinaryOperator;
 import java.util.function.ToDoubleBiFunction;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 class MemoryBasedOptionValuesTest {
 
-    private static final BinaryOperator<Double> SUM = Double::sum;
+  private static final BinaryOperator<Double> SUM = Double::sum;
 
-    private final KeyedMemory<String, String, Double> keyedMemory = new KeyedMemory<>();
-    private final AtomicReference<String> contextKey = new AtomicReference<>("trawl");
-    private final AtomicReference<ToDoubleBiFunction<String, Double>> valuation =
-        new AtomicReference<>((option, recollection) -> recollection);
-    private final MemoryBasedOptionValues<String, Double> optionValues =
-        new MemoryBasedOptionValues<>(
-            new KeyedMemorySelector<>(keyedMemory, vessel -> contextKey.get()),
-            mock(Vessel.class),
-            (option, recollection) -> valuation.get().applyAsDouble(option, recollection)
-        );
+  private final KeyedMemory<String, String, Double> keyedMemory =
+    new KeyedMemory<>();
+  private final AtomicReference<String> contextKey = new AtomicReference<>(
+    "trawl"
+  );
+  private final AtomicReference<ToDoubleBiFunction<String, Double>> valuation =
+    new AtomicReference<>((option, recollection) -> recollection);
+  private final MemoryBasedOptionValues<String, Double> optionValues =
+    new MemoryBasedOptionValues<>(
+      new KeyedMemorySelector<>(keyedMemory, vessel -> contextKey.get()),
+      mock(Vessel.class),
+      (option, recollection) ->
+        valuation.get().applyAsDouble(option, recollection)
+    );
 
-    @Test
-    void bestOptionChangesWhenTheValuationChangesWithoutNewObservations() {
-        keyedMemory.get("trawl").observe("A", 1.0, SUM);
-        keyedMemory.get("trawl").observe("B", 2.0, SUM);
-        assertThat(optionValues.getBestOptions()).containsExactly("B");
+  @Test
+  void bestOptionChangesWhenTheValuationChangesWithoutNewObservations() {
+    keyedMemory.get("trawl").observe("A", 1.0, SUM);
+    keyedMemory.get("trawl").observe("B", 2.0, SUM);
+    assertThat(optionValues.getBestOptions()).containsExactly("B");
 
-        valuation.set((option, recollection) -> -recollection);
+    valuation.set((option, recollection) -> -recollection);
 
-        assertThat(optionValues.getBestOptions()).containsExactly("A");
-        assertThat(optionValues.getBestValue()).contains(-1.0);
-    }
+    assertThat(optionValues.getBestOptions()).containsExactly("A");
+    assertThat(optionValues.getBestValue()).contains(-1.0);
+  }
 
-    @Test
-    void bestOptionChangesWhenTheContextKeyChanges() {
-        keyedMemory.get("trawl").observe("A", 1.0, SUM);
-        keyedMemory.get("seine").observe("B", 5.0, SUM);
-        assertThat(optionValues.getBestOptions()).containsExactly("A");
+  @Test
+  void bestOptionChangesWhenTheContextKeyChanges() {
+    keyedMemory.get("trawl").observe("A", 1.0, SUM);
+    keyedMemory.get("seine").observe("B", 5.0, SUM);
+    assertThat(optionValues.getBestOptions()).containsExactly("A");
 
-        contextKey.set("seine");
+    contextKey.set("seine");
 
-        assertThat(optionValues.getBestOptions()).containsExactly("B");
-    }
+    assertThat(optionValues.getBestOptions()).containsExactly("B");
+  }
 
-    @Test
-    void tiesGiveEveryTiedOption() {
-        keyedMemory.get("trawl").observe("A", 2.0, SUM);
-        keyedMemory.get("trawl").observe("B", 2.0, SUM);
-        keyedMemory.get("trawl").observe("C", 1.0, SUM);
+  @Test
+  void tiesGiveEveryTiedOption() {
+    keyedMemory.get("trawl").observe("A", 2.0, SUM);
+    keyedMemory.get("trawl").observe("B", 2.0, SUM);
+    keyedMemory.get("trawl").observe("C", 1.0, SUM);
 
-        assertThat(optionValues.getBestOptions()).containsExactlyInAnyOrder("A", "B");
-        assertThat(optionValues.getBestEntries())
-            .containsExactlyInAnyOrder(Map.entry("A", 2.0), Map.entry("B", 2.0));
-        assertThat(optionValues.getBestValue()).contains(2.0);
-        final MersenneTwisterFast rng = new MersenneTwisterFast(42);
-        assertThat(optionValues.getBestOption(rng)).hasValueSatisfying(
-            option -> assertThat(option).isIn("A", "B")
-        );
-        assertThat(optionValues.getBestEntry(rng)).hasValueSatisfying(
-            entry -> assertThat(entry).isIn(Map.entry("A", 2.0), Map.entry("B", 2.0))
-        );
-    }
+    assertThat(optionValues.getBestOptions()).containsExactlyInAnyOrder(
+      "A",
+      "B"
+    );
+    assertThat(optionValues.getBestEntries()).containsExactlyInAnyOrder(
+      Map.entry("A", 2.0),
+      Map.entry("B", 2.0)
+    );
+    assertThat(optionValues.getBestValue()).contains(2.0);
+    final MersenneTwisterFast rng = new MersenneTwisterFast(42);
+    assertThat(optionValues.getBestOption(rng)).hasValueSatisfying(option ->
+      assertThat(option).isIn("A", "B")
+    );
+    assertThat(optionValues.getBestEntry(rng)).hasValueSatisfying(entry ->
+      assertThat(entry).isIn(Map.entry("A", 2.0), Map.entry("B", 2.0))
+    );
+  }
 
-    @Test
-    void emptyMemoryHasNoBestOption() {
-        final MersenneTwisterFast rng = new MersenneTwisterFast(42);
+  @Test
+  void emptyMemoryHasNoBestOption() {
+    final MersenneTwisterFast rng = new MersenneTwisterFast(42);
 
-        assertThat(optionValues.getBestOptions()).isEmpty();
-        assertThat(optionValues.getBestEntries()).isEmpty();
-        assertThat(optionValues.getBestValue()).isEmpty();
-        assertThat(optionValues.getBestOption(rng)).isEmpty();
-        assertThat(optionValues.getBestEntry(rng)).isEmpty();
-    }
+    assertThat(optionValues.getBestOptions()).isEmpty();
+    assertThat(optionValues.getBestEntries()).isEmpty();
+    assertThat(optionValues.getBestValue()).isEmpty();
+    assertThat(optionValues.getBestOption(rng)).isEmpty();
+    assertThat(optionValues.getBestEntry(rng)).isEmpty();
+  }
 
-    @Test
-    void valuesGoThroughTheValuation() {
-        keyedMemory.get("trawl").observe("A", 1.0, SUM);
-        keyedMemory.get("trawl").observe("B", 2.0, SUM);
-        valuation.set((option, recollection) -> recollection * 10);
+  @Test
+  void valuesGoThroughTheValuation() {
+    keyedMemory.get("trawl").observe("A", 1.0, SUM);
+    keyedMemory.get("trawl").observe("B", 2.0, SUM);
+    valuation.set((option, recollection) -> recollection * 10);
 
-        assertThat(optionValues.getValue("A")).contains(10.0);
-        assertThat(optionValues.getValue("C")).isEmpty();
-        final Map<String, Double> entries = new HashMap<>();
-        optionValues.forEachEntry(entries::put);
-        assertThat(entries).containsOnly(Map.entry("A", 10.0), Map.entry("B", 20.0));
-    }
+    assertThat(optionValues.getValue("A")).contains(10.0);
+    assertThat(optionValues.getValue("C")).isEmpty();
+    final Map<String, Double> entries = new HashMap<>();
+    optionValues.forEachEntry(entries::put);
+    assertThat(entries).containsOnly(
+      Map.entry("A", 10.0),
+      Map.entry("B", 20.0)
+    );
+  }
 
-    @Test
-    void valuationCanDependOnTheOption() {
-        keyedMemory.get("trawl").observe("near", 1.0, SUM);
-        keyedMemory.get("trawl").observe("far", 2.0, SUM);
-        valuation.set((option, recollection) -> recollection - (option.equals("far") ? 5 : 0));
+  @Test
+  void valuationCanDependOnTheOption() {
+    keyedMemory.get("trawl").observe("near", 1.0, SUM);
+    keyedMemory.get("trawl").observe("far", 2.0, SUM);
+    valuation.set(
+      (option, recollection) -> recollection - (option.equals("far") ? 5 : 0)
+    );
 
-        assertThat(optionValues.getValue("far")).contains(-3.0);
-        assertThat(optionValues.getBestOptions()).containsExactly("near");
-    }
+    assertThat(optionValues.getValue("far")).contains(-3.0);
+    assertThat(optionValues.getBestOptions()).containsExactly("near");
+  }
 }

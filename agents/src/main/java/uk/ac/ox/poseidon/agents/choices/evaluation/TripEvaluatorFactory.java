@@ -42,15 +42,21 @@ import uk.ac.ox.poseidon.core.Factory;
 @EqualsAndHashCode(callSuper = true)
 public class TripEvaluatorFactory extends VesselScopeFactory<TripEvaluator> {
 
-    private Factory<? super VesselScope, ? extends MutableOptionValues<Int2D>> optionValues;
-    private Factory<? super VesselScope, ? extends Evaluator<Int2D>> evaluationProvider;
+  private Factory<
+    ? super VesselScope,
+    ? extends MutableOptionValues<Int2D>
+  > optionValues;
+  private Factory<
+    ? super VesselScope,
+    ? extends Evaluator<Int2D>
+  > evaluationProvider;
 
-    @Override
-    protected TripEvaluator newInstance(final VesselScope scope) {
-        return new TripEvaluator(
-            scope.getVessel().getEventManager(),
-            optionValues.get(scope),
-            evaluationProvider.get(scope)
-        );
-    }
+  @Override
+  protected TripEvaluator newInstance(final VesselScope scope) {
+    return new TripEvaluator(
+      scope.getVessel().getEventManager(),
+      optionValues.get(scope),
+      evaluationProvider.get(scope)
+    );
+  }
 }

@@ -22,21 +22,20 @@
 
 package uk.ac.ox.poseidon.gui;
 
+import static java.lang.System.Logger.Level.WARNING;
+
 import com.google.common.collect.ImmutableList;
+import java.awt.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+import javax.swing.*;
 import sim.display.Display2D;
 import sim.display.GUIState;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.gui.portrayals.NamedPortrayal;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * A {@link DisplayWrapper} for a MASON {@link Display2D}: attaches one {@link NamedPortrayal} per
@@ -45,84 +44,87 @@ import static java.lang.System.Logger.Level.WARNING;
  */
 public class DisplayWrapper2D extends DisplayWrapper<Display2D> {
 
-    private static final System.Logger logger = System.getLogger(DisplayWrapper2D.class.getName());
+  private static final System.Logger logger = System.getLogger(
+    DisplayWrapper2D.class.getName()
+  );
 
-    private static final int DEFAULT_STEP_INTERVAL = 64;
+  private static final int DEFAULT_STEP_INTERVAL = 64;
 
-    private final List<Factory<? super SimulationScope, ?>> fieldPortrayalFactories;
-    private final double width;
-    private final double height;
-    private final Paint backDrop;
+  private final List<
+    Factory<? super SimulationScope, ?>
+  > fieldPortrayalFactories;
+  private final double width;
+  private final double height;
+  private final Paint backDrop;
 
-    /**
-     * @param title                   the display window's title
-     * @param fieldPortrayalFactories factories evaluated against a fresh {@link SimulationScope}
-     *                                on each {@link #setupPortrayals}; each must produce a
-     *                                {@link NamedPortrayal}, or a {@link Collection} of them
-     * @param width                   the field's width
-     * @param height                  the field's height
-     * @param backDrop                the field's background paint
-     */
-    public DisplayWrapper2D(
-        final String title,
-        final List<Factory<? super SimulationScope, ?>> fieldPortrayalFactories,
-        final double width,
-        final double height,
-        final Paint backDrop
-    ) {
-        super(title);
-        this.fieldPortrayalFactories = ImmutableList.copyOf(fieldPortrayalFactories);
-        this.width = width;
-        this.height = height;
-        this.backDrop = backDrop;
-    }
+  /**
+   * @param title                   the display window's title
+   * @param fieldPortrayalFactories factories evaluated against a fresh {@link SimulationScope}
+   *                                on each {@link #setupPortrayals}; each must produce a
+   *                                {@link NamedPortrayal}, or a {@link Collection} of them
+   * @param width                   the field's width
+   * @param height                  the field's height
+   * @param backDrop                the field's background paint
+   */
+  public DisplayWrapper2D(
+    final String title,
+    final List<Factory<? super SimulationScope, ?>> fieldPortrayalFactories,
+    final double width,
+    final double height,
+    final Paint backDrop
+  ) {
+    super(title);
+    this.fieldPortrayalFactories = ImmutableList.copyOf(
+      fieldPortrayalFactories
+    );
+    this.width = width;
+    this.height = height;
+    this.backDrop = backDrop;
+  }
 
-    @Override
-    Display2D createDisplay(final GUIState guiState) {
-        return new Display2D(width, height, guiState) {
-            {
-                setClipping(false);
-                updateRule = UPDATE_RULE_STEPS;
-                stepInterval = DEFAULT_STEP_INTERVAL;
-            }
-        };
-    }
+  @Override
+  Display2D createDisplay(final GUIState guiState) {
+    return new Display2D(width, height, guiState) {
+      {
+        setClipping(false);
+        updateRule = UPDATE_RULE_STEPS;
+        stepInterval = DEFAULT_STEP_INTERVAL;
+      }
+    };
+  }
 
-    @Override
-    JFrame createFrame() {
-        return display.createFrame();
-    }
+  @Override
+  JFrame createFrame() {
+    return display.createFrame();
+  }
 
-    @Override
-    void setupPortrayals(final Simulation simulation) {
-        final SimulationScope scope = new SimulationScope(simulation);
-        display.detachAll();
-        fieldPortrayalFactories
-            .stream()
-            .flatMap(factory -> {
-                final Object o = factory.get(scope);
-                return o instanceof final Collection<?> os
-                    ? os.stream()
-                    : Stream.of(o);
-            })
-            .forEach(o -> {
-                if (o instanceof final NamedPortrayal namedPortrayal) {
-                    display.attach(
-                        namedPortrayal.getPortrayal(),
-                        namedPortrayal.getName(),
-                        namedPortrayal.isVisible()
-                    );
-                } else {
-                    logger.log(
-                        WARNING,
-                        "Expected named portrayal but got {0}",
-                        o.getClass().getName()
-                    );
-                }
-            });
-        display.reset();
-        display.setBackdrop(backDrop);
-        display.repaint();
-    }
-
+  @Override
+  void setupPortrayals(final Simulation simulation) {
+    final SimulationScope scope = new SimulationScope(simulation);
+    display.detachAll();
+    fieldPortrayalFactories
+      .stream()
+      .flatMap(factory -> {
+        final Object o = factory.get(scope);
+        return o instanceof final Collection<?> os ? os.stream() : Stream.of(o);
+      })
+      .forEach(o -> {
+        if (o instanceof final NamedPortrayal namedPortrayal) {
+          display.attach(
+            namedPortrayal.getPortrayal(),
+            namedPortrayal.getName(),
+            namedPortrayal.isVisible()
+          );
+        } else {
+          logger.log(
+            WARNING,
+            "Expected named portrayal but got {0}",
+            o.getClass().getName()
+          );
+        }
+      });
+    display.reset();
+    display.setBackdrop(backDrop);
+    display.repaint();
+  }
 }

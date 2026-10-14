@@ -22,10 +22,9 @@
 
 package uk.ac.ox.poseidon.io.sources;
 
-import lombok.Value;
-
 import java.io.Reader;
 import java.io.StringReader;
+import lombok.Value;
 
 /**
  * A {@link DataSource} over a fixed, in-memory string. Built via
@@ -34,10 +33,10 @@ import java.io.StringReader;
 @Value
 public class StringDataSource implements DataSource {
 
-    String data;
+  String data;
 
-    @Override
-    public Reader getReader() {
-        return new StringReader(data);
-    }
+  @Override
+  public Reader getReader() {
+    return new StringReader(data);
+  }
 }

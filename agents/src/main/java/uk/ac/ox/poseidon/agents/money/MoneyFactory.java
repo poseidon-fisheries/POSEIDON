@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.agents.money;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.math.RoundingMode.HALF_EVEN;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,9 +33,6 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.math.RoundingMode.HALF_EVEN;
 
 /**
  * A {@link GlobalScopeFactory} for a fixed {@link Money} amount. Built via
@@ -44,19 +44,13 @@ import static java.math.RoundingMode.HALF_EVEN;
 @EqualsAndHashCode(callSuper = true)
 public class MoneyFactory extends GlobalScopeFactory<Money> {
 
-    private double amount;
-    private String currencyUnit;
+  private double amount;
+  private String currencyUnit;
 
-    @Override
-    protected Money newInstance(final Scope scope) {
+  @Override
+  protected Money newInstance(final Scope scope) {
+    checkNotNull(currencyUnit, "currencyUnit must not be null");
 
-        checkNotNull(currencyUnit, "currencyUnit must not be null");
-
-        return Money.of(
-            CurrencyUnit.of(currencyUnit),
-            amount,
-            HALF_EVEN
-        );
-    }
-
+    return Money.of(CurrencyUnit.of(currencyUnit), amount, HALF_EVEN);
+  }
 }

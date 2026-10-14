@@ -37,13 +37,14 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ExponentialMovingAverageOptionValuesFactory<O>
-    extends VesselScopeFactory<MutableOptionValues<O>> {
+public class ExponentialMovingAverageOptionValuesFactory<O> extends VesselScopeFactory<
+  MutableOptionValues<O>
+> {
 
-    private double alpha;
+  private double alpha;
 
-    @Override
-    protected MutableOptionValues<O> newInstance(final VesselScope scope) {
-        return new ExponentialMovingAverageOptionValues<>(alpha);
-    }
+  @Override
+  protected MutableOptionValues<O> newInstance(final VesselScope scope) {
+    return new ExponentialMovingAverageOptionValues<>(alpha);
+  }
 }

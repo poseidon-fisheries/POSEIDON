@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.RequiredArgsConstructor;
+import static lombok.AccessLevel.PACKAGE;
 
 import java.util.function.ToDoubleBiFunction;
-
-import static lombok.AccessLevel.PACKAGE;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Values an option net of its cost: a revenue valuation minus a cost valuation, both given the
@@ -40,16 +39,15 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor(access = PACKAGE)
 public class NetValuation<O, M> implements ToDoubleBiFunction<O, M> {
 
-    private final ToDoubleBiFunction<? super O, ? super M> revenueValuation;
-    private final ToDoubleBiFunction<? super O, ? super M> costValuation;
+  private final ToDoubleBiFunction<? super O, ? super M> revenueValuation;
+  private final ToDoubleBiFunction<? super O, ? super M> costValuation;
 
-    /** @return the revenue valuation of the option minus its cost valuation */
-    @Override
-    public double applyAsDouble(
-        final O option,
-        final M recollection
-    ) {
-        return revenueValuation.applyAsDouble(option, recollection) -
-            costValuation.applyAsDouble(option, recollection);
-    }
+  /** @return the revenue valuation of the option minus its cost valuation */
+  @Override
+  public double applyAsDouble(final O option, final M recollection) {
+    return (
+      revenueValuation.applyAsDouble(option, recollection) -
+      costValuation.applyAsDouble(option, recollection)
+    );
+  }
 }

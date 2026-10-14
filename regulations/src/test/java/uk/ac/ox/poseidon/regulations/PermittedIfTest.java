@@ -22,84 +22,103 @@
 
 package uk.ac.ox.poseidon.regulations;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.util.function.Predicate;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 @SuppressWarnings("unchecked")
 class PermittedIfTest {
 
-    /**
-     * Test class for the PermittedIf class. Provides test cases for the isPermitted method, which
-     * determines if an action is permitted based on a given predicate.
-     */
+  /**
+   * Test class for the PermittedIf class. Provides test cases for the isPermitted method, which
+   * determines if an action is permitted based on a given predicate.
+   */
 
-    @Test
-    void testIsPermittedWhenPredicateReturnsTrue() {
-        // Mock the Action interface
-        final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
+  @Test
+  void testIsPermittedWhenPredicateReturnsTrue() {
+    // Mock the Action interface
+    final ExtendedAction<Object> mockExtendedAction = Mockito.mock(
+      ExtendedAction.class
+    );
 
-        // Define a predicate that always returns true
-        final Predicate<ExtendedAction<Object>> predicate = action -> true;
+    // Define a predicate that always returns true
+    final Predicate<ExtendedAction<Object>> predicate = action -> true;
 
-        // Create an instance of PermittedIf with the predicate
-        final PermittedIf<ExtendedAction<Object>> permittedIf = new PermittedIf<>(predicate);
+    // Create an instance of PermittedIf with the predicate
+    final PermittedIf<ExtendedAction<Object>> permittedIf = new PermittedIf<>(
+      predicate
+    );
 
-        // Assert the method isPermitted returns true
-        assertTrue(permittedIf.isPermitted(mockExtendedAction));
-    }
+    // Assert the method isPermitted returns true
+    assertTrue(permittedIf.isPermitted(mockExtendedAction));
+  }
 
-    @Test
-    void testIsPermittedWhenPredicateReturnsFalse() {
-        // Mock the Action interface
-        final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
+  @Test
+  void testIsPermittedWhenPredicateReturnsFalse() {
+    // Mock the Action interface
+    final ExtendedAction<Object> mockExtendedAction = Mockito.mock(
+      ExtendedAction.class
+    );
 
-        // Define a predicate that always returns false
-        final Predicate<ExtendedAction<Object>> predicate = action -> false;
+    // Define a predicate that always returns false
+    final Predicate<ExtendedAction<Object>> predicate = action -> false;
 
-        // Create an instance of PermittedIf with the predicate
-        final PermittedIf<ExtendedAction<Object>> permittedIf = new PermittedIf<>(predicate);
+    // Create an instance of PermittedIf with the predicate
+    final PermittedIf<ExtendedAction<Object>> permittedIf = new PermittedIf<>(
+      predicate
+    );
 
-        // Assert the method isPermitted returns false
-        assertFalse(permittedIf.isPermitted(mockExtendedAction));
-    }
+    // Assert the method isPermitted returns false
+    assertFalse(permittedIf.isPermitted(mockExtendedAction));
+  }
 
-    @Test
-    void testIsPermittedWithPredicateThatEvaluatesSpecificAction() {
-        // Mock the Action interface
-        final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
-        Mockito.when(mockExtendedAction.getDuration()).thenReturn(Duration.ofHours(2));
+  @Test
+  void testIsPermittedWithPredicateThatEvaluatesSpecificAction() {
+    // Mock the Action interface
+    final ExtendedAction<Object> mockExtendedAction = Mockito.mock(
+      ExtendedAction.class
+    );
+    Mockito.when(mockExtendedAction.getDuration()).thenReturn(
+      Duration.ofHours(2)
+    );
 
-        // Define a predicate that permits actions with a duration of exactly 2 hours
-        final Predicate<ExtendedAction<Object>> predicate =
-            action -> action.getDuration().equals(Duration.ofHours(2));
+    // Define a predicate that permits actions with a duration of exactly 2 hours
+    final Predicate<ExtendedAction<Object>> predicate = action ->
+      action.getDuration().equals(Duration.ofHours(2));
 
-        // Create an instance of PermittedIf with the predicate
-        final PermittedIf<ExtendedAction<Object>> permittedIf = new PermittedIf<>(predicate);
+    // Create an instance of PermittedIf with the predicate
+    final PermittedIf<ExtendedAction<Object>> permittedIf = new PermittedIf<>(
+      predicate
+    );
 
-        // Assert the method isPermitted returns true for the mockAction
-        assertTrue(permittedIf.isPermitted(mockExtendedAction));
-    }
+    // Assert the method isPermitted returns true for the mockAction
+    assertTrue(permittedIf.isPermitted(mockExtendedAction));
+  }
 
-    @Test
-    void testIsPermittedWithPredicateThatRejectsSpecificAction() {
-        // Mock the Action interface
-        final ExtendedAction<Object> mockExtendedAction = Mockito.mock(ExtendedAction.class);
-        Mockito.when(mockExtendedAction.getDuration()).thenReturn(Duration.ofHours(3));
+  @Test
+  void testIsPermittedWithPredicateThatRejectsSpecificAction() {
+    // Mock the Action interface
+    final ExtendedAction<Object> mockExtendedAction = Mockito.mock(
+      ExtendedAction.class
+    );
+    Mockito.when(mockExtendedAction.getDuration()).thenReturn(
+      Duration.ofHours(3)
+    );
 
-        // Define a predicate that only permits actions with a duration of exactly 2 hours
-        final Predicate<ExtendedAction<Object>> predicate =
-            action -> action.getDuration().equals(Duration.ofHours(2));
+    // Define a predicate that only permits actions with a duration of exactly 2 hours
+    final Predicate<ExtendedAction<Object>> predicate = action ->
+      action.getDuration().equals(Duration.ofHours(2));
 
-        // Create an instance of PermittedIf with the predicate
-        final PermittedIf<ExtendedAction<Object>> permittedIf = new PermittedIf<>(predicate);
+    // Create an instance of PermittedIf with the predicate
+    final PermittedIf<ExtendedAction<Object>> permittedIf = new PermittedIf<>(
+      predicate
+    );
 
-        // Assert the method isPermitted returns false for the mockAction
-        assertFalse(permittedIf.isPermitted(mockExtendedAction));
-    }
+    // Assert the method isPermitted returns false for the mockAction
+    assertFalse(permittedIf.isPermitted(mockExtendedAction));
+  }
 }

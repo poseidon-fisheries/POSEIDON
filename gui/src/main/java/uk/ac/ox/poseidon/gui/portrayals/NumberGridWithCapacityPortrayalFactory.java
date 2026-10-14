@@ -41,35 +41,37 @@ import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class NumberGridWithCapacityPortrayalFactory extends NumberGridPortrayalFactory {
+public class NumberGridWithCapacityPortrayalFactory
+  extends NumberGridPortrayalFactory
+{
 
-    private Factory<? super SimulationScope, ? extends DoubleGrid> capacityGrid;
+  private Factory<? super SimulationScope, ? extends DoubleGrid> capacityGrid;
 
-    /**
-     * @param paletteName    the colour palette to use
-     * @param valueName      the label shown for cell values
-     * @param immutableField whether the underlying grid data is immutable between draws
-     * @param grid           the grid to portray
-     * @param capacityGrid   the grid whose maximum value bounds the colour range
-     */
-    public NumberGridWithCapacityPortrayalFactory(
-        final String paletteName,
-        final String valueName,
-        final boolean immutableField,
-        final Factory<? super SimulationScope, ? extends DoubleGrid> grid,
-        final Factory<? super SimulationScope, ? extends DoubleGrid> capacityGrid
-    ) {
-        super(paletteName, valueName, immutableField, grid);
-        this.capacityGrid = capacityGrid;
-    }
+  /**
+   * @param paletteName    the colour palette to use
+   * @param valueName      the label shown for cell values
+   * @param immutableField whether the underlying grid data is immutable between draws
+   * @param grid           the grid to portray
+   * @param capacityGrid   the grid whose maximum value bounds the colour range
+   */
+  public NumberGridWithCapacityPortrayalFactory(
+    final String paletteName,
+    final String valueName,
+    final boolean immutableField,
+    final Factory<? super SimulationScope, ? extends DoubleGrid> grid,
+    final Factory<? super SimulationScope, ? extends DoubleGrid> capacityGrid
+  ) {
+    super(paletteName, valueName, immutableField, grid);
+    this.capacityGrid = capacityGrid;
+  }
 
-    /** @return a {@link PaletteColorMap} ranged {@code [0, capacityGrid's max value]} */
-    @Override
-    protected ColorMap newColorMap(final SimulationScope scope) {
-        return new PaletteColorMap(
-            getPaletteName(),
-            0,
-            this.capacityGrid.get(scope).getMaximumValue()
-        );
-    }
+  /** @return a {@link PaletteColorMap} ranged {@code [0, capacityGrid's max value]} */
+  @Override
+  protected ColorMap newColorMap(final SimulationScope scope) {
+    return new PaletteColorMap(
+      getPaletteName(),
+      0,
+      this.capacityGrid.get(scope).getMaximumValue()
+    );
+  }
 }

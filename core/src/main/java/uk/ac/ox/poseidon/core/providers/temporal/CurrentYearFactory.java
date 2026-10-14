@@ -32,8 +32,9 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  */
 @EqualsAndHashCode(callSuper = true)
 public class CurrentYearFactory extends SimulationScopeFactory<CurrentYear> {
-    @Override
-    protected CurrentYear newInstance(final SimulationScope scope) {
-        return new CurrentYear(scope.getSimulation().getTemporalSchedule());
-    }
+
+  @Override
+  protected CurrentYear newInstance(final SimulationScope scope) {
+    return new CurrentYear(scope.getSimulation().getTemporalSchedule());
+  }
 }

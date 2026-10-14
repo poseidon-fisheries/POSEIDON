@@ -22,87 +22,96 @@
 
 package uk.ac.ox.poseidon.geography;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 class CoordinateTest {
 
-    @Test
-    void testFromJTSWithValidInput() {
-        // Arrange
-        final double x = 1.23;
-        final double y = 4.56;
-        final org.locationtech.jts.geom.Coordinate jtsCoordinate =
-            new org.locationtech.jts.geom.Coordinate(x, y);
+  @Test
+  void testFromJTSWithValidInput() {
+    // Arrange
+    final double x = 1.23;
+    final double y = 4.56;
+    final org.locationtech.jts.geom.Coordinate jtsCoordinate =
+      new org.locationtech.jts.geom.Coordinate(x, y);
 
-        // Act
-        final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
+    // Act
+    final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
 
-        // Assert
-        assertNotNull(result, "The result should not be null");
-        assertEquals(x, result.getLon(), "Longitude was not set correctly");
-        assertEquals(y, result.getLat(), "Latitude was not set correctly");
-    }
+    // Assert
+    assertNotNull(result, "The result should not be null");
+    assertEquals(x, result.getLon(), "Longitude was not set correctly");
+    assertEquals(y, result.getLat(), "Latitude was not set correctly");
+  }
 
-    @Test
-    void testFromJTSWithExtremelyLargeValues() {
-        // Arrange
-        final double x = Double.MAX_VALUE;
-        final double y = -Double.MAX_VALUE;
-        final org.locationtech.jts.geom.Coordinate jtsCoordinate =
-            new org.locationtech.jts.geom.Coordinate(x, y);
+  @Test
+  void testFromJTSWithExtremelyLargeValues() {
+    // Arrange
+    final double x = Double.MAX_VALUE;
+    final double y = -Double.MAX_VALUE;
+    final org.locationtech.jts.geom.Coordinate jtsCoordinate =
+      new org.locationtech.jts.geom.Coordinate(x, y);
 
-        // Act
-        final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
+    // Act
+    final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
 
-        // Assert
-        assertNotNull(result, "The result should not be null");
-        assertEquals(x, result.getLon(), "Longitude was not set correctly with large values");
-        assertEquals(y, result.getLat(), "Latitude was not set correctly with large values");
-    }
+    // Assert
+    assertNotNull(result, "The result should not be null");
+    assertEquals(
+      x,
+      result.getLon(),
+      "Longitude was not set correctly with large values"
+    );
+    assertEquals(
+      y,
+      result.getLat(),
+      "Latitude was not set correctly with large values"
+    );
+  }
 
-    @Test
-    void testFromJTSWithZeroCoordinates() {
-        // Arrange
-        final double x = 0.0;
-        final double y = 0.0;
-        final org.locationtech.jts.geom.Coordinate jtsCoordinate =
-            new org.locationtech.jts.geom.Coordinate(x, y);
+  @Test
+  void testFromJTSWithZeroCoordinates() {
+    // Arrange
+    final double x = 0.0;
+    final double y = 0.0;
+    final org.locationtech.jts.geom.Coordinate jtsCoordinate =
+      new org.locationtech.jts.geom.Coordinate(x, y);
 
-        // Act
-        final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
+    // Act
+    final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
 
-        // Assert
-        assertNotNull(result, "The result should not be null");
-        assertEquals(x, result.getLon(), "Longitude was not set correctly");
-        assertEquals(y, result.getLat(), "Latitude was not set correctly");
-    }
+    // Assert
+    assertNotNull(result, "The result should not be null");
+    assertEquals(x, result.getLon(), "Longitude was not set correctly");
+    assertEquals(y, result.getLat(), "Latitude was not set correctly");
+  }
 
-    @Test
-    void testFromJTSWithNegativeCoordinates() {
-        // Arrange
-        final double x = -12.34;
-        final double y = -56.78;
-        final org.locationtech.jts.geom.Coordinate jtsCoordinate =
-            new org.locationtech.jts.geom.Coordinate(x, y);
+  @Test
+  void testFromJTSWithNegativeCoordinates() {
+    // Arrange
+    final double x = -12.34;
+    final double y = -56.78;
+    final org.locationtech.jts.geom.Coordinate jtsCoordinate =
+      new org.locationtech.jts.geom.Coordinate(x, y);
 
-        // Act
-        final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
+    // Act
+    final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
 
-        // Assert
-        assertNotNull(result, "The result should not be null");
-        assertEquals(x, result.getLon(), "Longitude was not set correctly");
-        assertEquals(y, result.getLat(), "Latitude was not set correctly");
-    }
+    // Assert
+    assertNotNull(result, "The result should not be null");
+    assertEquals(x, result.getLon(), "Longitude was not set correctly");
+    assertEquals(y, result.getLat(), "Latitude was not set correctly");
+  }
 
-    @Test
-    void testFromJTSWithNullInput() {
-        // Act & Assert
-        // noinspection DataFlowIssue
-        assertThrows(
-            NullPointerException.class, () -> Coordinate.fromJTS(null),
-            "Passing a null JTSCoordinate should throw NullPointerException"
-        );
-    }
+  @Test
+  void testFromJTSWithNullInput() {
+    // Act & Assert
+    // noinspection DataFlowIssue
+    assertThrows(
+      NullPointerException.class,
+      () -> Coordinate.fromJTS(null),
+      "Passing a null JTSCoordinate should throw NullPointerException"
+    );
+  }
 }

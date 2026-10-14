@@ -22,54 +22,52 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static com.google.common.base.Preconditions.checkState;
+
+import java.util.List;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
-import java.util.List;
-
-import static com.google.common.base.Preconditions.checkState;
-
 /** An {@link ObjectGrid} of {@link Market}s, keyed by their code. */
 public class MarketGrid extends ObjectGrid<Market> {
 
-    MarketGrid(final ModelGrid modelGrid) {
-        super(modelGrid);
-    }
+  MarketGrid(final ModelGrid modelGrid) {
+    super(modelGrid);
+  }
 
-    /** @return {@code market}'s code */
-    @Override
-    protected String getObjectId(final Market market) {
-        return market.getCode();
-    }
+  /** @return {@code market}'s code */
+  @Override
+  protected String getObjectId(final Market market) {
+    return market.getCode();
+  }
 
-    /**
-     * Finds a market by the port it belongs to, not by its cell: ports can share a cell.
-     *
-     * @param port the port whose market to find
-     * @return the one market of {@code port}
-     * @throws IllegalStateException if {@code port} does not have exactly one market
-     */
-    public Market getMarket(final Port port) {
-        final List<Market> markets = marketsOf(port);
-        checkState(
-            markets.size() == 1,
-            "Expected one market at port %s, found %s.",
-            port,
-            markets.size()
-        );
-        return markets.getFirst();
-    }
+  /**
+   * Finds a market by the port it belongs to, not by its cell: ports can share a cell.
+   *
+   * @param port the port whose market to find
+   * @return the one market of {@code port}
+   * @throws IllegalStateException if {@code port} does not have exactly one market
+   */
+  public Market getMarket(final Port port) {
+    final List<Market> markets = marketsOf(port);
+    checkState(
+      markets.size() == 1,
+      "Expected one market at port %s, found %s.",
+      port,
+      markets.size()
+    );
+    return markets.getFirst();
+  }
 
-    /**
-     * @param port the port whose markets to find
-     * @return the markets of {@code port}, by scanning every market; a grid whose markets never
-     * change can index them instead
-     */
-    protected List<Market> marketsOf(final Port port) {
-        return stream()
-            .filter(market -> market.getPort().equals(port))
-            .toList();
-    }
-
+  /**
+   * @param port the port whose markets to find
+   * @return the markets of {@code port}, by scanning every market; a grid whose markets never
+   * change can index them instead
+   */
+  protected List<Market> marketsOf(final Port port) {
+    return stream()
+      .filter(market -> market.getPort().equals(port))
+      .toList();
+  }
 }

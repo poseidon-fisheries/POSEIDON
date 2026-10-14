@@ -29,9 +29,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} counterpart of {@link VesselHasStartedTripToday}, built via
  * {@link Factories#vesselHasStartedTripToday()}.
  */
-public class VesselHasStartedTripTodayFactory extends GlobalScopeFactory<VesselHasStartedTripToday> {
-    @Override
-    protected VesselHasStartedTripToday newInstance(final Scope scope) {
-        return new VesselHasStartedTripToday();
-    }
+public class VesselHasStartedTripTodayFactory
+  extends GlobalScopeFactory<VesselHasStartedTripToday>
+{
+
+  @Override
+  protected VesselHasStartedTripToday newInstance(final Scope scope) {
+    return new VesselHasStartedTripToday();
+  }
 }

@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.core.predicates.temporal;
 
+import java.time.LocalDateTime;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +31,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.time.LocalDateTime;
-import java.util.function.Supplier;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link AfterDateTime}, built via
@@ -41,13 +40,18 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AfterDateTimeFactory<S extends Scope>
-    extends RelativeScopeFactory<S, AfterDateTime> {
+public class AfterDateTimeFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  AfterDateTime
+> {
 
-    private Factory<? super S, ? extends Supplier<? extends LocalDateTime>> referenceDateTime;
+  private Factory<
+    ? super S,
+    ? extends Supplier<? extends LocalDateTime>
+  > referenceDateTime;
 
-    @Override
-    protected AfterDateTime newInstance(final S scope) {
-        return new AfterDateTime(referenceDateTime.get(scope));
-    }
+  @Override
+  protected AfterDateTime newInstance(final S scope) {
+    return new AfterDateTime(referenceDateTime.get(scope));
+  }
 }

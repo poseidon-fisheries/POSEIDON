@@ -22,106 +22,122 @@
 
 package uk.ac.ox.poseidon.geography;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+
 class EnvelopeFactoryTest {
 
-    /**
-     * Tests the `newInstance` method in the `EnvelopeFactory` class. The `newInstance` method
-     * should create an `Envelope` instance using the min and max coordinates provided in the
-     * `EnvelopeFactory` fields.
-     */
+  /**
+   * Tests the `newInstance` method in the `EnvelopeFactory` class. The `newInstance` method
+   * should create an `Envelope` instance using the min and max coordinates provided in the
+   * `EnvelopeFactory` fields.
+   */
 
-    @Test
-    void testNewInstance_CreatesEnvelopeWithSpecifiedBounds() {
-        // Prepare test data
-        final double minX = 1.0;
-        final double maxX = 5.0;
-        final double minY = 2.0;
-        final double maxY = 6.0;
-        final EnvelopeFactory factory = new EnvelopeFactory(minX, maxX, minY, maxY);
+  @Test
+  void testNewInstance_CreatesEnvelopeWithSpecifiedBounds() {
+    // Prepare test data
+    final double minX = 1.0;
+    final double maxX = 5.0;
+    final double minY = 2.0;
+    final double maxY = 6.0;
+    final EnvelopeFactory factory = new EnvelopeFactory(minX, maxX, minY, maxY);
 
-        // Call the method under test
-        final Envelope envelope = factory.get(mock(Scope.class));
+    // Call the method under test
+    final Envelope envelope = factory.get(mock(Scope.class));
 
-        // Verify results
-        assertNotNull(envelope, "Expected an instance of Envelope to be created.");
-        assertEquals(
-            minX,
-            envelope.getMinX(),
-            "Envelope minX does not match the value set in EnvelopeFactory."
-        );
-        assertEquals(
-            maxX,
-            envelope.getMaxX(),
-            "Envelope maxX does not match the value set in EnvelopeFactory."
-        );
-        assertEquals(
-            minY,
-            envelope.getMinY(),
-            "Envelope minY does not match the value set in EnvelopeFactory."
-        );
-        assertEquals(
-            maxY,
-            envelope.getMaxY(),
-            "Envelope maxY does not match the value set in EnvelopeFactory."
-        );
-    }
+    // Verify results
+    assertNotNull(envelope, "Expected an instance of Envelope to be created.");
+    assertEquals(
+      minX,
+      envelope.getMinX(),
+      "Envelope minX does not match the value set in EnvelopeFactory."
+    );
+    assertEquals(
+      maxX,
+      envelope.getMaxX(),
+      "Envelope maxX does not match the value set in EnvelopeFactory."
+    );
+    assertEquals(
+      minY,
+      envelope.getMinY(),
+      "Envelope minY does not match the value set in EnvelopeFactory."
+    );
+    assertEquals(
+      maxY,
+      envelope.getMaxY(),
+      "Envelope maxY does not match the value set in EnvelopeFactory."
+    );
+  }
 
-    @Test
-    void testNewInstance_CreatesNormalizedEnvelopeWhenValuesAreUnordered() {
-        // Prepare test data
-        final double minX = 5.0;
-        final double maxX = 1.0; // unordered values
-        final double minY = 6.0;
-        final double maxY = 2.0; // unordered values
-        final EnvelopeFactory factory = new EnvelopeFactory(minX, maxX, minY, maxY);
+  @Test
+  void testNewInstance_CreatesNormalizedEnvelopeWhenValuesAreUnordered() {
+    // Prepare test data
+    final double minX = 5.0;
+    final double maxX = 1.0; // unordered values
+    final double minY = 6.0;
+    final double maxY = 2.0; // unordered values
+    final EnvelopeFactory factory = new EnvelopeFactory(minX, maxX, minY, maxY);
 
-        // Call the method under test
-        final Envelope envelope = factory.get(mock(Scope.class));
+    // Call the method under test
+    final Envelope envelope = factory.get(mock(Scope.class));
 
-        // Verify results
-        assertNotNull(envelope, "Expected an instance of Envelope to be created.");
-        assertEquals(
-            1.0,
-            envelope.getMinX(),
-            "Envelope minX should be normalized to the smaller value."
-        );
-        assertEquals(
-            5.0,
-            envelope.getMaxX(),
-            "Envelope maxX should be normalized to the larger value."
-        );
-        assertEquals(
-            2.0,
-            envelope.getMinY(),
-            "Envelope minY should be normalized to the smaller value."
-        );
-        assertEquals(
-            6.0,
-            envelope.getMaxY(),
-            "Envelope maxY should be normalized to the larger value."
-        );
-    }
+    // Verify results
+    assertNotNull(envelope, "Expected an instance of Envelope to be created.");
+    assertEquals(
+      1.0,
+      envelope.getMinX(),
+      "Envelope minX should be normalized to the smaller value."
+    );
+    assertEquals(
+      5.0,
+      envelope.getMaxX(),
+      "Envelope maxX should be normalized to the larger value."
+    );
+    assertEquals(
+      2.0,
+      envelope.getMinY(),
+      "Envelope minY should be normalized to the smaller value."
+    );
+    assertEquals(
+      6.0,
+      envelope.getMaxY(),
+      "Envelope maxY should be normalized to the larger value."
+    );
+  }
 
-    @Test
-    void testNewInstance_CreatesEnvelopeWithZeroedBoundsWhenFactoryNotInitialized() {
-        // Prepare an uninitialized factory
-        final EnvelopeFactory factory = new EnvelopeFactory();
+  @Test
+  void testNewInstance_CreatesEnvelopeWithZeroedBoundsWhenFactoryNotInitialized() {
+    // Prepare an uninitialized factory
+    final EnvelopeFactory factory = new EnvelopeFactory();
 
-        // Call the method under test
-        final Envelope envelope = factory.get(mock(Scope.class));
+    // Call the method under test
+    final Envelope envelope = factory.get(mock(Scope.class));
 
-        // Verify results
-        assertNotNull(envelope, "Expected an instance of Envelope to be created.");
-        assertEquals(0.0, envelope.getMinX(), "Envelope minX should default to 0.0.");
-        assertEquals(0.0, envelope.getMaxX(), "Envelope maxX should default to 0.0.");
-        assertEquals(0.0, envelope.getMinY(), "Envelope minY should default to 0.0.");
-        assertEquals(0.0, envelope.getMaxY(), "Envelope maxY should default to 0.0.");
-    }
+    // Verify results
+    assertNotNull(envelope, "Expected an instance of Envelope to be created.");
+    assertEquals(
+      0.0,
+      envelope.getMinX(),
+      "Envelope minX should default to 0.0."
+    );
+    assertEquals(
+      0.0,
+      envelope.getMaxX(),
+      "Envelope maxX should default to 0.0."
+    );
+    assertEquals(
+      0.0,
+      envelope.getMinY(),
+      "Envelope minY should default to 0.0."
+    );
+    assertEquals(
+      0.0,
+      envelope.getMaxY(),
+      "Envelope maxY should default to 0.0."
+    );
+  }
 }

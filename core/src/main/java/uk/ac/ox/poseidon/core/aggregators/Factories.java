@@ -28,46 +28,45 @@ package uk.ac.ox.poseidon.core.aggregators;
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MeanAggregator}
-     * @see MeanAggregator
-     */
-    public static MeanAggregatorFactory meanAggregator() {
-        return new MeanAggregatorFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MeanAggregator}
+   * @see MeanAggregator
+   */
+  public static MeanAggregatorFactory meanAggregator() {
+    return new MeanAggregatorFactory();
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MinAggregator}
-     * @see MinAggregator
-     */
-    public static MinAggregatorFactory minAggregator() {
-        return new MinAggregatorFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MinAggregator}
+   * @see MinAggregator
+   */
+  public static MinAggregatorFactory minAggregator() {
+    return new MinAggregatorFactory();
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MaxAggregator}
-     * @see MaxAggregator
-     */
-    public static MaxAggregatorFactory maxAggregator() {
-        return new MaxAggregatorFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MaxAggregator}
+   * @see MaxAggregator
+   */
+  public static MaxAggregatorFactory maxAggregator() {
+    return new MaxAggregatorFactory();
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MedianAggregator}
-     * @see MedianAggregator
-     */
-    public static MedianAggregatorFactory medianAggregator() {
-        return new MedianAggregatorFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MedianAggregator}
+   * @see MedianAggregator
+   */
+  public static MedianAggregatorFactory medianAggregator() {
+    return new MedianAggregatorFactory();
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link SumAggregator}
-     * @see SumAggregator
-     */
-    public static SumAggregatorFactory sumAggregator() {
-        return new SumAggregatorFactory();
-    }
-
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link SumAggregator}
+   * @see SumAggregator
+   */
+  public static SumAggregatorFactory sumAggregator() {
+    return new SumAggregatorFactory();
+  }
 }

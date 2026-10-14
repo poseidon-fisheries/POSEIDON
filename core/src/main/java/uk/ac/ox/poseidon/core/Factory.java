@@ -37,9 +37,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * @param <C> the type of object produced
  */
 public interface Factory<S extends Scope, C> {
-    /**
-     * @param scope the scope to resolve this factory against
-     * @return the resolved object, of type {@code C}
-     */
-    C get(S scope);
+  /**
+   * @param scope the scope to resolve this factory against
+   * @return the resolved object, of type {@code C}
+   */
+  C get(S scope);
 }

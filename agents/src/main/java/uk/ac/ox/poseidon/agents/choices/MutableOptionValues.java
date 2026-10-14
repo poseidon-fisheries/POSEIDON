@@ -24,12 +24,9 @@ package uk.ac.ox.poseidon.agents.choices;
 
 /** An {@link OptionValues} that can be updated with new observations. */
 public interface MutableOptionValues<O> extends OptionValues<O> {
-    /**
-     * @param option the option just observed
-     * @param value  the value just observed for it
-     */
-    void observe(
-        O option,
-        double value
-    );
+  /**
+   * @param option the option just observed
+   * @param value  the value just observed for it
+   */
+  void observe(O option, double value);
 }

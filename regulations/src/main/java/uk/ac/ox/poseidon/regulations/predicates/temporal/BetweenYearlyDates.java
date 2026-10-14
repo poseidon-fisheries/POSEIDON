@@ -22,18 +22,17 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.time.LocalDateTime;
+import java.time.MonthDay;
+import java.util.function.Predicate;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import uk.ac.ox.poseidon.regulations.TemporalAction;
-
-import java.time.LocalDateTime;
-import java.time.MonthDay;
-import java.util.function.Predicate;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Predicate matching temporal actions whose start or end date falls within an inclusive
@@ -46,57 +45,62 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @EqualsAndHashCode
 public class BetweenYearlyDates implements Predicate<TemporalAction<?>> {
 
-    @NonNull private final MonthDay start;
-    @NonNull private final MonthDay end;
-    private final boolean yearSpanning;
+  @NonNull
+  private final MonthDay start;
 
-    /**
-     * @param start the inclusive start of the range; {@code end} before {@code start} makes the
-     *              range year-spanning rather than invalid
-     * @param end   the inclusive end of the range
-     */
-    public BetweenYearlyDates(
-        final MonthDay start,
-        final MonthDay end
-    ) {
-        this.start = checkNotNull(start);
-        this.end = checkNotNull(end);
-        this.yearSpanning = end.isBefore(start);
-    }
+  @NonNull
+  private final MonthDay end;
 
-    @Override
-    public boolean test(final TemporalAction<?> action) {
-        checkArgument(!action.getStartDateTime().isAfter(action.getEndDateTime()));
-        return insideRange(action.getStartDateTime()) ||
-            insideRange(action.getEndDateTime()) ||
-            coversRange(action.getStartDateTime(), action.getEndDateTime());
-    }
+  private final boolean yearSpanning;
 
-    /**
-     * Whether the action's duration fully covers the range, e.g. a multi-month trip encompassing
-     * a whole month-long closure.
-     */
-    private boolean coversRange(
-        final LocalDateTime actionStart,
-        final LocalDateTime actionEnd
-    ) {
-        final MonthDay startDay = MonthDay.from(actionStart);
-        final MonthDay endDay = MonthDay.from(actionEnd);
-        return switch (actionEnd.getYear() - actionStart.getYear()) {
-            // If the action is within a single year, it can only cover a range that isn't year
-            // spanning
-            case 0 -> !yearSpanning && startDay.isBefore(start) && endDay.isAfter(end);
-            // action spans year boundary, it can only cover a range that is year spanning
-            case 1 -> yearSpanning && startDay.isBefore(start) && endDay.isAfter(end);
-            // if action spans more than a year, it necessarily covers any range
-            default -> true;
-        };
-    }
+  /**
+   * @param start the inclusive start of the range; {@code end} before {@code start} makes the
+   *              range year-spanning rather than invalid
+   * @param end   the inclusive end of the range
+   */
+  public BetweenYearlyDates(final MonthDay start, final MonthDay end) {
+    this.start = checkNotNull(start);
+    this.end = checkNotNull(end);
+    this.yearSpanning = end.isBefore(start);
+  }
 
-    private boolean insideRange(final LocalDateTime dateTime) {
-        final MonthDay monthDay = MonthDay.from(dateTime);
-        return yearSpanning
-            ? !monthDay.isAfter(end) || !monthDay.isBefore(start)
-            : !monthDay.isBefore(start) && !monthDay.isAfter(end);
-    }
+  @Override
+  public boolean test(final TemporalAction<?> action) {
+    checkArgument(!action.getStartDateTime().isAfter(action.getEndDateTime()));
+    return (
+      insideRange(action.getStartDateTime()) ||
+      insideRange(action.getEndDateTime()) ||
+      coversRange(action.getStartDateTime(), action.getEndDateTime())
+    );
+  }
+
+  /**
+   * Whether the action's duration fully covers the range, e.g. a multi-month trip encompassing
+   * a whole month-long closure.
+   */
+  private boolean coversRange(
+    final LocalDateTime actionStart,
+    final LocalDateTime actionEnd
+  ) {
+    final MonthDay startDay = MonthDay.from(actionStart);
+    final MonthDay endDay = MonthDay.from(actionEnd);
+    return switch (actionEnd.getYear() - actionStart.getYear()) {
+      // If the action is within a single year, it can only cover a range that isn't year
+      // spanning
+      case 0 -> !yearSpanning &&
+        startDay.isBefore(start) &&
+        endDay.isAfter(end);
+      // action spans year boundary, it can only cover a range that is year spanning
+      case 1 -> yearSpanning && startDay.isBefore(start) && endDay.isAfter(end);
+      // if action spans more than a year, it necessarily covers any range
+      default -> true;
+    };
+  }
+
+  private boolean insideRange(final LocalDateTime dateTime) {
+    final MonthDay monthDay = MonthDay.from(dateTime);
+    return yearSpanning
+      ? !monthDay.isAfter(end) || !monthDay.isBefore(start)
+      : !monthDay.isBefore(start) && !monthDay.isAfter(end);
+  }
 }

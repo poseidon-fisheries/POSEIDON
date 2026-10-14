@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
+import static lombok.AccessLevel.PACKAGE;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
+
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
-
-import java.util.function.Function;
-
-import static lombok.AccessLevel.PACKAGE;
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 /**
  * A {@link DispositionProcess} that moves a per-species proportion of the currently
@@ -38,26 +37,26 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 @RequiredArgsConstructor(access = PACKAGE)
 public class DiscardMortality implements DispositionProcess {
 
-    private final Function<? super Species, Double> mortalityRate;
+  private final Function<? super Species, Double> mortalityRate;
 
-    /**
-     * @return {@code currentDisposition} with {@link #mortalityRate}'s per-species fraction of
-     * its discarded-alive catch moved into discarded-dead
-     */
-    @Override
-    public Disposition partition(
-        final Disposition currentDisposition,
-        final double availableCapacityInKg
-    ) {
-        final Bucket discardedAlive = currentDisposition.getDiscardedAlive();
-        final Bucket newlyDead =
-            discardedAlive.mapBiomassValue((species, biomass) ->
-                biomass * checkUnitRange(mortalityRate.apply(species), "Mortality")
-            );
-        return new Disposition(
-            currentDisposition.getRetained(),
-            discardedAlive.subtract(newlyDead),
-            currentDisposition.getDiscardedDead().add(newlyDead)
-        );
-    }
+  /**
+   * @return {@code currentDisposition} with {@link #mortalityRate}'s per-species fraction of
+   * its discarded-alive catch moved into discarded-dead
+   */
+  @Override
+  public Disposition partition(
+    final Disposition currentDisposition,
+    final double availableCapacityInKg
+  ) {
+    final Bucket discardedAlive = currentDisposition.getDiscardedAlive();
+    final Bucket newlyDead = discardedAlive.mapBiomassValue(
+      (species, biomass) ->
+        biomass * checkUnitRange(mortalityRate.apply(species), "Mortality")
+    );
+    return new Disposition(
+      currentDisposition.getRetained(),
+      discardedAlive.subtract(newlyDead),
+      currentDisposition.getDiscardedDead().add(newlyDead)
+    );
+  }
 }

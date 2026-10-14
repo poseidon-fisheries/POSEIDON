@@ -32,19 +32,20 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * {@link EquirectangularDistanceCalculator} and {@link HaversineDistanceCalculator}, which supply
  * the actual formula.
  */
-public abstract class CoordinateBasedDistanceCalculator extends AbstractDistanceCalculator {
+public abstract class CoordinateBasedDistanceCalculator
+  extends AbstractDistanceCalculator
+{
 
-    /** @param modelGrid the grid this calculator measures distances over */
-    public CoordinateBasedDistanceCalculator(final ModelGrid modelGrid) {
-        super(modelGrid);
-    }
+  /** @param modelGrid the grid this calculator measures distances over */
+  public CoordinateBasedDistanceCalculator(final ModelGrid modelGrid) {
+    super(modelGrid);
+  }
 
-    @Override
-    public double distanceInKm(
-        final Number2D start,
-        final Number2D end
-    ) {
-        return distanceInKm(modelGrid.toCoordinate(start), modelGrid.toCoordinate(end));
-    }
-
+  @Override
+  public double distanceInKm(final Number2D start, final Number2D end) {
+    return distanceInKm(
+      modelGrid.toCoordinate(start),
+      modelGrid.toCoordinate(end)
+    );
+  }
 }

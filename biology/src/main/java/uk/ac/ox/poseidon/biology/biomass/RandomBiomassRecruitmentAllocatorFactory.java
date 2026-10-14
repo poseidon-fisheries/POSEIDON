@@ -36,10 +36,13 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class RandomBiomassRecruitmentAllocatorFactory
-    extends SimulationScopeFactory<BiomassRecruitmentAllocator> {
+  extends SimulationScopeFactory<BiomassRecruitmentAllocator>
+{
 
-    @Override
-    protected BiomassRecruitmentAllocator newInstance(final SimulationScope scope) {
-        return new RandomBiomassRecruitmentAllocator(scope.getSimulation().random);
-    }
+  @Override
+  protected BiomassRecruitmentAllocator newInstance(
+    final SimulationScope scope
+  ) {
+    return new RandomBiomassRecruitmentAllocator(scope.getSimulation().random);
+  }
 }

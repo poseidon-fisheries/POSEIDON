@@ -22,10 +22,10 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
+import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
+
 import java.util.List;
 import java.util.function.Function;
-
-import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 
 /**
  * A {@link Function} that applies several other functions to the same input and joins their
@@ -37,21 +37,22 @@ import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
  */
 public class MultiStringKeyFromFunctions<T> implements Function<T, String> {
 
-    private final Function<T, ?>[] functions;
+  private final Function<T, ?>[] functions;
 
-    /** @param functions the functions whose results are joined into the composite key */
-    @SuppressWarnings("unchecked")
-    public MultiStringKeyFromFunctions(final List<? extends Function<? super T, ?>> functions) {
-        this.functions = functions.toArray(new Function[0]);
+  /** @param functions the functions whose results are joined into the composite key */
+  @SuppressWarnings("unchecked")
+  public MultiStringKeyFromFunctions(
+    final List<? extends Function<? super T, ?>> functions
+  ) {
+    this.functions = functions.toArray(new Function[0]);
+  }
+
+  @Override
+  public String apply(final T t) {
+    final Object[] keys = new Object[functions.length];
+    for (int i = 0; i < keys.length; i++) {
+      keys[i] = functions[i].apply(t);
     }
-
-    @Override
-    public String apply(final T t) {
-        final Object[] keys = new Object[functions.length];
-        for (int i = 0; i < keys.length; i++) {
-            keys[i] = functions[i].apply(t);
-        }
-        return multiStringKey(keys);
-    }
-
+    return multiStringKey(keys);
+  }
 }

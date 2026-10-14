@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,8 +35,6 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
-import java.util.function.Supplier;
-
 /**
  * A {@link VesselTaskFactory} counterpart of {@link TravelAlongPath}, built via
  * {@link Factories#travelAlongPathTo}.
@@ -44,21 +43,26 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TravelAlongPathFactory
-    extends VesselTaskFactory<TravelAlongPath> {
+public class TravelAlongPathFactory extends VesselTaskFactory<TravelAlongPath> {
 
-    private Factory<? super VesselScope, ? extends PathFinder<Int2D>> pathFinder;
-    private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
-    private Factory<? super VesselScope, ? extends Supplier<Int2D>> destinationCell;
-    private Factory<? super VesselScope, ? extends Supplier<EventManager>> eventManager;
+  private Factory<? super VesselScope, ? extends PathFinder<Int2D>> pathFinder;
+  private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
+  private Factory<
+    ? super VesselScope,
+    ? extends Supplier<Int2D>
+  > destinationCell;
+  private Factory<
+    ? super VesselScope,
+    ? extends Supplier<EventManager>
+  > eventManager;
 
-    @Override
-    protected TravelAlongPath newTask(final VesselScope scope) {
-        return new TravelAlongPath(
-            pathFinder.get(scope),
-            distance.get(scope),
-            destinationCell.get(scope),
-            eventManager.get(scope)
-        );
-    }
+  @Override
+  protected TravelAlongPath newTask(final VesselScope scope) {
+    return new TravelAlongPath(
+      pathFinder.get(scope),
+      distance.get(scope),
+      destinationCell.get(scope),
+      eventManager.get(scope)
+    );
+  }
 }

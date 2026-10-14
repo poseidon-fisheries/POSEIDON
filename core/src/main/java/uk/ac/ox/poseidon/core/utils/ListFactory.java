@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
+import java.util.List;
 import lombok.*;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.List;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link List} of resolved values from the given component
@@ -39,17 +38,19 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ListFactory<S extends Scope, C> extends RelativeScopeFactory<S, List<C>> {
+public class ListFactory<
+  S extends Scope,
+  C
+> extends RelativeScopeFactory<S, List<C>> {
 
-    @Singular
-    private List<Factory<? super S, ? extends C>> factories;
+  @Singular
+  private List<Factory<? super S, ? extends C>> factories;
 
-    @Override
-    protected List<C> newInstance(final S scope) {
-        return factories
-            .stream()
-            .map(f -> (C) f.get(scope))
-            .toList();
-    }
-
+  @Override
+  protected List<C> newInstance(final S scope) {
+    return factories
+      .stream()
+      .map(f -> (C) f.get(scope))
+      .toList();
+  }
 }

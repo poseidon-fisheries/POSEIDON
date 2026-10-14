@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.biology.species;
 
 import com.google.common.collect.ImmutableSet;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,8 +31,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.List;
 
 /**
  * A {@link RelativeScopeFactory} that filters a resolved list of species down to the ones whose
@@ -45,20 +44,23 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SpeciesByCodeFactory<S extends Scope>
-    extends RelativeScopeFactory<S, List<? extends Species>> {
+public class SpeciesByCodeFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  List<? extends Species>
+> {
 
-    private Factory<? super S, ? extends List<? extends String>> speciesCodes;
-    private Factory<? super S, ? extends List<? extends Species>> speciesList;
+  private Factory<? super S, ? extends List<? extends String>> speciesCodes;
+  private Factory<? super S, ? extends List<? extends Species>> speciesList;
 
-    @Override
-    protected List<? extends Species> newInstance(final S scope) {
-        final ImmutableSet<String> speciesCodes =
-            ImmutableSet.copyOf(this.speciesCodes.get(scope));
-        return speciesList
-            .get(scope)
-            .stream()
-            .filter(s -> speciesCodes.contains(s.getCode()))
-            .toList();
-    }
+  @Override
+  protected List<? extends Species> newInstance(final S scope) {
+    final ImmutableSet<String> speciesCodes = ImmutableSet.copyOf(
+      this.speciesCodes.get(scope)
+    );
+    return speciesList
+      .get(scope)
+      .stream()
+      .filter(s -> speciesCodes.contains(s.getCode()))
+      .toList();
+  }
 }

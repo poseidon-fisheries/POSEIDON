@@ -22,34 +22,37 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.ac.ox.poseidon.agents.travel.Factories.routeProperty;
+
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.ac.ox.poseidon.agents.travel.Factories.routeProperty;
-
 class RoutePropertyFactoryTest {
 
-    @Test
-    void survivesAYamlRoundTripWithOnlyItsPath() {
-        final LoaderOptions loaderOptions = new LoaderOptions();
-        loaderOptions.setTagInspector(tag -> tag.getClassName().startsWith("uk.ac.ox.poseidon"));
-        final Yaml yaml = new Yaml(loaderOptions);
-        final String dumped = yaml.dump(routeProperty("duration"));
-        assertThat(dumped).contains("propertyPath: duration").doesNotContain("rootClass");
-        assertThat(yaml.<Object>load(dumped)).isEqualTo(routeProperty("duration"));
-    }
+  @Test
+  void survivesAYamlRoundTripWithOnlyItsPath() {
+    final LoaderOptions loaderOptions = new LoaderOptions();
+    loaderOptions.setTagInspector(tag ->
+      tag.getClassName().startsWith("uk.ac.ox.poseidon")
+    );
+    final Yaml yaml = new Yaml(loaderOptions);
+    final String dumped = yaml.dump(routeProperty("duration"));
+    assertThat(dumped)
+      .contains("propertyPath: duration")
+      .doesNotContain("rootClass");
+    assertThat(yaml.<Object>load(dumped)).isEqualTo(routeProperty("duration"));
+  }
 
-    @Test
-    void readsTheDurationOfARoute() {
-        assertThat(
-            routeProperty("duration")
-                .get(Scope.GLOBAL_SCOPE)
-                .apply(new Route(15.0, Duration.ofMinutes(90)))
-        ).isEqualTo(Duration.ofMinutes(90));
-    }
+  @Test
+  void readsTheDurationOfARoute() {
+    assertThat(
+      routeProperty("duration")
+        .get(Scope.GLOBAL_SCOPE)
+        .apply(new Route(15.0, Duration.ofMinutes(90)))
+    ).isEqualTo(Duration.ofMinutes(90));
+  }
 }

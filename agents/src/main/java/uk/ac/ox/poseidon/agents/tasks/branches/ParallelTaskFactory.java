@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks.branches;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.branch.Parallel;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -31,8 +32,6 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-
-import java.util.List;
 
 /**
  * A {@link BranchTaskFactory} for a gdx-ai {@link Parallel}: runs all of its children every step,
@@ -43,26 +42,30 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class ParallelTaskFactory extends BranchTaskFactory<Parallel<Vessel>> {
 
-    /** @param children factories for the parallel node's child tasks, resolved and attached in order */
-    public ParallelTaskFactory(
-        final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
-    ) {
-        super(children);
-    }
+  /** @param children factories for the parallel node's child tasks, resolved and attached in order */
+  public ParallelTaskFactory(
+    final List<
+      ? extends Factory<? super VesselScope, ? extends Task<Vessel>>
+    > children
+  ) {
+    super(children);
+  }
 
-    /**
-     * @param guard    optional task guarding whether this parallel node runs at all
-     * @param children factories for the parallel node's child tasks, resolved and attached in order
-     */
-    public ParallelTaskFactory(
-        final VesselScopeFactory<? extends Task<Vessel>> guard,
-        final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
-    ) {
-        super(guard, children);
-    }
+  /**
+   * @param guard    optional task guarding whether this parallel node runs at all
+   * @param children factories for the parallel node's child tasks, resolved and attached in order
+   */
+  public ParallelTaskFactory(
+    final VesselScopeFactory<? extends Task<Vessel>> guard,
+    final List<
+      ? extends Factory<? super VesselScope, ? extends Task<Vessel>>
+    > children
+  ) {
+    super(guard, children);
+  }
 
-    @Override
-    protected Parallel<Vessel> newTask() {
-        return new Parallel<>();
-    }
+  @Override
+  protected Parallel<Vessel> newTask() {
+    return new Parallel<>();
+  }
 }

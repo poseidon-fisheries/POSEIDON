@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Function;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link ComposedFunction}, built via
@@ -40,14 +39,24 @@ import java.util.function.Function;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ComposedFunctionFactory<S extends Scope, T1, T2, R>
-    extends RelativeScopeFactory<S, ComposedFunction<T1, T2, R>> {
+public class ComposedFunctionFactory<
+  S extends Scope,
+  T1,
+  T2,
+  R
+> extends RelativeScopeFactory<S, ComposedFunction<T1, T2, R>> {
 
-    private Factory<? super S, ? extends Function<? super T1, ? extends T2>> function1;
-    private Factory<? super S, ? extends Function<? super T2, ? extends R>> function2;
+  private Factory<
+    ? super S,
+    ? extends Function<? super T1, ? extends T2>
+  > function1;
+  private Factory<
+    ? super S,
+    ? extends Function<? super T2, ? extends R>
+  > function2;
 
-    @Override
-    protected ComposedFunction<T1, T2, R> newInstance(final S scope) {
-        return new ComposedFunction<>(function1.get(scope), function2.get(scope));
-    }
+  @Override
+  protected ComposedFunction<T1, T2, R> newInstance(final S scope) {
+    return new ComposedFunction<>(function1.get(scope), function2.get(scope));
+  }
 }

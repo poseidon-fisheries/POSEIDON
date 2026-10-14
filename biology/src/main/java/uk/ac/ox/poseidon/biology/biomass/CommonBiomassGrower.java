@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+import java.io.Serial;
+import java.util.List;
 import lombok.Data;
 import lombok.NonNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.util.Int2D;
-
-import java.io.Serial;
-import java.util.List;
 
 /**
  * A biomass grower that operates on the total biomass of the grid.
@@ -37,32 +36,46 @@ import java.util.List;
 @Data
 public class CommonBiomassGrower implements Steppable {
 
-    @Serial private static final long serialVersionUID = -7273150961650782548L;
-    @NonNull private final BiomassGrid biomassGrid;
-    @NonNull private final CarryingCapacityGrid carryingCapacityGrid;
-    @NonNull private final BiomassGrowthRule biomassGrowthRule;
-    @NonNull private final BiomassRecruitmentAllocator biomassRecruitmentAllocator;
+  @Serial
+  private static final long serialVersionUID = -7273150961650782548L;
 
-    /**
-     * Sums biomass and carrying capacity over all habitable cells, applies
-     * {@link #biomassGrowthRule} once to those totals, then hands the resulting total recruitment
-     * to {@link #biomassRecruitmentAllocator} to spread back across cells.
-     */
-    @Override
-    public void step(final SimState simState) {
+  @NonNull
+  private final BiomassGrid biomassGrid;
 
-        final List<Int2D> habitableCells = carryingCapacityGrid.getHabitableCells();
-        double currentBiomass = 0;
-        double totalCarryingCapacity = 0;
-        for (final Int2D cell : habitableCells) {
-            currentBiomass += biomassGrid.getValue(cell);
-            totalCarryingCapacity += carryingCapacityGrid.getCarryingCapacity(cell);
-        }
+  @NonNull
+  private final CarryingCapacityGrid carryingCapacityGrid;
 
-        final double newTotalBiomass =
-            biomassGrowthRule.newBiomass(currentBiomass, totalCarryingCapacity);
+  @NonNull
+  private final BiomassGrowthRule biomassGrowthRule;
 
-        final double recruitment = newTotalBiomass - currentBiomass;
-        biomassRecruitmentAllocator.allocate(recruitment, biomassGrid, carryingCapacityGrid);
+  @NonNull
+  private final BiomassRecruitmentAllocator biomassRecruitmentAllocator;
+
+  /**
+   * Sums biomass and carrying capacity over all habitable cells, applies
+   * {@link #biomassGrowthRule} once to those totals, then hands the resulting total recruitment
+   * to {@link #biomassRecruitmentAllocator} to spread back across cells.
+   */
+  @Override
+  public void step(final SimState simState) {
+    final List<Int2D> habitableCells = carryingCapacityGrid.getHabitableCells();
+    double currentBiomass = 0;
+    double totalCarryingCapacity = 0;
+    for (final Int2D cell : habitableCells) {
+      currentBiomass += biomassGrid.getValue(cell);
+      totalCarryingCapacity += carryingCapacityGrid.getCarryingCapacity(cell);
     }
+
+    final double newTotalBiomass = biomassGrowthRule.newBiomass(
+      currentBiomass,
+      totalCarryingCapacity
+    );
+
+    final double recruitment = newTotalBiomass - currentBiomass;
+    biomassRecruitmentAllocator.allocate(
+      recruitment,
+      biomassGrid,
+      carryingCapacityGrid
+    );
+  }
 }

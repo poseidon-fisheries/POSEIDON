@@ -22,19 +22,6 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
-import com.google.common.collect.ImmutableList;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
-import sim.util.Number2D;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
-import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
-
-import java.time.Duration;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,85 +31,108 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableList;
+import java.time.Duration;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import sim.util.Int2D;
+import sim.util.Number2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+
 class RouteViaDestinationTest {
 
-    private final Int2D vesselCell = new Int2D(0, 0);
-    private final Int2D waypoint = new Int2D(1, 0);
-    private final Int2D destination = new Int2D(1, 1);
-    private final Int2D portCell = new Int2D(2, 2);
-    private final Vessel vessel = mock(Vessel.class);
-    private final Engine engine = mock(Engine.class);
-    private final GridPathFinder pathFinder = mock(GridPathFinder.class);
-    private final DistanceCalculator distanceCalculator = mock(DistanceCalculator.class);
-    private final RouteViaDestination routeViaDestination =
-        new RouteViaDestination(vessel, pathFinder, distanceCalculator);
+  private final Int2D vesselCell = new Int2D(0, 0);
+  private final Int2D waypoint = new Int2D(1, 0);
+  private final Int2D destination = new Int2D(1, 1);
+  private final Int2D portCell = new Int2D(2, 2);
+  private final Vessel vessel = mock(Vessel.class);
+  private final Engine engine = mock(Engine.class);
+  private final GridPathFinder pathFinder = mock(GridPathFinder.class);
+  private final DistanceCalculator distanceCalculator = mock(
+    DistanceCalculator.class
+  );
+  private final RouteViaDestination routeViaDestination =
+    new RouteViaDestination(vessel, pathFinder, distanceCalculator);
 
-    @BeforeEach
-    void setUp() {
-        when(engine.getCruisingSpeedInKph()).thenReturn(10.0);
-        when(vessel.getEngine()).thenReturn(engine);
-        when(vessel.getCell()).thenReturn(vesselCell);
-        when(vessel.getHomePortLocation()).thenReturn(portCell);
-        when(distanceCalculator.distanceInKm(any(Number2D.class), any(Number2D.class)))
-            .thenReturn(5.0);
-        when(distanceCalculator.distanceInKm(anyList())).thenCallRealMethod();
-        when(pathFinder.getPath(vesselCell, destination))
-            .thenReturn(Optional.of(ImmutableList.of(vesselCell, waypoint, destination)));
-        when(pathFinder.getPath(destination, portCell))
-            .thenReturn(Optional.of(ImmutableList.of(destination, portCell)));
-    }
+  @BeforeEach
+  void setUp() {
+    when(engine.getCruisingSpeedInKph()).thenReturn(10.0);
+    when(vessel.getEngine()).thenReturn(engine);
+    when(vessel.getCell()).thenReturn(vesselCell);
+    when(vessel.getHomePortLocation()).thenReturn(portCell);
+    when(
+      distanceCalculator.distanceInKm(any(Number2D.class), any(Number2D.class))
+    ).thenReturn(5.0);
+    when(distanceCalculator.distanceInKm(anyList())).thenCallRealMethod();
+    when(pathFinder.getPath(vesselCell, destination)).thenReturn(
+      Optional.of(ImmutableList.of(vesselCell, waypoint, destination))
+    );
+    when(pathFinder.getPath(destination, portCell)).thenReturn(
+      Optional.of(ImmutableList.of(destination, portCell))
+    );
+  }
 
-    @Test
-    void addsUpTheLegsToTheDestinationAndBackToPort() {
-        final Route route = routeViaDestination.apply(destination);
+  @Test
+  void addsUpTheLegsToTheDestinationAndBackToPort() {
+    final Route route = routeViaDestination.apply(destination);
 
-        assertThat(route.getDistanceInKm()).isEqualTo(15.0);
-        assertThat(route.getDuration()).isEqualTo(Duration.ofMinutes(90));
-    }
+    assertThat(route.getDistanceInKm()).isEqualTo(15.0);
+    assertThat(route.getDuration()).isEqualTo(Duration.ofMinutes(90));
+  }
 
-    @Test
-    void readsTheVesselsCurrentCellHomePortAndSpeedAtEachCall() {
-        final Route routeBefore = routeViaDestination.apply(destination);
+  @Test
+  void readsTheVesselsCurrentCellHomePortAndSpeedAtEachCall() {
+    final Route routeBefore = routeViaDestination.apply(destination);
 
-        final Int2D otherPortCell = new Int2D(3, 3);
-        when(vessel.getCell()).thenReturn(destination);
-        when(vessel.getHomePortLocation()).thenReturn(otherPortCell);
-        when(engine.getCruisingSpeedInKph()).thenReturn(20.0);
-        when(pathFinder.getPath(destination, destination))
-            .thenReturn(Optional.of(ImmutableList.of(destination)));
-        when(pathFinder.getPath(destination, otherPortCell))
-            .thenReturn(Optional.of(ImmutableList.of(destination, waypoint, otherPortCell)));
-        final Route routeAfter = routeViaDestination.apply(destination);
+    final Int2D otherPortCell = new Int2D(3, 3);
+    when(vessel.getCell()).thenReturn(destination);
+    when(vessel.getHomePortLocation()).thenReturn(otherPortCell);
+    when(engine.getCruisingSpeedInKph()).thenReturn(20.0);
+    when(pathFinder.getPath(destination, destination)).thenReturn(
+      Optional.of(ImmutableList.of(destination))
+    );
+    when(pathFinder.getPath(destination, otherPortCell)).thenReturn(
+      Optional.of(ImmutableList.of(destination, waypoint, otherPortCell))
+    );
+    final Route routeAfter = routeViaDestination.apply(destination);
 
-        assertThat(routeBefore).isEqualTo(new Route(15.0, Duration.ofMinutes(90)));
-        assertThat(routeAfter).isEqualTo(new Route(10.0, Duration.ofMinutes(30)));
-    }
+    assertThat(routeBefore).isEqualTo(new Route(15.0, Duration.ofMinutes(90)));
+    assertThat(routeAfter).isEqualTo(new Route(10.0, Duration.ofMinutes(30)));
+  }
 
-    @Test
-    void aVesselAlreadyAtTheDestinationOnlyTravelsBack() {
-        when(vessel.getCell()).thenReturn(destination);
-        when(pathFinder.getPath(destination, destination))
-            .thenReturn(Optional.of(ImmutableList.of(destination)));
+  @Test
+  void aVesselAlreadyAtTheDestinationOnlyTravelsBack() {
+    when(vessel.getCell()).thenReturn(destination);
+    when(pathFinder.getPath(destination, destination)).thenReturn(
+      Optional.of(ImmutableList.of(destination))
+    );
 
-        final Route route = routeViaDestination.apply(destination);
+    final Route route = routeViaDestination.apply(destination);
 
-        assertThat(route.getDistanceInKm()).isEqualTo(5.0);
-        assertThat(route.getDuration()).isEqualTo(Duration.ofMinutes(30));
-    }
+    assertThat(route.getDistanceInKm()).isEqualTo(5.0);
+    assertThat(route.getDuration()).isEqualTo(Duration.ofMinutes(30));
+  }
 
-    @Test
-    void sumsThePathBetweenTwoCellsOnlyOnce() {
-        routeViaDestination.apply(destination);
-        routeViaDestination.apply(destination);
+  @Test
+  void sumsThePathBetweenTwoCellsOnlyOnce() {
+    routeViaDestination.apply(destination);
+    routeViaDestination.apply(destination);
 
-        verify(distanceCalculator, times(2)).distanceInKm(anyList());
-    }
+    verify(distanceCalculator, times(2)).distanceInKm(anyList());
+  }
 
-    @Test
-    void throwsWhenThereIsNoPath() {
-        when(pathFinder.getPath(destination, portCell)).thenReturn(Optional.empty());
+  @Test
+  void throwsWhenThereIsNoPath() {
+    when(pathFinder.getPath(destination, portCell)).thenReturn(
+      Optional.empty()
+    );
 
-        assertThatThrownBy(() -> routeViaDestination.apply(destination))
-            .isInstanceOf(IllegalStateException.class);
-    }
+    assertThatThrownBy(() ->
+      routeViaDestination.apply(destination)
+    ).isInstanceOf(IllegalStateException.class);
+  }
 }

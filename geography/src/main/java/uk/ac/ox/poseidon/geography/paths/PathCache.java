@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.geography.paths;
 
 import com.google.common.collect.ImmutableList;
-
 import java.util.Optional;
 
 /**
@@ -35,17 +34,12 @@ import java.util.Optional;
  * {@link uk.ac.ox.poseidon.geography.paths.Factories}; implemented by {@link DefaultPathCache}.
  */
 public interface PathCache<P> extends PathFinder<P> {
-
-    /**
-     * @param start the starting point of the path
-     * @param end   the ending point of the path
-     * @param path  the path to remember: present for a known path, empty for a known-impossible
-     *              one
-     */
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    void putPath(
-        P start,
-        P end,
-        Optional<ImmutableList<P>> path
-    );
+  /**
+   * @param start the starting point of the path
+   * @param end   the ending point of the path
+   * @param path  the path to remember: present for a known path, empty for a known-impossible
+   *              one
+   */
+  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+  void putPath(P start, P end, Optional<ImmutableList<P>> path);
 }

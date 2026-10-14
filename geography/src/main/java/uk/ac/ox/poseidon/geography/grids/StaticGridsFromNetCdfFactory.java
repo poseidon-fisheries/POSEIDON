@@ -22,7 +22,11 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+
 import com.google.common.collect.ImmutableMap;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,11 +34,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Supplier;
-
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
 
 /**
  * Reads a NetCDF file holding one static {@code (latitude, longitude)} raster per data variable,
@@ -49,31 +48,41 @@ import static java.util.function.Function.identity;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class StaticGridsFromNetCdfFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ImmutableMap<String, DoubleGridWrapper>> {
+public class StaticGridsFromNetCdfFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  ImmutableMap<String, DoubleGridWrapper>
+> {
 
-    private Factory<? super S, ? extends ModelGrid> modelGrid;
-    private Factory<? super S, ? extends Supplier<StaticNetCdfGridReader>> staticNetCdfGridReader;
+  private Factory<? super S, ? extends ModelGrid> modelGrid;
+  private Factory<
+    ? super S,
+    ? extends Supplier<StaticNetCdfGridReader>
+  > staticNetCdfGridReader;
 
-    @Override
-    protected ImmutableMap<String, DoubleGridWrapper> newInstance(final S scope) {
+  @Override
+  protected ImmutableMap<String, DoubleGridWrapper> newInstance(final S scope) {
+    final ModelGrid modelGrid = this.modelGrid.get(scope);
 
-        final ModelGrid modelGrid = this.modelGrid.get(scope);
+    try (
+      final StaticNetCdfGridReader netCdfGridReader = staticNetCdfGridReader
+        .get(scope)
+        .get()
+    ) {
+      netCdfGridReader.checkAlignmentWith(modelGrid);
 
-        try (final StaticNetCdfGridReader netCdfGridReader = staticNetCdfGridReader.get(scope).get()) {
-
-            netCdfGridReader.checkAlignmentWith(modelGrid);
-
-            return netCdfGridReader
-                .getDataVariableNames()
-                .stream()
-                .collect(toImmutableMap(
-                    identity(),
-                    variableName -> new DoubleGridWrapper(
-                        new BaseDoubleGrid(modelGrid, netCdfGridReader.readGrid(variableName))
-                    )
-                ));
-        }
+      return netCdfGridReader
+        .getDataVariableNames()
+        .stream()
+        .collect(
+          toImmutableMap(identity(), variableName ->
+            new DoubleGridWrapper(
+              new BaseDoubleGrid(
+                modelGrid,
+                netCdfGridReader.readGrid(variableName)
+              )
+            )
+          )
+        );
     }
-
+  }
 }

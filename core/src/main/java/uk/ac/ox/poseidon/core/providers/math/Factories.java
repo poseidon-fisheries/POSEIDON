@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that compute a numeric result
@@ -34,58 +33,57 @@ import java.util.function.IntSupplier;
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @param a one of the two values to compare
-     * @param b the other value to compare
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MaxDouble}
-     * @see MaxDouble
-     */
-    public static <S extends Scope> MaxDoubleFactory<S> maxDouble(
-        final Factory<? super S, ? extends DoubleSupplier> a,
-        final Factory<? super S, ? extends DoubleSupplier> b
-    ) {
-        return new MaxDoubleFactory<>(a, b);
-    }
+  /**
+   * @param a one of the two values to compare
+   * @param b the other value to compare
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MaxDouble}
+   * @see MaxDouble
+   */
+  public static <S extends Scope> MaxDoubleFactory<S> maxDouble(
+    final Factory<? super S, ? extends DoubleSupplier> a,
+    final Factory<? super S, ? extends DoubleSupplier> b
+  ) {
+    return new MaxDoubleFactory<>(a, b);
+  }
 
-    /**
-     * @param a one of the two values to compare
-     * @param b the other value to compare
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MinDouble}
-     * @see MinDouble
-     */
-    public static <S extends Scope> MinDoubleFactory<S> minDouble(
-        final Factory<? super S, ? extends DoubleSupplier> a,
-        final Factory<? super S, ? extends DoubleSupplier> b
-    ) {
-        return new MinDoubleFactory<>(a, b);
-    }
+  /**
+   * @param a one of the two values to compare
+   * @param b the other value to compare
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MinDouble}
+   * @see MinDouble
+   */
+  public static <S extends Scope> MinDoubleFactory<S> minDouble(
+    final Factory<? super S, ? extends DoubleSupplier> a,
+    final Factory<? super S, ? extends DoubleSupplier> b
+  ) {
+    return new MinDoubleFactory<>(a, b);
+  }
 
-    /**
-     * @param a one of the two values to compare
-     * @param b the other value to compare
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MaxInt}
-     * @see MaxInt
-     */
-    public static <S extends Scope> MaxIntFactory<S> maxInt(
-        final Factory<? super S, ? extends IntSupplier> a,
-        final Factory<? super S, ? extends IntSupplier> b
-    ) {
-        return new MaxIntFactory<>(a, b);
-    }
+  /**
+   * @param a one of the two values to compare
+   * @param b the other value to compare
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MaxInt}
+   * @see MaxInt
+   */
+  public static <S extends Scope> MaxIntFactory<S> maxInt(
+    final Factory<? super S, ? extends IntSupplier> a,
+    final Factory<? super S, ? extends IntSupplier> b
+  ) {
+    return new MaxIntFactory<>(a, b);
+  }
 
-    /**
-     * @param a one of the two values to compare
-     * @param b the other value to compare
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MinInt}
-     * @see MinInt
-     */
-    public static <S extends Scope> MinIntFactory<S> minInt(
-        final Factory<? super S, ? extends IntSupplier> a,
-        final Factory<? super S, ? extends IntSupplier> b
-    ) {
-        return new MinIntFactory<>(a, b);
-    }
-
+  /**
+   * @param a one of the two values to compare
+   * @param b the other value to compare
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MinInt}
+   * @see MinInt
+   */
+  public static <S extends Scope> MinIntFactory<S> minInt(
+    final Factory<? super S, ? extends IntSupplier> a,
+    final Factory<? super S, ? extends IntSupplier> b
+  ) {
+    return new MinIntFactory<>(a, b);
+  }
 }

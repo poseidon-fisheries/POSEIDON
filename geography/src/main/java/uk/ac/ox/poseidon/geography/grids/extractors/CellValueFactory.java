@@ -39,13 +39,15 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CellValueFactory<S extends Scope> extends RelativeScopeFactory<S, CellValue> {
+public class CellValueFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  CellValue
+> {
 
-    private Factory<? super S, ? extends DoubleGrid> grid;
+  private Factory<? super S, ? extends DoubleGrid> grid;
 
-    @Override
-    protected CellValue newInstance(final S scope) {
-        return new CellValue(grid.get(scope));
-    }
-
+  @Override
+  protected CellValue newInstance(final S scope) {
+    return new CellValue(grid.get(scope));
+  }
 }

@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
-import org.joda.money.Money;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.function.Function;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.math.RoundingMode.HALF_EVEN;
+
+import java.util.function.Function;
+import org.joda.money.Money;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * The cost of the time a vessel would spend sailing a {@link Route}: its hourly cost times the
@@ -36,32 +35,32 @@ import static java.math.RoundingMode.HALF_EVEN;
  */
 public class TimeCost implements Function<Route, Money> {
 
-    private final Vessel vessel;
-    private final Function<? super Vessel, ? extends Money> hourlyCost;
+  private final Vessel vessel;
+  private final Function<? super Vessel, ? extends Money> hourlyCost;
 
-    /**
-     * @param vessel     the vessel that would sail the route
-     * @param hourlyCost gives the vessel's cost per hour at sea
-     */
-    TimeCost(
-        final Vessel vessel,
-        final Function<? super Vessel, ? extends Money> hourlyCost
-    ) {
-        this.vessel = checkNotNull(vessel);
-        this.hourlyCost = checkNotNull(hourlyCost);
-    }
+  /**
+   * @param vessel     the vessel that would sail the route
+   * @param hourlyCost gives the vessel's cost per hour at sea
+   */
+  TimeCost(
+    final Vessel vessel,
+    final Function<? super Vessel, ? extends Money> hourlyCost
+  ) {
+    this.vessel = checkNotNull(vessel);
+    this.hourlyCost = checkNotNull(hourlyCost);
+  }
 
-    /**
-     * @param route the route the vessel would sail
-     * @return the vessel's hourly cost times the hours {@code route} takes to sail
-     * @throws NullPointerException if {@code hourlyCost} gives no cost for the vessel
-     */
-    @Override
-    public Money apply(final Route route) {
-        return checkNotNull(
-            hourlyCost.apply(vessel),
-            "Unable to extract hourly cost for Vessel %s.",
-            vessel
-        ).multipliedBy(route.getDuration().toSeconds() / 3600.0, HALF_EVEN);
-    }
+  /**
+   * @param route the route the vessel would sail
+   * @return the vessel's hourly cost times the hours {@code route} takes to sail
+   * @throws NullPointerException if {@code hourlyCost} gives no cost for the vessel
+   */
+  @Override
+  public Money apply(final Route route) {
+    return checkNotNull(
+      hourlyCost.apply(vessel),
+      "Unable to extract hourly cost for Vessel %s.",
+      vessel
+    ).multipliedBy(route.getDuration().toSeconds() / 3600.0, HALF_EVEN);
+  }
 }

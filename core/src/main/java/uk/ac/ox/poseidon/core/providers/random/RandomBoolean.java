@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.core.providers.BooleanProvider;
 @RequiredArgsConstructor
 public class RandomBoolean implements BooleanProvider {
 
-    private final double probability;
-    private final MersenneTwisterFast rng;
+  private final double probability;
+  private final MersenneTwisterFast rng;
 
-    @Override
-    public boolean getAsBoolean() {
-        return rng.nextBoolean(probability);
-    }
+  @Override
+  public boolean getAsBoolean() {
+    return rng.nextBoolean(probability);
+  }
 }

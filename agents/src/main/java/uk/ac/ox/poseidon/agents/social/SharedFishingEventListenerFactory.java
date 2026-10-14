@@ -19,7 +19,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package uk.ac.ox.poseidon.agents.social;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,8 +34,6 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Registers the vessel's {@link #listener} with the {@link FishingEventSharer}, once per vessel,
@@ -49,20 +50,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SharedFishingEventListenerFactory<L extends Listener<? super FishingEvent>>
-    extends VesselScopeFactory<L> {
+public class SharedFishingEventListenerFactory<L extends Listener<? super FishingEvent>> extends VesselScopeFactory<L> {
 
-    private Factory<? super VesselScope, ? extends L> listener;
-    private Factory<? super SimulationScope, ? extends FishingEventSharer> fishingEventSharer;
+  private Factory<? super VesselScope, ? extends L> listener;
+  private Factory<
+    ? super SimulationScope,
+    ? extends FishingEventSharer
+  > fishingEventSharer;
 
-    @Override
-    protected L newInstance(final VesselScope scope) {
-        checkNotNull(listener, "listener must not be null");
-        checkNotNull(fishingEventSharer, "fishingEventSharer must not be null");
-        final L listener = this.listener.get(scope);
-        fishingEventSharer
-            .get(scope)
-            .registerSharedFishingEventListener(scope.getVessel(), listener);
-        return listener;
-    }
+  @Override
+  protected L newInstance(final VesselScope scope) {
+    checkNotNull(listener, "listener must not be null");
+    checkNotNull(fishingEventSharer, "fishingEventSharer must not be null");
+    final L listener = this.listener.get(scope);
+    fishingEventSharer
+      .get(scope)
+      .registerSharedFishingEventListener(scope.getVessel(), listener);
+    return listener;
+  }
 }

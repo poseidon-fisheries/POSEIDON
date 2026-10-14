@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.tasks.general;
 
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.Agent;
-import uk.ac.ox.poseidon.agents.tasks.ExtendedTask;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 import java.time.Duration;
 import java.util.function.Supplier;
-
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.Agent;
+import uk.ac.ox.poseidon.agents.tasks.ExtendedTask;
 
 /**
  * An {@link ExtendedTask} that runs for a fixed duration, drawn fresh from
@@ -40,18 +39,17 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 @RequiredArgsConstructor
 public class WaitFor<G extends Agent> extends ExtendedTask<G> {
 
-    final Supplier<Duration> durationSupplier;
+  final Supplier<Duration> durationSupplier;
 
-    /** @return a fresh duration from {@link #durationSupplier} */
-    @Override
-    protected Duration getDuration() {
-        return durationSupplier.get();
-    }
+  /** @return a fresh duration from {@link #durationSupplier} */
+  @Override
+  protected Duration getDuration() {
+    return durationSupplier.get();
+  }
 
-    /** @return always {@code SUCCEEDED} */
-    @Override
-    protected Status complete() {
-        return SUCCEEDED;
-    }
-
+  /** @return always {@code SUCCEEDED} */
+  @Override
+  protected Status complete() {
+    return SUCCEEDED;
+  }
 }

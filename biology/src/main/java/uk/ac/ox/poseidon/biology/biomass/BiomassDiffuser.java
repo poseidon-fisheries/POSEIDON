@@ -22,20 +22,19 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import ec.util.MersenneTwisterFast;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import sim.util.Double2D;
-import sim.util.Int2D;
-
-import java.io.Serial;
-import java.util.*;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
+
+import ec.util.MersenneTwisterFast;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serial;
+import java.util.*;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import sim.util.Double2D;
+import sim.util.Int2D;
 
 /**
  * Moves biomass between neighbouring habitable cells of a single-species grid, each step, according
@@ -44,73 +43,81 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
  */
 public class BiomassDiffuser implements Steppable {
 
-    @Serial private static final long serialVersionUID = 6904676724631409234L;
+  @Serial
+  private static final long serialVersionUID = 6904676724631409234L;
 
-    private final transient BiomassGrid biomassGrid;
+  private final transient BiomassGrid biomassGrid;
 
-    private final transient CarryingCapacityGrid carryingCapacityGrid;
+  private final transient CarryingCapacityGrid carryingCapacityGrid;
 
-    private final MersenneTwisterFast rng;
+  private final MersenneTwisterFast rng;
 
-    private final transient BiomassDiffusionRule biomassDiffusionRule;
+  private final transient BiomassDiffusionRule biomassDiffusionRule;
 
-    private final List<Int2D> habitableLocations;
+  private final List<Int2D> habitableLocations;
 
-    private final Map<Int2D, List<Int2D>> habitableNeighbours;
+  private final Map<Int2D, List<Int2D>> habitableNeighbours;
 
-    /**
-     * @param biomassGrid          the grid diffusion reads from and writes into
-     * @param carryingCapacityGrid must share the same {@link uk.ac.ox.poseidon.geography.grids.ModelGrid} as {@code biomassGrid}
-     * @param biomassDiffusionRule the per-pair diffusion rule
-     * @param rng                  the random number generator shuffling the visiting order
-     */
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public BiomassDiffuser(
-        final BiomassGrid biomassGrid,
-        final CarryingCapacityGrid carryingCapacityGrid,
-        final BiomassDiffusionRule biomassDiffusionRule,
-        final MersenneTwisterFast rng
-    ) {
-        checkArgument(biomassGrid.getModelGrid().equals(carryingCapacityGrid.getModelGrid()));
-        this.biomassGrid = biomassGrid;
-        this.carryingCapacityGrid = carryingCapacityGrid;
-        this.biomassDiffusionRule = biomassDiffusionRule;
-        this.rng = rng;
-        this.habitableLocations = List.copyOf(carryingCapacityGrid.getHabitableCells());
-        final HashSet<Int2D> habitableLocationsSet = new HashSet<>(habitableLocations);
-        this.habitableNeighbours =
-            habitableLocations
-                .stream()
-                .collect(toMap(
-                    identity(),
-                    location ->
-                        carryingCapacityGrid
-                            .getModelGrid()
-                            .getActiveNeighbours(location)
-                            .stream()
-                            .filter(habitableLocationsSet::contains)
-                            .toList()
-                ));
-    }
+  /**
+   * @param biomassGrid          the grid diffusion reads from and writes into
+   * @param carryingCapacityGrid must share the same {@link uk.ac.ox.poseidon.geography.grids.ModelGrid} as {@code biomassGrid}
+   * @param biomassDiffusionRule the per-pair diffusion rule
+   * @param rng                  the random number generator shuffling the visiting order
+   */
+  @SuppressFBWarnings("EI_EXPOSE_REP2")
+  public BiomassDiffuser(
+    final BiomassGrid biomassGrid,
+    final CarryingCapacityGrid carryingCapacityGrid,
+    final BiomassDiffusionRule biomassDiffusionRule,
+    final MersenneTwisterFast rng
+  ) {
+    checkArgument(
+      biomassGrid.getModelGrid().equals(carryingCapacityGrid.getModelGrid())
+    );
+    this.biomassGrid = biomassGrid;
+    this.carryingCapacityGrid = carryingCapacityGrid;
+    this.biomassDiffusionRule = biomassDiffusionRule;
+    this.rng = rng;
+    this.habitableLocations = List.copyOf(
+      carryingCapacityGrid.getHabitableCells()
+    );
+    final HashSet<Int2D> habitableLocationsSet = new HashSet<>(
+      habitableLocations
+    );
+    this.habitableNeighbours = habitableLocations
+      .stream()
+      .collect(
+        toMap(identity(), location ->
+          carryingCapacityGrid
+            .getModelGrid()
+            .getActiveNeighbours(location)
+            .stream()
+            .filter(habitableLocationsSet::contains)
+            .toList()
+        )
+      );
+  }
 
-    /**
-     * Visits every habitable cell, in shuffled order, and diffuses biomass between it and each of
-     * its (also shuffled) habitable neighbours in turn.
-     */
-    @Override
-    public void step(final SimState simState) {
-        shuffledStream(habitableLocations, rng).forEach(location -> {
-            shuffledStream(habitableNeighbours.get(location), rng).forEach(neighbour -> {
-                final Double2D updatedBiomasses =
-                    biomassDiffusionRule.updatedBiomasses(
-                        biomassGrid.getValue(location),
-                        carryingCapacityGrid.getCarryingCapacity(location),
-                        biomassGrid.getValue(neighbour),
-                        carryingCapacityGrid.getCarryingCapacity(neighbour)
-                    );
-                biomassGrid.setBiomass(location, updatedBiomasses.x);
-                biomassGrid.setBiomass(neighbour, updatedBiomasses.y);
-            });
-        });
-    }
+  /**
+   * Visits every habitable cell, in shuffled order, and diffuses biomass between it and each of
+   * its (also shuffled) habitable neighbours in turn.
+   */
+  @Override
+  public void step(final SimState simState) {
+    shuffledStream(habitableLocations, rng).forEach(location -> {
+      shuffledStream(habitableNeighbours.get(location), rng).forEach(
+        neighbour -> {
+          final Double2D updatedBiomasses =
+            biomassDiffusionRule.updatedBiomasses(
+              biomassGrid.getValue(location),
+              carryingCapacityGrid.getCarryingCapacity(location),
+              biomassGrid.getValue(neighbour),
+              carryingCapacityGrid.getCarryingCapacity(neighbour)
+            );
+          biomassGrid.setBiomass(location, updatedBiomasses.x);
+          biomassGrid.setBiomass(neighbour, updatedBiomasses.y);
+        }
+      );
+    });
+  }
 }

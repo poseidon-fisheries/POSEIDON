@@ -19,9 +19,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package uk.ac.ox.poseidon.agents.social;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.social.Factories.cliqueDynamics;
+import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
+
 import ec.util.MersenneTwisterFast;
+import java.util.List;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.trips.TripStartEvent;
@@ -33,63 +43,59 @@ import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import java.util.List;
-import java.util.function.Function;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.social.Factories.cliqueDynamics;
-import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
-
 class CliqueDynamicsFactoryTest {
 
-    private final EventManager simulationEventManager = new SimpleEventManager();
-    private final Simulation simulation = simulation(simulationEventManager);
-    private final Simulation otherSimulation = simulation(new SimpleEventManager());
-    private final Vessel a = vessel(simulationEventManager);
-    private final Vessel b = vessel(simulationEventManager);
-    private final VesselsGetter fleet = () -> List.of(a, b);
-    private final Function<Vessel, String> groupingKey = vessel -> "X";
-    private final SocialNetworkFactory network = socialNetwork(object(fleet));
-    private final CliqueDynamicsFactory factory =
-        cliqueDynamics(network, object(groupingKey), 5);
+  private final EventManager simulationEventManager = new SimpleEventManager();
+  private final Simulation simulation = simulation(simulationEventManager);
+  private final Simulation otherSimulation = simulation(
+    new SimpleEventManager()
+  );
+  private final Vessel a = vessel(simulationEventManager);
+  private final Vessel b = vessel(simulationEventManager);
+  private final VesselsGetter fleet = () -> List.of(a, b);
+  private final Function<Vessel, String> groupingKey = vessel -> "X";
+  private final SocialNetworkFactory network = socialNetwork(object(fleet));
+  private final CliqueDynamicsFactory factory = cliqueDynamics(
+    network,
+    object(groupingKey),
+    5
+  );
 
-    private static Simulation simulation(final EventManager eventManager) {
-        final Simulation simulation = mock(Simulation.class);
-        simulation.random = new MersenneTwisterFast(0);
-        when(simulation.getEventManager()).thenReturn(eventManager);
-        return simulation;
-    }
+  private static Simulation simulation(final EventManager eventManager) {
+    final Simulation simulation = mock(Simulation.class);
+    simulation.random = new MersenneTwisterFast(0);
+    when(simulation.getEventManager()).thenReturn(eventManager);
+    return simulation;
+  }
 
-    private static Vessel vessel(final EventManager simulationEventManager) {
-        final Vessel vessel = mock(Vessel.class);
-        when(vessel.isActive()).thenReturn(true);
-        when(vessel.getEventManager())
-            .thenReturn(new ForwardingEventManager(simulationEventManager));
-        return vessel;
-    }
+  private static Vessel vessel(final EventManager simulationEventManager) {
+    final Vessel vessel = mock(Vessel.class);
+    when(vessel.isActive()).thenReturn(true);
+    when(vessel.getEventManager()).thenReturn(
+      new ForwardingEventManager(simulationEventManager)
+    );
+    return vessel;
+  }
 
-    @Test
-    void givesOneDynamicsPerSimulation() {
-        final SimulationScope scope = new SimulationScope(simulation);
-        final SimulationScope otherScope = new SimulationScope(otherSimulation);
+  @Test
+  void givesOneDynamicsPerSimulation() {
+    final SimulationScope scope = new SimulationScope(simulation);
+    final SimulationScope otherScope = new SimulationScope(otherSimulation);
 
-        assertThat(factory.get(scope)).isNotNull().isSameAs(factory.get(scope));
-        assertThat(factory.get(scope)).isNotSameAs(factory.get(otherScope));
-    }
+    assertThat(factory.get(scope)).isNotNull().isSameAs(factory.get(scope));
+    assertThat(factory.get(scope)).isNotSameAs(factory.get(otherScope));
+  }
 
-    @Test
-    void aTripStartBroadcastOnAVesselsEventManagerFormsACliqueThroughForwarding() {
-        final SimulationScope scope = new SimulationScope(simulation);
-        factory.get(scope);
-        final Trip trip = mock(Trip.class);
-        when(trip.getVessel()).thenReturn(a);
+  @Test
+  void aTripStartBroadcastOnAVesselsEventManagerFormsACliqueThroughForwarding() {
+    final SimulationScope scope = new SimulationScope(simulation);
+    factory.get(scope);
+    final Trip trip = mock(Trip.class);
+    when(trip.getVessel()).thenReturn(a);
 
-        a.getEventManager().broadcast(new TripStartEvent(trip));
+    a.getEventManager().broadcast(new TripStartEvent(trip));
 
-        assertThat(network.get(scope).getRecipients(a)).containsExactly(b);
-        assertThat(network.get(scope).getRecipients(b)).containsExactly(a);
-    }
+    assertThat(network.get(scope).getRecipients(a)).containsExactly(b);
+    assertThat(network.get(scope).getRecipients(b)).containsExactly(a);
+  }
 }

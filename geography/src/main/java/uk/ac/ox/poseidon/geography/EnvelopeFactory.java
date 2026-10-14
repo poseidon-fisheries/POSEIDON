@@ -39,13 +39,13 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @EqualsAndHashCode(callSuper = true)
 public class EnvelopeFactory extends GlobalScopeFactory<Envelope> {
 
-    private double minX;
-    private double maxX;
-    private double minY;
-    private double maxY;
+  private double minX;
+  private double maxX;
+  private double minY;
+  private double maxY;
 
-    @Override
-    protected Envelope newInstance(final Scope scope) {
-        return new Envelope(minX, maxX, minY, maxY);
-    }
+  @Override
+  protected Envelope newInstance(final Scope scope) {
+    return new Envelope(minX, maxX, minY, maxY);
+  }
 }

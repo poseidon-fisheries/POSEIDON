@@ -32,12 +32,12 @@ import uk.ac.ox.poseidon.core.providers.Provider;
 @RequiredArgsConstructor
 public class CurrentTripDestinationCell implements Provider<Int2D> {
 
-    private final Vessel vessel;
+  private final Vessel vessel;
 
-    /** @return the current trip's destination, or {@code null} if there is no current trip */
-    @Override
-    public Int2D get() {
-        final Trip trip = vessel.getCurrentTrip();
-        return trip != null ? trip.getDestination() : null;
-    }
+  /** @return the current trip's destination, or {@code null} if there is no current trip */
+  @Override
+  public Int2D get() {
+    final Trip trip = vessel.getCurrentTrip();
+    return trip != null ? trip.getDestination() : null;
+  }
 }

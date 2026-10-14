@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.geography.grids.extractors;
 
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
-
-import java.util.function.Function;
 
 /**
  * A {@link Function} that reads a fixed, resolved {@link DoubleGrid}'s value at a given cell.
@@ -36,11 +35,10 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class CellValue implements Function<Int2D, Double> {
 
-    private final @NonNull DoubleGrid grid;
+  private final @NonNull DoubleGrid grid;
 
-    @Override
-    public Double apply(final Int2D int2D) {
-        return grid.getValue(int2D);
-    }
-
+  @Override
+  public Double apply(final Int2D int2D) {
+    return grid.getValue(int2D);
+  }
 }

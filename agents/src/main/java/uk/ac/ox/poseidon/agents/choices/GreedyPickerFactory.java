@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-
-import java.util.function.Predicate;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link GreedyPicker}, built via
@@ -40,17 +39,22 @@ import java.util.function.Predicate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class GreedyPickerFactory<O> extends VesselScopeFactory<GreedyPicker<O>> {
+public class GreedyPickerFactory<O> extends VesselScopeFactory<
+  GreedyPicker<O>
+> {
 
-    private Factory<? super VesselScope, ? extends OptionValues<O>> optionValues;
-    private Factory<? super VesselScope, ? extends Predicate<? super O>> optionPredicate;
+  private Factory<? super VesselScope, ? extends OptionValues<O>> optionValues;
+  private Factory<
+    ? super VesselScope,
+    ? extends Predicate<? super O>
+  > optionPredicate;
 
-    @Override
-    protected GreedyPicker<O> newInstance(final VesselScope scope) {
-        return new GreedyPicker<>(
-            optionValues.get(scope),
-            optionPredicate.get(scope),
-            scope.getSimulation().random
-        );
-    }
+  @Override
+  protected GreedyPicker<O> newInstance(final VesselScope scope) {
+    return new GreedyPicker<>(
+      optionValues.get(scope),
+      optionPredicate.get(scope),
+      scope.getSimulation().random
+    );
+  }
 }

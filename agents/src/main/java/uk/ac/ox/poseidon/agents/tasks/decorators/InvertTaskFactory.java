@@ -40,24 +40,26 @@ import uk.ac.ox.poseidon.core.Factory;
 @EqualsAndHashCode(callSuper = true)
 public class InvertTaskFactory extends DecoratorTaskFactory<Invert<Vessel>> {
 
-    /** @param child factory for the child task whose outcome gets inverted */
-    public InvertTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> child) {
-        super(child);
-    }
+  /** @param child factory for the child task whose outcome gets inverted */
+  public InvertTaskFactory(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> child
+  ) {
+    super(child);
+  }
 
-    /**
-     * @param guard optional task guarding whether this decorator runs at all
-     * @param child factory for the child task whose outcome gets inverted
-     */
-    public InvertTaskFactory(
-        final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
-        final Factory<? super VesselScope, ? extends Task<Vessel>> child
-    ) {
-        super(guard, child);
-    }
+  /**
+   * @param guard optional task guarding whether this decorator runs at all
+   * @param child factory for the child task whose outcome gets inverted
+   */
+  public InvertTaskFactory(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
+    final Factory<? super VesselScope, ? extends Task<Vessel>> child
+  ) {
+    super(guard, child);
+  }
 
-    @Override
-    protected Invert<Vessel> newTask(final VesselScope scope) {
-        return new Invert<>();
-    }
+  @Override
+  protected Invert<Vessel> newTask(final VesselScope scope) {
+    return new Invert<>();
+  }
 }

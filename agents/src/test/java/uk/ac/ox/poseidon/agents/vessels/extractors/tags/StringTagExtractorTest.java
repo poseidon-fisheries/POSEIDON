@@ -22,39 +22,46 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors.tags;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+
 class StringTagExtractorTest {
 
-    private static Vessel vesselWithTag(final Object tagValue) {
-        final Vessel vessel = mock(Vessel.class);
-        when(vessel.getTag("country_of_registration")).thenReturn(Optional.ofNullable(tagValue));
-        return vessel;
-    }
+  private static Vessel vesselWithTag(final Object tagValue) {
+    final Vessel vessel = mock(Vessel.class);
+    when(vessel.getTag("country_of_registration")).thenReturn(
+      Optional.ofNullable(tagValue)
+    );
+    return vessel;
+  }
 
-    @Test
-    void extractsTrimmedStringTag() {
-        final StringTagExtractor extractor = new StringTagExtractor("country_of_registration");
-        assertThat(extractor.apply(vesselWithTag(" FRA "))).isEqualTo("FRA");
-    }
+  @Test
+  void extractsTrimmedStringTag() {
+    final StringTagExtractor extractor = new StringTagExtractor(
+      "country_of_registration"
+    );
+    assertThat(extractor.apply(vesselWithTag(" FRA "))).isEqualTo("FRA");
+  }
 
-    @Test
-    void returnsNullForBlankOrNaTag() {
-        final StringTagExtractor extractor = new StringTagExtractor("country_of_registration");
-        assertThat(extractor.apply(vesselWithTag("  "))).isNull();
-        assertThat(extractor.apply(vesselWithTag("NA"))).isNull();
-    }
+  @Test
+  void returnsNullForBlankOrNaTag() {
+    final StringTagExtractor extractor = new StringTagExtractor(
+      "country_of_registration"
+    );
+    assertThat(extractor.apply(vesselWithTag("  "))).isNull();
+    assertThat(extractor.apply(vesselWithTag("NA"))).isNull();
+  }
 
-    @Test
-    void returnsNullWhenTagIsAbsent() {
-        final StringTagExtractor extractor = new StringTagExtractor("country_of_registration");
-        assertThat(extractor.apply(vesselWithTag(null))).isNull();
-    }
+  @Test
+  void returnsNullWhenTagIsAbsent() {
+    final StringTagExtractor extractor = new StringTagExtractor(
+      "country_of_registration"
+    );
+    assertThat(extractor.apply(vesselWithTag(null))).isNull();
+  }
 }

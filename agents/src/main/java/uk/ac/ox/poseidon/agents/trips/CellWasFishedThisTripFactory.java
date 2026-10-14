@@ -29,11 +29,12 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
  * A {@link VesselScopeFactory} counterpart of {@link CellWasFishedThisTrip}, built via
  * {@link Factories#cellWasFishedThisTrip()}.
  */
-public class CellWasFishedThisTripFactory extends VesselScopeFactory<CellWasFishedThisTrip> {
+public class CellWasFishedThisTripFactory
+  extends VesselScopeFactory<CellWasFishedThisTrip>
+{
 
-    @Override
-    protected CellWasFishedThisTrip newInstance(final VesselScope scope) {
-        return new CellWasFishedThisTrip(scope.getVessel());
-    }
-
+  @Override
+  protected CellWasFishedThisTrip newInstance(final VesselScope scope) {
+    return new CellWasFishedThisTrip(scope.getVessel());
+  }
 }

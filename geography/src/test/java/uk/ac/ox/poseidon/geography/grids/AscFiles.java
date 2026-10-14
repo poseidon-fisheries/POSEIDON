@@ -22,79 +22,82 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import static java.util.stream.Collectors.joining;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-import static java.util.stream.Collectors.joining;
-
 /** Writes small ESRI ASCII grid ({@code .asc}) files for the grid-reader tests. */
 public final class AscFiles {
 
-    private static final double WEST = 10;
-    private static final double SOUTH = 40;
-    private static final double CELL_SIZE = 1;
+  private static final double WEST = 10;
+  private static final double SOUTH = 40;
+  private static final double CELL_SIZE = 1;
 
-    /**
-     * A 3 by 2 grid of one-degree cells from 10°E to 13°E and 40°N to 42°N, with a different
-     * value in every cell, so that a flipped or shifted reading shows:
-     * <pre>
-     *          10°E  11°E  12°E  13°E
-     *   42°N  +-----+-----+-----+
-     *         |  1  |  2  |  3  |   (north row: image row 0)
-     *   41°N  +-----+-----+-----+
-     *         |  4  |  5  |  6  |   (south row: image row 1)
-     *   40°N  +-----+-----+-----+
-     * </pre>
-     *
-     * @return the fixture's values, a fresh array on every call
-     */
-    public static double[][] rowsFromNorth() {
-        return new double[][]{
-            {1, 2, 3},
-            {4, 5, 6}
-        };
-    }
+  /**
+   * A 3 by 2 grid of one-degree cells from 10°E to 13°E and 40°N to 42°N, with a different
+   * value in every cell, so that a flipped or shifted reading shows:
+   * <pre>
+   *          10°E  11°E  12°E  13°E
+   *   42°N  +-----+-----+-----+
+   *         |  1  |  2  |  3  |   (north row: image row 0)
+   *   41°N  +-----+-----+-----+
+   *         |  4  |  5  |  6  |   (south row: image row 1)
+   *   40°N  +-----+-----+-----+
+   * </pre>
+   *
+   * @return the fixture's values, a fresh array on every call
+   */
+  public static double[][] rowsFromNorth() {
+    return new double[][] { { 1, 2, 3 }, { 4, 5, 6 } };
+  }
 
-    private AscFiles() {
-    }
+  private AscFiles() {}
 
-    /** @return the path of {@link #rowsFromNorth()} written as {@code fileName} in {@code folder} */
-    public static Path writeFixture(final Path folder, final String fileName) {
-        return write(folder.resolve(fileName), WEST, SOUTH, CELL_SIZE, rowsFromNorth());
-    }
+  /** @return the path of {@link #rowsFromNorth()} written as {@code fileName} in {@code folder} */
+  public static Path writeFixture(final Path folder, final String fileName) {
+    return write(
+      folder.resolve(fileName),
+      WEST,
+      SOUTH,
+      CELL_SIZE,
+      rowsFromNorth()
+    );
+  }
 
-    /**
-     * Writes an {@code .asc} file, whose data rows go from north to south.
-     *
-     * @return {@code file}
-     */
-    public static Path write(
-        final Path file,
-        final double xllCorner,
-        final double yllCorner,
-        final double cellSize,
-        final double[][] rowsFromNorth
-    ) {
-        final String header = String.join(
-            "\n",
-            "ncols " + rowsFromNorth[0].length,
-            "nrows " + rowsFromNorth.length,
-            "xllcorner " + xllCorner,
-            "yllcorner " + yllCorner,
-            "cellsize " + cellSize,
-            "NODATA_value -9999"
-        );
-        final String rows = Arrays
-            .stream(rowsFromNorth)
-            .map(row -> Arrays.stream(row).mapToObj(Double::toString).collect(joining(" ")))
-            .collect(joining("\n"));
-        try {
-            return Files.writeString(file, header + "\n" + rows + "\n");
-        } catch (final IOException e) {
-            throw new UncheckedIOException(e);
-        }
+  /**
+   * Writes an {@code .asc} file, whose data rows go from north to south.
+   *
+   * @return {@code file}
+   */
+  public static Path write(
+    final Path file,
+    final double xllCorner,
+    final double yllCorner,
+    final double cellSize,
+    final double[][] rowsFromNorth
+  ) {
+    final String header = String.join(
+      "\n",
+      "ncols " + rowsFromNorth[0].length,
+      "nrows " + rowsFromNorth.length,
+      "xllcorner " + xllCorner,
+      "yllcorner " + yllCorner,
+      "cellsize " + cellSize,
+      "NODATA_value -9999"
+    );
+    final String rows = Arrays.stream(rowsFromNorth)
+      .map(row ->
+        Arrays.stream(row).mapToObj(Double::toString).collect(joining(" "))
+      )
+      .collect(joining("\n"));
+    try {
+      return Files.writeString(file, header + "\n" + rows + "\n");
+    } catch (final IOException e) {
+      throw new UncheckedIOException(e);
     }
+  }
 }

@@ -22,67 +22,65 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class BaseDoubleGridTest {
 
-    private final BaseDoubleGrid grid =
-        new BaseDoubleGrid(new double[][]{
-            {1d, 2d, 3d},
-            {4d, 5d, 6d},
-            {7d, 8d, 9d},
-        });
+  private final BaseDoubleGrid grid = new BaseDoubleGrid(new double[][] {
+    { 1d, 2d, 3d },
+    { 4d, 5d, 6d },
+    { 7d, 8d, 9d }
+  });
 
-    @Test
-    void getValue() {
-        assertEquals(1.0, grid.getValue(new Int2D(0, 0)));
-        assertEquals(2.0, grid.getValue(new Int2D(0, 1)));
-        assertEquals(4.0, grid.getValue(new Int2D(1, 0)));
-        assertEquals(9.0, grid.getValue(new Int2D(2, 2)));
-    }
+  @Test
+  void getValue() {
+    assertEquals(1.0, grid.getValue(new Int2D(0, 0)));
+    assertEquals(2.0, grid.getValue(new Int2D(0, 1)));
+    assertEquals(4.0, grid.getValue(new Int2D(1, 0)));
+    assertEquals(9.0, grid.getValue(new Int2D(2, 2)));
+  }
 
-    @Test
-    void getMinimumValue() {
-        assertEquals(1.0, grid.getMinimumValue());
-    }
+  @Test
+  void getMinimumValue() {
+    assertEquals(1.0, grid.getMinimumValue());
+  }
 
-    @Test
-    void getMaximumValue() {
-        assertEquals(9.0, grid.getMaximumValue());
-    }
+  @Test
+  void getMaximumValue() {
+    assertEquals(9.0, grid.getMaximumValue());
+  }
 
-    @Test
-    void testModelGrid() {
-        final ModelGrid modelGrid = grid.getModelGrid();
-        assertEquals(3, modelGrid.getGridWidth());
-        assertEquals(3, modelGrid.getGridHeight());
-        assertEquals(
-            List.of(
-                new Coordinate(0.5, 2.5),
-                new Coordinate(0.5, 1.5),
-                new Coordinate(0.5, 0.5),
-                new Coordinate(1.5, 2.5),
-                new Coordinate(1.5, 1.5),
-                new Coordinate(1.5, 0.5),
-                new Coordinate(2.5, 2.5),
-                new Coordinate(2.5, 1.5),
-                new Coordinate(2.5, 0.5)
-            ),
-            modelGrid.getAllCells().map(modelGrid::toCoordinate).toList()
-        );
-    }
+  @Test
+  void testModelGrid() {
+    final ModelGrid modelGrid = grid.getModelGrid();
+    assertEquals(3, modelGrid.getGridWidth());
+    assertEquals(3, modelGrid.getGridHeight());
+    assertEquals(
+      List.of(
+        new Coordinate(0.5, 2.5),
+        new Coordinate(0.5, 1.5),
+        new Coordinate(0.5, 0.5),
+        new Coordinate(1.5, 2.5),
+        new Coordinate(1.5, 1.5),
+        new Coordinate(1.5, 0.5),
+        new Coordinate(2.5, 2.5),
+        new Coordinate(2.5, 1.5),
+        new Coordinate(2.5, 0.5)
+      ),
+      modelGrid.getAllCells().map(modelGrid::toCoordinate).toList()
+    );
+  }
 
-    @Test
-    void testEnvelope() {
-        final Envelope envelope = grid.getModelGrid().getEnvelope();
-        assertEquals(3, envelope.getWidth());
-        assertEquals(3, envelope.getHeight());
-    }
+  @Test
+  void testEnvelope() {
+    final Envelope envelope = grid.getModelGrid().getEnvelope();
+    assertEquals(3, envelope.getWidth());
+    assertEquals(3, envelope.getHeight());
+  }
 }

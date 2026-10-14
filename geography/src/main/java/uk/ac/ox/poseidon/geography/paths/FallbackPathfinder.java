@@ -23,9 +23,8 @@
 package uk.ac.ox.poseidon.geography.paths;
 
 import com.google.common.collect.ImmutableList;
-import lombok.AllArgsConstructor;
-
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 
 /**
  * A {@link PathFinder} that tries a fast heuristic first, falling back to a slower but complete
@@ -36,19 +35,16 @@ import java.util.Optional;
 @AllArgsConstructor
 public class FallbackPathfinder<P> implements PathFinder<P> {
 
-    private final PathFinder<P> heuristicPathFinder;
-    private final PathFinder<P> canonicalPathFinder;
+  private final PathFinder<P> heuristicPathFinder;
+  private final PathFinder<P> canonicalPathFinder;
 
-    @Override
-    public Optional<ImmutableList<P>> getPath(
-        final P start,
-        final P end
-    ) {
-        final Optional<ImmutableList<P>> path = heuristicPathFinder
-            .getPath(start, end)
-            .or(() -> canonicalPathFinder.getPath(start, end));
-        assert path.isEmpty() ||
-            (path.get().getFirst().equals(start) && path.get().getLast().equals(end));
-        return path;
-    }
+  @Override
+  public Optional<ImmutableList<P>> getPath(final P start, final P end) {
+    final Optional<ImmutableList<P>> path = heuristicPathFinder
+      .getPath(start, end)
+      .or(() -> canonicalPathFinder.getPath(start, end));
+    assert path.isEmpty() ||
+      (path.get().getFirst().equals(start) && path.get().getLast().equals(end));
+    return path;
+  }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
+import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,8 +33,6 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-import java.util.function.Predicate;
-
 /**
  * A {@link RelativeScopeFactory} for an {@link ActionCellPredicate}. Built via
  * {@link Factories#actionCellPredicate}.
@@ -42,15 +41,19 @@ import java.util.function.Predicate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ActionCellPredicateFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ActionCellPredicate> {
+public class ActionCellPredicateFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  ActionCellPredicate
+> {
 
-    private Factory<? super S, ? extends ModelGrid> modelGrid;
-    private Factory<? super S, ? extends Predicate<Int2D>> cellPredicate;
+  private Factory<? super S, ? extends ModelGrid> modelGrid;
+  private Factory<? super S, ? extends Predicate<Int2D>> cellPredicate;
 
-    @Override
-    protected ActionCellPredicate newInstance(final S scope) {
-        return new ActionCellPredicate(modelGrid.get(scope), cellPredicate.get(scope));
-    }
-
+  @Override
+  protected ActionCellPredicate newInstance(final S scope) {
+    return new ActionCellPredicate(
+      modelGrid.get(scope),
+      cellPredicate.get(scope)
+    );
+  }
 }

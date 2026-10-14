@@ -22,6 +22,19 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
+import static java.time.temporal.ChronoField.*;
+import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
+import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_DAY;
+
+import java.awt.*;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalField;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+import javax.imageio.ImageIO;
 import lombok.*;
 import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.DrawInfo2D;
@@ -37,20 +50,6 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.temporal.TemporalField;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
-
-import static java.time.temporal.ChronoField.*;
-import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
-import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_DAY;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -62,140 +61,154 @@ import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.Up
  * closed to only part of the fleet, e.g. to the vessels of a port under a temporary closure, are
  * not marked. If no vessel of the fleet is active, no cell is marked.
  */
-public class RegulationGridPortrayalFactory extends SimulationScopeFactory<ObjectGridPortrayal2D> {
+public class RegulationGridPortrayalFactory
+  extends SimulationScopeFactory<ObjectGridPortrayal2D>
+{
 
-    private Factory<? super SimulationScope, ? extends Regulations<? super ExtendedFishingAction>>
-        regulations;
-    private Factory<? super SimulationScope, ? extends VesselField> vesselField;
-    private Factory<? super SimulationScope, ? extends Predicate<? super Vessel>> fleet;
-    private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetric;
-    private int displayWidth;
-    private int displayHeight;
+  private Factory<
+    ? super SimulationScope,
+    ? extends Regulations<? super ExtendedFishingAction>
+  > regulations;
+  private Factory<? super SimulationScope, ? extends VesselField> vesselField;
+  private Factory<
+    ? super SimulationScope,
+    ? extends Predicate<? super Vessel>
+  > fleet;
+  private Factory<
+    ? super SimulationScope,
+    ? extends BathymetricGrid
+  > bathymetric;
+  private int displayWidth;
+  private int displayHeight;
 
-    /** @return a portrayal overlaying a checkered texture on cells currently forbidden to fish */
-    @Override
-    protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
-        return new Portrayal(
-            scope.getSimulation().getTemporalSchedule(),
-            regulations.get(scope),
-            vesselField.get(scope),
-            fleet.get(scope),
-            bathymetric.get(scope),
-            EVERY_DAY,
-            displayWidth,
-            displayHeight
+  /** @return a portrayal overlaying a checkered texture on cells currently forbidden to fish */
+  @Override
+  protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
+    return new Portrayal(
+      scope.getSimulation().getTemporalSchedule(),
+      regulations.get(scope),
+      vesselField.get(scope),
+      fleet.get(scope),
+      bathymetric.get(scope),
+      EVERY_DAY,
+      displayWidth,
+      displayHeight
+    );
+  }
+
+  @RequiredArgsConstructor
+  enum UpdateFrequency {
+    EVERY_DAY(EPOCH_DAY),
+    EVERY_MONTH(PROLEPTIC_MONTH),
+    EVERY_YEAR(YEAR);
+
+    private final TemporalField field;
+  }
+
+  @Getter
+  static class Portrayal extends ObjectGridPortrayal2D {
+
+    private static final Image texture;
+
+    static {
+      try {
+        texture = ImageIO.read(
+          Objects.requireNonNull(
+            RegulationGridPortrayalFactory.class.getResource(
+              "/images/checkered.png"
+            )
+          )
         );
+      } catch (final IOException e) {
+        throw new RuntimeException(e);
+      }
     }
 
-    @RequiredArgsConstructor
-    enum UpdateFrequency {
-        EVERY_DAY(EPOCH_DAY),
-        EVERY_MONTH(PROLEPTIC_MONTH),
-        EVERY_YEAR(YEAR);
-        private final TemporalField field;
+    private final TemporalSchedule schedule;
+    private final Regulations<? super ExtendedFishingAction> regulations;
+    private final VesselField vesselField;
+    private final Predicate<? super Vessel> fleet;
+    private final BathymetricGrid bathymetricGrid;
+    private final ObjectGrid2D grid;
+    private final UpdateFrequency updateFrequency;
+    private long lastUpdated;
+
+    Portrayal(
+      final TemporalSchedule schedule,
+      final Regulations<? super ExtendedFishingAction> regulations,
+      final VesselField vesselField,
+      final Predicate<? super Vessel> fleet,
+      final BathymetricGrid bathymetricGrid,
+      final UpdateFrequency updateFrequency,
+      final int displayWidth,
+      final int displayHeight
+    ) {
+      super();
+      this.regulations = regulations;
+      this.vesselField = vesselField;
+      this.fleet = fleet;
+      this.bathymetricGrid = bathymetricGrid;
+      final int gridWidth = bathymetricGrid.getModelGrid().getGridWidth();
+      final int gridHeight = bathymetricGrid.getModelGrid().getGridHeight();
+      this.grid = new ObjectGrid2D(gridWidth, gridHeight);
+      this.schedule = schedule;
+      this.updateFrequency = updateFrequency;
+      setField(grid);
+
+      final Image scaledImage = texture.getScaledInstance(
+        displayWidth / gridWidth,
+        displayHeight / gridHeight,
+        Image.SCALE_DEFAULT
+      );
+
+      setPortrayalForNonNull(new ImagePortrayal2D(scaledImage));
     }
 
-    @Getter
-    static class Portrayal extends ObjectGridPortrayal2D {
-
-        private static final Image texture;
-
-        static {
-            try {
-                texture = ImageIO.read(Objects.requireNonNull(
-                    RegulationGridPortrayalFactory.class.getResource(
-                        "/images/checkered.png"
-                    )
-                ));
-            } catch (final IOException e) {
-                throw new RuntimeException(e);
-            }
+    @Override
+    public void draw(
+      final Object object,
+      final Graphics2D graphics,
+      final DrawInfo2D info
+    ) {
+      final double time = schedule.getTime();
+      if (time >= TemporalSchedule.EPOCH && time < Double.POSITIVE_INFINITY) {
+        final long currentFieldValue = schedule
+          .getDate()
+          .getLong(updateFrequency.field);
+        if (currentFieldValue != lastUpdated) {
+          updateGrid();
+          lastUpdated = currentFieldValue;
         }
-
-        private final TemporalSchedule schedule;
-        private final Regulations<? super ExtendedFishingAction> regulations;
-        private final VesselField vesselField;
-        private final Predicate<? super Vessel> fleet;
-        private final BathymetricGrid bathymetricGrid;
-        private final ObjectGrid2D grid;
-        private final UpdateFrequency updateFrequency;
-        private long lastUpdated;
-
-        Portrayal(
-            final TemporalSchedule schedule,
-            final Regulations<? super ExtendedFishingAction> regulations,
-            final VesselField vesselField,
-            final Predicate<? super Vessel> fleet,
-            final BathymetricGrid bathymetricGrid,
-            final UpdateFrequency updateFrequency,
-            final int displayWidth,
-            final int displayHeight
-        ) {
-            super();
-            this.regulations = regulations;
-            this.vesselField = vesselField;
-            this.fleet = fleet;
-            this.bathymetricGrid = bathymetricGrid;
-            final int gridWidth = bathymetricGrid.getModelGrid().getGridWidth();
-            final int gridHeight = bathymetricGrid.getModelGrid().getGridHeight();
-            this.grid = new ObjectGrid2D(gridWidth, gridHeight);
-            this.schedule = schedule;
-            this.updateFrequency = updateFrequency;
-            setField(grid);
-
-            final Image scaledImage =
-                texture.getScaledInstance(
-                    displayWidth / gridWidth,
-                    displayHeight / gridHeight,
-                    Image.SCALE_DEFAULT
-                );
-
-            setPortrayalForNonNull(new ImagePortrayal2D(scaledImage));
-        }
-
-        @Override
-        public void draw(
-            final Object object,
-            final Graphics2D graphics,
-            final DrawInfo2D info
-        ) {
-            final double time = schedule.getTime();
-            if (time >= TemporalSchedule.EPOCH && time < Double.POSITIVE_INFINITY) {
-                final long currentFieldValue = schedule.getDate().getLong(updateFrequency.field);
-                if (currentFieldValue != lastUpdated) {
-                    updateGrid();
-                    lastUpdated = currentFieldValue;
-                }
-            }
-            super.draw(object, graphics, info);
-        }
-
-        void updateGrid() {
-            final LocalDateTime dateTime = schedule.getDateTime();
-            final List<Vessel> fleetVessels =
-                bagToStream(vesselField.getField().allObjects, Vessel.class)
-                    .filter(Vessel::isActive)
-                    .filter(fleet)
-                    .toList();
-            bathymetricGrid.getActiveWaterCells().forEach(cell -> {
-                final boolean forbidden =
-                    !fleetVessels.isEmpty() &&
-                        fleetVessels
-                            .stream()
-                            .map(vessel ->
-                                new ExtendedFishingAction(
-                                    vessel,
-                                    dateTime,
-                                    Duration.ZERO,
-                                    bathymetricGrid.getModelGrid().toCoordinate(cell),
-                                    vessel.getGear()
-                                )
-                            )
-                            .allMatch(regulations::isForbidden);
-                grid.field[cell.x][cell.y] = forbidden ? "FORBIDDEN" : null;
-            });
-        }
-
+      }
+      super.draw(object, graphics, info);
     }
 
+    void updateGrid() {
+      final LocalDateTime dateTime = schedule.getDateTime();
+      final List<Vessel> fleetVessels = bagToStream(
+        vesselField.getField().allObjects,
+        Vessel.class
+      )
+        .filter(Vessel::isActive)
+        .filter(fleet)
+        .toList();
+      bathymetricGrid.getActiveWaterCells().forEach(cell -> {
+        final boolean forbidden =
+          !fleetVessels.isEmpty() &&
+          fleetVessels
+            .stream()
+            .map(vessel ->
+              new ExtendedFishingAction(
+                vessel,
+                dateTime,
+                Duration.ZERO,
+                bathymetricGrid.getModelGrid().toCoordinate(cell),
+                vessel.getGear()
+              )
+            )
+            .allMatch(regulations::isForbidden);
+        grid.field[cell.x][cell.y] = forbidden ? "FORBIDDEN" : null;
+      });
+    }
+  }
 }

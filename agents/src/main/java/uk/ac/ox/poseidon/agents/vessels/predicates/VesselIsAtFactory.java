@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,8 +32,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.function.Supplier;
-
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link VesselIsAt}, built via
  * {@link Factories#vesselIsAt}.
@@ -41,12 +40,15 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class VesselIsAtFactory<S extends Scope> extends RelativeScopeFactory<S, VesselIsAt> {
+public class VesselIsAtFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  VesselIsAt
+> {
 
-    private Factory<? super S, ? extends Supplier<Int2D>> cellSupplier;
+  private Factory<? super S, ? extends Supplier<Int2D>> cellSupplier;
 
-    @Override
-    protected VesselIsAt newInstance(final S scope) {
-        return new VesselIsAt(cellSupplier.get(scope));
-    }
+  @Override
+  protected VesselIsAt newInstance(final S scope) {
+    return new VesselIsAt(cellSupplier.get(scope));
+  }
 }

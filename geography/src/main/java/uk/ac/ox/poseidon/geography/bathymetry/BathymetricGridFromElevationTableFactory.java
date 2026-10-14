@@ -24,6 +24,8 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.Collection;
+import java.util.Map;
 import lombok.*;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -31,9 +33,6 @@ import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.utils.ElevationTable;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * A {@link BathymetricGridFactory} whose elevation samples come from a resolved
@@ -44,39 +43,40 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BathymetricGridFromElevationTableFactory<S extends Scope>
-    extends BathymetricGridFactory<S> {
+public class BathymetricGridFromElevationTableFactory<S extends Scope> extends BathymetricGridFactory<S> {
 
-    private Factory<? super S, ? extends ElevationTable> elevationTable;
+  private Factory<? super S, ? extends ElevationTable> elevationTable;
 
-    /**
-     * @param elevationTable factory for the table to read elevation samples from
-     * @param modelGrid      factory for the grid this bathymetry is defined over
-     * @param aggregator     factory for the aggregator combining a cell's samples
-     * @param inverted       whether to negate every sample value
-     */
-    public BathymetricGridFromElevationTableFactory(
-        @NonNull final Factory<? super S, ? extends ElevationTable> elevationTable,
-        @NonNull final Factory<? super S, ? extends ModelGrid> modelGrid,
-        @NonNull final Factory<? super S, ? extends Aggregator> aggregator,
-        final boolean inverted
-    ) {
-        super(modelGrid, aggregator, inverted);
-        this.elevationTable = elevationTable;
-    }
+  /**
+   * @param elevationTable factory for the table to read elevation samples from
+   * @param modelGrid      factory for the grid this bathymetry is defined over
+   * @param aggregator     factory for the aggregator combining a cell's samples
+   * @param inverted       whether to negate every sample value
+   */
+  public BathymetricGridFromElevationTableFactory(
+    @NonNull final Factory<? super S, ? extends ElevationTable> elevationTable,
+    @NonNull final Factory<? super S, ? extends ModelGrid> modelGrid,
+    @NonNull final Factory<? super S, ? extends Aggregator> aggregator,
+    final boolean inverted
+  ) {
+    super(modelGrid, aggregator, inverted);
+    this.elevationTable = elevationTable;
+  }
 
-    @Override
-    protected Map<Int2D, Collection<Double>> readElevationValues(
-        final ModelGrid modelGrid,
-        final S scope
-    ) {
-        final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
-        elevationTable.get(scope).entryStream().forEach(entry -> {
-            final Int2D cell = modelGrid.toCell(entry.getCoordinate());
-            final double value = entry.getElevation();
-            elevationValues.put(cell, isInverted() ? -value : value);
-        });
-        return elevationValues.asMap();
-    }
-
+  @Override
+  protected Map<Int2D, Collection<Double>> readElevationValues(
+    final ModelGrid modelGrid,
+    final S scope
+  ) {
+    final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
+    elevationTable
+      .get(scope)
+      .entryStream()
+      .forEach(entry -> {
+        final Int2D cell = modelGrid.toCell(entry.getCoordinate());
+        final double value = entry.getElevation();
+        elevationValues.put(cell, isInverted() ? -value : value);
+      });
+    return elevationValues.asMap();
+  }
 }

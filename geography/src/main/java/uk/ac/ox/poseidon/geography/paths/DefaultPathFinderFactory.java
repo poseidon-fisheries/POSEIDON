@@ -49,34 +49,38 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class DefaultPathFinderFactory
-    extends SimulationScopeFactory<GridPathFinder> {
+  extends SimulationScopeFactory<GridPathFinder>
+{
 
-    private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid;
-    private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
-    private Factory<? super SimulationScope, ? extends DistanceCalculator> distance;
-    private Factory<? super SimulationScope, ? extends PathCache<Int2D>> pathCache;
-    private Factory<? super SimulationScope, ? extends AccessibleWaterCellsCache>
-        accessibleWaterCellsCache;
+  private Factory<
+    ? super SimulationScope,
+    ? extends BathymetricGrid
+  > bathymetricGrid;
+  private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+  private Factory<
+    ? super SimulationScope,
+    ? extends DistanceCalculator
+  > distance;
+  private Factory<
+    ? super SimulationScope,
+    ? extends PathCache<Int2D>
+  > pathCache;
+  private Factory<
+    ? super SimulationScope,
+    ? extends AccessibleWaterCellsCache
+  > accessibleWaterCellsCache;
 
-    @Override
-    protected GridPathFinder newInstance(final SimulationScope scope) {
-        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
-        final PortGrid portGrid = this.portGrid.get(scope);
-        return new CachingGridPathFinder(
-            new FallbackGridPathfinder(
-                new BresenhamPathFinder(
-                    bathymetricGrid,
-                    portGrid
-                ),
-                new AStarPathFinder(
-                    bathymetricGrid,
-                    portGrid,
-                    distance.get(scope)
-                )
-            ),
-            pathCache.get(scope),
-            accessibleWaterCellsCache.get(scope)
-        );
-    }
-
+  @Override
+  protected GridPathFinder newInstance(final SimulationScope scope) {
+    final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
+    final PortGrid portGrid = this.portGrid.get(scope);
+    return new CachingGridPathFinder(
+      new FallbackGridPathfinder(
+        new BresenhamPathFinder(bathymetricGrid, portGrid),
+        new AStarPathFinder(bathymetricGrid, portGrid, distance.get(scope))
+      ),
+      pathCache.get(scope),
+      accessibleWaterCellsCache.get(scope)
+    );
+  }
 }

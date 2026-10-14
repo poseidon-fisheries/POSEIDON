@@ -38,14 +38,18 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UniformBathymetricGridFactory<S extends Scope>
-    extends RelativeScopeFactory<S, BathymetricGrid> {
+public class UniformBathymetricGridFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  BathymetricGrid
+> {
 
-    @NonNull private Factory<? super S, ? extends ModelGrid> modelGrid;
-    private double depth;
+  @NonNull
+  private Factory<? super S, ? extends ModelGrid> modelGrid;
 
-    @Override
-    protected BathymetricGrid newInstance(final S scope) {
-        return new DefaultBathymetricGrid(modelGrid.get(scope), -depth);
-    }
+  private double depth;
+
+  @Override
+  protected BathymetricGrid newInstance(final S scope) {
+    return new DefaultBathymetricGrid(modelGrid.get(scope), -depth);
+  }
 }

@@ -31,13 +31,10 @@ import uk.ac.ox.poseidon.core.events.EventManager;
  * @param <O> the type of option evaluated
  */
 public interface Evaluator<O> {
-    /**
-     * @param option       the option to evaluate
-     * @param eventManager the event manager to listen on while scoring {@code option}
-     * @return a fresh, in-progress {@link Evaluation} of {@code option}
-     */
-    Evaluation<O> newEvaluation(
-        O option,
-        EventManager eventManager
-    );
+  /**
+   * @param option       the option to evaluate
+   * @param eventManager the event manager to listen on while scoring {@code option}
+   * @return a fresh, in-progress {@link Evaluation} of {@code option}
+   */
+  Evaluation<O> newEvaluation(O option, EventManager eventManager);
 }

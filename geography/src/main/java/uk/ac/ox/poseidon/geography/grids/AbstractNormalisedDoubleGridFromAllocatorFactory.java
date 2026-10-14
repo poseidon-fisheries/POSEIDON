@@ -22,15 +22,15 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.Double.isNaN;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.lang.Double.isNaN;
 
 /**
  * An {@link AbstractDoubleGridFromAllocatorFactory} that rescales every cell's raw allocator
@@ -41,45 +41,46 @@ import static java.lang.Double.isNaN;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 abstract class AbstractNormalisedDoubleGridFromAllocatorFactory<
-    S extends Scope, G extends DoubleGrid
-    > extends AbstractDoubleGridFromAllocatorFactory<S, G> {
+  S extends Scope,
+  G extends DoubleGrid
+> extends AbstractDoubleGridFromAllocatorFactory<S, G> {
 
-    private Factory<? super S, ? extends Number> totalValue;
+  private Factory<? super S, ? extends Number> totalValue;
 
-    /**
-     * @param modelGrid  factory for the grid to build over
-     * @param allocator  factory for the allocator assigning each cell's raw value
-     * @param totalValue factory for the value the grid's values should sum to once normalised
-     */
-    protected AbstractNormalisedDoubleGridFromAllocatorFactory(
-        final Factory<? super S, ? extends ModelGrid> modelGrid,
-        final Factory<? super S, ? extends Allocator> allocator,
-        final Factory<? super S, ? extends Number> totalValue
-    ) {
-        super(modelGrid, allocator);
-        this.totalValue = totalValue;
-    }
+  /**
+   * @param modelGrid  factory for the grid to build over
+   * @param allocator  factory for the allocator assigning each cell's raw value
+   * @param totalValue factory for the value the grid's values should sum to once normalised
+   */
+  protected AbstractNormalisedDoubleGridFromAllocatorFactory(
+    final Factory<? super S, ? extends ModelGrid> modelGrid,
+    final Factory<? super S, ? extends Allocator> allocator,
+    final Factory<? super S, ? extends Number> totalValue
+  ) {
+    super(modelGrid, allocator);
+    this.totalValue = totalValue;
+  }
 
-    /**
-     * @throws IllegalArgumentException if the resolved total value or {@code sum} isn't positive
-     */
-    @Override
-    protected double[][] postProcess(
-        final S scope,
-        final double[][] values,
-        final double sum
-    ) {
-        final double totalValue = this.totalValue.get(scope).doubleValue();
-        checkArgument(totalValue > 0, "Total value must be positive");
-        checkArgument(sum > 0, "Sum of values must be positive");
-        final double scale = totalValue / sum;
-        for (int x = 0; x < values.length; x++) {
-            for (int y = 0; y < values[x].length; y++) {
-                if (!isNaN(values[x][y])) {
-                    values[x][y] *= scale;
-                }
-            }
+  /**
+   * @throws IllegalArgumentException if the resolved total value or {@code sum} isn't positive
+   */
+  @Override
+  protected double[][] postProcess(
+    final S scope,
+    final double[][] values,
+    final double sum
+  ) {
+    final double totalValue = this.totalValue.get(scope).doubleValue();
+    checkArgument(totalValue > 0, "Total value must be positive");
+    checkArgument(sum > 0, "Sum of values must be positive");
+    final double scale = totalValue / sum;
+    for (int x = 0; x < values.length; x++) {
+      for (int y = 0; y < values[x].length; y++) {
+        if (!isNaN(values[x][y])) {
+          values[x][y] *= scale;
         }
-        return values;
+      }
     }
+    return values;
+  }
 }

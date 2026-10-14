@@ -22,20 +22,19 @@
 
 package uk.ac.ox.poseidon.io;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import uk.ac.ox.poseidon.core.Scenario;
-import uk.ac.ox.poseidon.core.utils.CustomPathConverter;
-
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.function.Supplier;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+import uk.ac.ox.poseidon.core.Scenario;
+import uk.ac.ox.poseidon.core.utils.CustomPathConverter;
 
 /**
  * Serializes a {@link Scenario} to YAML, either as a string or written directly to a file/stream.
@@ -45,120 +44,122 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * editing the YAML.
  */
 public class ScenarioWriter {
-    private final Yaml yaml;
 
-    /**
-     * Constructs a {@code ScenarioWriter} with default {@link DumperOptions} (pretty flow-style).
-     */
-    public ScenarioWriter() {
-        this(new Yaml(defaultDumperOptions()));
-    }
+  private final Yaml yaml;
 
-    /** @param yaml the configured {@link Yaml} instance to dump scenarios through */
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public ScenarioWriter(final Yaml yaml) {
-        this.yaml = yaml;
-    }
+  /**
+   * Constructs a {@code ScenarioWriter} with default {@link DumperOptions} (pretty flow-style).
+   */
+  public ScenarioWriter() {
+    this(new Yaml(defaultDumperOptions()));
+  }
 
-    private static DumperOptions defaultDumperOptions() {
-        final DumperOptions dumperOptions = new DumperOptions();
-        dumperOptions.setPrettyFlow(true);
-        return dumperOptions;
-    }
+  /** @param yaml the configured {@link Yaml} instance to dump scenarios through */
+  @SuppressFBWarnings("EI_EXPOSE_REP2")
+  public ScenarioWriter(final Yaml yaml) {
+    this.yaml = yaml;
+  }
 
-    /**
-     * @param scenario the scenario to serialize
-     * @return the scenario as a YAML string
-     */
-    public String write(final Scenario scenario) {
-        return yaml.dump(scenario);
-    }
+  private static DumperOptions defaultDumperOptions() {
+    final DumperOptions dumperOptions = new DumperOptions();
+    dumperOptions.setPrettyFlow(true);
+    return dumperOptions;
+  }
 
-    /**
-     * @param scenario the scenario to serialize
-     * @param filePath the path of the file to write the YAML to
-     * @throws RuntimeException if an I/O error occurs
-     */
-    public void write(
-        final Scenario scenario,
-        final Path filePath
+  /**
+   * @param scenario the scenario to serialize
+   * @return the scenario as a YAML string
+   */
+  public String write(final Scenario scenario) {
+    return yaml.dump(scenario);
+  }
+
+  /**
+   * @param scenario the scenario to serialize
+   * @param filePath the path of the file to write the YAML to
+   * @throws RuntimeException if an I/O error occurs
+   */
+  public void write(final Scenario scenario, final Path filePath) {
+    write(scenario, filePath.toFile());
+  }
+
+  /**
+   * @param scenario the scenario to serialize
+   * @param file     the file to write the YAML to
+   * @throws RuntimeException if an I/O error occurs
+   */
+  public void write(final Scenario scenario, final File file) {
+    try (
+      final BufferedWriter writer = new BufferedWriter(
+        new FileWriter(file, UTF_8)
+      )
     ) {
-        write(scenario, filePath.toFile());
+      write(scenario, writer);
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    /**
-     * @param scenario the scenario to serialize
-     * @param file     the file to write the YAML to
-     * @throws RuntimeException if an I/O error occurs
-     */
-    public void write(
-        final Scenario scenario,
-        final File file
+  /**
+   * @param scenario the scenario to serialize
+   * @param writer   the writer to dump the YAML to
+   */
+  public void write(final Scenario scenario, final Writer writer) {
+    yaml.dump(scenario, writer);
+  }
+
+  private static class Args {
+
+    @Parameter(
+      names = { "-c", "--scenario_class_name" },
+      description = "Name of the scenario supplier class",
+      required = true
+    )
+    private String scenarioSupplierClassName;
+
+    @Parameter(
+      names = { "-s", "--scenario_path" },
+      description = "Path to the scenario file in YAML format.",
+      converter = CustomPathConverter.class,
+      required = true
+    )
+    private Path scenarioPath;
+  }
+
+  static void main(final String[] args) {
+    final Args writerArgs = new ScenarioWriter.Args();
+    JCommander.newBuilder().addObject(writerArgs).build().parse(args);
+    final Scenario scenario;
+    try {
+      final Class<?> clazz = Class.forName(
+        writerArgs.scenarioSupplierClassName
+      );
+      if (!Supplier.class.isAssignableFrom(clazz)) {
+        throw new IllegalArgumentException(
+          "Class " + clazz.getName() + " does not implement Supplier<Scenario>."
+        );
+      }
+      final Supplier<?> supplier = clazz
+        .asSubclass(Supplier.class)
+        .getDeclaredConstructor()
+        .newInstance();
+      final Object object = supplier.get();
+      if (!(object instanceof Scenario)) {
+        throw new IllegalArgumentException(
+          "Supplier class " + clazz.getName() + " does not return a Scenario."
+        );
+      }
+      scenario = (Scenario) object;
+    } catch (
+      final ClassNotFoundException
+      | InvocationTargetException
+      | InstantiationException
+      | IllegalAccessException
+      | NoSuchMethodException e
     ) {
-        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(file, UTF_8))) {
-            write(scenario, writer);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+      throw new RuntimeException(e);
     }
-
-    /**
-     * @param scenario the scenario to serialize
-     * @param writer   the writer to dump the YAML to
-     */
-    public void write(
-        final Scenario scenario,
-        final Writer writer
-    ) {
-        yaml.dump(scenario, writer);
-    }
-
-    private static class Args {
-
-        @Parameter(
-            names = {"-c", "--scenario_class_name"},
-            description = "Name of the scenario supplier class",
-            required = true
-        )
-        private String scenarioSupplierClassName;
-
-        @Parameter(
-            names = {"-s", "--scenario_path"},
-            description = "Path to the scenario file in YAML format.",
-            converter = CustomPathConverter.class,
-            required = true
-        )
-        private Path scenarioPath;
-
-    }
-
-    static void main(final String[] args) {
-        final Args writerArgs = new ScenarioWriter.Args();
-        JCommander.newBuilder().addObject(writerArgs).build().parse(args);
-        final Scenario scenario;
-        try {
-            final Class<?> clazz = Class.forName(writerArgs.scenarioSupplierClassName);
-            if (!Supplier.class.isAssignableFrom(clazz)) {
-                throw new IllegalArgumentException(
-                    "Class " + clazz.getName() + " does not implement Supplier<Scenario>."
-                );
-            }
-            final Supplier<?> supplier =
-                clazz.asSubclass(Supplier.class).getDeclaredConstructor().newInstance();
-            final Object object = supplier.get();
-            if (!(object instanceof Scenario)) {
-                throw new IllegalArgumentException(
-                    "Supplier class " + clazz.getName() + " does not return a Scenario."
-                );
-            }
-            scenario = (Scenario) object;
-        } catch (
-            final ClassNotFoundException | InvocationTargetException | InstantiationException |
-                  IllegalAccessException | NoSuchMethodException e
-        ) {
-            throw new RuntimeException(e);
-        }
-        final ScenarioWriter scenarioWriter = new ScenarioWriter();
-        scenarioWriter.write(scenario, writerArgs.scenarioPath);
-    }
+    final ScenarioWriter scenarioWriter = new ScenarioWriter();
+    scenarioWriter.write(scenario, writerArgs.scenarioPath);
+  }
 }

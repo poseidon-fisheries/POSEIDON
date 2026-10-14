@@ -26,19 +26,18 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 class ExponentialMovingAverageOptionValues<T> extends HashMapBasedOptionValues<T> {
 
-    private final double alpha;
+  private final double alpha;
 
-    ExponentialMovingAverageOptionValues(final double alpha) {
-        this.alpha = checkUnitRange(alpha, "alpha");
-    }
+  ExponentialMovingAverageOptionValues(final double alpha) {
+    this.alpha = checkUnitRange(alpha, "alpha");
+  }
 
-    @Override
-    protected double newValue(
-        final T option,
-        final double oldValue,
-        final double observedValue
-    ) {
-        return oldValue * (1 - alpha) + observedValue * alpha;
-    }
-
+  @Override
+  protected double newValue(
+    final T option,
+    final double oldValue,
+    final double observedValue
+  ) {
+    return oldValue * (1 - alpha) + observedValue * alpha;
+  }
 }

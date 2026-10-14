@@ -35,25 +35,22 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  */
 public class CartesianDistanceCalculator extends GridBasedDistanceCalculator {
 
-    private final double cellSizeInKm;
+  private final double cellSizeInKm;
 
-    /**
-     * @param modelGrid    the grid to measure distances over
-     * @param cellSizeInKm the length, in kilometres, of one grid cell's side
-     */
-    public CartesianDistanceCalculator(
-        final ModelGrid modelGrid,
-        final double cellSizeInKm
-    ) {
-        super(modelGrid);
-        this.cellSizeInKm = cellSizeInKm;
-    }
+  /**
+   * @param modelGrid    the grid to measure distances over
+   * @param cellSizeInKm the length, in kilometres, of one grid cell's side
+   */
+  public CartesianDistanceCalculator(
+    final ModelGrid modelGrid,
+    final double cellSizeInKm
+  ) {
+    super(modelGrid);
+    this.cellSizeInKm = cellSizeInKm;
+  }
 
-    @Override
-    public double distanceInKm(
-        final Number2D start,
-        final Number2D end
-    ) {
-        return cellSizeInKm * Math.sqrt(start.getDistanceSq(end));
-    }
+  @Override
+  public double distanceInKm(final Number2D start, final Number2D end) {
+    return cellSizeInKm * Math.sqrt(start.getDistanceSq(end));
+  }
 }

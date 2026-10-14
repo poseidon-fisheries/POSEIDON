@@ -35,19 +35,15 @@ import lombok.Value;
 @Value
 public class Pair<A, B> {
 
-    A first;
-    B second;
+  A first;
+  B second;
 
-    /**
-     * @param a the first value
-     * @param b the second value
-     * @return a pair of the two values
-     */
-    public static <A, B> Pair<A, B> of(
-        final A a,
-        final B b
-    ) {
-        return new Pair<>(a, b);
-    }
-
+  /**
+   * @param a the first value
+   * @param b the second value
+   * @return a pair of the two values
+   */
+  public static <A, B> Pair<A, B> of(final A a, final B b) {
+    return new Pair<>(a, b);
+  }
 }

@@ -30,59 +30,53 @@ import sim.util.Int2D;
  * {@link #setValue}. Built via {@code Factories.mutableDoubleGridFromAllocator(...)}/
  * {@code Factories.normalisedMutableDoubleGridFromAllocator(...)} in this package.
  */
-public class MutableDoubleGrid extends BaseDoubleGrid
-    implements MutableGrid<DoubleGrid2D> {
-    /** @param modelGrid the grid this is defined over; every cell starts at {@code 0.0} */
-    public MutableDoubleGrid(final ModelGrid modelGrid) {
-        super(modelGrid);
-    }
+public class MutableDoubleGrid
+  extends BaseDoubleGrid
+  implements MutableGrid<DoubleGrid2D>
+{
 
-    /**
-     * @param modelGrid    the grid this is defined over
-     * @param initialValue the value every cell starts at
-     */
-    public MutableDoubleGrid(
-        final ModelGrid modelGrid,
-        final double initialValue
-    ) {
-        super(modelGrid, initialValue);
-    }
+  /** @param modelGrid the grid this is defined over; every cell starts at {@code 0.0} */
+  public MutableDoubleGrid(final ModelGrid modelGrid) {
+    super(modelGrid);
+  }
 
-    /**
-     * @param modelGrid the grid this is defined over
-     * @param values    the values, indexed {@code [x][y]}
-     */
-    public MutableDoubleGrid(
-        final ModelGrid modelGrid,
-        final double[][] values
-    ) {
-        super(modelGrid, values);
-    }
+  /**
+   * @param modelGrid    the grid this is defined over
+   * @param initialValue the value every cell starts at
+   */
+  public MutableDoubleGrid(
+    final ModelGrid modelGrid,
+    final double initialValue
+  ) {
+    super(modelGrid, initialValue);
+  }
 
-    /**
-     * @param modelGrid the grid this is defined over
-     * @param grid      the values to copy
-     */
-    public MutableDoubleGrid(
-        final ModelGrid modelGrid,
-        final DoubleGrid2D grid
-    ) {
-        super(modelGrid, grid);
-    }
+  /**
+   * @param modelGrid the grid this is defined over
+   * @param values    the values, indexed {@code [x][y]}
+   */
+  public MutableDoubleGrid(final ModelGrid modelGrid, final double[][] values) {
+    super(modelGrid, values);
+  }
 
-    /**
-     * @param cell  the cell to update
-     * @param value the new value
-     */
-    protected void setValue(
-        final Int2D cell,
-        final double value
-    ) {
-        this.field.set(cell.x, cell.y, value);
-    }
+  /**
+   * @param modelGrid the grid this is defined over
+   * @param grid      the values to copy
+   */
+  public MutableDoubleGrid(final ModelGrid modelGrid, final DoubleGrid2D grid) {
+    super(modelGrid, grid);
+  }
 
-    @Override
-    public DoubleGrid2D getField() {
-        return field;
-    }
+  /**
+   * @param cell  the cell to update
+   * @param value the new value
+   */
+  protected void setValue(final Int2D cell, final double value) {
+    this.field.set(cell.x, cell.y, value);
+  }
+
+  @Override
+  public DoubleGrid2D getField() {
+    return field;
+  }
 }

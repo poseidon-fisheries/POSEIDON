@@ -22,33 +22,36 @@
 
 package uk.ac.ox.poseidon.regulations;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.function.Predicate;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.util.function.Predicate;
+import org.junit.jupiter.api.Test;
+
 class RegulationsTest {
 
-    @SuppressWarnings("unchecked")
-    private final Action<Object> action = mock(Action.class);
+  @SuppressWarnings("unchecked")
+  private final Action<Object> action = mock(Action.class);
 
-    @Test
-    void asAPredicateHoldsForPermittedActions() {
-        final Predicate<Action<Object>> permitting = (Regulations<Action<Object>>) a -> true;
-        final Predicate<Action<Object>> forbidding = (Regulations<Action<Object>>) a -> false;
+  @Test
+  void asAPredicateHoldsForPermittedActions() {
+    final Predicate<Action<Object>> permitting = (Regulations<
+      Action<Object>
+    >) a -> true;
+    final Predicate<Action<Object>> forbidding = (Regulations<
+      Action<Object>
+    >) a -> false;
 
-        assertThat(permitting.test(action)).isTrue();
-        assertThat(forbidding.test(action)).isFalse();
-    }
+    assertThat(permitting.test(action)).isTrue();
+    assertThat(forbidding.test(action)).isFalse();
+  }
 
-    @Test
-    void isForbiddenIsTheOppositeOfIsPermitted() {
-        final Regulations<Action<Object>> permitting = a -> true;
-        final Regulations<Action<Object>> forbidding = a -> false;
+  @Test
+  void isForbiddenIsTheOppositeOfIsPermitted() {
+    final Regulations<Action<Object>> permitting = a -> true;
+    final Regulations<Action<Object>> forbidding = a -> false;
 
-        assertThat(permitting.isForbidden(action)).isFalse();
-        assertThat(forbidding.isForbidden(action)).isTrue();
-    }
+    assertThat(permitting.isForbidden(action)).isFalse();
+    assertThat(forbidding.isForbidden(action)).isTrue();
+  }
 }

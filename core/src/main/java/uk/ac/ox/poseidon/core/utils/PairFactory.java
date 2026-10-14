@@ -38,13 +38,17 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PairFactory<S extends Scope, A, B> extends RelativeScopeFactory<S, Pair<A, B>> {
+public class PairFactory<
+  S extends Scope,
+  A,
+  B
+> extends RelativeScopeFactory<S, Pair<A, B>> {
 
-    private Factory<? super S, ? extends A> first;
-    private Factory<? super S, ? extends B> second;
+  private Factory<? super S, ? extends A> first;
+  private Factory<? super S, ? extends B> second;
 
-    @Override
-    protected Pair<A, B> newInstance(final S scope) {
-        return new Pair<>(first.get(scope), second.get(scope));
-    }
+  @Override
+  protected Pair<A, B> newInstance(final S scope) {
+    return new Pair<>(first.get(scope), second.get(scope));
+  }
 }

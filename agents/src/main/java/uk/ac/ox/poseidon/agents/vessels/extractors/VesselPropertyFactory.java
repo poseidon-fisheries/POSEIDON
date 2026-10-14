@@ -38,13 +38,13 @@ import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
 @EqualsAndHashCode(callSuper = true)
 public class VesselPropertyFactory<R> extends ObjectPropertyFactory<Vessel, R> {
 
-    /** @param propertyPath the dotted path of properties to follow from the vessel */
-    public VesselPropertyFactory(final String propertyPath) {
-        super(propertyPath);
-    }
+  /** @param propertyPath the dotted path of properties to follow from the vessel */
+  public VesselPropertyFactory(final String propertyPath) {
+    super(propertyPath);
+  }
 
-    @Override
-    protected Class<Vessel> rootClass() {
-        return Vessel.class;
-    }
+  @Override
+  protected Class<Vessel> rootClass() {
+    return Vessel.class;
+  }
 }

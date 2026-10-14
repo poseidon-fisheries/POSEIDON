@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @EqualsAndHashCode(callSuper = true)
 public class CurrentDateFactory extends SimulationScopeFactory<CurrentDate> {
 
-    @Override
-    protected CurrentDate newInstance(final SimulationScope scope) {
-        return new CurrentDate(scope.getSimulation().getTemporalSchedule());
-    }
+  @Override
+  protected CurrentDate newInstance(final SimulationScope scope) {
+    return new CurrentDate(scope.getSimulation().getTemporalSchedule());
+  }
 }

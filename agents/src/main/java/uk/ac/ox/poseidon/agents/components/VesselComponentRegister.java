@@ -22,57 +22,52 @@
 
 package uk.ac.ox.poseidon.agents.components;
 
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
-
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 
 /**
  * Stores per-vessel components for a simulation so other systems can query them by vessel.
  */
 public class VesselComponentRegister<C> implements VesselsGetter {
 
-    private final Map<Vessel, C> map = new HashMap<>();
+  private final Map<Vessel, C> map = new HashMap<>();
 
-    /**
-     * Associates the given component with the vessel.
-     */
-    public void putComponent(
-        final Vessel vessel,
-        final C component
-    ) {
-        map.put(vessel, component);
-    }
+  /**
+   * Associates the given component with the vessel.
+   */
+  public void putComponent(final Vessel vessel, final C component) {
+    map.put(vessel, component);
+  }
 
-    /**
-     * Retrieves the component for the vessel, if available.
-     */
-    public Optional<C> getComponent(final Vessel vessel) {
-        return Optional.ofNullable(map.get(vessel));
-    }
+  /**
+   * Retrieves the component for the vessel, if available.
+   */
+  public Optional<C> getComponent(final Vessel vessel) {
+    return Optional.ofNullable(map.get(vessel));
+  }
 
-    /**
-     * Returns the set of vessels currently in the register.
-     */
-    @Override
-    public Set<Vessel> getVessels() {
-        return Collections.unmodifiableSet(map.keySet());
-    }
+  /**
+   * Returns the set of vessels currently in the register.
+   */
+  @Override
+  public Set<Vessel> getVessels() {
+    return Collections.unmodifiableSet(map.keySet());
+  }
 
-    /**
-     * Returns a stream of all vessel/component entries.
-     */
-    public Stream<Map.Entry<Vessel, C>> getAllEntries() {
-        return map.entrySet().stream();
-    }
+  /**
+   * Returns a stream of all vessel/component entries.
+   */
+  public Stream<Map.Entry<Vessel, C>> getAllEntries() {
+    return map.entrySet().stream();
+  }
 
-    /**
-     * Returns a stream of entries excluding the provided vessel.
-     */
-    public Stream<Entry<Vessel, C>> getOtherEntries(final Vessel vessel) {
-        return getAllEntries().filter(entry -> !entry.getKey().equals(vessel));
-    }
-
+  /**
+   * Returns a stream of entries excluding the provided vessel.
+   */
+  public Stream<Entry<Vessel, C>> getOtherEntries(final Vessel vessel) {
+    return getAllEntries().filter(entry -> !entry.getKey().equals(vessel));
+  }
 }

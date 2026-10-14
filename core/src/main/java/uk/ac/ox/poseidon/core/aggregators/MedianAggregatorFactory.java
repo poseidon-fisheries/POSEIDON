@@ -35,9 +35,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MedianAggregatorFactory extends GlobalScopeFactory<MedianAggregator> {
-    @Override
-    protected MedianAggregator newInstance(final Scope scope) {
-        return new MedianAggregator();
-    }
+public class MedianAggregatorFactory
+  extends GlobalScopeFactory<MedianAggregator>
+{
+
+  @Override
+  protected MedianAggregator newInstance(final Scope scope) {
+    return new MedianAggregator();
+  }
 }

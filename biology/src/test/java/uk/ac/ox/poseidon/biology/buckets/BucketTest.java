@@ -22,342 +22,397 @@
 
 package uk.ac.ox.poseidon.biology.buckets;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.biology.Content;
-import uk.ac.ox.poseidon.biology.biomass.Biomass;
-import uk.ac.ox.poseidon.biology.species.Species;
+import static java.util.stream.Collectors.toMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import static java.util.stream.Collectors.toMap;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.biology.Content;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
+import uk.ac.ox.poseidon.biology.species.Species;
 
 abstract class BucketTest {
 
-    abstract Bucket newBucket(Map<Species, Double> map);
+  abstract Bucket newBucket(Map<Species, Double> map);
 
-    private final Species a = new Species("A", null, "A");
-    private final Species bA = new Species("B", "adult", "B");
-    private final Species bJ = new Species("B", "juvenile", "B");
-    private final Species c = new Species("C", null, "C");
-    private final Species d = new Species("D", null, "D");
+  private final Species a = new Species("A", null, "A");
+  private final Species bA = new Species("B", "adult", "B");
+  private final Species bJ = new Species("B", "juvenile", "B");
+  private final Species c = new Species("C", null, "C");
+  private final Species d = new Species("D", null, "D");
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private void assertContainsBiomass(
-        final Optional<? extends Content> maybeContent,
-        final double expectedKg
-    ) {
-        assertThat(maybeContent).hasValueSatisfying(
-            content -> assertThat(content).isEqualTo(Biomass.ofKg(expectedKg))
-        );
-    }
+  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+  private void assertContainsBiomass(
+    final Optional<? extends Content> maybeContent,
+    final double expectedKg
+  ) {
+    assertThat(maybeContent).hasValueSatisfying(content ->
+      assertThat(content).isEqualTo(Biomass.ofKg(expectedKg))
+    );
+  }
 
-    @Test
-    void simpleBucketCreation() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        assertContainsBiomass(bucket.getContent(a), 100.0);
-        assertContainsBiomass(bucket.getContent(bA), 200.0);
-        assertContainsBiomass(bucket.getContent(bJ), 300.0);
-        assertContainsBiomass(bucket.getContent(c), 400.0);
-        assertThat(bucket.getContent(d)).isEmpty();
-    }
+  @Test
+  void simpleBucketCreation() {
+    final Bucket bucket = newBucket(
+      Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
+    );
+    assertContainsBiomass(bucket.getContent(a), 100.0);
+    assertContainsBiomass(bucket.getContent(bA), 200.0);
+    assertContainsBiomass(bucket.getContent(bJ), 300.0);
+    assertContainsBiomass(bucket.getContent(c), 400.0);
+    assertThat(bucket.getContent(d)).isEmpty();
+  }
 
-    @Test
-    void bucketCreationWithAZeroBiomassSpecies() {
-        final Bucket bucket = newBucket(Map.of(a, 0.0, bA, 100.0, bJ, 200.0));
-        assertThat(bucket.getContent(a)).isEmpty();
-        assertContainsBiomass(bucket.getContent(bA), 100.0);
-        assertContainsBiomass(bucket.getContent(bJ), 200.0);
-        assertThat(bucket.getKg(a)).isEqualTo(0);
-        assertThat(bucket.getKg(bA)).isEqualTo(100.0);
-        assertThat(bucket.getKg(bJ)).isEqualTo(200.0);
-    }
+  @Test
+  void bucketCreationWithAZeroBiomassSpecies() {
+    final Bucket bucket = newBucket(Map.of(a, 0.0, bA, 100.0, bJ, 200.0));
+    assertThat(bucket.getContent(a)).isEmpty();
+    assertContainsBiomass(bucket.getContent(bA), 100.0);
+    assertContainsBiomass(bucket.getContent(bJ), 200.0);
+    assertThat(bucket.getKg(a)).isEqualTo(0);
+    assertThat(bucket.getKg(bA)).isEqualTo(100.0);
+    assertThat(bucket.getKg(bJ)).isEqualTo(200.0);
+  }
 
-    @Test
-    void simpleAddition() {
-        final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        final Bucket bucket2 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        final Bucket bucket3 = bucket1.add(bucket2);
-        assertContainsBiomass(bucket3.getContent(a), 200.0);
-        assertContainsBiomass(bucket3.getContent(bA), 400.0);
-        assertContainsBiomass(bucket3.getContent(bJ), 600.0);
-        assertContainsBiomass(bucket3.getContent(c), 800.0);
-    }
+  @Test
+  void simpleAddition() {
+    final Bucket bucket1 = newBucket(
+      Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
+    );
+    final Bucket bucket2 = newBucket(
+      Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
+    );
+    final Bucket bucket3 = bucket1.add(bucket2);
+    assertContainsBiomass(bucket3.getContent(a), 200.0);
+    assertContainsBiomass(bucket3.getContent(bA), 400.0);
+    assertContainsBiomass(bucket3.getContent(bJ), 600.0);
+    assertContainsBiomass(bucket3.getContent(c), 800.0);
+  }
 
-    @Test
-    void additionOfBucketsWithDifferentSpecies() {
-        final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
-        final Bucket bucket2 = newBucket(Map.of(bA, 200.0, bJ, 300.0));
-        final Bucket bucket3 = bucket1.add(bucket2);
-        assertContainsBiomass(bucket3.getContent(a), 100.0);
-        assertContainsBiomass(bucket3.getContent(bA), 400.0);
-        assertContainsBiomass(bucket3.getContent(bJ), 300.0);
-    }
+  @Test
+  void additionOfBucketsWithDifferentSpecies() {
+    final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
+    final Bucket bucket2 = newBucket(Map.of(bA, 200.0, bJ, 300.0));
+    final Bucket bucket3 = bucket1.add(bucket2);
+    assertContainsBiomass(bucket3.getContent(a), 100.0);
+    assertContainsBiomass(bucket3.getContent(bA), 400.0);
+    assertContainsBiomass(bucket3.getContent(bJ), 300.0);
+  }
 
-    @Test
-    void additionIsCommutative() {
-        final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
-        final Bucket bucket2 = newBucket(Map.of(bA, 50.0, c, 300.0));
-        assertThat(bucket1.add(bucket2).getMap()).isEqualTo(bucket2.add(bucket1).getMap());
-    }
+  @Test
+  void additionIsCommutative() {
+    final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
+    final Bucket bucket2 = newBucket(Map.of(bA, 50.0, c, 300.0));
+    assertThat(bucket1.add(bucket2).getMap()).isEqualTo(
+      bucket2.add(bucket1).getMap()
+    );
+  }
 
-    @Test
-    void additionIsAssociative() {
-        final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
-        final Bucket bucket2 = newBucket(Map.of(bA, 50.0, c, 300.0));
-        final Bucket bucket3 = newBucket(Map.of(a, 25.0, d, 75.0));
-        assertThat(bucket1.add(bucket2).add(bucket3).getMap())
-            .isEqualTo(bucket1.add(bucket2.add(bucket3)).getMap());
-    }
+  @Test
+  void additionIsAssociative() {
+    final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
+    final Bucket bucket2 = newBucket(Map.of(bA, 50.0, c, 300.0));
+    final Bucket bucket3 = newBucket(Map.of(a, 25.0, d, 75.0));
+    assertThat(bucket1.add(bucket2).add(bucket3).getMap()).isEqualTo(
+      bucket1.add(bucket2.add(bucket3)).getMap()
+    );
+  }
 
-    @Test
-    void addingEmptyBucketIsNoOp() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0));
-        assertThat(bucket.add(Bucket.empty()).getMap()).isEqualTo(bucket.getMap());
-    }
+  @Test
+  void addingEmptyBucketIsNoOp() {
+    final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0));
+    assertThat(bucket.add(Bucket.empty()).getMap()).isEqualTo(bucket.getMap());
+  }
 
-    @Test
-    void missingSpeciesRemainsEmptyAfterAddition() {
-        final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
-        final Bucket bucket2 = newBucket(Map.of(bA, 200.0, bJ, 300.0));
-        final Bucket bucket3 = bucket1.add(bucket2);
-        assertThat(bucket3.getContent(d)).isEmpty();
-        assertThat(bucket3.getKg(d)).isEqualTo(0.0);
-    }
+  @Test
+  void missingSpeciesRemainsEmptyAfterAddition() {
+    final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0));
+    final Bucket bucket2 = newBucket(Map.of(bA, 200.0, bJ, 300.0));
+    final Bucket bucket3 = bucket1.add(bucket2);
+    assertThat(bucket3.getContent(d)).isEmpty();
+    assertThat(bucket3.getKg(d)).isEqualTo(0.0);
+  }
 
-    @Test
-    void subtraction() {
-        final Bucket bucket1 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        final Bucket bucket2 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        final Bucket bucket3 = bucket1.subtract(bucket2);
-        assertThat(bucket3.getContent(a)).isEmpty();
-        assertThat(bucket3.getContent(bA)).isEmpty();
-        assertThat(bucket3.getContent(bJ)).isEmpty();
-        assertThat(bucket3.getContent(c)).isEmpty();
-        assertThat(bucket3.getTotalBiomass()).isEqualTo(Biomass.ZERO);
-    }
+  @Test
+  void subtraction() {
+    final Bucket bucket1 = newBucket(
+      Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
+    );
+    final Bucket bucket2 = newBucket(
+      Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
+    );
+    final Bucket bucket3 = bucket1.subtract(bucket2);
+    assertThat(bucket3.getContent(a)).isEmpty();
+    assertThat(bucket3.getContent(bA)).isEmpty();
+    assertThat(bucket3.getContent(bJ)).isEmpty();
+    assertThat(bucket3.getContent(c)).isEmpty();
+    assertThat(bucket3.getTotalBiomass()).isEqualTo(Biomass.ZERO);
+  }
 
-    @Test
-    void subtractingEmptyBucketIsNoOp() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0));
-        assertThat(bucket.subtract(Bucket.empty()).getMap()).isEqualTo(bucket.getMap());
-    }
+  @Test
+  void subtractingEmptyBucketIsNoOp() {
+    final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0));
+    assertThat(bucket.subtract(Bucket.empty()).getMap()).isEqualTo(
+      bucket.getMap()
+    );
+  }
 
-    @Test
-    void subtractingMoreThanAvailableThrows() {
-        final Bucket bucket1 = newBucket(Map.of(a, 100.0));
-        final Bucket bucket2 = newBucket(Map.of(a, 200.0));
-        assertThatThrownBy(() -> bucket1.subtract(bucket2))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+  @Test
+  void subtractingMoreThanAvailableThrows() {
+    final Bucket bucket1 = newBucket(Map.of(a, 100.0));
+    final Bucket bucket2 = newBucket(Map.of(a, 200.0));
+    assertThatThrownBy(() -> bucket1.subtract(bucket2)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+  }
 
-    @Test
-    void replaceContent() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        final Bucket newBucket = bucket.replaceContent(a, Biomass.ofKg(50.0));
-        assertContainsBiomass(bucket.getContent(a), 100.0);
-        assertContainsBiomass(newBucket.getContent(a), 50.0);
-    }
+  @Test
+  void replaceContent() {
+    final Bucket bucket = newBucket(
+      Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
+    );
+    final Bucket newBucket = bucket.replaceContent(a, Biomass.ofKg(50.0));
+    assertContainsBiomass(bucket.getContent(a), 100.0);
+    assertContainsBiomass(newBucket.getContent(a), 50.0);
+  }
 
-    @Test
-    void mapContent() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        final var newBucket = bucket.mapContent((species, content) -> content.multiply(2.0));
-        assertContainsBiomass(newBucket.getContent(a), 200.0);
-        assertContainsBiomass(newBucket.getContent(bA), 400.0);
-        assertContainsBiomass(newBucket.getContent(bJ), 600.0);
-        assertContainsBiomass(newBucket.getContent(c), 800.0);
-    }
+  @Test
+  void mapContent() {
+    final Bucket bucket = newBucket(
+      Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
+    );
+    final var newBucket = bucket.mapContent((species, content) ->
+      content.multiply(2.0)
+    );
+    assertContainsBiomass(newBucket.getContent(a), 200.0);
+    assertContainsBiomass(newBucket.getContent(bA), 400.0);
+    assertContainsBiomass(newBucket.getContent(bJ), 600.0);
+    assertContainsBiomass(newBucket.getContent(c), 800.0);
+  }
 
-    @Test
-    void partitionBy() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        final Map<Boolean, Bucket> result =
-            bucket.partitionBy((species, content) -> species.getLifeStage() == null);
-        assertThat(result.get(true).getSpecies()).isEqualTo(Set.of(a, c));
-        assertThat(result.get(false).getSpecies()).isEqualTo(Set.of(bA, bJ));
-    }
+  @Test
+  void partitionBy() {
+    final Bucket bucket = newBucket(
+      Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
+    );
+    final Map<Boolean, Bucket> result = bucket.partitionBy(
+      (species, content) -> species.getLifeStage() == null
+    );
+    assertThat(result.get(true).getSpecies()).isEqualTo(Set.of(a, c));
+    assertThat(result.get(false).getSpecies()).isEqualTo(Set.of(bA, bJ));
+  }
 
-    @Test
-    void isEmpty() {
-        final Bucket b1 = newBucket(Map.of());
-        assertThat(b1.isEmpty()).isTrue();
-        final Bucket b2 = newBucket(Map.of(a, 0.0));
-        assertThat(b2.isEmpty()).isTrue();
-        final Bucket b3 = newBucket(Map.of(a, 100.0));
-        assertThat(b3.isEmpty()).isFalse();
-    }
+  @Test
+  void isEmpty() {
+    final Bucket b1 = newBucket(Map.of());
+    assertThat(b1.isEmpty()).isTrue();
+    final Bucket b2 = newBucket(Map.of(a, 0.0));
+    assertThat(b2.isEmpty()).isTrue();
+    final Bucket b3 = newBucket(Map.of(a, 100.0));
+    assertThat(b3.isEmpty()).isFalse();
+  }
 
-    @Test
-    void getTotalBiomass() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        assertThat(bucket.getTotalBiomass()).isEqualTo(Biomass.ofKg(1000.0));
-    }
+  @Test
+  void getTotalBiomass() {
+    final Bucket bucket = newBucket(
+      Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
+    );
+    assertThat(bucket.getTotalBiomass()).isEqualTo(Biomass.ofKg(1000.0));
+  }
 
-    @Test
-    void getMap() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        final Map<Species, Content> map = bucket.getMap();
-        assertThat(map).isEqualTo(
-            Map.of(
-                a, Biomass.ofKg(100.0),
-                bA, Biomass.ofKg(200.0),
-                bJ, Biomass.ofKg(300.0),
-                c, Biomass.ofKg(400.0)
-            )
-        );
-    }
+  @Test
+  void getMap() {
+    final Bucket bucket = newBucket(
+      Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
+    );
+    final Map<Species, Content> map = bucket.getMap();
+    assertThat(map).isEqualTo(
+      Map.of(
+        a,
+        Biomass.ofKg(100.0),
+        bA,
+        Biomass.ofKg(200.0),
+        bJ,
+        Biomass.ofKg(300.0),
+        c,
+        Biomass.ofKg(400.0)
+      )
+    );
+  }
 
-    @Test
-    void getSpecies() {
-        final Bucket b1 = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        assertThat(b1.getSpecies()).isEqualTo(Set.of(a, bA, bJ, c));
-        final Bucket b2 = newBucket(Map.of(a, 100.0, c, 400.0));
-        assertThat(b2.getSpecies()).isEqualTo(Set.of(a, c));
-    }
+  @Test
+  void getSpecies() {
+    final Bucket b1 = newBucket(
+      Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
+    );
+    assertThat(b1.getSpecies()).isEqualTo(Set.of(a, bA, bJ, c));
+    final Bucket b2 = newBucket(Map.of(a, 100.0, c, 400.0));
+    assertThat(b2.getSpecies()).isEqualTo(Set.of(a, c));
+  }
 
-    @Test
-    void forEachSkipsZeroBiomassSpecies() {
-        final Bucket bucket = newBucket(Map.of(a, 0.0, bA, 100.0, bJ, 200.0));
-        final Set<Species> visited = new HashSet<>();
-        bucket.forEach((species, content) -> visited.add(species));
-        assertThat(visited).isEqualTo(Set.of(bA, bJ));
-    }
+  @Test
+  void forEachSkipsZeroBiomassSpecies() {
+    final Bucket bucket = newBucket(Map.of(a, 0.0, bA, 100.0, bJ, 200.0));
+    final Set<Species> visited = new HashSet<>();
+    bucket.forEach((species, content) -> visited.add(species));
+    assertThat(visited).isEqualTo(Set.of(bA, bJ));
+  }
 
-    @Test
-    void forEachBiomassValueSkipsZeroBiomassSpecies() {
-        final Bucket bucket = newBucket(Map.of(a, 0.0, bA, 100.0, bJ, 200.0));
-        final Set<Species> visited = new HashSet<>();
-        bucket.forEachBiomassValue((species, value) -> visited.add(species));
-        assertThat(visited).isEqualTo(Set.of(bA, bJ));
-    }
+  @Test
+  void forEachBiomassValueSkipsZeroBiomassSpecies() {
+    final Bucket bucket = newBucket(Map.of(a, 0.0, bA, 100.0, bJ, 200.0));
+    final Set<Species> visited = new HashSet<>();
+    bucket.forEachBiomassValue((species, value) -> visited.add(species));
+    assertThat(visited).isEqualTo(Set.of(bA, bJ));
+  }
 
-    @Test
-    void partitionBySkipsZeroBiomassSpecies() {
-        final Bucket bucket = newBucket(Map.of(a, 0.0, bA, 100.0, bJ, 200.0));
-        final Map<Boolean, Bucket> partitions = bucket.partitionBy((species, content) -> true);
-        final Set<Species> trueVisited = new HashSet<>();
-        partitions.get(true).forEach((species, content) -> trueVisited.add(species));
-        assertThat(trueVisited).isEqualTo(Set.of(bA, bJ));
-        assertThat(partitions.get(false).isEmpty()).isTrue();
-    }
+  @Test
+  void partitionBySkipsZeroBiomassSpecies() {
+    final Bucket bucket = newBucket(Map.of(a, 0.0, bA, 100.0, bJ, 200.0));
+    final Map<Boolean, Bucket> partitions = bucket.partitionBy(
+      (species, content) -> true
+    );
+    final Set<Species> trueVisited = new HashSet<>();
+    partitions
+      .get(true)
+      .forEach((species, content) -> trueVisited.add(species));
+    assertThat(trueVisited).isEqualTo(Set.of(bA, bJ));
+    assertThat(partitions.get(false).isEmpty()).isTrue();
+  }
 
-    @Test
-    void mapBiomassValueDoesNotVisitZeroBiomassSpecies() {
-        final Bucket bucket = newBucket(Map.of(a, 0.0, bA, 100.0));
-        final Set<Species> visited = new HashSet<>();
-        final Bucket mapped = bucket.mapBiomassValue((species, value) -> {
-            visited.add(species);
-            return value;
-        });
-        assertThat(visited).isEqualTo(Set.of(bA));
-        assertContainsBiomass(mapped.getContent(bA), 100.0);
-    }
+  @Test
+  void mapBiomassValueDoesNotVisitZeroBiomassSpecies() {
+    final Bucket bucket = newBucket(Map.of(a, 0.0, bA, 100.0));
+    final Set<Species> visited = new HashSet<>();
+    final Bucket mapped = bucket.mapBiomassValue((species, value) -> {
+      visited.add(species);
+      return value;
+    });
+    assertThat(visited).isEqualTo(Set.of(bA));
+    assertContainsBiomass(mapped.getContent(bA), 100.0);
+  }
 
-    @Test
-    void mapBiomassValueReturningNaNRemovesSpecies() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0));
-        final Bucket mapped = bucket.mapBiomassValue((species, value) -> Double.NaN);
-        assertThat(mapped).isSameAs(Bucket.empty());
-    }
+  @Test
+  void mapBiomassValueReturningNaNRemovesSpecies() {
+    final Bucket bucket = newBucket(Map.of(a, 100.0));
+    final Bucket mapped = bucket.mapBiomassValue(
+      (species, value) -> Double.NaN
+    );
+    assertThat(mapped).isSameAs(Bucket.empty());
+  }
 
-    @Test
-    void replaceContentWithZeroDoesNotVisitRemovedSpecies() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0));
-        final Bucket replaced = bucket.replaceContent(a, Biomass.ofKg(0.0));
-        final Set<Species> visited = new HashSet<>();
-        replaced.forEach((species, content) -> visited.add(species));
-        assertThat(visited).isEqualTo(Set.of(bA));
-    }
+  @Test
+  void replaceContentWithZeroDoesNotVisitRemovedSpecies() {
+    final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0));
+    final Bucket replaced = bucket.replaceContent(a, Biomass.ofKg(0.0));
+    final Set<Species> visited = new HashSet<>();
+    replaced.forEach((species, content) -> visited.add(species));
+    assertThat(visited).isEqualTo(Set.of(bA));
+  }
 
-    @Test
-    void replacingLastPositiveContentWithZeroReturnsBucketEmpty() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0));
-        final Bucket replaced = bucket.replaceContent(a, Biomass.ofKg(0.0));
-        assertThat(replaced).isSameAs(Bucket.empty());
-    }
+  @Test
+  void replacingLastPositiveContentWithZeroReturnsBucketEmpty() {
+    final Bucket bucket = newBucket(Map.of(a, 100.0));
+    final Bucket replaced = bucket.replaceContent(a, Biomass.ofKg(0.0));
+    assertThat(replaced).isSameAs(Bucket.empty());
+  }
 
-    @Test
-    void bucketWithNaNBiomassIsObservablyEmpty() {
-        final Bucket bucket = newBucket(Map.of(a, Double.NaN));
-        assertThat(bucket.isEmpty()).isTrue();
-        assertThat(bucket.getContent(a)).isEmpty();
-        assertThat(bucket.getKg(a)).isEqualTo(0.0);
-        assertThat(bucket.getSpecies()).isEmpty();
-        assertThat(bucket.getTotalBiomass()).isEqualTo(Biomass.ZERO);
-    }
+  @Test
+  void bucketWithNaNBiomassIsObservablyEmpty() {
+    final Bucket bucket = newBucket(Map.of(a, Double.NaN));
+    assertThat(bucket.isEmpty()).isTrue();
+    assertThat(bucket.getContent(a)).isEmpty();
+    assertThat(bucket.getKg(a)).isEqualTo(0.0);
+    assertThat(bucket.getSpecies()).isEmpty();
+    assertThat(bucket.getTotalBiomass()).isEqualTo(Biomass.ZERO);
+  }
 
-    @Test
-    void forEachSkipsNaNBiomassSpecies() {
-        final Bucket bucket = newBucket(Map.of(a, Double.NaN, bA, 100.0));
-        final Set<Species> visited = new HashSet<>();
-        bucket.forEach((species, content) -> visited.add(species));
-        assertThat(visited).isEqualTo(Set.of(bA));
-    }
+  @Test
+  void forEachSkipsNaNBiomassSpecies() {
+    final Bucket bucket = newBucket(Map.of(a, Double.NaN, bA, 100.0));
+    final Set<Species> visited = new HashSet<>();
+    bucket.forEach((species, content) -> visited.add(species));
+    assertThat(visited).isEqualTo(Set.of(bA));
+  }
 
-    @Test
-    void partitionByAllEntriesMatchPredicate() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0));
-        final Map<Boolean, Bucket> partitions =
-            bucket.partitionBy((species, content) -> true);
-        assertThat(partitions.get(true).getSpecies()).isEqualTo(Set.of(a, bA));
-        assertThat(partitions.get(false).isEmpty()).isTrue();
-    }
+  @Test
+  void partitionByAllEntriesMatchPredicate() {
+    final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0));
+    final Map<Boolean, Bucket> partitions = bucket.partitionBy(
+      (species, content) -> true
+    );
+    assertThat(partitions.get(true).getSpecies()).isEqualTo(Set.of(a, bA));
+    assertThat(partitions.get(false).isEmpty()).isTrue();
+  }
 
-    @Test
-    void partitionByNoEntriesMatchPredicate() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0));
-        final Map<Boolean, Bucket> partitions =
-            bucket.partitionBy((species, content) -> false);
-        assertThat(partitions.get(true).isEmpty()).isTrue();
-        assertThat(partitions.get(false).getSpecies()).isEqualTo(Set.of(a, bA));
-    }
+  @Test
+  void partitionByNoEntriesMatchPredicate() {
+    final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0));
+    final Map<Boolean, Bucket> partitions = bucket.partitionBy(
+      (species, content) -> false
+    );
+    assertThat(partitions.get(true).isEmpty()).isTrue();
+    assertThat(partitions.get(false).getSpecies()).isEqualTo(Set.of(a, bA));
+  }
 
-    @Test
-    void replaceContentForAbsentSpeciesAddsEntry() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0));
-        final Bucket replaced = bucket.replaceContent(bA, Biomass.ofKg(50.0));
-        assertThat(replaced.getKg(a)).isEqualTo(100.0);
-        assertThat(replaced.getKg(bA)).isEqualTo(50.0);
-        assertThat(replaced.getSpecies()).isEqualTo(Set.of(a, bA));
-    }
+  @Test
+  void replaceContentForAbsentSpeciesAddsEntry() {
+    final Bucket bucket = newBucket(Map.of(a, 100.0));
+    final Bucket replaced = bucket.replaceContent(bA, Biomass.ofKg(50.0));
+    assertThat(replaced.getKg(a)).isEqualTo(100.0);
+    assertThat(replaced.getKg(bA)).isEqualTo(50.0);
+    assertThat(replaced.getSpecies()).isEqualTo(Set.of(a, bA));
+  }
 
-    @Test
-    void hashCodeMatchesGetMapHashCode() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0));
-        assertThat(bucket.hashCode()).isEqualTo(bucket.getMap().hashCode());
-    }
+  @Test
+  void hashCodeMatchesGetMapHashCode() {
+    final Bucket bucket = newBucket(
+      Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
+    );
+    assertThat(bucket.hashCode()).isEqualTo(bucket.getMap().hashCode());
+  }
 
-    @Test
-    void equalBucketsFromDifferentImplementationsCompareEqual() {
-        final Map<Species, Double> map = Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0);
-        final Bucket bucket = newBucket(map);
-        final Bucket bucketFromFactory = Bucket.of(
-            map.entrySet()
-                .stream()
-                .collect(toMap(Map.Entry::getKey, e -> (Content) Biomass.ofKg(e.getValue())))
-        );
-        assertThat(bucket).isEqualTo(bucketFromFactory);
-        assertThat(bucket.hashCode()).isEqualTo(bucketFromFactory.hashCode());
-    }
+  @Test
+  void equalBucketsFromDifferentImplementationsCompareEqual() {
+    final Map<Species, Double> map = Map.of(
+      a,
+      100.0,
+      bA,
+      200.0,
+      bJ,
+      300.0,
+      c,
+      400.0
+    );
+    final Bucket bucket = newBucket(map);
+    final Bucket bucketFromFactory = Bucket.of(
+      map
+        .entrySet()
+        .stream()
+        .collect(
+          toMap(Map.Entry::getKey, e -> (Content) Biomass.ofKg(e.getValue()))
+        )
+    );
+    assertThat(bucket).isEqualTo(bucketFromFactory);
+    assertThat(bucket.hashCode()).isEqualTo(bucketFromFactory.hashCode());
+  }
 
-    @Test
-    void singleSpeciesBucketsFromDifferentImplementationsCompareEqual() {
-        final Bucket bucket = newBucket(Map.of(a, 100.0));
-        final Bucket singleSpeciesBucket = Bucket.of(a, 100.0);
-        assertThat(bucket).isEqualTo(singleSpeciesBucket);
-        assertThat(bucket.hashCode()).isEqualTo(singleSpeciesBucket.hashCode());
-    }
+  @Test
+  void singleSpeciesBucketsFromDifferentImplementationsCompareEqual() {
+    final Bucket bucket = newBucket(Map.of(a, 100.0));
+    final Bucket singleSpeciesBucket = Bucket.of(a, 100.0);
+    assertThat(bucket).isEqualTo(singleSpeciesBucket);
+    assertThat(bucket.hashCode()).isEqualTo(singleSpeciesBucket.hashCode());
+  }
 
-    @Test
-    void emptyBucketsFromDifferentImplementationsCompareEqual() {
-        final Bucket bucket = newBucket(Map.of());
-        assertThat(bucket).isEqualTo(Bucket.empty());
-        assertThat(bucket.hashCode()).isEqualTo(Bucket.empty().hashCode());
-    }
-
+  @Test
+  void emptyBucketsFromDifferentImplementationsCompareEqual() {
+    final Bucket bucket = newBucket(Map.of());
+    assertThat(bucket).isEqualTo(Bucket.empty());
+    assertThat(bucket.hashCode()).isEqualTo(Bucket.empty().hashCode());
+  }
 }

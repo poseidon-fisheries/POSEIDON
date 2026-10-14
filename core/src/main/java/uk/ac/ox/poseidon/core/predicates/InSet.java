@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import lombok.RequiredArgsConstructor;
 
 /**
  * A {@link Predicate} that is true iff the tested value is a member of a supplied collection.
@@ -37,11 +36,10 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class InSet<T> implements Predicate<T> {
 
-    private final Supplier<? extends Collection<? extends T>> values;
+  private final Supplier<? extends Collection<? extends T>> values;
 
-    @Override
-    public boolean test(final T t) {
-        return values.get().contains(t);
-    }
-
+  @Override
+  public boolean test(final T t) {
+    return values.get().contains(t);
+  }
 }

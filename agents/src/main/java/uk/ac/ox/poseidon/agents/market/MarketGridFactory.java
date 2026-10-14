@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,11 +34,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
-
-import java.util.List;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link ImmutableMarketGrid}, placing each
@@ -45,21 +44,25 @@ import static java.util.stream.Collectors.toMap;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MarketGridFactory<S extends Scope>
-    extends RelativeScopeFactory<S, MarketGrid> {
+public class MarketGridFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  MarketGrid
+> {
 
-    private Factory<? super S, ? extends PortGrid> portGrid;
-    private Factory<? super S, ? extends List<? extends Market>> markets;
+  private Factory<? super S, ? extends PortGrid> portGrid;
+  private Factory<? super S, ? extends List<? extends Market>> markets;
 
-    @Override
-    protected MarketGrid newInstance(final S scope) {
-        final PortGrid portGrid = this.portGrid.get(scope);
-        return new ImmutableMarketGrid(
-            portGrid.getModelGrid(),
-            markets.get(scope).stream().collect(toMap(
-                identity(),
-                market -> portGrid.getLocation(market.getPort())
-            ))
-        );
-    }
+  @Override
+  protected MarketGrid newInstance(final S scope) {
+    final PortGrid portGrid = this.portGrid.get(scope);
+    return new ImmutableMarketGrid(
+      portGrid.getModelGrid(),
+      markets
+        .get(scope)
+        .stream()
+        .collect(
+          toMap(identity(), market -> portGrid.getLocation(market.getPort()))
+        )
+    );
+  }
 }

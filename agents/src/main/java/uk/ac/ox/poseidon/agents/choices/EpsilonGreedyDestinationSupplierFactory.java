@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,8 +32,6 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
-import java.util.function.Supplier;
-
 /**
  * A {@link VesselScopeFactory} counterpart of {@link EpsilonGreedyChooser}, built via
  * {@link Factories#epsilonGreedyDestination}.
@@ -41,20 +40,22 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class EpsilonGreedyDestinationSupplierFactory extends VesselScopeFactory<DestinationSupplier> {
+public class EpsilonGreedyDestinationSupplierFactory
+  extends VesselScopeFactory<DestinationSupplier>
+{
 
-    private double epsilon;
-    private Factory<? super VesselScope, ? extends Supplier<Int2D>> explorer;
-    private Factory<? super VesselScope, ? extends Supplier<Int2D>> exploiter;
+  private double epsilon;
+  private Factory<? super VesselScope, ? extends Supplier<Int2D>> explorer;
+  private Factory<? super VesselScope, ? extends Supplier<Int2D>> exploiter;
 
-    /** @return an {@link EpsilonGreedyChooser} over the resolved explorer/exploiter, as a {@link DestinationSupplier} */
-    @Override
-    protected DestinationSupplier newInstance(final VesselScope scope) {
-        return new EpsilonGreedyChooser<>(
-            epsilon,
-            explorer.get(scope),
-            exploiter.get(scope),
-            scope.getSimulation().random
-        )::get;
-    }
+  /** @return an {@link EpsilonGreedyChooser} over the resolved explorer/exploiter, as a {@link DestinationSupplier} */
+  @Override
+  protected DestinationSupplier newInstance(final VesselScope scope) {
+    return new EpsilonGreedyChooser<>(
+      epsilon,
+      explorer.get(scope),
+      exploiter.get(scope),
+      scope.getSimulation().random
+    )::get;
+  }
 }

@@ -22,6 +22,13 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Map.entry;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,14 +36,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static java.util.Map.entry;
 
 /**
  * Turns the dated snapshots given by {@code timeIndexedBiomassGrids} into
@@ -51,27 +50,32 @@ import static java.util.Map.entry;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TimeIndexedBiomassGridUpdatesFactory<S extends Scope>
-    extends RelativeScopeFactory<S, List<Entry<LocalDateTime, BiomassGridUpdate>>> {
+public class TimeIndexedBiomassGridUpdatesFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  List<Entry<LocalDateTime, BiomassGridUpdate>>
+> {
 
-    private Factory<? super S, ? extends FisheableBiomassGrids> biomassGrids;
-    private Factory<? super S, ? extends Map<LocalDateTime, ? extends List<? extends SpeciesGrid>>>
-        timeIndexedBiomassGrids;
+  private Factory<? super S, ? extends FisheableBiomassGrids> biomassGrids;
+  private Factory<
+    ? super S,
+    ? extends Map<LocalDateTime, ? extends List<? extends SpeciesGrid>>
+  > timeIndexedBiomassGrids;
 
-    @Override
-    protected List<Entry<LocalDateTime, BiomassGridUpdate>> newInstance(
-        final S scope
-    ) {
-        final FisheableBiomassGrids target = biomassGrids.get(scope);
-        return timeIndexedBiomassGrids
-            .get(scope)
-            .entrySet()
-            .stream()
-            .map(snapshot -> entry(
-                snapshot.getKey(),
-                new BiomassGridUpdate(snapshot.getValue(), target)
-            ))
-            .collect(toImmutableList());
-    }
-
+  @Override
+  protected List<Entry<LocalDateTime, BiomassGridUpdate>> newInstance(
+    final S scope
+  ) {
+    final FisheableBiomassGrids target = biomassGrids.get(scope);
+    return timeIndexedBiomassGrids
+      .get(scope)
+      .entrySet()
+      .stream()
+      .map(snapshot ->
+        entry(
+          snapshot.getKey(),
+          new BiomassGridUpdate(snapshot.getValue(), target)
+        )
+      )
+      .collect(toImmutableList());
+  }
 }

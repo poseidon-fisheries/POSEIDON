@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 import java.util.function.BinaryOperator;
-
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /**
  * A {@link Memory} update rule for {@link Bucket}s: an exponential moving average taken species by
@@ -38,22 +37,21 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
  * Every species' content is averaged as {@link uk.ac.ox.poseidon.biology.biomass.Biomass}, so any
  * structure a content has beyond its weight in kilograms is lost.
  */
-public class ExponentialMovingAverageOfBuckets implements BinaryOperator<Bucket> {
+public class ExponentialMovingAverageOfBuckets
+  implements BinaryOperator<Bucket>
+{
 
-    private final double alpha;
+  private final double alpha;
 
-    /** @param alpha the weight of a new observation, between 0 and 1 */
-    ExponentialMovingAverageOfBuckets(final double alpha) {
-        this.alpha = checkUnitRange(alpha, "alpha");
-    }
+  /** @param alpha the weight of a new observation, between 0 and 1 */
+  ExponentialMovingAverageOfBuckets(final double alpha) {
+    this.alpha = checkUnitRange(alpha, "alpha");
+  }
 
-    @Override
-    public Bucket apply(
-        final Bucket recollection,
-        final Bucket observation
-    ) {
-        return recollection
-            .mapBiomassValue((species, kg) -> kg * (1 - alpha))
-            .add(observation.mapBiomassValue((species, kg) -> kg * alpha));
-    }
+  @Override
+  public Bucket apply(final Bucket recollection, final Bucket observation) {
+    return recollection
+      .mapBiomassValue((species, kg) -> kg * (1 - alpha))
+      .add(observation.mapBiomassValue((species, kg) -> kg * alpha));
+  }
 }

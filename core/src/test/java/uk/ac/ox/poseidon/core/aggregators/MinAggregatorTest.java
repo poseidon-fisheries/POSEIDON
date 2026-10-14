@@ -22,99 +22,109 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.OptionalDouble;
 import java.util.stream.DoubleStream;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class MinAggregatorTest {
 
-    /**
-     * The Min class provides a method to find the minimum value from a given {@link DoubleStream}.
-     * This test class validates the functionality of the {@link MinAggregator#apply(DoubleStream)}
-     * method.
-     */
+  /**
+   * The Min class provides a method to find the minimum value from a given {@link DoubleStream}.
+   * This test class validates the functionality of the {@link MinAggregator#apply(DoubleStream)}
+   * method.
+   */
 
-    private final MinAggregator minAggregatorAggregator = new MinAggregator();
+  private final MinAggregator minAggregatorAggregator = new MinAggregator();
 
-    @Test
-    void testApplyWithNonEmptyStream() {
-        // Arrange
-        final DoubleStream doubleStream = DoubleStream.of(3.5, 2.1, 4.8, 1.2, 5.6);
+  @Test
+  void testApplyWithNonEmptyStream() {
+    // Arrange
+    final DoubleStream doubleStream = DoubleStream.of(3.5, 2.1, 4.8, 1.2, 5.6);
 
-        // Act
-        final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
+    // Act
+    final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
-        // Assert
-        assertTrue(result.isPresent(), "Expected result to be present");
-        assertEquals(1.2, result.getAsDouble(), 0.001, "Minimum value is incorrect");
-    }
+    // Assert
+    assertTrue(result.isPresent(), "Expected result to be present");
+    assertEquals(
+      1.2,
+      result.getAsDouble(),
+      0.001,
+      "Minimum value is incorrect"
+    );
+  }
 
-    @Test
-    void testApplyWithEmptyStream() {
-        // Arrange
-        final DoubleStream doubleStream = DoubleStream.empty();
+  @Test
+  void testApplyWithEmptyStream() {
+    // Arrange
+    final DoubleStream doubleStream = DoubleStream.empty();
 
-        // Act
-        final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
+    // Act
+    final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
-        // Assert
-        assertFalse(result.isPresent(), "Expected result to be empty");
-    }
+    // Assert
+    assertFalse(result.isPresent(), "Expected result to be empty");
+  }
 
-    @Test
-    void testApplyWithSingleElementStream() {
-        // Arrange
-        final DoubleStream doubleStream = DoubleStream.of(7.9);
+  @Test
+  void testApplyWithSingleElementStream() {
+    // Arrange
+    final DoubleStream doubleStream = DoubleStream.of(7.9);
 
-        // Act
-        final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
+    // Act
+    final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
-        // Assert
-        assertTrue(result.isPresent(), "Expected result to be present");
-        assertEquals(
-            7.9,
-            result.getAsDouble(),
-            0.001,
-            "Minimum value for single element stream is incorrect"
-        );
-    }
+    // Assert
+    assertTrue(result.isPresent(), "Expected result to be present");
+    assertEquals(
+      7.9,
+      result.getAsDouble(),
+      0.001,
+      "Minimum value for single element stream is incorrect"
+    );
+  }
 
-    @Test
-    void testApplyWithNegativeValues() {
-        // Arrange
-        final DoubleStream doubleStream = DoubleStream.of(-3.4, -1.2, -7.8, -0.5);
+  @Test
+  void testApplyWithNegativeValues() {
+    // Arrange
+    final DoubleStream doubleStream = DoubleStream.of(-3.4, -1.2, -7.8, -0.5);
 
-        // Act
-        final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
+    // Act
+    final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
-        // Assert
-        assertTrue(result.isPresent(), "Expected result to be present");
-        assertEquals(
-            -7.8,
-            result.getAsDouble(),
-            0.001,
-            "Minimum value with negative numbers is incorrect"
-        );
-    }
+    // Assert
+    assertTrue(result.isPresent(), "Expected result to be present");
+    assertEquals(
+      -7.8,
+      result.getAsDouble(),
+      0.001,
+      "Minimum value with negative numbers is incorrect"
+    );
+  }
 
-    @Test
-    void testApplyWithMixedSignValues() {
-        // Arrange
-        final DoubleStream doubleStream = DoubleStream.of(4.5, -2.3, 0.0, 3.1, -5.9);
+  @Test
+  void testApplyWithMixedSignValues() {
+    // Arrange
+    final DoubleStream doubleStream = DoubleStream.of(
+      4.5,
+      -2.3,
+      0.0,
+      3.1,
+      -5.9
+    );
 
-        // Act
-        final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
+    // Act
+    final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
-        // Assert
-        assertTrue(result.isPresent(), "Expected result to be present");
-        assertEquals(
-            -5.9,
-            result.getAsDouble(),
-            0.001,
-            "Minimum value for mixed sign values is incorrect"
-        );
-    }
+    // Assert
+    assertTrue(result.isPresent(), "Expected result to be present");
+    assertEquals(
+      -5.9,
+      result.getAsDouble(),
+      0.001,
+      "Minimum value for mixed sign values is incorrect"
+    );
+  }
 }

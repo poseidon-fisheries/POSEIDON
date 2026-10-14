@@ -27,22 +27,29 @@ import java.util.Collection;
 /** A {@link DispositionProcess} that chains several steps, each refining the previous one's result. */
 public class CompositeDispositionProcess implements DispositionProcess {
 
-    private final DispositionProcess[] dispositionStrategies;
+  private final DispositionProcess[] dispositionStrategies;
 
-    CompositeDispositionProcess(final Collection<DispositionProcess> dispositionStrategies) {
-        this.dispositionStrategies = dispositionStrategies.toArray(DispositionProcess[]::new);
-    }
+  CompositeDispositionProcess(
+    final Collection<DispositionProcess> dispositionStrategies
+  ) {
+    this.dispositionStrategies = dispositionStrategies.toArray(
+      DispositionProcess[]::new
+    );
+  }
 
-    /** @return the disposition after running every step in {@link #dispositionStrategies}, in order */
-    @Override
-    public Disposition partition(
-        final Disposition currentDisposition,
-        final double availableCapacityInKg
-    ) {
-        Disposition disposition = currentDisposition;
-        for (final DispositionProcess dispositionProcess : dispositionStrategies) {
-            disposition = dispositionProcess.partition(disposition, availableCapacityInKg);
-        }
-        return disposition;
+  /** @return the disposition after running every step in {@link #dispositionStrategies}, in order */
+  @Override
+  public Disposition partition(
+    final Disposition currentDisposition,
+    final double availableCapacityInKg
+  ) {
+    Disposition disposition = currentDisposition;
+    for (final DispositionProcess dispositionProcess : dispositionStrategies) {
+      disposition = dispositionProcess.partition(
+        disposition,
+        availableCapacityInKg
+      );
     }
+    return disposition;
+  }
 }

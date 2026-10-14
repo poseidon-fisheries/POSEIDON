@@ -20,10 +20,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package uk.ac.ox.poseidon.agents.regulations.predicates;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableList;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
@@ -40,146 +50,169 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.regulations.Regulations;
 import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenDates;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 /**
  * A vessel in port at cell (0, 0) considers fishing at cell (2, 0), two hours away, with sets of
  * a typical one hour. A port closure starts on 20 January 2013 at midnight.
  */
 class FishingLocationLegalityCheckerTest {
 
-    private static final Int2D PORT = new Int2D(0, 0);
-    private static final Int2D CANDIDATE = new Int2D(2, 0);
-    private static final ImmutableList<Int2D> PATH =
-        ImmutableList.of(PORT, new Int2D(1, 0), CANDIDATE);
-    private static final double SPEED_IN_KPH = 10;
-    private static final Duration TRAVEL = Duration.ofHours(2);
-    private static final Duration TYPICAL_SET = Duration.ofHours(1);
-    private static final ModelGrid MODEL_GRID =
-        ModelGrid.create(3, 1, new Envelope(10, 13, 40, 41));
-    private static final Regulations<ExtendedFishingAction> CLOSED_FROM_20_JANUARY =
-        action -> !new BetweenDates(LocalDate.of(2013, 1, 20), LocalDate.of(2013, 2, 18))
-            .test(action);
+  private static final Int2D PORT = new Int2D(0, 0);
+  private static final Int2D CANDIDATE = new Int2D(2, 0);
+  private static final ImmutableList<Int2D> PATH = ImmutableList.of(
+    PORT,
+    new Int2D(1, 0),
+    CANDIDATE
+  );
+  private static final double SPEED_IN_KPH = 10;
+  private static final Duration TRAVEL = Duration.ofHours(2);
+  private static final Duration TYPICAL_SET = Duration.ofHours(1);
+  private static final ModelGrid MODEL_GRID = ModelGrid.create(
+    3,
+    1,
+    new Envelope(10, 13, 40, 41)
+  );
+  private static final Regulations<ExtendedFishingAction> CLOSED_FROM_20_JANUARY =
+    action ->
+      !new BetweenDates(
+        LocalDate.of(2013, 1, 20),
+        LocalDate.of(2013, 2, 18)
+      ).test(action);
 
-    private final Vessel vessel = mock(Vessel.class);
-    private final Gear gear = mock(Gear.class);
-    private final GridPathFinder pathFinder = mock(GridPathFinder.class);
-    private final DistanceCalculator distance = mock(DistanceCalculator.class);
+  private final Vessel vessel = mock(Vessel.class);
+  private final Gear gear = mock(Gear.class);
+  private final GridPathFinder pathFinder = mock(GridPathFinder.class);
+  private final DistanceCalculator distance = mock(DistanceCalculator.class);
 
-    @BeforeEach
-    void setUp() {
-        final Engine engine = mock(Engine.class);
-        when(engine.getCruisingSpeedInKph()).thenReturn(SPEED_IN_KPH);
-        final VesselField vesselField = mock(VesselField.class);
-        when(vesselField.getModelGrid()).thenReturn(MODEL_GRID);
-        when(vessel.getCell()).thenReturn(PORT);
-        when(vessel.getEngine()).thenReturn(engine);
-        when(vessel.getVesselField()).thenReturn(vesselField);
-        when(vessel.getGear()).thenReturn(gear);
-        when(pathFinder.getPath(PORT, CANDIDATE)).thenReturn(Optional.of(PATH));
-        when(distance.travelDuration(PATH, SPEED_IN_KPH)).thenReturn(TRAVEL);
-    }
+  @BeforeEach
+  void setUp() {
+    final Engine engine = mock(Engine.class);
+    when(engine.getCruisingSpeedInKph()).thenReturn(SPEED_IN_KPH);
+    final VesselField vesselField = mock(VesselField.class);
+    when(vesselField.getModelGrid()).thenReturn(MODEL_GRID);
+    when(vessel.getCell()).thenReturn(PORT);
+    when(vessel.getEngine()).thenReturn(engine);
+    when(vessel.getVesselField()).thenReturn(vesselField);
+    when(vessel.getGear()).thenReturn(gear);
+    when(pathFinder.getPath(PORT, CANDIDATE)).thenReturn(Optional.of(PATH));
+    when(distance.travelDuration(PATH, SPEED_IN_KPH)).thenReturn(TRAVEL);
+  }
 
-    private FishingLocationLegalityChecker checker(
-        final Regulations<? super ExtendedFishingAction> regulations,
-        final LocalDateTime now
-    ) {
-        return new FishingLocationLegalityChecker(
-            regulations,
-            pathFinder,
-            distance,
-            TYPICAL_SET,
-            () -> now,
-            vessel
+  private FishingLocationLegalityChecker checker(
+    final Regulations<? super ExtendedFishingAction> regulations,
+    final LocalDateTime now
+  ) {
+    return new FishingLocationLegalityChecker(
+      regulations,
+      pathFinder,
+      distance,
+      TYPICAL_SET,
+      () -> now,
+      vessel
+    );
+  }
+
+  @Test
+  void theActionCheckedStartsOnArrivalAtTheCandidateAndLastsATypicalSet() {
+    final List<ExtendedFishingAction> checked = new ArrayList<>();
+    final boolean permitted = checker(
+      action -> checked.add(action),
+      LocalDateTime.of(2013, 1, 19, 20, 30)
+    ).test(CANDIDATE);
+    assertThat(permitted).isTrue();
+    assertThat(checked)
+      .singleElement()
+      .satisfies(action -> {
+        assertThat(action.getAgent()).isSameAs(vessel);
+        assertThat(action.getGear()).isSameAs(gear);
+        assertThat(action.getStartCoordinate()).isEqualTo(
+          MODEL_GRID.toCoordinate(CANDIDATE)
         );
-    }
-
-    @Test
-    void theActionCheckedStartsOnArrivalAtTheCandidateAndLastsATypicalSet() {
-        final List<ExtendedFishingAction> checked = new ArrayList<>();
-        final boolean permitted = checker(
-            action -> checked.add(action),
-            LocalDateTime.of(2013, 1, 19, 20, 30)
-        ).test(CANDIDATE);
-        assertThat(permitted).isTrue();
-        assertThat(checked).singleElement().satisfies(action -> {
-            assertThat(action.getAgent()).isSameAs(vessel);
-            assertThat(action.getGear()).isSameAs(gear);
-            assertThat(action.getStartCoordinate()).isEqualTo(MODEL_GRID.toCoordinate(CANDIDATE));
-            assertThat(action.getEndCoordinate()).isEqualTo(MODEL_GRID.toCoordinate(CANDIDATE));
-            assertThat(action.getStartDateTime()).isEqualTo(LocalDateTime.of(2013, 1, 19, 22, 30));
-            assertThat(action.getEndDateTime()).isEqualTo(LocalDateTime.of(2013, 1, 19, 23, 30));
-        });
-    }
-
-    @Test
-    void aCandidateInTheVesselsOwnCellIsReachedWithoutTravel() {
-        when(vessel.getCell()).thenReturn(CANDIDATE);
-        when(pathFinder.getPath(CANDIDATE, CANDIDATE))
-            .thenReturn(Optional.of(ImmutableList.of(CANDIDATE)));
-        final List<ExtendedFishingAction> checked = new ArrayList<>();
-        final LocalDateTime now = LocalDateTime.of(2013, 1, 19, 20, 30);
-        new FishingLocationLegalityChecker(
-            action -> checked.add(action),
-            pathFinder,
-            new CartesianDistanceCalculator(MODEL_GRID, 1.0),
-            TYPICAL_SET,
-            () -> now,
-            vessel
-        ).test(CANDIDATE);
-        assertThat(checked).singleElement().satisfies(action ->
-            assertThat(action.getStartDateTime()).isEqualTo(now)
+        assertThat(action.getEndCoordinate()).isEqualTo(
+          MODEL_GRID.toCoordinate(CANDIDATE)
         );
-    }
+        assertThat(action.getStartDateTime()).isEqualTo(
+          LocalDateTime.of(2013, 1, 19, 22, 30)
+        );
+        assertThat(action.getEndDateTime()).isEqualTo(
+          LocalDateTime.of(2013, 1, 19, 23, 30)
+        );
+      });
+  }
 
-    @Test
-    void aSetExpectedToRunIntoAClosureIsRefused() {
-        // Arrives at 23:30, so a typical set would end at 00:30 on the first day of the closure
-        assertThat(
-            checker(CLOSED_FROM_20_JANUARY, LocalDateTime.of(2013, 1, 19, 21, 30)).test(CANDIDATE)
-        ).isFalse();
-    }
+  @Test
+  void aCandidateInTheVesselsOwnCellIsReachedWithoutTravel() {
+    when(vessel.getCell()).thenReturn(CANDIDATE);
+    when(pathFinder.getPath(CANDIDATE, CANDIDATE)).thenReturn(
+      Optional.of(ImmutableList.of(CANDIDATE))
+    );
+    final List<ExtendedFishingAction> checked = new ArrayList<>();
+    final LocalDateTime now = LocalDateTime.of(2013, 1, 19, 20, 30);
+    new FishingLocationLegalityChecker(
+      action -> checked.add(action),
+      pathFinder,
+      new CartesianDistanceCalculator(MODEL_GRID, 1.0),
+      TYPICAL_SET,
+      () -> now,
+      vessel
+    ).test(CANDIDATE);
+    assertThat(checked)
+      .singleElement()
+      .satisfies(action ->
+        assertThat(action.getStartDateTime()).isEqualTo(now)
+      );
+  }
 
-    @Test
-    void aSetExpectedToEndWhenAClosureStartsIsAllowed() {
-        // Arrives at 23:00, so a typical set would end at midnight, as the closure starts
-        assertThat(
-            checker(CLOSED_FROM_20_JANUARY, LocalDateTime.of(2013, 1, 19, 21, 0)).test(CANDIDATE)
-        ).isTrue();
-    }
+  @Test
+  void aSetExpectedToRunIntoAClosureIsRefused() {
+    // Arrives at 23:30, so a typical set would end at 00:30 on the first day of the closure
+    assertThat(
+      checker(
+        CLOSED_FROM_20_JANUARY,
+        LocalDateTime.of(2013, 1, 19, 21, 30)
+      ).test(CANDIDATE)
+    ).isFalse();
+  }
 
-    @Test
-    void aSetDuringAClosureIsRefused() {
-        assertThat(
-            checker(CLOSED_FROM_20_JANUARY, LocalDateTime.of(2013, 2, 1, 21, 0)).test(CANDIDATE)
-        ).isFalse();
-    }
+  @Test
+  void aSetExpectedToEndWhenAClosureStartsIsAllowed() {
+    // Arrives at 23:00, so a typical set would end at midnight, as the closure starts
+    assertThat(
+      checker(
+        CLOSED_FROM_20_JANUARY,
+        LocalDateTime.of(2013, 1, 19, 21, 0)
+      ).test(CANDIDATE)
+    ).isTrue();
+  }
 
-    @Test
-    void aSetAfterAClosureIsAllowed() {
-        // The closure covers 18 February entirely; this set starts at 00:00 on the 19th
-        assertThat(
-            checker(CLOSED_FROM_20_JANUARY, LocalDateTime.of(2013, 2, 18, 22, 0)).test(CANDIDATE)
-        ).isTrue();
-    }
+  @Test
+  void aSetDuringAClosureIsRefused() {
+    assertThat(
+      checker(CLOSED_FROM_20_JANUARY, LocalDateTime.of(2013, 2, 1, 21, 0)).test(
+        CANDIDATE
+      )
+    ).isFalse();
+  }
 
-    @Test
-    void aCandidateWithNoPathFails() {
-        when(pathFinder.getPath(PORT, CANDIDATE)).thenReturn(Optional.empty());
-        final FishingLocationLegalityChecker checker =
-            checker(action -> true, LocalDateTime.of(2013, 1, 19, 20, 30));
-        assertThatThrownBy(() -> checker.test(CANDIDATE))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("No path");
-    }
+  @Test
+  void aSetAfterAClosureIsAllowed() {
+    // The closure covers 18 February entirely; this set starts at 00:00 on the 19th
+    assertThat(
+      checker(
+        CLOSED_FROM_20_JANUARY,
+        LocalDateTime.of(2013, 2, 18, 22, 0)
+      ).test(CANDIDATE)
+    ).isTrue();
+  }
+
+  @Test
+  void aCandidateWithNoPathFails() {
+    when(pathFinder.getPath(PORT, CANDIDATE)).thenReturn(Optional.empty());
+    final FishingLocationLegalityChecker checker = checker(
+      action -> true,
+      LocalDateTime.of(2013, 1, 19, 20, 30)
+    );
+    assertThatThrownBy(() -> checker.test(CANDIDATE))
+      .isInstanceOf(RuntimeException.class)
+      .hasMessageContaining("No path");
+  }
 }

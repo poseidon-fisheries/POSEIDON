@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,8 +33,6 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.Pair;
 import uk.ac.ox.poseidon.geography.Coordinate;
-
-import java.util.List;
 
 /**
  * A {@link RelativeScopeFactory} that reads one (port, coordinate) pair per row of a resolved
@@ -50,30 +49,34 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PortsFromTableFactory<S extends Scope>
-    extends RelativeScopeFactory<S, List<Pair<Port, Coordinate>>> {
+public class PortsFromTableFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  List<Pair<Port, Coordinate>>
+> {
 
-    Factory<? super S, Table> table;
-    String portCodeColumnName;
-    String portNameColumnName;
-    String longitudeColumnName;
-    String latitudeColumnName;
+  Factory<? super S, Table> table;
+  String portCodeColumnName;
+  String portNameColumnName;
+  String longitudeColumnName;
+  String latitudeColumnName;
 
-    @Override
-    protected List<Pair<Port, Coordinate>> newInstance(final S scope) {
-        return table
-            .get(scope)
-            .stream()
-            .map(row -> Pair.of(
-                new Port(
-                    row.getString(portCodeColumnName),
-                    row.getString(portNameColumnName)
-                ),
-                new Coordinate(
-                    row.getNumber(longitudeColumnName),
-                    row.getNumber(latitudeColumnName)
-                )
-            ))
-            .toList();
-    }
+  @Override
+  protected List<Pair<Port, Coordinate>> newInstance(final S scope) {
+    return table
+      .get(scope)
+      .stream()
+      .map(row ->
+        Pair.of(
+          new Port(
+            row.getString(portCodeColumnName),
+            row.getString(portNameColumnName)
+          ),
+          new Coordinate(
+            row.getNumber(longitudeColumnName),
+            row.getNumber(latitudeColumnName)
+          )
+        )
+      )
+      .toList();
+  }
 }

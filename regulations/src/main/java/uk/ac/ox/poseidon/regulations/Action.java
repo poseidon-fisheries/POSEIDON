@@ -28,6 +28,6 @@ package uk.ac.ox.poseidon.regulations;
  * {@link SpatialAction} so predicates can constrain when and where the action happens.
  */
 public interface Action<G> {
-    /** @return the agent performing this action */
-    G getAgent();
+  /** @return the agent performing this action */
+  G getAgent();
 }

@@ -38,12 +38,13 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ExponentialMovingAverageOfDoublesFactory
-    extends GlobalScopeFactory<ExponentialMovingAverageOfDoubles> {
+  extends GlobalScopeFactory<ExponentialMovingAverageOfDoubles>
+{
 
-    private double alpha;
+  private double alpha;
 
-    @Override
-    protected ExponentialMovingAverageOfDoubles newInstance(final Scope scope) {
-        return new ExponentialMovingAverageOfDoubles(alpha);
-    }
+  @Override
+  protected ExponentialMovingAverageOfDoubles newInstance(final Scope scope) {
+    return new ExponentialMovingAverageOfDoubles(alpha);
+  }
 }

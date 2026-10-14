@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.io;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-
-import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * A {@link Steppable} that recursively deletes a target directory when stepped. Built via
@@ -37,29 +36,35 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public class DirectoryRemover implements Steppable {
 
-    private final System.Logger logger = System.getLogger(DirectoryRemover.class.getName());
+  private final System.Logger logger = System.getLogger(
+    DirectoryRemover.class.getName()
+  );
 
-    private final Path target;
-    private final boolean ignoreIfAbsent;
+  private final Path target;
+  private final boolean ignoreIfAbsent;
 
-    /**
-     * @throws IllegalStateException if {@code target} doesn't exist and {@code ignoreIfAbsent} is
-     *                                {@code false}, or if it exists but isn't a directory
-     */
-    @Override
-    public void step(final SimState simState) {
-        if (!target.toFile().exists()) {
-            if (ignoreIfAbsent) return;
-            else throw new IllegalStateException(target + " does not exist");
-        }
-        if (!target.toFile().isDirectory()) {
-            throw new IllegalStateException(target + " is not a directory");
-        }
-        try {
-            FileUtils.deleteDirectory(target.toFile());
-            logger.log(System.Logger.Level.INFO, "Deleted {0}", target.toAbsolutePath());
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+  /**
+   * @throws IllegalStateException if {@code target} doesn't exist and {@code ignoreIfAbsent} is
+   *                                {@code false}, or if it exists but isn't a directory
+   */
+  @Override
+  public void step(final SimState simState) {
+    if (!target.toFile().exists()) {
+      if (ignoreIfAbsent) return;
+      else throw new IllegalStateException(target + " does not exist");
     }
+    if (!target.toFile().isDirectory()) {
+      throw new IllegalStateException(target + " is not a directory");
+    }
+    try {
+      FileUtils.deleteDirectory(target.toFile());
+      logger.log(
+        System.Logger.Level.INFO,
+        "Deleted {0}",
+        target.toAbsolutePath()
+      );
+    } catch (final IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

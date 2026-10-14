@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.vessels.accounts;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.ToString;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A vessel's running balance, kept as one {@link Money} amount per {@link CurrencyUnit}
@@ -39,37 +38,42 @@ import java.util.Map;
 @ToString
 public class Account {
 
-    /** The account's live balance map; read-only by convention, not defensively copied. */
-    private final Map<CurrencyUnit, Money> balances = new HashMap<>();
+  /** The account's live balance map; read-only by convention, not defensively copied. */
+  private final Map<CurrencyUnit, Money> balances = new HashMap<>();
 
-    /** Overwrites the balance for {@code balance}'s currency. */
-    public void setBalance(final Money balance) {
-        balances.put(balance.getCurrencyUnit(), balance);
-    }
+  /** Overwrites the balance for {@code balance}'s currency. */
+  public void setBalance(final Money balance) {
+    balances.put(balance.getCurrencyUnit(), balance);
+  }
 
-    /** Adds {@code amount} to the balance for its currency. */
-    public void add(final Money amount) {
-        balances.put(
-            amount.getCurrencyUnit(),
-            balances
-                .getOrDefault(amount.getCurrencyUnit(), Money.zero(amount.getCurrencyUnit()))
-                .plus(amount)
-        );
-    }
+  /** Adds {@code amount} to the balance for its currency. */
+  public void add(final Money amount) {
+    balances.put(
+      amount.getCurrencyUnit(),
+      balances
+        .getOrDefault(
+          amount.getCurrencyUnit(),
+          Money.zero(amount.getCurrencyUnit())
+        )
+        .plus(amount)
+    );
+  }
 
-    /** Subtracts {@code amount} from the balance for its currency. */
-    public void subtract(final Money amount) {
-        balances.put(
-            amount.getCurrencyUnit(),
-            balances
-                .getOrDefault(amount.getCurrencyUnit(), Money.zero(amount.getCurrencyUnit()))
-                .minus(amount)
-        );
-    }
+  /** Subtracts {@code amount} from the balance for its currency. */
+  public void subtract(final Money amount) {
+    balances.put(
+      amount.getCurrencyUnit(),
+      balances
+        .getOrDefault(
+          amount.getCurrencyUnit(),
+          Money.zero(amount.getCurrencyUnit())
+        )
+        .minus(amount)
+    );
+  }
 
-    /** Adds every one of {@code other}'s balances to this account, currency by currency. */
-    public void add(final Account other) {
-        other.balances.values().forEach(this::add);
-    }
-
+  /** Adds every one of {@code other}'s balances to this account, currency by currency. */
+  public void add(final Account other) {
+    other.balances.values().forEach(this::add);
+  }
 }

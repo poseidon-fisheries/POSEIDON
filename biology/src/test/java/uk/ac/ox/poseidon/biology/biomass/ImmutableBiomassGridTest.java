@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -29,28 +31,37 @@ import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableGrid;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 class ImmutableBiomassGridTest {
 
-    private static final Species COD = new Species("COD", null, "Cod");
+  private static final Species COD = new Species("COD", null, "Cod");
 
-    @Test
-    void isNotMutableOrFisheable() {
-        assertThat(MutableGrid.class.isAssignableFrom(ImmutableBiomassGrid.class)).isFalse();
-        assertThat(BiomassGrid.class.isAssignableFrom(ImmutableBiomassGrid.class)).isFalse();
-    }
+  @Test
+  void isNotMutableOrFisheable() {
+    assertThat(
+      MutableGrid.class.isAssignableFrom(ImmutableBiomassGrid.class)
+    ).isFalse();
+    assertThat(
+      BiomassGrid.class.isAssignableFrom(ImmutableBiomassGrid.class)
+    ).isFalse();
+  }
 
-    @Test
-    void doesNotAliasTheSourceArray() {
-        final ModelGrid modelGrid = ModelGrid.create(2, 1, new Envelope(0, 2, 0, 1));
-        final double[][] values = {{1.0}, {2.0}};
+  @Test
+  void doesNotAliasTheSourceArray() {
+    final ModelGrid modelGrid = ModelGrid.create(
+      2,
+      1,
+      new Envelope(0, 2, 0, 1)
+    );
+    final double[][] values = { { 1.0 }, { 2.0 } };
 
-        final ImmutableBiomassGrid grid = new ImmutableBiomassGrid(modelGrid, COD, values);
-        values[0][0] = 999.0;
+    final ImmutableBiomassGrid grid = new ImmutableBiomassGrid(
+      modelGrid,
+      COD,
+      values
+    );
+    values[0][0] = 999.0;
 
-        assertThat(grid.getValue(new Int2D(0, 0))).isEqualTo(1.0);
-        assertThat(grid.getSpecies()).isEqualTo(COD);
-    }
-
+    assertThat(grid.getValue(new Int2D(0, 0))).isEqualTo(1.0);
+    assertThat(grid.getSpecies()).isEqualTo(COD);
+  }
 }

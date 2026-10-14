@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Function;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link KeyedMemorySelector}, built via
@@ -40,14 +39,25 @@ import java.util.function.Function;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class KeyedMemorySelectorFactory<S extends Scope, T, K, O, M>
-    extends RelativeScopeFactory<S, KeyedMemorySelector<T, K, O, M>> {
+public class KeyedMemorySelectorFactory<
+  S extends Scope,
+  T,
+  K,
+  O,
+  M
+> extends RelativeScopeFactory<S, KeyedMemorySelector<T, K, O, M>> {
 
-    private Factory<? super S, ? extends KeyedMemory<K, O, M>> keyedMemory;
-    private Factory<? super S, ? extends Function<? super T, ? extends K>> keyExtractor;
+  private Factory<? super S, ? extends KeyedMemory<K, O, M>> keyedMemory;
+  private Factory<
+    ? super S,
+    ? extends Function<? super T, ? extends K>
+  > keyExtractor;
 
-    @Override
-    protected KeyedMemorySelector<T, K, O, M> newInstance(final S scope) {
-        return new KeyedMemorySelector<>(keyedMemory.get(scope), keyExtractor.get(scope));
-    }
+  @Override
+  protected KeyedMemorySelector<T, K, O, M> newInstance(final S scope) {
+    return new KeyedMemorySelector<>(
+      keyedMemory.get(scope),
+      keyExtractor.get(scope)
+    );
+  }
 }

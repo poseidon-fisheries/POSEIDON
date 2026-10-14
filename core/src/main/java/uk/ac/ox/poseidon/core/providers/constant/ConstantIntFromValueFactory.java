@@ -38,13 +38,15 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantIntFromValueFactory<S extends Scope>
-    extends RelativeScopeFactory<S, IntProvider> {
+public class ConstantIntFromValueFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  IntProvider
+> {
 
-    private int value;
+  private int value;
 
-    @Override
-    protected IntProvider newInstance(final S scope) {
-        return new ConstantInt(value);
-    }
+  @Override
+  protected IntProvider newInstance(final S scope) {
+    return new ConstantInt(value);
+  }
 }

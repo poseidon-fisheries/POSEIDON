@@ -22,20 +22,19 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import sim.util.Number2D;
-import uk.ac.ox.poseidon.geography.Coordinate;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Length;
-import javax.measure.quantity.Speed;
-import java.time.Duration;
-import java.util.List;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static javax.measure.MetricPrefix.KILO;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 import static tech.units.indriya.unit.Units.METRE;
+
+import java.time.Duration;
+import java.util.List;
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
+import javax.measure.quantity.Speed;
+import sim.util.Number2D;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 /**
  * Measures distance and derived travel duration between two points, given either as
@@ -43,117 +42,107 @@ import static tech.units.indriya.unit.Units.METRE;
  * {@link uk.ac.ox.poseidon.geography.distance.Factories}.
  */
 public interface DistanceCalculator {
+  /**
+   * @param a one coordinate
+   * @param b the other coordinate
+   * @return the distance between {@code a} and {@code b}, in kilometres
+   */
+  double distanceInKm(Coordinate a, Coordinate b);
 
-    /**
-     * @param a one coordinate
-     * @param b the other coordinate
-     * @return the distance between {@code a} and {@code b}, in kilometres
-     */
-    double distanceInKm(
-        Coordinate a,
-        Coordinate b
+  /**
+   * @param start one grid point
+   * @param end   the other grid point
+   * @return the distance between {@code start} and {@code end}, in kilometres
+   */
+  double distanceInKm(Number2D start, Number2D end);
+
+  /**
+   * @param path the waypoints to travel through in order
+   * @return the length of {@code path}, summing the distance of each leg, in kilometres; zero
+   * for a path of a single waypoint
+   */
+  default double distanceInKm(final List<? extends Number2D> path) {
+    double distanceInKm = 0.0;
+    for (int i = 0; i < path.size() - 1; i++) {
+      distanceInKm += distanceInKm(path.get(i), path.get(i + 1));
+    }
+    return distanceInKm;
+  }
+
+  /** @return {@link #distanceInKm(Number2D, Number2D)} as a length {@link Quantity} */
+  default Quantity<Length> distance(final Number2D start, final Number2D end) {
+    return getQuantity(distanceInKm(start, end), KILO(METRE));
+  }
+
+  /** @return {@link #distanceInKm(Coordinate, Coordinate)} as a length {@link Quantity} */
+  default Quantity<Length> distance(final Coordinate a, final Coordinate b) {
+    return getQuantity(distanceInKm(a, b), KILO(METRE));
+  }
+
+  /** @return the time to travel from {@code start} to {@code end} at {@code cruisingSpeed} */
+  default Duration travelDuration(
+    final Number2D start,
+    final Number2D end,
+    final Quantity<Speed> cruisingSpeed
+  ) {
+    return travelDuration(List.of(start, end), cruisingSpeed);
+  }
+
+  /**
+   * @return the time to travel from {@code start} to {@code end} at {@code cruisingSpeedInKph}
+   */
+  default Duration travelDuration(
+    final Number2D start,
+    final Number2D end,
+    final double cruisingSpeedInKph
+  ) {
+    return travelDuration(List.of(start, end), cruisingSpeedInKph);
+  }
+
+  /**
+   * @param path              the waypoints to travel through in order, at least one
+   * @param cruisingSpeedInKph the constant travel speed, in km/h
+   * @return the time to travel the full path at {@code cruisingSpeedInKph}, summing the
+   * distance of each leg; zero for a path of a single waypoint
+   * @throws IllegalArgumentException if {@code path} is empty
+   */
+  default Duration travelDuration(
+    final List<? extends Number2D> path,
+    final double cruisingSpeedInKph
+  ) {
+    checkArgument(
+      !path.isEmpty(),
+      "Path must contain at least one cell but was empty"
     );
+    return travelDuration(distanceInKm(path), cruisingSpeedInKph);
+  }
 
-    /**
-     * @param start one grid point
-     * @param end   the other grid point
-     * @return the distance between {@code start} and {@code end}, in kilometres
-     */
-    double distanceInKm(
-        Number2D start,
-        Number2D end
+  /**
+   * Takes the distance first and the speed last, like the other {@code travelDuration} methods:
+   * both are {@code double}s, so a swap would not be caught by the compiler.
+   *
+   * @param totalDistanceInKm  the total distance to travel, in kilometres
+   * @param cruisingSpeedInKph the constant travel speed, in km/h
+   * @return the time to travel {@code totalDistanceInKm} at {@code cruisingSpeedInKph}
+   */
+  static Duration travelDuration(
+    final double totalDistanceInKm,
+    final double cruisingSpeedInKph
+  ) {
+    final long SECONDS_PER_HOUR = 3600;
+    return Duration.ofSeconds(
+      (long) ((totalDistanceInKm / cruisingSpeedInKph) * SECONDS_PER_HOUR)
     );
+  }
 
-    /**
-     * @param path the waypoints to travel through in order
-     * @return the length of {@code path}, summing the distance of each leg, in kilometres; zero
-     * for a path of a single waypoint
-     */
-    default double distanceInKm(final List<? extends Number2D> path) {
-        double distanceInKm = 0.0;
-        for (int i = 0; i < path.size() - 1; i++) {
-            distanceInKm += distanceInKm(path.get(i), path.get(i + 1));
-        }
-        return distanceInKm;
-    }
-
-    /** @return {@link #distanceInKm(Number2D, Number2D)} as a length {@link Quantity} */
-    default Quantity<Length> distance(
-        final Number2D start,
-        final Number2D end
-    ) {
-        return getQuantity(distanceInKm(start, end), KILO(METRE));
-    }
-
-    /** @return {@link #distanceInKm(Coordinate, Coordinate)} as a length {@link Quantity} */
-    default Quantity<Length> distance(
-        final Coordinate a,
-        final Coordinate b
-    ) {
-        return getQuantity(distanceInKm(a, b), KILO(METRE));
-    }
-
-    /** @return the time to travel from {@code start} to {@code end} at {@code cruisingSpeed} */
-    default Duration travelDuration(
-        final Number2D start,
-        final Number2D end,
-        final Quantity<Speed> cruisingSpeed
-    ) {
-        return travelDuration(List.of(start, end), cruisingSpeed);
-    }
-
-    /**
-     * @return the time to travel from {@code start} to {@code end} at {@code cruisingSpeedInKph}
-     */
-    default Duration travelDuration(
-        final Number2D start,
-        final Number2D end,
-        final double cruisingSpeedInKph
-    ) {
-        return travelDuration(List.of(start, end), cruisingSpeedInKph);
-    }
-
-    /**
-     * @param path              the waypoints to travel through in order, at least one
-     * @param cruisingSpeedInKph the constant travel speed, in km/h
-     * @return the time to travel the full path at {@code cruisingSpeedInKph}, summing the
-     * distance of each leg; zero for a path of a single waypoint
-     * @throws IllegalArgumentException if {@code path} is empty
-     */
-    default Duration travelDuration(
-        final List<? extends Number2D> path,
-        final double cruisingSpeedInKph
-    ) {
-        checkArgument(!path.isEmpty(), "Path must contain at least one cell but was empty");
-        return travelDuration(distanceInKm(path), cruisingSpeedInKph);
-    }
-
-    /**
-     * Takes the distance first and the speed last, like the other {@code travelDuration} methods:
-     * both are {@code double}s, so a swap would not be caught by the compiler.
-     *
-     * @param totalDistanceInKm  the total distance to travel, in kilometres
-     * @param cruisingSpeedInKph the constant travel speed, in km/h
-     * @return the time to travel {@code totalDistanceInKm} at {@code cruisingSpeedInKph}
-     */
-    static Duration travelDuration(
-        final double totalDistanceInKm,
-        final double cruisingSpeedInKph
-    ) {
-        final long SECONDS_PER_HOUR = 3600;
-        return Duration.ofSeconds(
-            (long) ((totalDistanceInKm / cruisingSpeedInKph) * SECONDS_PER_HOUR)
-        );
-    }
-
-    /** @return the time to travel the full path at {@code cruisingSpeed} */
-    default Duration travelDuration(
-        final List<? extends Number2D> path,
-        final Quantity<Speed> cruisingSpeed
-    ) {
-        return travelDuration(
-            path,
-            cruisingSpeed.to(KILOMETRE_PER_HOUR).getValue().doubleValue()
-        );
-    }
+  /** @return the time to travel the full path at {@code cruisingSpeed} */
+  default Duration travelDuration(
+    final List<? extends Number2D> path,
+    final Quantity<Speed> cruisingSpeed
+  ) {
+    return travelDuration(
+      path,
+      cruisingSpeed.to(KILOMETRE_PER_HOUR).getValue().doubleValue()
+    );
+  }
 }

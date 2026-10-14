@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.fisheables;
 
+import static lombok.AccessLevel.PACKAGE;
+
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
-
-import java.util.function.Supplier;
-
-import static lombok.AccessLevel.PACKAGE;
 
 /**
  * Resupplies the {@link Fisheable} at {@code vessel}'s current cell on every call, tracking the
@@ -38,11 +37,11 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor(access = PACKAGE)
 public class CurrentCellFisheable implements Supplier<Fisheable> {
 
-    private final Vessel vessel;
-    private final FisheableGrid fisheableGrid;
+  private final Vessel vessel;
+  private final FisheableGrid fisheableGrid;
 
-    @Override
-    public Fisheable get() {
-        return fisheableGrid.getFisheableCell(vessel.getCell());
-    }
+  @Override
+  public Fisheable get() {
+    return fisheableGrid.getFisheableCell(vessel.getCell());
+  }
 }

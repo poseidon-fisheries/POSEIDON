@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.gui;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import sim.display.Controller;
 import uk.ac.ox.poseidon.core.Scenario;
-
-import java.util.List;
 
 /**
  * A GUI-runnable {@link Scenario}: wraps it, and a fixed set of displays, into a
@@ -35,13 +34,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScenarioWithUI {
 
-    private final Scenario scenario;
-    private final List<DisplayWrapper<?>> displays;
+  private final Scenario scenario;
+  private final List<DisplayWrapper<?>> displays;
 
-    /**
-     * @return the {@link Controller} of a new {@link SimulationWithUI} wrapping {@link #scenario}
-     */
-    public Controller createController() {
-        return new SimulationWithUI(scenario::startNewSimulation, displays).createController();
-    }
+  /**
+   * @return the {@link Controller} of a new {@link SimulationWithUI} wrapping {@link #scenario}
+   */
+  public Controller createController() {
+    return new SimulationWithUI(
+      scenario::startNewSimulation,
+      displays
+    ).createController();
+  }
 }

@@ -32,25 +32,24 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @EqualsAndHashCode(callSuper = true)
 public class VesselScope extends AgentScope<Vessel> {
 
-    /** @param vesselScope the scope to copy */
-    public VesselScope(final VesselScope vesselScope) {
-        super(vesselScope);
-    }
+  /** @param vesselScope the scope to copy */
+  public VesselScope(final VesselScope vesselScope) {
+    super(vesselScope);
+  }
 
-    /**
-     * @param simulationScope the simulation scope to narrow
-     * @param vessel          the vessel to scope to
-     */
-    public VesselScope(
-        final SimulationScope simulationScope,
-        final Vessel vessel
-    ) {
-        super(new AgentScope<>(simulationScope, vessel));
-    }
+  /**
+   * @param simulationScope the simulation scope to narrow
+   * @param vessel          the vessel to scope to
+   */
+  public VesselScope(
+    final SimulationScope simulationScope,
+    final Vessel vessel
+  ) {
+    super(new AgentScope<>(simulationScope, vessel));
+  }
 
-    /** @return the scoped vessel, or {@code null} if it has since been garbage-collected */
-    public Vessel getVessel() {
-        return getAgent();
-    }
-
+  /** @return the scoped vessel, or {@code null} if it has since been garbage-collected */
+  public Vessel getVessel() {
+    return getAgent();
+  }
 }

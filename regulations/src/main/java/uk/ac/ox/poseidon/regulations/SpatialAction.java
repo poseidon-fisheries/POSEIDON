@@ -30,11 +30,9 @@ import uk.ac.ox.poseidon.geography.Coordinate;
  * spanning a movement, such as a trip leg.
  */
 public interface SpatialAction<G> extends Action<G> {
+  /** @return where this action starts */
+  Coordinate getStartCoordinate();
 
-    /** @return where this action starts */
-    Coordinate getStartCoordinate();
-
-    /** @return where this action ends */
-    Coordinate getEndCoordinate();
-
+  /** @return where this action ends */
+  Coordinate getEndCoordinate();
 }

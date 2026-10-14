@@ -29,29 +29,28 @@ import lombok.NonNull;
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a fixed
-     * {@link org.joda.money.Money} amount
-     * @see MoneyFactory
-     */
-    public static MoneyFactory money(
-        final double amount,
-        final @NonNull String currencyUnit
-    ) {
-        return new MoneyFactory(amount, currencyUnit);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a fixed
+   * {@link org.joda.money.Money} amount
+   * @see MoneyFactory
+   */
+  public static MoneyFactory money(
+    final double amount,
+    final @NonNull String currencyUnit
+  ) {
+    return new MoneyFactory(amount, currencyUnit);
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MoneyFromRow}
-     * @see MoneyFromRowFactory
-     */
-    public static MoneyFromRowFactory moneyFromRow(
-        final String currencyColumnName,
-        final String amountColumnName
-    ) {
-        return new MoneyFromRowFactory(currencyColumnName, amountColumnName);
-    }
-
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MoneyFromRow}
+   * @see MoneyFromRowFactory
+   */
+  public static MoneyFromRowFactory moneyFromRow(
+    final String currencyColumnName,
+    final String amountColumnName
+  ) {
+    return new MoneyFromRowFactory(currencyColumnName, amountColumnName);
+  }
 }

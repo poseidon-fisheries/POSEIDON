@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
+import java.util.function.DoubleSupplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.DoubleProvider;
-
-import java.util.function.DoubleSupplier;
 
 /**
  * A {@link DoubleProvider} that returns the greater of two supplied double values, recomputed on
@@ -36,11 +35,14 @@ import java.util.function.DoubleSupplier;
 @RequiredArgsConstructor
 public class MaxDouble implements DoubleProvider {
 
-    @NonNull private final DoubleSupplier a;
-    @NonNull private final DoubleSupplier b;
+  @NonNull
+  private final DoubleSupplier a;
 
-    @Override
-    public double getAsDouble() {
-        return Math.max(a.getAsDouble(), b.getAsDouble());
-    }
+  @NonNull
+  private final DoubleSupplier b;
+
+  @Override
+  public double getAsDouble() {
+    return Math.max(a.getAsDouble(), b.getAsDouble());
+  }
 }

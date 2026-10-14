@@ -22,7 +22,11 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
+
 import com.google.common.collect.ImmutableSet;
+import java.util.Collection;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,11 +35,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.ObjectFactory;
-
-import java.util.Collection;
-import java.util.function.Supplier;
-
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link InSet}, built via
@@ -46,22 +45,29 @@ import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class InSetFactory<S extends Scope, T> extends RelativeScopeFactory<S, InSet<T>> {
+public class InSetFactory<
+  S extends Scope,
+  T
+> extends RelativeScopeFactory<S, InSet<T>> {
 
-    private Factory<? super S, ? extends Supplier<? extends Collection<? extends T>>> values;
+  private Factory<
+    ? super S,
+    ? extends Supplier<? extends Collection<? extends T>>
+  > values;
 
-    /**
-     * @param values the literal values the resulting predicate tests membership against
-     * @return an {@link InSetFactory} for an {@link InSet} predicate over the given values
-     */
-    @SafeVarargs
-    public static <T> InSetFactory<Scope, T> of(final T... values) {
-        return new InSetFactory<>(constant(new ObjectFactory<>(ImmutableSet.copyOf(values))));
-    }
+  /**
+   * @param values the literal values the resulting predicate tests membership against
+   * @return an {@link InSetFactory} for an {@link InSet} predicate over the given values
+   */
+  @SafeVarargs
+  public static <T> InSetFactory<Scope, T> of(final T... values) {
+    return new InSetFactory<>(
+      constant(new ObjectFactory<>(ImmutableSet.copyOf(values)))
+    );
+  }
 
-    @Override
-    protected InSet<T> newInstance(final S scope) {
-        return new InSet<>(values.get(scope));
-    }
-
+  @Override
+  protected InSet<T> newInstance(final S scope) {
+    return new InSet<>(values.get(scope));
+  }
 }

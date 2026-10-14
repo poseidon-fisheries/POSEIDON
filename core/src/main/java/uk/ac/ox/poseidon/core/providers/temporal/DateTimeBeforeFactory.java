@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAmount;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,10 +32,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.time.LocalDateTime;
-import java.time.temporal.TemporalAmount;
-import java.util.function.Supplier;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link DateTimeBefore}. Built via
@@ -42,14 +41,25 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DateTimeBeforeFactory<S extends Scope>
-    extends RelativeScopeFactory<S, DateTimeBefore> {
+public class DateTimeBeforeFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  DateTimeBefore
+> {
 
-    private Factory<? super S, ? extends Supplier<LocalDateTime>> referenceDateTime;
-    private Factory<? super S, ? extends Supplier<? extends TemporalAmount>> amountToSubtract;
+  private Factory<
+    ? super S,
+    ? extends Supplier<LocalDateTime>
+  > referenceDateTime;
+  private Factory<
+    ? super S,
+    ? extends Supplier<? extends TemporalAmount>
+  > amountToSubtract;
 
-    @Override
-    protected DateTimeBefore newInstance(final S scope) {
-        return new DateTimeBefore(referenceDateTime.get(scope), amountToSubtract.get(scope));
-    }
+  @Override
+  protected DateTimeBefore newInstance(final S scope) {
+    return new DateTimeBefore(
+      referenceDateTime.get(scope),
+      amountToSubtract.get(scope)
+    );
+  }
 }

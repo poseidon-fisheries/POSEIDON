@@ -22,27 +22,30 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
+import static com.google.common.base.Preconditions.checkState;
+
+import java.time.LocalDateTime;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
-import java.time.LocalDateTime;
-
-import static com.google.common.base.Preconditions.checkState;
-
 /** Provides when the vessel's current trip started; only checks made during a trip read it. */
 @RequiredArgsConstructor
 public class CurrentTripStartDateTime implements Provider<LocalDateTime> {
 
-    private final @NonNull Vessel vessel;
+  private final @NonNull Vessel vessel;
 
-    /** @throws IllegalStateException if the vessel is not on a trip */
-    @Override
-    public LocalDateTime get() {
-        final Trip currentTrip = vessel.getCurrentTrip();
-        checkState(currentTrip != null, "Vessel %s is not on a trip.", vessel.getId());
-        return currentTrip.getStartDateTime();
-    }
+  /** @throws IllegalStateException if the vessel is not on a trip */
+  @Override
+  public LocalDateTime get() {
+    final Trip currentTrip = vessel.getCurrentTrip();
+    checkState(
+      currentTrip != null,
+      "Vessel %s is not on a trip.",
+      vessel.getId()
+    );
+    return currentTrip.getStartDateTime();
+  }
 }

@@ -34,6 +34,8 @@ import java.util.function.Supplier;
  * @param <T> the type of object returned by the provider
  */
 public interface Provider<T> extends Supplier<T>, Function<Object, T> {
-    @Override
-    default T apply(final Object ignored) {return get();}
+  @Override
+  default T apply(final Object ignored) {
+    return get();
+  }
 }

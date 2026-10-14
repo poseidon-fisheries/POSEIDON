@@ -22,6 +22,13 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import static java.util.stream.IntStream.range;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import sim.util.Double2D;
 import sim.util.Int2D;
@@ -29,129 +36,106 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 
-import java.util.List;
-import java.util.Set;
-
-import static java.util.stream.IntStream.range;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-
 class ModelGridTest {
 
-    private final ModelGrid modelGrid =
-        ModelGrid.create(
-            10,
-            10,
-            new Envelope(-5, 5, -5, 5)
-        );
+  private final ModelGrid modelGrid = ModelGrid.create(
+    10,
+    10,
+    new Envelope(-5, 5, -5, 5)
+  );
 
-    @Test
-    void getActiveNeighbours() {
-        assertEquals(
-            Set.of(
-                new Int2D(4, 4),
-                new Int2D(4, 5),
-                new Int2D(4, 6),
-                new Int2D(5, 4),
-                new Int2D(6, 6),
-                new Int2D(5, 6),
-                new Int2D(6, 4),
-                new Int2D(6, 5)
-            ),
-            Set.copyOf(modelGrid.getActiveNeighbours(new Int2D(5, 5)))
-        );
-        assertEquals(
-            Set.of(
-                new Int2D(0, 1),
-                new Int2D(1, 0),
-                new Int2D(1, 1)
-            ),
-            Set.copyOf(modelGrid.getActiveNeighbours(new Int2D(0, 0)))
-        );
-    }
+  @Test
+  void getActiveNeighbours() {
+    assertEquals(
+      Set.of(
+        new Int2D(4, 4),
+        new Int2D(4, 5),
+        new Int2D(4, 6),
+        new Int2D(5, 4),
+        new Int2D(6, 6),
+        new Int2D(5, 6),
+        new Int2D(6, 4),
+        new Int2D(6, 5)
+      ),
+      Set.copyOf(modelGrid.getActiveNeighbours(new Int2D(5, 5)))
+    );
+    assertEquals(
+      Set.of(new Int2D(0, 1), new Int2D(1, 0), new Int2D(1, 1)),
+      Set.copyOf(modelGrid.getActiveNeighbours(new Int2D(0, 0)))
+    );
+  }
 
-    @Test
-    void cellToCoordinate() {
-        assertEquals(
-            new Coordinate(-4.5, 4.5),
-            modelGrid.toCoordinate(new Int2D(0, 0))
-        );
-        assertEquals(
-            new Coordinate(4.5, -4.5),
-            modelGrid.toCoordinate(new Int2D(9, 9))
-        );
-    }
+  @Test
+  void cellToCoordinate() {
+    assertEquals(
+      new Coordinate(-4.5, 4.5),
+      modelGrid.toCoordinate(new Int2D(0, 0))
+    );
+    assertEquals(
+      new Coordinate(4.5, -4.5),
+      modelGrid.toCoordinate(new Int2D(9, 9))
+    );
+  }
 
-    @Test
-    void pointToCoordinate() {
-        assertEquals(
-            new Coordinate(-5, 5),
-            modelGrid.toCoordinate(new Double2D(0, 0))
-        );
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> modelGrid.toCoordinate(new Double2D(10, 10)),
-            "Double2D[10.0,10.0] outside of grid"
-        );
-    }
+  @Test
+  void pointToCoordinate() {
+    assertEquals(
+      new Coordinate(-5, 5),
+      modelGrid.toCoordinate(new Double2D(0, 0))
+    );
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> modelGrid.toCoordinate(new Double2D(10, 10)),
+      "Double2D[10.0,10.0] outside of grid"
+    );
+  }
 
-    @Test
-    void coordinateToPoint() {
-        assertEquals(
-            new Double2D(0, 0),
-            modelGrid.toPoint(new Coordinate(-5, 5))
-        );
-        assertEquals(
-            new Double2D(10, 10),
-            modelGrid.toPoint(new Coordinate(5, -5))
-        );
-    }
+  @Test
+  void coordinateToPoint() {
+    assertEquals(new Double2D(0, 0), modelGrid.toPoint(new Coordinate(-5, 5)));
+    assertEquals(
+      new Double2D(10, 10),
+      modelGrid.toPoint(new Coordinate(5, -5))
+    );
+  }
 
-    @Test
-    void coordinateToCell() {
-        assertEquals(
-            new Int2D(0, 0),
-            modelGrid.toCell(new Coordinate(-5, 5))
-        );
-        assertEquals(
-            new Int2D(0, 0),
-            modelGrid.toCell(new Coordinate(-4.5, 4.5))
-        );
-        assertEquals(
-            new Int2D(9, 9),
-            modelGrid.toCell(new Coordinate(4.5, -4.5))
-        );
-        assertEquals(
-            new Int2D(10, 10),
-            modelGrid.toCell(new Coordinate(5, -5))
-        );
-    }
+  @Test
+  void coordinateToCell() {
+    assertEquals(new Int2D(0, 0), modelGrid.toCell(new Coordinate(-5, 5)));
+    assertEquals(new Int2D(0, 0), modelGrid.toCell(new Coordinate(-4.5, 4.5)));
+    assertEquals(new Int2D(9, 9), modelGrid.toCell(new Coordinate(4.5, -4.5)));
+    assertEquals(new Int2D(10, 10), modelGrid.toCell(new Coordinate(5, -5)));
+  }
 
-    @Test
-    void testCoordToXyAndBack() {
-        final ModelGrid modelGrid =
-            new ModelGridFactory(
-                1.0, -171, -70, -50, 50
-            ).get(mock(Scope.class));
-        final Envelope envelope = modelGrid.getEnvelope();
-        final List<Coordinate> coordinates =
-            range((int) envelope.getMinX(), (int) envelope.getMaxX() - 1)
-                .mapToObj(x -> x + 0.5)
-                .flatMap(x ->
-                    range((int) envelope.getMinY(), (int) envelope.getMaxY() - 1)
-                        .mapToObj(y -> y + 0.5)
-                        .map(y -> new Coordinate(x, y))
-                ).toList();
+  @Test
+  void testCoordToXyAndBack() {
+    final ModelGrid modelGrid = new ModelGridFactory(
+      1.0,
+      -171,
+      -70,
+      -50,
+      50
+    ).get(mock(Scope.class));
+    final Envelope envelope = modelGrid.getEnvelope();
+    final List<Coordinate> coordinates = range(
+      (int) envelope.getMinX(),
+      (int) envelope.getMaxX() - 1
+    )
+      .mapToObj(x -> x + 0.5)
+      .flatMap(x ->
+        range((int) envelope.getMinY(), (int) envelope.getMaxY() - 1)
+          .mapToObj(y -> y + 0.5)
+          .map(y -> new Coordinate(x, y))
+      )
+      .toList();
 
-        coordinates.forEach(coordinate -> {
-            final Double2D xy = modelGrid.toPoint(coordinate);
-            assertEquals(
-                coordinate,
-                modelGrid.toCoordinate(new Int2D((int) xy.x, (int) xy.y)),
-                coordinate.toString()
-            );
-        });
-    }
-
+    coordinates.forEach(coordinate -> {
+      final Double2D xy = modelGrid.toPoint(coordinate);
+      assertEquals(
+        coordinate,
+        modelGrid.toCoordinate(new Int2D((int) xy.x, (int) xy.y)),
+        coordinate.toString()
+      );
+    });
+  }
 }

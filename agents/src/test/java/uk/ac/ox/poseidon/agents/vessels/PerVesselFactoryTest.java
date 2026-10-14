@@ -22,119 +22,124 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntSupplier;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.providers.FirstIntFromFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.IntSupplier;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 class PerVesselFactoryTest {
 
-    @Test
-    void sameVesselReturnsSameInstance() {
-        final AtomicInteger counter = new AtomicInteger(0);
-        final Factory<? super VesselScope, String> delegate = scope ->
-            "instance-" + counter.incrementAndGet();
+  @Test
+  void sameVesselReturnsSameInstance() {
+    final AtomicInteger counter = new AtomicInteger(0);
+    final Factory<? super VesselScope, String> delegate = scope ->
+      "instance-" + counter.incrementAndGet();
 
-        final PerVesselFactory<String> factory = new PerVesselFactory<>(delegate);
+    final PerVesselFactory<String> factory = new PerVesselFactory<>(delegate);
 
-        final Vessel vessel = mock(Vessel.class);
-        final VesselScope scope1 = mock(VesselScope.class);
-        when(scope1.getVessel()).thenReturn(vessel);
-        final VesselScope scope2 = mock(VesselScope.class);
-        when(scope2.getVessel()).thenReturn(vessel);
+    final Vessel vessel = mock(Vessel.class);
+    final VesselScope scope1 = mock(VesselScope.class);
+    when(scope1.getVessel()).thenReturn(vessel);
+    final VesselScope scope2 = mock(VesselScope.class);
+    when(scope2.getVessel()).thenReturn(vessel);
 
-        final String first = factory.get(scope1);
-        final String second = factory.get(scope2);
+    final String first = factory.get(scope1);
+    final String second = factory.get(scope2);
 
-        assertThat(second).isSameAs(first).isEqualTo("instance-1");
+    assertThat(second).isSameAs(first).isEqualTo("instance-1");
+  }
+
+  @Test
+  void differentVesselsGetDifferentInstances() {
+    final AtomicInteger counter = new AtomicInteger(0);
+    final Factory<? super VesselScope, String> delegate = scope ->
+      "instance-" + counter.incrementAndGet();
+
+    final PerVesselFactory<String> factory = new PerVesselFactory<>(delegate);
+
+    final Vessel vesselA = mock(Vessel.class);
+    final VesselScope scopeA = mock(VesselScope.class);
+    when(scopeA.getVessel()).thenReturn(vesselA);
+
+    final Vessel vesselB = mock(Vessel.class);
+    final VesselScope scopeB = mock(VesselScope.class);
+    when(scopeB.getVessel()).thenReturn(vesselB);
+
+    final String fromA = factory.get(scopeA);
+    final String fromB = factory.get(scopeB);
+
+    assertThat(fromA).isEqualTo("instance-1");
+    assertThat(fromB).isEqualTo("instance-2");
+  }
+
+  @Test
+  void delegateCalledOnlyOncePerVessel() {
+    final AtomicInteger counter = new AtomicInteger(0);
+    final Factory<? super VesselScope, String> delegate = scope ->
+      "value-" + counter.incrementAndGet();
+
+    final PerVesselFactory<String> factory = new PerVesselFactory<>(delegate);
+
+    final Vessel vessel = mock(Vessel.class);
+    final VesselScope scope = mock(VesselScope.class);
+    when(scope.getVessel()).thenReturn(vessel);
+
+    factory.get(scope);
+    factory.get(scope);
+    factory.get(scope);
+
+    assertThat(counter).hasValue(1);
+  }
+
+  private static VesselScope scopeOfNewVessel() {
+    final Vessel vessel = mock(Vessel.class);
+    final VesselScope scope = mock(VesselScope.class);
+    when(scope.getVessel()).thenReturn(vessel);
+    return scope;
+  }
+
+  private static class CountingIntSupplierFactory
+    extends GlobalScopeFactory<IntSupplier>
+  {
+
+    @Override
+    protected IntSupplier newInstance(final Scope scope) {
+      final AtomicInteger counter = new AtomicInteger(0);
+      return counter::incrementAndGet;
     }
+  }
 
-    @Test
-    void differentVesselsGetDifferentInstances() {
-        final AtomicInteger counter = new AtomicInteger(0);
-        final Factory<? super VesselScope, String> delegate = scope ->
-            "instance-" + counter.incrementAndGet();
+  @Test
+  void eachVesselGetsItsOwnInstanceEvenFromASharedDelegate() {
+    final CountingIntSupplierFactory delegate =
+      new CountingIntSupplierFactory();
+    final PerVesselFactory<IntSupplier> factory = new PerVesselFactory<>(
+      delegate
+    );
+    final VesselScope scopeA = scopeOfNewVessel();
+    final VesselScope scopeB = scopeOfNewVessel();
 
-        final PerVesselFactory<String> factory = new PerVesselFactory<>(delegate);
+    assertThat(factory.get(scopeA)).isSameAs(factory.get(scopeA));
+    assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
+    assertThat(factory.get(scopeA)).isNotSameAs(delegate.get(scopeA));
+  }
 
-        final Vessel vesselA = mock(Vessel.class);
-        final VesselScope scopeA = mock(VesselScope.class);
-        when(scopeA.getVessel()).thenReturn(vesselA);
+  @Test
+  void factoriesBuiltOnItAreResolvedOncePerVessel() {
+    final FirstIntFromFactory<VesselScope> factory = new FirstIntFromFactory<>(
+      new PerVesselFactory<>(new CountingIntSupplierFactory())
+    );
+    final VesselScope scopeA = scopeOfNewVessel();
+    final VesselScope scopeB = scopeOfNewVessel();
 
-        final Vessel vesselB = mock(Vessel.class);
-        final VesselScope scopeB = mock(VesselScope.class);
-        when(scopeB.getVessel()).thenReturn(vesselB);
-
-        final String fromA = factory.get(scopeA);
-        final String fromB = factory.get(scopeB);
-
-        assertThat(fromA).isEqualTo("instance-1");
-        assertThat(fromB).isEqualTo("instance-2");
-    }
-
-    @Test
-    void delegateCalledOnlyOncePerVessel() {
-        final AtomicInteger counter = new AtomicInteger(0);
-        final Factory<? super VesselScope, String> delegate = scope ->
-            "value-" + counter.incrementAndGet();
-
-        final PerVesselFactory<String> factory = new PerVesselFactory<>(delegate);
-
-        final Vessel vessel = mock(Vessel.class);
-        final VesselScope scope = mock(VesselScope.class);
-        when(scope.getVessel()).thenReturn(vessel);
-
-        factory.get(scope);
-        factory.get(scope);
-        factory.get(scope);
-
-        assertThat(counter).hasValue(1);
-    }
-
-    private static VesselScope scopeOfNewVessel() {
-        final Vessel vessel = mock(Vessel.class);
-        final VesselScope scope = mock(VesselScope.class);
-        when(scope.getVessel()).thenReturn(vessel);
-        return scope;
-    }
-
-    private static class CountingIntSupplierFactory extends GlobalScopeFactory<IntSupplier> {
-        @Override
-        protected IntSupplier newInstance(final Scope scope) {
-            final AtomicInteger counter = new AtomicInteger(0);
-            return counter::incrementAndGet;
-        }
-    }
-
-    @Test
-    void eachVesselGetsItsOwnInstanceEvenFromASharedDelegate() {
-        final CountingIntSupplierFactory delegate = new CountingIntSupplierFactory();
-        final PerVesselFactory<IntSupplier> factory = new PerVesselFactory<>(delegate);
-        final VesselScope scopeA = scopeOfNewVessel();
-        final VesselScope scopeB = scopeOfNewVessel();
-
-        assertThat(factory.get(scopeA)).isSameAs(factory.get(scopeA));
-        assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
-        assertThat(factory.get(scopeA)).isNotSameAs(delegate.get(scopeA));
-    }
-
-    @Test
-    void factoriesBuiltOnItAreResolvedOncePerVessel() {
-        final FirstIntFromFactory<VesselScope> factory = new FirstIntFromFactory<>(
-            new PerVesselFactory<>(new CountingIntSupplierFactory())
-        );
-        final VesselScope scopeA = scopeOfNewVessel();
-        final VesselScope scopeB = scopeOfNewVessel();
-
-        assertThat(factory.get(scopeA)).isSameAs(factory.get(scopeA));
-        assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
-    }
+    assertThat(factory.get(scopeA)).isSameAs(factory.get(scopeA));
+    assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
+  }
 }

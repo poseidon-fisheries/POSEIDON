@@ -39,12 +39,17 @@ import uk.ac.ox.poseidon.core.Factory;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ChooseNextDestinationFactory extends VesselTaskFactory<ChooseNextDestination> {
+public class ChooseNextDestinationFactory
+  extends VesselTaskFactory<ChooseNextDestination>
+{
 
-    private Factory<? super VesselScope, ? extends DestinationSupplier> destinationSupplier;
+  private Factory<
+    ? super VesselScope,
+    ? extends DestinationSupplier
+  > destinationSupplier;
 
-    @Override
-    protected ChooseNextDestination newTask(final VesselScope scope) {
-        return new ChooseNextDestination(destinationSupplier.get(scope));
-    }
+  @Override
+  protected ChooseNextDestination newTask(final VesselScope scope) {
+    return new ChooseNextDestination(destinationSupplier.get(scope));
+  }
 }

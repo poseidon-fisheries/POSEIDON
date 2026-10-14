@@ -22,12 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
+import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
+
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
-import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 
 /**
  * A {@link Behaviour} that actually runs a gdx-ai {@link BehaviorTree}.
@@ -37,35 +37,32 @@ import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 @RequiredArgsConstructor
 public class ActiveBehaviour<G> implements Behaviour {
 
-    @NonNull
-    private final BehaviorTree<G> tree;
+  @NonNull
+  private final BehaviorTree<G> tree;
 
-    /**
-     * @param rootTask the tree's root task
-     * @param agent    the agent the tree runs against
-     */
-    public ActiveBehaviour(
-        final Task<G> rootTask,
-        final G agent
-    ) {
-        this(new BehaviorTree<>(rootTask, agent));
-    }
+  /**
+   * @param rootTask the tree's root task
+   * @param agent    the agent the tree runs against
+   */
+  public ActiveBehaviour(final Task<G> rootTask, final G agent) {
+    this(new BehaviorTree<>(rootTask, agent));
+  }
 
-    /** @return always {@code true} */
-    @Override
-    public boolean isActive() {
-        return true;
-    }
+  /** @return always {@code true} */
+  @Override
+  public boolean isActive() {
+    return true;
+  }
 
-    /** @return {@code true} if {@link #tree} is currently {@code RUNNING} */
-    @Override
-    public boolean isRunning() {
-        return tree.getStatus() == RUNNING;
-    }
+  /** @return {@code true} if {@link #tree} is currently {@code RUNNING} */
+  @Override
+  public boolean isRunning() {
+    return tree.getStatus() == RUNNING;
+  }
 
-    /** Steps {@link #tree} once. */
-    @Override
-    public void step() {
-        tree.step();
-    }
+  /** Steps {@link #tree} once. */
+  @Override
+  public void step() {
+    tree.step();
+  }
 }

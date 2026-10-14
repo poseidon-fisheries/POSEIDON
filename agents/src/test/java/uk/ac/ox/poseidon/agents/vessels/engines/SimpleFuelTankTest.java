@@ -22,59 +22,62 @@
 
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.junit.jupiter.api.Test;
+
 class SimpleFuelTankTest {
 
-    @Test
-    void consumeFuelReducesCurrentFuel() {
-        final SimpleFuelTank tank = new SimpleFuelTank(100.0, 70.0);
+  @Test
+  void consumeFuelReducesCurrentFuel() {
+    final SimpleFuelTank tank = new SimpleFuelTank(100.0, 70.0);
 
-        tank.consumeFuel(20.0);
+    tank.consumeFuel(20.0);
 
-        assertThat(tank.getCurrentFuelInLitres()).isEqualTo(50.0);
-    }
+    assertThat(tank.getCurrentFuelInLitres()).isEqualTo(50.0);
+  }
 
-    @Test
-    void consumeFuelRejectsNegativeVolume() {
-        final SimpleFuelTank tank = new SimpleFuelTank(100.0, 70.0);
+  @Test
+  void consumeFuelRejectsNegativeVolume() {
+    final SimpleFuelTank tank = new SimpleFuelTank(100.0, 70.0);
 
-        assertThatThrownBy(() -> tank.consumeFuel(-1.0))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+    assertThatThrownBy(() -> tank.consumeFuel(-1.0)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+  }
 
-    @Test
-    void consumeFuelRejectsVolumeAboveCurrentFuel() {
-        final SimpleFuelTank tank = new SimpleFuelTank(100.0, 70.0);
+  @Test
+  void consumeFuelRejectsVolumeAboveCurrentFuel() {
+    final SimpleFuelTank tank = new SimpleFuelTank(100.0, 70.0);
 
-        assertThatThrownBy(() -> tank.consumeFuel(71.0))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+    assertThatThrownBy(() -> tank.consumeFuel(71.0)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+  }
 
-    @Test
-    void addFuelClipsToCapacityWhenSlightlyOver() {
-        final SimpleFuelTank tank = new SimpleFuelTank(100.0, 99.9999999995);
+  @Test
+  void addFuelClipsToCapacityWhenSlightlyOver() {
+    final SimpleFuelTank tank = new SimpleFuelTank(100.0, 99.9999999995);
 
-        tank.addFuel(0.000000001);
+    tank.addFuel(0.000000001);
 
-        assertThat(tank.getCurrentFuelInLitres()).isEqualTo(100.0);
-    }
+    assertThat(tank.getCurrentFuelInLitres()).isEqualTo(100.0);
+  }
 
-    @Test
-    void consumeFuelClipsToZeroWhenSlightlyUnder() {
-        final SimpleFuelTank tank = new SimpleFuelTank(100.0, 0.0000000005);
+  @Test
+  void consumeFuelClipsToZeroWhenSlightlyUnder() {
+    final SimpleFuelTank tank = new SimpleFuelTank(100.0, 0.0000000005);
 
-        tank.consumeFuel(0.000000001);
+    tank.consumeFuel(0.000000001);
 
-        assertThat(tank.getCurrentFuelInLitres()).isEqualTo(0.0);
-    }
+    assertThat(tank.getCurrentFuelInLitres()).isEqualTo(0.0);
+  }
 
-    @Test
-    void constructorRejectsCurrentFuelAboveCapacity() {
-        assertThatThrownBy(() -> new SimpleFuelTank(100.0, 101.0))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+  @Test
+  void constructorRejectsCurrentFuelAboveCapacity() {
+    assertThatThrownBy(() -> new SimpleFuelTank(100.0, 101.0)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+  }
 }

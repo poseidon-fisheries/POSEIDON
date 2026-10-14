@@ -25,15 +25,14 @@ package uk.ac.ox.poseidon.examples.petersnapper;
 /** Factories specific to the Peter Snapper example scenario. */
 public class Factories {
 
-    private Factories() {
-    }
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
-     * {@link TotalLandingsPerYearAccumulator}
-     * @see TotalLandingsPerYearAccumulator
-     */
-    public static TotalLandingsPerYearAccumulatorFactory totalLandingsPerYearAccumulator() {
-        return new TotalLandingsPerYearAccumulatorFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   * {@link TotalLandingsPerYearAccumulator}
+   * @see TotalLandingsPerYearAccumulator
+   */
+  public static TotalLandingsPerYearAccumulatorFactory totalLandingsPerYearAccumulator() {
+    return new TotalLandingsPerYearAccumulatorFactory();
+  }
 }

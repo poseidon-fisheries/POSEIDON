@@ -22,40 +22,40 @@
 
 package uk.ac.ox.poseidon.core.schedule;
 
-import org.junit.jupiter.api.Test;
-import sim.engine.Steppable;
-import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map.Entry;
-
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map.Entry;
+import org.junit.jupiter.api.Test;
+import sim.engine.Steppable;
+import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+
 class ScheduledByDateTimeFactoryTest {
 
-    private final Simulation simulation = mock(Simulation.class);
+  private final Simulation simulation = mock(Simulation.class);
 
-    @Test
-    void schedulesAndReturnsTheResolvedSteppables() {
-        final List<Entry<LocalDateTime, Steppable>> steppables = List.of(
-            entry(LocalDate.of(2020, 1, 1).atStartOfDay(), mock(Steppable.class)),
-            entry(LocalDate.of(2021, 1, 1).atStartOfDay(), mock(Steppable.class))
-        );
-        final TemporalSchedule schedule = mock(TemporalSchedule.class);
-        when(simulation.getTemporalSchedule()).thenReturn(schedule);
+  @Test
+  void schedulesAndReturnsTheResolvedSteppables() {
+    final List<Entry<LocalDateTime, Steppable>> steppables = List.of(
+      entry(LocalDate.of(2020, 1, 1).atStartOfDay(), mock(Steppable.class)),
+      entry(LocalDate.of(2021, 1, 1).atStartOfDay(), mock(Steppable.class))
+    );
+    final TemporalSchedule schedule = mock(TemporalSchedule.class);
+    when(simulation.getTemporalSchedule()).thenReturn(schedule);
 
-        final List<Entry<LocalDateTime, Steppable>> result =
-            Factories.scheduledByDateTime(_ -> steppables).get(new SimulationScope(simulation));
+    final List<Entry<LocalDateTime, Steppable>> result =
+      Factories.scheduledByDateTime(_ -> steppables).get(
+        new SimulationScope(simulation)
+      );
 
-        verify(schedule).scheduleByDateTime(steppables);
-        assertThat(result).isSameAs(steppables);
-    }
-
+    verify(schedule).scheduleByDateTime(steppables);
+    assertThat(result).isSameAs(steppables);
+  }
 }

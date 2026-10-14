@@ -22,6 +22,11 @@
 
 package uk.ac.ox.poseidon.geography.paths;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
+import static uk.ac.ox.poseidon.geography.paths.Factories.pathCache;
+
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -31,52 +36,50 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
-import static uk.ac.ox.poseidon.geography.paths.Factories.pathCache;
-
 class DefaultPathCacheFactoryTest {
 
-    private final Simulation simulation = mock(Simulation.class);
-    private final Simulation otherSimulation = mock(Simulation.class);
+  private final Simulation simulation = mock(Simulation.class);
+  private final Simulation otherSimulation = mock(Simulation.class);
 
-    @Test
-    void sharesCacheWhenRoutingInputsAreGlobal() {
-        final DefaultPathCacheFactory<SimulationScope> factory =
-            pathCache(
-                object(mock(BathymetricGrid.class)),
-                object(mock(PortGrid.class)),
-                object(mock(DistanceCalculator.class))
-            );
+  @Test
+  void sharesCacheWhenRoutingInputsAreGlobal() {
+    final DefaultPathCacheFactory<SimulationScope> factory = pathCache(
+      object(mock(BathymetricGrid.class)),
+      object(mock(PortGrid.class)),
+      object(mock(DistanceCalculator.class))
+    );
 
-        final PathCache<Int2D> first = factory.get(new SimulationScope(simulation));
-        final PathCache<Int2D> second = factory.get(new SimulationScope(otherSimulation));
+    final PathCache<Int2D> first = factory.get(new SimulationScope(simulation));
+    final PathCache<Int2D> second = factory.get(
+      new SimulationScope(otherSimulation)
+    );
 
-        assertThat(first).isSameAs(second);
+    assertThat(first).isSameAs(second);
+  }
+
+  @Test
+  void separatesCacheWhenRoutingInputsAreSimulationScoped() {
+    final DefaultPathCacheFactory<SimulationScope> factory = pathCache(
+      new SimulationBathymetricGridFactory(),
+      object(mock(PortGrid.class)),
+      object(mock(DistanceCalculator.class))
+    );
+
+    final PathCache<Int2D> first = factory.get(new SimulationScope(simulation));
+    final PathCache<Int2D> second = factory.get(
+      new SimulationScope(otherSimulation)
+    );
+
+    assertThat(first).isNotSameAs(second);
+  }
+
+  private static final class SimulationBathymetricGridFactory
+    extends SimulationScopeFactory<BathymetricGrid>
+  {
+
+    @Override
+    protected BathymetricGrid newInstance(final SimulationScope scope) {
+      return mock(BathymetricGrid.class);
     }
-
-    @Test
-    void separatesCacheWhenRoutingInputsAreSimulationScoped() {
-        final DefaultPathCacheFactory<SimulationScope> factory =
-            pathCache(
-                new SimulationBathymetricGridFactory(),
-                object(mock(PortGrid.class)),
-                object(mock(DistanceCalculator.class))
-            );
-
-        final PathCache<Int2D> first = factory.get(new SimulationScope(simulation));
-        final PathCache<Int2D> second = factory.get(new SimulationScope(otherSimulation));
-
-        assertThat(first).isNotSameAs(second);
-    }
-
-    private static final class SimulationBathymetricGridFactory
-        extends SimulationScopeFactory<BathymetricGrid> {
-
-        @Override
-        protected BathymetricGrid newInstance(final SimulationScope scope) {
-            return mock(BathymetricGrid.class);
-        }
-    }
+  }
 }

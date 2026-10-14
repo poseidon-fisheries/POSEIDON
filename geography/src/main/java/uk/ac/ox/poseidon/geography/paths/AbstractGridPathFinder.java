@@ -34,21 +34,22 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  */
 @RequiredArgsConstructor
 abstract class AbstractGridPathFinder implements GridPathFinder {
-    private final BathymetricGrid bathymetricGrid;
-    private final PortGrid portGrid;
 
-    @Override
-    public boolean isNavigable(final Int2D cell) {
-        return isWater(cell) || portGrid.anyObjectsAt(cell);
-    }
+  private final BathymetricGrid bathymetricGrid;
+  private final PortGrid portGrid;
 
-    @Override
-    public boolean isWater(final Int2D cell) {
-        return bathymetricGrid.isWater(cell);
-    }
+  @Override
+  public boolean isNavigable(final Int2D cell) {
+    return isWater(cell) || portGrid.anyObjectsAt(cell);
+  }
 
-    @Override
-    public ModelGrid getModelGrid() {
-        return bathymetricGrid.getModelGrid();
-    }
+  @Override
+  public boolean isWater(final Int2D cell) {
+    return bathymetricGrid.isWater(cell);
+  }
+
+  @Override
+  public ModelGrid getModelGrid() {
+    return bathymetricGrid.getModelGrid();
+  }
 }

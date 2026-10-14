@@ -34,21 +34,24 @@ import java.util.function.ToDoubleFunction;
  * Lets the same object be wired into any of those call sites without an adapter.
  */
 public interface DoubleProvider
-    extends DoubleSupplier, Supplier<Double>, ToDoubleFunction<Object>, Function<Object, Double> {
+  extends
+    DoubleSupplier,
+    Supplier<Double>,
+    ToDoubleFunction<Object>,
+    Function<Object, Double>
+{
+  @Override
+  default double applyAsDouble(final Object ignored) {
+    return getAsDouble();
+  }
 
-    @Override
-    default double applyAsDouble(final Object ignored) {
-        return getAsDouble();
-    }
+  @Override
+  default Double apply(final Object o) {
+    return getAsDouble();
+  }
 
-    @Override
-    default Double apply(final Object o) {
-        return getAsDouble();
-    }
-
-    @Override
-    default Double get() {
-        return getAsDouble();
-    }
-
+  @Override
+  default Double get() {
+    return getAsDouble();
+  }
 }

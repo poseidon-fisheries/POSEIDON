@@ -35,20 +35,22 @@ import java.util.function.Function;
  */
 public class CombinedDuration<T> implements Function<T, Duration> {
 
-    private final Function<T, ? extends Duration>[] durations;
+  private final Function<T, ? extends Duration>[] durations;
 
-    /** @param durations the duration-producing functions to sum */
-    @SuppressWarnings("unchecked")
-    public CombinedDuration(final List<? extends Function<? super T, ? extends Duration>> durations) {
-        this.durations = durations.toArray(new Function[0]);
-    }
+  /** @param durations the duration-producing functions to sum */
+  @SuppressWarnings("unchecked")
+  public CombinedDuration(
+    final List<? extends Function<? super T, ? extends Duration>> durations
+  ) {
+    this.durations = durations.toArray(new Function[0]);
+  }
 
-    @Override
-    public Duration apply(final T t) {
-        Duration total = Duration.ZERO;
-        for (final Function<T, ? extends Duration> duration : durations) {
-            total = total.plus(duration.apply(t));
-        }
-        return total;
+  @Override
+  public Duration apply(final T t) {
+    Duration total = Duration.ZERO;
+    for (final Function<T, ? extends Duration> duration : durations) {
+      total = total.plus(duration.apply(t));
     }
+    return total;
+  }
 }

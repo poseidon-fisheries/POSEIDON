@@ -38,119 +38,118 @@ import uk.ac.ox.poseidon.geography.grids.MutableDoubleGrid;
  * is also directly {@link FisheableGrid} (fishing extracts from and releases into it in place).
  */
 @Getter
-class DefaultBiomassGrid extends MutableDoubleGrid implements BiomassGrid, FisheableGrid {
+class DefaultBiomassGrid
+  extends MutableDoubleGrid
+  implements BiomassGrid, FisheableGrid
+{
 
-    private final Species species;
+  private final Species species;
 
-    public DefaultBiomassGrid(
-        final ModelGrid modelGrid,
-        final Species species
-    ) {
-        super(modelGrid);
-        this.species = species;
+  public DefaultBiomassGrid(final ModelGrid modelGrid, final Species species) {
+    super(modelGrid);
+    this.species = species;
+  }
+
+  public DefaultBiomassGrid(
+    final ModelGrid modelGrid,
+    final Species species,
+    final double initialValue
+  ) {
+    super(modelGrid, initialValue);
+    this.species = species;
+  }
+
+  public DefaultBiomassGrid(
+    final ModelGrid modelGrid,
+    final Species species,
+    final double[][] values
+  ) {
+    super(modelGrid, values);
+    this.species = species;
+  }
+
+  public DefaultBiomassGrid(
+    final ModelGrid modelGrid,
+    final Species species,
+    final DoubleGrid2D grid
+  ) {
+    super(modelGrid, grid);
+    this.species = species;
+  }
+
+  @Override
+  public Biomass getBiomass(final Int2D cell) {
+    return Biomass.ofKg(getValue(cell));
+  }
+
+  @Override
+  public void setBiomass(final Int2D cell, final double value) {
+    setValue(cell, value);
+  }
+
+  @Override
+  public Fisheable getFisheableCell(final Int2D cell) {
+    return new FisheableCell(cell);
+  }
+
+  /**
+   * Sums the values for the grid, ignoring NaN, as they occur in non-habitable cells
+   */
+  @Override
+  public double getSum() {
+    double sum = 0.0;
+    final int width = field.width;
+    final int height = field.height;
+    final double[][] a = field.field;
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        final double biomass = a[x][y];
+        if (!Double.isNaN(biomass)) {
+          sum += biomass;
+        }
+      }
     }
+    return sum;
+  }
 
-    public DefaultBiomassGrid(
-        final ModelGrid modelGrid,
-        final Species species,
-        final double initialValue
-    ) {
-        super(modelGrid, initialValue);
-        this.species = species;
-    }
+  /**
+   * Extracting takes at most what the cell holds (never over-draws it); releasing rejects any
+   * species other than this grid's own.
+   */
+  @RequiredArgsConstructor
+  class FisheableCell implements Fisheable {
 
-    public DefaultBiomassGrid(
-        final ModelGrid modelGrid,
-        final Species species,
-        final double[][] values
-    ) {
-        super(modelGrid, values);
-        this.species = species;
-    }
+    final Int2D cell;
 
-    public DefaultBiomassGrid(
-        final ModelGrid modelGrid,
-        final Species species,
-        final DoubleGrid2D grid
-    ) {
-        super(modelGrid, grid);
-        this.species = species;
+    @Override
+    public Bucket availableFish() {
+      return Bucket.of(species, getValue(cell));
     }
 
     @Override
-    public Biomass getBiomass(final Int2D cell) {
-        return Biomass.ofKg(getValue(cell));
+    public void release(final Bucket fishToRelease) {
+      fishToRelease.forEachBiomassValue((s, biomass) -> {
+        if (s.equals(species)) setBiomass(
+          cell,
+          getBiomass(cell).asKg() + biomass
+        );
+        else {
+          throw new IllegalArgumentException(
+            "Unable to release %s in a %s grid".formatted(s, species)
+          );
+        }
+      });
     }
 
     @Override
-    public void setBiomass(
-        final Int2D cell,
-        final double value
-    ) {
-        setValue(cell, value);
+    public Bucket extract(final Bucket fishToExtract) {
+      final double biomassToExtract = fishToExtract.getKg(species);
+      if (biomassToExtract <= 0) return Bucket.empty();
+      final double gridBiomass = getValue(cell);
+      if (gridBiomass <= 0) return Bucket.empty();
+      final double biomassExtracted = Math.min(biomassToExtract, gridBiomass);
+      setValue(cell, gridBiomass - biomassExtracted);
+      return Bucket.of(species, biomassExtracted);
     }
-
-    @Override
-    public Fisheable getFisheableCell(final Int2D cell) {
-        return new FisheableCell(cell);
-    }
-
-    /**
-     * Sums the values for the grid, ignoring NaN, as they occur in non-habitable cells
-     */
-    @Override
-    public double getSum() {
-        double sum = 0.0;
-        final int width = field.width;
-        final int height = field.height;
-        final double[][] a = field.field;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                final double biomass = a[x][y];
-                if (!Double.isNaN(biomass)) {
-                    sum += biomass;
-                }
-            }
-        }
-        return sum;
-    }
-
-    /**
-     * Extracting takes at most what the cell holds (never over-draws it); releasing rejects any
-     * species other than this grid's own.
-     */
-    @RequiredArgsConstructor
-    class FisheableCell implements Fisheable {
-
-        final Int2D cell;
-
-        @Override
-        public Bucket availableFish() {
-            return Bucket.of(species, getValue(cell));
-        }
-
-        @Override
-        public void release(final Bucket fishToRelease) {
-            fishToRelease.forEachBiomassValue((s, biomass) -> {
-                if (s.equals(species))
-                    setBiomass(cell, getBiomass(cell).asKg() + biomass);
-                else {
-                    throw new IllegalArgumentException(
-                        "Unable to release %s in a %s grid".formatted(s, species)
-                    );
-                }
-            });
-        }
-
-        @Override
-        public Bucket extract(final Bucket fishToExtract) {
-            final double biomassToExtract = fishToExtract.getKg(species);
-            if (biomassToExtract <= 0) return Bucket.empty();
-            final double gridBiomass = getValue(cell);
-            if (gridBiomass <= 0) return Bucket.empty();
-            final double biomassExtracted = Math.min(biomassToExtract, gridBiomass);
-            setValue(cell, gridBiomass - biomassExtracted);
-            return Bucket.of(species, biomassExtracted);
-        }
-    }
+  }
 }

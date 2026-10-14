@@ -22,30 +22,33 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-
-import java.time.Duration;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.tasks.travel.TravelTasks.*;
 
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+
 class TravelDirectlyTest {
 
-    @Test
-    void takesTheDistanceOverTheCruisingSpeed() throws Exception {
-        final DistanceCalculator distanceCalculator = mock(DistanceCalculator.class);
-        when(distanceCalculator.distanceInKm(ORIGIN, DESTINATION)).thenReturn(5.0);
-        final Vessel vessel = vesselCruisingAtTenKph();
-        final TravelDirectly travelDirectly = new TravelDirectly(distanceCalculator);
-        setTaskObject(travelDirectly, vessel);
+  @Test
+  void takesTheDistanceOverTheCruisingSpeed() throws Exception {
+    final DistanceCalculator distanceCalculator = mock(
+      DistanceCalculator.class
+    );
+    when(distanceCalculator.distanceInKm(ORIGIN, DESTINATION)).thenReturn(5.0);
+    final Vessel vessel = vesselCruisingAtTenKph();
+    final TravelDirectly travelDirectly = new TravelDirectly(
+      distanceCalculator
+    );
+    setTaskObject(travelDirectly, vessel);
 
-        travelDirectly.start();
-        travelDirectly.execute();
+    travelDirectly.start();
+    travelDirectly.execute();
 
-        verify(vessel).setTaskDuration(Duration.ofMinutes(30));
-    }
+    verify(vessel).setTaskDuration(Duration.ofMinutes(30));
+  }
 }

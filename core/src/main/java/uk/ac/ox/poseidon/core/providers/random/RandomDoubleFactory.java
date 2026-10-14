@@ -37,14 +37,13 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class RandomDoubleFactory
-    extends SimulationScopeFactory<RandomDouble> {
+public class RandomDoubleFactory extends SimulationScopeFactory<RandomDouble> {
 
-    private double minimum;
-    private double maximum;
+  private double minimum;
+  private double maximum;
 
-    @Override
-    protected RandomDouble newInstance(final SimulationScope scope) {
-        return new RandomDouble(scope.getSimulation().random, minimum, maximum);
-    }
+  @Override
+  protected RandomDouble newInstance(final SimulationScope scope) {
+    return new RandomDouble(scope.getSimulation().random, minimum, maximum);
+  }
 }

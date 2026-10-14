@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
+import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,8 +32,6 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
-import java.util.function.Predicate;
-
 /**
  * A {@link RelativeScopeFactory} for an {@link ActionCoordinatePredicate}. Built via
  * {@link Factories#actionCoordinatePredicate}.
@@ -41,14 +40,18 @@ import java.util.function.Predicate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ActionCoordinatePredicateFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ActionCoordinatePredicate> {
+public class ActionCoordinatePredicateFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  ActionCoordinatePredicate
+> {
 
-    private Factory<? super S, ? extends Predicate<Coordinate>> coordinatePredicate;
+  private Factory<
+    ? super S,
+    ? extends Predicate<Coordinate>
+  > coordinatePredicate;
 
-    @Override
-    protected ActionCoordinatePredicate newInstance(final S scope) {
-        return new ActionCoordinatePredicate(coordinatePredicate.get(scope));
-    }
-
+  @Override
+  protected ActionCoordinatePredicate newInstance(final S scope) {
+    return new ActionCoordinatePredicate(coordinatePredicate.get(scope));
+  }
 }

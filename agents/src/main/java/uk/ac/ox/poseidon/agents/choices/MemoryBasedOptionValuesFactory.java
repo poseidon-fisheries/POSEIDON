@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.function.Function;
+import java.util.function.ToDoubleBiFunction;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,9 +33,6 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
-import java.util.function.Function;
-import java.util.function.ToDoubleBiFunction;
-
 /**
  * A {@link VesselScopeFactory} counterpart of {@link MemoryBasedOptionValues}, built via
  * {@link Factories#memoryBasedOptionValues(Factory, Factory)}.
@@ -42,20 +41,26 @@ import java.util.function.ToDoubleBiFunction;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MemoryBasedOptionValuesFactory<O, M>
-    extends VesselScopeFactory<MemoryBasedOptionValues<O, M>> {
+public class MemoryBasedOptionValuesFactory<
+  O,
+  M
+> extends VesselScopeFactory<MemoryBasedOptionValues<O, M>> {
 
-    private Factory<? super VesselScope, ? extends Function<? super Vessel, ? extends Memory<O, M>>>
-        memorySelector;
-    private Factory<? super VesselScope, ? extends ToDoubleBiFunction<? super O, ? super M>>
-        valuation;
+  private Factory<
+    ? super VesselScope,
+    ? extends Function<? super Vessel, ? extends Memory<O, M>>
+  > memorySelector;
+  private Factory<
+    ? super VesselScope,
+    ? extends ToDoubleBiFunction<? super O, ? super M>
+  > valuation;
 
-    @Override
-    protected MemoryBasedOptionValues<O, M> newInstance(final VesselScope scope) {
-        return new MemoryBasedOptionValues<>(
-            memorySelector.get(scope),
-            scope.getVessel(),
-            valuation.get(scope)
-        );
-    }
+  @Override
+  protected MemoryBasedOptionValues<O, M> newInstance(final VesselScope scope) {
+    return new MemoryBasedOptionValues<>(
+      memorySelector.get(scope),
+      scope.getVessel(),
+      valuation.get(scope)
+    );
+  }
 }

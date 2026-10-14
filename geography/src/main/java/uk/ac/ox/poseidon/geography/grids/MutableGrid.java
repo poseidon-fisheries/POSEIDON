@@ -30,8 +30,6 @@ import sim.field.grid.Grid2D;
  * method, or {@link MutableDoubleGrid}).
  */
 public interface MutableGrid<F extends Grid2D> extends Grid {
-
-    /** @return the underlying, mutable MASON field */
-    F getField();
-
+  /** @return the underlying, mutable MASON field */
+  F getField();
 }

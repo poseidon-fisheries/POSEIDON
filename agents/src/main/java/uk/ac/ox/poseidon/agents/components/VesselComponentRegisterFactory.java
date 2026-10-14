@@ -34,9 +34,14 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class VesselComponentRegisterFactory<C> extends SimulationScopeFactory<VesselComponentRegister<C>> {
-    @Override
-    protected VesselComponentRegister<C> newInstance(final SimulationScope scope) {
-        return new VesselComponentRegister<>();
-    }
+public class VesselComponentRegisterFactory<C> extends SimulationScopeFactory<
+  VesselComponentRegister<C>
+> {
+
+  @Override
+  protected VesselComponentRegister<C> newInstance(
+    final SimulationScope scope
+  ) {
+    return new VesselComponentRegister<>();
+  }
 }

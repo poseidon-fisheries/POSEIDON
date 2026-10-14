@@ -22,46 +22,48 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import ec.util.MersenneTwisterFast;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.providers.random.RandomInt;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 class RandomIntTest {
 
-    @Test
-    void testInclusiveRangeBounds() {
-        final MersenneTwisterFast rng = new MersenneTwisterFast(1234L);
-        final RandomInt supplier = new RandomInt(rng, 1, 3);
+  @Test
+  void testInclusiveRangeBounds() {
+    final MersenneTwisterFast rng = new MersenneTwisterFast(1234L);
+    final RandomInt supplier = new RandomInt(rng, 1, 3);
 
-        for (int i = 0; i < 1000; i++) {
-            final int value = supplier.getAsInt();
-            assertThat(value)
-                .as("Value should be within inclusive bounds")
-                .isBetween(1, 3);
-        }
+    for (int i = 0; i < 1000; i++) {
+      final int value = supplier.getAsInt();
+      assertThat(value)
+        .as("Value should be within inclusive bounds")
+        .isBetween(1, 3);
     }
+  }
 
-    @Test
-    void testSingleValueRangeReturnsMinimum() {
-        final MersenneTwisterFast rng = new MersenneTwisterFast(42L);
-        final RandomInt supplier = new RandomInt(rng, 7, 7);
+  @Test
+  void testSingleValueRangeReturnsMinimum() {
+    final MersenneTwisterFast rng = new MersenneTwisterFast(42L);
+    final RandomInt supplier = new RandomInt(rng, 7, 7);
 
-        for (int i = 0; i < 10; i++) {
-            assertThat(supplier.getAsInt())
-                .as("Single-value range should return minimum")
-                .isEqualTo(7);
-        }
+    for (int i = 0; i < 10; i++) {
+      assertThat(supplier.getAsInt())
+        .as("Single-value range should return minimum")
+        .isEqualTo(7);
     }
+  }
 
-    @Test
-    void testRangeOverflowThrows() {
-        final MersenneTwisterFast rng = new MersenneTwisterFast(1L);
+  @Test
+  void testRangeOverflowThrows() {
+    final MersenneTwisterFast rng = new MersenneTwisterFast(1L);
 
-        assertThatThrownBy(() -> new RandomInt(rng, Integer.MIN_VALUE, Integer.MAX_VALUE))
-            .as("Overflowing range should be rejected")
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+    assertThatThrownBy(() ->
+      new RandomInt(rng, Integer.MIN_VALUE, Integer.MAX_VALUE)
+    )
+      .as("Overflowing range should be rejected")
+      .isInstanceOf(IllegalArgumentException.class);
+  }
 }

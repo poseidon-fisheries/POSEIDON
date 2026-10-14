@@ -32,16 +32,16 @@ import uk.ac.ox.poseidon.core.Factory;
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-     * {@link CurrentCellFisheable}
-     * @see CurrentCellFisheableFactory
-     */
-    public static CurrentCellFisheableFactory currentCellFisheable(
-        final Factory<? super VesselScope, ? extends FisheableGrid> fisheableGrid
-    ) {
-        return new CurrentCellFisheableFactory(fisheableGrid);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+   * {@link CurrentCellFisheable}
+   * @see CurrentCellFisheableFactory
+   */
+  public static CurrentCellFisheableFactory currentCellFisheable(
+    final Factory<? super VesselScope, ? extends FisheableGrid> fisheableGrid
+  ) {
+    return new CurrentCellFisheableFactory(fisheableGrid);
+  }
 }

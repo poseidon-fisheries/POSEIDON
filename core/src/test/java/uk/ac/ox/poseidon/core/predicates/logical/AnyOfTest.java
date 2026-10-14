@@ -22,139 +22,149 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import com.google.common.collect.ImmutableList;
-import org.junit.jupiter.api.Test;
-
-import java.util.function.Predicate;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableList;
+import java.util.function.Predicate;
+import org.junit.jupiter.api.Test;
+
 @SuppressWarnings("unchecked")
 class AnyOfTest {
 
-    @Test
-    void test_allPredicatesReturnFalse_shouldReturnFalse() {
-        // Arrange
-        final Object object = mock(Object.class);
-        final Predicate<Object> falsePredicate1 = act -> false;
-        final Predicate<Object> falsePredicate2 = act -> false;
+  @Test
+  void test_allPredicatesReturnFalse_shouldReturnFalse() {
+    // Arrange
+    final Object object = mock(Object.class);
+    final Predicate<Object> falsePredicate1 = act -> false;
+    final Predicate<Object> falsePredicate2 = act -> false;
 
-        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(falsePredicate1, falsePredicate2));
+    final AnyOf<Object> anyOf = new AnyOf<>(
+      ImmutableList.of(falsePredicate1, falsePredicate2)
+    );
 
-        // Act
-        final boolean result = anyOf.test(object);
+    // Act
+    final boolean result = anyOf.test(object);
 
-        // Assert
-        assertFalse(result, "Expected false when all predicates return false.");
-    }
+    // Assert
+    assertFalse(result, "Expected false when all predicates return false.");
+  }
 
-    @Test
-    void test_mixedPredicates_someTrueSomeFalse_shouldReturnTrue() {
-        // Arrange
-        final Object object = mock(Object.class);
-        final Predicate<Object> falsePredicate = act -> false;
-        final Predicate<Object> truePredicate = act -> true;
+  @Test
+  void test_mixedPredicates_someTrueSomeFalse_shouldReturnTrue() {
+    // Arrange
+    final Object object = mock(Object.class);
+    final Predicate<Object> falsePredicate = act -> false;
+    final Predicate<Object> truePredicate = act -> true;
 
-        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(falsePredicate, truePredicate));
+    final AnyOf<Object> anyOf = new AnyOf<>(
+      ImmutableList.of(falsePredicate, truePredicate)
+    );
 
-        // Act
-        final boolean result = anyOf.test(object);
+    // Act
+    final boolean result = anyOf.test(object);
 
-        // Assert
-        assertTrue(result, "Expected true when at least one predicate returns true.");
-    }
+    // Assert
+    assertTrue(
+      result,
+      "Expected true when at least one predicate returns true."
+    );
+  }
 
-    /**
-     * Tests the {@link AnyOf} class, which holds a collection of predicates and evaluates if any of
-     * them return true when applied to a given {@link Object}.
-     */
+  /**
+   * Tests the {@link AnyOf} class, which holds a collection of predicates and evaluates if any of
+   * them return true when applied to a given {@link Object}.
+   */
 
-    @Test
-    void test_whenAnyPredicateMatches_shouldReturnTrue() {
-        // Arrange
-        final Object object = mock(Object.class);
-        final Predicate<Object> predicate1 = mock(Predicate.class);
-        final Predicate<Object> predicate2 = mock(Predicate.class);
+  @Test
+  void test_whenAnyPredicateMatches_shouldReturnTrue() {
+    // Arrange
+    final Object object = mock(Object.class);
+    final Predicate<Object> predicate1 = mock(Predicate.class);
+    final Predicate<Object> predicate2 = mock(Predicate.class);
 
-        when(predicate1.test(object)).thenReturn(false);
-        when(predicate2.test(object)).thenReturn(true);
+    when(predicate1.test(object)).thenReturn(false);
+    when(predicate2.test(object)).thenReturn(true);
 
-        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(predicate1, predicate2));
+    final AnyOf<Object> anyOf = new AnyOf<>(
+      ImmutableList.of(predicate1, predicate2)
+    );
 
-        // Act
-        final boolean result = anyOf.test(object);
+    // Act
+    final boolean result = anyOf.test(object);
 
-        // Assert
-        assertTrue(result);
-    }
+    // Assert
+    assertTrue(result);
+  }
 
-    @Test
-    void test_whenNoPredicatesMatch_shouldReturnFalse() {
-        // Arrange
-        final Object object = mock(Object.class);
-        final Predicate<Object> predicate1 = mock(Predicate.class);
-        final Predicate<Object> predicate2 = mock(Predicate.class);
+  @Test
+  void test_whenNoPredicatesMatch_shouldReturnFalse() {
+    // Arrange
+    final Object object = mock(Object.class);
+    final Predicate<Object> predicate1 = mock(Predicate.class);
+    final Predicate<Object> predicate2 = mock(Predicate.class);
 
-        when(predicate1.test(object)).thenReturn(false);
-        when(predicate2.test(object)).thenReturn(false);
+    when(predicate1.test(object)).thenReturn(false);
+    when(predicate2.test(object)).thenReturn(false);
 
-        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(predicate1, predicate2));
+    final AnyOf<Object> anyOf = new AnyOf<>(
+      ImmutableList.of(predicate1, predicate2)
+    );
 
-        // Act
-        final boolean result = anyOf.test(object);
+    // Act
+    final boolean result = anyOf.test(object);
 
-        // Assert
-        assertFalse(result);
-    }
+    // Assert
+    assertFalse(result);
+  }
 
-    @Test
-    void test_whenNoPredicatesProvided_shouldReturnFalse() {
-        // Arrange
-        final Object object = mock(Object.class);
+  @Test
+  void test_whenNoPredicatesProvided_shouldReturnFalse() {
+    // Arrange
+    final Object object = mock(Object.class);
 
-        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of());
+    final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of());
 
-        // Act
-        final boolean result = anyOf.test(object);
+    // Act
+    final boolean result = anyOf.test(object);
 
-        // Assert
-        assertFalse(result);
-    }
+    // Assert
+    assertFalse(result);
+  }
 
-    @Test
-    void test_whenSinglePredicateMatches_shouldReturnTrue() {
-        // Arrange
-        final Object object = mock(Object.class);
-        final Predicate<Object> predicate = mock(Predicate.class);
+  @Test
+  void test_whenSinglePredicateMatches_shouldReturnTrue() {
+    // Arrange
+    final Object object = mock(Object.class);
+    final Predicate<Object> predicate = mock(Predicate.class);
 
-        when(predicate.test(object)).thenReturn(true);
+    when(predicate.test(object)).thenReturn(true);
 
-        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(predicate));
+    final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(predicate));
 
-        // Act
-        final boolean result = anyOf.test(object);
+    // Act
+    final boolean result = anyOf.test(object);
 
-        // Assert
-        assertTrue(result);
-    }
+    // Assert
+    assertTrue(result);
+  }
 
-    @Test
-    void test_whenSinglePredicateDoesNotMatch_shouldReturnFalse() {
-        // Arrange
-        final Object object = mock(Object.class);
-        final Predicate<Object> predicate = mock(Predicate.class);
+  @Test
+  void test_whenSinglePredicateDoesNotMatch_shouldReturnFalse() {
+    // Arrange
+    final Object object = mock(Object.class);
+    final Predicate<Object> predicate = mock(Predicate.class);
 
-        when(predicate.test(object)).thenReturn(false);
+    when(predicate.test(object)).thenReturn(false);
 
-        final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(predicate));
+    final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(predicate));
 
-        // Act
-        final boolean result = anyOf.test(object);
+    // Act
+    final boolean result = anyOf.test(object);
 
-        // Assert
-        assertFalse(result);
-    }
+    // Assert
+    assertFalse(result);
+  }
 }

@@ -22,65 +22,61 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.DoubleSupplier;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.DoubleSupplier;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class FirstDoubleFromFactoryTest {
 
-    @Test
-    void returnedProviderIsStable() {
-        final AtomicInteger counter = new AtomicInteger(0);
-        final FirstDoubleFromFactory<Scope> factory =
-            new FirstDoubleFromFactory<>(
-                new GlobalScopeFactory<DoubleSupplier>() {
-                    @Override
-                    protected DoubleSupplier newInstance(final Scope scope) {
-                        return counter::incrementAndGet;
-                    }
-                }
-            );
+  @Test
+  void returnedProviderIsStable() {
+    final AtomicInteger counter = new AtomicInteger(0);
+    final FirstDoubleFromFactory<Scope> factory = new FirstDoubleFromFactory<>(
+      new GlobalScopeFactory<DoubleSupplier>() {
+        @Override
+        protected DoubleSupplier newInstance(final Scope scope) {
+          return counter::incrementAndGet;
+        }
+      }
+    );
 
-        final DoubleProvider provider = factory.get(Scope.GLOBAL_SCOPE);
-        assertThat(provider.getAsDouble()).isEqualTo(1.0);
-        assertThat(provider.getAsDouble()).isEqualTo(1.0);
-        assertThat(provider.getAsDouble()).isEqualTo(1.0);
-    }
+    final DoubleProvider provider = factory.get(Scope.GLOBAL_SCOPE);
+    assertThat(provider.getAsDouble()).isEqualTo(1.0);
+    assertThat(provider.getAsDouble()).isEqualTo(1.0);
+    assertThat(provider.getAsDouble()).isEqualTo(1.0);
+  }
 
-    @Test
-    void delegateSupplierCalledOnlyOnce() {
-        final AtomicInteger counter = new AtomicInteger(0);
-        final FirstDoubleFromFactory<Scope> factory =
-            new FirstDoubleFromFactory<>(
-                new GlobalScopeFactory<DoubleSupplier>() {
-                    @Override
-                    protected DoubleSupplier newInstance(final Scope scope) {
-                        return counter::incrementAndGet;
-                    }
-                }
-            );
+  @Test
+  void delegateSupplierCalledOnlyOnce() {
+    final AtomicInteger counter = new AtomicInteger(0);
+    final FirstDoubleFromFactory<Scope> factory = new FirstDoubleFromFactory<>(
+      new GlobalScopeFactory<DoubleSupplier>() {
+        @Override
+        protected DoubleSupplier newInstance(final Scope scope) {
+          return counter::incrementAndGet;
+        }
+      }
+    );
 
-        factory.get(Scope.GLOBAL_SCOPE);
-        assertThat(counter).hasValue(1);
-    }
+    factory.get(Scope.GLOBAL_SCOPE);
+    assertThat(counter).hasValue(1);
+  }
 
-    @Test
-    void returnsConstantDoubleProvider() {
-        final FirstDoubleFromFactory<Scope> factory =
-            new FirstDoubleFromFactory<>(
-                new GlobalScopeFactory<DoubleSupplier>() {
-                    @Override
-                    protected DoubleSupplier newInstance(final Scope scope) {
-                        return () -> 1.23;
-                    }
-                }
-            );
+  @Test
+  void returnsConstantDoubleProvider() {
+    final FirstDoubleFromFactory<Scope> factory = new FirstDoubleFromFactory<>(
+      new GlobalScopeFactory<DoubleSupplier>() {
+        @Override
+        protected DoubleSupplier newInstance(final Scope scope) {
+          return () -> 1.23;
+        }
+      }
+    );
 
-        assertThat(factory.get(Scope.GLOBAL_SCOPE).getAsDouble()).isEqualTo(1.23);
-    }
+    assertThat(factory.get(Scope.GLOBAL_SCOPE).getAsDouble()).isEqualTo(1.23);
+  }
 }

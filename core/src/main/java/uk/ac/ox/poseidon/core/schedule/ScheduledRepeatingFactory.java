@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.core.schedule;
 
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAmount;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,9 +32,6 @@ import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAmount;
 
 /**
  * A {@link SimulationScopeFactory} that schedules the resolved steppable to run repeatedly, at a
@@ -47,21 +46,23 @@ import java.time.temporal.TemporalAmount;
 @EqualsAndHashCode(callSuper = true)
 public class ScheduledRepeatingFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
-    private Factory<? super SimulationScope, ? extends Temporal> startingDateTime;
-    private Factory<? super SimulationScope, ? extends TemporalAmount> interval;
-    private Factory<? super SimulationScope, ? extends C> steppable;
-    private int ordering;
+  private Factory<? super SimulationScope, ? extends Temporal> startingDateTime;
+  private Factory<? super SimulationScope, ? extends TemporalAmount> interval;
+  private Factory<? super SimulationScope, ? extends C> steppable;
+  private int ordering;
 
-    @Override
-    protected C newInstance(final SimulationScope scope) {
-        final C steppableObject = steppable.get(scope);
-        scope.getSimulation().getTemporalSchedule().scheduleRepeating(
-            startingDateTime.get(scope),
-            ordering,
-            steppableObject,
-            interval.get(scope)
-        );
-        return steppableObject;
-    }
-
+  @Override
+  protected C newInstance(final SimulationScope scope) {
+    final C steppableObject = steppable.get(scope);
+    scope
+      .getSimulation()
+      .getTemporalSchedule()
+      .scheduleRepeating(
+        startingDateTime.get(scope),
+        ordering,
+        steppableObject,
+        interval.get(scope)
+      );
+    return steppableObject;
+  }
 }

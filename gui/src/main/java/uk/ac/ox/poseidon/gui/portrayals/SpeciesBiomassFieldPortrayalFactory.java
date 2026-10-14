@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
+import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,8 +35,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,30 +44,35 @@ import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
  * {@link NamedPortrayal}, named after the species and coloured relative to
  * {@link #carryingCapacityGrid}'s maximum.
  */
-public class SpeciesBiomassFieldPortrayalFactory extends SimulationScopeFactory<NamedPortrayal> {
+public class SpeciesBiomassFieldPortrayalFactory
+  extends SimulationScopeFactory<NamedPortrayal>
+{
 
-    private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;
-    private Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid;
-    private boolean visible;
+  private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;
+  private Factory<
+    ? super SimulationScope,
+    ? extends CarryingCapacityGrid
+  > carryingCapacityGrid;
+  private boolean visible;
 
-    /** @return a named portrayal of {@link #biomassGrid}, labelled with the species' name and life stage */
-    @Override
-    protected NamedPortrayal newInstance(final SimulationScope scope) {
-        final Species species = biomassGrid.get(scope).getSpecies();
-        final String name =
-            species.getName() +
-                (species.getLifeStage() != null ? " " + species.getLifeStage() : "") +
-                " biomass";
-        return new NamedPortrayal(
-            name,
-            new NumberGridWithCapacityPortrayalFactory(
-                LAJOLLA,
-                name,
-                false,
-                this.biomassGrid,
-                this.carryingCapacityGrid
-            ).get(scope),
-            visible
-        );
-    }
+  /** @return a named portrayal of {@link #biomassGrid}, labelled with the species' name and life stage */
+  @Override
+  protected NamedPortrayal newInstance(final SimulationScope scope) {
+    final Species species = biomassGrid.get(scope).getSpecies();
+    final String name =
+      species.getName() +
+      (species.getLifeStage() != null ? " " + species.getLifeStage() : "") +
+      " biomass";
+    return new NamedPortrayal(
+      name,
+      new NumberGridWithCapacityPortrayalFactory(
+        LAJOLLA,
+        name,
+        false,
+        this.biomassGrid,
+        this.carryingCapacityGrid
+      ).get(scope),
+      visible
+    );
+  }
 }

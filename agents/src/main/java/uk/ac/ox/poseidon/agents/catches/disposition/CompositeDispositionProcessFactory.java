@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,10 +32,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.List;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link CompositeDispositionProcess}, built via
@@ -42,29 +41,35 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CompositeDispositionProcessFactory<S extends Scope>
-    extends RelativeScopeFactory<S, CompositeDispositionProcess> {
+public class CompositeDispositionProcessFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  CompositeDispositionProcess
+> {
 
-    private List<Factory<? super S, ? extends DispositionProcess>> dispositionStrategies;
+  private List<
+    Factory<? super S, ? extends DispositionProcess>
+  > dispositionStrategies;
 
-    /** @param dispositionStrategies the steps to chain, in order */
-    @SafeVarargs
-    @SuppressWarnings("varargs")
-    public CompositeDispositionProcessFactory(
-        final Factory<? super S, ? extends DispositionProcess>... dispositionStrategies
-    ) {
-        this(List.of(dispositionStrategies));
-    }
+  /** @param dispositionStrategies the steps to chain, in order */
+  @SafeVarargs
+  @SuppressWarnings("varargs")
+  public CompositeDispositionProcessFactory(
+    final Factory<
+      ? super S,
+      ? extends DispositionProcess
+    >... dispositionStrategies
+  ) {
+    this(List.of(dispositionStrategies));
+  }
 
-    /** @return a {@link CompositeDispositionProcess} chaining every resolved step, in order */
-    @Override
-    protected CompositeDispositionProcess newInstance(final S scope) {
-        return new CompositeDispositionProcess(
-            dispositionStrategies
-                .stream()
-                .map(f -> f.get(scope))
-                .collect(toImmutableList())
-        );
-    }
-
+  /** @return a {@link CompositeDispositionProcess} chaining every resolved step, in order */
+  @Override
+  protected CompositeDispositionProcess newInstance(final S scope) {
+    return new CompositeDispositionProcess(
+      dispositionStrategies
+        .stream()
+        .map(f -> f.get(scope))
+        .collect(toImmutableList())
+    );
+  }
 }

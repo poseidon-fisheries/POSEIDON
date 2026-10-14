@@ -22,62 +22,64 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import ec.util.MersenneTwisterFast;
-import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import ec.util.MersenneTwisterFast;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
+import org.junit.jupiter.api.Test;
+import sim.util.Int2D;
+
 class BestKnownOptionTest {
 
-    private static final Int2D BEST = new Int2D(4, 2);
-    private static final Int2D WORSE = new Int2D(1, 1);
-    private static final Int2D FALLBACK = new Int2D(2, 2);
-    private static final Supplier<Int2D> NO_FALLBACK = () -> {
-        throw new AssertionError("The fallback should not be asked for an option.");
-    };
+  private static final Int2D BEST = new Int2D(4, 2);
+  private static final Int2D WORSE = new Int2D(1, 1);
+  private static final Int2D FALLBACK = new Int2D(2, 2);
+  private static final Supplier<Int2D> NO_FALLBACK = () -> {
+    throw new AssertionError("The fallback should not be asked for an option.");
+  };
 
-    private final MersenneTwisterFast rng = new MersenneTwisterFast(0);
+  private final MersenneTwisterFast rng = new MersenneTwisterFast(0);
 
-    @Test
-    void givesTheBestKnownOption() {
-        final BestKnownOption<Int2D> bestKnownOption = new BestKnownOption<>(
-            new ImmutableOptionValues<>(Map.of(BEST, 2.0, WORSE, 1.0)),
-            NO_FALLBACK,
-            rng
-        );
+  @Test
+  void givesTheBestKnownOption() {
+    final BestKnownOption<Int2D> bestKnownOption = new BestKnownOption<>(
+      new ImmutableOptionValues<>(Map.of(BEST, 2.0, WORSE, 1.0)),
+      NO_FALLBACK,
+      rng
+    );
 
-        assertThat(bestKnownOption.get()).isEqualTo(BEST);
-    }
+    assertThat(bestKnownOption.get()).isEqualTo(BEST);
+  }
 
-    @Test
-    void givesTheFallbackWhenNoOptionIsKnown() {
-        final BestKnownOption<Int2D> bestKnownOption = new BestKnownOption<>(
-            new ImmutableOptionValues<>(Map.of()),
-            () -> FALLBACK,
-            rng
-        );
+  @Test
+  void givesTheFallbackWhenNoOptionIsKnown() {
+    final BestKnownOption<Int2D> bestKnownOption = new BestKnownOption<>(
+      new ImmutableOptionValues<>(Map.of()),
+      () -> FALLBACK,
+      rng
+    );
 
-        assertThat(bestKnownOption.get()).isEqualTo(FALLBACK);
-    }
+    assertThat(bestKnownOption.get()).isEqualTo(FALLBACK);
+  }
 
-    @Test
-    void readsTheOptionValuesAnewOnEachCall() {
-        @SuppressWarnings("unchecked") final OptionValues<Int2D> optionValues =
-            mock(OptionValues.class);
-        when(optionValues.getBestOption(rng))
-            .thenReturn(Optional.of(BEST))
-            .thenReturn(Optional.of(WORSE));
-        final BestKnownOption<Int2D> bestKnownOption =
-            new BestKnownOption<>(optionValues, NO_FALLBACK, rng);
+  @Test
+  void readsTheOptionValuesAnewOnEachCall() {
+    @SuppressWarnings("unchecked")
+    final OptionValues<Int2D> optionValues = mock(OptionValues.class);
+    when(optionValues.getBestOption(rng))
+      .thenReturn(Optional.of(BEST))
+      .thenReturn(Optional.of(WORSE));
+    final BestKnownOption<Int2D> bestKnownOption = new BestKnownOption<>(
+      optionValues,
+      NO_FALLBACK,
+      rng
+    );
 
-        assertThat(bestKnownOption.get()).isEqualTo(BEST);
-        assertThat(bestKnownOption.get()).isEqualTo(WORSE);
-    }
+    assertThat(bestKnownOption.get()).isEqualTo(BEST);
+    assertThat(bestKnownOption.get()).isEqualTo(WORSE);
+  }
 }

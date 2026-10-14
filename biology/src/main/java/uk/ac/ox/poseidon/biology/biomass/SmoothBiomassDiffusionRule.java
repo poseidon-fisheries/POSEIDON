@@ -34,36 +34,42 @@ import sim.util.Double2D;
 @Data
 public class SmoothBiomassDiffusionRule implements BiomassDiffusionRule {
 
-    /**
-     * how much of the differential do you want to move
-     */
-    private final double differentialPercentageToMove;
+  /**
+   * how much of the differential do you want to move
+   */
+  private final double differentialPercentageToMove;
 
-    /**
-     * maximum percentage of biomass that can leave one place for another in a single call to
-     * {@link #updatedBiomasses}, i.e. per {@link BiomassDiffuser} step — not necessarily daily,
-     * despite the field name, since the step interval is whatever {@link BiomassDiffuser} is
-     * scheduled at.
-     */
-    private final double percentageLimitOnDailyMovement;
+  /**
+   * maximum percentage of biomass that can leave one place for another in a single call to
+   * {@link #updatedBiomasses}, i.e. per {@link BiomassDiffuser} step — not necessarily daily,
+   * despite the field name, since the step interval is whatever {@link BiomassDiffuser} is
+   * scheduled at.
+   */
+  private final double percentageLimitOnDailyMovement;
 
-    @Override
-    public Double2D updatedBiomasses(
-        final double currentBiomassX,
-        final double carryingCapacityX,
-        final double currentBiomassY,
-        final double carryingCapacityY
-    ) {
-        final double delta = currentBiomassX - currentBiomassY;
-        if (delta > 0) {
-            final double differential = Math.min(delta, (carryingCapacityY - currentBiomassY));
-            if (differential > 0) {
-                final double movement = Math.min(
-                    differentialPercentageToMove * differential,
-                    percentageLimitOnDailyMovement * currentBiomassX
-                );
-                return new Double2D(currentBiomassX - movement, currentBiomassY + movement);
-            } else return new Double2D(currentBiomassX, currentBiomassY);
-        } else return new Double2D(currentBiomassX, currentBiomassY);
-    }
+  @Override
+  public Double2D updatedBiomasses(
+    final double currentBiomassX,
+    final double carryingCapacityX,
+    final double currentBiomassY,
+    final double carryingCapacityY
+  ) {
+    final double delta = currentBiomassX - currentBiomassY;
+    if (delta > 0) {
+      final double differential = Math.min(
+        delta,
+        carryingCapacityY - currentBiomassY
+      );
+      if (differential > 0) {
+        final double movement = Math.min(
+          differentialPercentageToMove * differential,
+          percentageLimitOnDailyMovement * currentBiomassX
+        );
+        return new Double2D(
+          currentBiomassX - movement,
+          currentBiomassY + movement
+        );
+      } else return new Double2D(currentBiomassX, currentBiomassY);
+    } else return new Double2D(currentBiomassX, currentBiomassY);
+  }
 }

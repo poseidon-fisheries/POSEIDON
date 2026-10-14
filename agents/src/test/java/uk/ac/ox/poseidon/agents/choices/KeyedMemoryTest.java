@@ -22,46 +22,45 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.function.BinaryOperator;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class KeyedMemoryTest {
 
-    private static final BinaryOperator<Double> SUM = Double::sum;
+  private static final BinaryOperator<Double> SUM = Double::sum;
 
-    @Test
-    void eachKeyHasItsOwnMemory() {
-        final KeyedMemory<String, String, Double> keyedMemory = new KeyedMemory<>();
-        keyedMemory.get("trawl").observe("A", 3.0, SUM);
-        keyedMemory.get("seine").observe("A", 5.0, SUM);
+  @Test
+  void eachKeyHasItsOwnMemory() {
+    final KeyedMemory<String, String, Double> keyedMemory = new KeyedMemory<>();
+    keyedMemory.get("trawl").observe("A", 3.0, SUM);
+    keyedMemory.get("seine").observe("A", 5.0, SUM);
 
-        assertThat(keyedMemory.get("trawl").get("A")).contains(3.0);
-        assertThat(keyedMemory.get("seine").get("A")).contains(5.0);
-    }
+    assertThat(keyedMemory.get("trawl").get("A")).contains(3.0);
+    assertThat(keyedMemory.get("seine").get("A")).contains(5.0);
+  }
 
-    @Test
-    void missingKeyReadsAsEmptyMemory() {
-        final KeyedMemory<String, String, Double> keyedMemory = new KeyedMemory<>();
+  @Test
+  void missingKeyReadsAsEmptyMemory() {
+    final KeyedMemory<String, String, Double> keyedMemory = new KeyedMemory<>();
 
-        assertThat(keyedMemory.get("trawl").get("A")).isEmpty();
-    }
+    assertThat(keyedMemory.get("trawl").get("A")).isEmpty();
+  }
 
-    @Test
-    void sameKeyGivesTheSameMemory() {
-        final KeyedMemory<String, String, Double> keyedMemory = new KeyedMemory<>();
+  @Test
+  void sameKeyGivesTheSameMemory() {
+    final KeyedMemory<String, String, Double> keyedMemory = new KeyedMemory<>();
 
-        assertThat(keyedMemory.get("trawl")).isSameAs(keyedMemory.get("trawl"));
-    }
+    assertThat(keyedMemory.get("trawl")).isSameAs(keyedMemory.get("trawl"));
+  }
 
-    @Test
-    void nullKeyIsAKeyLikeAnyOther() {
-        final KeyedMemory<String, String, Double> keyedMemory = new KeyedMemory<>();
-        keyedMemory.get(null).observe("A", 3.0, SUM);
+  @Test
+  void nullKeyIsAKeyLikeAnyOther() {
+    final KeyedMemory<String, String, Double> keyedMemory = new KeyedMemory<>();
+    keyedMemory.get(null).observe("A", 3.0, SUM);
 
-        assertThat(keyedMemory.get(null).get("A")).contains(3.0);
-        assertThat(keyedMemory.get("trawl").get("A")).isEmpty();
-    }
+    assertThat(keyedMemory.get(null).get("A")).contains(3.0);
+    assertThat(keyedMemory.get("trawl").get("A")).isEmpty();
+  }
 }

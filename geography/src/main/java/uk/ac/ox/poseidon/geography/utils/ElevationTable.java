@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.geography.utils;
 
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Value;
 import tech.tablesaw.api.NumericColumn;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.geography.Coordinate;
-
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * A {@link LonLatTable} that also has an elevation column, exposing its rows as a stream of
@@ -40,41 +39,42 @@ import java.util.stream.Stream;
 @Getter
 public class ElevationTable extends LonLatTable {
 
-    private final NumericColumn<?> elevationColumn;
+  private final NumericColumn<?> elevationColumn;
 
-    /**
-     * @param table               the table to wrap
-     * @param longitudeColumnName the name of the column holding longitude values
-     * @param latitudeColumnName  the name of the column holding latitude values
-     * @param elevationColumnName the name of the column holding elevation values
-     */
-    public ElevationTable(
-        final Table table,
-        final String longitudeColumnName,
-        final String latitudeColumnName,
-        final String elevationColumnName
-    ) {
-        super(table, longitudeColumnName, latitudeColumnName);
-        this.elevationColumn = table.numberColumn(elevationColumnName);
-    }
+  /**
+   * @param table               the table to wrap
+   * @param longitudeColumnName the name of the column holding longitude values
+   * @param latitudeColumnName  the name of the column holding latitude values
+   * @param elevationColumnName the name of the column holding elevation values
+   */
+  public ElevationTable(
+    final Table table,
+    final String longitudeColumnName,
+    final String latitudeColumnName,
+    final String elevationColumnName
+  ) {
+    super(table, longitudeColumnName, latitudeColumnName);
+    this.elevationColumn = table.numberColumn(elevationColumnName);
+  }
 
-    /** One row's coordinate and elevation. */
-    @Value
-    public static class Entry {
-        Coordinate coordinate;
-        double elevation;
-    }
+  /** One row's coordinate and elevation. */
+  @Value
+  public static class Entry {
 
-    /** @return one {@link Entry} per row, in table order */
-    public Stream<Entry> entryStream() {
-        return IntStream.range(0, table.rowCount())
-            .mapToObj(i -> new Entry(
-                new Coordinate(
-                    longitudeColumn.getDouble(i),
-                    latitudeColumn.getDouble(i)
-                ),
-                elevationColumn.getDouble(i)
-            ));
-    }
+    Coordinate coordinate;
+    double elevation;
+  }
 
+  /** @return one {@link Entry} per row, in table order */
+  public Stream<Entry> entryStream() {
+    return IntStream.range(0, table.rowCount()).mapToObj(i ->
+      new Entry(
+        new Coordinate(
+          longitudeColumn.getDouble(i),
+          latitudeColumn.getDouble(i)
+        ),
+        elevationColumn.getDouble(i)
+      )
+    );
+  }
 }

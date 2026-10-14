@@ -22,39 +22,43 @@
 
 package uk.ac.ox.poseidon.io;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.io.paths.PathFactory;
-
-import java.nio.file.Path;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.io.paths.Factories.path;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.file.Path;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.io.paths.PathFactory;
+
 @SuppressFBWarnings("DMI")
 class PathFactoryTest {
 
-    private static final String FOLDERS = "/a/b/c/";
-    private static final String FILENAME = "file.txt";
+  private static final String FOLDERS = "/a/b/c/";
+  private static final String FILENAME = "file.txt";
 
-    @Test
-    void newInstanceSimpleFile() {
-        final PathFactory<Scope> pathFactory = path(FILENAME);
-        assertEquals(Path.of(FILENAME), pathFactory.get(mock(Scope.class)));
-    }
+  @Test
+  void newInstanceSimpleFile() {
+    final PathFactory<Scope> pathFactory = path(FILENAME);
+    assertEquals(Path.of(FILENAME), pathFactory.get(mock(Scope.class)));
+  }
 
-    @Test
-    void newInstanceFileInFolder() {
-        final PathFactory<Scope> pathFactory = path(FOLDERS + FILENAME);
-        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(mock(Scope.class)));
-    }
+  @Test
+  void newInstanceFileInFolder() {
+    final PathFactory<Scope> pathFactory = path(FOLDERS + FILENAME);
+    assertEquals(
+      Path.of(FOLDERS + FILENAME),
+      pathFactory.get(mock(Scope.class))
+    );
+  }
 
-    @Test
-    void newInstanceWithParent() {
-        final PathFactory<Scope> pathFactory = path(FOLDERS).plus(FILENAME);
-        assertEquals(Path.of(FOLDERS + FILENAME), pathFactory.get(mock(Scope.class)));
-    }
-
+  @Test
+  void newInstanceWithParent() {
+    final PathFactory<Scope> pathFactory = path(FOLDERS).plus(FILENAME);
+    assertEquals(
+      Path.of(FOLDERS + FILENAME),
+      pathFactory.get(mock(Scope.class))
+    );
+  }
 }

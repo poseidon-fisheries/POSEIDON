@@ -22,19 +22,18 @@
 
 package uk.ac.ox.poseidon.biology.buckets;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+
 import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.ToString;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 /**
  * The general-purpose {@link Bucket}, holding arbitrary {@link Content} per species in a plain
@@ -48,90 +47,81 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 @ToString
 final class ContentBucket implements Bucket {
 
-    private final ImmutableMap<Species, Content> map;
+  private final ImmutableMap<Species, Content> map;
 
-    private ContentBucket(final ImmutableMap<Species, Content> map) {
-        this.map = map;
+  private ContentBucket(final ImmutableMap<Species, Content> map) {
+    this.map = map;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return Bucket.contentEquals(this, obj);
+  }
+
+  @Override
+  public int hashCode() {
+    return Bucket.contentHashCode(this);
+  }
+
+  /** @return a bucket holding {@code map}'s entries, dropping those with no positive mass */
+  static ContentBucket ofContentMap(final Map<Species, Content> map) {
+    return new ContentBucket(
+      map
+        .entrySet()
+        .stream()
+        .filter(e -> e.getValue() != null && e.getValue().asKg() > 0.0)
+        .collect(toImmutableMap(Entry::getKey, Entry::getValue))
+    );
+  }
+
+  /**
+   * @return a bucket holding {@code map}'s biomasses in kilograms, dropping non-positive
+   * entries. Exists so the shared bucket test suite can build a {@code ContentBucket} from the
+   * same fixture as its siblings; production code goes through {@link #ofContentMap}.
+   */
+  static ContentBucket ofBiomassMap(final Map<Species, Double> map) {
+    return new ContentBucket(
+      map
+        .entrySet()
+        .stream()
+        .filter(e -> e.getValue() != null && e.getValue() > 0.0)
+        .collect(toImmutableMap(Entry::getKey, e -> Biomass.ofKg(e.getValue())))
+    );
+  }
+
+  @Override
+  public Optional<Content> getContent(final Species species) {
+    return Optional.ofNullable(getMap().get(species));
+  }
+
+  @Override
+  public Bucket add(final Bucket other) {
+    final Map<Species, Content> results = new HashMap<>(getMap());
+    for (final Entry<Species, Content> entry : other.getMap().entrySet()) {
+      results.merge(entry.getKey(), entry.getValue(), Content::add);
     }
-
-    @Override
-    public boolean equals(final Object obj) {
-        return Bucket.contentEquals(this, obj);
+    results.values().removeIf(Content::isEmpty);
+    if (results.isEmpty()) {
+      return Bucket.empty();
     }
-
-    @Override
-    public int hashCode() {
-        return Bucket.contentHashCode(this);
+    if (results.values().stream().allMatch(Biomass.class::isInstance)) {
+      return BiomassBucket.ofContentMap(results);
     }
+    return ContentBucket.ofContentMap(results);
+  }
 
-    /** @return a bucket holding {@code map}'s entries, dropping those with no positive mass */
-    static ContentBucket ofContentMap(final Map<Species, Content> map) {
-        return new ContentBucket(
-            map
-                .entrySet()
-                .stream()
-                .filter(e -> e.getValue() != null && e.getValue().asKg() > 0.0)
-                .collect(toImmutableMap(Entry::getKey, Entry::getValue))
-        );
-    }
+  @Override
+  public boolean isEmpty() {
+    return getMap().isEmpty();
+  }
 
-    /**
-     * @return a bucket holding {@code map}'s biomasses in kilograms, dropping non-positive
-     * entries. Exists so the shared bucket test suite can build a {@code ContentBucket} from the
-     * same fixture as its siblings; production code goes through {@link #ofContentMap}.
-     */
-    static ContentBucket ofBiomassMap(final Map<Species, Double> map) {
-        return new ContentBucket(
-            map
-                .entrySet()
-                .stream()
-                .filter(e -> e.getValue() != null && e.getValue() > 0.0)
-                .collect(toImmutableMap(
-                        Entry::getKey,
-                        e -> Biomass.ofKg(e.getValue())
-                    )
-                )
-        );
-    }
-
-    @Override
-    public Optional<Content> getContent(final Species species) {
-        return Optional.ofNullable(getMap().get(species));
-    }
-
-    @Override
-    public Bucket add(final Bucket other) {
-        final Map<Species, Content> results = new HashMap<>(getMap());
-        for (final Entry<Species, Content> entry : other.getMap().entrySet()) {
-            results.merge(
-                entry.getKey(),
-                entry.getValue(),
-                Content::add
-            );
-        }
-        results.values().removeIf(Content::isEmpty);
-        if (results.isEmpty()) {
-            return Bucket.empty();
-        }
-        if (results.values().stream().allMatch(Biomass.class::isInstance)) {
-            return BiomassBucket.ofContentMap(results);
-        }
-        return ContentBucket.ofContentMap(results);
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return getMap().isEmpty();
-    }
-
-    @Override
-    public Biomass getTotalBiomass() {
-        return getMap()
-            .values()
-            .stream()
-            .map(Content::asBiomass)
-            .reduce(Biomass::add)
-            .orElse(Biomass.ZERO);
-    }
-
+  @Override
+  public Biomass getTotalBiomass() {
+    return getMap()
+      .values()
+      .stream()
+      .map(Content::asBiomass)
+      .reduce(Biomass::add)
+      .orElse(Biomass.ZERO);
+  }
 }

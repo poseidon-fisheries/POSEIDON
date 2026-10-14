@@ -22,39 +22,41 @@
 
 package uk.ac.ox.poseidon.agents.components;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+
 class VesselComponentRegisterTest {
 
-    @Test
-    void storesAndRetrievesComponents() {
-        final VesselComponentRegister<String> register = new VesselComponentRegister<>();
-        final Vessel vessel = mock(Vessel.class);
+  @Test
+  void storesAndRetrievesComponents() {
+    final VesselComponentRegister<String> register =
+      new VesselComponentRegister<>();
+    final Vessel vessel = mock(Vessel.class);
 
-        register.putComponent(vessel, "component");
+    register.putComponent(vessel, "component");
 
-        assertThat(register.getComponent(vessel)).contains("component");
-        assertThat(register.getVessels()).contains(vessel);
-        assertThat(register.getAllEntries()).anyMatch(entry ->
-            entry.getKey() == vessel && entry.getValue().equals("component")
-        );
-    }
+    assertThat(register.getComponent(vessel)).contains("component");
+    assertThat(register.getVessels()).contains(vessel);
+    assertThat(register.getAllEntries()).anyMatch(
+      entry -> entry.getKey() == vessel && entry.getValue().equals("component")
+    );
+  }
 
-    @Test
-    void getOtherEntriesExcludesProvidedVessel() {
-        final VesselComponentRegister<String> register = new VesselComponentRegister<>();
-        final Vessel first = mock(Vessel.class);
-        final Vessel second = mock(Vessel.class);
+  @Test
+  void getOtherEntriesExcludesProvidedVessel() {
+    final VesselComponentRegister<String> register =
+      new VesselComponentRegister<>();
+    final Vessel first = mock(Vessel.class);
+    final Vessel second = mock(Vessel.class);
 
-        register.putComponent(first, "first");
-        register.putComponent(second, "second");
+    register.putComponent(first, "first");
+    register.putComponent(second, "second");
 
-        assertThat(register.getOtherEntries(first))
-            .extracting(entry -> entry.getKey())
-            .containsExactly(second);
-    }
+    assertThat(register.getOtherEntries(first))
+      .extracting(entry -> entry.getKey())
+      .containsExactly(second);
+  }
 }

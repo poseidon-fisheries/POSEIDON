@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import lombok.Getter;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -31,79 +34,79 @@ import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.Listener;
 
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
 /**
  * An {@link Evaluator} that scores a destination by the vessel's trip profit (in a fixed
  * currency), divided by the trip's time at sea ({@link Trip#getTimeAtSea()}) in hours.
  */
 public class ProfitPerHourDestinationEvaluator implements Evaluator<Int2D> {
 
-    private final String currencyCode;
+  private final String currencyCode;
 
-    /** @param currencyUnit the currency trip profit is measured in */
-    public ProfitPerHourDestinationEvaluator(final CurrencyUnit currencyUnit) {
-        this.currencyCode = checkNotNull(currencyUnit).getCode();
-    }
+  /** @param currencyUnit the currency trip profit is measured in */
+  public ProfitPerHourDestinationEvaluator(final CurrencyUnit currencyUnit) {
+    this.currencyCode = checkNotNull(currencyUnit).getCode();
+  }
 
-    /** @return an evaluation that scores {@code option} once the trip it's part of ends */
-    @Override
-    public Evaluation<Int2D> newEvaluation(
-        final Int2D option,
-        final EventManager eventManager
+  /** @return an evaluation that scores {@code option} once the trip it's part of ends */
+  @Override
+  public Evaluation<Int2D> newEvaluation(
+    final Int2D option,
+    final EventManager eventManager
+  ) {
+    return new ProfitPerHourEvaluation(
+      option,
+      eventManager,
+      CurrencyUnit.of(currencyCode)
+    );
+  }
+
+  private static class ProfitPerHourEvaluation
+    implements Evaluation<Int2D>, Listener<TripEndEvent>
+  {
+
+    @Getter
+    private final Int2D option;
+
+    private final EventManager eventManager;
+    private final CurrencyUnit currencyUnit;
+    private Double result;
+
+    private ProfitPerHourEvaluation(
+      final Int2D option,
+      final EventManager eventManager,
+      final CurrencyUnit currencyUnit
     ) {
-        return new ProfitPerHourEvaluation(option, eventManager, CurrencyUnit.of(currencyCode));
+      this.option = option;
+      this.eventManager = eventManager;
+      this.currencyUnit = currencyUnit;
+      eventManager.addListener(this);
     }
 
-    private static class ProfitPerHourEvaluation
-        implements
-        Evaluation<Int2D>,
-        Listener<TripEndEvent> {
-
-        @Getter private final Int2D option;
-        private final EventManager eventManager;
-        private final CurrencyUnit currencyUnit;
-        private Double result;
-
-        private ProfitPerHourEvaluation(
-            final Int2D option,
-            final EventManager eventManager,
-            final CurrencyUnit currencyUnit
-        ) {
-            this.option = option;
-            this.eventManager = eventManager;
-            this.currencyUnit = currencyUnit;
-            eventManager.addListener(this);
-        }
-
-        @Override
-        public Class<? extends TripEndEvent> getEventClass() {
-            return TripEndEvent.class;
-        }
-
-        @Override
-        public void receive(final TripEndEvent event) {
-            result = profitPerHour(event.getTrip());
-            eventManager.removeListener(this);
-        }
-
-        @Override
-        public double getResult() {
-            checkState(result != null, "Trip evaluation is not complete.");
-            return result;
-        }
-
-        private double profitPerHour(final Trip trip) {
-            final Money profit =
-                trip
-                    .getAccount()
-                    .getBalances()
-                    .getOrDefault(currencyUnit, Money.zero(currencyUnit));
-            final double hours = trip.getTimeAtSea().toSeconds() / 3600.0;
-            checkState(hours > 0, "Time at sea must be positive.");
-            return profit.getAmount().doubleValue() / hours;
-        }
+    @Override
+    public Class<? extends TripEndEvent> getEventClass() {
+      return TripEndEvent.class;
     }
+
+    @Override
+    public void receive(final TripEndEvent event) {
+      result = profitPerHour(event.getTrip());
+      eventManager.removeListener(this);
+    }
+
+    @Override
+    public double getResult() {
+      checkState(result != null, "Trip evaluation is not complete.");
+      return result;
+    }
+
+    private double profitPerHour(final Trip trip) {
+      final Money profit = trip
+        .getAccount()
+        .getBalances()
+        .getOrDefault(currencyUnit, Money.zero(currencyUnit));
+      final double hours = trip.getTimeAtSea().toSeconds() / 3600.0;
+      checkState(hours > 0, "Time at sea must be positive.");
+      return profit.getAmount().doubleValue() / hours;
+    }
+  }
 }

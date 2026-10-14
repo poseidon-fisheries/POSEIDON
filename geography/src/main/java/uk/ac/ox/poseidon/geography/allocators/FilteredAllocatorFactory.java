@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.allocators;
 
+import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,8 +32,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.function.Predicate;
-
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link FilteredAllocator}, built via
  * {@link Factories#filteredAllocator(Factory, Factory)}.
@@ -41,14 +40,19 @@ import java.util.function.Predicate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FilteredAllocatorFactory<S extends Scope>
-    extends RelativeScopeFactory<S, FilteredAllocator> {
+public class FilteredAllocatorFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  FilteredAllocator
+> {
 
-    private Factory<? super S, ? extends Allocator> delegateAllocator;
-    private Factory<? super S, ? extends Predicate<? super Int2D>> cellPredicate;
+  private Factory<? super S, ? extends Allocator> delegateAllocator;
+  private Factory<? super S, ? extends Predicate<? super Int2D>> cellPredicate;
 
-    @Override
-    protected FilteredAllocator newInstance(final S scope) {
-        return new FilteredAllocator(delegateAllocator.get(scope), cellPredicate.get(scope));
-    }
+  @Override
+  protected FilteredAllocator newInstance(final S scope) {
+    return new FilteredAllocator(
+      delegateAllocator.get(scope),
+      cellPredicate.get(scope)
+    );
+  }
 }

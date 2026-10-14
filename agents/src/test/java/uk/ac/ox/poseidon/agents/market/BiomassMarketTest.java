@@ -22,6 +22,18 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
@@ -34,173 +46,227 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-
 class BiomassMarketTest {
 
-    private static final LocalDateTime DATE_TIME = LocalDateTime.of(2026, 1, 1, 0, 0);
+  private static final LocalDateTime DATE_TIME = LocalDateTime.of(
+    2026,
+    1,
+    1,
+    0,
+    0
+  );
 
-    @Test
-    void getPriceResolvesCoveringSpeciesAndInvalidatesMissCacheOnSetPrice() {
-        final CatchCategory category = new CatchCategory("C1");
-        final Species baseSpecies = new Species("S", null, null);
-        final Species juvenileSpecies = new Species("S", "J", null);
-        final Species missingSpecies = new Species("T", null, null);
+  @Test
+  void getPriceResolvesCoveringSpeciesAndInvalidatesMissCacheOnSetPrice() {
+    final CatchCategory category = new CatchCategory("C1");
+    final Species baseSpecies = new Species("S", null, null);
+    final Species juvenileSpecies = new Species("S", "J", null);
+    final Species missingSpecies = new Species("T", null, null);
 
-        final Price basePrice = new Price(Money.of(CurrencyUnit.of("EUR"), 2.0), KILOGRAM);
-        final Price missingPrice = new Price(Money.of(CurrencyUnit.of("EUR"), 3.0), KILOGRAM);
+    final Price basePrice = new Price(
+      Money.of(CurrencyUnit.of("EUR"), 2.0),
+      KILOGRAM
+    );
+    final Price missingPrice = new Price(
+      Money.of(CurrencyUnit.of("EUR"), 3.0),
+      KILOGRAM
+    );
 
-        final Map<Species, Price> pricesBySpecies = new HashMap<>();
-        pricesBySpecies.put(baseSpecies, basePrice);
+    final Map<Species, Price> pricesBySpecies = new HashMap<>();
+    pricesBySpecies.put(baseSpecies, basePrice);
 
-        final Map<CatchCategory, Map<Species, Price>> prices = new HashMap<>();
-        prices.put(category, pricesBySpecies);
+    final Map<CatchCategory, Map<Species, Price>> prices = new HashMap<>();
+    prices.put(category, pricesBySpecies);
 
-        final BiomassMarket market = marketWithPrices("M1", prices);
+    final BiomassMarket market = marketWithPrices("M1", prices);
 
-        assertThat(market.getPrice(category, juvenileSpecies)).contains(basePrice);
-        assertThat(market.getPrice(category, missingSpecies)).isEmpty();
+    assertThat(market.getPrice(category, juvenileSpecies)).contains(basePrice);
+    assertThat(market.getPrice(category, missingSpecies)).isEmpty();
 
-        market.setPrice(category, missingSpecies, missingPrice, DATE_TIME);
+    market.setPrice(category, missingSpecies, missingPrice, DATE_TIME);
 
-        assertThat(market.getPrice(category, missingSpecies)).contains(missingPrice);
-    }
+    assertThat(market.getPrice(category, missingSpecies)).contains(
+      missingPrice
+    );
+  }
 
-    @Test
-    void forEachPriceIteratesAllEntries() {
-        final CatchCategory firstCategory = new CatchCategory("C1");
-        final CatchCategory secondCategory = new CatchCategory("C2");
-        final Species firstSpecies = new Species("S1", null, null);
-        final Species secondSpecies = new Species("S2", null, null);
+  @Test
+  void forEachPriceIteratesAllEntries() {
+    final CatchCategory firstCategory = new CatchCategory("C1");
+    final CatchCategory secondCategory = new CatchCategory("C2");
+    final Species firstSpecies = new Species("S1", null, null);
+    final Species secondSpecies = new Species("S2", null, null);
 
-        final Price firstPrice = new Price(Money.of(CurrencyUnit.of("EUR"), 2.0), KILOGRAM);
-        final Price secondPrice = new Price(Money.of(CurrencyUnit.of("USD"), 3.0), KILOGRAM);
+    final Price firstPrice = new Price(
+      Money.of(CurrencyUnit.of("EUR"), 2.0),
+      KILOGRAM
+    );
+    final Price secondPrice = new Price(
+      Money.of(CurrencyUnit.of("USD"), 3.0),
+      KILOGRAM
+    );
 
-        final Map<CatchCategory, Map<Species, Price>> prices = new HashMap<>();
-        prices.put(firstCategory, Map.of(firstSpecies, firstPrice));
-        prices.put(secondCategory, Map.of(secondSpecies, secondPrice));
+    final Map<CatchCategory, Map<Species, Price>> prices = new HashMap<>();
+    prices.put(firstCategory, Map.of(firstSpecies, firstPrice));
+    prices.put(secondCategory, Map.of(secondSpecies, secondPrice));
 
-        final BiomassMarket market = marketWithPrices("M2", prices);
+    final BiomassMarket market = marketWithPrices("M2", prices);
 
-        final Set<String> seen = new HashSet<>();
-        market.forEachPrice((category, species, price) ->
-            seen.add(category.getCode() + ":" + species.getCode() + ":" +
-                price.getAmount().getCurrencyUnit().getCode())
-        );
+    final Set<String> seen = new HashSet<>();
+    market.forEachPrice((category, species, price) ->
+      seen.add(
+        category.getCode() +
+          ":" +
+          species.getCode() +
+          ":" +
+          price.getAmount().getCurrencyUnit().getCode()
+      )
+    );
 
-        assertThat(seen).containsExactlyInAnyOrder(
-            "C1:S1:EUR",
-            "C2:S2:USD"
-        );
-    }
+    assertThat(seen).containsExactlyInAnyOrder("C1:S1:EUR", "C2:S2:USD");
+  }
 
-    @Test
-    void sellFallsBackToGenericPriceWithoutMutatingStoredPriceMap() {
-        final CatchCategory category = new CatchCategory("C1");
-        final Species genericSpecies = new Species("S", null, null);
-        final Species stagedSpecies = new Species("S", "juvenile", null);
-        final Price genericPrice = new Price(Money.of(CurrencyUnit.of("EUR"), 2.0), KILOGRAM);
+  @Test
+  void sellFallsBackToGenericPriceWithoutMutatingStoredPriceMap() {
+    final CatchCategory category = new CatchCategory("C1");
+    final Species genericSpecies = new Species("S", null, null);
+    final Species stagedSpecies = new Species("S", "juvenile", null);
+    final Price genericPrice = new Price(
+      Money.of(CurrencyUnit.of("EUR"), 2.0),
+      KILOGRAM
+    );
 
-        final Map<Species, Price> pricesBySpecies = new HashMap<>();
-        pricesBySpecies.put(genericSpecies, genericPrice);
+    final Map<Species, Price> pricesBySpecies = new HashMap<>();
+    pricesBySpecies.put(genericSpecies, genericPrice);
 
-        final Map<CatchCategory, Map<Species, Price>> prices = new HashMap<>();
-        prices.put(category, pricesBySpecies);
+    final Map<CatchCategory, Map<Species, Price>> prices = new HashMap<>();
+    prices.put(category, pricesBySpecies);
 
-        final BiomassMarket market = marketWithPrices("M3", prices);
+    final BiomassMarket market = marketWithPrices("M3", prices);
 
-        final Set<Species> initialKeys = new HashSet<>(market.getPrices().get(category).keySet());
-        final Sale sale = market.sell(
-            mock(Vessel.class),
-            new CategorisedCatch(Map.of(category, Bucket.of(stagedSpecies, 10.0))),
-            LocalDateTime.of(2026, 1, 1, 0, 0)
-        );
+    final Set<Species> initialKeys = new HashSet<>(
+      market.getPrices().get(category).keySet()
+    );
+    final Sale sale = market.sell(
+      mock(Vessel.class),
+      new CategorisedCatch(Map.of(category, Bucket.of(stagedSpecies, 10.0))),
+      LocalDateTime.of(2026, 1, 1, 0, 0)
+    );
 
-        assertThat(sale.getUnsold().isEmpty()).isTrue();
-        assertThat(sale.getItems()).hasSize(1);
-        assertThat(sale.getItems().getFirst().getSpecies()).isEqualTo(stagedSpecies);
-        assertThat(sale.getItems().getFirst().getPrice()).isEqualTo(genericPrice);
-        assertThat(market.getPrices().get(category).keySet())
-            .containsExactlyInAnyOrderElementsOf(initialKeys);
-        assertThat(market.getPrices().get(category)).doesNotContainKey(stagedSpecies);
-    }
+    assertThat(sale.getUnsold().isEmpty()).isTrue();
+    assertThat(sale.getItems()).hasSize(1);
+    assertThat(sale.getItems().getFirst().getSpecies()).isEqualTo(
+      stagedSpecies
+    );
+    assertThat(sale.getItems().getFirst().getPrice()).isEqualTo(genericPrice);
+    assertThat(
+      market.getPrices().get(category).keySet()
+    ).containsExactlyInAnyOrderElementsOf(initialKeys);
+    assertThat(market.getPrices().get(category)).doesNotContainKey(
+      stagedSpecies
+    );
+  }
 
-    @Test
-    void quotePricesOnlyWhatHasAPriceWithoutBroadcasting() {
-        final CatchCategory pricedCategory = new CatchCategory("C1");
-        final CatchCategory unpricedCategory = new CatchCategory("C2");
-        final Species pricedSpecies = new Species("S1", null, null);
-        final Species unpricedSpecies = new Species("S2", null, null);
-        final Price price = new Price(Money.of(CurrencyUnit.of("EUR"), 2.0), KILOGRAM);
-        final EventManager eventManager = mock(EventManager.class);
-        final BiomassMarket market = new BiomassMarket(mock(Port.class), "M4", eventManager);
-        market.setPrice(pricedCategory, pricedSpecies, price, DATE_TIME);
+  @Test
+  void quotePricesOnlyWhatHasAPriceWithoutBroadcasting() {
+    final CatchCategory pricedCategory = new CatchCategory("C1");
+    final CatchCategory unpricedCategory = new CatchCategory("C2");
+    final Species pricedSpecies = new Species("S1", null, null);
+    final Species unpricedSpecies = new Species("S2", null, null);
+    final Price price = new Price(
+      Money.of(CurrencyUnit.of("EUR"), 2.0),
+      KILOGRAM
+    );
+    final EventManager eventManager = mock(EventManager.class);
+    final BiomassMarket market = new BiomassMarket(
+      mock(Port.class),
+      "M4",
+      eventManager
+    );
+    market.setPrice(pricedCategory, pricedSpecies, price, DATE_TIME);
 
-        final List<Sale.Item> items = market.quote(new CategorisedCatch(Map.of(
-            pricedCategory, Bucket.of(Map.of(
-                pricedSpecies, Biomass.ofKg(10.0),
-                unpricedSpecies, Biomass.ofKg(20.0)
-            )),
-            unpricedCategory, Bucket.of(pricedSpecies, 30.0)
-        )));
-
-        assertThat(items).containsExactly(
-            new Sale.Item(pricedCategory, pricedSpecies, Biomass.ofKg(10.0), price)
-        );
-        verifyNoInteractions(eventManager);
-    }
-
-    @Test
-    void pricesCannotBeChangedThroughGetPrices() {
-        final CatchCategory category = new CatchCategory("C1");
-        final Species species = new Species("S1", null, null);
-        final Price price = new Price(Money.of(CurrencyUnit.of("EUR"), 2.0), KILOGRAM);
-        final BiomassMarket market =
-            marketWithPrices("M5", Map.of(category, Map.of(species, price)));
-
-        assertThatThrownBy(() -> market.getPrices().remove(category))
-            .isInstanceOf(UnsupportedOperationException.class);
-        assertThatThrownBy(() -> market.getPrices().get(category).remove(species))
-            .isInstanceOf(UnsupportedOperationException.class);
-    }
-
-    @Test
-    void remembersWhenItsPricesLastChanged() {
-        final CatchCategory category = new CatchCategory("C1");
-        final Species species = new Species("S1", null, null);
-        final Price price = new Price(Money.of(CurrencyUnit.of("EUR"), 2.0), KILOGRAM);
-        final BiomassMarket market =
-            new BiomassMarket(mock(Port.class), "M6", mock(EventManager.class));
-
-        assertThat(market.getLastPriceChangeDateTime()).isEmpty();
-        market.setPrice(category, species, price, DATE_TIME);
-        assertThat(market.getLastPriceChangeDateTime()).contains(DATE_TIME);
-        market.setPrice(category, species, price, DATE_TIME.plusDays(1));
-        assertThat(market.getLastPriceChangeDateTime()).contains(DATE_TIME.plusDays(1));
-    }
-
-    private static BiomassMarket marketWithPrices(
-        final String code,
-        final Map<CatchCategory, Map<Species, Price>> prices
-    ) {
-        final BiomassMarket market =
-            new BiomassMarket(mock(Port.class), code, mock(EventManager.class));
-        prices.forEach((category, pricesBySpecies) ->
-            pricesBySpecies.forEach((species, price) ->
-                market.setPrice(category, species, price, DATE_TIME)
+    final List<Sale.Item> items = market.quote(
+      new CategorisedCatch(
+        Map.of(
+          pricedCategory,
+          Bucket.of(
+            Map.of(
+              pricedSpecies,
+              Biomass.ofKg(10.0),
+              unpricedSpecies,
+              Biomass.ofKg(20.0)
             )
-        );
-        return market;
-    }
+          ),
+          unpricedCategory,
+          Bucket.of(pricedSpecies, 30.0)
+        )
+      )
+    );
+
+    assertThat(items).containsExactly(
+      new Sale.Item(pricedCategory, pricedSpecies, Biomass.ofKg(10.0), price)
+    );
+    verifyNoInteractions(eventManager);
+  }
+
+  @Test
+  void pricesCannotBeChangedThroughGetPrices() {
+    final CatchCategory category = new CatchCategory("C1");
+    final Species species = new Species("S1", null, null);
+    final Price price = new Price(
+      Money.of(CurrencyUnit.of("EUR"), 2.0),
+      KILOGRAM
+    );
+    final BiomassMarket market = marketWithPrices(
+      "M5",
+      Map.of(category, Map.of(species, price))
+    );
+
+    assertThatThrownBy(() -> market.getPrices().remove(category)).isInstanceOf(
+      UnsupportedOperationException.class
+    );
+    assertThatThrownBy(() ->
+      market.getPrices().get(category).remove(species)
+    ).isInstanceOf(UnsupportedOperationException.class);
+  }
+
+  @Test
+  void remembersWhenItsPricesLastChanged() {
+    final CatchCategory category = new CatchCategory("C1");
+    final Species species = new Species("S1", null, null);
+    final Price price = new Price(
+      Money.of(CurrencyUnit.of("EUR"), 2.0),
+      KILOGRAM
+    );
+    final BiomassMarket market = new BiomassMarket(
+      mock(Port.class),
+      "M6",
+      mock(EventManager.class)
+    );
+
+    assertThat(market.getLastPriceChangeDateTime()).isEmpty();
+    market.setPrice(category, species, price, DATE_TIME);
+    assertThat(market.getLastPriceChangeDateTime()).contains(DATE_TIME);
+    market.setPrice(category, species, price, DATE_TIME.plusDays(1));
+    assertThat(market.getLastPriceChangeDateTime()).contains(
+      DATE_TIME.plusDays(1)
+    );
+  }
+
+  private static BiomassMarket marketWithPrices(
+    final String code,
+    final Map<CatchCategory, Map<Species, Price>> prices
+  ) {
+    final BiomassMarket market = new BiomassMarket(
+      mock(Port.class),
+      code,
+      mock(EventManager.class)
+    );
+    prices.forEach((category, pricesBySpecies) ->
+      pricesBySpecies.forEach((species, price) ->
+        market.setPrice(category, species, price, DATE_TIME)
+      )
+    );
+    return market;
+  }
 }

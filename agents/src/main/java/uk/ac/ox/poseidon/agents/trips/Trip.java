@@ -22,7 +22,15 @@
 
 package uk.ac.ox.poseidon.agents.trips;
 
+import static com.google.common.base.Preconditions.checkState;
+import static lombok.AccessLevel.NONE;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
 import sim.util.Int2D;
@@ -32,15 +40,6 @@ import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static com.google.common.base.Preconditions.checkState;
-import static lombok.AccessLevel.NONE;
 
 /**
  * A single fishing trip: the span between a vessel leaving its current cell with a destination in
@@ -61,121 +60,127 @@ import static lombok.AccessLevel.NONE;
 @SuppressFBWarnings(value = "EI_EXPOSE_REP")
 public class Trip {
 
-    private final @NonNull Vessel vessel;
-    private final @NonNull EventManager eventManager;
-    private final @NonNull Int2D origin;
-    private final @NonNull LocalDateTime startDateTime;
-    private final Account account = new Account();
-    /** The fishing events of this trip, in the order they happened. */
-    @Getter(NONE)
-    private final List<FishingEvent> fishingEvents = new ArrayList<>();
+  private final @NonNull Vessel vessel;
+  private final @NonNull EventManager eventManager;
+  private final @NonNull Int2D origin;
+  private final @NonNull LocalDateTime startDateTime;
+  private final Account account = new Account();
 
-    private @NonNull Int2D destination;
-    private LocalDateTime portArrivalDateTime;
-    private LocalDateTime endDateTime;
+  /** The fishing events of this trip, in the order they happened. */
+  @Getter(NONE)
+  private final List<FishingEvent> fishingEvents = new ArrayList<>();
 
-    /**
-     * @param vessel      the vessel taking this trip
-     * @param destination where the trip is initially headed; must be a cell in the vessel's grid
-     */
-    public Trip(
-        final @NonNull Vessel vessel,
-        final @NonNull Int2D destination
-    ) {
-        this.vessel = vessel;
-        this.destination = checkInGrid(destination);
-        this.eventManager = new ForwardingEventManager(vessel.getEventManager());
-        // Registered on the trip's own event manager, which delivers to its listeners before
-        // forwarding to the vessel's, so the record is complete before vessel-level listeners
-        // react.
-        this.eventManager.addListener(new SimpleListener<>(FishingEvent.class, fishingEvents::add));
-        this.origin = vessel.getCell();
-        this.startDateTime = vessel.getSchedule().getDateTime();
-        this.eventManager.broadcast(new TripStartEvent(this));
-    }
+  private @NonNull Int2D destination;
+  private LocalDateTime portArrivalDateTime;
+  private LocalDateTime endDateTime;
 
-    /**
-     * @param destination the new destination; must be a cell in the vessel's grid
-     * @throws IllegalArgumentException if {@code destination} is outside the vessel's grid
-     */
-    public void setDestination(final @NonNull Int2D destination) {
-        this.destination = checkInGrid(destination);
-    }
+  /**
+   * @param vessel      the vessel taking this trip
+   * @param destination where the trip is initially headed; must be a cell in the vessel's grid
+   */
+  public Trip(final @NonNull Vessel vessel, final @NonNull Int2D destination) {
+    this.vessel = vessel;
+    this.destination = checkInGrid(destination);
+    this.eventManager = new ForwardingEventManager(vessel.getEventManager());
+    // Registered on the trip's own event manager, which delivers to its listeners before
+    // forwarding to the vessel's, so the record is complete before vessel-level listeners
+    // react.
+    this.eventManager.addListener(
+      new SimpleListener<>(FishingEvent.class, fishingEvents::add)
+    );
+    this.origin = vessel.getCell();
+    this.startDateTime = vessel.getSchedule().getDateTime();
+    this.eventManager.broadcast(new TripStartEvent(this));
+  }
 
-    private Int2D checkInGrid(final Int2D cell) {
-        vessel.getVesselField().getModelGrid().checkIsInGrid(cell);
-        return cell;
-    }
+  /**
+   * @param destination the new destination; must be a cell in the vessel's grid
+   * @throws IllegalArgumentException if {@code destination} is outside the vessel's grid
+   */
+  public void setDestination(final @NonNull Int2D destination) {
+    this.destination = checkInGrid(destination);
+  }
 
-    /**
-     * Records the vessel's arrival in port at the current simulation time, which ends its time at
-     * sea.
-     *
-     * @throws IllegalStateException if the vessel is not at a port, or the trip has already arrived
-     *                               in port
-     */
-    public void arriveInPort() {
-        checkState(
-            !hasArrivedInPort(),
-            "The trip of vessel %s has already arrived in port.",
-            vessel.getId()
-        );
-        checkState(vessel.isAtPort(), "Vessel %s is not at a port.", vessel.getId());
-        this.portArrivalDateTime = vessel.getSchedule().getDateTime();
-    }
+  private Int2D checkInGrid(final Int2D cell) {
+    vessel.getVesselField().getModelGrid().checkIsInGrid(cell);
+    return cell;
+  }
 
-    /** @return whether the trip has arrived in port; see {@link #arriveInPort()} */
-    public boolean hasArrivedInPort() {
-        return portArrivalDateTime != null;
-    }
+  /**
+   * Records the vessel's arrival in port at the current simulation time, which ends its time at
+   * sea.
+   *
+   * @throws IllegalStateException if the vessel is not at a port, or the trip has already arrived
+   *                               in port
+   */
+  public void arriveInPort() {
+    checkState(
+      !hasArrivedInPort(),
+      "The trip of vessel %s has already arrived in port.",
+      vessel.getId()
+    );
+    checkState(
+      vessel.isAtPort(),
+      "Vessel %s is not at a port.",
+      vessel.getId()
+    );
+    this.portArrivalDateTime = vessel.getSchedule().getDateTime();
+  }
 
-    /**
-     * @return the time from the trip's start to its end or, while the trip is still open, to the
-     * current simulation time
-     */
-    public Duration getTotalDuration() {
-        return Duration.between(
-            startDateTime,
-            endDateTime != null ? endDateTime : vessel.getSchedule().getDateTime()
-        );
-    }
+  /** @return whether the trip has arrived in port; see {@link #arriveInPort()} */
+  public boolean hasArrivedInPort() {
+    return portArrivalDateTime != null;
+  }
 
-    /**
-     * @return the time from the trip's start to its arrival in port or, while the vessel is still
-     * at sea, to the current simulation time
-     */
-    public Duration getTimeAtSea() {
-        return Duration.between(
-            startDateTime,
-            portArrivalDateTime != null ? portArrivalDateTime : vessel.getSchedule().getDateTime()
-        );
-    }
+  /**
+   * @return the time from the trip's start to its end or, while the trip is still open, to the
+   * current simulation time
+   */
+  public Duration getTotalDuration() {
+    return Duration.between(
+      startDateTime,
+      endDateTime != null ? endDateTime : vessel.getSchedule().getDateTime()
+    );
+  }
 
-    /**
-     * Marks the trip as ended at the vessel's current simulation time and broadcasts a
-     * {@link TripEndEvent}.
-     *
-     * @throws IllegalStateException if the trip has not arrived in port
-     */
-    public void endTrip() {
-        checkState(
-            hasArrivedInPort(),
-            "The trip of vessel %s cannot end before arriving in port.",
-            vessel.getId()
-        );
-        this.endDateTime = vessel.getSchedule().getDateTime();
-        this.eventManager.broadcast(new TripEndEvent(this));
-    }
+  /**
+   * @return the time from the trip's start to its arrival in port or, while the vessel is still
+   * at sea, to the current simulation time
+   */
+  public Duration getTimeAtSea() {
+    return Duration.between(
+      startDateTime,
+      portArrivalDateTime != null
+        ? portArrivalDateTime
+        : vessel.getSchedule().getDateTime()
+    );
+  }
 
-    /**
-     * @return an unmodifiable view of the fishing events of this trip, in the order they happened
-     */
-    public List<FishingEvent> getFishingEvents() {
-        return Collections.unmodifiableList(fishingEvents);
-    }
+  /**
+   * Marks the trip as ended at the vessel's current simulation time and broadcasts a
+   * {@link TripEndEvent}.
+   *
+   * @throws IllegalStateException if the trip has not arrived in port
+   */
+  public void endTrip() {
+    checkState(
+      hasArrivedInPort(),
+      "The trip of vessel %s cannot end before arriving in port.",
+      vessel.getId()
+    );
+    this.endDateTime = vessel.getSchedule().getDateTime();
+    this.eventManager.broadcast(new TripEndEvent(this));
+  }
 
-    /** Redirects the trip back towards where it started. */
-    public void setDestinationToTripOrigin() {
-        setDestination(origin);
-    }
+  /**
+   * @return an unmodifiable view of the fishing events of this trip, in the order they happened
+   */
+  public List<FishingEvent> getFishingEvents() {
+    return Collections.unmodifiableList(fishingEvents);
+  }
+
+  /** Redirects the trip back towards where it started. */
+  public void setDestinationToTripOrigin() {
+    setDestination(origin);
+  }
 }

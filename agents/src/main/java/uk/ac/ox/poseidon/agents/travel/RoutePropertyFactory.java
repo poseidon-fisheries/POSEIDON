@@ -37,13 +37,13 @@ import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
 @EqualsAndHashCode(callSuper = true)
 public class RoutePropertyFactory<R> extends ObjectPropertyFactory<Route, R> {
 
-    /** @param propertyPath the dotted path of properties to follow from the route */
-    public RoutePropertyFactory(final String propertyPath) {
-        super(propertyPath);
-    }
+  /** @param propertyPath the dotted path of properties to follow from the route */
+  public RoutePropertyFactory(final String propertyPath) {
+    super(propertyPath);
+  }
 
-    @Override
-    protected Class<Route> rootClass() {
-        return Route.class;
-    }
+  @Override
+  protected Class<Route> rootClass() {
+    return Route.class;
+  }
 }

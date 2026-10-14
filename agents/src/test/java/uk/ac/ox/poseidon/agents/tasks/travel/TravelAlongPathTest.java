@@ -22,7 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.tasks.travel.TravelTasks.*;
+
 import com.google.common.collect.ImmutableList;
+import java.time.Duration;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -30,35 +37,31 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
-import java.time.Duration;
-import java.util.Optional;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.tasks.travel.TravelTasks.*;
-
 class TravelAlongPathTest {
 
-    @Test
-    void takesEachHopsDistanceOverTheCruisingSpeed() throws Exception {
-        @SuppressWarnings("unchecked") final PathFinder<Int2D> pathFinder = mock(PathFinder.class);
-        when(pathFinder.getPath(ORIGIN, DESTINATION))
-            .thenReturn(Optional.of(ImmutableList.of(ORIGIN, DESTINATION)));
-        final DistanceCalculator distanceCalculator = mock(DistanceCalculator.class);
-        when(distanceCalculator.distanceInKm(ORIGIN, DESTINATION)).thenReturn(5.0);
-        final Vessel vessel = vesselCruisingAtTenKph();
-        final TravelAlongPath travelAlongPath = new TravelAlongPath(
-            pathFinder,
-            distanceCalculator,
-            () -> DESTINATION,
-            () -> mock(EventManager.class)
-        );
-        setTaskObject(travelAlongPath, vessel);
+  @Test
+  void takesEachHopsDistanceOverTheCruisingSpeed() throws Exception {
+    @SuppressWarnings("unchecked")
+    final PathFinder<Int2D> pathFinder = mock(PathFinder.class);
+    when(pathFinder.getPath(ORIGIN, DESTINATION)).thenReturn(
+      Optional.of(ImmutableList.of(ORIGIN, DESTINATION))
+    );
+    final DistanceCalculator distanceCalculator = mock(
+      DistanceCalculator.class
+    );
+    when(distanceCalculator.distanceInKm(ORIGIN, DESTINATION)).thenReturn(5.0);
+    final Vessel vessel = vesselCruisingAtTenKph();
+    final TravelAlongPath travelAlongPath = new TravelAlongPath(
+      pathFinder,
+      distanceCalculator,
+      () -> DESTINATION,
+      () -> mock(EventManager.class)
+    );
+    setTaskObject(travelAlongPath, vessel);
 
-        travelAlongPath.start();
-        travelAlongPath.execute();
+    travelAlongPath.start();
+    travelAlongPath.execute();
 
-        verify(vessel).setTaskDuration(Duration.ofMinutes(30));
-    }
+    verify(vessel).setTaskDuration(Duration.ofMinutes(30));
+  }
 }

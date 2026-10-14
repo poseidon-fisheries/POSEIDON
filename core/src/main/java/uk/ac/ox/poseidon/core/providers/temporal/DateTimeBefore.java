@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
-
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 import java.util.function.Supplier;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
  * A {@link Provider} of a reference date-time minus an amount of time, both read anew on every
@@ -38,11 +37,11 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class DateTimeBefore implements Provider<LocalDateTime> {
 
-    private final @NonNull Supplier<? extends LocalDateTime> referenceDateTime;
-    private final @NonNull Supplier<? extends TemporalAmount> amountToSubtract;
+  private final @NonNull Supplier<? extends LocalDateTime> referenceDateTime;
+  private final @NonNull Supplier<? extends TemporalAmount> amountToSubtract;
 
-    @Override
-    public LocalDateTime get() {
-        return referenceDateTime.get().minus(amountToSubtract.get());
-    }
+  @Override
+  public LocalDateTime get() {
+    return referenceDateTime.get().minus(amountToSubtract.get());
+  }
 }

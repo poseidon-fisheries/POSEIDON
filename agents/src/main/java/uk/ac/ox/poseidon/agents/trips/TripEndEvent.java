@@ -27,5 +27,6 @@ import lombok.Value;
 /** Broadcast when a {@link Trip} ends, via {@link Trip#endTrip()}. */
 @Value
 public class TripEndEvent implements TripEvent {
-    Trip trip;
+
+  Trip trip;
 }

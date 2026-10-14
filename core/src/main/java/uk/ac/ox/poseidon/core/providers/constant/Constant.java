@@ -33,10 +33,11 @@ import uk.ac.ox.poseidon.core.providers.Provider;
  */
 @RequiredArgsConstructor
 public class Constant<T> implements Provider<T> {
-    private final T value;
 
-    @Override
-    public T get() {
-        return value;
-    }
+  private final T value;
+
+  @Override
+  public T get() {
+    return value;
+  }
 }

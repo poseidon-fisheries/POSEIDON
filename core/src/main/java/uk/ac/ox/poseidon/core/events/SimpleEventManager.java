@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.core.events;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
-
 import java.util.*;
 
 /**
@@ -36,89 +35,88 @@ import java.util.*;
  */
 public class SimpleEventManager implements EventManager {
 
-    private final Multimap<Class<?>, Listener<?>> listeners =
-        MultimapBuilder.hashKeys().arrayListValues().build();
-    private final Map<Class<?>, Class<?>[]> dispatchClassCache = new HashMap<>();
-    private final Map<Class<?>, Listener<?>[]> listenerSnapshotCache = new HashMap<>();
+  private final Multimap<Class<?>, Listener<?>> listeners =
+    MultimapBuilder.hashKeys().arrayListValues().build();
+  private final Map<Class<?>, Class<?>[]> dispatchClassCache = new HashMap<>();
+  private final Map<Class<?>, Listener<?>[]> listenerSnapshotCache =
+    new HashMap<>();
 
-    @Override
-    public void addListener(final Listener<?> listener) {
-        final Class<?> eventClass = listener.getEventClass();
-        listeners.put(eventClass, listener);
-        listenerSnapshotCache.remove(eventClass);
+  @Override
+  public void addListener(final Listener<?> listener) {
+    final Class<?> eventClass = listener.getEventClass();
+    listeners.put(eventClass, listener);
+    listenerSnapshotCache.remove(eventClass);
+  }
+
+  @Override
+  public void removeListener(final Listener<?> listener) {
+    final Class<?> eventClass = listener.getEventClass();
+    listeners.get(eventClass).removeIf(l -> l == listener);
+    listenerSnapshotCache.remove(eventClass);
+  }
+
+  @Override
+  public <E> void broadcast(final E event) {
+    if (event == null) return;
+    final Class<?>[] dispatchClasses = dispatchClassCache.computeIfAbsent(
+      event.getClass(),
+      this::computeDispatchClasses
+    );
+    for (final Class<?> dispatchClass : dispatchClasses) {
+      notifyListenersForClass(dispatchClass, event);
     }
+  }
 
-    @Override
-    public void removeListener(
-        final Listener<?> listener
-    ) {
-        final Class<?> eventClass = listener.getEventClass();
-        listeners.get(eventClass).removeIf(l -> l == listener);
-        listenerSnapshotCache.remove(eventClass);
+  private Class<?>[] computeDispatchClasses(final Class<?> rootEventClass) {
+    final List<Class<?>> dispatchClasses = new ArrayList<>();
+    final Set<Class<?>> visitedClasses = new HashSet<>();
+    Class<?> eventClass = rootEventClass;
+    while (eventClass != null) {
+      collectClassAndInterfaces(eventClass, visitedClasses, dispatchClasses);
+      eventClass = eventClass.getSuperclass();
     }
+    return dispatchClasses.toArray(Class[]::new);
+  }
 
-    @Override
-    public <E> void broadcast(final E event) {
-        if (event == null) return;
-        final Class<?>[] dispatchClasses = dispatchClassCache.computeIfAbsent(
-            event.getClass(),
-            this::computeDispatchClasses
-        );
-        for (final Class<?> dispatchClass : dispatchClasses) {
-            notifyListenersForClass(dispatchClass, event);
-        }
+  private void collectClassAndInterfaces(
+    final Class<?> clazz,
+    final Set<Class<?>> visitedClasses,
+    final List<Class<?>> dispatchClasses
+  ) {
+    if (!visitedClasses.add(clazz)) return;
+    dispatchClasses.add(clazz);
+    collectInterfaces(clazz, visitedClasses, dispatchClasses);
+  }
+
+  private void collectInterfaces(
+    final Class<?> clazz,
+    final Set<Class<?>> visitedClasses,
+    final List<Class<?>> dispatchClasses
+  ) {
+    for (final Class<?> interfaceClass : clazz.getInterfaces()) {
+      if (!visitedClasses.add(interfaceClass)) continue;
+      dispatchClasses.add(interfaceClass);
+      collectInterfaces(interfaceClass, visitedClasses, dispatchClasses);
     }
+  }
 
-    private Class<?>[] computeDispatchClasses(final Class<?> rootEventClass) {
-        final List<Class<?>> dispatchClasses = new ArrayList<>();
-        final Set<Class<?>> visitedClasses = new HashSet<>();
-        Class<?> eventClass = rootEventClass;
-        while (eventClass != null) {
-            collectClassAndInterfaces(eventClass, visitedClasses, dispatchClasses);
-            eventClass = eventClass.getSuperclass();
-        }
-        return dispatchClasses.toArray(Class[]::new);
+  @SuppressWarnings("unchecked")
+  private <E> void notifyListenersForClass(
+    final Class<?> eventClass,
+    final E event
+  ) {
+    final Listener<?>[] listenerSnapshot =
+      listenerSnapshotCache.computeIfAbsent(
+        eventClass,
+        this::createListenerSnapshot
+      );
+    for (final Listener<?> listener : listenerSnapshot) {
+      ((Listener<E>) listener).receive(event);
     }
+  }
 
-    private void collectClassAndInterfaces(
-        final Class<?> clazz,
-        final Set<Class<?>> visitedClasses,
-        final List<Class<?>> dispatchClasses
-    ) {
-        if (!visitedClasses.add(clazz)) return;
-        dispatchClasses.add(clazz);
-        collectInterfaces(clazz, visitedClasses, dispatchClasses);
-    }
-
-    private void collectInterfaces(
-        final Class<?> clazz,
-        final Set<Class<?>> visitedClasses,
-        final List<Class<?>> dispatchClasses
-    ) {
-        for (final Class<?> interfaceClass : clazz.getInterfaces()) {
-            if (!visitedClasses.add(interfaceClass)) continue;
-            dispatchClasses.add(interfaceClass);
-            collectInterfaces(interfaceClass, visitedClasses, dispatchClasses);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private <E> void notifyListenersForClass(
-        final Class<?> eventClass,
-        final E event
-    ) {
-        final Listener<?>[] listenerSnapshot = listenerSnapshotCache.computeIfAbsent(
-            eventClass,
-            this::createListenerSnapshot
-        );
-        for (final Listener<?> listener : listenerSnapshot) {
-            ((Listener<E>) listener).receive(event);
-        }
-    }
-
-    private Listener<?>[] createListenerSnapshot(final Class<?> eventClass) {
-        final Collection<Listener<?>> listenersForClass = listeners.get(eventClass);
-        return listenersForClass.toArray(Listener[]::new);
-    }
-
+  private Listener<?>[] createListenerSnapshot(final Class<?> eventClass) {
+    final Collection<Listener<?>> listenersForClass = listeners.get(eventClass);
+    return listenersForClass.toArray(Listener[]::new);
+  }
 }

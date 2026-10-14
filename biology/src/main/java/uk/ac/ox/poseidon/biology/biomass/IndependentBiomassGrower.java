@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+import java.io.Serial;
 import lombok.Data;
 import lombok.NonNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-
-import java.io.Serial;
 
 /**
  * A biomass grower that operates on each cell independently.
@@ -35,25 +34,34 @@ import java.io.Serial;
 @Data
 public class IndependentBiomassGrower implements Steppable {
 
-    @Serial private static final long serialVersionUID = -560728986379999066L;
-    @NonNull private final BiomassGrid biomassGrid;
-    @NonNull private final CarryingCapacityGrid carryingCapacityGrid;
-    @NonNull private final BiomassGrowthRule biomassGrowthRule;
+  @Serial
+  private static final long serialVersionUID = -560728986379999066L;
 
-    /**
-     * Applies {@link #biomassGrowthRule} to each habitable cell independently, using that cell's
-     * own biomass and carrying capacity.
-     */
-    @Override
-    public void step(final SimState simState) {
-        carryingCapacityGrid.getHabitableCells().forEach(location ->
-            biomassGrid.setBiomass(
-                location,
-                biomassGrowthRule.newBiomass(
-                    biomassGrid.getValue(location),
-                    carryingCapacityGrid.getCarryingCapacity(location)
-                )
-            )
-        );
-    }
+  @NonNull
+  private final BiomassGrid biomassGrid;
+
+  @NonNull
+  private final CarryingCapacityGrid carryingCapacityGrid;
+
+  @NonNull
+  private final BiomassGrowthRule biomassGrowthRule;
+
+  /**
+   * Applies {@link #biomassGrowthRule} to each habitable cell independently, using that cell's
+   * own biomass and carrying capacity.
+   */
+  @Override
+  public void step(final SimState simState) {
+    carryingCapacityGrid
+      .getHabitableCells()
+      .forEach(location ->
+        biomassGrid.setBiomass(
+          location,
+          biomassGrowthRule.newBiomass(
+            biomassGrid.getValue(location),
+            carryingCapacityGrid.getCarryingCapacity(location)
+          )
+        )
+      );
+  }
 }

@@ -19,7 +19,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package uk.ac.ox.poseidon.agents.social;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,8 +33,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link SocialNetwork}, built via
  * {@link Factories#socialNetwork}. The network starts with no ties.
@@ -40,13 +41,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SocialNetworkFactory extends SimulationScopeFactory<SocialNetwork> {
+public class SocialNetworkFactory
+  extends SimulationScopeFactory<SocialNetwork>
+{
 
-    private Factory<? super SimulationScope, ? extends VesselsGetter> candidates;
+  private Factory<? super SimulationScope, ? extends VesselsGetter> candidates;
 
-    @Override
-    protected SocialNetwork newInstance(final SimulationScope scope) {
-        checkNotNull(candidates, "candidates must not be null");
-        return new SocialNetwork(candidates.get(scope));
-    }
+  @Override
+  protected SocialNetwork newInstance(final SimulationScope scope) {
+    checkNotNull(candidates, "candidates must not be null");
+    return new SocialNetwork(candidates.get(scope));
+  }
 }

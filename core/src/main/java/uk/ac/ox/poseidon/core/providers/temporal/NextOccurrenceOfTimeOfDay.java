@@ -22,16 +22,15 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
-import uk.ac.ox.poseidon.core.providers.Provider;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.function.Supplier;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
  * A {@link Provider} of the next occurrence of one of the given times of day strictly after a
@@ -42,33 +41,33 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class NextOccurrenceOfTimeOfDay implements Provider<LocalDateTime> {
 
-    private final Supplier<? extends LocalDateTime> referenceDateTime;
-    private final LocalTime[] times;
+  private final Supplier<? extends LocalDateTime> referenceDateTime;
+  private final LocalTime[] times;
 
-    /**
-     * @param referenceDateTime supplies the date-time the occurrence must be strictly after
-     * @param times             the times of day, at least one
-     */
-    public NextOccurrenceOfTimeOfDay(
-        final Supplier<? extends LocalDateTime> referenceDateTime,
-        final LocalTime[] times
-    ) {
-        checkArgument(times.length > 0, "At least one time of day is required.");
-        this.referenceDateTime = checkNotNull(referenceDateTime);
-        this.times = times.clone();
-        Arrays.sort(this.times);
-    }
+  /**
+   * @param referenceDateTime supplies the date-time the occurrence must be strictly after
+   * @param times             the times of day, at least one
+   */
+  public NextOccurrenceOfTimeOfDay(
+    final Supplier<? extends LocalDateTime> referenceDateTime,
+    final LocalTime[] times
+  ) {
+    checkArgument(times.length > 0, "At least one time of day is required.");
+    this.referenceDateTime = checkNotNull(referenceDateTime);
+    this.times = times.clone();
+    Arrays.sort(this.times);
+  }
 
-    @Override
-    public LocalDateTime get() {
-        final LocalDateTime reference = referenceDateTime.get();
-        final LocalDate day = reference.toLocalDate();
-        final LocalTime timeOfDay = reference.toLocalTime();
-        for (final LocalTime time : times) {
-            if (time.isAfter(timeOfDay)) {
-                return day.atTime(time);
-            }
-        }
-        return day.plusDays(1).atTime(times[0]);
+  @Override
+  public LocalDateTime get() {
+    final LocalDateTime reference = referenceDateTime.get();
+    final LocalDate day = reference.toLocalDate();
+    final LocalTime timeOfDay = reference.toLocalTime();
+    for (final LocalTime time : times) {
+      if (time.isAfter(timeOfDay)) {
+        return day.atTime(time);
+      }
     }
+    return day.plusDays(1).atTime(times[0]);
+  }
 }

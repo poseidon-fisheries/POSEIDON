@@ -29,13 +29,10 @@ package uk.ac.ox.poseidon.biology.biomass;
  * ({@link CommonBiomassGrower}), depending on the grower applying the rule.
  */
 public interface BiomassGrowthRule {
-    /**
-     * @param currentBiomass    the current biomass
-     * @param carryingCapacity  the carrying capacity being grown towards
-     * @return the biomass after one growth step
-     */
-    double newBiomass(
-        double currentBiomass,
-        double carryingCapacity
-    );
+  /**
+   * @param currentBiomass    the current biomass
+   * @param carryingCapacity  the carrying capacity being grown towards
+   * @return the biomass after one growth step
+   */
+  double newBiomass(double currentBiomass, double carryingCapacity);
 }

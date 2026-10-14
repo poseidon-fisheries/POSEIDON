@@ -34,11 +34,10 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 @RequiredArgsConstructor
 public class CurrentYear implements IntProvider {
 
-    private final TemporalSchedule temporalSchedule;
+  private final TemporalSchedule temporalSchedule;
 
-    @Override
-    public int getAsInt() {
-        return temporalSchedule.getDate().getYear();
-    }
-
+  @Override
+  public int getAsInt() {
+    return temporalSchedule.getDate().getYear();
+  }
 }

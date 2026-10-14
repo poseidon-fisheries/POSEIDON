@@ -22,39 +22,40 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+import sim.util.Int2D;
+
 class CartesianDistanceCalculatorTest {
 
-    private final CartesianDistanceCalculator calculator =
-        new CartesianDistanceCalculator(null, 2.0);
+  private final CartesianDistanceCalculator calculator =
+    new CartesianDistanceCalculator(null, 2.0);
 
-    @Test
-    void threeFourFiveTriangle() {
-        // 3-4-5 triangle scaled by cellSizeInKm=2 should give a 6-8-10 result.
-        assertEquals(
-            10.0,
-            calculator.distanceInKm(new Int2D(0, 0), new Int2D(3, 4)),
-            1e-9
-        );
-    }
+  @Test
+  void threeFourFiveTriangle() {
+    // 3-4-5 triangle scaled by cellSizeInKm=2 should give a 6-8-10 result.
+    assertEquals(
+      10.0,
+      calculator.distanceInKm(new Int2D(0, 0), new Int2D(3, 4)),
+      1e-9
+    );
+  }
 
-    @Test
-    void samePointIsZero() {
-        final Int2D cell = new Int2D(5, 5);
-        assertEquals(0.0, calculator.distanceInKm(cell, cell), 1e-9);
-    }
+  @Test
+  void samePointIsZero() {
+    final Int2D cell = new Int2D(5, 5);
+    assertEquals(0.0, calculator.distanceInKm(cell, cell), 1e-9);
+  }
 
-    @Test
-    void isSymmetric() {
-        final Int2D a = new Int2D(1, 2);
-        final Int2D b = new Int2D(7, -3);
-        assertTrue(
-            Math.abs(calculator.distanceInKm(a, b) - calculator.distanceInKm(b, a)) < 1e-9
-        );
-    }
+  @Test
+  void isSymmetric() {
+    final Int2D a = new Int2D(1, 2);
+    final Int2D b = new Int2D(7, -3);
+    assertTrue(
+      Math.abs(calculator.distanceInKm(a, b) - calculator.distanceInKm(b, a)) <
+        1e-9
+    );
+  }
 }

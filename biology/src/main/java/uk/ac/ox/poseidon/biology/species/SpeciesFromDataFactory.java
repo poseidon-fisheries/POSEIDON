@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,8 +31,6 @@ import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.List;
 
 /**
  * A {@link RelativeScopeFactory} that reads one {@link Species} per row of a resolved
@@ -47,26 +46,28 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SpeciesFromDataFactory<S extends Scope>
-    extends RelativeScopeFactory<S, List<Species>> {
+public class SpeciesFromDataFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  List<Species>
+> {
 
-    private Factory<? super S, ? extends Table> data;
-    private String speciesCodeColumn;
-    private String speciesNameColumn;
-    private String lifeStageColumn;
+  private Factory<? super S, ? extends Table> data;
+  private String speciesCodeColumn;
+  private String speciesNameColumn;
+  private String lifeStageColumn;
 
-    @Override
-    protected List<Species> newInstance(final S scope) {
-        return data.get(scope)
-            .stream()
-            .map(row ->
-                new Species(
-                    row.getString(speciesCodeColumn),
-                    lifeStageColumn == null ? null : row.getString(lifeStageColumn),
-                    row.getString(speciesNameColumn)
-                )
-            )
-            .toList();
-    }
-
+  @Override
+  protected List<Species> newInstance(final S scope) {
+    return data
+      .get(scope)
+      .stream()
+      .map(row ->
+        new Species(
+          row.getString(speciesCodeColumn),
+          lifeStageColumn == null ? null : row.getString(lifeStageColumn),
+          row.getString(speciesNameColumn)
+        )
+      )
+      .toList();
+  }
 }

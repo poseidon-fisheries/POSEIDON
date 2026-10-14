@@ -39,14 +39,16 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CartesianDistanceCalculatorFactory<S extends Scope>
-    extends RelativeScopeFactory<S, CartesianDistanceCalculator> {
+public class CartesianDistanceCalculatorFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  CartesianDistanceCalculator
+> {
 
-    private Factory<? super S, ? extends ModelGrid> modelGrid;
-    private double cellSizeInKm;
+  private Factory<? super S, ? extends ModelGrid> modelGrid;
+  private double cellSizeInKm;
 
-    @Override
-    protected CartesianDistanceCalculator newInstance(final S scope) {
-        return new CartesianDistanceCalculator(modelGrid.get(scope), cellSizeInKm);
-    }
+  @Override
+  protected CartesianDistanceCalculator newInstance(final S scope) {
+    return new CartesianDistanceCalculator(modelGrid.get(scope), cellSizeInKm);
+  }
 }

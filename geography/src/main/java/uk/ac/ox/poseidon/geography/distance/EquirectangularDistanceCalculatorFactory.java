@@ -39,13 +39,15 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class EquirectangularDistanceCalculatorFactory<S extends Scope>
-    extends RelativeScopeFactory<S, EquirectangularDistanceCalculator> {
+public class EquirectangularDistanceCalculatorFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  EquirectangularDistanceCalculator
+> {
 
-    private Factory<? super S, ? extends ModelGrid> modelGrid;
+  private Factory<? super S, ? extends ModelGrid> modelGrid;
 
-    @Override
-    protected EquirectangularDistanceCalculator newInstance(final S scope) {
-        return new EquirectangularDistanceCalculator(modelGrid.get(scope));
-    }
+  @Override
+  protected EquirectangularDistanceCalculator newInstance(final S scope) {
+    return new EquirectangularDistanceCalculator(modelGrid.get(scope));
+  }
 }

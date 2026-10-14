@@ -31,15 +31,16 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
  */
 @Value
 public class Disposition {
-    /** The portion kept aboard. */
-    Bucket retained;
-    /** The portion thrown back alive. */
-    Bucket discardedAlive;
-    /** The portion thrown back dead. */
-    Bucket discardedDead;
 
-    /** @return a disposition with nothing retained or discarded */
-    public static Disposition empty() {
-        return new Disposition(Bucket.empty(), Bucket.empty(), Bucket.empty());
-    }
+  /** The portion kept aboard. */
+  Bucket retained;
+  /** The portion thrown back alive. */
+  Bucket discardedAlive;
+  /** The portion thrown back dead. */
+  Bucket discardedDead;
+
+  /** @return a disposition with nothing retained or discarded */
+  public static Disposition empty() {
+    return new Disposition(Bucket.empty(), Bucket.empty(), Bucket.empty());
+  }
 }

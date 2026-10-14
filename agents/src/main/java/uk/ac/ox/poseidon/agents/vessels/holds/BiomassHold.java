@@ -37,29 +37,28 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 @RequiredArgsConstructor
 public abstract class BiomassHold implements Hold {
 
-    private final CatchCategoriser catchCategoriser;
+  private final CatchCategoriser catchCategoriser;
 
-    /** The hold's current content. */
-    protected CategorisedCatch content = CategorisedCatch.empty();
+  /** The hold's current content. */
+  protected CategorisedCatch content = CategorisedCatch.empty();
 
-    /** Sorts {@code uncategorisedCatch} via {@link #catchCategoriser}, then adds it. */
-    @Override
-    public void addContent(final Bucket uncategorisedCatch) {
-        addContent(catchCategoriser.apply(uncategorisedCatch));
-    }
+  /** Sorts {@code uncategorisedCatch} via {@link #catchCategoriser}, then adds it. */
+  @Override
+  public void addContent(final Bucket uncategorisedCatch) {
+    addContent(catchCategoriser.apply(uncategorisedCatch));
+  }
 
-    /** Adds {@code categorisedCatch} to {@link #content} unconditionally. */
-    @Override
-    public void addContent(final CategorisedCatch categorisedCatch) {
-        content = content.add(categorisedCatch);
-    }
+  /** Adds {@code categorisedCatch} to {@link #content} unconditionally. */
+  @Override
+  public void addContent(final CategorisedCatch categorisedCatch) {
+    content = content.add(categorisedCatch);
+  }
 
-    /** Empties {@link #content} and returns what was removed. */
-    @Override
-    public CategorisedCatch extractContent() {
-        final CategorisedCatch removedContent = content;
-        content = CategorisedCatch.empty();
-        return removedContent;
-    }
-
+  /** Empties {@link #content} and returns what was removed. */
+  @Override
+  public CategorisedCatch extractContent() {
+    final CategorisedCatch removedContent = content;
+    content = CategorisedCatch.empty();
+    return removedContent;
+  }
 }

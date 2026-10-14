@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import ucar.nc2.Dimension;
-import ucar.nc2.Variable;
-
 import java.nio.file.Path;
 import java.util.List;
+import ucar.nc2.Dimension;
+import ucar.nc2.Variable;
 
 /**
  * Reads a NetCDF file holding a single static {@code (latitude, longitude)} raster per data
@@ -34,49 +33,54 @@ import java.util.List;
  */
 public final class StaticNetCdfGridReader extends AbstractNetCdfGridReader {
 
-    /**
-     * @param ncFile                 the NetCDF file to open
-     * @param latitudeDimensionName  the name of the latitude dimension/coordinate variable
-     * @param longitudeDimensionName the name of the longitude dimension/coordinate variable
-     */
-    public StaticNetCdfGridReader(
-        final Path ncFile,
-        final String latitudeDimensionName,
-        final String longitudeDimensionName
-    ) {
-        super(ncFile, latitudeDimensionName, longitudeDimensionName);
-    }
+  /**
+   * @param ncFile                 the NetCDF file to open
+   * @param latitudeDimensionName  the name of the latitude dimension/coordinate variable
+   * @param longitudeDimensionName the name of the longitude dimension/coordinate variable
+   */
+  public StaticNetCdfGridReader(
+    final Path ncFile,
+    final String latitudeDimensionName,
+    final String longitudeDimensionName
+  ) {
+    super(ncFile, latitudeDimensionName, longitudeDimensionName);
+  }
 
-    /**
-     * Names of the data variables shaped exactly {@code (latitude, longitude)}, excluding the
-     * coordinate variables and any grid-mapping variable (e.g. {@code crs}).
-     */
-    public List<String> getDataVariableNames() {
-        return netcdfFile
-            .getVariables()
-            .stream()
-            .filter(this::isLatitudeLongitudeVariable)
-            .map(Variable::getFullName)
-            .toList();
-    }
+  /**
+   * Names of the data variables shaped exactly {@code (latitude, longitude)}, excluding the
+   * coordinate variables and any grid-mapping variable (e.g. {@code crs}).
+   */
+  public List<String> getDataVariableNames() {
+    return netcdfFile
+      .getVariables()
+      .stream()
+      .filter(this::isLatitudeLongitudeVariable)
+      .map(Variable::getFullName)
+      .toList();
+  }
 
-    private boolean isLatitudeLongitudeVariable(final Variable variable) {
-        final List<Dimension> dimensions = variable.getDimensions();
-        return dimensions.size() == 2
-            && latitudeDimensionName.equals(dimensions.get(0).getShortName())
-            && longitudeDimensionName.equals(dimensions.get(1).getShortName());
-    }
+  private boolean isLatitudeLongitudeVariable(final Variable variable) {
+    final List<Dimension> dimensions = variable.getDimensions();
+    return (
+      dimensions.size() == 2 &&
+      latitudeDimensionName.equals(dimensions.get(0).getShortName()) &&
+      longitudeDimensionName.equals(dimensions.get(1).getShortName())
+    );
+  }
 
-    /**
-     * Reads the named variable's {@code (latitude, longitude)} raster, reoriented to
-     * {@code [longitudeIndex][latitudeIndex]}, with {@code _FillValue} cells converted to
-     * {@link Double#NaN}.
-     */
-    public double[][] readGrid(final String variableName) {
-        final Variable variable = findVariable(variableName);
-        final int latDim = getLatDimensionSize();
-        final int lonDim = getLonDimensionSize();
-        return readAndReorient(variable, new int[]{0, 0}, new int[]{latDim, lonDim});
-    }
-
+  /**
+   * Reads the named variable's {@code (latitude, longitude)} raster, reoriented to
+   * {@code [longitudeIndex][latitudeIndex]}, with {@code _FillValue} cells converted to
+   * {@link Double#NaN}.
+   */
+  public double[][] readGrid(final String variableName) {
+    final Variable variable = findVariable(variableName);
+    final int latDim = getLatDimensionSize();
+    final int lonDim = getLonDimensionSize();
+    return readAndReorient(
+      variable,
+      new int[] { 0, 0 },
+      new int[] { latDim, lonDim }
+    );
+  }
 }

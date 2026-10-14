@@ -22,65 +22,61 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntSupplier;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.IntSupplier;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class FirstIntFromFactoryTest {
 
-    @Test
-    void returnedProviderIsStable() {
-        final AtomicInteger counter = new AtomicInteger(0);
-        final FirstIntFromFactory<Scope> factory =
-            new FirstIntFromFactory<>(
-                new GlobalScopeFactory<IntSupplier>() {
-                    @Override
-                    protected IntSupplier newInstance(final Scope scope) {
-                        return counter::incrementAndGet;
-                    }
-                }
-            );
+  @Test
+  void returnedProviderIsStable() {
+    final AtomicInteger counter = new AtomicInteger(0);
+    final FirstIntFromFactory<Scope> factory = new FirstIntFromFactory<>(
+      new GlobalScopeFactory<IntSupplier>() {
+        @Override
+        protected IntSupplier newInstance(final Scope scope) {
+          return counter::incrementAndGet;
+        }
+      }
+    );
 
-        final IntProvider provider = factory.get(Scope.GLOBAL_SCOPE);
-        assertThat(provider.getAsInt()).isEqualTo(1);
-        assertThat(provider.getAsInt()).isEqualTo(1);
-        assertThat(provider.getAsInt()).isEqualTo(1);
-    }
+    final IntProvider provider = factory.get(Scope.GLOBAL_SCOPE);
+    assertThat(provider.getAsInt()).isEqualTo(1);
+    assertThat(provider.getAsInt()).isEqualTo(1);
+    assertThat(provider.getAsInt()).isEqualTo(1);
+  }
 
-    @Test
-    void delegateSupplierCalledOnlyOnce() {
-        final AtomicInteger counter = new AtomicInteger(0);
-        final FirstIntFromFactory<Scope> factory =
-            new FirstIntFromFactory<>(
-                new GlobalScopeFactory<IntSupplier>() {
-                    @Override
-                    protected IntSupplier newInstance(final Scope scope) {
-                        return counter::incrementAndGet;
-                    }
-                }
-            );
+  @Test
+  void delegateSupplierCalledOnlyOnce() {
+    final AtomicInteger counter = new AtomicInteger(0);
+    final FirstIntFromFactory<Scope> factory = new FirstIntFromFactory<>(
+      new GlobalScopeFactory<IntSupplier>() {
+        @Override
+        protected IntSupplier newInstance(final Scope scope) {
+          return counter::incrementAndGet;
+        }
+      }
+    );
 
-        factory.get(Scope.GLOBAL_SCOPE);
-        assertThat(counter).hasValue(1);
-    }
+    factory.get(Scope.GLOBAL_SCOPE);
+    assertThat(counter).hasValue(1);
+  }
 
-    @Test
-    void returnsConstantIntProvider() {
-        final FirstIntFromFactory<Scope> factory =
-            new FirstIntFromFactory<>(
-                new GlobalScopeFactory<IntSupplier>() {
-                    @Override
-                    protected IntSupplier newInstance(final Scope scope) {
-                        return () -> 42;
-                    }
-                }
-            );
+  @Test
+  void returnsConstantIntProvider() {
+    final FirstIntFromFactory<Scope> factory = new FirstIntFromFactory<>(
+      new GlobalScopeFactory<IntSupplier>() {
+        @Override
+        protected IntSupplier newInstance(final Scope scope) {
+          return () -> 42;
+        }
+      }
+    );
 
-        assertThat(factory.get(Scope.GLOBAL_SCOPE).getAsInt()).isEqualTo(42);
-    }
+    assertThat(factory.get(Scope.GLOBAL_SCOPE).getAsInt()).isEqualTo(42);
+  }
 }

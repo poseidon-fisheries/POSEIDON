@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
+import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
@@ -29,18 +30,18 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.providers.Provider;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
-import java.util.List;
-
 /** Provides the water cells reachable from a vessel's current cell, per {@code pathFinder}. */
 @RequiredArgsConstructor
 public class AccessibleWaterCells implements Provider<List<Int2D>> {
 
-    @NonNull private final Vessel vessel;
-    @NonNull private final GridPathFinder pathFinder;
+  @NonNull
+  private final Vessel vessel;
 
-    @Override
-    public List<Int2D> get() {
-        return pathFinder.getAccessibleWaterCells(vessel.getCell());
-    }
+  @NonNull
+  private final GridPathFinder pathFinder;
 
+  @Override
+  public List<Int2D> get() {
+    return pathFinder.getAccessibleWaterCells(vessel.getCell());
+  }
 }

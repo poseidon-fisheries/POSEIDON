@@ -30,10 +30,10 @@ import uk.ac.ox.poseidon.biology.species.Species;
 @Value
 public class PriceEntry {
 
-    /** The entry's catch category. */
-    CatchCategory catchCategory;
-    /** The entry's species. */
-    Species species;
-    /** The price for this category/species combination. */
-    Price price;
+  /** The entry's catch category. */
+  CatchCategory catchCategory;
+  /** The entry's species. */
+  Species species;
+  /** The price for this category/species combination. */
+  Price price;
 }

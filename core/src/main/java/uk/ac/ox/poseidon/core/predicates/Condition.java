@@ -22,10 +22,9 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.RequiredArgsConstructor;
 
 /**
  * A {@link Predicate} that extracts a value from its input via a {@link Function}, then tests
@@ -39,12 +38,11 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class Condition<T, U> implements Predicate<T> {
 
-    private final Function<? super T, ? extends U> extractor;
-    private final Predicate<? super U> predicate;
+  private final Function<? super T, ? extends U> extractor;
+  private final Predicate<? super U> predicate;
 
-    @Override
-    public boolean test(final T t) {
-        return predicate.test(extractor.apply(t));
-    }
-
+  @Override
+  public boolean test(final T t) {
+    return predicate.test(extractor.apply(t));
+  }
 }

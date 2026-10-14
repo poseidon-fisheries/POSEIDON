@@ -23,26 +23,28 @@
 package uk.ac.ox.poseidon.agents.market;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serial;
 import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Simulation;
 
-import java.io.Serial;
-
 /** A scheduled change of one {@link MarketPrice}: when run, it applies that price. */
 @Value
 public class PriceUpdate implements Steppable {
 
-    @Serial private static final long serialVersionUID = 135321789743469343L;
+  @Serial
+  private static final long serialVersionUID = 135321789743469343L;
 
-    /** The price to apply. */
-    MarketPrice marketPrice;
+  /** The price to apply. */
+  MarketPrice marketPrice;
 
-    /** Applies {@link #marketPrice} at the simulation's current date-time. */
-    @Override
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
-    public void step(final SimState simState) {
-        marketPrice.apply(((Simulation) simState).getTemporalSchedule().getDateTime());
-    }
+  /** Applies {@link #marketPrice} at the simulation's current date-time. */
+  @Override
+  @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
+  public void step(final SimState simState) {
+    marketPrice.apply(
+      ((Simulation) simState).getTemporalSchedule().getDateTime()
+    );
+  }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.schedule;
 
+import java.time.temporal.Temporal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,8 +31,6 @@ import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.time.temporal.Temporal;
 
 /**
  * A {@link SimulationScopeFactory} that schedules the resolved steppable to run once at a
@@ -45,21 +44,17 @@ import java.time.temporal.Temporal;
 @EqualsAndHashCode(callSuper = true)
 public class ScheduledOnceFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
-    private Factory<? super SimulationScope, ? extends Temporal> dateTime;
-    private Factory<? super SimulationScope, ? extends C> steppable;
-    private int ordering;
+  private Factory<? super SimulationScope, ? extends Temporal> dateTime;
+  private Factory<? super SimulationScope, ? extends C> steppable;
+  private int ordering;
 
-    @Override
-    protected C newInstance(final SimulationScope scope) {
-        final C steppableObject = steppable.get(scope);
-        scope
-            .getSimulation()
-            .getTemporalSchedule()
-            .scheduleOnce(
-                dateTime.get(scope),
-                ordering,
-                steppableObject
-            );
-        return steppableObject;
-    }
+  @Override
+  protected C newInstance(final SimulationScope scope) {
+    final C steppableObject = steppable.get(scope);
+    scope
+      .getSimulation()
+      .getTemporalSchedule()
+      .scheduleOnce(dateTime.get(scope), ordering, steppableObject);
+    return steppableObject;
+  }
 }

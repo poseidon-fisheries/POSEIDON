@@ -22,11 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * A {@link FuelTank} with a fixed capacity: {@link #addFuel}/{@link #consumeFuel} clamp to
@@ -38,73 +38,74 @@ import static com.google.common.base.Preconditions.checkArgument;
 @EqualsAndHashCode
 public class SimpleFuelTank implements FuelTank {
 
-    private static final double TOLERANCE_IN_LITRES = 1e-6;
+  private static final double TOLERANCE_IN_LITRES = 1e-6;
 
-    private final double capacityInLitres;
-    private double currentFuelInLitres;
+  private final double capacityInLitres;
+  private double currentFuelInLitres;
 
-    /**
-     * @param capacityInLitres    the tank's total capacity, in litres; must be non-negative
-     * @param currentFuelInLitres the tank's starting fuel level, in litres; must be non-negative
-     *                            and not exceed {@code capacityInLitres}
-     */
-    public SimpleFuelTank(
-        final double capacityInLitres,
-        final double currentFuelInLitres
-    ) {
-        checkArgument(capacityInLitres >= 0, "capacityInLitres must be >= 0");
-        checkArgument(currentFuelInLitres >= 0, "currentFuelInLitres must be >= 0");
-        checkArgument(
-            currentFuelInLitres <= capacityInLitres,
-            "currentFuelInLitres (%s) must be <= capacityInLitres (%s)".formatted(
-                currentFuelInLitres, capacityInLitres
-            )
-        );
-        this.capacityInLitres = capacityInLitres;
-        this.currentFuelInLitres = currentFuelInLitres;
+  /**
+   * @param capacityInLitres    the tank's total capacity, in litres; must be non-negative
+   * @param currentFuelInLitres the tank's starting fuel level, in litres; must be non-negative
+   *                            and not exceed {@code capacityInLitres}
+   */
+  public SimpleFuelTank(
+    final double capacityInLitres,
+    final double currentFuelInLitres
+  ) {
+    checkArgument(capacityInLitres >= 0, "capacityInLitres must be >= 0");
+    checkArgument(currentFuelInLitres >= 0, "currentFuelInLitres must be >= 0");
+    checkArgument(
+      currentFuelInLitres <= capacityInLitres,
+      "currentFuelInLitres (%s) must be <= capacityInLitres (%s)".formatted(
+        currentFuelInLitres,
+        capacityInLitres
+      )
+    );
+    this.capacityInLitres = capacityInLitres;
+    this.currentFuelInLitres = currentFuelInLitres;
+  }
+
+  /**
+   * @throws IllegalArgumentException if {@code litres} is negative, or would overfill the tank
+   *                                   by more than {@value #TOLERANCE_IN_LITRES} litres
+   */
+  @Override
+  public void addFuel(final double litres) {
+    checkArgument(litres >= 0, "litres must be >= 0");
+    final double newFuelLevel = currentFuelInLitres + litres;
+    if (newFuelLevel <= capacityInLitres) {
+      currentFuelInLitres = newFuelLevel;
+    } else {
+      checkArgument(
+        newFuelLevel <= capacityInLitres + TOLERANCE_IN_LITRES,
+        (
+          "adding %s litres of fuel to the current amount of %s " +
+          "would exceed tank capacity of %s"
+        ).formatted(litres, currentFuelInLitres, capacityInLitres)
+      );
+      currentFuelInLitres = capacityInLitres;
     }
+  }
 
-    /**
-     * @throws IllegalArgumentException if {@code litres} is negative, or would overfill the tank
-     *                                   by more than {@value #TOLERANCE_IN_LITRES} litres
-     */
-    @Override
-    public void addFuel(final double litres) {
-        checkArgument(litres >= 0, "litres must be >= 0");
-        final double newFuelLevel = currentFuelInLitres + litres;
-        if (newFuelLevel <= capacityInLitres) {
-            currentFuelInLitres = newFuelLevel;
-        } else {
-            checkArgument(
-                newFuelLevel <= capacityInLitres + TOLERANCE_IN_LITRES,
-                ("adding %s litres of fuel to the current amount of %s " +
-                    "would exceed tank capacity of %s").formatted(
-                    litres, currentFuelInLitres, capacityInLitres
-                )
-            );
-            currentFuelInLitres = capacityInLitres;
-        }
+  /**
+   * @throws IllegalArgumentException if {@code litres} is negative, or would draw the tank
+   *                                   below {@code -}{@value #TOLERANCE_IN_LITRES} litres
+   */
+  @Override
+  public void consumeFuel(final double litres) {
+    checkArgument(litres >= 0, "litres must be >= 0");
+    final double newFuelLevel = currentFuelInLitres - litres;
+    if (newFuelLevel >= 0) {
+      currentFuelInLitres = newFuelLevel;
+    } else {
+      checkArgument(
+        newFuelLevel >= -TOLERANCE_IN_LITRES,
+        "cannot consume %s litres with only %s available".formatted(
+          litres,
+          currentFuelInLitres
+        )
+      );
+      currentFuelInLitres = 0;
     }
-
-    /**
-     * @throws IllegalArgumentException if {@code litres} is negative, or would draw the tank
-     *                                   below {@code -}{@value #TOLERANCE_IN_LITRES} litres
-     */
-    @Override
-    public void consumeFuel(final double litres) {
-        checkArgument(litres >= 0, "litres must be >= 0");
-        final double newFuelLevel = currentFuelInLitres - litres;
-        if (newFuelLevel >= 0) {
-            currentFuelInLitres = newFuelLevel;
-        } else {
-            checkArgument(
-                newFuelLevel >= -TOLERANCE_IN_LITRES,
-                "cannot consume %s litres with only %s available".formatted(
-                    litres,
-                    currentFuelInLitres
-                )
-            );
-            currentFuelInLitres = 0;
-        }
-    }
+  }
 }

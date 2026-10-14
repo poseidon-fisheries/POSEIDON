@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-
-import java.util.function.Supplier;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link BestKnownOption}, built via
@@ -40,17 +39,19 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BestKnownOptionFactory<O> extends VesselScopeFactory<BestKnownOption<O>> {
+public class BestKnownOptionFactory<O> extends VesselScopeFactory<
+  BestKnownOption<O>
+> {
 
-    private Factory<? super VesselScope, ? extends OptionValues<O>> optionValues;
-    private Factory<? super VesselScope, ? extends Supplier<O>> fallback;
+  private Factory<? super VesselScope, ? extends OptionValues<O>> optionValues;
+  private Factory<? super VesselScope, ? extends Supplier<O>> fallback;
 
-    @Override
-    protected BestKnownOption<O> newInstance(final VesselScope scope) {
-        return new BestKnownOption<>(
-            optionValues.get(scope),
-            fallback.get(scope),
-            scope.getSimulation().random
-        );
-    }
+  @Override
+  protected BestKnownOption<O> newInstance(final VesselScope scope) {
+    return new BestKnownOption<>(
+      optionValues.get(scope),
+      fallback.get(scope),
+      scope.getSimulation().random
+    );
+  }
 }

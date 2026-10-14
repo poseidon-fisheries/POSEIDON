@@ -37,25 +37,27 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SmoothBiomassDiffusionRuleFactory extends GlobalScopeFactory<SmoothBiomassDiffusionRule> {
+public class SmoothBiomassDiffusionRuleFactory
+  extends GlobalScopeFactory<SmoothBiomassDiffusionRule>
+{
 
-    /**
-     * how much of the differential do you want to move
-     */
-    private double differentialPercentageToMove;
+  /**
+   * how much of the differential do you want to move
+   */
+  private double differentialPercentageToMove;
 
-    /**
-     * maximum percentage of biomass that can leave one place for another per
-     * {@link SmoothBiomassDiffusionRule} step, not necessarily daily despite the field name — see
-     * {@link SmoothBiomassDiffusionRule#percentageLimitOnDailyMovement}.
-     */
-    private double percentageLimitOnDailyMovement;
+  /**
+   * maximum percentage of biomass that can leave one place for another per
+   * {@link SmoothBiomassDiffusionRule} step, not necessarily daily despite the field name — see
+   * {@link SmoothBiomassDiffusionRule#percentageLimitOnDailyMovement}.
+   */
+  private double percentageLimitOnDailyMovement;
 
-    @Override
-    protected SmoothBiomassDiffusionRule newInstance(final Scope scope) {
-        return new SmoothBiomassDiffusionRule(
-            differentialPercentageToMove,
-            percentageLimitOnDailyMovement
-        );
-    }
+  @Override
+  protected SmoothBiomassDiffusionRule newInstance(final Scope scope) {
+    return new SmoothBiomassDiffusionRule(
+      differentialPercentageToMove,
+      percentageLimitOnDailyMovement
+    );
+  }
 }

@@ -34,25 +34,25 @@ import java.util.stream.Stream;
  */
 public class EventAccumulator<E> extends AbstractListener<E> {
 
-    private final ArrayList<E> events = new ArrayList<>();
+  private final ArrayList<E> events = new ArrayList<>();
 
-    /** @param eventClass the event type this accumulator is registered for */
-    public EventAccumulator(final Class<E> eventClass) {
-        super(eventClass);
-    }
+  /** @param eventClass the event type this accumulator is registered for */
+  public EventAccumulator(final Class<E> eventClass) {
+    super(eventClass);
+  }
 
-    @Override
-    public void receive(final E event) {
-        events.add(event);
-    }
+  @Override
+  public void receive(final E event) {
+    events.add(event);
+  }
 
-    /** @return the accumulated events, in the order received */
-    public Stream<E> getEvents() {
-        return events.stream();
-    }
+  /** @return the accumulated events, in the order received */
+  public Stream<E> getEvents() {
+    return events.stream();
+  }
 
-    /** Discards every accumulated event. */
-    public void clear() {
-        events.clear();
-    }
+  /** Discards every accumulated event. */
+  public void clear() {
+    events.clear();
+  }
 }

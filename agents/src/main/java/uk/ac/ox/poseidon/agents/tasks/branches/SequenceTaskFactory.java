@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks.branches;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.branch.Sequence;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -31,8 +32,6 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-
-import java.util.List;
 
 /**
  * A {@link BranchTaskFactory} for a gdx-ai {@link Sequence}: runs its children in order, failing
@@ -44,26 +43,30 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class SequenceTaskFactory extends BranchTaskFactory<Sequence<Vessel>> {
 
-    /** @param children factories for the sequence's child tasks, resolved and attached in order */
-    public SequenceTaskFactory(
-        final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
-    ) {
-        super(children);
-    }
+  /** @param children factories for the sequence's child tasks, resolved and attached in order */
+  public SequenceTaskFactory(
+    final List<
+      ? extends Factory<? super VesselScope, ? extends Task<Vessel>>
+    > children
+  ) {
+    super(children);
+  }
 
-    /**
-     * @param guard    optional task guarding whether this sequence runs at all
-     * @param children factories for the sequence's child tasks, resolved and attached in order
-     */
-    public SequenceTaskFactory(
-        final VesselScopeFactory<? extends Task<Vessel>> guard,
-        final List<? extends Factory<? super VesselScope, ? extends Task<Vessel>>> children
-    ) {
-        super(guard, children);
-    }
+  /**
+   * @param guard    optional task guarding whether this sequence runs at all
+   * @param children factories for the sequence's child tasks, resolved and attached in order
+   */
+  public SequenceTaskFactory(
+    final VesselScopeFactory<? extends Task<Vessel>> guard,
+    final List<
+      ? extends Factory<? super VesselScope, ? extends Task<Vessel>>
+    > children
+  ) {
+    super(guard, children);
+  }
 
-    @Override
-    protected Sequence<Vessel> newTask() {
-        return new Sequence<>();
-    }
+  @Override
+  protected Sequence<Vessel> newTask() {
+    return new Sequence<>();
+  }
 }

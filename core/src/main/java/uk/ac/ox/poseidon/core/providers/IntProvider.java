@@ -34,21 +34,24 @@ import java.util.function.ToIntFunction;
  * the same object be wired into any of those call sites without an adapter.
  */
 public interface IntProvider
-    extends IntSupplier, Supplier<Integer>, ToIntFunction<Object>, Function<Object, Integer> {
+  extends
+    IntSupplier,
+    Supplier<Integer>,
+    ToIntFunction<Object>,
+    Function<Object, Integer>
+{
+  @Override
+  default Integer get() {
+    return getAsInt();
+  }
 
-    @Override
-    default Integer get() {
-        return getAsInt();
-    }
+  @Override
+  default int applyAsInt(final Object value) {
+    return getAsInt();
+  }
 
-    @Override
-    default int applyAsInt(final Object value) {
-        return getAsInt();
-    }
-
-    @Override
-    default Integer apply(final Object o) {
-        return getAsInt();
-    }
-
+  @Override
+  default Integer apply(final Object o) {
+    return getAsInt();
+  }
 }

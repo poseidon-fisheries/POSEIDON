@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,10 +35,6 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 /**
  * A {@link VesselScopeFactory} counterpart of {@link RandomPicker}, built via
  * {@link Factories#randomGridExplorer}.
@@ -44,18 +43,25 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class RandomGridExplorerFactory extends VesselScopeFactory<Provider<Int2D>> {
+public class RandomGridExplorerFactory
+  extends VesselScopeFactory<Provider<Int2D>>
+{
 
-    private Factory<? super VesselScope, ? extends Supplier<? extends List<? extends Int2D>>>
-        cellsSupplier;
-    private Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate;
+  private Factory<
+    ? super VesselScope,
+    ? extends Supplier<? extends List<? extends Int2D>>
+  > cellsSupplier;
+  private Factory<
+    ? super VesselScope,
+    ? extends Predicate<? super Int2D>
+  > cellPredicate;
 
-    @Override
-    protected Provider<Int2D> newInstance(final VesselScope scope) {
-        return new RandomPicker<>(
-            cellsSupplier.get(scope),
-            cellPredicate.get(scope),
-            scope.getSimulation().random
-        );
-    }
+  @Override
+  protected Provider<Int2D> newInstance(final VesselScope scope) {
+    return new RandomPicker<>(
+      cellsSupplier.get(scope),
+      cellPredicate.get(scope),
+      scope.getSimulation().random
+    );
+  }
 }

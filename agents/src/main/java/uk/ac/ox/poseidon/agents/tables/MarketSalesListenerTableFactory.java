@@ -37,11 +37,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class MarketSalesListenerTableFactory
-    extends SimulationEventListenerFactory<MarketSalesListenerTable> {
+  extends SimulationEventListenerFactory<MarketSalesListenerTable>
+{
 
-    @Override
-    protected MarketSalesListenerTable newListener(final SimulationScope scope) {
-        return new MarketSalesListenerTable();
-    }
-
+  @Override
+  protected MarketSalesListenerTable newListener(final SimulationScope scope) {
+    return new MarketSalesListenerTable();
+  }
 }

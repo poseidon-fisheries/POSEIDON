@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.regulations;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,10 +32,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.List;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link AllOfRegulations}, built via
@@ -42,18 +41,22 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AllOfRegulationsFactory<S extends Scope, A extends Action<?>>
-    extends RelativeScopeFactory<S, AllOfRegulations<A>> {
+public class AllOfRegulationsFactory<
+  S extends Scope,
+  A extends Action<?>
+> extends RelativeScopeFactory<S, AllOfRegulations<A>> {
 
-    private List<Factory<? super S, ? extends Regulations<? super A>>> regulations;
+  private List<
+    Factory<? super S, ? extends Regulations<? super A>>
+  > regulations;
 
-    @Override
-    protected AllOfRegulations<A> newInstance(final S scope) {
-        return new AllOfRegulations<>(
-            regulations
-                .stream()
-                .map(regulation -> regulation.get(scope))
-                .collect(toImmutableList())
-        );
-    }
+  @Override
+  protected AllOfRegulations<A> newInstance(final S scope) {
+    return new AllOfRegulations<>(
+      regulations
+        .stream()
+        .map(regulation -> regulation.get(scope))
+        .collect(toImmutableList())
+    );
+  }
 }

@@ -22,50 +22,49 @@
 
 package uk.ac.ox.poseidon.core;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.LinkedHashMap;
 import java.util.SequencedMap;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class SimulationStartOptionsTest {
 
-    @Test
-    void defaultsPropertyOverridesToEmptyOrderedMap() {
-        final SimulationStartOptions options = SimulationStartOptions.builder().build();
+  @Test
+  void defaultsPropertyOverridesToEmptyOrderedMap() {
+    final SimulationStartOptions options =
+      SimulationStartOptions.builder().build();
 
-        assertTrue(options.getPropertyOverrides().isEmpty());
-    }
+    assertTrue(options.getPropertyOverrides().isEmpty());
+  }
 
-    @Test
-    void copiesPropertyOverridesFromBuilderInput() {
-        final SequencedMap<String, Object> propertyOverrides = new LinkedHashMap<>();
-        propertyOverrides.put("startingDateTime", "value");
+  @Test
+  void copiesPropertyOverridesFromBuilderInput() {
+    final SequencedMap<String, Object> propertyOverrides =
+      new LinkedHashMap<>();
+    propertyOverrides.put("startingDateTime", "value");
 
-        final SimulationStartOptions options =
-            SimulationStartOptions.builder().propertyOverrides(propertyOverrides).build();
+    final SimulationStartOptions options = SimulationStartOptions.builder()
+      .propertyOverrides(propertyOverrides)
+      .build();
 
-        propertyOverrides.put("startingDateTime.year", 2001);
+    propertyOverrides.put("startingDateTime.year", 2001);
 
-        assertEquals(1, options.getPropertyOverrides().size());
-        assertEquals(
-            "value",
-            options.getPropertyOverrides().get("startingDateTime")
-        );
-    }
+    assertEquals(1, options.getPropertyOverrides().size());
+    assertEquals(
+      "value",
+      options.getPropertyOverrides().get("startingDateTime")
+    );
+  }
 
-    @Test
-    void exposesPropertyOverridesAsUnmodifiableMap() {
-        final SimulationStartOptions options =
-            SimulationStartOptions
-                .builder()
-                .propertyOverrides(new LinkedHashMap<>())
-                .build();
+  @Test
+  void exposesPropertyOverridesAsUnmodifiableMap() {
+    final SimulationStartOptions options = SimulationStartOptions.builder()
+      .propertyOverrides(new LinkedHashMap<>())
+      .build();
 
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> options.getPropertyOverrides().put("startingDateTime.year", 2001)
-        );
-    }
+    assertThrows(UnsupportedOperationException.class, () ->
+      options.getPropertyOverrides().put("startingDateTime.year", 2001)
+    );
+  }
 }

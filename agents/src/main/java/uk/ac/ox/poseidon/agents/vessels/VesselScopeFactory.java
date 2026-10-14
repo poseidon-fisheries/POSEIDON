@@ -39,14 +39,18 @@ import uk.ac.ox.poseidon.core.Factory;
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class VesselScopeFactory<C> extends AbstractFactory<VesselScope, C> {
-    @Override
-    protected Object makeKey(final VesselScope scope) {
-        return scope.getVessel();
-    }
+public abstract class VesselScopeFactory<C> extends AbstractFactory<
+  VesselScope,
+  C
+> {
 
-    @Override
-    protected Class<VesselScope> scopeClass() {
-        return VesselScope.class;
-    }
+  @Override
+  protected Object makeKey(final VesselScope scope) {
+    return scope.getVessel();
+  }
+
+  @Override
+  protected Class<VesselScope> scopeClass() {
+    return VesselScope.class;
+  }
 }

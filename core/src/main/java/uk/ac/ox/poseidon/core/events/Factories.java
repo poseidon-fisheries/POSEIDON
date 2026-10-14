@@ -29,17 +29,17 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 /** Factories for scheduling maintenance steppables over the event subsystem. */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @param eventAccumulator factory for the accumulator to periodically clear
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link EventClearer}
-     * over the resolved accumulator
-     * @see EventClearer
-     */
-    public static <S extends Scope> EventClearerFactory<S> eventClearer(
-        final Factory<? super S, ? extends EventAccumulator<?>> eventAccumulator
-    ) {
-        return new EventClearerFactory<>(eventAccumulator);
-    }
+  /**
+   * @param eventAccumulator factory for the accumulator to periodically clear
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link EventClearer}
+   * over the resolved accumulator
+   * @see EventClearer
+   */
+  public static <S extends Scope> EventClearerFactory<S> eventClearer(
+    final Factory<? super S, ? extends EventAccumulator<?>> eventAccumulator
+  ) {
+    return new EventClearerFactory<>(eventAccumulator);
+  }
 }

@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
+import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.regulations.TemporalAction;
-
-import java.util.function.Predicate;
 
 /**
  * Predicate matching temporal actions whose start or end year is {@code year}, or whose duration
@@ -36,14 +35,16 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class InYear implements Predicate<TemporalAction<?>> {
 
-    private final int year;
+  private final int year;
 
-    @Override
-    public boolean test(final TemporalAction<?> action) {
-        final var actionStartYear = action.getStartDateTime().getYear();
-        final var actionEndYear = action.getEndDateTime().getYear();
-        return actionStartYear == this.year ||
-            actionEndYear == this.year ||
-            (actionStartYear < this.year && actionEndYear > this.year);
-    }
+  @Override
+  public boolean test(final TemporalAction<?> action) {
+    final var actionStartYear = action.getStartDateTime().getYear();
+    final var actionEndYear = action.getEndDateTime().getYear();
+    return (
+      actionStartYear == this.year ||
+      actionEndYear == this.year ||
+      (actionStartYear < this.year && actionEndYear > this.year)
+    );
+  }
 }

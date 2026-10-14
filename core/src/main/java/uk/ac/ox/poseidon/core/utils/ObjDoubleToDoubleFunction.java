@@ -29,13 +29,10 @@ package uk.ac.ox.poseidon.core.utils;
  */
 @FunctionalInterface
 public interface ObjDoubleToDoubleFunction<T> {
-    /**
-     * @param t     the object argument
-     * @param value the double argument
-     * @return the computed result
-     */
-    double applyAsDouble(
-        T t,
-        double value
-    );
+  /**
+   * @param t     the object argument
+   * @param value the double argument
+   * @return the computed result
+   */
+  double applyAsDouble(T t, double value);
 }

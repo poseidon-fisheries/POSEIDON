@@ -22,55 +22,84 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class NextOccurrenceOfTimeOfDayTest {
 
-    private static final LocalTime[] SIX_AND_TWENTY_TWO = {LocalTime.of(22, 0), LocalTime.of(6, 0)};
+  private static final LocalTime[] SIX_AND_TWENTY_TWO = {
+    LocalTime.of(22, 0),
+    LocalTime.of(6, 0)
+  };
 
-    private static LocalDateTime nextOccurrenceAfter(
-        final LocalDateTime referenceDateTime,
-        final LocalTime... times
-    ) {
-        return new NextOccurrenceOfTimeOfDay(() -> referenceDateTime, times).get();
-    }
+  private static LocalDateTime nextOccurrenceAfter(
+    final LocalDateTime referenceDateTime,
+    final LocalTime... times
+  ) {
+    return new NextOccurrenceOfTimeOfDay(() -> referenceDateTime, times).get();
+  }
 
-    @Test
-    void picksTheNextTimeLaterTheSameDay() {
-        assertThat(nextOccurrenceAfter(LocalDateTime.of(2025, 6, 1, 2, 0), SIX_AND_TWENTY_TWO))
-            .isEqualTo(LocalDateTime.of(2025, 6, 1, 6, 0));
-        assertThat(nextOccurrenceAfter(LocalDateTime.of(2025, 6, 1, 7, 0), SIX_AND_TWENTY_TWO))
-            .isEqualTo(LocalDateTime.of(2025, 6, 1, 22, 0));
-    }
+  @Test
+  void picksTheNextTimeLaterTheSameDay() {
+    assertThat(
+      nextOccurrenceAfter(
+        LocalDateTime.of(2025, 6, 1, 2, 0),
+        SIX_AND_TWENTY_TWO
+      )
+    ).isEqualTo(LocalDateTime.of(2025, 6, 1, 6, 0));
+    assertThat(
+      nextOccurrenceAfter(
+        LocalDateTime.of(2025, 6, 1, 7, 0),
+        SIX_AND_TWENTY_TWO
+      )
+    ).isEqualTo(LocalDateTime.of(2025, 6, 1, 22, 0));
+  }
 
-    @Test
-    void wrapsToTheNextDayWhenEveryTimeHasPassed() {
-        assertThat(nextOccurrenceAfter(LocalDateTime.of(2025, 6, 1, 23, 0), SIX_AND_TWENTY_TWO))
-            .isEqualTo(LocalDateTime.of(2025, 6, 2, 6, 0));
-    }
+  @Test
+  void wrapsToTheNextDayWhenEveryTimeHasPassed() {
+    assertThat(
+      nextOccurrenceAfter(
+        LocalDateTime.of(2025, 6, 1, 23, 0),
+        SIX_AND_TWENTY_TWO
+      )
+    ).isEqualTo(LocalDateTime.of(2025, 6, 2, 6, 0));
+  }
 
-    @Test
-    void isStrictlyAfterTheReference() {
-        assertThat(nextOccurrenceAfter(LocalDateTime.of(2025, 6, 1, 6, 0), SIX_AND_TWENTY_TWO))
-            .isEqualTo(LocalDateTime.of(2025, 6, 1, 22, 0));
-        assertThat(nextOccurrenceAfter(LocalDateTime.of(2025, 6, 1, 22, 0), SIX_AND_TWENTY_TWO))
-            .isEqualTo(LocalDateTime.of(2025, 6, 2, 6, 0));
-    }
+  @Test
+  void isStrictlyAfterTheReference() {
+    assertThat(
+      nextOccurrenceAfter(
+        LocalDateTime.of(2025, 6, 1, 6, 0),
+        SIX_AND_TWENTY_TWO
+      )
+    ).isEqualTo(LocalDateTime.of(2025, 6, 1, 22, 0));
+    assertThat(
+      nextOccurrenceAfter(
+        LocalDateTime.of(2025, 6, 1, 22, 0),
+        SIX_AND_TWENTY_TWO
+      )
+    ).isEqualTo(LocalDateTime.of(2025, 6, 2, 6, 0));
+  }
 
-    @Test
-    void readsTheReferenceAnewOnEachCall() {
-        final LocalDateTime[] reference = {LocalDateTime.of(2025, 6, 1, 22, 30)};
-        final NextOccurrenceOfTimeOfDay nextOccurrence =
-            new NextOccurrenceOfTimeOfDay(() -> reference[0], new LocalTime[]{LocalTime.of(6, 30)});
-        assertThat(nextOccurrence.get()).isEqualTo(LocalDateTime.of(2025, 6, 2, 6, 30));
+  @Test
+  void readsTheReferenceAnewOnEachCall() {
+    final LocalDateTime[] reference = { LocalDateTime.of(2025, 6, 1, 22, 30) };
+    final NextOccurrenceOfTimeOfDay nextOccurrence =
+      new NextOccurrenceOfTimeOfDay(
+        () -> reference[0],
+        new LocalTime[] { LocalTime.of(6, 30) }
+      );
+    assertThat(nextOccurrence.get()).isEqualTo(
+      LocalDateTime.of(2025, 6, 2, 6, 30)
+    );
 
-        reference[0] = LocalDateTime.of(2025, 6, 2, 22, 30);
+    reference[0] = LocalDateTime.of(2025, 6, 2, 22, 30);
 
-        assertThat(nextOccurrence.get()).isEqualTo(LocalDateTime.of(2025, 6, 3, 6, 30));
-    }
+    assertThat(nextOccurrence.get()).isEqualTo(
+      LocalDateTime.of(2025, 6, 3, 6, 30)
+    );
+  }
 }

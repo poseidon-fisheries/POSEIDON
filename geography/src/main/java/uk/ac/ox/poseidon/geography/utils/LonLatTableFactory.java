@@ -39,15 +39,21 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class LonLatTableFactory<S extends Scope> extends RelativeScopeFactory<S, LonLatTable> {
+public class LonLatTableFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  LonLatTable
+> {
 
-    private Factory<? super S, ? extends Table> factory;
-    private String longitudeColumnName;
-    private String latitudeColumnName;
+  private Factory<? super S, ? extends Table> factory;
+  private String longitudeColumnName;
+  private String latitudeColumnName;
 
-    @Override
-    protected LonLatTable newInstance(final S scope) {
-        return new LonLatTable(factory.get(scope), longitudeColumnName, latitudeColumnName);
-    }
-    
+  @Override
+  protected LonLatTable newInstance(final S scope) {
+    return new LonLatTable(
+      factory.get(scope),
+      longitudeColumnName,
+      latitudeColumnName
+    );
+  }
 }

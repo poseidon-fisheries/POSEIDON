@@ -29,11 +29,12 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
  * A {@link VesselScopeFactory} counterpart of {@link CurrentTimeAtSea}, built via
  * {@link Factories#currentTimeAtSea()}.
  */
-public class CurrentTimeAtSeaFactory extends VesselScopeFactory<CurrentTimeAtSea> {
+public class CurrentTimeAtSeaFactory
+  extends VesselScopeFactory<CurrentTimeAtSea>
+{
 
-    @Override
-    protected CurrentTimeAtSea newInstance(final VesselScope scope) {
-        return new CurrentTimeAtSea(scope.getVessel());
-    }
-
+  @Override
+  protected CurrentTimeAtSea newInstance(final VesselScope scope) {
+    return new CurrentTimeAtSea(scope.getVessel());
+  }
 }

@@ -29,76 +29,59 @@ import static com.google.common.base.Preconditions.checkArgument;
  * checks.
  */
 public class Preconditions {
-    /**
-     * @param value the value to check, must be in {@code [0, 1]}
-     * @param name  the name used in the exception message if the check fails
-     * @return {@code value}, unchanged
-     */
-    public static double checkUnitRange(
-        final double value,
-        final String name
-    ) {
-        checkArgument(
-            value >= 0 && value <= 1,
-            "%s must be between 0 and 1 but was %s",
-            name,
-            value
-        );
-        return value;
-    }
 
-    /**
-     * @param value the value to check, must be non-negative
-     * @param name  the name used in the exception message if the check fails
-     * @return {@code value}, unchanged
-     */
-    public static int checkNonNegative(
-        final int value,
-        final String name
-    ) {
-        checkArgument(
-            value >= 0,
-            "%s must be not be negative but was %s",
-            name,
-            value
-        );
-        return value;
-    }
+  /**
+   * @param value the value to check, must be in {@code [0, 1]}
+   * @param name  the name used in the exception message if the check fails
+   * @return {@code value}, unchanged
+   */
+  public static double checkUnitRange(final double value, final String name) {
+    checkArgument(
+      value >= 0 && value <= 1,
+      "%s must be between 0 and 1 but was %s",
+      name,
+      value
+    );
+    return value;
+  }
 
-    /**
-     * @param value the value to check, must be non-negative
-     * @param name  the name used in the exception message if the check fails
-     * @return {@code value}, unchanged
-     */
-    public static double checkNonNegative(
-        final double value,
-        final String name
-    ) {
-        checkArgument(
-            value >= 0,
-            "%s must be not be negative but was %s",
-            name,
-            value
-        );
-        return value;
-    }
+  /**
+   * @param value the value to check, must be non-negative
+   * @param name  the name used in the exception message if the check fails
+   * @return {@code value}, unchanged
+   */
+  public static int checkNonNegative(final int value, final String name) {
+    checkArgument(
+      value >= 0,
+      "%s must be not be negative but was %s",
+      name,
+      value
+    );
+    return value;
+  }
 
-    /**
-     * @param value the value to check, must be strictly positive
-     * @param name  the name used in the exception message if the check fails
-     * @return {@code value}, unchanged
-     */
-    public static double checkPositive(
-        final double value,
-        final String name
-    ) {
-        checkArgument(
-            value > 0,
-            "%s must be positive but was %s",
-            name,
-            value
-        );
-        return value;
-    }
+  /**
+   * @param value the value to check, must be non-negative
+   * @param name  the name used in the exception message if the check fails
+   * @return {@code value}, unchanged
+   */
+  public static double checkNonNegative(final double value, final String name) {
+    checkArgument(
+      value >= 0,
+      "%s must be not be negative but was %s",
+      name,
+      value
+    );
+    return value;
+  }
 
+  /**
+   * @param value the value to check, must be strictly positive
+   * @param name  the name used in the exception message if the check fails
+   * @return {@code value}, unchanged
+   */
+  public static double checkPositive(final double value, final String name) {
+    checkArgument(value > 0, "%s must be positive but was %s", name, value);
+    return value;
+  }
 }

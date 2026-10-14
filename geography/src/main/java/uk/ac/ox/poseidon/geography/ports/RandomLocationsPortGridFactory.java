@@ -22,6 +22,11 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
+import static com.google.common.base.Preconditions.checkState;
+import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
+
+import java.util.List;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,12 +38,6 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
-import java.util.List;
-import java.util.function.Supplier;
-
-import static com.google.common.base.Preconditions.checkState;
-import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 /**
  * A {@link SimulationScopeFactory} for a {@link MutablePortGrid} with a fixed number of ports
@@ -54,47 +53,57 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class RandomLocationsPortGridFactory extends SimulationScopeFactory<PortGrid> {
+public class RandomLocationsPortGridFactory
+  extends SimulationScopeFactory<PortGrid>
+{
 
-    private Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid;
-    private Factory<? super SimulationScope, ? extends Supplier<String>> idSupplier;
-    private int numberOfPorts;
-    private int minimumAdjacentWaterTiles;
+  private Factory<
+    ? super SimulationScope,
+    ? extends BathymetricGrid
+  > bathymetricGrid;
+  private Factory<
+    ? super SimulationScope,
+    ? extends Supplier<String>
+  > idSupplier;
+  private int numberOfPorts;
+  private int minimumAdjacentWaterTiles;
 
-    @Override
-    protected PortGrid newInstance(final SimulationScope scope) {
-        final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
-        final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
-        final List<Int2D> suitableTiles =
-            bathymetricGrid
-                .getLandCells()
-                .filter(cell ->
-                    modelGrid
-                        .getActiveNeighbours(cell)
-                        .stream()
-                        .filter(bathymetricGrid::isWater)
-                        .count() >= minimumAdjacentWaterTiles
-                )
-                .toList();
-        checkState(
-            suitableTiles.size() >= numberOfPorts,
-            "Only %s suitable land tiles for %s ports.",
-            suitableTiles.size(),
-            numberOfPorts
-        );
-        final SparseGrid2D sparseGrid2D =
-            new SparseGrid2D(
-                modelGrid.getGridWidth(),
-                modelGrid.getGridHeight()
-            );
-        final MutablePortGrid portGrid = new MutablePortGrid(bathymetricGrid, sparseGrid2D);
-        final Supplier<String> idSupplier = this.idSupplier.get(scope);
-        shuffledStream(suitableTiles, scope.getSimulation().random)
-            .limit(numberOfPorts)
-            .forEach(cell -> {
-                final String portCode = idSupplier.get();
-                portGrid.createPort(portCode, "Port " + portCode, cell);
-            });
-        return portGrid;
-    }
+  @Override
+  protected PortGrid newInstance(final SimulationScope scope) {
+    final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
+    final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
+    final List<Int2D> suitableTiles = bathymetricGrid
+      .getLandCells()
+      .filter(
+        cell ->
+          modelGrid
+            .getActiveNeighbours(cell)
+            .stream()
+            .filter(bathymetricGrid::isWater)
+            .count() >= minimumAdjacentWaterTiles
+      )
+      .toList();
+    checkState(
+      suitableTiles.size() >= numberOfPorts,
+      "Only %s suitable land tiles for %s ports.",
+      suitableTiles.size(),
+      numberOfPorts
+    );
+    final SparseGrid2D sparseGrid2D = new SparseGrid2D(
+      modelGrid.getGridWidth(),
+      modelGrid.getGridHeight()
+    );
+    final MutablePortGrid portGrid = new MutablePortGrid(
+      bathymetricGrid,
+      sparseGrid2D
+    );
+    final Supplier<String> idSupplier = this.idSupplier.get(scope);
+    shuffledStream(suitableTiles, scope.getSimulation().random)
+      .limit(numberOfPorts)
+      .forEach(cell -> {
+        final String portCode = idSupplier.get();
+        portGrid.createPort(portCode, "Port " + portCode, cell);
+      });
+    return portGrid;
+  }
 }

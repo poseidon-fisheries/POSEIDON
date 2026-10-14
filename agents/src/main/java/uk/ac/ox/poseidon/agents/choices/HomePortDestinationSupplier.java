@@ -22,24 +22,23 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import static lombok.AccessLevel.PACKAGE;
+
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.util.Optional;
-
-import static lombok.AccessLevel.PACKAGE;
-
 /** A {@link DestinationSupplier} that always returns the vessel's home port cell. */
 @RequiredArgsConstructor(access = PACKAGE)
 public class HomePortDestinationSupplier implements DestinationSupplier {
 
-    private final Vessel vessel;
-    private final PortGrid portGrid;
+  private final Vessel vessel;
+  private final PortGrid portGrid;
 
-    @Override
-    public Optional<Int2D> get() {
-        return Optional.of(portGrid.getLocation(vessel.getHomePort()));
-    }
+  @Override
+  public Optional<Int2D> get() {
+    return Optional.of(portGrid.getLocation(vessel.getHomePort()));
+  }
 }

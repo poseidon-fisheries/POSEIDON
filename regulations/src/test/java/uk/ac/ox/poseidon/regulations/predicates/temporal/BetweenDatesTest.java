@@ -22,232 +22,232 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
+import static java.time.ZoneOffset.UTC;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.threeten.extra.Interval;
 import uk.ac.ox.poseidon.regulations.TemporalAction;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import static java.time.ZoneOffset.UTC;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 class BetweenDatesTest {
 
-    /**
-     * Tests the {@code BetweenDates} class, which is a predicate that checks whether the start or
-     * end date of an {@code Action} falls between a given date range.
-     */
+  /**
+   * Tests the {@code BetweenDates} class, which is a predicate that checks whether the start or
+   * end date of an {@code Action} falls between a given date range.
+   */
 
-    @Test
-    void testStartDateAfterEndDateThrowsException() {
-        // Arrange
-        final LocalDate startDate = LocalDate.of(2023, 12, 31);
-        final LocalDate endDate = LocalDate.of(2023, 1, 1);
+  @Test
+  void testStartDateAfterEndDateThrowsException() {
+    // Arrange
+    final LocalDate startDate = LocalDate.of(2023, 12, 31);
+    final LocalDate endDate = LocalDate.of(2023, 1, 1);
 
-        // Act & Assert
-        assertThatThrownBy(() -> new BetweenDates(startDate, endDate))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+    // Act & Assert
+    assertThatThrownBy(() -> new BetweenDates(startDate, endDate)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+  }
 
-    @Test
-    void testActionWithinDateRangeStartOnly() {
-        // Arrange
-        final LocalDate startDate = LocalDate.of(2023, 1, 1);
-        final LocalDate endDate = LocalDate.of(2023, 12, 31);
-        final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
+  @Test
+  void testActionWithinDateRangeStartOnly() {
+    // Arrange
+    final LocalDate startDate = LocalDate.of(2023, 1, 1);
+    final LocalDate endDate = LocalDate.of(2023, 12, 31);
+    final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final TemporalAction<?> action = mockTemporalAction(
-            LocalDateTime.of(2023, 6, 15, 12, 0),
-            LocalDateTime.of(2024, 1, 1, 12, 0)
-        );
+    final TemporalAction<?> action = mockTemporalAction(
+      LocalDateTime.of(2023, 6, 15, 12, 0),
+      LocalDateTime.of(2024, 1, 1, 12, 0)
+    );
 
-        // Act & Assert
-        assertThat(betweenDates.test(action)).isTrue();
-    }
+    // Act & Assert
+    assertThat(betweenDates.test(action)).isTrue();
+  }
 
-    @Test
-    void testActionWithinDateRangeEndOnly() {
-        // Arrange
-        final LocalDate startDate = LocalDate.of(2023, 1, 1);
-        final LocalDate endDate = LocalDate.of(2023, 12, 31);
-        final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
+  @Test
+  void testActionWithinDateRangeEndOnly() {
+    // Arrange
+    final LocalDate startDate = LocalDate.of(2023, 1, 1);
+    final LocalDate endDate = LocalDate.of(2023, 12, 31);
+    final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final TemporalAction<?> action = mockTemporalAction(
-            LocalDateTime.of(2022, 12, 31, 12, 0),
-            LocalDateTime.of(2023, 6, 15, 12, 0)
-        );
+    final TemporalAction<?> action = mockTemporalAction(
+      LocalDateTime.of(2022, 12, 31, 12, 0),
+      LocalDateTime.of(2023, 6, 15, 12, 0)
+    );
 
-        // Act & Assert
-        assertThat(betweenDates.test(action)).isTrue();
-    }
+    // Act & Assert
+    assertThat(betweenDates.test(action)).isTrue();
+  }
 
-    @Test
-    void testActionExactlyOnStartDate() {
-        // Arrange
-        final LocalDate startDate = LocalDate.of(2023, 1, 1);
-        final LocalDate endDate = LocalDate.of(2023, 12, 31);
-        final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
+  @Test
+  void testActionExactlyOnStartDate() {
+    // Arrange
+    final LocalDate startDate = LocalDate.of(2023, 1, 1);
+    final LocalDate endDate = LocalDate.of(2023, 12, 31);
+    final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final TemporalAction<?> action = mockTemporalAction(
-            LocalDateTime.of(2023, 1, 1, 0, 0),
-            LocalDateTime.of(2023, 12, 31, 23, 59)
-        );
+    final TemporalAction<?> action = mockTemporalAction(
+      LocalDateTime.of(2023, 1, 1, 0, 0),
+      LocalDateTime.of(2023, 12, 31, 23, 59)
+    );
 
-        // Act & Assert
-        assertThat(betweenDates.test(action)).isTrue();
-    }
+    // Act & Assert
+    assertThat(betweenDates.test(action)).isTrue();
+  }
 
-    @Test
-    void testActionExactlyOnEndDate() {
-        // Arrange
-        final LocalDate startDate = LocalDate.of(2023, 1, 1);
-        final LocalDate endDate = LocalDate.of(2023, 12, 31);
-        final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
+  @Test
+  void testActionExactlyOnEndDate() {
+    // Arrange
+    final LocalDate startDate = LocalDate.of(2023, 1, 1);
+    final LocalDate endDate = LocalDate.of(2023, 12, 31);
+    final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final TemporalAction<?> action = mockTemporalAction(
-            LocalDateTime.of(2022, 12, 31, 23, 59),
-            LocalDateTime.of(2023, 12, 31, 0, 0)
-        );
+    final TemporalAction<?> action = mockTemporalAction(
+      LocalDateTime.of(2022, 12, 31, 23, 59),
+      LocalDateTime.of(2023, 12, 31, 0, 0)
+    );
 
-        // Act & Assert
-        assertThat(betweenDates.test(action)).isTrue();
-    }
+    // Act & Assert
+    assertThat(betweenDates.test(action)).isTrue();
+  }
 
-    @Test
-    void testActionBeforeDateRange() {
-        // Arrange
-        final LocalDate startDate = LocalDate.of(2023, 1, 1);
-        final LocalDate endDate = LocalDate.of(2023, 12, 31);
-        final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
+  @Test
+  void testActionBeforeDateRange() {
+    // Arrange
+    final LocalDate startDate = LocalDate.of(2023, 1, 1);
+    final LocalDate endDate = LocalDate.of(2023, 12, 31);
+    final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final TemporalAction<?> action = mockTemporalAction(
-            LocalDateTime.of(2022, 12, 30, 12, 0),
-            LocalDateTime.of(2022, 12, 31, 23, 59)
-        );
+    final TemporalAction<?> action = mockTemporalAction(
+      LocalDateTime.of(2022, 12, 30, 12, 0),
+      LocalDateTime.of(2022, 12, 31, 23, 59)
+    );
 
-        // Act & Assert
-        assertThat(betweenDates.test(action)).isFalse();
-    }
+    // Act & Assert
+    assertThat(betweenDates.test(action)).isFalse();
+  }
 
-    @Test
-    void testActionAfterDateRange() {
-        // Arrange
-        final LocalDate startDate = LocalDate.of(2023, 1, 1);
-        final LocalDate endDate = LocalDate.of(2023, 12, 31);
-        final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
+  @Test
+  void testActionAfterDateRange() {
+    // Arrange
+    final LocalDate startDate = LocalDate.of(2023, 1, 1);
+    final LocalDate endDate = LocalDate.of(2023, 12, 31);
+    final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final TemporalAction<?> action = mockTemporalAction(
-            LocalDateTime.of(2024, 1, 1, 0, 0),
-            LocalDateTime.of(2024, 1, 2, 12, 0)
-        );
+    final TemporalAction<?> action = mockTemporalAction(
+      LocalDateTime.of(2024, 1, 1, 0, 0),
+      LocalDateTime.of(2024, 1, 2, 12, 0)
+    );
 
-        // Act & Assert
-        assertThat(betweenDates.test(action)).isFalse();
-    }
+    // Act & Assert
+    assertThat(betweenDates.test(action)).isFalse();
+  }
 
-    @Test
-    void testActionStartAndEndDatesWithinRange() {
-        // Arrange
-        final LocalDate startDate = LocalDate.of(2023, 1, 1);
-        final LocalDate endDate = LocalDate.of(2023, 12, 31);
-        final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
+  @Test
+  void testActionStartAndEndDatesWithinRange() {
+    // Arrange
+    final LocalDate startDate = LocalDate.of(2023, 1, 1);
+    final LocalDate endDate = LocalDate.of(2023, 12, 31);
+    final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final TemporalAction<?> action = mockTemporalAction(
-            LocalDateTime.of(2023, 6, 1, 0, 0),
-            LocalDateTime.of(2023, 6, 30, 23, 59)
-        );
+    final TemporalAction<?> action = mockTemporalAction(
+      LocalDateTime.of(2023, 6, 1, 0, 0),
+      LocalDateTime.of(2023, 6, 30, 23, 59)
+    );
 
-        // Act & Assert
-        assertThat(betweenDates.test(action)).isTrue();
-    }
+    // Act & Assert
+    assertThat(betweenDates.test(action)).isTrue();
+  }
 
-    @Test
-    void testActionStartAndEndSpanningDateRange() {
-        // Arrange
-        final LocalDate startDate = LocalDate.of(2023, 1, 1);
-        final LocalDate endDate = LocalDate.of(2023, 12, 31);
-        final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
+  @Test
+  void testActionStartAndEndSpanningDateRange() {
+    // Arrange
+    final LocalDate startDate = LocalDate.of(2023, 1, 1);
+    final LocalDate endDate = LocalDate.of(2023, 12, 31);
+    final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
 
-        final TemporalAction<?> action = mockTemporalAction(
-            LocalDateTime.of(2022, 12, 31, 12, 0),
-            LocalDateTime.of(2024, 1, 1, 12, 0)
-        );
+    final TemporalAction<?> action = mockTemporalAction(
+      LocalDateTime.of(2022, 12, 31, 12, 0),
+      LocalDateTime.of(2024, 1, 1, 12, 0)
+    );
 
-        // Act & Assert
-        assertThat(betweenDates.test(action)).isTrue();
-    }
+    // Act & Assert
+    assertThat(betweenDates.test(action)).isTrue();
+  }
 
-    @Test
-    void testActionEndingExactlyAtRangeStartDoesNotMatch() {
-        final BetweenDates betweenDates = new BetweenDates(
-            LocalDate.of(2023, 1, 1),
-            LocalDate.of(2023, 12, 31)
-        );
+  @Test
+  void testActionEndingExactlyAtRangeStartDoesNotMatch() {
+    final BetweenDates betweenDates = new BetweenDates(
+      LocalDate.of(2023, 1, 1),
+      LocalDate.of(2023, 12, 31)
+    );
 
-        final TemporalAction<?> action = mockTemporalAction(
-            LocalDateTime.of(2022, 12, 31, 23, 0),
-            LocalDateTime.of(2023, 1, 1, 0, 0)
-        );
+    final TemporalAction<?> action = mockTemporalAction(
+      LocalDateTime.of(2022, 12, 31, 23, 0),
+      LocalDateTime.of(2023, 1, 1, 0, 0)
+    );
 
-        assertThat(betweenDates.test(action)).isFalse();
-    }
+    assertThat(betweenDates.test(action)).isFalse();
+  }
 
-    @Test
-    void testActionStartingExactlyAtDayAfterRangeEndDoesNotMatch() {
-        final BetweenDates betweenDates = new BetweenDates(
-            LocalDate.of(2023, 1, 1),
-            LocalDate.of(2023, 12, 31)
-        );
+  @Test
+  void testActionStartingExactlyAtDayAfterRangeEndDoesNotMatch() {
+    final BetweenDates betweenDates = new BetweenDates(
+      LocalDate.of(2023, 1, 1),
+      LocalDate.of(2023, 12, 31)
+    );
 
-        final TemporalAction<?> action = mockTemporalAction(
-            LocalDateTime.of(2024, 1, 1, 0, 0),
-            LocalDateTime.of(2024, 1, 1, 1, 0)
-        );
+    final TemporalAction<?> action = mockTemporalAction(
+      LocalDateTime.of(2024, 1, 1, 0, 0),
+      LocalDateTime.of(2024, 1, 1, 1, 0)
+    );
 
-        assertThat(betweenDates.test(action)).isFalse();
-    }
+    assertThat(betweenDates.test(action)).isFalse();
+  }
 
-    @Test
-    void testZeroDurationActionInsideRangeMatches() {
-        final BetweenDates betweenDates = new BetweenDates(
-            LocalDate.of(2023, 1, 1),
-            LocalDate.of(2023, 12, 31)
-        );
+  @Test
+  void testZeroDurationActionInsideRangeMatches() {
+    final BetweenDates betweenDates = new BetweenDates(
+      LocalDate.of(2023, 1, 1),
+      LocalDate.of(2023, 12, 31)
+    );
 
-        final TemporalAction<?> action = mockTemporalAction(
-            LocalDateTime.of(2023, 6, 1, 12, 0),
-            LocalDateTime.of(2023, 6, 1, 12, 0)
-        );
+    final TemporalAction<?> action = mockTemporalAction(
+      LocalDateTime.of(2023, 6, 1, 12, 0),
+      LocalDateTime.of(2023, 6, 1, 12, 0)
+    );
 
-        assertThat(betweenDates.test(action)).isTrue();
-    }
+    assertThat(betweenDates.test(action)).isTrue();
+  }
 
-    @Test
-    void testZeroDurationActionOutsideRangeDoesNotMatch() {
-        final BetweenDates betweenDates = new BetweenDates(
-            LocalDate.of(2023, 1, 1),
-            LocalDate.of(2023, 12, 31)
-        );
+  @Test
+  void testZeroDurationActionOutsideRangeDoesNotMatch() {
+    final BetweenDates betweenDates = new BetweenDates(
+      LocalDate.of(2023, 1, 1),
+      LocalDate.of(2023, 12, 31)
+    );
 
-        final TemporalAction<?> action = mockTemporalAction(
-            LocalDateTime.of(2024, 1, 1, 12, 0),
-            LocalDateTime.of(2024, 1, 1, 12, 0)
-        );
+    final TemporalAction<?> action = mockTemporalAction(
+      LocalDateTime.of(2024, 1, 1, 12, 0),
+      LocalDateTime.of(2024, 1, 1, 12, 0)
+    );
 
-        assertThat(betweenDates.test(action)).isFalse();
-    }
+    assertThat(betweenDates.test(action)).isFalse();
+  }
 
-    private static TemporalAction<?> mockTemporalAction(
-        final LocalDateTime startDateTime,
-        final LocalDateTime endDateTime
-    ) {
-        final TemporalAction<?> action = Mockito.mock(TemporalAction.class);
-        Mockito.when(action.getInterval()).thenReturn(
-            Interval.of(startDateTime.toInstant(UTC), endDateTime.toInstant(UTC))
-        );
-        return action;
-    }
+  private static TemporalAction<?> mockTemporalAction(
+    final LocalDateTime startDateTime,
+    final LocalDateTime endDateTime
+  ) {
+    final TemporalAction<?> action = Mockito.mock(TemporalAction.class);
+    Mockito.when(action.getInterval()).thenReturn(
+      Interval.of(startDateTime.toInstant(UTC), endDateTime.toInstant(UTC))
+    );
+    return action;
+  }
 }

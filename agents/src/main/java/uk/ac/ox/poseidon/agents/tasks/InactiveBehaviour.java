@@ -24,25 +24,24 @@ package uk.ac.ox.poseidon.agents.tasks;
 
 /** A {@link Behaviour} for agents with no behavior tree at all; stepping it is an error. */
 public enum InactiveBehaviour implements Behaviour {
+  /** The single instance of this enum. */
+  INACTIVE_BEHAVIOUR;
 
-    /** The single instance of this enum. */
-    INACTIVE_BEHAVIOUR;
+  /** @return always {@code false} */
+  @Override
+  public boolean isActive() {
+    return false;
+  }
 
-    /** @return always {@code false} */
-    @Override
-    public boolean isActive() {
-        return false;
-    }
+  /** @return always {@code false} */
+  @Override
+  public boolean isRunning() {
+    return false;
+  }
 
-    /** @return always {@code false} */
-    @Override
-    public boolean isRunning() {
-        return false;
-    }
-
-    /** @throws IllegalStateException always */
-    @Override
-    public void step() {
-        throw new IllegalStateException("Cannot step an inactive behaviour");
-    }
+  /** @throws IllegalStateException always */
+  @Override
+  public void step() {
+    throw new IllegalStateException("Cannot step an inactive behaviour");
+  }
 }

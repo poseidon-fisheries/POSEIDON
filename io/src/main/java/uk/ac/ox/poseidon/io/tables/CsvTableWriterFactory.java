@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import java.nio.file.Path;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,9 +33,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.nio.file.Path;
-import java.util.function.Supplier;
-
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link CsvTableWriter}, built via
  * {@link Factories#csvTableWriter(Factory, Factory, boolean, boolean)}.
@@ -42,21 +41,23 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CsvTableWriterFactory<S extends Scope>
-    extends RelativeScopeFactory<S, CsvTableWriter> {
+public class CsvTableWriterFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  CsvTableWriter
+> {
 
-    private Factory<? super S, ? extends Supplier<Table>> tableSupplier;
-    private Factory<? super S, ? extends Path> path;
-    private boolean append;
-    private boolean clearAfterWriting;
+  private Factory<? super S, ? extends Supplier<Table>> tableSupplier;
+  private Factory<? super S, ? extends Path> path;
+  private boolean append;
+  private boolean clearAfterWriting;
 
-    @Override
-    protected CsvTableWriter newInstance(final S scope) {
-        return new CsvTableWriter(
-            tableSupplier.get(scope),
-            path.get(scope),
-            append,
-            clearAfterWriting
-        );
-    }
+  @Override
+  protected CsvTableWriter newInstance(final S scope) {
+    return new CsvTableWriter(
+      tableSupplier.get(scope),
+      path.get(scope),
+      append,
+      clearAfterWriting
+    );
+  }
 }

@@ -22,87 +22,102 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import ucar.ma2.Array;
-import ucar.nc2.Dimension;
-import ucar.nc2.Variable;
-
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
+import ucar.ma2.Array;
+import ucar.nc2.Dimension;
+import ucar.nc2.Variable;
 
 /**
  * Reads a NetCDF file holding a stack of {@code (time, latitude, longitude)} rasters, one per
  * data variable.
  */
-public final class TimeIndexedNetCdfGridReader extends AbstractNetCdfGridReader {
+public final class TimeIndexedNetCdfGridReader
+  extends AbstractNetCdfGridReader
+{
 
-    private static final LocalDateTime EPOCH_DATE_TIME = LocalDateTime.of(1970, 1, 1, 0, 0);
-    private static final long SECONDS_PER_DAY = 86_400L;
+  private static final LocalDateTime EPOCH_DATE_TIME = LocalDateTime.of(
+    1970,
+    1,
+    1,
+    0,
+    0
+  );
+  private static final long SECONDS_PER_DAY = 86_400L;
 
-    private final String timeDimensionName;
+  private final String timeDimensionName;
 
-    /**
-     * @param ncFile                 the NetCDF file to open
-     * @param timeDimensionName      the name of the time dimension/coordinate variable
-     * @param latitudeDimensionName  the name of the latitude dimension/coordinate variable
-     * @param longitudeDimensionName the name of the longitude dimension/coordinate variable
-     */
-    public TimeIndexedNetCdfGridReader(
-        final Path ncFile,
-        final String timeDimensionName,
-        final String latitudeDimensionName,
-        final String longitudeDimensionName
-    ) {
-        super(ncFile, latitudeDimensionName, longitudeDimensionName);
-        this.timeDimensionName = timeDimensionName;
-    }
+  /**
+   * @param ncFile                 the NetCDF file to open
+   * @param timeDimensionName      the name of the time dimension/coordinate variable
+   * @param latitudeDimensionName  the name of the latitude dimension/coordinate variable
+   * @param longitudeDimensionName the name of the longitude dimension/coordinate variable
+   */
+  public TimeIndexedNetCdfGridReader(
+    final Path ncFile,
+    final String timeDimensionName,
+    final String latitudeDimensionName,
+    final String longitudeDimensionName
+  ) {
+    super(ncFile, latitudeDimensionName, longitudeDimensionName);
+    this.timeDimensionName = timeDimensionName;
+  }
 
-    /**
-     * Names of the data variables shaped exactly {@code (time, latitude, longitude)}, excluding
-     * the coordinate variables and any grid-mapping variable (e.g. {@code crs}).
-     */
-    public List<String> getDataVariableNames() {
-        return netcdfFile
-            .getVariables()
-            .stream()
-            .filter(this::isTimeLatitudeLongitudeVariable)
-            .map(Variable::getFullName)
-            .toList();
-    }
+  /**
+   * Names of the data variables shaped exactly {@code (time, latitude, longitude)}, excluding
+   * the coordinate variables and any grid-mapping variable (e.g. {@code crs}).
+   */
+  public List<String> getDataVariableNames() {
+    return netcdfFile
+      .getVariables()
+      .stream()
+      .filter(this::isTimeLatitudeLongitudeVariable)
+      .map(Variable::getFullName)
+      .toList();
+  }
 
-    private boolean isTimeLatitudeLongitudeVariable(final Variable variable) {
-        final List<Dimension> dimensions = variable.getDimensions();
-        return dimensions.size() == 3
-            && timeDimensionName.equals(dimensions.get(0).getShortName())
-            && latitudeDimensionName.equals(dimensions.get(1).getShortName())
-            && longitudeDimensionName.equals(dimensions.get(2).getShortName());
-    }
+  private boolean isTimeLatitudeLongitudeVariable(final Variable variable) {
+    final List<Dimension> dimensions = variable.getDimensions();
+    return (
+      dimensions.size() == 3 &&
+      timeDimensionName.equals(dimensions.get(0).getShortName()) &&
+      latitudeDimensionName.equals(dimensions.get(1).getShortName()) &&
+      longitudeDimensionName.equals(dimensions.get(2).getShortName())
+    );
+  }
 
-    /**
-     * {@code time} variable values (CF "days since 1970-01-01", not necessarily whole days), in
-     * file order, converted to the nearest second — {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}
-     * itself only resolves elapsed time to whole seconds, so rounding here loses nothing usable
-     * downstream while still preserving any sub-day precision the source data actually carries.
-     */
-    public List<LocalDateTime> getDateTimes() {
-        final Array array = readVariable(timeDimensionName);
-        return IntStream
-            .range(0, (int) array.getSize())
-            .mapToObj(i -> EPOCH_DATE_TIME.plusSeconds(Math.round(array.getDouble(i) * SECONDS_PER_DAY)))
-            .toList();
-    }
+  /**
+   * {@code time} variable values (CF "days since 1970-01-01", not necessarily whole days), in
+   * file order, converted to the nearest second — {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}
+   * itself only resolves elapsed time to whole seconds, so rounding here loses nothing usable
+   * downstream while still preserving any sub-day precision the source data actually carries.
+   */
+  public List<LocalDateTime> getDateTimes() {
+    final Array array = readVariable(timeDimensionName);
+    return IntStream.range(0, (int) array.getSize())
+      .mapToObj(i ->
+        EPOCH_DATE_TIME.plusSeconds(
+          Math.round(array.getDouble(i) * SECONDS_PER_DAY)
+        )
+      )
+      .toList();
+  }
 
-    /**
-     * Reads one {@code (latitude, longitude)} slice of the named variable at the given time
-     * index, reoriented to {@code [longitudeIndex][latitudeIndex]}, with {@code _FillValue}
-     * cells converted to {@link Double#NaN}.
-     */
-    public double[][] readSlice(final String variableName, final int timeIndex) {
-        final Variable variable = findVariable(variableName);
-        final int latDim = getLatDimensionSize();
-        final int lonDim = getLonDimensionSize();
-        return readAndReorient(variable, new int[]{timeIndex, 0, 0}, new int[]{1, latDim, lonDim});
-    }
-
+  /**
+   * Reads one {@code (latitude, longitude)} slice of the named variable at the given time
+   * index, reoriented to {@code [longitudeIndex][latitudeIndex]}, with {@code _FillValue}
+   * cells converted to {@link Double#NaN}.
+   */
+  public double[][] readSlice(final String variableName, final int timeIndex) {
+    final Variable variable = findVariable(variableName);
+    final int latDim = getLatDimensionSize();
+    final int lonDim = getLonDimensionSize();
+    return readAndReorient(
+      variable,
+      new int[] { timeIndex, 0, 0 },
+      new int[] { 1, latDim, lonDim }
+    );
+  }
 }

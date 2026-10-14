@@ -34,10 +34,10 @@ import uk.ac.ox.poseidon.core.providers.IntProvider;
 @RequiredArgsConstructor
 public class RandomPoisson implements IntProvider {
 
-    private final Poisson poisson;
+  private final Poisson poisson;
 
-    @Override
-    public int getAsInt() {
-        return poisson.nextInt();
-    }
+  @Override
+  public int getAsInt() {
+    return poisson.nextInt();
+  }
 }

@@ -22,22 +22,28 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
+import java.util.function.Predicate;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.function.Predicate;
 
 /**
  * Holds for a vessel whose most recent trip (the current one if it is on a trip, else the previous
  * one) started on the current calendar date. Never holds for a vessel that has made no trip yet.
  */
 public class VesselHasStartedTripToday implements Predicate<Vessel> {
-    @Override
-    public boolean test(final Vessel vessel) {
-        final Trip mostRecentTrip =
-            vessel.getCurrentTrip() != null ? vessel.getCurrentTrip() : vessel.getPreviousTrip();
-        return mostRecentTrip != null &&
-            mostRecentTrip.getStartDateTime().toLocalDate()
-                .equals(vessel.getSchedule().getDateTime().toLocalDate());
-    }
+
+  @Override
+  public boolean test(final Vessel vessel) {
+    final Trip mostRecentTrip =
+      vessel.getCurrentTrip() != null
+        ? vessel.getCurrentTrip()
+        : vessel.getPreviousTrip();
+    return (
+      mostRecentTrip != null &&
+      mostRecentTrip
+        .getStartDateTime()
+        .toLocalDate()
+        .equals(vessel.getSchedule().getDateTime().toLocalDate())
+    );
+  }
 }

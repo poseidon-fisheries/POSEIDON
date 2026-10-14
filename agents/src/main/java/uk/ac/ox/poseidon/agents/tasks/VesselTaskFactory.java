@@ -38,16 +38,22 @@ import uk.ac.ox.poseidon.core.Factory;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class VesselTaskFactory<T extends Task<Vessel>>
-    extends TaskFactory<Vessel, VesselScope, T> {
-    /** @param guard optional task guarding whether the built task runs at all */
-    public VesselTaskFactory(final Factory<? super VesselScope, ? extends Task<Vessel>> guard) {
-        super(guard);
-    }
+public abstract class VesselTaskFactory<T extends Task<Vessel>> extends TaskFactory<
+  Vessel,
+  VesselScope,
+  T
+> {
 
-    /** @return {@link VesselScope}{@code .class} */
-    @Override
-    protected Class<VesselScope> scopeClass() {
-        return VesselScope.class;
-    }
+  /** @param guard optional task guarding whether the built task runs at all */
+  public VesselTaskFactory(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> guard
+  ) {
+    super(guard);
+  }
+
+  /** @return {@link VesselScope}{@code .class} */
+  @Override
+  protected Class<VesselScope> scopeClass() {
+    return VesselScope.class;
+  }
 }

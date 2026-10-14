@@ -22,115 +22,119 @@
 
 package uk.ac.ox.poseidon.biology.buckets;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 class EmptyBucketTest {
 
-    private final Species a = new Species("A", null, "A");
+  private final Species a = new Species("A", null, "A");
 
-    @Test
-    void basicQueriesReturnEmptyOrZero() {
-        final Bucket empty = EmptyBucket.INSTANCE;
-        assertThat(empty.getContent(a)).isEmpty();
-        assertThat(empty.getKg(a)).isEqualTo(0.0);
-        assertThat(empty.isEmpty()).isTrue();
-        assertThat(empty.getTotalBiomass()).isEqualTo(Biomass.ZERO);
-        assertThat(empty.getMap()).isEmpty();
-        assertThat(empty.getSpecies()).isEmpty();
-    }
+  @Test
+  void basicQueriesReturnEmptyOrZero() {
+    final Bucket empty = EmptyBucket.INSTANCE;
+    assertThat(empty.getContent(a)).isEmpty();
+    assertThat(empty.getKg(a)).isEqualTo(0.0);
+    assertThat(empty.isEmpty()).isTrue();
+    assertThat(empty.getTotalBiomass()).isEqualTo(Biomass.ZERO);
+    assertThat(empty.getMap()).isEmpty();
+    assertThat(empty.getSpecies()).isEmpty();
+  }
 
-    @Test
-    void addReturnsOtherBucket() {
-        final Bucket other = Bucket.of(Map.of(a, Biomass.ofKg(10.0)));
-        final Bucket empty = EmptyBucket.INSTANCE;
-        assertThat(empty.add(other)).isSameAs(other);
-    }
+  @Test
+  void addReturnsOtherBucket() {
+    final Bucket other = Bucket.of(Map.of(a, Biomass.ofKg(10.0)));
+    final Bucket empty = EmptyBucket.INSTANCE;
+    assertThat(empty.add(other)).isSameAs(other);
+  }
 
-    @Test
-    void subtractEmptyFromEmptyIsNoOp() {
-        final Bucket empty = EmptyBucket.INSTANCE;
-        assertThat(empty.subtract(Bucket.empty())).isSameAs(empty);
-    }
+  @Test
+  void subtractEmptyFromEmptyIsNoOp() {
+    final Bucket empty = EmptyBucket.INSTANCE;
+    assertThat(empty.subtract(Bucket.empty())).isSameAs(empty);
+  }
 
-    @Test
-    void subtractingNonEmptyFromEmptyThrows() {
-        final Bucket empty = EmptyBucket.INSTANCE;
-        final Bucket other = Bucket.of(Map.of(a, Biomass.ofKg(10.0)));
-        assertThatThrownBy(() -> empty.subtract(other))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+  @Test
+  void subtractingNonEmptyFromEmptyThrows() {
+    final Bucket empty = EmptyBucket.INSTANCE;
+    final Bucket other = Bucket.of(Map.of(a, Biomass.ofKg(10.0)));
+    assertThatThrownBy(() -> empty.subtract(other)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+  }
 
-    @Test
-    void replaceContentCreatesNewBucket() {
-        final Bucket empty = EmptyBucket.INSTANCE;
-        final Bucket replaced = empty.replaceContent(a, Biomass.ofKg(25.0));
-        assertThat(replaced.getContent(a)).hasValueSatisfying(
-            content -> assertThat(content).isEqualTo(Biomass.ofKg(25.0))
-        );
-    }
+  @Test
+  void replaceContentCreatesNewBucket() {
+    final Bucket empty = EmptyBucket.INSTANCE;
+    final Bucket replaced = empty.replaceContent(a, Biomass.ofKg(25.0));
+    assertThat(replaced.getContent(a)).hasValueSatisfying(content ->
+      assertThat(content).isEqualTo(Biomass.ofKg(25.0))
+    );
+  }
 
-    @Test
-    void mapContentIsNoOp() {
-        final Bucket empty = EmptyBucket.INSTANCE;
-        assertThat(empty.mapContent((species, content) -> content.multiply(2.0))).isSameAs(empty);
-    }
+  @Test
+  void mapContentIsNoOp() {
+    final Bucket empty = EmptyBucket.INSTANCE;
+    assertThat(
+      empty.mapContent((species, content) -> content.multiply(2.0))
+    ).isSameAs(empty);
+  }
 
-    @Test
-    void partitionByReturnsEmptyBuckets() {
-        final Bucket empty = EmptyBucket.INSTANCE;
-        final var partitions = empty.partitionBy((species, content) -> true);
-        assertThat(partitions.get(true)).isSameAs(empty);
-        assertThat(partitions.get(false)).isSameAs(empty);
-    }
+  @Test
+  void partitionByReturnsEmptyBuckets() {
+    final Bucket empty = EmptyBucket.INSTANCE;
+    final var partitions = empty.partitionBy((species, content) -> true);
+    assertThat(partitions.get(true)).isSameAs(empty);
+    assertThat(partitions.get(false)).isSameAs(empty);
+  }
 
-    @Test
-    void forEachIsNoOp() {
-        final Bucket empty = EmptyBucket.INSTANCE;
-        final boolean[] visited = {false};
-        empty.forEach((species, content) -> visited[0] = true);
-        assertThat(visited[0]).isFalse();
-    }
+  @Test
+  void forEachIsNoOp() {
+    final Bucket empty = EmptyBucket.INSTANCE;
+    final boolean[] visited = { false };
+    empty.forEach((species, content) -> visited[0] = true);
+    assertThat(visited[0]).isFalse();
+  }
 
-    @Test
-    void forEachBiomassValueIsNoOp() {
-        final Bucket empty = EmptyBucket.INSTANCE;
-        final boolean[] visited = {false};
-        empty.forEachBiomassValue((species, value) -> visited[0] = true);
-        assertThat(visited[0]).isFalse();
-    }
+  @Test
+  void forEachBiomassValueIsNoOp() {
+    final Bucket empty = EmptyBucket.INSTANCE;
+    final boolean[] visited = { false };
+    empty.forEachBiomassValue((species, value) -> visited[0] = true);
+    assertThat(visited[0]).isFalse();
+  }
 
-    @Test
-    void mapBiomassValueReturnsEmpty() {
-        final Bucket empty = EmptyBucket.INSTANCE;
-        final Bucket result = empty.mapBiomassValue((species, value) -> 10.0);
-        assertThat(result).isSameAs(empty);
-    }
+  @Test
+  void mapBiomassValueReturnsEmpty() {
+    final Bucket empty = EmptyBucket.INSTANCE;
+    final Bucket result = empty.mapBiomassValue((species, value) -> 10.0);
+    assertThat(result).isSameAs(empty);
+  }
 
-    @Test
-    void addContentBucketReturnsContentBucket() {
-        final Bucket empty = EmptyBucket.INSTANCE;
-        final Bucket contentBucket = ContentBucket.ofContentMap(Map.of(a, Biomass.ofKg(10.0)));
-        assertThat(empty.add(contentBucket)).isSameAs(contentBucket);
-    }
+  @Test
+  void addContentBucketReturnsContentBucket() {
+    final Bucket empty = EmptyBucket.INSTANCE;
+    final Bucket contentBucket = ContentBucket.ofContentMap(
+      Map.of(a, Biomass.ofKg(10.0))
+    );
+    assertThat(empty.add(contentBucket)).isSameAs(contentBucket);
+  }
 
-    @Test
-    void toBuilderBuildsEmptyBucket() {
-        final Bucket empty = EmptyBucket.INSTANCE;
-        assertThat(empty.toBuilder().build()).isSameAs(empty);
-    }
+  @Test
+  void toBuilderBuildsEmptyBucket() {
+    final Bucket empty = EmptyBucket.INSTANCE;
+    assertThat(empty.toBuilder().build()).isSameAs(empty);
+  }
 
-    @Test
-    void equalsAndHashCodeAreContentBased() {
-        final Bucket empty = EmptyBucket.INSTANCE;
-        assertThat(empty).isEqualTo(EmptyBucket.INSTANCE);
-        assertThat(empty.hashCode()).isEqualTo(empty.getMap().hashCode());
-        assertThat(empty).isNotEqualTo(Bucket.of(Map.of(a, Biomass.ofKg(10.0))));
-    }
+  @Test
+  void equalsAndHashCodeAreContentBased() {
+    final Bucket empty = EmptyBucket.INSTANCE;
+    assertThat(empty).isEqualTo(EmptyBucket.INSTANCE);
+    assertThat(empty.hashCode()).isEqualTo(empty.getMap().hashCode());
+    assertThat(empty).isNotEqualTo(Bucket.of(Map.of(a, Biomass.ofKg(10.0))));
+  }
 }

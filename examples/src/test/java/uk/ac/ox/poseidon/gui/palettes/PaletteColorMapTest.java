@@ -22,38 +22,47 @@
 
 package uk.ac.ox.poseidon.gui.palettes;
 
-import org.junit.jupiter.api.Test;
-
-import java.awt.*;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
 
+import java.awt.*;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
 class PaletteColorMapTest {
 
-    private static final double MAX = 5;
-    private static final double MIN = -MAX;
-    private final PaletteColorMap colorMap = new PaletteColorMap(OLERON, MIN, MAX);
+  private static final double MAX = 5;
+  private static final double MIN = -MAX;
+  private final PaletteColorMap colorMap = new PaletteColorMap(
+    OLERON,
+    MIN,
+    MAX
+  );
 
-    @Test
-    void getColor() {
-        final Color[] palette = colorMap.getColors();
-        Map.of(
-            MIN - 1, 0,
-            MIN, 0,
-            -1E-10, 127,
-            0.0, 128,
-            MAX, palette.length - 1,
-            MAX + 1, palette.length - 1
-        ).forEach((value, index) -> {
-            final Color expected = palette[index];
-            final Color actual = colorMap.getColor(value);
-            assertEquals(
-                expected,
-                actual,
-                () -> "Expected " + value + " but got " + actual + " for value " + value
-            );
-        });
-    }
+  @Test
+  void getColor() {
+    final Color[] palette = colorMap.getColors();
+    Map.of(
+      MIN - 1,
+      0,
+      MIN,
+      0,
+      -1E-10,
+      127,
+      0.0,
+      128,
+      MAX,
+      palette.length - 1,
+      MAX + 1,
+      palette.length - 1
+    ).forEach((value, index) -> {
+      final Color expected = palette[index];
+      final Color actual = colorMap.getColor(value);
+      assertEquals(
+        expected,
+        actual,
+        () -> "Expected " + value + " but got " + actual + " for value " + value
+      );
+    });
+  }
 }

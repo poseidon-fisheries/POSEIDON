@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
  */
 public class HomePortCellFactory extends VesselScopeFactory<HomePortCell> {
 
-    @Override
-    protected HomePortCell newInstance(final VesselScope scope) {
-        return new HomePortCell(scope.getVessel());
-    }
+  @Override
+  protected HomePortCell newInstance(final VesselScope scope) {
+    return new HomePortCell(scope.getVessel());
+  }
 }

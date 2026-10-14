@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
+import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,8 +32,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.Collection;
-
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link InGeometries}, built via
  * {@link Factories#inGeometries(Factory)}.
@@ -41,13 +40,18 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class InGeometriesFactory<S extends Scope>
-    extends RelativeScopeFactory<S, InGeometries> {
+public class InGeometriesFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  InGeometries
+> {
 
-    private Factory<? super S, ? extends Collection<? extends Geometry>> geometries;
+  private Factory<
+    ? super S,
+    ? extends Collection<? extends Geometry>
+  > geometries;
 
-    @Override
-    protected InGeometries newInstance(final S scope) {
-        return new InGeometries(geometries.get(scope));
-    }
+  @Override
+  protected InGeometries newInstance(final S scope) {
+    return new InGeometries(geometries.get(scope));
+  }
 }

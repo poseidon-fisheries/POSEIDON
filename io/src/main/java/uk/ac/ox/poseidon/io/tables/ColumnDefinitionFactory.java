@@ -38,13 +38,15 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ColumnDefinitionFactory extends GlobalScopeFactory<ColumnDefinition> {
+public class ColumnDefinitionFactory
+  extends GlobalScopeFactory<ColumnDefinition>
+{
 
-    private String columnName;
-    private String columnType;
+  private String columnName;
+  private String columnType;
 
-    @Override
-    protected ColumnDefinition newInstance(final Scope scope) {
-        return new ColumnDefinition(columnName, ColumnType.valueOf(columnType));
-    }
+  @Override
+  protected ColumnDefinition newInstance(final Scope scope) {
+    return new ColumnDefinition(columnName, ColumnType.valueOf(columnType));
+  }
 }

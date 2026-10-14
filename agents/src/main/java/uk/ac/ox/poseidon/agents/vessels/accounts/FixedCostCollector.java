@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels.accounts;
 
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.joda.money.Money;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.function.Function;
 
 /**
  * A {@link Steppable} that, on each step, subtracts {@code costExtractor}'s result from the
@@ -38,21 +37,20 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class FixedCostCollector implements Steppable {
 
-    private final Fleet fleet;
-    private final Function<? super Vessel, ? extends Money> costExtractor;
+  private final Fleet fleet;
+  private final Function<? super Vessel, ? extends Money> costExtractor;
 
-    /**
-     * Subtracts {@code costExtractor}'s result from every active vessel's {@link Account}.
-     */
-    @Override
-    public void step(final SimState simState) {
-        fleet
-            .getVessels()
-            .stream()
-            .filter(Vessel::isActive)
-            .forEach(vessel -> {
-                vessel.getAccount().subtract(costExtractor.apply(vessel));
-            });
-    }
-
+  /**
+   * Subtracts {@code costExtractor}'s result from every active vessel's {@link Account}.
+   */
+  @Override
+  public void step(final SimState simState) {
+    fleet
+      .getVessels()
+      .stream()
+      .filter(Vessel::isActive)
+      .forEach(vessel -> {
+        vessel.getAccount().subtract(costExtractor.apply(vessel));
+      });
+  }
 }

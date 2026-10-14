@@ -22,78 +22,78 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BooleanSupplier;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class FirstBooleanFromFactoryTest {
 
-    private static class CallCountingSupplier implements BooleanSupplier {
-        final AtomicInteger callCount = new AtomicInteger(0);
-        private boolean value = true;
+  private static class CallCountingSupplier implements BooleanSupplier {
 
-        @Override
-        public boolean getAsBoolean() {
-            callCount.incrementAndGet();
-            final boolean old = value;
-            value = !value;
-            return old;
+    final AtomicInteger callCount = new AtomicInteger(0);
+    private boolean value = true;
+
+    @Override
+    public boolean getAsBoolean() {
+      callCount.incrementAndGet();
+      final boolean old = value;
+      value = !value;
+      return old;
+    }
+  }
+
+  @Test
+  void returnedProviderIsStable() {
+    final CallCountingSupplier supplier = new CallCountingSupplier();
+    final FirstBooleanFromFactory<Scope> factory =
+      new FirstBooleanFromFactory<>(
+        new GlobalScopeFactory<BooleanSupplier>() {
+          @Override
+          protected BooleanSupplier newInstance(final Scope scope) {
+            return supplier;
+          }
         }
-    }
+      );
 
-    @Test
-    void returnedProviderIsStable() {
-        final CallCountingSupplier supplier = new CallCountingSupplier();
-        final FirstBooleanFromFactory<Scope> factory =
-            new FirstBooleanFromFactory<>(
-                new GlobalScopeFactory<BooleanSupplier>() {
-                    @Override
-                    protected BooleanSupplier newInstance(final Scope scope) {
-                        return supplier;
-                    }
-                }
-            );
+    final BooleanProvider provider = factory.get(Scope.GLOBAL_SCOPE);
+    assertThat(provider.getAsBoolean()).isTrue();
+    assertThat(provider.getAsBoolean()).isTrue();
+    assertThat(provider.getAsBoolean()).isTrue();
+  }
 
-        final BooleanProvider provider = factory.get(Scope.GLOBAL_SCOPE);
-        assertThat(provider.getAsBoolean()).isTrue();
-        assertThat(provider.getAsBoolean()).isTrue();
-        assertThat(provider.getAsBoolean()).isTrue();
-    }
+  @Test
+  void delegateSupplierCalledOnlyOnce() {
+    final CallCountingSupplier supplier = new CallCountingSupplier();
+    final FirstBooleanFromFactory<Scope> factory =
+      new FirstBooleanFromFactory<>(
+        new GlobalScopeFactory<BooleanSupplier>() {
+          @Override
+          protected BooleanSupplier newInstance(final Scope scope) {
+            return supplier;
+          }
+        }
+      );
 
-    @Test
-    void delegateSupplierCalledOnlyOnce() {
-        final CallCountingSupplier supplier = new CallCountingSupplier();
-        final FirstBooleanFromFactory<Scope> factory =
-            new FirstBooleanFromFactory<>(
-                new GlobalScopeFactory<BooleanSupplier>() {
-                    @Override
-                    protected BooleanSupplier newInstance(final Scope scope) {
-                        return supplier;
-                    }
-                }
-            );
+    factory.get(Scope.GLOBAL_SCOPE);
+    assertThat(supplier.callCount).hasValue(1);
+  }
 
-        factory.get(Scope.GLOBAL_SCOPE);
-        assertThat(supplier.callCount).hasValue(1);
-    }
+  @Test
+  void returnsConstantBooleanProvider() {
+    final FirstBooleanFromFactory<Scope> factory =
+      new FirstBooleanFromFactory<>(
+        new GlobalScopeFactory<BooleanSupplier>() {
+          @Override
+          protected BooleanSupplier newInstance(final Scope scope) {
+            return () -> false;
+          }
+        }
+      );
 
-    @Test
-    void returnsConstantBooleanProvider() {
-        final FirstBooleanFromFactory<Scope> factory =
-            new FirstBooleanFromFactory<>(
-                new GlobalScopeFactory<BooleanSupplier>() {
-                    @Override
-                    protected BooleanSupplier newInstance(final Scope scope) {
-                        return () -> false;
-                    }
-                }
-            );
-
-        assertThat(factory.get(Scope.GLOBAL_SCOPE).getAsBoolean()).isFalse();
-    }
+    assertThat(factory.get(Scope.GLOBAL_SCOPE).getAsBoolean()).isFalse();
+  }
 }

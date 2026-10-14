@@ -22,6 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -40,167 +47,162 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 class VesselCreatorTest {
 
-    @Test
-    void appliesExtraFactoriesAfterCoreFactories() {
-        final Simulation simulation = mock(Simulation.class);
-        when(simulation.getTemporalSchedule()).thenReturn(mock(TemporalSchedule.class));
+  @Test
+  void appliesExtraFactoriesAfterCoreFactories() {
+    final Simulation simulation = mock(Simulation.class);
+    when(simulation.getTemporalSchedule()).thenReturn(
+      mock(TemporalSchedule.class)
+    );
 
-        final VesselField vesselField = mock(VesselField.class);
-        final PortGrid portGrid = mock(PortGrid.class);
-        final MarketGrid marketGrid = mock(MarketGrid.class);
-        final Account account = mock(Account.class);
-        final Hold hold = mock(Hold.class);
-        final Gear gear = mock(Gear.class);
-        final Engine engine = mock(Engine.class);
-        final Behaviour behaviour = mock(Behaviour.class);
-        final EventManager eventManager = mock(EventManager.class);
-        final Port port = mock(Port.class);
-        when(portGrid.getLocation(port)).thenReturn(new Int2D(1, 2));
+    final VesselField vesselField = mock(VesselField.class);
+    final PortGrid portGrid = mock(PortGrid.class);
+    final MarketGrid marketGrid = mock(MarketGrid.class);
+    final Account account = mock(Account.class);
+    final Hold hold = mock(Hold.class);
+    final Gear gear = mock(Gear.class);
+    final Engine engine = mock(Engine.class);
+    final Behaviour behaviour = mock(Behaviour.class);
+    final EventManager eventManager = mock(EventManager.class);
+    final Port port = mock(Port.class);
+    when(portGrid.getLocation(port)).thenReturn(new Int2D(1, 2));
 
-        final AtomicInteger id = new AtomicInteger();
-        final AtomicInteger extraFactoryCalls = new AtomicInteger();
-        final Factory<VesselScope, Object> extraFactory = scope -> {
-            final Vessel vessel = scope.getVessel();
-            assertThat(vessel.getAccount()).isSameAs(account);
-            assertThat(vessel.getHold()).isSameAs(hold);
-            assertThat(vessel.getGear()).isSameAs(gear);
-            assertThat(vessel.getEngine()).isSameAs(engine);
-            assertThat(vessel.getBehaviour()).isSameAs(behaviour);
-            assertThat(vessel.getName()).isEqualTo("Vessel " + vessel.getId());
-            assertThat(vessel.getHomePort()).isSameAs(port);
-            extraFactoryCalls.incrementAndGet();
-            return new Object();
-        };
+    final AtomicInteger id = new AtomicInteger();
+    final AtomicInteger extraFactoryCalls = new AtomicInteger();
+    final Factory<VesselScope, Object> extraFactory = scope -> {
+      final Vessel vessel = scope.getVessel();
+      assertThat(vessel.getAccount()).isSameAs(account);
+      assertThat(vessel.getHold()).isSameAs(hold);
+      assertThat(vessel.getGear()).isSameAs(gear);
+      assertThat(vessel.getEngine()).isSameAs(engine);
+      assertThat(vessel.getBehaviour()).isSameAs(behaviour);
+      assertThat(vessel.getName()).isEqualTo("Vessel " + vessel.getId());
+      assertThat(vessel.getHomePort()).isSameAs(port);
+      extraFactoryCalls.incrementAndGet();
+      return new Object();
+    };
 
-        final VesselCreator creator =
-            new VesselCreator(
-                eventManager,
-                vesselField,
-                portGrid,
-                marketGrid,
-                () -> Integer.toString(id.incrementAndGet()),
-                scope -> "Vessel " + scope.getVessel().getId(),
-                scope -> account,
-                scope -> port,
-                scope -> hold,
-                scope -> gear,
-                scope -> engine,
-                scope -> behaviour,
-                List.of(extraFactory),
-                2
-            );
+    final VesselCreator creator = new VesselCreator(
+      eventManager,
+      vesselField,
+      portGrid,
+      marketGrid,
+      () -> Integer.toString(id.incrementAndGet()),
+      scope -> "Vessel " + scope.getVessel().getId(),
+      scope -> account,
+      scope -> port,
+      scope -> hold,
+      scope -> gear,
+      scope -> engine,
+      scope -> behaviour,
+      List.of(extraFactory),
+      2
+    );
 
-        creator.step(simulation);
+    creator.step(simulation);
 
-        assertThat(extraFactoryCalls).hasValue(2);
-    }
+    assertThat(extraFactoryCalls).hasValue(2);
+  }
 
-    @Test
-    void setsHomePortBeforeResolvingBehaviour() {
-        final Simulation simulation = mock(Simulation.class);
-        when(simulation.getTemporalSchedule()).thenReturn(mock(TemporalSchedule.class));
+  @Test
+  void setsHomePortBeforeResolvingBehaviour() {
+    final Simulation simulation = mock(Simulation.class);
+    when(simulation.getTemporalSchedule()).thenReturn(
+      mock(TemporalSchedule.class)
+    );
 
-        final VesselField vesselField = mock(VesselField.class);
-        final PortGrid portGrid = mock(PortGrid.class);
-        final MarketGrid marketGrid = mock(MarketGrid.class);
-        final Account account = mock(Account.class);
-        final Hold hold = mock(Hold.class);
-        final Gear gear = mock(Gear.class);
-        final Engine engine = mock(Engine.class);
-        final Behaviour behaviour = mock(Behaviour.class);
-        final Port port = mock(Port.class);
-        when(portGrid.getLocation(port)).thenReturn(new Int2D(1, 2));
+    final VesselField vesselField = mock(VesselField.class);
+    final PortGrid portGrid = mock(PortGrid.class);
+    final MarketGrid marketGrid = mock(MarketGrid.class);
+    final Account account = mock(Account.class);
+    final Hold hold = mock(Hold.class);
+    final Gear gear = mock(Gear.class);
+    final Engine engine = mock(Engine.class);
+    final Behaviour behaviour = mock(Behaviour.class);
+    final Port port = mock(Port.class);
+    when(portGrid.getLocation(port)).thenReturn(new Int2D(1, 2));
 
-        final AtomicInteger behaviourFactoryCalls = new AtomicInteger();
-        final Factory<VesselScope, Behaviour> behaviourFactory = scope -> {
-            assertThat(scope.getVessel().getHomePort()).isSameAs(port);
-            behaviourFactoryCalls.incrementAndGet();
-            return behaviour;
-        };
+    final AtomicInteger behaviourFactoryCalls = new AtomicInteger();
+    final Factory<VesselScope, Behaviour> behaviourFactory = scope -> {
+      assertThat(scope.getVessel().getHomePort()).isSameAs(port);
+      behaviourFactoryCalls.incrementAndGet();
+      return behaviour;
+    };
 
-        final VesselCreator creator =
-            new VesselCreator(
-                mock(EventManager.class),
-                vesselField,
-                portGrid,
-                marketGrid,
-                () -> "1",
-                scope -> "Vessel " + scope.getVessel().getId(),
-                scope -> account,
-                scope -> port,
-                scope -> hold,
-                scope -> gear,
-                scope -> engine,
-                behaviourFactory,
-                List.of(),
-                1
-            );
+    final VesselCreator creator = new VesselCreator(
+      mock(EventManager.class),
+      vesselField,
+      portGrid,
+      marketGrid,
+      () -> "1",
+      scope -> "Vessel " + scope.getVessel().getId(),
+      scope -> account,
+      scope -> port,
+      scope -> hold,
+      scope -> gear,
+      scope -> engine,
+      behaviourFactory,
+      List.of(),
+      1
+    );
 
-        creator.step(simulation);
+    creator.step(simulation);
 
-        assertThat(behaviourFactoryCalls).hasValue(1);
-    }
+    assertThat(behaviourFactoryCalls).hasValue(1);
+  }
 
-    @Test
-    void createsVesselsWithSeparateLocalEventManagers() {
-        final Simulation simulation = mock(Simulation.class);
-        when(simulation.getTemporalSchedule()).thenReturn(mock(TemporalSchedule.class));
+  @Test
+  void createsVesselsWithSeparateLocalEventManagers() {
+    final Simulation simulation = mock(Simulation.class);
+    when(simulation.getTemporalSchedule()).thenReturn(
+      mock(TemporalSchedule.class)
+    );
 
-        final VesselField vesselField = mock(VesselField.class);
-        final PortGrid portGrid = mock(PortGrid.class);
-        final MarketGrid marketGrid = mock(MarketGrid.class);
-        final Account account = mock(Account.class);
-        final Hold hold = mock(Hold.class);
-        final Gear gear = mock(Gear.class);
-        final Engine engine = mock(Engine.class);
-        final Behaviour behaviour = mock(Behaviour.class);
-        final Port port = mock(Port.class);
-        when(portGrid.getLocation(port)).thenReturn(new Int2D(1, 2));
+    final VesselField vesselField = mock(VesselField.class);
+    final PortGrid portGrid = mock(PortGrid.class);
+    final MarketGrid marketGrid = mock(MarketGrid.class);
+    final Account account = mock(Account.class);
+    final Hold hold = mock(Hold.class);
+    final Gear gear = mock(Gear.class);
+    final Engine engine = mock(Engine.class);
+    final Behaviour behaviour = mock(Behaviour.class);
+    final Port port = mock(Port.class);
+    when(portGrid.getLocation(port)).thenReturn(new Int2D(1, 2));
 
-        final AtomicInteger id = new AtomicInteger();
-        final List<Vessel> vessels = new ArrayList<>();
-        final VesselCreator creator =
-            new VesselCreator(
-                new SimpleEventManager(),
-                vesselField,
-                portGrid,
-                marketGrid,
-                () -> Integer.toString(id.incrementAndGet()),
-                scope -> "Vessel " + scope.getVessel().getId(),
-                scope -> account,
-                scope -> port,
-                scope -> hold,
-                scope -> gear,
-                scope -> engine,
-                scope -> behaviour,
-                List.of(scope -> {
-                    vessels.add(scope.getVessel());
-                    return new Object();
-                }),
-                2
-            );
+    final AtomicInteger id = new AtomicInteger();
+    final List<Vessel> vessels = new ArrayList<>();
+    final VesselCreator creator = new VesselCreator(
+      new SimpleEventManager(),
+      vesselField,
+      portGrid,
+      marketGrid,
+      () -> Integer.toString(id.incrementAndGet()),
+      scope -> "Vessel " + scope.getVessel().getId(),
+      scope -> account,
+      scope -> port,
+      scope -> hold,
+      scope -> gear,
+      scope -> engine,
+      scope -> behaviour,
+      List.of(scope -> {
+        vessels.add(scope.getVessel());
+        return new Object();
+      }),
+      2
+    );
 
-        creator.step(simulation);
-        final List<String> receivedEvents = new ArrayList<>();
-        vessels
-            .getFirst()
-            .getEventManager()
-            .addListener(new SimpleListener<>(String.class, receivedEvents::add));
+    creator.step(simulation);
+    final List<String> receivedEvents = new ArrayList<>();
+    vessels
+      .getFirst()
+      .getEventManager()
+      .addListener(new SimpleListener<>(String.class, receivedEvents::add));
 
-        vessels.getLast().getEventManager().broadcast("second");
-        assertThat(receivedEvents).isEmpty();
+    vessels.getLast().getEventManager().broadcast("second");
+    assertThat(receivedEvents).isEmpty();
 
-        vessels.getFirst().getEventManager().broadcast("first");
-        assertThat(receivedEvents).containsExactly("first");
-    }
+    vessels.getFirst().getEventManager().broadcast("first");
+    assertThat(receivedEvents).containsExactly("first");
+  }
 }

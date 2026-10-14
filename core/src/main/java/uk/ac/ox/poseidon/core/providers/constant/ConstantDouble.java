@@ -32,10 +32,10 @@ import uk.ac.ox.poseidon.core.providers.DoubleProvider;
 @RequiredArgsConstructor
 public class ConstantDouble implements DoubleProvider {
 
-    private final double value;
+  private final double value;
 
-    @Override
-    public double getAsDouble() {
-        return value;
-    }
+  @Override
+  public double getAsDouble() {
+    return value;
+  }
 }

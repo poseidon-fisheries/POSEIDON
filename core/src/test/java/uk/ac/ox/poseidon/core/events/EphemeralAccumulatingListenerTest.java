@@ -22,109 +22,125 @@
 
 package uk.ac.ox.poseidon.core.events;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.function.BiFunction;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import java.util.function.BiFunction;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 class EphemeralAccumulatingListenerTest {
 
-    private EventManager eventManager;
+  private EventManager eventManager;
 
-    @BeforeEach
-    void setUp() {
-        eventManager = mock(EventManager.class);
-    }
+  @BeforeEach
+  void setUp() {
+    eventManager = mock(EventManager.class);
+  }
 
-    @Test
-    void testBasicAccumulation() {
-        // Define an accumulator that adds integers
-        final BiFunction<Integer, Integer, Integer> accumulator = Integer::sum;
+  @Test
+  void testBasicAccumulation() {
+    // Define an accumulator that adds integers
+    final BiFunction<Integer, Integer, Integer> accumulator = Integer::sum;
 
-        // Initialize the listener with an initial value of 0
-        final EphemeralAccumulatingListener<Integer, Integer> listener =
-            new EphemeralAccumulatingListener<>(Integer.class, eventManager, 0, accumulator);
+    // Initialize the listener with an initial value of 0
+    final EphemeralAccumulatingListener<Integer, Integer> listener =
+      new EphemeralAccumulatingListener<>(
+        Integer.class,
+        eventManager,
+        0,
+        accumulator
+      );
 
-        // Simulate events being received
-        listener.receive(5);
-        listener.receive(10);
+    // Simulate events being received
+    listener.receive(5);
+    listener.receive(10);
 
-        // Retrieve the accumulated value
-        assertEquals(15, listener.get());
-    }
+    // Retrieve the accumulated value
+    assertEquals(15, listener.get());
+  }
 
-    @Test
-    void testAutoUnsubscriptionOnGet() {
-        // Define an accumulator that concatenates strings
-        final BiFunction<String, String, String> accumulator = String::concat;
+  @Test
+  void testAutoUnsubscriptionOnGet() {
+    // Define an accumulator that concatenates strings
+    final BiFunction<String, String, String> accumulator = String::concat;
 
-        // Initialize the listener with an initial value
-        final EphemeralAccumulatingListener<String, String> listener =
-            new EphemeralAccumulatingListener<>(String.class, eventManager, "", accumulator);
+    // Initialize the listener with an initial value
+    final EphemeralAccumulatingListener<String, String> listener =
+      new EphemeralAccumulatingListener<>(
+        String.class,
+        eventManager,
+        "",
+        accumulator
+      );
 
-        // Call get to retrieve the accumulated value, triggering unsubscription
-        listener.get();
+    // Call get to retrieve the accumulated value, triggering unsubscription
+    listener.get();
 
-        // Verify that removeListener was called once on eventManager
-        verify(eventManager, times(1)).removeListener(listener);
-    }
+    // Verify that removeListener was called once on eventManager
+    verify(eventManager, times(1)).removeListener(listener);
+  }
 
-    @Test
-    void testSingleRetrievalReturnsSameValue() {
-        // Define an accumulator that multiplies integers
-        final BiFunction<Integer, Integer, Integer> accumulator = (a, b) -> a * b;
+  @Test
+  void testSingleRetrievalReturnsSameValue() {
+    // Define an accumulator that multiplies integers
+    final BiFunction<Integer, Integer, Integer> accumulator = (a, b) -> a * b;
 
-        // Initialize the listener with an initial value of 2
-        final EphemeralAccumulatingListener<Integer, Integer> listener =
-            new EphemeralAccumulatingListener<>(Integer.class, eventManager, 2, accumulator);
+    // Initialize the listener with an initial value of 2
+    final EphemeralAccumulatingListener<Integer, Integer> listener =
+      new EphemeralAccumulatingListener<>(
+        Integer.class,
+        eventManager,
+        2,
+        accumulator
+      );
 
-        // Simulate events being received
-        listener.receive(3);
-        listener.receive(4);
+    // Simulate events being received
+    listener.receive(3);
+    listener.receive(4);
 
-        // Retrieve the accumulated value multiple times
-        assertEquals(24, listener.get());
-        assertEquals(24, listener.get());
+    // Retrieve the accumulated value multiple times
+    assertEquals(24, listener.get());
+    assertEquals(24, listener.get());
 
-        // Verify that removeListener was only called once
-        verify(eventManager, times(1)).removeListener(listener);
-    }
+    // Verify that removeListener was only called once
+    verify(eventManager, times(1)).removeListener(listener);
+  }
 
-    @Test
-    void testNullSafetyInConstructor() {
-        // Verify that passing null to any constructor argument throws NullPointerException
-        assertThrows(
-            NullPointerException.class,
-            () -> new EphemeralAccumulatingListener<>(Integer.class, null, 0, Integer::sum)
-        );
-        assertThrows(
-            NullPointerException.class,
-            () -> new EphemeralAccumulatingListener<>(null, eventManager, 0, Integer::sum)
-        );
-        assertThrows(
-            NullPointerException.class,
-            () -> new EphemeralAccumulatingListener<>(Integer.class, eventManager, 0, null)
-        );
-    }
+  @Test
+  void testNullSafetyInConstructor() {
+    // Verify that passing null to any constructor argument throws NullPointerException
+    assertThrows(NullPointerException.class, () ->
+      new EphemeralAccumulatingListener<>(Integer.class, null, 0, Integer::sum)
+    );
+    assertThrows(NullPointerException.class, () ->
+      new EphemeralAccumulatingListener<>(null, eventManager, 0, Integer::sum)
+    );
+    assertThrows(NullPointerException.class, () ->
+      new EphemeralAccumulatingListener<>(Integer.class, eventManager, 0, null)
+    );
+  }
 
-    @Test
-    void testInitialValueIsUsedCorrectly() {
-        // Define an accumulator that adds integers
-        final BiFunction<Integer, Integer, Integer> accumulator = Integer::sum;
+  @Test
+  void testInitialValueIsUsedCorrectly() {
+    // Define an accumulator that adds integers
+    final BiFunction<Integer, Integer, Integer> accumulator = Integer::sum;
 
-        // Initialize the listener with an initial value of 100
-        final EphemeralAccumulatingListener<Integer, Integer> listener =
-            new EphemeralAccumulatingListener<>(Integer.class, eventManager, 100, accumulator);
+    // Initialize the listener with an initial value of 100
+    final EphemeralAccumulatingListener<Integer, Integer> listener =
+      new EphemeralAccumulatingListener<>(
+        Integer.class,
+        eventManager,
+        100,
+        accumulator
+      );
 
-        // Simulate events being received
-        listener.receive(10);
-        listener.receive(20);
+    // Simulate events being received
+    listener.receive(10);
+    listener.receive(20);
 
-        // Retrieve the accumulated value
-        assertEquals(130, listener.get());
-    }
+    // Retrieve the accumulated value
+    assertEquals(130, listener.get());
+  }
 }

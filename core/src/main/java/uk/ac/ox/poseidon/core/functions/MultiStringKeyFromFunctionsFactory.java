@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
+import java.util.List;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +31,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link MultiStringKeyFromFunctions}, built via
@@ -41,15 +40,20 @@ import java.util.function.Function;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MultiStringKeyFromFunctionsFactory<S extends Scope, T>
-    extends RelativeScopeFactory<S, MultiStringKeyFromFunctions<T>> {
+public class MultiStringKeyFromFunctionsFactory<
+  S extends Scope,
+  T
+> extends RelativeScopeFactory<S, MultiStringKeyFromFunctions<T>> {
 
-    private List<Factory<? super S, ? extends Function<? super T, ?>>> functions;
+  private List<Factory<? super S, ? extends Function<? super T, ?>>> functions;
 
-    @Override
-    protected MultiStringKeyFromFunctions<T> newInstance(final S scope) {
-        return new MultiStringKeyFromFunctions<>(
-            functions.stream().map(f -> f.get(scope)).toList()
-        );
-    }
+  @Override
+  protected MultiStringKeyFromFunctions<T> newInstance(final S scope) {
+    return new MultiStringKeyFromFunctions<>(
+      functions
+        .stream()
+        .map(f -> f.get(scope))
+        .toList()
+    );
+  }
 }

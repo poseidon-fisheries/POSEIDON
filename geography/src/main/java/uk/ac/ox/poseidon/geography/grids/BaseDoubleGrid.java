@@ -31,108 +31,98 @@ import uk.ac.ox.poseidon.geography.Envelope;
  * (always defensively copied at construction, so later mutation of a source {@code DoubleGrid2D}
  * doesn't affect this grid).
  */
-public class BaseDoubleGrid extends AbstractGrid<DoubleGrid2D>
-    implements DoubleGrid {
+public class BaseDoubleGrid
+  extends AbstractGrid<DoubleGrid2D>
+  implements DoubleGrid
+{
 
-    /** @param modelGrid the grid this is defined over; every cell starts at {@code 0.0} */
-    public BaseDoubleGrid(final ModelGrid modelGrid) {
-        this(modelGrid, 0.0);
-    }
+  /** @param modelGrid the grid this is defined over; every cell starts at {@code 0.0} */
+  public BaseDoubleGrid(final ModelGrid modelGrid) {
+    this(modelGrid, 0.0);
+  }
 
-    /**
-     * @param modelGrid    the grid this is defined over
-     * @param initialValue the value every cell starts at
-     */
-    public BaseDoubleGrid(
-        final ModelGrid modelGrid,
-        final double initialValue
-    ) {
-        this(
-            modelGrid,
-            new DoubleGrid2D(modelGrid.getGridWidth(), modelGrid.getGridHeight(), initialValue)
-        );
-    }
+  /**
+   * @param modelGrid    the grid this is defined over
+   * @param initialValue the value every cell starts at
+   */
+  public BaseDoubleGrid(final ModelGrid modelGrid, final double initialValue) {
+    this(
+      modelGrid,
+      new DoubleGrid2D(
+        modelGrid.getGridWidth(),
+        modelGrid.getGridHeight(),
+        initialValue
+      )
+    );
+  }
 
-    /**
-     * @param values the values, indexed {@code [x][y]}; also determines the grid size. The
-     *               underlying {@link ModelGrid} is a plain cell grid with an envelope matching
-     *               the array's dimensions, with no geographic meaning.
-     */
-    public BaseDoubleGrid(
-        final double[][] values
-    ) {
-        this(new DoubleGrid2D(values));
-    }
+  /**
+   * @param values the values, indexed {@code [x][y]}; also determines the grid size. The
+   *               underlying {@link ModelGrid} is a plain cell grid with an envelope matching
+   *               the array's dimensions, with no geographic meaning.
+   */
+  public BaseDoubleGrid(final double[][] values) {
+    this(new DoubleGrid2D(values));
+  }
 
-    /**
-     * @param grid2D the values to copy. The underlying {@link ModelGrid} is a plain cell grid
-     *               with an envelope matching {@code grid2D}'s dimensions, with no geographic
-     *               meaning.
-     */
-    public BaseDoubleGrid(final DoubleGrid2D grid2D) {
-        this(
-            ModelGrid.create(
-                grid2D.width,
-                grid2D.height,
-                new Envelope(
-                    0, grid2D.width,
-                    0, grid2D.height
-                )
-            ),
-            grid2D
-        );
-    }
+  /**
+   * @param grid2D the values to copy. The underlying {@link ModelGrid} is a plain cell grid
+   *               with an envelope matching {@code grid2D}'s dimensions, with no geographic
+   *               meaning.
+   */
+  public BaseDoubleGrid(final DoubleGrid2D grid2D) {
+    this(
+      ModelGrid.create(
+        grid2D.width,
+        grid2D.height,
+        new Envelope(0, grid2D.width, 0, grid2D.height)
+      ),
+      grid2D
+    );
+  }
 
-    /**
-     * @param modelGrid the grid this is defined over
-     * @param values    the values, indexed {@code [x][y]}
-     */
-    public BaseDoubleGrid(
-        final ModelGrid modelGrid,
-        final double[][] values
-    ) {
-        this(modelGrid, new DoubleGrid2D(values));
-    }
+  /**
+   * @param modelGrid the grid this is defined over
+   * @param values    the values, indexed {@code [x][y]}
+   */
+  public BaseDoubleGrid(final ModelGrid modelGrid, final double[][] values) {
+    this(modelGrid, new DoubleGrid2D(values));
+  }
 
-    /**
-     * @param modelGrid the grid this is defined over
-     * @param grid      the values to copy
-     */
-    public BaseDoubleGrid(
-        final ModelGrid modelGrid,
-        final DoubleGrid2D grid
-    ) {
-        super(modelGrid, new DoubleGrid2D(grid));
-    }
+  /**
+   * @param modelGrid the grid this is defined over
+   * @param grid      the values to copy
+   */
+  public BaseDoubleGrid(final ModelGrid modelGrid, final DoubleGrid2D grid) {
+    super(modelGrid, new DoubleGrid2D(grid));
+  }
 
-    @Override
-    public double getMinimumValue() {
-        return field.min();
-    }
+  @Override
+  public double getMinimumValue() {
+    return field.min();
+  }
 
-    @Override
-    public double getMaximumValue() {
-        return field.max();
-    }
+  @Override
+  public double getMaximumValue() {
+    return field.max();
+  }
 
-    @Override
-    public double getValue(
-        final Int2D cell
-    ) {
-        return field.get(cell.x, cell.y);
-    }
+  @Override
+  public double getValue(final Int2D cell) {
+    return field.get(cell.x, cell.y);
+  }
 
-    @Override
-    public double getSum() {
-        double sum = 0.0;
-        final int width = field.width;
-        final int height = field.height;
-        final double[][] a = field.field;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                sum += a[x][y];
-            }
-        }
-        return sum;
+  @Override
+  public double getSum() {
+    double sum = 0.0;
+    final int width = field.width;
+    final int height = field.height;
+    final double[][] a = field.field;
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        sum += a[x][y];
+      }
     }
+    return sum;
+  }
 }

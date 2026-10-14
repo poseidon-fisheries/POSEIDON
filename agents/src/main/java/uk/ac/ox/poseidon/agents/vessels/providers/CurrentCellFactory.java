@@ -31,9 +31,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
  */
 public class CurrentCellFactory extends VesselScopeFactory<CurrentCell> {
 
-    @Override
-    protected CurrentCell newInstance(final VesselScope scope) {
-        return new CurrentCell(scope.getVessel());
-    }
-    
+  @Override
+  protected CurrentCell newInstance(final VesselScope scope) {
+    return new CurrentCell(scope.getVessel());
+  }
 }

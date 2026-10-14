@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 @EqualsAndHashCode(callSuper = true)
 public class EndTripFactory extends VesselTaskFactory<EndTrip> {
 
-    @Override
-    protected EndTrip newTask(final VesselScope scope) {
-        return new EndTrip();
-    }
+  @Override
+  protected EndTrip newTask(final VesselScope scope) {
+    return new EndTrip();
+  }
 }

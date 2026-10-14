@@ -35,9 +35,12 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SetDestinationToOriginFactory extends VesselTaskFactory<SetDestinationToOrigin> {
-    @Override
-    protected SetDestinationToOrigin newTask(final VesselScope scope) {
-        return new SetDestinationToOrigin();
-    }
+public class SetDestinationToOriginFactory
+  extends VesselTaskFactory<SetDestinationToOrigin>
+{
+
+  @Override
+  protected SetDestinationToOrigin newTask(final VesselScope scope) {
+    return new SetDestinationToOrigin();
+  }
 }

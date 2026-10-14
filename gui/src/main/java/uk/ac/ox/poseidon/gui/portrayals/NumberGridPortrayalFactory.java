@@ -52,54 +52,59 @@ import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
  * override {@link #newColorMap} to change how the colour range is chosen.
  */
 public class NumberGridPortrayalFactory
-    extends SimulationScopeFactory<FastValueGridPortrayal2D> {
+  extends SimulationScopeFactory<FastValueGridPortrayal2D>
+{
 
-    private String paletteName;
-    private String valueName;
-    private boolean immutableField;
-    private Factory<? super SimulationScope, ? extends DoubleGrid> grid;
+  private String paletteName;
+  private String valueName;
+  private boolean immutableField;
+  private Factory<? super SimulationScope, ? extends DoubleGrid> grid;
 
-    /** @return a raster portrayal of {@link #grid}, coloured by {@link #newColorMap} */
-    @Override
-    protected FastValueGridPortrayal2D newInstance(final SimulationScope scope) {
-        final var portrayal = new FastValueGridPortrayal2D(valueName, immutableField);
-        portrayal.setPortrayalForAll(new ValuePortrayal2D() {
-            @Override
-            public String getName(final LocationWrapper wrapper) {
-                final ValueGridPortrayal2D portrayal =
-                    (ValueGridPortrayal2D) wrapper.getFieldPortrayal();
-                return portrayal.getValueName() + ": " + wrapper.getObject();
-            }
-        });
-        final DoubleGrid doubleGrid = grid.get(scope);
-        portrayal.setField(toField(doubleGrid));
-        portrayal.setMap(newColorMap(scope));
-        return portrayal;
-    }
-
-    /** @return a {@link PaletteColorMap} for {@link #paletteName}, ranged {@code [0, grid's max value]} */
-    protected ColorMap newColorMap(final SimulationScope scope) {
-        return new PaletteColorMap(
-            paletteName,
-            0,
-            grid.get(scope).getMaximumValue()
-        );
-    }
-
-    private static Grid2D toField(final DoubleGrid grid) {
-        if (grid instanceof final MutableGrid<?> mutableGrid) {
-            final Grid2D field = mutableGrid.getField();
-            if (field instanceof DoubleGrid2D) return field;
+  /** @return a raster portrayal of {@link #grid}, coloured by {@link #newColorMap} */
+  @Override
+  protected FastValueGridPortrayal2D newInstance(final SimulationScope scope) {
+    final var portrayal = new FastValueGridPortrayal2D(
+      valueName,
+      immutableField
+    );
+    portrayal.setPortrayalForAll(
+      new ValuePortrayal2D() {
+        @Override
+        public String getName(final LocationWrapper wrapper) {
+          final ValueGridPortrayal2D portrayal =
+            (ValueGridPortrayal2D) wrapper.getFieldPortrayal();
+          return portrayal.getValueName() + ": " + wrapper.getObject();
         }
-        final int width = grid.getModelGrid().getGridWidth();
-        final int height = grid.getModelGrid().getGridHeight();
-        final DoubleGrid2D copy = new DoubleGrid2D(width, height);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                copy.set(x, y, grid.getValue(new Int2D(x, y)));
-            }
-        }
-        return copy;
-    }
+      }
+    );
+    final DoubleGrid doubleGrid = grid.get(scope);
+    portrayal.setField(toField(doubleGrid));
+    portrayal.setMap(newColorMap(scope));
+    return portrayal;
+  }
 
+  /** @return a {@link PaletteColorMap} for {@link #paletteName}, ranged {@code [0, grid's max value]} */
+  protected ColorMap newColorMap(final SimulationScope scope) {
+    return new PaletteColorMap(
+      paletteName,
+      0,
+      grid.get(scope).getMaximumValue()
+    );
+  }
+
+  private static Grid2D toField(final DoubleGrid grid) {
+    if (grid instanceof final MutableGrid<?> mutableGrid) {
+      final Grid2D field = mutableGrid.getField();
+      if (field instanceof DoubleGrid2D) return field;
+    }
+    final int width = grid.getModelGrid().getGridWidth();
+    final int height = grid.getModelGrid().getGridHeight();
+    final DoubleGrid2D copy = new DoubleGrid2D(width, height);
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        copy.set(x, y, grid.getValue(new Int2D(x, y)));
+      }
+    }
+    return copy;
+  }
 }

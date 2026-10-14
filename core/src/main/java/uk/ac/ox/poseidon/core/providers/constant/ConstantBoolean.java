@@ -32,11 +32,10 @@ import uk.ac.ox.poseidon.core.providers.BooleanProvider;
 @RequiredArgsConstructor
 public class ConstantBoolean implements BooleanProvider {
 
-    private final boolean value;
+  private final boolean value;
 
-    @Override
-    public boolean getAsBoolean() {
-        return value;
-    }
-
+  @Override
+  public boolean getAsBoolean() {
+    return value;
+  }
 }

@@ -35,11 +35,11 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 @RequiredArgsConstructor
 public class IsActiveWaterCell implements CellPredicate {
 
-    @NonNull
-    private final BathymetricGrid bathymetricGrid;
+  @NonNull
+  private final BathymetricGrid bathymetricGrid;
 
-    @Override
-    public boolean test(final Int2D cell) {
-        return bathymetricGrid.isActiveWater(cell);
-    }
+  @Override
+  public boolean test(final Int2D cell) {
+    return bathymetricGrid.isActiveWater(cell);
+  }
 }

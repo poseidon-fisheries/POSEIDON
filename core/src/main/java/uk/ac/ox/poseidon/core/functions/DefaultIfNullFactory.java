@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Function;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link DefaultIfNull}, built via
@@ -40,14 +39,20 @@ import java.util.function.Function;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DefaultIfNullFactory<S extends Scope, T, R>
-    extends RelativeScopeFactory<S, DefaultIfNull<T, R>> {
+public class DefaultIfNullFactory<
+  S extends Scope,
+  T,
+  R
+> extends RelativeScopeFactory<S, DefaultIfNull<T, R>> {
 
-    private Factory<? super S, ? extends Function<? super T, ? extends R>> delegate;
-    private Factory<? super S, ? extends R> defaultValue;
+  private Factory<
+    ? super S,
+    ? extends Function<? super T, ? extends R>
+  > delegate;
+  private Factory<? super S, ? extends R> defaultValue;
 
-    @Override
-    protected DefaultIfNull<T, R> newInstance(final S scope) {
-        return new DefaultIfNull<>(delegate.get(scope), defaultValue.get(scope));
-    }
+  @Override
+  protected DefaultIfNull<T, R> newInstance(final S scope) {
+    return new DefaultIfNull<>(delegate.get(scope), defaultValue.get(scope));
+  }
 }

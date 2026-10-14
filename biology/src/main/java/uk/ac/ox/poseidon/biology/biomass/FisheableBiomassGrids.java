@@ -22,7 +22,17 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+
 import com.google.common.collect.ImmutableMap;
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -34,146 +44,139 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedObjects;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
-
 /**
  * A whole-community {@link FisheableGrid}: one {@link BiomassGrid} per species, indexed by a shared
  * {@link SpeciesIndex} so a {@link Bucket} can be extracted from or released into every species'
  * grid at a cell in one pass, rather than one {@link Fisheable} per species.
  */
 public final class FisheableBiomassGrids
-    implements FisheableGrid, SpeciesIndexedObjects<BiomassGrid, FisheableBiomassGrids> {
+  implements
+    FisheableGrid,
+    SpeciesIndexedObjects<BiomassGrid, FisheableBiomassGrids>
+{
 
-    @Getter
-    private final SpeciesIndex speciesIndex;
-    private final BiomassGrid[] grids;
+  @Getter
+  private final SpeciesIndex speciesIndex;
 
-    /**
-     * @param grids the per-species grids; must not contain two grids for the same species
-     */
-    public FisheableBiomassGrids(final Collection<? extends BiomassGrid> grids) {
-        final ImmutableMap<Species, ? extends BiomassGrid> gridMap =
-            grids.stream().collect(toImmutableMap(
-                BiomassGrid::getSpecies,
-                identity()
-            ));
-        if (gridMap.size() != grids.size()) throw new IllegalArgumentException(
-            "Duplicate species %s found in collection of biomass grids: %s".formatted(
-                grids
-                    .stream()
-                    .map(BiomassGrid::getSpecies)
-                    .collect(groupingBy(Function.identity(), counting()))
-                    .entrySet()
-                    .stream()
-                    .filter(e -> e.getValue() > 1)
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toSet()),
-                grids
-            )
-        );
-        this.speciesIndex = SpeciesIndex.of(gridMap.keySet());
-        this.grids = new BiomassGrid[gridMap.size()];
-        speciesIndex.asMap().forEach((species, index) ->
-            this.grids[index] = gridMap.get(species)
-        );
+  private final BiomassGrid[] grids;
+
+  /**
+   * @param grids the per-species grids; must not contain two grids for the same species
+   */
+  public FisheableBiomassGrids(final Collection<? extends BiomassGrid> grids) {
+    final ImmutableMap<Species, ? extends BiomassGrid> gridMap = grids
+      .stream()
+      .collect(toImmutableMap(BiomassGrid::getSpecies, identity()));
+    if (gridMap.size() != grids.size()) throw new IllegalArgumentException(
+      "Duplicate species %s found in collection of biomass grids: %s".formatted(
+        grids
+          .stream()
+          .map(BiomassGrid::getSpecies)
+          .collect(groupingBy(Function.identity(), counting()))
+          .entrySet()
+          .stream()
+          .filter(e -> e.getValue() > 1)
+          .map(Map.Entry::getKey)
+          .collect(Collectors.toSet()),
+        grids
+      )
+    );
+    this.speciesIndex = SpeciesIndex.of(gridMap.keySet());
+    this.grids = new BiomassGrid[gridMap.size()];
+    speciesIndex
+      .asMap()
+      .forEach((species, index) -> this.grids[index] = gridMap.get(species));
+  }
+
+  private FisheableBiomassGrids(
+    final BiomassGrid[] grids,
+    final SpeciesIndex speciesIndex
+  ) {
+    checkArgument(
+      grids.length == speciesIndex.size(),
+      "Grid array length must match species index size"
+    );
+    this.speciesIndex = speciesIndex;
+    this.grids = grids;
+  }
+
+  @Override
+  public Fisheable getFisheableCell(final Int2D cell) {
+    return new FisheableCell(cell);
+  }
+
+  /**
+   * Extracting and releasing act on every species' grid at this cell at once, indexed by
+   * {@link #speciesIndex}; extracting never over-draws a species' grid, and releasing a species
+   * with no backing grid throws.
+   */
+  @RequiredArgsConstructor
+  class FisheableCell implements Fisheable {
+
+    private final Int2D cell;
+
+    @Override
+    public Bucket extract(final Bucket fishToExtract) {
+      final double[] biomassExtracted = speciesIndex.newDoubleArray();
+      fishToExtract.forEachWithIndex(FisheableBiomassGrids.this, (biomass, i) ->
+        extractBiomass(i, biomass, biomassExtracted)
+      );
+      return Bucket.of(biomassExtracted, speciesIndex);
     }
 
-    private FisheableBiomassGrids(
-        final BiomassGrid[] grids,
-        final SpeciesIndex speciesIndex
+    private void extractBiomass(
+      final int gridIndex,
+      final double biomassToExtract,
+      final double[] biomassExtracted
     ) {
-        checkArgument(
-            grids.length == speciesIndex.size(),
-            "Grid array length must match species index size"
-        );
-        this.speciesIndex = speciesIndex;
-        this.grids = grids;
+      final BiomassGrid grid = grids[gridIndex];
+      final double currentBiomass = grid.getValue(cell);
+      final double extractedBiomass = Math.min(
+        biomassToExtract,
+        currentBiomass
+      );
+      biomassExtracted[gridIndex] = extractedBiomass;
+      grid.setBiomass(cell, currentBiomass - extractedBiomass);
     }
 
     @Override
-    public Fisheable getFisheableCell(final Int2D cell) {
-        return new FisheableCell(cell);
-    }
-
-    /**
-     * Extracting and releasing act on every species' grid at this cell at once, indexed by
-     * {@link #speciesIndex}; extracting never over-draws a species' grid, and releasing a species
-     * with no backing grid throws.
-     */
-    @RequiredArgsConstructor
-    class FisheableCell implements Fisheable {
-
-        private final Int2D cell;
-
-        @Override
-        public Bucket extract(final Bucket fishToExtract) {
-            final double[] biomassExtracted = speciesIndex.newDoubleArray();
-            fishToExtract.forEachWithIndex(
-                FisheableBiomassGrids.this,
-                (biomass, i) -> extractBiomass(i, biomass, biomassExtracted)
-            );
-            return Bucket.of(biomassExtracted, speciesIndex);
-        }
-
-        private void extractBiomass(
-            final int gridIndex,
-            final double biomassToExtract,
-            final double[] biomassExtracted
-        ) {
-            final BiomassGrid grid = grids[gridIndex];
-            final double currentBiomass = grid.getValue(cell);
-            final double extractedBiomass = Math.min(biomassToExtract, currentBiomass);
-            biomassExtracted[gridIndex] = extractedBiomass;
-            grid.setBiomass(cell, currentBiomass - extractedBiomass);
-        }
-
-        @Override
-        public Bucket availableFish() {
-            final double[] biomasses = new double[speciesIndex.size()];
-            for (int i = 0; i < grids.length; i++) {
-                biomasses[i] = grids[i].getValue(cell);
-            }
-            return Bucket.of(biomasses, speciesIndex);
-        }
-
-        @Override
-        public void release(@NonNull final Bucket fishToRelease) {
-            fishToRelease.forEachWithIndex(
-                FisheableBiomassGrids.this,
-                (biomass, i) -> {
-                    final BiomassGrid grid = grids[i];
-                    grid.setBiomass(cell, grid.getValue(cell) + biomass);
-                },
-                (species, biomass) -> {
-                    throw new IllegalArgumentException(
-                        "No grid available to release %s.".formatted(species)
-                    );
-                }
-            );
-        }
+    public Bucket availableFish() {
+      final double[] biomasses = new double[speciesIndex.size()];
+      for (int i = 0; i < grids.length; i++) {
+        biomasses[i] = grids[i].getValue(cell);
+      }
+      return Bucket.of(biomasses, speciesIndex);
     }
 
     @Override
-    public BiomassGrid get(final int index) {
-        return grids[index];
+    public void release(@NonNull final Bucket fishToRelease) {
+      fishToRelease.forEachWithIndex(
+        FisheableBiomassGrids.this,
+        (biomass, i) -> {
+          final BiomassGrid grid = grids[i];
+          grid.setBiomass(cell, grid.getValue(cell) + biomass);
+        },
+        (species, biomass) -> {
+          throw new IllegalArgumentException(
+            "No grid available to release %s.".formatted(species)
+          );
+        }
+      );
     }
+  }
 
-    @Override
-    public FisheableBiomassGrids newInstance(final BiomassGrid[] values) {
-        return new FisheableBiomassGrids(values, speciesIndex);
-    }
+  @Override
+  public BiomassGrid get(final int index) {
+    return grids[index];
+  }
 
-    @Override
-    public BiomassGrid[] newArray(final int size) {
-        return new BiomassGrid[size];
-    }
+  @Override
+  public FisheableBiomassGrids newInstance(final BiomassGrid[] values) {
+    return new FisheableBiomassGrids(values, speciesIndex);
+  }
+
+  @Override
+  public BiomassGrid[] newArray(final int size) {
+    return new BiomassGrid[size];
+  }
 }

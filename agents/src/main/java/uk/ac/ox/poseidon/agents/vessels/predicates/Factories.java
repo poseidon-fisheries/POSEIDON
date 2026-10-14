@@ -22,52 +22,51 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
+import java.util.function.Supplier;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.function.Supplier;
-
 /** Factories for {@code Predicate<Vessel>}s testing a vessel's activity, trips, home port or location. */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link VesselIsActive}
-     * @see VesselIsActive
-     */
-    public static VesselIsActiveFactory vesselIsActive() {
-        return new VesselIsActiveFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link VesselIsActive}
+   * @see VesselIsActive
+   */
+  public static VesselIsActiveFactory vesselIsActive() {
+    return new VesselIsActiveFactory();
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-     * {@link VesselHasStartedTripToday}
-     * @see VesselHasStartedTripToday
-     */
-    public static VesselHasStartedTripTodayFactory vesselHasStartedTripToday() {
-        return new VesselHasStartedTripTodayFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   * {@link VesselHasStartedTripToday}
+   * @see VesselHasStartedTripToday
+   */
+  public static VesselHasStartedTripTodayFactory vesselHasStartedTripToday() {
+    return new VesselHasStartedTripTodayFactory();
+  }
 
-    /**
-     * @return a {@link VesselScope}-relative factory for a {@link VesselHasSameHomePort}
-     * matching the scoped vessel's home port
-     * @see VesselHasSameHomePort
-     */
-    public static VesselHasSameHomePortFactory vesselHasSameHomePort() {
-        return new VesselHasSameHomePortFactory();
-    }
+  /**
+   * @return a {@link VesselScope}-relative factory for a {@link VesselHasSameHomePort}
+   * matching the scoped vessel's home port
+   * @see VesselHasSameHomePort
+   */
+  public static VesselHasSameHomePortFactory vesselHasSameHomePort() {
+    return new VesselHasSameHomePortFactory();
+  }
 
-    /**
-     * @param cellSupplier supplies the cell to test the vessel's location against
-     * @return a {@link VesselScope}-relative factory for a {@link VesselIsAt}
-     * @see VesselIsAt
-     */
-    public static <S extends Scope> VesselIsAtFactory<S> vesselIsAt(
-        final Factory<? super S, ? extends Supplier<Int2D>> cellSupplier
-    ) {
-        return new VesselIsAtFactory<>(cellSupplier);
-    }
+  /**
+   * @param cellSupplier supplies the cell to test the vessel's location against
+   * @return a {@link VesselScope}-relative factory for a {@link VesselIsAt}
+   * @see VesselIsAt
+   */
+  public static <S extends Scope> VesselIsAtFactory<S> vesselIsAt(
+    final Factory<? super S, ? extends Supplier<Int2D>> cellSupplier
+  ) {
+    return new VesselIsAtFactory<>(cellSupplier);
+  }
 }

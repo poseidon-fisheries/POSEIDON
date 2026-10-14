@@ -37,10 +37,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class FishingEventAccumulatorFactory
-    extends SimulationEventListenerFactory<FishingEventAccumulator> {
+  extends SimulationEventListenerFactory<FishingEventAccumulator>
+{
 
-    @Override
-    protected FishingEventAccumulator newListener(final SimulationScope scope) {
-        return new FishingEventAccumulator();
-    }
+  @Override
+  protected FishingEventAccumulator newListener(final SimulationScope scope) {
+    return new FishingEventAccumulator();
+  }
 }

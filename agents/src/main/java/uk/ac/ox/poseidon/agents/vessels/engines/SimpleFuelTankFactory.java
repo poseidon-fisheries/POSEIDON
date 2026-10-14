@@ -22,6 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static tech.units.indriya.unit.Units.LITRE;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Volume;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,12 +34,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Volume;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static tech.units.indriya.unit.Units.LITRE;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link SimpleFuelTank}, built via
@@ -46,22 +45,27 @@ import static tech.units.indriya.unit.Units.LITRE;
 @EqualsAndHashCode(callSuper = true)
 public class SimpleFuelTankFactory extends VesselScopeFactory<FuelTank> {
 
-    private Factory<? super VesselScope, ? extends Quantity<Volume>> capacity;
-    private Factory<? super VesselScope, ? extends Quantity<Volume>> currentFuel;
+  private Factory<? super VesselScope, ? extends Quantity<Volume>> capacity;
+  private Factory<? super VesselScope, ? extends Quantity<Volume>> currentFuel;
 
-    @Override
-    protected FuelTank newInstance(final VesselScope scope) {
-        final double capacityInLitres = checkNotNull(capacity, "capacity must not be null")
-            .get(scope)
-            .to(LITRE)
-            .getValue()
-            .doubleValue();
-        final double currentFuelInLitres = checkNotNull(currentFuel, "currentFuel must not be null")
-            .get(scope)
-            .to(LITRE)
-            .getValue()
-            .doubleValue();
-        return new SimpleFuelTank(capacityInLitres, currentFuelInLitres);
-    }
-
+  @Override
+  protected FuelTank newInstance(final VesselScope scope) {
+    final double capacityInLitres = checkNotNull(
+      capacity,
+      "capacity must not be null"
+    )
+      .get(scope)
+      .to(LITRE)
+      .getValue()
+      .doubleValue();
+    final double currentFuelInLitres = checkNotNull(
+      currentFuel,
+      "currentFuel must not be null"
+    )
+      .get(scope)
+      .to(LITRE)
+      .getValue()
+      .doubleValue();
+    return new SimpleFuelTank(capacityInLitres, currentFuelInLitres);
+  }
 }

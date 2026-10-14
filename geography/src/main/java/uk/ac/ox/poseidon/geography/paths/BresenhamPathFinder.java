@@ -26,11 +26,10 @@ import com.badlogic.gdx.math.Bresenham2;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import com.google.common.collect.ImmutableList;
+import java.util.Optional;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
-
-import java.util.Optional;
 
 /**
  * A {@link GridPathFinder} that only ever tries the direct straight line between two cells
@@ -41,32 +40,36 @@ import java.util.Optional;
  */
 public class BresenhamPathFinder extends AbstractGridPathFinder {
 
-    /**
-     * @param bathymetricGrid the grid to find water/land cells on
-     * @param portGrid        the grid of ports, whose cells also count as navigable
-     */
-    public BresenhamPathFinder(
-        final BathymetricGrid bathymetricGrid,
-        final PortGrid portGrid
-    ) {
-        super(bathymetricGrid, portGrid);
-    }
+  /**
+   * @param bathymetricGrid the grid to find water/land cells on
+   * @param portGrid        the grid of ports, whose cells also count as navigable
+   */
+  public BresenhamPathFinder(
+    final BathymetricGrid bathymetricGrid,
+    final PortGrid portGrid
+  ) {
+    super(bathymetricGrid, portGrid);
+  }
 
-    @Override
-    public Optional<ImmutableList<Int2D>> getPath(
-        final Int2D start,
-        final Int2D end
-    ) {
-        if (!(isNavigable(start) && isNavigable(end))) return Optional.empty();
-        final Array<GridPoint2> linePoints = new Bresenham2().line(start.x, start.y, end.x, end.y);
-        final ImmutableList.Builder<Int2D> pathBuilder = ImmutableList.builder();
-        for (final GridPoint2 point : linePoints) {
-            final Int2D cell = new Int2D(point.x, point.y);
-            // break early if we bump into land
-            if (!isNavigable(cell)) return Optional.empty();
-            pathBuilder.add(cell);
-        }
-        return Optional.of(pathBuilder.build());
+  @Override
+  public Optional<ImmutableList<Int2D>> getPath(
+    final Int2D start,
+    final Int2D end
+  ) {
+    if (!(isNavigable(start) && isNavigable(end))) return Optional.empty();
+    final Array<GridPoint2> linePoints = new Bresenham2().line(
+      start.x,
+      start.y,
+      end.x,
+      end.y
+    );
+    final ImmutableList.Builder<Int2D> pathBuilder = ImmutableList.builder();
+    for (final GridPoint2 point : linePoints) {
+      final Int2D cell = new Int2D(point.x, point.y);
+      // break early if we bump into land
+      if (!isNavigable(cell)) return Optional.empty();
+      pathBuilder.add(cell);
     }
-
+    return Optional.of(pathBuilder.build());
+  }
 }

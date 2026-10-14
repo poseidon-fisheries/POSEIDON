@@ -33,14 +33,19 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
  * uk.ac.ox.poseidon.core.Factory)} in this package.
  */
 public class ImmutablePortGrid extends AbstractPortGrid {
-    /**
-     * @param field           the field of ports to copy
-     * @param bathymetricGrid the bathymetric grid ports are placed relative to
-     */
-    public ImmutablePortGrid(
-        final SparseGrid2D field,
-        @NonNull final BathymetricGrid bathymetricGrid
-    ) {
-        super(bathymetricGrid.getModelGrid(), new SparseGrid2D(field), bathymetricGrid);
-    }
+
+  /**
+   * @param field           the field of ports to copy
+   * @param bathymetricGrid the bathymetric grid ports are placed relative to
+   */
+  public ImmutablePortGrid(
+    final SparseGrid2D field,
+    @NonNull final BathymetricGrid bathymetricGrid
+  ) {
+    super(
+      bathymetricGrid.getModelGrid(),
+      new SparseGrid2D(field),
+      bathymetricGrid
+    );
+  }
 }

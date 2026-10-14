@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
+import java.util.function.Predicate;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
-import java.util.function.Predicate;
 
 /**
  * Factories for predicates over a {@link uk.ac.ox.poseidon.regulations.SpatialAction}'s start/end
@@ -36,29 +35,31 @@ import java.util.function.Predicate;
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-     * {@link ActionCellPredicate}
-     * @see ActionCellPredicateFactory
-     */
-    public static <S extends Scope> ActionCellPredicateFactory<S> actionCellPredicate(
-        final Factory<? super S, ? extends ModelGrid> modelGrid,
-        final Factory<? super S, ? extends Predicate<Int2D>> cellPredicate
-    ) {
-        return new ActionCellPredicateFactory<>(modelGrid, cellPredicate);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   * {@link ActionCellPredicate}
+   * @see ActionCellPredicateFactory
+   */
+  public static <S extends Scope> ActionCellPredicateFactory<S> actionCellPredicate(
+    final Factory<? super S, ? extends ModelGrid> modelGrid,
+    final Factory<? super S, ? extends Predicate<Int2D>> cellPredicate
+  ) {
+    return new ActionCellPredicateFactory<>(modelGrid, cellPredicate);
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-     * {@link ActionCoordinatePredicate}
-     * @see ActionCoordinatePredicateFactory
-     */
-    public static <S extends Scope> ActionCoordinatePredicateFactory<S> actionCoordinatePredicate(
-        final Factory<? super S, ? extends Predicate<Coordinate>> coordinatePredicate
-    ) {
-        return new ActionCoordinatePredicateFactory<>(coordinatePredicate);
-    }
-
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   * {@link ActionCoordinatePredicate}
+   * @see ActionCoordinatePredicateFactory
+   */
+  public static <S extends Scope> ActionCoordinatePredicateFactory<S> actionCoordinatePredicate(
+    final Factory<
+      ? super S,
+      ? extends Predicate<Coordinate>
+    > coordinatePredicate
+  ) {
+    return new ActionCoordinatePredicateFactory<>(coordinatePredicate);
+  }
 }

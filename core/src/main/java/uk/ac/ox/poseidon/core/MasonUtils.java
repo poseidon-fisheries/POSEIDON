@@ -22,26 +22,25 @@
 
 package uk.ac.ox.poseidon.core;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.Lists.newArrayList;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
-import sim.field.continuous.Continuous2D;
-import sim.field.grid.Grid2D;
-import sim.util.Bag;
-import sim.util.Double2D;
-
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static com.google.common.collect.Lists.newArrayList;
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
+import sim.field.continuous.Continuous2D;
+import sim.field.grid.Grid2D;
+import sim.util.Bag;
+import sim.util.Double2D;
 
 /**
  * Static helpers for working with MASON types ({@link Bag}, {@link Continuous2D}, {@link Grid2D})
@@ -51,305 +50,301 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
  */
 public class MasonUtils {
 
-    /**
-     * @param candidates the candidates to choose from, materialized into a list first
-     * @param random     the RNG to draw from
-     * @return a uniformly random element of {@code candidates}
-     */
-    public static <T> T oneOf(
-        final Iterator<T> candidates,
-        final MersenneTwisterFast random
+  /**
+   * @param candidates the candidates to choose from, materialized into a list first
+   * @param random     the RNG to draw from
+   * @return a uniformly random element of {@code candidates}
+   */
+  public static <T> T oneOf(
+    final Iterator<T> candidates,
+    final MersenneTwisterFast random
+  ) {
+    final ArrayList<T> candidatesList = newArrayList(candidates);
+    return candidatesList.get(oneOfIndices(candidatesList, random));
+  }
+
+  /**
+   * @param candidates the candidates to choose from, materialized into a list first
+   * @param random     the RNG to draw from
+   * @return a uniformly random element of {@code candidates}
+   */
+  public static <T> T oneOf(
+    final Iterable<T> candidates,
+    final MersenneTwisterFast random
+  ) {
+    final ArrayList<T> candidatesList = newArrayList(candidates);
+    return candidatesList.get(oneOfIndices(candidatesList, random));
+  }
+
+  /**
+   * @param bag the bag to convert, may be null (treated as empty)
+   * @return the bag's elements as an {@link ImmutableSet}, unchecked-cast to {@code T}
+   */
+  public static <T> ImmutableSet<T> bagToSet(final Bag bag) {
+    return MasonUtils.<T>bagToStream(bag).collect(toImmutableSet());
+  }
+
+  /**
+   * @param bag the bag to convert, may be null (treated as empty)
+   * @return the bag's elements as a {@link Stream}, unchecked-cast to {@code T}
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> Stream<T> bagToStream(final Bag bag) {
+    return Optional.ofNullable(bag)
+      .stream()
+      .flatMap(b -> IntStream.range(0, b.size()).mapToObj(i -> (T) b.get(i)));
+  }
+
+  /**
+   * @param bag   the bag to convert, may be null (treated as empty)
+   * @param clazz the type to cast every element to
+   * @return the bag's elements as a {@link Stream}, cast to {@code T}
+   * @throws ClassCastException if any element isn't an instance of {@code clazz}
+   */
+  public static <T> Stream<T> bagToStream(final Bag bag, final Class<T> clazz) {
+    return Optional.ofNullable(bag)
+      .stream()
+      .flatMap(b ->
+        IntStream.range(0, b.size()).mapToObj(i -> clazz.cast(b.get(i)))
+      );
+  }
+
+  /**
+   * @param candidates the candidates to choose from, must not be null or empty
+   * @param random     the RNG to draw from
+   * @return a uniformly random element of {@code candidates}
+   */
+  public static Object oneOf(
+    final Bag candidates,
+    final MersenneTwisterFast random
+  ) {
+    return candidates.get(oneOfIndices(candidates, random));
+  }
+
+  private static int oneOfIndices(
+    @SuppressWarnings("rawtypes") final Collection candidates,
+    final MersenneTwisterFast random
+  ) {
+    checkNotNull(candidates, "collection of candidates must not be null");
+    checkArgument(
+      !candidates.isEmpty(),
+      "collection of candidates must not be empty"
+    );
+    final int n = candidates.size();
+    return n == 1 ? 0 : random.nextInt(n);
+  }
+
+  /**
+   * @param candidates the candidates to choose from, must not be null or empty
+   * @param random     the RNG to draw from
+   * @return a uniformly random element of {@code candidates}
+   */
+  public static <T> T oneOf(
+    final T[] candidates,
+    final MersenneTwisterFast random
+  ) {
+    return candidates[oneOfIndices(candidates, random)];
+  }
+
+  private static <T> int oneOfIndices(
+    final T[] candidates,
+    final MersenneTwisterFast random
+  ) {
+    validateCandidates(candidates);
+    final int n = candidates.length;
+    return n == 1 ? 0 : random.nextInt(n);
+  }
+
+  private static <T> void validateCandidates(final T[] candidates) {
+    checkNotNull(candidates, "collection of candidates must not be null");
+    checkArgument(candidates.length > 0, "collection of must not be empty");
+  }
+
+  /**
+   * @param candidates the candidates to choose from, must not be null or empty
+   * @param random     the RNG to draw from
+   * @return a uniformly random element of {@code candidates}
+   */
+  public static <T> T oneOf(
+    final List<T> candidates,
+    final MersenneTwisterFast random
+  ) {
+    return candidates.get(oneOfIndices(candidates, random));
+  }
+
+  /**
+   * @param candidates the candidates to choose from, may be null or empty
+   * @param random     the RNG to draw from
+   * @return a uniformly random element of {@code candidates}, or {@link Optional#empty()} if
+   * {@code candidates} is null or empty
+   */
+  public static <T> Optional<T> upToOneOf(
+    final List<T> candidates,
+    final MersenneTwisterFast random
+  ) {
+    return Optional.ofNullable(candidates)
+      .filter(xs -> !xs.isEmpty())
+      .map(xs -> xs.get(oneOfIndices(candidates, random)));
+  }
+
+  /**
+   * Selection-samples up to {@code n} items from {@code candidates}, uniformly without
+   * replacement, preserving their original relative order. Unlike {@link #shuffledStream}, this
+   * requires knowing {@code candidates}' size up front and does not shuffle the selected items
+   * relative to each other.
+   *
+   * @param n          the maximum number of items to return
+   * @param candidates the source list to sample from
+   * @param rng        the RNG to draw from
+   * @return up to {@code n} items from {@code candidates}, in their original relative order
+   */
+  public static <T> ImmutableList<T> upToNOf(
+    final int n,
+    final List<T> candidates,
+    final MersenneTwisterFast rng
+  ) {
+    checkNonNegative(n, "n");
+    if (n == 0 || candidates.isEmpty()) return ImmutableList.of();
+    final int size = candidates.size();
+    if (n >= size) return ImmutableList.copyOf(candidates);
+    final ImmutableList.Builder<T> builder = ImmutableList.builder();
+    int i = 0;
+    int j = 0;
+    while (j < n && i < size) {
+      if (rng.nextInt(size - i) < n - j) {
+        builder.add(candidates.get(i));
+        j += 1;
+      }
+      i += 1;
+    }
+    return builder.build();
+  }
+
+  /**
+   * @param location     the location to check
+   * @param continuous2D the field whose bounds to check against
+   * @return whether {@code location} falls within {@code continuous2D}'s width and height
+   */
+  public static boolean inBounds(
+    final Double2D location,
+    final Continuous2D continuous2D
+  ) {
+    return inBounds(
+      location,
+      continuous2D.getWidth(),
+      continuous2D.getHeight()
+    );
+  }
+
+  private static boolean inBounds(
+    final Double2D location,
+    final double fieldWidth,
+    final double fieldHeight
+  ) {
+    return (
+      location.x >= 0 &&
+      location.x < fieldWidth &&
+      location.y >= 0 &&
+      location.y < fieldHeight
+    );
+  }
+
+  /**
+   * @param location the location to check
+   * @param grid2D   the grid whose bounds to check against
+   * @return whether {@code location} falls within {@code grid2D}'s width and height
+   */
+  public static boolean inBounds(final Double2D location, final Grid2D grid2D) {
+    return inBounds(location, grid2D.getWidth(), grid2D.getHeight());
+  }
+
+  /**
+   * @param candidates the candidates to shuffle; a {@link RandomAccess} {@link List} is shuffled
+   *                   in place, anything else is first copied into an {@link ArrayList}
+   * @param rng        the RNG to draw from
+   * @return a lazily, partially Fisher-Yates-shuffled stream: only as many elements are shuffled
+   * as are actually consumed from the returned stream
+   * @see #shuffledStream(List, MersenneTwisterFast)
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> Stream<T> shuffledStream(
+    final Collection<T> candidates,
+    final MersenneTwisterFast rng
+  ) {
+    if (candidates instanceof RandomAccess && candidates instanceof List) {
+      return shuffledStream((List<T>) candidates, rng);
+    }
+    return shuffledStream(new ArrayList<>(candidates), rng);
+  }
+
+  /**
+   * @param candidates the candidates to shuffle, left unchanged
+   * @param rng        the RNG to draw from
+   * @return a lazily, partially Fisher-Yates-shuffled stream over {@code candidates}: only as
+   * many elements are shuffled as are actually consumed from the returned stream, so early
+   * termination (e.g. {@code findFirst()}) avoids the cost of a full shuffle
+   */
+  public static <T> Stream<T> shuffledStream(
+    final List<T> candidates,
+    final MersenneTwisterFast rng
+  ) {
+    if (candidates.isEmpty()) return Stream.empty();
+    final int[] indices = new int[candidates.size()];
+    Arrays.setAll(indices, i -> i);
+
+    final Spliterator<T> spliterator = new Spliterators.AbstractSpliterator<>(
+      candidates.size(),
+      Spliterator.SIZED | Spliterator.SUBSIZED
     ) {
-        final ArrayList<T> candidatesList = newArrayList(candidates);
-        return candidatesList.get(oneOfIndices(candidatesList, random));
-    }
+      private int remaining = candidates.size();
 
-    /**
-     * @param candidates the candidates to choose from, materialized into a list first
-     * @param random     the RNG to draw from
-     * @return a uniformly random element of {@code candidates}
-     */
-    public static <T> T oneOf(
-        final Iterable<T> candidates,
-        final MersenneTwisterFast random
-    ) {
-        final ArrayList<T> candidatesList = newArrayList(candidates);
-        return candidatesList.get(oneOfIndices(candidatesList, random));
-    }
+      @Override
+      public boolean tryAdvance(final Consumer<? super T> action) {
+        if (remaining == 0) return false;
+        final int i = candidates.size() - remaining;
+        final int j = i + rng.nextInt(remaining);
+        final int tmp = indices[i];
+        indices[i] = indices[j];
+        indices[j] = tmp;
+        action.accept(candidates.get(indices[i]));
+        remaining--;
+        return true;
+      }
+    };
+    return StreamSupport.stream(spliterator, false);
+  }
 
-    /**
-     * @param bag the bag to convert, may be null (treated as empty)
-     * @return the bag's elements as an {@link ImmutableSet}, unchecked-cast to {@code T}
-     */
-    public static <T> ImmutableSet<T> bagToSet(final Bag bag) {
-        return MasonUtils.<T>bagToStream(bag).collect(toImmutableSet());
-    }
-
-    /**
-     * @param bag the bag to convert, may be null (treated as empty)
-     * @return the bag's elements as a {@link Stream}, unchecked-cast to {@code T}
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> Stream<T> bagToStream(final Bag bag) {
-        return Optional
-            .ofNullable(bag)
-            .stream()
-            .flatMap(b -> IntStream
-                .range(0, b.size())
-                .mapToObj(i -> (T) b.get(i))
-            );
-    }
-
-    /**
-     * @param bag   the bag to convert, may be null (treated as empty)
-     * @param clazz the type to cast every element to
-     * @return the bag's elements as a {@link Stream}, cast to {@code T}
-     * @throws ClassCastException if any element isn't an instance of {@code clazz}
-     */
-    public static <T> Stream<T> bagToStream(
-        final Bag bag,
-        final Class<T> clazz
-    ) {
-        return Optional
-            .ofNullable(bag)
-            .stream()
-            .flatMap(b -> IntStream
-                .range(0, b.size())
-                .mapToObj(i -> clazz.cast(b.get(i)))
-            );
-    }
-
-    /**
-     * @param candidates the candidates to choose from, must not be null or empty
-     * @param random     the RNG to draw from
-     * @return a uniformly random element of {@code candidates}
-     */
-    public static Object oneOf(
-        final Bag candidates,
-        final MersenneTwisterFast random
-    ) {
-        return candidates.get(oneOfIndices(candidates, random));
-    }
-
-    private static int oneOfIndices(
-        @SuppressWarnings("rawtypes") final Collection candidates,
-        final MersenneTwisterFast random
-    ) {
-        checkNotNull(candidates, "collection of candidates must not be null");
-        checkArgument(!candidates.isEmpty(), "collection of candidates must not be empty");
-        final int n = candidates.size();
-        return n == 1 ? 0 : random.nextInt(n);
-    }
-
-    /**
-     * @param candidates the candidates to choose from, must not be null or empty
-     * @param random     the RNG to draw from
-     * @return a uniformly random element of {@code candidates}
-     */
-    public static <T> T oneOf(
-        final T[] candidates,
-        final MersenneTwisterFast random
-    ) {
-        return candidates[oneOfIndices(candidates, random)];
-    }
-
-    private static <T> int oneOfIndices(
-        final T[] candidates,
-        final MersenneTwisterFast random
-    ) {
-        validateCandidates(candidates);
-        final int n = candidates.length;
-        return n == 1 ? 0 : random.nextInt(n);
-    }
-
-    private static <T> void validateCandidates(final T[] candidates) {
-        checkNotNull(candidates, "collection of candidates must not be null");
-        checkArgument(candidates.length > 0, "collection of must not be empty");
-    }
-
-    /**
-     * @param candidates the candidates to choose from, must not be null or empty
-     * @param random     the RNG to draw from
-     * @return a uniformly random element of {@code candidates}
-     */
-    public static <T> T oneOf(
-        final List<T> candidates,
-        final MersenneTwisterFast random
-    ) {
-        return candidates.get(oneOfIndices(candidates, random));
-    }
-
-    /**
-     * @param candidates the candidates to choose from, may be null or empty
-     * @param random     the RNG to draw from
-     * @return a uniformly random element of {@code candidates}, or {@link Optional#empty()} if
-     * {@code candidates} is null or empty
-     */
-    public static <T> Optional<T> upToOneOf(
-        final List<T> candidates,
-        final MersenneTwisterFast random
-    ) {
-        return Optional
-            .ofNullable(candidates)
-            .filter(xs -> !xs.isEmpty())
-            .map(xs -> xs.get(oneOfIndices(candidates, random)));
-    }
-
-    /**
-     * Selection-samples up to {@code n} items from {@code candidates}, uniformly without
-     * replacement, preserving their original relative order. Unlike {@link #shuffledStream}, this
-     * requires knowing {@code candidates}' size up front and does not shuffle the selected items
-     * relative to each other.
-     *
-     * @param n          the maximum number of items to return
-     * @param candidates the source list to sample from
-     * @param rng        the RNG to draw from
-     * @return up to {@code n} items from {@code candidates}, in their original relative order
-     */
-    public static <T> ImmutableList<T> upToNOf(
-        final int n,
-        final List<T> candidates,
-        final MersenneTwisterFast rng
-    ) {
-        checkNonNegative(n, "n");
-        if (n == 0 || candidates.isEmpty()) return ImmutableList.of();
-        final int size = candidates.size();
-        if (n >= size) return ImmutableList.copyOf(candidates);
-        final ImmutableList.Builder<T> builder = ImmutableList.builder();
-        int i = 0;
-        int j = 0;
-        while (j < n && i < size) {
-            if (rng.nextInt(size - i) < n - j) {
-                builder.add(candidates.get(i));
-                j += 1;
-            }
-            i += 1;
+  /**
+   * Reservoir-samples up to {@code sampleSize} items from {@code pool} that pass {@code filter},
+   * uniformly without replacement. O(|pool|) time, O(sampleSize) memory.
+   *
+   * @param pool       the source of items, traversed once
+   * @param sampleSize maximum number of items to return
+   * @param filter     predicate that items must satisfy to be eligible
+   * @param rng        random number generator
+   * @param <T>        item type
+   * @return list of up to {@code sampleSize} items, uniformly sampled without replacement
+   */
+  public static <T> List<T> reservoirSample(
+    final Iterable<? extends T> pool,
+    final int sampleSize,
+    final Predicate<? super T> filter,
+    final MersenneTwisterFast rng
+  ) {
+    final List<T> reservoir = new ArrayList<>();
+    int count = 0;
+    for (final T item : pool) {
+      if (!filter.test(item)) continue;
+      if (count < sampleSize) {
+        reservoir.add(item);
+      } else {
+        final int j = rng.nextInt(count + 1);
+        if (j < sampleSize) {
+          reservoir.set(j, item);
         }
-        return builder.build();
+      }
+      count++;
     }
-
-    /**
-     * @param location     the location to check
-     * @param continuous2D the field whose bounds to check against
-     * @return whether {@code location} falls within {@code continuous2D}'s width and height
-     */
-    public static boolean inBounds(
-        final Double2D location,
-        final Continuous2D continuous2D
-    ) {
-        return inBounds(location, continuous2D.getWidth(), continuous2D.getHeight());
-    }
-
-    private static boolean inBounds(
-        final Double2D location,
-        final double fieldWidth,
-        final double fieldHeight
-    ) {
-        return location.x >= 0 &&
-            location.x < fieldWidth &&
-            location.y >= 0 &&
-            location.y < fieldHeight;
-    }
-
-    /**
-     * @param location the location to check
-     * @param grid2D   the grid whose bounds to check against
-     * @return whether {@code location} falls within {@code grid2D}'s width and height
-     */
-    public static boolean inBounds(
-        final Double2D location,
-        final Grid2D grid2D
-    ) {
-        return inBounds(location, grid2D.getWidth(), grid2D.getHeight());
-    }
-
-    /**
-     * @param candidates the candidates to shuffle; a {@link RandomAccess} {@link List} is shuffled
-     *                   in place, anything else is first copied into an {@link ArrayList}
-     * @param rng        the RNG to draw from
-     * @return a lazily, partially Fisher-Yates-shuffled stream: only as many elements are shuffled
-     * as are actually consumed from the returned stream
-     * @see #shuffledStream(List, MersenneTwisterFast)
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> Stream<T> shuffledStream(
-        final Collection<T> candidates,
-        final MersenneTwisterFast rng
-    ) {
-        if (candidates instanceof RandomAccess && candidates instanceof List) {
-            return shuffledStream((List<T>) candidates, rng);
-        }
-        return shuffledStream(new ArrayList<>(candidates), rng);
-    }
-
-    /**
-     * @param candidates the candidates to shuffle, left unchanged
-     * @param rng        the RNG to draw from
-     * @return a lazily, partially Fisher-Yates-shuffled stream over {@code candidates}: only as
-     * many elements are shuffled as are actually consumed from the returned stream, so early
-     * termination (e.g. {@code findFirst()}) avoids the cost of a full shuffle
-     */
-    public static <T> Stream<T> shuffledStream(
-        final List<T> candidates,
-        final MersenneTwisterFast rng
-    ) {
-        if (candidates.isEmpty()) return Stream.empty();
-        final int[] indices = new int[candidates.size()];
-        Arrays.setAll(indices, i -> i);
-
-        final Spliterator<T> spliterator = new Spliterators.AbstractSpliterator<>(
-            candidates.size(),
-            Spliterator.SIZED | Spliterator.SUBSIZED
-        ) {
-            private int remaining = candidates.size();
-
-            @Override
-            public boolean tryAdvance(final Consumer<? super T> action) {
-                if (remaining == 0) return false;
-                final int i = candidates.size() - remaining;
-                final int j = i + rng.nextInt(remaining);
-                final int tmp = indices[i];
-                indices[i] = indices[j];
-                indices[j] = tmp;
-                action.accept(candidates.get(indices[i]));
-                remaining--;
-                return true;
-            }
-        };
-        return StreamSupport.stream(spliterator, false);
-    }
-
-    /**
-     * Reservoir-samples up to {@code sampleSize} items from {@code pool} that pass {@code filter},
-     * uniformly without replacement. O(|pool|) time, O(sampleSize) memory.
-     *
-     * @param pool       the source of items, traversed once
-     * @param sampleSize maximum number of items to return
-     * @param filter     predicate that items must satisfy to be eligible
-     * @param rng        random number generator
-     * @param <T>        item type
-     * @return list of up to {@code sampleSize} items, uniformly sampled without replacement
-     */
-    public static <T> List<T> reservoirSample(
-        final Iterable<? extends T> pool,
-        final int sampleSize,
-        final Predicate<? super T> filter,
-        final MersenneTwisterFast rng
-    ) {
-        final List<T> reservoir = new ArrayList<>();
-        int count = 0;
-        for (final T item : pool) {
-            if (!filter.test(item)) continue;
-            if (count < sampleSize) {
-                reservoir.add(item);
-            } else {
-                final int j = rng.nextInt(count + 1);
-                if (j < sampleSize) {
-                    reservoir.set(j, item);
-                }
-            }
-            count++;
-        }
-        return reservoir;
-    }
+    return reservoir;
+  }
 }

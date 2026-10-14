@@ -37,22 +37,21 @@ import java.util.function.Function;
  */
 public class ComposedFunction<T1, T2, R> implements Function<T1, R> {
 
-    private final Function<? super T1, ? extends R> composedFunction;
+  private final Function<? super T1, ? extends R> composedFunction;
 
-    /**
-     * @param function1 the function applied first, {@code T1 -> T2}
-     * @param function2 the function applied to {@code function1}'s result, {@code T2 -> R}
-     */
-    public ComposedFunction(
-        final Function<? super T1, ? extends T2> function1,
-        final Function<? super T2, ? extends R> function2
-    ) {
-        this.composedFunction = function2.compose(function1);
-    }
+  /**
+   * @param function1 the function applied first, {@code T1 -> T2}
+   * @param function2 the function applied to {@code function1}'s result, {@code T2 -> R}
+   */
+  public ComposedFunction(
+    final Function<? super T1, ? extends T2> function1,
+    final Function<? super T2, ? extends R> function2
+  ) {
+    this.composedFunction = function2.compose(function1);
+  }
 
-    @Override
-    public R apply(final T1 t1) {
-        return composedFunction.apply(t1);
-    }
-
+  @Override
+  public R apply(final T1 t1) {
+    return composedFunction.apply(t1);
+  }
 }

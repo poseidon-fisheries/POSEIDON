@@ -22,126 +22,153 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
 public class ObjectPropertyTest {
 
-    @Test
-    void readsASingleProperty() {
-        assertThat(new ObjectProperty<Outer, String>(Outer.class, "name").apply(new Outer()))
-            .isEqualTo("outer");
+  @Test
+  void readsASingleProperty() {
+    assertThat(
+      new ObjectProperty<Outer, String>(Outer.class, "name").apply(new Outer())
+    ).isEqualTo("outer");
+  }
+
+  @Test
+  void followsANestedPath() {
+    assertThat(
+      new ObjectProperty<Outer, String>(Outer.class, "inner.code").apply(
+        new Outer()
+      )
+    ).isEqualTo("code");
+  }
+
+  @Test
+  void readsABooleanPropertyThroughItsIsGetter() {
+    assertThat(
+      new ObjectProperty<Outer, Boolean>(Outer.class, "active").apply(
+        new Outer()
+      )
+    ).isTrue();
+  }
+
+  @Test
+  void readsAGetterInheritedFromAnInterface() {
+    assertThat(
+      new ObjectProperty<Coded, String>(Coded.class, "code").apply(new Inner())
+    ).isEqualTo("code");
+  }
+
+  @Test
+  void givesNullWhenTheLastPropertyIsNull() {
+    assertThat(
+      new ObjectProperty<Outer, String>(Outer.class, "inner.missingCode").apply(
+        new Outer()
+      )
+    ).isNull();
+  }
+
+  @Test
+  void throwsWhenAPropertyPartWayAlongThePathIsNull() {
+    final ObjectProperty<Outer, String> property = new ObjectProperty<>(
+      Outer.class,
+      "missingInner.code"
+    );
+    assertThatThrownBy(() -> property.apply(new Outer()))
+      .isInstanceOf(NullPointerException.class)
+      .hasMessageContaining("missingInner");
+  }
+
+  @Test
+  void throwsWhenBuiltWithAnUnknownProperty() {
+    assertThatThrownBy(() ->
+      new ObjectProperty<Outer, String>(Outer.class, "inner.colour")
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("colour");
+  }
+
+  @Test
+  void throwsWhenBuiltWithAnInvalidPropertyName() {
+    for (final String path : List.of(
+      "",
+      ".",
+      ".name",
+      "name.",
+      "inner..code",
+      "inner code",
+      "inner-code"
+    )) {
+      assertThatThrownBy(() ->
+        new ObjectProperty<Outer, Object>(Outer.class, path)
+      )
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("Invalid property name")
+        .hasMessageContaining("\"" + path + "\"");
+    }
+  }
+
+  @Test
+  void doesNotTakeAnIsGetterForANonBooleanProperty() {
+    assertThatThrownBy(() ->
+      new ObjectProperty<Outer, String>(Outer.class, "weird")
+    ).isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void passesOnAGetterExceptionUnwrapped() {
+    final ObjectProperty<Outer, String> property = new ObjectProperty<>(
+      Outer.class,
+      "broken"
+    );
+    assertThatThrownBy(() -> property.apply(new Outer())).isExactlyInstanceOf(
+      UnsupportedOperationException.class
+    );
+  }
+
+  public interface Coded {
+    String getCode();
+  }
+
+  public static class Inner implements Coded {
+
+    @Override
+    public String getCode() {
+      return "code";
     }
 
-    @Test
-    void followsANestedPath() {
-        assertThat(new ObjectProperty<Outer, String>(Outer.class, "inner.code").apply(new Outer()))
-            .isEqualTo("code");
+    public String getMissingCode() {
+      return null;
+    }
+  }
+
+  public static class Outer {
+
+    public String getName() {
+      return "outer";
     }
 
-    @Test
-    void readsABooleanPropertyThroughItsIsGetter() {
-        assertThat(new ObjectProperty<Outer, Boolean>(Outer.class, "active").apply(new Outer()))
-            .isTrue();
+    public Inner getInner() {
+      return new Inner();
     }
 
-    @Test
-    void readsAGetterInheritedFromAnInterface() {
-        assertThat(new ObjectProperty<Coded, String>(Coded.class, "code").apply(new Inner()))
-            .isEqualTo("code");
+    public Inner getMissingInner() {
+      return null;
     }
 
-    @Test
-    void givesNullWhenTheLastPropertyIsNull() {
-        assertThat(new ObjectProperty<Outer, String>(Outer.class, "inner.missingCode")
-            .apply(new Outer()))
-            .isNull();
+    public boolean isActive() {
+      return true;
     }
 
-    @Test
-    void throwsWhenAPropertyPartWayAlongThePathIsNull() {
-        final ObjectProperty<Outer, String> property =
-            new ObjectProperty<>(Outer.class, "missingInner.code");
-        assertThatThrownBy(() -> property.apply(new Outer()))
-            .isInstanceOf(NullPointerException.class)
-            .hasMessageContaining("missingInner");
+    public String isWeird() {
+      return "weird";
     }
 
-    @Test
-    void throwsWhenBuiltWithAnUnknownProperty() {
-        assertThatThrownBy(() -> new ObjectProperty<Outer, String>(Outer.class, "inner.colour"))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("colour");
+    public String getBroken() {
+      throw new UnsupportedOperationException();
     }
-
-    @Test
-    void throwsWhenBuiltWithAnInvalidPropertyName() {
-        for (final String path : List.of(
-            "", ".", ".name", "name.", "inner..code", "inner code", "inner-code"
-        )) {
-            assertThatThrownBy(() -> new ObjectProperty<Outer, Object>(Outer.class, path))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid property name")
-                .hasMessageContaining("\"" + path + "\"");
-        }
-    }
-
-    @Test
-    void doesNotTakeAnIsGetterForANonBooleanProperty() {
-        assertThatThrownBy(() -> new ObjectProperty<Outer, String>(Outer.class, "weird"))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void passesOnAGetterExceptionUnwrapped() {
-        final ObjectProperty<Outer, String> property =
-            new ObjectProperty<>(Outer.class, "broken");
-        assertThatThrownBy(() -> property.apply(new Outer()))
-            .isExactlyInstanceOf(UnsupportedOperationException.class);
-    }
-
-    public interface Coded {
-        String getCode();
-    }
-
-    public static class Inner implements Coded {
-        @Override
-        public String getCode() {
-            return "code";
-        }
-
-        public String getMissingCode() {
-            return null;
-        }
-    }
-
-    public static class Outer {
-        public String getName() {
-            return "outer";
-        }
-
-        public Inner getInner() {
-            return new Inner();
-        }
-
-        public Inner getMissingInner() {
-            return null;
-        }
-
-        public boolean isActive() {
-            return true;
-        }
-
-        public String isWeird() {
-            return "weird";
-        }
-
-        public String getBroken() {
-            throw new UnsupportedOperationException();
-        }
-    }
+  }
 }

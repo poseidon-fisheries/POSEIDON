@@ -22,9 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
-import lombok.Value;
-
 import java.time.Duration;
+import lombok.Value;
 
 /**
  * A route a vessel would sail, by its length and how long sailing it takes: what the costs of
@@ -32,8 +31,9 @@ import java.time.Duration;
  */
 @Value
 public class Route {
-    /** The length of the route, in kilometres. */
-    double distanceInKm;
-    /** How long sailing the route takes. */
-    Duration duration;
+
+  /** The length of the route, in kilometres. */
+  double distanceInKm;
+  /** How long sailing the route takes. */
+  Duration duration;
 }

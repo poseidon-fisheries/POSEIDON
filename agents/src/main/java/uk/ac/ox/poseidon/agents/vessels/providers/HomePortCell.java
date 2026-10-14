@@ -31,10 +31,10 @@ import uk.ac.ox.poseidon.core.providers.Provider;
 @RequiredArgsConstructor
 public class HomePortCell implements Provider<Int2D> {
 
-    private final Vessel vessel;
+  private final Vessel vessel;
 
-    @Override
-    public Int2D get() {
-        return vessel.getHomePortLocation();
-    }
+  @Override
+  public Int2D get() {
+    return vessel.getHomePortLocation();
+  }
 }

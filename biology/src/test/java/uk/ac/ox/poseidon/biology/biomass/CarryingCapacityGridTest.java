@@ -22,6 +22,11 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
@@ -30,45 +35,43 @@ import uk.ac.ox.poseidon.geography.grids.BaseDoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFactory;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-
 class CarryingCapacityGridTest {
 
-    private CarryingCapacityGrid grid;
+  private CarryingCapacityGrid grid;
 
-    @BeforeEach
-    void setUp() {
-        final ModelGrid modelGrid =
-            new ModelGridFactory(1.0, -1.5, 1.5, -1.5, 1.5)
-                .get(mock(Scope.class));
-        grid = new CarryingCapacityGrid(
-            new BaseDoubleGrid(
-                modelGrid,
-                new double[][]{
-                    {0, 0, 1},
-                    {0, 0, 1},
-                    {0, 0, 1}
-                }
-            )
-        );
-    }
+  @BeforeEach
+  void setUp() {
+    final ModelGrid modelGrid = new ModelGridFactory(
+      1.0,
+      -1.5,
+      1.5,
+      -1.5,
+      1.5
+    ).get(mock(Scope.class));
+    grid = new CarryingCapacityGrid(
+      new BaseDoubleGrid(modelGrid, new double[][] {
+        { 0, 0, 1 },
+        { 0, 0, 1 },
+        { 0, 0, 1 }
+      })
+    );
+  }
 
-    @Test
-    void getCarryingCapacity() {
-        grid.getModelGrid().getAllCells().forEach(cell ->
-            assertEquals(cell.y == 2 ? 1 : 0, grid.getCarryingCapacity(cell))
-        );
-    }
+  @Test
+  void getCarryingCapacity() {
+    grid
+      .getModelGrid()
+      .getAllCells()
+      .forEach(cell ->
+        assertEquals(cell.y == 2 ? 1 : 0, grid.getCarryingCapacity(cell))
+      );
+  }
 
-    @Test
-    void getHabitableLocations() {
-        assertEquals(
-            Set.of(new Int2D(0, 2), new Int2D(1, 2), new Int2D(2, 2)),
-            new HashSet<>(grid.getHabitableCells())
-        );
-    }
+  @Test
+  void getHabitableLocations() {
+    assertEquals(
+      Set.of(new Int2D(0, 2), new Int2D(1, 2), new Int2D(2, 2)),
+      new HashSet<>(grid.getHabitableCells())
+    );
+  }
 }

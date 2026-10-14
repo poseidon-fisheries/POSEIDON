@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,8 +32,6 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
-
-import java.util.function.Function;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link TimeCost}, built via
@@ -44,11 +43,13 @@ import java.util.function.Function;
 @EqualsAndHashCode(callSuper = true)
 public class TimeCostFactory extends VesselScopeFactory<TimeCost> {
 
-    private Factory<? super VesselScope, ? extends Function<? super Vessel, ? extends Money>>
-        hourlyCost;
+  private Factory<
+    ? super VesselScope,
+    ? extends Function<? super Vessel, ? extends Money>
+  > hourlyCost;
 
-    @Override
-    protected TimeCost newInstance(final VesselScope scope) {
-        return new TimeCost(scope.getVessel(), hourlyCost.get(scope));
-    }
+  @Override
+  protected TimeCost newInstance(final VesselScope scope) {
+    return new TimeCost(scope.getVessel(), hourlyCost.get(scope));
+  }
 }

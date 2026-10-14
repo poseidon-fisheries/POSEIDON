@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import java.io.File;
+import java.nio.file.Path;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,9 +31,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.io.File;
-import java.nio.file.Path;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link ModelGrid} whose width, height, and envelope are
@@ -44,20 +43,21 @@ import java.nio.file.Path;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ModelGridFromGridFileFactory<S extends Scope>
-    extends RelativeScopeFactory<S, ModelGrid> {
+public class ModelGridFromGridFileFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  ModelGrid
+> {
 
-    private Factory<? super S, ? extends Path> gridFilePath;
+  private Factory<? super S, ? extends Path> gridFilePath;
 
-    @Override
-    protected ModelGrid newInstance(final S scope) {
-        final File gridFile = gridFilePath.get(scope).toFile();
-        final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
-        return ModelGrid.create(
-            coverageWrapper.getGridWidth(),
-            coverageWrapper.getGridHeight(),
-            coverageWrapper.makeEnvelope()
-        );
-    }
-
+  @Override
+  protected ModelGrid newInstance(final S scope) {
+    final File gridFile = gridFilePath.get(scope).toFile();
+    final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
+    return ModelGrid.create(
+      coverageWrapper.getGridWidth(),
+      coverageWrapper.getGridHeight(),
+      coverageWrapper.makeEnvelope()
+    );
+  }
 }

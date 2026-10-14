@@ -22,46 +22,45 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
+import java.lang.reflect.Field;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
-import java.lang.reflect.Field;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 /** Shared set-up for the travel task tests: a vessel at {@link #ORIGIN} cruising at 10 km/h. */
 final class TravelTasks {
 
-    static final Int2D ORIGIN = new Int2D(0, 0);
-    static final Int2D DESTINATION = new Int2D(1, 0);
+  static final Int2D ORIGIN = new Int2D(0, 0);
+  static final Int2D DESTINATION = new Int2D(1, 0);
 
-    private TravelTasks() {
-    }
+  private TravelTasks() {}
 
-    static Vessel vesselCruisingAtTenKph() {
-        final Vessel vessel = mock(Vessel.class);
-        final Engine engine = mock(Engine.class);
-        final Trip trip = mock(Trip.class);
-        when(engine.getCruisingSpeedInKph()).thenReturn(10.0);
-        when(trip.getDestination()).thenReturn(DESTINATION);
-        when(vessel.getEngine()).thenReturn(engine);
-        when(vessel.getCell()).thenReturn(ORIGIN);
-        when(vessel.getCurrentTrip()).thenReturn(trip);
-        when(vessel.getSchedule()).thenReturn(mock(TemporalSchedule.class));
-        return vessel;
-    }
+  static Vessel vesselCruisingAtTenKph() {
+    final Vessel vessel = mock(Vessel.class);
+    final Engine engine = mock(Engine.class);
+    final Trip trip = mock(Trip.class);
+    when(engine.getCruisingSpeedInKph()).thenReturn(10.0);
+    when(trip.getDestination()).thenReturn(DESTINATION);
+    when(vessel.getEngine()).thenReturn(engine);
+    when(vessel.getCell()).thenReturn(ORIGIN);
+    when(vessel.getCurrentTrip()).thenReturn(trip);
+    when(vessel.getSchedule()).thenReturn(mock(TemporalSchedule.class));
+    return vessel;
+  }
 
-    static void setTaskObject(final Task<?> task, final Object object) throws Exception {
-        final BehaviorTree<Object> behaviorTree = new BehaviorTree<>();
-        behaviorTree.setObject(object);
-        final Field treeField = Task.class.getDeclaredField("tree");
-        treeField.setAccessible(true);
-        treeField.set(task, behaviorTree);
-    }
+  static void setTaskObject(final Task<?> task, final Object object)
+    throws Exception {
+    final BehaviorTree<Object> behaviorTree = new BehaviorTree<>();
+    behaviorTree.setObject(object);
+    final Field treeField = Task.class.getDeclaredField("tree");
+    treeField.setAccessible(true);
+    treeField.set(task, behaviorTree);
+  }
 }

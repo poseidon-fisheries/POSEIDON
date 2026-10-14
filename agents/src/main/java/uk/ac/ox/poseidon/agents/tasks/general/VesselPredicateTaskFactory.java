@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.tasks.general;
 
+import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,8 +31,6 @@ import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
-
-import java.util.function.Predicate;
 
 /**
  * A {@link VesselTaskFactory} counterpart of {@link AgentPredicateTask}, built via
@@ -42,12 +41,13 @@ import java.util.function.Predicate;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class VesselPredicateTaskFactory
-    extends VesselTaskFactory<AgentPredicateTask<Vessel>> {
+  extends VesselTaskFactory<AgentPredicateTask<Vessel>>
+{
 
-    private Factory<? super VesselScope, ? extends Predicate<Vessel>> predicate;
+  private Factory<? super VesselScope, ? extends Predicate<Vessel>> predicate;
 
-    @Override
-    protected AgentPredicateTask<Vessel> newTask(final VesselScope scope) {
-        return new AgentPredicateTask<>(predicate.get(scope));
-    }
+  @Override
+  protected AgentPredicateTask<Vessel> newTask(final VesselScope scope) {
+    return new AgentPredicateTask<>(predicate.get(scope));
+  }
 }

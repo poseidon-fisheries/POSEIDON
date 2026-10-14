@@ -19,8 +19,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package uk.ac.ox.poseidon.agents.social;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,10 +33,6 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.util.function.Function;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A {@link SimulationEventListenerFactory} for {@link CliqueDynamics}, built via
@@ -44,21 +44,26 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class CliqueDynamicsFactory extends SimulationEventListenerFactory<CliqueDynamics> {
+public class CliqueDynamicsFactory
+  extends SimulationEventListenerFactory<CliqueDynamics>
+{
 
-    private Factory<? super SimulationScope, ? extends SocialNetwork> network;
-    private Factory<? super SimulationScope, ? extends Function<? super Vessel, ?>> groupingKey;
-    private int maximumCliqueSize;
+  private Factory<? super SimulationScope, ? extends SocialNetwork> network;
+  private Factory<
+    ? super SimulationScope,
+    ? extends Function<? super Vessel, ?>
+  > groupingKey;
+  private int maximumCliqueSize;
 
-    @Override
-    protected CliqueDynamics newListener(final SimulationScope scope) {
-        checkNotNull(network, "network must not be null");
-        checkNotNull(groupingKey, "groupingKey must not be null");
-        return new CliqueDynamics(
-            network.get(scope),
-            groupingKey.get(scope),
-            maximumCliqueSize,
-            scope.getSimulation().random
-        );
-    }
+  @Override
+  protected CliqueDynamics newListener(final SimulationScope scope) {
+    checkNotNull(network, "network must not be null");
+    checkNotNull(groupingKey, "groupingKey must not be null");
+    return new CliqueDynamics(
+      network.get(scope),
+      groupingKey.get(scope),
+      maximumCliqueSize,
+      scope.getSimulation().random
+    );
+  }
 }

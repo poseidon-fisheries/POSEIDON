@@ -22,10 +22,10 @@
 
 package uk.ac.ox.poseidon.core.providers.constant;
 
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
+
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 /**
  * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that always return a fixed
@@ -33,98 +33,97 @@ import static uk.ac.ox.poseidon.core.utils.Factories.object;
  */
 public class Factories {
 
-    private Factories() {
-        throw new IllegalStateException("Utility class");
-    }
+  private Factories() {
+    throw new IllegalStateException("Utility class");
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-     * {@link ConstantBoolean} that always returns {@code true}
-     * @see ConstantBoolean
-     */
-    public static ConstantBooleanFactory alwaysTrue() {
-        return new ConstantBooleanFactory(true);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   * {@link ConstantBoolean} that always returns {@code true}
+   * @see ConstantBoolean
+   */
+  public static ConstantBooleanFactory alwaysTrue() {
+    return new ConstantBooleanFactory(true);
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-     * {@link ConstantBoolean} that always returns {@code false}
-     * @see ConstantBoolean
-     */
-    public static ConstantBooleanFactory alwaysFalse() {
-        return new ConstantBooleanFactory(false);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   * {@link ConstantBoolean} that always returns {@code false}
+   * @see ConstantBoolean
+   */
+  public static ConstantBooleanFactory alwaysFalse() {
+    return new ConstantBooleanFactory(false);
+  }
 
-    /**
-     * @param value the value the resulting provider will always return
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
-     * a {@link ConstantDouble} wrapping the given literal value
-     * @see ConstantDouble
-     */
-    public static <S extends Scope> ConstantDoubleFromValueFactory<S> constantDouble(
-        final double value
-    ) {
-        return new ConstantDoubleFromValueFactory<>(value);
-    }
+  /**
+   * @param value the value the resulting provider will always return
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+   * a {@link ConstantDouble} wrapping the given literal value
+   * @see ConstantDouble
+   */
+  public static <S extends Scope> ConstantDoubleFromValueFactory<S> constantDouble(
+    final double value
+  ) {
+    return new ConstantDoubleFromValueFactory<>(value);
+  }
 
-    /**
-     * @param doubleFactory factory for the value the resulting provider will always return
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
-     * a {@link ConstantDouble} wrapping the resolved value
-     * @see ConstantDouble
-     */
-    public static <S extends Scope> ConstantDoubleFactory<S> constantDouble(
-        final Factory<? super S, ? extends Double> doubleFactory
-    ) {
-        return new ConstantDoubleFactory<>(doubleFactory);
-    }
+  /**
+   * @param doubleFactory factory for the value the resulting provider will always return
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+   * a {@link ConstantDouble} wrapping the resolved value
+   * @see ConstantDouble
+   */
+  public static <S extends Scope> ConstantDoubleFactory<S> constantDouble(
+    final Factory<? super S, ? extends Double> doubleFactory
+  ) {
+    return new ConstantDoubleFactory<>(doubleFactory);
+  }
 
-    /**
-     * @param value the value the resulting provider will always return
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
-     * a {@link ConstantInt} wrapping the given literal value
-     * @see ConstantInt
-     */
-    public static <S extends Scope> ConstantIntFromValueFactory<S> constantInt(
-        final int value
-    ) {
-        return new ConstantIntFromValueFactory<>(value);
-    }
+  /**
+   * @param value the value the resulting provider will always return
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+   * a {@link ConstantInt} wrapping the given literal value
+   * @see ConstantInt
+   */
+  public static <S extends Scope> ConstantIntFromValueFactory<S> constantInt(
+    final int value
+  ) {
+    return new ConstantIntFromValueFactory<>(value);
+  }
 
-    /**
-     * @param integerFactory factory for the value the resulting provider will always return
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
-     * a {@link ConstantInt} wrapping the resolved value
-     * @see ConstantInt
-     */
-    public static <S extends Scope> ConstantIntFactory<S> constantInt(
-        final Factory<? super S, ? extends Integer> integerFactory
-    ) {
-        return new ConstantIntFactory<>(integerFactory);
-    }
+  /**
+   * @param integerFactory factory for the value the resulting provider will always return
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+   * a {@link ConstantInt} wrapping the resolved value
+   * @see ConstantInt
+   */
+  public static <S extends Scope> ConstantIntFactory<S> constantInt(
+    final Factory<? super S, ? extends Integer> integerFactory
+  ) {
+    return new ConstantIntFactory<>(integerFactory);
+  }
 
-    /**
-     * @param value the value the resulting provider will always return
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
-     * a {@link Constant} wrapping the given literal value
-     * @see Constant
-     */
-    public static <S extends Scope, T> ConstantFactory<S, T> constant(
-        final T value
-    ) {
-        return new ConstantFactory<>(object(value));
-    }
+  /**
+   * @param value the value the resulting provider will always return
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+   * a {@link Constant} wrapping the given literal value
+   * @see Constant
+   */
+  public static <S extends Scope, T> ConstantFactory<S, T> constant(
+    final T value
+  ) {
+    return new ConstantFactory<>(object(value));
+  }
 
-    /**
-     * @param value factory for the value the resulting provider will always return
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
-     * a {@link Constant} wrapping the resolved value
-     * @see Constant
-     */
-    public static <S extends Scope, T> ConstantFactory<S, T> constant(
-        final Factory<? super S, ? extends T> value
-    ) {
-        return new ConstantFactory<>(value);
-    }
-
+  /**
+   * @param value factory for the value the resulting provider will always return
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+   * a {@link Constant} wrapping the resolved value
+   * @see Constant
+   */
+  public static <S extends Scope, T> ConstantFactory<S, T> constant(
+    final Factory<? super S, ? extends T> value
+  ) {
+    return new ConstantFactory<>(value);
+  }
 }

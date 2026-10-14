@@ -45,89 +45,91 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  */
 public class GridAdaptor implements IndexedGraph<Int2D> {
 
-    private final Interner<Int2D> interner = Interners.newStrongInterner();
-    private final BathymetricGrid bathymetricGrid;
-    private final PortGrid portGrid;
-    private final ModelGrid modelGrid;
-    @Getter
-    private final DistanceCalculator distanceCalculator;
-    private final Cache<Int2D, Array<Connection<Int2D>>> connectionsCache =
-        Caffeine.newBuilder().build();
+  private final Interner<Int2D> interner = Interners.newStrongInterner();
+  private final BathymetricGrid bathymetricGrid;
+  private final PortGrid portGrid;
+  private final ModelGrid modelGrid;
 
-    /**
-     * @param bathymetricGrid    the grid to find water/land cells on
-     * @param portGrid           the grid of ports, whose cells also count as navigable
-     * @param distanceCalculator the distance calculator used to weight connections between cells
-     */
-    public GridAdaptor(
-        final BathymetricGrid bathymetricGrid,
-        final PortGrid portGrid,
-        final DistanceCalculator distanceCalculator
-    ) {
-        this.bathymetricGrid = bathymetricGrid;
-        this.portGrid = portGrid;
-        this.modelGrid = bathymetricGrid.getModelGrid();
-        this.distanceCalculator = distanceCalculator;
-    }
+  @Getter
+  private final DistanceCalculator distanceCalculator;
 
-    private boolean isNavigable(final Int2D cell) {
-        return bathymetricGrid.isWater(cell) || portGrid.anyObjectsAt(cell);
-    }
+  private final Cache<Int2D, Array<Connection<Int2D>>> connectionsCache =
+    Caffeine.newBuilder().build();
 
-    /** @return a unique index for {@code cell}, as required by {@link IndexedGraph} */
-    @Override
-    public int getIndex(final Int2D cell) {
-        return cell.x + cell.y * modelGrid.getGridWidth();
-    }
+  /**
+   * @param bathymetricGrid    the grid to find water/land cells on
+   * @param portGrid           the grid of ports, whose cells also count as navigable
+   * @param distanceCalculator the distance calculator used to weight connections between cells
+   */
+  public GridAdaptor(
+    final BathymetricGrid bathymetricGrid,
+    final PortGrid portGrid,
+    final DistanceCalculator distanceCalculator
+  ) {
+    this.bathymetricGrid = bathymetricGrid;
+    this.portGrid = portGrid;
+    this.modelGrid = bathymetricGrid.getModelGrid();
+    this.distanceCalculator = distanceCalculator;
+  }
 
-    /** @return the total number of cells in the grid */
-    @Override
-    public int getNodeCount() {
-        return modelGrid.getGridHeight() * modelGrid.getGridWidth();
-    }
+  private boolean isNavigable(final Int2D cell) {
+    return bathymetricGrid.isWater(cell) || portGrid.anyObjectsAt(cell);
+  }
 
-    /**
-     * @return {@code cell}'s outgoing connections to its navigable neighbours, weighted by
-     * {@code getDistanceCalculator()}; empty if {@code cell} itself isn't navigable
-     */
-    @Override
-    public Array<Connection<Int2D>> getConnections(final Int2D cell) {
-        return connectionsCache.get(
-            cell,
-            key ->
-                !isNavigable(key) ? new Array<>() : new Array<>(
-                    modelGrid
-                        .getNeighbours(key)
-                        .stream()
-                        .filter(this::isNavigable)
-                        .map(neighbour ->
-                            new WeightedConnection(
-                                intern(key),
-                                intern(neighbour),
-                                (float) distanceCalculator.distanceInKm(key, neighbour)
-                            )
-                        )
-                        .toArray(WeightedConnection[]::new)
+  /** @return a unique index for {@code cell}, as required by {@link IndexedGraph} */
+  @Override
+  public int getIndex(final Int2D cell) {
+    return cell.x + cell.y * modelGrid.getGridWidth();
+  }
+
+  /** @return the total number of cells in the grid */
+  @Override
+  public int getNodeCount() {
+    return modelGrid.getGridHeight() * modelGrid.getGridWidth();
+  }
+
+  /**
+   * @return {@code cell}'s outgoing connections to its navigable neighbours, weighted by
+   * {@code getDistanceCalculator()}; empty if {@code cell} itself isn't navigable
+   */
+  @Override
+  public Array<Connection<Int2D>> getConnections(final Int2D cell) {
+    return connectionsCache.get(cell, key ->
+      !isNavigable(key)
+        ? new Array<>()
+        : new Array<>(
+            modelGrid
+              .getNeighbours(key)
+              .stream()
+              .filter(this::isNavigable)
+              .map(neighbour ->
+                new WeightedConnection(
+                  intern(key),
+                  intern(neighbour),
+                  (float) distanceCalculator.distanceInKm(key, neighbour)
                 )
-        );
-    }
+              )
+              .toArray(WeightedConnection[]::new)
+          )
+    );
+  }
 
-    /**
-     * We need to intern (i.e., map to a canonical instance) all instances of Int2D because the
-     * AStarPathFinder does all its comparisons by reference, not equality
-     *
-     * @param cell any Int2D cell instance
-     * @return the canonical instance for that cell
-     */
-    public Int2D intern(final Int2D cell) {
-        return interner.intern(cell);
-    }
+  /**
+   * We need to intern (i.e., map to a canonical instance) all instances of Int2D because the
+   * AStarPathFinder does all its comparisons by reference, not equality
+   *
+   * @param cell any Int2D cell instance
+   * @return the canonical instance for that cell
+   */
+  public Int2D intern(final Int2D cell) {
+    return interner.intern(cell);
+  }
 
-    @Data
-    private static class WeightedConnection implements Connection<Int2D> {
-        private final Int2D fromNode;
-        private final Int2D toNode;
-        private final float cost;
-    }
+  @Data
+  private static class WeightedConnection implements Connection<Int2D> {
 
+    private final Int2D fromNode;
+    private final Int2D toNode;
+    private final float cost;
+  }
 }

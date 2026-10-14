@@ -22,81 +22,89 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BinaryOperator;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import org.junit.jupiter.api.Test;
 
 class MemoryTest {
 
-    private static final BinaryOperator<Double> SUM = Double::sum;
+  private static final BinaryOperator<Double> SUM = Double::sum;
 
-    private static <O, M> Map<O, M> entries(final Memory<O, M> memory) {
-        final Map<O, M> entries = new HashMap<>();
-        memory.forEach(entries::put);
-        return entries;
-    }
+  private static <O, M> Map<O, M> entries(final Memory<O, M> memory) {
+    final Map<O, M> entries = new HashMap<>();
+    memory.forEach(entries::put);
+    return entries;
+  }
 
-    @Test
-    void emptyMemoryHasNoEntries() {
-        final Memory<String, Double> memory = new Memory<>();
+  @Test
+  void emptyMemoryHasNoEntries() {
+    final Memory<String, Double> memory = new Memory<>();
 
-        assertThat(memory.get("A")).isEmpty();
-        assertThat(entries(memory)).isEmpty();
-    }
+    assertThat(memory.get("A")).isEmpty();
+    assertThat(entries(memory)).isEmpty();
+  }
 
-    @Test
-    void firstObservationIsStoredAsIs() {
-        final Memory<String, Double> memory = new Memory<>();
-        memory.observe("A", 3.0, (recollection, observation) -> {
-            throw new AssertionError("the rule must not be called on a first observation");
-        });
+  @Test
+  void firstObservationIsStoredAsIs() {
+    final Memory<String, Double> memory = new Memory<>();
+    memory.observe("A", 3.0, (recollection, observation) -> {
+      throw new AssertionError(
+        "the rule must not be called on a first observation"
+      );
+    });
 
-        assertThat(memory.get("A")).contains(3.0);
-        assertThat(entries(memory)).containsExactly(Map.entry("A", 3.0));
-    }
+    assertThat(memory.get("A")).contains(3.0);
+    assertThat(entries(memory)).containsExactly(Map.entry("A", 3.0));
+  }
 
-    @Test
-    void laterObservationGoesThroughTheRuleWithRecollectionFirst() {
-        final Memory<String, Double> memory = new Memory<>();
-        memory.observe("A", 3.0, SUM);
-        memory.observe("A", 5.0, (recollection, observation) -> recollection * 10 + observation);
+  @Test
+  void laterObservationGoesThroughTheRuleWithRecollectionFirst() {
+    final Memory<String, Double> memory = new Memory<>();
+    memory.observe("A", 3.0, SUM);
+    memory.observe(
+      "A",
+      5.0,
+      (recollection, observation) -> recollection * 10 + observation
+    );
 
-        assertThat(memory.get("A")).contains(35.0);
-    }
+    assertThat(memory.get("A")).contains(35.0);
+  }
 
-    @Test
-    void optionsAreIndependent() {
-        final Memory<String, Double> memory = new Memory<>();
-        memory.observe("A", 3.0, SUM);
-        memory.observe("B", 5.0, SUM);
-        memory.observe("A", 1.0, SUM);
+  @Test
+  void optionsAreIndependent() {
+    final Memory<String, Double> memory = new Memory<>();
+    memory.observe("A", 3.0, SUM);
+    memory.observe("B", 5.0, SUM);
+    memory.observe("A", 1.0, SUM);
 
-        assertThat(entries(memory)).containsOnly(
-            Map.entry("A", 4.0),
-            Map.entry("B", 5.0)
-        );
-    }
+    assertThat(entries(memory)).containsOnly(
+      Map.entry("A", 4.0),
+      Map.entry("B", 5.0)
+    );
+  }
 
-    @Test
-    void nullObservationIsRejected() {
-        final Memory<String, Double> memory = new Memory<>();
+  @Test
+  void nullObservationIsRejected() {
+    final Memory<String, Double> memory = new Memory<>();
 
-        assertThatNullPointerException().isThrownBy(() -> memory.observe("A", null, SUM));
-        assertThat(entries(memory)).isEmpty();
-    }
+    assertThatNullPointerException().isThrownBy(() ->
+      memory.observe("A", null, SUM)
+    );
+    assertThat(entries(memory)).isEmpty();
+  }
 
-    @Test
-    void ruleReturningNullIsRejectedAndOptionIsNotForgotten() {
-        final Memory<String, Double> memory = new Memory<>();
-        memory.observe("A", 3.0, SUM);
+  @Test
+  void ruleReturningNullIsRejectedAndOptionIsNotForgotten() {
+    final Memory<String, Double> memory = new Memory<>();
+    memory.observe("A", 3.0, SUM);
 
-        assertThatNullPointerException()
-            .isThrownBy(() -> memory.observe("A", 5.0, (recollection, observation) -> null));
-        assertThat(memory.get("A")).contains(3.0);
-    }
+    assertThatNullPointerException().isThrownBy(() ->
+      memory.observe("A", 5.0, (recollection, observation) -> null)
+    );
+    assertThat(memory.get("A")).contains(3.0);
+  }
 }

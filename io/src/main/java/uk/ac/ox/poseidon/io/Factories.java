@@ -22,10 +22,9 @@
 
 package uk.ac.ox.poseidon.io;
 
+import java.nio.file.Path;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.nio.file.Path;
 
 /**
  * Factories for filesystem side-effects performed during a simulation run, such as clearing out
@@ -33,19 +32,19 @@ import java.nio.file.Path;
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @param target         factory for the directory to delete
-     * @param ignoreIfAbsent whether a missing target is silently ignored rather than an error
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DirectoryRemover}
-     * over the resolved target
-     * @see DirectoryRemover
-     */
-    public static <S extends Scope> DirectoryRemoverFactory<S> directoryRemover(
-        final Factory<? super S, ? extends Path> target,
-        final boolean ignoreIfAbsent
-    ) {
-        return new DirectoryRemoverFactory<>(target, ignoreIfAbsent);
-    }
+  /**
+   * @param target         factory for the directory to delete
+   * @param ignoreIfAbsent whether a missing target is silently ignored rather than an error
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DirectoryRemover}
+   * over the resolved target
+   * @see DirectoryRemover
+   */
+  public static <S extends Scope> DirectoryRemoverFactory<S> directoryRemover(
+    final Factory<? super S, ? extends Path> target,
+    final boolean ignoreIfAbsent
+  ) {
+    return new DirectoryRemoverFactory<>(target, ignoreIfAbsent);
+  }
 }

@@ -22,9 +22,9 @@
 
 package uk.ac.ox.poseidon.core.events;
 
-import lombok.Getter;
-
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import lombok.Getter;
 
 /**
  * A {@link Listener} base class that stores the event type given at construction, so subclasses
@@ -34,10 +34,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Getter
 public abstract class AbstractListener<E> implements Listener<E> {
-    private final Class<E> eventClass;
 
-    /** @param eventClass the event type this listener is registered for, must not be null */
-    protected AbstractListener(final Class<E> eventClass) {
-        this.eventClass = checkNotNull(eventClass);
-    }
+  private final Class<E> eventClass;
+
+  /** @param eventClass the event type this listener is registered for, must not be null */
+  protected AbstractListener(final Class<E> eventClass) {
+    this.eventClass = checkNotNull(eventClass);
+  }
 }

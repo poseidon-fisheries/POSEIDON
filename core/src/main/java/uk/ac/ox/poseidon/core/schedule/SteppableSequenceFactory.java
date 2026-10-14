@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.schedule;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,8 +32,6 @@ import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.util.List;
 
 /**
  * A {@link SimulationScopeFactory} for a MASON {@link Sequence} that runs the resolved list of
@@ -44,13 +43,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class SteppableSequenceFactory extends SimulationScopeFactory<Steppable> {
+public class SteppableSequenceFactory
+  extends SimulationScopeFactory<Steppable>
+{
 
-    private Factory<? super SimulationScope, ? extends List<? extends Steppable>> steppables;
+  private Factory<
+    ? super SimulationScope,
+    ? extends List<? extends Steppable>
+  > steppables;
 
-    @Override
-    protected Steppable newInstance(final SimulationScope scope) {
-        return new Sequence(steppables.get(scope));
-    }
-
+  @Override
+  protected Steppable newInstance(final SimulationScope scope) {
+    return new Sequence(steppables.get(scope));
+  }
 }

@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.regulations.SpatialAction;
-
-import java.util.function.Predicate;
 
 /**
  * Matches a {@link SpatialAction} whose start cell or end cell (converted from its coordinates via
@@ -36,12 +35,14 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class ActionCellPredicate implements Predicate<SpatialAction<?>> {
 
-    private final ModelGrid modelGrid;
-    private final Predicate<Int2D> cellPredicate;
+  private final ModelGrid modelGrid;
+  private final Predicate<Int2D> cellPredicate;
 
-    @Override
-    public boolean test(final SpatialAction<?> action) {
-        return cellPredicate.test(modelGrid.toCell(action.getStartCoordinate())) ||
-            cellPredicate.test(modelGrid.toCell(action.getEndCoordinate()));
-    }
+  @Override
+  public boolean test(final SpatialAction<?> action) {
+    return (
+      cellPredicate.test(modelGrid.toCell(action.getStartCoordinate())) ||
+      cellPredicate.test(modelGrid.toCell(action.getEndCoordinate()))
+    );
+  }
 }

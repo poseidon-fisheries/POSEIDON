@@ -22,69 +22,68 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.providers.constant.Constant;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class FirstValueFromFactoryTest {
 
-    @Test
-    void returnedProviderIsStable() {
-        final AtomicInteger counter = new AtomicInteger(0);
-        final FirstValueFromFactory<Scope, Integer> factory =
-            new FirstValueFromFactory<>(
-                new GlobalScopeFactory<Supplier<? extends Integer>>() {
-                    @Override
-                    protected Supplier<? extends Integer> newInstance(final Scope scope) {
-                        return counter::incrementAndGet;
-                    }
-                }
-            );
+  @Test
+  void returnedProviderIsStable() {
+    final AtomicInteger counter = new AtomicInteger(0);
+    final FirstValueFromFactory<Scope, Integer> factory =
+      new FirstValueFromFactory<>(
+        new GlobalScopeFactory<Supplier<? extends Integer>>() {
+          @Override
+          protected Supplier<? extends Integer> newInstance(final Scope scope) {
+            return counter::incrementAndGet;
+          }
+        }
+      );
 
-        final Provider<Integer> provider = factory.get(Scope.GLOBAL_SCOPE);
-        assertThat(provider.get()).isEqualTo(1);
-        assertThat(provider.get()).isEqualTo(1);
-        assertThat(provider.get()).isEqualTo(1);
-    }
+    final Provider<Integer> provider = factory.get(Scope.GLOBAL_SCOPE);
+    assertThat(provider.get()).isEqualTo(1);
+    assertThat(provider.get()).isEqualTo(1);
+    assertThat(provider.get()).isEqualTo(1);
+  }
 
-    @Test
-    void delegateSupplierCalledOnlyOnce() {
-        final AtomicInteger counter = new AtomicInteger(0);
-        final FirstValueFromFactory<Scope, Integer> factory =
-            new FirstValueFromFactory<>(
-                new GlobalScopeFactory<Supplier<? extends Integer>>() {
-                    @Override
-                    protected Supplier<? extends Integer> newInstance(final Scope scope) {
-                        return counter::incrementAndGet;
-                    }
-                }
-            );
+  @Test
+  void delegateSupplierCalledOnlyOnce() {
+    final AtomicInteger counter = new AtomicInteger(0);
+    final FirstValueFromFactory<Scope, Integer> factory =
+      new FirstValueFromFactory<>(
+        new GlobalScopeFactory<Supplier<? extends Integer>>() {
+          @Override
+          protected Supplier<? extends Integer> newInstance(final Scope scope) {
+            return counter::incrementAndGet;
+          }
+        }
+      );
 
-        factory.get(Scope.GLOBAL_SCOPE);
-        assertThat(counter).hasValue(1);
-    }
+    factory.get(Scope.GLOBAL_SCOPE);
+    assertThat(counter).hasValue(1);
+  }
 
-    @Test
-    void returnsConstantProvider() {
-        final FirstValueFromFactory<Scope, String> factory =
-            new FirstValueFromFactory<>(
-                new GlobalScopeFactory<Supplier<? extends String>>() {
-                    @Override
-                    protected Supplier<? extends String> newInstance(final Scope scope) {
-                        return () -> "hello";
-                    }
-                }
-            );
+  @Test
+  void returnsConstantProvider() {
+    final FirstValueFromFactory<Scope, String> factory =
+      new FirstValueFromFactory<>(
+        new GlobalScopeFactory<Supplier<? extends String>>() {
+          @Override
+          protected Supplier<? extends String> newInstance(final Scope scope) {
+            return () -> "hello";
+          }
+        }
+      );
 
-        assertThat(factory.get(Scope.GLOBAL_SCOPE))
-            .isInstanceOf(Constant.class)
-            .extracting(Provider::get)
-            .isEqualTo("hello");
-    }
+    assertThat(factory.get(Scope.GLOBAL_SCOPE))
+      .isInstanceOf(Constant.class)
+      .extracting(Provider::get)
+      .isEqualTo("hello");
+  }
 }

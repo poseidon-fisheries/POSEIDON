@@ -36,57 +36,62 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  */
 public class Factories {
 
-    private Factories() {
-    }
+  private Factories() {}
 
-    /**
-     * @param bathymetricGrid factory for the grid to find water/land cells on
-     * @param portGrid        factory for the grid of ports
-     * @param distance        factory for the distance calculator
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DefaultPathCache}
-     * @see DefaultPathCacheFactory
-     */
-    public static <S extends Scope> DefaultPathCacheFactory<S> pathCache(
-        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
-        final Factory<? super S, ? extends PortGrid> portGrid,
-        final Factory<? super S, ? extends DistanceCalculator> distance
-    ) {
-        return new DefaultPathCacheFactory<>(bathymetricGrid, portGrid, distance);
-    }
+  /**
+   * @param bathymetricGrid factory for the grid to find water/land cells on
+   * @param portGrid        factory for the grid of ports
+   * @param distance        factory for the distance calculator
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DefaultPathCache}
+   * @see DefaultPathCacheFactory
+   */
+  public static <S extends Scope> DefaultPathCacheFactory<S> pathCache(
+    final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
+    final Factory<? super S, ? extends PortGrid> portGrid,
+    final Factory<? super S, ? extends DistanceCalculator> distance
+  ) {
+    return new DefaultPathCacheFactory<>(bathymetricGrid, portGrid, distance);
+  }
 
-    /**
-     * @param bathymetricGrid factory for the grid to find water/land cells on
-     * @param portGrid        factory for the grid of ports
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-     * {@link AccessibleWaterCellsCache}
-     * @see AccessibleWaterCellsCacheFactory
-     */
-    public static <S extends Scope> AccessibleWaterCellsCacheFactory<S> accessibleWaterCellsCache(
-        final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
-        final Factory<? super S, ? extends PortGrid> portGrid
-    ) {
-        return new AccessibleWaterCellsCacheFactory<>(bathymetricGrid, portGrid);
-    }
+  /**
+   * @param bathymetricGrid factory for the grid to find water/land cells on
+   * @param portGrid        factory for the grid of ports
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   * {@link AccessibleWaterCellsCache}
+   * @see AccessibleWaterCellsCacheFactory
+   */
+  public static <S extends Scope> AccessibleWaterCellsCacheFactory<S> accessibleWaterCellsCache(
+    final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
+    final Factory<? super S, ? extends PortGrid> portGrid
+  ) {
+    return new AccessibleWaterCellsCacheFactory<>(bathymetricGrid, portGrid);
+  }
 
-    /**
-     * @param bathymetricGrid factory for the grid to find water/land cells on
-     * @param portGrid        factory for the grid of ports
-     * @param distance        factory for the distance calculator
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for this package's default
-     * {@link GridPathFinder}
-     * @see DefaultPathFinderFactory
-     */
-    public static DefaultPathFinderFactory pathFinder(
-        final Factory<? super SimulationScope, ? extends BathymetricGrid> bathymetricGrid,
-        final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
-        final Factory<? super SimulationScope, ? extends DistanceCalculator> distance
-    ) {
-        return new DefaultPathFinderFactory(
-            bathymetricGrid,
-            portGrid,
-            distance,
-            pathCache(bathymetricGrid, portGrid, distance),
-            accessibleWaterCellsCache(bathymetricGrid, portGrid)
-        );
-    }
+  /**
+   * @param bathymetricGrid factory for the grid to find water/land cells on
+   * @param portGrid        factory for the grid of ports
+   * @param distance        factory for the distance calculator
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for this package's default
+   * {@link GridPathFinder}
+   * @see DefaultPathFinderFactory
+   */
+  public static DefaultPathFinderFactory pathFinder(
+    final Factory<
+      ? super SimulationScope,
+      ? extends BathymetricGrid
+    > bathymetricGrid,
+    final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
+    final Factory<
+      ? super SimulationScope,
+      ? extends DistanceCalculator
+    > distance
+  ) {
+    return new DefaultPathFinderFactory(
+      bathymetricGrid,
+      portGrid,
+      distance,
+      pathCache(bathymetricGrid, portGrid, distance),
+      accessibleWaterCellsCache(bathymetricGrid, portGrid)
+    );
+  }
 }

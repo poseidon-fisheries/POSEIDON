@@ -39,17 +39,20 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PerSimulationFactory<T> extends PerScopeFactory<SimulationScope, T> {
+public class PerSimulationFactory<T> extends PerScopeFactory<
+  SimulationScope,
+  T
+> {
 
-    private Factory<? super SimulationScope, ? extends T> delegate;
+  private Factory<? super SimulationScope, ? extends T> delegate;
 
-    @Override
-    protected Object makeKey(final SimulationScope scope) {
-        return scope.getSimulation();
-    }
+  @Override
+  protected Object makeKey(final SimulationScope scope) {
+    return scope.getSimulation();
+  }
 
-    @Override
-    protected Class<SimulationScope> scopeClass() {
-        return SimulationScope.class;
-    }
+  @Override
+  protected Class<SimulationScope> scopeClass() {
+    return SimulationScope.class;
+  }
 }

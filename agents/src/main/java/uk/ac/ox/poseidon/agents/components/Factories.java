@@ -31,28 +31,32 @@ import uk.ac.ox.poseidon.core.Factory;
  */
 public class Factories {
 
-    private Factories() {
-    }
+  private Factories() {}
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} that builds the
-     * component and registers it against the resolving vessel
-     * @see RegisteredVesselComponentFactory
-     */
-    public static <C> RegisteredVesselComponentFactory<C> registeredVesselComponent(
-        final Factory<? super VesselScope, ? extends C> componentFactory,
-        final Factory<? super VesselScope, ? extends VesselComponentRegister<C>> componentRegister
-    ) {
-        return new RegisteredVesselComponentFactory<>(componentFactory, componentRegister);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} that builds the
+   * component and registers it against the resolving vessel
+   * @see RegisteredVesselComponentFactory
+   */
+  public static <C> RegisteredVesselComponentFactory<C> registeredVesselComponent(
+    final Factory<? super VesselScope, ? extends C> componentFactory,
+    final Factory<
+      ? super VesselScope,
+      ? extends VesselComponentRegister<C>
+    > componentRegister
+  ) {
+    return new RegisteredVesselComponentFactory<>(
+      componentFactory,
+      componentRegister
+    );
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for an empty
-     * {@link VesselComponentRegister}
-     * @see VesselComponentRegisterFactory
-     */
-    public static <C> VesselComponentRegisterFactory<C> vesselComponentRegister() {
-        return new VesselComponentRegisterFactory<>();
-    }
-
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for an empty
+   * {@link VesselComponentRegister}
+   * @see VesselComponentRegisterFactory
+   */
+  public static <C> VesselComponentRegisterFactory<C> vesselComponentRegister() {
+    return new VesselComponentRegisterFactory<>();
+  }
 }

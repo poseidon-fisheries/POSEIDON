@@ -22,19 +22,19 @@
 
 package uk.ac.ox.poseidon.regulations;
 
+import java.util.function.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
-import java.util.function.Predicate;
 
 /** A {@link Regulations} rule forbidding any action matching {@code actionPredicate}. */
 @RequiredArgsConstructor
 public class ForbiddenIf<A extends Action<?>> implements Regulations<A> {
 
-    @NonNull private final Predicate<? super A> actionPredicate;
+  @NonNull
+  private final Predicate<? super A> actionPredicate;
 
-    @Override
-    public boolean isPermitted(final A action) {
-        return !actionPredicate.test(action);
-    }
+  @Override
+  public boolean isPermitted(final A action) {
+    return !actionPredicate.test(action);
+  }
 }

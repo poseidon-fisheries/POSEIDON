@@ -39,14 +39,15 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ConstantFactory<S extends Scope, T>
-    extends RelativeScopeFactory<S, Provider<T>> {
+public class ConstantFactory<
+  S extends Scope,
+  T
+> extends RelativeScopeFactory<S, Provider<T>> {
 
-    Factory<? super S, ? extends T> object;
+  Factory<? super S, ? extends T> object;
 
-    @Override
-    protected Provider<T> newInstance(final S scope) {
-        return new Constant<>(object.get(scope));
-    }
-
+  @Override
+  protected Provider<T> newInstance(final S scope) {
+    return new Constant<>(object.get(scope));
+  }
 }

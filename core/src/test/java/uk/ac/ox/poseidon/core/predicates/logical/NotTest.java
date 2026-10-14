@@ -22,50 +22,49 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import java.util.function.Predicate;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.function.Predicate;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 @SuppressWarnings("unchecked")
 class NotTest {
 
-    @Test
-    void testWhenInnerPredicateReturnsTrue() {
-        // Arrange
-        final Predicate<Object> innerPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(innerPredicate.test(Mockito.any())).thenReturn(true);
-        final Not<Object> notPredicate = new Not<>(innerPredicate);
-        final Object mockObject = Mockito.mock(Object.class);
+  @Test
+  void testWhenInnerPredicateReturnsTrue() {
+    // Arrange
+    final Predicate<Object> innerPredicate = Mockito.mock(Predicate.class);
+    Mockito.when(innerPredicate.test(Mockito.any())).thenReturn(true);
+    final Not<Object> notPredicate = new Not<>(innerPredicate);
+    final Object mockObject = Mockito.mock(Object.class);
 
-        // Act
-        final boolean result = notPredicate.test(mockObject);
+    // Act
+    final boolean result = notPredicate.test(mockObject);
 
-        // Assert
-        assertFalse(
-            result,
-            "The Not predicate should return false when the inner predicate returns true."
-        );
-    }
+    // Assert
+    assertFalse(
+      result,
+      "The Not predicate should return false when the inner predicate returns true."
+    );
+  }
 
-    @Test
-    void testWhenInnerPredicateReturnsFalse() {
-        // Arrange
-        final Predicate<Object> innerPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(innerPredicate.test(Mockito.any())).thenReturn(false);
-        final Not<Object> notPredicate = new Not<>(innerPredicate);
-        final Object mockObject = Mockito.mock(Object.class);
+  @Test
+  void testWhenInnerPredicateReturnsFalse() {
+    // Arrange
+    final Predicate<Object> innerPredicate = Mockito.mock(Predicate.class);
+    Mockito.when(innerPredicate.test(Mockito.any())).thenReturn(false);
+    final Not<Object> notPredicate = new Not<>(innerPredicate);
+    final Object mockObject = Mockito.mock(Object.class);
 
-        // Act
-        final boolean result = notPredicate.test(mockObject);
+    // Act
+    final boolean result = notPredicate.test(mockObject);
 
-        // Assert
-        assertTrue(
-            result,
-            "The Not predicate should return true when the inner predicate returns false."
-        );
-    }
+    // Assert
+    assertTrue(
+      result,
+      "The Not predicate should return true when the inner predicate returns false."
+    );
+  }
 }

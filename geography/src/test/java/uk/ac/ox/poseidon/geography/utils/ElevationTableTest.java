@@ -22,41 +22,47 @@
 
 package uk.ac.ox.poseidon.geography.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class ElevationTableTest {
 
-    @Test
-    void entryStreamReturnsCoordinatesAndElevationsInRowOrder() {
-        final Table table = Table.create("elevation-data")
-            .addColumns(
-                DoubleColumn.create("lon", 10.0, 20.0, 30.0),
-                DoubleColumn.create("lat", -1.0, -2.0, -3.0),
-                DoubleColumn.create("elev", 100.0, 200.0, 300.0)
-            );
+  @Test
+  void entryStreamReturnsCoordinatesAndElevationsInRowOrder() {
+    final Table table = Table.create("elevation-data").addColumns(
+      DoubleColumn.create("lon", 10.0, 20.0, 30.0),
+      DoubleColumn.create("lat", -1.0, -2.0, -3.0),
+      DoubleColumn.create("elev", 100.0, 200.0, 300.0)
+    );
 
-        final ElevationTable elevationTable = new ElevationTable(
-            table,
-            "lon",
-            "lat",
-            "elev"
-        );
+    final ElevationTable elevationTable = new ElevationTable(
+      table,
+      "lon",
+      "lat",
+      "elev"
+    );
 
-        final List<ElevationTable.Entry> entries = elevationTable.entryStream().toList();
+    final List<ElevationTable.Entry> entries = elevationTable
+      .entryStream()
+      .toList();
 
-        assertThat(entries).hasSize(3);
-        assertThat(entries.get(0).getCoordinate()).isEqualTo(new Coordinate(10.0, -1.0));
-        assertThat(entries.get(0).getElevation()).isEqualTo(100.0);
-        assertThat(entries.get(1).getCoordinate()).isEqualTo(new Coordinate(20.0, -2.0));
-        assertThat(entries.get(1).getElevation()).isEqualTo(200.0);
-        assertThat(entries.get(2).getCoordinate()).isEqualTo(new Coordinate(30.0, -3.0));
-        assertThat(entries.get(2).getElevation()).isEqualTo(300.0);
-    }
+    assertThat(entries).hasSize(3);
+    assertThat(entries.get(0).getCoordinate()).isEqualTo(
+      new Coordinate(10.0, -1.0)
+    );
+    assertThat(entries.get(0).getElevation()).isEqualTo(100.0);
+    assertThat(entries.get(1).getCoordinate()).isEqualTo(
+      new Coordinate(20.0, -2.0)
+    );
+    assertThat(entries.get(1).getElevation()).isEqualTo(200.0);
+    assertThat(entries.get(2).getCoordinate()).isEqualTo(
+      new Coordinate(30.0, -3.0)
+    );
+    assertThat(entries.get(2).getElevation()).isEqualTo(300.0);
+  }
 }

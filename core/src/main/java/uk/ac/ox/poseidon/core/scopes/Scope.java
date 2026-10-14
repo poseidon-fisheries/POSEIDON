@@ -30,14 +30,12 @@ package uk.ac.ox.poseidon.core.scopes;
  */
 public class Scope {
 
-    /**
-     * The single global scope instance, used by factories whose output is shared across every
-     * simulation built from a scenario (see {@code GlobalScopeFactory}).
-     */
-    @SuppressWarnings("InstantiationOfUtilityClass")
-    public static final Scope GLOBAL_SCOPE = new Scope();
+  /**
+   * The single global scope instance, used by factories whose output is shared across every
+   * simulation built from a scenario (see {@code GlobalScopeFactory}).
+   */
+  @SuppressWarnings("InstantiationOfUtilityClass")
+  public static final Scope GLOBAL_SCOPE = new Scope();
 
-    Scope() {
-    }
-
+  Scope() {}
 }

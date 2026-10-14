@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.geography.allocators;
 
+import java.util.function.DoubleSupplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
-
-import java.util.function.DoubleSupplier;
 
 /**
  * An {@link Allocator} that ignores the cell entirely and returns the same resolved
@@ -36,11 +35,11 @@ import java.util.function.DoubleSupplier;
 @RequiredArgsConstructor
 public class SupplierAllocator implements Allocator {
 
-    @NonNull private final DoubleSupplier supplier;
+  @NonNull
+  private final DoubleSupplier supplier;
 
-    @Override
-    public double applyAsDouble(final Int2D cell) {
-        return supplier.getAsDouble();
-    }
-
+  @Override
+  public double applyAsDouble(final Int2D cell) {
+    return supplier.getAsDouble();
+  }
 }

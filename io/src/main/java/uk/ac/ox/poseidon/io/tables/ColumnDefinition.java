@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import java.util.function.Supplier;
 import lombok.Data;
 import tech.tablesaw.api.ColumnType;
 import tech.tablesaw.columns.Column;
-
-import java.util.function.Supplier;
 
 /**
  * A named, typed {@code tablesaw} {@link Column} that can be created on demand. Built via
@@ -35,13 +34,12 @@ import java.util.function.Supplier;
 @Data
 public class ColumnDefinition implements Supplier<Column<?>> {
 
-    private final String columnName;
-    private final ColumnType columnType;
+  private final String columnName;
+  private final ColumnType columnType;
 
-    /** @return a fresh, empty {@link Column} named {@code columnName} of type {@code columnType} */
-    @Override
-    public Column<?> get() {
-        return columnType.create(columnName);
-    }
-
+  /** @return a fresh, empty {@link Column} named {@code columnName} of type {@code columnType} */
+  @Override
+  public Column<?> get() {
+    return columnType.create(columnName);
+  }
 }

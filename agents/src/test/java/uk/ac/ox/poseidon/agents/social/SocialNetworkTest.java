@@ -19,63 +19,64 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package uk.ac.ox.poseidon.agents.social;
-
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+
 class SocialNetworkTest {
 
-    private final Vessel a = mock(Vessel.class);
-    private final Vessel b = mock(Vessel.class);
-    private final List<Vessel> vessels = new ArrayList<>(List.of(a, b));
-    private final SocialNetwork network = new SocialNetwork(() -> vessels);
+  private final Vessel a = mock(Vessel.class);
+  private final Vessel b = mock(Vessel.class);
+  private final List<Vessel> vessels = new ArrayList<>(List.of(a, b));
+  private final SocialNetwork network = new SocialNetwork(() -> vessels);
 
-    @Test
-    void aTieGoesFromItsSourceToItsRecipientOnly() {
-        network.addTie(a, b);
+  @Test
+  void aTieGoesFromItsSourceToItsRecipientOnly() {
+    network.addTie(a, b);
 
-        assertThat(network.getRecipients(a)).containsExactly(b);
-        assertThat(network.getRecipients(b)).isEmpty();
-        assertThat(network.getSources(b)).containsExactly(a);
-        assertThat(network.getSources(a)).isEmpty();
-    }
+    assertThat(network.getRecipients(a)).containsExactly(b);
+    assertThat(network.getRecipients(b)).isEmpty();
+    assertThat(network.getSources(b)).containsExactly(a);
+    assertThat(network.getSources(a)).isEmpty();
+  }
 
-    @Test
-    void aVesselNeverTiedHasNoRecipientsAndNoSources() {
-        assertThat(network.getRecipients(a)).isEmpty();
-        assertThat(network.getSources(a)).isEmpty();
-    }
+  @Test
+  void aVesselNeverTiedHasNoRecipientsAndNoSources() {
+    assertThat(network.getRecipients(a)).isEmpty();
+    assertThat(network.getSources(a)).isEmpty();
+  }
 
-    @Test
-    void removingATieRemovesOnlyThatDirection() {
-        network.addTie(a, b);
-        network.addTie(b, a);
+  @Test
+  void removingATieRemovesOnlyThatDirection() {
+    network.addTie(a, b);
+    network.addTie(b, a);
 
-        network.removeTie(a, b);
+    network.removeTie(a, b);
 
-        assertThat(network.getRecipients(a)).isEmpty();
-        assertThat(network.getRecipients(b)).containsExactly(a);
-    }
+    assertThat(network.getRecipients(a)).isEmpty();
+    assertThat(network.getRecipients(b)).containsExactly(a);
+  }
 
-    @Test
-    void rejectsATieFromAVesselToItself() {
-        assertThatThrownBy(() -> network.addTie(a, a))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+  @Test
+  void rejectsATieFromAVesselToItself() {
+    assertThatThrownBy(() -> network.addTie(a, a)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+  }
 
-    @Test
-    void readsItsCandidatesAtEachCall() {
-        final Vessel c = mock(Vessel.class);
-        vessels.add(c);
+  @Test
+  void readsItsCandidatesAtEachCall() {
+    final Vessel c = mock(Vessel.class);
+    vessels.add(c);
 
-        assertThat(network.getCandidates()).containsExactly(a, b, c);
-    }
+    assertThat(network.getCandidates()).containsExactly(a, b, c);
+  }
 }

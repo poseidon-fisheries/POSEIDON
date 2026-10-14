@@ -19,8 +19,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package uk.ac.ox.poseidon.agents.social;
 
+import java.util.function.Function;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -29,71 +31,77 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import java.util.function.Function;
-
 /** Factories for the ties between vessels. */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @param candidates gives the vessels ties can be made with; pass the base fleet, not a loader
-     *                   whose extra factories depend on this network, which would be a factory
-     *                   cycle
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link SocialNetwork}
-     * with no ties
-     * @see SocialNetwork
-     */
-    public static SocialNetworkFactory socialNetwork(
-        final Factory<? super SimulationScope, ? extends VesselsGetter> candidates
-    ) {
-        return new SocialNetworkFactory(candidates);
-    }
+  /**
+   * @param candidates gives the vessels ties can be made with; pass the base fleet, not a loader
+   *                   whose extra factories depend on this network, which would be a factory
+   *                   cycle
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link SocialNetwork}
+   * with no ties
+   * @see SocialNetwork
+   */
+  public static SocialNetworkFactory socialNetwork(
+    final Factory<? super SimulationScope, ? extends VesselsGetter> candidates
+  ) {
+    return new SocialNetworkFactory(candidates);
+  }
 
-    /**
-     * @param network           the network whose ties the dynamics add and remove
-     * @param groupingKey       gives a vessel's grouping key: vessels are eligible for each other
-     *                          when both are active and their keys are equal
-     * @param maximumCliqueSize the largest clique a vessel joins, itself included; 1 means no
-     *                          vessel ever has partners
-     * @return a {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory} for a
-     * {@link CliqueDynamics} registered with the simulation's event manager, so that it hears
-     * every vessel's trip starts
-     * @see CliqueDynamics
-     */
-    public static CliqueDynamicsFactory cliqueDynamics(
-        final Factory<? super SimulationScope, ? extends SocialNetwork> network,
-        final Factory<? super SimulationScope, ? extends Function<? super Vessel, ?>> groupingKey,
-        final int maximumCliqueSize
-    ) {
-        return new CliqueDynamicsFactory(network, groupingKey, maximumCliqueSize);
-    }
+  /**
+   * @param network           the network whose ties the dynamics add and remove
+   * @param groupingKey       gives a vessel's grouping key: vessels are eligible for each other
+   *                          when both are active and their keys are equal
+   * @param maximumCliqueSize the largest clique a vessel joins, itself included; 1 means no
+   *                          vessel ever has partners
+   * @return a {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory} for a
+   * {@link CliqueDynamics} registered with the simulation's event manager, so that it hears
+   * every vessel's trip starts
+   * @see CliqueDynamics
+   */
+  public static CliqueDynamicsFactory cliqueDynamics(
+    final Factory<? super SimulationScope, ? extends SocialNetwork> network,
+    final Factory<
+      ? super SimulationScope,
+      ? extends Function<? super Vessel, ?>
+    > groupingKey,
+    final int maximumCliqueSize
+  ) {
+    return new CliqueDynamicsFactory(network, groupingKey, maximumCliqueSize);
+  }
 
-    /**
-     * @param network the network whose ties decide who hears each fishing event
-     * @return a {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory} for a
-     * {@link FishingEventSharer} registered with the simulation's event manager, so that it hears
-     * every vessel's fishing events
-     * @see FishingEventSharer
-     */
-    public static FishingEventSharerFactory fishingEventSharer(
-        final Factory<? super SimulationScope, ? extends SocialNetwork> network
-    ) {
-        return new FishingEventSharerFactory(network);
-    }
+  /**
+   * @param network the network whose ties decide who hears each fishing event
+   * @return a {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory} for a
+   * {@link FishingEventSharer} registered with the simulation's event manager, so that it hears
+   * every vessel's fishing events
+   * @see FishingEventSharer
+   */
+  public static FishingEventSharerFactory fishingEventSharer(
+    final Factory<? super SimulationScope, ? extends SocialNetwork> network
+  ) {
+    return new FishingEventSharerFactory(network);
+  }
 
-    /**
-     * @param listener           the factory giving the vessel's shared fishing event listener
-     * @param fishingEventSharer the sharer to register the listener with
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} that registers the
-     * vessel's listener with the sharer and gives it; add it to the vessel's extra factories
-     * @see SharedFishingEventListenerFactory
-     */
-    public static <L extends Listener<? super FishingEvent>> SharedFishingEventListenerFactory<L>
-    sharedFishingEventListener(
-        final Factory<? super VesselScope, ? extends L> listener,
-        final Factory<? super SimulationScope, ? extends FishingEventSharer> fishingEventSharer
-    ) {
-        return new SharedFishingEventListenerFactory<>(listener, fishingEventSharer);
-    }
+  /**
+   * @param listener           the factory giving the vessel's shared fishing event listener
+   * @param fishingEventSharer the sharer to register the listener with
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} that registers the
+   * vessel's listener with the sharer and gives it; add it to the vessel's extra factories
+   * @see SharedFishingEventListenerFactory
+   */
+  public static <L extends Listener<? super FishingEvent>> SharedFishingEventListenerFactory<L> sharedFishingEventListener(
+    final Factory<? super VesselScope, ? extends L> listener,
+    final Factory<
+      ? super SimulationScope,
+      ? extends FishingEventSharer
+    > fishingEventSharer
+  ) {
+    return new SharedFishingEventListenerFactory<>(
+      listener,
+      fishingEventSharer
+    );
+  }
 }

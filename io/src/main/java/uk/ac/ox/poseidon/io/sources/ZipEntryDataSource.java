@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.io.sources;
 
-import lombok.Value;
-
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import lombok.Value;
 
 /**
  * A {@link DataSource} over a single entry of a zip archive, read with a fixed {@link Charset}.
@@ -39,20 +38,19 @@ import java.util.zip.ZipFile;
 @Value
 public class ZipEntryDataSource implements DataSource {
 
-    ZipFile zipFile;
-    ZipEntry zipEntry;
-    Charset charset;
+  ZipFile zipFile;
+  ZipEntry zipEntry;
+  Charset charset;
 
-    @Override
-    public Reader getReader() {
-        try {
-            return new InputStreamReader(
-                new BufferedInputStream(zipFile.getInputStream(zipEntry)),
-                charset
-            );
-        } catch (final IOException e) {
-            throw new UncheckedIOException(e);
-        }
+  @Override
+  public Reader getReader() {
+    try {
+      return new InputStreamReader(
+        new BufferedInputStream(zipFile.getInputStream(zipEntry)),
+        charset
+      );
+    } catch (final IOException e) {
+      throw new UncheckedIOException(e);
     }
-
+  }
 }

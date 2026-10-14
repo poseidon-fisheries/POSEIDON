@@ -28,10 +28,11 @@ import sim.portrayal.FieldPortrayal2D;
 /** A MASON {@link FieldPortrayal2D}, labelled and with an initial visibility, for a display. */
 @Data
 public class NamedPortrayal {
-    /** The label shown for this portrayal in the display's layer list. */
-    private final String name;
-    /** The portrayal itself. */
-    private final FieldPortrayal2D portrayal;
-    /** Whether this layer starts visible. */
-    private final boolean visible;
+
+  /** The label shown for this portrayal in the display's layer list. */
+  private final String name;
+  /** The portrayal itself. */
+  private final FieldPortrayal2D portrayal;
+  /** Whether this layer starts visible. */
+  private final boolean visible;
 }

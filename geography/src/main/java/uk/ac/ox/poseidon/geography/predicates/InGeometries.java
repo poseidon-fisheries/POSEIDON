@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
+import java.util.Collection;
+import java.util.function.Predicate;
 import lombok.NonNull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import uk.ac.ox.poseidon.geography.Coordinate;
-
-import java.util.Collection;
-import java.util.function.Predicate;
 
 /**
  * A {@link Predicate} testing whether a {@link Coordinate} falls within any of a fixed set of JTS
@@ -37,23 +36,24 @@ import java.util.function.Predicate;
  */
 public class InGeometries implements Predicate<Coordinate> {
 
-    private final Geometry[] geometries;
+  private final Geometry[] geometries;
 
-    /** @param geometries the geometries to test against */
-    public InGeometries(@NonNull final Collection<? extends Geometry> geometries) {
-        this.geometries = geometries.toArray(Geometry[]::new);
+  /** @param geometries the geometries to test against */
+  public InGeometries(
+    @NonNull final Collection<? extends Geometry> geometries
+  ) {
+    this.geometries = geometries.toArray(Geometry[]::new);
+  }
+
+  /** @return whether {@code coordinate} falls within any of this predicate's geometries */
+  @Override
+  public boolean test(final Coordinate coordinate) {
+    for (final Geometry geometry : geometries) {
+      final Point point = geometry.getFactory().createPoint(coordinate.toJTS());
+      if (geometry.contains(point)) {
+        return true;
+      }
     }
-
-    /** @return whether {@code coordinate} falls within any of this predicate's geometries */
-    @Override
-    public boolean test(final Coordinate coordinate) {
-        for (final Geometry geometry : geometries) {
-            final Point point = geometry.getFactory().createPoint(coordinate.toJTS());
-            if (geometry.contains(point)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    return false;
+  }
 }

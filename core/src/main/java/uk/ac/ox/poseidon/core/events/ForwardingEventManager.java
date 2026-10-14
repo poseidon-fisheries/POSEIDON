@@ -33,22 +33,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ForwardingEventManager implements EventManager {
 
-    private final EventManager primaryEventManager = new SimpleEventManager();
-    private final EventManager secondaryEventManager;
+  private final EventManager primaryEventManager = new SimpleEventManager();
+  private final EventManager secondaryEventManager;
 
-    @Override
-    public void addListener(final Listener<?> listener) {
-        primaryEventManager.addListener(listener);
-    }
+  @Override
+  public void addListener(final Listener<?> listener) {
+    primaryEventManager.addListener(listener);
+  }
 
-    @Override
-    public void removeListener(final Listener<?> listener) {
-        primaryEventManager.removeListener(listener);
-    }
+  @Override
+  public void removeListener(final Listener<?> listener) {
+    primaryEventManager.removeListener(listener);
+  }
 
-    @Override
-    public <E> void broadcast(final E event) {
-        primaryEventManager.broadcast(event);
-        secondaryEventManager.broadcast(event);
-    }
+  @Override
+  public <E> void broadcast(final E event) {
+    primaryEventManager.broadcast(event);
+    secondaryEventManager.broadcast(event);
+  }
 }

@@ -22,53 +22,54 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.functions.NumericIntervalMapper;
-import uk.ac.ox.poseidon.core.functions.NumericIntervalToStringMapperFactory;
-
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.core.functions.Factories.numericIntervalToStringMapper;
 import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.functions.NumericIntervalMapper;
+import uk.ac.ox.poseidon.core.functions.NumericIntervalToStringMapperFactory;
+
 class NumericIntervalToStringMapperFactoryTest {
 
-    @Test
-    void buildsStringMapperFromConfiguredIntervals() {
-        final NumericIntervalToStringMapperFactory factory =
-            new NumericIntervalToStringMapperFactory(
-                List.of(
-                    NumericIntervalToStringMapperFactory.interval(0.0, 6.0, "VL0006"),
-                    NumericIntervalToStringMapperFactory.interval(6.0, 12.0, "VL0612"),
-                    NumericIntervalToStringMapperFactory.interval(40.0, null, "VL40XX")
-                )
-            );
+  @Test
+  void buildsStringMapperFromConfiguredIntervals() {
+    final NumericIntervalToStringMapperFactory factory =
+      new NumericIntervalToStringMapperFactory(
+        List.of(
+          NumericIntervalToStringMapperFactory.interval(0.0, 6.0, "VL0006"),
+          NumericIntervalToStringMapperFactory.interval(6.0, 12.0, "VL0612"),
+          NumericIntervalToStringMapperFactory.interval(40.0, null, "VL40XX")
+        )
+      );
 
-        final NumericIntervalMapper<String> mapper = factory.get(GLOBAL_SCOPE);
+    final NumericIntervalMapper<String> mapper = factory.get(GLOBAL_SCOPE);
 
-        assertThat(mapper.apply(5.999)).isEqualTo("VL0006");
-        assertThat(mapper.apply(6.0)).isEqualTo("VL0612");
-        assertThat(mapper.apply(40.0)).isEqualTo("VL40XX");
-    }
+    assertThat(mapper.apply(5.999)).isEqualTo("VL0006");
+    assertThat(mapper.apply(6.0)).isEqualTo("VL0612");
+    assertThat(mapper.apply(40.0)).isEqualTo("VL40XX");
+  }
 
-    @Test
-    void createsIntervalsViaStaticHelper() {
-        assertThat(NumericIntervalToStringMapperFactory.interval(6.0, 12.0, "VL0612"))
-            .isEqualTo(new NumericIntervalToStringMapperFactory.Interval(6.0, 12.0, "VL0612"));
-    }
+  @Test
+  void createsIntervalsViaStaticHelper() {
+    assertThat(
+      NumericIntervalToStringMapperFactory.interval(6.0, 12.0, "VL0612")
+    ).isEqualTo(
+      new NumericIntervalToStringMapperFactory.Interval(6.0, 12.0, "VL0612")
+    );
+  }
 
-    @Test
-    void buildsFactoryViaFactoriesHelper() {
-        final NumericIntervalMapper<String> mapper =
-            numericIntervalToStringMapper(
-                NumericIntervalToStringMapperFactory.interval(0.0, 6.0, "VL0006"),
-                NumericIntervalToStringMapperFactory.interval(6.0, 12.0, "VL0612"),
-                NumericIntervalToStringMapperFactory.interval(40.0, null, "VL40XX")
-            ).get(GLOBAL_SCOPE);
+  @Test
+  void buildsFactoryViaFactoriesHelper() {
+    final NumericIntervalMapper<String> mapper = numericIntervalToStringMapper(
+      NumericIntervalToStringMapperFactory.interval(0.0, 6.0, "VL0006"),
+      NumericIntervalToStringMapperFactory.interval(6.0, 12.0, "VL0612"),
+      NumericIntervalToStringMapperFactory.interval(40.0, null, "VL40XX")
+    ).get(GLOBAL_SCOPE);
 
-        assertThat(mapper.apply(5.999)).isEqualTo("VL0006");
-        assertThat(mapper.apply(6.0)).isEqualTo("VL0612");
-        assertThat(mapper.apply(40.0)).isEqualTo("VL40XX");
-    }
+    assertThat(mapper.apply(5.999)).isEqualTo("VL0006");
+    assertThat(mapper.apply(6.0)).isEqualTo("VL0612");
+    assertThat(mapper.apply(40.0)).isEqualTo("VL40XX");
+  }
 }

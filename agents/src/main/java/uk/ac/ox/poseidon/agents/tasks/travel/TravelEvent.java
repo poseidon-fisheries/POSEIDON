@@ -22,24 +22,24 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import java.time.LocalDateTime;
 import lombok.Value;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
 
-import java.time.LocalDateTime;
-
 /** An {@link ExtendedEvent} recording one completed leg of travel between two cells. */
 @Value
 public class TravelEvent implements ExtendedEvent {
-    /** The vessel that travelled. */
-    Vessel vessel;
-    /** When travel started. */
-    LocalDateTime startDateTime;
-    /** When travel ended. */
-    LocalDateTime endDateTime;
-    /** The cell travel started from. */
-    Int2D origin;
-    /** The cell travel ended at. */
-    Int2D destination;
+
+  /** The vessel that travelled. */
+  Vessel vessel;
+  /** When travel started. */
+  LocalDateTime startDateTime;
+  /** When travel ended. */
+  LocalDateTime endDateTime;
+  /** The cell travel started from. */
+  Int2D origin;
+  /** The cell travel ended at. */
+  Int2D destination;
 }

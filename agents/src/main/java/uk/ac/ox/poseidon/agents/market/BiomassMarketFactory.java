@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,8 +33,6 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link BiomassMarket}, built via
  * {@link Factories#biomassMarket}. If {@link #marketCode} isn't set, the port's own code is used.
@@ -41,20 +41,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BiomassMarketFactory extends SimulationScopeFactory<BiomassMarket> {
+public class BiomassMarketFactory
+  extends SimulationScopeFactory<BiomassMarket>
+{
 
-    private Factory<? super SimulationScope, ? extends Port> port;
-    private String marketCode;
+  private Factory<? super SimulationScope, ? extends Port> port;
+  private String marketCode;
 
-    @Override
-    protected BiomassMarket newInstance(final SimulationScope scope) {
-        checkNotNull(port, "port must not be null");
-        final Port port = this.port.get(scope);
-        final String marketCode = this.marketCode != null ? this.marketCode : port.getCode();
-        return new BiomassMarket(
-            port,
-            marketCode,
-            scope.getSimulation().getEventManager()
-        );
-    }
+  @Override
+  protected BiomassMarket newInstance(final SimulationScope scope) {
+    checkNotNull(port, "port must not be null");
+    final Port port = this.port.get(scope);
+    final String marketCode =
+      this.marketCode != null ? this.marketCode : port.getCode();
+    return new BiomassMarket(
+      port,
+      marketCode,
+      scope.getSimulation().getEventManager()
+    );
+  }
 }

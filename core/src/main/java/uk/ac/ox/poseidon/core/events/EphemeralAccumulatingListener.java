@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.core.events;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import static com.google.common.base.Preconditions.checkNotNull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A {@link Listener} that folds every received event into a running value via {@code accumulator},
@@ -41,46 +40,47 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <T> the type of the accumulated value
  */
 public class EphemeralAccumulatingListener<E, T>
-    extends AbstractListener<E>
-    implements Supplier<T> {
+  extends AbstractListener<E>
+  implements Supplier<T>
+{
 
-    private final EventManager eventManager;
-    private final BiFunction<T, E, T> accumulator;
-    private T value;
-    private boolean stillListening = true;
+  private final EventManager eventManager;
+  private final BiFunction<T, E, T> accumulator;
+  private T value;
+  private boolean stillListening = true;
 
-    /**
-     * @param eventClass   the event type to accumulate over
-     * @param eventManager the event manager to register with, and unregister from on first
-     *                     {@link #get()}
-     * @param initialValue the starting value, before any event is received
-     * @param accumulator  folds the current value and a received event into the next value
-     */
-    @SuppressFBWarnings("EI2")
-    public EphemeralAccumulatingListener(
-        final Class<E> eventClass,
-        final EventManager eventManager,
-        final T initialValue,
-        final BiFunction<T, E, T> accumulator
-    ) {
-        super(eventClass);
-        this.eventManager = checkNotNull(eventManager);
-        this.accumulator = checkNotNull(accumulator);
-        this.value = initialValue;
-        eventManager.addListener(this);
+  /**
+   * @param eventClass   the event type to accumulate over
+   * @param eventManager the event manager to register with, and unregister from on first
+   *                     {@link #get()}
+   * @param initialValue the starting value, before any event is received
+   * @param accumulator  folds the current value and a received event into the next value
+   */
+  @SuppressFBWarnings("EI2")
+  public EphemeralAccumulatingListener(
+    final Class<E> eventClass,
+    final EventManager eventManager,
+    final T initialValue,
+    final BiFunction<T, E, T> accumulator
+  ) {
+    super(eventClass);
+    this.eventManager = checkNotNull(eventManager);
+    this.accumulator = checkNotNull(accumulator);
+    this.value = initialValue;
+    eventManager.addListener(this);
+  }
+
+  @Override
+  public void receive(final E event) {
+    value = accumulator.apply(value, event);
+  }
+
+  @Override
+  public T get() {
+    if (stillListening) {
+      eventManager.removeListener(this);
+      stillListening = false;
     }
-
-    @Override
-    public void receive(final E event) {
-        value = accumulator.apply(value, event);
-    }
-
-    @Override
-    public T get() {
-        if (stillListening) {
-            eventManager.removeListener(this);
-            stillListening = false;
-        }
-        return value;
-    }
+    return value;
+  }
 }

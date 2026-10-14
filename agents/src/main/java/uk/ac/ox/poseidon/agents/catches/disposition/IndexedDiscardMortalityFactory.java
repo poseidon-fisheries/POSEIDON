@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
+import java.util.Collection;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,10 +34,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-import java.util.Collection;
-import java.util.function.Function;
-
-
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link IndexedDiscardMortality}, built via
  * {@link Factories#indexedDiscardMortality}.
@@ -44,18 +42,24 @@ import java.util.function.Function;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class IndexedDiscardMortalityFactory<S extends Scope>
-    extends RelativeScopeFactory<S, IndexedDiscardMortality> {
+public class IndexedDiscardMortalityFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  IndexedDiscardMortality
+> {
 
-    private Factory<? super S, ? extends Collection<? extends Species>> species;
+  private Factory<? super S, ? extends Collection<? extends Species>> species;
 
-    private Factory<? super S, ? extends Function<? super Species, Double>> rateFunction;
+  private Factory<
+    ? super S,
+    ? extends Function<? super Species, Double>
+  > rateFunction;
 
-    @Override
-    protected IndexedDiscardMortality newInstance(final S scope) {
-        return new IndexedDiscardMortality(
-            SpeciesIndex.of(species.get(scope))
-                .mapToDoubleArray(rateFunction.get(scope))
-        );
-    }
+  @Override
+  protected IndexedDiscardMortality newInstance(final S scope) {
+    return new IndexedDiscardMortality(
+      SpeciesIndex.of(species.get(scope)).mapToDoubleArray(
+        rateFunction.get(scope)
+      )
+    );
+  }
 }

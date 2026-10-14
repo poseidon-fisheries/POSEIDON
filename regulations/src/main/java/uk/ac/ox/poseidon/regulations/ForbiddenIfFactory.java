@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.regulations;
 
+import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.Predicate;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link ForbiddenIf}. Built via
@@ -40,14 +39,15 @@ import java.util.function.Predicate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ForbiddenIfFactory<S extends Scope, A extends Action<?>>
-    extends RelativeScopeFactory<S, ForbiddenIf<A>> {
+public class ForbiddenIfFactory<
+  S extends Scope,
+  A extends Action<?>
+> extends RelativeScopeFactory<S, ForbiddenIf<A>> {
 
-    private Factory<? super S, ? extends Predicate<? super A>> actionPredicate;
+  private Factory<? super S, ? extends Predicate<? super A>> actionPredicate;
 
-    @Override
-    protected ForbiddenIf<A> newInstance(final S scope) {
-        return new ForbiddenIf<>(actionPredicate.get(scope));
-    }
-
+  @Override
+  protected ForbiddenIf<A> newInstance(final S scope) {
+    return new ForbiddenIf<>(actionPredicate.get(scope));
+  }
 }

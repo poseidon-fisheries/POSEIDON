@@ -37,23 +37,22 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class SimulationEventListenerFactory<T extends Listener<?>>
-    extends SimulationScopeFactory<T> {
+public abstract class SimulationEventListenerFactory<T extends Listener<?>> extends SimulationScopeFactory<T> {
 
-    /**
-     * @param scope the scope being resolved against
-     * @return a freshly built listener, not yet registered with the event manager
-     */
-    protected abstract T newListener(final SimulationScope scope);
+  /**
+   * @param scope the scope being resolved against
+   * @return a freshly built listener, not yet registered with the event manager
+   */
+  protected abstract T newListener(final SimulationScope scope);
 
-    /**
-     * Builds the listener via {@link #newListener}, then registers it with the resolved
-     * simulation's {@link uk.ac.ox.poseidon.core.events.EventManager} before returning it.
-     */
-    @Override
-    protected final T newInstance(final SimulationScope scope) {
-        final T listener = newListener(scope);
-        scope.getSimulation().getEventManager().addListener(listener);
-        return listener;
-    }
+  /**
+   * Builds the listener via {@link #newListener}, then registers it with the resolved
+   * simulation's {@link uk.ac.ox.poseidon.core.events.EventManager} before returning it.
+   */
+  @Override
+  protected final T newInstance(final SimulationScope scope) {
+    final T listener = newListener(scope);
+    scope.getSimulation().getEventManager().addListener(listener);
+    return listener;
+  }
 }

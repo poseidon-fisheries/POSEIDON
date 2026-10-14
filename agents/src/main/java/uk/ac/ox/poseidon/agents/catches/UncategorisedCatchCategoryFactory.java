@@ -35,9 +35,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UncategorisedCatchCategoryFactory extends GlobalScopeFactory<CatchCategory> {
-    @Override
-    protected CatchCategory newInstance(final Scope scope) {
-        return CatchCategory.UNCATEGORISED;
-    }
+public class UncategorisedCatchCategoryFactory
+  extends GlobalScopeFactory<CatchCategory>
+{
+
+  @Override
+  protected CatchCategory newInstance(final Scope scope) {
+    return CatchCategory.UNCATEGORISED;
+  }
 }

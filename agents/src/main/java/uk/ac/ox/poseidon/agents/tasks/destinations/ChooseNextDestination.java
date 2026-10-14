@@ -22,16 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.tasks.destinations;
 
+import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+import static com.google.common.base.Preconditions.checkState;
+
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Redirects the vessel's current trip to whatever destination {@code destinationSupplier} yields;
@@ -41,23 +41,27 @@ import static com.google.common.base.Preconditions.checkState;
 @RequiredArgsConstructor
 public class ChooseNextDestination extends AgentTask<Vessel> {
 
-    private final @NonNull DestinationSupplier destinationSupplier;
+  private final @NonNull DestinationSupplier destinationSupplier;
 
-    /**
-     * @return {@link Status#SUCCEEDED} if a destination was found and the trip redirected to it,
-     * else {@link Status#FAILED}
-     * @throws IllegalStateException if the vessel is not on a trip
-     */
-    @Override
-    public Status execute() {
-        final Trip currentTrip = getAgent().getCurrentTrip();
-        checkState(currentTrip != null, "Vessel %s is not on a trip.", getAgent().getId());
-        return destinationSupplier
-            .get()
-            .map(destination -> {
-                currentTrip.setDestination(destination);
-                return SUCCEEDED;
-            })
-            .orElse(FAILED);
-    }
+  /**
+   * @return {@link Status#SUCCEEDED} if a destination was found and the trip redirected to it,
+   * else {@link Status#FAILED}
+   * @throws IllegalStateException if the vessel is not on a trip
+   */
+  @Override
+  public Status execute() {
+    final Trip currentTrip = getAgent().getCurrentTrip();
+    checkState(
+      currentTrip != null,
+      "Vessel %s is not on a trip.",
+      getAgent().getId()
+    );
+    return destinationSupplier
+      .get()
+      .map(destination -> {
+        currentTrip.setDestination(destination);
+        return SUCCEEDED;
+      })
+      .orElse(FAILED);
+  }
 }

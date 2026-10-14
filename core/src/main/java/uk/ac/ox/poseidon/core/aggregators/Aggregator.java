@@ -37,17 +37,15 @@ import java.util.stream.Stream;
  * {@link uk.ac.ox.poseidon.core.aggregators.Factories} for the entry points.
  */
 public interface Aggregator extends Function<DoubleStream, OptionalDouble> {
+  default OptionalDouble apply(final Stream<? extends Number> numbers) {
+    return apply(numbers.mapToDouble(Number::doubleValue));
+  }
 
-    default OptionalDouble apply(final Stream<? extends Number> numbers) {
-        return apply(numbers.mapToDouble(Number::doubleValue));
-    }
+  default OptionalDouble apply(final Collection<? extends Number> numbers) {
+    return apply(numbers.stream());
+  }
 
-    default OptionalDouble apply(final Collection<? extends Number> numbers) {
-        return apply(numbers.stream());
-    }
-
-    default OptionalDouble apply(final double[] numbers) {
-        return apply(Arrays.stream(numbers));
-    }
-
+  default OptionalDouble apply(final double[] numbers) {
+    return apply(Arrays.stream(numbers));
+  }
 }

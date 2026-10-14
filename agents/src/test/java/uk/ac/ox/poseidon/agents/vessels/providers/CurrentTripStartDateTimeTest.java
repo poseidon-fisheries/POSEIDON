@@ -22,44 +22,46 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.trips.Trip;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-
-import java.time.LocalDateTime;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.trips.Trip;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+
 class CurrentTripStartDateTimeTest {
 
-    private static final LocalDateTime NOW = LocalDateTime.of(2026, 1, 1, 3, 0);
+  private static final LocalDateTime NOW = LocalDateTime.of(2026, 1, 1, 3, 0);
 
-    private final Vessel vessel = mock(Vessel.class);
+  private final Vessel vessel = mock(Vessel.class);
 
-    CurrentTripStartDateTimeTest() {
-        final TemporalSchedule schedule = mock(TemporalSchedule.class);
-        when(schedule.getDateTime()).thenReturn(NOW);
-        when(vessel.getSchedule()).thenReturn(schedule);
-    }
+  CurrentTripStartDateTimeTest() {
+    final TemporalSchedule schedule = mock(TemporalSchedule.class);
+    when(schedule.getDateTime()).thenReturn(NOW);
+    when(vessel.getSchedule()).thenReturn(schedule);
+  }
 
-    @Test
-    void throwsWhenTheVesselIsNotOnATrip() {
-        when(vessel.getCurrentTrip()).thenReturn(null);
+  @Test
+  void throwsWhenTheVesselIsNotOnATrip() {
+    when(vessel.getCurrentTrip()).thenReturn(null);
 
-        assertThatThrownBy(() -> new CurrentTripStartDateTime(vessel).get())
-            .isInstanceOf(IllegalStateException.class);
-    }
+    assertThatThrownBy(() ->
+      new CurrentTripStartDateTime(vessel).get()
+    ).isInstanceOf(IllegalStateException.class);
+  }
 
-    @Test
-    void isTheStartOfTheCurrentTrip() {
-        final Trip trip = mock(Trip.class);
-        when(trip.getStartDateTime()).thenReturn(NOW.minusHours(5));
-        when(vessel.getCurrentTrip()).thenReturn(trip);
+  @Test
+  void isTheStartOfTheCurrentTrip() {
+    final Trip trip = mock(Trip.class);
+    when(trip.getStartDateTime()).thenReturn(NOW.minusHours(5));
+    when(vessel.getCurrentTrip()).thenReturn(trip);
 
-        assertThat(new CurrentTripStartDateTime(vessel).get()).isEqualTo(NOW.minusHours(5));
-    }
+    assertThat(new CurrentTripStartDateTime(vessel).get()).isEqualTo(
+      NOW.minusHours(5)
+    );
+  }
 }

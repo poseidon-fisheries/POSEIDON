@@ -22,16 +22,15 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+
 import com.google.common.collect.ImmutableSet;
+import java.util.Arrays;
+import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.ToString;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
-
-import java.util.Arrays;
-import java.util.function.Predicate;
-
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 /**
  * An {@link AbstractModelGrid} where only a fixed subset of cells is active. Built via
@@ -39,56 +38,55 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
  */
 class ModelGridWithSomeCellsActive extends AbstractModelGrid {
 
-    // Using ImmutableSet here as it should provide fast lookup _and_ iteration
-    @ToString.Exclude
-    @Getter
-    private final ImmutableSet<Int2D> activeCells;
+  // Using ImmutableSet here as it should provide fast lookup _and_ iteration
+  @ToString.Exclude
+  @Getter
+  private final ImmutableSet<Int2D> activeCells;
 
-    ModelGridWithSomeCellsActive(
-        final int gridWidth,
-        final int gridHeight,
-        final Envelope envelope,
-        final Predicate<Int2D> activePredicate
-    ) {
-        this(
-            gridWidth,
-            gridHeight,
-            envelope,
-            makeAllCellsArray(gridWidth, gridHeight),
-            activePredicate
-        );
-    }
+  ModelGridWithSomeCellsActive(
+    final int gridWidth,
+    final int gridHeight,
+    final Envelope envelope,
+    final Predicate<Int2D> activePredicate
+  ) {
+    this(
+      gridWidth,
+      gridHeight,
+      envelope,
+      makeAllCellsArray(gridWidth, gridHeight),
+      activePredicate
+    );
+  }
 
-    private ModelGridWithSomeCellsActive(
-        final int gridWidth,
-        final int gridHeight,
-        final Envelope envelope,
-        final Int2D[] allCells,
-        final Predicate<Int2D> activePredicate
-    ) {
-        this(
-            gridWidth,
-            gridHeight,
-            envelope,
-            allCells,
-            Arrays.stream(allCells).filter(activePredicate).collect(toImmutableSet())
-        );
-    }
+  private ModelGridWithSomeCellsActive(
+    final int gridWidth,
+    final int gridHeight,
+    final Envelope envelope,
+    final Int2D[] allCells,
+    final Predicate<Int2D> activePredicate
+  ) {
+    this(
+      gridWidth,
+      gridHeight,
+      envelope,
+      allCells,
+      Arrays.stream(allCells).filter(activePredicate).collect(toImmutableSet())
+    );
+  }
 
-    private ModelGridWithSomeCellsActive(
-        final int gridWidth,
-        final int gridHeight,
-        final Envelope envelope,
-        final Int2D[] allCells,
-        final ImmutableSet<Int2D> activeCells
-    ) {
-        super(gridWidth, gridHeight, envelope, allCells);
-        this.activeCells = activeCells;
-    }
+  private ModelGridWithSomeCellsActive(
+    final int gridWidth,
+    final int gridHeight,
+    final Envelope envelope,
+    final Int2D[] allCells,
+    final ImmutableSet<Int2D> activeCells
+  ) {
+    super(gridWidth, gridHeight, envelope, allCells);
+    this.activeCells = activeCells;
+  }
 
-    @Override
-    public boolean isActive(final Int2D cell) {
-        return activeCells.contains(cell);
-    }
-
+  @Override
+  public boolean isActive(final Int2D cell) {
+    return activeCells.contains(cell);
+  }
 }

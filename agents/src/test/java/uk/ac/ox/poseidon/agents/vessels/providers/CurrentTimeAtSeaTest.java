@@ -22,39 +22,38 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.trips.Trip;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.time.Duration;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.trips.Trip;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+
 class CurrentTimeAtSeaTest {
 
-    @Test
-    void throwsWhenNoTripIsInProgress() {
-        final Vessel vessel = mock(Vessel.class);
-        when(vessel.getCurrentTrip()).thenReturn(null);
+  @Test
+  void throwsWhenNoTripIsInProgress() {
+    final Vessel vessel = mock(Vessel.class);
+    when(vessel.getCurrentTrip()).thenReturn(null);
 
-        final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea(vessel);
+    final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea(vessel);
 
-        assertThrows(IllegalStateException.class, currentTimeAtSea::get);
-    }
+    assertThrows(IllegalStateException.class, currentTimeAtSea::get);
+  }
 
-    @Test
-    void isTheCurrentTripsTimeAtSea() {
-        final Vessel vessel = mock(Vessel.class);
-        final Trip trip = mock(Trip.class);
+  @Test
+  void isTheCurrentTripsTimeAtSea() {
+    final Vessel vessel = mock(Vessel.class);
+    final Trip trip = mock(Trip.class);
 
-        when(vessel.getCurrentTrip()).thenReturn(trip);
-        when(trip.getTimeAtSea()).thenReturn(Duration.ofHours(3));
+    when(vessel.getCurrentTrip()).thenReturn(trip);
+    when(trip.getTimeAtSea()).thenReturn(Duration.ofHours(3));
 
-        final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea(vessel);
+    final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea(vessel);
 
-        assertEquals(Duration.ofHours(3), currentTimeAtSea.get());
-    }
+    assertEquals(Duration.ofHours(3), currentTimeAtSea.get());
+  }
 }

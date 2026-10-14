@@ -22,17 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
+
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 
 /**
  * An {@link OptionValues} backed by a {@link Map} of option to value, computing (and caching)
@@ -40,65 +39,71 @@ import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
  */
 public abstract class MapBasedOptionValues<O> implements OptionValues<O> {
 
-    /** Cached result of {@link #getBestEntries()}; cleared by subclasses on mutation. */
-    protected ImmutableList<Map.Entry<O, Double>> cachedBest = null;
+  /** Cached result of {@link #getBestEntries()}; cleared by subclasses on mutation. */
+  protected ImmutableList<Map.Entry<O, Double>> cachedBest = null;
 
-    /** @return the backing option-to-value map */
-    protected abstract Map<O, Double> getValues();
+  /** @return the backing option-to-value map */
+  protected abstract Map<O, Double> getValues();
 
-    @Override
-    public Optional<Double> getValue(final O option) {
-        return Optional.ofNullable(getValues().get(option));
-    }
+  @Override
+  public Optional<Double> getValue(final O option) {
+    return Optional.ofNullable(getValues().get(option));
+  }
 
-    @Override
-    public void forEachEntry(final ObjectDoubleBiConsumer<? super O> consumer) {
-        getValues().forEach((option, value) -> consumer.accept(option, (double) value));
-    }
+  @Override
+  public void forEachEntry(final ObjectDoubleBiConsumer<? super O> consumer) {
+    getValues().forEach((option, value) ->
+      consumer.accept(option, (double) value)
+    );
+  }
 
-    @Override
-    public List<O> getBestOptions() {
-        return getBestEntries().stream().map(Map.Entry::getKey).collect(toImmutableList());
-    }
+  @Override
+  public List<O> getBestOptions() {
+    return getBestEntries()
+      .stream()
+      .map(Map.Entry::getKey)
+      .collect(toImmutableList());
+  }
 
-    @Override
-    public Optional<O> getBestOption(final MersenneTwisterFast rng) {
-        return getBestEntry(rng).map(Map.Entry::getKey);
-    }
+  @Override
+  public Optional<O> getBestOption(final MersenneTwisterFast rng) {
+    return getBestEntry(rng).map(Map.Entry::getKey);
+  }
 
-    @Override
-    public Optional<Double> getBestValue() {
-        return getBestEntries().stream().findAny().map(Map.Entry::getValue);
-    }
+  @Override
+  public Optional<Double> getBestValue() {
+    return getBestEntries().stream().findAny().map(Map.Entry::getValue);
+  }
 
-    /** @return every entry tied for the highest value, computed by a full scan and cached in {@link #cachedBest} */
-    @Override
-    public List<Map.Entry<O, Double>> getBestEntries() {
-        if (cachedBest == null) {
-            final List<Map.Entry<O, Double>> best = new ArrayList<>();
-            double bestValue = Double.NEGATIVE_INFINITY;
-            for (final Map.Entry<O, Double> entry : getValues().entrySet()) {
-                final double v = entry.getValue();
-                if (v > bestValue) {
-                    bestValue = v;
-                    best.clear();
-                    best.add(entry);
-                } else if (v == bestValue) {
-                    best.add(entry);
-                }
-            }
-            cachedBest = ImmutableList.copyOf(best);
+  /** @return every entry tied for the highest value, computed by a full scan and cached in {@link #cachedBest} */
+  @Override
+  public List<Map.Entry<O, Double>> getBestEntries() {
+    if (cachedBest == null) {
+      final List<Map.Entry<O, Double>> best = new ArrayList<>();
+      double bestValue = Double.NEGATIVE_INFINITY;
+      for (final Map.Entry<O, Double> entry : getValues().entrySet()) {
+        final double v = entry.getValue();
+        if (v > bestValue) {
+          bestValue = v;
+          best.clear();
+          best.add(entry);
+        } else if (v == bestValue) {
+          best.add(entry);
         }
-        return cachedBest;
+      }
+      cachedBest = ImmutableList.copyOf(best);
     }
+    return cachedBest;
+  }
 
-    /** @param rng the RNG to break ties with; @return one entry uniformly picked among the best, if any */
-    @Override
-    public Optional<Map.Entry<O, Double>> getBestEntry(final MersenneTwisterFast rng) {
-        final List<Map.Entry<O, Double>> bestEntries = getBestEntries();
-        return bestEntries.isEmpty()
-            ? Optional.empty()
-            : Optional.of(oneOf(bestEntries, rng));
-    }
-
+  /** @param rng the RNG to break ties with; @return one entry uniformly picked among the best, if any */
+  @Override
+  public Optional<Map.Entry<O, Double>> getBestEntry(
+    final MersenneTwisterFast rng
+  ) {
+    final List<Map.Entry<O, Double>> bestEntries = getBestEntries();
+    return bestEntries.isEmpty()
+      ? Optional.empty()
+      : Optional.of(oneOf(bestEntries, rng));
+  }
 }

@@ -22,35 +22,36 @@
 
 package uk.ac.ox.poseidon.agents.components;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static uk.ac.ox.poseidon.agents.components.Factories.registeredVesselComponent;
+
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static uk.ac.ox.poseidon.agents.components.Factories.registeredVesselComponent;
-
 class RegisteredVesselComponentFactoryTest {
 
-    private final Simulation simulation = mock(Simulation.class);
+  private final Simulation simulation = mock(Simulation.class);
 
-    @Test
-    void registersComponentWhenCreated() {
-        final VesselComponentRegister<String> register = new VesselComponentRegister<>();
-        final RegisteredVesselComponentFactory<String> factory =
-            registeredVesselComponent(
-                scope -> "component",
-                scope -> register
-            );
+  @Test
+  void registersComponentWhenCreated() {
+    final VesselComponentRegister<String> register =
+      new VesselComponentRegister<>();
+    final RegisteredVesselComponentFactory<String> factory =
+      registeredVesselComponent(scope -> "component", scope -> register);
 
-        final Vessel vessel = mock(Vessel.class);
-        final VesselScope scope = new VesselScope(new SimulationScope(simulation), vessel);
+    final Vessel vessel = mock(Vessel.class);
+    final VesselScope scope = new VesselScope(
+      new SimulationScope(simulation),
+      vessel
+    );
 
-        final String component = factory.get(scope);
+    final String component = factory.get(scope);
 
-        assertThat(component).isEqualTo("component");
-        assertThat(register.getComponent(vessel)).contains("component");
-    }
+    assertThat(component).isEqualTo("component");
+    assertThat(register.getComponent(vessel)).contains("component");
+  }
 }

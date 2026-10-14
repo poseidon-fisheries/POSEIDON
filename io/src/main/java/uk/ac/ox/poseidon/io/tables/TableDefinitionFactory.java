@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.List;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link TableDefinition}, built via
@@ -40,14 +39,18 @@ import java.util.List;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TableDefinitionFactory<S extends Scope>
-    extends RelativeScopeFactory<S, TableDefinition> {
+public class TableDefinitionFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  TableDefinition
+> {
 
-    private Factory<? super S, ? extends List<? extends ColumnDefinition>> columnDefinitions;
+  private Factory<
+    ? super S,
+    ? extends List<? extends ColumnDefinition>
+  > columnDefinitions;
 
-    @Override
-    protected TableDefinition newInstance(final S scope) {
-        return new TableDefinition(columnDefinitions.get(scope));
-    }
-
+  @Override
+  protected TableDefinition newInstance(final S scope) {
+    return new TableDefinition(columnDefinitions.get(scope));
+  }
 }

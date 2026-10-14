@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.gui;
 
+import javax.swing.*;
 import sim.display.Controller;
 import sim.display.GUIState;
 import uk.ac.ox.poseidon.core.Simulation;
-
-import javax.swing.*;
 
 /**
  * Owns one MASON display window (type {@code D}, e.g. {@link sim.display.Display2D}): builds it,
@@ -34,37 +33,31 @@ import javax.swing.*;
  */
 public abstract class DisplayWrapper<D> {
 
-    private final String title;
-    D display;
-    private JFrame displayFrame;
+  private final String title;
+  D display;
+  private JFrame displayFrame;
 
-    DisplayWrapper(
-        final String title
-    ) {
-        this.title = title;
-    }
+  DisplayWrapper(final String title) {
+    this.title = title;
+  }
 
-    void init(
-        final Controller controller,
-        final GUIState guiState
-    ) {
-        display = createDisplay(guiState);
-        displayFrame = createFrame();
-        displayFrame.setTitle(title);
-        controller.registerFrame(displayFrame);
-        displayFrame.setVisible(true);
-    }
+  void init(final Controller controller, final GUIState guiState) {
+    display = createDisplay(guiState);
+    displayFrame = createFrame();
+    displayFrame.setTitle(title);
+    controller.registerFrame(displayFrame);
+    displayFrame.setVisible(true);
+  }
 
-    void quit() {
-        if (displayFrame != null) displayFrame.dispose();
-        displayFrame = null;
-        display = null;
-    }
+  void quit() {
+    if (displayFrame != null) displayFrame.dispose();
+    displayFrame = null;
+    display = null;
+  }
 
-    abstract void setupPortrayals(Simulation simulation);
+  abstract void setupPortrayals(Simulation simulation);
 
-    abstract D createDisplay(GUIState guiState);
+  abstract D createDisplay(GUIState guiState);
 
-    abstract JFrame createFrame();
-
+  abstract JFrame createFrame();
 }

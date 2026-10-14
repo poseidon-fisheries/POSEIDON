@@ -40,15 +40,16 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class HomePortDestinationSupplierFactory
-    extends VesselScopeFactory<HomePortDestinationSupplier> {
+  extends VesselScopeFactory<HomePortDestinationSupplier>
+{
 
-    private Factory<? super VesselScope, ? extends PortGrid> portGrid;
+  private Factory<? super VesselScope, ? extends PortGrid> portGrid;
 
-    @Override
-    protected HomePortDestinationSupplier newInstance(final VesselScope scope) {
-        return new HomePortDestinationSupplier(
-            scope.getVessel(),
-            portGrid.get(scope)
-        );
-    }
+  @Override
+  protected HomePortDestinationSupplier newInstance(final VesselScope scope) {
+    return new HomePortDestinationSupplier(
+      scope.getVessel(),
+      portGrid.get(scope)
+    );
+  }
 }

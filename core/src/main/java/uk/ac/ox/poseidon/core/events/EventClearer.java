@@ -22,12 +22,12 @@
 
 package uk.ac.ox.poseidon.core.events;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static uk.ac.ox.poseidon.core.Simulation.log;
+
 import lombok.RequiredArgsConstructor;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-
-import static java.lang.System.Logger.Level.DEBUG;
-import static uk.ac.ox.poseidon.core.Simulation.log;
 
 /**
  * A {@link Steppable} that clears a given {@link EventAccumulator} every time it runs, logging how
@@ -38,19 +38,21 @@ import static uk.ac.ox.poseidon.core.Simulation.log;
 @RequiredArgsConstructor
 public class EventClearer implements Steppable {
 
-    private static final System.Logger logger = System.getLogger(EventClearer.class.getName());
+  private static final System.Logger logger = System.getLogger(
+    EventClearer.class.getName()
+  );
 
-    private final EventAccumulator<?> accumulator;
+  private final EventAccumulator<?> accumulator;
 
-    @Override
-    public void step(final SimState simState) {
-        log(
-            logger,
-            DEBUG,
-            simState,
-            "Clearing {0} events from accumulator",
-            accumulator.getEvents().count()
-        );
-        accumulator.clear();
-    }
+  @Override
+  public void step(final SimState simState) {
+    log(
+      logger,
+      DEBUG,
+      simState,
+      "Clearing {0} events from accumulator",
+      accumulator.getEvents().count()
+    );
+    accumulator.clear();
+  }
 }

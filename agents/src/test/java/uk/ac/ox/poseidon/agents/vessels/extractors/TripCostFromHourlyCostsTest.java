@@ -22,33 +22,33 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.Duration;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 class TripCostFromHourlyCostsTest {
 
-    @Test
-    void appliesHourlyRateToHoursAtSea() {
-        final CurrencyUnit eur = CurrencyUnit.of("EUR");
-        final Money hourlyCost = Money.of(eur, 10.0);
+  @Test
+  void appliesHourlyRateToHoursAtSea() {
+    final CurrencyUnit eur = CurrencyUnit.of("EUR");
+    final Money hourlyCost = Money.of(eur, 10.0);
 
-        final Vessel vessel = mock(Vessel.class);
-        final Trip trip = mock(Trip.class);
-        when(vessel.getCurrentTrip()).thenReturn(trip);
-        when(trip.getTimeAtSea()).thenReturn(Duration.ofHours(3));
+    final Vessel vessel = mock(Vessel.class);
+    final Trip trip = mock(Trip.class);
+    when(vessel.getCurrentTrip()).thenReturn(trip);
+    when(trip.getTimeAtSea()).thenReturn(Duration.ofHours(3));
 
-        final TripCostFromHourlyCosts tripCost =
-            new TripCostFromHourlyCosts(v -> hourlyCost);
+    final TripCostFromHourlyCosts tripCost = new TripCostFromHourlyCosts(
+      v -> hourlyCost
+    );
 
-        assertThat(tripCost.apply(vessel)).isEqualTo(Money.of(eur, 30.0));
-    }
+    assertThat(tripCost.apply(vessel)).isEqualTo(Money.of(eur, 30.0));
+  }
 }

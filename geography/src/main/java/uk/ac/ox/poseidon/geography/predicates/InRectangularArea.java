@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
+import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
-
-import java.util.function.Predicate;
 
 /**
  * A {@link Predicate} testing whether a {@link Coordinate} falls within a fixed {@link Envelope}.
@@ -37,11 +36,11 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class InRectangularArea implements Predicate<Coordinate> {
 
-    private final Envelope envelope;
+  private final Envelope envelope;
 
-    /** @return whether {@code coordinate} falls within this predicate's envelope */
-    @Override
-    public boolean test(final Coordinate coordinate) {
-        return envelope.contains(coordinate);
-    }
+  /** @return whether {@code coordinate} falls within this predicate's envelope */
+  @Override
+  public boolean test(final Coordinate coordinate) {
+    return envelope.contains(coordinate);
+  }
 }

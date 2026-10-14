@@ -22,16 +22,15 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
-
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Records each fishing event it receives in a {@link Memory}: the event's retained catch, observed
@@ -44,32 +43,40 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class FishingEventRecorder extends AbstractListener<FishingEvent> {
 
-    private final ModelGrid modelGrid;
-    private final Function<? super FishingEvent, ? extends Memory<Int2D, Bucket>> memorySelector;
-    private final BinaryOperator<Bucket> updateRule;
+  private final ModelGrid modelGrid;
+  private final Function<
+    ? super FishingEvent,
+    ? extends Memory<Int2D, Bucket>
+  > memorySelector;
+  private final BinaryOperator<Bucket> updateRule;
 
-    /**
-     * @param modelGrid      the grid giving the cell of a fishing event's coordinate
-     * @param memorySelector selects, from a fishing event, the memory to record it in
-     * @param updateRule     revises what is remembered of a cell with a new observation of it
-     */
-    FishingEventRecorder(
-        final ModelGrid modelGrid,
-        final Function<? super FishingEvent, ? extends Memory<Int2D, Bucket>> memorySelector,
-        final BinaryOperator<Bucket> updateRule
-    ) {
-        super(FishingEvent.class);
-        this.modelGrid = checkNotNull(modelGrid);
-        this.memorySelector = checkNotNull(memorySelector);
-        this.updateRule = checkNotNull(updateRule);
-    }
+  /**
+   * @param modelGrid      the grid giving the cell of a fishing event's coordinate
+   * @param memorySelector selects, from a fishing event, the memory to record it in
+   * @param updateRule     revises what is remembered of a cell with a new observation of it
+   */
+  FishingEventRecorder(
+    final ModelGrid modelGrid,
+    final Function<
+      ? super FishingEvent,
+      ? extends Memory<Int2D, Bucket>
+    > memorySelector,
+    final BinaryOperator<Bucket> updateRule
+  ) {
+    super(FishingEvent.class);
+    this.modelGrid = checkNotNull(modelGrid);
+    this.memorySelector = checkNotNull(memorySelector);
+    this.updateRule = checkNotNull(updateRule);
+  }
 
-    @Override
-    public void receive(final FishingEvent event) {
-        memorySelector.apply(event).observe(
-            modelGrid.toCell(event.getAction().getStartCoordinate()),
-            event.getOutcome().getDisposition().getRetained(),
-            updateRule
-        );
-    }
+  @Override
+  public void receive(final FishingEvent event) {
+    memorySelector
+      .apply(event)
+      .observe(
+        modelGrid.toCell(event.getAction().getStartCoordinate()),
+        event.getOutcome().getDisposition().getRetained(),
+        updateRule
+      );
+  }
 }

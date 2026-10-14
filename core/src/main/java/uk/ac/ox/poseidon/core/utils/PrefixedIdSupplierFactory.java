@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
+import java.util.concurrent.atomic.AtomicLong;
 import lombok.*;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link PrefixedIdSupplier}, built via
@@ -36,13 +35,15 @@ import java.util.concurrent.atomic.AtomicLong;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PrefixedIdSupplierFactory extends SimulationScopeFactory<PrefixedIdSupplier> {
+public class PrefixedIdSupplierFactory
+  extends SimulationScopeFactory<PrefixedIdSupplier>
+{
 
-    @NonNull private String prefix;
+  @NonNull
+  private String prefix;
 
-    @Override
-    protected PrefixedIdSupplier newInstance(final SimulationScope scope) {
-        return new PrefixedIdSupplier(prefix, new AtomicLong());
-    }
-
+  @Override
+  protected PrefixedIdSupplier newInstance(final SimulationScope scope) {
+    return new PrefixedIdSupplier(prefix, new AtomicLong());
+  }
 }

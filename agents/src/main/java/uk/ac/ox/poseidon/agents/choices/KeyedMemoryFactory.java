@@ -39,9 +39,14 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class KeyedMemoryFactory<K, O, M> extends SimulationScopeFactory<KeyedMemory<K, O, M>> {
-    @Override
-    protected KeyedMemory<K, O, M> newInstance(final SimulationScope scope) {
-        return new KeyedMemory<>();
-    }
+public class KeyedMemoryFactory<
+  K,
+  O,
+  M
+> extends SimulationScopeFactory<KeyedMemory<K, O, M>> {
+
+  @Override
+  protected KeyedMemory<K, O, M> newInstance(final SimulationScope scope) {
+    return new KeyedMemory<>();
+  }
 }

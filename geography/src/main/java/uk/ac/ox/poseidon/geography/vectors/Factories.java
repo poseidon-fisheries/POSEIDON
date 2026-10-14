@@ -22,26 +22,25 @@
 
 package uk.ac.ox.poseidon.geography.vectors;
 
+import java.nio.file.Path;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import java.nio.file.Path;
-
 /** Factories for reading vector geometry data. */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @param path factory for the shapefile to read
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the list of geometries
-     * read from the resolved shapefile
-     * @see GeometriesFromShapeFileFactory
-     */
-    public static <S extends Scope> GeometriesFromShapeFileFactory<S> geometriesFromShapeFile(
-        final Factory<? super S, ? extends Path> path
-    ) {
-        return new GeometriesFromShapeFileFactory<>(path);
-    }
+  /**
+   * @param path factory for the shapefile to read
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the list of geometries
+   * read from the resolved shapefile
+   * @see GeometriesFromShapeFileFactory
+   */
+  public static <S extends Scope> GeometriesFromShapeFileFactory<S> geometriesFromShapeFile(
+    final Factory<? super S, ? extends Path> path
+  ) {
+    return new GeometriesFromShapeFileFactory<>(path);
+  }
 }

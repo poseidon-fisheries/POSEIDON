@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.List;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of {@link MultiStringKeyFromRow}, built via
@@ -39,13 +38,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MultiStringKeyFromRowFactory extends GlobalScopeFactory<MultiStringKeyFromRow> {
+public class MultiStringKeyFromRowFactory
+  extends GlobalScopeFactory<MultiStringKeyFromRow>
+{
 
-    List<String> keyColumnNames;
+  List<String> keyColumnNames;
 
-    @Override
-    protected MultiStringKeyFromRow newInstance(final Scope scope) {
-        return new MultiStringKeyFromRow(keyColumnNames);
-    }
-
+  @Override
+  protected MultiStringKeyFromRow newInstance(final Scope scope) {
+    return new MultiStringKeyFromRow(keyColumnNames);
+  }
 }

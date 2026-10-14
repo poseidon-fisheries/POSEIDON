@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.core.quantities;
 
+import static tech.units.indriya.unit.Units.KILOGRAM;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Mass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,11 +33,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
-
-import static tech.units.indriya.unit.Units.KILOGRAM;
 
 /**
  * A {@link RelativeScopeFactory} for the numeric value, in kilograms, of a resolved {@link Mass}
@@ -46,16 +45,15 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class KilogramsFactory<S extends Scope> extends RelativeScopeFactory<S, Double> {
+public class KilogramsFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  Double
+> {
 
-    private Factory<? super S, ? extends Quantity<Mass>> mass;
+  private Factory<? super S, ? extends Quantity<Mass>> mass;
 
-    @Override
-    protected Double newInstance(final S scope) {
-        return mass.get(scope)
-            .to(KILOGRAM)
-            .getValue()
-            .doubleValue();
-    }
-
+  @Override
+  protected Double newInstance(final S scope) {
+    return mass.get(scope).to(KILOGRAM).getValue().doubleValue();
+  }
 }

@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.io.paths;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.nio.file.Path;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,10 +32,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.nio.file.Path;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link Path} resolved against another
@@ -42,14 +41,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class RelativePathFactory<S extends Scope> extends RelativeScopeFactory<S, Path>
-    implements PathFactory<S> {
+public class RelativePathFactory<S extends Scope>
+  extends RelativeScopeFactory<S, Path>
+  implements PathFactory<S>
+{
 
-    private Factory<? super S, Path> parent;
-    private String path;
+  private Factory<? super S, Path> parent;
+  private String path;
 
-    @Override
-    protected Path newInstance(final S scope) {
-        return checkNotNull(parent).get(scope).resolve(path);
-    }
+  @Override
+  protected Path newInstance(final S scope) {
+    return checkNotNull(parent).get(scope).resolve(path);
+  }
 }

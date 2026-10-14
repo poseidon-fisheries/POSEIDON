@@ -22,11 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
+
 import lombok.NonNull;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
-
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 /**
  * Applies per-species discard rates to retained catch, using a pre-indexed rate array
@@ -34,34 +34,33 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
  */
 public class IndexedDiscardRates implements DispositionProcess {
 
-    private final @NonNull SpeciesIndexedDoubleArray discardRates;
+  private final @NonNull SpeciesIndexedDoubleArray discardRates;
 
-    /** @param discardRates per-species proportion of retained catch to discard, each in {@code [0, 1]} */
-    public IndexedDiscardRates(
-        @NonNull final SpeciesIndexedDoubleArray discardRates
-    ) {
-        discardRates.forEachValue(rate -> checkUnitRange(rate, "discard rate"));
-        this.discardRates = discardRates;
-    }
+  /** @param discardRates per-species proportion of retained catch to discard, each in {@code [0, 1]} */
+  public IndexedDiscardRates(
+    @NonNull final SpeciesIndexedDoubleArray discardRates
+  ) {
+    discardRates.forEachValue(rate -> checkUnitRange(rate, "discard rate"));
+    this.discardRates = discardRates;
+  }
 
-    /**
-     * @return {@code currentDisposition} with {@link #discardRates}' per-species fraction of its
-     * retained catch moved into discarded-alive
-     */
-    @Override
-    public Disposition partition(
-        final Disposition currentDisposition,
-        final double availableCapacityInKg
-    ) {
-        final Bucket discarded =
-            SpeciesSpecificRateBuckets.applyRates(
-                currentDisposition.getRetained(),
-                discardRates
-            );
-        return new Disposition(
-            currentDisposition.getRetained().subtract(discarded),
-            currentDisposition.getDiscardedAlive().add(discarded),
-            currentDisposition.getDiscardedDead()
-        );
-    }
+  /**
+   * @return {@code currentDisposition} with {@link #discardRates}' per-species fraction of its
+   * retained catch moved into discarded-alive
+   */
+  @Override
+  public Disposition partition(
+    final Disposition currentDisposition,
+    final double availableCapacityInKg
+  ) {
+    final Bucket discarded = SpeciesSpecificRateBuckets.applyRates(
+      currentDisposition.getRetained(),
+      discardRates
+    );
+    return new Disposition(
+      currentDisposition.getRetained().subtract(discarded),
+      currentDisposition.getDiscardedAlive().add(discarded),
+      currentDisposition.getDiscardedDead()
+    );
+  }
 }

@@ -39,8 +39,9 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class MemoryFactory<O, M> extends SimulationScopeFactory<Memory<O, M>> {
-    @Override
-    protected Memory<O, M> newInstance(final SimulationScope scope) {
-        return new Memory<>();
-    }
+
+  @Override
+  protected Memory<O, M> newInstance(final SimulationScope scope) {
+    return new Memory<>();
+  }
 }

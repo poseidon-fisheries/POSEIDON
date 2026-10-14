@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors.tags;
 
+import static uk.ac.ox.poseidon.core.utils.Utils.toTrimmedString;
+
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.function.Function;
-
-import static uk.ac.ox.poseidon.core.utils.Utils.toTrimmedString;
 
 /**
  * Extracts a vessel's tag named {@code tagName} as a {@link Double}: a {@link Number} tag value
@@ -39,29 +38,30 @@ import static uk.ac.ox.poseidon.core.utils.Utils.toTrimmedString;
 @RequiredArgsConstructor
 public class DoubleTagExtractor implements Function<Vessel, Double> {
 
-    @NonNull private final String tagName;
+  @NonNull
+  private final String tagName;
 
-    private static Double toDouble(final Object value) {
-        if (value instanceof final Number number) {
-            final double doubleValue = number.doubleValue();
-            return Double.isFinite(doubleValue) ? doubleValue : null;
-        }
-        final String stringValue = toTrimmedString(value, true);
-        if (stringValue == null) {
-            return null;
-        }
-        try {
-            return Double.valueOf(stringValue);
-        } catch (final NumberFormatException ignored) {
-            return null;
-        }
+  private static Double toDouble(final Object value) {
+    if (value instanceof final Number number) {
+      final double doubleValue = number.doubleValue();
+      return Double.isFinite(doubleValue) ? doubleValue : null;
     }
-
-    @Override
-    public Double apply(final Vessel vessel) {
-        return vessel.getTag(tagName)
-            .map(DoubleTagExtractor::toDouble)
-            .orElse(null);
+    final String stringValue = toTrimmedString(value, true);
+    if (stringValue == null) {
+      return null;
     }
+    try {
+      return Double.valueOf(stringValue);
+    } catch (final NumberFormatException ignored) {
+      return null;
+    }
+  }
 
+  @Override
+  public Double apply(final Vessel vessel) {
+    return vessel
+      .getTag(tagName)
+      .map(DoubleTagExtractor::toDouble)
+      .orElse(null);
+  }
 }

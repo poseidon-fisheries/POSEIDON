@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import static lombok.AccessLevel.PACKAGE;
+
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-
-import java.util.function.Supplier;
-
-import static lombok.AccessLevel.PACKAGE;
 
 /**
  * Supplies the best options across a vessel's active friends' own {@link OptionValues}
@@ -39,25 +38,28 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor(access = PACKAGE)
 class BestOptionsFromFriends<O> implements Supplier<OptionValues<O>> {
 
-    private final VesselComponentRegister<? extends OptionValues<O>> optionValuesRegister;
-    private final Supplier<? extends Iterable<? extends Vessel>> friendsSupplier;
-    private final ReusableOptionValues<O> aggregatedValues = new ReusableOptionValues<>();
+  private final VesselComponentRegister<
+    ? extends OptionValues<O>
+  > optionValuesRegister;
+  private final Supplier<? extends Iterable<? extends Vessel>> friendsSupplier;
+  private final ReusableOptionValues<O> aggregatedValues =
+    new ReusableOptionValues<>();
 
-    /**
-     * @return every active friend's best options, merged by keeping the highest value for each
-     * option; the same reused instance every call, invalidated by the next call
-     */
-    @Override
-    public OptionValues<O> get() {
-        aggregatedValues.clear();
-        for (final Vessel friend : friendsSupplier.get()) {
-            if (!friend.isActive()) continue;
-            final OptionValues<O> values = optionValuesRegister
-                .getComponent(friend)
-                .orElse(null);
-            if (values == null) continue;
-            values.forEachBestEntry(aggregatedValues::putIfGreater);
-        }
-        return aggregatedValues;
+  /**
+   * @return every active friend's best options, merged by keeping the highest value for each
+   * option; the same reused instance every call, invalidated by the next call
+   */
+  @Override
+  public OptionValues<O> get() {
+    aggregatedValues.clear();
+    for (final Vessel friend : friendsSupplier.get()) {
+      if (!friend.isActive()) continue;
+      final OptionValues<O> values = optionValuesRegister
+        .getComponent(friend)
+        .orElse(null);
+      if (values == null) continue;
+      values.forEachBestEntry(aggregatedValues::putIfGreater);
     }
+    return aggregatedValues;
+  }
 }

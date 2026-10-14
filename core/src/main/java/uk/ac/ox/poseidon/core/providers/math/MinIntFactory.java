@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
+import java.util.function.IntSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,8 +30,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.util.function.IntSupplier;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link MinInt}, built via
@@ -40,14 +39,16 @@ import java.util.function.IntSupplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MinIntFactory<S extends Scope> extends RelativeScopeFactory<S, MinInt> {
+public class MinIntFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  MinInt
+> {
 
-    private Factory<? super S, ? extends IntSupplier> a;
-    private Factory<? super S, ? extends IntSupplier> b;
+  private Factory<? super S, ? extends IntSupplier> a;
+  private Factory<? super S, ? extends IntSupplier> b;
 
-    @Override
-    protected MinInt newInstance(final S scope) {
-        return new MinInt(a.get(scope), b.get(scope));
-    }
-
+  @Override
+  protected MinInt newInstance(final S scope) {
+    return new MinInt(a.get(scope), b.get(scope));
+  }
 }

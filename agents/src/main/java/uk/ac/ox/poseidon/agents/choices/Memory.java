@@ -22,16 +22,15 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.NoArgsConstructor;
+import static java.util.Objects.requireNonNull;
+import static lombok.AccessLevel.PACKAGE;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
-
-import static java.util.Objects.requireNonNull;
-import static lombok.AccessLevel.PACKAGE;
+import lombok.NoArgsConstructor;
 
 /**
  * What has been observed about each option (e.g. each destination cell), as one remembered
@@ -47,46 +46,46 @@ import static lombok.AccessLevel.PACKAGE;
 @NoArgsConstructor(access = PACKAGE)
 public class Memory<O, M> {
 
-    private final Map<O, M> contents = new HashMap<>();
+  private final Map<O, M> contents = new HashMap<>();
 
-    /**
-     * Remembers {@code observation} for {@code option}: as is if nothing is remembered for it
-     * yet, otherwise combined with what is remembered by {@code rule}.
-     *
-     * @param option      the option observed
-     * @param observation what was observed; must not be {@code null}
-     * @param rule        called with the recollection of {@code option} first and
-     *                    {@code observation} second, it returns what to remember from now on; must
-     *                    not return {@code null}
-     */
-    public void observe(
-        final O option,
-        final M observation,
-        final BinaryOperator<M> rule
-    ) {
-        contents.merge(
-            option,
-            requireNonNull(observation, "observation"),
-            (recollection, _) ->
-                requireNonNull(rule.apply(recollection, observation), "rule result")
-        );
-    }
+  /**
+   * Remembers {@code observation} for {@code option}: as is if nothing is remembered for it
+   * yet, otherwise combined with what is remembered by {@code rule}.
+   *
+   * @param option      the option observed
+   * @param observation what was observed; must not be {@code null}
+   * @param rule        called with the recollection of {@code option} first and
+   *                    {@code observation} second, it returns what to remember from now on; must
+   *                    not return {@code null}
+   */
+  public void observe(
+    final O option,
+    final M observation,
+    final BinaryOperator<M> rule
+  ) {
+    contents.merge(
+      option,
+      requireNonNull(observation, "observation"),
+      (recollection, _) ->
+        requireNonNull(rule.apply(recollection, observation), "rule result")
+    );
+  }
 
-    /**
-     * @param option the option to look up
-     * @return what is remembered for {@code option}, if it has been observed
-     */
-    public Optional<M> get(final O option) {
-        return Optional.ofNullable(contents.get(option));
-    }
+  /**
+   * @param option the option to look up
+   * @return what is remembered for {@code option}, if it has been observed
+   */
+  public Optional<M> get(final O option) {
+    return Optional.ofNullable(contents.get(option));
+  }
 
-    /**
-     * Calls {@code action} once per observed option, with what is remembered for it, in no
-     * particular order.
-     *
-     * @param action the action to call
-     */
-    public void forEach(final BiConsumer<? super O, ? super M> action) {
-        contents.forEach(action);
-    }
+  /**
+   * Calls {@code action} once per observed option, with what is remembered for it, in no
+   * particular order.
+   *
+   * @param action the action to call
+   */
+  public void forEach(final BiConsumer<? super O, ? super M> action) {
+    contents.forEach(action);
+  }
 }

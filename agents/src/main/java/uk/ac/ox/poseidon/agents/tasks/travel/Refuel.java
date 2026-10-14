@@ -22,15 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import static java.util.Comparator.comparing;
+
+import java.time.Duration;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.fuel.FuelStation;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
-
-import java.time.Duration;
-
-import static java.util.Comparator.comparing;
 
 /**
  * An {@link ExtendedTripTask} that refuels the vessel at the cheapest fuel station in its
@@ -39,38 +38,42 @@ import static java.util.Comparator.comparing;
 @RequiredArgsConstructor
 public class Refuel extends ExtendedTripTask {
 
-    private final @NonNull FuelStationGrid fuelStationGrid;
-    private Duration duration;
+  private final @NonNull FuelStationGrid fuelStationGrid;
+  private Duration duration;
 
-    /**
-     * Buys fuel from the cheapest-per-litre fuel station in the vessel's current cell, charging
-     * its price to the trip account and recording its duration.
-     *
-     * @throws IllegalStateException if there's no fuel station in the vessel's current cell
-     */
-    @Override
-    public void start() {
-        super.start();
-        final FuelStation.Purchase purchase = fuelStationGrid
-            .getObjectsAt(getAgent().getCell())
-            .min(comparing(FuelStation::getPricePerLitre))
-            .map(fuelStation -> fuelStation.refill(getAgent().getEngine().getFuelTank()))
-            .orElseThrow(() -> new IllegalStateException(
-                "No fuel stations found in cell: " + getAgent().getCell())
-            );
-        duration = purchase.getDuration();
-        getTrip().getAccount().subtract(purchase.getPrice());
-    }
+  /**
+   * Buys fuel from the cheapest-per-litre fuel station in the vessel's current cell, charging
+   * its price to the trip account and recording its duration.
+   *
+   * @throws IllegalStateException if there's no fuel station in the vessel's current cell
+   */
+  @Override
+  public void start() {
+    super.start();
+    final FuelStation.Purchase purchase = fuelStationGrid
+      .getObjectsAt(getAgent().getCell())
+      .min(comparing(FuelStation::getPricePerLitre))
+      .map(fuelStation ->
+        fuelStation.refill(getAgent().getEngine().getFuelTank())
+      )
+      .orElseThrow(() ->
+        new IllegalStateException(
+          "No fuel stations found in cell: " + getAgent().getCell()
+        )
+      );
+    duration = purchase.getDuration();
+    getTrip().getAccount().subtract(purchase.getPrice());
+  }
 
-    /** @return the purchase's duration, computed at {@link #start()} */
-    @Override
-    protected Duration getDuration() {
-        return duration;
-    }
+  /** @return the purchase's duration, computed at {@link #start()} */
+  @Override
+  protected Duration getDuration() {
+    return duration;
+  }
 
-    /** @return always {@code SUCCEEDED} */
-    @Override
-    protected Status complete() {
-        return Status.SUCCEEDED;
-    }
+  /** @return always {@code SUCCEEDED} */
+  @Override
+  protected Status complete() {
+    return Status.SUCCEEDED;
+  }
 }

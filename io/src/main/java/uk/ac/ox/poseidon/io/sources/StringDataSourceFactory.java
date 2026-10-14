@@ -37,13 +37,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class StringDataSourceFactory extends GlobalScopeFactory<StringDataSource> {
+public class StringDataSourceFactory
+  extends GlobalScopeFactory<StringDataSource>
+{
 
-    private String data;
+  private String data;
 
-    @Override
-    protected StringDataSource newInstance(final Scope scope) {
-        return new StringDataSource(data);
-    }
-
+  @Override
+  protected StringDataSource newInstance(final Scope scope) {
+    return new StringDataSource(data);
+  }
 }

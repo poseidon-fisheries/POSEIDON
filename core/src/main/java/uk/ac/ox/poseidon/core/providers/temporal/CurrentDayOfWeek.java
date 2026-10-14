@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import java.time.DayOfWeek;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.Provider;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-
-import java.time.DayOfWeek;
 
 /**
  * A {@link Provider} that returns the simulation's current day of the week, read live from the
@@ -36,10 +35,10 @@ import java.time.DayOfWeek;
 @RequiredArgsConstructor
 public class CurrentDayOfWeek implements Provider<DayOfWeek> {
 
-    private final TemporalSchedule temporalSchedule;
+  private final TemporalSchedule temporalSchedule;
 
-    @Override
-    public DayOfWeek get() {
-        return temporalSchedule.getDateTime().getDayOfWeek();
-    }
+  @Override
+  public DayOfWeek get() {
+    return temporalSchedule.getDateTime().getDayOfWeek();
+  }
 }

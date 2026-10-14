@@ -22,24 +22,23 @@
 
 package uk.ac.ox.poseidon.agents.vessels.holds;
 
+import static java.lang.Double.POSITIVE_INFINITY;
+
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
-
-import static java.lang.Double.POSITIVE_INFINITY;
 
 /** A {@link BiomassHold} with unlimited capacity; never full, never rejects content. */
 @Getter
 public class InfiniteBiomassHold extends BiomassHold {
 
-    /** @param catchCategoriser sorts uncategorised content added to the hold */
-    public InfiniteBiomassHold(final CatchCategoriser catchCategoriser) {
-        super(catchCategoriser);
-    }
+  /** @param catchCategoriser sorts uncategorised content added to the hold */
+  public InfiniteBiomassHold(final CatchCategoriser catchCategoriser) {
+    super(catchCategoriser);
+  }
 
-    /** @return {@link Double#POSITIVE_INFINITY} */
-    @Override
-    public double getTotalCapacityInKg() {
-        return POSITIVE_INFINITY;
-    }
-
+  /** @return {@link Double#POSITIVE_INFINITY} */
+  @Override
+  public double getTotalCapacityInKg() {
+    return POSITIVE_INFINITY;
+  }
 }

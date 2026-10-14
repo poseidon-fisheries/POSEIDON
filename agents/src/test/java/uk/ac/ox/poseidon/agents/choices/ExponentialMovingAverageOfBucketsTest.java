@@ -22,53 +22,58 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.biology.buckets.Bucket;
-import uk.ac.ox.poseidon.biology.species.Species;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.within;
 
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.biology.species.Species;
+
 class ExponentialMovingAverageOfBucketsTest {
 
-    private final Species a = new Species("A", null, "A");
-    private final Species b = new Species("B", null, "B");
-    private final ExponentialMovingAverageOfBuckets rule =
-        new ExponentialMovingAverageOfBuckets(0.25);
+  private final Species a = new Species("A", null, "A");
+  private final Species b = new Species("B", null, "B");
+  private final ExponentialMovingAverageOfBuckets rule =
+    new ExponentialMovingAverageOfBuckets(0.25);
 
-    @Test
-    void speciesInBothBucketsIsAveraged() {
-        final Bucket result = rule.apply(Bucket.of(a, 10), Bucket.of(a, 4));
+  @Test
+  void speciesInBothBucketsIsAveraged() {
+    final Bucket result = rule.apply(Bucket.of(a, 10), Bucket.of(a, 4));
 
-        assertThat(result.getKg(a)).isCloseTo(10 * 0.75 + 4 * 0.25, within(1e-12));
-    }
+    assertThat(result.getKg(a)).isCloseTo(10 * 0.75 + 4 * 0.25, within(1e-12));
+  }
 
-    @Test
-    void speciesOnlyRememberedDecays() {
-        final Bucket result = rule.apply(Bucket.of(a, 10).add(Bucket.of(b, 8)), Bucket.of(a, 4));
+  @Test
+  void speciesOnlyRememberedDecays() {
+    final Bucket result = rule.apply(
+      Bucket.of(a, 10).add(Bucket.of(b, 8)),
+      Bucket.of(a, 4)
+    );
 
-        assertThat(result.getKg(b)).isCloseTo(8 * 0.75, within(1e-12));
-    }
+    assertThat(result.getKg(b)).isCloseTo(8 * 0.75, within(1e-12));
+  }
 
-    @Test
-    void speciesOnlyObservedEntersWeightedByAlpha() {
-        final Bucket result = rule.apply(Bucket.of(a, 10), Bucket.of(b, 8));
+  @Test
+  void speciesOnlyObservedEntersWeightedByAlpha() {
+    final Bucket result = rule.apply(Bucket.of(a, 10), Bucket.of(b, 8));
 
-        assertThat(result.getKg(a)).isCloseTo(10 * 0.75, within(1e-12));
-        assertThat(result.getKg(b)).isCloseTo(8 * 0.25, within(1e-12));
-    }
+    assertThat(result.getKg(a)).isCloseTo(10 * 0.75, within(1e-12));
+    assertThat(result.getKg(b)).isCloseTo(8 * 0.25, within(1e-12));
+  }
 
-    @Test
-    void emptyBucketsGiveAnEmptyBucket() {
-        assertThat(rule.apply(Bucket.empty(), Bucket.empty()).isEmpty()).isTrue();
-    }
+  @Test
+  void emptyBucketsGiveAnEmptyBucket() {
+    assertThat(rule.apply(Bucket.empty(), Bucket.empty()).isEmpty()).isTrue();
+  }
 
-    @Test
-    void alphaOutsideTheUnitRangeIsRejected() {
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> new ExponentialMovingAverageOfBuckets(-0.1));
-        assertThatIllegalArgumentException()
-            .isThrownBy(() -> new ExponentialMovingAverageOfBuckets(1.1));
-    }
+  @Test
+  void alphaOutsideTheUnitRangeIsRejected() {
+    assertThatIllegalArgumentException().isThrownBy(() ->
+      new ExponentialMovingAverageOfBuckets(-0.1)
+    );
+    assertThatIllegalArgumentException().isThrownBy(() ->
+      new ExponentialMovingAverageOfBuckets(1.1)
+    );
+  }
 }

@@ -47,33 +47,32 @@ import uk.ac.ox.poseidon.core.Factory;
 @EqualsAndHashCode(callSuper = true)
 public class RoundTripFactory extends VesselTaskFactory<Sequence<Vessel>> {
 
-    private Factory<? super VesselScope, ? extends Task<Vessel>> startTripTask;
-    private Factory<? super VesselScope, ? extends Task<Vessel>> travelTask;
-    private Factory<? super VesselScope, ? extends Task<Vessel>> fishingTask;
-    private Factory<? super VesselScope, ? extends Task<Vessel>> landingTask;
+  private Factory<? super VesselScope, ? extends Task<Vessel>> startTripTask;
+  private Factory<? super VesselScope, ? extends Task<Vessel>> travelTask;
+  private Factory<? super VesselScope, ? extends Task<Vessel>> fishingTask;
+  private Factory<? super VesselScope, ? extends Task<Vessel>> landingTask;
 
-    /**
-     * @return a {@link Sequence} of: {@code startTripTask}, {@code travelTask} (outbound),
-     * {@code fishingTask}, a {@link SetDestinationToOrigin}, {@code travelTask} again (inbound),
-     * an {@link ArriveInPort}, {@code landingTask}, and an {@link EndTrip}
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    protected Sequence<Vessel> newTask(final VesselScope scope) {
-        final Task<Vessel> startTripTask = this.startTripTask.get(scope);
-        final Task<Vessel> travelTask = this.travelTask.get(scope);
-        final Task<Vessel> fishingTask = this.fishingTask.get(scope);
-        final Task<Vessel> landingTask = this.landingTask.get(scope);
-        return new Sequence<>(
-            startTripTask,
-            travelTask,
-            fishingTask,
-            new SetDestinationToOrigin(),
-            travelTask,
-            new ArriveInPort(),
-            landingTask,
-            new EndTrip()
-        );
-    }
-
+  /**
+   * @return a {@link Sequence} of: {@code startTripTask}, {@code travelTask} (outbound),
+   * {@code fishingTask}, a {@link SetDestinationToOrigin}, {@code travelTask} again (inbound),
+   * an {@link ArriveInPort}, {@code landingTask}, and an {@link EndTrip}
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  protected Sequence<Vessel> newTask(final VesselScope scope) {
+    final Task<Vessel> startTripTask = this.startTripTask.get(scope);
+    final Task<Vessel> travelTask = this.travelTask.get(scope);
+    final Task<Vessel> fishingTask = this.fishingTask.get(scope);
+    final Task<Vessel> landingTask = this.landingTask.get(scope);
+    return new Sequence<>(
+      startTripTask,
+      travelTask,
+      fishingTask,
+      new SetDestinationToOrigin(),
+      travelTask,
+      new ArriveInPort(),
+      landingTask,
+      new EndTrip()
+    );
+  }
 }

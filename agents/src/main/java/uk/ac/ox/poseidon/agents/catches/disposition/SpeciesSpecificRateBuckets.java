@@ -27,16 +27,15 @@ import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 
 final class SpeciesSpecificRateBuckets {
 
-    private SpeciesSpecificRateBuckets() {
-    }
+  private SpeciesSpecificRateBuckets() {}
 
-    static Bucket applyRates(
-        final Bucket bucket,
-        final SpeciesIndexedDoubleArray rates
-    ) {
-        return bucket.mapWithIndex(
-            rates,
-            (biomass, index) -> rates.getDouble(index) * biomass
-        );
-    }
+  static Bucket applyRates(
+    final Bucket bucket,
+    final SpeciesIndexedDoubleArray rates
+  ) {
+    return bucket.mapWithIndex(
+      rates,
+      (biomass, index) -> rates.getDouble(index) * biomass
+    );
+  }
 }

@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.regulations;
 
-import lombok.NonNull;
-import uk.ac.ox.poseidon.core.predicates.logical.AllOf;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
+import lombok.NonNull;
+import uk.ac.ox.poseidon.core.predicates.logical.AllOf;
 
 /**
  * The conjunction of several rules: permits an action only when every one of them permits it
@@ -37,17 +36,20 @@ import java.util.function.Predicate;
  *
  * @param <A> the type of action judged
  */
-public class AllOfRegulations<A extends Action<?>> extends AllOf<A> implements Regulations<A> {
+public class AllOfRegulations<A extends Action<?>>
+  extends AllOf<A>
+  implements Regulations<A>
+{
 
-    /** @param regulations the rules, all of which must permit an action */
-    public AllOfRegulations(
-        @NonNull final Collection<? extends Regulations<? super A>> regulations
-    ) {
-        super(List.<Predicate<? super A>>copyOf(regulations));
-    }
+  /** @param regulations the rules, all of which must permit an action */
+  public AllOfRegulations(
+    @NonNull final Collection<? extends Regulations<? super A>> regulations
+  ) {
+    super(List.<Predicate<? super A>>copyOf(regulations));
+  }
 
-    @Override
-    public boolean isPermitted(final A action) {
-        return test(action);
-    }
+  @Override
+  public boolean isPermitted(final A action) {
+    return test(action);
+  }
 }

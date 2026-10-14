@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.regulations.predicates;
 
+import java.time.Duration;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
@@ -29,40 +30,38 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
-import java.time.Duration;
-
 /**
  * Factories for predicates over candidate fishing locations, built on the
  * {@link uk.ac.ox.poseidon.regulations} model.
  */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @param regulations     the regulations a candidate fishing action must be permitted by
-     * @param pathFinder      finds the path from the vessel's current cell to the candidate
-     * @param distance        gives the travel time along that path
-     * @param fishingDuration the typical duration of a fishing action, which the candidate action
-     *                        lasts (see {@link FishingLocationLegalityChecker})
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-     * {@link FishingLocationLegalityChecker}
-     * @see FishingLocationLegalityCheckerFactory
-     */
-    public static FishingLocationLegalityCheckerFactory fishingLocationLegalityChecker(
-        final Factory<
-            ? super VesselScope,
-            ? extends Regulations<? super ExtendedFishingAction>
-            > regulations,
-        final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
-        final Factory<? super VesselScope, ? extends DistanceCalculator> distance,
-        final Factory<? super VesselScope, ? extends Duration> fishingDuration
-    ) {
-        return new FishingLocationLegalityCheckerFactory(
-            regulations,
-            pathFinder,
-            distance,
-            fishingDuration
-        );
-    }
+  /**
+   * @param regulations     the regulations a candidate fishing action must be permitted by
+   * @param pathFinder      finds the path from the vessel's current cell to the candidate
+   * @param distance        gives the travel time along that path
+   * @param fishingDuration the typical duration of a fishing action, which the candidate action
+   *                        lasts (see {@link FishingLocationLegalityChecker})
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+   * {@link FishingLocationLegalityChecker}
+   * @see FishingLocationLegalityCheckerFactory
+   */
+  public static FishingLocationLegalityCheckerFactory fishingLocationLegalityChecker(
+    final Factory<
+      ? super VesselScope,
+      ? extends Regulations<? super ExtendedFishingAction>
+    > regulations,
+    final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
+    final Factory<? super VesselScope, ? extends DistanceCalculator> distance,
+    final Factory<? super VesselScope, ? extends Duration> fishingDuration
+  ) {
+    return new FishingLocationLegalityCheckerFactory(
+      regulations,
+      pathFinder,
+      distance,
+      fishingDuration
+    );
+  }
 }

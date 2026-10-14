@@ -36,9 +36,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ProportionallyLimitingBiomassToHoldFactory
-    extends GlobalScopeFactory<ProportionallyLimitingBiomassToHold> {
-    @Override
-    protected ProportionallyLimitingBiomassToHold newInstance(final Scope scope) {
-        return new ProportionallyLimitingBiomassToHold();
-    }
+  extends GlobalScopeFactory<ProportionallyLimitingBiomassToHold>
+{
+
+  @Override
+  protected ProportionallyLimitingBiomassToHold newInstance(final Scope scope) {
+    return new ProportionallyLimitingBiomassToHold();
+  }
 }

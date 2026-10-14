@@ -22,119 +22,118 @@
 
 package uk.ac.ox.poseidon.biology.species;
 
-import uk.ac.ox.poseidon.core.utils.ObjIntToObjFunction;
-
 import java.util.function.*;
+import uk.ac.ox.poseidon.core.utils.ObjIntToObjFunction;
 
 /**
  * A {@link SpeciesIndexed} array of arbitrary objects of type {@code T}, one per species.
  * Implemented by {@code FisheableBiomassGrids} in {@code biology.biomass}.
  */
-public interface SpeciesIndexedObjects<T, S extends SpeciesIndexedObjects<T, S>>
-    extends SpeciesIndexed {
+public interface SpeciesIndexedObjects<
+  T,
+  S extends SpeciesIndexedObjects<T, S>
+> extends SpeciesIndexed {
+  /**
+   * Returns the value at a valid index for {@link #getSpeciesIndex()}.
+   */
+  T get(int index);
 
-    /**
-     * Returns the value at a valid index for {@link #getSpeciesIndex()}.
-     */
-    T get(int index);
+  /**
+   * Creates a new instance with the same {@link SpeciesIndex} as this object.
+   * <p>
+   * Intended for internal use by default methods; callers should prefer implementation-specific
+   * factories.
+   *
+   * @param values array aligned with {@link #getSpeciesIndex()}
+   * @return a new instance backed by the provided values
+   */
+  S newInstance(T[] values);
 
-    /**
-     * Creates a new instance with the same {@link SpeciesIndex} as this object.
-     * <p>
-     * Intended for internal use by default methods; callers should prefer implementation-specific
-     * factories.
-     *
-     * @param values array aligned with {@link #getSpeciesIndex()}
-     * @return a new instance backed by the provided values
-     */
-    S newInstance(T[] values);
+  /**
+   * Allocates an array suitable for this instance's element type.
+   */
+  T[] newArray(int size);
 
-    /**
-     * Allocates an array suitable for this instance's element type.
-     */
-    T[] newArray(int size);
+  /**
+   * Retrieves the value associated with the specified {@code Species}.
+   *
+   * @param species the {@code Species} for which the value is to be retrieved
+   * @return the value associated with the specified {@code Species}
+   */
+  default T get(final Species species) {
+    return get(getSpeciesIndex().indexOf(species));
+  }
 
-    /**
-     * Retrieves the value associated with the specified {@code Species}.
-     *
-     * @param species the {@code Species} for which the value is to be retrieved
-     * @return the value associated with the specified {@code Species}
-     */
-    default T get(final Species species) {
-        return get(getSpeciesIndex().indexOf(species));
+  /**
+   * Returns a default if the species is not in {@code speciesIndex}.
+   */
+  default T getOrDefault(final Species species, final T defaultValue) {
+    final int i = getSpeciesIndex().indexOf(species);
+    return i == -1 ? defaultValue : get(i);
+  }
+
+  /**
+   * Executes an action for each value.
+   */
+  default void forEachValue(final Consumer<T> consumer) {
+    final int size = getSpeciesIndex().size();
+    for (int i = 0; i < size; i++) {
+      consumer.accept(get(i));
     }
+  }
 
-    /**
-     * Returns a default if the species is not in {@code speciesIndex}.
-     */
-    default T getOrDefault(
-        final Species species,
-        final T defaultValue
-    ) {
-        final int i = getSpeciesIndex().indexOf(species);
-        return i == -1 ? defaultValue : get(i);
+  /**
+   * Executes an action for each value/index pair.
+   */
+  default void forEachWithIndex(final ObjIntConsumer<T> consumer) {
+    final int size = getSpeciesIndex().size();
+    for (int i = 0; i < size; i++) {
+      consumer.accept(get(i), i);
     }
+  }
 
-    /**
-     * Executes an action for each value.
-     */
-    default void forEachValue(final Consumer<T> consumer) {
-        final int size = getSpeciesIndex().size();
-        for (int i = 0; i < size; i++) {
-            consumer.accept(get(i));
-        }
-    }
+  /**
+   * Executes an action for each species/value pair.
+   */
+  default void forEachEntry(final BiConsumer<Species, T> consumer) {
+    final SpeciesIndex speciesIndex = getSpeciesIndex();
+    forEachWithIndex((value, index) ->
+      consumer.accept(speciesIndex.speciesAt(index), value)
+    );
+  }
 
-    /**
-     * Executes an action for each value/index pair.
-     */
-    default void forEachWithIndex(final ObjIntConsumer<T> consumer) {
-        final int size = getSpeciesIndex().size();
-        for (int i = 0; i < size; i++) {
-            consumer.accept(get(i), i);
-        }
-    }
+  /**
+   * Returns a mapped copy based on each value.
+   */
+  default S mapValue(final UnaryOperator<T> mapper) {
+    final SpeciesIndex speciesIndex = getSpeciesIndex();
+    final T[] mapped = newArray(speciesIndex.size());
+    forEachWithIndex((value, index) -> mapped[index] = mapper.apply(value));
+    return newInstance(mapped);
+  }
 
-    /**
-     * Executes an action for each species/value pair.
-     */
-    default void forEachEntry(final BiConsumer<Species, T> consumer) {
-        final SpeciesIndex speciesIndex = getSpeciesIndex();
-        forEachWithIndex((value, index) ->
-            consumer.accept(speciesIndex.speciesAt(index), value)
-        );
-    }
+  /**
+   * Returns a mapped copy based on each value/index pair.
+   */
+  default S mapWithIndex(final ObjIntToObjFunction<T, T> mapper) {
+    final SpeciesIndex speciesIndex = getSpeciesIndex();
+    final T[] mapped = newArray(speciesIndex.size());
+    forEachWithIndex(
+      (value, index) -> mapped[index] = mapper.apply(value, index)
+    );
+    return newInstance(mapped);
+  }
 
-    /**
-     * Returns a mapped copy based on each value.
-     */
-    default S mapValue(final UnaryOperator<T> mapper) {
-        final SpeciesIndex speciesIndex = getSpeciesIndex();
-        final T[] mapped = newArray(speciesIndex.size());
-        forEachWithIndex((value, index) -> mapped[index] = mapper.apply(value));
-        return newInstance(mapped);
-    }
-
-    /**
-     * Returns a mapped copy based on each value/index pair.
-     */
-    default S mapWithIndex(final ObjIntToObjFunction<T, T> mapper) {
-        final SpeciesIndex speciesIndex = getSpeciesIndex();
-        final T[] mapped = newArray(speciesIndex.size());
-        forEachWithIndex((value, index) -> mapped[index] = mapper.apply(value, index));
-        return newInstance(mapped);
-    }
-
-    /**
-     * Returns a mapped copy based on each species/value pair.
-     */
-    default S mapEntry(final BiFunction<Species, T, T> mapper) {
-        final SpeciesIndex speciesIndex = getSpeciesIndex();
-        final T[] mapped = newArray(speciesIndex.size());
-        forEachWithIndex((value, index) ->
-            mapped[index] = mapper.apply(speciesIndex.speciesAt(index), value)
-        );
-        return newInstance(mapped);
-    }
-
+  /**
+   * Returns a mapped copy based on each species/value pair.
+   */
+  default S mapEntry(final BiFunction<Species, T, T> mapper) {
+    final SpeciesIndex speciesIndex = getSpeciesIndex();
+    final T[] mapped = newArray(speciesIndex.size());
+    forEachWithIndex(
+      (value, index) ->
+        mapped[index] = mapper.apply(speciesIndex.speciesAt(index), value)
+    );
+    return newInstance(mapped);
+  }
 }

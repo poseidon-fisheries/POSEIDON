@@ -22,10 +22,9 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import tech.tablesaw.api.Row;
-
-import java.util.function.Function;
 
 /**
  * A {@link Function} that reads a fixed column's value as a {@link Double} from a {@code
@@ -34,10 +33,10 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class DoubleFromRow implements Function<Row, Double> {
 
-    private final String columnName;
+  private final String columnName;
 
-    @Override
-    public Double apply(final Row row) {
-        return row.getDouble(columnName);
-    }
+  @Override
+  public Double apply(final Row row) {
+    return row.getDouble(columnName);
+  }
 }

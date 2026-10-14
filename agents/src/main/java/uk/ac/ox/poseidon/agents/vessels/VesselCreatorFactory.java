@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.List;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -39,11 +43,6 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import java.util.List;
-import java.util.function.Supplier;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link VesselCreator}, built via
  * {@link Factories#vesselCreator}.
@@ -52,74 +51,82 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class VesselCreatorFactory extends SimulationScopeFactory<VesselCreator> {
+public class VesselCreatorFactory
+  extends SimulationScopeFactory<VesselCreator>
+{
 
-    private Factory<? super SimulationScope, ? extends VesselField> vesselField;
-    private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
-    private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;
-    private Factory<? super SimulationScope, ? extends Supplier<String>> vesselIdSupplier;
+  private Factory<? super SimulationScope, ? extends VesselField> vesselField;
+  private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+  private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;
+  private Factory<
+    ? super SimulationScope,
+    ? extends Supplier<String>
+  > vesselIdSupplier;
 
-    private Factory<? super VesselScope, ? extends String> name;
-    private Factory<? super VesselScope, ? extends Account> account;
-    private Factory<? super VesselScope, ? extends Port> homePort;
-    private Factory<? super VesselScope, ? extends Hold> hold;
-    private Factory<? super VesselScope, ? extends Gear> gear;
-    private Factory<? super VesselScope, ? extends Engine> engine;
-    private Factory<? super VesselScope, ? extends Behaviour> behaviour;
-    private List<Factory<? super VesselScope, ?>> extraFactories = List.of();
+  private Factory<? super VesselScope, ? extends String> name;
+  private Factory<? super VesselScope, ? extends Account> account;
+  private Factory<? super VesselScope, ? extends Port> homePort;
+  private Factory<? super VesselScope, ? extends Hold> hold;
+  private Factory<? super VesselScope, ? extends Gear> gear;
+  private Factory<? super VesselScope, ? extends Engine> engine;
+  private Factory<? super VesselScope, ? extends Behaviour> behaviour;
+  private List<Factory<? super VesselScope, ?>> extraFactories = List.of();
 
-    private int numberOfVesselsToCreate;
+  private int numberOfVesselsToCreate;
 
-    /** Shorthand for the full constructor with no extra per-vessel factories. */
-    public VesselCreatorFactory(
-        final Factory<? super SimulationScope, ? extends VesselField> vesselField,
-        final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
-        final Factory<? super SimulationScope, ? extends MarketGrid> marketGrid,
-        final Factory<? super SimulationScope, ? extends Supplier<String>> vesselIdSupplier,
-        final Factory<? super VesselScope, ? extends String> name,
-        final Factory<? super VesselScope, ? extends Account> account,
-        final Factory<? super VesselScope, ? extends Port> homePort,
-        final Factory<? super VesselScope, ? extends Hold> hold,
-        final Factory<? super VesselScope, ? extends Gear> gear,
-        final Factory<? super VesselScope, ? extends Engine> engine,
-        final Factory<? super VesselScope, ? extends Behaviour> behaviour,
-        final int numberOfVesselsToCreate
-    ) {
-        this(
-            vesselField,
-            portGrid,
-            marketGrid,
-            vesselIdSupplier,
-            name,
-            account,
-            homePort,
-            hold,
-            gear,
-            engine,
-            behaviour,
-            List.of(),
-            numberOfVesselsToCreate
-        );
-    }
+  /** Shorthand for the full constructor with no extra per-vessel factories. */
+  public VesselCreatorFactory(
+    final Factory<? super SimulationScope, ? extends VesselField> vesselField,
+    final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
+    final Factory<? super SimulationScope, ? extends MarketGrid> marketGrid,
+    final Factory<
+      ? super SimulationScope,
+      ? extends Supplier<String>
+    > vesselIdSupplier,
+    final Factory<? super VesselScope, ? extends String> name,
+    final Factory<? super VesselScope, ? extends Account> account,
+    final Factory<? super VesselScope, ? extends Port> homePort,
+    final Factory<? super VesselScope, ? extends Hold> hold,
+    final Factory<? super VesselScope, ? extends Gear> gear,
+    final Factory<? super VesselScope, ? extends Engine> engine,
+    final Factory<? super VesselScope, ? extends Behaviour> behaviour,
+    final int numberOfVesselsToCreate
+  ) {
+    this(
+      vesselField,
+      portGrid,
+      marketGrid,
+      vesselIdSupplier,
+      name,
+      account,
+      homePort,
+      hold,
+      gear,
+      engine,
+      behaviour,
+      List.of(),
+      numberOfVesselsToCreate
+    );
+  }
 
-    /** @return a {@link VesselCreator} ready to create {@link #numberOfVesselsToCreate} vessels */
-    @Override
-    protected VesselCreator newInstance(final SimulationScope scope) {
-        return new VesselCreator(
-            scope.getSimulation().getEventManager(),
-            checkNotNull(vesselField).get(scope),
-            checkNotNull(portGrid).get(scope),
-            checkNotNull(marketGrid).get(scope),
-            checkNotNull(vesselIdSupplier).get(scope),
-            checkNotNull(name),
-            checkNotNull(account),
-            checkNotNull(homePort),
-            checkNotNull(hold),
-            checkNotNull(gear),
-            checkNotNull(engine),
-            checkNotNull(behaviour),
-            extraFactories == null ? List.of() : extraFactories,
-            numberOfVesselsToCreate
-        );
-    }
+  /** @return a {@link VesselCreator} ready to create {@link #numberOfVesselsToCreate} vessels */
+  @Override
+  protected VesselCreator newInstance(final SimulationScope scope) {
+    return new VesselCreator(
+      scope.getSimulation().getEventManager(),
+      checkNotNull(vesselField).get(scope),
+      checkNotNull(portGrid).get(scope),
+      checkNotNull(marketGrid).get(scope),
+      checkNotNull(vesselIdSupplier).get(scope),
+      checkNotNull(name),
+      checkNotNull(account),
+      checkNotNull(homePort),
+      checkNotNull(hold),
+      checkNotNull(gear),
+      checkNotNull(engine),
+      checkNotNull(behaviour),
+      extraFactories == null ? List.of() : extraFactories,
+      numberOfVesselsToCreate
+    );
+  }
 }

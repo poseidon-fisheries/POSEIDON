@@ -36,13 +36,16 @@ import uk.ac.ox.poseidon.geography.Envelope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class InRectangularAreaFactory<S extends Scope>
-    extends RelativeScopeFactory<S, InRectangularArea> {
+public class InRectangularAreaFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  InRectangularArea
+> {
 
-    @NonNull private Factory<? super S, ? extends Envelope> envelope;
+  @NonNull
+  private Factory<? super S, ? extends Envelope> envelope;
 
-    @Override
-    protected InRectangularArea newInstance(final S scope) {
-        return new InRectangularArea(envelope.get(scope));
-    }
+  @Override
+  protected InRectangularArea newInstance(final S scope) {
+    return new InRectangularArea(envelope.get(scope));
+  }
 }

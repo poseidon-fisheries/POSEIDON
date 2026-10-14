@@ -19,7 +19,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package uk.ac.ox.poseidon.agents.social;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -33,42 +38,38 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
-
 class SocialNetworkFactoryTest {
 
-    private final Simulation simulation = mock(Simulation.class);
-    private final Simulation otherSimulation = mock(Simulation.class);
-    private final Fleet fleet = new Fleet(
-        mock(TemporalSchedule.class),
-        mock(EventManager.class),
-        mock(VesselField.class),
-        mock(PortGrid.class),
-        mock(MarketGrid.class)
-    );
-    private final SocialNetworkFactory factory = socialNetwork(fleetFactory());
+  private final Simulation simulation = mock(Simulation.class);
+  private final Simulation otherSimulation = mock(Simulation.class);
+  private final Fleet fleet = new Fleet(
+    mock(TemporalSchedule.class),
+    mock(EventManager.class),
+    mock(VesselField.class),
+    mock(PortGrid.class),
+    mock(MarketGrid.class)
+  );
+  private final SocialNetworkFactory factory = socialNetwork(fleetFactory());
 
-    private Factory<SimulationScope, Fleet> fleetFactory() {
-        return scope -> fleet;
-    }
+  private Factory<SimulationScope, Fleet> fleetFactory() {
+    return scope -> fleet;
+  }
 
-    @Test
-    void givesOneNetworkPerSimulation() {
-        final SimulationScope scope = new SimulationScope(simulation);
-        final SimulationScope otherScope = new SimulationScope(otherSimulation);
+  @Test
+  void givesOneNetworkPerSimulation() {
+    final SimulationScope scope = new SimulationScope(simulation);
+    final SimulationScope otherScope = new SimulationScope(otherSimulation);
 
-        assertThat(factory.get(scope)).isNotNull().isSameAs(factory.get(scope));
-        assertThat(factory.get(scope)).isNotSameAs(factory.get(otherScope));
-    }
+    assertThat(factory.get(scope)).isNotNull().isSameAs(factory.get(scope));
+    assertThat(factory.get(scope)).isNotSameAs(factory.get(otherScope));
+  }
 
-    @Test
-    void vesselsAddedToTheFleetLaterAreCandidates() {
-        final SocialNetwork network = factory.get(new SimulationScope(simulation));
+  @Test
+  void vesselsAddedToTheFleetLaterAreCandidates() {
+    final SocialNetwork network = factory.get(new SimulationScope(simulation));
 
-        final Vessel vessel = fleet.createVessel("A");
+    final Vessel vessel = fleet.createVessel("A");
 
-        assertThat(network.getCandidates()).containsExactly(vessel);
-    }
+    assertThat(network.getCandidates()).containsExactly(vessel);
+  }
 }

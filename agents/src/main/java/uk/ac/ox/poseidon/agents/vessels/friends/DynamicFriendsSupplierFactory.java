@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels.friends;
 
+import java.util.function.Predicate;
 import lombok.*;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
-
-import java.util.function.Predicate;
 
 /**
  * A {@link VesselScopeFactory} for a {@link DynamicFriendsSupplier}. Built via
@@ -39,21 +38,28 @@ import java.util.function.Predicate;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @EqualsAndHashCode(callSuper = true)
-public class DynamicFriendsSupplierFactory extends VesselScopeFactory<DynamicFriendsSupplier> {
+public class DynamicFriendsSupplierFactory
+  extends VesselScopeFactory<DynamicFriendsSupplier>
+{
 
-    private int targetNumberOfFriends;
-    private Factory<? super VesselScope, ? extends VesselsGetter> potentialFriends;
-    private Factory<? super VesselScope, ? extends Predicate<? super Vessel>> friendshipCondition;
+  private int targetNumberOfFriends;
+  private Factory<
+    ? super VesselScope,
+    ? extends VesselsGetter
+  > potentialFriends;
+  private Factory<
+    ? super VesselScope,
+    ? extends Predicate<? super Vessel>
+  > friendshipCondition;
 
-    @Override
-    protected DynamicFriendsSupplier newInstance(final VesselScope scope) {
-        return new DynamicFriendsSupplier(
-            targetNumberOfFriends,
-            potentialFriends.get(scope),
-            friendshipCondition.get(scope),
-            scope.getVessel(),
-            scope.getSimulation().random
-        );
-    }
-
+  @Override
+  protected DynamicFriendsSupplier newInstance(final VesselScope scope) {
+    return new DynamicFriendsSupplier(
+      targetNumberOfFriends,
+      potentialFriends.get(scope),
+      friendshipCondition.get(scope),
+      scope.getVessel(),
+      scope.getSimulation().random
+    );
+  }
 }

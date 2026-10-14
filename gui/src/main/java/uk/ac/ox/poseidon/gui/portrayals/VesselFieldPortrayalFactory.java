@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
+import static java.awt.Color.LIGHT_GRAY;
+import static sim.portrayal.simple.OrientedPortrayal2D.SHAPE_COMPASS;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,33 +37,33 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-import static java.awt.Color.LIGHT_GRAY;
-import static sim.portrayal.simple.OrientedPortrayal2D.SHAPE_COMPASS;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 /** A {@link SimulationScopeFactory} that portrays a {@link VesselField} as oriented compass markers. */
-public class VesselFieldPortrayalFactory extends SimulationScopeFactory<ContinuousPortrayal2D> {
+public class VesselFieldPortrayalFactory
+  extends SimulationScopeFactory<ContinuousPortrayal2D>
+{
 
-    private static final double SCALE = 0.5;
-    private Factory<? super SimulationScope, ? extends VesselField> vesselField;
+  private static final double SCALE = 0.5;
+  private Factory<? super SimulationScope, ? extends VesselField> vesselField;
 
-    /** @return a continuous-space portrayal showing each vessel as an oriented compass marker */
-    @Override
-    protected ContinuousPortrayal2D newInstance(final SimulationScope scope) {
-        final ContinuousPortrayal2D continuousPortrayal2D = new ContinuousPortrayal2D();
-        continuousPortrayal2D.setField(vesselField.get(scope).getField());
-        continuousPortrayal2D.setPortrayalForAll(
-            new OrientedPortrayal2D(
-                new SimplePortrayal2D(),
-                0,
-                SCALE,
-                LIGHT_GRAY,
-                SHAPE_COMPASS
-            )
-        );
-        return continuousPortrayal2D;
-    }
+  /** @return a continuous-space portrayal showing each vessel as an oriented compass marker */
+  @Override
+  protected ContinuousPortrayal2D newInstance(final SimulationScope scope) {
+    final ContinuousPortrayal2D continuousPortrayal2D =
+      new ContinuousPortrayal2D();
+    continuousPortrayal2D.setField(vesselField.get(scope).getField());
+    continuousPortrayal2D.setPortrayalForAll(
+      new OrientedPortrayal2D(
+        new SimplePortrayal2D(),
+        0,
+        SCALE,
+        LIGHT_GRAY,
+        SHAPE_COMPASS
+      )
+    );
+    return continuousPortrayal2D;
+  }
 }

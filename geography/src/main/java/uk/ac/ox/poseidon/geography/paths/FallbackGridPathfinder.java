@@ -33,48 +33,56 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * knowledge of the grid. Not built directly — see {@link DefaultPathFinderFactory}/
  * {@link uk.ac.ox.poseidon.geography.paths.Factories}.
  */
-public class FallbackGridPathfinder extends FallbackPathfinder<Int2D> implements GridPathFinder {
+public class FallbackGridPathfinder
+  extends FallbackPathfinder<Int2D>
+  implements GridPathFinder
+{
 
-    private final GridPathFinder canonicalPathFinder;
+  private final GridPathFinder canonicalPathFinder;
 
-    /**
-     * @param heuristicPathFinder  the fast pathfinder tried first
-     * @param canonicalPathFinder  the complete pathfinder tried on a heuristic miss, and consulted
-     *                             for every other {@link GridPathFinder} method
-     */
-    public FallbackGridPathfinder(
-        final GridPathFinder heuristicPathFinder,
-        final GridPathFinder canonicalPathFinder
-    ) {
-        super(heuristicPathFinder, canonicalPathFinder);
-        this.canonicalPathFinder = canonicalPathFinder;
-    }
+  /**
+   * @param heuristicPathFinder  the fast pathfinder tried first
+   * @param canonicalPathFinder  the complete pathfinder tried on a heuristic miss, and consulted
+   *                             for every other {@link GridPathFinder} method
+   */
+  public FallbackGridPathfinder(
+    final GridPathFinder heuristicPathFinder,
+    final GridPathFinder canonicalPathFinder
+  ) {
+    super(heuristicPathFinder, canonicalPathFinder);
+    this.canonicalPathFinder = canonicalPathFinder;
+  }
 
-    @Override
-    public ModelGrid getModelGrid() {
-        return canonicalPathFinder.getModelGrid();
-    }
+  @Override
+  public ModelGrid getModelGrid() {
+    return canonicalPathFinder.getModelGrid();
+  }
 
-    @Override
-    public boolean isWater(final Int2D cell) {
-        return canonicalPathFinder.isWater(cell);
-    }
+  @Override
+  public boolean isWater(final Int2D cell) {
+    return canonicalPathFinder.isWater(cell);
+  }
 
-    @Override
-    public boolean isNavigable(final Int2D cell) {
-        return canonicalPathFinder.isNavigable(cell);
-    }
+  @Override
+  public boolean isNavigable(final Int2D cell) {
+    return canonicalPathFinder.isNavigable(cell);
+  }
 
-    @Override
-    public ImmutableList<Int2D> getAccessibleWaterCells(final Int2D startingCell) {
-        return canonicalPathFinder.getAccessibleWaterCells(startingCell);
-    }
+  @Override
+  public ImmutableList<Int2D> getAccessibleWaterCells(
+    final Int2D startingCell
+  ) {
+    return canonicalPathFinder.getAccessibleWaterCells(startingCell);
+  }
 
-    @Override
-    public ImmutableList<Int2D> getAccessibleWaterNeighbours(
-        final Int2D startingCell,
-        final int neighbourhoodSize
-    ) {
-        return canonicalPathFinder.getAccessibleWaterNeighbours(startingCell, neighbourhoodSize);
-    }
+  @Override
+  public ImmutableList<Int2D> getAccessibleWaterNeighbours(
+    final Int2D startingCell,
+    final int neighbourhoodSize
+  ) {
+    return canonicalPathFinder.getAccessibleWaterNeighbours(
+      startingCell,
+      neighbourhoodSize
+    );
+  }
 }

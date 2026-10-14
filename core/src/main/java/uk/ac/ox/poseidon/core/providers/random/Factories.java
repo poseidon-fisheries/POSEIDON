@@ -28,67 +28,65 @@ package uk.ac.ox.poseidon.core.providers.random;
  */
 public class Factories {
 
-    private Factories() {
-        throw new IllegalStateException("Utility class");
-    }
+  private Factories() {
+    throw new IllegalStateException("Utility class");
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link RandomBoolean} with an even (0.5) probability of returning {@code true}
-     * @see RandomBoolean
-     */
-    public static RandomBooleanFactory randomBoolean() {
-        return new RandomBooleanFactory(0.5);
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+   * a {@link RandomBoolean} with an even (0.5) probability of returning {@code true}
+   * @see RandomBoolean
+   */
+  public static RandomBooleanFactory randomBoolean() {
+    return new RandomBooleanFactory(0.5);
+  }
 
-    /**
-     * @param probability the probability, in {@code [0, 1]}, that the resulting provider returns
-     *                    {@code true}
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link RandomBoolean} with the given probability
-     * @see RandomBoolean
-     */
-    public static RandomBooleanFactory randomBoolean(final double probability) {
-        return new RandomBooleanFactory(probability);
-    }
+  /**
+   * @param probability the probability, in {@code [0, 1]}, that the resulting provider returns
+   *                    {@code true}
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+   * a {@link RandomBoolean} with the given probability
+   * @see RandomBoolean
+   */
+  public static RandomBooleanFactory randomBoolean(final double probability) {
+    return new RandomBooleanFactory(probability);
+  }
 
-    /**
-     * @param minimum inclusive lower bound of the returned values
-     * @param maximum exclusive upper bound of the returned values
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link RandomDouble} uniformly distributed over the range
-     * @see RandomDouble
-     */
-    public static RandomDoubleFactory randomDouble(
-        final double minimum,
-        final double maximum
-    ) {
-        return new RandomDoubleFactory(minimum, maximum);
-    }
+  /**
+   * @param minimum inclusive lower bound of the returned values
+   * @param maximum exclusive upper bound of the returned values
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+   * a {@link RandomDouble} uniformly distributed over the range
+   * @see RandomDouble
+   */
+  public static RandomDoubleFactory randomDouble(
+    final double minimum,
+    final double maximum
+  ) {
+    return new RandomDoubleFactory(minimum, maximum);
+  }
 
-    /**
-     * @param minimum inclusive lower bound of the returned values
-     * @param maximum inclusive upper bound of the returned values
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link RandomInt} uniformly distributed over the range
-     * @see RandomInt
-     */
-    public static RandomIntFactory randomInt(
-        final int minimum,
-        final int maximum
-    ) {
-        return new RandomIntFactory(minimum, maximum);
-    }
+  /**
+   * @param minimum inclusive lower bound of the returned values
+   * @param maximum inclusive upper bound of the returned values
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+   * a {@link RandomInt} uniformly distributed over the range
+   * @see RandomInt
+   */
+  public static RandomIntFactory randomInt(
+    final int minimum,
+    final int maximum
+  ) {
+    return new RandomIntFactory(minimum, maximum);
+  }
 
-    /**
-     * @param mean the mean of the Poisson distribution the resulting provider draws from
-     * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-     * a {@link RandomPoisson} with the given mean
-     * @see RandomPoisson
-     */
-    public static RandomPoissonFactory randomPoisson(
-        final double mean
-    ) {
-        return new RandomPoissonFactory(mean);
-    }
+  /**
+   * @param mean the mean of the Poisson distribution the resulting provider draws from
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
+   * a {@link RandomPoisson} with the given mean
+   * @see RandomPoisson
+   */
+  public static RandomPoissonFactory randomPoisson(final double mean) {
+    return new RandomPoissonFactory(mean);
+  }
 }

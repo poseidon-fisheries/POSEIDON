@@ -22,13 +22,12 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+import java.io.Serial;
+import java.util.List;
 import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.util.Int2D;
-
-import java.io.Serial;
-import java.util.List;
 
 /**
  * Fully replaces the contents of each species' live {@link BiomassGrid} in {@code target} with
@@ -37,18 +36,19 @@ import java.util.List;
 @Value
 public class BiomassGridUpdate implements Steppable {
 
-    @Serial private static final long serialVersionUID = 5460918327904618374L;
+  @Serial
+  private static final long serialVersionUID = 5460918327904618374L;
 
-    List<? extends SpeciesGrid> snapshot;
-    FisheableBiomassGrids target;
+  List<? extends SpeciesGrid> snapshot;
+  FisheableBiomassGrids target;
 
-    @Override
-    public void step(final SimState simState) {
-        for (final SpeciesGrid speciesGrid : snapshot) {
-            final BiomassGrid targetGrid = target.get(speciesGrid.getSpecies());
-            for (final Int2D cell : targetGrid.getModelGrid().getActiveCells()) {
-                targetGrid.setBiomass(cell, speciesGrid.getValue(cell));
-            }
-        }
+  @Override
+  public void step(final SimState simState) {
+    for (final SpeciesGrid speciesGrid : snapshot) {
+      final BiomassGrid targetGrid = target.get(speciesGrid.getSpecies());
+      for (final Int2D cell : targetGrid.getModelGrid().getActiveCells()) {
+        targetGrid.setBiomass(cell, speciesGrid.getValue(cell));
+      }
     }
+  }
 }

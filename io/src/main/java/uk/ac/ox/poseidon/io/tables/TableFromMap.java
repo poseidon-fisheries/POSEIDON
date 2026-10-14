@@ -22,12 +22,11 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import java.util.Map;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
-
-import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * A {@link Supplier} that builds a two-column {@code tablesaw} {@link Table} (key, value) from a
@@ -41,23 +40,23 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class TableFromMap<K, V> implements Supplier<Table> {
 
-    private final TableDefinition tableDefinition;
-    private final Supplier<Map<K, V>> mapSupplier;
+  private final TableDefinition tableDefinition;
+  private final Supplier<Map<K, V>> mapSupplier;
 
-    /**
-     * @return a fresh {@link Table}, shaped by {@code tableDefinition}, with one row per entry of
-     * the resolved map
-     */
-    @Override
-    public Table get() {
-        final Map<K, V> map = mapSupplier.get();
-        final Table table = tableDefinition.get();
-        final Column<?> keyColumn = table.column(0);
-        final Column<?> valueColumn = table.column(1);
-        for (final Map.Entry<K, V> entry : map.entrySet()) {
-            keyColumn.appendObj(entry.getKey());
-            valueColumn.appendObj(entry.getValue());
-        }
-        return table;
+  /**
+   * @return a fresh {@link Table}, shaped by {@code tableDefinition}, with one row per entry of
+   * the resolved map
+   */
+  @Override
+  public Table get() {
+    final Map<K, V> map = mapSupplier.get();
+    final Table table = tableDefinition.get();
+    final Column<?> keyColumn = table.column(0);
+    final Column<?> valueColumn = table.column(1);
+    for (final Map.Entry<K, V> entry : map.entrySet()) {
+      keyColumn.appendObj(entry.getKey());
+      valueColumn.appendObj(entry.getValue());
     }
+    return table;
+  }
 }

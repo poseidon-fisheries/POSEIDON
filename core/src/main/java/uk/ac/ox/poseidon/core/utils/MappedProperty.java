@@ -23,11 +23,10 @@
 package uk.ac.ox.poseidon.core.utils;
 
 import it.unimi.dsi.fastutil.objects.ObjectIntBiConsumer;
-import lombok.Value;
-import uk.ac.ox.poseidon.core.Factory;
-
 import java.util.List;
 import java.util.function.BiConsumer;
+import lombok.Value;
+import uk.ac.ox.poseidon.core.Factory;
 
 /**
  * Pairs a bean-property setter with a list of values to apply, one per index — used by
@@ -38,17 +37,16 @@ import java.util.function.BiConsumer;
  * @param <T> the type of the property values
  */
 @Value
-public class MappedProperty<F extends Factory<?, ?>, T> implements ObjectIntBiConsumer<F> {
+public class MappedProperty<
+  F extends Factory<?, ?>,
+  T
+> implements ObjectIntBiConsumer<F> {
 
-    BiConsumer<F, T> consumer;
-    List<T> values;
+  BiConsumer<F, T> consumer;
+  List<T> values;
 
-    @Override
-    public void accept(
-        final F f,
-        final int i
-    ) {
-        consumer.accept(f, values.get(i));
-    }
-
+  @Override
+  public void accept(final F f, final int i) {
+    consumer.accept(f, values.get(i));
+  }
 }

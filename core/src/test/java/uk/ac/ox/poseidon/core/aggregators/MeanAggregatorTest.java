@@ -22,91 +22,107 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.OptionalDouble;
 import java.util.stream.DoubleStream;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class MeanAggregatorTest {
 
-    /**
-     * Class under test: Mean Method under test: apply(DoubleStream doubleStream)
-     * <p>
-     * This method computes the arithmetic mean (average) of the provided stream of doubles. If the
-     * stream is empty, the method returns an empty OptionalDouble.
-     */
+  /**
+   * Class under test: Mean Method under test: apply(DoubleStream doubleStream)
+   * <p>
+   * This method computes the arithmetic mean (average) of the provided stream of doubles. If the
+   * stream is empty, the method returns an empty OptionalDouble.
+   */
 
-    @Test
-    void testApplyWithNonEmptyStream() {
-        final MeanAggregator meanAggreagator = new MeanAggregator();
-        final DoubleStream stream = DoubleStream.of(1.0, 2.0, 3.0, 4.0, 5.0);
+  @Test
+  void testApplyWithNonEmptyStream() {
+    final MeanAggregator meanAggreagator = new MeanAggregator();
+    final DoubleStream stream = DoubleStream.of(1.0, 2.0, 3.0, 4.0, 5.0);
 
-        final OptionalDouble result = meanAggreagator.apply(stream);
+    final OptionalDouble result = meanAggreagator.apply(stream);
 
-        assertTrue(result.isPresent(), "Result should be present for a non-empty stream");
-        assertEquals(3.0, result.getAsDouble(), 0.0001, "The calculated mean should be correct");
-    }
+    assertTrue(
+      result.isPresent(),
+      "Result should be present for a non-empty stream"
+    );
+    assertEquals(
+      3.0,
+      result.getAsDouble(),
+      0.0001,
+      "The calculated mean should be correct"
+    );
+  }
 
-    @Test
-    void testApplyWithEmptyStream() {
-        final MeanAggregator meanAggreagator = new MeanAggregator();
-        final DoubleStream stream = DoubleStream.empty();
+  @Test
+  void testApplyWithEmptyStream() {
+    final MeanAggregator meanAggreagator = new MeanAggregator();
+    final DoubleStream stream = DoubleStream.empty();
 
-        final OptionalDouble result = meanAggreagator.apply(stream);
+    final OptionalDouble result = meanAggreagator.apply(stream);
 
-        assertFalse(result.isPresent(), "Result should be empty for an empty stream");
-    }
+    assertFalse(
+      result.isPresent(),
+      "Result should be empty for an empty stream"
+    );
+  }
 
-    @Test
-    void testApplyWithSingleElementStream() {
-        final MeanAggregator meanAggreagator = new MeanAggregator();
-        final DoubleStream stream = DoubleStream.of(42.0);
+  @Test
+  void testApplyWithSingleElementStream() {
+    final MeanAggregator meanAggreagator = new MeanAggregator();
+    final DoubleStream stream = DoubleStream.of(42.0);
 
-        final OptionalDouble result = meanAggreagator.apply(stream);
+    final OptionalDouble result = meanAggreagator.apply(stream);
 
-        assertTrue(result.isPresent(), "Result should be present for a single-element stream");
-        assertEquals(
-            42.0,
-            result.getAsDouble(),
-            0.0001,
-            "The calculated mean should match the single element"
-        );
-    }
+    assertTrue(
+      result.isPresent(),
+      "Result should be present for a single-element stream"
+    );
+    assertEquals(
+      42.0,
+      result.getAsDouble(),
+      0.0001,
+      "The calculated mean should match the single element"
+    );
+  }
 
-    @Test
-    void testApplyWithNegativeNumbers() {
-        final MeanAggregator meanAggreagator = new MeanAggregator();
-        final DoubleStream stream = DoubleStream.of(-10.0, -20.0, -30.0);
+  @Test
+  void testApplyWithNegativeNumbers() {
+    final MeanAggregator meanAggreagator = new MeanAggregator();
+    final DoubleStream stream = DoubleStream.of(-10.0, -20.0, -30.0);
 
-        final OptionalDouble result = meanAggreagator.apply(stream);
+    final OptionalDouble result = meanAggreagator.apply(stream);
 
-        assertTrue(
-            result.isPresent(),
-            "Result should be present for a non-empty stream with negative numbers"
-        );
-        assertEquals(
-            -20.0,
-            result.getAsDouble(),
-            0.0001,
-            "The mean of negative numbers should be calculated correctly"
-        );
-    }
+    assertTrue(
+      result.isPresent(),
+      "Result should be present for a non-empty stream with negative numbers"
+    );
+    assertEquals(
+      -20.0,
+      result.getAsDouble(),
+      0.0001,
+      "The mean of negative numbers should be calculated correctly"
+    );
+  }
 
-    @Test
-    void testApplyWithMixedNumbers() {
-        final MeanAggregator meanAggreagator = new MeanAggregator();
-        final DoubleStream stream = DoubleStream.of(-10.0, 0.0, 10.0);
+  @Test
+  void testApplyWithMixedNumbers() {
+    final MeanAggregator meanAggreagator = new MeanAggregator();
+    final DoubleStream stream = DoubleStream.of(-10.0, 0.0, 10.0);
 
-        final OptionalDouble result = meanAggreagator.apply(stream);
+    final OptionalDouble result = meanAggreagator.apply(stream);
 
-        assertTrue(result.isPresent(), "Result should be present for a mixed stream of numbers");
-        assertEquals(
-            0.0,
-            result.getAsDouble(),
-            0.0001,
-            "The calculated mean for mixed numbers should be correct"
-        );
-    }
+    assertTrue(
+      result.isPresent(),
+      "Result should be present for a mixed stream of numbers"
+    );
+    assertEquals(
+      0.0,
+      result.getAsDouble(),
+      0.0001,
+      "The calculated mean for mixed numbers should be correct"
+    );
+  }
 }

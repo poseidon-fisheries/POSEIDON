@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-
 import java.util.Map;
 import java.util.function.Function;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * A {@link Function} that looks up its input in a fixed, resolved {@link Map} on every call.
@@ -37,11 +36,11 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class MapValueExtractor<K, V> implements Function<K, V> {
 
-    @NonNull private final Map<? super K, ? extends V> map;
+  @NonNull
+  private final Map<? super K, ? extends V> map;
 
-    @Override
-    public V apply(final K k) {
-        return map.get(k);
-    }
-
+  @Override
+  public V apply(final K k) {
+    return map.get(k);
+  }
 }

@@ -39,12 +39,20 @@ import uk.ac.ox.poseidon.core.Factory;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class HomePortCatchValuationFactory extends VesselScopeFactory<HomePortCatchValuation> {
+public class HomePortCatchValuationFactory
+  extends VesselScopeFactory<HomePortCatchValuation>
+{
 
-    private Factory<? super VesselScope, ? extends CatchCategoriser> catchCategoriser;
+  private Factory<
+    ? super VesselScope,
+    ? extends CatchCategoriser
+  > catchCategoriser;
 
-    @Override
-    protected HomePortCatchValuation newInstance(final VesselScope scope) {
-        return new HomePortCatchValuation(scope.getVessel(), catchCategoriser.get(scope));
-    }
+  @Override
+  protected HomePortCatchValuation newInstance(final VesselScope scope) {
+    return new HomePortCatchValuation(
+      scope.getVessel(),
+      catchCategoriser.get(scope)
+    );
+  }
 }

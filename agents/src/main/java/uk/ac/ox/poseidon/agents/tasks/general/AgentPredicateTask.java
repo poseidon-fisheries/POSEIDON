@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.tasks.general;
 
+import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
-
-import java.util.function.Predicate;
-
-import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 /**
  * A leaf {@link AgentTask} that succeeds or fails in one step, depending on whether
@@ -40,12 +39,11 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 @RequiredArgsConstructor
 public class AgentPredicateTask<G extends Agent> extends AgentTask<G> {
 
-    private final Predicate<? super G> predicate;
+  private final Predicate<? super G> predicate;
 
-    /** @return {@code SUCCEEDED} if {@code predicate} holds for the agent, {@code FAILED} otherwise */
-    @Override
-    public Status execute() {
-        return predicate.test(getAgent()) ? SUCCEEDED : FAILED;
-    }
-
+  /** @return {@code SUCCEEDED} if {@code predicate} holds for the agent, {@code FAILED} otherwise */
+  @Override
+  public Status execute() {
+    return predicate.test(getAgent()) ? SUCCEEDED : FAILED;
+  }
 }

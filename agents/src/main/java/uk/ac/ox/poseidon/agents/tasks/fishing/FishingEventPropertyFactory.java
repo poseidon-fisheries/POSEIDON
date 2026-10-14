@@ -35,15 +35,18 @@ import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
  */
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FishingEventPropertyFactory<R> extends ObjectPropertyFactory<FishingEvent, R> {
+public class FishingEventPropertyFactory<R> extends ObjectPropertyFactory<
+  FishingEvent,
+  R
+> {
 
-    /** @param propertyPath the dotted path of properties to follow from the fishing event */
-    public FishingEventPropertyFactory(final String propertyPath) {
-        super(propertyPath);
-    }
+  /** @param propertyPath the dotted path of properties to follow from the fishing event */
+  public FishingEventPropertyFactory(final String propertyPath) {
+    super(propertyPath);
+  }
 
-    @Override
-    protected Class<FishingEvent> rootClass() {
-        return FishingEvent.class;
-    }
+  @Override
+  protected Class<FishingEvent> rootClass() {
+    return FishingEvent.class;
+  }
 }

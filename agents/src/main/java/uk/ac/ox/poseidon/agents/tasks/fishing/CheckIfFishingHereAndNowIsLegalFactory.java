@@ -41,16 +41,16 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class CheckIfFishingHereAndNowIsLegalFactory
-    extends VesselTaskFactory<CheckIfFishingHereAndNowIsLegal> {
+  extends VesselTaskFactory<CheckIfFishingHereAndNowIsLegal>
+{
 
-    private Factory<
-        ? super VesselScope,
-        ? extends Regulations<? super ExtendedFishingAction>
-        > regulations;
+  private Factory<
+    ? super VesselScope,
+    ? extends Regulations<? super ExtendedFishingAction>
+  > regulations;
 
-    @Override
-    protected CheckIfFishingHereAndNowIsLegal newTask(final VesselScope scope) {
-        return new CheckIfFishingHereAndNowIsLegal(regulations.get(scope));
-    }
-
+  @Override
+  protected CheckIfFishingHereAndNowIsLegal newTask(final VesselScope scope) {
+    return new CheckIfFishingHereAndNowIsLegal(regulations.get(scope));
+  }
 }

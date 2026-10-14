@@ -22,10 +22,10 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
+import static com.google.common.math.Quantiles.median;
+
 import java.util.OptionalDouble;
 import java.util.stream.DoubleStream;
-
-import static com.google.common.math.Quantiles.median;
 
 /**
  * An {@link Aggregator} that returns the median of its input numbers, or
@@ -34,15 +34,15 @@ import static com.google.common.math.Quantiles.median;
  */
 public class MedianAggregator implements Aggregator {
 
-    @Override
-    public OptionalDouble apply(final double[] numbers) {
-        return numbers.length == 0
-            ? OptionalDouble.empty()
-            : OptionalDouble.of(median().compute(numbers));
-    }
+  @Override
+  public OptionalDouble apply(final double[] numbers) {
+    return numbers.length == 0
+      ? OptionalDouble.empty()
+      : OptionalDouble.of(median().compute(numbers));
+  }
 
-    @Override
-    public OptionalDouble apply(final DoubleStream doubleStream) {
-        return apply(doubleStream.toArray());
-    }
+  @Override
+  public OptionalDouble apply(final DoubleStream doubleStream) {
+    return apply(doubleStream.toArray());
+  }
 }

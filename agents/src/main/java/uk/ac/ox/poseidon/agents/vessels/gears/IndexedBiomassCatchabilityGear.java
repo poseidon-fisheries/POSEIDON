@@ -22,6 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
+import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
+
+import java.time.Duration;
+import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -29,12 +34,6 @@ import lombok.ToString;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
-
-import java.time.Duration;
-import java.util.function.Supplier;
-
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
-import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 /**
  * A {@link Gear} that catches a per-species proportion of each species' available biomass, per
@@ -45,55 +44,62 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 @ToString
 public class IndexedBiomassCatchabilityGear implements Gear {
 
-    @NonNull private final String code;
+  @NonNull
+  private final String code;
 
-    private final SpeciesIndexedDoubleArray proportions;
-    private final double minimumCatchThresholdInKg;
+  private final SpeciesIndexedDoubleArray proportions;
+  private final double minimumCatchThresholdInKg;
 
-    @NonNull private final Supplier<Duration> durationSupplier;
-    @Setter private boolean active = true;
+  @NonNull
+  private final Supplier<Duration> durationSupplier;
 
-    /**
-     * @param code                       this gear's identifying code
-     * @param proportions                the fraction of available biomass caught, per species,
-     *                                   each in {@code [0, 1]}
-     * @param minimumCatchThresholdInKg  per-species catch below this, in kilograms, is discarded
-     *                                   down to zero
-     * @param durationSupplier           supplies how long one fishing event takes
-     */
-    public IndexedBiomassCatchabilityGear(
-        @NonNull final String code,
-        @NonNull final SpeciesIndexedDoubleArray proportions,
-        final double minimumCatchThresholdInKg,
-        @NonNull final Supplier<Duration> durationSupplier
-    ) {
-        proportions.forEachValue(value -> checkUnitRange(value, "proportion"));
-        this.code = code;
-        this.proportions = proportions;
-        this.minimumCatchThresholdInKg = checkPositive(
-            minimumCatchThresholdInKg,
-            "minimumCatchThresholdInKg"
-        );
-        this.durationSupplier = durationSupplier;
-    }
+  @Setter
+  private boolean active = true;
 
-    /**
-     * @return each species' {@link #proportions} entry times its available biomass in
-     * {@code fisheable}, zeroed out per species below {@link #minimumCatchThresholdInKg},
-     * removed from {@code fisheable} in the process
-     */
-    @Override
-    public Bucket fish(final Fisheable fisheable) {
-        final Bucket availableFish = fisheable.availableFish();
-        final Bucket fishToCatch = availableFish.mapWithIndex(proportions, (biomass, i) -> {
-            final double v = proportions.getDouble(i) * biomass;
-            return v >= minimumCatchThresholdInKg ? v : 0;
-        });
-        return fisheable.extract(fishToCatch);
-    }
+  /**
+   * @param code                       this gear's identifying code
+   * @param proportions                the fraction of available biomass caught, per species,
+   *                                   each in {@code [0, 1]}
+   * @param minimumCatchThresholdInKg  per-species catch below this, in kilograms, is discarded
+   *                                   down to zero
+   * @param durationSupplier           supplies how long one fishing event takes
+   */
+  public IndexedBiomassCatchabilityGear(
+    @NonNull final String code,
+    @NonNull final SpeciesIndexedDoubleArray proportions,
+    final double minimumCatchThresholdInKg,
+    @NonNull final Supplier<Duration> durationSupplier
+  ) {
+    proportions.forEachValue(value -> checkUnitRange(value, "proportion"));
+    this.code = code;
+    this.proportions = proportions;
+    this.minimumCatchThresholdInKg = checkPositive(
+      minimumCatchThresholdInKg,
+      "minimumCatchThresholdInKg"
+    );
+    this.durationSupplier = durationSupplier;
+  }
 
-    @Override
-    public String getCode() {
-        return code;
-    }
+  /**
+   * @return each species' {@link #proportions} entry times its available biomass in
+   * {@code fisheable}, zeroed out per species below {@link #minimumCatchThresholdInKg},
+   * removed from {@code fisheable} in the process
+   */
+  @Override
+  public Bucket fish(final Fisheable fisheable) {
+    final Bucket availableFish = fisheable.availableFish();
+    final Bucket fishToCatch = availableFish.mapWithIndex(
+      proportions,
+      (biomass, i) -> {
+        final double v = proportions.getDouble(i) * biomass;
+        return v >= minimumCatchThresholdInKg ? v : 0;
+      }
+    );
+    return fisheable.extract(fishToCatch);
+  }
+
+  @Override
+  public String getCode() {
+    return code;
+  }
 }

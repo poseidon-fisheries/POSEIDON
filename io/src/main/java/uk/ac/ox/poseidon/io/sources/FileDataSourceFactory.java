@@ -22,6 +22,10 @@
 
 package uk.ac.ox.poseidon.io.sources;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,11 +33,6 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
-
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link FileDataSource}, built via
@@ -43,23 +42,27 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FileDataSourceFactory<S extends Scope>
-    extends RelativeScopeFactory<S, FileDataSource> {
+public class FileDataSourceFactory<S extends Scope> extends RelativeScopeFactory<
+  S,
+  FileDataSource
+> {
 
-    private static final String DEFAULT_ENCODING = UTF_8.name();
+  private static final String DEFAULT_ENCODING = UTF_8.name();
 
-    private Factory<S, ? extends Path> path;
-    private String encoding;
+  private Factory<S, ? extends Path> path;
+  private String encoding;
 
-    /** @param path factory for the file to read, using the default UTF-8 encoding */
-    public FileDataSourceFactory(final Factory<S, ? extends Path> path) {
-        this.path = path;
-        this.encoding = DEFAULT_ENCODING;
-    }
+  /** @param path factory for the file to read, using the default UTF-8 encoding */
+  public FileDataSourceFactory(final Factory<S, ? extends Path> path) {
+    this.path = path;
+    this.encoding = DEFAULT_ENCODING;
+  }
 
-    @Override
-    protected FileDataSource newInstance(final S scope) {
-        return new FileDataSource(path.get(scope).toFile(), Charset.forName(encoding));
-    }
-
+  @Override
+  protected FileDataSource newInstance(final S scope) {
+    return new FileDataSource(
+      path.get(scope).toFile(),
+      Charset.forName(encoding)
+    );
+  }
 }

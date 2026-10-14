@@ -22,36 +22,34 @@
 
 package uk.ac.ox.poseidon.agents.tasks.accounting;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-import java.util.function.Function;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /** Deducts a vessel's trip cost from its current trip's account, then succeeds. */
 @RequiredArgsConstructor
 public class PayTripCost extends AgentTask<Vessel> {
 
-    @NonNull private final Function<? super Vessel, ? extends Money> tripCostExtractor;
+  @NonNull
+  private final Function<? super Vessel, ? extends Money> tripCostExtractor;
 
-    /**
-     * @return {@link Status#SUCCEEDED}
-     * @throws NullPointerException if {@code tripCostExtractor} yields no cost for the vessel
-     */
-    @Override
-    public Status execute() {
-        final Vessel vessel = getAgent();
-        final Money tripCost =
-            checkNotNull(
-                tripCostExtractor.apply(vessel),
-                "Unable to extract trip cost for Vessel %s.".formatted(vessel)
-            );
-        vessel.getCurrentTrip().getAccount().subtract(tripCost);
-        return Status.SUCCEEDED;
-    }
-
+  /**
+   * @return {@link Status#SUCCEEDED}
+   * @throws NullPointerException if {@code tripCostExtractor} yields no cost for the vessel
+   */
+  @Override
+  public Status execute() {
+    final Vessel vessel = getAgent();
+    final Money tripCost = checkNotNull(
+      tripCostExtractor.apply(vessel),
+      "Unable to extract trip cost for Vessel %s.".formatted(vessel)
+    );
+    vessel.getCurrentTrip().getAccount().subtract(tripCost);
+    return Status.SUCCEEDED;
+  }
 }

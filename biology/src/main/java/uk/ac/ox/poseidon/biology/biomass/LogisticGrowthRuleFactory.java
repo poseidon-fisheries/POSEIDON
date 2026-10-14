@@ -37,13 +37,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class LogisticGrowthRuleFactory extends GlobalScopeFactory<LogisticGrowthRule> {
+public class LogisticGrowthRuleFactory
+  extends GlobalScopeFactory<LogisticGrowthRule>
+{
 
-    private double growthRate;
+  private double growthRate;
 
-    @Override
-    protected LogisticGrowthRule newInstance(final Scope scope) {
-        return new LogisticGrowthRule(growthRate);
-    }
-
+  @Override
+  protected LogisticGrowthRule newInstance(final Scope scope) {
+    return new LogisticGrowthRule(growthRate);
+  }
 }

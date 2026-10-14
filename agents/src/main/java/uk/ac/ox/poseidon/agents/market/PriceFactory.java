@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.math.RoundingMode.HALF_EVEN;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,9 +35,6 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.Measurements;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.math.RoundingMode.HALF_EVEN;
-
 /**
  * A {@link GlobalScopeFactory} counterpart of {@link Price}, built via {@link Factories#price}.
  */
@@ -44,21 +44,17 @@ import static java.math.RoundingMode.HALF_EVEN;
 @EqualsAndHashCode(callSuper = true)
 public class PriceFactory extends GlobalScopeFactory<Price> {
 
-    private double amount;
-    private String currencyUnit;
-    private String massUnit;
+  private double amount;
+  private String currencyUnit;
+  private String massUnit;
 
-    @Override
-    protected Price newInstance(final Scope scope) {
-        checkNotNull(currencyUnit, "currencyUnit must not be null");
-        checkNotNull(massUnit, "massUnit must not be null");
-        return new Price(
-            Money.of(
-                CurrencyUnit.of(currencyUnit),
-                amount,
-                HALF_EVEN
-            ),
-            Measurements.parseMassUnit(massUnit)
-        );
-    }
+  @Override
+  protected Price newInstance(final Scope scope) {
+    checkNotNull(currencyUnit, "currencyUnit must not be null");
+    checkNotNull(massUnit, "massUnit must not be null");
+    return new Price(
+      Money.of(CurrencyUnit.of(currencyUnit), amount, HALF_EVEN),
+      Measurements.parseMassUnit(massUnit)
+    );
+  }
 }

@@ -27,8 +27,9 @@ import lombok.Value;
 /** A named category (e.g. a market grading) a caught bucket of biomass can be sorted into. */
 @Value
 public class CatchCategory {
-    /** The catch category standing for biomass that hasn't been sorted into any real category. */
-    public static final CatchCategory UNCATEGORISED = new CatchCategory("NA");
-    /** This category's code. */
-    String code;
+
+  /** The catch category standing for biomass that hasn't been sorted into any real category. */
+  public static final CatchCategory UNCATEGORISED = new CatchCategory("NA");
+  /** This category's code. */
+  String code;
 }

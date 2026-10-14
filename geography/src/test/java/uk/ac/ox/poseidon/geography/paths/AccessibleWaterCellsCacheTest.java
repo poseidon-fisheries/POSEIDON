@@ -22,15 +22,6 @@
 
 package uk.ac.ox.poseidon.geography.paths;
 
-import com.google.common.collect.ImmutableList;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
-import sim.util.Int2D;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 import static org.mockito.Mockito.mock;
@@ -38,87 +29,125 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableList;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import sim.util.Int2D;
+
 class AccessibleWaterCellsCacheTest {
 
-    private static final Int2D CELL = new Int2D(1, 1);
-    private static final Int2D OTHER_CELL = new Int2D(2, 1);
-    private static final ImmutableList<Int2D> NEIGHBOURS =
-        ImmutableList.of(new Int2D(0, 1), new Int2D(2, 1));
+  private static final Int2D CELL = new Int2D(1, 1);
+  private static final Int2D OTHER_CELL = new Int2D(2, 1);
+  private static final ImmutableList<Int2D> NEIGHBOURS = ImmutableList.of(
+    new Int2D(0, 1),
+    new Int2D(2, 1)
+  );
 
-    private final AccessibleWaterCellsCache cache = new AccessibleWaterCellsCache();
-    private final GridPathFinder pathFinder = mock(GridPathFinder.class);
-    private final GridPathFinder otherPathFinder = mock(GridPathFinder.class);
+  private final AccessibleWaterCellsCache cache =
+    new AccessibleWaterCellsCache();
+  private final GridPathFinder pathFinder = mock(GridPathFinder.class);
+  private final GridPathFinder otherPathFinder = mock(GridPathFinder.class);
 
-    @Test
-    void computesNeighboursOnceWhicheverPathFinderAsks() {
-        when(pathFinder.getAccessibleWaterNeighbours(CELL, 1)).thenReturn(NEIGHBOURS);
+  @Test
+  void computesNeighboursOnceWhicheverPathFinderAsks() {
+    when(pathFinder.getAccessibleWaterNeighbours(CELL, 1)).thenReturn(
+      NEIGHBOURS
+    );
 
-        assertThat(cache.getAccessibleWaterNeighbours(CELL, 1, pathFinder)).isSameAs(NEIGHBOURS);
-        assertThat(cache.getAccessibleWaterNeighbours(CELL, 1, otherPathFinder))
-            .isSameAs(NEIGHBOURS);
-        verify(otherPathFinder, never()).getAccessibleWaterNeighbours(CELL, 1);
-    }
+    assertThat(
+      cache.getAccessibleWaterNeighbours(CELL, 1, pathFinder)
+    ).isSameAs(NEIGHBOURS);
+    assertThat(
+      cache.getAccessibleWaterNeighbours(CELL, 1, otherPathFinder)
+    ).isSameAs(NEIGHBOURS);
+    verify(otherPathFinder, never()).getAccessibleWaterNeighbours(CELL, 1);
+  }
 
-    @Test
-    void keepsNeighbourhoodsOfDifferentSizesApart() {
-        final ImmutableList<Int2D> larger =
-            ImmutableList.<Int2D>builder().addAll(NEIGHBOURS).add(new Int2D(3, 1)).build();
-        when(pathFinder.getAccessibleWaterNeighbours(CELL, 1)).thenReturn(NEIGHBOURS);
-        when(pathFinder.getAccessibleWaterNeighbours(CELL, 2)).thenReturn(larger);
+  @Test
+  void keepsNeighbourhoodsOfDifferentSizesApart() {
+    final ImmutableList<Int2D> larger = ImmutableList.<Int2D>builder()
+      .addAll(NEIGHBOURS)
+      .add(new Int2D(3, 1))
+      .build();
+    when(pathFinder.getAccessibleWaterNeighbours(CELL, 1)).thenReturn(
+      NEIGHBOURS
+    );
+    when(pathFinder.getAccessibleWaterNeighbours(CELL, 2)).thenReturn(larger);
 
-        assertThat(cache.getAccessibleWaterNeighbours(CELL, 1, pathFinder)).isSameAs(NEIGHBOURS);
-        assertThat(cache.getAccessibleWaterNeighbours(CELL, 2, pathFinder)).isSameAs(larger);
-    }
+    assertThat(
+      cache.getAccessibleWaterNeighbours(CELL, 1, pathFinder)
+    ).isSameAs(NEIGHBOURS);
+    assertThat(
+      cache.getAccessibleWaterNeighbours(CELL, 2, pathFinder)
+    ).isSameAs(larger);
+  }
 
-    @Test
-    void computesAccessibleCellsOnceWhicheverPathFinderAsks() {
-        when(pathFinder.getAccessibleWaterCells(CELL)).thenReturn(NEIGHBOURS);
+  @Test
+  void computesAccessibleCellsOnceWhicheverPathFinderAsks() {
+    when(pathFinder.getAccessibleWaterCells(CELL)).thenReturn(NEIGHBOURS);
 
-        assertThat(cache.getAccessibleWaterCells(CELL, pathFinder)).isEqualTo(NEIGHBOURS);
-        assertThat(cache.getAccessibleWaterCells(CELL, otherPathFinder)).isEqualTo(NEIGHBOURS);
-        verify(otherPathFinder, never()).getAccessibleWaterCells(CELL);
-    }
+    assertThat(cache.getAccessibleWaterCells(CELL, pathFinder)).isEqualTo(
+      NEIGHBOURS
+    );
+    assertThat(cache.getAccessibleWaterCells(CELL, otherPathFinder)).isEqualTo(
+      NEIGHBOURS
+    );
+    verify(otherPathFinder, never()).getAccessibleWaterCells(CELL);
+  }
 
-    @Test
-    void sharesOneInstanceBetweenEqualListsOfAccessibleCells() {
-        when(pathFinder.getAccessibleWaterCells(CELL)).thenReturn(ImmutableList.copyOf(NEIGHBOURS));
-        when(pathFinder.getAccessibleWaterCells(OTHER_CELL))
-            .thenReturn(ImmutableList.copyOf(NEIGHBOURS));
+  @Test
+  void sharesOneInstanceBetweenEqualListsOfAccessibleCells() {
+    when(pathFinder.getAccessibleWaterCells(CELL)).thenReturn(
+      ImmutableList.copyOf(NEIGHBOURS)
+    );
+    when(pathFinder.getAccessibleWaterCells(OTHER_CELL)).thenReturn(
+      ImmutableList.copyOf(NEIGHBOURS)
+    );
 
-        assertThat(cache.getAccessibleWaterCells(CELL, pathFinder))
-            .isSameAs(cache.getAccessibleWaterCells(OTHER_CELL, pathFinder));
-    }
+    assertThat(cache.getAccessibleWaterCells(CELL, pathFinder)).isSameAs(
+      cache.getAccessibleWaterCells(OTHER_CELL, pathFinder)
+    );
+  }
 
-    /**
-     * A second simulation asking while the first is still computing waits for that result: the
-     * computation runs once, and the second pathfinder (which may not be used by two threads at
-     * once) is never asked.
-     */
-    @Test
-    @Timeout(value = 10, threadMode = SEPARATE_THREAD)
-    void aConcurrentRequestWaitsForTheComputationInProgress() throws Exception {
-        final CountDownLatch computing = new CountDownLatch(1);
-        final AtomicInteger computations = new AtomicInteger();
-        when(pathFinder.getAccessibleWaterNeighbours(CELL, 1)).thenAnswer(_ -> {
-            computations.incrementAndGet();
-            computing.countDown();
-            Thread.sleep(200);
-            return NEIGHBOURS;
-        });
-        when(otherPathFinder.getAccessibleWaterNeighbours(CELL, 1)).thenAnswer(_ -> {
-            computations.incrementAndGet();
-            return NEIGHBOURS;
-        });
+  /**
+   * A second simulation asking while the first is still computing waits for that result: the
+   * computation runs once, and the second pathfinder (which may not be used by two threads at
+   * once) is never asked.
+   */
+  @Test
+  @Timeout(value = 10, threadMode = SEPARATE_THREAD)
+  void aConcurrentRequestWaitsForTheComputationInProgress() throws Exception {
+    final CountDownLatch computing = new CountDownLatch(1);
+    final AtomicInteger computations = new AtomicInteger();
+    when(pathFinder.getAccessibleWaterNeighbours(CELL, 1)).thenAnswer(_ -> {
+      computations.incrementAndGet();
+      computing.countDown();
+      Thread.sleep(200);
+      return NEIGHBOURS;
+    });
+    when(otherPathFinder.getAccessibleWaterNeighbours(CELL, 1)).thenAnswer(
+      _ -> {
+        computations.incrementAndGet();
+        return NEIGHBOURS;
+      }
+    );
 
-        final CompletableFuture<ImmutableList<Int2D>> first = CompletableFuture.supplyAsync(() ->
-            cache.getAccessibleWaterNeighbours(CELL, 1, pathFinder)
-        );
-        computing.await();
-        final ImmutableList<Int2D> second =
-            cache.getAccessibleWaterNeighbours(CELL, 1, otherPathFinder);
+    final CompletableFuture<ImmutableList<Int2D>> first =
+      CompletableFuture.supplyAsync(() ->
+        cache.getAccessibleWaterNeighbours(CELL, 1, pathFinder)
+      );
+    computing.await();
+    final ImmutableList<Int2D> second = cache.getAccessibleWaterNeighbours(
+      CELL,
+      1,
+      otherPathFinder
+    );
 
-        assertThat(first.get()).isSameAs(NEIGHBOURS);
-        assertThat(second).isSameAs(NEIGHBOURS);
-        assertThat(computations).hasValue(1);
-    }
+    assertThat(first.get()).isSameAs(NEIGHBOURS);
+    assertThat(second).isSameAs(NEIGHBOURS);
+    assertThat(computations).hasValue(1);
+  }
 }

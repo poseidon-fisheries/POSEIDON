@@ -32,11 +32,13 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * {@link Factories#totalLandingsPerYearAccumulator()}.
  */
 public class TotalLandingsPerYearAccumulatorFactory
-    extends SimulationEventListenerFactory<TotalLandingsPerYearAccumulator> {
+  extends SimulationEventListenerFactory<TotalLandingsPerYearAccumulator>
+{
 
-    @Override
-    protected TotalLandingsPerYearAccumulator newListener(final SimulationScope scope) {
-        return new TotalLandingsPerYearAccumulator();
-    }
-
+  @Override
+  protected TotalLandingsPerYearAccumulator newListener(
+    final SimulationScope scope
+  ) {
+    return new TotalLandingsPerYearAccumulator();
+  }
 }

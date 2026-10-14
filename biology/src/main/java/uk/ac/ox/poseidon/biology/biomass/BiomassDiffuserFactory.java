@@ -38,19 +38,27 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BiomassDiffuserFactory extends SimulationScopeFactory<BiomassDiffuser> {
+public class BiomassDiffuserFactory
+  extends SimulationScopeFactory<BiomassDiffuser>
+{
 
-    private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;
-    private Factory<? super SimulationScope, ? extends CarryingCapacityGrid> carryingCapacityGrid;
-    private Factory<? super SimulationScope, ? extends BiomassDiffusionRule> biomassDiffusionRule;
+  private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;
+  private Factory<
+    ? super SimulationScope,
+    ? extends CarryingCapacityGrid
+  > carryingCapacityGrid;
+  private Factory<
+    ? super SimulationScope,
+    ? extends BiomassDiffusionRule
+  > biomassDiffusionRule;
 
-    @Override
-    protected BiomassDiffuser newInstance(final SimulationScope scope) {
-        return new BiomassDiffuser(
-            biomassGrid.get(scope),
-            carryingCapacityGrid.get(scope),
-            biomassDiffusionRule.get(scope),
-            scope.getSimulation().random
-        );
-    }
+  @Override
+  protected BiomassDiffuser newInstance(final SimulationScope scope) {
+    return new BiomassDiffuser(
+      biomassGrid.get(scope),
+      carryingCapacityGrid.get(scope),
+      biomassDiffusionRule.get(scope),
+      scope.getSimulation().random
+    );
+  }
 }

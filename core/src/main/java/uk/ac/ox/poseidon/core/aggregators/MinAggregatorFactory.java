@@ -36,8 +36,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class MinAggregatorFactory extends GlobalScopeFactory<MinAggregator> {
-    @Override
-    protected MinAggregator newInstance(final Scope scope) {
-        return new MinAggregator();
-    }
+
+  @Override
+  protected MinAggregator newInstance(final Scope scope) {
+    return new MinAggregator();
+  }
 }

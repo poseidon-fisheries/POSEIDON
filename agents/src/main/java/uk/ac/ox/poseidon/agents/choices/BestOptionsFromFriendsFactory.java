@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,8 +33,6 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
-import java.util.function.Supplier;
-
 /**
  * A {@link VesselScopeFactory} counterpart of {@link BestOptionsFromFriends}, built via
  * {@link Factories#bestOptionsFromFriends}.
@@ -42,23 +41,25 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class BestOptionsFromFriendsFactory<O>
-    extends VesselScopeFactory<Supplier<OptionValues<O>>> {
+public class BestOptionsFromFriendsFactory<O> extends VesselScopeFactory<
+  Supplier<OptionValues<O>>
+> {
 
-    private Factory<
-        ? super VesselScope,
-        ? extends VesselComponentRegister<? extends OptionValues<O>>
-        > optionValuesRegister;
+  private Factory<
+    ? super VesselScope,
+    ? extends VesselComponentRegister<? extends OptionValues<O>>
+  > optionValuesRegister;
 
-    private Factory<? super VesselScope, ? extends Supplier<? extends Iterable<? extends Vessel>>>
-        friendsSupplier;
+  private Factory<
+    ? super VesselScope,
+    ? extends Supplier<? extends Iterable<? extends Vessel>>
+  > friendsSupplier;
 
-    @Override
-    protected Supplier<OptionValues<O>> newInstance(final VesselScope scope) {
-        return new BestOptionsFromFriends<>(
-            optionValuesRegister.get(scope),
-            friendsSupplier.get(scope)
-        );
-    }
-
+  @Override
+  protected Supplier<OptionValues<O>> newInstance(final VesselScope scope) {
+    return new BestOptionsFromFriends<>(
+      optionValuesRegister.get(scope),
+      friendsSupplier.get(scope)
+    );
+  }
 }

@@ -34,20 +34,24 @@ import java.util.function.Supplier;
  * be wired into any of those call sites without an adapter.
  */
 public interface BooleanProvider
-    extends BooleanSupplier, Supplier<Boolean>, Predicate<Object>, Function<Object, Boolean> {
-    @Override
-    default boolean test(final Object ignored) {
-        return getAsBoolean();
-    }
+  extends
+    BooleanSupplier,
+    Supplier<Boolean>,
+    Predicate<Object>,
+    Function<Object, Boolean>
+{
+  @Override
+  default boolean test(final Object ignored) {
+    return getAsBoolean();
+  }
 
-    @Override
-    default Boolean apply(final Object o) {
-        return getAsBoolean();
-    }
+  @Override
+  default Boolean apply(final Object o) {
+    return getAsBoolean();
+  }
 
-    @Override
-    default Boolean get() {
-        return getAsBoolean();
-    }
-
+  @Override
+  default Boolean get() {
+    return getAsBoolean();
+  }
 }

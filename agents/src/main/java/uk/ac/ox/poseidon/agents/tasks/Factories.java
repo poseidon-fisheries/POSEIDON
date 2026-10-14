@@ -30,25 +30,25 @@ import uk.ac.ox.poseidon.core.Factory;
 /** Factories for a vessel's {@link Behaviour}: an active behavior tree, or none at all. */
 public class Factories {
 
-    private Factories() {}
+  private Factories() {}
 
-    /**
-     * @param rootTask the tree's root task
-     * @return a {@link VesselScope}-relative factory for an {@link ActiveBehaviour}
-     * @see ActiveBehaviour
-     */
-    public static BehaviourFactory behaviour(
-        final Factory<? super VesselScope, ? extends Task<Vessel>> rootTask
-    ) {
-        return new BehaviourFactory(rootTask);
-    }
+  /**
+   * @param rootTask the tree's root task
+   * @return a {@link VesselScope}-relative factory for an {@link ActiveBehaviour}
+   * @see ActiveBehaviour
+   */
+  public static BehaviourFactory behaviour(
+    final Factory<? super VesselScope, ? extends Task<Vessel>> rootTask
+  ) {
+    return new BehaviourFactory(rootTask);
+  }
 
-    /**
-     * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the
-     * {@link InactiveBehaviour}
-     * @see InactiveBehaviour
-     */
-    public static InactiveBehaviourFactory inactiveBehaviour() {
-        return new InactiveBehaviourFactory();
-    }
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the
+   * {@link InactiveBehaviour}
+   * @see InactiveBehaviour
+   */
+  public static InactiveBehaviourFactory inactiveBehaviour() {
+    return new InactiveBehaviourFactory();
+  }
 }

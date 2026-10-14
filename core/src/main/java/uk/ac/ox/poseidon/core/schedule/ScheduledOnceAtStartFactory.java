@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.core.schedule;
 
+import static sim.engine.Schedule.EPOCH;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,8 +32,6 @@ import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
-
-import static sim.engine.Schedule.EPOCH;
 
 /**
  * A {@link SimulationScopeFactory} that schedules the resolved steppable to run once at the very
@@ -46,16 +46,16 @@ import static sim.engine.Schedule.EPOCH;
 @EqualsAndHashCode(callSuper = true)
 public class ScheduledOnceAtStartFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
-    private Factory<? super SimulationScope, ? extends C> steppable;
-    private int ordering;
+  private Factory<? super SimulationScope, ? extends C> steppable;
+  private int ordering;
 
-    @Override
-    protected C newInstance(final SimulationScope scope) {
-        final C steppableObject = steppable.get(scope);
-        scope
-            .getSimulation()
-            .getTemporalSchedule()
-            .scheduleOnce(EPOCH, ordering, steppableObject);
-        return steppableObject;
-    }
+  @Override
+  protected C newInstance(final SimulationScope scope) {
+    final C steppableObject = steppable.get(scope);
+    scope
+      .getSimulation()
+      .getTemporalSchedule()
+      .scheduleOnce(EPOCH, ordering, steppableObject);
+    return steppableObject;
+  }
 }

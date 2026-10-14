@@ -35,12 +35,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @EqualsAndHashCode(callSuper = true)
 public class MoneyFromRowFactory extends GlobalScopeFactory<MoneyFromRow> {
 
-    private String currencyColumnName;
-    private String amountColumnName;
+  private String currencyColumnName;
+  private String amountColumnName;
 
-    @Override
-    protected MoneyFromRow newInstance(final Scope scope) {
-        return new MoneyFromRow(currencyColumnName, amountColumnName);
-    }
-    
+  @Override
+  protected MoneyFromRow newInstance(final Scope scope) {
+    return new MoneyFromRow(currencyColumnName, amountColumnName);
+  }
 }
