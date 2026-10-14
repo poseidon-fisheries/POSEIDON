@@ -5,7 +5,7 @@ this repository. Longer topic-specific sections live in `docs/agents/` — read 
 before touching code it covers:
 
 - `docs/agents/architecture.md` — the Factory + Scenario pattern, `*Factory` class shape, live parameters with plain-value overloads.
-- `docs/agents/javadoc.md` — Javadoc conventions for the component/`Factory`/`Factories` triplet.
+- `docs/agents/javadoc.md` — Javadoc layout, and conventions for the component/`Factory`/`Factories` triplet.
 - `docs/agents/lombok.md` — which Lombok annotation shape to use per class role.
 - `docs/agents/conceptual-correctness.md` — don't collapse distinct concepts for a smaller diff; absence is not a default.
 
@@ -23,9 +23,11 @@ POSEIDON is an agent-based model of fisheries, built on the [MASON](https://cs.g
 ./gradlew :core:test --tests "uk.ac.ox.poseidon.core.ScenarioTest.methodName"  # run a single test method
 ./gradlew jacocoTestReport          # generate coverage reports (build/reports/jacoco/test/…) per module
 ./gradlew spotbugsMain              # run SpotBugs static analysis on a module (Werror is on for javac too)
+./gradlew spotlessApply             # format Java sources with Prettier and add missing license headers
 ```
 
 Notes:
+- `build` runs `spotlessCheck`, which fails on any Java file `spotlessApply` would change: run `./gradlew spotlessApply` after editing Java.
 - Compilation treats warnings as errors (`-Werror`), so unused-import or unchecked warnings fail the build, not just linting.
 - Test tasks are auto-configured with a Mockito Java agent (`-javaagent`, `-Xshare:off`) — don't remove this if editing `buildlogic.java-common-conventions.gradle.kts`.
 - Tests use JUnit 5 (`useJUnitPlatform()`), AssertJ, Mockito, and jqwik (property-based testing) — check existing tests in a module before assuming which style applies.
@@ -65,8 +67,10 @@ Convention plugins (in `buildSrc/src/main/kotlin/`) centralize shared config:
 
 Mark everything that can be `final` as `final` — local variables, method/constructor parameters, and caught exceptions (e.g. `catch (final IOException e)`, `try (final SomeResource r = ...)`). The only common exception is a traditional counting `for` loop's own loop variable (`for (int i = 0; ...; i++)`), which must stay mutable by definition.
 
+Formatting is Prettier's (prettier-plugin-java, options in `.prettierrc`), applied by `./gradlew spotlessApply`. Prettier leaves comments as they are: wrap them by hand within 80 columns. It moves a comment placed at the start of a lambda body down the method chain, so put such a comment above the call that takes the lambda. SURIMI-POSEIDON duplicates this setup (`.prettierrc`, `package.json`, the Spotless block and license header in `build.gradle.kts`, the `nodejs`/`node-gradle`/`spotless` versions in `libs.versions.toml`, the Node.js repository in `settings.gradle.kts`): change both repos together.
+
 Prefer lambdas to anonymous classes, and method references to lambdas, wherever they fit. For a `Listener`, which has two abstract methods, use `new SimpleListener<>(EventClass.class, consumer)`. Scenario classes (such as `PeterSnapperScenario`) are the exception: they stay readable for people new to Java, with no method references or other clever tricks.
 
 ## Licensing
 
-All source files carry a GNU GPLv3 header (University of Oxford copyright). Preserve this header format when creating new source files — copy it from a neighboring file in the same module rather than retyping it.
+All source files carry a GNU GPLv3 header (University of Oxford copyright); `./gradlew spotlessApply` adds it to new Java files. Spotless keeps whatever year a header has, so when you modify a file, end its year range at the current year yourself: with `YYYY` the current year, `2024` and `2024-2025` both become `2024-YYYY`, and `YYYY` stays.

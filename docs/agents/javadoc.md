@@ -1,5 +1,25 @@
 # Javadoc conventions
 
+## Layout
+
+Prettier leaves Javadoc as written, so lay it out by hand:
+
+- Wrap at 80 columns. A single `{@link …}` too long to fit gets a line of its own.
+- Start each new paragraph with `<p>` on its own line.
+- Write lists as `<ul>`/`<ol>` with one `<li>` per item, and keep `<pre>` blocks verbatim.
+- Align the descriptions of consecutive `@param` tags, and hang continuation lines under the
+  description:
+
+  ```java
+     * @param currentDisposition    the disposition so far, refined further by
+     *                              this step
+     * @param availableCapacityInKg how much hold capacity remains
+     * @return the disposition after this step, starting from {@code grossCatch}
+     *         entirely retained
+  ```
+
+## The component/`Factory`/`Factories` triplet
+
 See `docs/agents/architecture.md` for the component/`Factory`/`Factories`-helper triplet pattern
 this section documents.
 
