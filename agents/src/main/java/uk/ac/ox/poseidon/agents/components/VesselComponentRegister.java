@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -34,7 +34,9 @@ import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
  */
 public class VesselComponentRegister<C> implements VesselsGetter {
 
-  private final Map<Vessel, C> map = new HashMap<>();
+  // Insertion order, not hash order: vessels hash by identity, so a HashMap's
+  // order would change from run to run with the same seed
+  private final Map<Vessel, C> map = new LinkedHashMap<>();
 
   /**
    * Associates the given component with the vessel.

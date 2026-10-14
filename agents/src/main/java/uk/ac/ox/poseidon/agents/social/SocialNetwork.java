@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.social;
 import static lombok.AccessLevel.PACKAGE;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.ElementOrder;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import java.util.Collection;
@@ -43,8 +44,11 @@ import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 @RequiredArgsConstructor(access = PACKAGE)
 public class SocialNetwork {
 
+  // Stable order for each vessel's ties: vessels hash by identity, so the
+  // default (unordered) would change from run to run with the same seed
   private final MutableGraph<Vessel> ties = GraphBuilder.directed()
     .allowsSelfLoops(false)
+    .incidentEdgeOrder(ElementOrder.stable())
     .build();
   private final VesselsGetter candidates;
 

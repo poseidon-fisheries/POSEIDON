@@ -27,7 +27,7 @@ import static uk.ac.ox.poseidon.core.MasonUtils.reservoirSample;
 
 import ec.util.MersenneTwisterFast;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -68,7 +68,8 @@ public class DynamicFriendsSupplier implements Supplier<Set<Vessel>> {
   @NonNull
   private final MersenneTwisterFast rng;
 
-  private final Set<Vessel> currentFriends = new HashSet<>();
+  // Insertion order, not hash order: vessels hash by identity
+  private final Set<Vessel> currentFriends = new LinkedHashSet<>();
 
   @Override
   public Set<Vessel> get() {

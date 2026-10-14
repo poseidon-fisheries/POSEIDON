@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -60,8 +60,12 @@ public class MarketGridFactory<S extends Scope> extends RelativeScopeFactory<
       markets
         .get(scope)
         .stream()
+        // An ordered map: markets hash by identity, so a HashMap's order would
+        // change from run to run with the same seed
         .collect(
-          toMap(identity(), market -> portGrid.getLocation(market.getPort()))
+          toImmutableMap(identity(), market ->
+            portGrid.getLocation(market.getPort())
+          )
         )
     );
   }

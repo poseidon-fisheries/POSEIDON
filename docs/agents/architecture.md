@@ -90,3 +90,25 @@ as the live version; a concrete value-factory class such as `DurationFactory` do
 This doesn't apply to the configuration literals of the previous section (a column name, a
 separator, a file path): they say how to build or read something, not how the model behaves, and
 stay plain fields.
+
+## Determinism
+
+A simulation's results depend only on its scenario and its seed: the same seed gives the same
+results in one JVM or across JVMs, whatever ran before it. Code that runs during a simulation
+therefore never iterates a collection whose order depends on identity hash codes:
+
+- a `HashMap` or `HashSet` keyed by a class without its own `equals`/`hashCode` (`Vessel`, `Agent`,
+  `Market`, `Fleet`, most components) iterates in an order that changes from run to run, because
+  identity hash codes depend on how many the thread has already handed out. Use a `LinkedHashMap`
+  or `LinkedHashSet` (insertion order), a Guava immutable collection, or sort by a stable key. A
+  hash collection that is only looked up, never iterated, is fine;
+- Guava graphs: set `incidentEdgeOrder(ElementOrder.stable())`, since the default order of a
+  node's neighbours is unordered (`SocialNetwork`);
+- `Collectors.toMap`, `toSet` and `groupingBy` build hash collections: use Guava's
+  `toImmutableMap`/`toImmutableSet` or pass an ordered supplier when the result is iterated.
+
+Keys with value equality (`String`, `Species`, `Int2D`, records, `@Value` classes, enums) iterate in
+the same order in every run and are fine. Randomness comes only from the simulation's random
+number generator. Each example scenario has a test that runs the same seed twice in one JVM and
+compares the results (`PeterSnapperScenarioTest.sameSeedGivesSameLandings`; SURIMI-POSEIDON's
+`ScenarioReproducibilityTest`).

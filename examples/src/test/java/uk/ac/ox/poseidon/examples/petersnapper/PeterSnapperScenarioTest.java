@@ -23,12 +23,16 @@
 package uk.ac.ox.poseidon.examples.petersnapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPerYearAccumulator;
 
 import java.time.Period;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
+import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationStartOptions;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
 
 class PeterSnapperScenarioTest {
@@ -60,5 +64,40 @@ class PeterSnapperScenarioTest {
       simulation.getTemporalSchedule().stepFor(simulation, Period.ofDays(1));
     }
     assertThat(tripEnded).isTrue();
+  }
+
+  // Each run hands out identity hash codes, so a result that depended on
+  // them (iterating a HashMap keyed by vessels, say) would differ between
+  // these runs.
+  @Test
+  void sameSeedGivesSameLandings() {
+    final Scenario scenario = new PeterSnapperScenario().get();
+    final Map<Integer, Double> firstLandings = landingsForAYear(scenario);
+    assertThat(landingsForAYear(scenario)).isEqualTo(firstLandings);
+    assertThat(landingsForAYear(new PeterSnapperScenario().get())).isEqualTo(
+      firstLandings
+    );
+  }
+
+  private static Map<Integer, Double> landingsForAYear(
+    final Scenario scenario
+  ) {
+    final Simulation simulation = scenario.startNewSimulation(
+      SimulationStartOptions.builder()
+        .seed(0)
+        .extraComponent(
+          "totalLandingsPerYear",
+          totalLandingsPerYearAccumulator()
+        )
+        .build()
+    );
+    try {
+      simulation.getTemporalSchedule().stepFor(simulation, Period.ofYears(1));
+      return Map.copyOf(
+        simulation.getComponent(TotalLandingsPerYearAccumulator.class).get()
+      );
+    } finally {
+      simulation.finish();
+    }
   }
 }
