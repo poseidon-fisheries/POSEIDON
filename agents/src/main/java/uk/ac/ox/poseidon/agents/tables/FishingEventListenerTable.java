@@ -123,9 +123,9 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
       )
     );
     table.rowKeySet().forEach(species -> {
-      // FIXME: this repeats the event info for each species, which is a colossal waste
-      //  of space. We should have some kind of event id (which needs to be implemented) and
-      //  store the catch data in a separate table.
+      // FIXME: this repeats the event info for each species, which is a
+      //  colossal waste of space. We should have some kind of event id (which
+      //  needs to be implemented) and store the catch data in a separate table.
       vesselId.append(event.getAction().getAgent().getId());
       startDateTime.append(event.getStartDateTime());
       endDateTime.append(event.getEndDateTime());

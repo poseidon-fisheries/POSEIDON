@@ -87,7 +87,8 @@ class TripTest {
 
   @Test
   void setDestinationRejectsCellOutsideGrid() {
-    // ModelGrid mock's checkIsInGrid no-ops by default, so construction succeeds.
+    // ModelGrid mock's checkIsInGrid no-ops by default, so construction
+    // succeeds.
     final ModelGrid modelGrid = mock(ModelGrid.class);
     final Vessel vessel = newVessel(new Int2D(0, 0), modelGrid);
     final Trip trip = new Trip(vessel, new Int2D(1, 1));

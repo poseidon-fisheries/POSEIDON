@@ -165,7 +165,8 @@ public class Vessel extends Agent implements Oriented2D {
   public void setHomePort(final Port homePort) {
     mutate(() -> {
       this.homePort = homePort;
-      // TODO: if location were to be stored in port we wouldn't need the port grid here
+      // TODO: if location were to be stored in port we wouldn't need the port
+      // grid here
       if (this.homePort != null && getCell() == null) setCurrentCell(
         portGrid.getLocation(homePort)
       );

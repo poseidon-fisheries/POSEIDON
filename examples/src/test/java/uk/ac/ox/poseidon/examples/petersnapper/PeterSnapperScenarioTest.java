@@ -42,8 +42,9 @@ class PeterSnapperScenarioTest {
     assertThat(simulation.schedule.getSteps()).isEqualTo(1);
   }
 
-  // Runs whole trips, so that the checks made along a trip (arrival in port before landing and
-  // before the trip ends) catch tasks missing from, or misplaced in, the behaviour tree.
+  // Runs whole trips, so that the checks made along a trip (arrival in port
+  // before landing and before the trip ends) catch tasks missing from, or
+  // misplaced in, the behaviour tree.
   @Test
   void endsATrip() {
     final Simulation simulation = new PeterSnapperScenario()

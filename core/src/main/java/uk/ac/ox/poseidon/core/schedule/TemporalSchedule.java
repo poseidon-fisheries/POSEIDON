@@ -117,15 +117,16 @@ public class TemporalSchedule extends Schedule {
   private static final long serialVersionUID = 4197200009803943439L;
 
   private final LocalDateTime startingDateTime;
-  // The last time converted by toDateTime, which is called with the same time many times in a
-  // step: converting it is costly, its result never changes.
+  // The last time converted by toDateTime, which is called with the same time
+  // many times in a step: converting it is costly, its result never changes.
   private transient Conversion lastConversion;
 
   // Where the last stepUntil stopped: the clock between calls. Guarded by lock.
   @Getter(AccessLevel.NONE)
   private double boundary = EPOCH;
 
-  // Whether step() is running events, to refuse advancing from inside one. Guarded by this.
+  // Whether step() is running events, to refuse advancing from inside one.
+  // Guarded by this.
   @Getter(AccessLevel.NONE)
   private transient boolean running;
 
@@ -475,8 +476,8 @@ public class TemporalSchedule extends Schedule {
       }
     }
     while (true) {
-      // The last look at the queue and the boundary update are one locked block, so that no
-      // event can be queued before the target in between.
+      // The last look at the queue and the boundary update are one locked
+      // block, so that no event can be queued before the target in between.
       synchronized (lock) {
         if (sealed) {
           throw new IllegalStateException("The schedule is finished.");
@@ -550,8 +551,8 @@ public class TemporalSchedule extends Schedule {
     }
   }
 
-  // MASON's relative scheduling methods count from MASON's own time, which can be earlier than
-  // the clock between calls: these count from the clock.
+  // MASON's relative scheduling methods count from MASON's own time, which can
+  // be earlier than the clock between calls: these count from the clock.
 
   @Override
   public boolean scheduleOnce(final Steppable event) {

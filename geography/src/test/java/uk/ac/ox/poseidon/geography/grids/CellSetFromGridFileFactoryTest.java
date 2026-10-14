@@ -101,8 +101,9 @@ class CellSetFromGridFileFactoryTest {
 
   @Test
   void cellsMatchTheModelGridBuiltFromAFileWithTheSameHeader() {
-    // How NW Med builds its active cells: the model grid from one file, the cell set from
-    // another with the same header. A cell from the set must be where its value is.
+    // How NW Med builds its active cells: the model grid from one file, the
+    // cell set from another with the same header. A cell from the set must be
+    // where its value is.
     final Path file = writeFixture(tempDir, "fixture.asc");
     final ModelGrid modelGrid = modelGridFromGridFile(scope -> file).get(
       mock(Scope.class)

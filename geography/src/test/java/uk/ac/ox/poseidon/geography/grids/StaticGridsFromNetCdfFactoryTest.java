@@ -81,7 +81,8 @@ class StaticGridsFromNetCdfFactoryTest {
     assertThat(result).isInstanceOf(ImmutableMap.class);
     assertThat(result.keySet()).containsExactlyInAnyOrder("mpa_4", "mpa_5");
 
-    // written as [lat][lon] = {{0,1,FILL},{1,0,0}}; expect [lon][lat] via Int2D(x=lon, y=lat)
+    // written as [lat][lon] = {{0,1,FILL},{1,0,0}}; expect [lon][lat] via
+    // Int2D(x=lon, y=lat)
     assertThat(result.get("mpa_4").getValue(new Int2D(0, 0))).isEqualTo(0.0);
     assertThat(result.get("mpa_4").getValue(new Int2D(1, 0))).isEqualTo(1.0);
     assertThat(result.get("mpa_4").getValue(new Int2D(2, 0))).isNaN();

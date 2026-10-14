@@ -58,8 +58,8 @@ public class NumericIntervalMapper<T> implements Function<Double, T> {
    */
   @Override
   public T apply(final Double value) {
-    // A loop, not a stream: this runs for every cell valued, and the stream's overhead showed
-    // in profiles.
+    // A loop, not a stream: this runs for every cell valued, and the stream's
+    // overhead showed in profiles.
     for (final Interval<T> interval : intervals) {
       if (interval.contains(value)) return interval.getMappedValue();
     }

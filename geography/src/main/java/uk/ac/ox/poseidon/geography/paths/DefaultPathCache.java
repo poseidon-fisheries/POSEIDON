@@ -36,8 +36,8 @@ import java.util.Optional;
  */
 public class DefaultPathCache<P> implements PathCache<P> {
 
-  // Keyed by List.of(start, end): Map.entry's hash, the XOR of the two points' hashes, collides
-  // badly on grid cells (A to B and B to A always collide).
+  // Keyed by List.of(start, end): Map.entry's hash, the XOR of the two points'
+  // hashes, collides badly on grid cells (A to B and B to A always collide).
   private final Cache<List<P>, Optional<ImmutableList<P>>> memory =
     Caffeine.newBuilder().build();
 

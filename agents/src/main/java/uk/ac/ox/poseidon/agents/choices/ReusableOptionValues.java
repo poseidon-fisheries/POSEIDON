@@ -43,9 +43,10 @@ class ReusableOptionValues<O> extends MapBasedOptionValues<O> {
   private final Object2DoubleOpenHashMap<O> values =
     new Object2DoubleOpenHashMap<>();
 
-  // A field rather than a local so its backing array survives across forEachBestEntry() calls
-  // (clear() resets size to 0 but keeps the array) instead of being reallocated every call.
-  // Holds only the keys currently tied for the best value, not the whole map.
+  // A field rather than a local so its backing array survives across
+  // forEachBestEntry() calls (clear() resets size to 0 but keeps the array)
+  // instead of being reallocated every call. Holds only the keys currently tied
+  // for the best value, not the whole map.
   private final ObjectArrayList<O> bestKeysBuffer = new ObjectArrayList<>();
 
   /**

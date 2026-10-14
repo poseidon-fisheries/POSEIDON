@@ -34,10 +34,10 @@ class ReusableOptionValuesTest {
   @Test
   void forEachBestEntryOnlyEmitsTrueMaximum() {
     final ReusableOptionValues<String> values = new ReusableOptionValues<>();
-    // Enough distinct entries, in an order unrelated to the map's hash-bucket iteration
-    // order, that a single-pass implementation which forgets to retract an
-    // entry once a higher value is found later (the original bug) would very
-    // likely emit some non-maximal entry alongside the true maximum.
+    // Enough distinct entries, in an order unrelated to the map's hash-bucket
+    // iteration order, that a single-pass implementation which forgets to
+    // retract an entry once a higher value is found later (the original bug)
+    // would very likely emit some non-maximal entry alongside the true maximum.
     for (int i = 0; i < 20; i++) {
       values.putIfGreater("option-" + i, i);
     }

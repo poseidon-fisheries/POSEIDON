@@ -121,13 +121,15 @@ final class AdaptiveBucketBuilder implements BucketBuilder {
   @Override
   public Bucket build() {
     // Performance note:
-    // This method is intentionally implemented as a single-pass loop (instead of
-    // stream/filter/collect) because it sits on a profiled hot path. The loop avoids
-    // transient stream/collector allocations while still preserving builder semantics:
+    // This method is intentionally implemented as a single-pass loop (instead
+    // of stream/filter/collect) because it sits on a profiled hot path. The
+    // loop avoids transient stream/collector allocations while still preserving
+    // builder semantics:
     // 1) drop empty content,
     // 2) return Bucket.empty() if everything is empty,
     // 3) specialize one-species biomass into SingleSpeciesBiomassBucket,
-    // 4) otherwise choose BiomassBucket vs ContentBucket based on filtered entries.
+    // 4) otherwise choose BiomassBucket vs ContentBucket based on filtered
+    //    entries.
     Species firstSpecies = null;
     Content firstContent = null;
     boolean allBiomass = true;

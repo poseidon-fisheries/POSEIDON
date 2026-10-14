@@ -87,7 +87,8 @@ class PermittedIfTest {
       Duration.ofHours(2)
     );
 
-    // Define a predicate that permits actions with a duration of exactly 2 hours
+    // Define a predicate that permits actions with a duration of exactly 2
+    // hours
     final Predicate<ExtendedAction<Object>> predicate = action ->
       action.getDuration().equals(Duration.ofHours(2));
 
@@ -110,7 +111,8 @@ class PermittedIfTest {
       Duration.ofHours(3)
     );
 
-    // Define a predicate that only permits actions with a duration of exactly 2 hours
+    // Define a predicate that only permits actions with a duration of exactly 2
+    // hours
     final Predicate<ExtendedAction<Object>> predicate = action ->
       action.getDuration().equals(Duration.ofHours(2));
 

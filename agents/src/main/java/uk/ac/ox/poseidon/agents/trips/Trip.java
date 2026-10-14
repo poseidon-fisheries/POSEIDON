@@ -87,9 +87,9 @@ public class Trip {
     this.vessel = vessel;
     this.destination = checkInGrid(destination);
     this.eventManager = new ForwardingEventManager(vessel.getEventManager());
-    // Registered on the trip's own event manager, which delivers to its listeners before
-    // forwarding to the vessel's, so the record is complete before vessel-level listeners
-    // react.
+    // Registered on the trip's own event manager, which delivers to its
+    // listeners before forwarding to the vessel's, so the record is complete
+    // before vessel-level listeners react.
     this.eventManager.addListener(
       new SimpleListener<>(FishingEvent.class, fishingEvents::add)
     );

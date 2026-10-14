@@ -125,8 +125,8 @@ import uk.ac.ox.poseidon.io.ScenarioWriter;
  */
 public class PeterSnapperScenario implements Supplier<Scenario> {
 
-  // Relative to the examples module, which Gradle runs from: set IDE run configurations to the
-  // module's working directory.
+  // Relative to the examples module, which Gradle runs from: set IDE run
+  // configurations to the module's working directory.
   private static final Path INPUT_PATH = Path.of("inputs", "peter_snapper");
 
   private static final double LEARNING_ALPHA = 1;
@@ -136,8 +136,9 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
   private static final String CURRENCY_CODE = "IDR";
 
   static void main() {
-    // This just checks that the biomass growth matches that of the old petersnapper scenario.
-    // It does; so the calibration mismatch is from fisher behaviour, not biology.
+    // This just checks that the biomass growth matches that of the old
+    // petersnapper scenario. It does; so the calibration mismatch is from
+    // fisher behaviour, not biology.
 
     final Scenario scenario = new PeterSnapperScenario().get();
 

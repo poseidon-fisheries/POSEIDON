@@ -100,8 +100,8 @@ public class GreedyPicker<O> implements Provider<O> {
         tied.add(entries.get(end).getKey());
         end++;
       }
-      // The first option to pass, in a random order, is a uniformly random pick among the
-      // passing ones, without testing the others.
+      // The first option to pass, in a random order, is a uniformly random pick
+      // among the passing ones, without testing the others.
       final Optional<O> picked = shuffledStream(tied, rng)
         .filter(optionPredicate)
         .findFirst();

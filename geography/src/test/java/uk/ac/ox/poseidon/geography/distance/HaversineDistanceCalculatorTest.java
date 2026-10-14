@@ -108,7 +108,8 @@ class HaversineDistanceCalculatorTest {
     final Coordinate sydney = new Coordinate(151.2093, -33.8688);
 
     final double result = calculator.distanceInKm(newYork, sydney);
-    final double expectedDistance = 15988.8; // Approximate distance in kilometers
+    // Approximate distance in kilometers
+    final double expectedDistance = 15988.8;
 
     assertEquals(
       expectedDistance,
@@ -130,7 +131,8 @@ class HaversineDistanceCalculatorTest {
     final Coordinate southPole = new Coordinate(0.0, -90.0);
 
     final double result = calculator.distanceInKm(northPole, southPole);
-    final double expectedDistance = 20015.1; // Half Earth's approximate circumference
+    // Half Earth's approximate circumference
+    final double expectedDistance = 20015.1;
 
     assertEquals(
       expectedDistance,

@@ -117,7 +117,8 @@ public class SvgRenderer {
       final BufferedImage img,
       final TranscoderOutput output
     ) {
-      // Image is already captured in createImage(), so no need to do anything here
+      // Image is already captured in createImage(), so no need to do anything
+      // here
     }
 
     public BufferedImage getBufferedImage() {

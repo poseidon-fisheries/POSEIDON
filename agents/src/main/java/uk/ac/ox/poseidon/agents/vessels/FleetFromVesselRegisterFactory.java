@@ -197,10 +197,11 @@ public class FleetFromVesselRegisterFactory
       return __ -> null;
     } else {
       return vessel -> {
-        // The mapped values are set on this factory (and the factories it holds) only for
-        // the time of the call, then the original values are put back: factories cache
-        // their products by hash code, which depends on these values, and other
-        // simulations of the same scenario may be using this factory at the same time.
+        // The mapped values are set on this factory (and the factories it
+        // holds) only for the time of the call, then the original values are
+        // put back: factories cache their products by hash code, which depends
+        // on these values, and other simulations of the same scenario may be
+        // using this factory at the same time.
         synchronized (this) {
           final Map<String, Object> originalValues = new LinkedHashMap<>();
           mappings
@@ -265,7 +266,8 @@ public class FleetFromVesselRegisterFactory
       this.ignoredColumns.stream()
     ).collect(toSet());
 
-    // Populating the map with forEach because Collectors.toMap rejects null values
+    // Populating the map with forEach because Collectors.toMap rejects null
+    // values
     final Map<String, Object> tags = new HashMap<>();
     row
       .columnNames()

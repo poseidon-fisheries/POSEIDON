@@ -54,8 +54,8 @@ class TimeIndexedBiomassGridUpdatesFactoryTest {
 
   @Test
   void datesEachUpdateAtItsSnapshotDateTime() {
-    // A non-midnight date-time proves the time of day survives: this factory must not force
-    // updates to midnight via atStartOfDay().
+    // A non-midnight date-time proves the time of day survives: this factory
+    // must not force updates to midnight via atStartOfDay().
     final LocalDateTime midnight = LocalDate.of(2020, 1, 1).atStartOfDay();
     final LocalDateTime noon = LocalDateTime.of(2026, 3, 1, 12, 0);
     final TimeIndexedBiomassGridUpdatesFactory<SimulationScope> factory =

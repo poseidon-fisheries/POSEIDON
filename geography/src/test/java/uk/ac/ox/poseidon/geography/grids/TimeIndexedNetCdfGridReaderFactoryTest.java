@@ -49,8 +49,9 @@ class TimeIndexedNetCdfGridReaderFactoryTest {
 
   @Test
   void resolvingTheFactoryDoesNoFileIO() {
-    // A nonexistent path must not throw when the outer factory is resolved — only when
-    // the supplier's own get() is called does the file actually get opened.
+    // A nonexistent path must not throw when the outer factory is resolved —
+    // only when the supplier's own get() is called does the file actually get
+    // opened.
     final TimeIndexedNetCdfGridReaderFactory<Scope> factory =
       new TimeIndexedNetCdfGridReaderFactory<>(
         scope -> tempDir.resolve("does-not-exist.nc"),

@@ -150,9 +150,9 @@ public class FleetEvent implements Steppable {
             vessel.setCurrentCell(vessel.getPortGrid().getLocation(port));
           }
         },
-        // this will only get applied once current vessel behaviour is done running
-        // so it shouldn't pause any problems to ongoing trips as long as vessel
-        // behaviours always end with the vessel at a port.
+        // this will only get applied once current vessel behaviour is done
+        // running so it shouldn't pause any problems to ongoing trips as long
+        // as vessel behaviours always end with the vessel at a port.
         () -> {
           logger.log(
             WARNING,

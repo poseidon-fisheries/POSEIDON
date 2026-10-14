@@ -56,8 +56,8 @@ public class HomePortCatchValuation
   implements ToDoubleBiFunction<Object, Bucket>
 {
 
-  // Catches no longer remembered would pile up here, so it is cleared past this size. Weak keys
-  // would drop them precisely, but made NW Med runs 10% slower.
+  // Catches no longer remembered would pile up here, so it is cleared past this
+  // size. Weak keys would drop them precisely, but made NW Med runs 10% slower.
   private static final int MAXIMUM_NUMBER_OF_VALUES = 10_000;
 
   private final Vessel vessel;
@@ -95,7 +95,8 @@ public class HomePortCatchValuation
     return values.computeIfAbsent(bucket, key -> valueAt(market, key));
   }
 
-  // Strictly before: a price set in the same second as a valuation may have come after it.
+  // Strictly before: a price set in the same second as a valuation may have
+  // come after it.
   private static boolean pricesChangedSince(
     final Market market,
     final LocalDateTime dateTime

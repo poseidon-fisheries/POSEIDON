@@ -102,7 +102,8 @@ public class Factories {
    */
   @SafeVarargs
   public static <T> ObjectFactory<Set<T>> setOf(final T... values) {
-    // using LinkedHashSet to preserve insertion order and be consistent with SnakeYAML
+    // using LinkedHashSet to preserve insertion order and be consistent with
+    // SnakeYAML
     final LinkedHashSet<T> set = new LinkedHashSet<>(Arrays.asList(values));
     return new ObjectFactory<>(Collections.unmodifiableSet(set));
   }
@@ -114,7 +115,8 @@ public class Factories {
    * @see ObjectFactory
    */
   public static <T> ObjectFactory<Set<T>> setOf(final Stream<T> values) {
-    // using LinkedHashSet to preserve insertion order and be consistent with SnakeYAML
+    // using LinkedHashSet to preserve insertion order and be consistent with
+    // SnakeYAML
     final LinkedHashSet<T> set = values.collect(
       Collectors.toCollection(LinkedHashSet::new)
     );

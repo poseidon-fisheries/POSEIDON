@@ -110,7 +110,8 @@ class EphemeralAccumulatingListenerTest {
 
   @Test
   void testNullSafetyInConstructor() {
-    // Verify that passing null to any constructor argument throws NullPointerException
+    // Verify that passing null to any constructor argument throws
+    // NullPointerException
     assertThrows(NullPointerException.class, () ->
       new EphemeralAccumulatingListener<>(Integer.class, null, 0, Integer::sum)
     );

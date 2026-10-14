@@ -87,12 +87,13 @@ public class BetweenYearlyDates implements Predicate<TemporalAction<?>> {
     final MonthDay startDay = MonthDay.from(actionStart);
     final MonthDay endDay = MonthDay.from(actionEnd);
     return switch (actionEnd.getYear() - actionStart.getYear()) {
-      // If the action is within a single year, it can only cover a range that isn't year
-      // spanning
+      // If the action is within a single year, it can only cover a range that
+      // isn't year spanning
       case 0 -> !yearSpanning &&
         startDay.isBefore(start) &&
         endDay.isAfter(end);
-      // action spans year boundary, it can only cover a range that is year spanning
+      // action spans year boundary, it can only cover a range that is year
+      // spanning
       case 1 -> yearSpanning && startDay.isBefore(start) && endDay.isAfter(end);
       // if action spans more than a year, it necessarily covers any range
       default -> true;

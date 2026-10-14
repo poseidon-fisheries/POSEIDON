@@ -115,8 +115,8 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
       .extracting(ImmutableBiomassGrid::getSpecies)
       .containsExactly(ANE_ADULT, HKE);
 
-    // The fixture writes a deliberate fill cell for the first variable (ANE_adult)
-    // at time index 0, latitude index 0, longitude index 2.
+    // The fixture writes a deliberate fill cell for the first variable
+    // (ANE_adult) at time index 0, latitude index 0, longitude index 2.
     assertThat(grids0.get(0).getValue(new Int2D(2, 0))).isNaN();
     assertThat(grids0.get(0).getValue(new Int2D(0, 0))).isEqualTo(
       expectedValue(0, 0, 0, 0)
@@ -214,7 +214,8 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
   @Test
   void misalignedGridThrows() throws IOException {
     // Same dimension sizes, but longitudes shifted so cell centers no longer
-    // line up with the ModelGrid's — must be caught even though the shape matches.
+    // line up with the ModelGrid's — must be caught even though the shape
+    // matches.
     final double[] shiftedLongitudes = { 11.0, 21.0, 31.0 };
     final Path fixture = writeFixture(
       shiftedLongitudes,
@@ -245,8 +246,8 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
   @Test
   void matchesOnAnyConfiguredLifeStageVocabularyAndSeparator()
     throws IOException {
-    // Neither "-" nor "larva"/"spawner" are hardcoded anywhere; both come entirely from the
-    // configured species list and the separator argument.
+    // Neither "-" nor "larva"/"spawner" are hardcoded anywhere; both come
+    // entirely from the configured species list and the separator argument.
     final Species codLarva = new Species("COD", "larva", null);
     final Species codSpawner = new Species("COD", "spawner", null);
     final Path fixture = writeFixture(
@@ -282,8 +283,9 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
   @Test
   void splitsUnconditionallyEvenForAnUncommonLifeStageValue()
     throws IOException {
-    // "xxx" isn't tied to any pre-known vocabulary; splitting is purely syntactic, so a
-    // configured (HKE, xxx) species matches "HKE_xxx" regardless.
+    // "xxx" isn't tied to any pre-known vocabulary; splitting is purely
+    // syntactic, so a configured (HKE, xxx) species matches "HKE_xxx"
+    // regardless.
     final Species hkeXxx = new Species("HKE", "xxx", null);
     final Path fixture = writeFixture(
       LONGITUDES,
@@ -318,8 +320,9 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
   @Test
   void unknownSuffixDoesNotFalselyMatchAnUnrelatedBareSpecies()
     throws IOException {
-    // "HKE_xxx" must be parsed as (HKE, xxx) and fail to match the *bare* HKE species — it
-    // must not be silently absorbed into HKE just because "xxx" isn't independently known.
+    // "HKE_xxx" must be parsed as (HKE, xxx) and fail to match the *bare* HKE
+    // species — it must not be silently absorbed into HKE just because "xxx"
+    // isn't independently known.
     final Path fixture = writeFixture(
       LONGITUDES,
       LATITUDES,

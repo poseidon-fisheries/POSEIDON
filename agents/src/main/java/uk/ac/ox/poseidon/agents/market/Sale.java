@@ -71,7 +71,8 @@ public class Sale {
   public static Map<CurrencyUnit, Money> summarise(
     final Collection<Item> items
   ) {
-    // Aggregate as doubles to avoid per-item Money creation; round once per currency.
+    // Aggregate as doubles to avoid per-item Money creation; round once per
+    // currency.
     final Map<CurrencyUnit, Double> totals = new HashMap<>();
     for (final Item item : items) {
       final CurrencyUnit currency = item

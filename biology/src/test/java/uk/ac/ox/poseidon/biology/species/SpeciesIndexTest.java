@@ -63,7 +63,8 @@ class SpeciesIndexTest {
     assertThatThrownBy(() ->
       SpeciesIndex.of(
         Set.of(
-          new Species("S1", "Adult", "Species 1 (juvenile)"), // deliberately inconsistent
+          // deliberately inconsistent
+          new Species("S1", "Adult", "Species 1 (juvenile)"),
           new Species("S1", "Adult", "Species 1 (adult)"),
           new Species("S3", "Juvenile", "Species 3")
         )

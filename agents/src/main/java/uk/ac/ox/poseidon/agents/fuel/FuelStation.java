@@ -53,7 +53,8 @@ public class FuelStation {
   private final @NonNull String code;
   private final @NonNull EventManager eventManager;
 
-  // suppresses @Data's unchecked setter; setPricePerLitre below enforces non-negativity instead
+  // suppresses @Data's unchecked setter; setPricePerLitre below enforces
+  // non-negativity instead
   @Setter(NONE)
   private @NonNull Money pricePerLitre;
 

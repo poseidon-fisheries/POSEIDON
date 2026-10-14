@@ -111,8 +111,9 @@ class BathymetricGridFromGridFileFactoryTest {
 
   @Test
   void valuesGoToTheModelCellCoveringThemNotToTheSamePosition() {
-    // One row per latitude band and one column per longitude band: a reading that ignored
-    // the coordinates, or flipped north and south, would mix up these maxima.
+    // One row per latitude band and one column per longitude band: a reading
+    // that ignored the coordinates, or flipped north and south, would mix up
+    // these maxima.
     final ModelGrid rows = ModelGrid.create(1, 2, new Envelope(10, 13, 40, 42));
     assertThat(
       elevations(read(rows, new MaxAggregator(), false), rows)
@@ -142,9 +143,9 @@ class BathymetricGridFromGridFileFactoryTest {
 
   @Test
   void valuesWestOrNorthOfTheModelGridAreLeftOut() {
-    // The model grid starts one column east and ends one row south of the file, so the
-    // file's west column and north row lie outside it; they must not be folded into the
-    // model's edge cells.
+    // The model grid starts one column east and ends one row south of the file,
+    // so the file's west column and north row lie outside it; they must not be
+    // folded into the model's edge cells.
     final ModelGrid inner = ModelGrid.create(
       2,
       1,

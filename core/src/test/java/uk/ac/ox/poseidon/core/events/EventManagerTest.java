@@ -162,7 +162,8 @@ class EventManagerTest {
       new SimpleListener<>(CharSequence.class, receivedEvents::add)
     );
 
-    // Broadcast a StringBuilder event (implements Appendable, which extends CharSequence)
+    // Broadcast a StringBuilder event (implements Appendable, which extends
+    // CharSequence)
     final StringBuilder event = new StringBuilder("Test Event");
     eventManager.broadcast(event);
 

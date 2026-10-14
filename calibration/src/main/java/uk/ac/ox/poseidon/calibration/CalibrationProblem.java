@@ -146,8 +146,8 @@ public class CalibrationProblem
   }
 
   private double evaluate(final SequencedMap<String, Double> parameters) {
-    // Scores are collected in seed order and averaged sequentially, so the result does not
-    // depend on which simulation finishes first
+    // Scores are collected in seed order and averaged sequentially, so the
+    // result does not depend on which simulation finishes first
     final double[] scores = seeds
       .stream()
       .parallel()

@@ -30,7 +30,8 @@ import org.junit.jupiter.api.Test;
 
 class MeasurementsTest {
 
-  // Must not touch si.uom.NonSI before parsing: the point is that parsing alone registers it.
+  // Must not touch si.uom.NonSI before parsing: the point is that parsing alone
+  // registers it.
   @Test
   void parsesTonneWithoutPriorUseOfNonSi() {
     assertThat(

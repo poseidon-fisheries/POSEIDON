@@ -87,7 +87,8 @@ public class NeighbourhoodCellPicker implements Provider<Int2D> {
         centre,
         neighbourhoodSize
       );
-      // Every cell of the previous neighbourhood has already failed the predicate
+      // Every cell of the previous neighbourhood has already failed the
+      // predicate
       final List<Int2D> candidates =
         neighbourhoodSize == initialNeighbourhoodSize
           ? neighbours

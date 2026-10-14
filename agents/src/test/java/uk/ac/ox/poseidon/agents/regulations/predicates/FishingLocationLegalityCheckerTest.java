@@ -165,7 +165,8 @@ class FishingLocationLegalityCheckerTest {
 
   @Test
   void aSetExpectedToRunIntoAClosureIsRefused() {
-    // Arrives at 23:30, so a typical set would end at 00:30 on the first day of the closure
+    // Arrives at 23:30, so a typical set would end at 00:30 on the first day of
+    // the closure
     assertThat(
       checker(
         CLOSED_FROM_20_JANUARY,
@@ -176,7 +177,8 @@ class FishingLocationLegalityCheckerTest {
 
   @Test
   void aSetExpectedToEndWhenAClosureStartsIsAllowed() {
-    // Arrives at 23:00, so a typical set would end at midnight, as the closure starts
+    // Arrives at 23:00, so a typical set would end at midnight, as the closure
+    // starts
     assertThat(
       checker(
         CLOSED_FROM_20_JANUARY,
@@ -196,7 +198,8 @@ class FishingLocationLegalityCheckerTest {
 
   @Test
   void aSetAfterAClosureIsAllowed() {
-    // The closure covers 18 February entirely; this set starts at 00:00 on the 19th
+    // The closure covers 18 February entirely; this set starts at 00:00 on the
+    // 19th
     assertThat(
       checker(
         CLOSED_FROM_20_JANUARY,

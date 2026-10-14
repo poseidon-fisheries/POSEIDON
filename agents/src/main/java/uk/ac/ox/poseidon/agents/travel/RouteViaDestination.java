@@ -46,8 +46,9 @@ public class RouteViaDestination implements Function<Int2D, Route> {
   private final Vessel vessel;
   private final GridPathFinder pathFinder;
   private final DistanceCalculator distanceCalculator;
-  // Keyed by the two cells packed into a long (see cellPairKey): the map grows with every
-  // (vessel cell, destination) pair valued, and object keys made lookups a sixth of a NW Med run.
+  // Keyed by the two cells packed into a long (see cellPairKey): the map grows
+  // with every (vessel cell, destination) pair valued, and object keys made
+  // lookups a sixth of a NW Med run.
   private final Long2DoubleMap pathLengthsInKm = new Long2DoubleOpenHashMap();
 
   /**
