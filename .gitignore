@@ -15,3 +15,6 @@ derby.log
 buildSrc/.kotlin/
 .Rproj.user
 .positai
+
+# Prettier, installed by `npm install` for the IDE integration
+node_modules/

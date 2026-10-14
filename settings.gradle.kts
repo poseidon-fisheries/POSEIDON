@@ -60,5 +60,14 @@ dependencyResolutionManagement {
             // macOS artifacts (flatlaf-<version>-macos-arm64.dylib / -macos-x86_64.dylib)
             url = uri("https://nexus.geomatys.com/repository/maven-public/")
         }
+        ivy {
+            // Node.js distributions, downloaded by the node-gradle plugin to run Prettier. Declared
+            // here rather than by the plugin because project repositories are forbidden above.
+            name = "Node.js"
+            url = uri("https://nodejs.org/dist/")
+            patternLayout { artifact("v[revision]/[artifact](-v[revision]-[classifier]).[ext]") }
+            metadataSources { artifact() }
+            content { includeModule("org.nodejs", "node") }
+        }
     }
 }

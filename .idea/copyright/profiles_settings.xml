@@ -1,7 +1,7 @@
 <component name="CopyrightManager">
-  <settings>
+  <settings default="POSEIDON">
     <module2copyright>
-      <element module="Project Files" copyright="POSEIDON" />
+      <element module="Copyrighted files" copyright="POSEIDON" />
     </module2copyright>
   </settings>
 </component>
