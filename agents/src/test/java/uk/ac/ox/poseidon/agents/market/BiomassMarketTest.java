@@ -42,11 +42,14 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
 class BiomassMarketTest {
+
+    private static final LocalDateTime DATE_TIME = LocalDateTime.of(2026, 1, 1, 0, 0);
 
     @Test
     void getPriceResolvesCoveringSpeciesAndInvalidatesMissCacheOnSetPrice() {
@@ -69,7 +72,7 @@ class BiomassMarketTest {
         assertThat(market.getPrice(category, juvenileSpecies)).contains(basePrice);
         assertThat(market.getPrice(category, missingSpecies)).isEmpty();
 
-        market.setPrice(category, missingSpecies, missingPrice);
+        market.setPrice(category, missingSpecies, missingPrice, DATE_TIME);
 
         assertThat(market.getPrice(category, missingSpecies)).contains(missingPrice);
     }
@@ -142,7 +145,7 @@ class BiomassMarketTest {
         final Price price = new Price(Money.of(CurrencyUnit.of("EUR"), 2.0), KILOGRAM);
         final EventManager eventManager = mock(EventManager.class);
         final BiomassMarket market = new BiomassMarket(mock(Port.class), "M4", eventManager);
-        market.setPrice(pricedCategory, pricedSpecies, price);
+        market.setPrice(pricedCategory, pricedSpecies, price, DATE_TIME);
 
         final List<Sale.Item> items = market.quote(new CategorisedCatch(Map.of(
             pricedCategory, Bucket.of(Map.of(
@@ -158,6 +161,35 @@ class BiomassMarketTest {
         verifyNoInteractions(eventManager);
     }
 
+    @Test
+    void pricesCannotBeChangedThroughGetPrices() {
+        final CatchCategory category = new CatchCategory("C1");
+        final Species species = new Species("S1", null, null);
+        final Price price = new Price(Money.of(CurrencyUnit.of("EUR"), 2.0), KILOGRAM);
+        final BiomassMarket market =
+            marketWithPrices("M5", Map.of(category, Map.of(species, price)));
+
+        assertThatThrownBy(() -> market.getPrices().remove(category))
+            .isInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(() -> market.getPrices().get(category).remove(species))
+            .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void remembersWhenItsPricesLastChanged() {
+        final CatchCategory category = new CatchCategory("C1");
+        final Species species = new Species("S1", null, null);
+        final Price price = new Price(Money.of(CurrencyUnit.of("EUR"), 2.0), KILOGRAM);
+        final BiomassMarket market =
+            new BiomassMarket(mock(Port.class), "M6", mock(EventManager.class));
+
+        assertThat(market.getLastPriceChangeDateTime()).isEmpty();
+        market.setPrice(category, species, price, DATE_TIME);
+        assertThat(market.getLastPriceChangeDateTime()).contains(DATE_TIME);
+        market.setPrice(category, species, price, DATE_TIME.plusDays(1));
+        assertThat(market.getLastPriceChangeDateTime()).contains(DATE_TIME.plusDays(1));
+    }
+
     private static BiomassMarket marketWithPrices(
         final String code,
         final Map<CatchCategory, Map<Species, Price>> prices
@@ -165,7 +197,9 @@ class BiomassMarketTest {
         final BiomassMarket market =
             new BiomassMarket(mock(Port.class), code, mock(EventManager.class));
         prices.forEach((category, pricesBySpecies) ->
-            pricesBySpecies.forEach((species, price) -> market.setPrice(category, species, price))
+            pricesBySpecies.forEach((species, price) ->
+                market.setPrice(category, species, price, DATE_TIME)
+            )
         );
         return market;
     }

@@ -30,6 +30,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -56,7 +57,8 @@ public class InitialPricesFactory extends SimulationScopeFactory<List<MarketPric
             .stream()
             .flatMap(factory -> factory.get(scope).stream())
             .collect(toImmutableList());
-        resolved.forEach(MarketPrice::apply);
+        final LocalDateTime dateTime = scope.getSimulation().getTemporalSchedule().getDateTime();
+        resolved.forEach(marketPrice -> marketPrice.apply(dateTime));
         return resolved;
     }
 }

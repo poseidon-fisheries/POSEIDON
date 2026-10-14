@@ -29,6 +29,8 @@ import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
+import java.time.LocalDateTime;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.ToDoubleBiFunction;
 
@@ -40,14 +42,28 @@ import static lombok.AccessLevel.PACKAGE;
  * the catch is sorted by the vessel's own {@link CatchCategoriser}, priced by
  * {@link Market#quote}, and summed by {@link Sale#summarise}. Species without a price count as
  * zero. The option the catch is remembered for is ignored, so that this can be combined with
- * other valuations of the same shape. Everything is read at each call, so a change of home port
- * or of prices shows straight away. Assumes a single currency.
+ * other valuations of the same shape. A change of home port or of prices shows straight away.
+ * Assumes a single currency.
+ * <p>
+ * Values are remembered per catch, and forgotten when the home port's market changes or its
+ * prices change ({@link Market#getLastPriceChangeDateTime}). This assumes that a catch never
+ * changes once remembered, as {@link Bucket}s are immutable, and that the catch categoriser
+ * always sorts the same catch the same way.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class HomePortCatchValuation implements ToDoubleBiFunction<Object, Bucket> {
 
+    // Catches no longer remembered would pile up here, so it is cleared past this size. Weak keys
+    // would drop them precisely, but made NW Med runs 10% slower.
+    private static final int MAXIMUM_NUMBER_OF_VALUES = 10_000;
+
     private final Vessel vessel;
     private final CatchCategoriser catchCategoriser;
+    // By identity: cheaper than comparing catches, and a catch never changes.
+    private final Map<Bucket, Double> values = new IdentityHashMap<>();
+    // The market and the time from which the values above hold.
+    private Market valuedMarket;
+    private LocalDateTime valuedSince;
 
     /**
      * @throws IllegalStateException if the vessel has no home port, its home port does not have
@@ -61,6 +77,32 @@ public class HomePortCatchValuation implements ToDoubleBiFunction<Object, Bucket
     ) {
         checkState(vessel.getHomePort() != null, "Vessel %s has no home port.", vessel.getId());
         final Market market = vessel.getMarketGrid().getMarket(vessel.getHomePort());
+        final boolean valuesHold = market == valuedMarket &&
+            !pricesChangedSince(market, valuedSince) &&
+            values.size() <= MAXIMUM_NUMBER_OF_VALUES;
+        if (!valuesHold) {
+            values.clear();
+            valuedMarket = market;
+            valuedSince = vessel.getSchedule().getDateTime();
+        }
+        return values.computeIfAbsent(bucket, key -> valueAt(market, key));
+    }
+
+    // Strictly before: a price set in the same second as a valuation may have come after it.
+    private static boolean pricesChangedSince(
+        final Market market,
+        final LocalDateTime dateTime
+    ) {
+        return market
+            .getLastPriceChangeDateTime()
+            .map(lastPriceChange -> !lastPriceChange.isBefore(dateTime))
+            .orElse(false);
+    }
+
+    private double valueAt(
+        final Market market,
+        final Bucket bucket
+    ) {
         final Map<CurrencyUnit, Money> summary =
             Sale.summarise(market.quote(catchCategoriser.apply(bucket)));
         checkState(

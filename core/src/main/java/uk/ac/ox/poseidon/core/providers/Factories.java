@@ -94,14 +94,14 @@ public final class Factories {
      * @param delegateIntProvider factory for the int provider to shift
      * @param shift               the amount to add to the delegate's value on every call
      * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-     * {@link ShiftedIntProvider} over the resolved delegate
-     * @see ShiftedIntProvider
+     * {@link ShiftedInt} over the resolved delegate
+     * @see ShiftedInt
      */
-    public static <S extends Scope> ShiftedIntProviderFactory<S> shiftedInt(
+    public static <S extends Scope> ShiftedIntFactory<S> shiftedInt(
         final Factory<? super S, ? extends IntProvider> delegateIntProvider,
         final int shift
     ) {
-        return new ShiftedIntProviderFactory<>(delegateIntProvider, shift);
+        return new ShiftedIntFactory<>(delegateIntProvider, shift);
     }
 
 }

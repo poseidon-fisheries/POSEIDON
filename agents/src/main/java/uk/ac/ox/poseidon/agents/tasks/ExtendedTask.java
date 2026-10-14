@@ -48,10 +48,8 @@ public abstract class ExtendedTask<G extends Agent> extends AgentTask<G> {
     public Status execute() {
         if (getStatus() == RUNNING)
             return complete();
-        else {
-            getAgent().setTaskDuration(getDuration());
-            return RUNNING;
-        }
+        else
+            return runFor(getDuration());
     }
 
     /** @return how long this task should run for, computed once, when it starts */

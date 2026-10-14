@@ -25,11 +25,13 @@ package uk.ac.ox.poseidon.regulations;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * Factories for the two base {@link Regulations} rules, {@link ForbiddenIf} and
- * {@link PermittedIf}, each built from a predicate over the action.
+ * Factories for {@link Regulations} rules: the two base rules, {@link ForbiddenIf} and
+ * {@link PermittedIf}, each built from a predicate over the action, and the conjunction of rules,
+ * {@link AllOfRegulations}.
  */
 public class Factories {
 
@@ -53,6 +55,19 @@ public class Factories {
         final Factory<? super S, ? extends Predicate<? super A>> actionPredicate
     ) {
         return new PermittedIfFactory<S, A>(actionPredicate);
+    }
+
+    /**
+     * @param regulations the rules to combine
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+     * {@link AllOfRegulations} of the given rules, itself a rule
+     * @see AllOfRegulations
+     */
+    @SafeVarargs
+    public static <S extends Scope, A extends Action<?>> AllOfRegulationsFactory<S, A> allOf(
+        final Factory<? super S, ? extends Regulations<? super A>>... regulations
+    ) {
+        return new AllOfRegulationsFactory<S, A>(List.of(regulations));
     }
 
 }

@@ -30,8 +30,8 @@ import static lombok.AccessLevel.PACKAGE;
 
 /**
  * Selects, from a {@link KeyedMemory}, the {@link Memory} for the key extracted from its input,
- * such as the code of the gear used in a {@code FishingEvent} when remembering a haul, or of the
- * gear a vessel currently uses when reading. Several selectors can share one keyed memory, each
+ * such as the code of the gear used in a {@code FishingEvent} when remembering it, or of the gear
+ * a vessel currently uses when reading. Several selectors can share one keyed memory, each
  * extracting the key from a different kind of input.
  *
  * @param <T> the type of input the key is extracted from

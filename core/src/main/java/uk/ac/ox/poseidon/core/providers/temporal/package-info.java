@@ -21,8 +21,10 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.core.providers.Provider}s that read the simulation's current or
- * upcoming date/time from its {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}. See
+ * {@link uk.ac.ox.poseidon.core.providers.Provider}s of dates, times and durations read anew on
+ * every call: the simulation's current date/time from its
+ * {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}, and date-times and durations computed
+ * from other such providers. See
  * {@link uk.ac.ox.poseidon.core.providers.temporal.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.core.providers.temporal;

@@ -22,7 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
-/** An agent's behavior-tree-driven behavior, steppable once per simulation tick. */
+/**
+ * An agent's behavior-tree-driven behavior, steppable once per simulation tick.
+ * <p>
+ * Changes to the agent from outside its behaviour take effect only between runs of the behaviour
+ * (see {@link uk.ac.ox.poseidon.agents.Agent#mutate}), so a tree must finish regularly: one that
+ * keeps running forever would never let them apply. A vessel's tree typically finishes in port,
+ * at the end of each trip or of each failed departure attempt.
+ */
 public interface Behaviour {
 
     /** @return {@code true} if this behaviour actually runs a tree (see {@link ActiveBehaviour}) */

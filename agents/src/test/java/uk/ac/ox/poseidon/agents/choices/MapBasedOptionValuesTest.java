@@ -34,13 +34,15 @@ class MapBasedOptionValuesTest {
 
     @Test
     void testGetBestEntriesWhenEmpty() {
-        final AverageOptionValues<String> values = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> values =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         assertThat(values.getBestEntries()).isEmpty();
     }
 
     @Test
     void testGetBestEntriesSingleEntry() {
-        final AverageOptionValues<String> values = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> values =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         values.observe("A", 10.0);
         assertThat(values.getBestEntries())
             .hasSize(1)
@@ -53,7 +55,8 @@ class MapBasedOptionValuesTest {
 
     @Test
     void testGetBestEntriesUniqueMax() {
-        final AverageOptionValues<String> values = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> values =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         values.observe("A", 10.0);
         values.observe("B", 20.0);
         values.observe("C", 15.0);
@@ -68,7 +71,8 @@ class MapBasedOptionValuesTest {
 
     @Test
     void testGetBestEntriesWithTie() {
-        final AverageOptionValues<String> values = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> values =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         values.observe("A", 20.0);
         values.observe("B", 20.0);
         values.observe("C", 10.0);
@@ -81,7 +85,8 @@ class MapBasedOptionValuesTest {
 
     @Test
     void testGetBestEntriesAllEqual() {
-        final AverageOptionValues<String> values = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> values =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         values.observe("A", 5.0);
         values.observe("B", 5.0);
         values.observe("C", 5.0);
@@ -92,7 +97,8 @@ class MapBasedOptionValuesTest {
 
     @Test
     void testGetBestEntriesCacheReuse() {
-        final AverageOptionValues<String> values = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> values =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         values.observe("A", 10.0);
         assertThat(values.getBestEntries())
             .containsExactlyElementsOf(values.getBestEntries());
@@ -100,7 +106,8 @@ class MapBasedOptionValuesTest {
 
     @Test
     void testGetBestEntriesCacheInvalidation() {
-        final AverageOptionValues<String> values = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> values =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         values.observe("A", 10.0);
         values.observe("B", 20.0);
 
@@ -109,7 +116,7 @@ class MapBasedOptionValuesTest {
             .first()
             .satisfies(entry -> assertThat(entry.getKey()).isEqualTo("B"));
 
-        values.observe("A", 30.0);
+        values.observe("A", 20.0);
 
         assertThat(values.getBestEntries())
             .hasSize(2)
@@ -143,13 +150,14 @@ class MapBasedOptionValuesTest {
 
     @Test
     void forEachEntryGivesTheStoredValuesOfMutableOptionValues() {
-        final AverageOptionValues<String> values = new AverageOptionValues<>();
+        final ExponentialMovingAverageOptionValues<String> values =
+            new ExponentialMovingAverageOptionValues<>(1.0);
         values.observe("A", 10.0);
         values.observe("A", 20.0);
         values.observe("B", 5.0);
 
         assertThat(entries(values)).containsOnly(
-            Map.entry("A", 15.0),
+            Map.entry("A", 20.0),
             Map.entry("B", 5.0)
         );
     }

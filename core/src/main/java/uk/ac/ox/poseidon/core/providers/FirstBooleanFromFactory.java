@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.providers.constant.ConstantBooleanProvider;
+import uk.ac.ox.poseidon.core.providers.constant.ConstantBoolean;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.BooleanSupplier;
@@ -37,7 +37,7 @@ import java.util.function.BooleanSupplier;
  * A {@link RelativeScopeFactory} that resolves the given delegate {@link BooleanSupplier} once,
  * when built, and returns a {@link BooleanProvider} that keeps handing out that same
  * first-resolved value thereafter — a snapshot, not a live pass-through to the delegate. No
- * separate plain component class here: the produced value is a {@link ConstantBooleanProvider}
+ * separate plain component class here: the produced value is a {@link ConstantBoolean}
  * wrapping the snapshot, built via {@link Factories#firstBooleanFrom(Factory)}.
  */
 @Data
@@ -51,6 +51,6 @@ public class FirstBooleanFromFactory<S extends Scope>
 
     @Override
     protected BooleanProvider newInstance(final S scope) {
-        return new ConstantBooleanProvider(delegate.get(scope).getAsBoolean());
+        return new ConstantBoolean(delegate.get(scope).getAsBoolean());
     }
 }

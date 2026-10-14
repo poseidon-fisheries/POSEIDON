@@ -27,7 +27,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * Factories for tasks that pick and start towards a destination.
+ * Factories for tasks that pick a destination and start a trip towards it or redirect the
+ * current trip to it.
  */
 public class Factories {
 
@@ -41,5 +42,17 @@ public class Factories {
         final Factory<? super VesselScope, ? extends DestinationSupplier> destinationSupplier
     ) {
         return new StartTripFactory(destinationSupplier);
+    }
+
+    /**
+     * @param destinationSupplier chooses the trip's next destination
+     * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
+     * {@link ChooseNextDestination}
+     * @see ChooseNextDestination
+     */
+    public static ChooseNextDestinationFactory chooseNextDestination(
+        final Factory<? super VesselScope, ? extends DestinationSupplier> destinationSupplier
+    ) {
+        return new ChooseNextDestinationFactory(destinationSupplier);
     }
 }

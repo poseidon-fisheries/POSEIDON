@@ -26,6 +26,10 @@ import com.badlogic.gdx.ai.btree.LeafTask;
 import com.badlogic.gdx.ai.btree.Task;
 import uk.ac.ox.poseidon.agents.Agent;
 
+import java.time.Duration;
+
+import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
+
 /**
  * A gdx-ai {@link LeafTask} run against an {@link Agent}. Behavior trees are built fresh per
  * agent rather than cloned, so {@link #copyTo} is deliberately unsupported.
@@ -37,6 +41,20 @@ public abstract class AgentTask<G extends Agent> extends LeafTask<G> {
     /** @return the agent this task is running against */
     public G getAgent() {
         return getObject();
+    }
+
+    /**
+     * Reports this task as running for {@code duration}: the agent executes it again once
+     * {@code duration} has elapsed. Tasks report {@code RUNNING} only through this method, so each
+     * running step sets its own duration, which the agent clears once it has scheduled its next
+     * step.
+     *
+     * @param duration how long until this task is executed again
+     * @return {@code RUNNING}
+     */
+    protected Status runFor(final Duration duration) {
+        getAgent().setTaskDuration(duration);
+        return RUNNING;
     }
 
     /** @throws UnsupportedOperationException always; behavior trees are never cloned */

@@ -24,28 +24,17 @@ package uk.ac.ox.poseidon.geography.paths;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.Collection;
 import java.util.Optional;
 
 /**
  * A {@link PathFinder} that also remembers paths (and the absence thereof) it's told about, so
- * repeated queries for the same start/end don't require recomputation. Built via
+ * repeated queries for the same start/end don't require recomputation. It answers only for the
+ * exact start and end it was told about: never with a reversed path or the tail of a longer one,
+ * which could differ from what a path finder returns for that start and end. A cached answer thus
+ * never depends on which queries came before, even when simulations share the cache. Built via
  * {@link uk.ac.ox.poseidon.geography.paths.Factories}; implemented by {@link DefaultPathCache}.
  */
 public interface PathCache<P> extends PathFinder<P> {
-
-    /**
-     * Turns a path provided as a {@link Collection} into an {@link ImmutableList} before putting
-     * it into memory. For this to make sense, the collection must be ordered (i.e., be a
-     * {@link java.util.List}, a {@link java.util.Queue}, or a {@link java.util.SortedSet}).
-     *
-     * @param path An ordered collection of points forming the path
-     */
-    default void putPath(
-        final Collection<P> path
-    ) {
-        putPath(ImmutableList.copyOf(path));
-    }
 
     /**
      * @param start the starting point of the path
@@ -58,25 +47,5 @@ public interface PathCache<P> extends PathFinder<P> {
         P start,
         P end,
         Optional<ImmutableList<P>> path
-    );
-
-    /**
-     * Puts a new path in memory.
-     *
-     * @param path An immutable list of points forming the path
-     */
-    void putPath(
-        ImmutableList<P> path
-    );
-
-    /**
-     * Records the fact that there is no possible path from {@code start} to {@code end}.
-     *
-     * @param start The starting node of the path
-     * @param end   The ending node of the path
-     */
-    void putImpossiblePath(
-        P start,
-        P end
     );
 }

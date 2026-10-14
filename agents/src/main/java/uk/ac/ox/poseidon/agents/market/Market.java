@@ -28,6 +28,7 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /** A place, at a {@link Port}, where a vessel sells its catch. */
 public interface Market {
@@ -59,5 +60,11 @@ public interface Market {
      * has no price is left out
      */
     List<Sale.Item> quote(CategorisedCatch categorisedCatch);
+
+    /**
+     * @return when this market's prices last changed, or empty if they never have: a
+     * {@link #quote} made strictly after that still holds
+     */
+    Optional<LocalDateTime> getLastPriceChangeDateTime();
 
 }

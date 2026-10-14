@@ -22,9 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.poseidon.core.Simulation;
 
 import java.io.Serial;
 
@@ -37,9 +39,10 @@ public class PriceUpdate implements Steppable {
     /** The price to apply. */
     MarketPrice marketPrice;
 
-    /** Applies {@link #marketPrice}. */
+    /** Applies {@link #marketPrice} at the simulation's current date-time. */
     @Override
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public void step(final SimState simState) {
-        marketPrice.apply();
+        marketPrice.apply(((Simulation) simState).getTemporalSchedule().getDateTime());
     }
 }

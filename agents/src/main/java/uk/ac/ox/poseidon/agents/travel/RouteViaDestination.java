@@ -22,18 +22,17 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
+import it.unimi.dsi.fastutil.longs.Long2DoubleMap;
+import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.Map.entry;
 
 /**
  * The {@link Route} a vessel would sail to fish at a destination cell: from its current cell to
@@ -47,7 +46,9 @@ public class RouteViaDestination implements Function<Int2D, Route> {
     private final Vessel vessel;
     private final GridPathFinder pathFinder;
     private final DistanceCalculator distanceCalculator;
-    private final Map<Entry<Int2D, Int2D>, Double> pathLengthsInKm = new HashMap<>();
+    // Keyed by the two cells packed into a long (see cellPairKey): the map grows with every
+    // (vessel cell, destination) pair valued, and object keys made lookups a sixth of a NW Med run.
+    private final Long2DoubleMap pathLengthsInKm = new Long2DoubleOpenHashMap();
 
     /**
      * @param vessel             the vessel that would sail the route
@@ -88,12 +89,28 @@ public class RouteViaDestination implements Function<Int2D, Route> {
         final Int2D start,
         final Int2D end
     ) {
-        return pathLengthsInKm.computeIfAbsent(entry(start, end), _ ->
+        return pathLengthsInKm.computeIfAbsent(cellPairKey(start, end), _ ->
             distanceCalculator.distanceInKm(
                 pathFinder.getPath(start, end).orElseThrow(() ->
                     new IllegalStateException("No path from " + start + " to " + end)
                 )
             )
         );
+    }
+
+    // Each coordinate in 16 bits: grids are far smaller than 65,536 cells a side.
+    private static long cellPairKey(
+        final Int2D start,
+        final Int2D end
+    ) {
+        return (long) coordinate(start.x) << 48 |
+            (long) coordinate(start.y) << 32 |
+            (long) coordinate(end.x) << 16 |
+            coordinate(end.y);
+    }
+
+    private static int coordinate(final int value) {
+        checkArgument(value >= 0 && value < 1 << 16, "Cell coordinate out of range: %s.", value);
+        return value;
     }
 }

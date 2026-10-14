@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import tech.tablesaw.api.DateColumn;
@@ -32,11 +33,13 @@ import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.EventManager;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -51,6 +54,13 @@ class PriceUpdatesFromTableFactoryTest {
     private static final CatchCategory CATCH_CATEGORY = new CatchCategory("Fresh - Whole");
 
     private final Simulation simulation = mock(Simulation.class);
+    private final TemporalSchedule schedule = mock(TemporalSchedule.class);
+
+    @BeforeEach
+    void setUp() {
+        when(simulation.getTemporalSchedule()).thenReturn(schedule);
+        when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 0, 0));
+    }
 
     @Test
     void setsPricesOnExistingMarket() {
@@ -175,7 +185,7 @@ class PriceUpdatesFromTableFactoryTest {
     }
 
     private void applyAll(final PriceUpdatesFromTableFactory<SimulationScope> factory) {
-        factory.get(scope()).forEach(update -> update.getValue().step(null));
+        factory.get(scope()).forEach(update -> update.getValue().step(simulation));
     }
 
     private SimulationScope scope() {

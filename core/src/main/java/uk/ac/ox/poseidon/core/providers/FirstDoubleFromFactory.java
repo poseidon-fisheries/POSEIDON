@@ -28,7 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.providers.constant.ConstantDoubleProvider;
+import uk.ac.ox.poseidon.core.providers.constant.ConstantDouble;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 import java.util.function.DoubleSupplier;
@@ -37,7 +37,7 @@ import java.util.function.DoubleSupplier;
  * A {@link RelativeScopeFactory} that resolves the given delegate {@link DoubleSupplier} once,
  * when built, and returns a {@link DoubleProvider} that keeps handing out that same
  * first-resolved value thereafter — a snapshot, not a live pass-through to the delegate. No
- * separate plain component class here: the produced value is a {@link ConstantDoubleProvider}
+ * separate plain component class here: the produced value is a {@link ConstantDouble}
  * wrapping the snapshot, built via {@link Factories#firstDoubleFrom(Factory)}.
  */
 @Data
@@ -51,6 +51,6 @@ public class FirstDoubleFromFactory<S extends Scope>
 
     @Override
     protected DoubleProvider newInstance(final S scope) {
-        return new ConstantDoubleProvider(delegate.get(scope).getAsDouble());
+        return new ConstantDouble(delegate.get(scope).getAsDouble());
     }
 }

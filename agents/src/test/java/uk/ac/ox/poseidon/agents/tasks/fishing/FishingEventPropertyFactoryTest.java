@@ -35,7 +35,7 @@ import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventPrope
 class FishingEventPropertyFactoryTest {
 
     @Test
-    void readsTheCodeOfTheGearTheHaulWasMadeWith() {
+    void readsTheCodeOfTheGearTheFishingEventWasMadeWith() {
         final Gear gear = mock(Gear.class);
         when(gear.getCode()).thenReturn("PS");
         final ExtendedFishingAction action = mock(ExtendedFishingAction.class);

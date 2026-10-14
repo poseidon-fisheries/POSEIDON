@@ -27,9 +27,8 @@ import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -38,17 +37,14 @@ import static org.mockito.Mockito.when;
 class TripCostFromHourlyCostsTest {
 
     @Test
-    void appliesHourlyRateToTripDurationInHours() {
+    void appliesHourlyRateToHoursAtSea() {
         final CurrencyUnit eur = CurrencyUnit.of("EUR");
         final Money hourlyCost = Money.of(eur, 10.0);
 
         final Vessel vessel = mock(Vessel.class);
         final Trip trip = mock(Trip.class);
-        final TemporalSchedule schedule = mock(TemporalSchedule.class);
         when(vessel.getCurrentTrip()).thenReturn(trip);
-        when(vessel.getSchedule()).thenReturn(schedule);
-        when(trip.getStartDateTime()).thenReturn(LocalDateTime.of(2024, 1, 1, 0, 0));
-        when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2024, 1, 1, 3, 0));
+        when(trip.getTimeAtSea()).thenReturn(Duration.ofHours(3));
 
         final TripCostFromHourlyCosts tripCost =
             new TripCostFromHourlyCosts(v -> hourlyCost);

@@ -4,10 +4,10 @@ This file provides guidance to coding agents (Claude Code and others) when worki
 this repository. Longer topic-specific sections live in `docs/agents/` — read the relevant one
 before touching code it covers:
 
-- `docs/agents/architecture.md` — the Factory + Scenario pattern, `*Factory` class shape.
+- `docs/agents/architecture.md` — the Factory + Scenario pattern, `*Factory` class shape, live parameters with plain-value overloads.
 - `docs/agents/javadoc.md` — Javadoc conventions for the component/`Factory`/`Factories` triplet.
 - `docs/agents/lombok.md` — which Lombok annotation shape to use per class role.
-- `docs/agents/conceptual-correctness.md` — don't collapse distinct concepts for a smaller diff.
+- `docs/agents/conceptual-correctness.md` — don't collapse distinct concepts for a smaller diff; absence is not a default.
 
 ## What this is
 
@@ -64,6 +64,8 @@ Convention plugins (in `buildSrc/src/main/kotlin/`) centralize shared config:
 ## Code style
 
 Mark everything that can be `final` as `final` — local variables, method/constructor parameters, and caught exceptions (e.g. `catch (final IOException e)`, `try (final SomeResource r = ...)`). The only common exception is a traditional counting `for` loop's own loop variable (`for (int i = 0; ...; i++)`), which must stay mutable by definition.
+
+Prefer lambdas to anonymous classes, and method references to lambdas, wherever they fit. For a `Listener`, which has two abstract methods, use `new SimpleListener<>(EventClass.class, consumer)`. Scenario classes (such as `PeterSnapperScenario`) are the exception: they stay readable for people new to Java, with no method references or other clever tricks.
 
 ## Licensing
 

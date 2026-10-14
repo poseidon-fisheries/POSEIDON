@@ -46,23 +46,21 @@ import java.util.function.Supplier;
 @EqualsAndHashCode(callSuper = true)
 public class NeighbourhoodGridExplorerFactory extends VesselScopeFactory<NeighbourhoodCellPicker> {
 
-    private Factory<? super VesselScope, ? extends OptionValues<Int2D>> optionValues;
     private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
     private Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate;
     private Factory<? super VesselScope, ? extends IntSupplier> neighbourhoodSizeSupplier;
     private int maximumWidening;
-    private Factory<? super VesselScope, ? extends Supplier<Int2D>> fallbackCellPicker;
+    private Factory<? super VesselScope, ? extends Supplier<Int2D>> searchCentre;
 
     @Override
     protected NeighbourhoodCellPicker newInstance(final VesselScope scope) {
         return new NeighbourhoodCellPicker(
             scope.getVessel(),
-            optionValues.get(scope),
             pathFinder.get(scope),
             cellPredicate.get(scope),
             neighbourhoodSizeSupplier.get(scope),
             maximumWidening,
-            fallbackCellPicker.get(scope),
+            searchCentre.get(scope),
             scope.getSimulation().random
         );
     }

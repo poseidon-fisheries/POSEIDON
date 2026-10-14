@@ -26,12 +26,21 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.NonNull;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
+import uk.ac.ox.poseidon.core.events.SimpleListener;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkState;
+import static lombok.AccessLevel.NONE;
 
 /**
  * A single fishing trip: the span between a vessel leaving its current cell with a destination in
@@ -42,6 +51,11 @@ import java.time.LocalDateTime;
  * a new destination or, via {@link #setDestinationToTripOrigin()}, to abort and return home; every
  * change is validated against the vessel's grid, the way the initial destination is at
  * construction. {@code origin} and {@code startDateTime} are fixed once the trip begins.
+ * <p>
+ * A trip has two durations: its {@linkplain #getTotalDuration() total duration}, from its start to
+ * its end, and its {@linkplain #getTimeAtSea() time at sea}, from its start to its arrival in port
+ * ({@link #arriveInPort()}). The difference is the time spent in port before the trip ends, e.g.
+ * landing the catch.
  */
 @Getter
 @SuppressFBWarnings(value = "EI_EXPOSE_REP")
@@ -52,8 +66,12 @@ public class Trip {
     private final @NonNull Int2D origin;
     private final @NonNull LocalDateTime startDateTime;
     private final Account account = new Account();
+    /** The fishing events of this trip, in the order they happened. */
+    @Getter(NONE)
+    private final List<FishingEvent> fishingEvents = new ArrayList<>();
 
     private @NonNull Int2D destination;
+    private LocalDateTime portArrivalDateTime;
     private LocalDateTime endDateTime;
 
     /**
@@ -67,6 +85,10 @@ public class Trip {
         this.vessel = vessel;
         this.destination = checkInGrid(destination);
         this.eventManager = new ForwardingEventManager(vessel.getEventManager());
+        // Registered on the trip's own event manager, which delivers to its listeners before
+        // forwarding to the vessel's, so the record is complete before vessel-level listeners
+        // react.
+        this.eventManager.addListener(new SimpleListener<>(FishingEvent.class, fishingEvents::add));
         this.origin = vessel.getCell();
         this.startDateTime = vessel.getSchedule().getDateTime();
         this.eventManager.broadcast(new TripStartEvent(this));
@@ -85,10 +107,71 @@ public class Trip {
         return cell;
     }
 
-    /** Marks the trip as ended at the vessel's current simulation time and broadcasts a {@link TripEndEvent}. */
+    /**
+     * Records the vessel's arrival in port at the current simulation time, which ends its time at
+     * sea.
+     *
+     * @throws IllegalStateException if the vessel is not at a port, or the trip has already arrived
+     *                               in port
+     */
+    public void arriveInPort() {
+        checkState(
+            !hasArrivedInPort(),
+            "The trip of vessel %s has already arrived in port.",
+            vessel.getId()
+        );
+        checkState(vessel.isAtPort(), "Vessel %s is not at a port.", vessel.getId());
+        this.portArrivalDateTime = vessel.getSchedule().getDateTime();
+    }
+
+    /** @return whether the trip has arrived in port; see {@link #arriveInPort()} */
+    public boolean hasArrivedInPort() {
+        return portArrivalDateTime != null;
+    }
+
+    /**
+     * @return the time from the trip's start to its end or, while the trip is still open, to the
+     * current simulation time
+     */
+    public Duration getTotalDuration() {
+        return Duration.between(
+            startDateTime,
+            endDateTime != null ? endDateTime : vessel.getSchedule().getDateTime()
+        );
+    }
+
+    /**
+     * @return the time from the trip's start to its arrival in port or, while the vessel is still
+     * at sea, to the current simulation time
+     */
+    public Duration getTimeAtSea() {
+        return Duration.between(
+            startDateTime,
+            portArrivalDateTime != null ? portArrivalDateTime : vessel.getSchedule().getDateTime()
+        );
+    }
+
+    /**
+     * Marks the trip as ended at the vessel's current simulation time and broadcasts a
+     * {@link TripEndEvent}.
+     *
+     * @throws IllegalStateException if the trip has not arrived in port
+     */
     public void endTrip() {
+        checkState(
+            hasArrivedInPort(),
+            "The trip of vessel %s cannot end before arriving in port.",
+            vessel.getId()
+        );
         this.endDateTime = vessel.getSchedule().getDateTime();
         this.eventManager.broadcast(new TripEndEvent(this));
+    }
+
+    /**
+     * @return an unmodifiable view of the fishing events of this trip, in the order they happened
+     */
+    public List<FishingEvent> getFishingEvents() {
+        return Collections.unmodifiableList(fishingEvents);
     }
 
     /** Redirects the trip back towards where it started. */

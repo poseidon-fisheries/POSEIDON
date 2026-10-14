@@ -66,6 +66,7 @@ class FleetFromVesselRegisterFactoryTest {
     private Gear g1;
     private Gear g2;
     private Hold h1;
+    private VesselScopeFactoriesByCode<Gear> gears;
 
     void initSimulation(final String extraData) {
         p1 = mock(Port.class);
@@ -85,6 +86,10 @@ class FleetFromVesselRegisterFactoryTest {
         when(g1.isActive()).thenReturn(true);
         when(g2.isActive()).thenReturn(true);
         h1 = mock(Hold.class);
+        gears = VesselScopeFactoriesByCode.<Gear>builder()
+            .factory("G1", new ObjectFactory<>(g1))
+            .factory("G2", new ObjectFactory<>(g2))
+            .build();
 
         simulation =
             new Scenario(
@@ -98,12 +103,7 @@ class FleetFromVesselRegisterFactoryTest {
                         ))
                         .data(tableFromCsvString(initialData + extraData))
                         .hold(new ObjectFactory<>(h1))
-                        .gear(
-                            VesselScopeFactoriesByCode.<Gear>builder()
-                                .factory("G1", new ObjectFactory<>(g1))
-                                .factory("G2", new ObjectFactory<>(g2))
-                                .build()
-                        )
+                        .gear(gears)
                         .dataMapping("gear.code", "gear")
                         .engine(new ObjectFactory<>(mock(Engine.class)))
                         .behaviour(behaviour(waitFor(constant(ONE_DAY))))
@@ -129,6 +129,13 @@ class FleetFromVesselRegisterFactoryTest {
         assertThat(v2.getHomePort()).isEqualTo(p1);
         assertThat(v2.getTag("t1").orElseThrow()).isEqualTo(2);
         assertThat(v2.getTag("t2").orElseThrow()).isEqualTo("b");
+    }
+
+    @Test
+    void mappedValuesAreSetOnlyWhileAVesselIsBuilt() {
+        initSimulation("");
+        assertThat(fleet.getVessels()).hasSize(2);
+        assertThat(gears.getCode()).isNull();
     }
 
     @Test

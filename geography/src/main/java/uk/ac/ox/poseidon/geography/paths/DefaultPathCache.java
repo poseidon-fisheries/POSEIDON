@@ -25,12 +25,9 @@ package uk.ac.ox.poseidon.geography.paths;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableList;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.Optional;
-
-import static java.util.Map.entry;
 
 /**
  * The default {@link PathCache}: an in-memory, unbounded Caffeine {@link Cache} keyed by
@@ -39,50 +36,28 @@ import static java.util.Map.entry;
  */
 public class DefaultPathCache<P> implements PathCache<P> {
 
-    private final Cache<Entry<P, P>, Optional<ImmutableList<P>>> memory =
+    // Keyed by List.of(start, end): Map.entry's hash, the XOR of the two points' hashes, collides
+    // badly on grid cells (A to B and B to A always collide).
+    private final Cache<List<P>, Optional<ImmutableList<P>>> memory =
         Caffeine.newBuilder().build();
 
     /**
-     * Returns a path from start to end if one is known. Otherwise, checks for a path from end to
-     * start that we can reverse, storing it and returning it if there is one. Returned paths are
-     * wrapped in Optional. An empty optional means the path is impossible.
-     *
      * @param start The point at which the path should start
      * @param end   The point at which the path should end
      * @return Either:
      * <ul>
-     * <li>An immutable list of sea tiles wrapped in an Optional if there is a known path between
-     * start and end;</li>
-     * <li>An empty Optional if we know there is no path between start and end;</li>
-     * <li>null if we don't know anything about this path.</li>
+     * <li>An immutable list of sea tiles wrapped in an Optional if a path from start to end was
+     * stored;</li>
+     * <li>An empty Optional if start to end was stored as impossible;</li>
+     * <li>null if nothing was stored for start to end.</li>
      * </ul>
      */
     @Override
-    @SuppressFBWarnings("NP_OPTIONAL_RETURN_NULL")
-    @SuppressWarnings("OptionalAssignedToNull")
     public Optional<ImmutableList<P>> getPath(
         final P start,
         final P end
     ) {
-        final Optional<ImmutableList<P>> knownPath =
-            memory.getIfPresent(entry(start, end));
-        if (knownPath != null)
-            return knownPath;
-        else {
-            // maybe we have it in reverse?
-            final Optional<ImmutableList<P>> knownInversePath =
-                memory.getIfPresent(entry(end, start));
-            if (knownInversePath != null) {
-                // We have the path we want (possible or not) in reverse so we can
-                // reverse it, memorise it and return it
-                final Optional<ImmutableList<P>> newPath =
-                    knownInversePath.map(ImmutableList::reverse);
-                putPath(start, end, newPath);
-                return newPath;
-            }
-        }
-        // We do not know anything about this path
-        return null;
+        return memory.getIfPresent(List.of(start, end));
     }
 
     @Override
@@ -91,41 +66,7 @@ public class DefaultPathCache<P> implements PathCache<P> {
         final P end,
         final Optional<ImmutableList<P>> path
     ) {
-        path.ifPresentOrElse(
-            this::putPath,
-            () -> putImpossiblePath(start, end)
-        );
-    }
-
-    /**
-     * This method stores the path in the cache, but it also stores all the intermediate sublists
-     * along the path. For example, if {@code A -> B -> C -> D} is the shortest path from A to D,
-     * {@code B -> C -> D} is the shortest path from B to D, and {@code C -> D} is also (trivially)
-     * the shortest path from C to D. Since intermediate paths are stored as sublists, they won't
-     * take up space besides their keys in the cache.
-     *
-     * @param path An immutable list of points forming the path
-     */
-    @Override
-    public void putPath(
-        final ImmutableList<P> path
-    ) {
-        final int n = path.size();
-        final P end = path.getLast();
-        for (int i = 0; i < n - 1; i++) {
-            memory.put(
-                entry(path.get(i), end),
-                Optional.of(path.subList(i, n))
-            );
-        }
-    }
-
-    @Override
-    public void putImpossiblePath(
-        final P start,
-        final P end
-    ) {
-        memory.put(entry(start, end), Optional.empty());
+        memory.put(List.of(start, end), path);
     }
 
 }

@@ -12,7 +12,7 @@ The model is built around a declarative configuration → runtime object pattern
   - **`newInstance` reads something from the scope itself**: `scope.getVessel()`, or `scope.getSimulation()` for its random number generator, schedule or event manager, including registering the product with one of them. A relative factory with global inputs would build it once, from the first scope it was given;
   - **`newInstance` has side effects**, such as changing the objects its inputs give it (`InitialPricesFactory` sets the prices of the markets it is given). The scope decides how many times the side effect runs, so it shouldn't depend on what the inputs happen to resolve at.
 
-  A stateless product built only from what its inputs give it (`TravelCost`, `HaulRecorder`, `NetValuation`) gets a relative factory, typed `<S extends Scope>` like `NetValuationFactory`: it is then per vessel when an input is, and shared when none is.
+  A stateless product built only from what its inputs give it (`TravelCost`, `FishingEventRecorder`, `NetValuation`) gets a relative factory, typed `<S extends Scope>` like `NetValuationFactory`: it is then per vessel when an input is, and shared when none is.
 - `Scenario` is an immutable (Lombok `@Builder`) bag of named component `Factory` instances plus a starting date/time. `Scenario.startNewSimulation(...)` builds a `Simulation` by resolving every component factory against a fresh `SimulationScope`. `SimulationStartOptions` supports temporarily overriding bean properties (via `commons-beanutils`, dotted property paths) for the duration of a single simulation run — used heavily by calibration, which needs to vary parameters run-to-run without mutating the original `Scenario`.
 - `Simulation` extends MASON's `SimState` and owns the `TemporalSchedule`, an `EventManager`, and the list of resolved components; `finalProcesses` run at `finish()`.
 - Scenarios are serialized to/from YAML via SnakeYAML (`io/.../ScenarioLoader`, `ScenarioWriter`); `ScenarioLoader` restricts deserializable classes to configured prefixes (`uk.ac.ox.poseidon`, `java`, plus caller-supplied extras) as a safety measure — keep this in mind if adding factories in new packages that scenarios need to reference.
@@ -56,3 +56,37 @@ varies per scope. A plain literal that's just configuration — a `String`, `dou
 `TimeIndexedBiomassGridsFromNetCdfFactory`. Wrapping a literal in `Factory<String>` "for
 consistency" or "to be safe" is over-engineering: it adds a layer of indirection nothing resolves
 differently through, and every call site has to write `scope -> "value"` for no gain.
+
+## Live parameters, with a plain-value overload
+
+A building block reads its model parameters (a threshold, a duration, an amount of time, a rate)
+through a `Supplier` each time it is used, rather than fixing them when it is built. It then works
+the same whether the value is fixed, depends on the date, the vessel or the state of the
+simulation, or is changed mid-run, and any provider in `core/providers` can feed it. Its package's
+`Factories` class offers the live version, taking a `Factory<? super S, ? extends Supplier<…>>`,
+plus an overload taking a plain value that it wraps in `constant(...)`:
+
+- `lessThan(double)` and `lessThan(Factory)` in `core/predicates/comparable`;
+- `dateTimeAfter(referenceDateTime, DurationFactory)` and
+  `dateTimeAfter(referenceDateTime, Factory)` in `core/providers/temporal`.
+
+Use this shape for new building blocks even when no caller needs a varying value yet. Reading a
+`Constant` costs a call that the JIT inlines; it doesn't show next to the work around it.
+
+What counts as a plain value depends on the YAML:
+
+- a `double`, `int`, `boolean`, `String` or enum is written to the YAML as it is, so the overload
+  takes it directly;
+- a `java.time` value, a `Quantity` or another object without a no-args constructor is not: the
+  YAML would hold an empty `!!java.time.Duration {}`, losing the value, and loading it would
+  fail. The overload takes its value factory instead (`DurationFactory`, `PeriodFactory`,
+  `TimeFactory`…), which is what scenario code holds anyway (`hours(3)`).
+
+Never write the overload as a generic `foo(T value)` for such types: `foo(hours(3))` would then
+compile with `T = DurationFactory` and wrap the factory itself as the value. An overload taking
+`Factory<? super S, ? extends X>` isn't possible either, because it erases to the same signature
+as the live version; a concrete value-factory class such as `DurationFactory` doesn't clash.
+
+This doesn't apply to the configuration literals of the previous section (a column name, a
+separator, a file path): they say how to build or read something, not how the model behaves, and
+stay plain fields.

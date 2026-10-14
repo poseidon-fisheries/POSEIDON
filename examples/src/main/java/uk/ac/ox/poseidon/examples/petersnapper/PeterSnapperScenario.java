@@ -75,7 +75,7 @@ import static uk.ac.ox.poseidon.agents.vessels.predicates.Factories.vesselHasSam
 import static uk.ac.ox.poseidon.agents.vessels.predicates.Factories.vesselIsActive;
 import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.accessibleWaterCells;
 import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.currentTripDestinationCell;
-import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.currentTripDuration;
+import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.currentTimeAtSea;
 import static uk.ac.ox.poseidon.agents.vessels.providers.Factories.currentTripEventManager;
 import static uk.ac.ox.poseidon.biology.allocators.Factories.proportionOfCarryingCapacityAllocator;
 import static uk.ac.ox.poseidon.biology.biomass.Factories.*;
@@ -371,12 +371,14 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             epsilonGreedyDestination(
                 EXPLORATION_PROBABILITY,
                 neighbourhoodGridExplorer(
-                    optionValues,
                     pathFinder,
                     validCellPredicate,
                     firstIntFrom(perVessel(randomInt(1, 10))),
                     MAXIMUM_EXPLORATION_WIDENING,
-                    randomGridExplorer(accessibleWaterCells(pathFinder), validCellPredicate)
+                    bestKnownOption(
+                        optionValues,
+                        randomGridExplorer(accessibleWaterCells(pathFinder), validCellPredicate)
+                    )
                 ),
                 imitatingPicker(
                     optionValues,
@@ -415,13 +417,14 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                             checkThat(
                                 allOf(
                                     condition(vesselProperty("hold.availableCapacityInKg"), greaterThan(1)),
-                                    condition(currentTripDuration(), lessThan(constant(days(10))))
+                                    condition(currentTimeAtSea(), lessThan(constant(days(10))))
                                 )
                             )
                         )
                     ),
                     setDestinationToOrigin(),
                     travelAlongPathTo(pathFinder, distance, currentTripDestinationCell(), currentTripEventManager()),
+                    arriveInPort(),
                     landCatches(constant(ONE_HOUR)),
                     refuel(fuelStationGrid),
                     endTrip(),

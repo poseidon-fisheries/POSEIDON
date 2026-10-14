@@ -109,6 +109,14 @@ public class Factories {
     }
 
     /**
+     * @return a {@link VesselScope}-relative factory for an {@link ArriveInPort}
+     * @see ArriveInPort
+     */
+    public static ArriveInPortFactory arriveInPort() {
+        return new ArriveInPortFactory();
+    }
+
+    /**
      * @return a {@link VesselScope}-relative factory for an {@link EndTrip}
      * @see EndTrip
      */

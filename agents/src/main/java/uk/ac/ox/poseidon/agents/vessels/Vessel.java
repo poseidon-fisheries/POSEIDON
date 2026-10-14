@@ -25,14 +25,12 @@ package uk.ac.ox.poseidon.agents.vessels;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
-import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
@@ -53,6 +51,11 @@ import java.util.Optional;
  * A fishing vessel: an {@link Agent} with a hold, gear, engine, home port, and behaviour tree
  * driving its trips. Active only while {@link #isActive()} holds — the base agent is active, it's
  * registered as active, its gear is active, and it has a home port.
+ * <p>
+ * Its modifiable characteristics (name, account, home port, hold, gear, engine, registration,
+ * tags, and behaviour) are changed from outside its behaviour, by the fleet register, so their
+ * setters go through {@link #mutate} and take effect between runs of the behaviour. Its current
+ * state (cell, heading, trips) is changed by the behaviour itself and changes immediately.
  */
 @Getter
 @SuppressFBWarnings(value = "EI_EXPOSE_REP")
@@ -72,7 +75,6 @@ public class Vessel extends Agent implements Oriented2D {
     /**
      * @param schedule      the simulation's temporal schedule
      * @param eventManager  the event manager this vessel broadcasts on
-     * @param nextBehaviour the vessel's initial behaviour
      * @param id            the vessel's identifying id
      * @param vesselField   the field the vessel moves within
      * @param portGrid      the grid of ports the vessel can dock at
@@ -81,13 +83,12 @@ public class Vessel extends Agent implements Oriented2D {
     public Vessel(
         @NonNull final TemporalSchedule schedule,
         @NonNull final EventManager eventManager,
-        @NonNull final Behaviour nextBehaviour,
         @NonNull final String id,
         @NonNull final VesselField vesselField,
         @NonNull final PortGrid portGrid,
         @NonNull final MarketGrid marketGrid
     ) {
-        super(schedule, eventManager, nextBehaviour);
+        super(schedule, eventManager);
         this.id = id;
         this.vesselField = vesselField;
         this.portGrid = portGrid;
@@ -104,9 +105,9 @@ public class Vessel extends Agent implements Oriented2D {
 
     // Modifiable characteristics
     /** This vessel's display name. */
-    @Setter private String name;
+    private String name;
     /** This vessel's running balance. */
-    @Setter private Account account;
+    private Account account;
     /** This vessel's home port. */
     private Port homePort;
     /** This vessel's hold. */
@@ -124,6 +125,8 @@ public class Vessel extends Agent implements Oriented2D {
     private double heading;
     /** The vessel's current trip, or {@code null} if it isn't on one. */
     private Trip currentTrip;
+    /** The vessel's last finished trip, or {@code null} if it hasn't finished one yet. */
+    private Trip previousTrip;
 
     /** @return whether the base agent is active, {@link #registeredAsActive}, the gear is active, and there's a home port */
     @Override
@@ -132,6 +135,16 @@ public class Vessel extends Agent implements Oriented2D {
             registeredAsActive &&
             gear.isActive() &&
             homePort != null;
+    }
+
+    /** Sets the vessel's display name. */
+    public void setName(final String name) {
+        mutate(() -> this.name = name);
+    }
+
+    /** Sets the vessel's running balance. */
+    public void setAccount(final Account account) {
+        mutate(() -> this.account = account);
     }
 
     /** Sets the vessel's home port, moving it there if it has no current cell yet. */
@@ -246,10 +259,19 @@ public class Vessel extends Agent implements Oriented2D {
         this.currentTrip = new Trip(this, destination);
     }
 
-    /** Ends the current trip, folding its account into the vessel's own. */
+    /** Records the current trip's arrival in port; see {@link Trip#arriveInPort()}. */
+    public void arriveInPort() {
+        currentTrip.arriveInPort();
+    }
+
+    /**
+     * Ends the current trip, folding its account into the vessel's own, and keeps it as the
+     * {@link #previousTrip}.
+     */
     public void endTrip() {
         currentTrip.endTrip();
         this.account.add(currentTrip.getAccount());
+        this.previousTrip = currentTrip;
         this.currentTrip = null;
     }
 }

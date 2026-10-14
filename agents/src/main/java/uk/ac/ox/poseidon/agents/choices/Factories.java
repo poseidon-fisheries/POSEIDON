@@ -52,15 +52,6 @@ public class Factories {
     private Factories() {}
 
     /**
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an
-     * {@link AverageOptionValues}
-     * @see AverageOptionValues
-     */
-    public static <O> AverageOptionValuesFactory<O> averageOptionValues() {
-        return new AverageOptionValuesFactory<>();
-    }
-
-    /**
      * @param optionValuesRegister looks up each other vessel's own option-values component
      * @param friendsSupplier      supplies the vessel's current friends
      * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a supplier of
@@ -79,21 +70,6 @@ public class Factories {
             optionValuesRegister,
             friendsSupplier
         );
-    }
-
-    /**
-     * @param optionValuesRegister looks up each other vessel's own option-values component
-     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a supplier of
-     * every other active vessel's best options
-     * @see BestOptions
-     */
-    public static <O> BestOptionsFactory<O> bestOptions(
-        final Factory<
-            ? super VesselScope,
-            ? extends VesselComponentRegister<? extends OptionValues<O>>
-            > optionValuesRegister
-    ) {
-        return new BestOptionsFactory<>(optionValuesRegister);
     }
 
     /**
@@ -179,14 +155,14 @@ public class Factories {
     }
 
     /**
-     * @param modelGrid      the grid giving the cell of a haul's coordinate
-     * @param memorySelector selects, from a haul, the memory to record it in
+     * @param modelGrid      the grid giving the cell of a fishing event's coordinate
+     * @param memorySelector selects, from a fishing event, the memory to record it in
      * @param updateRule     revises what is remembered of a cell with a new observation of it
-     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link HaulRecorder},
-     * which it does not register with anything
-     * @see HaulRecorder
+     * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+     * {@link FishingEventRecorder}, which it does not register with anything
+     * @see FishingEventRecorder
      */
-    public static <S extends Scope> HaulRecorderFactory<S> haulRecorder(
+    public static <S extends Scope> FishingEventRecorderFactory<S> fishingEventRecorder(
         final Factory<? super S, ? extends ModelGrid> modelGrid,
         final Factory<
             ? super S,
@@ -194,7 +170,7 @@ public class Factories {
             > memorySelector,
         final Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule
     ) {
-        return new HaulRecorderFactory<>(modelGrid, memorySelector, updateRule);
+        return new FishingEventRecorderFactory<>(modelGrid, memorySelector, updateRule);
     }
 
     /**
@@ -283,34 +259,45 @@ public class Factories {
     }
 
     /**
-     * @param optionValues              the vessel's own learned option values, for the search's
-     *                                  starting cell
      * @param pathFinder                finds accessible water neighbours
      * @param cellPredicate             filters which candidate cells are eligible
      * @param neighbourhoodSizeSupplier the initial search radius
      * @param maximumWidening           how many cells the radius may grow beyond the initial one
      *                                  while no cell satisfies {@code cellPredicate}
-     * @param fallbackCellPicker        supplies a starting cell if there's no best-known option
+     * @param searchCentre              supplies the cell to search around, asked for anew on each
+     *                                  pick
      * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
      * {@link NeighbourhoodCellPicker}
      * @see NeighbourhoodCellPicker
      */
     public static NeighbourhoodGridExplorerFactory neighbourhoodGridExplorer(
-        final Factory<? super VesselScope, ? extends OptionValues<Int2D>> optionValues,
         final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
         final Factory<? super VesselScope, ? extends Predicate<? super Int2D>> cellPredicate,
         final Factory<? super VesselScope, ? extends IntSupplier> neighbourhoodSizeSupplier,
         final int maximumWidening,
-        final Factory<? super VesselScope, ? extends Supplier<Int2D>> fallbackCellPicker
+        final Factory<? super VesselScope, ? extends Supplier<Int2D>> searchCentre
     ) {
         return new NeighbourhoodGridExplorerFactory(
-            optionValues,
             pathFinder,
             cellPredicate,
             neighbourhoodSizeSupplier,
             maximumWidening,
-            fallbackCellPicker
+            searchCentre
         );
+    }
+
+    /**
+     * @param optionValues the values of the options
+     * @param fallback     supplies an option when none is known
+     * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+     * {@link BestKnownOption}
+     * @see BestKnownOption
+     */
+    public static <O> BestKnownOptionFactory<O> bestKnownOption(
+        final Factory<? super VesselScope, ? extends OptionValues<O>> optionValues,
+        final Factory<? super VesselScope, ? extends Supplier<O>> fallback
+    ) {
+        return new BestKnownOptionFactory<>(optionValues, fallback);
     }
 
     /**
