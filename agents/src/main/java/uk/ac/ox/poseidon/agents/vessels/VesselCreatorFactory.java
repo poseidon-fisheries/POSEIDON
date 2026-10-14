@@ -44,8 +44,8 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link VesselCreator}, built via
- * {@link Factories#vesselCreator}.
+ * A {@link SimulationScopeFactory} counterpart of {@link VesselCreator}, built
+ * via {@link Factories#vesselCreator}.
  */
 @Data
 @NoArgsConstructor
@@ -109,7 +109,10 @@ public class VesselCreatorFactory
     );
   }
 
-  /** @return a {@link VesselCreator} ready to create {@link #numberOfVesselsToCreate} vessels */
+  /**
+   * @return a {@link VesselCreator} ready to create
+   *         {@link #numberOfVesselsToCreate} vessels
+   */
   @Override
   protected VesselCreator newInstance(final SimulationScope scope) {
     return new VesselCreator(

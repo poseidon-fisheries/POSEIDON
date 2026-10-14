@@ -29,8 +29,9 @@ import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
 
 /**
- * A {@link Supplier} that builds a two-column {@code tablesaw} {@link Table} (key, value) from a
- * resolved {@link Map}, using a fixed {@link TableDefinition} for the table shape. Built via
+ * A {@link Supplier} that builds a two-column {@code tablesaw} {@link Table}
+ * (key, value) from a resolved {@link Map}, using a fixed
+ * {@link TableDefinition} for the table shape. Built via
  * {@link Factories#tableFromMap(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
  * in this package.
  *
@@ -44,8 +45,8 @@ public class TableFromMap<K, V> implements Supplier<Table> {
   private final Supplier<Map<K, V>> mapSupplier;
 
   /**
-   * @return a fresh {@link Table}, shaped by {@code tableDefinition}, with one row per entry of
-   * the resolved map
+   * @return a fresh {@link Table}, shaped by {@code tableDefinition}, with one
+   *         row per entry of the resolved map
    */
   @Override
   public Table get() {

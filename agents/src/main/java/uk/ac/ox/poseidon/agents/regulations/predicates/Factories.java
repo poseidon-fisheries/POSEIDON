@@ -39,13 +39,16 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param regulations     the regulations a candidate fishing action must be permitted by
-   * @param pathFinder      finds the path from the vessel's current cell to the candidate
+   * @param regulations     the regulations a candidate fishing action must be
+   *                        permitted by
+   * @param pathFinder      finds the path from the vessel's current cell to the
+   *                        candidate
    * @param distance        gives the travel time along that path
-   * @param fishingDuration the typical duration of a fishing action, which the candidate action
-   *                        lasts (see {@link FishingLocationLegalityChecker})
+   * @param fishingDuration the typical duration of a fishing action, which the
+   *                        candidate action lasts (see
+   *                        {@link FishingLocationLegalityChecker})
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link FishingLocationLegalityChecker}
+   *         {@link FishingLocationLegalityChecker}
    * @see FishingLocationLegalityCheckerFactory
    */
   public static FishingLocationLegalityCheckerFactory fishingLocationLegalityChecker(

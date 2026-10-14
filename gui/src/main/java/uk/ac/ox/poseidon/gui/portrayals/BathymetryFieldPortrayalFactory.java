@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 /**
- * A {@link SimpleFieldPortrayalFactory} preset for a {@link BathymetricGrid}: labelled
- * "Bathymetry", diverging colour range around zero elevation.
+ * A {@link SimpleFieldPortrayalFactory} preset for a {@link BathymetricGrid}:
+ * labelled "Bathymetry", diverging colour range around zero elevation.
  */
 public class BathymetryFieldPortrayalFactory
   extends SimpleFieldPortrayalFactory<SimulationScope>

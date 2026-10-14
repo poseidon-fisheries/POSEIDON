@@ -21,11 +21,14 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.biology.species.Species} identity, and the array-backed addressing
- * scheme ({@link uk.ac.ox.poseidon.biology.species.SpeciesIndex}, {@code SpeciesIndexed*}) used
- * across the model to store per-species data without species-keyed maps. See
+ * {@link uk.ac.ox.poseidon.biology.species.Species} identity, and the
+ * array-backed addressing scheme
+ * ({@link uk.ac.ox.poseidon.biology.species.SpeciesIndex},
+ * {@code SpeciesIndexed*}) used across the model to store per-species data
+ * without species-keyed maps. See
  * {@link uk.ac.ox.poseidon.biology.species.Factories} for the entry points. The
- * {@code extractors} subpackage builds simple {@link java.util.function.Function}s that pull a
- * field off a {@link uk.ac.ox.poseidon.biology.species.Species}.
+ * {@code extractors} subpackage builds simple
+ * {@link java.util.function.Function}s that pull a field off a
+ * {@link uk.ac.ox.poseidon.biology.species.Species}.
  */
 package uk.ac.ox.poseidon.biology.species;

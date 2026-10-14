@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link RouteViaDestination}, built via
- * {@link Factories#routeViaDestination(Factory, Factory)}.
+ * A {@link VesselScopeFactory} counterpart of {@link RouteViaDestination},
+ * built via {@link Factories#routeViaDestination(Factory, Factory)}.
  */
 @Data
 @NoArgsConstructor

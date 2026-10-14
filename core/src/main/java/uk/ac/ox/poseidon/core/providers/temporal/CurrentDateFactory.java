@@ -29,8 +29,8 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link CurrentDate}, built via
- * {@link Factories#currentDate()}.
+ * A {@link SimulationScopeFactory} counterpart of {@link CurrentDate}, built
+ * via {@link Factories#currentDate()}.
  */
 @Data
 @NoArgsConstructor

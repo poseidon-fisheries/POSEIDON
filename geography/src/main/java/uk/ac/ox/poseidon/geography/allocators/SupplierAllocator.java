@@ -28,9 +28,10 @@ import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 
 /**
- * An {@link Allocator} that ignores the cell entirely and returns the same resolved
- * {@link DoubleSupplier}'s value for every cell. Built via
- * {@link Factories#supplierAllocator(uk.ac.ox.poseidon.core.Factory)} in this package.
+ * An {@link Allocator} that ignores the cell entirely and returns the same
+ * resolved {@link DoubleSupplier}'s value for every cell. Built via
+ * {@link Factories#supplierAllocator(uk.ac.ox.poseidon.core.Factory)} in this
+ * package.
  */
 @RequiredArgsConstructor
 public class SupplierAllocator implements Allocator {

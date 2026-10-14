@@ -35,8 +35,9 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link NextOccurrenceOfTimeOfDay}, built via
- * {@link Factories Factories.nextOccurrenceOf(...)/Factories.nextOccurrenceAfter(...)}.
+ * A {@link RelativeScopeFactory} counterpart of
+ * {@link NextOccurrenceOfTimeOfDay}, built via {@link Factories
+ * Factories.nextOccurrenceOf(...)/Factories.nextOccurrenceAfter(...)}.
  */
 @Data
 @NoArgsConstructor

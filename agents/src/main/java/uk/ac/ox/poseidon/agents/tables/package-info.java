@@ -21,8 +21,9 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.agents.tables.ListenerTable}s: simulation event listeners that
- * accumulate the events they receive into a tablesaw table, for later export/analysis. See
- * {@link uk.ac.ox.poseidon.agents.tables.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.agents.tables.ListenerTable}s: simulation event
+ * listeners that accumulate the events they receive into a tablesaw table, for
+ * later export/analysis. See {@link uk.ac.ox.poseidon.agents.tables.Factories}
+ * for the entry points.
  */
 package uk.ac.ox.poseidon.agents.tables;

@@ -37,8 +37,8 @@ import sim.util.Number2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 /**
- * Measures distance and derived travel duration between two points, given either as
- * {@link Coordinate}s or grid points ({@link Number2D}). Built via
+ * Measures distance and derived travel duration between two points, given
+ * either as {@link Coordinate}s or grid points ({@link Number2D}). Built via
  * {@link uk.ac.ox.poseidon.geography.distance.Factories}.
  */
 public interface DistanceCalculator {
@@ -58,8 +58,8 @@ public interface DistanceCalculator {
 
   /**
    * @param path the waypoints to travel through in order
-   * @return the length of {@code path}, summing the distance of each leg, in kilometres; zero
-   * for a path of a single waypoint
+   * @return the length of {@code path}, summing the distance of each leg, in
+   *         kilometres; zero for a path of a single waypoint
    */
   default double distanceInKm(final List<? extends Number2D> path) {
     double distanceInKm = 0.0;
@@ -69,17 +69,26 @@ public interface DistanceCalculator {
     return distanceInKm;
   }
 
-  /** @return {@link #distanceInKm(Number2D, Number2D)} as a length {@link Quantity} */
+  /**
+   * @return {@link #distanceInKm(Number2D, Number2D)} as a length
+   *         {@link Quantity}
+   */
   default Quantity<Length> distance(final Number2D start, final Number2D end) {
     return getQuantity(distanceInKm(start, end), KILO(METRE));
   }
 
-  /** @return {@link #distanceInKm(Coordinate, Coordinate)} as a length {@link Quantity} */
+  /**
+   * @return {@link #distanceInKm(Coordinate, Coordinate)} as a length
+   *         {@link Quantity}
+   */
   default Quantity<Length> distance(final Coordinate a, final Coordinate b) {
     return getQuantity(distanceInKm(a, b), KILO(METRE));
   }
 
-  /** @return the time to travel from {@code start} to {@code end} at {@code cruisingSpeed} */
+  /**
+   * @return the time to travel from {@code start} to {@code end} at
+   *         {@code cruisingSpeed}
+   */
   default Duration travelDuration(
     final Number2D start,
     final Number2D end,
@@ -89,7 +98,8 @@ public interface DistanceCalculator {
   }
 
   /**
-   * @return the time to travel from {@code start} to {@code end} at {@code cruisingSpeedInKph}
+   * @return the time to travel from {@code start} to {@code end} at
+   *         {@code cruisingSpeedInKph}
    */
   default Duration travelDuration(
     final Number2D start,
@@ -100,10 +110,12 @@ public interface DistanceCalculator {
   }
 
   /**
-   * @param path              the waypoints to travel through in order, at least one
+   * @param path               the waypoints to travel through in order, at
+   *                           least one
    * @param cruisingSpeedInKph the constant travel speed, in km/h
-   * @return the time to travel the full path at {@code cruisingSpeedInKph}, summing the
-   * distance of each leg; zero for a path of a single waypoint
+   * @return the time to travel the full path at {@code cruisingSpeedInKph},
+   *         summing the distance of each leg; zero for a path of a single
+   *         waypoint
    * @throws IllegalArgumentException if {@code path} is empty
    */
   default Duration travelDuration(
@@ -118,12 +130,14 @@ public interface DistanceCalculator {
   }
 
   /**
-   * Takes the distance first and the speed last, like the other {@code travelDuration} methods:
-   * both are {@code double}s, so a swap would not be caught by the compiler.
+   * Takes the distance first and the speed last, like the other
+   * {@code travelDuration} methods: both are {@code double}s, so a swap would
+   * not be caught by the compiler.
    *
    * @param totalDistanceInKm  the total distance to travel, in kilometres
    * @param cruisingSpeedInKph the constant travel speed, in km/h
-   * @return the time to travel {@code totalDistanceInKm} at {@code cruisingSpeedInKph}
+   * @return the time to travel {@code totalDistanceInKm} at
+   *         {@code cruisingSpeedInKph}
    */
   static Duration travelDuration(
     final double totalDistanceInKm,

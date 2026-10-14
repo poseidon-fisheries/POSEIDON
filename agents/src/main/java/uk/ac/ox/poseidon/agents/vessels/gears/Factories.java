@@ -34,19 +34,24 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-/** Factories for a vessel's {@link Gear}: inactive, a fixed proportion, or a per-species one. */
+/**
+ * Factories for a vessel's {@link Gear}: inactive, a fixed proportion, or a
+ * per-species one.
+ */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @param code                   this gear's identifying code
-   * @param proportion             the fraction of available biomass caught per species
-   * @param minimumCatchThreshold  per-species catch below this is discarded down to zero
-   * @param durationSupplier       supplies how long one fishing event takes
-   * @param fuelConsumptionRate    fuel burned per hour of fishing
+   * @param code                  this gear's identifying code
+   * @param proportion            the fraction of available biomass caught per
+   *                              species
+   * @param minimumCatchThreshold per-species catch below this is discarded down
+   *                              to zero
+   * @param durationSupplier      supplies how long one fishing event takes
+   * @param fuelConsumptionRate   fuel burned per hour of fishing
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link FixedBiomassProportionGear}
+   *         {@link FixedBiomassProportionGear}
    * @see FixedBiomassProportionGear
    */
   public static <S extends SimulationScope> FixedBiomassProportionGearFactory<S> fixedBiomassProportionGear(
@@ -70,7 +75,8 @@ public class Factories {
 
   /**
    * @param code this gear's identifying code
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an {@link InactiveGear}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
+   *         {@link InactiveGear}
    * @see InactiveGear
    */
   public static InactiveGearFactory inactiveGear(final String code) {
@@ -81,10 +87,12 @@ public class Factories {
    * @param code                  this gear's identifying code
    * @param durationSupplier      supplies how long one fishing event takes
    * @param species               the species to index proportions over
-   * @param proportionFunction    the fraction of available biomass caught, per species
-   * @param minimumCatchThreshold per-species catch below this is discarded down to zero
+   * @param proportionFunction    the fraction of available biomass caught, per
+   *                              species
+   * @param minimumCatchThreshold per-species catch below this is discarded down
+   *                              to zero
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   * {@link IndexedBiomassCatchabilityGear}
+   *         {@link IndexedBiomassCatchabilityGear}
    * @see IndexedBiomassCatchabilityGear
    */
   public static <S extends Scope> IndexedBiomassCatchabilityGearFactory<S> indexedBiomassCatchabilityGear(

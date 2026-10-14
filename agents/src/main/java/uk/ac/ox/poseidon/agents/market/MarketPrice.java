@@ -26,9 +26,10 @@ import java.time.LocalDateTime;
 import lombok.Value;
 
 /**
- * A price at one market: the price of a species in a catch category there. This is a price
- * assignment, not an event: {@link PriceUpdate} schedules one as a change over time, and
- * {@link Factories#initialPrices} applies a set of them when the simulation is built.
+ * A price at one market: the price of a species in a catch category there. This
+ * is a price assignment, not an event: {@link PriceUpdate} schedules one as a
+ * change over time, and {@link Factories#initialPrices} applies a set of them
+ * when the simulation is built.
  */
 @Value
 public class MarketPrice {
@@ -39,7 +40,8 @@ public class MarketPrice {
   PriceEntry priceEntry;
 
   /**
-   * Sets this price on {@link #market}, replacing any price it had for the same entry.
+   * Sets this price on {@link #market}, replacing any price it had for the same
+   * entry.
    *
    * @param dateTime when the price changes
    */

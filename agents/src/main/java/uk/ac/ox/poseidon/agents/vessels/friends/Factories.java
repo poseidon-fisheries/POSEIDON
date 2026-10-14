@@ -29,7 +29,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * Factories for suppliers of a vessel's dynamically-maintained set of "friend" vessels.
+ * Factories for suppliers of a vessel's dynamically-maintained set of "friend"
+ * vessels.
  */
 public class Factories {
 
@@ -37,7 +38,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link DynamicFriendsSupplier}
+   *         {@link DynamicFriendsSupplier}
    * @see DynamicFriendsSupplierFactory
    */
   public static DynamicFriendsSupplierFactory dynamicFriendsSupplier(

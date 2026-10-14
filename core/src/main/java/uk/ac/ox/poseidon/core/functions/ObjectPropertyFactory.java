@@ -30,8 +30,9 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link ObjectProperty}. Each subclass fixes the
- * class the property path starts from, so that only the path appears in a scenario.
+ * A {@link GlobalScopeFactory} counterpart of {@link ObjectProperty}. Each
+ * subclass fixes the class the property path starts from, so that only the path
+ * appears in a scenario.
  *
  * @param <T> the type of the object read
  * @param <R> the type of the property; not checked
@@ -48,8 +49,9 @@ public abstract class ObjectPropertyFactory<
   private String propertyPath;
 
   /**
-   * @return the class the property path starts from; deliberately not named as a getter, so
-   * that it isn't taken for a property when the scenario is written out
+   * @return the class the property path starts from; deliberately not named as
+   *         a getter, so that it isn't taken for a property when the scenario
+   *         is written out
    */
   protected abstract Class<T> rootClass();
 

@@ -28,8 +28,8 @@ import uk.ac.ox.poseidon.core.functions.ObjectProperty;
 import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
 
 /**
- * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a {@link Route}, built via
- * {@link Factories#routeProperty}.
+ * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a
+ * {@link Route}, built via {@link Factories#routeProperty}.
  *
  * @param <R> the type of the property; not checked
  */
@@ -37,7 +37,9 @@ import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
 @EqualsAndHashCode(callSuper = true)
 public class RoutePropertyFactory<R> extends ObjectPropertyFactory<Route, R> {
 
-  /** @param propertyPath the dotted path of properties to follow from the route */
+  /**
+   * @param propertyPath the dotted path of properties to follow from the route
+   */
   public RoutePropertyFactory(final String propertyPath) {
     super(propertyPath);
   }

@@ -29,11 +29,13 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGridWrapper;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A read-only biomass grid for a single species, meant to be shared across simulations (e.g. as
- * a global-scoped reference dataset). Unlike {@link BiomassGrid}, this does not implement
- * {@link uk.ac.ox.poseidon.geography.grids.MutableGrid}, so it never leaks a mutable handle to
- * its backing array; it is not {@link uk.ac.ox.poseidon.biology.Fisheable} either, since fishing
- * always targets a live, simulation-scoped, mutable {@link BiomassGrid} instead.
+ * A read-only biomass grid for a single species, meant to be shared across
+ * simulations (e.g. as a global-scoped reference dataset). Unlike
+ * {@link BiomassGrid}, this does not implement
+ * {@link uk.ac.ox.poseidon.geography.grids.MutableGrid}, so it never leaks a
+ * mutable handle to its backing array; it is not
+ * {@link uk.ac.ox.poseidon.biology.Fisheable} either, since fishing always
+ * targets a live, simulation-scoped, mutable {@link BiomassGrid} instead.
  */
 public class ImmutableBiomassGrid
   extends DoubleGridWrapper

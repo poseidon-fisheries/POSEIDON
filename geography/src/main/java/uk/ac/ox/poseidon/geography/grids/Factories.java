@@ -32,10 +32,11 @@ import uk.ac.ox.poseidon.geography.allocators.Allocator;
 import uk.ac.ox.poseidon.geography.utils.LonLatTable;
 
 /**
- * Factories for {@link ModelGrid}s and the {@link DoubleGrid}/NetCDF-reading components built on
- * top of them: building a grid from an explicit bounding box, a table's coordinates, or a raster
- * file's own metadata; narrowing a grid's active cells; building an allocator-driven double grid
- * (fixed or mutable, normalised or not); and reading raster/NetCDF data files.
+ * Factories for {@link ModelGrid}s and the {@link DoubleGrid}/NetCDF-reading
+ * components built on top of them: building a grid from an explicit bounding
+ * box, a table's coordinates, or a raster file's own metadata; narrowing a
+ * grid's active cells; building an allocator-driven double grid (fixed or
+ * mutable, normalised or not); and reading raster/NetCDF data files.
  */
 public class Factories {
 
@@ -43,11 +44,13 @@ public class Factories {
 
   /**
    * @param path          factory for the raster grid file to read
-   * @param modelGrid     factory for the model grid whose cells the file's columns and rows
-   *                      are; the file must cover the same cells
+   * @param modelGrid     factory for the model grid whose cells the file's
+   *                      columns and rows are; the file must cover the same
+   *                      cells
    * @param includedValue the cell value to select
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the set of cells in the
-   * resolved file whose value equals {@code includedValue}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the set
+   *         of cells in the resolved file whose value equals
+   *         {@code includedValue}
    * @see CellSetFromGridFileFactory
    */
   public static <S extends Scope> CellSetFromGridFileFactory<S> cellSetFromGridFile(
@@ -59,13 +62,15 @@ public class Factories {
   }
 
   /**
-   * @param resolutionInDegrees the size of one cell, in degrees; the bounding box's width and
-   *                            height must each be an exact multiple of this
+   * @param resolutionInDegrees the size of one cell, in degrees; the bounding
+   *                            box's width and height must each be an exact
+   *                            multiple of this
    * @param westLongitude       the bounding box's western edge
    * @param eastLongitude       the bounding box's eastern edge
    * @param southLatitude       the bounding box's southern edge
    * @param northLatitude       the bounding box's northern edge
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link ModelGrid}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link ModelGrid}
    * @see ModelGridFactory
    */
   public static ModelGridFactory modelGrid(
@@ -86,9 +91,10 @@ public class Factories {
 
   /**
    * @param modelGrid   factory for the grid to narrow
-   * @param activeCells factory for the cells that should be active in the resolved grid
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the resolved grid,
-   * narrowed to {@code activeCells}
+   * @param activeCells factory for the cells that should be active in the
+   *                    resolved grid
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the
+   *         resolved grid, narrowed to {@code activeCells}
    * @see ModelGridWithActiveCellsFactory
    */
   public static <S extends Scope> ModelGridWithActiveCellsFactory<S> modelGridWithActiveCells(
@@ -99,12 +105,13 @@ public class Factories {
   }
 
   /**
-   * @param lonLatTable         factory for the table whose coordinates the grid should fit
+   * @param lonLatTable         factory for the table whose coordinates the grid
+   *                            should fit
    * @param gridWidthInCells    the width of the resulting grid, in cells
-   * @param mapPaddingInDegrees the margin added around the coordinates' bounding box, on every
-   *                            side
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link ModelGrid} sized
-   * to fit the resolved table's coordinates
+   * @param mapPaddingInDegrees the margin added around the coordinates'
+   *                            bounding box, on every side
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link ModelGrid} sized to fit the resolved table's coordinates
    * @see ModelGridFromLonLatTableFactory
    */
   public static <S extends Scope> ModelGridFromLonLatTableFactory<S> modelGridFromLonLatTable(
@@ -122,8 +129,8 @@ public class Factories {
   /**
    * @param modelGrid factory for the grid to build over
    * @param allocator factory for the allocator assigning each cell's value
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an immutable
-   * {@link BaseDoubleGrid}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         immutable {@link BaseDoubleGrid}
    * @see DoubleGridFromAllocatorFactory
    */
   public static <S extends Scope> DoubleGridFromAllocatorFactory<S> doubleGridFromAllocator(
@@ -136,9 +143,10 @@ public class Factories {
   /**
    * @param modelGrid  factory for the grid to build over
    * @param allocator  factory for the allocator assigning each cell's raw value
-   * @param totalValue factory for the value the grid's values should sum to once normalised
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an immutable, normalised
-   * {@link BaseDoubleGrid}
+   * @param totalValue factory for the value the grid's values should sum to
+   *                   once normalised
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         immutable, normalised {@link BaseDoubleGrid}
    * @see NormalisedDoubleGridFromAllocatorFactory
    */
   public static <S extends Scope> NormalisedDoubleGridFromAllocatorFactory<S> normalisedDoubleGridFromAllocator(
@@ -157,7 +165,7 @@ public class Factories {
    * @param modelGrid factory for the grid to build over
    * @param allocator factory for the allocator assigning each cell's value
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link MutableDoubleGrid}
+   *         {@link MutableDoubleGrid}
    * @see MutableDoubleGridFromAllocatorFactory
    */
   public static <S extends Scope> MutableDoubleGridFromAllocatorFactory<S> mutableDoubleGridFromAllocator(
@@ -170,9 +178,10 @@ public class Factories {
   /**
    * @param modelGrid  factory for the grid to build over
    * @param allocator  factory for the allocator assigning each cell's raw value
-   * @param totalValue factory for the value the grid's values should sum to once normalised
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a normalised
-   * {@link MutableDoubleGrid}
+   * @param totalValue factory for the value the grid's values should sum to
+   *                   once normalised
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         normalised {@link MutableDoubleGrid}
    * @see NormalisedMutableDoubleGridFromAllocatorFactory
    */
   public static <S extends Scope> NormalisedMutableDoubleGridFromAllocatorFactory<S> normalisedMutableDoubleGridFromAllocator(
@@ -189,8 +198,9 @@ public class Factories {
 
   /**
    * @param gridFilePath factory for the raster grid file to read
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link ModelGrid} sized
-   * to the resolved file's own extent and resolution
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link ModelGrid} sized to the resolved file's own extent and
+   *         resolution
    * @see ModelGridFromGridFileFactory
    */
   public static <S extends Scope> ModelGridFromGridFileFactory<S> modelGridFromGridFile(
@@ -200,12 +210,15 @@ public class Factories {
   }
 
   /**
-   * @param ncFilePath              factory for the NetCDF file to read
-   * @param timeDimensionName       the name of the time dimension/coordinate variable
-   * @param latitudeDimensionName   the name of the latitude dimension/coordinate variable
-   * @param longitudeDimensionName  the name of the longitude dimension/coordinate variable
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a supplier of fresh
-   * {@link TimeIndexedNetCdfGridReader}s
+   * @param ncFilePath             factory for the NetCDF file to read
+   * @param timeDimensionName      the name of the time dimension/coordinate
+   *                               variable
+   * @param latitudeDimensionName  the name of the latitude dimension/coordinate
+   *                               variable
+   * @param longitudeDimensionName the name of the longitude
+   *                               dimension/coordinate variable
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         supplier of fresh {@link TimeIndexedNetCdfGridReader}s
    * @see TimeIndexedNetCdfGridReaderFactory
    */
   public static <S extends Scope> TimeIndexedNetCdfGridReaderFactory<S> timeIndexedNetCdfGridReader(
@@ -224,10 +237,12 @@ public class Factories {
 
   /**
    * @param ncFilePath             factory for the NetCDF file to read
-   * @param latitudeDimensionName  the name of the latitude dimension/coordinate variable
-   * @param longitudeDimensionName the name of the longitude dimension/coordinate variable
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a supplier of fresh
-   * {@link StaticNetCdfGridReader}s
+   * @param latitudeDimensionName  the name of the latitude dimension/coordinate
+   *                               variable
+   * @param longitudeDimensionName the name of the longitude
+   *                               dimension/coordinate variable
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         supplier of fresh {@link StaticNetCdfGridReader}s
    * @see StaticNetCdfGridReaderFactory
    */
   public static <S extends Scope> StaticNetCdfGridReaderFactory<S> staticNetCdfGridReader(
@@ -243,10 +258,12 @@ public class Factories {
   }
 
   /**
-   * @param modelGrid              factory for the grid the NetCDF file must align with
-   * @param staticNetCdfGridReader factory for the supplier of the reader to read from
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a map from NetCDF
-   * variable name to the corresponding {@link DoubleGrid}
+   * @param modelGrid              factory for the grid the NetCDF file must
+   *                               align with
+   * @param staticNetCdfGridReader factory for the supplier of the reader to
+   *                               read from
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a map
+   *         from NetCDF variable name to the corresponding {@link DoubleGrid}
    * @see StaticGridsFromNetCdfFactory
    */
   public static <S extends Scope> StaticGridsFromNetCdfFactory<S> staticGridsFromNetCdf(

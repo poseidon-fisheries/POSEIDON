@@ -33,11 +33,13 @@ import java.util.function.Supplier;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
- * A {@link Provider} of the next occurrence of one of the given times of day strictly after a
- * reference date-time, read anew on every call: the same day if one of the times is still to come,
- * else the earliest of them on the following day. The reference is usually the current date-time
- * ({@link Factories#nextOccurrenceOf}), but can be any other, such as when a vessel departed
- * ({@link Factories#nextOccurrenceAfter}); the occurrence can then already be in the past.
+ * A {@link Provider} of the next occurrence of one of the given times of day
+ * strictly after a reference date-time, read anew on every call: the same day
+ * if one of the times is still to come, else the earliest of them on the
+ * following day. The reference is usually the current date-time
+ * ({@link Factories#nextOccurrenceOf}), but can be any other, such as when a
+ * vessel departed ({@link Factories#nextOccurrenceAfter}); the occurrence can
+ * then already be in the past.
  */
 public class NextOccurrenceOfTimeOfDay implements Provider<LocalDateTime> {
 
@@ -45,7 +47,8 @@ public class NextOccurrenceOfTimeOfDay implements Provider<LocalDateTime> {
   private final LocalTime[] times;
 
   /**
-   * @param referenceDateTime supplies the date-time the occurrence must be strictly after
+   * @param referenceDateTime supplies the date-time the occurrence must be
+   *                          strictly after
    * @param times             the times of day, at least one
    */
   public NextOccurrenceOfTimeOfDay(

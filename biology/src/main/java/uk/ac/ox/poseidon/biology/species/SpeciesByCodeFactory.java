@@ -33,10 +33,11 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} that filters a resolved list of species down to the ones whose
- * code appears in a resolved list of codes. There's no separate plain component class here: the
- * produced {@link List} is returned as-is, with no wrapper type to carry documentation, so this
- * factory carries the behavior doc directly. Built via
+ * A {@link RelativeScopeFactory} that filters a resolved list of species down
+ * to the ones whose code appears in a resolved list of codes. There's no
+ * separate plain component class here: the produced {@link List} is returned
+ * as-is, with no wrapper type to carry documentation, so this factory carries
+ * the behavior doc directly. Built via
  * {@link Factories#speciesByCode(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
  * in this package.
  */

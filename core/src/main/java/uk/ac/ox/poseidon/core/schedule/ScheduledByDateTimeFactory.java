@@ -35,11 +35,13 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} that schedules each resolved steppable to run once at its own
- * date-time, via {@link TemporalSchedule#scheduleByDateTime}, and returns those same dated
- * steppables. Steppables dated before the simulation's start all run at the start, in date order.
- * No separate plain component class here: scheduling is a side effect of building the factory,
- * not a distinct behavior class. Built via {@link Factories#scheduledByDateTime(Factory)}.
+ * A {@link SimulationScopeFactory} that schedules each resolved steppable to
+ * run once at its own date-time, via
+ * {@link TemporalSchedule#scheduleByDateTime}, and returns those same dated
+ * steppables. Steppables dated before the simulation's start all run at the
+ * start, in date order. No separate plain component class here: scheduling is a
+ * side effect of building the factory, not a distinct behavior class. Built via
+ * {@link Factories#scheduledByDateTime(Factory)}.
  */
 @Data
 @NoArgsConstructor

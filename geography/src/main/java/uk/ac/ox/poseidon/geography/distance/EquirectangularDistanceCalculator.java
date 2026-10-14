@@ -31,11 +31,13 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link CoordinateBasedDistanceCalculator} using the equirectangular approximation: fast, but
- * only accurate over short distances (a warning is logged past {@code WARNING_THRESHOLD} km) —
- * prefer {@link HaversineDistanceCalculator} when accuracy matters more than speed. Built via
- * {@link Factories#equirectangularDistanceCalculator(uk.ac.ox.poseidon.core.Factory)} in this
- * package.
+ * A {@link CoordinateBasedDistanceCalculator} using the equirectangular
+ * approximation: fast, but only accurate over short distances (a warning is
+ * logged past {@code WARNING_THRESHOLD} km) — prefer
+ * {@link HaversineDistanceCalculator} when accuracy matters more than speed.
+ * Built via
+ * {@link Factories#equirectangularDistanceCalculator(uk.ac.ox.poseidon.core.Factory)}
+ * in this package.
  */
 public class EquirectangularDistanceCalculator
   extends CoordinateBasedDistanceCalculator

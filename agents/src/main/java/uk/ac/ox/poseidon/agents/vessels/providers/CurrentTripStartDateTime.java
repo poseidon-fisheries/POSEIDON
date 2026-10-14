@@ -31,7 +31,10 @@ import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
-/** Provides when the vessel's current trip started; only checks made during a trip read it. */
+/**
+ * Provides when the vessel's current trip started; only checks made during a
+ * trip read it.
+ */
 @RequiredArgsConstructor
 public class CurrentTripStartDateTime implements Provider<LocalDateTime> {
 

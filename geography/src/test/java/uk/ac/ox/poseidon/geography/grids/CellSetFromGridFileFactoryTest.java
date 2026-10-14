@@ -43,7 +43,9 @@ class CellSetFromGridFileFactoryTest {
   @TempDir
   private Path tempDir;
 
-  /** The fixture's own grid: 3 by 2 cells from 10°E to 13°E and 40°N to 42°N. */
+  /**
+   * The fixture's own grid: 3 by 2 cells from 10°E to 13°E and 40°N to 42°N.
+   */
   private static final ModelGrid FIXTURE_GRID = ModelGrid.create(
     3,
     2,

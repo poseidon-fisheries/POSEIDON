@@ -33,7 +33,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
-/** Factories for the routes vessels would sail and what travelling them costs. */
+/**
+ * Factories for the routes vessels would sail and what travelling them costs.
+ */
 public class Factories {
 
   private Factories() {}
@@ -42,7 +44,7 @@ public class Factories {
    * @param pathFinder finds the paths of the route's two legs
    * @param distance   measures the paths
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link RouteViaDestination}
+   *         {@link RouteViaDestination}
    * @see RouteViaDestination
    */
   public static RouteViaDestinationFactory routeViaDestination(
@@ -54,7 +56,8 @@ public class Factories {
 
   /**
    * @param hourlyCost gives the vessel's cost per hour at sea
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a {@link TimeCost}
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+   *         {@link TimeCost}
    * @see TimeCost
    */
   public static TimeCostFactory timeCost(
@@ -69,7 +72,8 @@ public class Factories {
   /**
    * @param routeFunction gives the route via a cell
    * @param routeCosts    what is charged for a route, each in money
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link TravelCost}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link TravelCost}
    * @see TravelCost
    */
   @SafeVarargs
@@ -87,10 +91,10 @@ public class Factories {
   }
 
   /**
-   * @param propertyPath the dotted path of properties to follow from the route, e.g.
-   *                     {@code "duration"} for how long sailing it takes
+   * @param propertyPath the dotted path of properties to follow from the route,
+   *                     e.g. {@code "duration"} for how long sailing it takes
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
-   * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a route
+   *         {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a route
    * @see RoutePropertyFactory
    */
   public static <R> RoutePropertyFactory<R> routeProperty(

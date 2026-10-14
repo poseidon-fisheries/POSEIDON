@@ -25,13 +25,16 @@
  * {@link uk.ac.ox.poseidon.agents.tasks.AgentTask}/
  * {@link uk.ac.ox.poseidon.agents.tasks.ExtendedTask} for building leaf tasks,
  * {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory}/
- * {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for their factories, and
- * {@link uk.ac.ox.poseidon.agents.tasks.Behaviour} for wrapping a whole tree (or none) as the
- * agent's top-level behavior. Concrete leaves and branch/decorator nodes live in sibling
- * packages ({@link uk.ac.ox.poseidon.agents.tasks.branches},
+ * {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for their factories,
+ * and {@link uk.ac.ox.poseidon.agents.tasks.Behaviour} for wrapping a whole
+ * tree (or none) as the agent's top-level behavior. Concrete leaves and
+ * branch/decorator nodes live in sibling packages
+ * ({@link uk.ac.ox.poseidon.agents.tasks.branches},
  * {@link uk.ac.ox.poseidon.agents.tasks.decorators},
- * {@link uk.ac.ox.poseidon.agents.tasks.general}, {@link uk.ac.ox.poseidon.agents.tasks.fishing},
+ * {@link uk.ac.ox.poseidon.agents.tasks.general},
+ * {@link uk.ac.ox.poseidon.agents.tasks.fishing},
  * {@link uk.ac.ox.poseidon.agents.tasks.travel}). See
- * {@link uk.ac.ox.poseidon.agents.tasks.Factories} for this package's own entry points.
+ * {@link uk.ac.ox.poseidon.agents.tasks.Factories} for this package's own entry
+ * points.
  */
 package uk.ac.ox.poseidon.agents.tasks;

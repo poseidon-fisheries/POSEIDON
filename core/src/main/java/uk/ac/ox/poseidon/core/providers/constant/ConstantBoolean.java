@@ -26,8 +26,9 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.BooleanProvider;
 
 /**
- * A {@link BooleanProvider} that always returns the same, fixed value. Built via
- * {@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()} in this package.
+ * A {@link BooleanProvider} that always returns the same, fixed value. Built
+ * via {@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()} in this
+ * package.
  */
 @RequiredArgsConstructor
 public class ConstantBoolean implements BooleanProvider {

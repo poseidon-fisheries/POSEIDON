@@ -36,8 +36,9 @@ import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.poseidon.core.Scenario;
 
 /**
- * The {@code ScenarioLoader} class provides methods to load {@code Scenario} objects from YAML
- * strings, files, and input streams. This class uses the SnakeYAML library to parse YAML data.
+ * The {@code ScenarioLoader} class provides methods to load {@code Scenario}
+ * objects from YAML strings, files, and input streams. This class uses the
+ * SnakeYAML library to parse YAML data.
  */
 public class ScenarioLoader {
 
@@ -49,18 +50,20 @@ public class ScenarioLoader {
   private final List<String> permittedClassPrefixes;
 
   /**
-   * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance, optionally passing
-   * class prefixes that will be permitted in addition to "uk.ac.ox.poseidon" and "java" when
-   * loading factory classes from the YAML scenario.
+   * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance,
+   * optionally passing class prefixes that will be permitted in addition to
+   * "uk.ac.ox.poseidon" and "java" when loading factory classes from the YAML
+   * scenario.
    */
   public ScenarioLoader(final String... extraClassPrefixes) {
     this(Arrays.asList(extraClassPrefixes));
   }
 
   /**
-   * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance, passing class
-   * prefixes that will be permitted in addition to "uk.ac.ox.poseidon" and "java" when loading
-   * factory classes from the YAML scenario.
+   * Constructs a {@code ScenarioLoader} with a default {@code Yaml} instance,
+   * passing class prefixes that will be permitted in addition to
+   * "uk.ac.ox.poseidon" and "java" when loading factory classes from the YAML
+   * scenario.
    */
   public ScenarioLoader(final Collection<String> permittedClassPrefixes) {
     this.permittedClassPrefixes = ImmutableList.<String>builder()

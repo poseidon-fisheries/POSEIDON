@@ -31,8 +31,9 @@ import lombok.EqualsAndHashCode;
 import si.uom.quantity.VolumetricFlowRate;
 
 /**
- * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link VolumetricFlowRate} quantities,
- * built via {@link Factories Factories.volumetricFlowRateOf(...)}.
+ * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for
+ * {@link VolumetricFlowRate} quantities, built via {@link Factories
+ * Factories.volumetricFlowRateOf(...)}.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -52,7 +53,8 @@ public class VolumetricFlowRateFactory
 
   /**
    * @param value      the numeric flow rate value
-   * @param unitString the unit, in the format produced by {@code Unit.toString()}
+   * @param unitString the unit, in the format produced by
+   *                   {@code Unit.toString()}
    */
   public VolumetricFlowRateFactory(
     final double value,

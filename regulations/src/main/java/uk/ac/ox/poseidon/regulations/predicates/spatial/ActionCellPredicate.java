@@ -29,8 +29,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.regulations.SpatialAction;
 
 /**
- * Matches a {@link SpatialAction} whose start cell or end cell (converted from its coordinates via
- * {@code modelGrid}) satisfies {@code cellPredicate}.
+ * Matches a {@link SpatialAction} whose start cell or end cell (converted from
+ * its coordinates via {@code modelGrid}) satisfies {@code cellPredicate}.
  */
 @RequiredArgsConstructor
 public class ActionCellPredicate implements Predicate<SpatialAction<?>> {

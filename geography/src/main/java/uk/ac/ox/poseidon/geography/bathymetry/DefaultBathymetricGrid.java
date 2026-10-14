@@ -33,9 +33,10 @@ import uk.ac.ox.poseidon.geography.grids.BaseDoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * The default {@link BathymetricGrid} implementation, backed by a MASON {@link DoubleGrid2D} of
- * elevation values. Caches its land/water/active-water cell lists (computed lazily, once, on
- * first access) since {@link BathymetricGrid}'s default implementations of those would otherwise
+ * The default {@link BathymetricGrid} implementation, backed by a MASON
+ * {@link DoubleGrid2D} of elevation values. Caches its land/water/active-water
+ * cell lists (computed lazily, once, on first access) since
+ * {@link BathymetricGrid}'s default implementations of those would otherwise
  * rescan the whole grid on every call.
  */
 public class DefaultBathymetricGrid
@@ -56,14 +57,17 @@ public class DefaultBathymetricGrid
     BathymetricGrid.super.getActiveWaterCells().toArray(Int2D[]::new);
 
   /**
-   * @param modelGrid the grid this bathymetry is defined over; all elevations start at
-   *                  {@code 0}
+   * @param modelGrid the grid this bathymetry is defined over; all elevations
+   *                  start at {@code 0}
    */
   public DefaultBathymetricGrid(final ModelGrid modelGrid) {
     super(modelGrid);
   }
 
-  /** @param values the elevation values, indexed {@code [x][y]}; also determines the grid size */
+  /**
+   * @param values the elevation values, indexed {@code [x][y]}; also determines
+   *               the grid size
+   */
   public DefaultBathymetricGrid(final double[][] values) {
     super(values);
   }

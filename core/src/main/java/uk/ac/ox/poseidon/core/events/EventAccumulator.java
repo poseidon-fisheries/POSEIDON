@@ -26,9 +26,9 @@ import java.util.ArrayList;
 import java.util.stream.Stream;
 
 /**
- * An {@link AbstractListener} that collects every received event, in order, until
- * {@link #clear()} is called. Typically paired with an {@link EventClearer} to periodically
- * flush accumulated events.
+ * An {@link AbstractListener} that collects every received event, in order,
+ * until {@link #clear()} is called. Typically paired with an
+ * {@link EventClearer} to periodically flush accumulated events.
  *
  * @param <E> the type of event received
  */

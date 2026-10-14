@@ -37,7 +37,8 @@ import uk.ac.ox.poseidon.core.Factory;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link SimpleFuelTank}, built via
- * {@link Factories Factories.tank(...)/Factories.fullTank(...)/Factories.emptyTank(...)}.
+ * {@link Factories
+ * Factories.tank(...)/Factories.fullTank(...)/Factories.emptyTank(...)}.
  */
 @Data
 @NoArgsConstructor

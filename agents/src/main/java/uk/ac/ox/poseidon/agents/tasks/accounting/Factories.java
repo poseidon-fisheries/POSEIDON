@@ -36,7 +36,8 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link PayTripCost}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link PayTripCost}
    * @see PayTripCostFactory
    */
   public static <S extends Scope> PayTripCostFactory<S> payTripCost(

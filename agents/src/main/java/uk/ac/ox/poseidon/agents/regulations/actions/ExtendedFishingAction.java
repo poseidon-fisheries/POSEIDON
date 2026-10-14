@@ -32,8 +32,8 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.regulations.ExtendedAction;
 
 /**
- * A {@link FishingAction} spanning a fixed {@link Duration}, starting at a given time and place,
- * fishing with a given {@link Gear}.
+ * A {@link FishingAction} spanning a fixed {@link Duration}, starting at a
+ * given time and place, fishing with a given {@link Gear}.
  */
 @Getter
 public class ExtendedFishingAction
@@ -64,8 +64,8 @@ public class ExtendedFishingAction
   }
 
   /**
-   * Starts now, at the vessel's current cell, for the vessel's gear's own duration, fishing
-   * with the vessel's current gear.
+   * Starts now, at the vessel's current cell, for the vessel's gear's own
+   * duration, fishing with the vessel's current gear.
    *
    * @param vessel the vessel taking the action
    */

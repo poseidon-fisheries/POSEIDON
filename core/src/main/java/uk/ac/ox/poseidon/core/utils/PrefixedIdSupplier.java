@@ -28,8 +28,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Supplier} of unique string ids, each the given prefix followed by an incrementing
- * counter (starting at 0). Built via {@link Factories#prefixedIdSupplier(String)} in this package.
+ * A {@link Supplier} of unique string ids, each the given prefix followed by an
+ * incrementing counter (starting at 0). Built via
+ * {@link Factories#prefixedIdSupplier(String)} in this package.
  */
 @RequiredArgsConstructor
 public class PrefixedIdSupplier implements Supplier<String> {
@@ -40,7 +41,8 @@ public class PrefixedIdSupplier implements Supplier<String> {
   private final AtomicLong counter;
 
   /**
-   * @param prefix the prefix prepended to every generated id, with a fresh counter starting at 0
+   * @param prefix the prefix prepended to every generated id, with a fresh
+   *               counter starting at 0
    */
   public PrefixedIdSupplier(final String prefix) {
     this.prefix = prefix;

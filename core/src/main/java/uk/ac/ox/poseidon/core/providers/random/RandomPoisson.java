@@ -27,9 +27,9 @@ import sim.util.distribution.Poisson;
 import uk.ac.ox.poseidon.core.providers.IntProvider;
 
 /**
- * An {@link IntProvider} that returns a Poisson-distributed random integer with the given mean on
- * each call, drawn from the simulation's shared RNG. Built via
- * {@link Factories#randomPoisson(double)} in this package.
+ * An {@link IntProvider} that returns a Poisson-distributed random integer with
+ * the given mean on each call, drawn from the simulation's shared RNG. Built
+ * via {@link Factories#randomPoisson(double)} in this package.
  */
 @RequiredArgsConstructor
 public class RandomPoisson implements IntProvider {

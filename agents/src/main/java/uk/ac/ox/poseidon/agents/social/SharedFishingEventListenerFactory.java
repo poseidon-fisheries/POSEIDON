@@ -36,13 +36,13 @@ import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * Registers the vessel's {@link #listener} with the {@link FishingEventSharer}, once per vessel,
- * and gives that listener: it then hears the fishing events of the vessel's sources. Built via
- * {@link Factories#sharedFishingEventListener}.
+ * Registers the vessel's {@link #listener} with the {@link FishingEventSharer},
+ * once per vessel, and gives that listener: it then hears the fishing events of
+ * the vessel's sources. Built via {@link Factories#sharedFishingEventListener}.
  * <p>
- * A listener nothing else reads would never be built for a vessel, since factories only build
- * when asked: add this factory to the vessel's extra factories, which are built when the vessel
- * is created.
+ * A listener nothing else reads would never be built for a vessel, since
+ * factories only build when asked: add this factory to the vessel's extra
+ * factories, which are built when the vessel is created.
  *
  * @param <L> the type of listener
  */

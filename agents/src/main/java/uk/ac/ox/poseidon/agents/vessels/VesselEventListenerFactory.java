@@ -30,12 +30,13 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.events.Listener;
 
 /**
- * Registers the vessel's {@link #listener} on the vessel's event manager, once per vessel, and
- * gives that listener. Built via {@link Factories#vesselEventListener(Factory)}.
+ * Registers the vessel's {@link #listener} on the vessel's event manager, once
+ * per vessel, and gives that listener. Built via
+ * {@link Factories#vesselEventListener(Factory)}.
  * <p>
- * A listener nothing else reads would never be built for a vessel, since factories only build
- * when asked: add this factory to the vessel's extra factories, which are built when the vessel
- * is created.
+ * A listener nothing else reads would never be built for a vessel, since
+ * factories only build when asked: add this factory to the vessel's extra
+ * factories, which are built when the vessel is created.
  *
  * @param <L> the type of listener
  */

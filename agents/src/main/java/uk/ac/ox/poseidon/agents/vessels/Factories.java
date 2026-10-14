@@ -39,14 +39,18 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-/** Factories for a vessel's scope, its fleet, and the events that create/update vessels. */
+/**
+ * Factories for a vessel's scope, its fleet, and the events that create/update
+ * vessels.
+ */
 public class Factories {
 
   private Factories() {}
 
   /**
    * @param delegate the factory whose product is built once per vessel
-   * @return a {@link uk.ac.ox.poseidon.core.PerScopeFactory} for {@code T}, one per vessel
+   * @return a {@link uk.ac.ox.poseidon.core.PerScopeFactory} for {@code T}, one
+   *         per vessel
    * @see PerVesselFactory
    */
   public static <T> PerVesselFactory<T> perVessel(
@@ -89,7 +93,8 @@ public class Factories {
    * @param hold      builds the vessel's hold
    * @param gear      builds the vessel's gear
    * @param engine    builds the vessel's engine
-   * @return a {@link SimulationScopeFactory} for a {@link FleetEvent.Type#ACTIVATION} event
+   * @return a {@link SimulationScopeFactory} for a
+   *         {@link FleetEvent.Type#ACTIVATION} event
    * @see VesselActivationFactory
    */
   public static VesselActivationFactory vesselActivation(
@@ -170,8 +175,9 @@ public class Factories {
 
   /**
    * @param listener the factory giving the vessel's listener
-   * @return a {@link VesselScopeFactory} that registers the vessel's listener on the vessel's
-   * event manager and gives it; add it to the vessel's extra factories
+   * @return a {@link VesselScopeFactory} that registers the vessel's listener
+   *         on the vessel's event manager and gives it; add it to the vessel's
+   *         extra factories
    * @see VesselEventListenerFactory
    */
   public static <L extends Listener<?>> VesselEventListenerFactory<L> vesselEventListener(

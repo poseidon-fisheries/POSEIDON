@@ -31,8 +31,9 @@ import uk.ac.ox.poseidon.core.providers.DoubleProvider;
 
 /**
  * A {@link DoubleProvider} that returns a uniformly distributed random value in
- * {@code [minimum, maximum)} on each call, drawn from the simulation's shared RNG. Built via
- * {@link Factories#randomDouble(double, double)} in this package.
+ * {@code [minimum, maximum)} on each call, drawn from the simulation's shared
+ * RNG. Built via {@link Factories#randomDouble(double, double)} in this
+ * package.
  */
 public class RandomDouble implements DoubleProvider {
 
@@ -43,7 +44,8 @@ public class RandomDouble implements DoubleProvider {
   /**
    * @param rng     the shared RNG to draw from
    * @param minimum the inclusive lower bound
-   * @param maximum the exclusive upper bound, must be greater than {@code minimum}
+   * @param maximum the exclusive upper bound, must be greater than
+   *                {@code minimum}
    */
   @SuppressFBWarnings("EI_EXPOSE_REP2")
   public RandomDouble(

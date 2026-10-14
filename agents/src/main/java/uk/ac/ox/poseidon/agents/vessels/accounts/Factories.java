@@ -29,14 +29,17 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-/** Factories for a vessel's {@link Account} and for {@link sim.engine.Steppable}s that draw on it. */
+/**
+ * Factories for a vessel's {@link Account} and for
+ * {@link sim.engine.Steppable}s that draw on it.
+ */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an
-   * {@link Account}
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for
+   *         an {@link Account}
    * @see Account
    */
   public static AccountFactory account() {
@@ -45,9 +48,10 @@ public class Factories {
 
   /**
    * @param fleet         the fleet whose active vessels get charged
-   * @param costExtractor computes the amount to subtract from each vessel's account
+   * @param costExtractor computes the amount to subtract from each vessel's
+   *                      account
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link FixedCostCollector}
+   *         {@link FixedCostCollector}
    * @see FixedCostCollector
    */
   public static <S extends Scope> FixedCostCollectorFactory<S> fixedCostCollector(

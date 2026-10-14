@@ -30,8 +30,8 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link RandomDouble}, built via
- * {@link Factories#randomDouble(double, double)}.
+ * A {@link SimulationScopeFactory} counterpart of {@link RandomDouble}, built
+ * via {@link Factories#randomDouble(double, double)}.
  */
 @Data
 @NoArgsConstructor

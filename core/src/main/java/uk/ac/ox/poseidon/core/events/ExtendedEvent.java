@@ -25,7 +25,10 @@ package uk.ac.ox.poseidon.core.events;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-/** An event that spans an interval of simulation time, rather than occurring at an instant. */
+/**
+ * An event that spans an interval of simulation time, rather than occurring at
+ * an instant.
+ */
 public interface ExtendedEvent {
   /** @return the date-time the event started */
   LocalDateTime getStartDateTime();
@@ -35,7 +38,7 @@ public interface ExtendedEvent {
 
   /**
    * @return the {@link Duration} between {@link #getStartDateTime()} and
-   * {@link #getEndDateTime()}
+   *         {@link #getEndDateTime()}
    */
   default Duration getDuration() {
     return Duration.between(getStartDateTime(), getEndDateTime());

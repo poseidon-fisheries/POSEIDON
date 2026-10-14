@@ -25,7 +25,9 @@ package uk.ac.ox.poseidon.agents.fuel;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
 
-/** A grid of {@link FuelStation}s, keyed by each station's {@code getCode()}. */
+/**
+ * A grid of {@link FuelStation}s, keyed by each station's {@code getCode()}.
+ */
 public class FuelStationGrid extends ObjectGrid<FuelStation> {
 
   public FuelStationGrid(final ModelGrid modelGrid) {

@@ -27,7 +27,10 @@ import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
-/** Factories for scoring a vessel's destination choices and feeding the scores back in. */
+/**
+ * Factories for scoring a vessel's destination choices and feeding the scores
+ * back in.
+ */
 public final class Factories {
 
   private Factories() {}
@@ -35,7 +38,7 @@ public final class Factories {
   /**
    * @param currencyCode the currency code trip profit is measured in
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   * {@link ProfitPerHourDestinationEvaluator}
+   *         {@link ProfitPerHourDestinationEvaluator}
    * @see ProfitPerHourDestinationEvaluator
    */
   public static ProfitPerHourDestinationEvaluationProviderFactory profitPerHour(
@@ -45,9 +48,10 @@ public final class Factories {
   }
 
   /**
-   * @param optionValues       where each completed trip's (destination, score) observation is
-   *                           fed
-   * @param evaluationProvider starts a fresh evaluation for each trip's destination
+   * @param optionValues       where each completed trip's (destination, score)
+   *                           observation is fed
+   * @param evaluationProvider starts a fresh evaluation for each trip's
+   *                           destination
    * @return a {@link VesselScope}-relative factory for a {@link TripEvaluator}
    * @see TripEvaluator
    */

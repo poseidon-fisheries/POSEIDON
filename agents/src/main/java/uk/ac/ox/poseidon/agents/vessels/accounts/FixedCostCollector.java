@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * A {@link Steppable} that, on each step, subtracts {@code costExtractor}'s result from the
- * {@link Account} of every active vessel in {@code fleet}.
+ * A {@link Steppable} that, on each step, subtracts {@code costExtractor}'s
+ * result from the {@link Account} of every active vessel in {@code fleet}.
  */
 @RequiredArgsConstructor
 public class FixedCostCollector implements Steppable {
@@ -41,7 +41,8 @@ public class FixedCostCollector implements Steppable {
   private final Function<? super Vessel, ? extends Money> costExtractor;
 
   /**
-   * Subtracts {@code costExtractor}'s result from every active vessel's {@link Account}.
+   * Subtracts {@code costExtractor}'s result from every active vessel's
+   * {@link Account}.
    */
   @Override
   public void step(final SimState simState) {

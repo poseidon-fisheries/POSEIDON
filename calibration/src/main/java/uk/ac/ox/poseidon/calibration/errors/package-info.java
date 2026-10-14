@@ -21,9 +21,11 @@
  */
 
 /**
- * Error metrics for calibration, expressed as {@link java.util.function.ToDoubleFunction}s over a
+ * Error metrics for calibration, expressed as
+ * {@link java.util.function.ToDoubleFunction}s over a
  * {@link uk.ac.ox.poseidon.core.Simulation}. Currently just
- * {@link uk.ac.ox.poseidon.calibration.errors.SumSquaredErrors}, which compares a map of target
- * values against a map of values extracted from the simulation, keyed by an arbitrary type.
+ * {@link uk.ac.ox.poseidon.calibration.errors.SumSquaredErrors}, which compares
+ * a map of target values against a map of values extracted from the simulation,
+ * keyed by an arbitrary type.
  */
 package uk.ac.ox.poseidon.calibration.errors;

@@ -22,9 +22,10 @@
 
 /**
  * {@link uk.ac.ox.poseidon.gui.palettes.PaletteColorMap}, a MASON
- * {@link sim.util.gui.AbstractColorMap} that interpolates over a scientific colour palette
- * (imola, lajolla, oleron, turku) loaded from a {@code /palettes/*.txt} resource, clamping the
- * input value to {@code [minimum, maximum]} and mapping {@link Double#NaN} to a transparent
+ * {@link sim.util.gui.AbstractColorMap} that interpolates over a scientific
+ * colour palette (imola, lajolla, oleron, turku) loaded from a
+ * {@code /palettes/*.txt} resource, clamping the input value to
+ * {@code [minimum, maximum]} and mapping {@link Double#NaN} to a transparent
  * colour.
  */
 package uk.ac.ox.poseidon.gui.palettes;

@@ -33,7 +33,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
 
 /**
- * A {@link PortGrid} base class, shared by {@link ImmutablePortGrid} and {@link MutablePortGrid}.
+ * A {@link PortGrid} base class, shared by {@link ImmutablePortGrid} and
+ * {@link MutablePortGrid}.
  */
 @Getter
 public abstract class AbstractPortGrid

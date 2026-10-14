@@ -29,7 +29,8 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 
 /**
- * Stores per-vessel components for a simulation so other systems can query them by vessel.
+ * Stores per-vessel components for a simulation so other systems can query them
+ * by vessel.
  */
 public class VesselComponentRegister<C> implements VesselsGetter {
 

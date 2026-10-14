@@ -21,8 +21,9 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.examples.QuickRunner}, a CLI entry point for loading a YAML scenario
- * and running it for a fixed period without a GUI. See
- * {@link uk.ac.ox.poseidon.examples.petersnapper} for a concrete example scenario.
+ * {@link uk.ac.ox.poseidon.examples.QuickRunner}, a CLI entry point for loading
+ * a YAML scenario and running it for a fixed period without a GUI. See
+ * {@link uk.ac.ox.poseidon.examples.petersnapper} for a concrete example
+ * scenario.
  */
 package uk.ac.ox.poseidon.examples;

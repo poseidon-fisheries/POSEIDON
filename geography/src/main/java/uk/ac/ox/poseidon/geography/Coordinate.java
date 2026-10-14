@@ -27,10 +27,11 @@ import lombok.Data;
 import lombok.NonNull;
 
 /**
- * Represents a geographic coordinate specified by latitude and longitude. This class provides
- * methods for conversion to and from instances of {@code org.locationtech.jts.geom.Coordinate},
- * which we don't want to use directly because it is mutable and therefore unsuitable for
- * concurrency or usage as a hash key. Built via {@link Factories#coordinate(double, double)}.
+ * Represents a geographic coordinate specified by latitude and longitude. This
+ * class provides methods for conversion to and from instances of
+ * {@code org.locationtech.jts.geom.Coordinate}, which we don't want to use
+ * directly because it is mutable and therefore unsuitable for concurrency or
+ * usage as a hash key. Built via {@link Factories#coordinate(double, double)}.
  */
 @Data
 public final class Coordinate {
@@ -41,7 +42,8 @@ public final class Coordinate {
   public final double lat;
 
   /**
-   * @return a {@code Coordinate} with {@code lon} and {@code lat} taken from {@code point}'s x/y
+   * @return a {@code Coordinate} with {@code lon} and {@code lat} taken from
+   *         {@code point}'s x/y
    */
   public static Coordinate fromPoint2D(@NonNull final Point2D point) {
     return new Coordinate(point.getX(), point.getY());

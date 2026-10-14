@@ -21,9 +21,10 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid}s: elevation grids that determine
- * which cells are land and which are water, built from real elevation data or generated
- * synthetically. See {@link uk.ac.ox.poseidon.geography.bathymetry.Factories} for the entry
+ * {@link uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid}s: elevation
+ * grids that determine which cells are land and which are water, built from
+ * real elevation data or generated synthetically. See
+ * {@link uk.ac.ox.poseidon.geography.bathymetry.Factories} for the entry
  * points.
  */
 package uk.ac.ox.poseidon.geography.bathymetry;

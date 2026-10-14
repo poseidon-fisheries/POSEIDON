@@ -49,8 +49,8 @@ public class Measurements {
    * @param unitString    the unit string to parse
    * @param quantityClass the quantity type to type the parsed unit as
    * @param dimension     the dimension the parsed unit must have
-   * @return the parsed unit typed as {@code Q}, or {@code null} if its dimension doesn't match
-   * {@code dimension}
+   * @return the parsed unit typed as {@code Q}, or {@code null} if its
+   *         dimension doesn't match {@code dimension}
    */
   public static <Q extends Quantity<Q>> Unit<Q> parseUnit(
     final String unitString,
@@ -63,7 +63,8 @@ public class Measurements {
 
   /**
    * @param unitString a non-null, non-empty unit string
-   * @return the parsed unit, typed as {@link Mass}, or {@code null} if its dimension isn't mass
+   * @return the parsed unit, typed as {@link Mass}, or {@code null} if its
+   *         dimension isn't mass
    */
   public static Unit<Mass> parseMassUnit(final String unitString) {
     checkNotNull(unitString, "Trying to parse null as a unit of mass");

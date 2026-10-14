@@ -27,8 +27,8 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link InfiniteFuelTank}, built via
- * {@link Factories#infiniteTank()}.
+ * A {@link GlobalScopeFactory} counterpart of {@link InfiniteFuelTank}, built
+ * via {@link Factories#infiniteTank()}.
  */
 @EqualsAndHashCode(callSuper = true)
 public class InfiniteFuelTankFactory

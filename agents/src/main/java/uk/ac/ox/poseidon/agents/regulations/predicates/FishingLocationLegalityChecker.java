@@ -38,16 +38,16 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
- * Predicate matching cells the vessel could legally fish at: builds a hypothetical
- * {@link ExtendedFishingAction} for arriving at the candidate cell (travel time included, via
- * {@code pathFinder}/{@code distanceCalculator}) and lasting {@code fishingDuration}, and checks it
- * against {@code regulations}. Used to filter fishing-location candidates before committing to a
- * trip there.
+ * Predicate matching cells the vessel could legally fish at: builds a
+ * hypothetical {@link ExtendedFishingAction} for arriving at the candidate cell
+ * (travel time included, via {@code pathFinder}/{@code distanceCalculator}) and
+ * lasting {@code fishingDuration}, and checks it against {@code regulations}.
+ * Used to filter fishing-location candidates before committing to a trip there.
  * <p>
- * {@code fishingDuration} is the typical duration of a fishing action: fishers don't know how long
- * a given set or haul will take, so they plan with a typical one. A fishing action expected to run
- * into a closure is refused here; one that actually runs longer than planned is not this
- * checker's concern.
+ * {@code fishingDuration} is the typical duration of a fishing action: fishers
+ * don't know how long a given set or haul will take, so they plan with a
+ * typical one. A fishing action expected to run into a closure is refused here;
+ * one that actually runs longer than planned is not this checker's concern.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class FishingLocationLegalityChecker implements Predicate<Int2D> {
@@ -59,19 +59,22 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
   private final Supplier<LocalDateTime> currentDateTimeSupplier;
   private final Vessel vessel;
 
-  /** @return whether fishing at {@code fishingLocation} would currently be permitted */
+  /**
+   * @return whether fishing at {@code fishingLocation} would currently be
+   *         permitted
+   */
   @Override
   public boolean test(final Int2D fishingLocation) {
     return regulations.isPermitted(makeAction(fishingLocation));
   }
 
   /**
-   * Builds the {@link ExtendedFishingAction} the vessel would plan at {@code fishingLocation}:
-   * starting whenever it would arrive there from its current cell, and lasting
-   * {@code fishingDuration}.
+   * Builds the {@link ExtendedFishingAction} the vessel would plan at
+   * {@code fishingLocation}: starting whenever it would arrive there from its
+   * current cell, and lasting {@code fishingDuration}.
    *
-   * @throws RuntimeException if no path exists from the vessel's current cell to
-   *                          {@code fishingLocation}
+   * @throws RuntimeException if no path exists from the vessel's current cell
+   *                          to {@code fishingLocation}
    */
   private ExtendedFishingAction makeAction(final Int2D fishingLocation) {
     final List<Int2D> pathToFishingLocation = pathFinder

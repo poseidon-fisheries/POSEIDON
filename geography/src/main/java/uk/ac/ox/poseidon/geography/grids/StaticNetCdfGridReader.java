@@ -28,15 +28,18 @@ import ucar.nc2.Dimension;
 import ucar.nc2.Variable;
 
 /**
- * Reads a NetCDF file holding a single static {@code (latitude, longitude)} raster per data
- * variable — e.g. one 0/1 membership mask per named zone (MPA id, habitat type, ...).
+ * Reads a NetCDF file holding a single static {@code (latitude, longitude)}
+ * raster per data variable — e.g. one 0/1 membership mask per named zone (MPA
+ * id, habitat type, ...).
  */
 public final class StaticNetCdfGridReader extends AbstractNetCdfGridReader {
 
   /**
    * @param ncFile                 the NetCDF file to open
-   * @param latitudeDimensionName  the name of the latitude dimension/coordinate variable
-   * @param longitudeDimensionName the name of the longitude dimension/coordinate variable
+   * @param latitudeDimensionName  the name of the latitude dimension/coordinate
+   *                               variable
+   * @param longitudeDimensionName the name of the longitude
+   *                               dimension/coordinate variable
    */
   public StaticNetCdfGridReader(
     final Path ncFile,
@@ -47,8 +50,9 @@ public final class StaticNetCdfGridReader extends AbstractNetCdfGridReader {
   }
 
   /**
-   * Names of the data variables shaped exactly {@code (latitude, longitude)}, excluding the
-   * coordinate variables and any grid-mapping variable (e.g. {@code crs}).
+   * Names of the data variables shaped exactly {@code (latitude, longitude)},
+   * excluding the coordinate variables and any grid-mapping variable (e.g.
+   * {@code crs}).
    */
   public List<String> getDataVariableNames() {
     return netcdfFile
@@ -69,9 +73,9 @@ public final class StaticNetCdfGridReader extends AbstractNetCdfGridReader {
   }
 
   /**
-   * Reads the named variable's {@code (latitude, longitude)} raster, reoriented to
-   * {@code [longitudeIndex][latitudeIndex]}, with {@code _FillValue} cells converted to
-   * {@link Double#NaN}.
+   * Reads the named variable's {@code (latitude, longitude)} raster, reoriented
+   * to {@code [longitudeIndex][latitudeIndex]}, with {@code _FillValue} cells
+   * converted to {@link Double#NaN}.
    */
   public double[][] readGrid(final String variableName) {
     final Variable variable = findVariable(variableName);

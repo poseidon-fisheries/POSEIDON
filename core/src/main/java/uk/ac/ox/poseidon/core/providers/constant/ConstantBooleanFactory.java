@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.core.providers.BooleanProvider;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link ConstantBoolean}, built via
- * {@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()}.
+ * A {@link GlobalScopeFactory} counterpart of {@link ConstantBoolean}, built
+ * via {@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()}.
  */
 @Data
 @NoArgsConstructor

@@ -34,8 +34,9 @@ import uk.ac.ox.poseidon.geography.allocators.Allocator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link SimulationScopeFactory} for a single-species {@link BiomassGrid}, initialised cell by
- * cell from {@code biomassAllocator}. Built via {@link Factories#biomassGrid}.
+ * A {@link SimulationScopeFactory} for a single-species {@link BiomassGrid},
+ * initialised cell by cell from {@code biomassAllocator}. Built via
+ * {@link Factories#biomassGrid}.
  */
 @Data
 @NoArgsConstructor

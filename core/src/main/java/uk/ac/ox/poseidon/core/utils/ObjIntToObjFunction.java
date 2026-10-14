@@ -23,7 +23,8 @@
 package uk.ac.ox.poseidon.core.utils;
 
 /**
- * A function of a {@code T} and an {@code int} index that produces an {@code R}.
+ * A function of a {@code T} and an {@code int} index that produces an
+ * {@code R}.
  *
  * @param <T> the type of the object argument
  * @param <R> the type of the result

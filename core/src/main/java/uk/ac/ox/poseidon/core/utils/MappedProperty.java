@@ -29,9 +29,9 @@ import lombok.Value;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * Pairs a bean-property setter with a list of values to apply, one per index — used by
- * {@link Factories#mappedFactory(Factory, MappedProperty[])} to vary a cloned factory's property
- * across a batch of clones (e.g. for calibration).
+ * Pairs a bean-property setter with a list of values to apply, one per index —
+ * used by {@link Factories#mappedFactory(Factory, MappedProperty[])} to vary a
+ * cloned factory's property across a batch of clones (e.g. for calibration).
  *
  * @param <F> the factory type whose property is being set
  * @param <T> the type of the property values

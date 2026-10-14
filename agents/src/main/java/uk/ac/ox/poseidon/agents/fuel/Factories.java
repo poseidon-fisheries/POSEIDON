@@ -38,7 +38,8 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link uk.ac.ox.poseidon.agents.fuel.FuelStationGrid} over the resolved stations
+   *         {@link uk.ac.ox.poseidon.agents.fuel.FuelStationGrid} over the
+   *         resolved stations
    * @see FuelStationGridFactory
    */
   public static <S extends Scope> FuelStationGridFactory<S> fuelStationGrid(
@@ -50,7 +51,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for one
-   * {@link FuelStation} per port in {@code portGrid}
+   *         {@link FuelStation} per port in {@code portGrid}
    * @see OneFuelStationPerPortFactory
    */
   public static OneFuelStationPerPortFactory oneFuelStationPerPort(

@@ -21,8 +21,9 @@
  */
 
 /**
- * {@link java.util.function.Predicate}s that compare a tested {@link Comparable} value against
- * one or two thresholds. See {@link uk.ac.ox.poseidon.core.predicates.comparable.Factories} for
- * the entry points.
+ * {@link java.util.function.Predicate}s that compare a tested
+ * {@link Comparable} value against one or two thresholds. See
+ * {@link uk.ac.ox.poseidon.core.predicates.comparable.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.core.predicates.comparable;

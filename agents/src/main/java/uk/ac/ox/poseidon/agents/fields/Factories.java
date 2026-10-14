@@ -34,8 +34,8 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link VesselField}
-   * over the resolved grid
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link VesselField} over the resolved grid
    * @see VesselFieldFactory
    */
   public static VesselFieldFactory vesselField(

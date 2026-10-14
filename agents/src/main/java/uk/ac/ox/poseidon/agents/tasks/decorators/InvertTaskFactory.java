@@ -32,8 +32,9 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link DecoratorTaskFactory} for a gdx-ai {@link Invert}: runs its child and flips its
- * outcome (success becomes failure and vice versa). Built via {@link Factories#invert}.
+ * A {@link DecoratorTaskFactory} for a gdx-ai {@link Invert}: runs its child
+ * and flips its outcome (success becomes failure and vice versa). Built via
+ * {@link Factories#invert}.
  */
 @Data
 @NoArgsConstructor

@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 /**
- * A {@link RelativeScopeFactory} for an {@link ActionCoordinatePredicate}. Built via
- * {@link Factories#actionCoordinatePredicate}.
+ * A {@link RelativeScopeFactory} for an {@link ActionCoordinatePredicate}.
+ * Built via {@link Factories#actionCoordinatePredicate}.
  */
 @Data
 @NoArgsConstructor

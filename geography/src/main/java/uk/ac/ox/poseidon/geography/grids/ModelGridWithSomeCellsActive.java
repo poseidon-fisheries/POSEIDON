@@ -33,8 +33,8 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
- * An {@link AbstractModelGrid} where only a fixed subset of cells is active. Built via
- * {@link ModelGrid#withActiveCells}.
+ * An {@link AbstractModelGrid} where only a fixed subset of cells is active.
+ * Built via {@link ModelGrid#withActiveCells}.
  */
 class ModelGridWithSomeCellsActive extends AbstractModelGrid {
 

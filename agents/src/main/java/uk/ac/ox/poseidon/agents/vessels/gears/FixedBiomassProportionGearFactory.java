@@ -39,7 +39,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link FixedBiomassProportionGear}, built via
+ * A {@link RelativeScopeFactory} counterpart of
+ * {@link FixedBiomassProportionGear}, built via
  * {@link Factories#fixedBiomassProportionGear}.
  */
 @Data

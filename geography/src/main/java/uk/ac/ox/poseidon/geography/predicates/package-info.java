@@ -21,8 +21,9 @@
  */
 
 /**
- * Spatial predicates: testing grid cells or geographic coordinates against bathymetry, a
- * bounding box, or a set of geometries. See
- * {@link uk.ac.ox.poseidon.geography.predicates.Factories} for the entry points.
+ * Spatial predicates: testing grid cells or geographic coordinates against
+ * bathymetry, a bounding box, or a set of geometries. See
+ * {@link uk.ac.ox.poseidon.geography.predicates.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.geography.predicates;

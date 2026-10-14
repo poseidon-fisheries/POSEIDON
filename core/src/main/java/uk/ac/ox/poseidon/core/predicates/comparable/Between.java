@@ -28,9 +28,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} that is true iff the tested value lies between a minimum and a maximum
- * (each supplied, and each independently inclusive or exclusive). Built via
- * {@link Factories Factories.between(...)} in this package.
+ * A {@link Predicate} that is true iff the tested value lies between a minimum
+ * and a maximum (each supplied, and each independently inclusive or exclusive).
+ * Built via {@link Factories Factories.between(...)} in this package.
  *
  * @param <T> the {@link Comparable} type of the bounds
  */

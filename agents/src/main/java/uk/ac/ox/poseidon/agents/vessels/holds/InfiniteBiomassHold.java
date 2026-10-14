@@ -27,7 +27,10 @@ import static java.lang.Double.POSITIVE_INFINITY;
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 
-/** A {@link BiomassHold} with unlimited capacity; never full, never rejects content. */
+/**
+ * A {@link BiomassHold} with unlimited capacity; never full, never rejects
+ * content.
+ */
 @Getter
 public class InfiniteBiomassHold extends BiomassHold {
 

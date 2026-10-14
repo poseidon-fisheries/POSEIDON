@@ -21,8 +21,9 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.geography.allocators.Allocator}s built from biological data, e.g.
- * weighing a cell by a proportion of its carrying capacity. See
- * {@link uk.ac.ox.poseidon.biology.allocators.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.geography.allocators.Allocator}s built from
+ * biological data, e.g. weighing a cell by a proportion of its carrying
+ * capacity. See {@link uk.ac.ox.poseidon.biology.allocators.Factories} for the
+ * entry points.
  */
 package uk.ac.ox.poseidon.biology.allocators;

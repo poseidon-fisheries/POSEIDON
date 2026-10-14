@@ -35,7 +35,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link FileDataSource}, built via
+ * A {@link RelativeScopeFactory} counterpart of {@link FileDataSource}, built
+ * via
  * {@link Factories#fileDataSource(Factory)}/{@link Factories#fileDataSource(Factory, String)}.
  */
 @Data
@@ -52,7 +53,9 @@ public class FileDataSourceFactory<S extends Scope> extends RelativeScopeFactory
   private Factory<S, ? extends Path> path;
   private String encoding;
 
-  /** @param path factory for the file to read, using the default UTF-8 encoding */
+  /**
+   * @param path factory for the file to read, using the default UTF-8 encoding
+   */
   public FileDataSourceFactory(final Factory<S, ? extends Path> path) {
     this.path = path;
     this.encoding = DEFAULT_ENCODING;

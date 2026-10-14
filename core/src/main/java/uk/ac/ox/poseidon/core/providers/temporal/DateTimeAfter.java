@@ -30,9 +30,10 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
- * A {@link Provider} of a reference date-time plus an amount of time, both read anew on every
- * call. Built via {@link Factories#dateTimeAfter(uk.ac.ox.poseidon.core.Factory,
- * uk.ac.ox.poseidon.core.Factory)} in this package.
+ * A {@link Provider} of a reference date-time plus an amount of time, both read
+ * anew on every call. Built via
+ * {@link Factories#dateTimeAfter(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * in this package.
  */
 @RequiredArgsConstructor
 public class DateTimeAfter implements Provider<LocalDateTime> {

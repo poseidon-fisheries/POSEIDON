@@ -41,9 +41,10 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 /**
- * A leaf {@link AgentTask} that moves the vessel cell by cell along a path from its current cell
- * to a destination, resolved once at {@link #start()}, consuming fuel and taking the travel
- * duration for each hop; broadcasts a {@link TravelEvent} on arrival.
+ * A leaf {@link AgentTask} that moves the vessel cell by cell along a path from
+ * its current cell to a destination, resolved once at {@link #start()},
+ * consuming fuel and taking the travel duration for each hop; broadcasts a
+ * {@link TravelEvent} on arrival.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class TravelAlongPath extends AgentTask<Vessel> {
@@ -61,7 +62,10 @@ public class TravelAlongPath extends AgentTask<Vessel> {
   private double cruisingSpeedInKph;
   private double distanceToNextCell;
 
-  /** Clears the remaining path and event manager, so the next run resolves them afresh. */
+  /**
+   * Clears the remaining path and event manager, so the next run resolves them
+   * afresh.
+   */
   @Override
   public void resetTask() {
     currentPath = null;
@@ -99,9 +103,10 @@ public class TravelAlongPath extends AgentTask<Vessel> {
   }
 
   /**
-   * Moves the vessel to the next cell on the path, consuming the fuel for the hop just
-   * completed. Broadcasts a {@link TravelEvent} and succeeds once the destination is reached;
-   * otherwise computes the next hop's distance/duration and reports {@code RUNNING}.
+   * Moves the vessel to the next cell on the path, consuming the fuel for the
+   * hop just completed. Broadcasts a {@link TravelEvent} and succeeds once the
+   * destination is reached; otherwise computes the next hop's distance/duration
+   * and reports {@code RUNNING}.
    */
   @Override
   public Status execute() {

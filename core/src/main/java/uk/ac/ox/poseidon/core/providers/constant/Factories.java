@@ -28,8 +28,8 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that always return a fixed
- * value.
+ * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that always
+ * return a fixed value.
  */
 public class Factories {
 
@@ -39,7 +39,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   * {@link ConstantBoolean} that always returns {@code true}
+   *         {@link ConstantBoolean} that always returns {@code true}
    * @see ConstantBoolean
    */
   public static ConstantBooleanFactory alwaysTrue() {
@@ -48,7 +48,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   * {@link ConstantBoolean} that always returns {@code false}
+   *         {@link ConstantBoolean} that always returns {@code false}
    * @see ConstantBoolean
    */
   public static ConstantBooleanFactory alwaysFalse() {
@@ -57,8 +57,8 @@ public class Factories {
 
   /**
    * @param value the value the resulting provider will always return
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
-   * a {@link ConstantDouble} wrapping the given literal value
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link ConstantDouble} wrapping the given literal value
    * @see ConstantDouble
    */
   public static <S extends Scope> ConstantDoubleFromValueFactory<S> constantDouble(
@@ -68,9 +68,10 @@ public class Factories {
   }
 
   /**
-   * @param doubleFactory factory for the value the resulting provider will always return
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
-   * a {@link ConstantDouble} wrapping the resolved value
+   * @param doubleFactory factory for the value the resulting provider will
+   *                      always return
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link ConstantDouble} wrapping the resolved value
    * @see ConstantDouble
    */
   public static <S extends Scope> ConstantDoubleFactory<S> constantDouble(
@@ -81,8 +82,8 @@ public class Factories {
 
   /**
    * @param value the value the resulting provider will always return
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
-   * a {@link ConstantInt} wrapping the given literal value
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link ConstantInt} wrapping the given literal value
    * @see ConstantInt
    */
   public static <S extends Scope> ConstantIntFromValueFactory<S> constantInt(
@@ -92,9 +93,10 @@ public class Factories {
   }
 
   /**
-   * @param integerFactory factory for the value the resulting provider will always return
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
-   * a {@link ConstantInt} wrapping the resolved value
+   * @param integerFactory factory for the value the resulting provider will
+   *                       always return
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link ConstantInt} wrapping the resolved value
    * @see ConstantInt
    */
   public static <S extends Scope> ConstantIntFactory<S> constantInt(
@@ -105,8 +107,8 @@ public class Factories {
 
   /**
    * @param value the value the resulting provider will always return
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
-   * a {@link Constant} wrapping the given literal value
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link Constant} wrapping the given literal value
    * @see Constant
    */
   public static <S extends Scope, T> ConstantFactory<S, T> constant(
@@ -116,9 +118,10 @@ public class Factories {
   }
 
   /**
-   * @param value factory for the value the resulting provider will always return
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
-   * a {@link Constant} wrapping the resolved value
+   * @param value factory for the value the resulting provider will always
+   *              return
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link Constant} wrapping the resolved value
    * @see Constant
    */
   public static <S extends Scope, T> ConstantFactory<S, T> constant(

@@ -24,7 +24,10 @@ package uk.ac.ox.poseidon.biology;
 
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
-/** Something that fish can be caught from and released back to, at a single grid cell. */
+/**
+ * Something that fish can be caught from and released back to, at a single grid
+ * cell.
+ */
 public interface Fisheable {
   /** @return the fish currently available to be caught */
   Bucket availableFish();
@@ -33,9 +36,10 @@ public interface Fisheable {
   void release(Bucket fishToRelease);
 
   /**
-   * Mutates the fisheable by removing the content of the provided bucket and returns another
-   * bucket containing the fish that were actually removed. The returned bucket may contain less
-   * than requested if the fisheable does not have enough available.
+   * Mutates the fisheable by removing the content of the provided bucket and
+   * returns another bucket containing the fish that were actually removed. The
+   * returned bucket may contain less than requested if the fisheable does not
+   * have enough available.
    *
    * @param bucket the fish to remove from the fisheable
    * @return the fish that were removed from the fisheable

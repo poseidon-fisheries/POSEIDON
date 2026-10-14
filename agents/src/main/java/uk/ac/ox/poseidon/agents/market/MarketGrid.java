@@ -43,11 +43,13 @@ public class MarketGrid extends ObjectGrid<Market> {
   }
 
   /**
-   * Finds a market by the port it belongs to, not by its cell: ports can share a cell.
+   * Finds a market by the port it belongs to, not by its cell: ports can share
+   * a cell.
    *
    * @param port the port whose market to find
    * @return the one market of {@code port}
-   * @throws IllegalStateException if {@code port} does not have exactly one market
+   * @throws IllegalStateException if {@code port} does not have exactly one
+   *                               market
    */
   public Market getMarket(final Port port) {
     final List<Market> markets = marketsOf(port);
@@ -62,8 +64,8 @@ public class MarketGrid extends ObjectGrid<Market> {
 
   /**
    * @param port the port whose markets to find
-   * @return the markets of {@code port}, by scanning every market; a grid whose markets never
-   * change can index them instead
+   * @return the markets of {@code port}, by scanning every market; a grid whose
+   *         markets never change can index them instead
    */
   protected List<Market> marketsOf(final Port port) {
     return stream()

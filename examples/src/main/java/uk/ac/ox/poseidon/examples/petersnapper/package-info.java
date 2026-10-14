@@ -21,10 +21,11 @@
  */
 
 /**
- * A worked example scenario ({@link uk.ac.ox.poseidon.examples.petersnapper.PeterSnapperScenario})
- * built entirely from POSEIDON's own factories, plus its GUI variant
- * ({@link uk.ac.ox.poseidon.examples.petersnapper.PeterSnapperScenarioWithUI}), a gear
- * catchability calibration entry point, and the total-landings accumulator the calibration scores
- * against.
+ * A worked example scenario
+ * ({@link uk.ac.ox.poseidon.examples.petersnapper.PeterSnapperScenario}) built
+ * entirely from POSEIDON's own factories, plus its GUI variant
+ * ({@link uk.ac.ox.poseidon.examples.petersnapper.PeterSnapperScenarioWithUI}),
+ * a gear catchability calibration entry point, and the total-landings
+ * accumulator the calibration scores against.
  */
 package uk.ac.ox.poseidon.examples.petersnapper;

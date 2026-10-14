@@ -24,10 +24,16 @@ package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
-/** A {@link DispositionProcess} that moves all currently discarded-alive catch into discarded-dead. */
+/**
+ * A {@link DispositionProcess} that moves all currently discarded-alive catch
+ * into discarded-dead.
+ */
 public class FullDiscardMortality implements DispositionProcess {
 
-  /** @return {@code currentDisposition} with all of its discarded-alive catch moved to discarded-dead */
+  /**
+   * @return {@code currentDisposition} with all of its discarded-alive catch
+   *         moved to discarded-dead
+   */
   @Override
   public Disposition partition(
     final Disposition currentDisposition,

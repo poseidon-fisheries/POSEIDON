@@ -30,9 +30,15 @@ public interface FuelTank {
   /** @return the fuel currently in the tank, in litres */
   double getCurrentFuelInLitres();
 
-  /** @param litres the amount of fuel to add, in litres; must not exceed remaining capacity */
+  /**
+   * @param litres the amount of fuel to add, in litres; must not exceed
+   *               remaining capacity
+   */
   void addFuel(double litres);
 
-  /** @param litres the amount of fuel to consume, in litres; must not exceed current fuel */
+  /**
+   * @param litres the amount of fuel to consume, in litres; must not exceed
+   *               current fuel
+   */
   void consumeFuel(double litres);
 }

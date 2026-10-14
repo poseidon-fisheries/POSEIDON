@@ -21,8 +21,9 @@
  */
 
 /**
- * {@link java.util.function.Predicate}s that compare a tested date, time, or date-time against a
- * reference. See {@link uk.ac.ox.poseidon.core.predicates.temporal.Factories} for the entry
+ * {@link java.util.function.Predicate}s that compare a tested date, time, or
+ * date-time against a reference. See
+ * {@link uk.ac.ox.poseidon.core.predicates.temporal.Factories} for the entry
  * points.
  */
 package uk.ac.ox.poseidon.core.predicates.temporal;

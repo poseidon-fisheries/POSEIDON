@@ -21,13 +21,16 @@
  */
 
 /**
- * A vessel's destination choice: {@link uk.ac.ox.poseidon.agents.choices.OptionValues} holds
- * what's been learned about each candidate option (see
- * {@link uk.ac.ox.poseidon.agents.choices.evaluation} for how those observations are produced),
- * and a {@link uk.ac.ox.poseidon.agents.choices.DestinationSupplier} (or, at a lower level, a
- * {@link uk.ac.ox.poseidon.core.providers.Provider} of a cell) picks the next destination —
- * exploring randomly or in a neighbourhood, exploiting the best-known option, imitating friends'
- * best options, or an epsilon-greedy mix of exploring and exploiting. See
+ * A vessel's destination choice:
+ * {@link uk.ac.ox.poseidon.agents.choices.OptionValues} holds what's been
+ * learned about each candidate option (see
+ * {@link uk.ac.ox.poseidon.agents.choices.evaluation} for how those
+ * observations are produced), and a
+ * {@link uk.ac.ox.poseidon.agents.choices.DestinationSupplier} (or, at a lower
+ * level, a {@link uk.ac.ox.poseidon.core.providers.Provider} of a cell) picks
+ * the next destination — exploring randomly or in a neighbourhood, exploiting
+ * the best-known option, imitating friends' best options, or an epsilon-greedy
+ * mix of exploring and exploiting. See
  * {@link uk.ac.ox.poseidon.agents.choices.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.agents.choices;

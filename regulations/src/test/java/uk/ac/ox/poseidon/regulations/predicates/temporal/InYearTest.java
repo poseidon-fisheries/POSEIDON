@@ -33,8 +33,9 @@ import uk.ac.ox.poseidon.regulations.ExtendedAction;
 class InYearTest {
 
   /**
-   * Tests the {@code test} method of the {@code InYear} class, which evaluates whether the start
-   * or end year of an {@code Action} matches the specified year.
+   * Tests the {@code test} method of the {@code InYear} class, which evaluates
+   * whether the start or end year of an {@code Action} matches the specified
+   * year.
    */
 
   @Test

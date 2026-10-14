@@ -33,9 +33,10 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselTaskFactory} for a gdx-ai {@link BranchTask}: builds the branch node via
- * {@link #newTask()} and attaches one child, resolved against the current {@link VesselScope},
- * per entry in {@code children}. See {@link SequenceTaskFactory}, {@link SelectorTaskFactory} and
+ * A {@link VesselTaskFactory} for a gdx-ai {@link BranchTask}: builds the
+ * branch node via {@link #newTask()} and attaches one child, resolved against
+ * the current {@link VesselScope}, per entry in {@code children}. See
+ * {@link SequenceTaskFactory}, {@link SelectorTaskFactory} and
  * {@link ParallelTaskFactory} for the concrete branch types.
  *
  * @param <T> the concrete {@link BranchTask} type built
@@ -54,7 +55,8 @@ public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends Ve
 
   /**
    * @param guard    optional task guarding whether this branch runs at all
-   * @param children factories for the branch's child tasks, resolved and attached in order
+   * @param children factories for the branch's child tasks, resolved and
+   *                 attached in order
    */
   public BranchTaskFactory(
     final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
@@ -66,7 +68,10 @@ public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends Ve
     this.children = children;
   }
 
-  /** @return a branch node built by {@link #newTask()} with every child in {@code children} attached */
+  /**
+   * @return a branch node built by {@link #newTask()} with every child in
+   *         {@code children} attached
+   */
   @Override
   protected T newTask(final VesselScope scope) {
     final T task = newTask();

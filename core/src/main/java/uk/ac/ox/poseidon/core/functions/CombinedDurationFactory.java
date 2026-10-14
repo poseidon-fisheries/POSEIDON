@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link CombinedDuration}, built via
- * {@link Factories#combinedDuration(Factory...)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link CombinedDuration}, built
+ * via {@link Factories#combinedDuration(Factory...)}.
  */
 @Data
 @NoArgsConstructor

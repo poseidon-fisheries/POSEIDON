@@ -48,9 +48,10 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
- * A {@link ModelGrid} base class providing the actual coordinate/point/cell math and neighbour
- * computation, caching Moore neighbourhoods (plain and active-filtered) since they're recomputed
- * often. Subclasses only need to supply {@link #isActive}. Instantiated indirectly via
+ * A {@link ModelGrid} base class providing the actual coordinate/point/cell
+ * math and neighbour computation, caching Moore neighbourhoods (plain and
+ * active-filtered) since they're recomputed often. Subclasses only need to
+ * supply {@link #isActive}. Instantiated indirectly via
  * {@link ModelGrid#create}/{@link ModelGrid#withActiveCells}.
  */
 @Getter
@@ -64,7 +65,10 @@ abstract class AbstractModelGrid implements ModelGrid {
   private final double cellWidth; // the width of a cell in degrees
   private final double cellHeight; // the height of a cell in degrees
 
-  /** Every cell in the grid, active or not, in the order returned by {@link #getAllCells()}. */
+  /**
+   * Every cell in the grid, active or not, in the order returned by
+   * {@link #getAllCells()}.
+   */
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   protected final Int2D[] allCells;
@@ -95,8 +99,8 @@ abstract class AbstractModelGrid implements ModelGrid {
    * @param gridWidth  the number of cells wide
    * @param gridHeight the number of cells tall
    * @param envelope   the geographic bounding box the grid covers
-   * @param allCells   every cell in the grid, in the order {@link #getAllCells()} should return
-   *                   them
+   * @param allCells   every cell in the grid, in the order
+   *                   {@link #getAllCells()} should return them
    */
   protected AbstractModelGrid(
     final int gridWidth,
@@ -114,8 +118,10 @@ abstract class AbstractModelGrid implements ModelGrid {
   }
 
   /**
-   * @return every cell of a {@code gridWidth x gridHeight} grid, in x-then-y order
-   * @throws IllegalArgumentException if {@code gridWidth} or {@code gridHeight} isn't positive
+   * @return every cell of a {@code gridWidth x gridHeight} grid, in x-then-y
+   *         order
+   * @throws IllegalArgumentException if {@code gridWidth} or {@code gridHeight}
+   *                                  isn't positive
    */
   protected static Int2D[] makeAllCellsArray(
     final int gridWidth,
@@ -151,10 +157,10 @@ abstract class AbstractModelGrid implements ModelGrid {
   }
 
   /**
-   * Transforms a lon/lat coordinate to an x/y coordinate that can be used with a continuous field
-   * covering the same space as the nautical map. This is basically a floating point version of
-   * vectors.size().toXCoord/.toYCoord; not sure why it doesn't exist in GeomVectorField in the
-   * first place...
+   * Transforms a lon/lat coordinate to an x/y coordinate that can be used with
+   * a continuous field covering the same space as the nautical map. This is
+   * basically a floating point version of vectors.size().toXCoord/.toYCoord;
+   * not sure why it doesn't exist in GeomVectorField in the first place...
    */
   @Override
   public Double2D toPoint(final Coordinate coordinate) {
@@ -165,7 +171,10 @@ abstract class AbstractModelGrid implements ModelGrid {
     return new Double2D(x, y);
   }
 
-  /** Cached: computed once per (cell, neighbourhoodSize) pair and reused thereafter. */
+  /**
+   * Cached: computed once per (cell, neighbourhoodSize) pair and reused
+   * thereafter.
+   */
   @Override
   public List<Int2D> getNeighbours(
     final Int2D cell,
@@ -174,7 +183,10 @@ abstract class AbstractModelGrid implements ModelGrid {
     return mooreNeighbourhoods.get(entry(cell, neighbourhoodSize));
   }
 
-  /** Cached: computed once per (cell, neighbourhoodSize) pair and reused thereafter. */
+  /**
+   * Cached: computed once per (cell, neighbourhoodSize) pair and reused
+   * thereafter.
+   */
   @Override
   public List<Int2D> getActiveNeighbours(
     final Int2D cell,

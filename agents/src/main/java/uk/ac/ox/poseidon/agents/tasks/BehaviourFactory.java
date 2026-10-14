@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link ActiveBehaviour}, built via
- * {@link Factories#behaviour}.
+ * A {@link VesselScopeFactory} counterpart of {@link ActiveBehaviour}, built
+ * via {@link Factories#behaviour}.
  */
 @Data
 @NoArgsConstructor
@@ -44,7 +44,10 @@ public class BehaviourFactory extends VesselScopeFactory<Behaviour> {
 
   private Factory<? super VesselScope, ? extends Task<Vessel>> rootTask;
 
-  /** @return an {@link ActiveBehaviour} whose tree is rooted at {@link #rootTask} */
+  /**
+   * @return an {@link ActiveBehaviour} whose tree is rooted at
+   *         {@link #rootTask}
+   */
   @Override
   protected Behaviour newInstance(final VesselScope scope) {
     return new ActiveBehaviour<>(rootTask.get(scope), scope.getVessel());

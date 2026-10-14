@@ -38,11 +38,12 @@ import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 /**
- * The resolved, runnable form of a {@link Scenario}: a MASON {@link SimState} that owns the
- * {@link TemporalSchedule}, an {@link EventManager}, a unique id, and the resolved scenario
- * components, by name. Built exclusively via {@link Scenario#startNewSimulation()} (or the
- * {@link SimulationStartOptions}-taking overload) — never constructed directly, since the
- * constructor is package-private.
+ * The resolved, runnable form of a {@link Scenario}: a MASON {@link SimState}
+ * that owns the {@link TemporalSchedule}, an {@link EventManager}, a unique id,
+ * and the resolved scenario components, by name. Built exclusively via
+ * {@link Scenario#startNewSimulation()} (or the
+ * {@link SimulationStartOptions}-taking overload) — never constructed directly,
+ * since the constructor is package-private.
  */
 @Getter
 public class Simulation extends SimState {
@@ -56,9 +57,9 @@ public class Simulation extends SimState {
   private final List<Steppable> finalProcesses = new ArrayList<>();
   private boolean started = false;
   /**
-   * The resolved components, keyed by the name they were registered under in the
-   * {@link Scenario} (or among the {@code extraComponents} of the {@link SimulationStartOptions}),
-   * in registration order.
+   * The resolved components, keyed by the name they were registered under in
+   * the {@link Scenario} (or among the {@code extraComponents} of the
+   * {@link SimulationStartOptions}), in registration order.
    */
   Map<String, ?> components;
 
@@ -72,7 +73,9 @@ public class Simulation extends SimState {
     this.id = simulationId;
   }
 
-  /** @throws IllegalStateException if the simulation has already been started */
+  /**
+   * @throws IllegalStateException if the simulation has already been started
+   */
   @Override
   public void start() {
     if (started) throw new IllegalStateException("Simulation already started.");
@@ -90,7 +93,10 @@ public class Simulation extends SimState {
     finalProcesses.add(simState -> process.run());
   }
 
-  /** Runs every registered {@link #addFinalProcess} process, then delegates to {@code super}. */
+  /**
+   * Runs every registered {@link #addFinalProcess} process, then delegates to
+   * {@code super}.
+   */
   @Override
   public void finish() {
     finalProcesses.forEach(process -> process.step(this));
@@ -98,9 +104,10 @@ public class Simulation extends SimState {
   }
 
   /**
-   * Pinned {@code final} to lock in {@code Object}'s default reference-equality semantics
-   * (neither {@link SimState} nor this class declares {@code @EqualsAndHashCode}): without this
-   * override, a subclass could otherwise change what "equal simulations" means.
+   * Pinned {@code final} to lock in {@code Object}'s default reference-equality
+   * semantics (neither {@link SimState} nor this class declares
+   * {@code @EqualsAndHashCode}): without this override, a subclass could
+   * otherwise change what "equal simulations" means.
    */
   @Override
   public final int hashCode() {
@@ -108,9 +115,10 @@ public class Simulation extends SimState {
   }
 
   /**
-   * Pinned {@code final} to lock in {@code Object}'s default reference-equality semantics
-   * (neither {@link SimState} nor this class declares {@code @EqualsAndHashCode}): without this
-   * override, a subclass could otherwise change what "equal simulations" means.
+   * Pinned {@code final} to lock in {@code Object}'s default reference-equality
+   * semantics (neither {@link SimState} nor this class declares
+   * {@code @EqualsAndHashCode}): without this override, a subclass could
+   * otherwise change what "equal simulations" means.
    */
   @Override
   public final boolean equals(final Object obj) {
@@ -133,8 +141,8 @@ public class Simulation extends SimState {
   }
 
   /**
-   * @param componentClass the type of component to look up; nested collections among the
-   *                       resolved components are flattened first
+   * @param componentClass the type of component to look up; nested collections
+   *                       among the resolved components are flattened first
    * @return every resolved component assignable to {@code componentClass}
    * @throws NoSuchElementException if none are found
    */
@@ -172,14 +180,15 @@ public class Simulation extends SimState {
   }
 
   /**
-   * Logs a message prefixed with the simulation's id and current simulation timestamp. The
-   * message is only formatted if {@code level} is enabled for {@code logger}, since it's built
-   * lazily inside the log call.
+   * Logs a message prefixed with the simulation's id and current simulation
+   * timestamp. The message is only formatted if {@code level} is enabled for
+   * {@code logger}, since it's built lazily inside the log call.
    *
    * @param logger   the logger to log to
    * @param level    the level to log at
-   * @param simState the simulation to read the id and timestamp from; must be a {@link
-   *                 Simulation} whose {@code schedule} is a {@link TemporalSchedule}
+   * @param simState the simulation to read the id and timestamp from; must be a
+   *                 {@link Simulation} whose {@code schedule} is a
+   *                 {@link TemporalSchedule}
    * @param format   a {@link MessageFormat} pattern
    * @param args     arguments substituted into {@code format}
    */
@@ -207,7 +216,10 @@ public class Simulation extends SimState {
     schedule.step(this);
   }
 
-  /** @param temporalAmount the amount of simulation time to advance by, stepping synchronously */
+  /**
+   * @param temporalAmount the amount of simulation time to advance by, stepping
+   *                       synchronously
+   */
   public void stepFor(final TemporalAmount temporalAmount) {
     temporalSchedule.stepFor(this, temporalAmount);
   }

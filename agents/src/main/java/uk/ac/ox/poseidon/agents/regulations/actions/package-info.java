@@ -21,10 +21,12 @@
  */
 
 /**
- * A vessel's {@link uk.ac.ox.poseidon.agents.regulations.actions.FishingAction}s: things a
- * vessel does that the regulations engine can permit or forbid, timed and located so
- * {@link uk.ac.ox.poseidon.regulations.TemporalAction}/
- * {@link uk.ac.ox.poseidon.regulations.SpatialAction} predicates can constrain them. See
- * {@link uk.ac.ox.poseidon.agents.regulations.actions.Factories} for the entry points.
+ * A vessel's
+ * {@link uk.ac.ox.poseidon.agents.regulations.actions.FishingAction}s: things a
+ * vessel does that the regulations engine can permit or forbid, timed and
+ * located so {@link uk.ac.ox.poseidon.regulations.TemporalAction}/
+ * {@link uk.ac.ox.poseidon.regulations.SpatialAction} predicates can constrain
+ * them. See {@link uk.ac.ox.poseidon.agents.regulations.actions.Factories} for
+ * the entry points.
  */
 package uk.ac.ox.poseidon.agents.regulations.actions;

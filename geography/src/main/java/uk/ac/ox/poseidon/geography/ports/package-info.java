@@ -22,8 +22,9 @@
 
 /**
  * {@link uk.ac.ox.poseidon.geography.ports.Port}s and
- * {@link uk.ac.ox.poseidon.geography.ports.PortGrid}s: named locations placed on land cells
- * adjacent to active water, built from fixed coordinates, a table, or randomly-chosen suitable
- * locations. See {@link uk.ac.ox.poseidon.geography.ports.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.geography.ports.PortGrid}s: named locations placed
+ * on land cells adjacent to active water, built from fixed coordinates, a
+ * table, or randomly-chosen suitable locations. See
+ * {@link uk.ac.ox.poseidon.geography.ports.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.geography.ports;

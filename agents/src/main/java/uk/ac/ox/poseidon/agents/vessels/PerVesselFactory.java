@@ -30,13 +30,15 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.PerScopeFactory;
 
 /**
- * A {@link PerScopeFactory} that builds its delegate's product once per vessel, whatever scope the
- * delegate has: wrapping a global or simulation-scoped factory gives each vessel its own instance
- * (see {@link PerScopeFactory} for what is and is not new). Factories built on top of it that take
- * the scope of their inputs (a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory}) become
- * vessel-scoped too, e.g. {@code firstIntFrom(perVessel(randomInt(1, 10)))} draws a separate number
- * for each vessel. No separate plain component class here: the produced value is whatever the
- * delegate produces, passed through unchanged. Built via {@link Factories#perVessel}.
+ * A {@link PerScopeFactory} that builds its delegate's product once per vessel,
+ * whatever scope the delegate has: wrapping a global or simulation-scoped
+ * factory gives each vessel its own instance (see {@link PerScopeFactory} for
+ * what is and is not new). Factories built on top of it that take the scope of
+ * their inputs (a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory}) become
+ * vessel-scoped too, e.g. {@code firstIntFrom(perVessel(randomInt(1, 10)))}
+ * draws a separate number for each vessel. No separate plain component class
+ * here: the produced value is whatever the delegate produces, passed through
+ * unchanged. Built via {@link Factories#perVessel}.
  */
 @Data
 @NoArgsConstructor

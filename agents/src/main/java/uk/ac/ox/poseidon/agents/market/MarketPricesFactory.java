@@ -34,8 +34,9 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} for the {@link MarketPrice}s of one market: one per entry in
- * {@link #priceEntries}, all at {@link #market}. Built via {@link Factories#marketPrices}.
+ * A {@link RelativeScopeFactory} for the {@link MarketPrice}s of one market:
+ * one per entry in {@link #priceEntries}, all at {@link #market}. Built via
+ * {@link Factories#marketPrices}.
  */
 @Data
 @NoArgsConstructor

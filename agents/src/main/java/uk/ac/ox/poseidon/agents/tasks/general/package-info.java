@@ -21,10 +21,14 @@
  */
 
 /**
- * General-purpose behavior-tree leaves not tied to a specific domain task: predicate checks
- * ({@link uk.ac.ox.poseidon.agents.tasks.general.AgentPredicateTask}), fixed-duration waits
- * ({@link uk.ac.ox.poseidon.agents.tasks.general.WaitFor}), and a try-then-wait retry combinator
+ * General-purpose behavior-tree leaves not tied to a specific domain task:
+ * predicate checks
+ * ({@link uk.ac.ox.poseidon.agents.tasks.general.AgentPredicateTask}),
+ * fixed-duration waits
+ * ({@link uk.ac.ox.poseidon.agents.tasks.general.WaitFor}), and a try-then-wait
+ * retry combinator
  * ({@link uk.ac.ox.poseidon.agents.tasks.general.SucceedOrWaitFactory}). See
- * {@link uk.ac.ox.poseidon.agents.tasks.general.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.agents.tasks.general.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.agents.tasks.general;

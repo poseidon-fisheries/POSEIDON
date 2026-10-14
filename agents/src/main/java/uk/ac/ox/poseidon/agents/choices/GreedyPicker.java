@@ -37,18 +37,20 @@ import java.util.function.Predicate;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
- * Picks the option with the highest value that passes a predicate, breaking ties at random, or
- * gives {@code null} when no option passes (so that an
+ * Picks the option with the highest value that passes a predicate, breaking
+ * ties at random, or gives {@code null} when no option passes (so that an
  * {@link EpsilonGreedyChooser} falls back to exploring).
  * <p>
- * Options are tested from the highest value down, one value at a time, and testing stops at the
- * first value with an option that passes: the predicate can be costly (such as a check that
- * computes a path), and is not called for options that could not be picked anyway. Options tied
- * at a value are tested in a random order, stopping at the first that passes, which breaks the
- * tie at random among the passing options without testing all of them.
+ * Options are tested from the highest value down, one value at a time, and
+ * testing stops at the first value with an option that passes: the predicate
+ * can be costly (such as a check that computes a path), and is not called for
+ * options that could not be picked anyway. Options tied at a value are tested
+ * in a random order, stopping at the first that passes, which breaks the tie at
+ * random among the passing options without testing all of them.
  * <p>
- * Infinite values are ordinary values, but a {@code NaN} value is an error: it has no place in
- * the order of values, so it would hide a broken valuation behind an arbitrary pick.
+ * Infinite values are ordinary values, but a {@code NaN} value is an error: it
+ * has no place in the order of values, so it would hide a broken valuation
+ * behind an arbitrary pick.
  *
  * @param <O> the type of option
  */
@@ -74,7 +76,8 @@ public class GreedyPicker<O> implements Provider<O> {
   }
 
   /**
-   * @return the picked option, or {@code null} if no option passes the predicate
+   * @return the picked option, or {@code null} if no option passes the
+   *         predicate
    * @throws IllegalStateException if the value of any option is {@code NaN}
    */
   @Override

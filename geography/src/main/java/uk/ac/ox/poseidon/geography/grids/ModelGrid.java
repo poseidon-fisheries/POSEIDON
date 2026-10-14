@@ -38,19 +38,21 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
- * The rectangular cell grid underlying every other spatial component in this module: maps between
- * geographic {@link Coordinate}s, continuous grid points ({@link Double2D}), and discrete cells
- * ({@link Int2D}), and tracks which cells are "active" (participate in the simulation) versus
- * merely present. Built via {@link #create}/{@link #withActiveCells}, or
- * {@link uk.ac.ox.poseidon.geography.grids.Factories} for the {@code Factory}-facing entry
- * points.
+ * The rectangular cell grid underlying every other spatial component in this
+ * module: maps between geographic {@link Coordinate}s, continuous grid points
+ * ({@link Double2D}), and discrete cells ({@link Int2D}), and tracks which
+ * cells are "active" (participate in the simulation) versus merely present.
+ * Built via {@link #create}/{@link #withActiveCells}, or
+ * {@link uk.ac.ox.poseidon.geography.grids.Factories} for the
+ * {@code Factory}-facing entry points.
  */
 public interface ModelGrid {
   /**
    * @param gridWidth  the number of cells wide
    * @param gridHeight the number of cells tall
    * @param envelope   the geographic bounding box the grid covers
-   * @return a new grid, of size {@code gridWidth x gridHeight}, with every cell active
+   * @return a new grid, of size {@code gridWidth x gridHeight}, with every cell
+   *         active
    */
   static ModelGrid create(
     final int gridWidth,
@@ -62,8 +64,9 @@ public interface ModelGrid {
 
   /**
    * @param activeCells the cells that should be active in the returned grid
-   * @return a grid with the same dimensions and envelope as this one, but with only
-   * {@code activeCells} active (or, if that's every cell, an all-active grid)
+   * @return a grid with the same dimensions and envelope as this one, but with
+   *         only {@code activeCells} active (or, if that's every cell, an
+   *         all-active grid)
    */
   default ModelGrid withActiveCells(final Collection<Int2D> activeCells) {
     final Set<Int2D> activeCellSet = Set.copyOf(activeCells);
@@ -81,10 +84,11 @@ public interface ModelGrid {
   Stream<Int2D> getAllCells();
 
   /**
-   * Dispatches the correct method to convert a Number2D to a coordinate. Note that, in the case
-   * of Int2D, e.g. (3, 2), we assume that we are referring to the cell itself and return the
-   * coordinate at the centre of the cell (3.5, 2.5) instead of at its corner (3.0, 2.0). There is
-   * potential for confusion, so be careful.
+   * Dispatches the correct method to convert a Number2D to a coordinate. Note
+   * that, in the case of Int2D, e.g. (3, 2), we assume that we are referring to
+   * the cell itself and return the coordinate at the centre of the cell (3.5,
+   * 2.5) instead of at its corner (3.0, 2.0). There is potential for confusion,
+   * so be careful.
    */
   default Coordinate toCoordinate(final Number2D number2D) {
     return switch (number2D) {
@@ -123,27 +127,33 @@ public interface ModelGrid {
   }
 
   /**
-   * @return the discrete cell containing {@code point}; a point west or north of the grid gives a
-   * negative column or row, so {@link #isInGrid(Int2D)} rejects it
+   * @return the discrete cell containing {@code point}; a point west or north
+   *         of the grid gives a negative column or row, so
+   *         {@link #isInGrid(Int2D)} rejects it
    */
   default Int2D toCell(final Double2D point) {
     return new Int2D((int) Math.floor(point.x), (int) Math.floor(point.y));
   }
 
-  /** @return {@code cell}'s Moore neighbours, within a neighbourhood size of 1 */
+  /**
+   * @return {@code cell}'s Moore neighbours, within a neighbourhood size of 1
+   */
   default List<Int2D> getNeighbours(final Int2D cell) {
     return getNeighbours(cell, 1);
   }
 
-  /** @return {@code cell}'s Moore neighbours, within the given neighbourhood size */
+  /**
+   * @return {@code cell}'s Moore neighbours, within the given neighbourhood
+   *         size
+   */
   List<Int2D> getNeighbours(
     Int2D cell,
     @SuppressWarnings("SameParameterValue") int neighbourhoodSize
   );
 
   /**
-   * @return {@code cell}'s Moore neighbours that are also active, within the given
-   * neighbourhood size
+   * @return {@code cell}'s Moore neighbours that are also active, within the
+   *         given neighbourhood size
    */
   List<Int2D> getActiveNeighbours(
     Int2D cell,
@@ -159,21 +169,23 @@ public interface ModelGrid {
 
   /**
    * @return a fresh {@code [gridWidth][gridHeight]} array, e.g. for building a
-   * {@link DoubleGrid}
+   *         {@link DoubleGrid}
    */
   default double[][] makeDoubleArray() {
     return new double[getGridWidth()][getGridHeight()];
   }
 
   /**
-   * @return {@code cell}'s Moore neighbours that are also active, within a neighbourhood size
-   * of 1
+   * @return {@code cell}'s Moore neighbours that are also active, within a
+   *         neighbourhood size of 1
    */
   default List<Int2D> getActiveNeighbours(final Int2D cell) {
     return getActiveNeighbours(cell, 1);
   }
 
-  /** @throws IllegalArgumentException if {@code coordinate} is outside the grid */
+  /**
+   * @throws IllegalArgumentException if {@code coordinate} is outside the grid
+   */
   default void checkIsInGrid(final Coordinate coordinate) {
     checkArgument(
       isInGrid(coordinate),
@@ -204,7 +216,10 @@ public interface ModelGrid {
     return isInGrid(toCell(point));
   }
 
-  /** @return whether {@code cell} is within the grid's bounds (does not check activeness) */
+  /**
+   * @return whether {@code cell} is within the grid's bounds (does not check
+   *         activeness)
+   */
   default boolean isInGrid(final Int2D cell) {
     return (
       cell.x >= 0 &&
@@ -245,6 +260,9 @@ public interface ModelGrid {
   /** @return every active cell in the grid */
   ImmutableSet<Int2D> getActiveCells();
 
-  /** @return a MASON grid holding each cell's {@link Coordinate}, for direct MASON interop */
+  /**
+   * @return a MASON grid holding each cell's {@link Coordinate}, for direct
+   *         MASON interop
+   */
   ObjectGrid2D getCoordinatesGrid();
 }

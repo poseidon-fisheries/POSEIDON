@@ -45,7 +45,8 @@ public class NormalisedDoubleGridFromAllocatorFactory<S extends Scope> extends A
   /**
    * @param modelGrid  factory for the grid to build over
    * @param allocator  factory for the allocator assigning each cell's raw value
-   * @param totalValue factory for the value the grid's values should sum to once normalised
+   * @param totalValue factory for the value the grid's values should sum to
+   *                   once normalised
    */
   public NormalisedDoubleGridFromAllocatorFactory(
     final Factory<? super S, ? extends ModelGrid> modelGrid,

@@ -29,15 +29,17 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.time.MonthDayFactory;
 
 /**
- * Factories for predicates over a {@link uk.ac.ox.poseidon.regulations.TemporalAction}'s
- * date/time span: a fixed date range, a range repeating every calendar year, and a single year.
+ * Factories for predicates over a
+ * {@link uk.ac.ox.poseidon.regulations.TemporalAction}'s date/time span: a
+ * fixed date range, a range repeating every calendar year, and a single year.
  */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link BetweenDates}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link BetweenDates}
    * @see BetweenDatesFactory
    */
   public static <S extends Scope> BetweenDatesFactory<S> betweenDates(
@@ -49,7 +51,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link BetweenYearlyDates}
+   *         {@link BetweenYearlyDates}
    * @see BetweenYearlyDatesFactory
    */
   public static <S extends Scope> BetweenYearlyDatesFactory<S> betweenYearlyDates(
@@ -60,10 +62,12 @@ public class Factories {
   }
 
   /**
-   * @param start the inclusive start of the range, parsed via {@link MonthDayFactory#parse}
-   * @param end   the inclusive end of the range, parsed via {@link MonthDayFactory#parse}
+   * @param start the inclusive start of the range, parsed via
+   *              {@link MonthDayFactory#parse}
+   * @param end   the inclusive end of the range, parsed via
+   *              {@link MonthDayFactory#parse}
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link BetweenYearlyDates}, resolvable against any {@link Scope}
+   *         {@link BetweenYearlyDates}, resolvable against any {@link Scope}
    * @see BetweenYearlyDatesFactory
    */
   public static BetweenYearlyDatesFactory<Scope> betweenYearlyDates(
@@ -77,7 +81,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an {@link InYear}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
+   *         {@link InYear}
    * @see InYearFactory
    */
   public static InYearFactory inYear(final int year) {

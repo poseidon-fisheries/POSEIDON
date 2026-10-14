@@ -28,8 +28,8 @@ import java.util.stream.Stream;
 import lombok.NonNull;
 
 /**
- * A {@link Predicate} that is true iff at least one of its component predicates is true for the
- * given input (false for zero predicates). Built via
+ * A {@link Predicate} that is true iff at least one of its component predicates
+ * is true for the given input (false for zero predicates). Built via
  * {@link Factories#anyOf(uk.ac.ox.poseidon.core.Factory...)} in this package.
  *
  * @param <T> the type of input tested
@@ -40,7 +40,9 @@ public class AnyOf<T> implements Predicate<T> {
   @NonNull
   private final Predicate<? super T>[] predicates;
 
-  /** @param predicates the component predicates, at least one of which must pass */
+  /**
+   * @param predicates the component predicates, at least one of which must pass
+   */
   @SuppressWarnings("unchecked")
   public AnyOf(final Collection<? extends Predicate<? super T>> predicates) {
     this.predicates = predicates.toArray(Predicate[]::new);

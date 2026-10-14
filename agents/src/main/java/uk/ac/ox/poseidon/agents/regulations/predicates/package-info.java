@@ -21,10 +21,11 @@
  */
 
 /**
- * Predicates bridging {@link uk.ac.ox.poseidon.agents.regulations.actions} to the
- * {@link uk.ac.ox.poseidon.regulations} model:
- * {@link uk.ac.ox.poseidon.agents.regulations.predicates.FishingLocationLegalityChecker} checks
- * whether a candidate cell would be legal to fish at. See
- * {@link uk.ac.ox.poseidon.agents.regulations.predicates.Factories} for the entry points.
+ * Predicates bridging {@link uk.ac.ox.poseidon.agents.regulations.actions} to
+ * the {@link uk.ac.ox.poseidon.regulations} model:
+ * {@link uk.ac.ox.poseidon.agents.regulations.predicates.FishingLocationLegalityChecker}
+ * checks whether a candidate cell would be legal to fish at. See
+ * {@link uk.ac.ox.poseidon.agents.regulations.predicates.Factories} for the
+ * entry points.
  */
 package uk.ac.ox.poseidon.agents.regulations.predicates;

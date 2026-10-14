@@ -28,10 +28,11 @@ import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Selects, from a {@link KeyedMemory}, the {@link Memory} for the key extracted from its input,
- * such as the code of the gear used in a {@code FishingEvent} when remembering it, or of the gear
- * a vessel currently uses when reading. Several selectors can share one keyed memory, each
- * extracting the key from a different kind of input.
+ * Selects, from a {@link KeyedMemory}, the {@link Memory} for the key extracted
+ * from its input, such as the code of the gear used in a {@code FishingEvent}
+ * when remembering it, or of the gear a vessel currently uses when reading.
+ * Several selectors can share one keyed memory, each extracting the key from a
+ * different kind of input.
  *
  * @param <T> the type of input the key is extracted from
  * @param <K> the type of key

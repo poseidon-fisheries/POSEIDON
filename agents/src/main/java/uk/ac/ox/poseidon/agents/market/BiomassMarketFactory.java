@@ -34,8 +34,9 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link BiomassMarket}, built via
- * {@link Factories#biomassMarket}. If {@link #marketCode} isn't set, the port's own code is used.
+ * A {@link SimulationScopeFactory} counterpart of {@link BiomassMarket}, built
+ * via {@link Factories#biomassMarket}. If {@link #marketCode} isn't set, the
+ * port's own code is used.
  */
 @Data
 @NoArgsConstructor

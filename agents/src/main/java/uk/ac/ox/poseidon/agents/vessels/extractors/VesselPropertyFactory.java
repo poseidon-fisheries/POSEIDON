@@ -29,8 +29,8 @@ import uk.ac.ox.poseidon.core.functions.ObjectProperty;
 import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
 
 /**
- * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a {@link Vessel}, built via
- * {@link Factories#vesselProperty}.
+ * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a
+ * {@link Vessel}, built via {@link Factories#vesselProperty}.
  *
  * @param <R> the type of the property; not checked
  */
@@ -38,7 +38,9 @@ import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
 @EqualsAndHashCode(callSuper = true)
 public class VesselPropertyFactory<R> extends ObjectPropertyFactory<Vessel, R> {
 
-  /** @param propertyPath the dotted path of properties to follow from the vessel */
+  /**
+   * @param propertyPath the dotted path of properties to follow from the vessel
+   */
   public VesselPropertyFactory(final String propertyPath) {
     super(propertyPath);
   }

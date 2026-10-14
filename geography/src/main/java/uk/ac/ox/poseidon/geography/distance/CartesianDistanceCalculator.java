@@ -26,12 +26,13 @@ import sim.util.Number2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link GridBasedDistanceCalculator} that measures straight-line (Pythagorean) distance in
- * grid-cell units, scaled by a fixed cell size, rather than computing geographic distance from
- * lon/lat coordinates. Cheaper than {@link CoordinateBasedDistanceCalculator}'s implementations,
- * at the cost of assuming a uniform cell size across the grid. Built via
- * {@link Factories#cartesianDistanceCalculator(uk.ac.ox.poseidon.core.Factory, double)} in this
- * package.
+ * A {@link GridBasedDistanceCalculator} that measures straight-line
+ * (Pythagorean) distance in grid-cell units, scaled by a fixed cell size,
+ * rather than computing geographic distance from lon/lat coordinates. Cheaper
+ * than {@link CoordinateBasedDistanceCalculator}'s implementations, at the cost
+ * of assuming a uniform cell size across the grid. Built via
+ * {@link Factories#cartesianDistanceCalculator(uk.ac.ox.poseidon.core.Factory, double)}
+ * in this package.
  */
 public class CartesianDistanceCalculator extends GridBasedDistanceCalculator {
 

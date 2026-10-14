@@ -39,10 +39,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * General-purpose factories that don't belong to a more specific domain package: literal and
- * collection pass-throughs (e.g. {@link ObjectFactory}), simple combinations of other resolved
- * components (e.g. {@link PairFactory}), scope-changing wrappers, small standalone utilities like
- * a unique-id supplier, and calibration support for cloning a factory with varied property values.
+ * General-purpose factories that don't belong to a more specific domain
+ * package: literal and collection pass-throughs (e.g. {@link ObjectFactory}),
+ * simple combinations of other resolved components (e.g. {@link PairFactory}),
+ * scope-changing wrappers, small standalone utilities like a unique-id
+ * supplier, and calibration support for cloning a factory with varied property
+ * values.
  */
 public class Factories {
 
@@ -50,8 +52,8 @@ public class Factories {
 
   /**
    * @param value the value to always resolve to
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always resolves to
-   * {@code value}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always
+   *         resolves to {@code value}
    * @see ObjectFactory
    */
   public static <T> ObjectFactory<T> object(final T value) {
@@ -60,8 +62,8 @@ public class Factories {
 
   /**
    * @param values the component factories to resolve, in order
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link List} of the
-   * resolved values
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link List} of the resolved values
    * @see ListFactory
    */
   @SafeVarargs
@@ -73,8 +75,8 @@ public class Factories {
 
   /**
    * @param values the literal values to wrap
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always resolves to a
-   * {@link List} of {@code values}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always
+   *         resolves to a {@link List} of {@code values}
    * @see ObjectFactory
    */
   @SafeVarargs
@@ -84,8 +86,8 @@ public class Factories {
 
   /**
    * @param values the literal values to wrap
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always resolves to a
-   * {@link List} of {@code values}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always
+   *         resolves to a {@link List} of {@code values}
    * @see ObjectFactory
    */
   public static <T> ObjectFactory<List<T>> listOf(final Stream<T> values) {
@@ -94,8 +96,8 @@ public class Factories {
 
   /**
    * @param values the literal values to wrap, deduplicated and order-preserved
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always resolves to a
-   * {@link Set} of {@code values}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always
+   *         resolves to a {@link Set} of {@code values}
    * @see ObjectFactory
    */
   @SafeVarargs
@@ -107,8 +109,8 @@ public class Factories {
 
   /**
    * @param values the literal values to wrap, deduplicated and order-preserved
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always resolves to a
-   * {@link Set} of {@code values}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always
+   *         resolves to a {@link Set} of {@code values}
    * @see ObjectFactory
    */
   public static <T> ObjectFactory<Set<T>> setOf(final Stream<T> values) {
@@ -122,8 +124,8 @@ public class Factories {
   /**
    * @param first  factory for the first value
    * @param second factory for the second value
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link Pair} of the
-   * resolved values
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link Pair} of the resolved values
    * @see Pair
    */
   public static <S extends Scope, A, B> PairFactory<S, A, B> pair(
@@ -136,7 +138,7 @@ public class Factories {
   /**
    * @param prefix the prefix prepended to every generated id
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
-   * {@link PrefixedIdSupplier} with that prefix
+   *         {@link PrefixedIdSupplier} with that prefix
    * @see PrefixedIdSupplier
    */
   public static PrefixedIdSupplierFactory prefixedIdSupplier(
@@ -158,8 +160,9 @@ public class Factories {
 
   /**
    * @param process factory for the steppable to register as a final process
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for the resolved steppable,
-   * registered to run at simulation {@code finish()}
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for the
+   *         resolved steppable, registered to run at simulation
+   *         {@code finish()}
    * @see FinalProcessFactory
    */
   public static <C extends Steppable> FinalProcessFactory<C> finalProcess(
@@ -170,7 +173,8 @@ public class Factories {
 
   /**
    * @param consumer the bean-property setter to apply
-   * @param values   the values to apply, one per clone in {@link #mappedFactory}
+   * @param values   the values to apply, one per clone in
+   *                 {@link #mappedFactory}
    * @return a {@link MappedProperty} pairing the setter with its values
    * @see MappedProperty
    */
@@ -182,16 +186,17 @@ public class Factories {
   }
 
   /**
-   * Clones {@code factory} once per value in {@code mappedProperties} (all of which must have
-   * the same number of values), applying each mapped property's setter to its corresponding
-   * clone, and collects the clones into a {@link ListFactory}. Used for calibration, to vary a
-   * factory's property across a batch of otherwise-identical clones.
+   * Clones {@code factory} once per value in {@code mappedProperties} (all of
+   * which must have the same number of values), applying each mapped property's
+   * setter to its corresponding clone, and collects the clones into a
+   * {@link ListFactory}. Used for calibration, to vary a factory's property
+   * across a batch of otherwise-identical clones.
    *
    * @param factory          the factory to clone
-   * @param mappedProperties the properties to vary across clones; all must have equal-length
-   *                         value lists
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link List} of the
-   * resolved clones
+   * @param mappedProperties the properties to vary across clones; all must have
+   *                         equal-length value lists
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link List} of the resolved clones
    * @see ListFactory
    */
   @SafeVarargs

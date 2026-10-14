@@ -34,8 +34,9 @@ import tech.units.indriya.quantity.Quantities;
 import uk.ac.ox.poseidon.biology.Content;
 
 /**
- * A single quantity of fish mass, immutable and always non-negative. The canonical, concrete
- * {@link Content} implementation — every other {@code Content} method reduces to one of these.
+ * A single quantity of fish mass, immutable and always non-negative. The
+ * canonical, concrete {@link Content} implementation — every other
+ * {@code Content} method reduces to one of these.
  */
 @EqualsAndHashCode
 public class Biomass implements Content {
@@ -53,7 +54,8 @@ public class Biomass implements Content {
   }
 
   /**
-   * @param value the mass, in {@code unit}; must convert to a non-negative number of kilograms
+   * @param value the mass, in {@code unit}; must convert to a non-negative
+   *              number of kilograms
    * @param unit  the unit {@code value} is expressed in
    */
   public Biomass(final Number value, final Unit<Mass> unit) {
@@ -83,8 +85,8 @@ public class Biomass implements Content {
   }
 
   /**
-   * @param content the amount to subtract; must not exceed this biomass, or the resulting
-   *                 negative mass is rejected by the constructor
+   * @param content the amount to subtract; must not exceed this biomass, or the
+   *                resulting negative mass is rejected by the constructor
    * @return this minus {@code content}
    */
   public Biomass subtract(final Biomass content) {
@@ -101,8 +103,8 @@ public class Biomass implements Content {
   }
 
   /**
-   * @param value the strictly positive divisor; {@code 0} is rejected rather than silently
-   *              producing an infinite biomass
+   * @param value the strictly positive divisor; {@code 0} is rejected rather
+   *              than silently producing an infinite biomass
    */
   @Override
   public Biomass divide(final double value) {

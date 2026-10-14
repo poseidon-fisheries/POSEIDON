@@ -28,10 +28,11 @@ import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 
 /**
- * An {@link IntSupplier} that can also be used anywhere a {@link ToIntFunction} or {@link Function}
- * of {@link Integer} is required, in which case it ignores the argument passed to
- * {@link #applyAsInt}/{@link #apply} and just returns the int it would have supplied anyway. Lets
- * the same object be wired into any of those call sites without an adapter.
+ * An {@link IntSupplier} that can also be used anywhere a {@link ToIntFunction}
+ * or {@link Function} of {@link Integer} is required, in which case it ignores
+ * the argument passed to {@link #applyAsInt}/{@link #apply} and just returns
+ * the int it would have supplied anyway. Lets the same object be wired into any
+ * of those call sites without an adapter.
  */
 public interface IntProvider
   extends

@@ -22,9 +22,10 @@
 
 /**
  * {@link java.util.function.Function}s that pull a value off a
- * {@link uk.ac.ox.poseidon.agents.vessels.Vessel}, such as its remaining hold capacity or the code
- * of its current gear. See tag-specific extractors in
+ * {@link uk.ac.ox.poseidon.agents.vessels.Vessel}, such as its remaining hold
+ * capacity or the code of its current gear. See tag-specific extractors in
  * {@link uk.ac.ox.poseidon.agents.vessels.extractors.tags}. See
- * {@link uk.ac.ox.poseidon.agents.vessels.extractors.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.agents.vessels.extractors.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.agents.vessels.extractors;

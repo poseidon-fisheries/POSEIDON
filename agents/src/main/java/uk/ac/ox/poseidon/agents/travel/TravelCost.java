@@ -32,10 +32,11 @@ import org.joda.money.Money;
 import sim.util.Int2D;
 
 /**
- * Values the cost of travelling to fish at a cell: computes the {@link Route} via the cell once,
- * then sums what each route cost charges for it. The recollection the cell is valued for is
- * ignored, so that this can be combined with other valuations of the same shape. Route costs in
- * different currencies cannot be summed.
+ * Values the cost of travelling to fish at a cell: computes the {@link Route}
+ * via the cell once, then sums what each route cost charges for it. The
+ * recollection the cell is valued for is ignored, so that this can be combined
+ * with other valuations of the same shape. Route costs in different currencies
+ * cannot be summed.
  */
 public class TravelCost implements ToDoubleBiFunction<Int2D, Object> {
 
@@ -57,10 +58,10 @@ public class TravelCost implements ToDoubleBiFunction<Int2D, Object> {
   /**
    * @param cell         the cell to fish at
    * @param recollection ignored
-   * @return the sum of the route costs of the route via {@code cell}, as an amount in their
-   * currency; zero without route costs
-   * @throws org.joda.money.CurrencyMismatchException if the route costs are in different
-   *                                                  currencies
+   * @return the sum of the route costs of the route via {@code cell}, as an
+   *         amount in their currency; zero without route costs
+   * @throws org.joda.money.CurrencyMismatchException if the route costs are in
+   *                                                  different currencies
    */
   @Override
   public double applyAsDouble(final Int2D cell, final Object recollection) {

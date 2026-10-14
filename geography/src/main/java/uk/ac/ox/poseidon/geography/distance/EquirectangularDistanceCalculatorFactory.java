@@ -32,8 +32,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link EquirectangularDistanceCalculator}, built
- * via {@link Factories#equirectangularDistanceCalculator(Factory)}.
+ * A {@link RelativeScopeFactory} counterpart of
+ * {@link EquirectangularDistanceCalculator}, built via
+ * {@link Factories#equirectangularDistanceCalculator(Factory)}.
  */
 @Data
 @NoArgsConstructor

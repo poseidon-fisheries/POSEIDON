@@ -36,10 +36,10 @@ class ForbiddenIfTest {
   /**
    * Class under test: ForbiddenIf
    * <p>
-   * The ForbiddenIf class is used to determine whether an Action is permitted or forbidden. It
-   * uses a Predicate<Action> to evaluate the conditions that make an action forbidden. The
-   * isPermitted(Action action) method returns true if the action is permitted (i.e., not
-   * forbidden) and false otherwise.
+   * The ForbiddenIf class is used to determine whether an Action is permitted
+   * or forbidden. It uses a Predicate<Action> to evaluate the conditions that
+   * make an action forbidden. The isPermitted(Action action) method returns
+   * true if the action is permitted (i.e., not forbidden) and false otherwise.
    */
 
   @SuppressWarnings("unchecked")

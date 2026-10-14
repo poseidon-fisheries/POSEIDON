@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link DirectoryRemover}, built via
- * {@link Factories#directoryRemover(Factory, boolean)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link DirectoryRemover}, built
+ * via {@link Factories#directoryRemover(Factory, boolean)}.
  */
 @Data
 @NoArgsConstructor

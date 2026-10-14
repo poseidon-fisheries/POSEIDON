@@ -21,7 +21,9 @@
  */
 
 /**
- * Factories for fixed {@code java.time} values (dates, times, durations, periods) and for a
- * {@link java.time.LocalDateTime} computed relative to the simulation's start. See {@link uk.ac.ox.poseidon.core.time.Factories} for the entry points.
+ * Factories for fixed {@code java.time} values (dates, times, durations,
+ * periods) and for a {@link java.time.LocalDateTime} computed relative to the
+ * simulation's start. See {@link uk.ac.ox.poseidon.core.time.Factories} for the
+ * entry points.
  */
 package uk.ac.ox.poseidon.core.time;

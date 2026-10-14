@@ -74,8 +74,9 @@ class AnyOfTest {
   }
 
   /**
-   * Tests the {@link AnyOf} class, which holds a collection of predicates and evaluates if any of
-   * them return true when applied to a given {@link Object}.
+   * Tests the {@link AnyOf} class, which holds a collection of predicates and
+   * evaluates if any of them return true when applied to a given
+   * {@link Object}.
    */
 
   @Test

@@ -28,7 +28,10 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
 
-/** An {@link ExtendedEvent} recording one completed leg of travel between two cells. */
+/**
+ * An {@link ExtendedEvent} recording one completed leg of travel between two
+ * cells.
+ */
 @Value
 public class TravelEvent implements ExtendedEvent {
 

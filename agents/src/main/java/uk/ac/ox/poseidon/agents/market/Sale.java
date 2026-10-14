@@ -40,7 +40,10 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.species.Species;
 
-/** The record of one vessel's completed sale: what sold (as line {@link Item}s) and what didn't. */
+/**
+ * The record of one vessel's completed sale: what sold (as line {@link Item}s)
+ * and what didn't.
+ */
 @Data
 public class Sale {
 
@@ -57,7 +60,9 @@ public class Sale {
   /** What was offered but didn't sell. */
   private final CategorisedCatch unsold;
 
-  /** @return the total sale value, per currency, summed across {@link #items} */
+  /**
+   * @return the total sale value, per currency, summed across {@link #items}
+   */
   public Map<CurrencyUnit, Money> summary() {
     return summarise(items);
   }
@@ -85,7 +90,10 @@ public class Sale {
     return result;
   }
 
-  /** One sold line: a (category, species) combination, how much, and at what price. */
+  /**
+   * One sold line: a (category, species) combination, how much, and at what
+   * price.
+   */
   @Value
   public static class Item {
 

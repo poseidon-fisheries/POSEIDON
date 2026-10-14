@@ -27,8 +27,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link Mass} quantities, built via
- * {@link Factories Factories.massOf(...)}.
+ * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link Mass}
+ * quantities, built via {@link Factories Factories.massOf(...)}.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -41,7 +41,8 @@ public class MassFactory extends AbstractQuantityFactory<Mass> {
 
   /**
    * @param value      the numeric mass value
-   * @param unitString the unit, in the format produced by {@code Unit.toString()}
+   * @param unitString the unit, in the format produced by
+   *                   {@code Unit.toString()}
    */
   public MassFactory(final double value, final String unitString) {
     super(Mass.class, value, unitString);

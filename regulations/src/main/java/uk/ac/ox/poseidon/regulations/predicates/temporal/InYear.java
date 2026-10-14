@@ -28,8 +28,8 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.regulations.TemporalAction;
 
 /**
- * Predicate matching temporal actions whose start or end year is {@code year}, or whose duration
- * spans it entirely.
+ * Predicate matching temporal actions whose start or end year is {@code year},
+ * or whose duration spans it entirely.
  */
 @Getter
 @RequiredArgsConstructor

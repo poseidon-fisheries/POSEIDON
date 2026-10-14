@@ -42,8 +42,10 @@ public class Factories {
 
   /**
    * @param port       the market's port
-   * @param marketCode the market's code; the port's own code is used if this is null
-   * @return a {@link SimulationScopeFactory} for a {@link BiomassMarket}, without prices
+   * @param marketCode the market's code; the port's own code is used if this is
+   *                   null
+   * @return a {@link SimulationScopeFactory} for a {@link BiomassMarket},
+   *         without prices
    * @see BiomassMarket
    */
   public static BiomassMarketFactory biomassMarket(
@@ -55,7 +57,7 @@ public class Factories {
 
   /**
    * @return a {@link SimulationScopeFactory} for a
-   * {@link BiomassSaleAccumulator}
+   *         {@link BiomassSaleAccumulator}
    * @see BiomassSaleAccumulator
    */
   public static BiomassSaleAccumulatorFactory biomassSaleAccumulator() {
@@ -63,10 +65,11 @@ public class Factories {
   }
 
   /**
-   * @param catchCategoriser sorts the catch before pricing; give it the same factory as the
-   *                         vessel's hold, so that both sort the catch the same way
+   * @param catchCategoriser sorts the catch before pricing; give it the same
+   *                         factory as the vessel's hold, so that both sort the
+   *                         catch the same way
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link HomePortCatchValuation}
+   *         {@link HomePortCatchValuation}
    * @see HomePortCatchValuation
    */
   public static HomePortCatchValuationFactory homePortCatchValuation(
@@ -80,8 +83,8 @@ public class Factories {
 
   /**
    * @param marketPrices the market prices to apply, concatenated in order
-   * @return a {@link SimulationScopeFactory} for the {@link MarketPrice}s, applied when the
-   * simulation is built
+   * @return a {@link SimulationScopeFactory} for the {@link MarketPrice}s,
+   *         applied when the simulation is built
    * @see InitialPricesFactory
    */
   @SafeVarargs
@@ -97,7 +100,8 @@ public class Factories {
   /**
    * @param portGrid locates each market's port
    * @param markets  the markets to place
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link ImmutableMarketGrid}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         {@link ImmutableMarketGrid}
    * @see MarketGridFactory
    */
   public static <S extends Scope> MarketGridFactory<S> marketGrid(
@@ -111,7 +115,7 @@ public class Factories {
    * @param market       the market the prices apply to
    * @param priceEntries the (category, species) prices at that market
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for one
-   * {@link MarketPrice} per entry, all at {@code market}
+   *         {@link MarketPrice} per entry, all at {@code market}
    * @see MarketPricesFactory
    */
   public static <S extends Scope> MarketPricesFactory<S> marketPrices(
@@ -123,9 +127,10 @@ public class Factories {
 
   /**
    * @param marketGrid   the markets the prices apply to
-   * @param priceEntries the (category, species) prices, the same at every market
+   * @param priceEntries the (category, species) prices, the same at every
+   *                     market
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for one
-   * {@link MarketPrice} per market and entry
+   *         {@link MarketPrice} per market and entry
    * @see UniformMarketPricesFactory
    */
   public static <S extends Scope> UniformMarketPricesFactory<S> uniformMarketPrices(
@@ -137,8 +142,8 @@ public class Factories {
 
   /**
    * @param portGrid the ports to build one market per
-   * @return a {@link SimulationScopeFactory} for a list of {@link BiomassMarket}s, one per port,
-   * without prices
+   * @return a {@link SimulationScopeFactory} for a list of
+   *         {@link BiomassMarket}s, one per port, without prices
    * @see OneBiomassMarketPerPortFactory
    */
   public static OneBiomassMarketPerPortFactory oneBiomassMarketPerPort(
@@ -158,8 +163,8 @@ public class Factories {
    * @param measurementUnitColumn column giving each row's unit of mass
    * @param marketGrid            the markets whose prices the table updates
    * @param species               the species to match row species codes against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the table's price
-   * updates, each dated at its row's date
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the
+   *         table's price updates, each dated at its row's date
    * @see PriceUpdatesFromTableFactory
    */
   public static <S extends Scope> PriceUpdatesFromTableFactory<S> priceUpdatesFromTable(
@@ -192,7 +197,8 @@ public class Factories {
    * @param catchCategory the entry's catch category
    * @param species       the entry's species
    * @param price         the entry's price
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link PriceEntry}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link PriceEntry}
    * @see PriceEntry
    */
   public static <S extends Scope> PriceEntryFactory<S> priceEntry(
@@ -207,7 +213,8 @@ public class Factories {
    * @param amount       the amount paid per {@code massUnit}
    * @param currencyUnit the currency code {@code amount} is in
    * @param massUnit     the unit of mass {@code amount} is quoted per
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link Price}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link Price}
    * @see Price
    */
   public static PriceFactory price(

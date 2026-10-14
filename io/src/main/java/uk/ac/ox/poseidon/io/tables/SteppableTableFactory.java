@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link SteppableTable}, built via
- * {@link Factories#steppableTable(Factory, Factory[])}/
+ * A {@link SimulationScopeFactory} counterpart of {@link SteppableTable}, built
+ * via {@link Factories#steppableTable(Factory, Factory[])}/
  * {@link Factories#steppableTable(Factory, Factory)}.
  */
 @Data

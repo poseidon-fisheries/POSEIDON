@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
 /**
- * Factories for spatial predicates: testing grid cells or coordinates against bathymetry, a
- * bounding box, or a set of geometries.
+ * Factories for spatial predicates: testing grid cells or coordinates against
+ * bathymetry, a bounding box, or a set of geometries.
  */
 public class Factories {
 
@@ -46,7 +46,7 @@ public class Factories {
   /**
    * @param bathymetricGrid factory for the grid to test cells against
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   * {@link IsActiveWaterCell}
+   *         {@link IsActiveWaterCell}
    * @see IsActiveWaterCell
    */
   public static <S extends Scope> IsActiveWaterCellFactory<S> isActiveWaterCell(
@@ -57,10 +57,11 @@ public class Factories {
 
   /**
    * @param bathymetricGrid factory for the grid to read cell depth from
-   * @param minimumDepth    the minimum depth (in the same units as the grid, positive downward)
+   * @param minimumDepth    the minimum depth (in the same units as the grid,
+   *                        positive downward)
    * @param maximumDepth    the maximum depth
-   * @return a {@link Factory} for a predicate testing whether a cell's depth falls within
-   * {@code [minimumDepth, maximumDepth]}
+   * @return a {@link Factory} for a predicate testing whether a cell's depth
+   *         falls within {@code [minimumDepth, maximumDepth]}
    */
   public static <S extends Scope> Factory<
     S,
@@ -79,7 +80,7 @@ public class Factories {
   /**
    * @param envelope factory for the bounding box to test coordinates against
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   * {@link InRectangularArea}
+   *         {@link InRectangularArea}
    * @see InRectangularArea
    */
   public static <S extends Scope> InRectangularAreaFactory<S> inRectangularArea(
@@ -90,7 +91,8 @@ public class Factories {
 
   /**
    * @param geometries factory for the geometries to test coordinates against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link InGeometries}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         {@link InGeometries}
    * @see InGeometries
    */
   public static <S extends Scope> InGeometriesFactory<S> inGeometries(

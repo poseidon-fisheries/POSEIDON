@@ -46,10 +46,11 @@ import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 /**
- * A {@link SimulationScopeFactory} that portrays a {@link DoubleGrid} as a colour-mapped raster,
- * ranged from {@code 0} to the grid's current maximum value. Subclasses (e.g.
- * {@link DivergingNumberGridPortrayalFactory}, {@link NumberGridWithCapacityPortrayalFactory})
- * override {@link #newColorMap} to change how the colour range is chosen.
+ * A {@link SimulationScopeFactory} that portrays a {@link DoubleGrid} as a
+ * colour-mapped raster, ranged from {@code 0} to the grid's current maximum
+ * value. Subclasses (e.g. {@link DivergingNumberGridPortrayalFactory},
+ * {@link NumberGridWithCapacityPortrayalFactory}) override {@link #newColorMap}
+ * to change how the colour range is chosen.
  */
 public class NumberGridPortrayalFactory
   extends SimulationScopeFactory<FastValueGridPortrayal2D>
@@ -60,7 +61,10 @@ public class NumberGridPortrayalFactory
   private boolean immutableField;
   private Factory<? super SimulationScope, ? extends DoubleGrid> grid;
 
-  /** @return a raster portrayal of {@link #grid}, coloured by {@link #newColorMap} */
+  /**
+   * @return a raster portrayal of {@link #grid}, coloured by
+   *         {@link #newColorMap}
+   */
   @Override
   protected FastValueGridPortrayal2D newInstance(final SimulationScope scope) {
     final var portrayal = new FastValueGridPortrayal2D(
@@ -83,7 +87,10 @@ public class NumberGridPortrayalFactory
     return portrayal;
   }
 
-  /** @return a {@link PaletteColorMap} for {@link #paletteName}, ranged {@code [0, grid's max value]} */
+  /**
+   * @return a {@link PaletteColorMap} for {@link #paletteName}, ranged
+   *         {@code [0, grid's max value]}
+   */
   protected ColorMap newColorMap(final SimulationScope scope) {
     return new PaletteColorMap(
       paletteName,

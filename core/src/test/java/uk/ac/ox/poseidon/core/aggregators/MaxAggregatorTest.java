@@ -31,10 +31,11 @@ import org.junit.jupiter.api.Test;
 class MaxAggregatorTest {
 
   /**
-   * The Max class implements the Aggregator interface and provides a method to compute the
-   * maximum value from a given DoubleStream.
+   * The Max class implements the Aggregator interface and provides a method to
+   * compute the maximum value from a given DoubleStream.
    *
-   * <p>Method being tested: {@link MaxAggregator#apply(DoubleStream)}.
+   * <p>
+   * Method being tested: {@link MaxAggregator#apply(DoubleStream)}.
    */
 
   @Test

@@ -30,7 +30,8 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link ExponentialMovingAverageOfDoubles}, built via
+ * A {@link GlobalScopeFactory} counterpart of
+ * {@link ExponentialMovingAverageOfDoubles}, built via
  * {@link Factories#exponentialMovingAverageOfDoubles(double)}.
  */
 @Data

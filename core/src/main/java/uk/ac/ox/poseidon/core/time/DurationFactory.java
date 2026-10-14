@@ -31,10 +31,12 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} for a fixed {@link Duration}. No separate plain component class
- * here: the produced value is a bare JDK type, with no wrapper to carry documentation. Built via
- * {@link Factories} — {@code duration(...)}, {@code days/hours/minutes/seconds(long)}, or the
- * {@code ONE_SECOND}/{@code ONE_MINUTE}/{@code ONE_HOUR}/{@code ONE_DAY} constants.
+ * A {@link GlobalScopeFactory} for a fixed {@link Duration}. No separate plain
+ * component class here: the produced value is a bare JDK type, with no wrapper
+ * to carry documentation. Built via {@link Factories} — {@code duration(...)},
+ * {@code days/hours/minutes/seconds(long)}, or the
+ * {@code ONE_SECOND}/{@code ONE_MINUTE}/{@code ONE_HOUR}/{@code ONE_DAY}
+ * constants.
  */
 @Data
 @NoArgsConstructor
@@ -58,7 +60,8 @@ public class DurationFactory extends GlobalScopeFactory<Duration> {
   }
 
   /**
-   * @param iso8601Duration an ISO-8601 duration string (e.g. {@code "PT1H30M"}), as accepted by
+   * @param iso8601Duration an ISO-8601 duration string (e.g.
+   *                        {@code "PT1H30M"}), as accepted by
    *                        {@link Duration#parse}
    */
   public DurationFactory(final String iso8601Duration) {

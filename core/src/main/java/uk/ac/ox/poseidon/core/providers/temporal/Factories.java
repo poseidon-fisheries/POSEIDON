@@ -36,16 +36,17 @@ import uk.ac.ox.poseidon.core.time.DurationFactory;
 import uk.ac.ox.poseidon.core.time.PeriodFactory;
 
 /**
- * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that read the simulation's
- * current or upcoming date/time from its {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}.
+ * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that read
+ * the simulation's current or upcoming date/time from its
+ * {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}.
  */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-   * a {@link CurrentDate}
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link CurrentDate}
    * @see CurrentDate
    */
   public static CurrentDateFactory currentDate() {
@@ -53,8 +54,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-   * a {@link CurrentYear}
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link CurrentYear}
    * @see CurrentYear
    */
   public static CurrentYearFactory currentYear() {
@@ -62,8 +63,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-   * a {@link CurrentDateTime}
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link CurrentDateTime}
    * @see CurrentDateTime
    */
   public static CurrentDateTimeFactory currentDateTime() {
@@ -71,8 +72,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-   * a {@link CurrentDayOfWeek}
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link CurrentDayOfWeek}
    * @see CurrentDayOfWeek
    */
   public static CurrentDayOfWeekFactory currentDayOfWeek() {
@@ -80,8 +81,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for
-   * a {@link CurrentTime}
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link CurrentTime}
    * @see CurrentTime
    */
   public static CurrentTimeFactory currentTime() {
@@ -91,7 +92,8 @@ public class Factories {
   /**
    * @param times the times of day
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link NextOccurrenceOfTimeOfDay} of the given times strictly after the current date-time
+   *         {@link NextOccurrenceOfTimeOfDay} of the given times strictly after
+   *         the current date-time
    * @see NextOccurrenceOfTimeOfDay
    */
   @SafeVarargs
@@ -105,10 +107,12 @@ public class Factories {
   }
 
   /**
-   * @param referenceDateTime supplies the date-time the occurrence must be strictly after
+   * @param referenceDateTime supplies the date-time the occurrence must be
+   *                          strictly after
    * @param times             the times of day
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link NextOccurrenceOfTimeOfDay} of the given times strictly after the reference
+   *         {@link NextOccurrenceOfTimeOfDay} of the given times strictly after
+   *         the reference
    * @see NextOccurrenceOfTimeOfDay
    */
   @SafeVarargs
@@ -126,10 +130,10 @@ public class Factories {
   }
 
   /**
-   * @param referenceDateTime supplies the date-time to compute the time left until; the result is
-   *                          negative once it has passed
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DurationUntil}
-   * from the current date-time
+   * @param referenceDateTime supplies the date-time to compute the time left
+   *                          until; the result is negative once it has passed
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link DurationUntil} from the current date-time
    * @see DurationUntil
    */
   public static <S extends SimulationScope> DurationUntilFactory<S> durationUntil(
@@ -144,7 +148,8 @@ public class Factories {
   /**
    * @param referenceDateTime supplies the date-time to add to
    * @param amountToAdd       supplies the amount to add
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateTimeAfter}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link DateTimeAfter}
    * @see DateTimeAfter
    */
   public static <S extends Scope> DateTimeAfterFactory<S> dateTimeAfter(
@@ -163,8 +168,8 @@ public class Factories {
   /**
    * @param referenceDateTime supplies the date-time to add to
    * @param amountToAdd       the amount to add
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateTimeAfter}
-   * over a constant amount
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link DateTimeAfter} over a constant amount
    * @see DateTimeAfter
    */
   public static <S extends Scope> DateTimeAfterFactory<S> dateTimeAfter(
@@ -180,8 +185,8 @@ public class Factories {
   /**
    * @param referenceDateTime supplies the date-time to add to
    * @param amountToAdd       the amount to add
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateTimeAfter}
-   * over a constant amount
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link DateTimeAfter} over a constant amount
    * @see DateTimeAfter
    */
   public static <S extends Scope> DateTimeAfterFactory<S> dateTimeAfter(
@@ -197,7 +202,8 @@ public class Factories {
   /**
    * @param referenceDateTime supplies the date-time to subtract from
    * @param amountToSubtract  supplies the amount to subtract
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateTimeBefore}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link DateTimeBefore}
    * @see DateTimeBefore
    */
   public static <S extends Scope> DateTimeBeforeFactory<S> dateTimeBefore(
@@ -216,8 +222,8 @@ public class Factories {
   /**
    * @param referenceDateTime supplies the date-time to subtract from
    * @param amountToSubtract  the amount to subtract
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateTimeBefore}
-   * over a constant amount
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link DateTimeBefore} over a constant amount
    * @see DateTimeBefore
    */
   public static <S extends Scope> DateTimeBeforeFactory<S> dateTimeBefore(
@@ -233,8 +239,8 @@ public class Factories {
   /**
    * @param referenceDateTime supplies the date-time to subtract from
    * @param amountToSubtract  the amount to subtract
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DateTimeBefore}
-   * over a constant amount
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link DateTimeBefore} over a constant amount
    * @see DateTimeBefore
    */
   public static <S extends Scope> DateTimeBeforeFactory<S> dateTimeBefore(

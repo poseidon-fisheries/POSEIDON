@@ -21,10 +21,12 @@
  */
 
 /**
- * Factories for gdx-ai behavior-tree decorator nodes (invert, always-fail, always-succeed,
- * until-fail, until-success) that wrap a single child {@link com.badlogic.gdx.ai.btree.Task}. See
- * {@link uk.ac.ox.poseidon.agents.tasks.decorators.DecoratorTaskFactory} for the shared
- * child-attachment mechanics and {@link uk.ac.ox.poseidon.agents.tasks.decorators.Factories} for
- * the entry points.
+ * Factories for gdx-ai behavior-tree decorator nodes (invert, always-fail,
+ * always-succeed, until-fail, until-success) that wrap a single child
+ * {@link com.badlogic.gdx.ai.btree.Task}. See
+ * {@link uk.ac.ox.poseidon.agents.tasks.decorators.DecoratorTaskFactory} for
+ * the shared child-attachment mechanics and
+ * {@link uk.ac.ox.poseidon.agents.tasks.decorators.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.agents.tasks.decorators;

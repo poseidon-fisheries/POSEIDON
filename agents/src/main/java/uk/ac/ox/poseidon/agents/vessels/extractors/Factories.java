@@ -37,7 +37,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link TripCostFromHourlyCosts}
+   *         {@link TripCostFromHourlyCosts}
    * @see TripCostFromHourlyCostsFactory
    */
   public static <S extends Scope> TripCostFromHourlyCostsFactory<S> tripCostFromHourlyCosts(
@@ -50,10 +50,11 @@ public class Factories {
   }
 
   /**
-   * @param propertyPath the dotted path of properties to follow from the vessel, e.g.
-   *                     {@code "gear.code"} for the code of the vessel's current gear
+   * @param propertyPath the dotted path of properties to follow from the
+   *                     vessel, e.g. {@code "gear.code"} for the code of the
+   *                     vessel's current gear
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
-   * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a vessel
+   *         {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a vessel
    * @see VesselPropertyFactory
    */
   public static <R> VesselPropertyFactory<R> vesselProperty(

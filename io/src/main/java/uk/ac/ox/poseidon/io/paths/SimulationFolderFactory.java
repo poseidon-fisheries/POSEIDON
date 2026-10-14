@@ -35,8 +35,9 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} for a per-simulation subdirectory of a resolved parent path,
- * named after the simulation's id and created on disk (if absent) at resolution time. Built via
+ * A {@link SimulationScopeFactory} for a per-simulation subdirectory of a
+ * resolved parent path, named after the simulation's id and created on disk (if
+ * absent) at resolution time. Built via
  * {@link Factories#simulationFolder(Factory)}.
  */
 @Data

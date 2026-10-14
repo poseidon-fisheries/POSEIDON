@@ -29,9 +29,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The default {@link PathCache}: an in-memory, unbounded Caffeine {@link Cache} keyed by
- * (start, end) pairs. Built via {@link Factories#pathCache(uk.ac.ox.poseidon.core.Factory,
- * uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)} in this package.
+ * The default {@link PathCache}: an in-memory, unbounded Caffeine {@link Cache}
+ * keyed by (start, end) pairs. Built via
+ * {@link Factories#pathCache(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * in this package.
  */
 public class DefaultPathCache<P> implements PathCache<P> {
 
@@ -44,12 +45,13 @@ public class DefaultPathCache<P> implements PathCache<P> {
    * @param start The point at which the path should start
    * @param end   The point at which the path should end
    * @return Either:
-   * <ul>
-   * <li>An immutable list of sea tiles wrapped in an Optional if a path from start to end was
-   * stored;</li>
-   * <li>An empty Optional if start to end was stored as impossible;</li>
-   * <li>null if nothing was stored for start to end.</li>
-   * </ul>
+   *         <ul>
+   *         <li>An immutable list of sea tiles wrapped in an Optional if a path
+   *         from start to end was stored;</li>
+   *         <li>An empty Optional if start to end was stored as
+   *         impossible;</li>
+   *         <li>null if nothing was stored for start to end.</li>
+   *         </ul>
    */
   @Override
   public Optional<ImmutableList<P>> getPath(final P start, final P end) {

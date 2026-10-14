@@ -21,10 +21,11 @@
  */
 
 /**
- * Sorts a caught {@link uk.ac.ox.poseidon.biology.buckets.Bucket} of biomass into one or more
- * {@link uk.ac.ox.poseidon.agents.catches.CatchCategory}s, producing a
- * {@link uk.ac.ox.poseidon.agents.catches.CategorisedCatch}. See
- * {@link uk.ac.ox.poseidon.agents.catches.disposition} for what happens to a categorised catch
- * afterward, and {@link uk.ac.ox.poseidon.agents.catches.Factories} for the entry points.
+ * Sorts a caught {@link uk.ac.ox.poseidon.biology.buckets.Bucket} of biomass
+ * into one or more {@link uk.ac.ox.poseidon.agents.catches.CatchCategory}s,
+ * producing a {@link uk.ac.ox.poseidon.agents.catches.CategorisedCatch}. See
+ * {@link uk.ac.ox.poseidon.agents.catches.disposition} for what happens to a
+ * categorised catch afterward, and
+ * {@link uk.ac.ox.poseidon.agents.catches.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.agents.catches;

@@ -40,12 +40,13 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * An immutable-by-convention (Lombok {@link Builder}), declarative bag of named component
- * {@link Factory} instances plus a starting date/time — the serializable, YAML-loadable
- * description of a simulation to run. Every field must remain serializable to YAML; don't
- * introduce fields/types that can't survive a SnakeYAML round-trip. {@link #startNewSimulation()}
- * is the entry point: it resolves every component factory against a fresh {@link SimulationScope}
- * to build a runnable {@link Simulation}.
+ * An immutable-by-convention (Lombok {@link Builder}), declarative bag of named
+ * component {@link Factory} instances plus a starting date/time — the
+ * serializable, YAML-loadable description of a simulation to run. Every field
+ * must remain serializable to YAML; don't introduce fields/types that can't
+ * survive a SnakeYAML round-trip. {@link #startNewSimulation()} is the entry
+ * point: it resolves every component factory against a fresh
+ * {@link SimulationScope} to build a runnable {@link Simulation}.
  */
 @Getter
 @Setter
@@ -63,7 +64,8 @@ public final class Scenario {
 
   /**
    * @param startingDateTime the simulation's starting date-time
-   * @param components       the named component factories making up the scenario
+   * @param components       the named component factories making up the
+   *                         scenario
    */
   public Scenario(
     final LocalDateTime startingDateTime,
@@ -84,8 +86,9 @@ public final class Scenario {
   }
 
   /**
-   * Equivalent to {@link #startNewSimulation(SimulationStartOptions)} with default options (a
-   * random seed, no property overrides, no extra components).
+   * Equivalent to {@link #startNewSimulation(SimulationStartOptions)} with
+   * default options (a random seed, no property overrides, no extra
+   * components).
    *
    * @return the started {@link Simulation}
    */
@@ -94,17 +97,20 @@ public final class Scenario {
   }
 
   /**
-   * Builds and starts a new {@link Simulation} by resolving every component factory (plus
-   * {@code options}' extra components) against a fresh {@link SimulationScope}.
+   * Builds and starts a new {@link Simulation} by resolving every component
+   * factory (plus {@code options}' extra components) against a fresh
+   * {@link SimulationScope}.
    * <p>
-   * If {@code options} carries property overrides, this method temporarily mutates {@code this}
-   * {@link Scenario}'s bean properties (via reflection, dotted property paths) to the override
-   * values for the duration of the build, then restores the original values in a
-   * {@code finally} block before returning — even though the method is {@code synchronized} on
-   * {@code this}, that only serializes concurrent calls against the same {@link Scenario}
-   * instance; any other code reading this scenario's properties concurrently could observe the
-   * temporarily-overridden values. This is how calibration varies parameters run-to-run without
-   * permanently mutating the original {@link Scenario}.
+   * If {@code options} carries property overrides, this method temporarily
+   * mutates {@code this} {@link Scenario}'s bean properties (via reflection,
+   * dotted property paths) to the override values for the duration of the
+   * build, then restores the original values in a {@code finally} block before
+   * returning — even though the method is {@code synchronized} on {@code this},
+   * that only serializes concurrent calls against the same {@link Scenario}
+   * instance; any other code reading this scenario's properties concurrently
+   * could observe the temporarily-overridden values. This is how calibration
+   * varies parameters run-to-run without permanently mutating the original
+   * {@link Scenario}.
    *
    * @param options seed, property overrides, and extra components for this run
    * @return the started {@link Simulation}
@@ -200,13 +206,17 @@ public final class Scenario {
   }
 
   /**
-   * @param componentName the component's name, as registered in {@link #components}
+   * @param componentName the component's name, as registered in
+   *                      {@link #components}
    * @return the named component's factory, unchecked-cast to a
-   * {@code Factory<SimulationScope, C>}. The type has no wildcards so that the compiler can
-   * infer {@code C}, and the scope of a generic factory method given the component, from where
-   * the component is passed: with wildcards, callers need explicit type arguments. Narrowing
-   * the factory's scope to {@link SimulationScope} is safe, since a factory only takes a scope.
-   * @throws IllegalArgumentException if no component is registered under that name
+   *         {@code Factory<SimulationScope, C>}. The type has no wildcards so
+   *         that the compiler can infer {@code C}, and the scope of a generic
+   *         factory method given the component, from where the component is
+   *         passed: with wildcards, callers need explicit type arguments.
+   *         Narrowing the factory's scope to {@link SimulationScope} is safe,
+   *         since a factory only takes a scope.
+   * @throws IllegalArgumentException if no component is registered under that
+   *                                  name
    */
   @SuppressWarnings("unchecked")
   public <C> Factory<SimulationScope, C> component(final String componentName) {
@@ -217,11 +227,13 @@ public final class Scenario {
   }
 
   /**
-   * @param componentName the component's name, as registered in {@link #components}
+   * @param componentName the component's name, as registered in
+   *                      {@link #components}
    * @param factoryClass  the expected factory type
    * @return the named component's factory, cast to {@code factoryClass}
-   * @throws IllegalArgumentException if no component is registered under that name, or if it's
-   *                                  not an instance of {@code factoryClass}
+   * @throws IllegalArgumentException if no component is registered under that
+   *                                  name, or if it's not an instance of
+   *                                  {@code factoryClass}
    */
   public <F extends Factory<?, ?>> F component(
     final String componentName,

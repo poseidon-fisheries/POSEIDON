@@ -32,8 +32,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link TableDefinition}, built via
- * {@code Factories.tableDefinition(...)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link TableDefinition}, built
+ * via {@code Factories.tableDefinition(...)}.
  */
 @Data
 @RequiredArgsConstructor

@@ -21,10 +21,12 @@
  */
 
 /**
- * Predicates over a {@link uk.ac.ox.poseidon.regulations.SpatialAction}'s start/end location,
- * matched either as grid cells ({@link uk.ac.ox.poseidon.regulations.predicates.spatial.ActionCellPredicate})
+ * Predicates over a {@link uk.ac.ox.poseidon.regulations.SpatialAction}'s
+ * start/end location, matched either as grid cells
+ * ({@link uk.ac.ox.poseidon.regulations.predicates.spatial.ActionCellPredicate})
  * or as raw coordinates
- * ({@link uk.ac.ox.poseidon.regulations.predicates.spatial.ActionCoordinatePredicate}). See
- * {@link uk.ac.ox.poseidon.regulations.predicates.spatial.Factories} for the entry points.
+ * ({@link uk.ac.ox.poseidon.regulations.predicates.spatial.ActionCoordinatePredicate}).
+ * See {@link uk.ac.ox.poseidon.regulations.predicates.spatial.Factories} for
+ * the entry points.
  */
 package uk.ac.ox.poseidon.regulations.predicates.spatial;

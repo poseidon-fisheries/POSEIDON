@@ -56,9 +56,10 @@ class CliqueDynamicsPropertyTest {
   }
 
   /**
-   * Checks that every tie goes both ways, that no vessel is tied to itself or has more than
-   * {@code maximumCliqueSize - 1} partners, and that every vessel's partners are tied to each
-   * other: each partner's clique is the vessel's.
+   * Checks that every tie goes both ways, that no vessel is tied to itself or
+   * has more than {@code maximumCliqueSize - 1} partners, and that every
+   * vessel's partners are tied to each other: each partner's clique is the
+   * vessel's.
    */
   static void assertCliqueInvariants(
     final SocialNetwork network,

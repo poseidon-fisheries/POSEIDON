@@ -33,7 +33,8 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * Extracts the cost of a vessel's current trip so far, as its time at sea
- * ({@link Trip#getTimeAtSea()}) times an hourly rate from {@code hourlyCostsExtractor}.
+ * ({@link Trip#getTimeAtSea()}) times an hourly rate from
+ * {@code hourlyCostsExtractor}.
  */
 @RequiredArgsConstructor
 public class TripCostFromHourlyCosts implements Function<Vessel, Money> {
@@ -42,8 +43,8 @@ public class TripCostFromHourlyCosts implements Function<Vessel, Money> {
   private final Function<? super Vessel, ? extends Money> hourlyCostsExtractor;
 
   /**
-   * @return {@code hourlyCostsExtractor}'s rate for {@code vessel}, times its current trip's
-   * hours at sea
+   * @return {@code hourlyCostsExtractor}'s rate for {@code vessel}, times its
+   *         current trip's hours at sea
    */
   @Override
   public Money apply(final Vessel vessel) {

@@ -30,15 +30,19 @@ import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
-/** Factories for fishing behavior-tree tasks and their supporting event accumulator. */
+/**
+ * Factories for fishing behavior-tree tasks and their supporting event
+ * accumulator.
+ */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @param regulations the regulations a fishing action started now, here, is checked against
+   * @param regulations the regulations a fishing action started now, here, is
+   *                    checked against
    * @return a {@link VesselScope}-relative factory for a
-   * {@link CheckIfFishingHereAndNowIsLegal}
+   *         {@link CheckIfFishingHereAndNowIsLegal}
    * @see CheckIfFishingHereAndNowIsLegal
    */
   public static CheckIfFishingHereAndNowIsLegalFactory checkIfFishingHereAndNowIsLegal(
@@ -52,7 +56,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
-   * {@link FishingEventAccumulator}
+   *         {@link FishingEventAccumulator}
    * @see FishingEventAccumulator
    */
   public static FishingEventAccumulatorFactory fishingEventAccumulator() {
@@ -60,11 +64,12 @@ public class Factories {
   }
 
   /**
-   * @param propertyPath the dotted path of properties to follow from the fishing event, e.g.
-   *                     {@code "action.gear.code"} for the code of the gear the fishing action
-   *                     was made with
+   * @param propertyPath the dotted path of properties to follow from the
+   *                     fishing event, e.g. {@code "action.gear.code"} for the
+   *                     code of the gear the fishing action was made with
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
-   * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a fishing event
+   *         {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a
+   *         fishing event
    * @see FishingEventPropertyFactory
    */
   public static <R> FishingEventPropertyFactory<R> fishingEventProperty(
@@ -74,7 +79,7 @@ public class Factories {
   }
 
   /**
-   * @param fisheableSupplier supplies the fisheable to fish from
+   * @param fisheableSupplier  supplies the fisheable to fish from
    * @param dispositionProcess sorts the catch into retained/discarded
    * @return a {@link VesselScope}-relative factory for a {@link Fishing} task
    * @see Fishing

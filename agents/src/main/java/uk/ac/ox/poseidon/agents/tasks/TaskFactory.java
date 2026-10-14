@@ -33,9 +33,10 @@ import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * An {@link AbstractFactory} base for behavior-tree {@link Task}s: subclasses supply the task via
- * {@link #newTask}, and this base attaches the optional {@code guard} and keys resolved
- * instances by agent, so each agent gets its own task instance.
+ * An {@link AbstractFactory} base for behavior-tree {@link Task}s: subclasses
+ * supply the task via {@link #newTask}, and this base attaches the optional
+ * {@code guard} and keys resolved instances by agent, so each agent gets its
+ * own task instance.
  *
  * @param <G> the type of agent the task runs against
  * @param <S> the agent scope type
@@ -62,7 +63,10 @@ public abstract class TaskFactory<
     return scope.getAgent();
   }
 
-  /** @return a task built by {@link #newTask}, with {@link #guard} attached if set */
+  /**
+   * @return a task built by {@link #newTask}, with {@link #guard} attached if
+   *         set
+   */
   @Override
   protected T newInstance(final S scope) {
     final T task = newTask(scope);

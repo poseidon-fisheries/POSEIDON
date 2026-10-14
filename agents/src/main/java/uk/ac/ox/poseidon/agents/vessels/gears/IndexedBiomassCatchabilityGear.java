@@ -36,9 +36,10 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 
 /**
- * A {@link Gear} that catches a per-species proportion of each species' available biomass, per
- * fishing event, discarding any per-species catch below {@code minimumCatchThresholdInKg}.
- * Unlike {@link FixedBiomassProportionGear}, the proportion varies by species.
+ * A {@link Gear} that catches a per-species proportion of each species'
+ * available biomass, per fishing event, discarding any per-species catch below
+ * {@code minimumCatchThresholdInKg}. Unlike {@link FixedBiomassProportionGear},
+ * the proportion varies by species.
  */
 @Getter
 @ToString
@@ -57,12 +58,12 @@ public class IndexedBiomassCatchabilityGear implements Gear {
   private boolean active = true;
 
   /**
-   * @param code                       this gear's identifying code
-   * @param proportions                the fraction of available biomass caught, per species,
-   *                                   each in {@code [0, 1]}
-   * @param minimumCatchThresholdInKg  per-species catch below this, in kilograms, is discarded
-   *                                   down to zero
-   * @param durationSupplier           supplies how long one fishing event takes
+   * @param code                      this gear's identifying code
+   * @param proportions               the fraction of available biomass caught,
+   *                                  per species, each in {@code [0, 1]}
+   * @param minimumCatchThresholdInKg per-species catch below this, in
+   *                                  kilograms, is discarded down to zero
+   * @param durationSupplier          supplies how long one fishing event takes
    */
   public IndexedBiomassCatchabilityGear(
     @NonNull final String code,
@@ -81,9 +82,10 @@ public class IndexedBiomassCatchabilityGear implements Gear {
   }
 
   /**
-   * @return each species' {@link #proportions} entry times its available biomass in
-   * {@code fisheable}, zeroed out per species below {@link #minimumCatchThresholdInKg},
-   * removed from {@code fisheable} in the process
+   * @return each species' {@link #proportions} entry times its available
+   *         biomass in {@code fisheable}, zeroed out per species below
+   *         {@link #minimumCatchThresholdInKg}, removed from {@code fisheable}
+   *         in the process
    */
   @Override
   public Bucket fish(final Fisheable fisheable) {

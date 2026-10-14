@@ -26,8 +26,8 @@ import java.util.OptionalDouble;
 import java.util.stream.DoubleStream;
 
 /**
- * An {@link Aggregator} that returns the arithmetic mean of its input numbers, or
- * {@link java.util.OptionalDouble#empty()} for an empty input. Built via
+ * An {@link Aggregator} that returns the arithmetic mean of its input numbers,
+ * or {@link java.util.OptionalDouble#empty()} for an empty input. Built via
  * {@link Factories#meanAggregator()} in this package.
  */
 public class MeanAggregator implements Aggregator {

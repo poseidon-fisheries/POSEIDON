@@ -36,7 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.Measurements;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link Price}, built via {@link Factories#price}.
+ * A {@link GlobalScopeFactory} counterpart of {@link Price}, built via
+ * {@link Factories#price}.
  */
 @Data
 @NoArgsConstructor

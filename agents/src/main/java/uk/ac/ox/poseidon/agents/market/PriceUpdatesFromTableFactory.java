@@ -55,15 +55,17 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.utils.Measurements;
 
 /**
- * Turns every row of a price table into a {@link PriceUpdate} on the {@link BiomassMarket} of
- * {@link #marketGrid} whose code the row names, dated at the row's date. Nothing is scheduled
- * here: pass the result to
- * {@link uk.ac.ox.poseidon.core.schedule.Factories#scheduledByDateTime(Factory)} for prices to
- * change over time as the table dictates. The markets must already exist: a row naming a market
- * code not found in {@link #marketGrid} is an error, as is a row whose species code matches none
- * of {@link #species}. A species code that matches only species with life stages gets a generic,
- * life-stage-less {@link Species} created on the fly, since markets commonly price species
- * without distinguishing life stages. Built via {@link Factories#priceUpdatesFromTable}.
+ * Turns every row of a price table into a {@link PriceUpdate} on the
+ * {@link BiomassMarket} of {@link #marketGrid} whose code the row names, dated
+ * at the row's date. Nothing is scheduled here: pass the result to
+ * {@link uk.ac.ox.poseidon.core.schedule.Factories#scheduledByDateTime(Factory)}
+ * for prices to change over time as the table dictates. The markets must
+ * already exist: a row naming a market code not found in {@link #marketGrid} is
+ * an error, as is a row whose species code matches none of {@link #species}. A
+ * species code that matches only species with life stages gets a generic,
+ * life-stage-less {@link Species} created on the fly, since markets commonly
+ * price species without distinguishing life stages. Built via
+ * {@link Factories#priceUpdatesFromTable}.
  */
 @Data
 @NoArgsConstructor

@@ -43,9 +43,10 @@ import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
 import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
 
 /**
- * Factories for {@code tablesaw} {@link Table} components: building tables from CSV or from a
- * resolved {@link Map}, writing them back out to CSV, growing one incrementally over the course
- * of a simulation, and deriving a lookup {@link Function} from a table's contents.
+ * Factories for {@code tablesaw} {@link Table} components: building tables from
+ * CSV or from a resolved {@link Map}, writing them back out to CSV, growing one
+ * incrementally over the course of a simulation, and deriving a lookup
+ * {@link Function} from a table's contents.
  */
 public class Factories {
 
@@ -53,8 +54,8 @@ public class Factories {
 
   /**
    * @param data the literal CSV content
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link Table} parsed
-   * from {@code data}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link Table} parsed from {@code data}
    * @see TableFromCsvFactory
    */
   public static TableFromCsvFactory<Scope> tableFromCsvString(
@@ -65,8 +66,8 @@ public class Factories {
 
   /**
    * @param pathFactory factory for the CSV file to read
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link Table} parsed
-   * from the resolved file
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link Table} parsed from the resolved file
    * @see TableFromCsvFactory
    */
   public static <S extends Scope> TableFromCsvFactory<S> tableFromCsvFile(
@@ -77,8 +78,8 @@ public class Factories {
 
   /**
    * @param dataSourceFactory factory for the CSV content to read
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link Table} parsed
-   * from the resolved data source
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link Table} parsed from the resolved data source
    * @see TableFromCsvFactory
    */
   public static <S extends Scope> TableFromCsvFactory<S> tableFromCsv(
@@ -88,11 +89,15 @@ public class Factories {
   }
 
   /**
-   * @param tableSupplier     factory for the supplier of the table to write on each step
+   * @param tableSupplier     factory for the supplier of the table to write on
+   *                          each step
    * @param path              factory for the CSV file to write to
-   * @param append            whether to append to an existing file rather than overwrite it
-   * @param clearAfterWriting whether to clear the table's rows immediately after each write
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link CsvTableWriter}
+   * @param append            whether to append to an existing file rather than
+   *                          overwrite it
+   * @param clearAfterWriting whether to clear the table's rows immediately
+   *                          after each write
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link CsvTableWriter}
    * @see CsvTableWriter
    */
   public static <S extends Scope> CsvTableWriterFactory<S> csvTableWriter(
@@ -111,8 +116,10 @@ public class Factories {
 
   /**
    * @param tableDefinition factory for the shape of the table to build
-   * @param mapSupplier     factory for the supplier of the map to build the table from
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link TableFromMap}
+   * @param mapSupplier     factory for the supplier of the map to build the
+   *                        table from
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link TableFromMap}
    * @see TableFromMap
    */
   public static <S extends Scope, K, V> TableFromMapFactory<
@@ -128,8 +135,10 @@ public class Factories {
 
   /**
    * @param tableDefinition factory for the shape of the table to grow
-   * @param valueSuppliers  one value-supplier factory per column, in column order
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link SteppableTable}
+   * @param valueSuppliers  one value-supplier factory per column, in column
+   *                        order
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link SteppableTable}
    * @see SteppableTable
    */
   @SafeVarargs
@@ -145,9 +154,10 @@ public class Factories {
 
   /**
    * @param tableDefinition factory for the shape of the table to grow
-   * @param valueSuppliers  factory for the list of value suppliers, one per column, in column
-   *                        order
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link SteppableTable}
+   * @param valueSuppliers  factory for the list of value suppliers, one per
+   *                        column, in column order
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link SteppableTable}
    * @see SteppableTable
    */
   public static SteppableTableFactory steppableTable(
@@ -162,9 +172,10 @@ public class Factories {
 
   /**
    * @param columnName the name of the column
-   * @param columnType the {@code tablesaw} {@code ColumnType} name (e.g. {@code "STRING"},
-   *                   {@code "DOUBLE"})
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link ColumnDefinition}
+   * @param columnType the {@code tablesaw} {@code ColumnType} name (e.g.
+   *                   {@code "STRING"}, {@code "DOUBLE"})
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link ColumnDefinition}
    * @see ColumnDefinition
    */
   public static ColumnDefinitionFactory columnDefinition(
@@ -176,8 +187,8 @@ public class Factories {
 
   /**
    * @param columnDefinitions factories for the table's columns, in column order
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link TableDefinition}
-   * over the resolved columns
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link TableDefinition} over the resolved columns
    * @see TableDefinition
    */
   @SafeVarargs
@@ -191,9 +202,10 @@ public class Factories {
   }
 
   /**
-   * @param columnDefinitions factory for the list of the table's columns, in column order
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link TableDefinition}
-   * over the resolved columns
+   * @param columnDefinitions factory for the list of the table's columns, in
+   *                          column order
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link TableDefinition} over the resolved columns
    * @see TableDefinition
    */
   public static <S extends Scope> TableDefinitionFactory<S> tableDefinition(
@@ -209,8 +221,8 @@ public class Factories {
    * @param table        factory for the table to read
    * @param keyBuilder   factory for the function deriving each row's map key
    * @param valueBuilder factory for the function deriving each row's map value
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an immutable map built
-   * from the resolved table's rows
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         immutable map built from the resolved table's rows
    * @see MapFromTableFactory
    */
   public static <S extends Scope, K, V> MapFromTableFactory<
@@ -232,9 +244,10 @@ public class Factories {
   }
 
   /**
-   * @param keyColumnNames the non-empty list of columns whose values are joined into the key
+   * @param keyColumnNames the non-empty list of columns whose values are joined
+   *                       into the key
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   * {@link MultiStringKeyFromRow} over the given columns
+   *         {@link MultiStringKeyFromRow} over the given columns
    * @see MultiStringKeyFromRow
    */
   public static MultiStringKeyFromRowFactory multiStringKeyFromRow(
@@ -245,8 +258,8 @@ public class Factories {
 
   /**
    * @param columnName the column to read as a {@code double}
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link DoubleFromRow}
-   * over {@code columnName}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link DoubleFromRow} over {@code columnName}
    * @see DoubleFromRow
    */
   public static DoubleFromRowFactory doubleFromRow(final String columnName) {
@@ -254,13 +267,16 @@ public class Factories {
   }
 
   /**
-   * @param keyExtractor    factory for the function that computes the lookup key from an
-   *                        arbitrary input
+   * @param keyExtractor    factory for the function that computes the lookup
+   *                        key from an arbitrary input
    * @param table           factory for the table to look values up in
-   * @param rowKeyBuilder   factory for the function deriving each table row's map key
-   * @param rowValueBuilder factory for the function deriving each table row's map value
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a function composing
-   * {@code keyExtractor} with a lookup into the map built from the resolved table
+   * @param rowKeyBuilder   factory for the function deriving each table row's
+   *                        map key
+   * @param rowValueBuilder factory for the function deriving each table row's
+   *                        map value
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         function composing {@code keyExtractor} with a lookup into the map
+   *         built from the resolved table
    * @see uk.ac.ox.poseidon.core.functions.ComposedFunction
    * @see uk.ac.ox.poseidon.core.functions.MapValueExtractor
    */

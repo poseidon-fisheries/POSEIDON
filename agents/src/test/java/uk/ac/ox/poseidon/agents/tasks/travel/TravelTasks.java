@@ -34,7 +34,10 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
-/** Shared set-up for the travel task tests: a vessel at {@link #ORIGIN} cruising at 10 km/h. */
+/**
+ * Shared set-up for the travel task tests: a vessel at {@link #ORIGIN} cruising
+ * at 10 km/h.
+ */
 final class TravelTasks {
 
   static final Int2D ORIGIN = new Int2D(0, 0);

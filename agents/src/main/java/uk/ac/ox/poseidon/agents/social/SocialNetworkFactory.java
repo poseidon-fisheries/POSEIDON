@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link SocialNetwork}, built via
- * {@link Factories#socialNetwork}. The network starts with no ties.
+ * A {@link SimulationScopeFactory} counterpart of {@link SocialNetwork}, built
+ * via {@link Factories#socialNetwork}. The network starts with no ties.
  */
 @Data
 @NoArgsConstructor

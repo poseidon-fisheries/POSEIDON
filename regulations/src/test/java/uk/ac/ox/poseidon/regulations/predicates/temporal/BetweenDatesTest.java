@@ -36,8 +36,9 @@ import uk.ac.ox.poseidon.regulations.TemporalAction;
 class BetweenDatesTest {
 
   /**
-   * Tests the {@code BetweenDates} class, which is a predicate that checks whether the start or
-   * end date of an {@code Action} falls between a given date range.
+   * Tests the {@code BetweenDates} class, which is a predicate that checks
+   * whether the start or end date of an {@code Action} falls between a given
+   * date range.
    */
 
   @Test

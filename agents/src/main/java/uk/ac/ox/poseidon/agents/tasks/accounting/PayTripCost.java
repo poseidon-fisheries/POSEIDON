@@ -31,7 +31,9 @@ import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-/** Deducts a vessel's trip cost from its current trip's account, then succeeds. */
+/**
+ * Deducts a vessel's trip cost from its current trip's account, then succeeds.
+ */
 @RequiredArgsConstructor
 public class PayTripCost extends AgentTask<Vessel> {
 
@@ -40,7 +42,8 @@ public class PayTripCost extends AgentTask<Vessel> {
 
   /**
    * @return {@link Status#SUCCEEDED}
-   * @throws NullPointerException if {@code tripCostExtractor} yields no cost for the vessel
+   * @throws NullPointerException if {@code tripCostExtractor} yields no cost
+   *                              for the vessel
    */
   @Override
   public Status execute() {

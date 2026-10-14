@@ -35,8 +35,9 @@ import uk.ac.ox.poseidon.geography.predicates.InRectangularArea;
 class InRectangularAreaTest {
 
   /**
-   * Tests the {@code InRectangularAreaPredicate.test(Coordinate)} method. The method checks if a
-   * given {@link Coordinate} lies within the specified {@link Envelope}.
+   * Tests the {@code InRectangularAreaPredicate.test(Coordinate)} method. The
+   * method checks if a given {@link Coordinate} lies within the specified
+   * {@link Envelope}.
    */
 
   @Test

@@ -26,6 +26,9 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import sim.util.Int2D;
 
-/** Supplies a vessel's next destination cell, or {@link Optional#empty()} if it has none to offer. */
+/**
+ * Supplies a vessel's next destination cell, or {@link Optional#empty()} if it
+ * has none to offer.
+ */
 @FunctionalInterface
 public interface DestinationSupplier extends Supplier<Optional<Int2D>> {}

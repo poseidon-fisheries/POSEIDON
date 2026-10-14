@@ -21,11 +21,13 @@
  */
 
 /**
- * The vessel's core fishing behavior: {@link uk.ac.ox.poseidon.agents.tasks.fishing.Fishing}
- * (the task that actually fishes and sorts the catch), a legality precheck
- * ({@link uk.ac.ox.poseidon.agents.tasks.fishing.CheckIfFishingHereAndNowIsLegal}), and the
- * {@link uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent}/
- * {@link uk.ac.ox.poseidon.agents.tasks.fishing.FishingOutcome} records it broadcasts. See
- * {@link uk.ac.ox.poseidon.agents.tasks.fishing.Factories} for the entry points.
+ * The vessel's core fishing behavior:
+ * {@link uk.ac.ox.poseidon.agents.tasks.fishing.Fishing} (the task that
+ * actually fishes and sorts the catch), a legality precheck
+ * ({@link uk.ac.ox.poseidon.agents.tasks.fishing.CheckIfFishingHereAndNowIsLegal}),
+ * and the {@link uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent}/
+ * {@link uk.ac.ox.poseidon.agents.tasks.fishing.FishingOutcome} records it
+ * broadcasts. See {@link uk.ac.ox.poseidon.agents.tasks.fishing.Factories} for
+ * the entry points.
  */
 package uk.ac.ox.poseidon.agents.tasks.fishing;

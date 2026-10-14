@@ -29,8 +29,8 @@ import uk.ac.ox.poseidon.core.functions.ObjectProperty;
 import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
 
 /**
- * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a {@link Species}, built via
- * {@link Factories#speciesProperty}.
+ * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a
+ * {@link Species}, built via {@link Factories#speciesProperty}.
  *
  * @param <R> the type of the property; not checked
  */
@@ -41,7 +41,10 @@ public class SpeciesPropertyFactory<R> extends ObjectPropertyFactory<
   R
 > {
 
-  /** @param propertyPath the dotted path of properties to follow from the species */
+  /**
+   * @param propertyPath the dotted path of properties to follow from the
+   *                     species
+   */
   public SpeciesPropertyFactory(final String propertyPath) {
     super(propertyPath);
   }

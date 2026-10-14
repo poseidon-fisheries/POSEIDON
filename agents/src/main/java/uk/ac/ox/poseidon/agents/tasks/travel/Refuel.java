@@ -32,8 +32,9 @@ import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 
 /**
- * An {@link ExtendedTripTask} that refuels the vessel at the cheapest fuel station in its
- * current cell, running for that purchase's duration and charging its price to the trip account.
+ * An {@link ExtendedTripTask} that refuels the vessel at the cheapest fuel
+ * station in its current cell, running for that purchase's duration and
+ * charging its price to the trip account.
  */
 @RequiredArgsConstructor
 public class Refuel extends ExtendedTripTask {
@@ -42,10 +43,11 @@ public class Refuel extends ExtendedTripTask {
   private Duration duration;
 
   /**
-   * Buys fuel from the cheapest-per-litre fuel station in the vessel's current cell, charging
-   * its price to the trip account and recording its duration.
+   * Buys fuel from the cheapest-per-litre fuel station in the vessel's current
+   * cell, charging its price to the trip account and recording its duration.
    *
-   * @throws IllegalStateException if there's no fuel station in the vessel's current cell
+   * @throws IllegalStateException if there's no fuel station in the vessel's
+   *                               current cell
    */
   @Override
   public void start() {

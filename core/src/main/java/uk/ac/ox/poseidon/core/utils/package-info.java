@@ -21,9 +21,9 @@
  */
 
 /**
- * General-purpose helpers that don't belong to a more specific domain package: functional
- * interfaces, small stateless utility classes, and factories for simple, broadly-applicable
- * building blocks. See {@link uk.ac.ox.poseidon.core.utils.Factories} for the factory entry
- * points.
+ * General-purpose helpers that don't belong to a more specific domain package:
+ * functional interfaces, small stateless utility classes, and factories for
+ * simple, broadly-applicable building blocks. See
+ * {@link uk.ac.ox.poseidon.core.utils.Factories} for the factory entry points.
  */
 package uk.ac.ox.poseidon.core.utils;

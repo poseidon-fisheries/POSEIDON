@@ -31,7 +31,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * Creates per-vessel components and registers them in a shared component register.
+ * Creates per-vessel components and registers them in a shared component
+ * register.
  */
 @Data
 @NoArgsConstructor

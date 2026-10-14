@@ -37,16 +37,19 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 
 /**
- * A per-vessel supplier that maintains a bounded, randomly sampled set of "friends" from a pool of
- * candidate vessels.
+ * A per-vessel supplier that maintains a bounded, randomly sampled set of
+ * "friends" from a pool of candidate vessels.
  *
- * <p>Each call to {@link #get()} first prunes friends that no longer satisfy the friendship
- * condition. If the target count has not been reached, new friends are sampled uniformly (without
- * replacement) from the pool, filtered by the condition and excluding current friends.
+ * <p>
+ * Each call to {@link #get()} first prunes friends that no longer satisfy the
+ * friendship condition. If the target count has not been reached, new friends
+ * are sampled uniformly (without replacement) from the pool, filtered by the
+ * condition and excluding current friends.
  *
- * <p>The sampling uses reservoir sampling ({@link
- * uk.ac.ox.poseidon.core.MasonUtils#reservoirSample reservoirSample}) for O(target) allocation
- * at the cost of O(pool) predicate evaluations.
+ * <p>
+ * The sampling uses reservoir sampling
+ * ({@link uk.ac.ox.poseidon.core.MasonUtils#reservoirSample reservoirSample})
+ * for O(target) allocation at the cost of O(pool) predicate evaluations.
  */
 @RequiredArgsConstructor
 public class DynamicFriendsSupplier implements Supplier<Set<Vessel>> {

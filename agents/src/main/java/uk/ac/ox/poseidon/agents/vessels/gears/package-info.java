@@ -21,9 +21,10 @@
  */
 
 /**
- * A vessel's fishing {@link uk.ac.ox.poseidon.agents.vessels.gears.Gear}: the contract itself,
- * an inactive placeholder, and implementations that catch a fixed or per-species proportion of
- * available biomass. See {@link uk.ac.ox.poseidon.agents.vessels.gears.Factories} for the entry
+ * A vessel's fishing {@link uk.ac.ox.poseidon.agents.vessels.gears.Gear}: the
+ * contract itself, an inactive placeholder, and implementations that catch a
+ * fixed or per-species proportion of available biomass. See
+ * {@link uk.ac.ox.poseidon.agents.vessels.gears.Factories} for the entry
  * points.
  */
 package uk.ac.ox.poseidon.agents.vessels.gears;

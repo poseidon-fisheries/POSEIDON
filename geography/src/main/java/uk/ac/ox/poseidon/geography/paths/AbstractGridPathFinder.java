@@ -29,8 +29,9 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A {@link GridPathFinder} base class holding the {@link BathymetricGrid} and {@link PortGrid} a
- * grid-based pathfinder needs: a cell is navigable if it's water or has a port on it.
+ * A {@link GridPathFinder} base class holding the {@link BathymetricGrid} and
+ * {@link PortGrid} a grid-based pathfinder needs: a cell is navigable if it's
+ * water or has a port on it.
  */
 @RequiredArgsConstructor
 abstract class AbstractGridPathFinder implements GridPathFinder {

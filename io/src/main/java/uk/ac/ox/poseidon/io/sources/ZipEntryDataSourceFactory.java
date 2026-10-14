@@ -40,8 +40,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link ZipEntryDataSource}, built via
- * {@link Factories#zipEntryDataSource(Factory, String)}/
+ * A {@link RelativeScopeFactory} counterpart of {@link ZipEntryDataSource},
+ * built via {@link Factories#zipEntryDataSource(Factory, String)}/
  * {@link Factories#zipEntryDataSource(Factory, String, String)}.
  */
 @Data
@@ -61,8 +61,8 @@ public class ZipEntryDataSourceFactory<S extends Scope> extends RelativeScopeFac
 
   /**
    * @param path  factory for the zip archive to read
-   * @param entry the name of the entry to read within the archive, using the default UTF-8
-   *              encoding
+   * @param entry the name of the entry to read within the archive, using the
+   *              default UTF-8 encoding
    */
   public ZipEntryDataSourceFactory(
     final Factory<S, ? extends Path> path,

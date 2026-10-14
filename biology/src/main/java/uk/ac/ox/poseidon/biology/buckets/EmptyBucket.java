@@ -35,11 +35,12 @@ import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 /**
- * The shared, contentless {@link Bucket}, obtained from {@link Bucket#empty()}. A singleton (a
- * plain class rather than an enum, since {@link Enum#equals}/{@link Enum#hashCode} are
- * {@code final} and this class needs to define content-based equality like every other
- * {@link Bucket} implementation), so the many operations that end up with nothing left need not
- * allocate.
+ * The shared, contentless {@link Bucket}, obtained from {@link Bucket#empty()}.
+ * A singleton (a plain class rather than an enum, since
+ * {@link Enum#equals}/{@link Enum#hashCode} are {@code final} and this class
+ * needs to define content-based equality like every other {@link Bucket}
+ * implementation), so the many operations that end up with nothing left need
+ * not allocate.
  */
 final class EmptyBucket implements Bucket {
 

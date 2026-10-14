@@ -26,8 +26,8 @@ import lombok.Value;
 
 /**
  * An immutable pair of two values, of possibly different types. Built via
- * {@link Factories#pair(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)} in this
- * package.
+ * {@link Factories#pair(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * in this package.
  *
  * @param <A> the type of the first value
  * @param <B> the type of the second value

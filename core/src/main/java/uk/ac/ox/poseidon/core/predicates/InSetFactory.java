@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link InSet}, built via
- * {@link Factories#in(Factory)} or the literal-values convenience {@link #of(Object[])} on
- * this class.
+ * {@link Factories#in(Factory)} or the literal-values convenience
+ * {@link #of(Object[])} on this class.
  */
 @Data
 @NoArgsConstructor
@@ -56,8 +56,10 @@ public class InSetFactory<
   > values;
 
   /**
-   * @param values the literal values the resulting predicate tests membership against
-   * @return an {@link InSetFactory} for an {@link InSet} predicate over the given values
+   * @param values the literal values the resulting predicate tests membership
+   *               against
+   * @return an {@link InSetFactory} for an {@link InSet} predicate over the
+   *         given values
    */
   @SafeVarargs
   public static <T> InSetFactory<Scope, T> of(final T... values) {

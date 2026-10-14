@@ -30,8 +30,9 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * A {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} counterpart of
- * {@link BiomassSaleAccumulator}, registering it with the {@code EventManager} (see
- * {@link SimulationEventListenerFactory}), built via {@link Factories#biomassSaleAccumulator()}.
+ * {@link BiomassSaleAccumulator}, registering it with the {@code EventManager}
+ * (see {@link SimulationEventListenerFactory}), built via
+ * {@link Factories#biomassSaleAccumulator()}.
  */
 @Data
 @NoArgsConstructor

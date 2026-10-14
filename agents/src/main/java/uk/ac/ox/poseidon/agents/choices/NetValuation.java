@@ -28,10 +28,11 @@ import java.util.function.ToDoubleBiFunction;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Values an option net of its cost: a revenue valuation minus a cost valuation, both given the
- * same option and recollection (in NW Med, the value of the remembered catch minus the cost of
- * travelling to fish there). The two are assumed to give amounts in the same currency; this is
- * not checked, since valuations give bare amounts.
+ * Values an option net of its cost: a revenue valuation minus a cost valuation,
+ * both given the same option and recollection (in NW Med, the value of the
+ * remembered catch minus the cost of travelling to fish there). The two are
+ * assumed to give amounts in the same currency; this is not checked, since
+ * valuations give bare amounts.
  *
  * @param <O> the type of option valued
  * @param <M> the type of what is remembered about an option

@@ -35,12 +35,14 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} that applies the resolved {@link MarketPrice}s as soon as it is
- * built, so that markets have them from the start of the simulation, and returns them. Prices are
- * applied when the simulation is built rather than scheduled at its start, so that prices set
- * before the first step, e.g. by a SURIMI {@code UpdateSpeciesPrices} message, are not
- * overwritten. No separate plain component class here: applying the prices is a side effect of
- * building the factory. Built via {@link Factories#initialPrices}.
+ * A {@link SimulationScopeFactory} that applies the resolved
+ * {@link MarketPrice}s as soon as it is built, so that markets have them from
+ * the start of the simulation, and returns them. Prices are applied when the
+ * simulation is built rather than scheduled at its start, so that prices set
+ * before the first step, e.g. by a SURIMI {@code UpdateSpeciesPrices} message,
+ * are not overwritten. No separate plain component class here: applying the
+ * prices is a side effect of building the factory. Built via
+ * {@link Factories#initialPrices}.
  */
 @Data
 @NoArgsConstructor

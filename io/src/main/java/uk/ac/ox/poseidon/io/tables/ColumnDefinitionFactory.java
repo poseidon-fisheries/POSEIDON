@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link ColumnDefinition}, built via
- * {@link Factories#columnDefinition(String, String)}.
+ * A {@link GlobalScopeFactory} counterpart of {@link ColumnDefinition}, built
+ * via {@link Factories#columnDefinition(String, String)}.
  */
 @Data
 @RequiredArgsConstructor

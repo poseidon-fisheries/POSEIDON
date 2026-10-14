@@ -27,9 +27,11 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 import java.util.function.BinaryOperator;
 
 /**
- * A {@link Memory} update rule for {@code Double}s: an exponential moving average, which
- * remembers {@code recollection × (1 − alpha) + observation × alpha}. An {@code alpha} of 1
- * replaces what is remembered with each new observation; an {@code alpha} of 0 keeps it forever.
+ * A {@link Memory} update rule for {@code Double}s: an exponential moving
+ * average, which remembers
+ * {@code recollection × (1 − alpha) + observation × alpha}. An {@code alpha} of
+ * 1 replaces what is remembered with each new observation; an {@code alpha} of
+ * 0 keeps it forever.
  */
 public class ExponentialMovingAverageOfDoubles
   implements BinaryOperator<Double>

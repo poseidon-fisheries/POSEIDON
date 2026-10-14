@@ -35,9 +35,10 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 /**
- * A {@link ListenerTable} that records one row per species per {@link FishingEvent}: the
- * catching vessel, the event's start/end times and end location, and the species' gross catch
- * broken down by {@link Disposition} (retained, discarded alive, discarded dead).
+ * A {@link ListenerTable} that records one row per species per
+ * {@link FishingEvent}: the catching vessel, the event's start/end times and
+ * end location, and the species' gross catch broken down by {@link Disposition}
+ * (retained, discarded alive, discarded dead).
  */
 @SuppressWarnings("FieldCanBeLocal")
 public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
@@ -99,7 +100,9 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
     );
   }
 
-  /** Appends one row per species involved in {@code event} to {@link #table}. */
+  /**
+   * Appends one row per species involved in {@code event} to {@link #table}.
+   */
   @Override
   public void receive(final FishingEvent event) {
     final Disposition disposition = event.getOutcome().getDisposition();

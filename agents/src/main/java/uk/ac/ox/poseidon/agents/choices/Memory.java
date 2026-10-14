@@ -33,12 +33,14 @@ import java.util.function.BinaryOperator;
 import lombok.NoArgsConstructor;
 
 /**
- * What has been observed about each option (e.g. each destination cell), as one remembered
- * {@code M} per option. The first observation of an option is remembered as is; each later one is
- * combined with what is remembered by an update rule supplied with the observation, so that
- * observations from different sources can be remembered differently.
+ * What has been observed about each option (e.g. each destination cell), as one
+ * remembered {@code M} per option. The first observation of an option is
+ * remembered as is; each later one is combined with what is remembered by an
+ * update rule supplied with the observation, so that observations from
+ * different sources can be remembered differently.
  * <p>
- * This only stores observations: how much an option is worth is up to whoever reads the memory.
+ * This only stores observations: how much an option is worth is up to whoever
+ * reads the memory.
  *
  * @param <O> the type of option observed
  * @param <M> the type of what is remembered about an option
@@ -49,14 +51,15 @@ public class Memory<O, M> {
   private final Map<O, M> contents = new HashMap<>();
 
   /**
-   * Remembers {@code observation} for {@code option}: as is if nothing is remembered for it
-   * yet, otherwise combined with what is remembered by {@code rule}.
+   * Remembers {@code observation} for {@code option}: as is if nothing is
+   * remembered for it yet, otherwise combined with what is remembered by
+   * {@code rule}.
    *
    * @param option      the option observed
    * @param observation what was observed; must not be {@code null}
    * @param rule        called with the recollection of {@code option} first and
-   *                    {@code observation} second, it returns what to remember from now on; must
-   *                    not return {@code null}
+   *                    {@code observation} second, it returns what to remember
+   *                    from now on; must not return {@code null}
    */
   public void observe(
     final O option,
@@ -80,8 +83,8 @@ public class Memory<O, M> {
   }
 
   /**
-   * Calls {@code action} once per observed option, with what is remembered for it, in no
-   * particular order.
+   * Calls {@code action} once per observed option, with what is remembered for
+   * it, in no particular order.
    *
    * @param action the action to call
    */

@@ -38,9 +38,10 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
- * Wraps a GeoTools {@link GridCoverage2D} (a raster grid, e.g. read from a GeoTIFF or ASCII grid
- * file) with convenience accessors used across this module to build a {@link ModelGrid} or read
- * per-cell values from raster files.
+ * Wraps a GeoTools {@link GridCoverage2D} (a raster grid, e.g. read from a
+ * GeoTIFF or ASCII grid file) with convenience accessors used across this
+ * module to build a {@link ModelGrid} or read per-cell values from raster
+ * files.
  */
 @Getter
 @RequiredArgsConstructor
@@ -48,13 +49,17 @@ public final class CoverageWrapper {
 
   private final GridCoverage2D coverage;
 
-  /** @param gridFile the raster grid file to read, in any format GeoTools can auto-detect */
+  /**
+   * @param gridFile the raster grid file to read, in any format GeoTools can
+   *                 auto-detect
+   */
   public CoverageWrapper(final File gridFile) {
     this(readCoverage(gridFile));
   }
 
   /**
-   * @param gridFile the raster grid file to read, in any format GeoTools can auto-detect
+   * @param gridFile the raster grid file to read, in any format GeoTools can
+   *                 auto-detect
    * @return the file's content as a GeoTools coverage
    * @throws RuntimeException if an I/O error occurs
    */
@@ -71,8 +76,8 @@ public final class CoverageWrapper {
   }
 
   /**
-   * @param action called once per raster cell, with its (x, y) position and its value (only the
-   *               first band is read)
+   * @param action called once per raster cell, with its (x, y) position and its
+   *               value (only the first band is read)
    */
   public void processGrid(final BiConsumer<Int2D, Double> action) {
     final RenderedImage image = coverage.getRenderedImage();

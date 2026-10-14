@@ -36,9 +36,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link ImmutableMarketGrid}, placing each
- * resolved {@link Market} at its own port's location in {@link #portGrid}, built via
- * {@link Factories#marketGrid}.
+ * A {@link RelativeScopeFactory} counterpart of {@link ImmutableMarketGrid},
+ * placing each resolved {@link Market} at its own port's location in
+ * {@link #portGrid}, built via {@link Factories#marketGrid}.
  */
 @Data
 @NoArgsConstructor

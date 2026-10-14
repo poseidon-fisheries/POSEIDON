@@ -31,9 +31,9 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
- * A {@link MarketGrid} placed once, at construction, from a fixed set of market locations. Since its
- * markets never change, it indexes them by port, so finding the market of a port does not scan
- * every market.
+ * A {@link MarketGrid} placed once, at construction, from a fixed set of market
+ * locations. Since its markets never change, it indexes them by port, so
+ * finding the market of a port does not scan every market.
  */
 public class ImmutableMarketGrid extends MarketGrid {
 

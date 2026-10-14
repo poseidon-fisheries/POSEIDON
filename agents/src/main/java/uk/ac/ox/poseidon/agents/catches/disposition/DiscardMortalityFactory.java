@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link DiscardMortality}, built via
- * {@link Factories#discardMortality}.
+ * A {@link RelativeScopeFactory} counterpart of {@link DiscardMortality}, built
+ * via {@link Factories#discardMortality}.
  */
 @Data
 @NoArgsConstructor

@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselTaskFactory} counterpart of {@link AgentPredicateTask}, built via
- * {@link Factories Factories.checkThat(...)}.
+ * A {@link VesselTaskFactory} counterpart of {@link AgentPredicateTask}, built
+ * via {@link Factories Factories.checkThat(...)}.
  */
 @Data
 @NoArgsConstructor

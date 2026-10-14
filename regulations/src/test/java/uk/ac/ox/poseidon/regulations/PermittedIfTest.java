@@ -34,8 +34,9 @@ import org.mockito.Mockito;
 class PermittedIfTest {
 
   /**
-   * Test class for the PermittedIf class. Provides test cases for the isPermitted method, which
-   * determines if an action is permitted based on a given predicate.
+   * Test class for the PermittedIf class. Provides test cases for the
+   * isPermitted method, which determines if an action is permitted based on a
+   * given predicate.
    */
 
   @Test

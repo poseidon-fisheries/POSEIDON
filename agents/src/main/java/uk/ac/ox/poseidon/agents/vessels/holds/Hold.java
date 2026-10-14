@@ -57,7 +57,7 @@ public interface Hold {
    * Removes all content currently held in the container and returns it.
    *
    * @return the removed content. If the container was empty, returns an empty
-   * {@link CategorisedCatch}.
+   *         {@link CategorisedCatch}.
    */
   CategorisedCatch extractContent();
 
@@ -69,7 +69,10 @@ public interface Hold {
   /** @return this hold's fixed total capacity, in kilograms */
   double getTotalCapacityInKg();
 
-  /** @return {@link #getTotalCapacityInKg()} minus the current content's total biomass */
+  /**
+   * @return {@link #getTotalCapacityInKg()} minus the current content's total
+   *         biomass
+   */
   default double getAvailableCapacityInKg() {
     return getTotalCapacityInKg() - getContent().getTotalBiomassInKg();
   }

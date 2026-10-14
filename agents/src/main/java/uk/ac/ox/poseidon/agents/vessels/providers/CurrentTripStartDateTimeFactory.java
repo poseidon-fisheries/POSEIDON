@@ -26,8 +26,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link CurrentTripStartDateTime}, built via
- * {@link Factories#currentTripStartDateTime()}.
+ * A {@link VesselScopeFactory} counterpart of {@link CurrentTripStartDateTime},
+ * built via {@link Factories#currentTripStartDateTime()}.
  */
 public class CurrentTripStartDateTimeFactory
   extends VesselScopeFactory<CurrentTripStartDateTime>

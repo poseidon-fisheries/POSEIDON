@@ -27,8 +27,9 @@ import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Holds for a vessel whose most recent trip (the current one if it is on a trip, else the previous
- * one) started on the current calendar date. Never holds for a vessel that has made no trip yet.
+ * Holds for a vessel whose most recent trip (the current one if it is on a
+ * trip, else the previous one) started on the current calendar date. Never
+ * holds for a vessel that has made no trip yet.
  */
 public class VesselHasStartedTripToday implements Predicate<Vessel> {
 

@@ -37,17 +37,19 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /**
- * Values a catch at the prices of the market at a vessel's home port, as it would sell there now:
- * the catch is sorted by the vessel's own {@link CatchCategoriser}, priced by
- * {@link Market#quote}, and summed by {@link Sale#summarise}. Species without a price count as
- * zero. The option the catch is remembered for is ignored, so that this can be combined with
- * other valuations of the same shape. A change of home port or of prices shows straight away.
- * Assumes a single currency.
+ * Values a catch at the prices of the market at a vessel's home port, as it
+ * would sell there now: the catch is sorted by the vessel's own
+ * {@link CatchCategoriser}, priced by {@link Market#quote}, and summed by
+ * {@link Sale#summarise}. Species without a price count as zero. The option the
+ * catch is remembered for is ignored, so that this can be combined with other
+ * valuations of the same shape. A change of home port or of prices shows
+ * straight away. Assumes a single currency.
  * <p>
- * Values are remembered per catch, and forgotten when the home port's market changes or its
- * prices change ({@link Market#getLastPriceChangeDateTime}). This assumes that a catch never
- * changes once remembered, as {@link Bucket}s are immutable, and that the catch categoriser
- * always sorts the same catch the same way.
+ * Values are remembered per catch, and forgotten when the home port's market
+ * changes or its prices change ({@link Market#getLastPriceChangeDateTime}).
+ * This assumes that a catch never changes once remembered, as {@link Bucket}s
+ * are immutable, and that the catch categoriser always sorts the same catch the
+ * same way.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class HomePortCatchValuation
@@ -67,9 +69,9 @@ public class HomePortCatchValuation
   private LocalDateTime valuedSince;
 
   /**
-   * @throws IllegalStateException if the vessel has no home port, its home port does not have
-   *                               exactly one market, or the catch is priced in more than one
-   *                               currency
+   * @throws IllegalStateException if the vessel has no home port, its home port
+   *                               does not have exactly one market, or the
+   *                               catch is priced in more than one currency
    */
   @Override
   public double applyAsDouble(final Object option, final Bucket bucket) {

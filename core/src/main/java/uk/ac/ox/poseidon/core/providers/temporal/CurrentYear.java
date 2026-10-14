@@ -27,8 +27,8 @@ import uk.ac.ox.poseidon.core.providers.IntProvider;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 /**
- * An {@link IntProvider} that returns the simulation's current calendar year, read live from the
- * {@link TemporalSchedule} on every call. Built via
+ * An {@link IntProvider} that returns the simulation's current calendar year,
+ * read live from the {@link TemporalSchedule} on every call. Built via
  * {@link Factories#currentYear()} in this package.
  */
 @RequiredArgsConstructor

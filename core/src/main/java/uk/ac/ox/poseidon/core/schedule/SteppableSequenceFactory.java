@@ -34,9 +34,10 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} for a MASON {@link Sequence} that runs the resolved list of
- * steppables, in order, on every step. No separate plain component class here: the produced value
- * is a bare MASON type, with no wrapper to carry documentation. Built via
+ * A {@link SimulationScopeFactory} for a MASON {@link Sequence} that runs the
+ * resolved list of steppables, in order, on every step. No separate plain
+ * component class here: the produced value is a bare MASON type, with no
+ * wrapper to carry documentation. Built via
  * {@link Factories#steppableSequence(Factory)}.
  */
 @Data

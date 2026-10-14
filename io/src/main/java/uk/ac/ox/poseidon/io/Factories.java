@@ -27,8 +27,8 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * Factories for filesystem side-effects performed during a simulation run, such as clearing out
- * a target directory.
+ * Factories for filesystem side-effects performed during a simulation run, such
+ * as clearing out a target directory.
  */
 public class Factories {
 
@@ -36,9 +36,10 @@ public class Factories {
 
   /**
    * @param target         factory for the directory to delete
-   * @param ignoreIfAbsent whether a missing target is silently ignored rather than an error
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DirectoryRemover}
-   * over the resolved target
+   * @param ignoreIfAbsent whether a missing target is silently ignored rather
+   *                       than an error
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link DirectoryRemover} over the resolved target
    * @see DirectoryRemover
    */
   public static <S extends Scope> DirectoryRemoverFactory<S> directoryRemover(

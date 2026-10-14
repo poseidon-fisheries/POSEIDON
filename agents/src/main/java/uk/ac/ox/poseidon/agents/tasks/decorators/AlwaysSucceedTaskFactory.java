@@ -32,8 +32,9 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link DecoratorTaskFactory} for a gdx-ai {@link AlwaysSucceed}: runs its child, then reports
- * success regardless of that child's outcome. Built via {@link Factories#alwaysSucceed}.
+ * A {@link DecoratorTaskFactory} for a gdx-ai {@link AlwaysSucceed}: runs its
+ * child, then reports success regardless of that child's outcome. Built via
+ * {@link Factories#alwaysSucceed}.
  */
 @Data
 @NoArgsConstructor

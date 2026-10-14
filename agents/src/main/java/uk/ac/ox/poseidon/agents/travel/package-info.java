@@ -21,10 +21,11 @@
  */
 
 /**
- * Travel as something with a cost: {@link uk.ac.ox.poseidon.agents.travel.Route} describes a
- * route a vessel would sail, and {@link uk.ac.ox.poseidon.agents.travel.RouteViaDestination}
+ * Travel as something with a cost:
+ * {@link uk.ac.ox.poseidon.agents.travel.Route} describes a route a vessel
+ * would sail, and {@link uk.ac.ox.poseidon.agents.travel.RouteViaDestination}
  * gives the route to fish at a cell and return to port. See
- * {@link uk.ac.ox.poseidon.agents.travel.Factories} for the entry points. The travel tasks
- * themselves are in {@code uk.ac.ox.poseidon.agents.tasks.travel}.
+ * {@link uk.ac.ox.poseidon.agents.travel.Factories} for the entry points. The
+ * travel tasks themselves are in {@code uk.ac.ox.poseidon.agents.tasks.travel}.
  */
 package uk.ac.ox.poseidon.agents.travel;

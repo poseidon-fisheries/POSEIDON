@@ -33,11 +33,11 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} for a {@link ModelGrid} whose width, height, and envelope are
- * read straight from a raster grid file's own metadata (via {@link CoverageWrapper}), rather than
- * specified by hand — keeping the grid aligned with a bathymetry/elevation source file without
- * duplicating its dimensions. Built via
- * {@link Factories#modelGridFromGridFile(Factory)}.
+ * A {@link RelativeScopeFactory} for a {@link ModelGrid} whose width, height,
+ * and envelope are read straight from a raster grid file's own metadata (via
+ * {@link CoverageWrapper}), rather than specified by hand — keeping the grid
+ * aligned with a bathymetry/elevation source file without duplicating its
+ * dimensions. Built via {@link Factories#modelGridFromGridFile(Factory)}.
  */
 @Data
 @NoArgsConstructor

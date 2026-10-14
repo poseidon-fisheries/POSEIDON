@@ -37,9 +37,9 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 /**
- * The MASON {@link GUIState} for a POSEIDON {@link Simulation}: on each (re)start it builds a
- * fresh simulation from {@code simulationSupplier} and hands it to every registered
- * {@link DisplayWrapper} to set up portrayals for.
+ * The MASON {@link GUIState} for a POSEIDON {@link Simulation}: on each
+ * (re)start it builds a fresh simulation from {@code simulationSupplier} and
+ * hands it to every registered {@link DisplayWrapper} to set up portrayals for.
  */
 public class SimulationWithUI extends GUIState {
 
@@ -48,8 +48,10 @@ public class SimulationWithUI extends GUIState {
   private Simulation simulation;
 
   /**
-   * @param simulationSupplier builds a fresh {@link Simulation} on each (re)start
-   * @param displayWrappers    the displays to set up and tear down alongside the simulation
+   * @param simulationSupplier builds a fresh {@link Simulation} on each
+   *                           (re)start
+   * @param displayWrappers    the displays to set up and tear down alongside
+   *                           the simulation
    */
   public SimulationWithUI(
     final Supplier<Simulation> simulationSupplier,
@@ -59,8 +61,10 @@ public class SimulationWithUI extends GUIState {
   }
 
   /**
-   * @param simulationSupplier builds a fresh {@link Simulation} on each (re)start
-   * @param displayWrappers    the displays to set up and tear down alongside the simulation
+   * @param simulationSupplier builds a fresh {@link Simulation} on each
+   *                           (re)start
+   * @param displayWrappers    the displays to set up and tear down alongside
+   *                           the simulation
    */
   public SimulationWithUI(
     final Supplier<Simulation> simulationSupplier,
@@ -73,8 +77,9 @@ public class SimulationWithUI extends GUIState {
   }
 
   /**
-   * Looked up by MASON's console via reflection (not an {@code @Override}, {@link GUIState}
-   * exposes no instance method for it) to label the application window.
+   * Looked up by MASON's console via reflection (not an {@code @Override},
+   * {@link GUIState} exposes no instance method for it) to label the
+   * application window.
    *
    * @return {@code "POSEIDON"}
    */
@@ -84,8 +89,8 @@ public class SimulationWithUI extends GUIState {
   }
 
   /**
-   * Builds a fresh {@link Simulation} from {@link #simulationSupplier} and sets up portrayals
-   * on every registered {@link DisplayWrapper} for it.
+   * Builds a fresh {@link Simulation} from {@link #simulationSupplier} and sets
+   * up portrayals on every registered {@link DisplayWrapper} for it.
    */
   @Override
   public void start() {
@@ -108,8 +113,9 @@ public class SimulationWithUI extends GUIState {
   }
 
   /**
-   * @return a {@link SimulationProxy} pointing at the current simulation, so the model
-   * inspector keeps working across restarts (see {@link SimulationProxy}'s own doc)
+   * @return a {@link SimulationProxy} pointing at the current simulation, so
+   *         the model inspector keeps working across restarts (see
+   *         {@link SimulationProxy}'s own doc)
    */
   @Override
   public Object getSimulationInspectedObject() {
@@ -117,7 +123,8 @@ public class SimulationWithUI extends GUIState {
   }
 
   /**
-   * @return the inherited inspector, marked volatile so it refreshes across simulation restarts
+   * @return the inherited inspector, marked volatile so it refreshes across
+   *         simulation restarts
    */
   @Override
   public Inspector getInspector() {
@@ -127,7 +134,8 @@ public class SimulationWithUI extends GUIState {
   }
 
   /**
-   * Tears down every registered {@link DisplayWrapper} alongside the inherited cleanup.
+   * Tears down every registered {@link DisplayWrapper} alongside the inherited
+   * cleanup.
    */
   @Override
   public void quit() {
@@ -136,11 +144,12 @@ public class SimulationWithUI extends GUIState {
   }
 
   /**
-   * This class is there to get around the fact that the MASON model inspector is tied to a
-   * particular object that cannot be changed without reconstructing the inspector. Since we build
-   * a new simulation object everytime it is restarted (instead of re-initialising the same object
-   * as is more common in MASON), we use this proxy class pointing to the current simulation for
-   * the inspector to display.
+   * This class is there to get around the fact that the MASON model inspector
+   * is tied to a particular object that cannot be changed without
+   * reconstructing the inspector. Since we build a new simulation object
+   * everytime it is restarted (instead of re-initialising the same object as is
+   * more common in MASON), we use this proxy class pointing to the current
+   * simulation for the inspector to display.
    */
   @SuppressWarnings("WeakerAccess")
   public class SimulationProxy {
@@ -156,19 +165,25 @@ public class SimulationWithUI extends GUIState {
       return propertyOrNull(Simulation::getId);
     }
 
-    /** @return the current simulation's temporal schedule, or {@code null} if there is none */
+    /**
+     * @return the current simulation's temporal schedule, or {@code null} if
+     *         there is none
+     */
     public TemporalSchedule getTemporalSchedule() {
       return propertyOrNull(Simulation::getTemporalSchedule);
     }
 
-    /** @return the current simulation's final processes, or {@code null} if there is none */
+    /**
+     * @return the current simulation's final processes, or {@code null} if
+     *         there is none
+     */
     public List<Steppable> getFinalProcess() {
       return propertyOrNull(Simulation::getFinalProcesses);
     }
 
     /**
-     * @return one {@link ComponentView} per component of the current simulation, or
-     * {@code null} if there is none
+     * @return one {@link ComponentView} per component of the current
+     *         simulation, or {@code null} if there is none
      */
     public List<ComponentView> getComponents() {
       return propertyOrNull(ComponentView::of);

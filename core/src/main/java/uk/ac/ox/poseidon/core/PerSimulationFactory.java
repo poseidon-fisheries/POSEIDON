@@ -29,10 +29,11 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link PerScopeFactory} that builds its delegate's product once per simulation, whatever
- * scope the delegate has: wrapping a global factory gives each simulation its own instance (see
- * {@link PerScopeFactory} for what is and is not new). No separate plain component class here: the
- * produced value is whatever the delegate produces, passed through unchanged. Built via
+ * A {@link PerScopeFactory} that builds its delegate's product once per
+ * simulation, whatever scope the delegate has: wrapping a global factory gives
+ * each simulation its own instance (see {@link PerScopeFactory} for what is and
+ * is not new). No separate plain component class here: the produced value is
+ * whatever the delegate produces, passed through unchanged. Built via
  * {@link uk.ac.ox.poseidon.core.utils.Factories#perSimulation(Factory)}.
  */
 @Data

@@ -31,15 +31,19 @@ import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Starts a vessel's trip towards whatever destination {@code destinationSupplier} yields; fails,
- * without starting a trip, if the supplier yields none.
+ * Starts a vessel's trip towards whatever destination
+ * {@code destinationSupplier} yields; fails, without starting a trip, if the
+ * supplier yields none.
  */
 @RequiredArgsConstructor
 public class StartTrip extends AgentTask<Vessel> {
 
   private final DestinationSupplier destinationSupplier;
 
-  /** @return {@link Status#SUCCEEDED} if a destination was found and the trip started, else {@link Status#FAILED} */
+  /**
+   * @return {@link Status#SUCCEEDED} if a destination was found and the trip
+   *         started, else {@link Status#FAILED}
+   */
   @Override
   public Status execute() {
     return destinationSupplier

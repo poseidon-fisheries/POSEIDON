@@ -22,7 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.tasks;
 
-/** A {@link Behaviour} for agents with no behavior tree at all; stepping it is an error. */
+/**
+ * A {@link Behaviour} for agents with no behavior tree at all; stepping it is
+ * an error.
+ */
 public enum InactiveBehaviour implements Behaviour {
   /** The single instance of this enum. */
   INACTIVE_BEHAVIOUR;

@@ -27,16 +27,19 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
- * The default, immutable {@link DoubleGrid} implementation, backed by a MASON {@link DoubleGrid2D}
- * (always defensively copied at construction, so later mutation of a source {@code DoubleGrid2D}
- * doesn't affect this grid).
+ * The default, immutable {@link DoubleGrid} implementation, backed by a MASON
+ * {@link DoubleGrid2D} (always defensively copied at construction, so later
+ * mutation of a source {@code DoubleGrid2D} doesn't affect this grid).
  */
 public class BaseDoubleGrid
   extends AbstractGrid<DoubleGrid2D>
   implements DoubleGrid
 {
 
-  /** @param modelGrid the grid this is defined over; every cell starts at {@code 0.0} */
+  /**
+   * @param modelGrid the grid this is defined over; every cell starts at
+   *                  {@code 0.0}
+   */
   public BaseDoubleGrid(final ModelGrid modelGrid) {
     this(modelGrid, 0.0);
   }
@@ -57,18 +60,19 @@ public class BaseDoubleGrid
   }
 
   /**
-   * @param values the values, indexed {@code [x][y]}; also determines the grid size. The
-   *               underlying {@link ModelGrid} is a plain cell grid with an envelope matching
-   *               the array's dimensions, with no geographic meaning.
+   * @param values the values, indexed {@code [x][y]}; also determines the grid
+   *               size. The underlying {@link ModelGrid} is a plain cell grid
+   *               with an envelope matching the array's dimensions, with no
+   *               geographic meaning.
    */
   public BaseDoubleGrid(final double[][] values) {
     this(new DoubleGrid2D(values));
   }
 
   /**
-   * @param grid2D the values to copy. The underlying {@link ModelGrid} is a plain cell grid
-   *               with an envelope matching {@code grid2D}'s dimensions, with no geographic
-   *               meaning.
+   * @param grid2D the values to copy. The underlying {@link ModelGrid} is a
+   *               plain cell grid with an envelope matching {@code grid2D}'s
+   *               dimensions, with no geographic meaning.
    */
   public BaseDoubleGrid(final DoubleGrid2D grid2D) {
     this(

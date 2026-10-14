@@ -30,8 +30,8 @@ import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * The cost of the time a vessel would spend sailing a {@link Route}: its hourly cost times the
- * route's hours. The hourly cost is read at each call.
+ * The cost of the time a vessel would spend sailing a {@link Route}: its hourly
+ * cost times the route's hours. The hourly cost is read at each call.
  */
 public class TimeCost implements Function<Route, Money> {
 
@@ -52,8 +52,10 @@ public class TimeCost implements Function<Route, Money> {
 
   /**
    * @param route the route the vessel would sail
-   * @return the vessel's hourly cost times the hours {@code route} takes to sail
-   * @throws NullPointerException if {@code hourlyCost} gives no cost for the vessel
+   * @return the vessel's hourly cost times the hours {@code route} takes to
+   *         sail
+   * @throws NullPointerException if {@code hourlyCost} gives no cost for the
+   *                              vessel
    */
   @Override
   public Money apply(final Route route) {

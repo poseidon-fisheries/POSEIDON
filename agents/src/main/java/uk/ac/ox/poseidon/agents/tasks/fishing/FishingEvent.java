@@ -27,7 +27,10 @@ import lombok.Value;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
 
-/** An {@link ExtendedEvent} recording one completed fishing action and what it caught. */
+/**
+ * An {@link ExtendedEvent} recording one completed fishing action and what it
+ * caught.
+ */
 @Value
 public class FishingEvent implements ExtendedEvent {
 

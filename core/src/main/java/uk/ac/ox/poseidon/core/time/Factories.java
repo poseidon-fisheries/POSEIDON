@@ -34,8 +34,9 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * Factories for fixed dates, times, durations, and periods, and for a
- * {@link java.time.LocalDateTime} computed relative to the simulation's start. Date-times that
- * move with the simulation are in {@link uk.ac.ox.poseidon.core.providers.temporal.Factories}.
+ * {@link java.time.LocalDateTime} computed relative to the simulation's start.
+ * Date-times that move with the simulation are in
+ * {@link uk.ac.ox.poseidon.core.providers.temporal.Factories}.
  */
 public class Factories {
 
@@ -131,8 +132,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link DateTimeFactory} for the start (midnight) of today, evaluated when this
-   * method is called
+   * @return a {@link DateTimeFactory} for the start (midnight) of today,
+   *         evaluated when this method is called
    * @see DateTimeFactory
    */
   public static DateTimeFactory startOfToday() {
@@ -140,8 +141,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link DateTimeFactory} for the current date-time, evaluated when this method is
-   * called
+   * @return a {@link DateTimeFactory} for the current date-time, evaluated when
+   *         this method is called
    * @see DateTimeFactory
    */
   public static DateTimeFactory now() {
@@ -205,9 +206,10 @@ public class Factories {
   }
 
   /**
-   * @param amountToAdd factory for the amount to add to the simulation's starting date-time
-   * @return a {@link SimulationScope}-scoped factory for a {@link LocalDateTime} relative to
-   * the simulation's start
+   * @param amountToAdd factory for the amount to add to the simulation's
+   *                    starting date-time
+   * @return a {@link SimulationScope}-scoped factory for a
+   *         {@link LocalDateTime} relative to the simulation's start
    * @see DateTimeAfterStartingFactory
    */
   public static DateTimeAfterStartingFactory dateTimeAfterStarting(
@@ -219,7 +221,7 @@ public class Factories {
   /**
    * @param meanDuration factory for the mean of the exponential distribution
    * @return a {@link SimulationScope}-scoped factory for an
-   * {@link ExponentiallyDistributedDuration} with the resolved mean
+   *         {@link ExponentiallyDistributedDuration} with the resolved mean
    * @see ExponentiallyDistributedDuration
    */
   public static ExponentiallyDistributedDurationSupplierFactory exponentiallyDistributedDuration(

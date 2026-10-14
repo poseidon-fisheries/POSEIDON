@@ -27,7 +27,10 @@ import lombok.EqualsAndHashCode;
 import uk.ac.ox.poseidon.agents.AgentScope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-/** An {@link AgentScope} narrowed to a {@link Vessel}, for factories building vessel-owned components. */
+/**
+ * An {@link AgentScope} narrowed to a {@link Vessel}, for factories building
+ * vessel-owned components.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class VesselScope extends AgentScope<Vessel> {
@@ -48,7 +51,10 @@ public class VesselScope extends AgentScope<Vessel> {
     super(new AgentScope<>(simulationScope, vessel));
   }
 
-  /** @return the scoped vessel, or {@code null} if it has since been garbage-collected */
+  /**
+   * @return the scoped vessel, or {@code null} if it has since been
+   *         garbage-collected
+   */
   public Vessel getVessel() {
     return getAgent();
   }

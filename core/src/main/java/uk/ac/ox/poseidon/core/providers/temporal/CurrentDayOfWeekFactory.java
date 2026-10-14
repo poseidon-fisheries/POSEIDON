@@ -29,8 +29,8 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link CurrentDayOfWeek}, built via
- * {@link Factories#currentDayOfWeek()}.
+ * A {@link SimulationScopeFactory} counterpart of {@link CurrentDayOfWeek},
+ * built via {@link Factories#currentDayOfWeek()}.
  */
 @Data
 @NoArgsConstructor

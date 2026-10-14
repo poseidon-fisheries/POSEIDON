@@ -28,13 +28,17 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-/** Factories for {@code Predicate<Vessel>}s testing a vessel's activity, trips, home port or location. */
+/**
+ * Factories for {@code Predicate<Vessel>}s testing a vessel's activity, trips,
+ * home port or location.
+ */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link VesselIsActive}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link VesselIsActive}
    * @see VesselIsActive
    */
   public static VesselIsActiveFactory vesselIsActive() {
@@ -43,7 +47,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   * {@link VesselHasStartedTripToday}
+   *         {@link VesselHasStartedTripToday}
    * @see VesselHasStartedTripToday
    */
   public static VesselHasStartedTripTodayFactory vesselHasStartedTripToday() {
@@ -51,8 +55,9 @@ public class Factories {
   }
 
   /**
-   * @return a {@link VesselScope}-relative factory for a {@link VesselHasSameHomePort}
-   * matching the scoped vessel's home port
+   * @return a {@link VesselScope}-relative factory for a
+   *         {@link VesselHasSameHomePort} matching the scoped vessel's home
+   *         port
    * @see VesselHasSameHomePort
    */
   public static VesselHasSameHomePortFactory vesselHasSameHomePort() {

@@ -36,10 +36,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link RelativeScopeFactory} for a {@link DefaultBathymetricGrid} built directly from one
- * literal elevation value per cell (no aggregation, unlike {@link BathymetricGridFactory}'s
- * subclasses): {@code elevationValues} must have exactly one entry per grid cell, in row-major
- * (x-then-y) order. Built via
+ * A {@link RelativeScopeFactory} for a {@link DefaultBathymetricGrid} built
+ * directly from one literal elevation value per cell (no aggregation, unlike
+ * {@link BathymetricGridFactory}'s subclasses): {@code elevationValues} must
+ * have exactly one entry per grid cell, in row-major (x-then-y) order. Built
+ * via
  * {@link Factories#bathymetricGridFromElevationValues(Factory, java.util.List)}.
  */
 @Data

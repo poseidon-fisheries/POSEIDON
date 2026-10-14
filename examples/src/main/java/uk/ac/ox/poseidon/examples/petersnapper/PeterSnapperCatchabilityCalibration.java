@@ -40,9 +40,9 @@ import uk.ac.ox.poseidon.calibration.CalibrationRunner;
 import uk.ac.ox.poseidon.calibration.errors.SumSquaredErrors;
 
 /**
- * CLI entry point that calibrates the Peter Snapper scenario's gear catchability against
- * observed yearly landings, via {@link CalibrationRunner}, and reports the result against the
- * scenario's tutorial catchability value.
+ * CLI entry point that calibrates the Peter Snapper scenario's gear
+ * catchability against observed yearly landings, via {@link CalibrationRunner},
+ * and reports the result against the scenario's tutorial catchability value.
  */
 public final class PeterSnapperCatchabilityCalibration {
 

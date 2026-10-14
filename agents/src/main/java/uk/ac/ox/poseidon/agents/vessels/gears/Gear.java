@@ -27,12 +27,18 @@ import java.util.function.Supplier;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
-/** A vessel's fishing gear: how it catches, how long that takes, and what it costs in fuel. */
+/**
+ * A vessel's fishing gear: how it catches, how long that takes, and what it
+ * costs in fuel.
+ */
 public interface Gear {
   /** @return this gear's identifying code */
   String getCode();
 
-  /** @return litres of fuel burned per hour of fishing; {@code 0} unless overridden */
+  /**
+   * @return litres of fuel burned per hour of fishing; {@code 0} unless
+   *         overridden
+   */
   default double getLitresOfFuelConsumedPerHourOfFishing() {
     return 0;
   }
@@ -40,7 +46,10 @@ public interface Gear {
   /** @return supplies how long one fishing event with this gear takes */
   Supplier<Duration> getDurationSupplier();
 
-  /** @return what this gear catches from {@code fisheable}, removed from it in the process */
+  /**
+   * @return what this gear catches from {@code fisheable}, removed from it in
+   *         the process
+   */
   Bucket fish(Fisheable fisheable);
 
   /** @return {@code true} if this gear can actually be fished with */

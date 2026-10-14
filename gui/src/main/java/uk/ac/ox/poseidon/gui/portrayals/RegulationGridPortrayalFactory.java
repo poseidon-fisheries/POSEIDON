@@ -55,11 +55,13 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 /**
- * A {@link SimulationScopeFactory} that overlays a checkered texture on cells where fishing is
- * currently forbidden for every active vessel of a fleet, i.e. cells closed to the whole fleet,
- * recomputed once per {@link UpdateFrequency#EVERY_DAY day} rather than on every draw. Cells
- * closed to only part of the fleet, e.g. to the vessels of a port under a temporary closure, are
- * not marked. If no vessel of the fleet is active, no cell is marked.
+ * A {@link SimulationScopeFactory} that overlays a checkered texture on cells
+ * where fishing is currently forbidden for every active vessel of a fleet, i.e.
+ * cells closed to the whole fleet, recomputed once per
+ * {@link UpdateFrequency#EVERY_DAY day} rather than on every draw. Cells closed
+ * to only part of the fleet, e.g. to the vessels of a port under a temporary
+ * closure, are not marked. If no vessel of the fleet is active, no cell is
+ * marked.
  */
 public class RegulationGridPortrayalFactory
   extends SimulationScopeFactory<ObjectGridPortrayal2D>
@@ -81,7 +83,10 @@ public class RegulationGridPortrayalFactory
   private int displayWidth;
   private int displayHeight;
 
-  /** @return a portrayal overlaying a checkered texture on cells currently forbidden to fish */
+  /**
+   * @return a portrayal overlaying a checkered texture on cells currently
+   *         forbidden to fish
+   */
   @Override
   protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
     return new Portrayal(

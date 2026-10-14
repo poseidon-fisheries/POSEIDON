@@ -32,9 +32,10 @@ import org.threeten.extra.Interval;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 /**
- * A convenience base {@link Action} combining {@link TemporalAction} and {@link SpatialAction},
- * with constructors covering the common ways of specifying its time span (an explicit end,
- * a duration from the start) and location (stationary, or a start/end pair).
+ * A convenience base {@link Action} combining {@link TemporalAction} and
+ * {@link SpatialAction}, with constructors covering the common ways of
+ * specifying its time span (an explicit end, a duration from the start) and
+ * location (stationary, or a start/end pair).
  */
 @Data
 @AllArgsConstructor
@@ -47,7 +48,10 @@ public abstract class ExtendedAction<G> implements
   private final Coordinate startCoordinate;
   private final Coordinate endCoordinate;
 
-  /** A stationary action running from {@code startDateTime} to {@code endDateTime}. */
+  /**
+   * A stationary action running from {@code startDateTime} to
+   * {@code endDateTime}.
+   */
   public ExtendedAction(
     final G agent,
     final LocalDateTime startDateTime,
@@ -62,7 +66,10 @@ public abstract class ExtendedAction<G> implements
     );
   }
 
-  /** A stationary action of length {@code duration}, starting at {@code startDateTime}. */
+  /**
+   * A stationary action of length {@code duration}, starting at
+   * {@code startDateTime}.
+   */
   public ExtendedAction(
     final G agent,
     final LocalDateTime startDateTime,
@@ -73,8 +80,8 @@ public abstract class ExtendedAction<G> implements
   }
 
   /**
-   * An action of length {@code duration}, starting at {@code startDateTime}, moving from
-   * {@code startCoordinate} to {@code endCoordinate}.
+   * An action of length {@code duration}, starting at {@code startDateTime},
+   * moving from {@code startCoordinate} to {@code endCoordinate}.
    */
   public ExtendedAction(
     final G agent,

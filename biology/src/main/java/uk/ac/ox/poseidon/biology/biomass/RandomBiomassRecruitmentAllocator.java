@@ -32,10 +32,10 @@ import sim.util.Bag;
 import sim.util.Int2D;
 
 /**
- * Allocates recruited biomass in randomly-ordered, evenly-sized chunks across habitable cells,
- * skipping (and eventually dropping) any cell once it reaches carrying capacity. If total carrying
- * capacity across habitable cells is exceeded, the remainder is logged and left unallocated rather
- * than thrown.
+ * Allocates recruited biomass in randomly-ordered, evenly-sized chunks across
+ * habitable cells, skipping (and eventually dropping) any cell once it reaches
+ * carrying capacity. If total carrying capacity across habitable cells is
+ * exceeded, the remainder is logged and left unallocated rather than thrown.
  */
 @RequiredArgsConstructor
 public class RandomBiomassRecruitmentAllocator

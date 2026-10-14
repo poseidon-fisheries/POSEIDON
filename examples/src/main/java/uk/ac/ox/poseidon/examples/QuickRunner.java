@@ -43,9 +43,9 @@ import uk.ac.ox.poseidon.core.utils.CustomPathConverter;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 
 /**
- * A JCommander-driven CLI entry point that loads a {@link Scenario} from a YAML file, runs it for
- * a fixed {@link Period}, and logs start/completion. See {@code -h}/the {@link Parameter}
- * annotations below for the accepted flags.
+ * A JCommander-driven CLI entry point that loads a {@link Scenario} from a YAML
+ * file, runs it for a fixed {@link Period}, and logs start/completion. See
+ * {@code -h}/the {@link Parameter} annotations below for the accepted flags.
  */
 @NoArgsConstructor
 @AllArgsConstructor
@@ -115,7 +115,8 @@ public class QuickRunner implements Runnable {
   }
 
   /**
-   * Loads the scenario from {@code scenarioPath} and runs it for {@code period}.
+   * Loads the scenario from {@code scenarioPath} and runs it for
+   * {@code period}.
    */
   @Override
   public void run() {

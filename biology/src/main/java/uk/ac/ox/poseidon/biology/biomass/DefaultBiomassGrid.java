@@ -34,8 +34,9 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableDoubleGrid;
 
 /**
- * The default {@link BiomassGrid} implementation: a single-species {@link MutableDoubleGrid} that
- * is also directly {@link FisheableGrid} (fishing extracts from and releases into it in place).
+ * The default {@link BiomassGrid} implementation: a single-species
+ * {@link MutableDoubleGrid} that is also directly {@link FisheableGrid}
+ * (fishing extracts from and releases into it in place).
  */
 @Getter
 class DefaultBiomassGrid
@@ -93,7 +94,8 @@ class DefaultBiomassGrid
   }
 
   /**
-   * Sums the values for the grid, ignoring NaN, as they occur in non-habitable cells
+   * Sums the values for the grid, ignoring NaN, as they occur in non-habitable
+   * cells
    */
   @Override
   public double getSum() {
@@ -113,8 +115,8 @@ class DefaultBiomassGrid
   }
 
   /**
-   * Extracting takes at most what the cell holds (never over-draws it); releasing rejects any
-   * species other than this grid's own.
+   * Extracting takes at most what the cell holds (never over-draws it);
+   * releasing rejects any species other than this grid's own.
    */
   @RequiredArgsConstructor
   class FisheableCell implements Fisheable {

@@ -30,8 +30,8 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} for a {@link SmoothBiomassDiffusionRule}. Built via
- * {@link Factories#smoothBiomassDiffusionRule}.
+ * A {@link GlobalScopeFactory} for a {@link SmoothBiomassDiffusionRule}. Built
+ * via {@link Factories#smoothBiomassDiffusionRule}.
  */
 @Data
 @NoArgsConstructor
@@ -48,7 +48,8 @@ public class SmoothBiomassDiffusionRuleFactory
 
   /**
    * maximum percentage of biomass that can leave one place for another per
-   * {@link SmoothBiomassDiffusionRule} step, not necessarily daily despite the field name — see
+   * {@link SmoothBiomassDiffusionRule} step, not necessarily daily despite the
+   * field name — see
    * {@link SmoothBiomassDiffusionRule#percentageLimitOnDailyMovement}.
    */
   private double percentageLimitOnDailyMovement;

@@ -25,7 +25,10 @@ package uk.ac.ox.poseidon.gui.portrayals;
 import lombok.Data;
 import sim.portrayal.FieldPortrayal2D;
 
-/** A MASON {@link FieldPortrayal2D}, labelled and with an initial visibility, for a display. */
+/**
+ * A MASON {@link FieldPortrayal2D}, labelled and with an initial visibility,
+ * for a display.
+ */
 @Data
 public class NamedPortrayal {
 

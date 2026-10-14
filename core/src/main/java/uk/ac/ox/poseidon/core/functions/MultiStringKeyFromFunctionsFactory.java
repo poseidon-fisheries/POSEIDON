@@ -33,7 +33,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link MultiStringKeyFromFunctions}, built via
+ * A {@link RelativeScopeFactory} counterpart of
+ * {@link MultiStringKeyFromFunctions}, built via
  * {@link Factories#multiStringKeyFromFunctions(Factory...)}.
  */
 @Data

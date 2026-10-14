@@ -51,8 +51,9 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenDates;
 
 /**
- * A vessel in port at cell (0, 0) considers fishing at cell (2, 0), two hours away, with sets of
- * a typical one hour. A port closure starts on 20 January 2013 at midnight.
+ * A vessel in port at cell (0, 0) considers fishing at cell (2, 0), two hours
+ * away, with sets of a typical one hour. A port closure starts on 20 January
+ * 2013 at midnight.
  */
 class FishingLocationLegalityCheckerTest {
 

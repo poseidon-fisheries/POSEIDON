@@ -31,9 +31,10 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.Listener;
 
 /**
- * Listens for a vessel's trip start/end events and feeds each completed trip's destination and
- * score into {@code optionValues}, so future destination choices can learn from past outcomes.
- * Registers itself with {@code eventManager} on construction.
+ * Listens for a vessel's trip start/end events and feeds each completed trip's
+ * destination and score into {@code optionValues}, so future destination
+ * choices can learn from past outcomes. Registers itself with
+ * {@code eventManager} on construction.
  */
 public class TripEvaluator implements Listener<TripEvent> {
 
@@ -42,9 +43,12 @@ public class TripEvaluator implements Listener<TripEvent> {
   private Evaluation<Int2D> currentEvaluation;
 
   /**
-   * @param eventManager the event manager to listen on for trip start/end events
-   * @param optionValues where each completed trip's (destination, score) observation is fed
-   * @param evaluator    starts a fresh {@link Evaluation} for each trip's destination
+   * @param eventManager the event manager to listen on for trip start/end
+   *                     events
+   * @param optionValues where each completed trip's (destination, score)
+   *                     observation is fed
+   * @param evaluator    starts a fresh {@link Evaluation} for each trip's
+   *                     destination
    */
   public TripEvaluator(
     final EventManager eventManager,
@@ -63,9 +67,9 @@ public class TripEvaluator implements Listener<TripEvent> {
   }
 
   /**
-   * On a {@link TripStartEvent}, starts a fresh evaluation of the trip's destination. On a
-   * {@link TripEndEvent}, feeds that evaluation's (option, result) pair into
-   * {@link #optionValues}.
+   * On a {@link TripStartEvent}, starts a fresh evaluation of the trip's
+   * destination. On a {@link TripEndEvent}, feeds that evaluation's (option,
+   * result) pair into {@link #optionValues}.
    */
   @Override
   public void receive(final TripEvent event) {

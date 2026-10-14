@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} for a {@link TripCostFromHourlyCosts}. Built via
- * {@link Factories#tripCostFromHourlyCosts}.
+ * A {@link RelativeScopeFactory} for a {@link TripCostFromHourlyCosts}. Built
+ * via {@link Factories#tripCostFromHourlyCosts}.
  */
 @Data
 @NoArgsConstructor

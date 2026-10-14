@@ -31,12 +31,12 @@ import java.util.Map;
 
 /**
  * A reusable {@link OptionValues} implementation backed by a single
- * {@link Object2DoubleOpenHashMap}. After populating the map and
- * consuming the result, call {@link #clear()} to reset for re-use.
+ * {@link Object2DoubleOpenHashMap}. After populating the map and consuming the
+ * result, call {@link #clear()} to reset for re-use.
  * <p>
- * This instance must not be accessed concurrently or while another
- * caller holds a reference returned by a prior call (the returned
- * reference IS this instance).
+ * This instance must not be accessed concurrently or while another caller holds
+ * a reference returned by a prior call (the returned reference IS this
+ * instance).
  */
 class ReusableOptionValues<O> extends MapBasedOptionValues<O> {
 
@@ -48,13 +48,19 @@ class ReusableOptionValues<O> extends MapBasedOptionValues<O> {
   // Holds only the keys currently tied for the best value, not the whole map.
   private final ObjectArrayList<O> bestKeysBuffer = new ObjectArrayList<>();
 
-  /** Empties this instance so it can be reused for a fresh round of {@link #putIfGreater} calls. */
+  /**
+   * Empties this instance so it can be reused for a fresh round of
+   * {@link #putIfGreater} calls.
+   */
   void clear() {
     values.clear();
     cachedBest = null;
   }
 
-  /** Sets {@code key}'s value to {@code value} only if it's greater than what's currently stored. */
+  /**
+   * Sets {@code key}'s value to {@code value} only if it's greater than what's
+   * currently stored.
+   */
   void putIfGreater(final O key, final double value) {
     if (value > values.getOrDefault(key, Double.NEGATIVE_INFINITY)) {
       values.put(key, value);
@@ -62,10 +68,10 @@ class ReusableOptionValues<O> extends MapBasedOptionValues<O> {
   }
 
   /**
-   * Calls {@code consumer} once per entry tied for the highest value, in a single pass:
-   * {@link #bestKeysBuffer} collects the keys tied for the best value seen so far, is cleared
-   * whenever a strictly higher value is found, and is only iterated (not the whole map) once
-   * the best value is settled.
+   * Calls {@code consumer} once per entry tied for the highest value, in a
+   * single pass: {@link #bestKeysBuffer} collects the keys tied for the best
+   * value seen so far, is cleared whenever a strictly higher value is found,
+   * and is only iterated (not the whole map) once the best value is settled.
    */
   @Override
   public void forEachBestEntry(

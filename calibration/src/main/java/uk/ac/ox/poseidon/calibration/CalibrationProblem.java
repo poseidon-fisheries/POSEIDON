@@ -53,15 +53,18 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A jenetics {@link Problem} that calibrates a subset of a {@link Scenario}'s properties by
- * running it forward for a fixed duration, once per seed, and scoring the outcome with an
- * {@code evaluator}. A candidate solution is a map of property name to value, each value encoded
- * as an allele in {@code [0.0, 1.0]} that {@link #codec()} rescales to that property's
- * {@code parameterRanges} entry; {@link #fitness()} runs the scenario with those property
- * overrides for every seed in {@code seeds} and returns the average evaluator score. The seeds
- * of one evaluation run in parallel, on the common fork-join pool (where jenetics also evaluates
- * the population), so the simulations running at once are bounded by the processors. It counts
- * the simulations it runs and how long they take; see {@link #takeSimulationTimes()}.
+ * A jenetics {@link Problem} that calibrates a subset of a {@link Scenario}'s
+ * properties by running it forward for a fixed duration, once per seed, and
+ * scoring the outcome with an {@code evaluator}. A candidate solution is a map
+ * of property name to value, each value encoded as an allele in
+ * {@code [0.0, 1.0]} that {@link #codec()} rescales to that property's
+ * {@code parameterRanges} entry; {@link #fitness()} runs the scenario with
+ * those property overrides for every seed in {@code seeds} and returns the
+ * average evaluator score. The seeds of one evaluation run in parallel, on the
+ * common fork-join pool (where jenetics also evaluates the population), so the
+ * simulations running at once are bounded by the processors. It counts the
+ * simulations it runs and how long they take; see
+ * {@link #takeSimulationTimes()}.
  */
 @RequiredArgsConstructor
 @Accessors(fluent = true)
@@ -69,7 +72,10 @@ public class CalibrationProblem
   implements Problem<SequencedMap<String, Double>, DoubleGene, Double>
 {
 
-  /** The scenario being calibrated; started fresh, with property overrides, for each seed. */
+  /**
+   * The scenario being calibrated; started fresh, with property overrides, for
+   * each seed.
+   */
   protected final @NonNull Scenario scenario;
   private final @NonNull TemporalAmount duration;
   private final @NonNull ImmutableMap<
@@ -84,9 +90,10 @@ public class CalibrationProblem
   private final LongAdder buildingNanos = new LongAdder();
 
   /**
-   * Encodes/decodes a genotype of {@code parameterRanges.size()} alleles in {@code [0.0, 1.0]}
-   * to/from a map of property name to value, by linearly rescaling each allele to its
-   * corresponding entry in {@code parameterRanges}. Computed lazily, once, on first access.
+   * Encodes/decodes a genotype of {@code parameterRanges.size()} alleles in
+   * {@code [0.0, 1.0]} to/from a map of property name to value, by linearly
+   * rescaling each allele to its corresponding entry in
+   * {@code parameterRanges}. Computed lazily, once, on first access.
    */
   @Getter(lazy = true)
   private final Codec<SequencedMap<String, Double>, DoubleGene> codec =
@@ -117,17 +124,18 @@ public class CalibrationProblem
     );
 
   /**
-   * @return a function that runs {@link #scenario} once per seed in {@code seeds}, with the
-   * given property overrides, and returns the average of {@code evaluator}'s score across seeds
+   * @return a function that runs {@link #scenario} once per seed in
+   *         {@code seeds}, with the given property overrides, and returns the
+   *         average of {@code evaluator}'s score across seeds
    */
   public Function<SequencedMap<String, Double>, Double> fitness() {
     return this::evaluate;
   }
 
   /**
-   * @return the number of simulations run, and their total time, since the previous call (or
-   * since this problem was created); meant to be read between generations, when no simulation
-   * is running
+   * @return the number of simulations run, and their total time, since the
+   *         previous call (or since this problem was created); meant to be read
+   *         between generations, when no simulation is running
    */
   public SimulationTimes takeSimulationTimes() {
     return new SimulationTimes(

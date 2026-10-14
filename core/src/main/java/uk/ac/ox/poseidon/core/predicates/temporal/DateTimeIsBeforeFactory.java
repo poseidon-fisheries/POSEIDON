@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link DateTimeIsBefore}, built via
- * {@link Factories#dateTimeIsBefore(Factory)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link DateTimeIsBefore}, built
+ * via {@link Factories#dateTimeIsBefore(Factory)}.
  */
 @Data
 @NoArgsConstructor

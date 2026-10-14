@@ -35,14 +35,15 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A {@link SimulationScopeFactory} for this package's default {@link GridPathFinder}: a
- * {@link BresenhamPathFinder} heuristic falling back to an {@link AStarPathFinder} (via
- * {@link FallbackGridPathfinder}), wrapped in a {@link CachingGridPathFinder} backed by the
- * resolved {@link PathCache} and {@link AccessibleWaterCellsCache}. One per simulation because the
- * A* search keeps state between calls and is not safe to share between simulations running in
- * parallel; the two caches can be, and are when their inputs are. Built via
- * {@link Factories#pathFinder(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory,
- * uk.ac.ox.poseidon.core.Factory)}.
+ * A {@link SimulationScopeFactory} for this package's default
+ * {@link GridPathFinder}: a {@link BresenhamPathFinder} heuristic falling back
+ * to an {@link AStarPathFinder} (via {@link FallbackGridPathfinder}), wrapped
+ * in a {@link CachingGridPathFinder} backed by the resolved {@link PathCache}
+ * and {@link AccessibleWaterCellsCache}. One per simulation because the A*
+ * search keeps state between calls and is not safe to share between simulations
+ * running in parallel; the two caches can be, and are when their inputs are.
+ * Built via
+ * {@link Factories#pathFinder(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}.
  */
 @Data
 @NoArgsConstructor

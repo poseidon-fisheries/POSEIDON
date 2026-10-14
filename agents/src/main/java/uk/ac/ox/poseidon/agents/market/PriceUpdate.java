@@ -29,7 +29,10 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Simulation;
 
-/** A scheduled change of one {@link MarketPrice}: when run, it applies that price. */
+/**
+ * A scheduled change of one {@link MarketPrice}: when run, it applies that
+ * price.
+ */
 @Value
 public class PriceUpdate implements Steppable {
 

@@ -40,8 +40,8 @@ import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 @EqualsAndHashCode(callSuper = true)
 /**
  * A {@link NumberGridPortrayalFactory} ranged symmetrically around zero (from
- * {@code -max(|min|, |max|)} to {@code +max(|min|, |max|)}), for grids with both positive and
- * negative values (e.g. elevation).
+ * {@code -max(|min|, |max|)} to {@code +max(|min|, |max|)}), for grids with
+ * both positive and negative values (e.g. elevation).
  */
 public class DivergingNumberGridPortrayalFactory
   extends NumberGridPortrayalFactory
@@ -50,7 +50,8 @@ public class DivergingNumberGridPortrayalFactory
   /**
    * @param paletteName    the colour palette to use
    * @param valueName      the label shown for cell values
-   * @param immutableField whether the underlying grid data is immutable between draws
+   * @param immutableField whether the underlying grid data is immutable between
+   *                       draws
    * @param grid           the grid to portray
    */
   public DivergingNumberGridPortrayalFactory(
@@ -62,7 +63,10 @@ public class DivergingNumberGridPortrayalFactory
     super(paletteName, valueName, immutableField, grid);
   }
 
-  /** @return a {@link PaletteColorMap} ranged symmetrically around zero, spanning the grid's actual extremes */
+  /**
+   * @return a {@link PaletteColorMap} ranged symmetrically around zero,
+   *         spanning the grid's actual extremes
+   */
   @Override
   protected ColorMap newColorMap(final SimulationScope scope) {
     final DoubleGrid grid = getGrid().get(scope);

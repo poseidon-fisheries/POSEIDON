@@ -34,7 +34,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link CompositeDispositionProcess}, built via
+ * A {@link RelativeScopeFactory} counterpart of
+ * {@link CompositeDispositionProcess}, built via
  * {@link Factories#compositeDispositionProcess}.
  */
 @Data
@@ -62,7 +63,10 @@ public class CompositeDispositionProcessFactory<S extends Scope> extends Relativ
     this(List.of(dispositionStrategies));
   }
 
-  /** @return a {@link CompositeDispositionProcess} chaining every resolved step, in order */
+  /**
+   * @return a {@link CompositeDispositionProcess} chaining every resolved step,
+   *         in order
+   */
   @Override
   protected CompositeDispositionProcess newInstance(final S scope) {
     return new CompositeDispositionProcess(

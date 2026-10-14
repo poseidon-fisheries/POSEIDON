@@ -42,7 +42,7 @@ public class Factories {
   /**
    * @param map factory for the map to look values up in
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link MapValueExtractor} over the resolved map
+   *         {@link MapValueExtractor} over the resolved map
    * @see MapValueExtractor
    */
   public static <S extends Scope, K, V> MapValueExtractorFactory<
@@ -58,8 +58,8 @@ public class Factories {
   /**
    * @param map factory for the map to look the value up in
    * @param key the fixed key to look up
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the value found under
-   * {@code key} in the resolved map
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the value
+   *         found under {@code key} in the resolved map
    * @see MapEntryFactory
    */
   public static <S extends Scope, K, V> MapEntryFactory<S, K, V> mapEntry(
@@ -73,7 +73,7 @@ public class Factories {
    * @param function1 the function applied first
    * @param function2 the function applied to {@code function1}'s result
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link ComposedFunction} of the two resolved functions
+   *         {@link ComposedFunction} of the two resolved functions
    * @see ComposedFunction
    */
   public static <S extends Scope, T1, T2, R> ComposedFunctionFactory<
@@ -97,7 +97,7 @@ public class Factories {
   /**
    * @param durations the duration-producing functions to sum
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link CombinedDuration} of the resolved functions
+   *         {@link CombinedDuration} of the resolved functions
    * @see CombinedDuration
    */
   @SafeVarargs
@@ -115,10 +115,10 @@ public class Factories {
 
   /**
    * @param delegate     the function to delegate to
-   * @param defaultValue factory for the value substituted when {@code delegate} returns
-   *                     {@code null}
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DefaultIfNull}
-   * wrapping the resolved delegate and default
+   * @param defaultValue factory for the value substituted when {@code delegate}
+   *                     returns {@code null}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link DefaultIfNull} wrapping the resolved delegate and default
    * @see DefaultIfNull
    */
   public static <S extends Scope, T, R> DefaultIfNullFactory<
@@ -137,10 +137,11 @@ public class Factories {
 
   /**
    * @param delegate     the function to delegate to
-   * @param defaultValue the literal value substituted when {@code delegate} returns
-   *                     {@code null}
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DefaultIfNull}
-   * wrapping the resolved delegate and the given default
+   * @param defaultValue the literal value substituted when {@code delegate}
+   *                     returns {@code null}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link DefaultIfNull} wrapping the resolved delegate and the given
+   *         default
    * @see DefaultIfNull
    */
   public static <S extends Scope, T, R> DefaultIfNullFactory<
@@ -158,9 +159,10 @@ public class Factories {
   }
 
   /**
-   * @param functions the functions to apply to the same input and join into one key
+   * @param functions the functions to apply to the same input and join into one
+   *                  key
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link MultiStringKeyFromFunctions} of the resolved functions
+   *         {@link MultiStringKeyFromFunctions} of the resolved functions
    * @see MultiStringKeyFromFunctions
    */
   @SafeVarargs
@@ -180,7 +182,7 @@ public class Factories {
    * @param intervals the non-overlapping intervals to map numbers into (see
    *                  {@link NumericIntervalToStringMapperFactory#interval})
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   * {@link NumericIntervalMapper} over the given intervals
+   *         {@link NumericIntervalMapper} over the given intervals
    * @see NumericIntervalMapper
    */
   public static NumericIntervalToStringMapperFactory numericIntervalToStringMapper(

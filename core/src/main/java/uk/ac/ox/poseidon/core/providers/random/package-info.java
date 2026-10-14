@@ -21,8 +21,9 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.core.providers.Provider}s that draw a fresh random value, from the
- * simulation's shared RNG, on every call. See
- * {@link uk.ac.ox.poseidon.core.providers.random.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.core.providers.Provider}s that draw a fresh random
+ * value, from the simulation's shared RNG, on every call. See
+ * {@link uk.ac.ox.poseidon.core.providers.random.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.core.providers.random;

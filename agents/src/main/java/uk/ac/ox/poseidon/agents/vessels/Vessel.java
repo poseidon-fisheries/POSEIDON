@@ -47,14 +47,16 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A fishing vessel: an {@link Agent} with a hold, gear, engine, home port, and behaviour tree
- * driving its trips. Active only while {@link #isActive()} holds — the base agent is active, it's
- * registered as active, its gear is active, and it has a home port.
+ * A fishing vessel: an {@link Agent} with a hold, gear, engine, home port, and
+ * behaviour tree driving its trips. Active only while {@link #isActive()} holds
+ * — the base agent is active, it's registered as active, its gear is active,
+ * and it has a home port.
  * <p>
- * Its modifiable characteristics (name, account, home port, hold, gear, engine, registration,
- * tags, and behaviour) are changed from outside its behaviour, by the fleet register, so their
- * setters go through {@link #mutate} and take effect between runs of the behaviour. Its current
- * state (cell, heading, trips) is changed by the behaviour itself and changes immediately.
+ * Its modifiable characteristics (name, account, home port, hold, gear, engine,
+ * registration, tags, and behaviour) are changed from outside its behaviour, by
+ * the fleet register, so their setters go through {@link #mutate} and take
+ * effect between runs of the behaviour. Its current state (cell, heading,
+ * trips) is changed by the behaviour itself and changes immediately.
  */
 @Getter
 @SuppressFBWarnings(value = "EI_EXPOSE_REP")
@@ -72,12 +74,12 @@ public class Vessel extends Agent implements Oriented2D {
   private final @NonNull MarketGrid marketGrid;
 
   /**
-   * @param schedule      the simulation's temporal schedule
-   * @param eventManager  the event manager this vessel broadcasts on
-   * @param id            the vessel's identifying id
-   * @param vesselField   the field the vessel moves within
-   * @param portGrid      the grid of ports the vessel can dock at
-   * @param marketGrid    the grid of markets the vessel can sell into
+   * @param schedule     the simulation's temporal schedule
+   * @param eventManager the event manager this vessel broadcasts on
+   * @param id           the vessel's identifying id
+   * @param vesselField  the field the vessel moves within
+   * @param portGrid     the grid of ports the vessel can dock at
+   * @param marketGrid   the grid of markets the vessel can sell into
    */
   public Vessel(
     @NonNull final TemporalSchedule schedule,
@@ -116,7 +118,10 @@ public class Vessel extends Agent implements Oriented2D {
   /** This vessel's engine. */
   private Engine engine;
 
-  /** Whether this vessel is currently registered as active (see {@link #setRegisteredAsActive}). */
+  /**
+   * Whether this vessel is currently registered as active (see
+   * {@link #setRegisteredAsActive}).
+   */
   private boolean registeredAsActive;
 
   // Current state variables
@@ -124,10 +129,16 @@ public class Vessel extends Agent implements Oriented2D {
   private double heading;
   /** The vessel's current trip, or {@code null} if it isn't on one. */
   private Trip currentTrip;
-  /** The vessel's last finished trip, or {@code null} if it hasn't finished one yet. */
+  /**
+   * The vessel's last finished trip, or {@code null} if it hasn't finished one
+   * yet.
+   */
   private Trip previousTrip;
 
-  /** @return whether the base agent is active, {@link #registeredAsActive}, the gear is active, and there's a home port */
+  /**
+   * @return whether the base agent is active, {@link #registeredAsActive}, the
+   *         gear is active, and there's a home port
+   */
   @Override
   public boolean isActive() {
     return (
@@ -148,7 +159,9 @@ public class Vessel extends Agent implements Oriented2D {
     mutate(() -> this.account = account);
   }
 
-  /** Sets the vessel's home port, moving it there if it has no current cell yet. */
+  /**
+   * Sets the vessel's home port, moving it there if it has no current cell yet.
+   */
   public void setHomePort(final Port homePort) {
     mutate(() -> {
       this.homePort = homePort;
@@ -227,7 +240,9 @@ public class Vessel extends Agent implements Oriented2D {
     return name == null ? id : name + " (" + id + ")";
   }
 
-  /** @return {@code true} if the vessel's current cell is its home port's cell */
+  /**
+   * @return {@code true} if the vessel's current cell is its home port's cell
+   */
   public boolean isAtHomePort() {
     return getCell().equals(getHomePortLocation());
   }
@@ -252,14 +267,17 @@ public class Vessel extends Agent implements Oriented2D {
     this.currentTrip = new Trip(this, destination);
   }
 
-  /** Records the current trip's arrival in port; see {@link Trip#arriveInPort()}. */
+  /**
+   * Records the current trip's arrival in port; see
+   * {@link Trip#arriveInPort()}.
+   */
   public void arriveInPort() {
     currentTrip.arriveInPort();
   }
 
   /**
-   * Ends the current trip, folding its account into the vessel's own, and keeps it as the
-   * {@link #previousTrip}.
+   * Ends the current trip, folding its account into the vessel's own, and keeps
+   * it as the {@link #previousTrip}.
    */
   public void endTrip() {
     currentTrip.endTrip();

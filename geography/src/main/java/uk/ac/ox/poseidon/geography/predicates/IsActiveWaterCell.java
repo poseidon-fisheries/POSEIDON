@@ -28,9 +28,10 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
 /**
- * A {@link CellPredicate} that delegates to a resolved {@link BathymetricGrid}'s
- * {@code isActiveWater} check. Built via
- * {@link Factories#isActiveWaterCell(uk.ac.ox.poseidon.core.Factory)} in this package.
+ * A {@link CellPredicate} that delegates to a resolved
+ * {@link BathymetricGrid}'s {@code isActiveWater} check. Built via
+ * {@link Factories#isActiveWaterCell(uk.ac.ox.poseidon.core.Factory)} in this
+ * package.
  */
 @RequiredArgsConstructor
 public class IsActiveWaterCell implements CellPredicate {

@@ -26,8 +26,8 @@ import java.util.function.ToDoubleFunction;
 import sim.util.Int2D;
 
 /**
- * Assigns a weight to a grid cell, e.g. for weighted random placement. Built via
- * {@link uk.ac.ox.poseidon.geography.allocators.Factories}.
+ * Assigns a weight to a grid cell, e.g. for weighted random placement. Built
+ * via {@link uk.ac.ox.poseidon.geography.allocators.Factories}.
  */
 public interface Allocator extends ToDoubleFunction<Int2D> {
   /**

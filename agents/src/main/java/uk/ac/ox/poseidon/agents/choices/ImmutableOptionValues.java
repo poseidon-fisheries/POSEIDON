@@ -26,7 +26,10 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import lombok.Getter;
 
-/** A {@link MapBasedOptionValues} over a fixed, defensively-copied map; never mutated after construction. */
+/**
+ * A {@link MapBasedOptionValues} over a fixed, defensively-copied map; never
+ * mutated after construction.
+ */
 @Getter
 public class ImmutableOptionValues<O> extends MapBasedOptionValues<O> {
 

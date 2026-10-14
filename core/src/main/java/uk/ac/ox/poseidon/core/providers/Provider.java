@@ -26,10 +26,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * A {@link Supplier} of {@code T} that can also be used anywhere a {@link Function} is required,
- * in which case it ignores the argument passed to {@link #apply} and just returns the value it
- * would have supplied anyway. Lets the same object be wired into either kind of call site without
- * an adapter.
+ * A {@link Supplier} of {@code T} that can also be used anywhere a
+ * {@link Function} is required, in which case it ignores the argument passed to
+ * {@link #apply} and just returns the value it would have supplied anyway. Lets
+ * the same object be wired into either kind of call site without an adapter.
  *
  * @param <T> the type of object returned by the provider
  */

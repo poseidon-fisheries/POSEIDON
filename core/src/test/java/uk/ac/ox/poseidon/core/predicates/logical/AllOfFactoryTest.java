@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 class AllOfFactoryTest {
 
   /**
-   * Tests the `get` method with valid predicate factories. Verifies that the predicate order is
-   * preserved.
+   * Tests the `get` method with valid predicate factories. Verifies that the
+   * predicate order is preserved.
    */
   @Test
   void getWithPredicateFactoriesPreservesOrder() {
@@ -66,8 +66,8 @@ class AllOfFactoryTest {
   }
 
   /**
-   * Tests the `get` method with an empty list of factories. Verifies that an `AllOf` instance is
-   * still created successfully.
+   * Tests the `get` method with an empty list of factories. Verifies that an
+   * `AllOf` instance is still created successfully.
    */
   @Test
   void getWithEmptyFactoryListCreatesAllOfInstance() {
@@ -88,7 +88,8 @@ class AllOfFactoryTest {
   }
 
   /**
-   * Tests the `get` method to ensure the resulting AllOf evaluates all predicates.
+   * Tests the `get` method to ensure the resulting AllOf evaluates all
+   * predicates.
    */
   @Test
   void getWithPredicateFactoriesCombinesPredicates() {
@@ -114,8 +115,8 @@ class AllOfFactoryTest {
   }
 
   /**
-   * Tests the `get` method to ensure it throws a NullPointerException when one of the factories
-   * provides a null predicate.
+   * Tests the `get` method to ensure it throws a NullPointerException when one
+   * of the factories provides a null predicate.
    */
   @Test
   void getWithNullPredicateThrowsNullPointerException() {

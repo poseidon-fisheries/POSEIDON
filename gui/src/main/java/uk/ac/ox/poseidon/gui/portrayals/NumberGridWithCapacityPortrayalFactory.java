@@ -33,9 +33,10 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 
 /**
- * A {@link NumberGridPortrayalFactory} ranged {@code [0, capacityGrid's max value]} instead of
- * the portrayed grid's own maximum — for grids (e.g. biomass) meant to be read against a fixed
- * capacity rather than their current extent.
+ * A {@link NumberGridPortrayalFactory} ranged
+ * {@code [0, capacityGrid's max value]} instead of the portrayed grid's own
+ * maximum — for grids (e.g. biomass) meant to be read against a fixed capacity
+ * rather than their current extent.
  */
 @Data
 @NoArgsConstructor
@@ -50,7 +51,8 @@ public class NumberGridWithCapacityPortrayalFactory
   /**
    * @param paletteName    the colour palette to use
    * @param valueName      the label shown for cell values
-   * @param immutableField whether the underlying grid data is immutable between draws
+   * @param immutableField whether the underlying grid data is immutable between
+   *                       draws
    * @param grid           the grid to portray
    * @param capacityGrid   the grid whose maximum value bounds the colour range
    */
@@ -65,7 +67,10 @@ public class NumberGridWithCapacityPortrayalFactory
     this.capacityGrid = capacityGrid;
   }
 
-  /** @return a {@link PaletteColorMap} ranged {@code [0, capacityGrid's max value]} */
+  /**
+   * @return a {@link PaletteColorMap} ranged
+   *         {@code [0, capacityGrid's max value]}
+   */
   @Override
   protected ColorMap newColorMap(final SimulationScope scope) {
     return new PaletteColorMap(

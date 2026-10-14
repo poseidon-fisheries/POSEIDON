@@ -27,8 +27,8 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link CurrentYear}, built via
- * {@link Factories#currentYear()}.
+ * A {@link SimulationScopeFactory} counterpart of {@link CurrentYear}, built
+ * via {@link Factories#currentYear()}.
  */
 @EqualsAndHashCode(callSuper = true)
 public class CurrentYearFactory extends SimulationScopeFactory<CurrentYear> {

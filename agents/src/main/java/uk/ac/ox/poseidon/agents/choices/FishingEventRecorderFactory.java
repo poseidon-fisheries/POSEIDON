@@ -37,10 +37,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link FishingEventRecorder}, built via
- * {@link Factories#fishingEventRecorder(Factory, Factory, Factory)}. It only builds the recorder:
- * it does not register it with the vessel's event manager or anything else, since a vessel can
- * have several recorders, each registered with whatever gives it the fishing events it records.
+ * A {@link RelativeScopeFactory} counterpart of {@link FishingEventRecorder},
+ * built via {@link Factories#fishingEventRecorder(Factory, Factory, Factory)}.
+ * It only builds the recorder: it does not register it with the vessel's event
+ * manager or anything else, since a vessel can have several recorders, each
+ * registered with whatever gives it the fishing events it records.
  */
 @Data
 @NoArgsConstructor

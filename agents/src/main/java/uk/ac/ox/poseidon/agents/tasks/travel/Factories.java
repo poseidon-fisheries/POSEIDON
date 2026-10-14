@@ -34,7 +34,10 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
-/** Factories for a vessel's travel-related behavior-tree tasks: refuel, travel, land, end trip. */
+/**
+ * Factories for a vessel's travel-related behavior-tree tasks: refuel, travel,
+ * land, end trip.
+ */
 public class Factories {
 
   private Factories() {}
@@ -55,12 +58,12 @@ public class Factories {
 
   /**
    * @param startTripTask the task that starts the trip
-   * @param travelTask    the task that travels between origin and fishing grounds, resolved
-   *                      once and reused for both legs
+   * @param travelTask    the task that travels between origin and fishing
+   *                      grounds, resolved once and reused for both legs
    * @param fishingTask   the task that fishes once at the destination
    * @param landingTask   the task that lands the catch after returning
-   * @return a {@link VesselScope}-relative factory for a {@link Sequence} stringing a whole
-   * fishing trip together
+   * @return a {@link VesselScope}-relative factory for a {@link Sequence}
+   *         stringing a whole fishing trip together
    * @see RoundTripFactory
    */
   public static RoundTripFactory roundTrip(
@@ -79,11 +82,14 @@ public class Factories {
 
   /**
    * @param pathFinder      finds a path between two cells
-   * @param distance        computes the distance, and so the duration, of each hop
-   * @param destinationCell supplies the destination to path to, resolved once at task start
+   * @param distance        computes the distance, and so the duration, of each
+   *                        hop
+   * @param destinationCell supplies the destination to path to, resolved once
+   *                        at task start
    * @param eventManager    supplies the event manager to broadcast the arrival
    *                        {@link TravelEvent} on
-   * @return a {@link VesselScope}-relative factory for a {@link TravelAlongPath}
+   * @return a {@link VesselScope}-relative factory for a
+   *         {@link TravelAlongPath}
    * @see TravelAlongPath
    */
   public static TravelAlongPathFactory travelAlongPathTo(
@@ -107,8 +113,8 @@ public class Factories {
   }
 
   /**
-   * @param distance computes the direct distance, and so the duration, to the trip's
-   *                 destination
+   * @param distance computes the direct distance, and so the duration, to the
+   *                 trip's destination
    * @return a {@link VesselScope}-relative factory for a {@link TravelDirectly}
    * @see TravelDirectly
    */
@@ -119,7 +125,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link VesselScope}-relative factory for a {@link SetDestinationToOrigin}
+   * @return a {@link VesselScope}-relative factory for a
+   *         {@link SetDestinationToOrigin}
    * @see SetDestinationToOrigin
    */
   public static SetDestinationToOriginFactory setDestinationToOrigin() {

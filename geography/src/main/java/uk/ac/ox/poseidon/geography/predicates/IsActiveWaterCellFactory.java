@@ -32,8 +32,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link IsActiveWaterCell}, built via
- * {@link Factories#isActiveWaterCell(Factory)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link IsActiveWaterCell},
+ * built via {@link Factories#isActiveWaterCell(Factory)}.
  */
 @Data
 @NoArgsConstructor

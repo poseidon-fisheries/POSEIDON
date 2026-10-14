@@ -34,10 +34,11 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 
 /**
- * Directed ties between vessels, where a tie from A to B means that A tells B. The network is
- * passive: it holds the ties and a live source of candidate vessels, and knows nothing of what
- * is told through the ties or of what adds and removes them (network dynamics do that). A tie
- * from a vessel to itself is rejected.
+ * Directed ties between vessels, where a tie from A to B means that A tells B.
+ * The network is passive: it holds the ties and a live source of candidate
+ * vessels, and knows nothing of what is told through the ties or of what adds
+ * and removes them (network dynamics do that). A tie from a vessel to itself is
+ * rejected.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class SocialNetwork {
@@ -61,7 +62,10 @@ public class SocialNetwork {
       : Set.of();
   }
 
-  /** @return the vessels ties can currently be made with, read from their source at each call */
+  /**
+   * @return the vessels ties can currently be made with, read from their source
+   *         at each call
+   */
   public Collection<Vessel> getCandidates() {
     return candidates.getVessels();
   }
@@ -71,7 +75,10 @@ public class SocialNetwork {
     ties.putEdge(source, recipient);
   }
 
-  /** Removes the tie through which {@code source} tells {@code recipient}, if there is one. */
+  /**
+   * Removes the tie through which {@code source} tells {@code recipient}, if
+   * there is one.
+   */
   public void removeTie(final Vessel source, final Vessel recipient) {
     ties.removeEdge(source, recipient);
   }

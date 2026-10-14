@@ -23,10 +23,12 @@
 /**
  * Wires a {@link uk.ac.ox.poseidon.core.Scenario} into a MASON GUI:
  * {@link uk.ac.ox.poseidon.gui.ScenarioWithUI} builds a
- * {@link uk.ac.ox.poseidon.gui.SimulationWithUI} ({@link sim.display.GUIState}), which in turn
- * drives one {@link uk.ac.ox.poseidon.gui.DisplayWrapper} per display window (see
+ * {@link uk.ac.ox.poseidon.gui.SimulationWithUI}
+ * ({@link sim.display.GUIState}), which in turn drives one
+ * {@link uk.ac.ox.poseidon.gui.DisplayWrapper} per display window (see
  * {@link uk.ac.ox.poseidon.gui.DisplayWrapper2D} for the 2D case). See
- * {@link uk.ac.ox.poseidon.gui.portrayals} for the factories that build the portrayals a display
- * attaches, and {@link uk.ac.ox.poseidon.gui.palettes} for the colour maps they use.
+ * {@link uk.ac.ox.poseidon.gui.portrayals} for the factories that build the
+ * portrayals a display attaches, and {@link uk.ac.ox.poseidon.gui.palettes} for
+ * the colour maps they use.
  */
 package uk.ac.ox.poseidon.gui;

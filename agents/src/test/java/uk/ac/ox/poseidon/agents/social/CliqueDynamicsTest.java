@@ -236,8 +236,8 @@ class CliqueDynamicsTest {
   }
 
   /**
-   * @return the partners of each of a fresh fleet's vessels, as indices in the fleet, after
-   * each vessel joins in turn
+   * @return the partners of each of a fresh fleet's vessels, as indices in the
+   *         fleet, after each vessel joins in turn
    */
   private List<Set<Integer>> cliquesAfterJoining(final int fleetSize) {
     final List<Vessel> fleet = new ArrayList<>();

@@ -37,9 +37,9 @@ import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 class AnyOfFactoryTest {
 
   /**
-   * Tests the `get` method of the AnyOfFactory class. Verifies that the method creates an `AnyOf`
-   * instance correctly when a valid list of factories for `Predicate<Object>` is provided and
-   * preserves predicate order.
+   * Tests the `get` method of the AnyOfFactory class. Verifies that the method
+   * creates an `AnyOf` instance correctly when a valid list of factories for
+   * `Predicate<Object>` is provided and preserves predicate order.
    */
   @Test
   void testGetWithValidPredicateFactories() {
@@ -67,8 +67,8 @@ class AnyOfFactoryTest {
   }
 
   /**
-   * Tests the `get` method with an empty list of factories. Verifies that an `AnyOf` instance is
-   * still created successfully.
+   * Tests the `get` method with an empty list of factories. Verifies that an
+   * `AnyOf` instance is still created successfully.
    */
   @Test
   void testGetWithEmptyFactoryList() {
@@ -92,8 +92,8 @@ class AnyOfFactoryTest {
   }
 
   /**
-   * Tests the `get` method to ensure it throws a NullPointerException when one of the factories
-   * provides a null predicate.
+   * Tests the `get` method to ensure it throws a NullPointerException when one
+   * of the factories provides a null predicate.
    */
   @Test
   void testGetWithNullPredicateThrowsException() {
@@ -114,8 +114,8 @@ class AnyOfFactoryTest {
   }
 
   /**
-   * Tests the `get` method with multiple valid predicate factories to ensure AnyOf returns true
-   * when at least one predicate matches.
+   * Tests the `get` method with multiple valid predicate factories to ensure
+   * AnyOf returns true when at least one predicate matches.
    */
   @Test
   void testGetWithMultipleValidFactories() {

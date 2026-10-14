@@ -26,8 +26,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link CellWasFishedThisTrip}, built via
- * {@link Factories#cellWasFishedThisTrip()}.
+ * A {@link VesselScopeFactory} counterpart of {@link CellWasFishedThisTrip},
+ * built via {@link Factories#cellWasFishedThisTrip()}.
  */
 public class CellWasFishedThisTripFactory
   extends VesselScopeFactory<CellWasFishedThisTrip>

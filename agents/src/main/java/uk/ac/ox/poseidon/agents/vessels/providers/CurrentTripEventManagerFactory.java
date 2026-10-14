@@ -26,8 +26,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link CurrentTripEventManager}, built via
- * {@link Factories#currentTripEventManager()}.
+ * A {@link VesselScopeFactory} counterpart of {@link CurrentTripEventManager},
+ * built via {@link Factories#currentTripEventManager()}.
  */
 public class CurrentTripEventManagerFactory
   extends VesselScopeFactory<CurrentTripEventManager>

@@ -21,12 +21,14 @@
  */
 
 /**
- * The regulation-rule model: {@link uk.ac.ox.poseidon.regulations.Action} (what a rule judges),
- * {@link uk.ac.ox.poseidon.regulations.Regulations} (the rule itself), and the two base rules,
+ * The regulation-rule model: {@link uk.ac.ox.poseidon.regulations.Action} (what
+ * a rule judges), {@link uk.ac.ox.poseidon.regulations.Regulations} (the rule
+ * itself), and the two base rules,
  * {@link uk.ac.ox.poseidon.regulations.ForbiddenIf} and
- * {@link uk.ac.ox.poseidon.regulations.PermittedIf}, each parameterised by a predicate over the
- * action. See {@link uk.ac.ox.poseidon.regulations.predicates} for predicates built on top of this
- * model, including composing rules themselves back into predicates. See
+ * {@link uk.ac.ox.poseidon.regulations.PermittedIf}, each parameterised by a
+ * predicate over the action. See
+ * {@link uk.ac.ox.poseidon.regulations.predicates} for predicates built on top
+ * of this model, including composing rules themselves back into predicates. See
  * {@link uk.ac.ox.poseidon.regulations.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.regulations;

@@ -33,12 +33,15 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * {@link uk.ac.ox.poseidon.geography.paths.Factories}.
  */
 public interface GridPathFinder extends PathFinder<Int2D> {
-  /** @return whether {@code cell} can be part of a path (water, or a port cell) */
+  /**
+   * @return whether {@code cell} can be part of a path (water, or a port cell)
+   */
   boolean isNavigable(final Int2D cell);
 
   /**
    * @param startingCell the cell to search from
-   * @return every water cell reachable from {@code startingCell} by an existing path
+   * @return every water cell reachable from {@code startingCell} by an existing
+   *         path
    */
   default ImmutableList<Int2D> getAccessibleWaterCells(
     final Int2D startingCell
@@ -64,8 +67,9 @@ public interface GridPathFinder extends PathFinder<Int2D> {
   /**
    * @param startingCell      the cell to search from
    * @param neighbourhoodSize how far out to look for neighbours
-   * @return {@code startingCell}'s water neighbours, within {@code neighbourhoodSize}, that are
-   * reachable from it by an existing path
+   * @return {@code startingCell}'s water neighbours, within
+   *         {@code neighbourhoodSize}, that are reachable from it by an
+   *         existing path
    */
   default ImmutableList<Int2D> getAccessibleWaterNeighbours(
     final Int2D startingCell,

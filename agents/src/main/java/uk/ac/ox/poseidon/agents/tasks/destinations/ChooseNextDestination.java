@@ -34,9 +34,11 @@ import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Redirects the vessel's current trip to whatever destination {@code destinationSupplier} yields;
- * fails, leaving the trip's destination unchanged, if the supplier yields none. The mid-trip
- * counterpart of {@link StartTrip}: within a trip, a failure ends a loop of fishing operations.
+ * Redirects the vessel's current trip to whatever destination
+ * {@code destinationSupplier} yields; fails, leaving the trip's destination
+ * unchanged, if the supplier yields none. The mid-trip counterpart of
+ * {@link StartTrip}: within a trip, a failure ends a loop of fishing
+ * operations.
  */
 @RequiredArgsConstructor
 public class ChooseNextDestination extends AgentTask<Vessel> {
@@ -44,8 +46,8 @@ public class ChooseNextDestination extends AgentTask<Vessel> {
   private final @NonNull DestinationSupplier destinationSupplier;
 
   /**
-   * @return {@link Status#SUCCEEDED} if a destination was found and the trip redirected to it,
-   * else {@link Status#FAILED}
+   * @return {@link Status#SUCCEEDED} if a destination was found and the trip
+   *         redirected to it, else {@link Status#FAILED}
    * @throws IllegalStateException if the vessel is not on a trip
    */
   @Override

@@ -39,11 +39,13 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A fixed, sorted set of {@link Species}, assigning each a stable integer position — the shared
- * addressing scheme behind {@link SpeciesIndexedDoubles}/{@link SpeciesIndexedObjects} and the
- * array-backed {@code Bucket} implementations, letting them operate on plain arrays instead of
- * species-keyed maps. Interned: two indices built from the same set of species are the same
- * instance (subject to GC, since interning is weak), so equal indices are cheap to compare and
+ * A fixed, sorted set of {@link Species}, assigning each a stable integer
+ * position — the shared addressing scheme behind
+ * {@link SpeciesIndexedDoubles}/{@link SpeciesIndexedObjects} and the
+ * array-backed {@code Bucket} implementations, letting them operate on plain
+ * arrays instead of species-keyed maps. Interned: two indices built from the
+ * same set of species are the same instance (subject to GC, since interning is
+ * weak), so equal indices are cheap to compare and
  * {@link SpeciesIndexed#sameIndex} can shortcut to the fast array-aligned path.
  */
 @EqualsAndHashCode
@@ -92,16 +94,20 @@ public final class SpeciesIndex {
     }
   }
 
-  /** @return a fresh {@code double} array sized to this index, one slot per species */
+  /**
+   * @return a fresh {@code double} array sized to this index, one slot per
+   *         species
+   */
   public double[] newDoubleArray() {
     return new double[speciesArray.length];
   }
 
   /**
    * @param function applied to each species, in index order, to build the array
-   * @return a {@link SpeciesIndexedDoubleArray} over this index, holding {@code function}'s
-   * result for each species
-   * @throws NullPointerException if {@code function} returns {@code null} for any species
+   * @return a {@link SpeciesIndexedDoubleArray} over this index, holding
+   *         {@code function}'s result for each species
+   * @throws NullPointerException if {@code function} returns {@code null} for
+   *                              any species
    */
   public SpeciesIndexedDoubleArray mapToDoubleArray(
     final Function<? super Species, Double> function
@@ -115,8 +121,8 @@ public final class SpeciesIndex {
   }
 
   /**
-   * Retrieves the index of the specified {@code Species} in this {@code SpeciesIndex}. If the
-   * species is not found, the method returns -1.
+   * Retrieves the index of the specified {@code Species} in this
+   * {@code SpeciesIndex}. If the species is not found, the method returns -1.
    *
    * @param species the {@code Species} whose index is to be retrieved
    * @return the index of the specified {@code Species}, or -1 if not found
@@ -126,12 +132,13 @@ public final class SpeciesIndex {
   }
 
   /**
-   * Retrieves the {@code Species} object at the specified index in the {@code SpeciesIndex}'s
-   * internal array. If the index is out of bounds, the method returns {@code null}.
+   * Retrieves the {@code Species} object at the specified index in the
+   * {@code SpeciesIndex}'s internal array. If the index is out of bounds, the
+   * method returns {@code null}.
    *
    * @param index the index of the {@code Species} object to retrieve
-   * @return the {@code Species} object at the specified index, or {@code null} if the index is
-   * out of bounds
+   * @return the {@code Species} object at the specified index, or {@code null}
+   *         if the index is out of bounds
    */
   public Species speciesAt(final int index) {
     return index < 0 || index >= speciesArray.length
@@ -144,7 +151,10 @@ public final class SpeciesIndex {
     return speciesArray.length;
   }
 
-  /** @return this index's species-to-position mapping. Cached after first access. */
+  /**
+   * @return this index's species-to-position mapping. Cached after first
+   *         access.
+   */
   public Map<Species, Integer> asMap() {
     Map<Species, Integer> map = cachedMap;
     if (map == null) {

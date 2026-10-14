@@ -22,7 +22,7 @@
 
 /**
  * {@link java.util.function.Predicate}s testing a
- * {@link uk.ac.ox.poseidon.agents.vessels.Vessel}'s activity, home port or current location. See
- * {@link Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.agents.vessels.Vessel}'s activity, home port or
+ * current location. See {@link Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.agents.vessels.predicates;

@@ -30,9 +30,10 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * Holds for a cell where the vessel has fished during its current trip: the cell of the start
- * coordinate of one of the trip's {@link Trip#getFishingEvents() fishing events}, in the vessel's
- * model grid. Never holds when the vessel is not on a trip.
+ * Holds for a cell where the vessel has fished during its current trip: the
+ * cell of the start coordinate of one of the trip's
+ * {@link Trip#getFishingEvents() fishing events}, in the vessel's model grid.
+ * Never holds when the vessel is not on a trip.
  */
 @RequiredArgsConstructor
 public class CellWasFishedThisTrip implements Predicate<Int2D> {

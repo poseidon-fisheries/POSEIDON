@@ -21,8 +21,9 @@
  */
 
 /**
- * Wrappers over {@code tablesaw} {@link tech.tablesaw.api.Table}s that expose their rows as
- * geographic data: plain longitude/latitude coordinates, or coordinate/elevation pairs. See
+ * Wrappers over {@code tablesaw} {@link tech.tablesaw.api.Table}s that expose
+ * their rows as geographic data: plain longitude/latitude coordinates, or
+ * coordinate/elevation pairs. See
  * {@link uk.ac.ox.poseidon.geography.utils.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.geography.utils;

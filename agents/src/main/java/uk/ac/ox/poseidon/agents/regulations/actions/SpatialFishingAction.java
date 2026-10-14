@@ -25,6 +25,8 @@ package uk.ac.ox.poseidon.agents.regulations.actions;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.regulations.SpatialAction;
 
-/** A {@link FishingAction} that also carries a {@link SpatialAction} location. */
+/**
+ * A {@link FishingAction} that also carries a {@link SpatialAction} location.
+ */
 public interface SpatialFishingAction
   extends FishingAction, SpatialAction<Vessel> {}

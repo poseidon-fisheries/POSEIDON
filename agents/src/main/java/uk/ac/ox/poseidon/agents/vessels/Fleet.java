@@ -39,7 +39,10 @@ import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-/** The set of vessels operating out of a set of ports, indexed by id, and the markets they sell into. */
+/**
+ * The set of vessels operating out of a set of ports, indexed by id, and the
+ * markets they sell into.
+ */
 @AllArgsConstructor
 public class Fleet implements VesselsGetter {
 
@@ -67,7 +70,8 @@ public class Fleet implements VesselsGetter {
 
   /**
    * @param vesselId the new vessel's id
-   * @return a freshly created, inactive vessel with no home port, gear, hold or engine yet set
+   * @return a freshly created, inactive vessel with no home port, gear, hold or
+   *         engine yet set
    * @throws IllegalStateException if {@code vesselId} is already in use
    */
   public Vessel createVessel(final String vesselId) {

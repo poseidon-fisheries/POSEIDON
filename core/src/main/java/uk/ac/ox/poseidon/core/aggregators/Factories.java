@@ -23,15 +23,16 @@
 package uk.ac.ox.poseidon.core.aggregators;
 
 /**
- * Factories for {@link Aggregator}s that reduce a stream, collection, or array of numbers to a
- * single summary value.
+ * Factories for {@link Aggregator}s that reduce a stream, collection, or array
+ * of numbers to a single summary value.
  */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MeanAggregator}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link MeanAggregator}
    * @see MeanAggregator
    */
   public static MeanAggregatorFactory meanAggregator() {
@@ -39,7 +40,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MinAggregator}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link MinAggregator}
    * @see MinAggregator
    */
   public static MinAggregatorFactory minAggregator() {
@@ -47,7 +49,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MaxAggregator}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link MaxAggregator}
    * @see MaxAggregator
    */
   public static MaxAggregatorFactory maxAggregator() {
@@ -55,7 +58,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MedianAggregator}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link MedianAggregator}
    * @see MedianAggregator
    */
   public static MedianAggregatorFactory medianAggregator() {
@@ -63,7 +67,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link SumAggregator}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link SumAggregator}
    * @see SumAggregator
    */
   public static SumAggregatorFactory sumAggregator() {

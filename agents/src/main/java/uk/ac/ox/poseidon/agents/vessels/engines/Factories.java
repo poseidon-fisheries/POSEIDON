@@ -49,7 +49,8 @@ public class Factories {
 
   /**
    * @param capacity the tank's total capacity, also its starting fuel level
-   * @return a {@link VesselScope}-relative factory for a full {@link SimpleFuelTank}
+   * @return a {@link VesselScope}-relative factory for a full
+   *         {@link SimpleFuelTank}
    * @see SimpleFuelTank
    */
   public static SimpleFuelTankFactory fullTank(
@@ -60,7 +61,8 @@ public class Factories {
 
   /**
    * @param capacity the tank's total capacity
-   * @return a {@link VesselScope}-relative factory for an empty {@link SimpleFuelTank}
+   * @return a {@link VesselScope}-relative factory for an empty
+   *         {@link SimpleFuelTank}
    * @see SimpleFuelTank
    */
   public static SimpleFuelTankFactory emptyTank(
@@ -71,7 +73,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
-   * {@link InfiniteFuelTank}
+   *         {@link InfiniteFuelTank}
    * @see InfiniteFuelTank
    */
   public static InfiniteFuelTankFactory infiniteTank() {
@@ -79,9 +81,10 @@ public class Factories {
   }
 
   /**
-   * @param fuelTank         the tank this engine draws fuel from
-   * @param cruisingSpeed    this engine's cruising speed
-   * @param fuelConsumedPerKm this engine's fuel consumption rate, per kilometre travelled
+   * @param fuelTank          the tank this engine draws fuel from
+   * @param cruisingSpeed     this engine's cruising speed
+   * @param fuelConsumedPerKm this engine's fuel consumption rate, per kilometre
+   *                          travelled
    * @return a {@link VesselScope}-relative factory for a {@link SimpleEngine}
    * @see SimpleEngine
    */

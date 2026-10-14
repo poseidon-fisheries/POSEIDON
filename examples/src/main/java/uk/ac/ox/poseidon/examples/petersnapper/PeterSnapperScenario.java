@@ -117,10 +117,11 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 /**
- * A worked example scenario: a single-species, single-gear artisanal fishery (modelled on
- * Indonesia's Peter Snapper fishery/tutorial) with two ports, epsilon-greedy destination choice
- * (with imitation of nearby vessels' best options), a fixed-proportion gear, and logistic
- * biomass growth with diffusion.
+ * A worked example scenario: a single-species, single-gear artisanal fishery
+ * (modelled on Indonesia's Peter Snapper fishery/tutorial) with two ports,
+ * epsilon-greedy destination choice (with imitation of nearby vessels' best
+ * options), a fixed-proportion gear, and logistic biomass growth with
+ * diffusion.
  */
 public class PeterSnapperScenario implements Supplier<Scenario> {
 

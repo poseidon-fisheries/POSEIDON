@@ -36,10 +36,11 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.events.Listener;
 
 /**
- * Network dynamics that keep vessels in cliques of at most {@link #maximumCliqueSize} vessels
- * eligible for each other: both active, with equal grouping keys (in NW Med, the same home port
- * and gear). Every tie goes both ways, so a vessel's clique is itself and its partners, its
- * recipients in the network.
+ * Network dynamics that keep vessels in cliques of at most
+ * {@link #maximumCliqueSize} vessels eligible for each other: both active, with
+ * equal grouping keys (in NW Med, the same home port and gear). Every tie goes
+ * both ways, so a vessel's clique is itself and its partners, its recipients in
+ * the network.
  */
 public class CliqueDynamics implements Listener<TripStartEvent> {
 
@@ -66,8 +67,9 @@ public class CliqueDynamics implements Listener<TripStartEvent> {
   }
 
   /**
-   * Removes every tie between two members of the vessel's clique that are not eligible for each
-   * other. Eligibility being transitive, the clique splits into cliques of eligible vessels.
+   * Removes every tie between two members of the vessel's clique that are not
+   * eligible for each other. Eligibility being transitive, the clique splits
+   * into cliques of eligible vessels.
    */
   @Override
   public Class<TripStartEvent> getEventClass() {
@@ -75,8 +77,9 @@ public class CliqueDynamics implements Listener<TripStartEvent> {
   }
 
   /**
-   * Settles the clique of the trip's vessel, then, if that leaves the vessel alone, has it join
-   * one, so that the vessel goes fishing with partners eligible for it whenever there are some.
+   * Settles the clique of the trip's vessel, then, if that leaves the vessel
+   * alone, has it join one, so that the vessel goes fishing with partners
+   * eligible for it whenever there are some.
    */
   @Override
   public void receive(final TripStartEvent event) {
@@ -86,11 +89,12 @@ public class CliqueDynamics implements Listener<TripStartEvent> {
   }
 
   /**
-   * If the vessel is alone, picks at random, among the network's candidates, a vessel eligible
-   * for it whose clique has room, settles that clique and ties the vessel, both ways, to every
-   * member left. A vessel with partners, or with no such vessel to pick, is left as it is. The
-   * pick depends only on the random number generator and the order of the candidates, so runs
-   * with the same seed and candidates in the same order make the same cliques.
+   * If the vessel is alone, picks at random, among the network's candidates, a
+   * vessel eligible for it whose clique has room, settles that clique and ties
+   * the vessel, both ways, to every member left. A vessel with partners, or
+   * with no such vessel to pick, is left as it is. The pick depends only on the
+   * random number generator and the order of the candidates, so runs with the
+   * same seed and candidates in the same order make the same cliques.
    */
   void join(final Vessel vessel) {
     if (!network.getRecipients(vessel).isEmpty()) {

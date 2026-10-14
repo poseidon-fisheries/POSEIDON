@@ -27,9 +27,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * A {@link Factory} whose produced object is cached under the single, global
- * {@link Scope#GLOBAL_SCOPE} key regardless of the scope it's resolved against — so one instance
- * is shared across every simulation built from a scenario. Use for components with no
- * per-simulation state.
+ * {@link Scope#GLOBAL_SCOPE} key regardless of the scope it's resolved against
+ * — so one instance is shared across every simulation built from a scenario.
+ * Use for components with no per-simulation state.
  */
 @NoArgsConstructor
 public abstract class GlobalScopeFactory<C> extends AbstractFactory<Scope, C> {

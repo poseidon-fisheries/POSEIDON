@@ -45,46 +45,53 @@ import lombok.RequiredArgsConstructor;
 import sim.engine.*;
 
 /**
- * MASON's {@link Schedule}, extended to let callers schedule {@link Steppable}s by
- * {@link LocalDateTime}/{@link Temporal} and {@link TemporalAmount} intervals instead of raw
- * {@code double} simulation time — converting to and from MASON's internal time via the seconds
- * elapsed since {@link #startingDateTime}. Owned by {@link uk.ac.ox.poseidon.core.Simulation}; the
- * {@code schedule*} factories in this package are the usual way scenario-built components get
- * onto it.
+ * MASON's {@link Schedule}, extended to let callers schedule {@link Steppable}s
+ * by {@link LocalDateTime}/{@link Temporal} and {@link TemporalAmount}
+ * intervals instead of raw {@code double} simulation time — converting to and
+ * from MASON's internal time via the seconds elapsed since
+ * {@link #startingDateTime}. Owned by
+ * {@link uk.ac.ox.poseidon.core.Simulation}; the {@code schedule*} factories in
+ * this package are the usual way scenario-built components get onto it.
  * <p>
  * The schedule follows seven rules:
  * <ol>
- *     <li><b>The clock reads how far the schedule has run</b> ({@link #getTime()},
- *     {@link #getDateTime()}): during an event, that event's time; between calls, where the last
- *     {@link #stepUntil} stopped; before the first step, the start.</li>
- *     <li><b>{@link #stepUntil stepUntil(t)} runs every event dated before {@code t}</b>; events
- *     dated {@code t} run in the next call. {@link #stepFor stepFor(d)} is
- *     {@code stepUntil(clock + d)}.</li>
- *     <li><b>Nothing can be scheduled before the clock</b>: trying throws
- *     {@link IllegalArgumentException}. Relative times count from the clock, for MASON's relative
- *     methods ({@code scheduleOnce(Steppable)}'s "+1", {@code scheduleOnceIn},
- *     {@code scheduleRepeating(Steppable, ...)}) as for this class's.</li>
- *     <li><b>An event scheduled for the current time runs after the event that scheduled it, at
- *     the same time</b>, as in MASON. Between calls, an event scheduled at the clock joins the
- *     events already queued there, ordered with them by its ordering.</li>
- *     <li><b>Date-times are whole seconds</b>: conversions between date-times and MASON time
- *     floor fractions of a second, and a date-time in the clock's current second means now.
- *     (MASON places an event scheduled for the current time a fraction of a second after it, so
- *     the clock can be just past the second {@link #getDateTime()} shows.)</li>
- *     <li><b>One advance at a time</b>: {@link #stepUntil}, {@link #stepFor} and {@link #step}
- *     are synchronised on the schedule, and advancing from inside an event throws
- *     {@link IllegalStateException}.</li>
- *     <li><b>A finished schedule cannot be advanced</b>: {@link #stepUntil} and {@link #stepFor}
- *     throw {@link IllegalStateException}, also when the schedule is killed during the advance,
- *     while {@link #step} returns {@code false}, as in MASON. Either way, the clock stays where the
- *     last step left it.</li>
+ * <li><b>The clock reads how far the schedule has run</b> ({@link #getTime()},
+ * {@link #getDateTime()}): during an event, that event's time; between calls,
+ * where the last {@link #stepUntil} stopped; before the first step, the
+ * start.</li>
+ * <li><b>{@link #stepUntil stepUntil(t)} runs every event dated before
+ * {@code t}</b>; events dated {@code t} run in the next call. {@link #stepFor
+ * stepFor(d)} is {@code stepUntil(clock + d)}.</li>
+ * <li><b>Nothing can be scheduled before the clock</b>: trying throws
+ * {@link IllegalArgumentException}. Relative times count from the clock, for
+ * MASON's relative methods ({@code scheduleOnce(Steppable)}'s "+1",
+ * {@code scheduleOnceIn}, {@code scheduleRepeating(Steppable, ...)}) as for
+ * this class's.</li>
+ * <li><b>An event scheduled for the current time runs after the event that
+ * scheduled it, at the same time</b>, as in MASON. Between calls, an event
+ * scheduled at the clock joins the events already queued there, ordered with
+ * them by its ordering.</li>
+ * <li><b>Date-times are whole seconds</b>: conversions between date-times and
+ * MASON time floor fractions of a second, and a date-time in the clock's
+ * current second means now. (MASON places an event scheduled for the current
+ * time a fraction of a second after it, so the clock can be just past the
+ * second {@link #getDateTime()} shows.)</li>
+ * <li><b>One advance at a time</b>: {@link #stepUntil}, {@link #stepFor} and
+ * {@link #step} are synchronised on the schedule, and advancing from inside an
+ * event throws {@link IllegalStateException}.</li>
+ * <li><b>A finished schedule cannot be advanced</b>: {@link #stepUntil} and
+ * {@link #stepFor} throw {@link IllegalStateException}, also when the schedule
+ * is killed during the advance, while {@link #step} returns {@code false}, as
+ * in MASON. Either way, the clock stays where the last step left it.</li>
  * </ol>
- * Events with the same time and ordering run in random order (MASON's shuffling). Callers needing
- * an order use distinct orderings or a {@link Sequence}.
+ * Events with the same time and ordering run in random order (MASON's
+ * shuffling). Callers needing an order use distinct orderings or a
+ * {@link Sequence}.
  * <p>
- * MASON's own time, the time of the last event that ran, stays internal: it can be earlier than
- * the clock between calls. Code in this class reads the clock through {@link #getTime()}, never
- * through MASON's {@code time} field. {@link #merge} is not supported.
+ * MASON's own time, the time of the last event that ran, stays internal: it can
+ * be earlier than the clock between calls. Code in this class reads the clock
+ * through {@link #getTime()}, never through MASON's {@code time} field.
+ * {@link #merge} is not supported.
  */
 @SuppressWarnings("rawtypes")
 @SuppressFBWarnings(
@@ -123,9 +130,10 @@ public class TemporalSchedule extends Schedule {
   private transient boolean running;
 
   /**
-   * @return the clock, in seconds since {@link #startingDateTime}: the time of the event being
-   * run; otherwise where the last {@link #stepUntil} stopped, or 0 before the first step; or
-   * {@link #AFTER_SIMULATION} once MASON has run out of events
+   * @return the clock, in seconds since {@link #startingDateTime}: the time of
+   *         the event being run; otherwise where the last {@link #stepUntil}
+   *         stopped, or 0 before the first step; or {@link #AFTER_SIMULATION}
+   *         once MASON has run out of events
    */
   @Override
   public double getTime() {
@@ -136,8 +144,8 @@ public class TemporalSchedule extends Schedule {
 
   /**
    * @return the clock as a {@link LocalDateTime}
-   * @throws IllegalStateException once MASON has run out of events, as the clock then has no
-   *                               date-time
+   * @throws IllegalStateException once MASON has run out of events, as the
+   *                               clock then has no date-time
    */
   @SuppressWarnings("WeakerAccess")
   public LocalDateTime getDateTime() {
@@ -156,8 +164,8 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * @return the clock as a human-readable timestamp, or {@link #AFTER_SIMULATION_STRING} once
-   * MASON has run out of events
+   * @return the clock as a human-readable timestamp, or
+   *         {@link #AFTER_SIMULATION_STRING} once MASON has run out of events
    */
   public String getTimestamp() {
     return getTimestamp(BEFORE_SIMULATION_STRING, AFTER_SIMULATION_STRING);
@@ -184,8 +192,8 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * @param delta the amount of time from the clock to schedule the event at, floored to whole
-   *              seconds
+   * @param delta the amount of time from the clock to schedule the event at,
+   *              floored to whole seconds
    * @param event the event to schedule
    * @return whether the event was successfully scheduled
    */
@@ -195,8 +203,8 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * @param delta    the amount of time from the clock to schedule the event at, floored to
-   *                 whole seconds
+   * @param delta    the amount of time from the clock to schedule the event at,
+   *                 floored to whole seconds
    * @param event    the event to schedule
    * @param ordering the schedule ordering to use
    * @return whether the event was successfully scheduled
@@ -223,9 +231,10 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * Converts a Java {@link Temporal} (most likely a {@link LocalDateTime}) to internal MASON
-   * schedule time by calculating the interval in seconds between that object and the starting
-   * date-time of the simulation, flooring fractions of a second.
+   * Converts a Java {@link Temporal} (most likely a {@link LocalDateTime}) to
+   * internal MASON schedule time by calculating the interval in seconds between
+   * that object and the starting date-time of the simulation, flooring
+   * fractions of a second.
    *
    * @param dateTime the {@link Temporal} object to convert.
    * @return the internal MASON schedule time corresponding to {@code dateTime}.
@@ -236,9 +245,10 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * @return the MASON time to schedule or step to for {@code dateTime}: its whole second, from
-   * {@link #toTime}, or the clock itself if that second is the clock's current second, since a
-   * date-time in the current second means now
+   * @return the MASON time to schedule or step to for {@code dateTime}: its
+   *         whole second, from {@link #toTime}, or the clock itself if that
+   *         second is the clock's current second, since a date-time in the
+   *         current second means now
    */
   private double schedulingTime(final Temporal dateTime) {
     synchronized (lock) {
@@ -249,9 +259,10 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * @param time internal MASON schedule time, as seconds elapsed since {@link #startingDateTime}
-   * @return the {@link LocalDateTime} corresponding to {@code time}, with fractions of a second
-   * floored
+   * @param time internal MASON schedule time, as seconds elapsed since
+   *             {@link #startingDateTime}
+   * @return the {@link LocalDateTime} corresponding to {@code time}, with
+   *         fractions of a second floored
    */
   @SuppressWarnings("WeakerAccess")
   public LocalDateTime toDateTime(final double time) {
@@ -285,12 +296,13 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * Schedules a collection of steppable entries at specified date-times. Entries dated before the
-   * clock are scheduled together at the clock, in date order, while others are scheduled at their
-   * respective specified date-times.
+   * Schedules a collection of steppable entries at specified date-times.
+   * Entries dated before the clock are scheduled together at the clock, in date
+   * order, while others are scheduled at their respective specified date-times.
    *
-   * @param steppablesByDateTime a collection of entries mapping {@link LocalDateTime} to
-   *                             {@link Steppable}. Each entry specifies a steppable and the
+   * @param steppablesByDateTime a collection of entries mapping
+   *                             {@link LocalDateTime} to {@link Steppable}.
+   *                             Each entry specifies a steppable and the
    *                             date-time at which it should be scheduled.
    */
   public void scheduleByDateTime(
@@ -336,9 +348,10 @@ public class TemporalSchedule extends Schedule {
 
   /**
    * @param event    the event to schedule repeatedly
-   * @param interval the recurring interval, also used to compute the first firing (the clock
-   *                 plus this interval)
-   * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling failed
+   * @param interval the recurring interval, also used to compute the first
+   *                 firing (the clock plus this interval)
+   * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling
+   *         failed
    */
   @SuppressWarnings("unused")
   public TemporalRepeat scheduleRepeating(
@@ -356,9 +369,10 @@ public class TemporalSchedule extends Schedule {
   /**
    * @param event    the event to schedule repeatedly
    * @param ordering the schedule ordering to use
-   * @param interval the recurring interval, also used to compute the first firing (the clock
-   *                 plus this interval)
-   * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling failed
+   * @param interval the recurring interval, also used to compute the first
+   *                 firing (the clock plus this interval)
+   * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling
+   *         failed
    */
   @SuppressWarnings("unused")
   public TemporalRepeat scheduleRepeating(
@@ -378,7 +392,8 @@ public class TemporalSchedule extends Schedule {
    * @param dateTime the date-time of the first firing
    * @param event    the event to schedule repeatedly
    * @param interval the recurring interval
-   * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling failed
+   * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling
+   *         failed
    */
   @SuppressWarnings("unused")
   public TemporalRepeat scheduleRepeating(
@@ -393,10 +408,13 @@ public class TemporalSchedule extends Schedule {
    * @param dateTime the date-time of the first firing
    * @param ordering the schedule ordering to use
    * @param event    the event to schedule repeatedly
-   * @param interval the recurring interval, a {@link Period} or a {@link Duration}
-   * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling failed
-   * @throws IllegalArgumentException if {@code interval} is neither a {@link Period} nor a
-   *                                  {@link Duration}, or does not move time forward
+   * @param interval the recurring interval, a {@link Period} or a
+   *                 {@link Duration}
+   * @return the {@link TemporalRepeat} handle, or {@code null} if scheduling
+   *         failed
+   * @throws IllegalArgumentException if {@code interval} is neither a
+   *                                  {@link Period} nor a {@link Duration}, or
+   *                                  does not move time forward
    */
   public TemporalRepeat scheduleRepeating(
     final Temporal dateTime,
@@ -409,12 +427,14 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * Steps until the clock plus {@code temporalAmount}: {@code stepUntil(clock + temporalAmount)},
-   * with the clock read and the advance made as one operation.
+   * Steps until the clock plus {@code temporalAmount}:
+   * {@code stepUntil(clock + temporalAmount)}, with the clock read and the
+   * advance made as one operation.
    *
    * @param simState       the simulation to step
    * @param temporalAmount the amount of time to advance by
-   * @throws IllegalStateException as {@link #stepUntil}, or if MASON has run out of events
+   * @throws IllegalStateException as {@link #stepUntil}, or if MASON has run
+   *                               out of events
    */
   public synchronized void stepFor(
     final SimState simState,
@@ -424,15 +444,17 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * Runs every event dated before {@code dateTime}, in time and ordering order, then leaves the
-   * clock at {@code dateTime}: events dated {@code dateTime} run in the next call. If
-   * {@code dateTime} is in the clock's current second, nothing runs.
+   * Runs every event dated before {@code dateTime}, in time and ordering order,
+   * then leaves the clock at {@code dateTime}: events dated {@code dateTime}
+   * run in the next call. If {@code dateTime} is in the clock's current second,
+   * nothing runs.
    *
    * @param simState the simulation to step
    * @param dateTime the date-time to step until, excluded
    * @throws IllegalArgumentException if {@code dateTime} is before the clock
-   * @throws IllegalStateException    if the schedule is finished or is killed during the advance,
-   *                                  or if called from inside an event
+   * @throws IllegalStateException    if the schedule is finished or is killed
+   *                                  during the advance, or if called from
+   *                                  inside an event
    */
   public synchronized void stepUntil(
     final SimState simState,
@@ -470,16 +492,17 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * Does nothing. Called by {@link #stepUntil} between looking at the queue and stepping, so that
-   * tests can pause an advance there.
+   * Does nothing. Called by {@link #stepUntil} between looking at the queue and
+   * stepping, so that tests can pause an advance there.
    */
   void checkpoint() {}
 
   /**
-   * Runs the events at the earliest queued time, as MASON's {@link Schedule#step} does.
+   * Runs the events at the earliest queued time, as MASON's
+   * {@link Schedule#step} does.
    *
-   * @return {@code false}, without moving the clock, if the schedule is finished; otherwise as
-   * MASON's {@link Schedule#step}
+   * @return {@code false}, without moving the clock, if the schedule is
+   *         finished; otherwise as MASON's {@link Schedule#step}
    * @throws IllegalStateException if called from inside an event
    */
   @Override
@@ -507,8 +530,9 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * Refuses a time before the clock: MASON only refuses times before its own time, the time of
-   * the last event that ran, which can be earlier than the clock between calls.
+   * Refuses a time before the clock: MASON only refuses times before its own
+   * time, the time of the last event that ran, which can be earlier than the
+   * clock between calls.
    */
   @Override
   protected boolean _scheduleOnce(final Key key, final Steppable event) {
@@ -589,8 +613,8 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * Not supported: MASON's merge also refuses events at the clock, which this schedule's rules
-   * allow.
+   * Not supported: MASON's merge also refuses events at the clock, which this
+   * schedule's rules allow.
    *
    * @throws UnsupportedOperationException always
    */
@@ -607,8 +631,9 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * Refuses a repeat interval that does not move time forward: zero, which would fire forever
-   * within the same second, or with a negative part, whose firings would be refused as past.
+   * Refuses a repeat interval that does not move time forward: zero, which
+   * would fire forever within the same second, or with a negative part, whose
+   * firings would be refused as past.
    */
   private static void checkMovesTimeForward(final TemporalAmount interval) {
     final List<TemporalUnit> units = interval.getUnits();
@@ -623,10 +648,11 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * A {@link Repeat} anchored to its first firing: its n-th firing after the first is the first
-   * plus n times {@link #interval}, floored to the second like any date-time, never the previous
-   * firing plus the interval. So neither calendar clamping nor flooring accumulates. Monthly from
-   * 31 January, it fires on 31 January, 28 February, 31 March, 30 April, and so on; every 1.5
+   * A {@link Repeat} anchored to its first firing: its n-th firing after the
+   * first is the first plus n times {@link #interval}, floored to the second
+   * like any date-time, never the previous firing plus the interval. So neither
+   * calendar clamping nor flooring accumulates. Monthly from 31 January, it
+   * fires on 31 January, 28 February, 31 March, 30 April, and so on; every 1.5
    * seconds from 0, it fires at 0, 1, 3, 4, 6 seconds, and so on.
    */
   public class TemporalRepeat extends Repeat {
@@ -641,8 +667,9 @@ public class TemporalSchedule extends Schedule {
     private long firingsAfterTheFirst;
 
     /**
-     * @throws IllegalArgumentException if {@code interval} is neither a {@link Period} nor a
-     *                                  {@link Duration}, the amounts that can be multiplied, or
+     * @throws IllegalArgumentException if {@code interval} is neither a
+     *                                  {@link Period} nor a {@link Duration},
+     *                                  the amounts that can be multiplied, or
      *                                  does not move time forward
      */
     TemporalRepeat(
@@ -688,9 +715,9 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
-   * This is a very ugly method meant to package the schedule in a slightly more easily
-   * interpretable way for human _debugging_ and should not under any circumstances be used in
-   * actual simulation code. -- NP 2026-02-03.
+   * This is a very ugly method meant to package the schedule in a slightly more
+   * easily interpretable way for human _debugging_ and should not under any
+   * circumstances be used in actual simulation code. -- NP 2026-02-03.
    */
   private List<?> asMap() {
     record K(

@@ -28,8 +28,9 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that compute a numeric result
- * from other supplied values via a basic math operation (currently max and min).
+ * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that compute
+ * a numeric result from other supplied values via a basic math operation
+ * (currently max and min).
  */
 public class Factories {
 
@@ -38,7 +39,8 @@ public class Factories {
   /**
    * @param a one of the two values to compare
    * @param b the other value to compare
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MaxDouble}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link MaxDouble}
    * @see MaxDouble
    */
   public static <S extends Scope> MaxDoubleFactory<S> maxDouble(
@@ -51,7 +53,8 @@ public class Factories {
   /**
    * @param a one of the two values to compare
    * @param b the other value to compare
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MinDouble}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link MinDouble}
    * @see MinDouble
    */
   public static <S extends Scope> MinDoubleFactory<S> minDouble(
@@ -64,7 +67,8 @@ public class Factories {
   /**
    * @param a one of the two values to compare
    * @param b the other value to compare
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MaxInt}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link MaxInt}
    * @see MaxInt
    */
   public static <S extends Scope> MaxIntFactory<S> maxInt(
@@ -77,7 +81,8 @@ public class Factories {
   /**
    * @param a one of the two values to compare
    * @param b the other value to compare
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link MinInt}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link MinInt}
    * @see MinInt
    */
   public static <S extends Scope> MinIntFactory<S> minInt(

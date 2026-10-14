@@ -33,7 +33,8 @@ import org.threeten.extra.Interval;
 import uk.ac.ox.poseidon.regulations.TemporalAction;
 
 /**
- * Predicate matching temporal actions that overlap a given inclusive date range.
+ * Predicate matching temporal actions that overlap a given inclusive date
+ * range.
  * <p>
  * The provided dates are converted to a UTC interval
  * {@code [start at 00:00, day after end at 00:00)}. An action matches when its

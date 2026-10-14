@@ -26,7 +26,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link CurrentTripDestinationCell}, built via
+ * A {@link VesselScopeFactory} counterpart of
+ * {@link CurrentTripDestinationCell}, built via
  * {@link Factories#currentTripDestinationCell()}.
  */
 public class CurrentTripDestinationCellFactory

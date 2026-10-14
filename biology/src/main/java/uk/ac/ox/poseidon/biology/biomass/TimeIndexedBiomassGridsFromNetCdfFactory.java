@@ -52,20 +52,22 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.TimeIndexedNetCdfGridReader;
 
 /**
- * Reads a NetCDF file holding, for each of a number of dates, one biomass raster per species, on a
- * grid that must align cell-for-cell with the given {@link ModelGrid} (no resampling is performed;
- * misalignment is an error). The resulting grids are immutable and meant to be shared: this
- * resolves to global scope when its input factories do (see {@link RelativeScopeFactory}), so the
- * whole map is typically computed once and reused across every simulation started from the same
- * loaded scenario.
+ * Reads a NetCDF file holding, for each of a number of dates, one biomass
+ * raster per species, on a grid that must align cell-for-cell with the given
+ * {@link ModelGrid} (no resampling is performed; misalignment is an error). The
+ * resulting grids are immutable and meant to be shared: this resolves to global
+ * scope when its input factories do (see {@link RelativeScopeFactory}), so the
+ * whole map is typically computed once and reused across every simulation
+ * started from the same loaded scenario.
  * <p>
- * Each NetCDF data variable name is split on the last occurrence of {@code separator} into a
- * species code and a life stage; a name containing no {@code separator} names a bare species with
- * no life stage. The resulting (code, lifeStage) pairs are matched against the configured species
- * list, strictly both ways: every configured species must have exactly one matching variable and
- * vice versa, or this throws. Configured species codes must not themselves contain
- * {@code separator}, since that would make a bare code indistinguishable from a code/lifeStage
- * pair.
+ * Each NetCDF data variable name is split on the last occurrence of
+ * {@code separator} into a species code and a life stage; a name containing no
+ * {@code separator} names a bare species with no life stage. The resulting
+ * (code, lifeStage) pairs are matched against the configured species list,
+ * strictly both ways: every configured species must have exactly one matching
+ * variable and vice versa, or this throws. Configured species codes must not
+ * themselves contain {@code separator}, since that would make a bare code
+ * indistinguishable from a code/lifeStage pair.
  */
 @Data
 @NoArgsConstructor
@@ -147,9 +149,10 @@ public class TimeIndexedBiomassGridsFromNetCdfFactory<S extends Scope> extends R
   }
 
   /**
-   * Rejects any configured species whose code contains {@code separator}: since variable names
-   * are split on it unconditionally, such a code would be indistinguishable from a code/lifeStage
-   * pair and could never be matched correctly.
+   * Rejects any configured species whose code contains {@code separator}: since
+   * variable names are split on it unconditionally, such a code would be
+   * indistinguishable from a code/lifeStage pair and could never be matched
+   * correctly.
    */
   private static void checkNoCodeContainsSeparator(
     final List<? extends Species> configuredSpecies,
@@ -169,10 +172,11 @@ public class TimeIndexedBiomassGridsFromNetCdfFactory<S extends Scope> extends R
   }
 
   /**
-   * Matches NetCDF variable names to configured species, strictly both ways: every configured
-   * species must have exactly one matching variable and vice versa. A mismatch is treated as a
-   * data-integrity defect (the file and the configured species list are meant to describe the
-   * same species set) and throws, rather than silently skipping or synthesizing a species.
+   * Matches NetCDF variable names to configured species, strictly both ways:
+   * every configured species must have exactly one matching variable and vice
+   * versa. A mismatch is treated as a data-integrity defect (the file and the
+   * configured species list are meant to describe the same species set) and
+   * throws, rather than silently skipping or synthesizing a species.
    */
   private static Map<String, String> matchVariablesToSpecies(
     final List<String> variableNames,
@@ -207,9 +211,9 @@ public class TimeIndexedBiomassGridsFromNetCdfFactory<S extends Scope> extends R
   }
 
   /**
-   * Splits a variable name into a (code, lifeStage) species key by splitting unconditionally on
-   * the last occurrence of {@code separator}; a name with no {@code separator} at all is a bare
-   * code with a {@code null} life stage.
+   * Splits a variable name into a (code, lifeStage) species key by splitting
+   * unconditionally on the last occurrence of {@code separator}; a name with no
+   * {@code separator} at all is a bare code with a {@code null} life stage.
    */
   private static String speciesKeyOf(
     final String variableName,

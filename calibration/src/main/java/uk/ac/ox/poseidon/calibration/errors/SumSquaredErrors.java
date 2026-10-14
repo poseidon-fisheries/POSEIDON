@@ -32,12 +32,13 @@ import java.util.function.ToDoubleFunction;
 import uk.ac.ox.poseidon.core.Simulation;
 
 /**
- * A calibration error metric that sums the squared differences between a fixed map of target
- * values and a map of actual values extracted from a {@link Simulation}, keyed by an arbitrary
- * type {@code K}. A key present in only one of the two maps is treated as having a value of
- * {@code 0.0} on the other side, so it still contributes to the error. Every target must be a
- * finite number: a single {@code NaN} target would make every error {@code NaN}, and the
- * calibration would have nothing to compare.
+ * A calibration error metric that sums the squared differences between a fixed
+ * map of target values and a map of actual values extracted from a
+ * {@link Simulation}, keyed by an arbitrary type {@code K}. A key present in
+ * only one of the two maps is treated as having a value of {@code 0.0} on the
+ * other side, so it still contributes to the error. Every target must be a
+ * finite number: a single {@code NaN} target would make every error
+ * {@code NaN}, and the calibration would have nothing to compare.
  *
  * @param <K> the type of key the target and actual value maps are indexed by
  */
@@ -47,7 +48,8 @@ public class SumSquaredErrors<K> implements ToDoubleFunction<Simulation> {
   private final Function<Simulation, Map<K, Double>> actualValues;
 
   /**
-   * @throws IllegalArgumentException if a target value is {@code null}, {@code NaN} or infinite
+   * @throws IllegalArgumentException if a target value is {@code null},
+   *                                  {@code NaN} or infinite
    */
   public SumSquaredErrors(
     final Map<K, Double> targetValues,
@@ -73,8 +75,9 @@ public class SumSquaredErrors<K> implements ToDoubleFunction<Simulation> {
   }
 
   /**
-   * Extracts the actual values from {@code simulation} and returns the sum of squared
-   * differences against {@link #targetValues}, over the union of both maps' keys.
+   * Extracts the actual values from {@code simulation} and returns the sum of
+   * squared differences against {@link #targetValues}, over the union of both
+   * maps' keys.
    */
   @Override
   public double applyAsDouble(final Simulation simulation) {

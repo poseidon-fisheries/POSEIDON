@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link CsvTableWriter}, built via
- * {@link Factories#csvTableWriter(Factory, Factory, boolean, boolean)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link CsvTableWriter}, built
+ * via {@link Factories#csvTableWriter(Factory, Factory, boolean, boolean)}.
  */
 @Data
 @NoArgsConstructor

@@ -23,7 +23,8 @@
 package uk.ac.ox.poseidon.core.utils;
 
 /**
- * A function of a {@code T} and a {@code double} that produces a {@code double}.
+ * A function of a {@code T} and a {@code double} that produces a
+ * {@code double}.
  *
  * @param <T> the type of the object argument
  */

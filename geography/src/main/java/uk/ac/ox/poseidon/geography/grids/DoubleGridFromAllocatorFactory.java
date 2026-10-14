@@ -30,9 +30,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
 
 /**
- * An {@link AbstractDoubleGridFromAllocatorFactory} for an immutable {@link BaseDoubleGrid}, with
- * no normalisation: each cell's value is exactly what the resolved {@link Allocator} returned for
- * it. Built via {@link Factories#doubleGridFromAllocator(Factory, Factory)}.
+ * An {@link AbstractDoubleGridFromAllocatorFactory} for an immutable
+ * {@link BaseDoubleGrid}, with no normalisation: each cell's value is exactly
+ * what the resolved {@link Allocator} returned for it. Built via
+ * {@link Factories#doubleGridFromAllocator(Factory, Factory)}.
  */
 @Data
 @NoArgsConstructor

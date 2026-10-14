@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link StandardBiomassHold}, built via
- * {@link Factories#standardBiomassHold}.
+ * A {@link VesselScopeFactory} counterpart of {@link StandardBiomassHold},
+ * built via {@link Factories#standardBiomassHold}.
  */
 @Data
 @NoArgsConstructor

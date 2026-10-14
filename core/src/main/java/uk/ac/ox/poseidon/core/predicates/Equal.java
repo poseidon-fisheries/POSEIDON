@@ -27,8 +27,9 @@ import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} that is true iff the tested value {@link Object#equals(Object) equals} a
- * supplied value. Built via {@link Factories Factories.equal(...)} in this package.
+ * A {@link Predicate} that is true iff the tested value
+ * {@link Object#equals(Object) equals} a supplied value. Built via
+ * {@link Factories Factories.equal(...)} in this package.
  *
  * @param <T> the type of input tested
  */

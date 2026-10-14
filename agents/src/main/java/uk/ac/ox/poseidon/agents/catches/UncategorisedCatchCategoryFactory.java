@@ -29,7 +29,8 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link CatchCategory#UNCATEGORISED}, built via
+ * A {@link GlobalScopeFactory} counterpart of
+ * {@link CatchCategory#UNCATEGORISED}, built via
  * {@link Factories#uncategorisedCatchCategory()}.
  */
 @Data

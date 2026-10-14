@@ -21,12 +21,14 @@
  */
 
 /**
- * The rectangular cell grid ({@link uk.ac.ox.poseidon.geography.grids.ModelGrid}) underlying
- * every other spatial component in this module, plus grids of values over it
+ * The rectangular cell grid
+ * ({@link uk.ac.ox.poseidon.geography.grids.ModelGrid}) underlying every other
+ * spatial component in this module, plus grids of values over it
  * ({@link uk.ac.ox.poseidon.geography.grids.DoubleGrid},
- * {@link uk.ac.ox.poseidon.geography.grids.ObjectGrid}) and readers for raster/NetCDF data
- * files. Subpackages build category-specific value extractors ({@code extractors}) and
- * aggregators ({@code suppliers}) on top of these. See
- * {@link uk.ac.ox.poseidon.geography.grids.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.geography.grids.ObjectGrid}) and readers for
+ * raster/NetCDF data files. Subpackages build category-specific value
+ * extractors ({@code extractors}) and aggregators ({@code suppliers}) on top of
+ * these. See {@link uk.ac.ox.poseidon.geography.grids.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.geography.grids;

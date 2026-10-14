@@ -28,7 +28,10 @@ import lombok.RequiredArgsConstructor;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.simple.RectanglePortrayal2D;
 
-/** A MASON {@link RectanglePortrayal2D} that draws an SVG image, scaled to the object's draw rectangle. */
+/**
+ * A MASON {@link RectanglePortrayal2D} that draws an SVG image, scaled to the
+ * object's draw rectangle.
+ */
 @RequiredArgsConstructor
 public class SvgPortrayal extends RectanglePortrayal2D {
 
@@ -39,7 +42,9 @@ public class SvgPortrayal extends RectanglePortrayal2D {
     return new SvgPortrayal(SvgRenderer.from(svgInputStream));
   }
 
-  /** Renders the SVG at the object's draw size, centred on {@code info.draw}. */
+  /**
+   * Renders the SVG at the object's draw size, centred on {@code info.draw}.
+   */
   @Override
   public void draw(
     final Object object,

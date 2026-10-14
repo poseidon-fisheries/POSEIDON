@@ -28,16 +28,17 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * Factories for {@link Regulations} rules: the two base rules, {@link ForbiddenIf} and
- * {@link PermittedIf}, each built from a predicate over the action, and the conjunction of rules,
- * {@link AllOfRegulations}.
+ * Factories for {@link Regulations} rules: the two base rules,
+ * {@link ForbiddenIf} and {@link PermittedIf}, each built from a predicate over
+ * the action, and the conjunction of rules, {@link AllOfRegulations}.
  */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link ForbiddenIf}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link ForbiddenIf}
    * @see ForbiddenIfFactory
    */
   public static <S extends Scope, A extends Action<?>> ForbiddenIfFactory<
@@ -50,7 +51,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link PermittedIf}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link PermittedIf}
    * @see PermittedIfFactory
    */
   public static <S extends Scope, A extends Action<?>> PermittedIfFactory<
@@ -65,7 +67,7 @@ public class Factories {
   /**
    * @param regulations the rules to combine
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   * {@link AllOfRegulations} of the given rules, itself a rule
+   *         {@link AllOfRegulations} of the given rules, itself a rule
    * @see AllOfRegulations
    */
   @SafeVarargs

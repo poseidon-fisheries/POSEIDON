@@ -23,16 +23,19 @@
 package uk.ac.ox.poseidon.core.scopes;
 
 /**
- * Marks the sharing/lifecycle boundary a {@link uk.ac.ox.poseidon.core.Factory}-produced object
- * belongs to. The base class itself represents the global scope, shared by every
- * {@code AbstractFactory} invocation regardless of the simulation it's built for; subclasses such
- * as {@link SimulationScope} narrow that boundary to a single simulation run.
+ * Marks the sharing/lifecycle boundary a
+ * {@link uk.ac.ox.poseidon.core.Factory}-produced object belongs to. The base
+ * class itself represents the global scope, shared by every
+ * {@code AbstractFactory} invocation regardless of the simulation it's built
+ * for; subclasses such as {@link SimulationScope} narrow that boundary to a
+ * single simulation run.
  */
 public class Scope {
 
   /**
-   * The single global scope instance, used by factories whose output is shared across every
-   * simulation built from a scenario (see {@code GlobalScopeFactory}).
+   * The single global scope instance, used by factories whose output is shared
+   * across every simulation built from a scenario (see
+   * {@code GlobalScopeFactory}).
    */
   @SuppressWarnings("InstantiationOfUtilityClass")
   public static final Scope GLOBAL_SCOPE = new Scope();

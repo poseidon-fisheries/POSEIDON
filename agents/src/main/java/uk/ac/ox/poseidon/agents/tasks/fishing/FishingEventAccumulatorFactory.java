@@ -30,8 +30,9 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * A {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} counterpart of
- * {@link FishingEventAccumulator}, registering it with the {@code EventManager} (see
- * {@link SimulationEventListenerFactory}), built via {@link Factories#fishingEventAccumulator()}.
+ * {@link FishingEventAccumulator}, registering it with the {@code EventManager}
+ * (see {@link SimulationEventListenerFactory}), built via
+ * {@link Factories#fishingEventAccumulator()}.
  */
 @Data
 @NoArgsConstructor

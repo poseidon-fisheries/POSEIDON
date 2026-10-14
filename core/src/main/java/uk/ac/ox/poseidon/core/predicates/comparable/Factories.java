@@ -29,8 +29,8 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * Factories for {@link java.util.function.Predicate}s that compare a tested value against one or
- * two thresholds.
+ * Factories for {@link java.util.function.Predicate}s that compare a tested
+ * value against one or two thresholds.
  */
 public class Factories {
 
@@ -38,8 +38,8 @@ public class Factories {
 
   /**
    * @param threshold the value the resulting predicate tests against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link LessThan}
-   * predicate over the given literal threshold
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link LessThan} predicate over the given literal threshold
    * @see LessThan
    */
   public static <S extends Scope> LessThanFactory<S, Double> lessThan(
@@ -50,8 +50,8 @@ public class Factories {
 
   /**
    * @param value factory for the value the resulting predicate tests against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link LessThan}
-   * predicate over the resolved threshold
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link LessThan} predicate over the resolved threshold
    * @see LessThan
    */
   public static <S extends Scope, T> LessThanFactory<S, T> lessThan(
@@ -62,8 +62,8 @@ public class Factories {
 
   /**
    * @param threshold the value the resulting predicate tests against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link GreaterThan}
-   * predicate over the given literal threshold
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link GreaterThan} predicate over the given literal threshold
    * @see GreaterThan
    */
   public static <S extends Scope> GreaterThanFactory<S, Double> greaterThan(
@@ -74,8 +74,8 @@ public class Factories {
 
   /**
    * @param value factory for the value the resulting predicate tests against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link GreaterThan}
-   * predicate over the resolved threshold
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link GreaterThan} predicate over the resolved threshold
    * @see GreaterThan
    */
   public static <S extends Scope, T> GreaterThanFactory<S, T> greaterThan(
@@ -87,8 +87,8 @@ public class Factories {
   /**
    * @param minimum inclusive lower bound
    * @param maximum inclusive upper bound
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link Between}
-   * predicate over the given literal bounds
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link Between} predicate over the given literal bounds
    * @see Between
    */
   public static <S extends Scope> BetweenFactory<S, Double> between(
@@ -101,10 +101,12 @@ public class Factories {
   /**
    * @param minimum        lower bound
    * @param maximum        upper bound
-   * @param includeMinimum whether {@code minimum} itself satisfies the resulting predicate
-   * @param includeMaximum whether {@code maximum} itself satisfies the resulting predicate
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link Between}
-   * predicate over the given literal bounds
+   * @param includeMinimum whether {@code minimum} itself satisfies the
+   *                       resulting predicate
+   * @param includeMaximum whether {@code maximum} itself satisfies the
+   *                       resulting predicate
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link Between} predicate over the given literal bounds
    * @see Between
    */
   public static <S extends Scope> BetweenFactory<S, Double> between(
@@ -124,8 +126,8 @@ public class Factories {
   /**
    * @param minimum factory for the inclusive lower bound
    * @param maximum factory for the inclusive upper bound
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link Between}
-   * predicate over the resolved bounds
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link Between} predicate over the resolved bounds
    * @see Between
    */
   public static <S extends Scope, T> BetweenFactory<S, T> between(
@@ -138,10 +140,12 @@ public class Factories {
   /**
    * @param minimum        factory for the lower bound
    * @param maximum        factory for the upper bound
-   * @param includeMinimum whether {@code minimum} itself satisfies the resulting predicate
-   * @param includeMaximum whether {@code maximum} itself satisfies the resulting predicate
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link Between}
-   * predicate over the resolved bounds
+   * @param includeMinimum whether {@code minimum} itself satisfies the
+   *                       resulting predicate
+   * @param includeMaximum whether {@code maximum} itself satisfies the
+   *                       resulting predicate
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link Between} predicate over the resolved bounds
    * @see Between
    */
   public static <S extends Scope, T> BetweenFactory<S, T> between(

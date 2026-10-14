@@ -21,8 +21,9 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.agents.tasks.landings.LandCatches}: sells a vessel's hold contents to
- * a market at its current cell and credits the proceeds to the trip's account. See
- * {@link uk.ac.ox.poseidon.agents.tasks.landings.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.agents.tasks.landings.LandCatches}: sells a vessel's
+ * hold contents to a market at its current cell and credits the proceeds to the
+ * trip's account. See {@link uk.ac.ox.poseidon.agents.tasks.landings.Factories}
+ * for the entry points.
  */
 package uk.ac.ox.poseidon.agents.tasks.landings;

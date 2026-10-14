@@ -22,8 +22,9 @@
 
 /**
  * YAML {@link uk.ac.ox.poseidon.core.Scenario} (de)serialization
- * ({@link uk.ac.ox.poseidon.io.ScenarioLoader}, {@link uk.ac.ox.poseidon.io.ScenarioWriter}) and
- * filesystem side-effect components for use during a simulation run. See
+ * ({@link uk.ac.ox.poseidon.io.ScenarioLoader},
+ * {@link uk.ac.ox.poseidon.io.ScenarioWriter}) and filesystem side-effect
+ * components for use during a simulation run. See
  * {@link uk.ac.ox.poseidon.io.Factories} for the entry points to the latter.
  */
 package uk.ac.ox.poseidon.io;

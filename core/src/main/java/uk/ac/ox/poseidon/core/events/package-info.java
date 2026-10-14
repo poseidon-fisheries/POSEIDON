@@ -21,10 +21,13 @@
  */
 
 /**
- * A lightweight publish/subscribe event system ({@link uk.ac.ox.poseidon.core.events.EventManager},
- * {@link uk.ac.ox.poseidon.core.events.Listener}) used to decouple event producers from consumers
- * across the simulation, plus listener implementations that accumulate or fold received events.
- * Most types here are plain classes constructed directly, not via the Factory pattern; see
- * {@link uk.ac.ox.poseidon.core.events.Factories} for the one component that is.
+ * A lightweight publish/subscribe event system
+ * ({@link uk.ac.ox.poseidon.core.events.EventManager},
+ * {@link uk.ac.ox.poseidon.core.events.Listener}) used to decouple event
+ * producers from consumers across the simulation, plus listener implementations
+ * that accumulate or fold received events. Most types here are plain classes
+ * constructed directly, not via the Factory pattern; see
+ * {@link uk.ac.ox.poseidon.core.events.Factories} for the one component that
+ * is.
  */
 package uk.ac.ox.poseidon.core.events;

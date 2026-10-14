@@ -26,8 +26,8 @@ import lombok.Value;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /**
- * How a gross catch was split up: what's kept aboard, what's thrown back alive, and what's
- * thrown back dead.
+ * How a gross catch was split up: what's kept aboard, what's thrown back alive,
+ * and what's thrown back dead.
  */
 @Value
 public class Disposition {

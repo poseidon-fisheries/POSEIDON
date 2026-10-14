@@ -26,7 +26,8 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link VesselHasStartedTripToday}, built via
+ * A {@link GlobalScopeFactory} counterpart of
+ * {@link VesselHasStartedTripToday}, built via
  * {@link Factories#vesselHasStartedTripToday()}.
  */
 public class VesselHasStartedTripTodayFactory

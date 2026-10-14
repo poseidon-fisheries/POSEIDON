@@ -35,7 +35,8 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a {@link LandCatches}
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
+   *         {@link LandCatches}
    * @see LandCatchesFactory
    */
   public static LandCatchesFactory landCatches(

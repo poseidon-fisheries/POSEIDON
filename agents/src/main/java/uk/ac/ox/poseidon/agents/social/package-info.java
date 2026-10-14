@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * Ties between vessels: {@link uk.ac.ox.poseidon.agents.social.SocialNetwork} holds who tells
- * whom, and network dynamics add and remove its ties.
+ * Ties between vessels: {@link uk.ac.ox.poseidon.agents.social.SocialNetwork}
+ * holds who tells whom, and network dynamics add and remove its ties.
  */
 package uk.ac.ox.poseidon.agents.social;

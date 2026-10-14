@@ -26,10 +26,11 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 /**
- * A {@link DoubleGrid} for a single species, with no assumption of mutability. Both
- * {@link BiomassGrid} (live, mutable) and {@link ImmutableBiomassGrid} (read-only, shareable
- * snapshot) implement this, so code that only needs to read per-species grid values can depend on
- * this common type instead of on either concrete flavor.
+ * A {@link DoubleGrid} for a single species, with no assumption of mutability.
+ * Both {@link BiomassGrid} (live, mutable) and {@link ImmutableBiomassGrid}
+ * (read-only, shareable snapshot) implement this, so code that only needs to
+ * read per-species grid values can depend on this common type instead of on
+ * either concrete flavor.
  */
 public interface SpeciesGrid extends DoubleGrid {
   Species getSpecies();

@@ -25,13 +25,15 @@ package uk.ac.ox.poseidon.core;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * The core declarative-configuration-to-runtime-object producer of the Factory/Scenario pattern
- * (see {@code docs/agents/architecture.md}): resolves to a {@code C} given a {@code Scope}. Most
- * simulation components are expressed as a {@link Factory} implementation (typically extending
- * {@link AbstractFactory}) plus a plain value/config class, so scenarios can be built either
- * programmatically or deserialized from YAML. Scenario-building code composes {@code Factory}-
- * returning static helpers only; never call {@link #get} directly in scenario-building code —
- * resolving the graph is the framework's job at simulation-start time.
+ * The core declarative-configuration-to-runtime-object producer of the
+ * Factory/Scenario pattern (see {@code docs/agents/architecture.md}): resolves
+ * to a {@code C} given a {@code Scope}. Most simulation components are
+ * expressed as a {@link Factory} implementation (typically extending
+ * {@link AbstractFactory}) plus a plain value/config class, so scenarios can be
+ * built either programmatically or deserialized from YAML. Scenario-building
+ * code composes {@code Factory}- returning static helpers only; never call
+ * {@link #get} directly in scenario-building code — resolving the graph is the
+ * framework's job at simulation-start time.
  *
  * @param <S> the scope this factory resolves against
  * @param <C> the type of object produced

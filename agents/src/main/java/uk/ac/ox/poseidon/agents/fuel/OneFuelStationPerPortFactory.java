@@ -35,8 +35,9 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A {@link SimulationScopeFactory} creating one {@link FuelStation} per port in {@code portGrid},
- * all sharing the same price and pump rate. Built via {@link Factories#oneFuelStationPerPort}.
+ * A {@link SimulationScopeFactory} creating one {@link FuelStation} per port in
+ * {@code portGrid}, all sharing the same price and pump rate. Built via
+ * {@link Factories#oneFuelStationPerPort}.
  */
 @Data
 @NoArgsConstructor

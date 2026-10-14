@@ -33,14 +33,15 @@ import java.util.Map.Entry;
 import sim.util.Int2D;
 
 /**
- * Remembers the accessible water cells from a starting cell, and the accessible water neighbours
- * of a cell within a neighbourhood size. Both depend only on the grids a {@link GridPathFinder}
- * navigates, so one cache can serve every pathfinder built from the same grids, including those
- * of simulations running in parallel. Each result is computed once, by the pathfinder that first
- * asks for it; a concurrent request for the same result waits for it rather than computing it
- * again. Equal lists of accessible water cells (from cells of the same connected area) share one
- * instance. Built via {@link Factories#accessibleWaterCellsCache(uk.ac.ox.poseidon.core.Factory,
- * uk.ac.ox.poseidon.core.Factory)}.
+ * Remembers the accessible water cells from a starting cell, and the accessible
+ * water neighbours of a cell within a neighbourhood size. Both depend only on
+ * the grids a {@link GridPathFinder} navigates, so one cache can serve every
+ * pathfinder built from the same grids, including those of simulations running
+ * in parallel. Each result is computed once, by the pathfinder that first asks
+ * for it; a concurrent request for the same result waits for it rather than
+ * computing it again. Equal lists of accessible water cells (from cells of the
+ * same connected area) share one instance. Built via
+ * {@link Factories#accessibleWaterCellsCache(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}.
  */
 public class AccessibleWaterCellsCache {
 

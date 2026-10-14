@@ -32,9 +32,10 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} for a {@link SpeciesIndex} over a resolved collection of
- * species. Built via
- * {@link Factories#speciesIndex(uk.ac.ox.poseidon.core.Factory)} in this package.
+ * A {@link RelativeScopeFactory} for a {@link SpeciesIndex} over a resolved
+ * collection of species. Built via
+ * {@link Factories#speciesIndex(uk.ac.ox.poseidon.core.Factory)} in this
+ * package.
  */
 @Data
 @NoArgsConstructor

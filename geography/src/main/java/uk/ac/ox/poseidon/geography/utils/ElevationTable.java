@@ -31,10 +31,10 @@ import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 /**
- * A {@link LonLatTable} that also has an elevation column, exposing its rows as a stream of
- * coordinate/elevation {@link Entry} pairs. Built via
- * {@link Factories#elevationTable(uk.ac.ox.poseidon.core.Factory, String, String, String)} in
- * this package.
+ * A {@link LonLatTable} that also has an elevation column, exposing its rows as
+ * a stream of coordinate/elevation {@link Entry} pairs. Built via
+ * {@link Factories#elevationTable(uk.ac.ox.poseidon.core.Factory, String, String, String)}
+ * in this package.
  */
 @Getter
 public class ElevationTable extends LonLatTable {

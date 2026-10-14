@@ -21,8 +21,9 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.geography.distance.DistanceCalculator}s and derived travel-duration
- * calculations, both geographic (equirectangular, haversine) and grid-native (Cartesian). See
+ * {@link uk.ac.ox.poseidon.geography.distance.DistanceCalculator}s and derived
+ * travel-duration calculations, both geographic (equirectangular, haversine)
+ * and grid-native (Cartesian). See
  * {@link uk.ac.ox.poseidon.geography.distance.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.geography.distance;

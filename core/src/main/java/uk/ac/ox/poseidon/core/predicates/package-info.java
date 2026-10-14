@@ -21,11 +21,11 @@
  */
 
 /**
- * {@link java.util.function.Predicate}s that test a value derived from, or drawn against, other
- * factory-resolved inputs. See {@link uk.ac.ox.poseidon.core.predicates.Factories} for the entry
- * points. Sibling packages
- * {@link uk.ac.ox.poseidon.core.predicates.logical} and
- * {@link uk.ac.ox.poseidon.core.predicates.comparable} hold predicate combinators and
- * comparison-based predicates, respectively.
+ * {@link java.util.function.Predicate}s that test a value derived from, or
+ * drawn against, other factory-resolved inputs. See
+ * {@link uk.ac.ox.poseidon.core.predicates.Factories} for the entry points.
+ * Sibling packages {@link uk.ac.ox.poseidon.core.predicates.logical} and
+ * {@link uk.ac.ox.poseidon.core.predicates.comparable} hold predicate
+ * combinators and comparison-based predicates, respectively.
  */
 package uk.ac.ox.poseidon.core.predicates;

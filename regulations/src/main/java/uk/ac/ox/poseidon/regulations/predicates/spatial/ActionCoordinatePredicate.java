@@ -28,9 +28,10 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.regulations.SpatialAction;
 
 /**
- * Matches a {@link SpatialAction} whose start coordinate or end coordinate satisfies
- * {@code coordinatePredicate}. Contrast with {@link ActionCellPredicate}, which tests against grid
- * cells rather than raw coordinates.
+ * Matches a {@link SpatialAction} whose start coordinate or end coordinate
+ * satisfies {@code coordinatePredicate}. Contrast with
+ * {@link ActionCellPredicate}, which tests against grid cells rather than raw
+ * coordinates.
  */
 @RequiredArgsConstructor
 public class ActionCoordinatePredicate implements Predicate<SpatialAction<?>> {

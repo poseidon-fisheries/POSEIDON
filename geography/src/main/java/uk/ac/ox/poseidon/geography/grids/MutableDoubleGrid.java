@@ -27,15 +27,20 @@ import sim.util.Int2D;
 
 /**
  * A {@link BaseDoubleGrid} whose values can be changed after construction, via
- * {@link #setValue}. Built via {@code Factories.mutableDoubleGridFromAllocator(...)}/
- * {@code Factories.normalisedMutableDoubleGridFromAllocator(...)} in this package.
+ * {@link #setValue}. Built via
+ * {@code Factories.mutableDoubleGridFromAllocator(...)}/
+ * {@code Factories.normalisedMutableDoubleGridFromAllocator(...)} in this
+ * package.
  */
 public class MutableDoubleGrid
   extends BaseDoubleGrid
   implements MutableGrid<DoubleGrid2D>
 {
 
-  /** @param modelGrid the grid this is defined over; every cell starts at {@code 0.0} */
+  /**
+   * @param modelGrid the grid this is defined over; every cell starts at
+   *                  {@code 0.0}
+   */
   public MutableDoubleGrid(final ModelGrid modelGrid) {
     super(modelGrid);
   }

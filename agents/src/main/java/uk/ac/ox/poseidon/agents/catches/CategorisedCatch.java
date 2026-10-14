@@ -28,7 +28,10 @@ import java.util.Map;
 import lombok.Value;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
-/** An immutable catch, split into one {@link Bucket} of biomass per {@link CatchCategory}. */
+/**
+ * An immutable catch, split into one {@link Bucket} of biomass per
+ * {@link CatchCategory}.
+ */
 @Value
 public class CategorisedCatch {
 
@@ -37,7 +40,9 @@ public class CategorisedCatch {
     return new CategorisedCatch(ImmutableMap.of());
   }
 
-  /** @param buckets one bucket of biomass per catch category; defensively copied */
+  /**
+   * @param buckets one bucket of biomass per catch category; defensively copied
+   */
   public CategorisedCatch(final Map<CatchCategory, Bucket> buckets) {
     this.buckets = ImmutableMap.copyOf(buckets);
   }
@@ -46,8 +51,9 @@ public class CategorisedCatch {
   ImmutableMap<CatchCategory, Bucket> buckets;
 
   /**
-   * @return a new catch combining every bucket of this catch and {@code other}'s, merging
-   * (via {@link Bucket#add}) buckets that share a category
+   * @return a new catch combining every bucket of this catch and
+   *         {@code other}'s, merging (via {@link Bucket#add}) buckets that
+   *         share a category
    */
   public CategorisedCatch add(final CategorisedCatch other) {
     if (buckets.isEmpty()) return other;
@@ -63,7 +69,10 @@ public class CategorisedCatch {
     return new CategorisedCatch(merged);
   }
 
-  /** @return {@code true} if there are no buckets, or every bucket is itself empty */
+  /**
+   * @return {@code true} if there are no buckets, or every bucket is itself
+   *         empty
+   */
   public boolean isEmpty() {
     if (buckets.isEmpty()) return true;
     for (final Bucket bucket : buckets.values()) {

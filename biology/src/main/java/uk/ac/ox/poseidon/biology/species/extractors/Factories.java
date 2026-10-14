@@ -24,16 +24,21 @@ package uk.ac.ox.poseidon.biology.species.extractors;
 
 import uk.ac.ox.poseidon.biology.species.Species;
 
-/** Factories for {@link java.util.function.Function}s that read a {@link Species}' properties. */
+/**
+ * Factories for {@link java.util.function.Function}s that read a
+ * {@link Species}' properties.
+ */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @param propertyPath the dotted path of properties to follow from the species, e.g.
-   *                     {@code "key"}, {@code "code"} or {@code "lifeStage"}
+   * @param propertyPath the dotted path of properties to follow from the
+   *                     species, e.g. {@code "key"}, {@code "code"} or
+   *                     {@code "lifeStage"}
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
-   * {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a species
+   *         {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a
+   *         species
    * @see SpeciesPropertyFactory
    */
   public static <R> SpeciesPropertyFactory<R> speciesProperty(

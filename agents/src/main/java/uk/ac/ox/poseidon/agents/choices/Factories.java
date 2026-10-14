@@ -43,18 +43,20 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * Factories for a vessel's learned {@link OptionValues}, its {@link Memory} of observations and the
- * rules updating it, and its destination-choice strategies.
+ * Factories for a vessel's learned {@link OptionValues}, its {@link Memory} of
+ * observations and the rules updating it, and its destination-choice
+ * strategies.
  */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @param optionValuesRegister looks up each other vessel's own option-values component
+   * @param optionValuesRegister looks up each other vessel's own option-values
+   *                             component
    * @param friendsSupplier      supplies the vessel's current friends
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a supplier of
-   * friends' best options
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+   *         supplier of friends' best options
    * @see BestOptionsFromFriends
    */
   public static <O> BestOptionsFromFriendsFactory<O> bestOptionsFromFriends(
@@ -77,7 +79,7 @@ public class Factories {
    * @param modelGrid  the grid {@code coordinate} is resolved against
    * @param coordinate the fixed destination
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link ConstantDestinationSupplier}
+   *         {@link ConstantDestinationSupplier}
    * @see ConstantDestinationSupplier
    */
   public static <S extends Scope> ConstantDestinationSupplierFactory<S> constantDestination(
@@ -91,8 +93,8 @@ public class Factories {
    * @param epsilon   probability of exploring instead of exploiting
    * @param explorer  supplies an exploratory destination
    * @param exploiter supplies the currently-best-known destination
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an
-   * {@link EpsilonGreedyChooser}-backed {@link DestinationSupplier}
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for
+   *         an {@link EpsilonGreedyChooser}-backed {@link DestinationSupplier}
    * @see EpsilonGreedyChooser
    */
   public static EpsilonGreedyDestinationSupplierFactory epsilonGreedyDestination(
@@ -109,9 +111,9 @@ public class Factories {
 
   /**
    * @param alpha the weight of a new observation, between 0 and 1
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link Memory} update rule
-   * that is a species-by-species exponential moving average of
-   * {@link uk.ac.ox.poseidon.biology.buckets.Bucket}s
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link Memory} update rule that is a species-by-species exponential
+   *         moving average of {@link uk.ac.ox.poseidon.biology.buckets.Bucket}s
    * @see ExponentialMovingAverageOfBuckets
    */
   public static ExponentialMovingAverageOfBucketsFactory exponentialMovingAverageOfBuckets(
@@ -122,8 +124,9 @@ public class Factories {
 
   /**
    * @param alpha the weight of a new observation, between 0 and 1
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link Memory} update rule
-   * that is an exponential moving average of {@code Double}s
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link Memory} update rule that is an exponential moving average of
+   *         {@code Double}s
    * @see ExponentialMovingAverageOfDoubles
    */
   public static ExponentialMovingAverageOfDoublesFactory exponentialMovingAverageOfDoubles(
@@ -134,8 +137,8 @@ public class Factories {
 
   /**
    * @param alpha the smoothing factor, in {@code [0, 1]}
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an
-   * {@link ExponentialMovingAverageOptionValues}
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for
+   *         an {@link ExponentialMovingAverageOptionValues}
    * @see ExponentialMovingAverageOptionValues
    */
   public static <O> ExponentialMovingAverageOptionValuesFactory<O> exponentialMovingAverageOptionValues(
@@ -148,7 +151,7 @@ public class Factories {
    * @param optionValues    the values of the options to pick from
    * @param optionPredicate which options can be picked
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link GreedyPicker}
+   *         {@link GreedyPicker}
    * @see GreedyPicker
    */
   public static <O> GreedyPickerFactory<O> greedyPicker(
@@ -162,11 +165,15 @@ public class Factories {
   }
 
   /**
-   * @param modelGrid      the grid giving the cell of a fishing event's coordinate
-   * @param memorySelector selects, from a fishing event, the memory to record it in
-   * @param updateRule     revises what is remembered of a cell with a new observation of it
+   * @param modelGrid      the grid giving the cell of a fishing event's
+   *                       coordinate
+   * @param memorySelector selects, from a fishing event, the memory to record
+   *                       it in
+   * @param updateRule     revises what is remembered of a cell with a new
+   *                       observation of it
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link FishingEventRecorder}, which it does not register with anything
+   *         {@link FishingEventRecorder}, which it does not register with
+   *         anything
    * @see FishingEventRecorder
    */
   public static <S extends Scope> FishingEventRecorderFactory<S> fishingEventRecorder(
@@ -187,7 +194,7 @@ public class Factories {
   /**
    * @param portGrid locates the vessel's home port
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link HomePortDestinationSupplier}
+   *         {@link HomePortDestinationSupplier}
    * @see HomePortDestinationSupplier
    */
   public static HomePortDestinationSupplierFactory homePortDestination(
@@ -197,11 +204,11 @@ public class Factories {
   }
 
   /**
-   * @param optionValues          the vessel's own learned option values
-   * @param optionPredicate       filters which candidate options are eligible
-   * @param optionValuesSupplier  supplies the candidate options to imitate
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for an
-   * {@link ImitatingPicker}
+   * @param optionValues         the vessel's own learned option values
+   * @param optionPredicate      filters which candidate options are eligible
+   * @param optionValuesSupplier supplies the candidate options to imitate
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for
+   *         an {@link ImitatingPicker}
    * @see ImitatingPicker
    */
   public static <O> ImitatingPickerFactory<O> imitatingPicker(
@@ -223,10 +230,11 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for an empty
-   * {@link KeyedMemory}, shared by the whole simulation; wrap it in
-   * {@link uk.ac.ox.poseidon.agents.vessels.Factories#perVessel} for one per vessel, and give
-   * every selector of a vessel's memory that same wrapper (two wrappers make two memories)
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for an
+   *         empty {@link KeyedMemory}, shared by the whole simulation; wrap it
+   *         in {@link uk.ac.ox.poseidon.agents.vessels.Factories#perVessel} for
+   *         one per vessel, and give every selector of a vessel's memory that
+   *         same wrapper (two wrappers make two memories)
    * @see KeyedMemory
    */
   public static <K, O, M> KeyedMemoryFactory<K, O, M> keyedMemory() {
@@ -237,7 +245,7 @@ public class Factories {
    * @param keyedMemory  the keyed memory to select from
    * @param keyExtractor extracts the key from the selector's input
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link KeyedMemorySelector}
+   *         {@link KeyedMemorySelector}
    * @see KeyedMemorySelector
    */
   public static <S extends Scope, T, K, O, M> KeyedMemorySelectorFactory<
@@ -257,9 +265,10 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for an empty {@link Memory},
-   * shared by the whole simulation; wrap it in
-   * {@link uk.ac.ox.poseidon.agents.vessels.Factories#perVessel} for one per vessel
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for an
+   *         empty {@link Memory}, shared by the whole simulation; wrap it in
+   *         {@link uk.ac.ox.poseidon.agents.vessels.Factories#perVessel} for
+   *         one per vessel
    * @see Memory
    */
   public static <O, M> MemoryFactory<O, M> memory() {
@@ -270,7 +279,7 @@ public class Factories {
    * @param memorySelector selects the memory to read for the vessel
    * @param valuation      values an option given what is remembered about it
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link MemoryBasedOptionValues}
+   *         {@link MemoryBasedOptionValues}
    * @see MemoryBasedOptionValues
    */
   public static <O, M> MemoryBasedOptionValuesFactory<
@@ -293,12 +302,13 @@ public class Factories {
    * @param pathFinder                finds accessible water neighbours
    * @param cellPredicate             filters which candidate cells are eligible
    * @param neighbourhoodSizeSupplier the initial search radius
-   * @param maximumWidening           how many cells the radius may grow beyond the initial one
-   *                                  while no cell satisfies {@code cellPredicate}
-   * @param searchCentre              supplies the cell to search around, asked for anew on each
-   *                                  pick
+   * @param maximumWidening           how many cells the radius may grow beyond
+   *                                  the initial one while no cell satisfies
+   *                                  {@code cellPredicate}
+   * @param searchCentre              supplies the cell to search around, asked
+   *                                  for anew on each pick
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link NeighbourhoodCellPicker}
+   *         {@link NeighbourhoodCellPicker}
    * @see NeighbourhoodCellPicker
    */
   public static NeighbourhoodGridExplorerFactory neighbourhoodGridExplorer(
@@ -327,7 +337,7 @@ public class Factories {
    * @param optionValues the values of the options
    * @param fallback     supplies an option when none is known
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link BestKnownOption}
+   *         {@link BestKnownOption}
    * @see BestKnownOption
    */
   public static <O> BestKnownOptionFactory<O> bestKnownOption(
@@ -339,8 +349,10 @@ public class Factories {
 
   /**
    * @param revenueValuation values an option given what is remembered about it
-   * @param costValuation    values the cost of an option given what is remembered about it
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link NetValuation}
+   * @param costValuation    values the cost of an option given what is
+   *                         remembered about it
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link NetValuation}
    * @see NetValuation
    */
   public static <S extends Scope, O, M> NetValuationFactory<
@@ -364,7 +376,7 @@ public class Factories {
    * @param cellsSupplier the candidate cells to pick from
    * @param cellPredicate filters which candidate cells are eligible
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link RandomPicker}
+   *         {@link RandomPicker}
    * @see RandomPicker
    */
   public static RandomGridExplorerFactory randomGridExplorer(

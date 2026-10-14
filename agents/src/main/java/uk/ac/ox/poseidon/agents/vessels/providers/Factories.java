@@ -43,7 +43,8 @@ public class Factories {
 
   /**
    * @param pathFinder finds which cells are reachable, and by what path
-   * @return a {@link VesselScope}-relative factory for an {@link AccessibleWaterCells}
+   * @return a {@link VesselScope}-relative factory for an
+   *         {@link AccessibleWaterCells}
    * @see AccessibleWaterCells
    */
   public static AccessibleWaterCellsFactory accessibleWaterCells(
@@ -61,7 +62,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link VesselScope}-relative factory for a {@link CurrentTripDestinationCell}
+   * @return a {@link VesselScope}-relative factory for a
+   *         {@link CurrentTripDestinationCell}
    * @see CurrentTripDestinationCell
    */
   public static CurrentTripDestinationCellFactory currentTripDestinationCell() {
@@ -69,7 +71,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link VesselScope}-relative factory for a {@link CurrentTimeAtSea}
+   * @return a {@link VesselScope}-relative factory for a
+   *         {@link CurrentTimeAtSea}
    * @see CurrentTimeAtSea
    */
   public static CurrentTimeAtSeaFactory currentTimeAtSea() {
@@ -77,7 +80,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link VesselScope}-relative factory for a {@link CurrentTripStartDateTime}
+   * @return a {@link VesselScope}-relative factory for a
+   *         {@link CurrentTripStartDateTime}
    * @see CurrentTripStartDateTime
    */
   public static CurrentTripStartDateTimeFactory currentTripStartDateTime() {
@@ -85,7 +89,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link VesselScope}-relative factory for a {@link VesselEventManager}
+   * @return a {@link VesselScope}-relative factory for a
+   *         {@link VesselEventManager}
    * @see VesselEventManager
    */
   public static VesselEventManagerFactory vesselEventManager() {
@@ -93,7 +98,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link VesselScope}-relative factory for a {@link CurrentTripEventManager}
+   * @return a {@link VesselScope}-relative factory for a
+   *         {@link CurrentTripEventManager}
    * @see CurrentTripEventManager
    */
   public static CurrentTripEventManagerFactory currentTripEventManager() {

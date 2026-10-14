@@ -31,9 +31,9 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
- * Gives the option with the highest value, ties broken at random, read anew from the option
- * values on each call; when no option is known, gives what the fallback supplies (which may be
- * {@code null}).
+ * Gives the option with the highest value, ties broken at random, read anew
+ * from the option values on each call; when no option is known, gives what the
+ * fallback supplies (which may be {@code null}).
  *
  * @param <O> the type of option
  */

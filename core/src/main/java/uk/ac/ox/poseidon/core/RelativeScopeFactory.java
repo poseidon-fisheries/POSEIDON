@@ -39,13 +39,15 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link Factory} whose effective scope is derived from its own {@link Factory}-typed fields
- * rather than fixed: it inspects those fields, finds their common (leaf) scope class, and caches
- * its produced object under that same key — so it inherits whatever scope its inputs resolve at,
- * falling back to {@link Scope#GLOBAL_SCOPE} if it has no {@link Factory}-typed fields. Prefer
- * this over {@link GlobalScopeFactory} for any factory with {@link Factory}-typed input fields: it
- * still ends up at global scope when its inputs do, but safely demotes to a narrower scope instead
- * of silently sharing stale state if an input ever isn't global.
+ * A {@link Factory} whose effective scope is derived from its own
+ * {@link Factory}-typed fields rather than fixed: it inspects those fields,
+ * finds their common (leaf) scope class, and caches its produced object under
+ * that same key — so it inherits whatever scope its inputs resolve at, falling
+ * back to {@link Scope#GLOBAL_SCOPE} if it has no {@link Factory}-typed fields.
+ * Prefer this over {@link GlobalScopeFactory} for any factory with
+ * {@link Factory}-typed input fields: it still ends up at global scope when its
+ * inputs do, but safely demotes to a narrower scope instead of silently sharing
+ * stale state if an input ever isn't global.
  */
 @NoArgsConstructor
 public abstract class RelativeScopeFactory<
@@ -71,17 +73,18 @@ public abstract class RelativeScopeFactory<
     });
 
   /**
-   * Finds this factory's member {@link Factory}-typed fields (recursing into nested
-   * {@link Map}s, {@link Collection}s, and other {@link RelativeScopeFactory}s), determines
-   * their single common leaf scope class, and delegates key generation to one of the member
-   * factories that has that leaf scope — so this factory's cache key matches whichever scope
-   * its inputs are ultimately rooted in. Falls back to {@link Scope#GLOBAL_SCOPE} if there are
-   * no member factories.
+   * Finds this factory's member {@link Factory}-typed fields (recursing into
+   * nested {@link Map}s, {@link Collection}s, and other
+   * {@link RelativeScopeFactory}s), determines their single common leaf scope
+   * class, and delegates key generation to one of the member factories that has
+   * that leaf scope — so this factory's cache key matches whichever scope its
+   * inputs are ultimately rooted in. Falls back to {@link Scope#GLOBAL_SCOPE}
+   * if there are no member factories.
    *
    * @param scope the scope being resolved against
    * @return the delegated cache key
-   * @throws IllegalStateException if member factories are rooted in more than one leaf scope
-   *                                class
+   * @throws IllegalStateException if member factories are rooted in more than
+   *                               one leaf scope class
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
@@ -122,9 +125,12 @@ public abstract class RelativeScopeFactory<
   }
 
   /**
-   * @throws UnsupportedOperationException always — a relative scope factory's effective scope
-   * class is derived per call from its member factories (see {@link #makeKey}), not fixed, so
-   * there is no single answer to give here
+   * @throws UnsupportedOperationException always — a relative scope factory's
+   *                                       effective scope class is derived per
+   *                                       call from its member factories (see
+   *                                       {@link #makeKey}), not fixed, so
+   *                                       there is no single answer to give
+   *                                       here
    */
   @Override
   protected Class<S> scopeClass() {
@@ -134,9 +140,10 @@ public abstract class RelativeScopeFactory<
   }
 
   /**
-   * @return this factory's distinct leaf {@link AbstractFactory} inputs: its own
-   * {@code Factory}-typed bean properties, with any nested {@link RelativeScopeFactory}s
-   * expanded recursively into their own member factories (so only genuine leaves are returned)
+   * @return this factory's distinct leaf {@link AbstractFactory} inputs: its
+   *         own {@code Factory}-typed bean properties, with any nested
+   *         {@link RelativeScopeFactory}s expanded recursively into their own
+   *         member factories (so only genuine leaves are returned)
    */
   @SuppressWarnings("rawtypes")
   protected synchronized Stream<AbstractFactory> memberFactories() {

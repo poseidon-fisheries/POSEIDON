@@ -35,10 +35,11 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselTaskFactory} for a {@link Selector} that tries {@code mainTask} first; if it
- * fails, the selector runs {@code waitTask} but reports failure regardless of that task's
- * outcome (via {@link AlwaysFail}) — so a parent driving this on a loop keeps retrying
- * {@code mainTask} every step, waiting in between. Built via {@link Factories#succeedOrWait}.
+ * A {@link VesselTaskFactory} for a {@link Selector} that tries
+ * {@code mainTask} first; if it fails, the selector runs {@code waitTask} but
+ * reports failure regardless of that task's outcome (via {@link AlwaysFail}) —
+ * so a parent driving this on a loop keeps retrying {@code mainTask} every
+ * step, waiting in between. Built via {@link Factories#succeedOrWait}.
  */
 @Data
 @NoArgsConstructor
@@ -51,7 +52,7 @@ public class SucceedOrWaitFactory extends VesselTaskFactory<Selector<Vessel>> {
 
   /**
    * @return a {@link Selector} with {@code mainTask} as its first child and an
-   * {@link AlwaysFail}-wrapped {@code waitTask} as its second
+   *         {@link AlwaysFail}-wrapped {@code waitTask} as its second
    */
   @Override
   protected Selector<Vessel> newTask(final VesselScope scope) {

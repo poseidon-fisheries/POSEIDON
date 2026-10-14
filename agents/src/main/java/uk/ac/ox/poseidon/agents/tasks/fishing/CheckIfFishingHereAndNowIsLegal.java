@@ -33,8 +33,9 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
- * A leaf {@link AgentTask} that succeeds if a fishing action started now, at the vessel's
- * current cell and with its current gear, would be permitted by {@code regulations}.
+ * A leaf {@link AgentTask} that succeeds if a fishing action started now, at
+ * the vessel's current cell and with its current gear, would be permitted by
+ * {@code regulations}.
  */
 @RequiredArgsConstructor
 public class CheckIfFishingHereAndNowIsLegal extends AgentTask<Vessel> {
@@ -43,8 +44,8 @@ public class CheckIfFishingHereAndNowIsLegal extends AgentTask<Vessel> {
   private final Regulations<? super ExtendedFishingAction> regulations;
 
   /**
-   * @return {@code SUCCEEDED} if a fishing action started now, here, would be permitted,
-   * {@code FAILED} otherwise
+   * @return {@code SUCCEEDED} if a fishing action started now, here, would be
+   *         permitted, {@code FAILED} otherwise
    */
   @Override
   public Status execute() {

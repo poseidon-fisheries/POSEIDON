@@ -32,9 +32,9 @@ import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Sells the vessel's hold contents to the market of its home port, where it must be, and credits
- * the trip's account with the proceeds. The market is found by port, not by cell, because ports
- * can share a cell.
+ * Sells the vessel's hold contents to the market of its home port, where it
+ * must be, and credits the trip's account with the proceeds. The market is
+ * found by port, not by cell, because ports can share a cell.
  */
 @RequiredArgsConstructor
 public class LandCatches extends ExtendedTripTask {
@@ -48,13 +48,14 @@ public class LandCatches extends ExtendedTripTask {
   }
 
   /**
-   * Sells the vessel's entire hold to the market of its home port, adding the sale's proceeds
-   * (by currency) to the trip's account.
+   * Sells the vessel's entire hold to the market of its home port, adding the
+   * sale's proceeds (by currency) to the trip's account.
    *
    * @return {@link Status#SUCCEEDED}
-   * @throws IllegalStateException if the trip has not arrived in port, the vessel has no home
-   *                               port or is not at it, or its home port does not have exactly
-   *                               one market
+   * @throws IllegalStateException if the trip has not arrived in port, the
+   *                               vessel has no home port or is not at it, or
+   *                               its home port does not have exactly one
+   *                               market
    */
   @Override
   protected Status complete() {

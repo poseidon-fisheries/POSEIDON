@@ -21,10 +21,11 @@
  */
 
 /**
- * A generic per-vessel component registry: {@link uk.ac.ox.poseidon.agents.components.VesselComponentRegister}
- * stores one component of type {@code C} per vessel, queryable by other systems, and
- * {@link uk.ac.ox.poseidon.agents.components.RegisteredVesselComponentFactory} builds a
- * vessel-scoped component and registers it as it's built. See
+ * A generic per-vessel component registry:
+ * {@link uk.ac.ox.poseidon.agents.components.VesselComponentRegister} stores
+ * one component of type {@code C} per vessel, queryable by other systems, and
+ * {@link uk.ac.ox.poseidon.agents.components.RegisteredVesselComponentFactory}
+ * builds a vessel-scoped component and registers it as it's built. See
  * {@link uk.ac.ox.poseidon.agents.components.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.agents.components;

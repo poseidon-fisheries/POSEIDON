@@ -35,7 +35,10 @@ import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.svg.SVGDocument;
 
-/** Rasterises a parsed SVG document, via Apache Batik, to a given pixel size on demand. */
+/**
+ * Rasterises a parsed SVG document, via Apache Batik, to a given pixel size on
+ * demand.
+ */
 @RequiredArgsConstructor
 public class SvgRenderer {
 
@@ -72,7 +75,8 @@ public class SvgRenderer {
   }
 
   /**
-   * Rasterises the SVG at {@code width x height} and draws it at {@code (x, y)}.
+   * Rasterises the SVG at {@code width x height} and draws it at
+   * {@code (x, y)}.
    *
    * @throws RuntimeException if rasterising fails
    */

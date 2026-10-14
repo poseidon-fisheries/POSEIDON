@@ -22,8 +22,9 @@
 
 /**
  * Continuous-space tracking of vessel locations:
- * {@link uk.ac.ox.poseidon.agents.fields.VesselField} wraps a MASON {@code Continuous2D}, read by
- * both the GUI's portrayal layer and by code needing a vessel's current cell. See
+ * {@link uk.ac.ox.poseidon.agents.fields.VesselField} wraps a MASON
+ * {@code Continuous2D}, read by both the GUI's portrayal layer and by code
+ * needing a vessel's current cell. See
  * {@link uk.ac.ox.poseidon.agents.fields.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.agents.fields;

@@ -32,8 +32,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link BestKnownOption}, built via
- * {@link Factories#bestKnownOption(Factory, Factory)}.
+ * A {@link VesselScopeFactory} counterpart of {@link BestKnownOption}, built
+ * via {@link Factories#bestKnownOption(Factory, Factory)}.
  */
 @Data
 @NoArgsConstructor

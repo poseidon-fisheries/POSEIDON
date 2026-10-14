@@ -29,7 +29,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
-   * {@link TotalLandingsPerYearAccumulator}
+   *         {@link TotalLandingsPerYearAccumulator}
    * @see TotalLandingsPerYearAccumulator
    */
   public static TotalLandingsPerYearAccumulatorFactory totalLandingsPerYearAccumulator() {

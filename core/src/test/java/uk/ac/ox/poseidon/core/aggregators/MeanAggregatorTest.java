@@ -33,8 +33,9 @@ class MeanAggregatorTest {
   /**
    * Class under test: Mean Method under test: apply(DoubleStream doubleStream)
    * <p>
-   * This method computes the arithmetic mean (average) of the provided stream of doubles. If the
-   * stream is empty, the method returns an empty OptionalDouble.
+   * This method computes the arithmetic mean (average) of the provided stream
+   * of doubles. If the stream is empty, the method returns an empty
+   * OptionalDouble.
    */
 
   @Test

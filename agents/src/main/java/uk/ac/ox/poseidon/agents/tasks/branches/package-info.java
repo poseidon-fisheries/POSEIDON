@@ -21,10 +21,12 @@
  */
 
 /**
- * Factories for gdx-ai behavior-tree branch nodes (sequence, selector, parallel) that compose a
- * vessel's task tree out of child {@link com.badlogic.gdx.ai.btree.Task}s. See
- * {@link uk.ac.ox.poseidon.agents.tasks.branches.BranchTaskFactory} for the shared
- * child-attachment mechanics and {@link uk.ac.ox.poseidon.agents.tasks.branches.Factories} for
- * the entry points.
+ * Factories for gdx-ai behavior-tree branch nodes (sequence, selector,
+ * parallel) that compose a vessel's task tree out of child
+ * {@link com.badlogic.gdx.ai.btree.Task}s. See
+ * {@link uk.ac.ox.poseidon.agents.tasks.branches.BranchTaskFactory} for the
+ * shared child-attachment mechanics and
+ * {@link uk.ac.ox.poseidon.agents.tasks.branches.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.agents.tasks.branches;

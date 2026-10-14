@@ -35,10 +35,10 @@ import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationEventListenerFactory} for {@link CliqueDynamics}, built via
- * {@link Factories#cliqueDynamics}. Registered with the simulation's event manager, the dynamics
- * hear the trip starts every vessel's event manager forwards there. They use the simulation's
- * random number generator.
+ * A {@link SimulationEventListenerFactory} for {@link CliqueDynamics}, built
+ * via {@link Factories#cliqueDynamics}. Registered with the simulation's event
+ * manager, the dynamics hear the trip starts every vessel's event manager
+ * forwards there. They use the simulation's random number generator.
  */
 @Data
 @NoArgsConstructor

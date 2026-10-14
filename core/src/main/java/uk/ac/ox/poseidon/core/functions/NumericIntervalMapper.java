@@ -30,11 +30,12 @@ import java.util.function.Function;
 import lombok.Value;
 
 /**
- * A {@link Function} that maps numeric values to labels using non-overlapping intervals. Bounds
- * are lower-inclusive and upper-exclusive; null bounds are unbounded. Built via
+ * A {@link Function} that maps numeric values to labels using non-overlapping
+ * intervals. Bounds are lower-inclusive and upper-exclusive; null bounds are
+ * unbounded. Built via
  * {@link Factories#numericIntervalToStringMapper(NumericIntervalToStringMapperFactory.Interval...)}
- * in this package (currently the only Factory-facing specialization, with {@code T} fixed to
- * {@link String}).
+ * in this package (currently the only Factory-facing specialization, with
+ * {@code T} fixed to {@link String}).
  */
 @Value
 public class NumericIntervalMapper<T> implements Function<Double, T> {
@@ -42,16 +43,19 @@ public class NumericIntervalMapper<T> implements Function<Double, T> {
   List<Interval<T>> intervals;
 
   /**
-   * @param intervals the non-overlapping intervals to map values through; each must have at
-   *                  least one bound, and a lower bound strictly less than its upper bound
+   * @param intervals the non-overlapping intervals to map values through; each
+   *                  must have at least one bound, and a lower bound strictly
+   *                  less than its upper bound
    */
   public NumericIntervalMapper(final List<Interval<T>> intervals) {
     this.intervals = List.copyOf(intervals);
     validateIntervals(this.intervals);
   }
 
-  /** @return the mapped value for the interval containing {@code value}, or {@code null} if no
-   * interval contains it */
+  /**
+   * @return the mapped value for the interval containing {@code value}, or
+   *         {@code null} if no interval contains it
+   */
   @Override
   public T apply(final Double value) {
     // A loop, not a stream: this runs for every cell valued, and the stream's overhead showed

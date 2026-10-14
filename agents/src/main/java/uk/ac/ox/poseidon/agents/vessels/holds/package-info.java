@@ -21,10 +21,11 @@
  */
 
 /**
- * A vessel's {@link uk.ac.ox.poseidon.agents.vessels.holds.Hold} for caught biomass: the
- * {@link uk.ac.ox.poseidon.agents.vessels.holds.Hold} contract itself, and
- * {@link uk.ac.ox.poseidon.agents.vessels.holds.BiomassHold} implementations with unlimited or
- * fixed capacity. See {@link uk.ac.ox.poseidon.agents.vessels.holds.Factories} for the entry
+ * A vessel's {@link uk.ac.ox.poseidon.agents.vessels.holds.Hold} for caught
+ * biomass: the {@link uk.ac.ox.poseidon.agents.vessels.holds.Hold} contract
+ * itself, and {@link uk.ac.ox.poseidon.agents.vessels.holds.BiomassHold}
+ * implementations with unlimited or fixed capacity. See
+ * {@link uk.ac.ox.poseidon.agents.vessels.holds.Factories} for the entry
  * points.
  */
 package uk.ac.ox.poseidon.agents.vessels.holds;

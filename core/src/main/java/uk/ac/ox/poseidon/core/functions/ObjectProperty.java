@@ -33,13 +33,14 @@ import java.util.function.Function;
 import javax.lang.model.SourceVersion;
 
 /**
- * Reads a property of an object by following a dotted path of getters: {@code "gear.code"} reads
- * {@code getGear().getCode()}, and {@code "active"} reads {@code isActive()} if it returns a
- * {@code boolean}. The getters are looked up once, when this is built, from the declared return
- * types along the path, so a wrong path fails when the scenario is built rather than when first
- * read. The last property may be {@code null}; a {@code null} part way along the path throws.
- * Built via a subclass of {@link ObjectPropertyFactory}, which fixes the class the path starts
- * from.
+ * Reads a property of an object by following a dotted path of getters:
+ * {@code "gear.code"} reads {@code getGear().getCode()}, and {@code "active"}
+ * reads {@code isActive()} if it returns a {@code boolean}. The getters are
+ * looked up once, when this is built, from the declared return types along the
+ * path, so a wrong path fails when the scenario is built rather than when first
+ * read. The last property may be {@code null}; a {@code null} part way along
+ * the path throws. Built via a subclass of {@link ObjectPropertyFactory}, which
+ * fixes the class the path starts from.
  *
  * @param <T> the type of the object read
  * @param <R> the type of the property; not checked
@@ -53,9 +54,9 @@ public class ObjectProperty<T, R> implements Function<T, R> {
   /**
    * @param rootClass    the class the path starts from
    * @param propertyPath the dotted path of properties to follow
-   * @throws IllegalArgumentException if a property name along the path is not a Java
-   *                                  identifier, or has no public getter on the declared type it
-   *                                  is read from
+   * @throws IllegalArgumentException if a property name along the path is not a
+   *                                  Java identifier, or has no public getter
+   *                                  on the declared type it is read from
    */
   ObjectProperty(final Class<T> rootClass, final String propertyPath) {
     this.propertyPath = propertyPath;
@@ -107,7 +108,8 @@ public class ObjectProperty<T, R> implements Function<T, R> {
   }
 
   /**
-   * @throws NullPointerException if a property part way along the path is {@code null}
+   * @throws NullPointerException if a property part way along the path is
+   *                              {@code null}
    */
   @Override
   @SuppressWarnings("unchecked")

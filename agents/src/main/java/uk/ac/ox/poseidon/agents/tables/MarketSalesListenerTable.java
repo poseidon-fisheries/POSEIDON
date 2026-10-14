@@ -28,9 +28,9 @@ import tech.tablesaw.api.StringColumn;
 import uk.ac.ox.poseidon.agents.market.Sale;
 
 /**
- * A {@link ListenerTable} that records one row per {@link Sale.Item} in every {@link Sale}: the
- * sale's date/time, ID, market and vessel, and the item's category, species, biomass sold and
- * sale value.
+ * A {@link ListenerTable} that records one row per {@link Sale.Item} in every
+ * {@link Sale}: the sale's date/time, ID, market and vessel, and the item's
+ * category, species, biomass sold and sale value.
  */
 @SuppressWarnings("rawtypes")
 public class MarketSalesListenerTable extends ListenerTable<Sale> {
@@ -87,7 +87,9 @@ public class MarketSalesListenerTable extends ListenerTable<Sale> {
     );
   }
 
-  /** Appends one row per {@link Sale.Item} in {@code sale} to {@link #table}. */
+  /**
+   * Appends one row per {@link Sale.Item} in {@code sale} to {@link #table}.
+   */
   @Override
   public void receive(final Sale sale) {
     sale.getItems().forEach(item -> {

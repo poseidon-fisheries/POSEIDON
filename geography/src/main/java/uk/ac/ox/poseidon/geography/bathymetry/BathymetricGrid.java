@@ -27,25 +27,32 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 /**
- * A {@link DoubleGrid} whose values are elevations: negative for water (a depth), non-negative
- * for land. Built via {@link uk.ac.ox.poseidon.geography.bathymetry.Factories}; implemented by
+ * A {@link DoubleGrid} whose values are elevations: negative for water (a
+ * depth), non-negative for land. Built via
+ * {@link uk.ac.ox.poseidon.geography.bathymetry.Factories}; implemented by
  * {@link DefaultBathymetricGrid}.
  */
 public interface BathymetricGrid extends DoubleGrid {
   /**
    * @return every water cell that is also
-   * {@link uk.ac.ox.poseidon.geography.grids.ModelGrid#isActive}
+   *         {@link uk.ac.ox.poseidon.geography.grids.ModelGrid#isActive}
    */
   default Stream<Int2D> getActiveWaterCells() {
     return getWaterCells().filter(getModelGrid()::isActive);
   }
 
-  /** @return {@code cell}'s active water neighbours, within a neighbourhood size of 1 */
+  /**
+   * @return {@code cell}'s active water neighbours, within a neighbourhood size
+   *         of 1
+   */
   default Stream<Int2D> getActiveWaterNeighbours(final Int2D cell) {
     return getActiveWaterNeighbours(cell, 1);
   }
 
-  /** @return {@code cell}'s active water neighbours, within the given neighbourhood size */
+  /**
+   * @return {@code cell}'s active water neighbours, within the given
+   *         neighbourhood size
+   */
   default Stream<Int2D> getActiveWaterNeighbours(
     final Int2D cell,
     final int neighbourhoodSize
@@ -56,12 +63,17 @@ public interface BathymetricGrid extends DoubleGrid {
       .filter(this::isWater);
   }
 
-  /** @return {@code cell}'s water neighbours, within a neighbourhood size of 1 */
+  /**
+   * @return {@code cell}'s water neighbours, within a neighbourhood size of 1
+   */
   default Stream<Int2D> getWaterNeighbours(final Int2D cell) {
     return getWaterNeighbours(cell, 1);
   }
 
-  /** @return {@code cell}'s water neighbours, within the given neighbourhood size */
+  /**
+   * @return {@code cell}'s water neighbours, within the given neighbourhood
+   *         size
+   */
   default Stream<Int2D> getWaterNeighbours(
     final Int2D cell,
     final int neighbourhoodSize
@@ -72,12 +84,16 @@ public interface BathymetricGrid extends DoubleGrid {
       .filter(this::isWater);
   }
 
-  /** @return {@code cell}'s land neighbours, within a neighbourhood size of 1 */
+  /**
+   * @return {@code cell}'s land neighbours, within a neighbourhood size of 1
+   */
   default Stream<Int2D> getLandNeighbours(final Int2D cell) {
     return getLandNeighbours(cell, 1);
   }
 
-  /** @return {@code cell}'s land neighbours, within the given neighbourhood size */
+  /**
+   * @return {@code cell}'s land neighbours, within the given neighbourhood size
+   */
   default Stream<Int2D> getLandNeighbours(
     final Int2D cell,
     final int neighbourhoodSize
@@ -89,16 +105,16 @@ public interface BathymetricGrid extends DoubleGrid {
   }
 
   /**
-   * @return {@code cell}'s land neighbours that are also active, within a neighbourhood size
-   * of 1
+   * @return {@code cell}'s land neighbours that are also active, within a
+   *         neighbourhood size of 1
    */
   default Stream<Int2D> getActiveLandNeighbours(final Int2D cell) {
     return getActiveLandNeighbours(cell, 1);
   }
 
   /**
-   * @return {@code cell}'s land neighbours that are also active, within the given neighbourhood
-   * size
+   * @return {@code cell}'s land neighbours that are also active, within the
+   *         given neighbourhood size
    */
   default Stream<Int2D> getActiveLandNeighbours(
     final Int2D cell,
@@ -135,17 +151,21 @@ public interface BathymetricGrid extends DoubleGrid {
     return getElevation(cell) < 0;
   }
 
-  /** @return {@code cell}'s elevation: negative for water, non-negative for land */
+  /**
+   * @return {@code cell}'s elevation: negative for water, non-negative for land
+   */
   double getElevation(final Int2D cell);
 
-  /** @return the negation of {@link #getElevation(Int2D)}, positive for water */
+  /**
+   * @return the negation of {@link #getElevation(Int2D)}, positive for water
+   */
   default double getDepth(final Int2D cell) {
     return -getElevation(cell);
   }
 
   /**
    * @return whether {@code cell} is both water and
-   * {@link uk.ac.ox.poseidon.geography.grids.ModelGrid#isActive}
+   *         {@link uk.ac.ox.poseidon.geography.grids.ModelGrid#isActive}
    */
   default boolean isActiveWater(final Int2D cell) {
     return isWater(cell) && getModelGrid().isActive(cell);

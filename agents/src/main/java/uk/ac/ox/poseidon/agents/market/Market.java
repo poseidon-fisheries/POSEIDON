@@ -38,9 +38,9 @@ public interface Market {
   Port getPort();
 
   /**
-   * @param vessel            the selling vessel
-   * @param categorisedCatch  the catch offered for sale
-   * @param dateTime          when the sale happens
+   * @param vessel           the selling vessel
+   * @param categorisedCatch the catch offered for sale
+   * @param dateTime         when the sale happens
    * @return the resulting sale, recording what sold and what didn't
    */
   Sale sell(
@@ -50,18 +50,18 @@ public interface Market {
   );
 
   /**
-   * Prices {@code categorisedCatch} as {@link #sell} would, without selling it: nothing is
-   * broadcast and no sale ID is used.
+   * Prices {@code categorisedCatch} as {@link #sell} would, without selling it:
+   * nothing is broadcast and no sale ID is used.
    *
    * @param categorisedCatch the catch to price
-   * @return the items that would sell, one per priced (category, species) combination; what
-   * has no price is left out
+   * @return the items that would sell, one per priced (category, species)
+   *         combination; what has no price is left out
    */
   List<Sale.Item> quote(CategorisedCatch categorisedCatch);
 
   /**
-   * @return when this market's prices last changed, or empty if they never have: a
-   * {@link #quote} made strictly after that still holds
+   * @return when this market's prices last changed, or empty if they never
+   *         have: a {@link #quote} made strictly after that still holds
    */
   Optional<LocalDateTime> getLastPriceChangeDateTime();
 }

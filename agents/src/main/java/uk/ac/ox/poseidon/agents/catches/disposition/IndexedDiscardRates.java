@@ -29,14 +29,17 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 
 /**
- * Applies per-species discard rates to retained catch, using a pre-indexed rate array
- * for efficient array-based operations.
+ * Applies per-species discard rates to retained catch, using a pre-indexed rate
+ * array for efficient array-based operations.
  */
 public class IndexedDiscardRates implements DispositionProcess {
 
   private final @NonNull SpeciesIndexedDoubleArray discardRates;
 
-  /** @param discardRates per-species proportion of retained catch to discard, each in {@code [0, 1]} */
+  /**
+   * @param discardRates per-species proportion of retained catch to discard,
+   *                     each in {@code [0, 1]}
+   */
   public IndexedDiscardRates(
     @NonNull final SpeciesIndexedDoubleArray discardRates
   ) {
@@ -45,8 +48,8 @@ public class IndexedDiscardRates implements DispositionProcess {
   }
 
   /**
-   * @return {@code currentDisposition} with {@link #discardRates}' per-species fraction of its
-   * retained catch moved into discarded-alive
+   * @return {@code currentDisposition} with {@link #discardRates}' per-species
+   *         fraction of its retained catch moved into discarded-alive
    */
   @Override
   public Disposition partition(

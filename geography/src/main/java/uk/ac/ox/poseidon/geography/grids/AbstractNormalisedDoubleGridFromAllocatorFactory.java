@@ -33,9 +33,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
 
 /**
- * An {@link AbstractDoubleGridFromAllocatorFactory} that rescales every cell's raw allocator
- * value so the grid's total ({@link #postProcess}'s {@code sum}) equals a fixed
- * {@code totalValue}, preserving each cell's relative share.
+ * An {@link AbstractDoubleGridFromAllocatorFactory} that rescales every cell's
+ * raw allocator value so the grid's total ({@link #postProcess}'s {@code sum})
+ * equals a fixed {@code totalValue}, preserving each cell's relative share.
  */
 @Data
 @NoArgsConstructor
@@ -50,7 +50,8 @@ abstract class AbstractNormalisedDoubleGridFromAllocatorFactory<
   /**
    * @param modelGrid  factory for the grid to build over
    * @param allocator  factory for the allocator assigning each cell's raw value
-   * @param totalValue factory for the value the grid's values should sum to once normalised
+   * @param totalValue factory for the value the grid's values should sum to
+   *                   once normalised
    */
   protected AbstractNormalisedDoubleGridFromAllocatorFactory(
     final Factory<? super S, ? extends ModelGrid> modelGrid,
@@ -62,7 +63,8 @@ abstract class AbstractNormalisedDoubleGridFromAllocatorFactory<
   }
 
   /**
-   * @throws IllegalArgumentException if the resolved total value or {@code sum} isn't positive
+   * @throws IllegalArgumentException if the resolved total value or {@code sum}
+   *                                  isn't positive
    */
   @Override
   protected double[][] postProcess(

@@ -28,8 +28,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * A {@link VesselScopeFactory} for a simple vessel name: {@link #prefix} prepended to the
- * vessel's own id. Built via {@link Factories#prefixedId}.
+ * A {@link VesselScopeFactory} for a simple vessel name: {@link #prefix}
+ * prepended to the vessel's own id. Built via {@link Factories#prefixedId}.
  */
 @Data
 @NoArgsConstructor

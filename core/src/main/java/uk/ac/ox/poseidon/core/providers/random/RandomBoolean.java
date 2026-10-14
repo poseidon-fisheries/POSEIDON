@@ -27,8 +27,8 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.BooleanProvider;
 
 /**
- * A {@link BooleanProvider} that returns {@code true} with the given probability on each call,
- * drawn from the simulation's shared RNG. Built via
+ * A {@link BooleanProvider} that returns {@code true} with the given
+ * probability on each call, drawn from the simulation's shared RNG. Built via
  * {@link Factories Factories.randomBoolean(...)} in this package.
  */
 @RequiredArgsConstructor

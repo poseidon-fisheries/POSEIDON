@@ -28,8 +28,8 @@ import uk.ac.ox.poseidon.core.functions.ObjectProperty;
 import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
 
 /**
- * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a {@link FishingEvent}, built
- * via {@link Factories#fishingEventProperty}.
+ * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a
+ * {@link FishingEvent}, built via {@link Factories#fishingEventProperty}.
  *
  * @param <R> the type of the property; not checked
  */
@@ -40,7 +40,10 @@ public class FishingEventPropertyFactory<R> extends ObjectPropertyFactory<
   R
 > {
 
-  /** @param propertyPath the dotted path of properties to follow from the fishing event */
+  /**
+   * @param propertyPath the dotted path of properties to follow from the
+   *                     fishing event
+   */
   public FishingEventPropertyFactory(final String propertyPath) {
     super(propertyPath);
   }

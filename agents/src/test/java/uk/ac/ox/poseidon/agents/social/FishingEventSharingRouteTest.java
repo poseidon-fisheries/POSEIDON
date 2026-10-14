@@ -87,10 +87,10 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * The complete route of a fishing event, wired as in NW Med: one base fleet factory given both to
- * the register loader creating the vessels and to the social network, an own and a shared fishing
- * event recorder per vessel on the same memory, and real event managers from trip to vessel to
- * simulation.
+ * The complete route of a fishing event, wired as in NW Med: one base fleet
+ * factory given both to the register loader creating the vessels and to the
+ * social network, an own and a shared fishing event recorder per vessel on the
+ * same memory, and real event managers from trip to vessel to simulation.
  */
 class FishingEventSharingRouteTest {
 
@@ -226,7 +226,10 @@ class FishingEventSharingRouteTest {
     return optionValues.get(scopeOf(vessel)).getValue(cell);
   }
 
-  /** Broadcasts a fishing event on the trip's event manager, as {@code Fishing} does. */
+  /**
+   * Broadcasts a fishing event on the trip's event manager, as {@code Fishing}
+   * does.
+   */
   private void fishingEvent(final Trip trip, final double kg) {
     final Vessel vessel = trip.getVessel();
     final ExtendedFishingAction action = new ExtendedFishingAction(

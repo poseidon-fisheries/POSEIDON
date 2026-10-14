@@ -21,8 +21,8 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.core.aggregators.Aggregator}s that reduce a stream, collection, or
- * array of numbers to a single summary value. See
+ * {@link uk.ac.ox.poseidon.core.aggregators.Aggregator}s that reduce a stream,
+ * collection, or array of numbers to a single summary value. See
  * {@link uk.ac.ox.poseidon.core.aggregators.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.core.aggregators;

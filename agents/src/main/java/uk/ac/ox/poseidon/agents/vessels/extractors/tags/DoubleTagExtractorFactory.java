@@ -30,8 +30,8 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link DoubleTagExtractor}, built via
- * {@link Factories#doubleTagExtractor}.
+ * A {@link GlobalScopeFactory} counterpart of {@link DoubleTagExtractor}, built
+ * via {@link Factories#doubleTagExtractor}.
  */
 @Data
 @NoArgsConstructor

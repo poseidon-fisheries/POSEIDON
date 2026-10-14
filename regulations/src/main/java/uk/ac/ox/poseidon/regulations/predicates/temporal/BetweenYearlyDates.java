@@ -35,10 +35,11 @@ import lombok.ToString;
 import uk.ac.ox.poseidon.regulations.TemporalAction;
 
 /**
- * Predicate matching temporal actions whose start or end date falls within an inclusive
- * {@code [start, end]} range of {@link MonthDay}s that repeats every calendar year, or whose
- * duration fully covers the range. A range where {@code end} is before {@code start} (e.g.
- * November 1 to February 28) is treated as spanning the year boundary rather than empty.
+ * Predicate matching temporal actions whose start or end date falls within an
+ * inclusive {@code [start, end]} range of {@link MonthDay}s that repeats every
+ * calendar year, or whose duration fully covers the range. A range where
+ * {@code end} is before {@code start} (e.g. November 1 to February 28) is
+ * treated as spanning the year boundary rather than empty.
  */
 @Getter
 @ToString
@@ -54,8 +55,9 @@ public class BetweenYearlyDates implements Predicate<TemporalAction<?>> {
   private final boolean yearSpanning;
 
   /**
-   * @param start the inclusive start of the range; {@code end} before {@code start} makes the
-   *              range year-spanning rather than invalid
+   * @param start the inclusive start of the range; {@code end} before
+   *              {@code start} makes the range year-spanning rather than
+   *              invalid
    * @param end   the inclusive end of the range
    */
   public BetweenYearlyDates(final MonthDay start, final MonthDay end) {
@@ -75,8 +77,8 @@ public class BetweenYearlyDates implements Predicate<TemporalAction<?>> {
   }
 
   /**
-   * Whether the action's duration fully covers the range, e.g. a multi-month trip encompassing
-   * a whole month-long closure.
+   * Whether the action's duration fully covers the range, e.g. a multi-month
+   * trip encompassing a whole month-long closure.
    */
   private boolean coversRange(
     final LocalDateTime actionStart,

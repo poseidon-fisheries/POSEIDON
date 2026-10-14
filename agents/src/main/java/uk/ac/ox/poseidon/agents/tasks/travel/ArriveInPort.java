@@ -28,8 +28,8 @@ import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * A leaf {@link AgentTask} that records the vessel's arrival in port, ending its current trip's
- * time at sea, and always succeeds.
+ * A leaf {@link AgentTask} that records the vessel's arrival in port, ending
+ * its current trip's time at sea, and always succeeds.
  */
 public class ArriveInPort extends AgentTask<Vessel> {
 

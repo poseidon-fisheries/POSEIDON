@@ -27,11 +27,12 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link GridPathFinder} counterpart of {@link CachingPathFinder}: in addition to caching
- * individual paths (inherited from {@link CachingPathFinder}), it serves
- * {@link #getAccessibleWaterCells} and {@link #getAccessibleWaterNeighbours} from an
- * {@link AccessibleWaterCellsCache}, since both are expensive to recompute; on a miss, its own
- * delegate computes the result. Not built directly — see
+ * A {@link GridPathFinder} counterpart of {@link CachingPathFinder}: in
+ * addition to caching individual paths (inherited from
+ * {@link CachingPathFinder}), it serves {@link #getAccessibleWaterCells} and
+ * {@link #getAccessibleWaterNeighbours} from an
+ * {@link AccessibleWaterCellsCache}, since both are expensive to recompute; on
+ * a miss, its own delegate computes the result. Not built directly — see
  * {@link DefaultPathFinderFactory}/{@link uk.ac.ox.poseidon.geography.paths.Factories}.
  */
 public class CachingGridPathFinder

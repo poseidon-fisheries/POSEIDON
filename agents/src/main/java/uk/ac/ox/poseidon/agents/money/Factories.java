@@ -25,7 +25,8 @@ package uk.ac.ox.poseidon.agents.money;
 import lombok.NonNull;
 
 /**
- * Factories for {@link org.joda.money.Money} amounts: a fixed amount, or one read from a table row.
+ * Factories for {@link org.joda.money.Money} amounts: a fixed amount, or one
+ * read from a table row.
  */
 public class Factories {
 
@@ -33,7 +34,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a fixed
-   * {@link org.joda.money.Money} amount
+   *         {@link org.joda.money.Money} amount
    * @see MoneyFactory
    */
   public static MoneyFactory money(
@@ -44,7 +45,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link MoneyFromRow}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link MoneyFromRow}
    * @see MoneyFromRowFactory
    */
   public static MoneyFromRowFactory moneyFromRow(

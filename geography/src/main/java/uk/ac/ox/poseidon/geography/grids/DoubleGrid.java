@@ -26,8 +26,9 @@ import sim.util.Int2D;
 
 /**
  * A {@link Grid} of {@code double} values, one per cell. Built via
- * {@link uk.ac.ox.poseidon.geography.grids.Factories}; implemented by {@link BaseDoubleGrid}
- * (and its {@link MutableDoubleGrid} subclass) and {@link DoubleGridWrapper}.
+ * {@link uk.ac.ox.poseidon.geography.grids.Factories}; implemented by
+ * {@link BaseDoubleGrid} (and its {@link MutableDoubleGrid} subclass) and
+ * {@link DoubleGridWrapper}.
  */
 public interface DoubleGrid extends Grid {
   /** @return {@code cell}'s value */

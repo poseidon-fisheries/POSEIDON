@@ -36,9 +36,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A {@link RelativeScopeFactory} for an {@link ImmutableFuelStationGrid} placing each resolved
- * {@link FuelStation} at its own port's location in {@code portGrid}. Built via
- * {@link Factories#fuelStationGrid}.
+ * A {@link RelativeScopeFactory} for an {@link ImmutableFuelStationGrid}
+ * placing each resolved {@link FuelStation} at its own port's location in
+ * {@code portGrid}. Built via {@link Factories#fuelStationGrid}.
  */
 @Data
 @NoArgsConstructor

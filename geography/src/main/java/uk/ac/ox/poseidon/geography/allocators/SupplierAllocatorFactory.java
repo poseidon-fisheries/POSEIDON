@@ -32,8 +32,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link SupplierAllocator}, built via
- * {@link Factories#supplierAllocator(Factory)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link SupplierAllocator},
+ * built via {@link Factories#supplierAllocator(Factory)}.
  */
 @Data
 @NoArgsConstructor

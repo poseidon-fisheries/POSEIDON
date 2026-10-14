@@ -23,8 +23,8 @@
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
 /**
- * An in-progress or completed scoring of one option, kept alive across events until a result is
- * available.
+ * An in-progress or completed scoring of one option, kept alive across events
+ * until a result is available.
  *
  * @param <O> the type of option being evaluated
  */

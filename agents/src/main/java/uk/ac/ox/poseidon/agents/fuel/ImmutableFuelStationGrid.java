@@ -27,8 +27,8 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link FuelStationGrid} whose station locations are fixed at construction, from a
- * station-to-cell map, rather than mutated afterwards.
+ * A {@link FuelStationGrid} whose station locations are fixed at construction,
+ * from a station-to-cell map, rather than mutated afterwards.
  */
 public class ImmutableFuelStationGrid extends FuelStationGrid {
 

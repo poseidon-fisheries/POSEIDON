@@ -45,10 +45,11 @@ import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplier;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
- * A {@link Market} with prices keyed by (catch category, species), with a fallback lookup via
- * {@link Species#covers}. A market starts with no prices: they are set through
- * {@link #setPrice}, e.g. by {@link MarketPrice#apply}. Selling a catch splits it into what has a price
- * (sold, broadcast as a {@link Sale}) and what doesn't (left in the sale's {@code unsold} catch).
+ * A {@link Market} with prices keyed by (catch category, species), with a
+ * fallback lookup via {@link Species#covers}. A market starts with no prices:
+ * they are set through {@link #setPrice}, e.g. by {@link MarketPrice#apply}.
+ * Selling a catch splits it into what has a price (sold, broadcast as a
+ * {@link Sale}) and what doesn't (left in the sale's {@code unsold} catch).
  */
 @Getter
 @ToString
@@ -85,9 +86,10 @@ public class BiomassMarket implements Market {
   }
 
   /**
-   * Splits {@code categorisedCatch} into sold items (priced via {@link #getPrice}) and unsold
-   * remainder (no price for that category, or that species within it), broadcasts the
-   * resulting {@link Sale} on {@link #eventManager}, and returns it.
+   * Splits {@code categorisedCatch} into sold items (priced via
+   * {@link #getPrice}) and unsold remainder (no price for that category, or
+   * that species within it), broadcasts the resulting {@link Sale} on
+   * {@link #eventManager}, and returns it.
    */
   @Override
   public Sale sell(
@@ -122,7 +124,10 @@ public class BiomassMarket implements Market {
     return sale;
   }
 
-  /** Prices {@code categorisedCatch} via {@link #getPrice}, as {@link #sell} does. */
+  /**
+   * Prices {@code categorisedCatch} via {@link #getPrice}, as {@link #sell}
+   * does.
+   */
   @Override
   public List<Sale.Item> quote(final CategorisedCatch categorisedCatch) {
     final List<Sale.Item> items = new ArrayList<>();
@@ -131,10 +136,11 @@ public class BiomassMarket implements Market {
   }
 
   /**
-   * Splits {@code categorisedCatch} into priced items (priced via {@link #getPrice}), passed to
-   * {@code pricedItemConsumer}, and unpriced catch (no price for that category, or that species
-   * within it), passed to {@code unpricedCatchConsumer}. Species with no biomass are skipped,
-   * except within a wholly unpriced category.
+   * Splits {@code categorisedCatch} into priced items (priced via
+   * {@link #getPrice}), passed to {@code pricedItemConsumer}, and unpriced
+   * catch (no price for that category, or that species within it), passed to
+   * {@code unpricedCatchConsumer}. Species with no biomass are skipped, except
+   * within a wholly unpriced category.
    */
   private void split(
     final CategorisedCatch categorisedCatch,
@@ -163,7 +169,10 @@ public class BiomassMarket implements Market {
     });
   }
 
-  /** @return this market's prices, by catch category then species, as a read-only view */
+  /**
+   * @return this market's prices, by catch category then species, as a
+   *         read-only view
+   */
   public Map<CatchCategory, Map<Species, Price>> getPrices() {
     return Collections.unmodifiableMap(
       Maps.transformValues(prices, Collections::unmodifiableMap)
@@ -182,9 +191,10 @@ public class BiomassMarket implements Market {
   }
 
   /**
-   * @return this market's price for {@code species} under {@code catchCategory}: a direct
-   * match if one is set, otherwise the first priced species whose {@link Species#covers} the
-   * requested species, otherwise empty
+   * @return this market's price for {@code species} under
+   *         {@code catchCategory}: a direct match if one is set, otherwise the
+   *         first priced species whose {@link Species#covers} the requested
+   *         species, otherwise empty
    */
   public Optional<Price> getPrice(
     final CatchCategory catchCategory,
@@ -207,7 +217,8 @@ public class BiomassMarket implements Market {
   }
 
   /**
-   * Sets (or replaces) this market's price for {@code species} under {@code catchCategory}.
+   * Sets (or replaces) this market's price for {@code species} under
+   * {@code catchCategory}.
    *
    * @param dateTime when the price changes
    */
@@ -241,7 +252,10 @@ public class BiomassMarket implements Market {
     return Optional.empty();
   }
 
-  /** Receives one (catch category, species, price) triple, as passed to {@link #forEachPrice}. */
+  /**
+   * Receives one (catch category, species, price) triple, as passed to
+   * {@link #forEachPrice}.
+   */
   @FunctionalInterface
   public interface PriceConsumer {
     void accept(CatchCategory catchCategory, Species species, Price price);

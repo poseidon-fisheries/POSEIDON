@@ -48,11 +48,12 @@ import uk.ac.ox.poseidon.core.utils.DoubleIntConsumer;
 import uk.ac.ox.poseidon.core.utils.ObjDoubleToDoubleFunction;
 
 /**
- * A {@link Bucket} holding several species' {@link Biomass} as a flat {@code double} array indexed
- * by a shared {@link SpeciesIndex}, which lets it add, subtract and map against another bucket on
- * the same index without boxing or map lookups. A species' slot is simply zero when absent, so a
- * bucket's index may well be wider than the species it actually holds; {@link #getMap()} and
- * {@link #getSpecies()} report only the present ones.
+ * A {@link Bucket} holding several species' {@link Biomass} as a flat
+ * {@code double} array indexed by a shared {@link SpeciesIndex}, which lets it
+ * add, subtract and map against another bucket on the same index without boxing
+ * or map lookups. A species' slot is simply zero when absent, so a bucket's
+ * index may well be wider than the species it actually holds; {@link #getMap()}
+ * and {@link #getSpecies()} report only the present ones.
  */
 @ToString
 @RequiredArgsConstructor(access = PRIVATE)
@@ -89,12 +90,18 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
       )
     );
 
-  /** @return a bucket over a fresh index of {@code map}'s species, holding their biomasses */
+  /**
+   * @return a bucket over a fresh index of {@code map}'s species, holding their
+   *         biomasses
+   */
   static BiomassBucket ofContentMap(final Map<Species, Content> map) {
     return ofBiomassMap(Maps.transformValues(map, Content::asKg));
   }
 
-  /** @return a bucket over a fresh index of {@code map}'s species, holding their biomasses */
+  /**
+   * @return a bucket over a fresh index of {@code map}'s species, holding their
+   *         biomasses
+   */
   static BiomassBucket ofBiomassMap(final Map<Species, Double> map) {
     final SpeciesIndex speciesIndex = SpeciesIndex.of(map.keySet());
     final double[] biomasses = speciesIndex.newDoubleArray();
@@ -108,12 +115,12 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
 
   /**
    * @param biomasses    the biomass of each species, in kilograms, indexed by
-   *                     {@code speciesIndex}; copied, and {@link Double#NaN} entries are stored
-   *                     as zero
+   *                     {@code speciesIndex}; copied, and {@link Double#NaN}
+   *                     entries are stored as zero
    * @param speciesIndex the index giving each array position's species
    * @return a bucket over {@code speciesIndex} holding {@code biomasses}
-   * @throws IllegalArgumentException if the array's length doesn't match the index's size, or
-   *                                   any entry is negative
+   * @throws IllegalArgumentException if the array's length doesn't match the
+   *                                  index's size, or any entry is negative
    */
   static BiomassBucket create(
     final double[] biomasses,
@@ -296,7 +303,10 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
     return Bucket.super.replaceContent(species, newContent);
   }
 
-  /** @throws IllegalArgumentException if {@code mapper} returns a negative biomass */
+  /**
+   * @throws IllegalArgumentException if {@code mapper} returns a negative
+   *                                  biomass
+   */
   @Override
   public Bucket mapBiomassValue(
     final ObjDoubleToDoubleFunction<Species> mapper
@@ -325,7 +335,10 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
     return new BiomassBucket(mapped, speciesIndex);
   }
 
-  /** @throws IllegalArgumentException if {@code mapper} returns a negative biomass */
+  /**
+   * @throws IllegalArgumentException if {@code mapper} returns a negative
+   *                                  biomass
+   */
   @Override
   public Bucket mapWithIndex(
     final SpeciesIndexed other,

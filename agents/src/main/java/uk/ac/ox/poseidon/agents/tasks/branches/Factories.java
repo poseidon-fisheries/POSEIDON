@@ -36,7 +36,7 @@ public class Factories {
   /**
    * @param children factories for the sequence's child tasks
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link com.badlogic.gdx.ai.btree.branch.Sequence}
+   *         {@link com.badlogic.gdx.ai.btree.branch.Sequence}
    * @see SequenceTaskFactory
    */
   @SafeVarargs
@@ -49,7 +49,7 @@ public class Factories {
   /**
    * @param children factories for the selector's child tasks
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link com.badlogic.gdx.ai.btree.branch.Selector}
+   *         {@link com.badlogic.gdx.ai.btree.branch.Selector}
    * @see SelectorTaskFactory
    */
   @SafeVarargs
@@ -62,7 +62,7 @@ public class Factories {
   /**
    * @param children factories for the parallel node's child tasks
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link com.badlogic.gdx.ai.btree.branch.Parallel}
+   *         {@link com.badlogic.gdx.ai.btree.branch.Parallel}
    * @see ParallelTaskFactory
    */
   @SafeVarargs

@@ -34,12 +34,13 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselTaskFactory} for a {@link Sequence} stringing together a whole fishing trip:
- * start trip, travel out, fish, turn back, travel back (reusing the same resolved
- * {@code travelTask} instance for both legs — safe because every task here fully re-initializes
- * its own state in {@code start()}, which gdx-ai calls fresh each time a {@link Sequence} enters
- * a child, regardless of that child's previous run), arrive in port, land the catch, end trip.
- * Built via {@link Factories#roundTrip}.
+ * A {@link VesselTaskFactory} for a {@link Sequence} stringing together a whole
+ * fishing trip: start trip, travel out, fish, turn back, travel back (reusing
+ * the same resolved {@code travelTask} instance for both legs — safe because
+ * every task here fully re-initializes its own state in {@code start()}, which
+ * gdx-ai calls fresh each time a {@link Sequence} enters a child, regardless of
+ * that child's previous run), arrive in port, land the catch, end trip. Built
+ * via {@link Factories#roundTrip}.
  */
 @Data
 @NoArgsConstructor
@@ -53,9 +54,10 @@ public class RoundTripFactory extends VesselTaskFactory<Sequence<Vessel>> {
   private Factory<? super VesselScope, ? extends Task<Vessel>> landingTask;
 
   /**
-   * @return a {@link Sequence} of: {@code startTripTask}, {@code travelTask} (outbound),
-   * {@code fishingTask}, a {@link SetDestinationToOrigin}, {@code travelTask} again (inbound),
-   * an {@link ArriveInPort}, {@code landingTask}, and an {@link EndTrip}
+   * @return a {@link Sequence} of: {@code startTripTask}, {@code travelTask}
+   *         (outbound), {@code fishingTask}, a {@link SetDestinationToOrigin},
+   *         {@code travelTask} again (inbound), an {@link ArriveInPort},
+   *         {@code landingTask}, and an {@link EndTrip}
    */
   @SuppressWarnings("unchecked")
   @Override

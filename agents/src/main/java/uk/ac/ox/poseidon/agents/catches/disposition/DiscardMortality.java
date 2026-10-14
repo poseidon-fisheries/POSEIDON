@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 /**
- * A {@link DispositionProcess} that moves a per-species proportion of the currently
- * discarded-alive catch into discarded-dead.
+ * A {@link DispositionProcess} that moves a per-species proportion of the
+ * currently discarded-alive catch into discarded-dead.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class DiscardMortality implements DispositionProcess {
@@ -40,8 +40,9 @@ public class DiscardMortality implements DispositionProcess {
   private final Function<? super Species, Double> mortalityRate;
 
   /**
-   * @return {@code currentDisposition} with {@link #mortalityRate}'s per-species fraction of
-   * its discarded-alive catch moved into discarded-dead
+   * @return {@code currentDisposition} with {@link #mortalityRate}'s
+   *         per-species fraction of its discarded-alive catch moved into
+   *         discarded-dead
    */
   @Override
   public Disposition partition(

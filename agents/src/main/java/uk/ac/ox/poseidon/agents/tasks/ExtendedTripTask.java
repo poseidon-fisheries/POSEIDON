@@ -30,8 +30,8 @@ import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * An {@link ExtendedTask} run as part of the vessel's current {@link Trip}, capturing that trip
- * and the wall-clock start time when the task starts.
+ * An {@link ExtendedTask} run as part of the vessel's current {@link Trip},
+ * capturing that trip and the wall-clock start time when the task starts.
  */
 @Getter
 public abstract class ExtendedTripTask extends ExtendedTask<Vessel> {
@@ -40,7 +40,8 @@ public abstract class ExtendedTripTask extends ExtendedTask<Vessel> {
   private LocalDateTime startDateTime;
 
   /**
-   * Captures the vessel's current trip (must not be {@code null}) and the current date/time.
+   * Captures the vessel's current trip (must not be {@code null}) and the
+   * current date/time.
    */
   @Override
   public void start() {

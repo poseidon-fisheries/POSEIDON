@@ -35,9 +35,10 @@ class SumTest {
    * Tests for the {@link SumAggregator} class.
    *
    * <p>
-   * The {@link SumAggregator#apply(DoubleStream)} method takes a {@link DoubleStream} and returns
-   * the sum of all its elements wrapped in an {@link OptionalDouble}. If the stream is empty, the
-   * result will still return a valid {@link OptionalDouble} with its value set to 0.0 since the
+   * The {@link SumAggregator#apply(DoubleStream)} method takes a
+   * {@link DoubleStream} and returns the sum of all its elements wrapped in an
+   * {@link OptionalDouble}. If the stream is empty, the result will still
+   * return a valid {@link OptionalDouble} with its value set to 0.0 since the
    * sum of zero elements is conventionally 0.0.
    * </p>
    */

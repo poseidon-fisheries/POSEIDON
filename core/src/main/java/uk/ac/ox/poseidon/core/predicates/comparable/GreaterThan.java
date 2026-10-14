@@ -28,8 +28,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} that is true iff the tested value is strictly greater than a supplied
- * threshold. Built via {@link Factories Factories.greaterThan(...)} in this package.
+ * A {@link Predicate} that is true iff the tested value is strictly greater
+ * than a supplied threshold. Built via {@link Factories
+ * Factories.greaterThan(...)} in this package.
  *
  * @param <T> the {@link Comparable} type of the threshold
  */

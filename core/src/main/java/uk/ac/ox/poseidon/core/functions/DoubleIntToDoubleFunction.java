@@ -23,8 +23,9 @@
 package uk.ac.ox.poseidon.core.functions;
 
 /**
- * A function of a {@code double} and an {@code int} returning a {@code double}, avoiding the
- * boxing a {@code BiFunction<Double, Integer, Double>} would require.
+ * A function of a {@code double} and an {@code int} returning a {@code double},
+ * avoiding the boxing a {@code BiFunction<Double, Integer, Double>} would
+ * require.
  */
 @FunctionalInterface
 public interface DoubleIntToDoubleFunction {

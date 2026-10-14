@@ -33,9 +33,10 @@ import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationEventListenerFactory} for a {@link FishingEventSharer}, built via
- * {@link Factories#fishingEventSharer}. Registered with the simulation's event manager, the sharer
- * hears the fishing events every vessel's event manager forwards there.
+ * A {@link SimulationEventListenerFactory} for a {@link FishingEventSharer},
+ * built via {@link Factories#fishingEventSharer}. Registered with the
+ * simulation's event manager, the sharer hears the fishing events every
+ * vessel's event manager forwards there.
  */
 @Data
 @NoArgsConstructor

@@ -39,9 +39,10 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
  * Adapts this package's grid model to libGDX AI's {@link IndexedGraph}, so
- * {@link com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder} can search it (used by
- * {@link AStarPathFinder}). Caches each cell's outgoing connections, since libGDX's search
- * revisits cells and the underlying grid queries aren't free.
+ * {@link com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder} can search it
+ * (used by {@link AStarPathFinder}). Caches each cell's outgoing connections,
+ * since libGDX's search revisits cells and the underlying grid queries aren't
+ * free.
  */
 public class GridAdaptor implements IndexedGraph<Int2D> {
 
@@ -58,8 +59,10 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
 
   /**
    * @param bathymetricGrid    the grid to find water/land cells on
-   * @param portGrid           the grid of ports, whose cells also count as navigable
-   * @param distanceCalculator the distance calculator used to weight connections between cells
+   * @param portGrid           the grid of ports, whose cells also count as
+   *                           navigable
+   * @param distanceCalculator the distance calculator used to weight
+   *                           connections between cells
    */
   public GridAdaptor(
     final BathymetricGrid bathymetricGrid,
@@ -76,7 +79,10 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
     return bathymetricGrid.isWater(cell) || portGrid.anyObjectsAt(cell);
   }
 
-  /** @return a unique index for {@code cell}, as required by {@link IndexedGraph} */
+  /**
+   * @return a unique index for {@code cell}, as required by
+   *         {@link IndexedGraph}
+   */
   @Override
   public int getIndex(final Int2D cell) {
     return cell.x + cell.y * modelGrid.getGridWidth();
@@ -89,8 +95,9 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
   }
 
   /**
-   * @return {@code cell}'s outgoing connections to its navigable neighbours, weighted by
-   * {@code getDistanceCalculator()}; empty if {@code cell} itself isn't navigable
+   * @return {@code cell}'s outgoing connections to its navigable neighbours,
+   *         weighted by {@code getDistanceCalculator()}; empty if {@code cell}
+   *         itself isn't navigable
    */
   @Override
   public Array<Connection<Int2D>> getConnections(final Int2D cell) {
@@ -115,8 +122,9 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
   }
 
   /**
-   * We need to intern (i.e., map to a canonical instance) all instances of Int2D because the
-   * AStarPathFinder does all its comparisons by reference, not equality
+   * We need to intern (i.e., map to a canonical instance) all instances of
+   * Int2D because the AStarPathFinder does all its comparisons by reference,
+   * not equality
    *
    * @param cell any Int2D cell instance
    * @return the canonical instance for that cell

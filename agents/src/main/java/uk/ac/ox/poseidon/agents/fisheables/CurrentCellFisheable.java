@@ -31,8 +31,9 @@ import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 
 /**
- * Resupplies the {@link Fisheable} at {@code vessel}'s current cell on every call, tracking the
- * vessel as it moves rather than fixing on a single cell at construction time.
+ * Resupplies the {@link Fisheable} at {@code vessel}'s current cell on every
+ * call, tracking the vessel as it moves rather than fixing on a single cell at
+ * construction time.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class CurrentCellFisheable implements Supplier<Fisheable> {

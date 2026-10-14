@@ -32,10 +32,11 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A grid of {@link Port}s placed on land cells, each adjacent to at least one active water cell.
- * Built via {@link uk.ac.ox.poseidon.geography.ports.Factories}; implemented by
- * {@link ImmutablePortGrid} (fixed at build time) and {@link MutablePortGrid} (ports can be added
- * afterward).
+ * A grid of {@link Port}s placed on land cells, each adjacent to at least one
+ * active water cell. Built via
+ * {@link uk.ac.ox.poseidon.geography.ports.Factories}; implemented by
+ * {@link ImmutablePortGrid} (fixed at build time) and {@link MutablePortGrid}
+ * (ports can be added afterward).
  */
 public interface PortGrid extends Iterable<Port> {
   /** @return every port on this grid */
@@ -57,24 +58,26 @@ public interface PortGrid extends Iterable<Port> {
   Optional<Port> getObject(String id);
 
   /**
-   * @throws IllegalStateException if {@code coordinate}'s cell isn't a valid port location (see
-   *                                {@link #validateLocation(Int2D, Coordinate)})
+   * @throws IllegalStateException if {@code coordinate}'s cell isn't a valid
+   *                               port location (see
+   *                               {@link #validateLocation(Int2D, Coordinate)})
    */
   default void validateLocation(final Coordinate coordinate) {
     validateLocation(getModelGrid().toCell(coordinate), coordinate);
   }
 
   /**
-   * @throws IllegalStateException if {@code cell} isn't a valid port location (see
-   *                                {@link #validateLocation(Int2D, Coordinate)})
+   * @throws IllegalStateException if {@code cell} isn't a valid port location
+   *                               (see
+   *                               {@link #validateLocation(Int2D, Coordinate)})
    */
   default void validateLocation(final Int2D cell) {
     validateLocation(cell, getModelGrid().toCoordinate(cell));
   }
 
   /**
-   * @throws IllegalStateException if {@code cell} isn't land, or has no active water cell
-   *                                adjacent to it
+   * @throws IllegalStateException if {@code cell} isn't land, or has no active
+   *                               water cell adjacent to it
    */
   default void validateLocation(final Int2D cell, final Coordinate coordinate) {
     checkState(

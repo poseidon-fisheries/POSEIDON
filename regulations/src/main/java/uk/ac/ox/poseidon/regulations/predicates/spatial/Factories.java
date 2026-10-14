@@ -30,8 +30,9 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * Factories for predicates over a {@link uk.ac.ox.poseidon.regulations.SpatialAction}'s start/end
- * location, either as grid cells or as raw coordinates.
+ * Factories for predicates over a
+ * {@link uk.ac.ox.poseidon.regulations.SpatialAction}'s start/end location,
+ * either as grid cells or as raw coordinates.
  */
 public class Factories {
 
@@ -39,7 +40,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   * {@link ActionCellPredicate}
+   *         {@link ActionCellPredicate}
    * @see ActionCellPredicateFactory
    */
   public static <S extends Scope> ActionCellPredicateFactory<S> actionCellPredicate(
@@ -51,7 +52,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   * {@link ActionCoordinatePredicate}
+   *         {@link ActionCoordinatePredicate}
    * @see ActionCoordinatePredicateFactory
    */
   public static <S extends Scope> ActionCoordinatePredicateFactory<S> actionCoordinatePredicate(

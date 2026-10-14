@@ -41,14 +41,16 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * The {@link OptionValues} a vessel reads from its {@link Memory}: the memory used is the one its
- * memory selector gives for the vessel at the time (e.g. a {@link KeyedMemorySelector} picking the
- * memory for the vessel's current gear), and each option is worth the valuation of that option
- * given what is remembered about it. A value only makes sense in a context (where the vessel is,
- * the prices it faces, its gear...), which the valuation reads for itself. Both the memory and the
- * values are worked out afresh on every call, with nothing cached, so a change of context (e.g. a
- * gear change, a move, new prices) shows straight away, without any new observation. Finding the
- * best options therefore values every remembered option each time.
+ * The {@link OptionValues} a vessel reads from its {@link Memory}: the memory
+ * used is the one its memory selector gives for the vessel at the time (e.g. a
+ * {@link KeyedMemorySelector} picking the memory for the vessel's current
+ * gear), and each option is worth the valuation of that option given what is
+ * remembered about it. A value only makes sense in a context (where the vessel
+ * is, the prices it faces, its gear...), which the valuation reads for itself.
+ * Both the memory and the values are worked out afresh on every call, with
+ * nothing cached, so a change of context (e.g. a gear change, a move, new
+ * prices) shows straight away, without any new observation. Finding the best
+ * options therefore values every remembered option each time.
  *
  * @param <O> the type of option valued
  * @param <M> the type of what is remembered about an option

@@ -33,13 +33,15 @@ import uk.ac.ox.poseidon.core.events.AbstractListener;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * Records each fishing event it receives in a {@link Memory}: the event's retained catch, observed
- * in the cell where the fishing action started, in the memory selected from the event (such as the
- * slice for the gear it was made with), revised with an update rule.
+ * Records each fishing event it receives in a {@link Memory}: the event's
+ * retained catch, observed in the cell where the fishing action started, in the
+ * memory selected from the event (such as the slice for the gear it was made
+ * with), revised with an update rule.
  * <p>
- * It does not register itself with anything: whatever it is registered with decides whose fishing
- * events it records. A vessel can have several, on the same memory, with different update rules,
- * such as one for its own fishing events and one for fishing events it is told about.
+ * It does not register itself with anything: whatever it is registered with
+ * decides whose fishing events it records. A vessel can have several, on the
+ * same memory, with different update rules, such as one for its own fishing
+ * events and one for fishing events it is told about.
  */
 public class FishingEventRecorder extends AbstractListener<FishingEvent> {
 
@@ -51,9 +53,12 @@ public class FishingEventRecorder extends AbstractListener<FishingEvent> {
   private final BinaryOperator<Bucket> updateRule;
 
   /**
-   * @param modelGrid      the grid giving the cell of a fishing event's coordinate
-   * @param memorySelector selects, from a fishing event, the memory to record it in
-   * @param updateRule     revises what is remembered of a cell with a new observation of it
+   * @param modelGrid      the grid giving the cell of a fishing event's
+   *                       coordinate
+   * @param memorySelector selects, from a fishing event, the memory to record
+   *                       it in
+   * @param updateRule     revises what is remembered of a cell with a new
+   *                       observation of it
    */
   FishingEventRecorder(
     final ModelGrid modelGrid,

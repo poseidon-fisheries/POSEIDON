@@ -28,9 +28,10 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Function} that looks up its input in a fixed, resolved {@link Map} on every call.
- * Unlike {@link MapEntryFactory}, the key is supplied per-call rather than fixed at resolution
- * time. Built via {@link Factories#mapValueExtractor(uk.ac.ox.poseidon.core.Factory)} in this
+ * A {@link Function} that looks up its input in a fixed, resolved {@link Map}
+ * on every call. Unlike {@link MapEntryFactory}, the key is supplied per-call
+ * rather than fixed at resolution time. Built via
+ * {@link Factories#mapValueExtractor(uk.ac.ox.poseidon.core.Factory)} in this
  * package.
  */
 @RequiredArgsConstructor

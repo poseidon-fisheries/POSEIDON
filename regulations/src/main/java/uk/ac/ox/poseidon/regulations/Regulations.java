@@ -25,14 +25,15 @@ package uk.ac.ox.poseidon.regulations;
 import java.util.function.Predicate;
 
 /**
- * A rule judging whether an {@link Action} is legal: a {@link Predicate} over actions that holds
- * for the actions it permits. {@link #isPermitted} and {@link #isForbidden} say the same as
- * {@link #test}, in the words of the rule.
+ * A rule judging whether an {@link Action} is legal: a {@link Predicate} over
+ * actions that holds for the actions it permits. {@link #isPermitted} and
+ * {@link #isForbidden} say the same as {@link #test}, in the words of the rule.
  * <p>
- * A rule is built from descriptive predicates over the action (where, when, by whom) with
- * {@link ForbiddenIf} or {@link PermittedIf}, or is a component of its own, such as a catch
- * quota. Rules combine by conjunction, {@link AllOfRegulations}: an action is legal when every
- * rule permits it. Duties that are not a judgement of legality (quota accounting, fines, quota
+ * A rule is built from descriptive predicates over the action (where, when, by
+ * whom) with {@link ForbiddenIf} or {@link PermittedIf}, or is a component of
+ * its own, such as a catch quota. Rules combine by conjunction,
+ * {@link AllOfRegulations}: an action is legal when every rule permits it.
+ * Duties that are not a judgement of legality (quota accounting, fines, quota
  * markets, what to discard) belong to other components, which rules may read.
  */
 @FunctionalInterface
@@ -45,7 +46,10 @@ public interface Regulations<A extends Action<?>> extends Predicate<A> {
     return !isPermitted(action);
   }
 
-  /** @return whether {@code action} is allowed under this rule, as {@link #isPermitted} */
+  /**
+   * @return whether {@code action} is allowed under this rule, as
+   *         {@link #isPermitted}
+   */
   @Override
   default boolean test(final A action) {
     return isPermitted(action);

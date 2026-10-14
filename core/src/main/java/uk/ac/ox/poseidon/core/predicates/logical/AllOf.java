@@ -28,8 +28,8 @@ import java.util.stream.Stream;
 import lombok.NonNull;
 
 /**
- * A {@link Predicate} that is true iff every one of its component predicates is true for the
- * given input (vacuously true for zero predicates). Built via
+ * A {@link Predicate} that is true iff every one of its component predicates is
+ * true for the given input (vacuously true for zero predicates). Built via
  * {@link Factories#allOf(uk.ac.ox.poseidon.core.Factory...)} in this package.
  *
  * @param <T> the type of input tested

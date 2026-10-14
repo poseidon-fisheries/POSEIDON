@@ -33,10 +33,11 @@ import sim.engine.Steppable;
 import tech.tablesaw.api.Table;
 
 /**
- * A {@link Table} that grows one row per simulation step: each {@link #step} call appends the
- * current values of a fixed list of per-column {@link Supplier}s. Built via
- * {@link Factories#steppableTable(uk.ac.ox.poseidon.core.Factory,
- * uk.ac.ox.poseidon.core.Factory[])} in this package.
+ * A {@link Table} that grows one row per simulation step: each {@link #step}
+ * call appends the current values of a fixed list of per-column
+ * {@link Supplier}s. Built via
+ * {@link Factories#steppableTable(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory[])}
+ * in this package.
  */
 public class SteppableTable implements Steppable, Supplier<Table> {
 
@@ -49,8 +50,9 @@ public class SteppableTable implements Steppable, Supplier<Table> {
   /**
    * @param tableDefinition the shape of the table to create
    * @param valueSuppliers  one value supplier per column, in column order
-   * @throws IllegalArgumentException if the number of suppliers doesn't match the number of
-   *                                   columns in {@code tableDefinition}
+   * @throws IllegalArgumentException if the number of suppliers doesn't match
+   *                                  the number of columns in
+   *                                  {@code tableDefinition}
    */
   public SteppableTable(
     final TableDefinition tableDefinition,
@@ -68,7 +70,10 @@ public class SteppableTable implements Steppable, Supplier<Table> {
     return table;
   }
 
-  /** Appends one row: the current value of each of {@code valueSuppliers}, in column order. */
+  /**
+   * Appends one row: the current value of each of {@code valueSuppliers}, in
+   * column order.
+   */
   @Override
   public void step(final SimState simState) {
     for (int i = 0; i < valueSuppliers.size(); i++) {

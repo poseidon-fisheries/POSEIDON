@@ -29,11 +29,11 @@ import java.util.zip.ZipFile;
 import lombok.Value;
 
 /**
- * A {@link DataSource} over a single entry of a zip archive, read with a fixed {@link Charset}.
- * Built via
+ * A {@link DataSource} over a single entry of a zip archive, read with a fixed
+ * {@link Charset}. Built via
  * {@link Factories#zipEntryDataSource(uk.ac.ox.poseidon.core.Factory, String)}/
- * {@link Factories#zipEntryDataSource(uk.ac.ox.poseidon.core.Factory, String, String)} in this
- * package.
+ * {@link Factories#zipEntryDataSource(uk.ac.ox.poseidon.core.Factory, String, String)}
+ * in this package.
  */
 @Value
 public class ZipEntryDataSource implements DataSource {

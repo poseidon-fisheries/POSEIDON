@@ -33,14 +33,18 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
-/** Factories for general-purpose vessel behavior-tree leaves: checks, waits, and retry glue. */
+/**
+ * Factories for general-purpose vessel behavior-tree leaves: checks, waits, and
+ * retry glue.
+ */
 public class Factories {
 
   private Factories() {}
 
   /**
    * @param predicate the condition to test against the vessel
-   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for an {@link AgentPredicateTask}
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for an
+   *         {@link AgentPredicateTask}
    * @see AgentPredicateTask
    */
   public static VesselPredicateTaskFactory checkThat(
@@ -52,8 +56,9 @@ public class Factories {
   /**
    * @param extractor pulls a value off the vessel
    * @param predicate the condition to test the extracted value against
-   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for an {@link AgentPredicateTask} testing
-   * {@code predicate} against the value {@code extractor} pulls off the vessel
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for an
+   *         {@link AgentPredicateTask} testing {@code predicate} against the
+   *         value {@code extractor} pulls off the vessel
    * @see AgentPredicateTask
    */
   public static <T> VesselPredicateTaskFactory checkThat(
@@ -67,9 +72,10 @@ public class Factories {
   }
 
   /**
-   * @param durationSupplier supplies the duration to wait, resolved fresh each time the task
-   *                         starts
-   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a {@link WaitFor}
+   * @param durationSupplier supplies the duration to wait, resolved fresh each
+   *                         time the task starts
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
+   *         {@link WaitFor}
    * @see WaitFor
    */
   public static WaitForFactory waitFor(
@@ -83,10 +89,11 @@ public class Factories {
 
   /**
    * @param mainTask the task to try first
-   * @param waitTask the task to fall back to, every step, until {@code mainTask} succeeds
+   * @param waitTask the task to fall back to, every step, until
+   *                 {@code mainTask} succeeds
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
-   * {@link com.badlogic.gdx.ai.btree.branch.Selector} combining the two, see
-   * {@link SucceedOrWaitFactory} for the exact semantics
+   *         {@link com.badlogic.gdx.ai.btree.branch.Selector} combining the
+   *         two, see {@link SucceedOrWaitFactory} for the exact semantics
    * @see SucceedOrWaitFactory
    */
   public static SucceedOrWaitFactory succeedOrWait(

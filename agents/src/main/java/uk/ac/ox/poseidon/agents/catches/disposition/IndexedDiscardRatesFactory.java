@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link IndexedDiscardRates}, built via
- * {@link Factories#discardRates}.
+ * A {@link RelativeScopeFactory} counterpart of {@link IndexedDiscardRates},
+ * built via {@link Factories#discardRates}.
  */
 @Data
 @NoArgsConstructor

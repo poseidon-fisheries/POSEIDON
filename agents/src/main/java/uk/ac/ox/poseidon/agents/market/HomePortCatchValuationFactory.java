@@ -32,8 +32,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link HomePortCatchValuation}, built via
- * {@link Factories#homePortCatchValuation}.
+ * A {@link VesselScopeFactory} counterpart of {@link HomePortCatchValuation},
+ * built via {@link Factories#homePortCatchValuation}.
  */
 @Data
 @NoArgsConstructor

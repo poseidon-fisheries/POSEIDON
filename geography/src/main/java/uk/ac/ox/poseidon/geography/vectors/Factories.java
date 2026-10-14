@@ -34,8 +34,8 @@ public class Factories {
 
   /**
    * @param path factory for the shapefile to read
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the list of geometries
-   * read from the resolved shapefile
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the list
+   *         of geometries read from the resolved shapefile
    * @see GeometriesFromShapeFileFactory
    */
   public static <S extends Scope> GeometriesFromShapeFileFactory<S> geometriesFromShapeFile(

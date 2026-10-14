@@ -28,10 +28,12 @@ import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 
 /**
- * A {@link DoubleSupplier} that can also be used anywhere a {@link ToDoubleFunction} or
- * {@link Function} of {@link Double} is required, in which case it ignores the argument passed to
- * {@link #applyAsDouble}/{@link #apply} and just returns the double it would have supplied anyway.
- * Lets the same object be wired into any of those call sites without an adapter.
+ * A {@link DoubleSupplier} that can also be used anywhere a
+ * {@link ToDoubleFunction} or {@link Function} of {@link Double} is required,
+ * in which case it ignores the argument passed to
+ * {@link #applyAsDouble}/{@link #apply} and just returns the double it would
+ * have supplied anyway. Lets the same object be wired into any of those call
+ * sites without an adapter.
  */
 public interface DoubleProvider
   extends

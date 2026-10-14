@@ -30,8 +30,9 @@ import java.time.Duration;
 import uk.ac.ox.poseidon.agents.Agent;
 
 /**
- * A gdx-ai {@link LeafTask} run against an {@link Agent}. Behavior trees are built fresh per
- * agent rather than cloned, so {@link #copyTo} is deliberately unsupported.
+ * A gdx-ai {@link LeafTask} run against an {@link Agent}. Behavior trees are
+ * built fresh per agent rather than cloned, so {@link #copyTo} is deliberately
+ * unsupported.
  *
  * @param <G> the type of agent this task runs against
  */
@@ -43,10 +44,10 @@ public abstract class AgentTask<G extends Agent> extends LeafTask<G> {
   }
 
   /**
-   * Reports this task as running for {@code duration}: the agent executes it again once
-   * {@code duration} has elapsed. Tasks report {@code RUNNING} only through this method, so each
-   * running step sets its own duration, which the agent clears once it has scheduled its next
-   * step.
+   * Reports this task as running for {@code duration}: the agent executes it
+   * again once {@code duration} has elapsed. Tasks report {@code RUNNING} only
+   * through this method, so each running step sets its own duration, which the
+   * agent clears once it has scheduled its next step.
    *
    * @param duration how long until this task is executed again
    * @return {@code RUNNING}
@@ -56,7 +57,10 @@ public abstract class AgentTask<G extends Agent> extends LeafTask<G> {
     return RUNNING;
   }
 
-  /** @throws UnsupportedOperationException always; behavior trees are never cloned */
+  /**
+   * @throws UnsupportedOperationException always; behavior trees are never
+   *                                       cloned
+   */
   @Override
   protected Task<G> copyTo(final Task<G> task) {
     throw new UnsupportedOperationException("Not implemented");

@@ -32,8 +32,9 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} for a {@link FisheableBiomassGrids} over the resolved
- * {@code biomassGrids}. Built via {@link Factories#fisheableBiomassGrids}.
+ * A {@link RelativeScopeFactory} for a {@link FisheableBiomassGrids} over the
+ * resolved {@code biomassGrids}. Built via
+ * {@link Factories#fisheableBiomassGrids}.
  */
 @Data
 @NoArgsConstructor

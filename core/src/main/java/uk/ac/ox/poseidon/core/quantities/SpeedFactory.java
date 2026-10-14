@@ -28,8 +28,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link Speed} quantities, built via
- * {@link Factories Factories.speedOf(...)}.
+ * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link Speed}
+ * quantities, built via {@link Factories Factories.speedOf(...)}.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -42,7 +42,8 @@ public class SpeedFactory extends AbstractQuantityFactory<Speed> {
 
   /**
    * @param value      the numeric speed value
-   * @param unitString the unit, in the format produced by {@code Unit.toString()}
+   * @param unitString the unit, in the format produced by
+   *                   {@code Unit.toString()}
    */
   public SpeedFactory(final double value, final String unitString) {
     super(Speed.class, value, unitString);

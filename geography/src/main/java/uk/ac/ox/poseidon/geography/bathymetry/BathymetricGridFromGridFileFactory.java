@@ -44,9 +44,9 @@ import uk.ac.ox.poseidon.geography.grids.CoverageWrapper;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link BathymetricGridFactory} whose elevation samples come from a raster grid file (e.g.
- * GeoTIFF, via GeoTools' {@link CoverageWrapper}), reprojected cell-by-cell into this codebase's
- * {@link ModelGrid}. Built via
+ * A {@link BathymetricGridFactory} whose elevation samples come from a raster
+ * grid file (e.g. GeoTIFF, via GeoTools' {@link CoverageWrapper}), reprojected
+ * cell-by-cell into this codebase's {@link ModelGrid}. Built via
  * {@link Factories#bathymetricGridFromGridFile(Factory, Factory, Factory, boolean)}.
  */
 @Data

@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} for a resolved {@link ModelGrid} narrowed to a fixed set of
- * active cells (via {@link ModelGrid#withActiveCells}). Built via
+ * A {@link RelativeScopeFactory} for a resolved {@link ModelGrid} narrowed to a
+ * fixed set of active cells (via {@link ModelGrid#withActiveCells}). Built via
  * {@link Factories#modelGridWithActiveCells(Factory, Factory)}.
  */
 @Data

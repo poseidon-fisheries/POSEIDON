@@ -34,7 +34,8 @@ import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselTaskFactory} counterpart of {@link Fishing}, built via {@link Factories#fishing}.
+ * A {@link VesselTaskFactory} counterpart of {@link Fishing}, built via
+ * {@link Factories#fishing}.
  */
 @Data
 @NoArgsConstructor

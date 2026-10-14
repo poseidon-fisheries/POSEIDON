@@ -23,6 +23,7 @@
 /**
  * {@link java.util.function.Supplier}s that aggregate a resolved
  * {@link uk.ac.ox.poseidon.geography.grids.DoubleGrid}. See
- * {@link uk.ac.ox.poseidon.geography.grids.suppliers.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.geography.grids.suppliers.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.geography.grids.suppliers;

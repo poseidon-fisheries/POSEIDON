@@ -21,9 +21,11 @@
  */
 
 /**
- * Fuel stations: {@link uk.ac.ox.poseidon.agents.fuel.FuelStation} sells fuel at a per-litre price
- * and pump rate, broadcasting a {@link uk.ac.ox.poseidon.agents.fuel.FuelStation.Purchase} on each
- * refill; {@link uk.ac.ox.poseidon.agents.fuel.FuelStationGrid} locates stations spatially. See
- * {@link uk.ac.ox.poseidon.agents.fuel.Factories} for the entry points.
+ * Fuel stations: {@link uk.ac.ox.poseidon.agents.fuel.FuelStation} sells fuel
+ * at a per-litre price and pump rate, broadcasting a
+ * {@link uk.ac.ox.poseidon.agents.fuel.FuelStation.Purchase} on each refill;
+ * {@link uk.ac.ox.poseidon.agents.fuel.FuelStationGrid} locates stations
+ * spatially. See {@link uk.ac.ox.poseidon.agents.fuel.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.agents.fuel;

@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link EpsilonGreedyChooser}, built via
- * {@link Factories#epsilonGreedyDestination}.
+ * A {@link VesselScopeFactory} counterpart of {@link EpsilonGreedyChooser},
+ * built via {@link Factories#epsilonGreedyDestination}.
  */
 @Data
 @NoArgsConstructor
@@ -48,7 +48,10 @@ public class EpsilonGreedyDestinationSupplierFactory
   private Factory<? super VesselScope, ? extends Supplier<Int2D>> explorer;
   private Factory<? super VesselScope, ? extends Supplier<Int2D>> exploiter;
 
-  /** @return an {@link EpsilonGreedyChooser} over the resolved explorer/exploiter, as a {@link DestinationSupplier} */
+  /**
+   * @return an {@link EpsilonGreedyChooser} over the resolved
+   *         explorer/exploiter, as a {@link DestinationSupplier}
+   */
   @Override
   protected DestinationSupplier newInstance(final VesselScope scope) {
     return new EpsilonGreedyChooser<>(

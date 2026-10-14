@@ -27,10 +27,11 @@ import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
 /**
- * A {@link PortGrid} whose ports are fixed at construction time, defensively copying the given
- * field so later mutation of the source doesn't affect this grid. Built via
- * {@link Factories#portGrid(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory,
- * uk.ac.ox.poseidon.core.Factory)} in this package.
+ * A {@link PortGrid} whose ports are fixed at construction time, defensively
+ * copying the given field so later mutation of the source doesn't affect this
+ * grid. Built via
+ * {@link Factories#portGrid(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * in this package.
  */
 public class ImmutablePortGrid extends AbstractPortGrid {
 

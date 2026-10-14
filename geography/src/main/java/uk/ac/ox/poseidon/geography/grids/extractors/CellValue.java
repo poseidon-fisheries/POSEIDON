@@ -29,8 +29,9 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 /**
- * A {@link Function} that reads a fixed, resolved {@link DoubleGrid}'s value at a given cell.
- * Built via {@link Factories#cellValue(uk.ac.ox.poseidon.core.Factory)} in this package.
+ * A {@link Function} that reads a fixed, resolved {@link DoubleGrid}'s value at
+ * a given cell. Built via
+ * {@link Factories#cellValue(uk.ac.ox.poseidon.core.Factory)} in this package.
  */
 @RequiredArgsConstructor
 public class CellValue implements Function<Int2D, Double> {

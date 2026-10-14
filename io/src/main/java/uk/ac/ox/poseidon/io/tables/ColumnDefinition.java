@@ -28,8 +28,8 @@ import tech.tablesaw.api.ColumnType;
 import tech.tablesaw.columns.Column;
 
 /**
- * A named, typed {@code tablesaw} {@link Column} that can be created on demand. Built via
- * {@link Factories#columnDefinition(String, String)} in this package.
+ * A named, typed {@code tablesaw} {@link Column} that can be created on demand.
+ * Built via {@link Factories#columnDefinition(String, String)} in this package.
  */
 @Data
 public class ColumnDefinition implements Supplier<Column<?>> {
@@ -37,7 +37,10 @@ public class ColumnDefinition implements Supplier<Column<?>> {
   private final String columnName;
   private final ColumnType columnType;
 
-  /** @return a fresh, empty {@link Column} named {@code columnName} of type {@code columnType} */
+  /**
+   * @return a fresh, empty {@link Column} named {@code columnName} of type
+   *         {@code columnType}
+   */
   @Override
   public Column<?> get() {
     return columnType.create(columnName);

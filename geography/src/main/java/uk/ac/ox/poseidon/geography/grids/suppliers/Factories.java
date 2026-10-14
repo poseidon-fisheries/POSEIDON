@@ -36,8 +36,8 @@ public class Factories {
 
   /**
    * @param doubleGrid factory for the grid to sum
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link GridSumSupplier}
-   * over the resolved grid
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link GridSumSupplier} over the resolved grid
    * @see GridSumSupplier
    */
   public static <S extends Scope> GridSumSupplierFactory<S> gridSum(

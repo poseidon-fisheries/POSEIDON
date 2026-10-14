@@ -40,9 +40,10 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
- * An {@link AbstractGrid} placing arbitrary objects of type {@code T} on cells (a MASON
- * {@link SparseGrid2D}, so multiple objects can share a cell). Subclassed by
- * {@link uk.ac.ox.poseidon.geography.ports.AbstractPortGrid} in this module.
+ * An {@link AbstractGrid} placing arbitrary objects of type {@code T} on cells
+ * (a MASON {@link SparseGrid2D}, so multiple objects can share a cell).
+ * Subclassed by {@link uk.ac.ox.poseidon.geography.ports.AbstractPortGrid} in
+ * this module.
  */
 public abstract class ObjectGrid<T>
   extends AbstractGrid<SparseGrid2D>
@@ -97,11 +98,11 @@ public abstract class ObjectGrid<T>
   }
 
   /**
-   * @param bathymetricGrid  the bathymetric grid objects are placed relative to
-   * @param portCoordinates  the ports to place, each at its given coordinate
+   * @param bathymetricGrid the bathymetric grid objects are placed relative to
+   * @param portCoordinates the ports to place, each at its given coordinate
    * @return a fresh field with one entry per {@code portCoordinates} entry
-   * @throws IllegalArgumentException if any port's coordinate isn't on land, or isn't adjacent
-   *                                   to an active water cell
+   * @throws IllegalArgumentException if any port's coordinate isn't on land, or
+   *                                  isn't adjacent to an active water cell
    */
   protected static SparseGrid2D makeField(
     final BathymetricGrid bathymetricGrid,

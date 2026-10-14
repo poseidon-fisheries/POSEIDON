@@ -260,7 +260,10 @@ class TripTest {
     assertThat(trip.getTotalDuration()).isEqualTo(Duration.ofHours(9));
   }
 
-  /** A trip starting in port at {@code now}'s value, its vessel reading the time from {@code now}. */
+  /**
+   * A trip starting in port at {@code now}'s value, its vessel reading the time
+   * from {@code now}.
+   */
   private static Trip newTripStartingAt(
     final AtomicReference<LocalDateTime> now
   ) {

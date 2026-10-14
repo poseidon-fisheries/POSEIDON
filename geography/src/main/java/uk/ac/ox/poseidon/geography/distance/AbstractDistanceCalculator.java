@@ -27,15 +27,19 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link DistanceCalculator} base class holding the {@link ModelGrid} it measures distances
- * over. Subclassed by {@link CoordinateBasedDistanceCalculator} (geographic distance from
- * lon/lat) and {@link GridBasedDistanceCalculator} (distance in grid-cell space).
+ * A {@link DistanceCalculator} base class holding the {@link ModelGrid} it
+ * measures distances over. Subclassed by
+ * {@link CoordinateBasedDistanceCalculator} (geographic distance from lon/lat)
+ * and {@link GridBasedDistanceCalculator} (distance in grid-cell space).
  */
 @Getter
 @RequiredArgsConstructor
 public abstract class AbstractDistanceCalculator implements DistanceCalculator {
 
-  /** The mean radius of the Earth, in kilometres, used by great-circle distance formulas. */
+  /**
+   * The mean radius of the Earth, in kilometres, used by great-circle distance
+   * formulas.
+   */
   public static final double EARTH_RADIUS_IN_KM = 6371.0;
   /** The grid this calculator measures distances over. */
   protected final ModelGrid modelGrid;

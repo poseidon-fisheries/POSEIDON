@@ -25,7 +25,8 @@ package uk.ac.ox.poseidon.core.events;
 import java.util.function.Consumer;
 
 /**
- * An {@link AbstractListener} that delegates received events to a given {@link Consumer}.
+ * An {@link AbstractListener} that delegates received events to a given
+ * {@link Consumer}.
  *
  * @param <E> the type of event received
  */

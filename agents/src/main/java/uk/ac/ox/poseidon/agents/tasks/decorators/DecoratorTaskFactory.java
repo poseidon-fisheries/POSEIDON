@@ -34,11 +34,12 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselTaskFactory} for a gdx-ai {@link Decorator}: builds the decorator node via
- * {@link #newTask} and attaches a single child, resolved against the current
- * {@link VesselScope}. See {@link AlwaysFailTaskFactory}, {@link AlwaysSucceedTaskFactory},
- * {@link InvertTaskFactory}, {@link UntilFailTaskFactory} and {@link UntilSuccessTaskFactory} for
- * the concrete decorator types.
+ * A {@link VesselTaskFactory} for a gdx-ai {@link Decorator}: builds the
+ * decorator node via {@link #newTask} and attaches a single child, resolved
+ * against the current {@link VesselScope}. See {@link AlwaysFailTaskFactory},
+ * {@link AlwaysSucceedTaskFactory}, {@link InvertTaskFactory},
+ * {@link UntilFailTaskFactory} and {@link UntilSuccessTaskFactory} for the
+ * concrete decorator types.
  *
  * @param <T> the concrete {@link Decorator} type built
  */
@@ -62,7 +63,10 @@ public abstract class DecoratorTaskFactory<T extends Decorator<Vessel>> extends 
     this.child = child;
   }
 
-  /** @return a decorator node built by {@link #newTask} with {@link #child} attached */
+  /**
+   * @return a decorator node built by {@link #newTask} with {@link #child}
+   *         attached
+   */
   @Override
   protected T newInstance(final VesselScope scope) {
     final T task = super.newInstance(scope);

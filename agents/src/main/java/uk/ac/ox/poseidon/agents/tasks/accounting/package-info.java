@@ -21,8 +21,10 @@
  */
 
 /**
- * Tasks that settle a trip's finances: {@link uk.ac.ox.poseidon.agents.tasks.accounting.PayTripCost}
- * deducts a cost from the current trip's account. See
- * {@link uk.ac.ox.poseidon.agents.tasks.accounting.Factories} for the entry points.
+ * Tasks that settle a trip's finances:
+ * {@link uk.ac.ox.poseidon.agents.tasks.accounting.PayTripCost} deducts a cost
+ * from the current trip's account. See
+ * {@link uk.ac.ox.poseidon.agents.tasks.accounting.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.agents.tasks.accounting;

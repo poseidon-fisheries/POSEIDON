@@ -22,7 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
-/** A {@link FuelTank} with unlimited capacity; adding or consuming fuel is a no-op. */
+/**
+ * A {@link FuelTank} with unlimited capacity; adding or consuming fuel is a
+ * no-op.
+ */
 public class InfiniteFuelTank implements FuelTank {
 
   /** @return {@link Double#POSITIVE_INFINITY} */

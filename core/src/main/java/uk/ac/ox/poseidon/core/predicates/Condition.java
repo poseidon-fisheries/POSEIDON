@@ -27,8 +27,9 @@ import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} that extracts a value from its input via a {@link Function}, then tests
- * that extracted value against another predicate. Built via
+ * A {@link Predicate} that extracts a value from its input via a
+ * {@link Function}, then tests that extracted value against another predicate.
+ * Built via
  * {@link Factories#condition(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
  * in this package.
  *

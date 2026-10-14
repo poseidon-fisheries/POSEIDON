@@ -35,9 +35,10 @@ class BiomassTest {
   /**
    * Complete tests for the `Biomass` class.
    * <p>
-   * The Biomass class provides methods to perform arithmetic operations (add, subtract, multiply,
-   * divide) on biomass quantities, represent biomass as a Quantity, check if the biomass is
-   * empty, and create new instances of Biomass in kilograms.
+   * The Biomass class provides methods to perform arithmetic operations (add,
+   * subtract, multiply, divide) on biomass quantities, represent biomass as a
+   * Quantity, check if the biomass is empty, and create new instances of
+   * Biomass in kilograms.
    */
 
   @Test

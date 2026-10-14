@@ -33,9 +33,10 @@ import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
 /**
- * An {@link ExtendedTripTask} that travels straight (as the crow flies) from the vessel's
- * current cell to its trip's destination, in one step, taking the direct distance's travel
- * duration; broadcasts a {@link TravelEvent} on arrival.
+ * An {@link ExtendedTripTask} that travels straight (as the crow flies) from
+ * the vessel's current cell to its trip's destination, in one step, taking the
+ * direct distance's travel duration; broadcasts a {@link TravelEvent} on
+ * arrival.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class TravelDirectly extends ExtendedTripTask {
@@ -45,7 +46,10 @@ public class TravelDirectly extends ExtendedTripTask {
   private Int2D destination;
   private double distanceInKm;
 
-  /** Resolves the origin, the trip's destination, and the direct distance between them. */
+  /**
+   * Resolves the origin, the trip's destination, and the direct distance
+   * between them.
+   */
   @Override
   public void start() {
     super.start();
@@ -54,7 +58,10 @@ public class TravelDirectly extends ExtendedTripTask {
     distanceInKm = distanceCalculator.distanceInKm(origin, destination);
   }
 
-  /** @return the travel duration for {@link #distanceInKm} at the vessel's cruising speed */
+  /**
+   * @return the travel duration for {@link #distanceInKm} at the vessel's
+   *         cruising speed
+   */
   @Override
   protected Duration getDuration() {
     return travelDuration(
@@ -64,8 +71,8 @@ public class TravelDirectly extends ExtendedTripTask {
   }
 
   /**
-   * Consumes the fuel for {@link #distanceInKm}, moves the vessel to the destination, and
-   * broadcasts a {@link TravelEvent}.
+   * Consumes the fuel for {@link #distanceInKm}, moves the vessel to the
+   * destination, and broadcasts a {@link TravelEvent}.
    *
    * @return always {@code SUCCEEDED}
    */

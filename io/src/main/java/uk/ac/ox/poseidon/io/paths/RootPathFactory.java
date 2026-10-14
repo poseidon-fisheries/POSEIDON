@@ -41,7 +41,10 @@ public class RootPathFactory
   implements PathFactory<Scope>
 {
 
-  /** @param path the literal path, with any {@code "\\"} separators normalized to {@code "/"} */
+  /**
+   * @param path the literal path, with any {@code "\\"} separators normalized
+   *             to {@code "/"}
+   */
   public RootPathFactory(final String path) {
     this.path = path.replace("\\", "/");
   }

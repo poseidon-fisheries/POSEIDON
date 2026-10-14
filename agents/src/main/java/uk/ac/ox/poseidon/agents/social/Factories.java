@@ -37,11 +37,11 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param candidates gives the vessels ties can be made with; pass the base fleet, not a loader
-   *                   whose extra factories depend on this network, which would be a factory
-   *                   cycle
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link SocialNetwork}
-   * with no ties
+   * @param candidates gives the vessels ties can be made with; pass the base
+   *                   fleet, not a loader whose extra factories depend on this
+   *                   network, which would be a factory cycle
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link SocialNetwork} with no ties
    * @see SocialNetwork
    */
   public static SocialNetworkFactory socialNetwork(
@@ -52,13 +52,15 @@ public class Factories {
 
   /**
    * @param network           the network whose ties the dynamics add and remove
-   * @param groupingKey       gives a vessel's grouping key: vessels are eligible for each other
-   *                          when both are active and their keys are equal
-   * @param maximumCliqueSize the largest clique a vessel joins, itself included; 1 means no
-   *                          vessel ever has partners
-   * @return a {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory} for a
-   * {@link CliqueDynamics} registered with the simulation's event manager, so that it hears
-   * every vessel's trip starts
+   * @param groupingKey       gives a vessel's grouping key: vessels are
+   *                          eligible for each other when both are active and
+   *                          their keys are equal
+   * @param maximumCliqueSize the largest clique a vessel joins, itself
+   *                          included; 1 means no vessel ever has partners
+   * @return a
+   *         {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory}
+   *         for a {@link CliqueDynamics} registered with the simulation's event
+   *         manager, so that it hears every vessel's trip starts
    * @see CliqueDynamics
    */
   public static CliqueDynamicsFactory cliqueDynamics(
@@ -74,9 +76,10 @@ public class Factories {
 
   /**
    * @param network the network whose ties decide who hears each fishing event
-   * @return a {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory} for a
-   * {@link FishingEventSharer} registered with the simulation's event manager, so that it hears
-   * every vessel's fishing events
+   * @return a
+   *         {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory}
+   *         for a {@link FishingEventSharer} registered with the simulation's
+   *         event manager, so that it hears every vessel's fishing events
    * @see FishingEventSharer
    */
   public static FishingEventSharerFactory fishingEventSharer(
@@ -86,10 +89,12 @@ public class Factories {
   }
 
   /**
-   * @param listener           the factory giving the vessel's shared fishing event listener
+   * @param listener           the factory giving the vessel's shared fishing
+   *                           event listener
    * @param fishingEventSharer the sharer to register the listener with
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} that registers the
-   * vessel's listener with the sharer and gives it; add it to the vessel's extra factories
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} that
+   *         registers the vessel's listener with the sharer and gives it; add
+   *         it to the vessel's extra factories
    * @see SharedFishingEventListenerFactory
    */
   public static <L extends Listener<? super FishingEvent>> SharedFishingEventListenerFactory<L> sharedFishingEventListener(

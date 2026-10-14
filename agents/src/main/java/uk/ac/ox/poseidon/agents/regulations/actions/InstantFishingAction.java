@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.regulations.ExtendedAction;
 
 /**
- * A {@link FishingAction} with zero duration: starts and ends at the same instant, at a given
- * place, with a given {@link Gear}.
+ * A {@link FishingAction} with zero duration: starts and ends at the same
+ * instant, at a given place, with a given {@link Gear}.
  */
 @Getter
 public class InstantFishingAction

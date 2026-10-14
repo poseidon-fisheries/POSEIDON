@@ -29,18 +29,20 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /**
- * A {@link DispositionProcess} that discards (alive) whatever retained catch doesn't fit in the
- * remaining hold capacity, scaling every species down proportionally rather than discarding
- * whole species.
+ * A {@link DispositionProcess} that discards (alive) whatever retained catch
+ * doesn't fit in the remaining hold capacity, scaling every species down
+ * proportionally rather than discarding whole species.
  */
 @NoArgsConstructor(access = PACKAGE)
 public class ProportionallyLimitingBiomassToHold implements DispositionProcess {
 
   /**
-   * @return {@code currentDisposition} unchanged if its retained catch already fits in
-   * {@code availableCapacityInKg}; otherwise every species' retained biomass scaled down by
-   * the same factor to fit, with the rest moved to discarded-alive
-   * @throws IllegalArgumentException if {@code availableCapacityInKg} is negative or NaN
+   * @return {@code currentDisposition} unchanged if its retained catch already
+   *         fits in {@code availableCapacityInKg}; otherwise every species'
+   *         retained biomass scaled down by the same factor to fit, with the
+   *         rest moved to discarded-alive
+   * @throws IllegalArgumentException if {@code availableCapacityInKg} is
+   *                                  negative or NaN
    */
   @Override
   public Disposition partition(

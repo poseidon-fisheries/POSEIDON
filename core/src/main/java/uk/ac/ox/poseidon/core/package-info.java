@@ -21,16 +21,16 @@
  */
 
 /**
- * The framework's foundation: {@link uk.ac.ox.poseidon.core.Factory}, the declarative
- * configuration-to-runtime-object producer at the heart of the Factory/Scenario pattern (see
- * {@code docs/agents/architecture.md}), its {@link uk.ac.ox.poseidon.core.AbstractFactory} base
- * and {@code *ScopeFactory} caching variants
- * ({@link uk.ac.ox.poseidon.core.GlobalScopeFactory},
+ * The framework's foundation: {@link uk.ac.ox.poseidon.core.Factory}, the
+ * declarative configuration-to-runtime-object producer at the heart of the
+ * Factory/Scenario pattern (see {@code docs/agents/architecture.md}), its
+ * {@link uk.ac.ox.poseidon.core.AbstractFactory} base and {@code *ScopeFactory}
+ * caching variants ({@link uk.ac.ox.poseidon.core.GlobalScopeFactory},
  * {@link uk.ac.ox.poseidon.core.SimulationScopeFactory},
  * {@link uk.ac.ox.poseidon.core.RelativeScopeFactory}), and
- * {@link uk.ac.ox.poseidon.core.Scenario}/{@link uk.ac.ox.poseidon.core.Simulation}, the
- * declarative description of a run and its resolved, runnable form. See
- * {@link uk.ac.ox.poseidon.core.MasonUtils} for MASON-specific helpers used throughout the
- * framework.
+ * {@link uk.ac.ox.poseidon.core.Scenario}/{@link uk.ac.ox.poseidon.core.Simulation},
+ * the declarative description of a run and its resolved, runnable form. See
+ * {@link uk.ac.ox.poseidon.core.MasonUtils} for MASON-specific helpers used
+ * throughout the framework.
  */
 package uk.ac.ox.poseidon.core;

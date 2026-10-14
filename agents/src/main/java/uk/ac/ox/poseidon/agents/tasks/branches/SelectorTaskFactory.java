@@ -34,16 +34,19 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link BranchTaskFactory} for a gdx-ai {@link Selector}: runs its children in order,
- * succeeding (and stopping) as soon as one succeeds, failing once all of them have. Built via
- * {@link Factories#selectorTask}.
+ * A {@link BranchTaskFactory} for a gdx-ai {@link Selector}: runs its children
+ * in order, succeeding (and stopping) as soon as one succeeds, failing once all
+ * of them have. Built via {@link Factories#selectorTask}.
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SelectorTaskFactory extends BranchTaskFactory<Selector<Vessel>> {
 
-  /** @param children factories for the selector's child tasks, resolved and attached in order */
+  /**
+   * @param children factories for the selector's child tasks, resolved and
+   *                 attached in order
+   */
   public SelectorTaskFactory(
     final List<
       ? extends Factory<? super VesselScope, ? extends Task<Vessel>>
@@ -54,7 +57,8 @@ public class SelectorTaskFactory extends BranchTaskFactory<Selector<Vessel>> {
 
   /**
    * @param guard    optional task guarding whether this selector runs at all
-   * @param children factories for the selector's child tasks, resolved and attached in order
+   * @param children factories for the selector's child tasks, resolved and
+   *                 attached in order
    */
   public SelectorTaskFactory(
     final VesselScopeFactory<? extends Task<Vessel>> guard,

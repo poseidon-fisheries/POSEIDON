@@ -47,8 +47,8 @@ public class IndependentBiomassGrower implements Steppable {
   private final BiomassGrowthRule biomassGrowthRule;
 
   /**
-   * Applies {@link #biomassGrowthRule} to each habitable cell independently, using that cell's
-   * own biomass and carrying capacity.
+   * Applies {@link #biomassGrowthRule} to each habitable cell independently,
+   * using that cell's own biomass and carrying capacity.
    */
   @Override
   public void step(final SimState simState) {

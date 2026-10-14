@@ -21,8 +21,9 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.geography.allocators.Allocator}s: functions that assign a weight to a
- * grid cell, e.g. for weighted random placement. See
- * {@link uk.ac.ox.poseidon.geography.allocators.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.geography.allocators.Allocator}s: functions that
+ * assign a weight to a grid cell, e.g. for weighted random placement. See
+ * {@link uk.ac.ox.poseidon.geography.allocators.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.geography.allocators;

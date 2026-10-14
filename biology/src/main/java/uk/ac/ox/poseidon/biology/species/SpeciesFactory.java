@@ -32,10 +32,11 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link Species}. Note the field order here
- * ({@code code}, {@code name}, {@code lifeStage}) doesn't match {@link Species}'s own constructor
- * order ({@code code}, {@code lifeStage}, {@code name}) — {@link #newInstance} maps between them
- * by name, but take care when constructing either directly. Built via
+ * A {@link GlobalScopeFactory} counterpart of {@link Species}. Note the field
+ * order here ({@code code}, {@code name}, {@code lifeStage}) doesn't match
+ * {@link Species}'s own constructor order ({@code code}, {@code lifeStage},
+ * {@code name}) — {@link #newInstance} maps between them by name, but take care
+ * when constructing either directly. Built via
  * {@link Factories#species()}/{@link Factories#species(String)}/
  * {@link Factories#species(String, String, String)}.
  */
@@ -51,7 +52,10 @@ public class SpeciesFactory extends GlobalScopeFactory<Species> {
   private String name;
   private String lifeStage;
 
-  /** @param code the species' code; {@code name} defaults to {@code "Species <code>"} */
+  /**
+   * @param code the species' code; {@code name} defaults to
+   *             {@code "Species <code>"}
+   */
   public SpeciesFactory(final String code) {
     this(code, PREFIX + " " + code, null);
   }

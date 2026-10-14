@@ -22,8 +22,8 @@
 
 /**
  * {@link uk.ac.ox.poseidon.io.paths.PathFactory}s that resolve to a filesystem
- * {@link java.nio.file.Path}: fixed absolute paths, paths derived relative to another resolved
- * path, and per-simulation subdirectories. See {@link uk.ac.ox.poseidon.io.paths.Factories} for
- * the entry points.
+ * {@link java.nio.file.Path}: fixed absolute paths, paths derived relative to
+ * another resolved path, and per-simulation subdirectories. See
+ * {@link uk.ac.ox.poseidon.io.paths.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.io.paths;

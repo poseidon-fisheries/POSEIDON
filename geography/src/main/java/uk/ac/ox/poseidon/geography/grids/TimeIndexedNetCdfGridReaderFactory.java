@@ -33,11 +33,12 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * Resolves {@code ncFilePath} against scope once (cheap — no file I/O),
- * and returns a {@link Supplier} whose {@code get()} opens a fresh, independent
- * {@link TimeIndexedNetCdfGridReader} on every call. Memoizing the supplier (as every
- * {@code Factory} does) is safe because it holds no open resource itself; memoizing an open
- * reader instead would risk a second caller receiving an already-closed file handle.
+ * Resolves {@code ncFilePath} against scope once (cheap — no file I/O), and
+ * returns a {@link Supplier} whose {@code get()} opens a fresh, independent
+ * {@link TimeIndexedNetCdfGridReader} on every call. Memoizing the supplier (as
+ * every {@code Factory} does) is safe because it holds no open resource itself;
+ * memoizing an open reader instead would risk a second caller receiving an
+ * already-closed file handle.
  */
 @Data
 @NoArgsConstructor

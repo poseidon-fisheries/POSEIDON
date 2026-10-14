@@ -28,12 +28,15 @@ import lombok.EqualsAndHashCode;
 import uk.ac.ox.poseidon.core.Simulation;
 
 /**
- * A {@link Scope} tied to a single {@link Simulation} run, used by factories whose output must
- * not be shared across simulations (see {@code SimulationScopeFactory}). Holds the simulation via
- * a {@link WeakReference} so a scope kept alive elsewhere doesn't itself keep a finished
- * simulation from being garbage-collected. In tests, keep the simulation in a field: one that only
- * the scope references, such as {@code new SimulationScope(mock(Simulation.class))} or a local
- * variable not used afterwards, can be collected mid-test, and the test then fails at random.
+ * A {@link Scope} tied to a single {@link Simulation} run, used by factories
+ * whose output must not be shared across simulations (see
+ * {@code SimulationScopeFactory}). Holds the simulation via a
+ * {@link WeakReference} so a scope kept alive elsewhere doesn't itself keep a
+ * finished simulation from being garbage-collected. In tests, keep the
+ * simulation in a field: one that only the scope references, such as
+ * {@code new SimulationScope(mock(Simulation.class))} or a local variable not
+ * used afterwards, can be collected mid-test, and the test then fails at
+ * random.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -42,21 +45,24 @@ public class SimulationScope extends Scope {
   private final WeakReference<Simulation> simulation;
 
   /**
-   * Copy constructor: shares the same underlying simulation reference as {@code simulationScope}.
+   * Copy constructor: shares the same underlying simulation reference as
+   * {@code simulationScope}.
    */
   public SimulationScope(final SimulationScope simulationScope) {
     this.simulation = simulationScope.simulation;
   }
 
   /**
-   * @param simulation the simulation this scope is tied to, held via a {@link WeakReference}
+   * @param simulation the simulation this scope is tied to, held via a
+   *                   {@link WeakReference}
    */
   public SimulationScope(final Simulation simulation) {
     this.simulation = new WeakReference<>(simulation);
   }
 
   /**
-   * @return the scoped simulation, or {@code null} if it has already been garbage-collected.
+   * @return the scoped simulation, or {@code null} if it has already been
+   *         garbage-collected.
    */
   public Simulation getSimulation() {
     return simulation.get();

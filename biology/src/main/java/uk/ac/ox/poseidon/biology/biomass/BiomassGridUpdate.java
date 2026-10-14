@@ -30,8 +30,9 @@ import sim.engine.Steppable;
 import sim.util.Int2D;
 
 /**
- * Fully replaces the contents of each species' live {@link BiomassGrid} in {@code target} with
- * the corresponding values from {@code snapshot}, cell by cell over the target's active cells.
+ * Fully replaces the contents of each species' live {@link BiomassGrid} in
+ * {@code target} with the corresponding values from {@code snapshot}, cell by
+ * cell over the target's active cells.
  */
 @Value
 public class BiomassGridUpdate implements Steppable {

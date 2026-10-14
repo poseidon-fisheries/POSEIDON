@@ -29,9 +29,10 @@ import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /**
- * A {@link Hold} base that sorts uncategorised content via {@link #catchCategoriser} and keeps
- * the running content in {@link #content}. Subclasses supply {@link #getTotalCapacityInKg()} and
- * may override {@link #addContent(CategorisedCatch)} to enforce it (this base does not).
+ * A {@link Hold} base that sorts uncategorised content via
+ * {@link #catchCategoriser} and keeps the running content in {@link #content}.
+ * Subclasses supply {@link #getTotalCapacityInKg()} and may override
+ * {@link #addContent(CategorisedCatch)} to enforce it (this base does not).
  */
 @Getter
 @RequiredArgsConstructor
@@ -42,7 +43,10 @@ public abstract class BiomassHold implements Hold {
   /** The hold's current content. */
   protected CategorisedCatch content = CategorisedCatch.empty();
 
-  /** Sorts {@code uncategorisedCatch} via {@link #catchCategoriser}, then adds it. */
+  /**
+   * Sorts {@code uncategorisedCatch} via {@link #catchCategoriser}, then adds
+   * it.
+   */
   @Override
   public void addContent(final Bucket uncategorisedCatch) {
     addContent(catchCategoriser.apply(uncategorisedCatch));

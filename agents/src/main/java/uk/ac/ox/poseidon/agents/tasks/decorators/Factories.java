@@ -35,7 +35,7 @@ public class Factories {
   /**
    * @param child the child task to decorate
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link com.badlogic.gdx.ai.btree.decorator.UntilFail}
+   *         {@link com.badlogic.gdx.ai.btree.decorator.UntilFail}
    * @see UntilFailTaskFactory
    */
   public static UntilFailTaskFactory untilFail(
@@ -47,7 +47,7 @@ public class Factories {
   /**
    * @param child the child task to decorate
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link com.badlogic.gdx.ai.btree.decorator.UntilSuccess}
+   *         {@link com.badlogic.gdx.ai.btree.decorator.UntilSuccess}
    * @see UntilSuccessTaskFactory
    */
   public static UntilSuccessTaskFactory untilSuccess(
@@ -59,7 +59,7 @@ public class Factories {
   /**
    * @param child the child task to decorate
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link com.badlogic.gdx.ai.btree.decorator.Invert}
+   *         {@link com.badlogic.gdx.ai.btree.decorator.Invert}
    * @see InvertTaskFactory
    */
   public static InvertTaskFactory invert(
@@ -71,7 +71,7 @@ public class Factories {
   /**
    * @param child the child task to decorate
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link com.badlogic.gdx.ai.btree.decorator.AlwaysSucceed}
+   *         {@link com.badlogic.gdx.ai.btree.decorator.AlwaysSucceed}
    * @see AlwaysSucceedTaskFactory
    */
   public static AlwaysSucceedTaskFactory alwaysSucceed(
@@ -83,7 +83,7 @@ public class Factories {
   /**
    * @param child the child task to decorate
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link com.badlogic.gdx.ai.btree.decorator.AlwaysFail}
+   *         {@link com.badlogic.gdx.ai.btree.decorator.AlwaysFail}
    * @see AlwaysFailTaskFactory
    */
   public static AlwaysFailTaskFactory alwaysFail(

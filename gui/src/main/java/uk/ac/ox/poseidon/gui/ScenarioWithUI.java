@@ -28,8 +28,8 @@ import sim.display.Controller;
 import uk.ac.ox.poseidon.core.Scenario;
 
 /**
- * A GUI-runnable {@link Scenario}: wraps it, and a fixed set of displays, into a
- * {@link SimulationWithUI} and hands back its MASON {@link Controller}.
+ * A GUI-runnable {@link Scenario}: wraps it, and a fixed set of displays, into
+ * a {@link SimulationWithUI} and hands back its MASON {@link Controller}.
  */
 @RequiredArgsConstructor
 public class ScenarioWithUI {
@@ -38,7 +38,8 @@ public class ScenarioWithUI {
   private final List<DisplayWrapper<?>> displays;
 
   /**
-   * @return the {@link Controller} of a new {@link SimulationWithUI} wrapping {@link #scenario}
+   * @return the {@link Controller} of a new {@link SimulationWithUI} wrapping
+   *         {@link #scenario}
    */
   public Controller createController() {
     return new SimulationWithUI(

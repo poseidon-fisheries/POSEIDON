@@ -27,8 +27,9 @@ import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 
 /**
- * A {@link BiomassHold} with a fixed capacity, plus a small tolerance overage allowed before
- * {@link #addContent(CategorisedCatch)} rejects content outright.
+ * A {@link BiomassHold} with a fixed capacity, plus a small tolerance overage
+ * allowed before {@link #addContent(CategorisedCatch)} rejects content
+ * outright.
  */
 @Getter
 public class StandardBiomassHold extends BiomassHold {
@@ -39,8 +40,10 @@ public class StandardBiomassHold extends BiomassHold {
   /**
    * @param catchCategoriser  sorts uncategorised content added to the hold
    * @param totalCapacityInKg the hold's total capacity, in kilograms
-   * @param toleranceInKg     how far over {@code totalCapacityInKg} the hold may go before
-   *                          {@link #addContent(CategorisedCatch)} rejects further content
+   * @param toleranceInKg     how far over {@code totalCapacityInKg} the hold
+   *                          may go before
+   *                          {@link #addContent(CategorisedCatch)} rejects
+   *                          further content
    */
   public StandardBiomassHold(
     final CatchCategoriser catchCategoriser,
@@ -53,8 +56,9 @@ public class StandardBiomassHold extends BiomassHold {
   }
 
   /**
-   * @throws IllegalStateException if adding {@code categorisedCatch} would exceed
-   *                                {@link #totalCapacityInKg} plus {@link #toleranceInKg}
+   * @throws IllegalStateException if adding {@code categorisedCatch} would
+   *                               exceed {@link #totalCapacityInKg} plus
+   *                               {@link #toleranceInKg}
    */
   @Override
   public void addContent(final CategorisedCatch categorisedCatch) {

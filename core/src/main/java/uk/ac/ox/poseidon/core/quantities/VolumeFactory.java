@@ -27,8 +27,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link Volume} quantities, built via
- * {@link Factories Factories.volumeOf(...)}.
+ * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link Volume}
+ * quantities, built via {@link Factories Factories.volumeOf(...)}.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -41,7 +41,8 @@ public class VolumeFactory extends AbstractQuantityFactory<Volume> {
 
   /**
    * @param value      the numeric volume value
-   * @param unitString the unit, in the format produced by {@code Unit.toString()}
+   * @param unitString the unit, in the format produced by
+   *                   {@code Unit.toString()}
    */
   public VolumeFactory(final double value, final String unitString) {
     super(Volume.class, value, unitString);

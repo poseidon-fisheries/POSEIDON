@@ -33,10 +33,11 @@ import uk.ac.ox.poseidon.core.events.AbstractListener;
 import uk.ac.ox.poseidon.core.events.Listener;
 
 /**
- * Shares every fishing event it hears with the recipients of the vessel that made it: for each
- * recipient of the sender in the {@link SocialNetwork}, it calls that recipient's shared fishing
- * event listener, right away, with the event. A recipient with no shared fishing event listener
- * registered is skipped. The shared fishing event listeners are only called from here, not
+ * Shares every fishing event it hears with the recipients of the vessel that
+ * made it: for each recipient of the sender in the {@link SocialNetwork}, it
+ * calls that recipient's shared fishing event listener, right away, with the
+ * event. A recipient with no shared fishing event listener registered is
+ * skipped. The shared fishing event listeners are only called from here, not
  * registered with any event manager.
  */
 public class FishingEventSharer extends AbstractListener<FishingEvent> {
@@ -53,9 +54,12 @@ public class FishingEventSharer extends AbstractListener<FishingEvent> {
   }
 
   /**
-   * @param vessel                     the vessel the listener hears shared fishing events for
-   * @param sharedFishingEventListener hears the fishing events shared with {@code vessel}
-   * @throws IllegalStateException if {@code vessel} already has a shared fishing event listener
+   * @param vessel                     the vessel the listener hears shared
+   *                                   fishing events for
+   * @param sharedFishingEventListener hears the fishing events shared with
+   *                                   {@code vessel}
+   * @throws IllegalStateException if {@code vessel} already has a shared
+   *                               fishing event listener
    */
   public void registerSharedFishingEventListener(
     final Vessel vessel,

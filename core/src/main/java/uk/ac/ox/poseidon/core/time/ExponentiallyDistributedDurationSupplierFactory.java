@@ -32,8 +32,9 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link ExponentiallyDistributedDuration}, built
- * via {@link Factories#exponentiallyDistributedDuration(Factory)}.
+ * A {@link SimulationScopeFactory} counterpart of
+ * {@link ExponentiallyDistributedDuration}, built via
+ * {@link Factories#exponentiallyDistributedDuration(Factory)}.
  */
 @Data
 @NoArgsConstructor

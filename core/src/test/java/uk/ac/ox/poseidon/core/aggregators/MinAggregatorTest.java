@@ -31,9 +31,9 @@ import org.junit.jupiter.api.Test;
 class MinAggregatorTest {
 
   /**
-   * The Min class provides a method to find the minimum value from a given {@link DoubleStream}.
-   * This test class validates the functionality of the {@link MinAggregator#apply(DoubleStream)}
-   * method.
+   * The Min class provides a method to find the minimum value from a given
+   * {@link DoubleStream}. This test class validates the functionality of the
+   * {@link MinAggregator#apply(DoubleStream)} method.
    */
 
   private final MinAggregator minAggregatorAggregator = new MinAggregator();

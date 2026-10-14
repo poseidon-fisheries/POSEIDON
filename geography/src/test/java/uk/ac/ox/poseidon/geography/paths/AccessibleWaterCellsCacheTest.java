@@ -113,9 +113,9 @@ class AccessibleWaterCellsCacheTest {
   }
 
   /**
-   * A second simulation asking while the first is still computing waits for that result: the
-   * computation runs once, and the second pathfinder (which may not be used by two threads at
-   * once) is never asked.
+   * A second simulation asking while the first is still computing waits for
+   * that result: the computation runs once, and the second pathfinder (which
+   * may not be used by two threads at once) is never asked.
    */
   @Test
   @Timeout(value = 10, threadMode = SEPARATE_THREAD)

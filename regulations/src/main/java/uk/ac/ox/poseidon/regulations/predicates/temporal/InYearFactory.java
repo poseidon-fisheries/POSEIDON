@@ -30,7 +30,8 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} for an {@link InYear}. Built via {@link Factories#inYear}.
+ * A {@link GlobalScopeFactory} for an {@link InYear}. Built via
+ * {@link Factories#inYear}.
  */
 @Data
 @NoArgsConstructor

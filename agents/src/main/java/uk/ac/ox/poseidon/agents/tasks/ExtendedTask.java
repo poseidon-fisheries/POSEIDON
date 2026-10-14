@@ -29,9 +29,10 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.Agent;
 
 /**
- * An {@link AgentTask} that runs over more than one step: on first execution it sets the agent's
- * task duration to {@link #getDuration()} and reports {@code RUNNING}; once that duration has
- * elapsed and the task is executed again, it reports the outcome of {@link #complete()}.
+ * An {@link AgentTask} that runs over more than one step: on first execution it
+ * sets the agent's task duration to {@link #getDuration()} and reports
+ * {@code RUNNING}; once that duration has elapsed and the task is executed
+ * again, it reports the outcome of {@link #complete()}.
  *
  * @param <G> the type of agent this task runs against
  */
@@ -39,9 +40,9 @@ import uk.ac.ox.poseidon.agents.Agent;
 public abstract class ExtendedTask<G extends Agent> extends AgentTask<G> {
 
   /**
-   * @return {@link #complete()}'s outcome if already {@code RUNNING} (the task's duration has
-   * elapsed), otherwise sets the agent's task duration to {@link #getDuration()} and returns
-   * {@code RUNNING}
+   * @return {@link #complete()}'s outcome if already {@code RUNNING} (the
+   *         task's duration has elapsed), otherwise sets the agent's task
+   *         duration to {@link #getDuration()} and returns {@code RUNNING}
    */
   @Override
   public Status execute() {
@@ -49,7 +50,9 @@ public abstract class ExtendedTask<G extends Agent> extends AgentTask<G> {
     else return runFor(getDuration());
   }
 
-  /** @return how long this task should run for, computed once, when it starts */
+  /**
+   * @return how long this task should run for, computed once, when it starts
+   */
   protected abstract Duration getDuration();
 
   /** @return this task's outcome once {@link #getDuration()} has elapsed */

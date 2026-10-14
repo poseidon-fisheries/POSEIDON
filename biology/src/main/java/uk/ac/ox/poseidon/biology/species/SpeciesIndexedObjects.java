@@ -26,8 +26,9 @@ import java.util.function.*;
 import uk.ac.ox.poseidon.core.utils.ObjIntToObjFunction;
 
 /**
- * A {@link SpeciesIndexed} array of arbitrary objects of type {@code T}, one per species.
- * Implemented by {@code FisheableBiomassGrids} in {@code biology.biomass}.
+ * A {@link SpeciesIndexed} array of arbitrary objects of type {@code T}, one
+ * per species. Implemented by {@code FisheableBiomassGrids} in
+ * {@code biology.biomass}.
  */
 public interface SpeciesIndexedObjects<
   T,
@@ -41,8 +42,8 @@ public interface SpeciesIndexedObjects<
   /**
    * Creates a new instance with the same {@link SpeciesIndex} as this object.
    * <p>
-   * Intended for internal use by default methods; callers should prefer implementation-specific
-   * factories.
+   * Intended for internal use by default methods; callers should prefer
+   * implementation-specific factories.
    *
    * @param values array aligned with {@link #getSpeciesIndex()}
    * @return a new instance backed by the provided values

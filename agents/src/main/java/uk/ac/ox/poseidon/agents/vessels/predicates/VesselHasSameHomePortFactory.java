@@ -26,8 +26,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link VesselHasSameHomePort}, built via
- * {@link Factories#vesselHasSameHomePort()}.
+ * A {@link VesselScopeFactory} counterpart of {@link VesselHasSameHomePort},
+ * built via {@link Factories#vesselHasSameHomePort()}.
  */
 public class VesselHasSameHomePortFactory
   extends VesselScopeFactory<VesselHasSameHomePort>

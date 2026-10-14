@@ -41,9 +41,10 @@ import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 
 /**
- * A scheduled {@link Steppable} that, when run, activates, deactivates or modifies one vessel in
- * a {@link Fleet}: creating it on first {@link Type#ACTIVATION}, updating its home port, name,
- * tags, behaviour, hold, gear and engine, and flipping its registered-active status.
+ * A scheduled {@link Steppable} that, when run, activates, deactivates or
+ * modifies one vessel in a {@link Fleet}: creating it on first
+ * {@link Type#ACTIVATION}, updating its home port, name, tags, behaviour, hold,
+ * gear and engine, and flipping its registered-active status.
  */
 @Value
 public class FleetEvent implements Steppable {
@@ -60,11 +61,16 @@ public class FleetEvent implements Steppable {
   @NonNull
   Fleet fleet;
 
-  /** Whether this event activates, deactivates, or merely modifies the vessel. */
+  /**
+   * Whether this event activates, deactivates, or merely modifies the vessel.
+   */
   @NonNull
   Type eventType;
 
-  /** The affected vessel's id; created on first {@link Type#ACTIVATION} if not already registered. */
+  /**
+   * The affected vessel's id; created on first {@link Type#ACTIVATION} if not
+   * already registered.
+   */
   @NonNull
   String vesselId;
 
@@ -101,13 +107,15 @@ public class FleetEvent implements Steppable {
   List<Function<Vessel, ?>> extraFactoryFunctions;
 
   /**
-   * Applies this event to the vessel named {@link #vesselId} in {@link #fleet}: resolves (or
-   * creates) it, updates its home port/name/tags/behaviour/hold/gear/engine, and flips its
-   * registered-active status per {@link #eventType}.
+   * Applies this event to the vessel named {@link #vesselId} in {@link #fleet}:
+   * resolves (or creates) it, updates its home
+   * port/name/tags/behaviour/hold/gear/engine, and flips its registered-active
+   * status per {@link #eventType}.
    *
    * @throws IllegalStateException if the vessel doesn't exist and this isn't an
-   *                                {@link Type#ACTIVATION} event, or if a retroactive event
-   *                                arrives while the vessel's behaviour is running
+   *                               {@link Type#ACTIVATION} event, or if a
+   *                               retroactive event arrives while the vessel's
+   *                               behaviour is running
    */
   @Override
   public void step(final SimState simState) {

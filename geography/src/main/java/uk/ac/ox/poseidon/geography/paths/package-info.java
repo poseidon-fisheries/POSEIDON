@@ -21,8 +21,9 @@
  */
 
 /**
- * Pathfinding over a {@link uk.ac.ox.poseidon.geography.grids.ModelGrid}: a fast heuristic
- * (straight-line) search falling back to a complete (A*) search, both cached. See
- * {@link uk.ac.ox.poseidon.geography.paths.Factories} for the entry points.
+ * Pathfinding over a {@link uk.ac.ox.poseidon.geography.grids.ModelGrid}: a
+ * fast heuristic (straight-line) search falling back to a complete (A*) search,
+ * both cached. See {@link uk.ac.ox.poseidon.geography.paths.Factories} for the
+ * entry points.
  */
 package uk.ac.ox.poseidon.geography.paths;

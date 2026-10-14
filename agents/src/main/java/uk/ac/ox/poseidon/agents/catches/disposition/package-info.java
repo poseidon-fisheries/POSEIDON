@@ -21,11 +21,14 @@
  */
 
 /**
- * What happens to a {@link uk.ac.ox.poseidon.agents.catches.CategorisedCatch} once it's caught:
- * one or more {@link uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess} steps sort
- * it into retained/discarded-alive/discarded-dead
- * ({@link uk.ac.ox.poseidon.agents.catches.disposition.Disposition}), chained via
- * {@link uk.ac.ox.poseidon.agents.catches.disposition.CompositeDispositionProcess}. See
- * {@link uk.ac.ox.poseidon.agents.catches.disposition.Factories} for the entry points.
+ * What happens to a {@link uk.ac.ox.poseidon.agents.catches.CategorisedCatch}
+ * once it's caught: one or more
+ * {@link uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess} steps
+ * sort it into retained/discarded-alive/discarded-dead
+ * ({@link uk.ac.ox.poseidon.agents.catches.disposition.Disposition}), chained
+ * via
+ * {@link uk.ac.ox.poseidon.agents.catches.disposition.CompositeDispositionProcess}.
+ * See {@link uk.ac.ox.poseidon.agents.catches.disposition.Factories} for the
+ * entry points.
  */
 package uk.ac.ox.poseidon.agents.catches.disposition;

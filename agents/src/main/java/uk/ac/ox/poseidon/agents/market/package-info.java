@@ -21,9 +21,11 @@
  */
 
 /**
- * Where a vessel sells its catch: {@link uk.ac.ox.poseidon.agents.market.Market}s (concretely
- * {@link uk.ac.ox.poseidon.agents.market.BiomassMarket}) priced per (catch category, species),
- * placed in space via {@link uk.ac.ox.poseidon.agents.market.MarketGrid}, and the
+ * Where a vessel sells its catch:
+ * {@link uk.ac.ox.poseidon.agents.market.Market}s (concretely
+ * {@link uk.ac.ox.poseidon.agents.market.BiomassMarket}) priced per (catch
+ * category, species), placed in space via
+ * {@link uk.ac.ox.poseidon.agents.market.MarketGrid}, and the
  * {@link uk.ac.ox.poseidon.agents.market.Sale} record each sale produces. See
  * {@link uk.ac.ox.poseidon.agents.market.Factories} for the entry points.
  */

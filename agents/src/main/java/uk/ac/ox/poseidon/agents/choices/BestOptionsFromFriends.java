@@ -30,10 +30,11 @@ import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Supplies the best options across a vessel's active friends' own {@link OptionValues}
- * components, merging ties by keeping the highest value seen for each option. Reuses a single
- * {@link ReusableOptionValues} instance across calls — the returned {@link OptionValues} is only
- * valid until the next call to {@link #get()}.
+ * Supplies the best options across a vessel's active friends' own
+ * {@link OptionValues} components, merging ties by keeping the highest value
+ * seen for each option. Reuses a single {@link ReusableOptionValues} instance
+ * across calls — the returned {@link OptionValues} is only valid until the next
+ * call to {@link #get()}.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 class BestOptionsFromFriends<O> implements Supplier<OptionValues<O>> {
@@ -46,8 +47,9 @@ class BestOptionsFromFriends<O> implements Supplier<OptionValues<O>> {
     new ReusableOptionValues<>();
 
   /**
-   * @return every active friend's best options, merged by keeping the highest value for each
-   * option; the same reused instance every call, invalidated by the next call
+   * @return every active friend's best options, merged by keeping the highest
+   *         value for each option; the same reused instance every call,
+   *         invalidated by the next call
    */
   @Override
   public OptionValues<O> get() {

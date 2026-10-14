@@ -30,8 +30,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link ConstantDouble}, built via
- * {@link Factories#constantDouble(double)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link ConstantDouble}, built
+ * via {@link Factories#constantDouble(double)}.
  */
 @Data
 @NoArgsConstructor

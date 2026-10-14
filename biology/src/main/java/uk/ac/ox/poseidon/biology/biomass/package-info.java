@@ -21,10 +21,11 @@
  */
 
 /**
- * Biomass-based biology: {@link uk.ac.ox.poseidon.biology.biomass.Biomass}, the concrete
- * {@link uk.ac.ox.poseidon.biology.Content} implementation used throughout the model, plus the
- * per-species and whole-community grids, growth and diffusion rules, recruitment allocation, and
- * NetCDF-backed time-indexed snapshots built on top of it. See
+ * Biomass-based biology: {@link uk.ac.ox.poseidon.biology.biomass.Biomass}, the
+ * concrete {@link uk.ac.ox.poseidon.biology.Content} implementation used
+ * throughout the model, plus the per-species and whole-community grids, growth
+ * and diffusion rules, recruitment allocation, and NetCDF-backed time-indexed
+ * snapshots built on top of it. See
  * {@link uk.ac.ox.poseidon.biology.biomass.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.biology.biomass;

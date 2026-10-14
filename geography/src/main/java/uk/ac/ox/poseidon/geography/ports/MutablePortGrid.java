@@ -35,7 +35,8 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableGrid;
 
 /**
- * A {@link PortGrid} that ports can be added to after construction, via {@link #createPort}.
+ * A {@link PortGrid} that ports can be added to after construction, via
+ * {@link #createPort}.
  */
 @Getter
 public class MutablePortGrid
@@ -43,7 +44,10 @@ public class MutablePortGrid
   implements MutableGrid<SparseGrid2D>
 {
 
-  /** @return a new, independent {@code MutablePortGrid} with the same ports as {@code source} */
+  /**
+   * @return a new, independent {@code MutablePortGrid} with the same ports as
+   *         {@code source}
+   */
   public static MutablePortGrid copyOf(final @NonNull PortGrid source) {
     final SparseGrid2D sparseGrid2D = new SparseGrid2D(
       source.getModelGrid().getGridWidth(),
@@ -69,9 +73,10 @@ public class MutablePortGrid
   }
 
   /**
-   * @param bathymetricGrid  the bathymetric grid ports are placed relative to
-   * @param portCoordinates  the ports to place, each at its given coordinate
-   * @throws IllegalArgumentException if any port's coordinate isn't a valid port location
+   * @param bathymetricGrid the bathymetric grid ports are placed relative to
+   * @param portCoordinates the ports to place, each at its given coordinate
+   * @throws IllegalArgumentException if any port's coordinate isn't a valid
+   *                                  port location
    */
   public MutablePortGrid(
     final BathymetricGrid bathymetricGrid,

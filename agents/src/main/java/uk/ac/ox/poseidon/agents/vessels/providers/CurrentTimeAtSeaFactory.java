@@ -26,8 +26,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link CurrentTimeAtSea}, built via
- * {@link Factories#currentTimeAtSea()}.
+ * A {@link VesselScopeFactory} counterpart of {@link CurrentTimeAtSea}, built
+ * via {@link Factories#currentTimeAtSea()}.
  */
 public class CurrentTimeAtSeaFactory
   extends VesselScopeFactory<CurrentTimeAtSea>

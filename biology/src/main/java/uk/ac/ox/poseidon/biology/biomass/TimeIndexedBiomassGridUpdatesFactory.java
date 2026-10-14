@@ -39,11 +39,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * Turns the dated snapshots given by {@code timeIndexedBiomassGrids} into
- * {@link BiomassGridUpdate}s that fully replace {@code biomassGrids}' contents, species by
- * species, each dated at its snapshot's date-time — meant to replace a biological grower
- * entirely, not run alongside one. Nothing is scheduled here: pass the result to
- * {@link uk.ac.ox.poseidon.core.schedule.Factories#scheduledByDateTime(Factory)} for the
- * snapshots to apply over time. Built via
+ * {@link BiomassGridUpdate}s that fully replace {@code biomassGrids}' contents,
+ * species by species, each dated at its snapshot's date-time — meant to replace
+ * a biological grower entirely, not run alongside one. Nothing is scheduled
+ * here: pass the result to
+ * {@link uk.ac.ox.poseidon.core.schedule.Factories#scheduledByDateTime(Factory)}
+ * for the snapshots to apply over time. Built via
  * {@link Factories#timeIndexedBiomassGridUpdates(Factory, Factory)}.
  */
 @Data

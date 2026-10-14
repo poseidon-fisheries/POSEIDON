@@ -33,7 +33,8 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link ConstantDestinationSupplier}, built via
+ * A {@link RelativeScopeFactory} counterpart of
+ * {@link ConstantDestinationSupplier}, built via
  * {@link Factories#constantDestination}.
  */
 @Data
@@ -49,8 +50,10 @@ public class ConstantDestinationSupplierFactory<S extends Scope> extends Relativ
   private Factory<? super S, ? extends Coordinate> coordinate;
 
   /**
-   * @return a {@link ConstantDestinationSupplier} for {@link #coordinate}'s cell in {@link #modelGrid}
-   * @throws IllegalArgumentException if {@link #coordinate} falls outside {@link #modelGrid}
+   * @return a {@link ConstantDestinationSupplier} for {@link #coordinate}'s
+   *         cell in {@link #modelGrid}
+   * @throws IllegalArgumentException if {@link #coordinate} falls outside
+   *                                  {@link #modelGrid}
    */
   @Override
   protected DestinationSupplier newInstance(final S scope) {

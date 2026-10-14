@@ -40,12 +40,13 @@ import uk.ac.ox.poseidon.core.providers.Provider;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
- * Picks a random accessible water cell in the neighbourhood of a search centre, asked for anew on
- * each pick (the vessel's own cell if it gives none), growing the search radius until a cell
- * satisfies the option predicate. The radius grows by at most {@code maximumWidening} cells
- * beyond the initial one, and never beyond the grid's larger dimension: when no cell is legal
- * anywhere, which is common (a closed port, no time left), an unbounded search would test every
- * water cell of the grid.
+ * Picks a random accessible water cell in the neighbourhood of a search centre,
+ * asked for anew on each pick (the vessel's own cell if it gives none), growing
+ * the search radius until a cell satisfies the option predicate. The radius
+ * grows by at most {@code maximumWidening} cells beyond the initial one, and
+ * never beyond the grid's larger dimension: when no cell is legal anywhere,
+ * which is common (a closed port, no time left), an unbounded search would test
+ * every water cell of the grid.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class NeighbourhoodCellPicker implements Provider<Int2D> {
@@ -59,9 +60,10 @@ public class NeighbourhoodCellPicker implements Provider<Int2D> {
   private final MersenneTwisterFast rng;
 
   /**
-   * @return a uniformly random accessible water cell satisfying the option predicate, within
-   * the smallest searched neighbourhood that has any; {@code null} if none qualify within the
-   * largest neighbourhood searched
+   * @return a uniformly random accessible water cell satisfying the option
+   *         predicate, within the smallest searched neighbourhood that has any;
+   *         {@code null} if none qualify within the largest neighbourhood
+   *         searched
    */
   @Override
   public Int2D get() {
@@ -101,7 +103,10 @@ public class NeighbourhoodCellPicker implements Provider<Int2D> {
     return null;
   }
 
-  /** @return the cells of {@code neighbours} exactly {@code size} cells away from the centre */
+  /**
+   * @return the cells of {@code neighbours} exactly {@code size} cells away
+   *         from the centre
+   */
   private static List<Int2D> ring(
     final List<Int2D> neighbours,
     final Int2D centre,

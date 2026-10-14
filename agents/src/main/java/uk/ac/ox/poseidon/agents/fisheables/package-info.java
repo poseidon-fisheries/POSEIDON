@@ -23,8 +23,9 @@
 /**
  * Bridges a vessel's live location to the biology module's
  * {@link uk.ac.ox.poseidon.biology.Fisheable} abstraction:
- * {@link uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheable} resolves the fisheable content
- * at wherever the vessel currently is, re-evaluated on every call. See
- * {@link uk.ac.ox.poseidon.agents.fisheables.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheable} resolves the
+ * fisheable content at wherever the vessel currently is, re-evaluated on every
+ * call. See {@link uk.ac.ox.poseidon.agents.fisheables.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.agents.fisheables;

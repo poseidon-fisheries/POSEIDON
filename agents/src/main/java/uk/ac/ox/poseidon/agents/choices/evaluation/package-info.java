@@ -21,10 +21,13 @@
  */
 
 /**
- * Scores a vessel's trip destinations from what actually happened on each trip — profit per hour,
- * biomass caught per hour — and feeds the scores back into the choice model via
- * {@link uk.ac.ox.poseidon.agents.choices.evaluation.TripEvaluator}, so future destination
- * choices (see {@link uk.ac.ox.poseidon.agents.choices}) can learn from past outcomes. See
- * {@link uk.ac.ox.poseidon.agents.choices.evaluation.Factories} for the entry points.
+ * Scores a vessel's trip destinations from what actually happened on each trip
+ * — profit per hour, biomass caught per hour — and feeds the scores back into
+ * the choice model via
+ * {@link uk.ac.ox.poseidon.agents.choices.evaluation.TripEvaluator}, so future
+ * destination choices (see {@link uk.ac.ox.poseidon.agents.choices}) can learn
+ * from past outcomes. See
+ * {@link uk.ac.ox.poseidon.agents.choices.evaluation.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.agents.choices.evaluation;

@@ -28,8 +28,8 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link PrefixedIdSupplier}, built via
- * {@link Factories#prefixedIdSupplier(String)}.
+ * A {@link SimulationScopeFactory} counterpart of {@link PrefixedIdSupplier},
+ * built via {@link Factories#prefixedIdSupplier(String)}.
  */
 @Data
 @NoArgsConstructor

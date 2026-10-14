@@ -25,8 +25,9 @@ package uk.ac.ox.poseidon.biology.biomass;
 import sim.util.Double2D;
 
 /**
- * Computes how much biomass moves between a pair of neighbouring cells (conventionally X and Y)
- * for one diffusion step, given each cell's current biomass and carrying capacity.
+ * Computes how much biomass moves between a pair of neighbouring cells
+ * (conventionally X and Y) for one diffusion step, given each cell's current
+ * biomass and carrying capacity.
  */
 public interface BiomassDiffusionRule {
   /**

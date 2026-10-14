@@ -29,8 +29,8 @@ import uk.ac.ox.poseidon.regulations.Action;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
- * Factories for predicates over agents built on top of the {@link Regulations} model: converting a
- * rule back into an ordinary predicate.
+ * Factories for predicates over agents built on top of the {@link Regulations}
+ * model: converting a rule back into an ordinary predicate.
  */
 public class Factories {
 
@@ -38,7 +38,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   * {@link IsPermittedPredicate}
+   *         {@link IsPermittedPredicate}
    * @see IsPermittedPredicateFactory
    */
   public static <

@@ -50,9 +50,10 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
- * The pathfinder is a mock whose accessible water neighbourhoods are stubbed per centre and
- * radius; any other neighbourhood is empty. The grid is 6 by 4 cells, so the search never goes
- * beyond a radius of 6. Unless a test says otherwise, the maximum widening is larger than that.
+ * The pathfinder is a mock whose accessible water neighbourhoods are stubbed
+ * per centre and radius; any other neighbourhood is empty. The grid is 6 by 4
+ * cells, so the search never goes beyond a radius of 6. Unless a test says
+ * otherwise, the maximum widening is larger than that.
  */
 class NeighbourhoodCellPickerTest {
 

@@ -24,7 +24,8 @@
  * Basic spatial primitives, built on JTS: geographic
  * {@link uk.ac.ox.poseidon.geography.Coordinate}s and bounding-box
  * {@link uk.ac.ox.poseidon.geography.Envelope}s. See
- * {@link uk.ac.ox.poseidon.geography.Factories} for the entry points. Subpackages build on these
- * for grids, bathymetry, ports, spatial allocation, and related predicates and utilities.
+ * {@link uk.ac.ox.poseidon.geography.Factories} for the entry points.
+ * Subpackages build on these for grids, bathymetry, ports, spatial allocation,
+ * and related predicates and utilities.
  */
 package uk.ac.ox.poseidon.geography;

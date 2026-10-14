@@ -29,8 +29,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 /**
- * A learned value per option (e.g. per destination cell), supporting lookup of the current best
- * option(s) — the highest-valued one(s), possibly tied.
+ * A learned value per option (e.g. per destination cell), supporting lookup of
+ * the current best option(s) — the highest-valued one(s), possibly tied.
  *
  * @param <O> the type of option valued
  */
@@ -41,7 +41,10 @@ public interface OptionValues<O> {
   /** @return every option currently tied for the highest value */
   List<O> getBestOptions();
 
-  /** @param rng the RNG to break ties with; @return one option uniformly picked among the best, if any */
+  /**
+   * @param rng the RNG to break ties with; @return one option uniformly picked
+   *            among the best, if any
+   */
   Optional<O> getBestOption(MersenneTwisterFast rng);
 
   /** @return the current highest value, if any options have been observed */
@@ -50,11 +53,15 @@ public interface OptionValues<O> {
   /** @return every (option, value) pair currently tied for the highest value */
   List<Entry<O, Double>> getBestEntries();
 
-  /** @param rng the RNG to break ties with; @return one (option, value) pair uniformly picked among the best, if any */
+  /**
+   * @param rng the RNG to break ties with; @return one (option, value) pair
+   *            uniformly picked among the best, if any
+   */
   Optional<Entry<O, Double>> getBestEntry(MersenneTwisterFast rng);
 
   /**
-   * Calls {@code consumer} once per observed option, with its value, in no particular order.
+   * Calls {@code consumer} once per observed option, with its value, in no
+   * particular order.
    *
    * @param consumer the consumer to call
    */

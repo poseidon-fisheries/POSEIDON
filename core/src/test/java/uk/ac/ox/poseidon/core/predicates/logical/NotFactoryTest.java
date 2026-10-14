@@ -35,9 +35,9 @@ import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 class NotFactoryTest {
 
   /**
-   * Tests the `newInstance` method of the NotFactory class. Verifies that the method creates a
-   * `Not` instance correctly when a valid `Factory` for a `Predicate<Object>` is provided and is
-   * functional.
+   * Tests the `newInstance` method of the NotFactory class. Verifies that the
+   * method creates a `Not` instance correctly when a valid `Factory` for a
+   * `Predicate<Object>` is provided and is functional.
    */
   @Test
   void testNewInstanceWithValidPredicateFactory() {
@@ -59,8 +59,8 @@ class NotFactoryTest {
   }
 
   /**
-   * Tests the `newInstance` method to ensure it throws a NullPointerException when the factory
-   * provides a null predicate.
+   * Tests the `newInstance` method to ensure it throws a NullPointerException
+   * when the factory provides a null predicate.
    */
   @Test
   void testNewInstanceWithNullPredicateThrowsException() {

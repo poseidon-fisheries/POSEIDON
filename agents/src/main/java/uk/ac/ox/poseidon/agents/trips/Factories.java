@@ -29,7 +29,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   * {@link CellWasFishedThisTrip} of the scoped vessel
+   *         {@link CellWasFishedThisTrip} of the scoped vessel
    * @see CellWasFishedThisTrip
    */
   public static CellWasFishedThisTripFactory cellWasFishedThisTrip() {

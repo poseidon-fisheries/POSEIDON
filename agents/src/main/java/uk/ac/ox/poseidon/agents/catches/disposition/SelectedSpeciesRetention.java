@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 /**
- * A {@link DispositionProcess} that discards (alive) any retained catch whose species isn't in
- * {@link #selectedSpecies}, leaving the rest retained.
+ * A {@link DispositionProcess} that discards (alive) any retained catch whose
+ * species isn't in {@link #selectedSpecies}, leaving the rest retained.
  */
 @Getter
 public class SelectedSpeciesRetention implements DispositionProcess {
@@ -46,8 +46,9 @@ public class SelectedSpeciesRetention implements DispositionProcess {
   }
 
   /**
-   * @return {@code currentDisposition} with its retained catch split by species membership in
-   * {@link #selectedSpecies}: selected species stay retained, the rest move to discarded-alive
+   * @return {@code currentDisposition} with its retained catch split by species
+   *         membership in {@link #selectedSpecies}: selected species stay
+   *         retained, the rest move to discarded-alive
    */
   @Override
   public Disposition partition(

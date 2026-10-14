@@ -30,9 +30,10 @@ import org.locationtech.jts.geom.Point;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 /**
- * A {@link Predicate} testing whether a {@link Coordinate} falls within any of a fixed set of JTS
- * {@link Geometry}s. Built via
- * {@link Factories#inGeometries(uk.ac.ox.poseidon.core.Factory)} in this package.
+ * A {@link Predicate} testing whether a {@link Coordinate} falls within any of
+ * a fixed set of JTS {@link Geometry}s. Built via
+ * {@link Factories#inGeometries(uk.ac.ox.poseidon.core.Factory)} in this
+ * package.
  */
 public class InGeometries implements Predicate<Coordinate> {
 
@@ -45,7 +46,10 @@ public class InGeometries implements Predicate<Coordinate> {
     this.geometries = geometries.toArray(Geometry[]::new);
   }
 
-  /** @return whether {@code coordinate} falls within any of this predicate's geometries */
+  /**
+   * @return whether {@code coordinate} falls within any of this predicate's
+   *         geometries
+   */
   @Override
   public boolean test(final Coordinate coordinate) {
     for (final Geometry geometry : geometries) {

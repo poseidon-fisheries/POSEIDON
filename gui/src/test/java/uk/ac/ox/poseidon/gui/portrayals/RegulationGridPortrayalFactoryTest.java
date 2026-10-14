@@ -85,8 +85,9 @@ class RegulationGridPortrayalFactoryTest {
   }
 
   /**
-   * The trawler is forbidden everywhere and seiner1 also in {@link #CLOSED_TO_ONE_VESSEL}, so
-   * only {@link #CLOSED_TO_FLEET} is closed to both seiners.
+   * The trawler is forbidden everywhere and seiner1 also in
+   * {@link #CLOSED_TO_ONE_VESSEL}, so only {@link #CLOSED_TO_FLEET} is closed
+   * to both seiners.
    */
   private RegulationGridPortrayalFactory.Portrayal portrayal(
     final Predicate<Vessel> fleet

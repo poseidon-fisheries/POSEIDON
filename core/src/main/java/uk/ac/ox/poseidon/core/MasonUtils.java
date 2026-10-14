@@ -43,15 +43,17 @@ import sim.util.Bag;
 import sim.util.Double2D;
 
 /**
- * Static helpers for working with MASON types ({@link Bag}, {@link Continuous2D}, {@link Grid2D})
- * and for making uniformly-random selections from various collection shapes using MASON's
- * {@link MersenneTwisterFast} RNG, so simulation code doesn't reach for {@code java.util.Random}
- * or hand-roll selection logic.
+ * Static helpers for working with MASON types ({@link Bag},
+ * {@link Continuous2D}, {@link Grid2D}) and for making uniformly-random
+ * selections from various collection shapes using MASON's
+ * {@link MersenneTwisterFast} RNG, so simulation code doesn't reach for
+ * {@code java.util.Random} or hand-roll selection logic.
  */
 public class MasonUtils {
 
   /**
-   * @param candidates the candidates to choose from, materialized into a list first
+   * @param candidates the candidates to choose from, materialized into a list
+   *                   first
    * @param random     the RNG to draw from
    * @return a uniformly random element of {@code candidates}
    */
@@ -64,7 +66,8 @@ public class MasonUtils {
   }
 
   /**
-   * @param candidates the candidates to choose from, materialized into a list first
+   * @param candidates the candidates to choose from, materialized into a list
+   *                   first
    * @param random     the RNG to draw from
    * @return a uniformly random element of {@code candidates}
    */
@@ -78,7 +81,8 @@ public class MasonUtils {
 
   /**
    * @param bag the bag to convert, may be null (treated as empty)
-   * @return the bag's elements as an {@link ImmutableSet}, unchecked-cast to {@code T}
+   * @return the bag's elements as an {@link ImmutableSet}, unchecked-cast to
+   *         {@code T}
    */
   public static <T> ImmutableSet<T> bagToSet(final Bag bag) {
     return MasonUtils.<T>bagToStream(bag).collect(toImmutableSet());
@@ -99,7 +103,8 @@ public class MasonUtils {
    * @param bag   the bag to convert, may be null (treated as empty)
    * @param clazz the type to cast every element to
    * @return the bag's elements as a {@link Stream}, cast to {@code T}
-   * @throws ClassCastException if any element isn't an instance of {@code clazz}
+   * @throws ClassCastException if any element isn't an instance of
+   *                            {@code clazz}
    */
   public static <T> Stream<T> bagToStream(final Bag bag, final Class<T> clazz) {
     return Optional.ofNullable(bag)
@@ -175,8 +180,8 @@ public class MasonUtils {
   /**
    * @param candidates the candidates to choose from, may be null or empty
    * @param random     the RNG to draw from
-   * @return a uniformly random element of {@code candidates}, or {@link Optional#empty()} if
-   * {@code candidates} is null or empty
+   * @return a uniformly random element of {@code candidates}, or
+   *         {@link Optional#empty()} if {@code candidates} is null or empty
    */
   public static <T> Optional<T> upToOneOf(
     final List<T> candidates,
@@ -188,15 +193,16 @@ public class MasonUtils {
   }
 
   /**
-   * Selection-samples up to {@code n} items from {@code candidates}, uniformly without
-   * replacement, preserving their original relative order. Unlike {@link #shuffledStream}, this
-   * requires knowing {@code candidates}' size up front and does not shuffle the selected items
-   * relative to each other.
+   * Selection-samples up to {@code n} items from {@code candidates}, uniformly
+   * without replacement, preserving their original relative order. Unlike
+   * {@link #shuffledStream}, this requires knowing {@code candidates}' size up
+   * front and does not shuffle the selected items relative to each other.
    *
    * @param n          the maximum number of items to return
    * @param candidates the source list to sample from
    * @param rng        the RNG to draw from
-   * @return up to {@code n} items from {@code candidates}, in their original relative order
+   * @return up to {@code n} items from {@code candidates}, in their original
+   *         relative order
    */
   public static <T> ImmutableList<T> upToNOf(
     final int n,
@@ -223,7 +229,8 @@ public class MasonUtils {
   /**
    * @param location     the location to check
    * @param continuous2D the field whose bounds to check against
-   * @return whether {@code location} falls within {@code continuous2D}'s width and height
+   * @return whether {@code location} falls within {@code continuous2D}'s width
+   *         and height
    */
   public static boolean inBounds(
     final Double2D location,
@@ -252,18 +259,21 @@ public class MasonUtils {
   /**
    * @param location the location to check
    * @param grid2D   the grid whose bounds to check against
-   * @return whether {@code location} falls within {@code grid2D}'s width and height
+   * @return whether {@code location} falls within {@code grid2D}'s width and
+   *         height
    */
   public static boolean inBounds(final Double2D location, final Grid2D grid2D) {
     return inBounds(location, grid2D.getWidth(), grid2D.getHeight());
   }
 
   /**
-   * @param candidates the candidates to shuffle; a {@link RandomAccess} {@link List} is shuffled
-   *                   in place, anything else is first copied into an {@link ArrayList}
+   * @param candidates the candidates to shuffle; a {@link RandomAccess}
+   *                   {@link List} is shuffled in place, anything else is first
+   *                   copied into an {@link ArrayList}
    * @param rng        the RNG to draw from
-   * @return a lazily, partially Fisher-Yates-shuffled stream: only as many elements are shuffled
-   * as are actually consumed from the returned stream
+   * @return a lazily, partially Fisher-Yates-shuffled stream: only as many
+   *         elements are shuffled as are actually consumed from the returned
+   *         stream
    * @see #shuffledStream(List, MersenneTwisterFast)
    */
   @SuppressWarnings("unchecked")
@@ -280,9 +290,10 @@ public class MasonUtils {
   /**
    * @param candidates the candidates to shuffle, left unchanged
    * @param rng        the RNG to draw from
-   * @return a lazily, partially Fisher-Yates-shuffled stream over {@code candidates}: only as
-   * many elements are shuffled as are actually consumed from the returned stream, so early
-   * termination (e.g. {@code findFirst()}) avoids the cost of a full shuffle
+   * @return a lazily, partially Fisher-Yates-shuffled stream over
+   *         {@code candidates}: only as many elements are shuffled as are
+   *         actually consumed from the returned stream, so early termination
+   *         (e.g. {@code findFirst()}) avoids the cost of a full shuffle
    */
   public static <T> Stream<T> shuffledStream(
     final List<T> candidates,
@@ -315,15 +326,17 @@ public class MasonUtils {
   }
 
   /**
-   * Reservoir-samples up to {@code sampleSize} items from {@code pool} that pass {@code filter},
-   * uniformly without replacement. O(|pool|) time, O(sampleSize) memory.
+   * Reservoir-samples up to {@code sampleSize} items from {@code pool} that
+   * pass {@code filter}, uniformly without replacement. O(|pool|) time,
+   * O(sampleSize) memory.
    *
    * @param pool       the source of items, traversed once
    * @param sampleSize maximum number of items to return
    * @param filter     predicate that items must satisfy to be eligible
    * @param rng        random number generator
    * @param <T>        item type
-   * @return list of up to {@code sampleSize} items, uniformly sampled without replacement
+   * @return list of up to {@code sampleSize} items, uniformly sampled without
+   *         replacement
    */
   public static <T> List<T> reservoirSample(
     final Iterable<? extends T> pool,

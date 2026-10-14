@@ -28,10 +28,11 @@ import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
 
 /**
- * An {@link AbstractListener} that accumulates the events it receives into a tablesaw
- * {@link Table}, one row per event (or per some finer unit, e.g. one row per species per event —
- * see subclasses), exposed via {@link #get()}. Subclasses add columns to {@link #table} in their
- * constructor and append to them in {@link #receive}.
+ * An {@link AbstractListener} that accumulates the events it receives into a
+ * tablesaw {@link Table}, one row per event (or per some finer unit, e.g. one
+ * row per species per event — see subclasses), exposed via {@link #get()}.
+ * Subclasses add columns to {@link #table} in their constructor and append to
+ * them in {@link #receive}.
  *
  * @param <E> the type of event this table listens for
  */
@@ -40,7 +41,10 @@ public abstract class ListenerTable<E>
   implements Supplier<Table>
 {
 
-  /** The accumulated table; columns are added by subclasses in their constructor. */
+  /**
+   * The accumulated table; columns are added by subclasses in their
+   * constructor.
+   */
   protected final Table table = Table.create();
 
   /** @param eventClass the type of event this table listens for */
@@ -48,7 +52,10 @@ public abstract class ListenerTable<E>
     super(eventClass);
   }
 
-  /** @return the live, mutable table this listener has been accumulating rows into */
+  /**
+   * @return the live, mutable table this listener has been accumulating rows
+   *         into
+   */
   @SuppressFBWarnings(
     value = "EI",
     justification = "Mutable table willfully exposed; just be careful with it."

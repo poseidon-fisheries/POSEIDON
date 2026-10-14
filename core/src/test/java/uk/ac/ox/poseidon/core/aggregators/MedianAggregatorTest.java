@@ -32,8 +32,8 @@ import org.junit.jupiter.api.Test;
 class MedianAggregatorTest {
 
   /**
-   * This class tests the `apply` method in the `Median` class. The `apply` method calculates the
-   * median of a double array or a DoubleStream.
+   * This class tests the `apply` method in the `Median` class. The `apply`
+   * method calculates the median of a double array or a DoubleStream.
    */
 
   private final MedianAggregator median = new MedianAggregator();

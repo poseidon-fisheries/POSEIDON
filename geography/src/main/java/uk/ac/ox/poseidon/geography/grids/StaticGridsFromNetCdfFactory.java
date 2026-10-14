@@ -36,13 +36,14 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * Reads a NetCDF file holding one static {@code (latitude, longitude)} raster per data variable,
- * on a grid that must align cell-for-cell with the given {@link ModelGrid} (no resampling is
- * performed; misalignment is an error), and exposes the result as an immutable map keyed by the
- * raw NetCDF variable name. Unlike species-biomass reading, there is no closed, known-in-advance
- * set of names to match against: this is a generic reader, equally usable for MPA membership
- * masks (one variable per MPA id) or, later, habitat-type grids — whatever a static NetCDF file
- * happens to contain.
+ * Reads a NetCDF file holding one static {@code (latitude, longitude)} raster
+ * per data variable, on a grid that must align cell-for-cell with the given
+ * {@link ModelGrid} (no resampling is performed; misalignment is an error), and
+ * exposes the result as an immutable map keyed by the raw NetCDF variable name.
+ * Unlike species-biomass reading, there is no closed, known-in-advance set of
+ * names to match against: this is a generic reader, equally usable for MPA
+ * membership masks (one variable per MPA id) or, later, habitat-type grids —
+ * whatever a static NetCDF file happens to contain.
  */
 @Data
 @NoArgsConstructor

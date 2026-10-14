@@ -21,11 +21,14 @@
  */
 
 /**
- * Predicates over a {@link uk.ac.ox.poseidon.regulations.TemporalAction}'s date/time span: a fixed
- * date range ({@link uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenDates}), a range
- * repeating every calendar year
- * ({@link uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenYearlyDates}), and a single
- * year ({@link uk.ac.ox.poseidon.regulations.predicates.temporal.InYear}). See
- * {@link uk.ac.ox.poseidon.regulations.predicates.temporal.Factories} for the entry points.
+ * Predicates over a {@link uk.ac.ox.poseidon.regulations.TemporalAction}'s
+ * date/time span: a fixed date range
+ * ({@link uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenDates}), a
+ * range repeating every calendar year
+ * ({@link uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenYearlyDates}),
+ * and a single year
+ * ({@link uk.ac.ox.poseidon.regulations.predicates.temporal.InYear}). See
+ * {@link uk.ac.ox.poseidon.regulations.predicates.temporal.Factories} for the
+ * entry points.
  */
 package uk.ac.ox.poseidon.regulations.predicates.temporal;

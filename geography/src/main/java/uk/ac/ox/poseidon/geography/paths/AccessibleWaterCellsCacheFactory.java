@@ -33,11 +33,12 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link AccessibleWaterCellsCache}, built via
- * {@link Factories#accessibleWaterCellsCache(Factory, Factory)}. Its fields are never read when
- * building the cache: as in {@link DefaultPathCacheFactory}, they only shape the factory's
- * identity and scope, so caches are shared exactly when the grids they describe are. Don't drop
- * them.
+ * A {@link RelativeScopeFactory} counterpart of
+ * {@link AccessibleWaterCellsCache}, built via
+ * {@link Factories#accessibleWaterCellsCache(Factory, Factory)}. Its fields are
+ * never read when building the cache: as in {@link DefaultPathCacheFactory},
+ * they only shape the factory's identity and scope, so caches are shared
+ * exactly when the grids they describe are. Don't drop them.
  */
 @Data
 @NoArgsConstructor

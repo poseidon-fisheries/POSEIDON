@@ -27,7 +27,10 @@ import static java.time.ZoneOffset.UTC;
 import java.time.LocalDateTime;
 import org.threeten.extra.Interval;
 
-/** An {@link Action} that occupies a time interval, e.g. for date- or duration-based regulations. */
+/**
+ * An {@link Action} that occupies a time interval, e.g. for date- or
+ * duration-based regulations.
+ */
 public interface TemporalAction<G> extends Action<G> {
   /** @return the interval this action occupies */
   Interval getInterval();

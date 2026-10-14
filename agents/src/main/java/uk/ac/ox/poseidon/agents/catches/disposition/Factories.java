@@ -29,15 +29,20 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-/** Factories for the steps of a catch's {@link DispositionProcess} (retention/discarding). */
+/**
+ * Factories for the steps of a catch's {@link DispositionProcess}
+ * (retention/discarding).
+ */
 public class Factories {
 
   private Factories() {}
 
   /**
    * @param species      the species to index rates over
-   * @param rateFunction the proportion of retained catch to discard, per species
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link IndexedDiscardRates}
+   * @param rateFunction the proportion of retained catch to discard, per
+   *                     species
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         {@link IndexedDiscardRates}
    * @see IndexedDiscardRates
    */
   public static <S extends Scope> IndexedDiscardRatesFactory<S> discardRates(
@@ -53,7 +58,8 @@ public class Factories {
   /**
    * @param species      the species to index rates over
    * @param rateFunction the discard mortality rate, per species
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link IndexedDiscardMortality}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         {@link IndexedDiscardMortality}
    * @see IndexedDiscardMortality
    */
   public static <S extends Scope> IndexedDiscardMortalityFactory<S> indexedDiscardMortality(
@@ -68,7 +74,8 @@ public class Factories {
 
   /**
    * @param dispositionStrategies the steps to chain, in order
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link CompositeDispositionProcess}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link CompositeDispositionProcess}
    * @see CompositeDispositionProcess
    */
   @SafeVarargs
@@ -83,7 +90,8 @@ public class Factories {
 
   /**
    * @param selectedSpecies the species allowed to stay retained
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link SelectedSpeciesRetention}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link SelectedSpeciesRetention}
    * @see SelectedSpeciesRetention
    */
   public static <S extends Scope> SelectedSpeciesRetentionFactory<S> selectedSpeciesRetention(
@@ -97,7 +105,8 @@ public class Factories {
 
   /**
    * @param mortalityRate the discard mortality rate, per species
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link DiscardMortality}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link DiscardMortality}
    * @see DiscardMortality
    */
   public static <S extends Scope> DiscardMortalityFactory<S> discardMortality(
@@ -111,7 +120,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   * {@link ProportionallyLimitingBiomassToHold}
+   *         {@link ProportionallyLimitingBiomassToHold}
    * @see ProportionallyLimitingBiomassToHold
    */
   public static ProportionallyLimitingBiomassToHoldFactory proportionallyLimitingBiomassToHold() {
@@ -120,7 +129,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   * {@link FullDiscardMortality}
+   *         {@link FullDiscardMortality}
    * @see FullDiscardMortality
    */
   public static FullDiscardMortalityFactory fullDiscardMortality() {

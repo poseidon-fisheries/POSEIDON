@@ -22,12 +22,14 @@
 
 /**
  * Predicates built on top of the {@link uk.ac.ox.poseidon.regulations} model:
- * {@link uk.ac.ox.poseidon.regulations.predicates.IsPermittedPredicate} converts a
- * {@link uk.ac.ox.poseidon.regulations.Regulations} rule back into an ordinary predicate over the
- * agent. See {@link uk.ac.ox.poseidon.regulations.predicates.spatial} and
+ * {@link uk.ac.ox.poseidon.regulations.predicates.IsPermittedPredicate}
+ * converts a {@link uk.ac.ox.poseidon.regulations.Regulations} rule back into
+ * an ordinary predicate over the agent. See
+ * {@link uk.ac.ox.poseidon.regulations.predicates.spatial} and
  * {@link uk.ac.ox.poseidon.regulations.predicates.temporal} for predicates over
  * {@link uk.ac.ox.poseidon.regulations.SpatialAction} and
  * {@link uk.ac.ox.poseidon.regulations.TemporalAction}. See
- * {@link uk.ac.ox.poseidon.regulations.predicates.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.regulations.predicates.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.regulations.predicates;

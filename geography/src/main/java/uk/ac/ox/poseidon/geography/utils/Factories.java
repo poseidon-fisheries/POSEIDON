@@ -26,7 +26,10 @@ import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-/** Factories for {@link LonLatTable}-family wrappers over {@code tablesaw} tables. */
+/**
+ * Factories for {@link LonLatTable}-family wrappers over {@code tablesaw}
+ * tables.
+ */
 public class Factories {
 
   private Factories() {}
@@ -36,8 +39,8 @@ public class Factories {
    * @param longitudeColumnName the name of the column holding longitude values
    * @param latitudeColumnName  the name of the column holding latitude values
    * @param elevationColumnName the name of the column holding elevation values
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link ElevationTable}
-   * over the resolved table
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         {@link ElevationTable} over the resolved table
    * @see ElevationTable
    */
   public static <S extends Scope> ElevationTableFactory<S> elevationTable(
@@ -58,8 +61,8 @@ public class Factories {
    * @param table               factory for the table to wrap
    * @param longitudeColumnName the name of the column holding longitude values
    * @param latitudeColumnName  the name of the column holding latitude values
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link LonLatTable} over
-   * the resolved table
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link LonLatTable} over the resolved table
    * @see LonLatTable
    */
   public static <S extends Scope> LonLatTableFactory<S> lonLatTable(

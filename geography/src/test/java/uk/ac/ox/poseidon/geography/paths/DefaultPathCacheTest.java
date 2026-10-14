@@ -29,9 +29,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
- * {@link DefaultPathCache}'s contract: {@code null} for a path it knows nothing about, an empty
- * {@code Optional} for one it knows is impossible, and the path otherwise. Points are letters, so
- * {@code path("A", "B", "C")} goes from A to C through B.
+ * {@link DefaultPathCache}'s contract: {@code null} for a path it knows nothing
+ * about, an empty {@code Optional} for one it knows is impossible, and the path
+ * otherwise. Points are letters, so {@code path("A", "B", "C")} goes from A to
+ * C through B.
  */
 class DefaultPathCacheTest {
 

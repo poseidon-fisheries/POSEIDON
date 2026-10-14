@@ -49,9 +49,9 @@ class AgentTest {
   private final Agent agent = new Agent(schedule, mock(EventManager.class));
 
   /**
-   * A behaviour that records when it is stepped; active while {@link #active}. With a
-   * {@link #taskDuration}, each step alternates between starting a task of that duration and
-   * finishing it; without one, it is never running.
+   * A behaviour that records when it is stepped; active while {@link #active}.
+   * With a {@link #taskDuration}, each step alternates between starting a task
+   * of that duration and finishing it; without one, it is never running.
    */
   private class RecordingBehaviour implements Behaviour {
 
@@ -83,8 +83,8 @@ class AgentTest {
   }
 
   /**
-   * Keeps the schedule from running out of events, which would stop it, and gives the agent its
-   * behaviour, inactive until a test activates it.
+   * Keeps the schedule from running out of events, which would stop it, and
+   * gives the agent its behaviour, inactive until a test activates it.
    */
   @BeforeEach
   void setUp() {

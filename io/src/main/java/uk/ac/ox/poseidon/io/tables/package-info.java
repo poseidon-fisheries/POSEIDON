@@ -21,9 +21,10 @@
  */
 
 /**
- * {@code tablesaw} {@link tech.tablesaw.api.Table} components: building tables from CSV or from a
- * resolved {@link java.util.Map}, writing them back out to CSV, growing one incrementally over
- * the course of a simulation, and deriving lookup {@link java.util.function.Function}s from a
- * table's contents. See {@link uk.ac.ox.poseidon.io.tables.Factories} for the entry points.
+ * {@code tablesaw} {@link tech.tablesaw.api.Table} components: building tables
+ * from CSV or from a resolved {@link java.util.Map}, writing them back out to
+ * CSV, growing one incrementally over the course of a simulation, and deriving
+ * lookup {@link java.util.function.Function}s from a table's contents. See
+ * {@link uk.ac.ox.poseidon.io.tables.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.io.tables;

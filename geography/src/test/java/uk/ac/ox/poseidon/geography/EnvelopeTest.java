@@ -31,7 +31,8 @@ import org.junit.jupiter.api.Test;
 public class EnvelopeTest {
 
   /**
-   * Tests for the static intersects(Coordinate p1, Coordinate p2, Coordinate q) method.
+   * Tests for the static intersects(Coordinate p1, Coordinate p2, Coordinate q)
+   * method.
    */
   @Property
   public void testPropertyIntersects_PointInsideRectangle(
@@ -102,8 +103,8 @@ public class EnvelopeTest {
   }
 
   /**
-   * Tests for the static intersects(Coordinate p1, Coordinate p2, Coordinate q1, Coordinate q2)
-   * method.
+   * Tests for the static intersects(Coordinate p1, Coordinate p2, Coordinate
+   * q1, Coordinate q2) method.
    */
   @Property
   public void testPropertyIntersects_TwoOverlappingRectangles(

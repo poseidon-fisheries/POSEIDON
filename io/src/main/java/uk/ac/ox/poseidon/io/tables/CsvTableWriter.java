@@ -39,11 +39,11 @@ import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvWriteOptions;
 
 /**
- * A {@link Steppable} that writes a resolved {@link Table} to a CSV file when stepped, optionally
- * appending to an existing file (writing a header only when the file is new) and clearing the
- * table's rows afterward. Built via
- * {@link Factories#csvTableWriter(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory,
- * boolean, boolean)} in this package.
+ * A {@link Steppable} that writes a resolved {@link Table} to a CSV file when
+ * stepped, optionally appending to an existing file (writing a header only when
+ * the file is new) and clearing the table's rows afterward. Built via
+ * {@link Factories#csvTableWriter(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, boolean, boolean)}
+ * in this package.
  */
 @RequiredArgsConstructor
 public class CsvTableWriter implements Steppable {

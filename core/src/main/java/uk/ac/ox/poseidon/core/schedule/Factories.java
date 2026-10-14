@@ -38,19 +38,19 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * Factories for {@link Steppable}s that schedule themselves onto the simulation's
- * {@link TemporalSchedule} when built, and for MASON step-grouping constructs (e.g.
- * {@link Sequence}) over a resolved list of steppables.
+ * Factories for {@link Steppable}s that schedule themselves onto the
+ * simulation's {@link TemporalSchedule} when built, and for MASON step-grouping
+ * constructs (e.g. {@link Sequence}) over a resolved list of steppables.
  */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @param steppablesByDateTime factory for the steppables to schedule, each with its own
-   *                             date-time
-   * @return a {@link SimulationScopeFactory} for the resolved dated steppables, each scheduled
-   * once at its own date-time
+   * @param steppablesByDateTime factory for the steppables to schedule, each
+   *                             with its own date-time
+   * @return a {@link SimulationScopeFactory} for the resolved dated steppables,
+   *         each scheduled once at its own date-time
    * @see ScheduledByDateTimeFactory
    */
   public static <C extends Steppable> ScheduledByDateTimeFactory<C> scheduledByDateTime(
@@ -65,7 +65,8 @@ public class Factories {
   /**
    * @param dateTime  factory for the date-time to schedule the steppable at
    * @param steppable factory for the steppable to schedule
-   * @return a {@link SimulationScopeFactory} for the resolved steppable, scheduled once
+   * @return a {@link SimulationScopeFactory} for the resolved steppable,
+   *         scheduled once
    * @see ScheduledOnceFactory
    */
   public static <C extends Steppable> SimulationScopeFactory<C> scheduledOnce(
@@ -79,7 +80,8 @@ public class Factories {
    * @param dateTime  factory for the date-time to schedule the steppable at
    * @param steppable factory for the steppable to schedule
    * @param ordering  the schedule ordering to use
-   * @return a {@link SimulationScopeFactory} for the resolved steppable, scheduled once
+   * @return a {@link SimulationScopeFactory} for the resolved steppable,
+   *         scheduled once
    * @see ScheduledOnceFactory
    */
   public static <C extends Steppable> SimulationScopeFactory<C> scheduledOnce(
@@ -92,8 +94,8 @@ public class Factories {
 
   /**
    * @param steppable factory for the steppable to schedule
-   * @return a {@link SimulationScopeFactory} for the resolved steppable, scheduled once at the
-   * start of the simulation
+   * @return a {@link SimulationScopeFactory} for the resolved steppable,
+   *         scheduled once at the start of the simulation
    * @see ScheduledOnceAtStartFactory
    */
   public static <C extends Steppable> SimulationScopeFactory<C> scheduledOnceAtStart(
@@ -105,8 +107,8 @@ public class Factories {
   /**
    * @param steppable factory for the steppable to schedule
    * @param ordering  the schedule ordering to use
-   * @return a {@link SimulationScopeFactory} for the resolved steppable, scheduled once at the
-   * start of the simulation
+   * @return a {@link SimulationScopeFactory} for the resolved steppable,
+   *         scheduled once at the start of the simulation
    * @see ScheduledOnceAtStartFactory
    */
   public static <C extends Steppable> SimulationScopeFactory<C> scheduledOnceAtStart(
@@ -120,7 +122,8 @@ public class Factories {
    * @param dateTime  factory for the date-time to start scheduling at
    * @param interval  factory for the recurring interval
    * @param steppable factory for the steppable to schedule
-   * @return a {@link SimulationScopeFactory} for the resolved steppable, scheduled repeatedly
+   * @return a {@link SimulationScopeFactory} for the resolved steppable,
+   *         scheduled repeatedly
    * @see ScheduledRepeatingFactory
    */
   public static <C extends Steppable> SimulationScopeFactory<C> scheduledRepeating(
@@ -136,7 +139,8 @@ public class Factories {
    * @param interval  factory for the recurring interval
    * @param steppable factory for the steppable to schedule
    * @param ordering  the schedule ordering to use
-   * @return a {@link SimulationScopeFactory} for the resolved steppable, scheduled repeatedly
+   * @return a {@link SimulationScopeFactory} for the resolved steppable,
+   *         scheduled repeatedly
    * @see ScheduledRepeatingFactory
    */
   public static <C extends Steppable> SimulationScopeFactory<C> scheduledRepeating(
@@ -156,8 +160,9 @@ public class Factories {
   /**
    * @param interval  factory for the recurring interval
    * @param steppable factory for the steppable to schedule
-   * @return a {@link SimulationScopeFactory} for the resolved steppable, scheduled repeatedly
-   * starting at the simulation's starting date-time
+   * @return a {@link SimulationScopeFactory} for the resolved steppable,
+   *         scheduled repeatedly starting at the simulation's starting
+   *         date-time
    * @see ScheduledRepeatingFromStartFactory
    */
   public static <C extends Steppable> SimulationScopeFactory<C> scheduledRepeatingFromStart(
@@ -171,8 +176,9 @@ public class Factories {
    * @param interval  factory for the recurring interval
    * @param steppable factory for the steppable to schedule
    * @param ordering  the schedule ordering to use
-   * @return a {@link SimulationScopeFactory} for the resolved steppable, scheduled repeatedly
-   * starting at the simulation's starting date-time
+   * @return a {@link SimulationScopeFactory} for the resolved steppable,
+   *         scheduled repeatedly starting at the simulation's starting
+   *         date-time
    * @see ScheduledRepeatingFromStartFactory
    */
   public static <C extends Steppable> SimulationScopeFactory<C> scheduledRepeatingFromStart(
@@ -189,7 +195,8 @@ public class Factories {
 
   /**
    * @param steppables factory for the list of steppables to run in order
-   * @return a {@link SimulationScopeFactory} for a {@link Sequence} over the resolved steppables
+   * @return a {@link SimulationScopeFactory} for a {@link Sequence} over the
+   *         resolved steppables
    * @see SteppableSequenceFactory
    */
   public static SteppableSequenceFactory steppableSequence(
@@ -202,9 +209,10 @@ public class Factories {
   }
 
   /**
-   * @param steppables factory for the collection of steppables to run in random order
-   * @return a {@link SimulationScopeFactory} for a {@link RandomSequence} over the resolved
-   * steppables
+   * @param steppables factory for the collection of steppables to run in random
+   *                   order
+   * @return a {@link SimulationScopeFactory} for a {@link RandomSequence} over
+   *         the resolved steppables
    * @see SteppableRandomSequenceFactory
    */
   public static SteppableRandomSequenceFactory steppableRandomSequence(

@@ -21,9 +21,11 @@
  */
 
 /**
- * A vessel's running {@link uk.ac.ox.poseidon.agents.vessels.accounts.Account} balance, and
- * {@link sim.engine.Steppable}s that draw on it (e.g.
- * {@link uk.ac.ox.poseidon.agents.vessels.accounts.FixedCostCollector} for periodic fixed costs).
- * See {@link uk.ac.ox.poseidon.agents.vessels.accounts.Factories} for the entry points.
+ * A vessel's running {@link uk.ac.ox.poseidon.agents.vessels.accounts.Account}
+ * balance, and {@link sim.engine.Steppable}s that draw on it (e.g.
+ * {@link uk.ac.ox.poseidon.agents.vessels.accounts.FixedCostCollector} for
+ * periodic fixed costs). See
+ * {@link uk.ac.ox.poseidon.agents.vessels.accounts.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.agents.vessels.accounts;

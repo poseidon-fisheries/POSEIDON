@@ -29,8 +29,8 @@ import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 
 /**
- * A {@link VesselTaskFactory} counterpart of {@link SetDestinationToOrigin}, built via
- * {@link Factories#setDestinationToOrigin()}.
+ * A {@link VesselTaskFactory} counterpart of {@link SetDestinationToOrigin},
+ * built via {@link Factories#setDestinationToOrigin()}.
  */
 @Data
 @NoArgsConstructor

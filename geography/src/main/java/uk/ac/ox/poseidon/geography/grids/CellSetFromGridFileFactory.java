@@ -39,15 +39,18 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
- * A {@link RelativeScopeFactory} that reads a raster grid file and returns the set of cells whose
- * value equals a fixed target — e.g. picking out land cells from a land/water raster. There's no
- * separate plain component class here: the produced {@link ImmutableSet} is returned as-is, with
- * no wrapper type to carry documentation, so this factory carries the behavior doc directly.
+ * A {@link RelativeScopeFactory} that reads a raster grid file and returns the
+ * set of cells whose value equals a fixed target — e.g. picking out land cells
+ * from a land/water raster. There's no separate plain component class here: the
+ * produced {@link ImmutableSet} is returned as-is, with no wrapper type to
+ * carry documentation, so this factory carries the behavior doc directly.
  * <p>
- * The file's columns and rows are taken as the cells of {@code modelGrid}, so the file must cover
- * the same cells: the same number of columns and rows, and the same extent to within a hundredth
- * of a cell (enough to allow for the same header printed with different precision).
- * Built via {@link Factories#cellSetFromGridFile(Factory, Factory, double)} in this package.
+ * The file's columns and rows are taken as the cells of {@code modelGrid}, so
+ * the file must cover the same cells: the same number of columns and rows, and
+ * the same extent to within a hundredth of a cell (enough to allow for the same
+ * header printed with different precision). Built via
+ * {@link Factories#cellSetFromGridFile(Factory, Factory, double)} in this
+ * package.
  */
 @Data
 @NoArgsConstructor
@@ -58,7 +61,10 @@ public class CellSetFromGridFileFactory<S extends Scope> extends RelativeScopeFa
   ImmutableSet<Int2D>
 > {
 
-  /** The share of a cell by which the file's extent may differ from the model grid's. */
+  /**
+   * The share of a cell by which the file's extent may differ from the model
+   * grid's.
+   */
   private static final double EXTENT_TOLERANCE_IN_CELLS = 0.01;
 
   private Factory<? super S, ? extends Path> path;
@@ -67,8 +73,8 @@ public class CellSetFromGridFileFactory<S extends Scope> extends RelativeScopeFa
 
   /**
    * @throws RuntimeException         if {@code path} doesn't point to a file
-   * @throws IllegalArgumentException if the file doesn't cover the same cells as
-   *                                  {@code modelGrid}
+   * @throws IllegalArgumentException if the file doesn't cover the same cells
+   *                                  as {@code modelGrid}
    */
   @Override
   protected ImmutableSet<Int2D> newInstance(final S scope) {

@@ -47,16 +47,18 @@ import uk.ac.ox.poseidon.geography.grids.NormalisedDoubleGridFromAllocatorFactor
 import uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory;
 
 /**
- * Factories for biomass-based biology: per-species and per-community biomass grids, carrying
- * capacity, growth and diffusion rules and their growers/diffusers, recruitment allocation, and
- * reading/scheduling time-indexed biomass snapshots from NetCDF data.
+ * Factories for biomass-based biology: per-species and per-community biomass
+ * grids, carrying capacity, growth and diffusion rules and their
+ * growers/diffusers, recruitment allocation, and reading/scheduling
+ * time-indexed biomass snapshots from NetCDF data.
  */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a single-species {@link BiomassGrid}
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         single-species {@link BiomassGrid}
    * @see BiomassGridFactory
    */
   public static BiomassGridFactory biomassGrid(
@@ -68,7 +70,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for one {@link BiomassGrid} per species
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for one
+   *         {@link BiomassGrid} per species
    * @see BiomassGridsFactory
    */
   public static BiomassGridsFactory biomassGrids(
@@ -87,7 +90,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link FisheableBiomassGrids} over the resolved per-species grids
+   *         {@link FisheableBiomassGrids} over the resolved per-species grids
    * @see FisheableBiomassGridsFactory
    */
   public static <S extends Scope> FisheableBiomassGridsFactory<S> fisheableBiomassGrids(
@@ -97,7 +100,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link BiomassDiffuser}
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link BiomassDiffuser}
    * @see BiomassDiffuserFactory
    */
   public static BiomassDiffuserFactory biomassDiffuser(
@@ -119,8 +123,9 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link CarryingCapacityGrid} wrapping the
-   * resolved {@code grid} directly
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link CarryingCapacityGrid} wrapping the resolved {@code grid}
+   *         directly
    * @see CarryingCapacityGridFactory
    */
   public static <S extends Scope> CarryingCapacityGridFactory<S> carryingCapacityGrid(
@@ -130,8 +135,9 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link CarryingCapacityGrid} giving every
-   * active water cell the same carrying capacity
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link CarryingCapacityGrid} giving every active water cell the
+   *         same carrying capacity
    * @see CarryingCapacityGridFactory
    */
   public static <S extends Scope> CarryingCapacityGridFactory<S> uniformCarryingCapacityGrid(
@@ -153,8 +159,9 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link CarryingCapacityGrid} spreading
-   * {@code totalCarryingCapacity} evenly across active water cells
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link CarryingCapacityGrid} spreading
+   *         {@code totalCarryingCapacity} evenly across active water cells
    * @see CarryingCapacityGridFactory
    */
   public static <S extends Scope> CarryingCapacityGridFactory<S> totalCarryingCapacityGrid(
@@ -175,7 +182,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link LogisticGrowthRule}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link LogisticGrowthRule}
    * @see LogisticGrowthRuleFactory
    */
   public static LogisticGrowthRuleFactory logisticGrowthRule(
@@ -186,7 +194,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   * {@link SmoothBiomassDiffusionRule}
+   *         {@link SmoothBiomassDiffusionRule}
    * @see SmoothBiomassDiffusionRuleFactory
    */
   public static SmoothBiomassDiffusionRuleFactory smoothBiomassDiffusionRule(
@@ -201,7 +209,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link CommonBiomassGrower}
+   *         {@link CommonBiomassGrower}
    * @see CommonBiomassGrowerFactory
    */
   public static <S extends Scope> CommonBiomassGrowerFactory<S> commonBiomassGrower(
@@ -226,7 +234,7 @@ public class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   * {@link IndependentBiomassGrower}
+   *         {@link IndependentBiomassGrower}
    * @see IndependentBiomassGrowerFactory
    */
   public static <S extends Scope> IndependentBiomassGrowerFactory<S> independentBiomassGrower(
@@ -245,7 +253,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a {@link RandomBiomassRecruitmentAllocator}
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link RandomBiomassRecruitmentAllocator}
    * @see RandomBiomassRecruitmentAllocatorFactory
    */
   public static RandomBiomassRecruitmentAllocatorFactory randomBiomassRecruitmentAllocator() {
@@ -253,8 +262,9 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for time-indexed, per-species {@link ImmutableBiomassGrid}
-   * snapshots read from a NetCDF file, splitting variable names on {@code "_"}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+   *         time-indexed, per-species {@link ImmutableBiomassGrid} snapshots
+   *         read from a NetCDF file, splitting variable names on {@code "_"}
    * @see TimeIndexedBiomassGridsFromNetCdfFactory
    */
   public static <S extends Scope> TimeIndexedBiomassGridsFromNetCdfFactory<S> timeIndexedBiomassGridsFromNetCdf(
@@ -271,8 +281,10 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for time-indexed, per-species {@link ImmutableBiomassGrid}
-   * snapshots read from a NetCDF file, splitting variable names on {@code separator}
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for
+   *         time-indexed, per-species {@link ImmutableBiomassGrid} snapshots
+   *         read from a NetCDF file, splitting variable names on
+   *         {@code separator}
    * @see TimeIndexedBiomassGridsFromNetCdfFactory
    */
   public static <S extends Scope> TimeIndexedBiomassGridsFromNetCdfFactory<S> timeIndexedBiomassGridsFromNetCdf(
@@ -290,8 +302,9 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for dated updates replacing
-   * {@code biomassGrids}' contents with {@code timeIndexedBiomassGrids}' snapshots
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for dated
+   *         updates replacing {@code biomassGrids}' contents with
+   *         {@code timeIndexedBiomassGrids}' snapshots
    * @see TimeIndexedBiomassGridUpdatesFactory
    */
   public static <S extends Scope> TimeIndexedBiomassGridUpdatesFactory<S> timeIndexedBiomassGridUpdates(

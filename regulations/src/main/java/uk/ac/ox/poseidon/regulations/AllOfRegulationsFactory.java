@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link AllOfRegulations}, built via
- * {@link Factories#allOf(Factory...)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link AllOfRegulations}, built
+ * via {@link Factories#allOf(Factory...)}.
  */
 @Data
 @NoArgsConstructor

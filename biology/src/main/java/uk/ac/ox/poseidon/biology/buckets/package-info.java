@@ -21,15 +21,18 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.biology.buckets.Bucket}s: immutable, per-species quantities of
- * {@link uk.ac.ox.poseidon.biology.Content}, the unit in which fish are caught, carried, landed
- * and sold. Only the {@code Bucket} and
- * {@link uk.ac.ox.poseidon.biology.buckets.BucketBuilder} interfaces are visible outside this
- * package; the implementations are specialized for different shapes of content and chosen for you
- * at build time, since buckets sit on the model's hottest paths.
+ * {@link uk.ac.ox.poseidon.biology.buckets.Bucket}s: immutable, per-species
+ * quantities of {@link uk.ac.ox.poseidon.biology.Content}, the unit in which
+ * fish are caught, carried, landed and sold. Only the {@code Bucket} and
+ * {@link uk.ac.ox.poseidon.biology.buckets.BucketBuilder} interfaces are
+ * visible outside this package; the implementations are specialized for
+ * different shapes of content and chosen for you at build time, since buckets
+ * sit on the model's hottest paths.
  *
- * <p>Buckets are deliberately generic over {@link uk.ac.ox.poseidon.biology.Content} rather than
- * being about biomass specifically, so that an age- or length-structured abundance can be added
+ * <p>
+ * Buckets are deliberately generic over
+ * {@link uk.ac.ox.poseidon.biology.Content} rather than being about biomass
+ * specifically, so that an age- or length-structured abundance can be added
  * later without duplicating the machinery that moves fish around — see
  * {@link uk.ac.ox.poseidon.biology.Content} for why.
  */

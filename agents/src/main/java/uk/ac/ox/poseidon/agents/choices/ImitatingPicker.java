@@ -37,14 +37,16 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
- * This picker will look for better options than the current option in a list of candidates to
- * imitate and pick one at random if any of them are accessible from the vessel's current location.
+ * This picker will look for better options than the current option in a list of
+ * candidates to imitate and pick one at random if any of them are accessible
+ * from the vessel's current location.
  * <p>
- * Note that it is possible for this explorer to return {@code null}, in the case where
- * {@code currentOption} is {@code null} and all the other candidates are also {@code null} (which
- * can happen at the start of a simulation) or inaccessible (which can happen if the vessel is
- * isolated in a lake on a random map). This explorer should therefore never be used as the final
- * option in a chain of explorers; it needs another one to fall back on.
+ * Note that it is possible for this explorer to return {@code null}, in the
+ * case where {@code currentOption} is {@code null} and all the other candidates
+ * are also {@code null} (which can happen at the start of a simulation) or
+ * inaccessible (which can happen if the vessel is isolated in a lake on a
+ * random map). This explorer should therefore never be used as the final option
+ * in a chain of explorers; it needs another one to fall back on.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class ImitatingPicker<O> implements Provider<O> {
@@ -55,8 +57,9 @@ public class ImitatingPicker<O> implements Provider<O> {
   private final MersenneTwisterFast rng;
 
   /**
-   * @return a uniformly random candidate strictly better than the current best-known option, if
-   * any are accessible; otherwise the current best-known option; {@code null} if there is none
+   * @return a uniformly random candidate strictly better than the current
+   *         best-known option, if any are accessible; otherwise the current
+   *         best-known option; {@code null} if there is none
    */
   @Override
   public O get() {

@@ -34,8 +34,8 @@ import org.mockito.Mockito;
 class AllOfTest {
 
   /**
-   * Tests the {@link AllOf#test(Object)} method which checks if all predicates in the collection
-   * return true for the given object.
+   * Tests the {@link AllOf#test(Object)} method which checks if all predicates
+   * in the collection return true for the given object.
    */
 
   @Test

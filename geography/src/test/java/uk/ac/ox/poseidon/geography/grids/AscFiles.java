@@ -30,7 +30,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-/** Writes small ESRI ASCII grid ({@code .asc}) files for the grid-reader tests. */
+/**
+ * Writes small ESRI ASCII grid ({@code .asc}) files for the grid-reader tests.
+ */
 public final class AscFiles {
 
   private static final double WEST = 10;
@@ -38,9 +40,9 @@ public final class AscFiles {
   private static final double CELL_SIZE = 1;
 
   /**
-   * A 3 by 2 grid of one-degree cells from 10°E to 13°E and 40°N to 42°N, with a different
-   * value in every cell, so that a flipped or shifted reading shows:
-   * <pre>
+   * A 3 by 2 grid of one-degree cells from 10°E to 13°E and 40°N to 42°N, with
+   * a different value in every cell, so that a flipped or shifted reading
+   * shows: <pre>
    *          10°E  11°E  12°E  13°E
    *   42°N  +-----+-----+-----+
    *         |  1  |  2  |  3  |   (north row: image row 0)
@@ -57,7 +59,10 @@ public final class AscFiles {
 
   private AscFiles() {}
 
-  /** @return the path of {@link #rowsFromNorth()} written as {@code fileName} in {@code folder} */
+  /**
+   * @return the path of {@link #rowsFromNorth()} written as {@code fileName} in
+   *         {@code folder}
+   */
   public static Path writeFixture(final Path folder, final String fileName) {
     return write(
       folder.resolve(fileName),

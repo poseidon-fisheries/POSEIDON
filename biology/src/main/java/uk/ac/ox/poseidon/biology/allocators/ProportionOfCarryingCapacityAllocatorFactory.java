@@ -33,8 +33,9 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link ProportionOfCarryingCapacityAllocator},
- * built via {@link Factories#proportionOfCarryingCapacityAllocator(Factory, Factory)}/
+ * A {@link RelativeScopeFactory} counterpart of
+ * {@link ProportionOfCarryingCapacityAllocator}, built via
+ * {@link Factories#proportionOfCarryingCapacityAllocator(Factory, Factory)}/
  * {@link Factories#fullCarryingCapacityAllocator(Factory)}.
  */
 @Data

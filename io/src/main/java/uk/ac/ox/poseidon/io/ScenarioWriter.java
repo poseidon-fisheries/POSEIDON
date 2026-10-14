@@ -37,24 +37,28 @@ import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.utils.CustomPathConverter;
 
 /**
- * Serializes a {@link Scenario} to YAML, either as a string or written directly to a file/stream.
- * The counterpart of {@link ScenarioLoader}; also runnable as a CLI ({@code main}) that
- * instantiates a named {@code Supplier<Scenario>} class and writes its result to a given path —
- * this is how the generated scenario files under {@code inputs/} are produced, never by hand-
- * editing the YAML.
+ * Serializes a {@link Scenario} to YAML, either as a string or written directly
+ * to a file/stream. The counterpart of {@link ScenarioLoader}; also runnable as
+ * a CLI ({@code main}) that instantiates a named {@code Supplier<Scenario>}
+ * class and writes its result to a given path — this is how the generated
+ * scenario files under {@code inputs/} are produced, never by hand- editing the
+ * YAML.
  */
 public class ScenarioWriter {
 
   private final Yaml yaml;
 
   /**
-   * Constructs a {@code ScenarioWriter} with default {@link DumperOptions} (pretty flow-style).
+   * Constructs a {@code ScenarioWriter} with default {@link DumperOptions}
+   * (pretty flow-style).
    */
   public ScenarioWriter() {
     this(new Yaml(defaultDumperOptions()));
   }
 
-  /** @param yaml the configured {@link Yaml} instance to dump scenarios through */
+  /**
+   * @param yaml the configured {@link Yaml} instance to dump scenarios through
+   */
   @SuppressFBWarnings("EI_EXPOSE_REP2")
   public ScenarioWriter(final Yaml yaml) {
     this.yaml = yaml;

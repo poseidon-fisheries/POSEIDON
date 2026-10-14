@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link MemoryBasedOptionValues}, built via
- * {@link Factories#memoryBasedOptionValues(Factory, Factory)}.
+ * A {@link VesselScopeFactory} counterpart of {@link MemoryBasedOptionValues},
+ * built via {@link Factories#memoryBasedOptionValues(Factory, Factory)}.
  */
 @Data
 @NoArgsConstructor

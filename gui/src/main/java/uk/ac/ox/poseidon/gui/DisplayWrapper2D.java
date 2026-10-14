@@ -38,9 +38,10 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.gui.portrayals.NamedPortrayal;
 
 /**
- * A {@link DisplayWrapper} for a MASON {@link Display2D}: attaches one {@link NamedPortrayal} per
- * value produced by {@code fieldPortrayalFactories} (unwrapping any {@link Collection} a factory
- * returns), against a fixed-size, fixed-backdrop 2D field.
+ * A {@link DisplayWrapper} for a MASON {@link Display2D}: attaches one
+ * {@link NamedPortrayal} per value produced by {@code fieldPortrayalFactories}
+ * (unwrapping any {@link Collection} a factory returns), against a fixed-size,
+ * fixed-backdrop 2D field.
  */
 public class DisplayWrapper2D extends DisplayWrapper<Display2D> {
 
@@ -59,9 +60,11 @@ public class DisplayWrapper2D extends DisplayWrapper<Display2D> {
 
   /**
    * @param title                   the display window's title
-   * @param fieldPortrayalFactories factories evaluated against a fresh {@link SimulationScope}
-   *                                on each {@link #setupPortrayals}; each must produce a
-   *                                {@link NamedPortrayal}, or a {@link Collection} of them
+   * @param fieldPortrayalFactories factories evaluated against a fresh
+   *                                {@link SimulationScope} on each
+   *                                {@link #setupPortrayals}; each must produce
+   *                                a {@link NamedPortrayal}, or a
+   *                                {@link Collection} of them
    * @param width                   the field's width
    * @param height                  the field's height
    * @param backDrop                the field's background paint

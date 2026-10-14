@@ -36,10 +36,11 @@ import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.utils.LonLatTable;
 
 /**
- * A {@link RelativeScopeFactory} for a {@link ModelGrid} sized to fit a resolved
- * {@link LonLatTable}'s coordinates, padded by a fixed margin: the envelope is the coordinates'
- * bounding box expanded by {@code mapPaddingInDegrees} on every side, and the grid height is
- * derived from {@code gridWidthInCells} to match the envelope's aspect ratio. Built via
+ * A {@link RelativeScopeFactory} for a {@link ModelGrid} sized to fit a
+ * resolved {@link LonLatTable}'s coordinates, padded by a fixed margin: the
+ * envelope is the coordinates' bounding box expanded by
+ * {@code mapPaddingInDegrees} on every side, and the grid height is derived
+ * from {@code gridWidthInCells} to match the envelope's aspect ratio. Built via
  * {@link Factories#modelGridFromLonLatTable(Factory, int, double)}.
  */
 @Data

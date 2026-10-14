@@ -30,8 +30,9 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * A {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} counterpart of
- * {@link MarketSalesListenerTable}, registering it with the {@code EventManager} (see
- * {@link SimulationEventListenerFactory}), built via {@link Factories#marketSalesListenerTable}.
+ * {@link MarketSalesListenerTable}, registering it with the
+ * {@code EventManager} (see {@link SimulationEventListenerFactory}), built via
+ * {@link Factories#marketSalesListenerTable}.
  */
 @Data
 @NoArgsConstructor

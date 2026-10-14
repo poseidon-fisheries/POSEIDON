@@ -40,7 +40,8 @@ public class SpeciesIndexedDoubleArray
   private final @NonNull SpeciesIndex speciesIndex;
 
   /**
-   * The array must be aligned with {@code speciesIndex} (same size and ordering).
+   * The array must be aligned with {@code speciesIndex} (same size and
+   * ordering).
    */
   private SpeciesIndexedDoubleArray(
     final double @NonNull [] a,
@@ -54,7 +55,8 @@ public class SpeciesIndexedDoubleArray
    * @param a            the values, aligned with {@code speciesIndex}; copied
    * @param speciesIndex the index the array is aligned with
    * @return a new instance holding a copy of {@code a}
-   * @throws IllegalArgumentException if {@code a}'s length doesn't match the index's size
+   * @throws IllegalArgumentException if {@code a}'s length doesn't match the
+   *                                  index's size
    */
   public static SpeciesIndexedDoubleArray of(
     final double @NonNull [] a,

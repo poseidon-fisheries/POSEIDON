@@ -29,9 +29,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} that is true iff the tested date-time is strictly before a supplied
- * reference date-time. Built via
- * {@link Factories#dateTimeIsBefore(uk.ac.ox.poseidon.core.Factory)} in this package.
+ * A {@link Predicate} that is true iff the tested date-time is strictly before
+ * a supplied reference date-time. Built via
+ * {@link Factories#dateTimeIsBefore(uk.ac.ox.poseidon.core.Factory)} in this
+ * package.
  */
 @Getter
 @RequiredArgsConstructor

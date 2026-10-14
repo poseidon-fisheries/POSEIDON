@@ -43,7 +43,10 @@ import uk.ac.ox.poseidon.calibration.CalibrationProblem.SimulationTimes;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 
-/** Runs an empty scenario for a day; the evaluator's score is the simulation's seed. */
+/**
+ * Runs an empty scenario for a day; the evaluator's score is the simulation's
+ * seed.
+ */
 class CalibrationProblemTest {
 
   private static CalibrationProblem problem(
@@ -70,9 +73,10 @@ class CalibrationProblemTest {
   }
 
   /**
-   * Each seed waits until the other has started: run one after the other, the first would wait
-   * in vain. Two seeds, because the common pool may have a single worker on a small machine,
-   * which with the calling thread still runs two at once.
+   * Each seed waits until the other has started: run one after the other, the
+   * first would wait in vain. Two seeds, because the common pool may have a
+   * single worker on a small machine, which with the calling thread still runs
+   * two at once.
    */
   @Test
   @Timeout(value = 30, threadMode = SEPARATE_THREAD)

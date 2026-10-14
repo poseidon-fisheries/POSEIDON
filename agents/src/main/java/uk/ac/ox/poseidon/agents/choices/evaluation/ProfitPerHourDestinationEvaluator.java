@@ -35,8 +35,9 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.Listener;
 
 /**
- * An {@link Evaluator} that scores a destination by the vessel's trip profit (in a fixed
- * currency), divided by the trip's time at sea ({@link Trip#getTimeAtSea()}) in hours.
+ * An {@link Evaluator} that scores a destination by the vessel's trip profit
+ * (in a fixed currency), divided by the trip's time at sea
+ * ({@link Trip#getTimeAtSea()}) in hours.
  */
 public class ProfitPerHourDestinationEvaluator implements Evaluator<Int2D> {
 
@@ -47,7 +48,10 @@ public class ProfitPerHourDestinationEvaluator implements Evaluator<Int2D> {
     this.currencyCode = checkNotNull(currencyUnit).getCode();
   }
 
-  /** @return an evaluation that scores {@code option} once the trip it's part of ends */
+  /**
+   * @return an evaluation that scores {@code option} once the trip it's part of
+   *         ends
+   */
   @Override
   public Evaluation<Int2D> newEvaluation(
     final Int2D option,

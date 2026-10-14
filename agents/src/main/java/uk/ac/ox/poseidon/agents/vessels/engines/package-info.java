@@ -21,9 +21,12 @@
  */
 
 /**
- * A vessel's propulsion: an {@link uk.ac.ox.poseidon.agents.vessels.engines.Engine} with a fixed
- * cruising speed and fuel consumption rate, drawing on a
- * {@link uk.ac.ox.poseidon.agents.vessels.engines.FuelTank} with unlimited or fixed capacity. See
- * {@link uk.ac.ox.poseidon.agents.vessels.engines.Factories} for the entry points.
+ * A vessel's propulsion: an
+ * {@link uk.ac.ox.poseidon.agents.vessels.engines.Engine} with a fixed cruising
+ * speed and fuel consumption rate, drawing on a
+ * {@link uk.ac.ox.poseidon.agents.vessels.engines.FuelTank} with unlimited or
+ * fixed capacity. See
+ * {@link uk.ac.ox.poseidon.agents.vessels.engines.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.agents.vessels.engines;

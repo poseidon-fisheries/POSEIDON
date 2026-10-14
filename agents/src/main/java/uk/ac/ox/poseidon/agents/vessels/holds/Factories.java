@@ -35,7 +35,8 @@ public class Factories {
 
   /**
    * @param catchCategoriser sorts uncategorised content added to the hold
-   * @return a {@link VesselScope}-relative factory for an {@link InfiniteBiomassHold}
+   * @return a {@link VesselScope}-relative factory for an
+   *         {@link InfiniteBiomassHold}
    * @see InfiniteBiomassHold
    */
   public static InfiniteBiomassHoldFactory infiniteBiomassHold(
@@ -49,9 +50,11 @@ public class Factories {
 
   /**
    * @param capacity         the hold's total capacity
-   * @param tolerance        how far over capacity the hold may go before rejecting content
+   * @param tolerance        how far over capacity the hold may go before
+   *                         rejecting content
    * @param catchCategoriser sorts uncategorised content added to the hold
-   * @return a {@link VesselScope}-relative factory for a {@link StandardBiomassHold}
+   * @return a {@link VesselScope}-relative factory for a
+   *         {@link StandardBiomassHold}
    * @see StandardBiomassHold
    */
   public static StandardBiomassHoldFactory standardBiomassHold(

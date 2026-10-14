@@ -30,7 +30,10 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-/** A {@link DestinationSupplier} that always returns the vessel's home port cell. */
+/**
+ * A {@link DestinationSupplier} that always returns the vessel's home port
+ * cell.
+ */
 @RequiredArgsConstructor(access = PACKAGE)
 public class HomePortDestinationSupplier implements DestinationSupplier {
 

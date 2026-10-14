@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A {@link SimulationScopeFactory} that builds one {@link BiomassMarket} per port in
- * {@link #portGrid}, without prices, built via
+ * A {@link SimulationScopeFactory} that builds one {@link BiomassMarket} per
+ * port in {@link #portGrid}, without prices, built via
  * {@link Factories#oneBiomassMarketPerPort}.
  */
 @Data

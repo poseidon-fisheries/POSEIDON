@@ -29,10 +29,10 @@ import lombok.NonNull;
 import uk.ac.ox.poseidon.core.predicates.logical.AllOf;
 
 /**
- * The conjunction of several rules: permits an action only when every one of them permits it
- * (every action when there are none), asking them in order and stopping at the first that
- * forbids it. An {@link AllOf} that is itself a rule. Built via
- * {@link Factories#allOf(uk.ac.ox.poseidon.core.Factory...)}.
+ * The conjunction of several rules: permits an action only when every one of
+ * them permits it (every action when there are none), asking them in order and
+ * stopping at the first that forbids it. An {@link AllOf} that is itself a
+ * rule. Built via {@link Factories#allOf(uk.ac.ox.poseidon.core.Factory...)}.
  *
  * @param <A> the type of action judged
  */

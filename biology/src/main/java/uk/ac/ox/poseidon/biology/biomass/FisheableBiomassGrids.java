@@ -45,9 +45,10 @@ import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedObjects;
 
 /**
- * A whole-community {@link FisheableGrid}: one {@link BiomassGrid} per species, indexed by a shared
- * {@link SpeciesIndex} so a {@link Bucket} can be extracted from or released into every species'
- * grid at a cell in one pass, rather than one {@link Fisheable} per species.
+ * A whole-community {@link FisheableGrid}: one {@link BiomassGrid} per species,
+ * indexed by a shared {@link SpeciesIndex} so a {@link Bucket} can be extracted
+ * from or released into every species' grid at a cell in one pass, rather than
+ * one {@link Fisheable} per species.
  */
 public final class FisheableBiomassGrids
   implements
@@ -61,7 +62,8 @@ public final class FisheableBiomassGrids
   private final BiomassGrid[] grids;
 
   /**
-   * @param grids the per-species grids; must not contain two grids for the same species
+   * @param grids the per-species grids; must not contain two grids for the same
+   *              species
    */
   public FisheableBiomassGrids(final Collection<? extends BiomassGrid> grids) {
     final ImmutableMap<Species, ? extends BiomassGrid> gridMap = grids
@@ -106,9 +108,9 @@ public final class FisheableBiomassGrids
   }
 
   /**
-   * Extracting and releasing act on every species' grid at this cell at once, indexed by
-   * {@link #speciesIndex}; extracting never over-draws a species' grid, and releasing a species
-   * with no backing grid throws.
+   * Extracting and releasing act on every species' grid at this cell at once,
+   * indexed by {@link #speciesIndex}; extracting never over-draws a species'
+   * grid, and releasing a species with no backing grid throws.
    */
   @RequiredArgsConstructor
   class FisheableCell implements Fisheable {

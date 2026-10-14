@@ -33,8 +33,8 @@ public class Factories {
 
   /**
    * @param eventAccumulator factory for the accumulator to periodically clear
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link EventClearer}
-   * over the resolved accumulator
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         {@link EventClearer} over the resolved accumulator
    * @see EventClearer
    */
   public static <S extends Scope> EventClearerFactory<S> eventClearer(

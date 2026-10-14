@@ -25,8 +25,8 @@ package uk.ac.ox.poseidon.core.utils;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * Argument-validation helpers, on top of Guava's {@code Preconditions}, for common numeric
- * checks.
+ * Argument-validation helpers, on top of Guava's {@code Preconditions}, for
+ * common numeric checks.
  */
 public class Preconditions {
 

@@ -28,8 +28,8 @@ import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * A leaf {@link AgentTask} that points the vessel's current trip back at its origin (e.g. to head
- * home after fishing) and always succeeds.
+ * A leaf {@link AgentTask} that points the vessel's current trip back at its
+ * origin (e.g. to head home after fishing) and always succeeds.
  */
 public class SetDestinationToOrigin extends AgentTask<Vessel> {
 

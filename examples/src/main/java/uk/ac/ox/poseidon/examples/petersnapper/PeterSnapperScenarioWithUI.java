@@ -32,12 +32,15 @@ import uk.ac.ox.poseidon.gui.ScenarioWithUI;
 import uk.ac.ox.poseidon.gui.portrayals.*;
 
 /**
- * A {@link ScenarioWithUI} for the Peter Snapper example fishery: a single 2D display showing
- * bathymetry, carrying capacity, species biomass, markets, ports, vessels and cell coordinates.
+ * A {@link ScenarioWithUI} for the Peter Snapper example fishery: a single 2D
+ * display showing bathymetry, carrying capacity, species biomass, markets,
+ * ports, vessels and cell coordinates.
  */
 public class PeterSnapperScenarioWithUI extends ScenarioWithUI {
 
-  /** @param scenario the scenario to run, wired up as the display's data source */
+  /**
+   * @param scenario the scenario to run, wired up as the display's data source
+   */
   public PeterSnapperScenarioWithUI(final Scenario scenario) {
     super(
       scenario,

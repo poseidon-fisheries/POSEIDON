@@ -37,12 +37,14 @@ import ucar.nc2.Variable;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 /**
- * Shared machinery for reading a NetCDF file on a regular latitude/longitude grid, exposing only
- * POSEIDON/JDK types (no {@code ucar.*} types leak out of this class). Reads via the raw,
- * non-"enhanced" CDM API so that {@code _FillValue} substitution is the only conversion applied —
- * CDM's automatic enhancement would also silently apply {@code scale_factor}/{@code add_offset}
- * /unit conversions that aren't wanted here. Subclasses add the shape-specific parts: which
- * variables count as data variables, and how a variable's values are sliced out.
+ * Shared machinery for reading a NetCDF file on a regular latitude/longitude
+ * grid, exposing only POSEIDON/JDK types (no {@code ucar.*} types leak out of
+ * this class). Reads via the raw, non-"enhanced" CDM API so that
+ * {@code _FillValue} substitution is the only conversion applied — CDM's
+ * automatic enhancement would also silently apply
+ * {@code scale_factor}/{@code add_offset} /unit conversions that aren't wanted
+ * here. Subclasses add the shape-specific parts: which variables count as data
+ * variables, and how a variable's values are sliced out.
  */
 public abstract class AbstractNetCdfGridReader implements AutoCloseable {
 
@@ -55,8 +57,10 @@ public abstract class AbstractNetCdfGridReader implements AutoCloseable {
 
   /**
    * @param ncFile                 the NetCDF file to open
-   * @param latitudeDimensionName  the name of the latitude dimension/coordinate variable
-   * @param longitudeDimensionName the name of the longitude dimension/coordinate variable
+   * @param latitudeDimensionName  the name of the latitude dimension/coordinate
+   *                               variable
+   * @param longitudeDimensionName the name of the longitude
+   *                               dimension/coordinate variable
    * @throws RuntimeException if an I/O error occurs
    */
   protected AbstractNetCdfGridReader(
@@ -84,24 +88,28 @@ public abstract class AbstractNetCdfGridReader implements AutoCloseable {
   }
 
   /**
-   * Longitude coordinate values (ascending, degrees_east), one per longitude cell.
+   * Longitude coordinate values (ascending, degrees_east), one per longitude
+   * cell.
    */
   public double[] getLongitudes() {
     return readDoubles(longitudeDimensionName);
   }
 
   /**
-   * Latitude coordinate values (descending, degrees_north), one per latitude cell.
+   * Latitude coordinate values (descending, degrees_north), one per latitude
+   * cell.
    */
   public double[] getLatitudes() {
     return readDoubles(latitudeDimensionName);
   }
 
   /**
-   * Validates that this file's grid aligns exactly with the given {@code ModelGrid}, comparing
-   * cell <em>centers</em> (via {@link ModelGrid#toCoordinate}) rather than raw envelope/cellsize
-   * values, since those disagree at the 1e-7-1e-9 level between an {@code .asc} grid header and
-   * a NetCDF {@code geotransform} even for grids that describe the same raster.
+   * Validates that this file's grid aligns exactly with the given
+   * {@code ModelGrid}, comparing cell <em>centers</em> (via
+   * {@link ModelGrid#toCoordinate}) rather than raw envelope/cellsize values,
+   * since those disagree at the 1e-7-1e-9 level between an {@code .asc} grid
+   * header and a NetCDF {@code geotransform} even for grids that describe the
+   * same raster.
    */
   public void checkAlignmentWith(final ModelGrid modelGrid) {
     checkState(
@@ -139,10 +147,12 @@ public abstract class AbstractNetCdfGridReader implements AutoCloseable {
   }
 
   /**
-   * Reads a {@code (latitude, longitude)}-shaped (or, with a leading size-1 dimension, e.g. a
-   * single time slice, shaped {@code (1, latitude, longitude)}) slice of the given variable,
-   * reoriented to {@code [longitudeIndex][latitudeIndex]} (i.e. {@code ModelGrid}'s
-   * {@code [x][y]} convention), with {@code _FillValue} cells converted to {@link Double#NaN}.
+   * Reads a {@code (latitude, longitude)}-shaped (or, with a leading size-1
+   * dimension, e.g. a single time slice, shaped
+   * {@code (1, latitude, longitude)}) slice of the given variable, reoriented
+   * to {@code [longitudeIndex][latitudeIndex]} (i.e. {@code ModelGrid}'s
+   * {@code [x][y]} convention), with {@code _FillValue} cells converted to
+   * {@link Double#NaN}.
    */
   protected double[][] readAndReorient(
     final Variable variable,

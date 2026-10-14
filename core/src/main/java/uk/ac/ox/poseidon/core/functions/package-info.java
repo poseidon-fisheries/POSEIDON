@@ -21,7 +21,8 @@
  */
 
 /**
- * {@link java.util.function.Function}s that transform, combine, or look up values. See
- * {@link uk.ac.ox.poseidon.core.functions.Factories} for the entry points.
+ * {@link java.util.function.Function}s that transform, combine, or look up
+ * values. See {@link uk.ac.ox.poseidon.core.functions.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.core.functions;

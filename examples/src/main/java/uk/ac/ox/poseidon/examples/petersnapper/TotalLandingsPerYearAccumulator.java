@@ -30,8 +30,8 @@ import uk.ac.ox.poseidon.agents.market.Sale;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
 
 /**
- * An {@link AbstractListener} that accumulates total biomass sold (in kg), per calendar year,
- * across every {@link Sale} it receives.
+ * An {@link AbstractListener} that accumulates total biomass sold (in kg), per
+ * calendar year, across every {@link Sale} it receives.
  */
 public class TotalLandingsPerYearAccumulator
   extends AbstractListener<Sale>

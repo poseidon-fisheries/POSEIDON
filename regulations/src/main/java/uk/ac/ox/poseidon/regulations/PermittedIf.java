@@ -26,7 +26,10 @@ import java.util.function.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-/** A {@link Regulations} rule permitting only actions matching {@code actionPredicate}. */
+/**
+ * A {@link Regulations} rule permitting only actions matching
+ * {@code actionPredicate}.
+ */
 @RequiredArgsConstructor
 public class PermittedIf<A extends Action<?>> implements Regulations<A> {
 

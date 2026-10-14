@@ -28,8 +28,9 @@ import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} that is true iff the tested value is a member of a supplied collection.
- * Built via {@link Factories#in(uk.ac.ox.poseidon.core.Factory)} in this package.
+ * A {@link Predicate} that is true iff the tested value is a member of a
+ * supplied collection. Built via
+ * {@link Factories#in(uk.ac.ox.poseidon.core.Factory)} in this package.
  *
  * @param <T> the type of input tested
  */

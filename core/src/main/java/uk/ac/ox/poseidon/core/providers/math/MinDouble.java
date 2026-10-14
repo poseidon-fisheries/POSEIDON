@@ -28,9 +28,10 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.DoubleProvider;
 
 /**
- * A {@link DoubleProvider} that returns the lesser of two supplied double values, recomputed on
- * every call. Built via {@link Factories#minDouble(uk.ac.ox.poseidon.core.Factory,
- * uk.ac.ox.poseidon.core.Factory)} in this package.
+ * A {@link DoubleProvider} that returns the lesser of two supplied double
+ * values, recomputed on every call. Built via
+ * {@link Factories#minDouble(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * in this package.
  */
 @RequiredArgsConstructor
 public class MinDouble implements DoubleProvider {

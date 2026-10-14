@@ -21,8 +21,9 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.io.sources.DataSource}s: sources of readable character data backed by
- * a string literal, a file, or an entry within a zip archive. See
- * {@link uk.ac.ox.poseidon.io.sources.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.io.sources.DataSource}s: sources of readable
+ * character data backed by a string literal, a file, or an entry within a zip
+ * archive. See {@link uk.ac.ox.poseidon.io.sources.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.io.sources;

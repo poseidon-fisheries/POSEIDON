@@ -30,11 +30,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
 
 /**
- * An {@link AbstractDoubleGridFromAllocatorFactory} for a {@link MutableDoubleGrid}, with no
- * normalisation: each cell's value is exactly what the resolved {@link Allocator} returned for
- * it, but the grid can be changed afterward via {@link MutableDoubleGrid#setValue} — useful for a
- * grid whose values need to be periodically re-derived from an allocator at runtime, unlike the
- * fixed {@link DoubleGridFromAllocatorFactory}. Built via
+ * An {@link AbstractDoubleGridFromAllocatorFactory} for a
+ * {@link MutableDoubleGrid}, with no normalisation: each cell's value is
+ * exactly what the resolved {@link Allocator} returned for it, but the grid can
+ * be changed afterward via {@link MutableDoubleGrid#setValue} — useful for a
+ * grid whose values need to be periodically re-derived from an allocator at
+ * runtime, unlike the fixed {@link DoubleGridFromAllocatorFactory}. Built via
  * {@link Factories#mutableDoubleGridFromAllocator(Factory, Factory)}.
  */
 @Data

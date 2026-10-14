@@ -78,7 +78,10 @@ public class Price {
     return Money.of(amount.getCurrencyUnit(), value, HALF_EVEN);
   }
 
-  /** @return this price's value for {@code kg} kilograms, as a raw double (no rounding) */
+  /**
+   * @return this price's value for {@code kg} kilograms, as a raw double (no
+   *         rounding)
+   */
   public double valueForKgDouble(final double kg) {
     return amountPerKg * kg;
   }

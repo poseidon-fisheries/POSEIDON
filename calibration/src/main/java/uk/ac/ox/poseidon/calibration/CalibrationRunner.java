@@ -38,11 +38,13 @@ import java.util.concurrent.ForkJoinTask;
 import uk.ac.ox.poseidon.calibration.CalibrationProblem.SimulationTimes;
 
 /**
- * Runs a {@link CalibrationProblem} through a jenetics genetic-algorithm {@link Engine}
- * (Gaussian mutation, mean-value recombination, single-elite tournament selection) and returns
- * the best solution found. Each individual is evaluated in its own task on the common fork-join
- * pool: by default jenetics runs the individuals of a generation in batches of up to five, one
- * after another within a batch, which suits cheap fitness functions but not simulations.
+ * Runs a {@link CalibrationProblem} through a jenetics genetic-algorithm
+ * {@link Engine} (Gaussian mutation, mean-value recombination, single-elite
+ * tournament selection) and returns the best solution found. Each individual is
+ * evaluated in its own task on the common fork-join pool: by default jenetics
+ * runs the individuals of a generation in batches of up to five, one after
+ * another within a batch, which suits cheap fitness functions but not
+ * simulations.
  */
 public final class CalibrationRunner {
 
@@ -111,22 +113,29 @@ public final class CalibrationRunner {
   }
 
   /**
-   * The genetic-algorithm parameters {@link #minimize(CalibrationProblem, Options)} runs with.
+   * The genetic-algorithm parameters
+   * {@link #minimize(CalibrationProblem, Options)} runs with.
    *
-   * @param populationSize             number of individuals per generation
-   * @param generations                hard cap on the number of generations to run
-   * @param mutationProbability        per-allele probability of Gaussian mutation
-   * @param recombinationProbability   probability of mean-value recombination between parents
-   * @param steadyGenerations          if greater than {@code 0}, stop early once the best
-   *                                   fitness hasn't improved for this many consecutive
-   *                                   generations; {@code 0} disables early stopping
-   * @param reportEveryGenerations     if greater than {@code 0}, print a progress line every
-   *                                   this many generations: the best fitness and, since the
-   *                                   previous line, the wall time, the simulations run, their
-   *                                   time and the share of the processors they used;
-   *                                   {@code 0} disables reporting
-   * @param mutatorShapeShift          shift parameter of the Gaussian mutator's shape
-   * @param mutatorShapeSigma          sigma (spread) parameter of the Gaussian mutator's shape
+   * @param populationSize           number of individuals per generation
+   * @param generations              hard cap on the number of generations to
+   *                                 run
+   * @param mutationProbability      per-allele probability of Gaussian mutation
+   * @param recombinationProbability probability of mean-value recombination
+   *                                 between parents
+   * @param steadyGenerations        if greater than {@code 0}, stop early once
+   *                                 the best fitness hasn't improved for this
+   *                                 many consecutive generations; {@code 0}
+   *                                 disables early stopping
+   * @param reportEveryGenerations   if greater than {@code 0}, print a progress
+   *                                 line every this many generations: the best
+   *                                 fitness and, since the previous line, the
+   *                                 wall time, the simulations run, their time
+   *                                 and the share of the processors they used;
+   *                                 {@code 0} disables reporting
+   * @param mutatorShapeShift        shift parameter of the Gaussian mutator's
+   *                                 shape
+   * @param mutatorShapeSigma        sigma (spread) parameter of the Gaussian
+   *                                 mutator's shape
    */
   public record Options(
     int populationSize,
@@ -139,8 +148,8 @@ public final class CalibrationRunner {
     double mutatorShapeSigma
   ) {
     /**
-     * Shorthand for the full constructor with early stopping, reporting and mutator shaping
-     * disabled/left at their neutral defaults.
+     * Shorthand for the full constructor with early stopping, reporting and
+     * mutator shaping disabled/left at their neutral defaults.
      */
     public Options(
       final int populationSize,
@@ -161,7 +170,8 @@ public final class CalibrationRunner {
     }
 
     /**
-     * Shorthand for the full constructor with mutator shaping left at its neutral default.
+     * Shorthand for the full constructor with mutator shaping left at its
+     * neutral default.
      */
     public Options(
       final int populationSize,
@@ -184,9 +194,10 @@ public final class CalibrationRunner {
     }
 
     /**
-     * @return a population of 30 run for up to 30 generations (10 generations of steady
-     * fitness, whichever comes first), with a 20% mutation probability and 35% recombination
-     * probability, reporting progress every generation
+     * @return a population of 30 run for up to 30 generations (10 generations
+     *         of steady fitness, whichever comes first), with a 20% mutation
+     *         probability and 35% recombination probability, reporting progress
+     *         every generation
      */
     public static Options defaults() {
       return new Options(30, 30, 0.20, 0.35, 10, 1, 0, 1);
@@ -196,8 +207,9 @@ public final class CalibrationRunner {
   /**
    * The outcome of a {@link #minimize(CalibrationProblem, Options)} run.
    *
-   * @param parameters  the best solution found, as a map of property name to value; defensively
-   *                    copied on construction and on every {@link #parameters()} call
+   * @param parameters  the best solution found, as a map of property name to
+   *                    value; defensively copied on construction and on every
+   *                    {@link #parameters()} call
    * @param fitness     the best solution's fitness score
    * @param generations the number of generations actually run
    */
@@ -216,7 +228,10 @@ public final class CalibrationRunner {
     }
   }
 
-  /** Runs each of {@code evaluations} in its own fork-join task, and waits for them all. */
+  /**
+   * Runs each of {@code evaluations} in its own fork-join task, and waits for
+   * them all.
+   */
   static void evaluateSeparately(
     final BaseSeq<? extends Runnable> evaluations
   ) {
@@ -226,9 +241,9 @@ public final class CalibrationRunner {
   }
 
   /**
-   * @return a progress line: {@code machine_use} is the simulations' total time over the wall
-   * time multiplied by the number of processors, so 1 means every processor ran a simulation
-   * all along
+   * @return a progress line: {@code machine_use} is the simulations' total time
+   *         over the wall time multiplied by the number of processors, so 1
+   *         means every processor ran a simulation all along
    */
   static String formatReport(
     final long generation,

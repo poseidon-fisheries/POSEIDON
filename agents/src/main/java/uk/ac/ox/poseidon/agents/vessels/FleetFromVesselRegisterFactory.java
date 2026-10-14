@@ -50,10 +50,11 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} that turns a vessel register table (one row per vessel
- * activation/deactivation/modification event) into a {@link Fleet}, scheduling every row as a
- * {@link FleetEvent} at its own event date. Built directly via its {@code @SuperBuilder}, not
- * from {@code Factories}, given how many optional columns/mappings it takes.
+ * A {@link SimulationScopeFactory} that turns a vessel register table (one row
+ * per vessel activation/deactivation/modification event) into a {@link Fleet},
+ * scheduling every row as a {@link FleetEvent} at its own event date. Built
+ * directly via its {@code @SuperBuilder}, not from {@code Factories}, given how
+ * many optional columns/mappings it takes.
  */
 @Data
 @SuperBuilder
@@ -89,7 +90,9 @@ public class FleetFromVesselRegisterFactory
   @Builder.Default
   private String eventDateColumn = "event_start_date";
 
-  /** Columns to exclude from a row's tags, on top of the other named columns. */
+  /**
+   * Columns to exclude from a row's tags, on top of the other named columns.
+   */
   @Builder.Default
   private List<String> ignoredColumns = List.of("event_end_date");
 
@@ -124,9 +127,11 @@ public class FleetFromVesselRegisterFactory
   private List<Factory<? super VesselScope, ?>> extraFactories;
 
   /**
-   * Maps a bean property path on this factory to a table column: before resolving
-   * {@link #behaviour}/{@link #hold}/{@link #gear}/{@link #engine}/{@link #extraFactories} for
-   * a row, each mapped property is set to that row's value in the named column.
+   * Maps a bean property path on this factory to a table column: before
+   * resolving
+   * {@link #behaviour}/{@link #hold}/{@link #gear}/{@link #engine}/{@link #extraFactories}
+   * for a row, each mapped property is set to that row's value in the named
+   * column.
    */
   @Singular
   private Map<String, String> dataMappings;
@@ -159,8 +164,8 @@ public class FleetFromVesselRegisterFactory
   }
 
   /**
-   * @return {@link #fleet}, with one {@link FleetEvent} per row of {@link #data} scheduled at
-   * that row's event date
+   * @return {@link #fleet}, with one {@link FleetEvent} per row of
+   *         {@link #data} scheduled at that row's event date
    */
   @Override
   protected Fleet newInstance(final SimulationScope scope) {

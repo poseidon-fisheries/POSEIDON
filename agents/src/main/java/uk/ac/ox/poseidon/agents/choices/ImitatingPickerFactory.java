@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link ImitatingPicker}, built via
- * {@link Factories#imitatingPicker}.
+ * A {@link VesselScopeFactory} counterpart of {@link ImitatingPicker}, built
+ * via {@link Factories#imitatingPicker}.
  */
 @Data
 @NoArgsConstructor

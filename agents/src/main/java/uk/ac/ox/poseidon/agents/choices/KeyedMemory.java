@@ -29,9 +29,10 @@ import java.util.Map;
 import lombok.NoArgsConstructor;
 
 /**
- * A separate {@link Memory} for each key, such as the code of the gear the observations were made
- * with, so that observations made in one context are only read back in the same context. Which key
- * an observation is remembered under, and which key a reader looks up, is up to the caller.
+ * A separate {@link Memory} for each key, such as the code of the gear the
+ * observations were made with, so that observations made in one context are
+ * only read back in the same context. Which key an observation is remembered
+ * under, and which key a reader looks up, is up to the caller.
  *
  * @param <K> the type of key
  * @param <O> the type of option observed
@@ -43,8 +44,9 @@ public class KeyedMemory<K, O, M> {
   private final Map<K, Memory<O, M>> memories = new HashMap<>();
 
   /**
-   * Gives the memory for {@code key}, to remember observations in or to read from. A key not
-   * seen before gets a new, empty memory, which is kept from then on.
+   * Gives the memory for {@code key}, to remember observations in or to read
+   * from. A key not seen before gets a new, empty memory, which is kept from
+   * then on.
    *
    * @param key the key to look up; may be {@code null}
    * @return the memory for {@code key}, always the same one for the same key

@@ -21,8 +21,9 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}, the date-time-aware MASON schedule
- * every simulation runs on, and factories for scheduling resolved steppables onto it. See
+ * {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}, the date-time-aware
+ * MASON schedule every simulation runs on, and factories for scheduling
+ * resolved steppables onto it. See
  * {@link uk.ac.ox.poseidon.core.schedule.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.core.schedule;

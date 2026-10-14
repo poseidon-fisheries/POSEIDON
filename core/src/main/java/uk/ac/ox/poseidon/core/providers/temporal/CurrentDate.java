@@ -28,8 +28,8 @@ import uk.ac.ox.poseidon.core.providers.Provider;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 /**
- * A {@link Provider} that returns the simulation's current date, read live from the
- * {@link TemporalSchedule} on every call. Built via
+ * A {@link Provider} that returns the simulation's current date, read live from
+ * the {@link TemporalSchedule} on every call. Built via
  * {@link Factories#currentDate()} in this package.
  */
 @RequiredArgsConstructor

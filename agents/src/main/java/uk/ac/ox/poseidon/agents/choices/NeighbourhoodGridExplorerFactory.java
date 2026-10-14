@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link NeighbourhoodCellPicker}, built via
- * {@link Factories#neighbourhoodGridExplorer}.
+ * A {@link VesselScopeFactory} counterpart of {@link NeighbourhoodCellPicker},
+ * built via {@link Factories#neighbourhoodGridExplorer}.
  */
 @Data
 @NoArgsConstructor

@@ -41,7 +41,10 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-/** A {@link SimulationScopeFactory} that portrays a {@link VesselField} as oriented compass markers. */
+/**
+ * A {@link SimulationScopeFactory} that portrays a {@link VesselField} as
+ * oriented compass markers.
+ */
 public class VesselFieldPortrayalFactory
   extends SimulationScopeFactory<ContinuousPortrayal2D>
 {
@@ -49,7 +52,10 @@ public class VesselFieldPortrayalFactory
   private static final double SCALE = 0.5;
   private Factory<? super SimulationScope, ? extends VesselField> vesselField;
 
-  /** @return a continuous-space portrayal showing each vessel as an oriented compass marker */
+  /**
+   * @return a continuous-space portrayal showing each vessel as an oriented
+   *         compass marker
+   */
   @Override
   protected ContinuousPortrayal2D newInstance(final SimulationScope scope) {
     final ContinuousPortrayal2D continuousPortrayal2D =

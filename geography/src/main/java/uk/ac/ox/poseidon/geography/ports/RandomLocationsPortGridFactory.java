@@ -40,14 +40,15 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link SimulationScopeFactory} for a {@link MutablePortGrid} with a fixed number of ports
- * placed on randomly-chosen suitable land cells (land cells with at least
- * {@code minimumAdjacentWaterTiles} active water neighbours), using the simulation's own random
- * stream. There's no separate plain component class here: the produced {@link PortGrid} is
- * returned as-is, with no wrapper type to carry documentation, so this factory carries the
- * behavior doc directly. Built via
- * {@link Factories#randomLocationsPortGrid(uk.ac.ox.poseidon.core.Factory,
- * uk.ac.ox.poseidon.core.Factory, int, int)} in this package.
+ * A {@link SimulationScopeFactory} for a {@link MutablePortGrid} with a fixed
+ * number of ports placed on randomly-chosen suitable land cells (land cells
+ * with at least {@code minimumAdjacentWaterTiles} active water neighbours),
+ * using the simulation's own random stream. There's no separate plain component
+ * class here: the produced {@link PortGrid} is returned as-is, with no wrapper
+ * type to carry documentation, so this factory carries the behavior doc
+ * directly. Built via
+ * {@link Factories#randomLocationsPortGrid(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, int, int)}
+ * in this package.
  */
 @Data
 @NoArgsConstructor

@@ -30,9 +30,10 @@ import lombok.NonNull;
 import uk.ac.ox.poseidon.core.providers.IntProvider;
 
 /**
- * An {@link IntProvider} that returns a uniformly distributed random integer in the inclusive
- * range {@code [minimum, maximum]} on each call, drawn from the simulation's shared RNG. Built via
- * {@link Factories#randomInt(int, int)} in this package.
+ * An {@link IntProvider} that returns a uniformly distributed random integer in
+ * the inclusive range {@code [minimum, maximum]} on each call, drawn from the
+ * simulation's shared RNG. Built via {@link Factories#randomInt(int, int)} in
+ * this package.
  */
 public class RandomInt implements IntProvider {
 
@@ -43,7 +44,8 @@ public class RandomInt implements IntProvider {
   /**
    * @param rng     the shared RNG to draw from
    * @param minimum the inclusive lower bound
-   * @param maximum the inclusive upper bound, must be greater than or equal to {@code minimum}
+   * @param maximum the inclusive upper bound, must be greater than or equal to
+   *                {@code minimum}
    */
   @SuppressFBWarnings("EI_EXPOSE_REP2")
   public RandomInt(

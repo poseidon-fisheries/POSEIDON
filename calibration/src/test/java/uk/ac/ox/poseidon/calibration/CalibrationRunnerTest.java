@@ -71,8 +71,9 @@ class CalibrationRunnerTest {
   }
 
   /**
-   * Jenetics would run a batch this small in one task, one evaluation after another; each
-   * evaluation here waits until another has started, so that would wait in vain.
+   * Jenetics would run a batch this small in one task, one evaluation after
+   * another; each evaluation here waits until another has started, so that
+   * would wait in vain.
    */
   @Test
   @Timeout(value = 30, threadMode = SEPARATE_THREAD)

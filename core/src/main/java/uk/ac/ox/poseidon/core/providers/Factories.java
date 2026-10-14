@@ -30,8 +30,9 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * Factories for {@link Provider}s that snapshot another factory's value once at build time, and
- * for a {@link Provider} that shifts a delegate's int value by a fixed amount.
+ * Factories for {@link Provider}s that snapshot another factory's value once at
+ * build time, and for a {@link Provider} that shifts a delegate's int value by
+ * a fixed amount.
  */
 public final class Factories {
 
@@ -40,9 +41,10 @@ public final class Factories {
   }
 
   /**
-   * @param delegate factory for the supplier whose value is resolved once and snapshotted
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link Provider} of
-   * that snapshotted value
+   * @param delegate factory for the supplier whose value is resolved once and
+   *                 snapshotted
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link Provider} of that snapshotted value
    * @see FirstValueFromFactory
    */
   public static <S extends Scope, T> FirstValueFromFactory<S, T> firstValueFrom(
@@ -52,9 +54,10 @@ public final class Factories {
   }
 
   /**
-   * @param delegate factory for the int supplier whose value is resolved once and snapshotted
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link IntProvider} of
-   * that snapshotted value
+   * @param delegate factory for the int supplier whose value is resolved once
+   *                 and snapshotted
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         {@link IntProvider} of that snapshotted value
    * @see FirstIntFromFactory
    */
   public static <S extends Scope> FirstIntFromFactory<S> firstIntFrom(
@@ -64,10 +67,10 @@ public final class Factories {
   }
 
   /**
-   * @param delegate factory for the double supplier whose value is resolved once and
-   * snapshotted
+   * @param delegate factory for the double supplier whose value is resolved
+   *                 once and snapshotted
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link DoubleProvider} of that snapshotted value
+   *         {@link DoubleProvider} of that snapshotted value
    * @see FirstDoubleFromFactory
    */
   public static <S extends Scope> FirstDoubleFromFactory<S> firstDoubleFrom(
@@ -77,10 +80,10 @@ public final class Factories {
   }
 
   /**
-   * @param delegate factory for the boolean supplier whose value is resolved once and
-   * snapshotted
+   * @param delegate factory for the boolean supplier whose value is resolved
+   *                 once and snapshotted
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link BooleanProvider} of that snapshotted value
+   *         {@link BooleanProvider} of that snapshotted value
    * @see FirstBooleanFromFactory
    */
   public static <S extends Scope> FirstBooleanFromFactory<S> firstBooleanFrom(
@@ -91,9 +94,10 @@ public final class Factories {
 
   /**
    * @param delegateIntProvider factory for the int provider to shift
-   * @param shift               the amount to add to the delegate's value on every call
+   * @param shift               the amount to add to the delegate's value on
+   *                            every call
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   * {@link ShiftedInt} over the resolved delegate
+   *         {@link ShiftedInt} over the resolved delegate
    * @see ShiftedInt
    */
   public static <S extends Scope> ShiftedIntFactory<S> shiftedInt(

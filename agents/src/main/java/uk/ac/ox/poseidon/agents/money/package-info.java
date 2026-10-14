@@ -21,7 +21,8 @@
  */
 
 /**
- * Constructing {@link org.joda.money.Money} amounts, either fixed or read from tabular data. See
- * {@link uk.ac.ox.poseidon.agents.money.Factories} for the entry points.
+ * Constructing {@link org.joda.money.Money} amounts, either fixed or read from
+ * tabular data. See {@link uk.ac.ox.poseidon.agents.money.Factories} for the
+ * entry points.
  */
 package uk.ac.ox.poseidon.agents.money;

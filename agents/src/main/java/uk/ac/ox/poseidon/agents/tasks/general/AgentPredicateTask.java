@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 
 /**
- * A leaf {@link AgentTask} that succeeds or fails in one step, depending on whether
- * {@code predicate} holds for the agent.
+ * A leaf {@link AgentTask} that succeeds or fails in one step, depending on
+ * whether {@code predicate} holds for the agent.
  *
  * @param <G> the type of agent this task runs against
  */
@@ -41,7 +41,10 @@ public class AgentPredicateTask<G extends Agent> extends AgentTask<G> {
 
   private final Predicate<? super G> predicate;
 
-  /** @return {@code SUCCEEDED} if {@code predicate} holds for the agent, {@code FAILED} otherwise */
+  /**
+   * @return {@code SUCCEEDED} if {@code predicate} holds for the agent,
+   *         {@code FAILED} otherwise
+   */
   @Override
   public Status execute() {
     return predicate.test(getAgent()) ? SUCCEEDED : FAILED;

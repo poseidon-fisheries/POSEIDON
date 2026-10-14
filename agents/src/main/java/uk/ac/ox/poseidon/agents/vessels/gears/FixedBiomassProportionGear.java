@@ -34,8 +34,9 @@ import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /**
- * A {@link Gear} that catches a fixed proportion of each species' available biomass, per
- * fishing event, discarding any per-species catch below {@code minimumCatchThresholdInKg}.
+ * A {@link Gear} that catches a fixed proportion of each species' available
+ * biomass, per fishing event, discarding any per-species catch below
+ * {@code minimumCatchThresholdInKg}.
  */
 @Getter
 @ToString
@@ -51,13 +52,17 @@ public class FixedBiomassProportionGear implements Gear {
   private boolean active = true;
 
   /**
-   * @param code                                  this gear's identifying code
-   * @param proportion                             the fraction of available biomass caught
-   *                                               per species, in {@code [0, 1]}
-   * @param minimumCatchThresholdInKg              per-species catch below this, in kilograms,
-   *                                               is discarded down to zero
-   * @param durationSupplier                       supplies how long one fishing event takes
-   * @param litresOfFuelConsumedPerHourOfFishing    fuel burned per hour of fishing, in litres
+   * @param code                                 this gear's identifying code
+   * @param proportion                           the fraction of available
+   *                                             biomass caught per species, in
+   *                                             {@code [0, 1]}
+   * @param minimumCatchThresholdInKg            per-species catch below this,
+   *                                             in kilograms, is discarded down
+   *                                             to zero
+   * @param durationSupplier                     supplies how long one fishing
+   *                                             event takes
+   * @param litresOfFuelConsumedPerHourOfFishing fuel burned per hour of
+   *                                             fishing, in litres
    */
   FixedBiomassProportionGear(
     final String code,
@@ -78,9 +83,10 @@ public class FixedBiomassProportionGear implements Gear {
   }
 
   /**
-   * @return {@link #proportion} of each species' available biomass in {@code fisheable},
-   * zeroed out per species below {@link #minimumCatchThresholdInKg}, removed from
-   * {@code fisheable} in the process
+   * @return {@link #proportion} of each species' available biomass in
+   *         {@code fisheable}, zeroed out per species below
+   *         {@link #minimumCatchThresholdInKg}, removed from {@code fisheable}
+   *         in the process
    */
   @Override
   public Bucket fish(final Fisheable fisheable) {

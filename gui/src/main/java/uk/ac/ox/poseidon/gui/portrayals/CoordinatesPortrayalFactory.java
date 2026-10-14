@@ -42,8 +42,9 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 /**
- * A {@link SimulationScopeFactory} that shows each cell's lon/lat coordinate as a tooltip,
- * formatted to a fixed number of decimal places, with no visible mark of its own.
+ * A {@link SimulationScopeFactory} that shows each cell's lon/lat coordinate as
+ * a tooltip, formatted to a fixed number of decimal places, with no visible
+ * mark of its own.
  */
 public class CoordinatesPortrayalFactory
   extends SimulationScopeFactory<ObjectGridPortrayal2D>
@@ -66,7 +67,10 @@ public class CoordinatesPortrayalFactory
     decimalFormat.setMinimumFractionDigits(decimalPlaces);
   }
 
-  /** @return an invisible object-grid portrayal whose tooltip reports each cell's coordinate */
+  /**
+   * @return an invisible object-grid portrayal whose tooltip reports each
+   *         cell's coordinate
+   */
   @Override
   protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
     final ObjectGridPortrayal2D objectGridPortrayal2D =

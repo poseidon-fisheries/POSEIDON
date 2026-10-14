@@ -31,10 +31,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of {@link Port}, built via
- * {@link Factories#port(String, String)}. Produces a standalone port not placed on any
- * {@link PortGrid} — most ports are created as a side effect of building a grid instead (via
- * {@link PortGridFactory}, {@link RandomLocationsPortGridFactory}, or
- * {@link PortsFromTableFactory}).
+ * {@link Factories#port(String, String)}. Produces a standalone port not placed
+ * on any {@link PortGrid} — most ports are created as a side effect of building
+ * a grid instead (via {@link PortGridFactory},
+ * {@link RandomLocationsPortGridFactory}, or {@link PortsFromTableFactory}).
  */
 @Data
 @NoArgsConstructor

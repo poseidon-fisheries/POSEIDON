@@ -28,8 +28,8 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * Factories for {@link Predicate}s that combine other predicates. For an always-true/always-false
- * leaf predicate to combine with these, see
+ * Factories for {@link Predicate}s that combine other predicates. For an
+ * always-true/always-false leaf predicate to combine with these, see
  * {@link uk.ac.ox.poseidon.core.providers.constant.Factories#alwaysTrue()}/
  * {@link uk.ac.ox.poseidon.core.providers.constant.Factories#alwaysFalse()} — a
  * {@code BooleanProvider} already doubles as a {@code Predicate<Object>}.
@@ -41,8 +41,8 @@ public class Factories {
 
   /**
    * @param predicates the predicates to combine
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link AllOf} of the
-   * given predicates
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         {@link AllOf} of the given predicates
    * @see AllOf
    */
   @SafeVarargs
@@ -54,8 +54,8 @@ public class Factories {
 
   /**
    * @param predicates the predicates to combine
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an {@link AnyOf} of the
-   * given predicates
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         {@link AnyOf} of the given predicates
    * @see AnyOf
    */
   @SafeVarargs
@@ -67,8 +67,8 @@ public class Factories {
 
   /**
    * @param predicate the predicate to negate
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a {@link Not} of the
-   * given predicate
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link Not} of the given predicate
    * @see Not
    */
   public static <S extends Scope, T> NotFactory<S, T> not(

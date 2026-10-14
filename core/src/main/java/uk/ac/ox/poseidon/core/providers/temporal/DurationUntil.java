@@ -30,9 +30,10 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
- * A {@link Provider} of the time left from the current date-time until a reference date-time, both
- * read anew on every call: negative once the reference has passed, so a deadline that has gone by
- * leaves no time. Built via {@link Factories#durationUntil(uk.ac.ox.poseidon.core.Factory)} in this
+ * A {@link Provider} of the time left from the current date-time until a
+ * reference date-time, both read anew on every call: negative once the
+ * reference has passed, so a deadline that has gone by leaves no time. Built
+ * via {@link Factories#durationUntil(uk.ac.ox.poseidon.core.Factory)} in this
  * package.
  */
 @RequiredArgsConstructor

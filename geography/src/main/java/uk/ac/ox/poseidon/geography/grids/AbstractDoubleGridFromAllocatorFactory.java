@@ -36,12 +36,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
 
 /**
- * A {@link RelativeScopeFactory} base for building a {@link DoubleGrid} from a resolved
- * {@link Allocator}: applies the allocator to every cell (skipping the running sum for
- * {@link Double#NaN}, i.e. excluded cells) and hands the resulting per-cell values, plus their
- * sum, to {@link #postProcess} before building the grid via {@link #makeGrid}. Subclasses fix the
- * concrete {@link DoubleGrid} type ({@link BaseDoubleGrid} or {@link MutableDoubleGrid}) and
- * whether to normalise the values (see {@link AbstractNormalisedDoubleGridFromAllocatorFactory}).
+ * A {@link RelativeScopeFactory} base for building a {@link DoubleGrid} from a
+ * resolved {@link Allocator}: applies the allocator to every cell (skipping the
+ * running sum for {@link Double#NaN}, i.e. excluded cells) and hands the
+ * resulting per-cell values, plus their sum, to {@link #postProcess} before
+ * building the grid via {@link #makeGrid}. Subclasses fix the concrete
+ * {@link DoubleGrid} type ({@link BaseDoubleGrid} or {@link MutableDoubleGrid})
+ * and whether to normalise the values (see
+ * {@link AbstractNormalisedDoubleGridFromAllocatorFactory}).
  */
 @Data
 @NoArgsConstructor
@@ -55,7 +57,10 @@ abstract class AbstractDoubleGridFromAllocatorFactory<
   private Factory<? super S, ? extends ModelGrid> modelGrid;
   private Factory<? super S, ? extends Allocator> allocator;
 
-  /** @throws IllegalArgumentException if the allocator returns a negative, non-NaN value */
+  /**
+   * @throws IllegalArgumentException if the allocator returns a negative,
+   *                                  non-NaN value
+   */
   @Override
   protected G newInstance(final S scope) {
     final ModelGrid modelGrid = this.modelGrid.get(scope);
@@ -81,8 +86,8 @@ abstract class AbstractDoubleGridFromAllocatorFactory<
    * @param scope  the scope being resolved against
    * @param values the raw per-cell allocator values, indexed {@code [x][y]}
    * @param sum    the sum of the non-{@code NaN} values
-   * @return the values to actually build the grid from; the base implementation returns
-   * {@code values} unchanged
+   * @return the values to actually build the grid from; the base implementation
+   *         returns {@code values} unchanged
    */
   protected double[][] postProcess(
     final S scope,

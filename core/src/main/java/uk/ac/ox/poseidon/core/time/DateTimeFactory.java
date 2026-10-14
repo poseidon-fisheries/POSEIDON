@@ -31,10 +31,11 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} for a fixed {@link LocalDateTime}. No separate plain component
- * class here: the produced value is a bare JDK type, with no wrapper to carry documentation.
- * Built via {@link Factories} — {@code now()}, {@code startOfToday()}, {@code startOf(LocalDate)},
- * or {@code dateTime(LocalDateTime)}.
+ * A {@link GlobalScopeFactory} for a fixed {@link LocalDateTime}. No separate
+ * plain component class here: the produced value is a bare JDK type, with no
+ * wrapper to carry documentation. Built via {@link Factories} — {@code now()},
+ * {@code startOfToday()}, {@code startOf(LocalDate)}, or
+ * {@code dateTime(LocalDateTime)}.
  */
 @Data
 @NoArgsConstructor

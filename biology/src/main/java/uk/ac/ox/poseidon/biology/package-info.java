@@ -21,10 +21,11 @@
  */
 
 /**
- * The biological/ecological model: species, biomass, and "fisheable" content on the grid.
- * Subpackages build species definitions ({@code species}), biomass grids ({@code biomass}),
- * initial-distribution allocators ({@code allocators}), and per-species content containers
- * ({@code buckets}) on top of the core {@link uk.ac.ox.poseidon.biology.Fisheable} and
+ * The biological/ecological model: species, biomass, and "fisheable" content on
+ * the grid. Subpackages build species definitions ({@code species}), biomass
+ * grids ({@code biomass}), initial-distribution allocators
+ * ({@code allocators}), and per-species content containers ({@code buckets}) on
+ * top of the core {@link uk.ac.ox.poseidon.biology.Fisheable} and
  * {@link uk.ac.ox.poseidon.biology.Content} abstractions defined here.
  */
 package uk.ac.ox.poseidon.biology;

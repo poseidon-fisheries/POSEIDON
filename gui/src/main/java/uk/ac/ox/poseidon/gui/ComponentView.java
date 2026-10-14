@@ -32,11 +32,12 @@ import sim.util.Proxiable;
 import uk.ac.ox.poseidon.core.Simulation;
 
 /**
- * One row of the model inspector's component list: a named simulation component, shown by a
- * short summary instead of its own {@link Object#toString()}, which can be arbitrarily large (a
- * component may hold hundreds of thousands of elements) and which MASON would otherwise rebuild
- * at every inspector refresh. Inspecting the row inspects the component itself, through
- * {@link Proxiable}.
+ * One row of the model inspector's component list: a named simulation
+ * component, shown by a short summary instead of its own
+ * {@link Object#toString()}, which can be arbitrarily large (a component may
+ * hold hundreds of thousands of elements) and which MASON would otherwise
+ * rebuild at every inspector refresh. Inspecting the row inspects the component
+ * itself, through {@link Proxiable}.
  */
 @Value
 public class ComponentView implements Proxiable {
@@ -66,8 +67,8 @@ public class ComponentView implements Proxiable {
   }
 
   /**
-   * @return the component's name and type, plus its size if it is a collection or a map; never
-   * the component's own string representation
+   * @return the component's name and type, plus its size if it is a collection
+   *         or a map; never the component's own string representation
    */
   @Override
   public String toString() {

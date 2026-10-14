@@ -21,11 +21,13 @@
  */
 
 /**
- * The {@link uk.ac.ox.poseidon.core.scopes.Scope} hierarchy that marks the sharing/lifecycle
- * boundary a {@link uk.ac.ox.poseidon.core.Factory}-produced object belongs to: a single instance
- * shared globally across every simulation built from a scenario, or one scoped to a single
- * {@link uk.ac.ox.poseidon.core.Simulation} run. See the {@code *ScopeFactory} classes in
- * {@code uk.ac.ox.poseidon.core} ({@code GlobalScopeFactory}, {@code PerSimulationFactory},
- * {@code RelativeScopeFactory}, {@code SimulationScopeFactory}) for how factories pick a scope.
+ * The {@link uk.ac.ox.poseidon.core.scopes.Scope} hierarchy that marks the
+ * sharing/lifecycle boundary a {@link uk.ac.ox.poseidon.core.Factory}-produced
+ * object belongs to: a single instance shared globally across every simulation
+ * built from a scenario, or one scoped to a single
+ * {@link uk.ac.ox.poseidon.core.Simulation} run. See the {@code *ScopeFactory}
+ * classes in {@code uk.ac.ox.poseidon.core} ({@code GlobalScopeFactory},
+ * {@code PerSimulationFactory}, {@code RelativeScopeFactory},
+ * {@code SimulationScopeFactory}) for how factories pick a scope.
  */
 package uk.ac.ox.poseidon.core.scopes;

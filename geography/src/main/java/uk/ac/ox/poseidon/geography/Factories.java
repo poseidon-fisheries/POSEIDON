@@ -23,8 +23,8 @@
 package uk.ac.ox.poseidon.geography;
 
 /**
- * Factories for the basic spatial primitives of this package: geographic coordinates and
- * bounding-box envelopes.
+ * Factories for the basic spatial primitives of this package: geographic
+ * coordinates and bounding-box envelopes.
  */
 public class Factories {
 
@@ -33,7 +33,8 @@ public class Factories {
   /**
    * @param longitude the longitude, in degrees
    * @param latitude  the latitude, in degrees
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a {@link Coordinate}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link Coordinate}
    * @see Coordinate
    */
   public static CoordinateFactory coordinate(
@@ -44,11 +45,14 @@ public class Factories {
   }
 
   /**
-   * @param minX one of the envelope's x bounds (ordered with {@code maxX} automatically)
+   * @param minX one of the envelope's x bounds (ordered with {@code maxX}
+   *             automatically)
    * @param maxX the other x bound
-   * @param minY one of the envelope's y bounds (ordered with {@code maxY} automatically)
+   * @param minY one of the envelope's y bounds (ordered with {@code maxY}
+   *             automatically)
    * @param maxY the other y bound
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an {@link Envelope}
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
+   *         {@link Envelope}
    * @see Envelope
    */
   public static EnvelopeFactory envelope(

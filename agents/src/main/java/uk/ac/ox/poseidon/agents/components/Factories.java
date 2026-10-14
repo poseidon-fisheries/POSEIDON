@@ -26,16 +26,16 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * Factories for registering per-vessel components in a shared, simulation-scoped register that
- * other systems can query by vessel.
+ * Factories for registering per-vessel components in a shared,
+ * simulation-scoped register that other systems can query by vessel.
  */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} that builds the
-   * component and registers it against the resolving vessel
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} that
+   *         builds the component and registers it against the resolving vessel
    * @see RegisteredVesselComponentFactory
    */
   public static <C> RegisteredVesselComponentFactory<C> registeredVesselComponent(
@@ -52,8 +52,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for an empty
-   * {@link VesselComponentRegister}
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for an
+   *         empty {@link VesselComponentRegister}
    * @see VesselComponentRegisterFactory
    */
   public static <C> VesselComponentRegisterFactory<C> vesselComponentRegister() {

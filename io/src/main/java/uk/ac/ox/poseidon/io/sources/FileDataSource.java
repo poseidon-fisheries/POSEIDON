@@ -31,9 +31,10 @@ import java.nio.file.Files;
 import lombok.Value;
 
 /**
- * A {@link DataSource} over a plain file, read with a fixed {@link Charset}. Built via
- * {@link Factories#fileDataSource(uk.ac.ox.poseidon.core.Factory)}/
- * {@link Factories#fileDataSource(uk.ac.ox.poseidon.core.Factory, String)} in this package.
+ * A {@link DataSource} over a plain file, read with a fixed {@link Charset}.
+ * Built via {@link Factories#fileDataSource(uk.ac.ox.poseidon.core.Factory)}/
+ * {@link Factories#fileDataSource(uk.ac.ox.poseidon.core.Factory, String)} in
+ * this package.
  */
 @Value
 public class FileDataSource implements DataSource {

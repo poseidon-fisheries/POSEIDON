@@ -21,12 +21,13 @@
  */
 
 /**
- * Factories that build MASON field portrayals (bathymetry, biomass, markets, ports, vessels,
- * coordinates, regulation status) for a {@link uk.ac.ox.poseidon.gui.DisplayWrapper2D} to attach,
- * plus {@link uk.ac.ox.poseidon.gui.portrayals.SvgPortrayal}/
- * {@link uk.ac.ox.poseidon.gui.portrayals.SvgRenderer} for drawing SVG icons. Unlike most POSEIDON
- * packages, these factories are wired up directly in Java (see
- * {@code PeterSnapperScenarioWithUI}) rather than from YAML, so there is no {@code Factories}
- * entry-point class here.
+ * Factories that build MASON field portrayals (bathymetry, biomass, markets,
+ * ports, vessels, coordinates, regulation status) for a
+ * {@link uk.ac.ox.poseidon.gui.DisplayWrapper2D} to attach, plus
+ * {@link uk.ac.ox.poseidon.gui.portrayals.SvgPortrayal}/
+ * {@link uk.ac.ox.poseidon.gui.portrayals.SvgRenderer} for drawing SVG icons.
+ * Unlike most POSEIDON packages, these factories are wired up directly in Java
+ * (see {@code PeterSnapperScenarioWithUI}) rather than from YAML, so there is
+ * no {@code Factories} entry-point class here.
  */
 package uk.ac.ox.poseidon.gui.portrayals;

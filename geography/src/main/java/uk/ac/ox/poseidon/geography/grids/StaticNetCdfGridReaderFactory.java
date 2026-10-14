@@ -33,10 +33,11 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * Resolves {@code ncFilePath} against scope once (cheap — no file I/O),
- * and returns a {@link Supplier} whose {@code get()} opens a fresh, independent
- * {@link StaticNetCdfGridReader} on every call. See {@link TimeIndexedNetCdfGridReaderFactory}
- * for why the supplier indirection matters.
+ * Resolves {@code ncFilePath} against scope once (cheap — no file I/O), and
+ * returns a {@link Supplier} whose {@code get()} opens a fresh, independent
+ * {@link StaticNetCdfGridReader} on every call. See
+ * {@link TimeIndexedNetCdfGridReaderFactory} for why the supplier indirection
+ * matters.
  */
 @Data
 @NoArgsConstructor

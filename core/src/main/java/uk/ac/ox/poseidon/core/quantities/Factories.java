@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * Factories for JSR-385 {@link Quantity} values (e.g. mass, volume), and for unwrapping a
- * resolved {@link Mass} into a plain kilogram {@link Double}.
+ * Factories for JSR-385 {@link Quantity} values (e.g. mass, volume), and for
+ * unwrapping a resolved {@link Mass} into a plain kilogram {@link Double}.
  */
 public class Factories {
 
@@ -45,8 +45,8 @@ public class Factories {
 
   /**
    * @param mass factory for the mass to unwrap
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the resolved mass's value
-   * in kilograms
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the
+   *         resolved mass's value in kilograms
    * @see KilogramsFactory
    */
   public static <S extends Scope> KilogramsFactory<S> kilograms(
@@ -57,8 +57,8 @@ public class Factories {
 
   /**
    * @param value the mass in kilograms
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the given value in
-   * kilograms
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the given
+   *         value in kilograms
    * @see KilogramsFactory
    */
   public static KilogramsFactory<Scope> kilograms(final double value) {
@@ -68,7 +68,8 @@ public class Factories {
   /**
    * @param value the numeric mass value
    * @param unit  the unit the value is expressed in
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given mass
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given
+   *         mass
    * @see MassFactory
    */
   public static MassFactory massOf(final double value, final Unit<Mass> unit) {
@@ -76,7 +77,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given mass
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given
+   *         mass
    * @see MassFactory
    */
   public static MassFactory massOf(final Quantity<Mass> quantity) {
@@ -86,7 +88,8 @@ public class Factories {
   /**
    * @param quantity a mass quantity string in the format produced by
    *                 {@code Quantity.toString()} (e.g. {@code "3.5 kg"})
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the parsed mass
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the parsed
+   *         mass
    * @see MassFactory
    */
   public static MassFactory massOf(final String quantity) {
@@ -97,7 +100,8 @@ public class Factories {
   /**
    * @param value the numeric volume value
    * @param unit  the unit the value is expressed in
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given volume
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given
+   *         volume
    * @see VolumeFactory
    */
   public static VolumeFactory volumeOf(
@@ -108,7 +112,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given volume
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given
+   *         volume
    * @see VolumeFactory
    */
   public static VolumeFactory volumeOf(final Quantity<Volume> quantity) {
@@ -118,7 +123,8 @@ public class Factories {
   /**
    * @param quantity a volume quantity string in the format produced by
    *                 {@code Quantity.toString()} (e.g. {@code "3.5 l"})
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the parsed volume
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the parsed
+   *         volume
    * @see VolumeFactory
    */
   public static VolumeFactory volumeOf(final String quantity) {
@@ -127,7 +133,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given speed
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given
+   *         speed
    * @see SpeedFactory
    */
   public static SpeedFactory speedOf(final Quantity<Speed> quantity) {
@@ -140,7 +147,8 @@ public class Factories {
   /**
    * @param value the numeric speed value
    * @param unit  the unit the value is expressed in
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given speed
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given
+   *         speed
    * @see SpeedFactory
    */
   public static SpeedFactory speedOf(
@@ -153,7 +161,8 @@ public class Factories {
   /**
    * @param quantity a speed quantity string in the format produced by
    *                 {@code Quantity.toString()} (e.g. {@code "3.5 m/s"})
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the parsed speed
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the parsed
+   *         speed
    * @see SpeedFactory
    */
   public static SpeedFactory speedOf(final String quantity) {
@@ -164,8 +173,8 @@ public class Factories {
   /**
    * @param value the numeric flow rate value
    * @param unit  the unit the value is expressed in
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given volumetric flow
-   * rate
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given
+   *         volumetric flow rate
    * @see VolumetricFlowRateFactory
    */
   public static VolumetricFlowRateFactory volumetricFlowRateOf(
@@ -176,8 +185,8 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given volumetric flow
-   * rate
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the given
+   *         volumetric flow rate
    * @see VolumetricFlowRateFactory
    */
   public static VolumetricFlowRateFactory volumetricFlowRateOf(
@@ -190,10 +199,11 @@ public class Factories {
   }
 
   /**
-   * @param quantity a volumetric flow rate quantity string in the format produced by
-   *                 {@code Quantity.toString()} (e.g. {@code "3.5 l/h"})
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the parsed volumetric flow
-   * rate
+   * @param quantity a volumetric flow rate quantity string in the format
+   *                 produced by {@code Quantity.toString()} (e.g.
+   *                 {@code "3.5 l/h"})
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the parsed
+   *         volumetric flow rate
    * @see VolumetricFlowRateFactory
    */
   public static VolumetricFlowRateFactory volumetricFlowRateOf(

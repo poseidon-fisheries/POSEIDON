@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} for an {@link IndependentBiomassGrower}. Built via
- * {@link Factories#independentBiomassGrower}.
+ * A {@link RelativeScopeFactory} for an {@link IndependentBiomassGrower}. Built
+ * via {@link Factories#independentBiomassGrower}.
  */
 @Data
 @NoArgsConstructor

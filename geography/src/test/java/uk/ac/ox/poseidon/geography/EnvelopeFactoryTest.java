@@ -32,9 +32,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 class EnvelopeFactoryTest {
 
   /**
-   * Tests the `newInstance` method in the `EnvelopeFactory` class. The `newInstance` method
-   * should create an `Envelope` instance using the min and max coordinates provided in the
-   * `EnvelopeFactory` fields.
+   * Tests the `newInstance` method in the `EnvelopeFactory` class. The
+   * `newInstance` method should create an `Envelope` instance using the min and
+   * max coordinates provided in the `EnvelopeFactory` fields.
    */
 
   @Test

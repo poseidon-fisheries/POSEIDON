@@ -34,9 +34,9 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
- * A {@link GlobalScopeFactory} for a {@link ModelGrid} covering a fixed geographic bounding box,
- * divided into cells of a fixed resolution (both dimensions must divide evenly into the
- * resolution). Built via
+ * A {@link GlobalScopeFactory} for a {@link ModelGrid} covering a fixed
+ * geographic bounding box, divided into cells of a fixed resolution (both
+ * dimensions must divide evenly into the resolution). Built via
  * {@link Factories#modelGrid(double, double, double, double, double)}.
  */
 @Data
@@ -52,8 +52,8 @@ public class ModelGridFactory extends GlobalScopeFactory<ModelGrid> {
   private double northLatitude;
 
   /**
-   * @throws IllegalStateException if the width or height (in degrees) isn't an exact multiple
-   *                                of {@code resolutionInDegrees}
+   * @throws IllegalStateException if the width or height (in degrees) isn't an
+   *                               exact multiple of {@code resolutionInDegrees}
    */
   @Override
   protected ModelGrid newInstance(final Scope scope) {

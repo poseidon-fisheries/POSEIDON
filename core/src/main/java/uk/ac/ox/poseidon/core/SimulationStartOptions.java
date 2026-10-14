@@ -30,11 +30,13 @@ import lombok.Singular;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * Per-run overrides passed to {@link Scenario#startNewSimulation(SimulationStartOptions)}: an id
- * and RNG seed for the run, bean-property overrides temporarily applied to the {@link Scenario}
- * for the duration of the build (dotted property paths, via {@code commons-beanutils}), and extra
- * components to resolve alongside the scenario's own. Used heavily by calibration, which needs to
- * vary parameters run-to-run without mutating the original {@link Scenario}.
+ * Per-run overrides passed to
+ * {@link Scenario#startNewSimulation(SimulationStartOptions)}: an id and RNG
+ * seed for the run, bean-property overrides temporarily applied to the
+ * {@link Scenario} for the duration of the build (dotted property paths, via
+ * {@code commons-beanutils}), and extra components to resolve alongside the
+ * scenario's own. Used heavily by calibration, which needs to vary parameters
+ * run-to-run without mutating the original {@link Scenario}.
  */
 @Getter
 @Builder
@@ -48,11 +50,16 @@ public final class SimulationStartOptions {
   @Builder.Default
   private final long seed = System.currentTimeMillis();
 
-  /** Bean-property overrides (dotted paths) applied to the scenario for the duration of the build. */
+  /**
+   * Bean-property overrides (dotted paths) applied to the scenario for the
+   * duration of the build.
+   */
   @Singular
   private final Map<String, Object> propertyOverrides;
 
-  /** Extra components to resolve alongside the scenario's own, keyed by name. */
+  /**
+   * Extra components to resolve alongside the scenario's own, keyed by name.
+   */
   @Singular
   private Map<
     String,

@@ -29,7 +29,10 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
-/** A {@link Gear} standing for having no gear at all; fishing with it is an error. */
+/**
+ * A {@link Gear} standing for having no gear at all; fishing with it is an
+ * error.
+ */
 @Getter
 @RequiredArgsConstructor
 public class InactiveGear implements Gear {

@@ -33,10 +33,11 @@ import uk.ac.ox.poseidon.core.providers.constant.ConstantInt;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link RelativeScopeFactory} that resolves the given delegate {@link IntSupplier} once, when
- * built, and returns an {@link IntProvider} that keeps handing out that same first-resolved value
- * thereafter — a snapshot, not a live pass-through to the delegate. No separate plain component
- * class here: the produced value is a {@link ConstantInt} wrapping the snapshot, built via
+ * A {@link RelativeScopeFactory} that resolves the given delegate
+ * {@link IntSupplier} once, when built, and returns an {@link IntProvider} that
+ * keeps handing out that same first-resolved value thereafter — a snapshot, not
+ * a live pass-through to the delegate. No separate plain component class here:
+ * the produced value is a {@link ConstantInt} wrapping the snapshot, built via
  * {@link Factories#firstIntFrom(Factory)}.
  */
 @Data

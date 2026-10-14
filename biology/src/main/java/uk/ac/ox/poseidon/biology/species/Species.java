@@ -32,10 +32,11 @@ import lombok.Getter;
 import lombok.NonNull;
 
 /**
- * A species, optionally narrowed to a life stage (e.g. "adult"/"juvenile") — the unit of species
- * identity tracked throughout the model, from biology to markets. Identity ({@code equals}/
- * {@code hashCode}/{@link #compareTo}) is based on {@code code} and {@code lifeStage} only,
- * {@code name} is purely cosmetic. Built via
+ * A species, optionally narrowed to a life stage (e.g. "adult"/"juvenile") —
+ * the unit of species identity tracked throughout the model, from biology to
+ * markets. Identity ({@code equals}/ {@code hashCode}/{@link #compareTo}) is
+ * based on {@code code} and {@code lifeStage} only, {@code name} is purely
+ * cosmetic. Built via
  * {@link Factories#species()}/{@link Factories#species(String)}/
  * {@link Factories#species(String, String, String)}.
  */
@@ -57,12 +58,13 @@ public class Species implements Comparable<Species> {
   private final String key = multiStringKey(code, lifeStage);
 
   /**
-   * @param code      the species' code; blank-only values aren't specially treated, only
-   *                   {@code null}/blank {@code lifeStage}/{@code name} are normalized
-   * @param lifeStage the life stage, or {@code null} for the species as a whole; a blank string
-   *                  is normalized to {@code null}
-   * @param name      the display name, or {@code null}; a blank string is normalized to
-   *                  {@code null}
+   * @param code      the species' code; blank-only values aren't specially
+   *                  treated, only {@code null}/blank
+   *                  {@code lifeStage}/{@code name} are normalized
+   * @param lifeStage the life stage, or {@code null} for the species as a
+   *                  whole; a blank string is normalized to {@code null}
+   * @param name      the display name, or {@code null}; a blank string is
+   *                  normalized to {@code null}
    */
   public Species(
     @NonNull final String code,
@@ -76,15 +78,17 @@ public class Species implements Comparable<Species> {
   }
 
   /**
-   * Returns true if a species "covers" another species, i.e., if it's the same according to its
-   * code and life stage, or if it doesn't specify a life stage and the other does.
+   * Returns true if a species "covers" another species, i.e., if it's the same
+   * according to its code and life stage, or if it doesn't specify a life stage
+   * and the other does.
    * <p>
-   * I'm adding this to handle the case where we have a price for a species as a whole, but
-   * vessels catch that species at different life stages.
+   * I'm adding this to handle the case where we have a price for a species as a
+   * whole, but vessels catch that species at different life stages.
    * <p>
-   * FIXME: this is needed, but a bit of a kludge and I'm not sure that this is the right approach
-   *  in general. We probably need some kind of standard species ontology (with the possibility
-   *  of encoding supra-species functional groups as well)
+   * FIXME: this is needed, but a bit of a kludge and I'm not sure that this is
+   * the right approach in general. We probably need some kind of standard
+   * species ontology (with the possibility of encoding supra-species functional
+   * groups as well)
    *
    * @param other the species to check against
    * @return whether this species covers {@code other}
@@ -96,7 +100,10 @@ public class Species implements Comparable<Species> {
     );
   }
 
-  /** @return {@code "code"}, plus {@code " - name"} and/or {@code " (lifeStage)"} if present */
+  /**
+   * @return {@code "code"}, plus {@code " - name"} and/or
+   *         {@code " (lifeStage)"} if present
+   */
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
@@ -112,7 +119,10 @@ public class Species implements Comparable<Species> {
     return sb.toString();
   }
 
-  /** Orders by {@code code}, then by {@code lifeStage} ({@code null} sorting first). */
+  /**
+   * Orders by {@code code}, then by {@code lifeStage} ({@code null} sorting
+   * first).
+   */
   @Override
   public int compareTo(final @NonNull Species o) {
     return Comparator.comparing(Species::getCode)

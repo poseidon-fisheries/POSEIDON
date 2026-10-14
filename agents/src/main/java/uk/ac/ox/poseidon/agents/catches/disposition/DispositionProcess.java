@@ -25,13 +25,15 @@ package uk.ac.ox.poseidon.agents.catches.disposition;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /**
- * One step of how a catch gets sorted into retained/discarded-alive/discarded-dead. Several steps
- * compose into a full {@link CompositeDispositionProcess}, each refining the previous one's
+ * One step of how a catch gets sorted into
+ * retained/discarded-alive/discarded-dead. Several steps compose into a full
+ * {@link CompositeDispositionProcess}, each refining the previous one's
  * {@link Disposition}.
  */
 public interface DispositionProcess {
   /**
-   * @param currentDisposition   the disposition so far, refined further by this step
+   * @param currentDisposition    the disposition so far, refined further by
+   *                              this step
    * @param availableCapacityInKg how much hold capacity remains
    * @return the refined disposition
    */
@@ -41,9 +43,11 @@ public interface DispositionProcess {
   );
 
   /**
-   * @param grossCatch            the whole gross catch, treated as fully retained to start with
+   * @param grossCatch            the whole gross catch, treated as fully
+   *                              retained to start with
    * @param availableCapacityInKg how much hold capacity remains
-   * @return the disposition after this step, starting from {@code grossCatch} entirely retained
+   * @return the disposition after this step, starting from {@code grossCatch}
+   *         entirely retained
    */
   default Disposition partition(
     final Bucket grossCatch,

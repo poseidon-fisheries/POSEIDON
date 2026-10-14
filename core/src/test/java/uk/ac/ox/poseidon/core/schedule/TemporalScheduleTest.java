@@ -811,7 +811,10 @@ class TemporalScheduleTest {
     assertThat(pausing.getDateTime()).isEqualTo(start.plusSeconds(20));
   }
 
-  /** A schedule whose first advance pauses between looking at the queue and stepping. */
+  /**
+   * A schedule whose first advance pauses between looking at the queue and
+   * stepping.
+   */
   private TemporalSchedule pausingAtTheFirstCheckpoint(
     final CountDownLatch paused,
     final CountDownLatch release
@@ -833,9 +836,10 @@ class TemporalScheduleTest {
   }
 
   /**
-   * Starts {@code first} and waits until it pauses at its checkpoint, then starts
-   * {@code second} and waits until it is blocked on the schedule's monitor (or has finished,
-   * if nothing blocks it), then releases {@code first} and waits for both.
+   * Starts {@code first} and waits until it pauses at its checkpoint, then
+   * starts {@code second} and waits until it is blocked on the schedule's
+   * monitor (or has finished, if nothing blocks it), then releases
+   * {@code first} and waits for both.
    */
   private static void runWhileTheFirstIsPaused(
     final CountDownLatch paused,

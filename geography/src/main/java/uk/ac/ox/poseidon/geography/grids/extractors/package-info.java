@@ -23,6 +23,7 @@
 /**
  * {@link java.util.function.Function}s that extract a value from a resolved
  * {@link uk.ac.ox.poseidon.geography.grids.DoubleGrid}. See
- * {@link uk.ac.ox.poseidon.geography.grids.extractors.Factories} for the entry points.
+ * {@link uk.ac.ox.poseidon.geography.grids.extractors.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.geography.grids.extractors;

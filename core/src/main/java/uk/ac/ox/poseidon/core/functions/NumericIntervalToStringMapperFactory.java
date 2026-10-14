@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link NumericIntervalMapper} (specialized to
- * {@link String} outputs), built via
+ * A {@link GlobalScopeFactory} counterpart of {@link NumericIntervalMapper}
+ * (specialized to {@link String} outputs), built via
  * {@link Factories#numericIntervalToStringMapper(Interval...)}.
  */
 @Data
@@ -47,7 +47,8 @@ public class NumericIntervalToStringMapperFactory
 
   /**
    * @return an {@link Interval} literal, for use as a
-   * {@link Factories#numericIntervalToStringMapper(Interval...)} argument
+   *         {@link Factories#numericIntervalToStringMapper(Interval...)}
+   *         argument
    */
   public static Interval interval(
     final Double lowerBoundInclusive,

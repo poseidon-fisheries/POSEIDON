@@ -28,8 +28,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import sim.field.grid.Grid2D;
 
 /**
- * A {@link Grid} base class wrapping a MASON {@link Grid2D} of type {@code F}, sized to match a
- * {@link ModelGrid}.
+ * A {@link Grid} base class wrapping a MASON {@link Grid2D} of type {@code F},
+ * sized to match a {@link ModelGrid}.
  */
 public abstract class AbstractGrid<F extends Grid2D> implements Grid {
 
@@ -39,10 +39,11 @@ public abstract class AbstractGrid<F extends Grid2D> implements Grid {
 
   /**
    * @param modelGrid the grid this is defined over
-   * @param field     the underlying MASON field; must have the same dimensions as
-   *                  {@code modelGrid}
+   * @param field     the underlying MASON field; must have the same dimensions
+   *                  as {@code modelGrid}
    * @throws IllegalArgumentException if {@code field}'s dimensions don't match
-   *                                   {@code modelGrid}'s, or either is non-positive
+   *                                  {@code modelGrid}'s, or either is
+   *                                  non-positive
    */
   protected AbstractGrid(final ModelGrid modelGrid, final F field) {
     checkNotNull(modelGrid);

@@ -27,7 +27,10 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.events.EventManager;
 
-/** Supplies a vessel's current trip's event manager; the vessel must have a current trip. */
+/**
+ * Supplies a vessel's current trip's event manager; the vessel must have a
+ * current trip.
+ */
 @RequiredArgsConstructor
 public class CurrentTripEventManager implements Supplier<EventManager> {
 

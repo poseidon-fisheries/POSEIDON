@@ -26,21 +26,24 @@ import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A factory that builds its delegate's product once per scope of its own (once per simulation,
- * once per vessel...), whatever scope the delegate itself has. Subclasses fix that scope through
- * {@link #makeKey} and {@link #scopeClass}, as the {@code *ScopeFactory} classes do.
+ * A factory that builds its delegate's product once per scope of its own (once
+ * per simulation, once per vessel...), whatever scope the delegate itself has.
+ * Subclasses fix that scope through {@link #makeKey} and {@link #scopeClass},
+ * as the {@code *ScopeFactory} classes do.
  * <p>
- * Each product is built by calling the delegate's own {@link AbstractFactory#newInstance}
- * directly, bypassing the delegate's cache: wrapping a global or simulation-scoped delegate does
- * give each scope its own instance, and leaves the instance the delegate shares elsewhere
- * untouched. If the delegate is not an {@link AbstractFactory} (e.g. a lambda in a test), it is
- * resolved with {@link Factory#get} instead.
+ * Each product is built by calling the delegate's own
+ * {@link AbstractFactory#newInstance} directly, bypassing the delegate's cache:
+ * wrapping a global or simulation-scoped delegate does give each scope its own
+ * instance, and leaves the instance the delegate shares elsewhere untouched. If
+ * the delegate is not an {@link AbstractFactory} (e.g. a lambda in a test), it
+ * is resolved with {@link Factory#get} instead.
  * <p>
- * <b>Only the delegate's own product is new: what it is built from is not.</b> The delegate
- * resolves its inputs as usual, at their own scopes, so a product that wraps a shared input (say,
- * a mutable object from a global factory) is a new wrapper around that same shared object. This is
- * the same rule as for any factory: a {@code VesselScopeFactory}'s inputs are not per vessel unless
- * they are themselves.
+ * <b>Only the delegate's own product is new: what it is built from is not.</b>
+ * The delegate resolves its inputs as usual, at their own scopes, so a product
+ * that wraps a shared input (say, a mutable object from a global factory) is a
+ * new wrapper around that same shared object. This is the same rule as for any
+ * factory: a {@code VesselScopeFactory}'s inputs are not per vessel unless they
+ * are themselves.
  *
  * @param <S> the scope this factory resolves against
  * @param <C> the type of object produced

@@ -31,8 +31,8 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
- * Provides the time at sea of a vessel's current trip ({@link Trip#getTimeAtSea()}); only checks
- * made during a trip read it.
+ * Provides the time at sea of a vessel's current trip
+ * ({@link Trip#getTimeAtSea()}); only checks made during a trip read it.
  */
 @RequiredArgsConstructor
 public class CurrentTimeAtSea implements Provider<Duration> {
