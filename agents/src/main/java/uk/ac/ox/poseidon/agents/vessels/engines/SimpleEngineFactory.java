@@ -29,9 +29,9 @@ import javax.measure.Quantity;
 import javax.measure.quantity.Speed;
 import javax.measure.quantity.Volume;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -41,8 +41,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link SimpleEngine}, built via
  * {@link Factories#simpleEngine}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -51,9 +51,12 @@ public class SimpleEngineFactory<S extends Scope> extends RelativeScopeFactory<
   Engine
 > {
 
-  private Factory<? super S, ? extends FuelTank> fuelTank;
-  private Factory<? super S, ? extends Quantity<Speed>> cruisingSpeed;
-  private Factory<? super S, ? extends Quantity<Volume>> fuelConsumedPerKm;
+  private final Factory<? super S, ? extends FuelTank> fuelTank;
+  private final Factory<? super S, ? extends Quantity<Speed>> cruisingSpeed;
+  private final Factory<
+    ? super S,
+    ? extends Quantity<Volume>
+  > fuelConsumedPerKm;
 
   @Override
   protected Engine newInstance(final S scope) {

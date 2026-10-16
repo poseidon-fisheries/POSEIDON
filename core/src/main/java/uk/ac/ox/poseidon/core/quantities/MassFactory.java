@@ -23,23 +23,20 @@
 package uk.ac.ox.poseidon.core.quantities;
 
 import javax.measure.quantity.Mass;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
  * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link Mass}
  * quantities, built via {@link Factories Factories.massOf(...)}.
  */
-@Data
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class MassFactory extends AbstractQuantityFactory<Mass> {
-
-  /** No-args constructor, used only by SnakeYAML during deserialization. */
-  public MassFactory() {
-    super(Mass.class);
-  }
 
   /**
    * @param value      the numeric mass value
@@ -47,6 +44,11 @@ public class MassFactory extends AbstractQuantityFactory<Mass> {
    *                   {@code Unit.toString()}
    */
   public MassFactory(final double value, final String unitString) {
-    super(Mass.class, value, unitString);
+    super(value, unitString);
+  }
+
+  @Override
+  protected Class<Mass> quantityClass() {
+    return Mass.class;
   }
 }

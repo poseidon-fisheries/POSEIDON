@@ -41,9 +41,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
@@ -70,8 +70,8 @@ import uk.ac.ox.poseidon.geography.grids.TimeIndexedNetCdfGridReader;
  * themselves contain {@code separator}, since that would make a bare code
  * indistinguishable from a code/lifeStage pair.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -80,10 +80,10 @@ public class TimeIndexedBiomassGridsFromNetCdfFactory<S extends Scope> extends R
   ImmutableMap<LocalDateTime, ImmutableList<ImmutableBiomassGrid>>
 > {
 
-  private Factory<? super S, ? extends ModelGrid> modelGrid;
-  private Factory<? super S, ? extends List<? extends Species>> species;
-  private String separator;
-  private Factory<
+  private final Factory<? super S, ? extends ModelGrid> modelGrid;
+  private final Factory<? super S, ? extends List<? extends Species>> species;
+  private final String separator;
+  private final Factory<
     ? super S,
     ? extends Supplier<TimeIndexedNetCdfGridReader>
   > timeIndexedNetCdfGridReader;

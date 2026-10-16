@@ -22,9 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -33,7 +34,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} counterpart of {@link FullDiscardMortality},
  * built via {@link Factories#fullDiscardMortality()}.
  */
-@Data
+@Getter
+@ToString
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)

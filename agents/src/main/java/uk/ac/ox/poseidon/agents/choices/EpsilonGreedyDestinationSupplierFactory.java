@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselScopeFactory} counterpart of {@link EpsilonGreedyChooser},
  * built via {@link Factories#epsilonGreedyDestination}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,9 +46,15 @@ public class EpsilonGreedyDestinationSupplierFactory
   extends VesselScopeFactory<DestinationSupplier>
 {
 
-  private double epsilon;
-  private Factory<? super VesselScope, ? extends Supplier<Int2D>> explorer;
-  private Factory<? super VesselScope, ? extends Supplier<Int2D>> exploiter;
+  private final double epsilon;
+  private final Factory<
+    ? super VesselScope,
+    ? extends Supplier<Int2D>
+  > explorer;
+  private final Factory<
+    ? super VesselScope,
+    ? extends Supplier<Int2D>
+  > exploiter;
 
   /**
    * @return an {@link EpsilonGreedyChooser} over the resolved

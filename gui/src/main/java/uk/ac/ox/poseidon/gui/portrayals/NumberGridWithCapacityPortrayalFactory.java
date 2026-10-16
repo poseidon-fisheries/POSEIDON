@@ -22,10 +22,9 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.gui.ColorMap;
 import uk.ac.ox.poseidon.core.Factory;
@@ -39,16 +38,18 @@ import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
  * maximum — for grids (e.g. biomass) meant to be read against a fixed capacity
  * rather than their current extent.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class NumberGridWithCapacityPortrayalFactory
   extends NumberGridPortrayalFactory
 {
 
-  private Factory<? super SimulationScope, ? extends DoubleGrid> capacityGrid;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends DoubleGrid
+  > capacityGrid;
 
   /**
    * @param paletteName    the colour palette to use

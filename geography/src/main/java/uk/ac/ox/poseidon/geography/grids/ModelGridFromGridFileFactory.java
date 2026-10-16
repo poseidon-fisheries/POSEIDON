@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.geography.grids;
 import java.io.File;
 import java.nio.file.Path;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -40,8 +40,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * aligned with a bathymetry/elevation source file without duplicating its
  * dimensions. Built via {@link Factories#modelGridFromGridFile(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -50,7 +50,7 @@ public class ModelGridFromGridFileFactory<S extends Scope> extends RelativeScope
   ModelGrid
 > {
 
-  private Factory<? super S, ? extends Path> gridFilePath;
+  private final Factory<? super S, ? extends Path> gridFilePath;
 
   @Override
   protected ModelGrid newInstance(final S scope) {

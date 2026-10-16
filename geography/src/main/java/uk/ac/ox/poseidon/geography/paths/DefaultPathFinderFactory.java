@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography.paths;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -46,8 +46,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * Built via
  * {@link Factories#pathFinder(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -55,20 +55,20 @@ public class DefaultPathFinderFactory
   extends SimulationScopeFactory<GridPathFinder>
 {
 
-  private Factory<
+  private final Factory<
     ? super SimulationScope,
     ? extends BathymetricGrid
   > bathymetricGrid;
-  private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
-  private Factory<
+  private final Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+  private final Factory<
     ? super SimulationScope,
     ? extends DistanceCalculator
   > distance;
-  private Factory<
+  private final Factory<
     ? super SimulationScope,
     ? extends PathCache<Int2D>
   > pathCache;
-  private Factory<
+  private final Factory<
     ? super SimulationScope,
     ? extends AccessibleWaterCellsCache
   > accessibleWaterCellsCache;

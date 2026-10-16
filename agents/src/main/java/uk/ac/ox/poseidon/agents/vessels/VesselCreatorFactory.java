@@ -24,12 +24,14 @@ package uk.ac.ox.poseidon.agents.vessels;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Singular;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
@@ -48,8 +50,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * A {@link SimulationScopeFactory} counterpart of {@link VesselCreator}, built
  * via {@link Factories#vesselCreator}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -57,24 +59,32 @@ public class VesselCreatorFactory
   extends SimulationScopeFactory<VesselCreator>
 {
 
-  private Factory<? super SimulationScope, ? extends VesselField> vesselField;
-  private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
-  private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;
-  private Factory<
+  private final Factory<
+    ? super SimulationScope,
+    ? extends VesselField
+  > vesselField;
+  private final Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends MarketGrid
+  > marketGrid;
+  private final Factory<
     ? super SimulationScope,
     ? extends Supplier<String>
   > vesselIdSupplier;
 
-  private Factory<? super VesselScope, ? extends String> name;
-  private Factory<? super VesselScope, ? extends Account> account;
-  private Factory<? super VesselScope, ? extends Port> homePort;
-  private Factory<? super VesselScope, ? extends Hold> hold;
-  private Factory<? super VesselScope, ? extends Gear> gear;
-  private Factory<? super VesselScope, ? extends Engine> engine;
-  private Factory<? super VesselScope, ? extends Behaviour> behaviour;
-  private List<Factory<? super VesselScope, ?>> extraFactories;
+  private final Factory<? super VesselScope, ? extends String> name;
+  private final Factory<? super VesselScope, ? extends Account> account;
+  private final Factory<? super VesselScope, ? extends Port> homePort;
+  private final Factory<? super VesselScope, ? extends Hold> hold;
+  private final Factory<? super VesselScope, ? extends Gear> gear;
+  private final Factory<? super VesselScope, ? extends Engine> engine;
+  private final Factory<? super VesselScope, ? extends Behaviour> behaviour;
 
-  private int numberOfVesselsToCreate;
+  @Singular
+  private final ImmutableList<Factory<? super VesselScope, ?>> extraFactories;
+
+  private final int numberOfVesselsToCreate;
 
   /** Shorthand for the full constructor with no extra per-vessel factories. */
   public VesselCreatorFactory(
@@ -106,7 +116,7 @@ public class VesselCreatorFactory
       gear,
       engine,
       behaviour,
-      List.of(),
+      ImmutableList.of(),
       numberOfVesselsToCreate
     );
   }

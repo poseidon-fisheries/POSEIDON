@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography.distance;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * {@link CartesianDistanceCalculator}, built via
  * {@link Factories#cartesianDistanceCalculator(Factory, double)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -47,8 +47,8 @@ public class CartesianDistanceCalculatorFactory<S extends Scope> extends Relativ
   CartesianDistanceCalculator
 > {
 
-  private Factory<? super S, ? extends ModelGrid> modelGrid;
-  private double cellSizeInKm;
+  private final Factory<? super S, ? extends ModelGrid> modelGrid;
+  private final double cellSizeInKm;
 
   @Override
   protected CartesianDistanceCalculator newInstance(final S scope) {

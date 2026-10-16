@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
@@ -94,7 +95,7 @@ public class Factories {
       ? extends List<MarketPrice>
     >... marketPrices
   ) {
-    return new InitialPricesFactory(List.of(marketPrices));
+    return new InitialPricesFactory(ImmutableList.copyOf(marketPrices));
   }
 
   /**

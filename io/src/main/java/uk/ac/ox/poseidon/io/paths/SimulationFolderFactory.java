@@ -27,9 +27,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -41,8 +41,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * absent) at resolution time. Built via
  * {@link Factories#simulationFolder(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -51,7 +51,7 @@ public class SimulationFolderFactory
   implements PathFactory<SimulationScope>
 {
 
-  private Factory<? super SimulationScope, ? extends Path> parent;
+  private final Factory<? super SimulationScope, ? extends Path> parent;
 
   @Override
   protected Path newInstance(final SimulationScope scope) {

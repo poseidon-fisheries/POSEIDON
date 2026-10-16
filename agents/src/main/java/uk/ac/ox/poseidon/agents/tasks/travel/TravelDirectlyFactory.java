@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -36,14 +36,17 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
  * A {@link VesselTaskFactory} counterpart of {@link TravelDirectly}, built via
  * {@link Factories#travelDirectly}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class TravelDirectlyFactory extends VesselTaskFactory<TravelDirectly> {
 
-  private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
+  private final Factory<
+    ? super VesselScope,
+    ? extends DistanceCalculator
+  > distance;
 
   @Override
   protected TravelDirectly newInstance(final VesselScope scope) {

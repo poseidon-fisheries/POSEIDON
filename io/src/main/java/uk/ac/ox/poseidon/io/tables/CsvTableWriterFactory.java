@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.io.tables;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link CsvTableWriter}, built
  * via {@link Factories#csvTableWriter(Factory, Factory, boolean, boolean)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,10 +48,10 @@ public class CsvTableWriterFactory<S extends Scope> extends RelativeScopeFactory
   CsvTableWriter
 > {
 
-  private Factory<? super S, ? extends Supplier<Table>> tableSupplier;
-  private Factory<? super S, ? extends Path> path;
-  private boolean append;
-  private boolean clearAfterWriting;
+  private final Factory<? super S, ? extends Supplier<Table>> tableSupplier;
+  private final Factory<? super S, ? extends Path> path;
+  private final boolean append;
+  private final boolean clearAfterWriting;
 
   @Override
   protected CsvTableWriter newInstance(final S scope) {

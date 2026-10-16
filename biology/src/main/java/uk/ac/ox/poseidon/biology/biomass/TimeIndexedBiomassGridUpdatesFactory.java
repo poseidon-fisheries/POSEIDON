@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -48,8 +48,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * for the snapshots to apply over time. Built via
  * {@link Factories#timeIndexedBiomassGridUpdates(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -58,8 +58,11 @@ public class TimeIndexedBiomassGridUpdatesFactory<S extends Scope> extends Relat
   List<Entry<LocalDateTime, BiomassGridUpdate>>
 > {
 
-  private Factory<? super S, ? extends FisheableBiomassGrids> biomassGrids;
-  private Factory<
+  private final Factory<
+    ? super S,
+    ? extends FisheableBiomassGrids
+  > biomassGrids;
+  private final Factory<
     ? super S,
     ? extends Map<LocalDateTime, ? extends List<? extends SpeciesGrid>>
   > timeIndexedBiomassGrids;

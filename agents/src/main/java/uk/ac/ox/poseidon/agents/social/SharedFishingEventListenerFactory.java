@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.agents.social;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -47,15 +47,15 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  *
  * @param <L> the type of listener
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class SharedFishingEventListenerFactory<L extends Listener<? super FishingEvent>> extends VesselScopeFactory<L> {
 
-  private Factory<? super VesselScope, ? extends L> listener;
-  private Factory<
+  private final Factory<? super VesselScope, ? extends L> listener;
+  private final Factory<
     ? super SimulationScope,
     ? extends FishingEventSharer
   > fishingEventSharer;

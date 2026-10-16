@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * {@link HomePortDestinationSupplier}, built via
  * {@link Factories#homePortDestination}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,7 +46,7 @@ public class HomePortDestinationSupplierFactory
   extends VesselScopeFactory<HomePortDestinationSupplier>
 {
 
-  private Factory<? super VesselScope, ? extends PortGrid> portGrid;
+  private final Factory<? super VesselScope, ? extends PortGrid> portGrid;
 
   @Override
   protected HomePortDestinationSupplier newInstance(final VesselScope scope) {

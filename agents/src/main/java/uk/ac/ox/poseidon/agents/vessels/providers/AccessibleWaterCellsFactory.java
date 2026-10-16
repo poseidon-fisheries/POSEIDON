@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * A {@link VesselScopeFactory} counterpart of {@link AccessibleWaterCells},
  * built via {@link Factories#accessibleWaterCells}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -45,7 +45,10 @@ public class AccessibleWaterCellsFactory
   extends VesselScopeFactory<AccessibleWaterCells>
 {
 
-  private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
+  private final Factory<
+    ? super VesselScope,
+    ? extends GridPathFinder
+  > pathFinder;
 
   @Override
   protected AccessibleWaterCells newInstance(final VesselScope scope) {

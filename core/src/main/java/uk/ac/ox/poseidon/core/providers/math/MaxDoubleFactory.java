@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.core.providers.math;
 
 import java.util.function.DoubleSupplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link MaxDouble}, built via
  * {@link Factories#maxDouble(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,8 +46,8 @@ public class MaxDoubleFactory<S extends Scope> extends RelativeScopeFactory<
   MaxDouble
 > {
 
-  private Factory<? super S, ? extends DoubleSupplier> a;
-  private Factory<? super S, ? extends DoubleSupplier> b;
+  private final Factory<? super S, ? extends DoubleSupplier> a;
+  private final Factory<? super S, ? extends DoubleSupplier> b;
 
   @Override
   protected MaxDouble newInstance(final S scope) {

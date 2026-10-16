@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.core.functions.Factories.numericIntervalToStringMapper;
 import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.functions.NumericIntervalMapper;
 import uk.ac.ox.poseidon.core.functions.NumericIntervalToStringMapperFactory;
@@ -37,7 +37,7 @@ class NumericIntervalToStringMapperFactoryTest {
   void buildsStringMapperFromConfiguredIntervals() {
     final NumericIntervalToStringMapperFactory factory =
       new NumericIntervalToStringMapperFactory(
-        List.of(
+        ImmutableList.of(
           NumericIntervalToStringMapperFactory.interval(0.0, 6.0, "VL0006"),
           NumericIntervalToStringMapperFactory.interval(6.0, 12.0, "VL0612"),
           NumericIntervalToStringMapperFactory.interval(40.0, null, "VL40XX")

@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselScopeFactory} counterpart of {@link GreedyPicker}, built via
  * {@link Factories#greedyPicker(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -45,8 +45,11 @@ public class GreedyPickerFactory<O> extends VesselScopeFactory<
   GreedyPicker<O>
 > {
 
-  private Factory<? super VesselScope, ? extends OptionValues<O>> optionValues;
-  private Factory<
+  private final Factory<
+    ? super VesselScope,
+    ? extends OptionValues<O>
+  > optionValues;
+  private final Factory<
     ? super VesselScope,
     ? extends Predicate<? super O>
   > optionPredicate;

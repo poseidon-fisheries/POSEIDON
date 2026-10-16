@@ -22,9 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -33,7 +34,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
  * A {@link VesselTaskFactory} counterpart of {@link ArriveInPort}, built via
  * {@link Factories#arriveInPort()}.
  */
-@Data
+@Getter
+@ToString
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)

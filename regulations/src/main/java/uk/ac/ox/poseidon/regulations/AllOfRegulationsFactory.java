@@ -24,11 +24,12 @@ package uk.ac.ox.poseidon.regulations;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Singular;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -38,8 +39,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link AllOfRegulations}, built
  * via {@link Factories#allOf(Factory...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,7 +49,8 @@ public class AllOfRegulationsFactory<
   A extends Action<?>
 > extends RelativeScopeFactory<S, AllOfRegulations<A>> {
 
-  private List<
+  @Singular
+  private final ImmutableList<
     Factory<? super S, ? extends Regulations<? super A>>
   > regulations;
 

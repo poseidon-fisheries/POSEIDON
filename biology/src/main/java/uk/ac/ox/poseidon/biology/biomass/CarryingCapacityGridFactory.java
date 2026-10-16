@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
  * {@link Factories#uniformCarryingCapacityGrid}, and
  * {@link Factories#totalCarryingCapacityGrid}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,7 +48,7 @@ public class CarryingCapacityGridFactory<S extends Scope> extends RelativeScopeF
   CarryingCapacityGrid
 > {
 
-  private Factory<? super S, ? extends DoubleGrid> grid;
+  private final Factory<? super S, ? extends DoubleGrid> grid;
 
   @Override
   protected CarryingCapacityGrid newInstance(final S scope) {

@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.vessels.extractors;
 
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.functions.ObjectProperty;
@@ -35,7 +34,6 @@ import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
  *
  * @param <R> the type of the property; not checked
  */
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class VesselPropertyFactory<R> extends ObjectPropertyFactory<Vessel, R> {

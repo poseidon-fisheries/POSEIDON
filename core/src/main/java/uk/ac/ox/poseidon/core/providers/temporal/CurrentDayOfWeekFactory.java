@@ -22,9 +22,10 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -33,7 +34,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * A {@link SimulationScopeFactory} counterpart of {@link CurrentDayOfWeek},
  * built via {@link Factories#currentDayOfWeek()}.
  */
-@Data
+@Getter
+@ToString
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)

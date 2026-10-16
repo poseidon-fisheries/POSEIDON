@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.core.functions;
 
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link DefaultIfNull}, built
  * via {@link Factories Factories.defaultIfNull(...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -47,11 +47,11 @@ public class DefaultIfNullFactory<
   R
 > extends RelativeScopeFactory<S, DefaultIfNull<T, R>> {
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Function<? super T, ? extends R>
   > delegate;
-  private Factory<? super S, ? extends R> defaultValue;
+  private final Factory<? super S, ? extends R> defaultValue;
 
   @Override
   protected DefaultIfNull<T, R> newInstance(final S scope) {

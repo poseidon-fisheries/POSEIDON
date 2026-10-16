@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.agents.social;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
@@ -39,8 +39,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * simulation's event manager, the sharer hears the fishing events every
  * vessel's event manager forwards there.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,7 +48,10 @@ public class FishingEventSharerFactory
   extends SimulationEventListenerFactory<FishingEventSharer>
 {
 
-  private Factory<? super SimulationScope, ? extends SocialNetwork> network;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends SocialNetwork
+  > network;
 
   @Override
   protected FishingEventSharer newListener(final SimulationScope scope) {

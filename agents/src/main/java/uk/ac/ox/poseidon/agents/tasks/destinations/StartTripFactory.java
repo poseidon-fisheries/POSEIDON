@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.tasks.destinations;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
@@ -36,14 +36,14 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselTaskFactory} for a {@link StartTrip}. Built via
  * {@link Factories#startTrip}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class StartTripFactory extends VesselTaskFactory<StartTrip> {
 
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends DestinationSupplier
   > destinationSupplier;

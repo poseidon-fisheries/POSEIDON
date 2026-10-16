@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  * {@link CheckIfFishingHereAndNowIsLegal}, built via
  * {@link Factories#checkIfFishingHereAndNowIsLegal}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -47,7 +47,7 @@ public class CheckIfFishingHereAndNowIsLegalFactory
   extends VesselTaskFactory<CheckIfFishingHereAndNowIsLegal>
 {
 
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends Regulations<? super ExtendedFishingAction>
   > regulations;

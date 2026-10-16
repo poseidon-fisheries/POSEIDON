@@ -88,8 +88,7 @@ class BuilderConstructorTest {
     );
   }
 
-  // Writes read-only properties, as the scenario writer will once factories
-  // have no setters
+  // Writes read-only properties, as the scenario writer does
   private static Yaml writer() {
     final DumperOptions options = new DumperOptions();
     options.setAllowReadOnlyProperties(true);

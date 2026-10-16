@@ -24,16 +24,16 @@ package uk.ac.ox.poseidon.gui.portrayals;
 
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 /**
  * A {@link SimpleFieldPortrayalFactory} preset for a {@link BathymetricGrid}:

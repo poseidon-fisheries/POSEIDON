@@ -14,21 +14,28 @@ almost every case — match the shape to the class's role:
   generated getters/`equals`/`hashCode`/`toString`. Add hand-written constructors alongside it only
   when a field needs derived/defaulted state.
 - **`Factory` YAML beans** (`*Factory` classes per the Factory/Scenario pattern — see
-  `docs/agents/architecture.md`): always the same five — `@Data @NoArgsConstructor
-  @AllArgsConstructor @EqualsAndHashCode(callSuper = true) @SuperBuilder(toBuilder = true)`.
-  `ScenarioLoader` builds every factory through its builder, so a factory class without one fails
-  to load (`FactoryBuildersTest` checks them all); `@SuperBuilder` needs every class in the
-  hierarchy to have it, abstract bases included, and `toBuilder` makes changed copies. A field
-  with an initialiser needs `@Builder.Default`, or the builder ignores the initialiser. The setters
-  are still used by code that changes factories in place, which is going. `callSuper = true` makes
-  equality include the superclass's fields. Don't add other constructors — see "Factory class
-  shape" in `docs/agents/architecture.md`.
+  `docs/agents/architecture.md`): immutable, always the same five — `@Getter @ToString
+  @AllArgsConstructor @EqualsAndHashCode(callSuper = true) @SuperBuilder(toBuilder = true)`, with
+  `final` fields. A class without fields has `@NoArgsConstructor` instead of
+  `@AllArgsConstructor`. `ScenarioLoader` builds every factory through its builder, so a factory
+  class without one fails to load (`FactoryBuildersTest` checks them all); `@SuperBuilder` needs
+  every class in the hierarchy to have it, abstract bases included, and `toBuilder` makes changed
+  copies. `ScenarioWriter` writes the properties the getters give, so every getter must be one
+  the builder sets (`FactoryBuildersTest` checks that too): a value derived from the class, such
+  as a quantity's type, is a method not named as a getter. A field with an initialiser needs
+  `@Builder.Default`, or the builder ignores the initialiser. A `List` or `Map` field is an
+  `ImmutableList` or `ImmutableMap` with `@Singular`, so the builder copies what it is given;
+  the static helpers copy their arguments into one. `callSuper = true` makes equality include the
+  superclass's fields. Don't add other constructors — see "Factory class shape" in
+  `docs/agents/architecture.md`. `FleetFromVesselRegisterFactory` and `VesselScopeFactoriesByCode`
+  still have setters and a no-args constructor: the first sets properties on itself from the
+  register's columns.
 - **`Scenario`**: `@Getter @Builder(toBuilder = true)`, built fluently; its `with…` methods derive
   changed copies through `toBuilder`. Its all-arguments constructor is hand-written, to check
-  component names. Its `@Setter` and `@NoArgsConstructor` go with the factories' setters.
+  component names.
 
-Use `@Getter(AccessLevel.NONE)` (or `@Setter(AccessLevel.NONE)`) on individual fields to suppress
-just that one accessor rather than dropping `@Data`/`@Getter` for a hand-written class.
+Use `@Getter(AccessLevel.NONE)` on individual fields to suppress just that one accessor rather
+than dropping `@Getter` for a hand-written class.
 
 ## Sharing data across simulations
 

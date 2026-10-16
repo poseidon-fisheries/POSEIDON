@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.agents.social;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * A {@link SimulationScopeFactory} counterpart of {@link SocialNetwork}, built
  * via {@link Factories#socialNetwork}. The network starts with no ties.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -47,7 +47,10 @@ public class SocialNetworkFactory
   extends SimulationScopeFactory<SocialNetwork>
 {
 
-  private Factory<? super SimulationScope, ? extends VesselsGetter> candidates;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends VesselsGetter
+  > candidates;
 
   @Override
   protected SocialNetwork newInstance(final SimulationScope scope) {

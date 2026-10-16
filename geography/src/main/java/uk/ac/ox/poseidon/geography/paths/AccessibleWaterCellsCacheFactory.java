@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography.paths;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -41,8 +41,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * they only shape the factory's identity and scope, so caches are shared
  * exactly when the grids they describe are. Don't drop them.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -51,8 +51,8 @@ public class AccessibleWaterCellsCacheFactory<S extends Scope> extends RelativeS
   AccessibleWaterCellsCache
 > {
 
-  private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
-  private Factory<? super S, ? extends PortGrid> portGrid;
+  private final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+  private final Factory<? super S, ? extends PortGrid> portGrid;
 
   @Override
   protected AccessibleWaterCellsCache newInstance(final S scope) {

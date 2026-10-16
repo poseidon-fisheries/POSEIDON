@@ -32,9 +32,9 @@ import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -45,8 +45,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * built via {@link Factories#zipEntryDataSource(Factory, String)}/
  * {@link Factories#zipEntryDataSource(Factory, String, String)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -57,9 +57,9 @@ public class ZipEntryDataSourceFactory<S extends Scope> extends RelativeScopeFac
 
   private static final String DEFAULT_ENCODING = UTF_8.name();
 
-  private Factory<S, ? extends Path> path;
-  private String entry;
-  private String encoding;
+  private final Factory<S, ? extends Path> path;
+  private final String entry;
+  private final String encoding;
 
   /**
    * @param path  factory for the zip archive to read

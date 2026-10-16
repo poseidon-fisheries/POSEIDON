@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.market;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselScopeFactory} counterpart of {@link HomePortCatchValuation},
  * built via {@link Factories#homePortCatchValuation}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -45,7 +45,7 @@ public class HomePortCatchValuationFactory
   extends VesselScopeFactory<HomePortCatchValuation>
 {
 
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends CatchCategoriser
   > catchCategoriser;

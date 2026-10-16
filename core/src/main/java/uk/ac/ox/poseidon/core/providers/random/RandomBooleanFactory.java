@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.providers.random;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * A {@link SimulationScopeFactory} counterpart of {@link RandomBoolean}, built
  * via {@link Factories Factories.randomBoolean(...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -43,7 +43,7 @@ public class RandomBooleanFactory
   extends SimulationScopeFactory<RandomBoolean>
 {
 
-  private double probability;
+  private final double probability;
 
   @Override
   protected RandomBoolean newInstance(final SimulationScope scope) {

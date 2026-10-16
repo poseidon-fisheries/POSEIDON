@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.core.functions;
 
 import java.util.Map;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link MapValueExtractor},
  * built via {@link Factories#mapValueExtractor(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -47,7 +47,7 @@ public class MapValueExtractorFactory<
   V
 > extends RelativeScopeFactory<S, MapValueExtractor<K, V>> {
 
-  private Factory<? super S, ? extends Map<? super K, ? extends V>> map;
+  private final Factory<? super S, ? extends Map<? super K, ? extends V>> map;
 
   @Override
   protected MapValueExtractor<K, V> newInstance(final S scope) {

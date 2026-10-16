@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import java.util.function.Function;
 import org.joda.money.Money;
 import sim.util.Int2D;
@@ -87,7 +87,10 @@ public class Factories {
       ? extends Function<? super Route, ? extends Money>
     >... routeCosts
   ) {
-    return new TravelCostFactory<>(routeFunction, List.of(routeCosts));
+    return new TravelCostFactory<>(
+      routeFunction,
+      ImmutableList.copyOf(routeCosts)
+    );
   }
 
   /**

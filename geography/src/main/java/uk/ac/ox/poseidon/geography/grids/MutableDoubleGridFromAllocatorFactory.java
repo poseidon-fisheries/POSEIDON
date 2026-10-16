@@ -22,9 +22,9 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -39,8 +39,8 @@ import uk.ac.ox.poseidon.geography.allocators.Allocator;
  * runtime, unlike the fixed {@link DoubleGridFromAllocatorFactory}. Built via
  * {@link Factories#mutableDoubleGridFromAllocator(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class MutableDoubleGridFromAllocatorFactory<S extends Scope> extends AbstractDoubleGridFromAllocatorFactory<

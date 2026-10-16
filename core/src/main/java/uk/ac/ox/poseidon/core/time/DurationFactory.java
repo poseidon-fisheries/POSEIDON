@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.core.time;
 
 import java.time.Duration;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -37,17 +37,17 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * to carry documentation. Built via {@link Factories} — {@code duration(...)}
  * or {@code days/hours/minutes/seconds(long)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class DurationFactory extends GlobalScopeFactory<Duration> {
 
-  private long days;
-  private long hours;
-  private long minutes;
-  private long seconds;
+  private final long days;
+  private final long hours;
+  private final long minutes;
+  private final long seconds;
 
   /**
    * @param duration the duration to decompose into days/hours/minutes/seconds

@@ -32,9 +32,9 @@ import java.util.function.Supplier;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
@@ -47,8 +47,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@link IndexedBiomassCatchabilityGear}, built via
  * {@link Factories#indexedBiomassCatchabilityGear}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -57,15 +57,24 @@ public class IndexedBiomassCatchabilityGearFactory<S extends Scope> extends Rela
   IndexedBiomassCatchabilityGear
 > {
 
-  private String code;
-  private Factory<? super S, ? extends Supplier<Duration>> durationSupplier;
-  private Factory<? super S, ? extends Collection<? extends Species>> species;
+  private final String code;
+  private final Factory<
+    ? super S,
+    ? extends Supplier<Duration>
+  > durationSupplier;
+  private final Factory<
+    ? super S,
+    ? extends Collection<? extends Species>
+  > species;
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Function<? super Species, Double>
   > proportionFunction;
-  private Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold;
+  private final Factory<
+    ? super S,
+    ? extends Quantity<Mass>
+  > minimumCatchThreshold;
 
   @Override
   protected IndexedBiomassCatchabilityGear newInstance(final S scope) {

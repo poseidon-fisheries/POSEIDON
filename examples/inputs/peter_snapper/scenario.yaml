@@ -331,8 +331,8 @@ components:
                 value: 100000.0
               }
               currentFuel: *id014
-          extraFactories: &id022
-          - !!uk.ac.ox.poseidon.agents.choices.evaluation.TripEvaluatorFactory
+          extraFactories:
+          - &id022 !!uk.ac.ox.poseidon.agents.choices.evaluation.TripEvaluatorFactory
             evaluationProvider: !!uk.ac.ox.poseidon.agents.choices.evaluation.ProfitPerHourDestinationEvaluationProviderFactory {
               currencyCode: IDR
             }
@@ -364,7 +364,8 @@ components:
           account: *id019
           behaviour: *id020
           engine: *id021
-          extraFactories: *id022
+          extraFactories:
+          - *id022
           gear: *id015
           hold: *id023
           homePort: *id024

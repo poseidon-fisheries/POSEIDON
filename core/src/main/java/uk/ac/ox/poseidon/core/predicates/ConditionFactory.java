@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.core.predicates;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link Condition}, built via
  * {@link Factories#condition(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,11 +48,11 @@ public class ConditionFactory<
   U
 > extends RelativeScopeFactory<S, Condition<T, U>> {
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Function<? super T, ? extends U>
   > extractor;
-  private Factory<? super S, ? extends Predicate<? super U>> predicate;
+  private final Factory<? super S, ? extends Predicate<? super U>> predicate;
 
   @Override
   protected Condition<T, U> newInstance(final S scope) {

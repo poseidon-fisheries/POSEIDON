@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -34,17 +34,17 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} counterpart of {@link Envelope}, built via
  * {@link Factories#envelope(double, double, double, double)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class EnvelopeFactory extends GlobalScopeFactory<Envelope> {
 
-  private double minX;
-  private double maxX;
-  private double minY;
-  private double maxY;
+  private final double minX;
+  private final double maxX;
+  private final double minY;
+  private final double maxY;
 
   @Override
   protected Envelope newInstance(final Scope scope) {

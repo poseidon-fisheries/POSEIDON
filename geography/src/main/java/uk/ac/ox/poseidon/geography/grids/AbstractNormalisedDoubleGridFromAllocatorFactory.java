@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.geography.grids;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Double.isNaN;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.geography.allocators.Allocator;
  * raw allocator value so the grid's total ({@link #postProcess}'s {@code sum})
  * equals a fixed {@code totalValue}, preserving each cell's relative share.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 abstract class AbstractNormalisedDoubleGridFromAllocatorFactory<
@@ -47,7 +47,7 @@ abstract class AbstractNormalisedDoubleGridFromAllocatorFactory<
   G extends DoubleGrid
 > extends AbstractDoubleGridFromAllocatorFactory<S, G> {
 
-  private Factory<? super S, ? extends Number> totalValue;
+  private final Factory<? super S, ? extends Number> totalValue;
 
   /**
    * @param modelGrid  factory for the grid to build over

@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.portrayal.grid.SparseGridPortrayal2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.MutablePortGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 /**
@@ -47,7 +47,7 @@ public final class PortGridPortrayalFactory
   extends SimulationScopeFactory<SparseGridPortrayal2D>
 {
 
-  private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+  private final Factory<? super SimulationScope, ? extends PortGrid> portGrid;
 
   /**
    * @return a sparse grid portrayal showing {@link #portGrid}'s cells with a

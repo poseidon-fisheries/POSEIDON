@@ -28,9 +28,9 @@ import static tech.units.indriya.unit.Units.LITRE;
 import javax.measure.Quantity;
 import javax.measure.quantity.Volume;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -41,15 +41,21 @@ import uk.ac.ox.poseidon.core.Factory;
  * {@link Factories
  * Factories.tank(...)/Factories.fullTank(...)/Factories.emptyTank(...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class SimpleFuelTankFactory extends VesselScopeFactory<FuelTank> {
 
-  private Factory<? super VesselScope, ? extends Quantity<Volume>> capacity;
-  private Factory<? super VesselScope, ? extends Quantity<Volume>> currentFuel;
+  private final Factory<
+    ? super VesselScope,
+    ? extends Quantity<Volume>
+  > capacity;
+  private final Factory<
+    ? super VesselScope,
+    ? extends Quantity<Volume>
+  > currentFuel;
 
   @Override
   protected FuelTank newInstance(final VesselScope scope) {

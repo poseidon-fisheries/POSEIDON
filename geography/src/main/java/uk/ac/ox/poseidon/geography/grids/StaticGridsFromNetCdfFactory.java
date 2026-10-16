@@ -28,9 +28,9 @@ import static java.util.function.Function.identity;
 import com.google.common.collect.ImmutableMap;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -46,8 +46,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * membership masks (one variable per MPA id) or, later, habitat-type grids —
  * whatever a static NetCDF file happens to contain.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -56,8 +56,8 @@ public class StaticGridsFromNetCdfFactory<S extends Scope> extends RelativeScope
   ImmutableMap<String, DoubleGridWrapper>
 > {
 
-  private Factory<? super S, ? extends ModelGrid> modelGrid;
-  private Factory<
+  private final Factory<? super S, ? extends ModelGrid> modelGrid;
+  private final Factory<
     ? super S,
     ? extends Supplier<StaticNetCdfGridReader>
   > staticNetCdfGridReader;

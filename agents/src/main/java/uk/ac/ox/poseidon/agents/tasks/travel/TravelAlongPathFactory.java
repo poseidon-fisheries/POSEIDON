@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
@@ -40,20 +40,26 @@ import uk.ac.ox.poseidon.geography.paths.PathFinder;
  * A {@link VesselTaskFactory} counterpart of {@link TravelAlongPath}, built via
  * {@link Factories#travelAlongPathTo}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class TravelAlongPathFactory extends VesselTaskFactory<TravelAlongPath> {
 
-  private Factory<? super VesselScope, ? extends PathFinder<Int2D>> pathFinder;
-  private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
-  private Factory<
+  private final Factory<
+    ? super VesselScope,
+    ? extends PathFinder<Int2D>
+  > pathFinder;
+  private final Factory<
+    ? super VesselScope,
+    ? extends DistanceCalculator
+  > distance;
+  private final Factory<
     ? super VesselScope,
     ? extends Supplier<Int2D>
   > destinationCell;
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends Supplier<EventManager>
   > eventManager;

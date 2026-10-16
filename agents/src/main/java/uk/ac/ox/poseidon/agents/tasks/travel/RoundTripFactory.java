@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.branch.Sequence;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -43,17 +43,26 @@ import uk.ac.ox.poseidon.core.Factory;
  * that child's previous run), arrive in port, land the catch, end trip. Built
  * via {@link Factories#roundTrip}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class RoundTripFactory extends VesselTaskFactory<Sequence<Vessel>> {
 
-  private Factory<? super VesselScope, ? extends Task<Vessel>> startTripTask;
-  private Factory<? super VesselScope, ? extends Task<Vessel>> travelTask;
-  private Factory<? super VesselScope, ? extends Task<Vessel>> fishingTask;
-  private Factory<? super VesselScope, ? extends Task<Vessel>> landingTask;
+  private final Factory<
+    ? super VesselScope,
+    ? extends Task<Vessel>
+  > startTripTask;
+  private final Factory<? super VesselScope, ? extends Task<Vessel>> travelTask;
+  private final Factory<
+    ? super VesselScope,
+    ? extends Task<Vessel>
+  > fishingTask;
+  private final Factory<
+    ? super VesselScope,
+    ? extends Task<Vessel>
+  > landingTask;
 
   /**
    * @return a {@link Sequence} of: {@code startTripTask}, {@code travelTask}

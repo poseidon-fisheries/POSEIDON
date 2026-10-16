@@ -28,9 +28,9 @@ import java.util.Map.Entry;
 import javax.measure.Quantity;
 import javax.measure.Unit;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import si.uom.NonSI;
 import tech.units.indriya.format.SimpleQuantityFormat;
@@ -52,8 +52,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  *
  * @param <Q> the JSR-385 quantity type this factory produces
  */
-@Data
-@RequiredArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -68,9 +68,8 @@ public abstract class AbstractQuantityFactory<Q extends Quantity<Q>> extends Glo
     NonSI.getInstance();
   }
 
-  private final Class<Q> type;
-  private double value;
-  private String unitString;
+  private final double value;
+  private final String unitString;
 
   /**
    * @param type     the quantity type to parse the string as
@@ -88,11 +87,18 @@ public abstract class AbstractQuantityFactory<Q extends Quantity<Q>> extends Glo
     return entry(q.getUnit().toString(), q.getValue().doubleValue());
   }
 
+  /**
+   * @return the quantity type to parse the unit string as; deliberately not
+   *         named as a getter, so that it isn't taken for a property when the
+   *         scenario is written out
+   */
+  protected abstract Class<Q> quantityClass();
+
   @Override
   protected Quantity<Q> newInstance(final Scope scope) {
     final Unit<Q> unit = SimpleUnitFormat.getInstance()
       .parse(unitString)
-      .asType(type);
+      .asType(quantityClass());
     return Quantities.getQuantity(value, unit);
   }
 }

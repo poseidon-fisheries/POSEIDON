@@ -41,9 +41,9 @@ import java.util.Set;
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -68,8 +68,8 @@ import uk.ac.ox.poseidon.core.utils.Measurements;
  * price species without distinguishing life stages. Built via
  * {@link Factories#priceUpdatesFromTable}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -82,18 +82,21 @@ public class PriceUpdatesFromTableFactory<S extends Scope> extends RelativeScope
     PriceUpdatesFromTableFactory.class.getName()
   );
 
-  private Factory<? super S, ? extends Table> data;
+  private final Factory<? super S, ? extends Table> data;
 
-  private String dateColumn;
-  private String marketCodeColumn;
-  private String speciesCodeColumn;
-  private String categoryCodeColumn;
-  private String priceColumn;
-  private String currencyColumn;
-  private String measurementUnitColumn;
+  private final String dateColumn;
+  private final String marketCodeColumn;
+  private final String speciesCodeColumn;
+  private final String categoryCodeColumn;
+  private final String priceColumn;
+  private final String currencyColumn;
+  private final String measurementUnitColumn;
 
-  private Factory<? super S, ? extends MarketGrid> marketGrid;
-  private Factory<? super S, ? extends Iterable<? extends Species>> species;
+  private final Factory<? super S, ? extends MarketGrid> marketGrid;
+  private final Factory<
+    ? super S,
+    ? extends Iterable<? extends Species>
+  > species;
 
   @Override
   protected List<Entry<LocalDateTime, PriceUpdate>> newInstance(final S scope) {

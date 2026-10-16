@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.agents.catches.disposition;
 import java.util.Collection;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
@@ -39,8 +39,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link IndexedDiscardRates},
  * built via {@link Factories#discardRates}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -49,9 +49,12 @@ public class IndexedDiscardRatesFactory<S extends Scope> extends RelativeScopeFa
   IndexedDiscardRates
 > {
 
-  private Factory<? super S, ? extends Collection<? extends Species>> species;
+  private final Factory<
+    ? super S,
+    ? extends Collection<? extends Species>
+  > species;
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Function<? super Species, Double>
   > rateFunction;

@@ -24,12 +24,14 @@ package uk.ac.ox.poseidon.agents.market;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.common.collect.ImmutableList;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Singular;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -45,8 +47,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * prices is a side effect of building the factory. Built via
  * {@link Factories#initialPrices}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -54,7 +56,8 @@ public class InitialPricesFactory
   extends SimulationScopeFactory<List<MarketPrice>>
 {
 
-  private List<
+  @Singular
+  private final ImmutableList<
     Factory<? super SimulationScope, ? extends List<MarketPrice>>
   > marketPrices;
 

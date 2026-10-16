@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * A {@link SimulationScopeFactory} for a {@link BiomassDiffuser}. Built via
  * {@link Factories#biomassDiffuser}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -44,12 +44,15 @@ public class BiomassDiffuserFactory
   extends SimulationScopeFactory<BiomassDiffuser>
 {
 
-  private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;
-  private Factory<
+  private final Factory<
+    ? super SimulationScope,
+    ? extends BiomassGrid
+  > biomassGrid;
+  private final Factory<
     ? super SimulationScope,
     ? extends CarryingCapacityGrid
   > carryingCapacityGrid;
-  private Factory<
+  private final Factory<
     ? super SimulationScope,
     ? extends BiomassDiffusionRule
   > biomassDiffusionRule;

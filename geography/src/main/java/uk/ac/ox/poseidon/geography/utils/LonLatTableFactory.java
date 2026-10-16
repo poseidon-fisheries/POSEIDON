@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography.utils;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link LonLatTable}, built via
  * {@link Factories#lonLatTable(Factory, String, String)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,9 +46,9 @@ public class LonLatTableFactory<S extends Scope> extends RelativeScopeFactory<
   LonLatTable
 > {
 
-  private Factory<? super S, ? extends Table> factory;
-  private String longitudeColumnName;
-  private String latitudeColumnName;
+  private final Factory<? super S, ? extends Table> factory;
+  private final String longitudeColumnName;
+  private final String latitudeColumnName;
 
   @Override
   protected LonLatTable newInstance(final S scope) {

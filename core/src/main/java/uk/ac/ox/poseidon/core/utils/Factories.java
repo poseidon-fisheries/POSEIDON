@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
+import com.google.common.collect.ImmutableList;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,7 +64,7 @@ public class Factories {
   public static <S extends Scope, C> ListFactory<S, C> listOf(
     final Factory<S, ? extends C>... values
   ) {
-    return new ListFactory<>(List.of(values));
+    return new ListFactory<>(ImmutableList.copyOf(values));
   }
 
   /**

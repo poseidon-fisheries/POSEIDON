@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.events;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link EventClearer}, built via
  * {@link Factories#eventClearer(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -45,7 +45,10 @@ public class EventClearerFactory<S extends Scope> extends RelativeScopeFactory<
   EventClearer
 > {
 
-  private Factory<? super S, ? extends EventAccumulator<?>> eventAccumulator;
+  private final Factory<
+    ? super S,
+    ? extends EventAccumulator<?>
+  > eventAccumulator;
 
   @Override
   protected EventClearer newInstance(final S scope) {

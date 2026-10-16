@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography.utils;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link ElevationTable}, built
  * via {@link Factories#elevationTable(Factory, String, String, String)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,10 +46,10 @@ public class ElevationTableFactory<S extends Scope> extends RelativeScopeFactory
   ElevationTable
 > {
 
-  private Factory<? super S, ? extends Table> table;
-  private String longitudeColumnName;
-  private String latitudeColumnName;
-  private String elevationColumnName;
+  private final Factory<? super S, ? extends Table> table;
+  private final String longitudeColumnName;
+  private final String latitudeColumnName;
+  private final String elevationColumnName;
 
   @Override
   protected ElevationTable newInstance(final S scope) {

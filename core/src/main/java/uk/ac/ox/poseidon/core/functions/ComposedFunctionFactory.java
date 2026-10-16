@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.core.functions;
 
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link ComposedFunction}, built
  * via {@link Factories#composedFunction(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,11 +48,11 @@ public class ComposedFunctionFactory<
   R
 > extends RelativeScopeFactory<S, ComposedFunction<T1, T2, R>> {
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Function<? super T1, ? extends T2>
   > function1;
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Function<? super T2, ? extends R>
   > function2;

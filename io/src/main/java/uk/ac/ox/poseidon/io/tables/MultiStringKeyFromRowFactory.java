@@ -22,11 +22,12 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Singular;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -35,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} counterpart of {@link MultiStringKeyFromRow},
  * built via {@link Factories#multiStringKeyFromRow(String...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -44,7 +45,8 @@ public class MultiStringKeyFromRowFactory
   extends GlobalScopeFactory<MultiStringKeyFromRow>
 {
 
-  List<String> keyColumnNames;
+  @Singular
+  final ImmutableList<String> keyColumnNames;
 
   @Override
   protected MultiStringKeyFromRow newInstance(final Scope scope) {

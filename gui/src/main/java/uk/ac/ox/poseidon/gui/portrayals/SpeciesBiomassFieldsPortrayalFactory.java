@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
@@ -41,8 +41,8 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 /**
@@ -57,15 +57,15 @@ public class SpeciesBiomassFieldsPortrayalFactory
   extends SimulationScopeFactory<List<NamedPortrayal>>
 {
 
-  private Factory<
+  private final Factory<
     ? super SimulationScope,
     List<? extends BiomassGrid>
   > biomassGrids;
-  private Factory<
+  private final Factory<
     ? super SimulationScope,
     List<? extends CarryingCapacityGrid>
   > carryingCapacityGrids;
-  private boolean visible;
+  private final boolean visible;
 
   /**
    * @return one named portrayal per species, pairing each biomass grid with its

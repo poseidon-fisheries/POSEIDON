@@ -27,9 +27,9 @@ import static com.google.common.base.Preconditions.checkState;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
@@ -44,8 +44,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * every species) or exactly one entry per species. Built via
  * {@link Factories#biomassGrids}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -53,12 +53,12 @@ public class BiomassGridsFactory
   extends SimulationScopeFactory<List<BiomassGrid>>
 {
 
-  private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
-  private Factory<
+  private final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
+  private final Factory<
     ? super SimulationScope,
     ? extends List<? extends Species>
   > species;
-  private Factory<
+  private final Factory<
     ? super SimulationScope,
     ? extends List<? extends Allocator>
   > biomassAllocators;

@@ -27,9 +27,9 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -40,8 +40,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselScopeFactory} counterpart of {@link StandardBiomassHold},
  * built via {@link Factories#standardBiomassHold}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -49,9 +49,12 @@ public class StandardBiomassHoldFactory
   extends VesselScopeFactory<StandardBiomassHold>
 {
 
-  private Factory<? super VesselScope, ? extends Quantity<Mass>> capacity;
-  private Factory<? super VesselScope, ? extends Quantity<Mass>> tolerance;
-  private Factory<
+  private final Factory<? super VesselScope, ? extends Quantity<Mass>> capacity;
+  private final Factory<
+    ? super VesselScope,
+    ? extends Quantity<Mass>
+  > tolerance;
+  private final Factory<
     ? super VesselScope,
     ? extends CatchCategoriser
   > catchCategoriser;

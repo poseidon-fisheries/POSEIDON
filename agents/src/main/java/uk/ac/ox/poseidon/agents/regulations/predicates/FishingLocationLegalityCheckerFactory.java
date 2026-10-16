@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.regulations.predicates;
 
 import java.time.Duration;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -40,8 +40,8 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  * A {@link VesselScopeFactory} for a {@link FishingLocationLegalityChecker}.
  * Built via {@link Factories#fishingLocationLegalityChecker}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -49,14 +49,23 @@ public class FishingLocationLegalityCheckerFactory
   extends VesselScopeFactory<FishingLocationLegalityChecker>
 {
 
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends Regulations<? super ExtendedFishingAction>
   > regulations;
 
-  private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
-  private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
-  private Factory<? super VesselScope, ? extends Duration> fishingDuration;
+  private final Factory<
+    ? super VesselScope,
+    ? extends GridPathFinder
+  > pathFinder;
+  private final Factory<
+    ? super VesselScope,
+    ? extends DistanceCalculator
+  > distance;
+  private final Factory<
+    ? super VesselScope,
+    ? extends Duration
+  > fishingDuration;
 
   @Override
   protected FishingLocationLegalityChecker newInstance(

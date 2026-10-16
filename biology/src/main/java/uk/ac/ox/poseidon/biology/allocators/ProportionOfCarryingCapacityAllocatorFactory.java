@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.biology.allocators;
 
 import java.util.function.DoubleSupplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.core.Factory;
@@ -39,8 +39,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@link Factories#proportionOfCarryingCapacityAllocator(Factory, Factory)}/
  * {@link Factories#fullCarryingCapacityAllocator(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -49,11 +49,11 @@ public class ProportionOfCarryingCapacityAllocatorFactory<S extends Scope> exten
   ProportionOfCarryingCapacityAllocator
 > {
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends CarryingCapacityGrid
   > carryingCapacityGrid;
-  private Factory<? super S, ? extends DoubleSupplier> proportionSupplier;
+  private final Factory<? super S, ? extends DoubleSupplier> proportionSupplier;
 
   @Override
   protected ProportionOfCarryingCapacityAllocator newInstance(final S scope) {

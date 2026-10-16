@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.core.functions;
 
 import java.util.Map;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -41,8 +41,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * with no wrapper type to carry documentation, so this factory carries the
  * behavior doc directly. Built via {@link Factories#mapEntry(Factory, Object)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -52,8 +52,8 @@ public class MapEntryFactory<
   V
 > extends RelativeScopeFactory<S, V> {
 
-  private Factory<? super S, ? extends Map<? super K, ? extends V>> map;
-  private K key;
+  private final Factory<? super S, ? extends Map<? super K, ? extends V>> map;
+  private final K key;
 
   @Override
   protected V newInstance(final S scope) {

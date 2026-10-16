@@ -22,9 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -35,7 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * (see {@link SimulationEventListenerFactory}), built via
  * {@link Factories#fishingEventAccumulator()}.
  */
-@Data
+@Getter
+@ToString
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)

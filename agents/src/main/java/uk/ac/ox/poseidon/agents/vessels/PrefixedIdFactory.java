@@ -23,23 +23,23 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
  * A {@link VesselScopeFactory} for a simple vessel name: {@link #prefix}
  * prepended to the vessel's own id. Built via {@link Factories#prefixedId}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class PrefixedIdFactory extends VesselScopeFactory<String> {
 
-  private String prefix;
+  private final String prefix;
 
   /** @return {@link #prefix} followed by the scoped vessel's id */
   @Override

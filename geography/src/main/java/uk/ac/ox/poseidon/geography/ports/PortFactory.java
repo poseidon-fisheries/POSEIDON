@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography.ports;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -37,15 +37,15 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * a grid instead (via {@link PortGridFactory},
  * {@link RandomLocationsPortGridFactory}, or {@link PortsFromTableFactory}).
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class PortFactory extends GlobalScopeFactory<Port> {
 
-  private String code;
-  private String name;
+  private final String code;
+  private final String name;
 
   @Override
   protected Port newInstance(final Scope scope) {

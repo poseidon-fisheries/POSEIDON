@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -34,14 +34,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} counterpart of {@link InactiveGear}, built via
  * {@link Factories#inactiveGear}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class InactiveGearFactory extends GlobalScopeFactory<InactiveGear> {
 
-  private String code;
+  private final String code;
 
   @Override
   protected InactiveGear newInstance(final Scope scope) {

@@ -22,9 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -39,7 +40,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * vessel its own, and give every selector of a vessel's memory that same
  * wrapper (two wrappers make two memories).
  */
-@Data
+@Getter
+@ToString
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)

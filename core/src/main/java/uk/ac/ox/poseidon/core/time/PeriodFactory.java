@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.core.time;
 
 import java.time.Period;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -36,16 +36,16 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * component class here: the produced value is a bare JDK type, with no wrapper
  * to carry documentation. Built via {@link Factories Factories.period(...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class PeriodFactory extends GlobalScopeFactory<Period> {
 
-  private int years;
-  private int months;
-  private int days;
+  private final int years;
+  private final int months;
+  private final int days;
 
   /**
    * @param period the period to decompose into years/months/days

@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.providers.constant;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.providers.IntProvider;
@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link ConstantInt}, built via
  * {@link Factories#constantInt(int)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -45,7 +45,7 @@ public class ConstantIntFromValueFactory<S extends Scope> extends RelativeScopeF
   IntProvider
 > {
 
-  private int value;
+  private final int value;
 
   @Override
   protected IntProvider newInstance(final S scope) {

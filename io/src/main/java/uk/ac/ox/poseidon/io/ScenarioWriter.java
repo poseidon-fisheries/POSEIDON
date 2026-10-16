@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -50,7 +50,7 @@ public class ScenarioWriter {
 
   /**
    * Constructs a {@code ScenarioWriter} with default {@link DumperOptions}
-   * (pretty flow-style).
+   * (pretty flow-style, read-only properties written).
    */
   public ScenarioWriter() {
     this(new Yaml(defaultDumperOptions()));
@@ -67,6 +67,8 @@ public class ScenarioWriter {
   private static DumperOptions defaultDumperOptions() {
     final DumperOptions dumperOptions = new DumperOptions();
     dumperOptions.setPrettyFlow(true);
+    // Factories have getters and no setters
+    dumperOptions.setAllowReadOnlyProperties(true);
     return dumperOptions;
   }
 

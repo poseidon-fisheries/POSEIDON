@@ -26,9 +26,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
@@ -41,8 +41,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * manager, the dynamics hear the trip starts every vessel's event manager
  * forwards there. They use the simulation's random number generator.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -50,12 +50,15 @@ public class CliqueDynamicsFactory
   extends SimulationEventListenerFactory<CliqueDynamics>
 {
 
-  private Factory<? super SimulationScope, ? extends SocialNetwork> network;
-  private Factory<
+  private final Factory<
+    ? super SimulationScope,
+    ? extends SocialNetwork
+  > network;
+  private final Factory<
     ? super SimulationScope,
     ? extends Function<? super Vessel, ?>
   > groupingKey;
-  private int maximumCliqueSize;
+  private final int maximumCliqueSize;
 
   @Override
   protected CliqueDynamics newListener(final SimulationScope scope) {

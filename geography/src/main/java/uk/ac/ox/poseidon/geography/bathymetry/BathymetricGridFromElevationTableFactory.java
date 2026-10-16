@@ -27,6 +27,8 @@ import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.Map;
 import lombok.*;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -40,14 +42,13 @@ import uk.ac.ox.poseidon.geography.utils.ElevationTable;
  * {@link ElevationTable}. Built via
  * {@link Factories#bathymetricGridFromElevationTable(Factory, Factory, Factory, boolean)}.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class BathymetricGridFromElevationTableFactory<S extends Scope> extends BathymetricGridFactory<S> {
 
-  private Factory<? super S, ? extends ElevationTable> elevationTable;
+  private final Factory<? super S, ? extends ElevationTable> elevationTable;
 
   /**
    * @param elevationTable factory for the table to read elevation samples from

@@ -26,9 +26,9 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -39,8 +39,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * one per entry in {@link #priceEntries}, all at {@link #market}. Built via
  * {@link Factories#marketPrices}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -49,8 +49,8 @@ public class MarketPricesFactory<S extends Scope> extends RelativeScopeFactory<
   List<MarketPrice>
 > {
 
-  private Factory<? super S, ? extends BiomassMarket> market;
-  private Factory<? super S, ? extends List<PriceEntry>> priceEntries;
+  private final Factory<? super S, ? extends BiomassMarket> market;
+  private final Factory<? super S, ? extends List<PriceEntry>> priceEntries;
 
   @Override
   protected List<MarketPrice> newInstance(final S scope) {

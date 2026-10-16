@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.core.time;
 import java.time.Month;
 import java.time.MonthDay;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -40,15 +40,15 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@code time.Factories} — construct directly, via {@link #parse}, or as a YAML
  * bean.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class MonthDayFactory extends GlobalScopeFactory<MonthDay> {
 
-  private int month;
-  private int dayOfMonth;
+  private final int month;
+  private final int dayOfMonth;
 
   /**
    * @param month      the month

@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.tasks.general;
 
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselTaskFactory} counterpart of {@link AgentPredicateTask}, built
  * via {@link Factories Factories.checkThat(...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,7 +46,10 @@ public class VesselPredicateTaskFactory
   extends VesselTaskFactory<AgentPredicateTask<Vessel>>
 {
 
-  private Factory<? super VesselScope, ? extends Predicate<Vessel>> predicate;
+  private final Factory<
+    ? super VesselScope,
+    ? extends Predicate<Vessel>
+  > predicate;
 
   @Override
   protected AgentPredicateTask<Vessel> newInstance(final VesselScope scope) {

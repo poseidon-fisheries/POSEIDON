@@ -29,10 +29,9 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.geotools.api.referencing.operation.MathTransform2D;
 import org.geotools.api.referencing.operation.TransformException;
@@ -50,14 +49,13 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * cell-by-cell into this codebase's {@link ModelGrid}. Built via
  * {@link Factories#bathymetricGridFromGridFile(Factory, Factory, Factory, boolean)}.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class BathymetricGridFromGridFileFactory<S extends Scope> extends BathymetricGridFactory<S> {
 
-  private Factory<? super S, ? extends Path> path;
+  private final Factory<? super S, ? extends Path> path;
 
   /**
    * @param path       factory for the raster grid file to read

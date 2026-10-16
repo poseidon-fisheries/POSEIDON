@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.core.providers.math;
 
 import java.util.function.DoubleSupplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link MinDouble}, built via
  * {@link Factories#minDouble(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,8 +46,8 @@ public class MinDoubleFactory<S extends Scope> extends RelativeScopeFactory<
   MinDouble
 > {
 
-  private Factory<? super S, ? extends DoubleSupplier> a;
-  private Factory<? super S, ? extends DoubleSupplier> b;
+  private final Factory<? super S, ? extends DoubleSupplier> a;
+  private final Factory<? super S, ? extends DoubleSupplier> b;
 
   @Override
   protected MinDouble newInstance(final S scope) {

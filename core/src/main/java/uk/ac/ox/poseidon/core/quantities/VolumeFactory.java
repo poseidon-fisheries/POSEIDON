@@ -23,23 +23,20 @@
 package uk.ac.ox.poseidon.core.quantities;
 
 import javax.measure.quantity.Volume;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
  * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link Volume}
  * quantities, built via {@link Factories Factories.volumeOf(...)}.
  */
-@Data
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class VolumeFactory extends AbstractQuantityFactory<Volume> {
-
-  /** No-args constructor, used only by SnakeYAML during deserialization. */
-  public VolumeFactory() {
-    super(Volume.class);
-  }
 
   /**
    * @param value      the numeric volume value
@@ -47,6 +44,11 @@ public class VolumeFactory extends AbstractQuantityFactory<Volume> {
    *                   {@code Unit.toString()}
    */
   public VolumeFactory(final double value, final String unitString) {
-    super(Volume.class, value, unitString);
+    super(value, unitString);
+  }
+
+  @Override
+  protected Class<Volume> quantityClass() {
+    return Volume.class;
   }
 }

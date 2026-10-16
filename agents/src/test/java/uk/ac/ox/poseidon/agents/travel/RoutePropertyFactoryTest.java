@@ -27,24 +27,26 @@ import static uk.ac.ox.poseidon.agents.travel.Factories.routeProperty;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
+import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.io.ScenarioLoader;
+import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 class RoutePropertyFactoryTest {
 
   @Test
   void survivesAYamlRoundTripWithOnlyItsPath() {
-    final LoaderOptions loaderOptions = new LoaderOptions();
-    loaderOptions.setTagInspector(tag ->
-      tag.getClassName().startsWith("uk.ac.ox.poseidon")
+    final String written = new ScenarioWriter().write(
+      Scenario.builder()
+        .component("property", routeProperty("duration"))
+        .build()
     );
-    final Yaml yaml = new Yaml(loaderOptions);
-    final String dumped = yaml.dump(routeProperty("duration"));
-    assertThat(dumped)
+    assertThat(written)
       .contains("propertyPath: duration")
       .doesNotContain("rootClass");
-    assertThat(yaml.<Object>load(dumped)).isEqualTo(routeProperty("duration"));
+    assertThat(
+      new ScenarioLoader().load(written).getComponents().get("property")
+    ).isEqualTo(routeProperty("duration"));
   }
 
   @Test

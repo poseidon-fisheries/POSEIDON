@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.agents.tasks.decorators;
 import com.badlogic.gdx.ai.btree.Decorator;
 import com.badlogic.gdx.ai.btree.Task;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -44,14 +44,14 @@ import uk.ac.ox.poseidon.core.Factory;
  *
  * @param <T> the concrete {@link Decorator} type built
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public abstract class DecoratorTaskFactory<T extends Decorator<Vessel>> extends VesselTaskFactory<T> {
 
-  private Factory<? super VesselScope, ? extends Task<Vessel>> child;
+  private final Factory<? super VesselScope, ? extends Task<Vessel>> child;
 
   /**
    * @return a decorator node built by {@link #newTask()} with {@link #child}

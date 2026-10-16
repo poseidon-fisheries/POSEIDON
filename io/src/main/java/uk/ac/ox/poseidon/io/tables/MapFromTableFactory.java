@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.io.tables;
 import com.google.common.collect.ImmutableMap;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
@@ -44,8 +44,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * directly. Built via {@link Factories#mapFromTable(Factory, Factory, Factory)}
  * in this package.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -55,14 +55,14 @@ public class MapFromTableFactory<
   V
 > extends RelativeScopeFactory<S, ImmutableMap<K, V>> {
 
-  private Factory<? super S, Table> table;
+  private final Factory<? super S, Table> table;
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Function<? super Row, ? extends K>
   > keyBuilder;
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Function<? super Row, ? extends V>
   > valueBuilder;

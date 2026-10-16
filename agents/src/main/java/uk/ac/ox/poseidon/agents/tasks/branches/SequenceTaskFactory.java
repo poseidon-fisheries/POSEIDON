@@ -24,10 +24,11 @@ package uk.ac.ox.poseidon.agents.tasks.branches;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.branch.Sequence;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -38,8 +39,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * in order, failing (and stopping) as soon as one fails, succeeding once all of
  * them have. Built via {@link Factories#sequenceTask}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class SequenceTaskFactory extends BranchTaskFactory<Sequence<Vessel>> {
@@ -53,7 +54,7 @@ public class SequenceTaskFactory extends BranchTaskFactory<Sequence<Vessel>> {
       ? extends Factory<? super VesselScope, ? extends Task<Vessel>>
     > children
   ) {
-    super(children);
+    super(ImmutableList.copyOf(children));
   }
 
   @Override

@@ -28,9 +28,9 @@ import static java.util.Comparator.comparingDouble;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
@@ -50,8 +50,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * land neighbour by resolved {@link DistanceCalculator}. Built via
  * {@link Factories#portGrid(Factory, Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -64,9 +64,15 @@ public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
     PortGridFactory.class.getName()
   );
 
-  private Factory<? super S, ? extends List<Pair<Port, Coordinate>>> ports;
-  private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
-  private Factory<? super S, ? extends DistanceCalculator> distanceCalculator;
+  private final Factory<
+    ? super S,
+    ? extends List<Pair<Port, Coordinate>>
+  > ports;
+  private final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+  private final Factory<
+    ? super S,
+    ? extends DistanceCalculator
+  > distanceCalculator;
 
   @Override
   protected ImmutablePortGrid newInstance(final S scope) {

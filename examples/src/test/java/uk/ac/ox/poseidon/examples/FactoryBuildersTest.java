@@ -26,16 +26,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.examples.FactoryChildrenTest.factoryClasses;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.yaml.snakeyaml.introspector.Property;
+import org.yaml.snakeyaml.introspector.PropertyUtils;
 
 /**
  * Every concrete factory class has a static {@code builder()} and a
  * {@code toBuilder()}: the scenario loader builds factories through their
  * builders, and a changed copy of a factory is made from its
- * {@code toBuilder()}.
+ * {@code toBuilder()}. The properties the scenario writer writes, read through
+ * the factory's getters, are the ones its builder sets, so that a written
+ * scenario loads back whole.
  */
 class FactoryBuildersTest {
 
@@ -48,6 +56,48 @@ class FactoryBuildersTest {
         .filter(clazz -> !hasBuilders(clazz))
         .map(Class::getName)
     ).isEmpty();
+  }
+
+  @Test
+  void everyWrittenPropertyIsOneTheBuilderSets() throws IOException {
+    final PropertyUtils propertyUtils = new PropertyUtils();
+    propertyUtils.setAllowReadOnlyProperties(true);
+    assertThat(
+      factoryClasses("uk.ac.ox.poseidon")
+        .stream()
+        .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
+        .filter(clazz -> {
+          final Set<String> written = propertyUtils
+            .getProperties(clazz)
+            .stream()
+            .map(Property::getName)
+            .collect(Collectors.toCollection(TreeSet::new));
+          return !written.equals(builderProperties(clazz));
+        })
+        .map(Class::getName)
+    ).isEmpty();
+  }
+
+  private static Set<String> builderProperties(final Class<?> clazz) {
+    final Set<String> properties = new TreeSet<>();
+    try {
+      for (
+        Class<?> builderClass = clazz.getMethod("builder").getReturnType();
+        builderClass != Object.class;
+        builderClass = builderClass.getSuperclass()
+      ) {
+        Arrays.stream(builderClass.getDeclaredFields())
+          .filter(field -> !Modifier.isStatic(field.getModifiers()))
+          .map(Field::getName)
+          // A field with a default is held as name$value and name$set
+          .filter(name -> !name.endsWith("$set"))
+          .map(name -> name.replace("$value", ""))
+          .forEach(properties::add);
+      }
+    } catch (final NoSuchMethodException e) {
+      throw new IllegalStateException(e);
+    }
+    return properties;
   }
 
   private static boolean hasBuilders(final Class<?> clazz) {

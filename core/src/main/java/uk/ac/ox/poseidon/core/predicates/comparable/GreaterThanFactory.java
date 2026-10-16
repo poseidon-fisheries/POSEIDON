@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.core.predicates.comparable;
 
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link GreaterThan}, built via
  * {@link Factories Factories.greaterThan(...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,7 +46,7 @@ public class GreaterThanFactory<
   T
 > extends RelativeScopeFactory<S, GreaterThan<T>> {
 
-  private Factory<? super S, ? extends Supplier<? extends T>> value;
+  private final Factory<? super S, ? extends Supplier<? extends T>> value;
 
   @Override
   protected GreaterThan<T> newInstance(final S scope) {

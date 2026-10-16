@@ -26,9 +26,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.nio.file.Path;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} for a {@link Path} resolved against another
  * {@link PathFactory}'s resolved path, built via {@link PathFactory#plus}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,8 +48,8 @@ public class RelativePathFactory<S extends Scope>
   implements PathFactory<S>
 {
 
-  private Factory<? super S, Path> parent;
-  private String path;
+  private final Factory<? super S, Path> parent;
+  private final String path;
 
   @Override
   protected Path newInstance(final S scope) {

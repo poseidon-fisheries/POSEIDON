@@ -24,10 +24,10 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
+import com.google.common.collect.ImmutableList;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAmount;
-import java.util.List;
 import java.util.function.Supplier;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -102,7 +102,7 @@ public class Factories {
   ) {
     return new NextOccurrenceOfTimeOfDayFactory<>(
       currentDateTime(),
-      List.of(times)
+      ImmutableList.copyOf(times)
     );
   }
 
@@ -125,7 +125,7 @@ public class Factories {
   ) {
     return new NextOccurrenceOfTimeOfDayFactory<>(
       referenceDateTime,
-      List.of(times)
+      ImmutableList.copyOf(times)
     );
   }
 

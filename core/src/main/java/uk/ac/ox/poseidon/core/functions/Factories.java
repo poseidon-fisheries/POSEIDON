@@ -24,9 +24,8 @@ package uk.ac.ox.poseidon.core.functions;
 
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
+import com.google.common.collect.ImmutableList;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import uk.ac.ox.poseidon.core.Factory;
@@ -110,7 +109,7 @@ public class Factories {
       ? extends Function<? super T, ? extends Duration>
     >... durations
   ) {
-    return new CombinedDurationFactory<S, T>(List.of(durations));
+    return new CombinedDurationFactory<S, T>(ImmutableList.copyOf(durations));
   }
 
   /**
@@ -174,7 +173,7 @@ public class Factories {
   ) {
     // noinspection Convert2Diamond
     return new MultiStringKeyFromFunctionsFactory<S, T>(
-      Arrays.asList(functions)
+      ImmutableList.copyOf(functions)
     );
   }
 
@@ -188,6 +187,8 @@ public class Factories {
   public static NumericIntervalToStringMapperFactory numericIntervalToStringMapper(
     final NumericIntervalToStringMapperFactory.Interval... intervals
   ) {
-    return new NumericIntervalToStringMapperFactory(List.of(intervals));
+    return new NumericIntervalToStringMapperFactory(
+      ImmutableList.copyOf(intervals)
+    );
   }
 }

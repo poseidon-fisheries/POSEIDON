@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.function.Supplier;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -129,7 +130,7 @@ public class Factories {
       gear,
       engine,
       behaviour,
-      extraFactories,
+      ImmutableList.copyOf(extraFactories),
       numberOfVesselsToCreate
     );
   }

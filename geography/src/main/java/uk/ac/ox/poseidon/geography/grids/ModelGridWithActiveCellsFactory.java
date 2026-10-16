@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import java.util.Collection;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * fixed set of active cells (via {@link ModelGrid#withActiveCells}). Built via
  * {@link Factories#modelGridWithActiveCells(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,8 +48,8 @@ public class ModelGridWithActiveCellsFactory<S extends Scope> extends RelativeSc
   ModelGrid
 > {
 
-  private Factory<? super S, ? extends ModelGrid> modelGrid;
-  private Factory<? super S, ? extends Collection<Int2D>> activeCells;
+  private final Factory<? super S, ? extends ModelGrid> modelGrid;
+  private final Factory<? super S, ? extends Collection<Int2D>> activeCells;
 
   @Override
   protected ModelGrid newInstance(final S scope) {

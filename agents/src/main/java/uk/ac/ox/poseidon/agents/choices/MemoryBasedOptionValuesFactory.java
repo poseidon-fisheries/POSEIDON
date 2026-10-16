@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.agents.choices;
 import java.util.function.Function;
 import java.util.function.ToDoubleBiFunction;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselScopeFactory} counterpart of {@link MemoryBasedOptionValues},
  * built via {@link Factories#memoryBasedOptionValues(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,11 +48,11 @@ public class MemoryBasedOptionValuesFactory<
   M
 > extends VesselScopeFactory<MemoryBasedOptionValues<O, M>> {
 
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends Function<? super Vessel, ? extends Memory<O, M>>
   > memorySelector;
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends ToDoubleBiFunction<? super O, ? super M>
   > valuation;

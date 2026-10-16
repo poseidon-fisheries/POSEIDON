@@ -30,6 +30,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import lombok.*;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
@@ -48,8 +50,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * the behavior doc directly. Built via
  * {@link Factories#geometriesFromShapeFile(Factory)} in this package.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -59,7 +61,7 @@ public class GeometriesFromShapeFileFactory<S extends Scope> extends RelativeSco
 > {
 
   @NonNull
-  private Factory<? super S, ? extends Path> path;
+  private final Factory<? super S, ? extends Path> path;
 
   @Override
   protected List<Geometry> newInstance(final S scope) {

@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.agents.market;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -39,8 +39,8 @@ import uk.ac.ox.poseidon.geography.ports.Port;
  * via {@link Factories#biomassMarket}. If {@link #marketCode} isn't set, the
  * port's own code is used.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,8 +48,8 @@ public class BiomassMarketFactory
   extends SimulationScopeFactory<BiomassMarket>
 {
 
-  private Factory<? super SimulationScope, ? extends Port> port;
-  private String marketCode;
+  private final Factory<? super SimulationScope, ? extends Port> port;
+  private final String marketCode;
 
   @Override
   protected BiomassMarket newInstance(final SimulationScope scope) {

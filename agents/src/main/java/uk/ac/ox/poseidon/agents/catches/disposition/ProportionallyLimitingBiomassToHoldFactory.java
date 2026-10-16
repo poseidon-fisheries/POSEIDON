@@ -22,9 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -34,7 +35,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@link ProportionallyLimitingBiomassToHold}, built via
  * {@link Factories#proportionallyLimitingBiomassToHold()}.
  */
-@Data
+@Getter
+@ToString
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)

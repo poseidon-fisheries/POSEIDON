@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
@@ -36,14 +36,14 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselTaskFactory} counterpart of {@link Refuel}, built via
  * {@link Factories#refuel}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class RefuelFactory extends VesselTaskFactory<Refuel> {
 
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends FuelStationGrid
   > fuelStationGrid;

@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@link ExponentialMovingAverageOfBuckets}, built via
  * {@link Factories#exponentialMovingAverageOfBuckets(double)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -44,7 +44,7 @@ public class ExponentialMovingAverageOfBucketsFactory
   extends GlobalScopeFactory<ExponentialMovingAverageOfBuckets>
 {
 
-  private double alpha;
+  private final double alpha;
 
   @Override
   protected ExponentialMovingAverageOfBuckets newInstance(final Scope scope) {

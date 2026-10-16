@@ -22,9 +22,10 @@
 
 package uk.ac.ox.poseidon.core.events;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -37,7 +38,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * the listener itself via {@link #newListener}; registration is handled once,
  * here, so it can't be forgotten.
  */
-@Data
+@Getter
+@ToString
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)

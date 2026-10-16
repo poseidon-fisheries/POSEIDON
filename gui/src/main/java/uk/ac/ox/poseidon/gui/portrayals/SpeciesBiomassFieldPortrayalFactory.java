@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.gui.portrayals;
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.biomass.BiomassGrid;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 /**
@@ -50,12 +50,15 @@ public class SpeciesBiomassFieldPortrayalFactory
   extends SimulationScopeFactory<NamedPortrayal>
 {
 
-  private Factory<? super SimulationScope, ? extends BiomassGrid> biomassGrid;
-  private Factory<
+  private final Factory<
+    ? super SimulationScope,
+    ? extends BiomassGrid
+  > biomassGrid;
+  private final Factory<
     ? super SimulationScope,
     ? extends CarryingCapacityGrid
   > carryingCapacityGrid;
-  private boolean visible;
+  private final boolean visible;
 
   /**
    * @return a named portrayal of {@link #biomassGrid}, labelled with the

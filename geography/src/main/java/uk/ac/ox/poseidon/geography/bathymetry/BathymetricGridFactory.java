@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import lombok.*;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -45,8 +47,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * sources where elevation and depth are the opposite sign convention from this
  * codebase's "negative is water" rule).
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -56,12 +58,12 @@ public abstract class BathymetricGridFactory<S extends Scope> extends RelativeSc
 > {
 
   @NonNull
-  private Factory<? super S, ? extends ModelGrid> modelGrid;
+  private final Factory<? super S, ? extends ModelGrid> modelGrid;
 
   @NonNull
-  private Factory<? super S, ? extends Aggregator> aggregator;
+  private final Factory<? super S, ? extends Aggregator> aggregator;
 
-  private boolean inverted;
+  private final boolean inverted;
 
   @Override
   protected BathymetricGrid newInstance(final S scope) {

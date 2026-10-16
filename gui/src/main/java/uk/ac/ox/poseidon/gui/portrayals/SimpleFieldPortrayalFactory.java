@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.portrayal.FieldPortrayal2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} that wraps a resolved {@link FieldPortrayal2D}
  * as a {@link NamedPortrayal}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,9 +46,9 @@ public class SimpleFieldPortrayalFactory<S extends Scope> extends RelativeScopeF
   NamedPortrayal
 > {
 
-  private String name;
-  private Factory<? super S, ? extends FieldPortrayal2D> portrayal;
-  private boolean visible;
+  private final String name;
+  private final Factory<? super S, ? extends FieldPortrayal2D> portrayal;
+  private final boolean visible;
 
   /**
    * @return {@link #name}, the resolved {@link #portrayal}, and

@@ -42,7 +42,7 @@ public class Factories {
    *         uncoded species
    */
   public static SpeciesFactory species() {
-    return new SpeciesFactory();
+    return SpeciesFactory.builder().build();
   }
 
   /**

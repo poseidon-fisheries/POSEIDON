@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * {@link ConstantDestinationSupplier}, built via
  * {@link Factories#constantDestination}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,8 +48,8 @@ public class ConstantDestinationSupplierFactory<S extends Scope> extends Relativ
   DestinationSupplier
 > {
 
-  private Factory<? super S, ? extends ModelGrid> modelGrid;
-  private Factory<? super S, ? extends Coordinate> coordinate;
+  private final Factory<? super S, ? extends ModelGrid> modelGrid;
+  private final Factory<? super S, ? extends Coordinate> coordinate;
 
   /**
    * @return a {@link ConstantDestinationSupplier} for {@link #coordinate}'s

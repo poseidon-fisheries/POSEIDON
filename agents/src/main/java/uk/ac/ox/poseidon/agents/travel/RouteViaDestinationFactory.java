@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.travel;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * A {@link VesselScopeFactory} counterpart of {@link RouteViaDestination},
  * built via {@link Factories#routeViaDestination(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,8 +46,14 @@ public class RouteViaDestinationFactory
   extends VesselScopeFactory<RouteViaDestination>
 {
 
-  private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
-  private Factory<? super VesselScope, ? extends DistanceCalculator> distance;
+  private final Factory<
+    ? super VesselScope,
+    ? extends GridPathFinder
+  > pathFinder;
+  private final Factory<
+    ? super VesselScope,
+    ? extends DistanceCalculator
+  > distance;
 
   @Override
   protected RouteViaDestination newInstance(final VesselScope scope) {

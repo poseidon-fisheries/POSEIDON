@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.core.schedule;
 import static sim.engine.Schedule.EPOCH;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
@@ -42,15 +42,15 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * not a distinct behavior class. Built via {@link Factories
  * Factories.scheduledOnceAtStart(...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class ScheduledOnceAtStartFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
-  private Factory<? super SimulationScope, ? extends C> steppable;
-  private int ordering;
+  private final Factory<? super SimulationScope, ? extends C> steppable;
+  private final int ordering;
 
   @Override
   protected C newInstance(final SimulationScope scope) {

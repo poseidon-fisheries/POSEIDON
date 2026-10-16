@@ -26,9 +26,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.math.RoundingMode.HALF_EVEN;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -40,16 +40,16 @@ import uk.ac.ox.poseidon.core.utils.Measurements;
  * A {@link GlobalScopeFactory} counterpart of {@link Price}, built via
  * {@link Factories#price}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class PriceFactory extends GlobalScopeFactory<Price> {
 
-  private double amount;
-  private String currencyUnit;
-  private String massUnit;
+  private final double amount;
+  private final String currencyUnit;
+  private final String massUnit;
 
   @Override
   protected Price newInstance(final Scope scope) {

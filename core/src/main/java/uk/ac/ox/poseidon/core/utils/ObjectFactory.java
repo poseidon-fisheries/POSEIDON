@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.utils;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -36,14 +36,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * passed through as-is, with nothing to wrap. Built via {@link Factories
  * Factories.object(...)/Factories.listOf(...)/Factories.setOf(...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class ObjectFactory<C> extends GlobalScopeFactory<C> {
 
-  private C value;
+  private final C value;
 
   @Override
   protected C newInstance(final Scope scope) {

@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.io.paths;
 
 import java.nio.file.Path;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} for a fixed, absolute {@link Path}, built via
  * {@link Factories#path(Path)}/{@link Factories#path(String, String...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class RootPathFactory
@@ -51,7 +51,7 @@ public class RootPathFactory
     this.path = path.replace("\\", "/");
   }
 
-  private String path;
+  private final String path;
 
   @Override
   protected Path newInstance(final Scope scope) {

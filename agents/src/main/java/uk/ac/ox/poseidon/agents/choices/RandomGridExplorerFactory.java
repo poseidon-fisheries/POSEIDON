@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -40,8 +40,8 @@ import uk.ac.ox.poseidon.core.providers.Provider;
  * A {@link VesselScopeFactory} counterpart of {@link RandomPicker}, built via
  * {@link Factories#randomGridExplorer}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -49,11 +49,11 @@ public class RandomGridExplorerFactory
   extends VesselScopeFactory<Provider<Int2D>>
 {
 
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends Supplier<? extends List<? extends Int2D>>
   > cellsSupplier;
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends Predicate<? super Int2D>
   > cellPredicate;

@@ -26,9 +26,9 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.math.DoubleMath.isMathematicalInteger;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -40,18 +40,18 @@ import uk.ac.ox.poseidon.geography.Envelope;
  * dimensions must divide evenly into the resolution). Built via
  * {@link Factories#modelGrid(double, double, double, double, double)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class ModelGridFactory extends GlobalScopeFactory<ModelGrid> {
 
-  private double resolutionInDegrees;
-  private double westLongitude;
-  private double eastLongitude;
-  private double southLatitude;
-  private double northLatitude;
+  private final double resolutionInDegrees;
+  private final double westLongitude;
+  private final double eastLongitude;
+  private final double southLatitude;
+  private final double northLatitude;
 
   /**
    * @throws IllegalStateException if the width or height (in degrees) isn't an

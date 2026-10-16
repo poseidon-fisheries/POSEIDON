@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import java.time.MonthDay;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} for a {@link BetweenYearlyDates}. Built via
  * {@link Factories#betweenYearlyDates}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,8 +46,8 @@ public class BetweenYearlyDatesFactory<S extends Scope> extends RelativeScopeFac
   BetweenYearlyDates
 > {
 
-  private Factory<? super S, ? extends MonthDay> start;
-  private Factory<? super S, ? extends MonthDay> end;
+  private final Factory<? super S, ? extends MonthDay> start;
+  private final Factory<? super S, ? extends MonthDay> end;
 
   @Override
   protected BetweenYearlyDates newInstance(final S scope) {

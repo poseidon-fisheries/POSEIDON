@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.components;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -35,15 +35,15 @@ import uk.ac.ox.poseidon.core.Factory;
  * Creates per-vessel components and registers them in a shared component
  * register.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class RegisteredVesselComponentFactory<C> extends VesselScopeFactory<C> {
 
-  private Factory<? super VesselScope, ? extends C> componentFactory;
-  private Factory<
+  private final Factory<? super VesselScope, ? extends C> componentFactory;
+  private final Factory<
     ? super VesselScope,
     ? extends VesselComponentRegister<C>
   > componentRegister;

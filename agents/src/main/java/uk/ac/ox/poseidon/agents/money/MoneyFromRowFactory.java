@@ -23,22 +23,22 @@
 package uk.ac.ox.poseidon.agents.money;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class MoneyFromRowFactory extends GlobalScopeFactory<MoneyFromRow> {
 
-  private String currencyColumnName;
-  private String amountColumnName;
+  private final String currencyColumnName;
+  private final String amountColumnName;
 
   @Override
   protected MoneyFromRow newInstance(final Scope scope) {

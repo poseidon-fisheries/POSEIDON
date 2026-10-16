@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -34,15 +34,15 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} counterpart of {@link Coordinate}, built via
  * {@link Factories#coordinate(double, double)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class CoordinateFactory extends GlobalScopeFactory<Coordinate> {
 
-  private double longitude;
-  private double latitude;
+  private final double longitude;
+  private final double latitude;
 
   @Override
   protected Coordinate newInstance(final Scope scope) {

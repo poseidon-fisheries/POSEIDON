@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
  * {@link ExponentialMovingAverageOptionValues}, built via
  * {@link Factories#exponentialMovingAverageOptionValues}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -44,7 +44,7 @@ public class ExponentialMovingAverageOptionValuesFactory<O> extends VesselScopeF
   MutableOptionValues<O>
 > {
 
-  private double alpha;
+  private final double alpha;
 
   @Override
   protected MutableOptionValues<O> newInstance(final VesselScope scope) {

@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselScopeFactory} counterpart of {@link BestOptionsFromFriends},
  * built via {@link Factories#bestOptionsFromFriends}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -47,12 +47,12 @@ public class BestOptionsFromFriendsFactory<O> extends VesselScopeFactory<
   Supplier<OptionValues<O>>
 > {
 
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends VesselComponentRegister<? extends OptionValues<O>>
   > optionValuesRegister;
 
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends Supplier<? extends Iterable<? extends Vessel>>
   > friendsSupplier;

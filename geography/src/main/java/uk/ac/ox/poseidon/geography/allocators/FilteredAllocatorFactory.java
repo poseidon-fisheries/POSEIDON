@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.geography.allocators;
 
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link FilteredAllocator},
  * built via {@link Factories#filteredAllocator(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -47,8 +47,11 @@ public class FilteredAllocatorFactory<S extends Scope> extends RelativeScopeFact
   FilteredAllocator
 > {
 
-  private Factory<? super S, ? extends Allocator> delegateAllocator;
-  private Factory<? super S, ? extends Predicate<? super Int2D>> cellPredicate;
+  private final Factory<? super S, ? extends Allocator> delegateAllocator;
+  private final Factory<
+    ? super S,
+    ? extends Predicate<? super Int2D>
+  > cellPredicate;
 
   @Override
   protected FilteredAllocator newInstance(final S scope) {

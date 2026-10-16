@@ -25,11 +25,13 @@ package uk.ac.ox.poseidon.geography.bathymetry;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Singular;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -44,8 +46,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * via
  * {@link Factories#bathymetricGridFromElevationValues(Factory, java.util.List)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -54,8 +56,10 @@ public class BathymetricGridFromElevationValuesFactory<S extends Scope> extends 
   BathymetricGrid
 > {
 
-  private Factory<? super S, ? extends ModelGrid> modelGrid;
-  private List<Number> elevationValues;
+  private final Factory<? super S, ? extends ModelGrid> modelGrid;
+
+  @Singular
+  private final ImmutableList<Number> elevationValues;
 
   @Override
   protected BathymetricGrid newInstance(final S scope) {

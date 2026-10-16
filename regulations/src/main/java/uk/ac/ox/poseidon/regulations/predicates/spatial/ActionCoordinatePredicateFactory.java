@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.geography.Coordinate;
  * A {@link RelativeScopeFactory} for an {@link ActionCoordinatePredicate}.
  * Built via {@link Factories#actionCoordinatePredicate}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -47,7 +47,7 @@ public class ActionCoordinatePredicateFactory<S extends Scope> extends RelativeS
   ActionCoordinatePredicate
 > {
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Predicate<Coordinate>
   > coordinatePredicate;

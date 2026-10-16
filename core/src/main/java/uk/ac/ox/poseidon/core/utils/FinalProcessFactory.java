@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.utils;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
@@ -39,14 +39,14 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * registering the final process is a side effect of building the factory, not a
  * distinct behavior class. Built via {@link Factories#finalProcess(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class FinalProcessFactory<C extends Steppable> extends SimulationScopeFactory<C> {
 
-  private Factory<? super SimulationScope, C> process;
+  private final Factory<? super SimulationScope, C> process;
 
   @Override
   protected C newInstance(final SimulationScope scope) {

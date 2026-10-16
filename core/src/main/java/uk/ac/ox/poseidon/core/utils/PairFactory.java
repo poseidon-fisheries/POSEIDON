@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.utils;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link Pair}, built via
  * {@link Factories#pair(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,8 +46,8 @@ public class PairFactory<
   B
 > extends RelativeScopeFactory<S, Pair<A, B>> {
 
-  private Factory<? super S, ? extends A> first;
-  private Factory<? super S, ? extends B> second;
+  private final Factory<? super S, ? extends A> first;
+  private final Factory<? super S, ? extends B> second;
 
   @Override
   protected Pair<A, B> newInstance(final S scope) {

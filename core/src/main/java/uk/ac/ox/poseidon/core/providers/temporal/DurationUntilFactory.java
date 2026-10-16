@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link DurationUntil}, built
  * via {@link Factories#durationUntil(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -47,8 +47,11 @@ public class DurationUntilFactory<S extends Scope> extends RelativeScopeFactory<
   DurationUntil
 > {
 
-  private Factory<? super S, ? extends Supplier<LocalDateTime>> currentDateTime;
-  private Factory<
+  private final Factory<
+    ? super S,
+    ? extends Supplier<LocalDateTime>
+  > currentDateTime;
+  private final Factory<
     ? super S,
     ? extends Supplier<LocalDateTime>
   > referenceDateTime;

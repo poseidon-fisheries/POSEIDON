@@ -26,9 +26,9 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} for a {@link DateTimeBefore}. Built via
  * {@link Factories#dateTimeBefore(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,11 +48,11 @@ public class DateTimeBeforeFactory<S extends Scope> extends RelativeScopeFactory
   DateTimeBefore
 > {
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Supplier<LocalDateTime>
   > referenceDateTime;
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Supplier<? extends TemporalAmount>
   > amountToSubtract;

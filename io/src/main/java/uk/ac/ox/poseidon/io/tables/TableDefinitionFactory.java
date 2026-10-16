@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.io.tables;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link TableDefinition}, built
  * via {@code Factories.tableDefinition(...)}.
  */
-@Data
-@RequiredArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,7 +46,7 @@ public class TableDefinitionFactory<S extends Scope> extends RelativeScopeFactor
   TableDefinition
 > {
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends List<? extends ColumnDefinition>
   > columnDefinitions;

@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * whatever the delegate produces, passed through unchanged. Built via
  * {@link uk.ac.ox.poseidon.core.utils.Factories#perSimulation(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -47,7 +47,7 @@ public class PerSimulationFactory<T> extends PerScopeFactory<
   T
 > {
 
-  private Factory<? super SimulationScope, ? extends T> delegate;
+  private final Factory<? super SimulationScope, ? extends T> delegate;
 
   @Override
   protected Object makeKey(final SimulationScope scope) {

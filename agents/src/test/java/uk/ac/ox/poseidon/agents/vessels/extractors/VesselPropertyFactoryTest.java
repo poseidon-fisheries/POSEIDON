@@ -28,11 +28,12 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.vesselProperty;
 
 import org.junit.jupiter.api.Test;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.io.ScenarioLoader;
+import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 class VesselPropertyFactoryTest {
 
@@ -46,18 +47,17 @@ class VesselPropertyFactoryTest {
 
   @Test
   void survivesAYamlRoundTripWithOnlyItsPath() {
-    final LoaderOptions loaderOptions = new LoaderOptions();
-    loaderOptions.setTagInspector(tag ->
-      tag.getClassName().startsWith("uk.ac.ox.poseidon")
+    final String written = new ScenarioWriter().write(
+      Scenario.builder()
+        .component("property", vesselProperty("gear.code"))
+        .build()
     );
-    final Yaml yaml = new Yaml(loaderOptions);
-    final String dumped = yaml.dump(vesselProperty("gear.code"));
-    assertThat(dumped)
+    assertThat(written)
       .contains("propertyPath: gear.code")
       .doesNotContain("rootClass");
-    assertThat(yaml.<Object>load(dumped)).isEqualTo(
-      vesselProperty("gear.code")
-    );
+    assertThat(
+      new ScenarioLoader().load(written).getComponents().get("property")
+    ).isEqualTo(vesselProperty("gear.code"));
   }
 
   @Test

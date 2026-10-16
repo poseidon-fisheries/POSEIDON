@@ -26,9 +26,9 @@ import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.branch.Selector;
 import com.badlogic.gdx.ai.btree.decorator.AlwaysFail;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -42,15 +42,15 @@ import uk.ac.ox.poseidon.core.Factory;
  * so a parent driving this on a loop keeps retrying {@code mainTask} every
  * step, waiting in between. Built via {@link Factories#succeedOrWait}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class SucceedOrWaitFactory extends VesselTaskFactory<Selector<Vessel>> {
 
-  private Factory<? super VesselScope, ? extends Task<Vessel>> mainTask;
-  private Factory<? super VesselScope, ? extends Task<Vessel>> waitTask;
+  private final Factory<? super VesselScope, ? extends Task<Vessel>> mainTask;
+  private final Factory<? super VesselScope, ? extends Task<Vessel>> waitTask;
 
   /**
    * @return a {@link Selector} with {@code mainTask} as its first child and an

@@ -30,6 +30,8 @@ import static java.util.stream.Collectors.toMap;
 
 import ec.util.MersenneTwisterFast;
 import lombok.*;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.DoubleGrid2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -52,8 +54,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * average elevation, without crossing the water/land boundary). Built via
  * {@link Factories#roughCoastalBathymetricGrid(Factory, int, int, double, int, double, double, double)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -62,15 +64,15 @@ public class RoughCoastalBathymetricGridFactory
 {
 
   @NonNull
-  private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
+  private final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
 
-  private int coastalRoughness;
-  private int smoothingIterations;
-  private double smoothingStrength;
-  private int maximumLandWidth;
-  private double minimumElevation;
-  private double maximumElevation;
-  private double probabilityOfFlippingLandToWater;
+  private final int coastalRoughness;
+  private final int smoothingIterations;
+  private final double smoothingStrength;
+  private final int maximumLandWidth;
+  private final double minimumElevation;
+  private final double maximumElevation;
+  private final double probabilityOfFlippingLandToWater;
 
   /**
    * @throws IllegalStateException if {@code minimumElevation >= 0} or

@@ -27,9 +27,9 @@ import static java.lang.Double.isNaN;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -46,8 +46,8 @@ import uk.ac.ox.poseidon.geography.allocators.Allocator;
  * and whether to normalise the values (see
  * {@link AbstractNormalisedDoubleGridFromAllocatorFactory}).
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -56,8 +56,8 @@ abstract class AbstractDoubleGridFromAllocatorFactory<
   G extends DoubleGrid
 > extends RelativeScopeFactory<S, G> {
 
-  private Factory<? super S, ? extends ModelGrid> modelGrid;
-  private Factory<? super S, ? extends Allocator> allocator;
+  private final Factory<? super S, ? extends ModelGrid> modelGrid;
+  private final Factory<? super S, ? extends Allocator> allocator;
 
   /**
    * @throws IllegalArgumentException if the allocator returns a negative,

@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.tasks;
 
 import com.badlogic.gdx.ai.btree.Task;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -37,14 +37,14 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselScopeFactory} counterpart of {@link ActiveBehaviour}, built
  * via {@link Factories#behaviour}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class BehaviourFactory extends VesselScopeFactory<Behaviour> {
 
-  private Factory<? super VesselScope, ? extends Task<Vessel>> rootTask;
+  private final Factory<? super VesselScope, ? extends Task<Vessel>> rootTask;
 
   /**
    * @return an {@link ActiveBehaviour} whose tree is rooted at

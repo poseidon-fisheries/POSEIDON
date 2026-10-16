@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.geography.bathymetry;
 
 import lombok.*;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -35,8 +37,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * negated to produce the (negative) elevation value every cell is set to. Built
  * via {@link Factories#uniformBathymetricGrid(Factory, double)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,9 +48,9 @@ public class UniformBathymetricGridFactory<S extends Scope> extends RelativeScop
 > {
 
   @NonNull
-  private Factory<? super S, ? extends ModelGrid> modelGrid;
+  private final Factory<? super S, ? extends ModelGrid> modelGrid;
 
-  private double depth;
+  private final double depth;
 
   @Override
   protected BathymetricGrid newInstance(final S scope) {

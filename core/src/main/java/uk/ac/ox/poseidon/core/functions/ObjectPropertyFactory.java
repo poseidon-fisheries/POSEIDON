@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.functions;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * @param <T> the type of the object read
  * @param <R> the type of the property; not checked
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,7 +48,7 @@ public abstract class ObjectPropertyFactory<
   R
 > extends GlobalScopeFactory<ObjectProperty<T, R>> {
 
-  private String propertyPath;
+  private final String propertyPath;
 
   /**
    * @return the class the property path starts from; deliberately not named as

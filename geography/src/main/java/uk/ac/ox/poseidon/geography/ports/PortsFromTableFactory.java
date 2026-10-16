@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.geography.ports;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
@@ -46,8 +46,8 @@ import uk.ac.ox.poseidon.geography.Coordinate;
  * in this package. The resulting pairs are typically passed on to
  * {@link Factories#portGrid(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -56,11 +56,11 @@ public class PortsFromTableFactory<S extends Scope> extends RelativeScopeFactory
   List<Pair<Port, Coordinate>>
 > {
 
-  Factory<? super S, Table> table;
-  String portCodeColumnName;
-  String portNameColumnName;
-  String longitudeColumnName;
-  String latitudeColumnName;
+  final Factory<? super S, Table> table;
+  final String portCodeColumnName;
+  final String portNameColumnName;
+  final String longitudeColumnName;
+  final String latitudeColumnName;
 
   @Override
   protected List<Pair<Port, Coordinate>> newInstance(final S scope) {

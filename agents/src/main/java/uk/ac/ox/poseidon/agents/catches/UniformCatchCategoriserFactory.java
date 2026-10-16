@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.catches;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@link UniformCatchCategoriser}, built via
  * {@link Factories#uniformCatchCategoriser}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,7 +46,7 @@ public class UniformCatchCategoriserFactory<S extends Scope> extends RelativeSco
   CatchCategoriser
 > {
 
-  private Factory<? super S, ? extends CatchCategory> catchCategory;
+  private final Factory<? super S, ? extends CatchCategory> catchCategory;
 
   @Override
   protected CatchCategoriser newInstance(final S scope) {

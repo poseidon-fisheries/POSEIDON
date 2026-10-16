@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.biology.species;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -41,8 +41,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@link Factories#species()}/{@link Factories#species(String)}/
  * {@link Factories#species(String, String, String)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -50,9 +50,9 @@ public class SpeciesFactory extends GlobalScopeFactory<Species> {
 
   private static final String PREFIX = "Species";
 
-  private String code;
-  private String name;
-  private String lifeStage;
+  private final String code;
+  private final String name;
+  private final String lifeStage;
 
   /**
    * @param code the species' code; {@code name} defaults to

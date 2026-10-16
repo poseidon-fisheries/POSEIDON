@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.vessels.extractors.tags;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} counterpart of {@link DoubleTagExtractor}, built
  * via {@link Factories#doubleTagExtractor}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -43,7 +43,7 @@ public class DoubleTagExtractorFactory
   extends GlobalScopeFactory<DoubleTagExtractor>
 {
 
-  private String tagName;
+  private final String tagName;
 
   @Override
   protected DoubleTagExtractor newInstance(final Scope scope) {

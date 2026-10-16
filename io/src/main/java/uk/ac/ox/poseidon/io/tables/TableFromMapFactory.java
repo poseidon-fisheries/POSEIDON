@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.io.tables;
 import java.util.Map;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link TableFromMap}, built via
  * {@link Factories#tableFromMap(Factory, Factory)}.
  */
-@Data
-@RequiredArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,8 +48,8 @@ public class TableFromMapFactory<
   V
 > extends RelativeScopeFactory<S, TableFromMap<K, V>> {
 
-  private Factory<? super S, ? extends TableDefinition> tableDefinition;
-  private Factory<? super S, ? extends Supplier<Map<K, V>>> mapSupplier;
+  private final Factory<? super S, ? extends TableDefinition> tableDefinition;
+  private final Factory<? super S, ? extends Supplier<Map<K, V>>> mapSupplier;
 
   @Override
   protected TableFromMap<K, V> newInstance(final S scope) {

@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.tasks.decorators;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.decorator.Invert;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * and flips its outcome (success becomes failure and vice versa). Built via
  * {@link Factories#invert}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class InvertTaskFactory extends DecoratorTaskFactory<Invert<Vessel>> {

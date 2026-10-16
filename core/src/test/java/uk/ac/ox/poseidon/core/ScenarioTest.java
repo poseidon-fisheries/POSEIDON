@@ -26,6 +26,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.google.common.collect.ImmutableList;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -132,7 +133,7 @@ class ScenarioTest {
         "table",
         new ObjectFactory<>(Map.of("DBO;adult", 1.0, "HKE;adult", 3.0)),
         "list",
-        new ListFactory<>(List.of(number(1), number(2)))
+        new ListFactory<>(ImmutableList.of(number(1), number(2)))
       )
     );
 
@@ -167,7 +168,7 @@ class ScenarioTest {
         "table",
         new ObjectFactory<>(Map.of("key", 1.0)),
         "list",
-        new ListFactory<>(List.of(number(1)))
+        new ListFactory<>(ImmutableList.of(number(1)))
       )
     );
 

@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.geography.grids.extractors;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
  * A {@link RelativeScopeFactory} counterpart of {@link CellValue}, built via
  * {@link Factories#cellValue(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,7 +46,7 @@ public class CellValueFactory<S extends Scope> extends RelativeScopeFactory<
   CellValue
 > {
 
-  private Factory<? super S, ? extends DoubleGrid> grid;
+  private final Factory<? super S, ? extends DoubleGrid> grid;
 
   @Override
   protected CellValue newInstance(final S scope) {

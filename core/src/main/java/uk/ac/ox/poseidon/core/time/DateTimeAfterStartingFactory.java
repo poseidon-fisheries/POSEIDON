@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.core.time;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -40,8 +40,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * with no wrapper to carry documentation. Built via
  * {@link Factories#dateTimeAfterStarting(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -49,7 +49,7 @@ public class DateTimeAfterStartingFactory
   extends SimulationScopeFactory<LocalDateTime>
 {
 
-  Factory<? super SimulationScope, ? extends TemporalAmount> amountToAdd;
+  final Factory<? super SimulationScope, ? extends TemporalAmount> amountToAdd;
 
   @Override
   protected LocalDateTime newInstance(final SimulationScope scope) {

@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.market;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -39,8 +39,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * port in {@link #portGrid}, without prices, built via
  * {@link Factories#oneBiomassMarketPerPort}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,7 +48,7 @@ public class OneBiomassMarketPerPortFactory
   extends SimulationScopeFactory<List<BiomassMarket>>
 {
 
-  private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+  private final Factory<? super SimulationScope, ? extends PortGrid> portGrid;
 
   @Override
   protected List<BiomassMarket> newInstance(final SimulationScope scope) {

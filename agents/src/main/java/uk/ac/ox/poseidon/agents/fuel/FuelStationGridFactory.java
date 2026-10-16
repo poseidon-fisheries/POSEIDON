@@ -27,9 +27,9 @@ import static java.util.stream.Collectors.toMap;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -41,8 +41,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * placing each resolved {@link FuelStation} at its own port's location in
  * {@code portGrid}. Built via {@link Factories#fuelStationGrid}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -51,8 +51,8 @@ public class FuelStationGridFactory<S extends Scope> extends RelativeScopeFactor
   FuelStationGrid
 > {
 
-  private Factory<? super S, ? extends PortGrid> portGrid;
-  private Factory<
+  private final Factory<? super S, ? extends PortGrid> portGrid;
+  private final Factory<
     ? super S,
     ? extends List<? extends FuelStation>
   > fuelStations;

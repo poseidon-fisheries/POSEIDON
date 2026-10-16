@@ -26,8 +26,9 @@ import static tech.units.indriya.unit.Units.HOUR;
 import static tech.units.indriya.unit.Units.LITRE;
 
 import javax.measure.Unit;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import si.uom.quantity.VolumetricFlowRate;
 
@@ -36,7 +37,8 @@ import si.uom.quantity.VolumetricFlowRate;
  * {@link VolumetricFlowRate} quantities, built via {@link Factories
  * Factories.volumetricFlowRateOf(...)}.
  */
-@Data
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class VolumetricFlowRateFactory
@@ -48,11 +50,6 @@ public class VolumetricFlowRateFactory
     HOUR
   ).asType(VolumetricFlowRate.class);
 
-  /** No-args constructor, used only by SnakeYAML during deserialization. */
-  public VolumetricFlowRateFactory() {
-    super(VolumetricFlowRate.class);
-  }
-
   /**
    * @param value      the numeric flow rate value
    * @param unitString the unit, in the format produced by
@@ -62,7 +59,7 @@ public class VolumetricFlowRateFactory
     final double value,
     final String unitString
   ) {
-    super(VolumetricFlowRate.class, value, unitString);
+    super(value, unitString);
   }
 
   /**
@@ -73,6 +70,11 @@ public class VolumetricFlowRateFactory
     final double value,
     final Unit<VolumetricFlowRate> unit
   ) {
-    super(VolumetricFlowRate.class, value, unit.toString());
+    super(value, unit.toString());
+  }
+
+  @Override
+  protected Class<VolumetricFlowRate> quantityClass() {
+    return VolumetricFlowRate.class;
   }
 }

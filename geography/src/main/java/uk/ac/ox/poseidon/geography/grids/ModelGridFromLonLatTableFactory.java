@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.geography.grids;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -44,8 +44,8 @@ import uk.ac.ox.poseidon.geography.utils.LonLatTable;
  * from {@code gridWidthInCells} to match the envelope's aspect ratio. Built via
  * {@link Factories#modelGridFromLonLatTable(Factory, int, double)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -54,9 +54,9 @@ public class ModelGridFromLonLatTableFactory<S extends Scope> extends RelativeSc
   ModelGrid
 > {
 
-  private Factory<? super S, ? extends LonLatTable> lonLatTable;
-  private int gridWidthInCells;
-  private double mapPaddingInDegrees;
+  private final Factory<? super S, ? extends LonLatTable> lonLatTable;
+  private final int gridWidthInCells;
+  private final double mapPaddingInDegrees;
 
   @Override
   protected ModelGrid newInstance(final S scope) {

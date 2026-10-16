@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
@@ -38,16 +38,22 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * A {@link SimulationScopeFactory} counterpart of {@link Fleet}, built via
  * {@link Factories#fleet}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class FleetFactory extends SimulationScopeFactory<Fleet> {
 
-  private Factory<? super SimulationScope, ? extends VesselField> vesselField;
-  private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
-  private Factory<? super SimulationScope, ? extends MarketGrid> marketGrid;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends VesselField
+  > vesselField;
+  private final Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends MarketGrid
+  > marketGrid;
 
   @Override
   protected Fleet newInstance(final SimulationScope scope) {

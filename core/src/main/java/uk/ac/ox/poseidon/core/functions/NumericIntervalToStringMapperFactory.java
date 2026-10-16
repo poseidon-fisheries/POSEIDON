@@ -22,11 +22,14 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Singular;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -36,8 +39,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * (specialized to {@link String} outputs), built via
  * {@link Factories#numericIntervalToStringMapper(Interval...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -45,7 +48,8 @@ public class NumericIntervalToStringMapperFactory
   extends GlobalScopeFactory<NumericIntervalMapper<String>>
 {
 
-  private List<Interval> intervals;
+  @Singular
+  private final ImmutableList<Interval> intervals;
 
   /**
    * @return an {@link Interval} literal, for use as a

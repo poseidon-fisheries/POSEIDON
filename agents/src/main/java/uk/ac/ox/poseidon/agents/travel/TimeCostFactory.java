@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.travel;
 
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -38,14 +38,14 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselScopeFactory} counterpart of {@link TimeCost}, built via
  * {@link Factories#timeCost(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class TimeCostFactory extends VesselScopeFactory<TimeCost> {
 
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends Function<? super Vessel, ? extends Money>
   > hourlyCost;

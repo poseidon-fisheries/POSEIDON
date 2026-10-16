@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
@@ -39,16 +39,16 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * initialised cell by cell from {@code biomassAllocator}. Built via
  * {@link Factories#biomassGrid}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class BiomassGridFactory extends SimulationScopeFactory<BiomassGrid> {
 
-  private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
-  private Factory<? super SimulationScope, ? extends Species> species;
-  private Factory<
+  private final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
+  private final Factory<? super SimulationScope, ? extends Species> species;
+  private final Factory<
     ? super SimulationScope,
     ? extends Allocator
   > biomassAllocator;

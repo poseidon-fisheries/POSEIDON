@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -34,14 +34,14 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} for an {@link InYear}. Built via
  * {@link Factories#inYear}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class InYearFactory extends GlobalScopeFactory<InYear> {
 
-  private int year;
+  private final int year;
 
   @Override
   protected InYear newInstance(final Scope scope) {

@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.core.providers;
 
 import java.util.function.BooleanSupplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -41,8 +41,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * plain component class here: the produced value is a {@link ConstantBoolean}
  * wrapping the snapshot, built via {@link Factories#firstBooleanFrom(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -51,7 +51,7 @@ public class FirstBooleanFromFactory<S extends Scope> extends RelativeScopeFacto
   BooleanProvider
 > {
 
-  private Factory<? super S, ? extends BooleanSupplier> delegate;
+  private final Factory<? super S, ? extends BooleanSupplier> delegate;
 
   @Override
   protected BooleanProvider newInstance(final S scope) {

@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.travel;
 
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.functions.ObjectProperty;
 import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
@@ -34,7 +33,6 @@ import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
  *
  * @param <R> the type of the property; not checked
  */
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class RoutePropertyFactory<R> extends ObjectPropertyFactory<Route, R> {

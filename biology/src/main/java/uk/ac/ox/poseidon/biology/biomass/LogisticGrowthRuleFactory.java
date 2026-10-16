@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} for a {@link LogisticGrowthRule}. Built via
  * {@link Factories#logisticGrowthRule}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -43,7 +43,7 @@ public class LogisticGrowthRuleFactory
   extends GlobalScopeFactory<LogisticGrowthRule>
 {
 
-  private double growthRate;
+  private final double growthRate;
 
   @Override
   protected LogisticGrowthRule newInstance(final Scope scope) {

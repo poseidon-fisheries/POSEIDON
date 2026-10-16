@@ -29,9 +29,9 @@ import com.google.common.collect.ImmutableSet;
 import java.io.File;
 import java.nio.file.Path;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -53,8 +53,8 @@ import uk.ac.ox.poseidon.geography.Envelope;
  * {@link Factories#cellSetFromGridFile(Factory, Factory, double)} in this
  * package.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor(access = PACKAGE)
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -69,9 +69,9 @@ public class CellSetFromGridFileFactory<S extends Scope> extends RelativeScopeFa
    */
   private static final double EXTENT_TOLERANCE_IN_CELLS = 0.01;
 
-  private Factory<? super S, ? extends Path> path;
-  private Factory<? super S, ? extends ModelGrid> modelGrid;
-  private double includedValue;
+  private final Factory<? super S, ? extends Path> path;
+  private final Factory<? super S, ? extends ModelGrid> modelGrid;
+  private final double includedValue;
 
   /**
    * @throws RuntimeException         if {@code path} doesn't point to a file

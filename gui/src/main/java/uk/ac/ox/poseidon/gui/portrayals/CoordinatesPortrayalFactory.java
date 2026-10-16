@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.gui.portrayals;
 
 import java.text.DecimalFormat;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.LocationWrapper;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 /**
@@ -52,8 +52,8 @@ public class CoordinatesPortrayalFactory
   extends SimulationScopeFactory<ObjectGridPortrayal2D>
 {
 
-  private Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
-  private DecimalFormat decimalFormat;
+  private final Factory<? super SimulationScope, ? extends ModelGrid> modelGrid;
+  private final DecimalFormat decimalFormat;
 
   /**
    * @param modelGrid     the grid whose cells' coordinates are shown

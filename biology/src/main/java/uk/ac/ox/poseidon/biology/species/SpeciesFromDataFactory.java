@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.biology.species;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
@@ -44,8 +44,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@link Factories#speciesFromData(uk.ac.ox.poseidon.core.Factory, String, String, String)}
  * in this package.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -54,10 +54,10 @@ public class SpeciesFromDataFactory<S extends Scope> extends RelativeScopeFactor
   List<Species>
 > {
 
-  private Factory<? super S, ? extends Table> data;
-  private String speciesCodeColumn;
-  private String speciesNameColumn;
-  private String lifeStageColumn;
+  private final Factory<? super S, ? extends Table> data;
+  private final String speciesCodeColumn;
+  private final String speciesNameColumn;
+  private final String lifeStageColumn;
 
   @Override
   protected List<Species> newInstance(final S scope) {

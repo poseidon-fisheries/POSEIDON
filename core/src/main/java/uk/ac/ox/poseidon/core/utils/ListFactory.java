@@ -22,8 +22,11 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import lombok.*;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -35,8 +38,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * the produced value is a bare {@link List}, with no wrapper to carry
  * documentation. Built via {@link Factories Factories.listOf(...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -46,7 +49,7 @@ public class ListFactory<
 > extends RelativeScopeFactory<S, List<C>> {
 
   @Singular
-  private List<Factory<? super S, ? extends C>> factories;
+  private final ImmutableList<Factory<? super S, ? extends C>> factories;
 
   @Override
   protected List<C> newInstance(final S scope) {

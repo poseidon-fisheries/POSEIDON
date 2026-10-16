@@ -49,13 +49,11 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * the same time.
  */
 @Getter
-@Setter
 @Builder(toBuilder = true)
-@NoArgsConstructor
 public final class Scenario {
 
   /** The simulation's starting date-time. */
-  private Factory<Scope, LocalDateTime> startingDateTime;
+  private final Factory<Scope, LocalDateTime> startingDateTime;
 
   /**
    * The named component factories making up the scenario. A name contains
@@ -63,7 +61,10 @@ public final class Scenario {
    * given to {@link #with}.
    */
   @Singular
-  private Map<String, ? extends Factory<? super SimulationScope, ?>> components;
+  private final Map<
+    String,
+    ? extends Factory<? super SimulationScope, ?>
+  > components;
 
   /**
    * @param startingDateTime the simulation's starting date-time

@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.vessels.predicates;
 
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -37,8 +37,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link VesselIsAt}, built via
  * {@link Factories#vesselIsAt}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -47,7 +47,7 @@ public class VesselIsAtFactory<S extends Scope> extends RelativeScopeFactory<
   VesselIsAt
 > {
 
-  private Factory<? super S, ? extends Supplier<Int2D>> cellSupplier;
+  private final Factory<? super S, ? extends Supplier<Int2D>> cellSupplier;
 
   @Override
   protected VesselIsAt newInstance(final S scope) {

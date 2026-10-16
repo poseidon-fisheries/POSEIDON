@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.DoubleGrid2D;
 import sim.field.grid.Grid2D;
@@ -42,8 +42,8 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableGrid;
 import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 /**
@@ -58,10 +58,10 @@ public class NumberGridPortrayalFactory
   extends SimulationScopeFactory<FastValueGridPortrayal2D>
 {
 
-  private String paletteName;
-  private String valueName;
-  private boolean immutableField;
-  private Factory<? super SimulationScope, ? extends DoubleGrid> grid;
+  private final String paletteName;
+  private final String valueName;
+  private final boolean immutableField;
+  private final Factory<? super SimulationScope, ? extends DoubleGrid> grid;
 
   /**
    * @return a raster portrayal of {@link #grid}, coloured by

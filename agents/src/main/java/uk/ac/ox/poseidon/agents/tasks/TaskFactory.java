@@ -23,9 +23,10 @@
 package uk.ac.ox.poseidon.agents.tasks;
 
 import com.badlogic.gdx.ai.btree.Task;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.AgentScope;
@@ -40,7 +41,8 @@ import uk.ac.ox.poseidon.core.AbstractFactory;
  * @param <S> the agent scope type
  * @param <T> the concrete task type built
  */
-@Data
+@Getter
+@ToString
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)

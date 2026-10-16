@@ -22,14 +22,15 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import com.google.common.collect.ImmutableList;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Singular;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -40,8 +41,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@link NextOccurrenceOfTimeOfDay}, built via {@link Factories
  * Factories.nextOccurrenceOf(...)/Factories.nextOccurrenceAfter(...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -50,11 +51,13 @@ public class NextOccurrenceOfTimeOfDayFactory<S extends Scope> extends RelativeS
   NextOccurrenceOfTimeOfDay
 > {
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Supplier<LocalDateTime>
   > referenceDateTime;
-  private List<Factory<? super S, ? extends LocalTime>> times;
+
+  @Singular
+  private final ImmutableList<Factory<? super S, ? extends LocalTime>> times;
 
   @Override
   protected NextOccurrenceOfTimeOfDay newInstance(final S scope) {

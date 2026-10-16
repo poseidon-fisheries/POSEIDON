@@ -24,23 +24,20 @@ package uk.ac.ox.poseidon.core.quantities;
 
 import javax.measure.Unit;
 import javax.measure.quantity.Speed;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
  * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link Speed}
  * quantities, built via {@link Factories Factories.speedOf(...)}.
  */
-@Data
+@Getter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class SpeedFactory extends AbstractQuantityFactory<Speed> {
-
-  /** No-args constructor, used only by SnakeYAML during deserialization. */
-  public SpeedFactory() {
-    super(Speed.class);
-  }
 
   /**
    * @param value      the numeric speed value
@@ -48,7 +45,7 @@ public class SpeedFactory extends AbstractQuantityFactory<Speed> {
    *                   {@code Unit.toString()}
    */
   public SpeedFactory(final double value, final String unitString) {
-    super(Speed.class, value, unitString);
+    super(value, unitString);
   }
 
   /**
@@ -56,6 +53,11 @@ public class SpeedFactory extends AbstractQuantityFactory<Speed> {
    * @param unit  the unit the value is expressed in
    */
   public SpeedFactory(final double value, final Unit<Speed> unit) {
-    super(Speed.class, value, unit.toString());
+    super(value, unit.toString());
+  }
+
+  @Override
+  protected Class<Speed> quantityClass() {
+    return Speed.class;
   }
 }

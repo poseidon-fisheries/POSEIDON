@@ -26,9 +26,9 @@ import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -40,8 +40,8 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * A {@link VesselScopeFactory} counterpart of {@link NeighbourhoodCellPicker},
  * built via {@link Factories#neighbourhoodGridExplorer}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -49,17 +49,23 @@ public class NeighbourhoodGridExplorerFactory
   extends VesselScopeFactory<NeighbourhoodCellPicker>
 {
 
-  private Factory<? super VesselScope, ? extends GridPathFinder> pathFinder;
-  private Factory<
+  private final Factory<
+    ? super VesselScope,
+    ? extends GridPathFinder
+  > pathFinder;
+  private final Factory<
     ? super VesselScope,
     ? extends Predicate<? super Int2D>
   > cellPredicate;
-  private Factory<
+  private final Factory<
     ? super VesselScope,
     ? extends IntSupplier
   > neighbourhoodSizeSupplier;
-  private int maximumWidening;
-  private Factory<? super VesselScope, ? extends Supplier<Int2D>> searchCentre;
+  private final int maximumWidening;
+  private final Factory<
+    ? super VesselScope,
+    ? extends Supplier<Int2D>
+  > searchCentre;
 
   @Override
   protected NeighbourhoodCellPicker newInstance(final VesselScope scope) {

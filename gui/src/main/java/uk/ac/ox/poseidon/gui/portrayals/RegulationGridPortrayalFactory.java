@@ -36,6 +36,8 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import javax.imageio.ImageIO;
 import lombok.*;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.DrawInfo2D;
@@ -51,8 +53,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 /**
@@ -69,21 +71,24 @@ public class RegulationGridPortrayalFactory
   extends SimulationScopeFactory<ObjectGridPortrayal2D>
 {
 
-  private Factory<
+  private final Factory<
     ? super SimulationScope,
     ? extends Regulations<? super ExtendedFishingAction>
   > regulations;
-  private Factory<? super SimulationScope, ? extends VesselField> vesselField;
-  private Factory<
+  private final Factory<
+    ? super SimulationScope,
+    ? extends VesselField
+  > vesselField;
+  private final Factory<
     ? super SimulationScope,
     ? extends Predicate<? super Vessel>
   > fleet;
-  private Factory<
+  private final Factory<
     ? super SimulationScope,
     ? extends BathymetricGrid
   > bathymetric;
-  private int displayWidth;
-  private int displayHeight;
+  private final int displayWidth;
+  private final int displayHeight;
 
   /**
    * @return a portrayal overlaying a checkered texture on cells currently

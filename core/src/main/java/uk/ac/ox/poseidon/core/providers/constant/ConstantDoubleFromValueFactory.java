@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.providers.constant;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link ConstantDouble}, built
  * via {@link Factories#constantDouble(double)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -44,7 +44,7 @@ public class ConstantDoubleFromValueFactory<S extends Scope> extends RelativeSco
   ConstantDouble
 > {
 
-  private double value;
+  private final double value;
 
   @Override
   protected ConstantDouble newInstance(final S scope) {

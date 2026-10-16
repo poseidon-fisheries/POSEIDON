@@ -28,9 +28,9 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -42,8 +42,8 @@ import uk.ac.ox.poseidon.core.utils.ObjectFactory;
  * {@link Factories#in(Factory)} or the literal-values convenience
  * {@link #of(Object[])} on this class.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -52,7 +52,7 @@ public class InSetFactory<
   T
 > extends RelativeScopeFactory<S, InSet<T>> {
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Supplier<? extends Collection<? extends T>>
   > values;

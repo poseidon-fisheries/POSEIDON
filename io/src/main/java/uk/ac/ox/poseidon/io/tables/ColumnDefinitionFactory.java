@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.io.tables;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import tech.tablesaw.api.ColumnType;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} counterpart of {@link ColumnDefinition}, built
  * via {@link Factories#columnDefinition(String, String)}.
  */
-@Data
-@RequiredArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -44,8 +44,8 @@ public class ColumnDefinitionFactory
   extends GlobalScopeFactory<ColumnDefinition>
 {
 
-  private String columnName;
-  private String columnType;
+  private final String columnName;
+  private final String columnType;
 
   @Override
   protected ColumnDefinition newInstance(final Scope scope) {

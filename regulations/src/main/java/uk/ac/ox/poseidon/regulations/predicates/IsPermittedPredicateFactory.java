@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.regulations.predicates;
 
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -38,8 +38,8 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  * A {@link RelativeScopeFactory} for an {@link IsPermittedPredicate}. Built via
  * {@link Factories#isPermitted}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -49,8 +49,14 @@ public class IsPermittedPredicateFactory<
   A extends Action<G>
 > extends RelativeScopeFactory<S, IsPermittedPredicate<G, A>> {
 
-  private Factory<? super S, ? extends Function<? super G, A>> actionFunction;
-  private Factory<? super S, ? extends Regulations<? super A>> regulations;
+  private final Factory<
+    ? super S,
+    ? extends Function<? super G, A>
+  > actionFunction;
+  private final Factory<
+    ? super S,
+    ? extends Regulations<? super A>
+  > regulations;
 
   @Override
   protected IsPermittedPredicate<G, A> newInstance(final S scope) {

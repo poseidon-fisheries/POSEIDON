@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.core.providers;
 
 import java.util.function.IntSupplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -41,8 +41,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * the produced value is a {@link ConstantInt} wrapping the snapshot, built via
  * {@link Factories#firstIntFrom(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -51,7 +51,7 @@ public class FirstIntFromFactory<S extends Scope> extends RelativeScopeFactory<
   IntProvider
 > {
 
-  private Factory<? super S, ? extends IntSupplier> delegate;
+  private final Factory<? super S, ? extends IntSupplier> delegate;
 
   @Override
   protected IntProvider newInstance(final S scope) {

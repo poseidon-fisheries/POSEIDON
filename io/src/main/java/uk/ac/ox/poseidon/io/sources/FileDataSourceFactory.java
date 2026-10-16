@@ -27,9 +27,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -40,8 +40,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * via
  * {@link Factories#fileDataSource(Factory)}/{@link Factories#fileDataSource(Factory, String)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -52,8 +52,8 @@ public class FileDataSourceFactory<S extends Scope> extends RelativeScopeFactory
 
   private static final String DEFAULT_ENCODING = UTF_8.name();
 
-  private Factory<S, ? extends Path> path;
-  private String encoding;
+  private final Factory<S, ? extends Path> path;
+  private final String encoding;
 
   /**
    * @param path factory for the file to read, using the default UTF-8 encoding

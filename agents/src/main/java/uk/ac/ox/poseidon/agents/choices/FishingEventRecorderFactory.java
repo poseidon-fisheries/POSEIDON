@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.agents.choices;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
@@ -44,8 +44,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * manager or anything else, since a vessel can have several recorders, each
  * registered with whatever gives it the fishing events it records.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -54,12 +54,12 @@ public class FishingEventRecorderFactory<S extends Scope> extends RelativeScopeF
   FishingEventRecorder
 > {
 
-  private Factory<? super S, ? extends ModelGrid> modelGrid;
-  private Factory<
+  private final Factory<? super S, ? extends ModelGrid> modelGrid;
+  private final Factory<
     ? super S,
     ? extends Function<? super FishingEvent, ? extends Memory<Int2D, Bucket>>
   > memorySelector;
-  private Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule;
+  private final Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule;
 
   @Override
   protected FishingEventRecorder newInstance(final S scope) {

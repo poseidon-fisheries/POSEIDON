@@ -25,8 +25,8 @@ package uk.ac.ox.poseidon.io.tables;
 import static uk.ac.ox.poseidon.core.functions.Factories.composedFunction;
 import static uk.ac.ox.poseidon.core.functions.Factories.mapValueExtractor;
 
+import com.google.common.collect.ImmutableList;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -148,7 +148,7 @@ public class Factories {
   ) {
     return new SteppableTableFactory(
       tableDefinition,
-      new ListFactory<SimulationScope, C>(List.of(valueSuppliers))
+      new ListFactory<SimulationScope, C>(ImmutableList.copyOf(valueSuppliers))
     );
   }
 
@@ -198,7 +198,9 @@ public class Factories {
   > TableDefinitionFactory<S> tableDefinition(
     final Factory<? super S, C>... columnDefinitions
   ) {
-    return tableDefinition(new ListFactory<S, C>(List.of(columnDefinitions)));
+    return tableDefinition(
+      new ListFactory<S, C>(ImmutableList.copyOf(columnDefinitions))
+    );
   }
 
   /**
@@ -253,7 +255,9 @@ public class Factories {
   public static MultiStringKeyFromRowFactory multiStringKeyFromRow(
     final String... keyColumnNames
   ) {
-    return new MultiStringKeyFromRowFactory(Arrays.asList(keyColumnNames));
+    return new MultiStringKeyFromRowFactory(
+      ImmutableList.copyOf(keyColumnNames)
+    );
   }
 
   /**

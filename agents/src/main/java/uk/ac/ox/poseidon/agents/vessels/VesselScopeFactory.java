@@ -22,9 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
@@ -36,7 +37,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * across simulation runs. Use for components that depend on a single vessel's
  * own state.
  */
-@Data
+@Getter
+@ToString
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)

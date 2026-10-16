@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import java.util.function.Predicate;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -49,7 +49,7 @@ public class Factories {
   public static <S extends Scope, T> AllOfFactory<S, T> allOf(
     final Factory<? super S, ? extends Predicate<? super T>>... predicates
   ) {
-    return new AllOfFactory<S, T>(List.of(predicates));
+    return new AllOfFactory<S, T>(ImmutableList.copyOf(predicates));
   }
 
   /**
@@ -62,7 +62,7 @@ public class Factories {
   public static <S extends Scope, T> AnyOfFactory<S, T> anyOf(
     final Factory<? super S, ? extends Predicate<? super T>>... predicates
   ) {
-    return new AnyOfFactory<S, T>(List.of(predicates));
+    return new AnyOfFactory<S, T>(ImmutableList.copyOf(predicates));
   }
 
   /**

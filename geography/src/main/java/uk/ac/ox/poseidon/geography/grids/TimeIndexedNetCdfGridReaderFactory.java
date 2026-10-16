@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.geography.grids;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -41,8 +41,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * memoizing an open reader instead would risk a second caller receiving an
  * already-closed file handle.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -51,10 +51,10 @@ public class TimeIndexedNetCdfGridReaderFactory<S extends Scope> extends Relativ
   Supplier<TimeIndexedNetCdfGridReader>
 > {
 
-  private Factory<? super S, ? extends Path> ncFilePath;
-  private String timeDimensionName;
-  private String latitudeDimensionName;
-  private String longitudeDimensionName;
+  private final Factory<? super S, ? extends Path> ncFilePath;
+  private final String timeDimensionName;
+  private final String latitudeDimensionName;
+  private final String longitudeDimensionName;
 
   @Override
   protected Supplier<TimeIndexedNetCdfGridReader> newInstance(final S scope) {

@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselScopeFactory} counterpart of {@link BestKnownOption}, built
  * via {@link Factories#bestKnownOption(Factory, Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -45,8 +45,11 @@ public class BestKnownOptionFactory<O> extends VesselScopeFactory<
   BestKnownOption<O>
 > {
 
-  private Factory<? super VesselScope, ? extends OptionValues<O>> optionValues;
-  private Factory<? super VesselScope, ? extends Supplier<O>> fallback;
+  private final Factory<
+    ? super VesselScope,
+    ? extends OptionValues<O>
+  > optionValues;
+  private final Factory<? super VesselScope, ? extends Supplier<O>> fallback;
 
   @Override
   protected BestKnownOption<O> newInstance(final VesselScope scope) {

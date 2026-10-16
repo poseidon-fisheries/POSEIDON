@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.agents.choices.evaluation;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.CurrencyUnit;
 import sim.util.Int2D;
@@ -39,8 +39,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@link ProfitPerHourDestinationEvaluator}, built via
  * {@link Factories#profitPerHour}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -48,7 +48,7 @@ public class ProfitPerHourDestinationEvaluationProviderFactory
   extends GlobalScopeFactory<Evaluator<Int2D>>
 {
 
-  private String currencyCode;
+  private final String currencyCode;
 
   @Override
   protected Evaluator<Int2D> newInstance(final Scope scope) {

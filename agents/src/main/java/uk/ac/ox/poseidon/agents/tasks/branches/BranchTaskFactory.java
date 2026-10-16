@@ -24,9 +24,10 @@ package uk.ac.ox.poseidon.agents.tasks.branches;
 
 import com.badlogic.gdx.ai.btree.BranchTask;
 import com.badlogic.gdx.ai.btree.Task;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import lombok.*;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -42,16 +43,15 @@ import uk.ac.ox.poseidon.core.Factory;
  *
  * @param <T> the concrete {@link BranchTask} type built
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends VesselTaskFactory<T> {
 
   @Singular
-  @SuppressFBWarnings(value = "EI_EXPOSE_REP")
-  private List<
+  private final ImmutableList<
     ? extends Factory<? super VesselScope, ? extends Task<Vessel>>
   > children;
 

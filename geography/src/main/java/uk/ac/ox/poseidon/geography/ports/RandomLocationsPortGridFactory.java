@@ -28,9 +28,9 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 import java.util.List;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Int2D;
@@ -51,8 +51,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * {@link Factories#randomLocationsPortGrid(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, int, int)}
  * in this package.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -60,16 +60,16 @@ public class RandomLocationsPortGridFactory
   extends SimulationScopeFactory<PortGrid>
 {
 
-  private Factory<
+  private final Factory<
     ? super SimulationScope,
     ? extends BathymetricGrid
   > bathymetricGrid;
-  private Factory<
+  private final Factory<
     ? super SimulationScope,
     ? extends Supplier<String>
   > idSupplier;
-  private int numberOfPorts;
-  private int minimumAdjacentWaterTiles;
+  private final int numberOfPorts;
+  private final int minimumAdjacentWaterTiles;
 
   @Override
   protected PortGrid newInstance(final SimulationScope scope) {

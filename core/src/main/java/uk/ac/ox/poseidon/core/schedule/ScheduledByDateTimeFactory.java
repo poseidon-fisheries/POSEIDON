@@ -26,9 +26,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map.Entry;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
@@ -44,8 +44,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * side effect of building the factory, not a distinct behavior class. Built via
  * {@link Factories#scheduledByDateTime(Factory)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -53,7 +53,7 @@ public class ScheduledByDateTimeFactory<C extends Steppable> extends SimulationS
   List<Entry<LocalDateTime, C>>
 > {
 
-  private Factory<
+  private final Factory<
     ? super SimulationScope,
     ? extends List<Entry<LocalDateTime, C>>
   > steppablesByDateTime;

@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.regulations;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import java.util.function.Predicate;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -77,6 +77,6 @@ public class Factories {
   > allOf(
     final Factory<? super S, ? extends Regulations<? super A>>... regulations
   ) {
-    return new AllOfRegulationsFactory<S, A>(List.of(regulations));
+    return new AllOfRegulationsFactory<S, A>(ImmutableList.copyOf(regulations));
   }
 }

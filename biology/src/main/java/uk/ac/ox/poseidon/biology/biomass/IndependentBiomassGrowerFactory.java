@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} for an {@link IndependentBiomassGrower}. Built
  * via {@link Factories#independentBiomassGrower}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -45,12 +45,15 @@ public class IndependentBiomassGrowerFactory<S extends Scope> extends RelativeSc
   IndependentBiomassGrower
 > {
 
-  private Factory<? super S, ? extends BiomassGrid> biomassGrid;
-  private Factory<
+  private final Factory<? super S, ? extends BiomassGrid> biomassGrid;
+  private final Factory<
     ? super S,
     ? extends CarryingCapacityGrid
   > carryingCapacityGrid;
-  private Factory<? super S, ? extends BiomassGrowthRule> biomassGrowthRule;
+  private final Factory<
+    ? super S,
+    ? extends BiomassGrowthRule
+  > biomassGrowthRule;
 
   @Override
   protected IndependentBiomassGrower newInstance(final S scope) {

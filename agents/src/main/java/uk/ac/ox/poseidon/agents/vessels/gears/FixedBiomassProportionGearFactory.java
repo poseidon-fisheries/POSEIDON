@@ -30,9 +30,9 @@ import java.util.function.Supplier;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import si.uom.quantity.VolumetricFlowRate;
 import uk.ac.ox.poseidon.core.Factory;
@@ -44,8 +44,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * {@link FixedBiomassProportionGear}, built via
  * {@link Factories#fixedBiomassProportionGear}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -54,11 +54,17 @@ public class FixedBiomassProportionGearFactory<S extends SimulationScope> extend
   FixedBiomassProportionGear
 > {
 
-  private String code;
-  private double proportion;
-  private Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold;
-  private Factory<? super S, ? extends Supplier<Duration>> durationSupplier;
-  private Factory<
+  private final String code;
+  private final double proportion;
+  private final Factory<
+    ? super S,
+    ? extends Quantity<Mass>
+  > minimumCatchThreshold;
+  private final Factory<
+    ? super S,
+    ? extends Supplier<Duration>
+  > durationSupplier;
+  private final Factory<
     ? super S,
     ? extends Quantity<VolumetricFlowRate>
   > fuelConsumptionRate;

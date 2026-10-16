@@ -40,8 +40,8 @@ When adding a new simulation component (a new kind of provider, allocator, regul
 
 ## Factory class shape
 
-`*Factory` classes have exactly two constructors and a Lombok builder:
-- a no-args constructor;
+`*Factory` classes are immutable: their fields are final and they have no setters. Each has one
+constructor and a Lombok builder:
 - an all-args constructor, used by the package's static `Factories` helper method;
 - `@SuperBuilder(toBuilder = true)`: `ScenarioLoader` builds factories through it, and
   `toBuilder()` makes a changed copy.
@@ -79,9 +79,8 @@ What counts as a plain value depends on the YAML:
 
 - a `double`, `int`, `boolean`, `String` or enum is written to the YAML as it is, so the overload
   takes it directly;
-- a `java.time` value, a `Quantity` or another object without a no-args constructor is not: the
-  YAML would hold an empty `!!java.time.Duration {}`, losing the value, and loading it would
-  fail. The overload takes its value factory instead (`DurationFactory`, `PeriodFactory`,
+- a `java.time` value, a `Quantity` or another object without a builder is not: the YAML would
+  hold whatever its getters give, and loading it would fail. The overload takes its value factory instead (`DurationFactory`, `PeriodFactory`,
   `TimeFactory`…), which is what scenario code holds anyway (`hours(3)`).
 
 Never write the overload as a generic `foo(T value)` for such types: `foo(hours(3))` would then

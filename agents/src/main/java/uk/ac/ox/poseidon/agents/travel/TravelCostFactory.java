@@ -22,12 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Singular;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
 import sim.util.Int2D;
@@ -39,8 +40,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link RelativeScopeFactory} counterpart of {@link TravelCost}, built via
  * {@link Factories#travelCost(Factory, Factory...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -49,11 +50,13 @@ public class TravelCostFactory<S extends Scope> extends RelativeScopeFactory<
   TravelCost
 > {
 
-  private Factory<
+  private final Factory<
     ? super S,
     ? extends Function<? super Int2D, ? extends Route>
   > routeFunction;
-  private List<
+
+  @Singular
+  private final ImmutableList<
     Factory<? super S, ? extends Function<? super Route, ? extends Money>>
   > routeCosts;
 

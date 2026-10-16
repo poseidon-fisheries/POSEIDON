@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
+import com.google.common.collect.ImmutableList;
 import java.nio.file.Path;
 import java.util.List;
 import uk.ac.ox.poseidon.core.Factory;
@@ -77,7 +78,7 @@ public class Factories {
   ) {
     return new BathymetricGridFromElevationValuesFactory<>(
       modelGrid,
-      elevationValues
+      ImmutableList.copyOf(elevationValues)
     );
   }
 

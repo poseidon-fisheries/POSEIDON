@@ -27,9 +27,9 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -43,8 +43,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * no wrapper to carry documentation. Built via {@link Factories
  * Factories.kilograms(...)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -53,7 +53,7 @@ public class KilogramsFactory<S extends Scope> extends RelativeScopeFactory<
   Double
 > {
 
-  private Factory<? super S, ? extends Quantity<Mass>> mass;
+  private final Factory<? super S, ? extends Quantity<Mass>> mass;
 
   @Override
   protected Double newInstance(final S scope) {

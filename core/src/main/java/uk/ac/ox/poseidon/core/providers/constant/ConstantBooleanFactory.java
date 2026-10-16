@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.core.providers.constant;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.providers.BooleanProvider;
@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} counterpart of {@link ConstantBoolean}, built
  * via {@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -44,7 +44,7 @@ public class ConstantBooleanFactory
   extends GlobalScopeFactory<BooleanProvider>
 {
 
-  private boolean value;
+  private final boolean value;
 
   @Override
   protected BooleanProvider newInstance(final Scope scope) {

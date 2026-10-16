@@ -25,7 +25,8 @@ package uk.ac.ox.poseidon.geography.paths;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -51,8 +52,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * unused fields — that would collapse every path cache in a scenario into one
  * shared instance regardless of which grids it was actually built for.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -61,9 +62,9 @@ public class DefaultPathCacheFactory<S extends Scope> extends RelativeScopeFacto
   PathCache<Int2D>
 > {
 
-  private Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
-  private Factory<? super S, ? extends PortGrid> portGrid;
-  private Factory<? super S, ? extends DistanceCalculator> distance;
+  private final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
+  private final Factory<? super S, ? extends PortGrid> portGrid;
+  private final Factory<? super S, ? extends DistanceCalculator> distance;
 
   @Override
   protected PathCache<Int2D> newInstance(final S scope) {

@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.events.Listener;
@@ -41,14 +41,14 @@ import uk.ac.ox.poseidon.core.events.Listener;
  *
  * @param <L> the type of listener
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class VesselEventListenerFactory<L extends Listener<?>> extends VesselScopeFactory<L> {
 
-  private Factory<? super VesselScope, ? extends L> listener;
+  private final Factory<? super VesselScope, ? extends L> listener;
 
   @Override
   protected L newInstance(final VesselScope scope) {

@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.agents.fuel;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.Factory;
@@ -40,8 +40,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * {@code portGrid}, all sharing the same price and pump rate. Built via
  * {@link Factories#oneFuelStationPerPort}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -49,9 +49,12 @@ public class OneFuelStationPerPortFactory
   extends SimulationScopeFactory<List<FuelStation>>
 {
 
-  private Factory<? super SimulationScope, ? extends PortGrid> portGrid;
-  private Factory<? super SimulationScope, ? extends Money> pricePerLitres;
-  private double pumpRateInLitresPerMinute;
+  private final Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends Money
+  > pricePerLitres;
+  private final double pumpRateInLitresPerMinute;
 
   @Override
   protected List<FuelStation> newInstance(final SimulationScope scope) {

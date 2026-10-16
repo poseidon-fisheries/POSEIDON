@@ -24,6 +24,8 @@ package uk.ac.ox.poseidon.core.utils;
 
 import java.util.concurrent.atomic.AtomicLong;
 import lombok.*;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -32,8 +34,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * A {@link SimulationScopeFactory} counterpart of {@link PrefixedIdSupplier},
  * built via {@link Factories#prefixedIdSupplier(String)}.
  */
-@Data
-@NoArgsConstructor
+@Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
@@ -42,7 +44,7 @@ public class PrefixedIdSupplierFactory
 {
 
   @NonNull
-  private String prefix;
+  private final String prefix;
 
   @Override
   protected PrefixedIdSupplier newInstance(final SimulationScope scope) {
