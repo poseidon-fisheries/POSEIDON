@@ -20,6 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+buildscript {
+    dependencies {
+        // node-gradle (latest release, 7.1.0) brings a vulnerable Jackson 2 onto the build
+        // classpath; drop once a node-gradle release brings 2.18.11 or later
+        classpath(platform(libs.jackson2.bom))
+    }
+}
+
 plugins {
     base
     alias(libs.plugins.node.gradle)
