@@ -14,11 +14,15 @@ almost every case — match the shape to the class's role:
   generated getters/`equals`/`hashCode`/`toString`. Add hand-written constructors alongside it only
   when a field needs derived/defaulted state.
 - **`Factory` YAML beans** (`*Factory` classes per the Factory/Scenario pattern — see
-  `docs/agents/architecture.md`): always the same four — `@Data @NoArgsConstructor
-  @AllArgsConstructor @EqualsAndHashCode(callSuper = true)`. These need mutable bean semantics
-  (no-args ctor + setters) for SnakeYAML (de)serialization, and `callSuper = true` so equality
-  includes the superclass's fields. Don't add other constructors — see "Factory class shape" in
-  `docs/agents/architecture.md`.
+  `docs/agents/architecture.md`): always the same five — `@Data @NoArgsConstructor
+  @AllArgsConstructor @EqualsAndHashCode(callSuper = true) @SuperBuilder(toBuilder = true)`.
+  `ScenarioLoader` builds every factory through its builder, so a factory class without one fails
+  to load (`FactoryBuildersTest` checks them all); `@SuperBuilder` needs every class in the
+  hierarchy to have it, abstract bases included, and `toBuilder` makes changed copies. A field
+  with an initialiser needs `@Builder.Default`, or the builder ignores the initialiser. The setters
+  are still used by code that changes factories in place, which is going. `callSuper = true` makes
+  equality include the superclass's fields. Don't add other constructors — see "Factory class
+  shape" in `docs/agents/architecture.md`.
 - **Builder-style config objects** (e.g. `Scenario`, `SimulationStartOptions`): `@Getter @Setter
   @Builder @NoArgsConstructor` — mutable via setters or built fluently via `@Builder`.
 

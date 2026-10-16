@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.biology.biomass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -36,6 +37,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class RandomBiomassRecruitmentAllocatorFactory
   extends SimulationScopeFactory<BiomassRecruitmentAllocator>
 {

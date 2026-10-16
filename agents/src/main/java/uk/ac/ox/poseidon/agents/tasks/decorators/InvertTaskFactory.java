@@ -27,6 +27,7 @@ import com.badlogic.gdx.ai.btree.decorator.Invert;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
@@ -39,6 +40,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class InvertTaskFactory extends DecoratorTaskFactory<Invert<Vessel>> {
 
   /** @param child factory for the child task whose outcome gets inverted */

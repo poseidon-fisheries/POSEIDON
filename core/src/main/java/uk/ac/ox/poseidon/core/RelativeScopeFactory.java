@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
@@ -50,6 +51,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * stale state if an input ever isn't global.
  */
 @NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public abstract class RelativeScopeFactory<
   S extends Scope,
   C

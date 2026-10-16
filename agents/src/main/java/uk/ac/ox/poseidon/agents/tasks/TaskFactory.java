@@ -26,6 +26,7 @@ import com.badlogic.gdx.ai.btree.Task;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.AgentScope;
 import uk.ac.ox.poseidon.core.AbstractFactory;
@@ -42,6 +43,7 @@ import uk.ac.ox.poseidon.core.AbstractFactory;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public abstract class TaskFactory<
   G extends Agent,
   S extends AgentScope<G>,

@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
@@ -30,6 +32,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
  * {@link CurrentTripDestinationCell}, built via
  * {@link Factories#currentTripDestinationCell()}.
  */
+@NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class CurrentTripDestinationCellFactory
   extends VesselScopeFactory<CurrentTripDestinationCell>
 {

@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks.fishing;
 
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.functions.ObjectProperty;
 import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
 
@@ -35,6 +36,7 @@ import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
  */
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class FishingEventPropertyFactory<R> extends ObjectPropertyFactory<
   FishingEvent,
   R

@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -31,6 +33,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * {@code EventManager} (see {@link SimulationEventListenerFactory}), built via
  * {@link Factories#totalLandingsPerYearAccumulator()}.
  */
+@NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class TotalLandingsPerYearAccumulatorFactory
   extends SimulationEventListenerFactory<TotalLandingsPerYearAccumulator>
 {

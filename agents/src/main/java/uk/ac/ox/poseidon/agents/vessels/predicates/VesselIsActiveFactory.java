@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -29,6 +31,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * A {@link GlobalScopeFactory} counterpart of {@link VesselIsActive}, built via
  * {@link Factories#vesselIsActive()}.
  */
+@NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class VesselIsActiveFactory extends GlobalScopeFactory<VesselIsActive> {
 
   @Override

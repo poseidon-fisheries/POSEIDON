@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -31,6 +33,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * via {@link Factories#infiniteTank()}.
  */
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class InfiniteFuelTankFactory
   extends GlobalScopeFactory<InfiniteFuelTank>
 {

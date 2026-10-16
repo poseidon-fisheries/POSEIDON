@@ -36,6 +36,7 @@ import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationStartOptions;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
+import uk.ac.ox.poseidon.io.ScenarioLoader;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 class PeterSnapperScenarioTest {
@@ -90,6 +91,17 @@ class PeterSnapperScenarioTest {
     assertThat(landingsForAYear(new PeterSnapperScenario().get())).isEqualTo(
       Map.of(1, 2.108111508988373E7)
     );
+  }
+
+  // The loader builds every factory through its builder, so this also checks
+  // that each factory in the scenario has one that sets all its properties
+  @Test
+  void aScenarioWrittenAndLoadedAgainIsTheSame() {
+    final Scenario scenario = new PeterSnapperScenario().get();
+    final String yaml = new ScenarioWriter().write(scenario);
+    final Scenario loaded = new ScenarioLoader().load(yaml);
+    assertThat(new ScenarioWriter().write(loaded)).isEqualTo(yaml);
+    assertThat(landingsForAYear(loaded)).isEqualTo(landingsForAYear(scenario));
   }
 
   @Test

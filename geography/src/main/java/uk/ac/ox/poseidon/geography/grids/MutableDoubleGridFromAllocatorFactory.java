@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.geography.grids;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
@@ -41,6 +42,7 @@ import uk.ac.ox.poseidon.geography.allocators.Allocator;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class MutableDoubleGridFromAllocatorFactory<S extends Scope> extends AbstractDoubleGridFromAllocatorFactory<
   S,
   MutableDoubleGrid

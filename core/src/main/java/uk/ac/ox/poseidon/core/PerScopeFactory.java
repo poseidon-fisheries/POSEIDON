@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core;
 
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
@@ -49,6 +50,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * @param <C> the type of object produced
  */
 @NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public abstract class PerScopeFactory<
   S extends Scope,
   C

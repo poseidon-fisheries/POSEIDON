@@ -40,11 +40,13 @@ When adding a new simulation component (a new kind of provider, allocator, regul
 
 ## Factory class shape
 
-`*Factory` classes should have exactly two constructors and nothing else constructor-wise:
-- a no-args constructor, used only by SnakeYAML during deserialization;
-- an all-args constructor, used by the package's static `Factories` helper method.
+`*Factory` classes have exactly two constructors and a Lombok builder:
+- a no-args constructor;
+- an all-args constructor, used by the package's static `Factories` helper method;
+- `@SuperBuilder(toBuilder = true)`: `ScenarioLoader` builds factories through it, and
+  `toBuilder()` makes a changed copy.
 
-Don't add other constructors or builders to a factory class — construct it either via YAML or via the static helper.
+Don't add other constructors to a factory class — construct it either via YAML or via the static helper.
 
 When designing a new factory, favor composition over a new bespoke implementation: check whether existing factories (in the same package or in `core`, e.g. constant/random/temporal providers) can be combined or parameterized to produce the desired behavior before writing a new `Factory` class from scratch.
 

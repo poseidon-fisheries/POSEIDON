@@ -26,6 +26,7 @@ import com.badlogic.gdx.ai.btree.Task;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 
@@ -37,6 +38,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public abstract class VesselTaskFactory<T extends Task<Vessel>> extends TaskFactory<
   Vessel,
   VesselScope,

@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
@@ -29,6 +31,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
  * A {@link VesselScopeFactory} counterpart of {@link HomePortCell}, built via
  * {@link Factories#homePortCell()}.
  */
+@NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class HomePortCellFactory extends VesselScopeFactory<HomePortCell> {
 
   @Override

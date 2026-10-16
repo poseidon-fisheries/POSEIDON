@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -27,6 +27,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.LocationWrapper;
 import sim.portrayal.SimplePortrayal2D;
@@ -46,6 +47,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * a tooltip, formatted to a fixed number of decimal places, with no visible
  * mark of its own.
  */
+@SuperBuilder(toBuilder = true)
 public class CoordinatesPortrayalFactory
   extends SimulationScopeFactory<ObjectGridPortrayal2D>
 {

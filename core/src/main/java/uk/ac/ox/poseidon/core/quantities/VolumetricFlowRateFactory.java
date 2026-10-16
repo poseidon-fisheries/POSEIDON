@@ -28,6 +28,7 @@ import static tech.units.indriya.unit.Units.LITRE;
 import javax.measure.Unit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 import si.uom.quantity.VolumetricFlowRate;
 
 /**
@@ -37,6 +38,7 @@ import si.uom.quantity.VolumetricFlowRate;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class VolumetricFlowRateFactory
   extends AbstractQuantityFactory<VolumetricFlowRate>
 {

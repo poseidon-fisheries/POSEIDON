@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
@@ -29,6 +31,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
  * A {@link VesselScopeFactory} counterpart of {@link VesselHasSameHomePort},
  * built via {@link Factories#vesselHasSameHomePort()}.
  */
+@NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class VesselHasSameHomePortFactory
   extends VesselScopeFactory<VesselHasSameHomePort>
 {

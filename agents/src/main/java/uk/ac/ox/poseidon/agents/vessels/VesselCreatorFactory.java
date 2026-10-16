@@ -30,6 +30,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.tasks.Behaviour;
@@ -51,6 +52,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class VesselCreatorFactory
   extends SimulationScopeFactory<VesselCreator>
 {
@@ -70,7 +72,7 @@ public class VesselCreatorFactory
   private Factory<? super VesselScope, ? extends Gear> gear;
   private Factory<? super VesselScope, ? extends Engine> engine;
   private Factory<? super VesselScope, ? extends Behaviour> behaviour;
-  private List<Factory<? super VesselScope, ?>> extraFactories = List.of();
+  private List<Factory<? super VesselScope, ?>> extraFactories;
 
   private int numberOfVesselsToCreate;
 

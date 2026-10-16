@@ -27,6 +27,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
@@ -39,6 +40,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class BetweenFactory<
   S extends Scope,
   T
@@ -46,8 +48,8 @@ public class BetweenFactory<
 
   private Factory<? super S, ? extends Supplier<? extends T>> minimum;
   private Factory<? super S, ? extends Supplier<? extends T>> maximum;
-  private boolean includeMinimum = true;
-  private boolean includeMaximum = true;
+  private boolean includeMinimum;
+  private boolean includeMaximum;
 
   @Override
   protected Between<T> newInstance(final S scope) {

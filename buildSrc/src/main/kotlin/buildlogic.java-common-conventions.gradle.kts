@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.lombok)
     annotationProcessor(libs.lombok)
+    testAnnotationProcessor(libs.lombok)
     testImplementation(libs.assertj)
     testImplementation(libs.junit)
     testImplementation(libs.jqwik)

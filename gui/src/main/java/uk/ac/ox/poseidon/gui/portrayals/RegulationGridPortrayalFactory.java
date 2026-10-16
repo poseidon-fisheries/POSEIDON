@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import javax.imageio.ImageIO;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
@@ -63,6 +64,7 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  * closure, are not marked. If no vessel of the fleet is active, no cell is
  * marked.
  */
+@SuperBuilder(toBuilder = true)
 public class RegulationGridPortrayalFactory
   extends SimulationScopeFactory<ObjectGridPortrayal2D>
 {

@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -30,6 +32,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * {@link VesselHasStartedTripToday}, built via
  * {@link Factories#vesselHasStartedTripToday()}.
  */
+@NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class VesselHasStartedTripTodayFactory
   extends GlobalScopeFactory<VesselHasStartedTripToday>
 {

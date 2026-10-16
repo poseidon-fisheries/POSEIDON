@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.core.providers.temporal;
 
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -31,6 +33,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * via {@link Factories#currentYear()}.
  */
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class CurrentYearFactory extends SimulationScopeFactory<CurrentYear> {
 
   @Override

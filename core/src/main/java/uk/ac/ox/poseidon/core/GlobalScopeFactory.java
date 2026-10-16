@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core;
 
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
@@ -32,6 +33,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * Use for components with no per-simulation state.
  */
 @NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public abstract class GlobalScopeFactory<C> extends AbstractFactory<Scope, C> {
 
   @Override

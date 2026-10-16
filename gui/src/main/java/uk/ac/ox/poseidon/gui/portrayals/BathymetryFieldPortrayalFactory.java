@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -27,6 +27,7 @@ import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
@@ -38,6 +39,9 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
  * A {@link SimpleFieldPortrayalFactory} preset for a {@link BathymetricGrid}:
  * labelled "Bathymetry", diverging colour range around zero elevation.
  */
+// Lombok's static builder() here hides the generic one of the superclass
+@SuppressWarnings("unchecked")
+@SuperBuilder(toBuilder = true)
 public class BathymetryFieldPortrayalFactory
   extends SimpleFieldPortrayalFactory<SimulationScope>
 {

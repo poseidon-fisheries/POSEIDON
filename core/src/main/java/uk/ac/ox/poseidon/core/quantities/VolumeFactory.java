@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core.quantities;
 import javax.measure.quantity.Volume;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 /**
  * A {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for {@link Volume}
@@ -32,6 +33,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class VolumeFactory extends AbstractQuantityFactory<Volume> {
 
   /** No-args constructor, used only by SnakeYAML during deserialization. */

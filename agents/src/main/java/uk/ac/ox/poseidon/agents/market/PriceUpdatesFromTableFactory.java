@@ -44,6 +44,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import tech.tablesaw.api.Table;
@@ -71,6 +72,7 @@ import uk.ac.ox.poseidon.core.utils.Measurements;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class PriceUpdatesFromTableFactory<S extends Scope> extends RelativeScopeFactory<
   S,
   List<Entry<LocalDateTime, PriceUpdate>>

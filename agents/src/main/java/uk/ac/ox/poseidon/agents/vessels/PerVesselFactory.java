@@ -26,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.PerScopeFactory;
 
@@ -44,6 +45,7 @@ import uk.ac.ox.poseidon.core.PerScopeFactory;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class PerVesselFactory<T> extends PerScopeFactory<VesselScope, T> {
 
   private Factory<? super VesselScope, ? extends T> delegate;

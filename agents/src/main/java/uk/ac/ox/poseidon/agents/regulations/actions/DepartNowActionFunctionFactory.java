@@ -24,6 +24,8 @@ package uk.ac.ox.poseidon.agents.regulations.actions;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -33,6 +35,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class DepartNowActionFunctionFactory
   extends GlobalScopeFactory<DepartNowActionFunction>
 {

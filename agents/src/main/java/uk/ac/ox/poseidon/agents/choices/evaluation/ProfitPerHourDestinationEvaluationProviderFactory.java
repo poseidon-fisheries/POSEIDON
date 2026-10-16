@@ -28,6 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.joda.money.CurrencyUnit;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
@@ -42,6 +43,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class ProfitPerHourDestinationEvaluationProviderFactory
   extends GlobalScopeFactory<Evaluator<Int2D>>
 {

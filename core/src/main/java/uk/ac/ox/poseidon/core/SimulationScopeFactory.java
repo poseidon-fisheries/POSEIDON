@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * depend on a live simulation's state (its RNG, its
  * {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}, etc.).
  */
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 public abstract class SimulationScopeFactory<C> extends AbstractFactory<
   SimulationScope,

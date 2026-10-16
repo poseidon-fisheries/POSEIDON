@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.vessels.friends;
 
 import java.util.function.Predicate;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
@@ -38,6 +39,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class DynamicFriendsSupplierFactory
   extends VesselScopeFactory<DynamicFriendsSupplier>
 {

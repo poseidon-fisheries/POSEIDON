@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels.accounts;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
@@ -35,6 +36,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 public class AccountFactory extends VesselScopeFactory<Account> {
 
   @Override
