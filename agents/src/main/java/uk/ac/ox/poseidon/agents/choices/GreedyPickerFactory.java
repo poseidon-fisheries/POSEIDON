@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import ec.util.MersenneTwisterFast;
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -53,13 +54,17 @@ public class GreedyPickerFactory<O> extends VesselScopeFactory<
     ? super VesselScope,
     ? extends Predicate<? super O>
   > optionPredicate;
+  private final Factory<
+    ? super VesselScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   @Override
   protected GreedyPicker<O> newInstance(final VesselScope scope) {
     return new GreedyPicker<>(
       optionValues.get(scope),
       optionPredicate.get(scope),
-      scope.getSimulation().random
+      randomNumberGenerator.get(scope)
     );
   }
 }

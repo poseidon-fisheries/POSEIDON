@@ -55,10 +55,14 @@ public class OneFuelStationPerPortFactory
     ? extends Money
   > pricePerLitres;
   private final double pumpRateInLitresPerMinute;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends EventManager
+  > eventManager;
 
   @Override
   protected List<FuelStation> newInstance(final SimulationScope scope) {
-    final EventManager eventManager = scope.getSimulation().getEventManager();
+    final EventManager eventManager = this.eventManager.get(scope);
     return portGrid
       .get(scope)
       .getPorts()

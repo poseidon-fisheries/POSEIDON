@@ -52,14 +52,14 @@ public abstract class SimulationEventListenerFactory<T extends Listener<?>> exte
   protected abstract T newListener(final SimulationScope scope);
 
   /**
-   * Builds the listener via {@link #newListener}, then registers it with the
-   * resolved simulation's {@link uk.ac.ox.poseidon.core.events.EventManager}
-   * before returning it.
+   * Builds the listener via {@link #newListener}, then registers it through
+   * the scope with the simulation's
+   * {@link uk.ac.ox.poseidon.core.events.EventManager} before returning it.
    */
   @Override
   protected final T newInstance(final SimulationScope scope) {
     final T listener = newListener(scope);
-    scope.getSimulation().getEventManager().addListener(listener);
+    scope.addListener(listener);
     return listener;
   }
 }

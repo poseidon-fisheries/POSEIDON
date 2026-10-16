@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels.friends;
 
+import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
+
 import java.util.function.Predicate;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -55,7 +57,8 @@ public class Factories {
     return new DynamicFriendsSupplierFactory(
       targetNumberOfFriends,
       potentialFriends,
-      friendshipCondition
+      friendshipCondition,
+      randomNumberGenerator()
     );
   }
 }

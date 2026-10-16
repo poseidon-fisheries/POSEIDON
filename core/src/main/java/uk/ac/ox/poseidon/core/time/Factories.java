@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.startingDateTime;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -193,7 +196,7 @@ public class Factories {
   public static DateTimeAfterStartingFactory dateTimeAfterStarting(
     final Factory<? super SimulationScope, ? extends TemporalAmount> amountToAdd
   ) {
-    return new DateTimeAfterStartingFactory(amountToAdd);
+    return new DateTimeAfterStartingFactory(amountToAdd, startingDateTime());
   }
 
   /**
@@ -205,6 +208,9 @@ public class Factories {
   public static ExponentiallyDistributedDurationSupplierFactory exponentiallyDistributedDuration(
     final Factory<? super SimulationScope, ? extends Duration> meanDuration
   ) {
-    return new ExponentiallyDistributedDurationSupplierFactory(meanDuration);
+    return new ExponentiallyDistributedDurationSupplierFactory(
+      meanDuration,
+      randomNumberGenerator()
+    );
   }
 }

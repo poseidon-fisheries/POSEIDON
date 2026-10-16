@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.PerSimulationFactory;
+import uk.ac.ox.poseidon.core.RunIdFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -129,6 +130,15 @@ public class Factories {
     final Factory<? super S, ? extends B> second
   ) {
     return new PairFactory<>(first, second);
+  }
+
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for the
+   *         id of the simulation run
+   * @see RunIdFactory
+   */
+  public static RunIdFactory runId() {
+    return new RunIdFactory();
   }
 
   /**

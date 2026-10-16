@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import ec.util.MersenneTwisterFast;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -50,13 +51,17 @@ public class BestKnownOptionFactory<O> extends VesselScopeFactory<
     ? extends OptionValues<O>
   > optionValues;
   private final Factory<? super VesselScope, ? extends Supplier<O>> fallback;
+  private final Factory<
+    ? super VesselScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   @Override
   protected BestKnownOption<O> newInstance(final VesselScope scope) {
     return new BestKnownOption<>(
       optionValues.get(scope),
       fallback.get(scope),
-      scope.getSimulation().random
+      randomNumberGenerator.get(scope)
     );
   }
 }

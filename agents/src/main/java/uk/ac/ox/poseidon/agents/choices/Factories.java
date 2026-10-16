@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
+
 import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -105,7 +107,8 @@ public class Factories {
     return new EpsilonGreedyDestinationSupplierFactory(
       epsilon,
       explorer,
-      exploiter
+      exploiter,
+      randomNumberGenerator()
     );
   }
 
@@ -161,7 +164,11 @@ public class Factories {
       ? extends Predicate<? super O>
     > optionPredicate
   ) {
-    return new GreedyPickerFactory<>(optionValues, optionPredicate);
+    return new GreedyPickerFactory<>(
+      optionValues,
+      optionPredicate,
+      randomNumberGenerator()
+    );
   }
 
   /**
@@ -225,7 +232,8 @@ public class Factories {
     return new ImitatingPickerFactory<>(
       optionValues,
       optionPredicate,
-      optionValuesSupplier
+      optionValuesSupplier,
+      randomNumberGenerator()
     );
   }
 
@@ -329,7 +337,8 @@ public class Factories {
       cellPredicate,
       neighbourhoodSizeSupplier,
       maximumWidening,
-      searchCentre
+      searchCentre,
+      randomNumberGenerator()
     );
   }
 
@@ -344,7 +353,11 @@ public class Factories {
     final Factory<? super VesselScope, ? extends OptionValues<O>> optionValues,
     final Factory<? super VesselScope, ? extends Supplier<O>> fallback
   ) {
-    return new BestKnownOptionFactory<>(optionValues, fallback);
+    return new BestKnownOptionFactory<>(
+      optionValues,
+      fallback,
+      randomNumberGenerator()
+    );
   }
 
   /**
@@ -389,6 +402,10 @@ public class Factories {
       ? extends Predicate<? super Int2D>
     > cellPredicate
   ) {
-    return new RandomGridExplorerFactory(cellsSupplier, cellPredicate);
+    return new RandomGridExplorerFactory(
+      cellsSupplier,
+      cellPredicate,
+      randomNumberGenerator()
+    );
   }
 }

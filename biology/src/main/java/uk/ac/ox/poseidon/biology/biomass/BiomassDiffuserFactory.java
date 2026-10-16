@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+import ec.util.MersenneTwisterFast;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -56,6 +57,10 @@ public class BiomassDiffuserFactory
     ? super SimulationScope,
     ? extends BiomassDiffusionRule
   > biomassDiffusionRule;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   @Override
   protected BiomassDiffuser newInstance(final SimulationScope scope) {
@@ -63,7 +68,7 @@ public class BiomassDiffuserFactory
       biomassGrid.get(scope),
       carryingCapacityGrid.get(scope),
       biomassDiffusionRule.get(scope),
-      scope.getSimulation().random
+      randomNumberGenerator.get(scope)
     );
   }
 }

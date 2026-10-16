@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.io.paths;
 
+import static uk.ac.ox.poseidon.core.utils.Factories.runId;
 import static uk.ac.ox.poseidon.io.paths.PathFactory.pathToString;
 
 import java.nio.file.Path;
@@ -68,6 +69,6 @@ public class Factories {
   public static SimulationFolderFactory simulationFolder(
     final Factory<? super SimulationScope, ? extends Path> parent
   ) {
-    return new SimulationFolderFactory(parent);
+    return new SimulationFolderFactory(parent, runId());
   }
 }

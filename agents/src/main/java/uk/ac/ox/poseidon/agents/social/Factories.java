@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.social;
 
+import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
+
 import java.util.function.Function;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -71,7 +73,12 @@ public class Factories {
     > groupingKey,
     final int maximumCliqueSize
   ) {
-    return new CliqueDynamicsFactory(network, groupingKey, maximumCliqueSize);
+    return new CliqueDynamicsFactory(
+      network,
+      groupingKey,
+      maximumCliqueSize,
+      randomNumberGenerator()
+    );
   }
 
   /**

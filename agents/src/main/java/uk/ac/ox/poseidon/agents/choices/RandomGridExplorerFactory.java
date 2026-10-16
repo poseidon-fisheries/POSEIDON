@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import ec.util.MersenneTwisterFast;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -57,13 +58,17 @@ public class RandomGridExplorerFactory
     ? super VesselScope,
     ? extends Predicate<? super Int2D>
   > cellPredicate;
+  private final Factory<
+    ? super VesselScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   @Override
   protected Provider<Int2D> newInstance(final VesselScope scope) {
     return new RandomPicker<>(
       cellsSupplier.get(scope),
       cellPredicate.get(scope),
-      scope.getSimulation().random
+      randomNumberGenerator.get(scope)
     );
   }
 }

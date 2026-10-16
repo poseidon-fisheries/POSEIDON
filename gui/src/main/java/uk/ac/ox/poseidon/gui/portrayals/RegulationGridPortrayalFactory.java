@@ -48,7 +48,7 @@ import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.providers.temporal.CurrentDateTime;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.regulations.Regulations;
@@ -87,6 +87,10 @@ public class RegulationGridPortrayalFactory
     ? super SimulationScope,
     ? extends BathymetricGrid
   > bathymetric;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends CurrentDateTime
+  > currentDateTime;
   private final int displayWidth;
   private final int displayHeight;
 
@@ -97,7 +101,7 @@ public class RegulationGridPortrayalFactory
   @Override
   protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
     return new Portrayal(
-      scope.getSimulation().getTemporalSchedule(),
+      currentDateTime.get(scope),
       regulations.get(scope),
       vesselField.get(scope),
       fleet.get(scope),
@@ -136,7 +140,7 @@ public class RegulationGridPortrayalFactory
       }
     }
 
-    private final TemporalSchedule schedule;
+    private final CurrentDateTime currentDateTime;
     private final Regulations<? super ExtendedFishingAction> regulations;
     private final VesselField vesselField;
     private final Predicate<? super Vessel> fleet;
@@ -146,7 +150,7 @@ public class RegulationGridPortrayalFactory
     private long lastUpdated;
 
     Portrayal(
-      final TemporalSchedule schedule,
+      final CurrentDateTime currentDateTime,
       final Regulations<? super ExtendedFishingAction> regulations,
       final VesselField vesselField,
       final Predicate<? super Vessel> fleet,
@@ -163,7 +167,7 @@ public class RegulationGridPortrayalFactory
       final int gridWidth = bathymetricGrid.getModelGrid().getGridWidth();
       final int gridHeight = bathymetricGrid.getModelGrid().getGridHeight();
       this.grid = new ObjectGrid2D(gridWidth, gridHeight);
-      this.schedule = schedule;
+      this.currentDateTime = currentDateTime;
       this.updateFrequency = updateFrequency;
       setField(grid);
 
@@ -182,10 +186,10 @@ public class RegulationGridPortrayalFactory
       final Graphics2D graphics,
       final DrawInfo2D info
     ) {
-      final double time = schedule.getTime();
-      if (time >= TemporalSchedule.EPOCH && time < Double.POSITIVE_INFINITY) {
-        final long currentFieldValue = schedule
-          .getDate()
+      if (currentDateTime.hasDateTime()) {
+        final long currentFieldValue = currentDateTime
+          .get()
+          .toLocalDate()
           .getLong(updateFrequency.field);
         if (currentFieldValue != lastUpdated) {
           updateGrid();
@@ -196,7 +200,7 @@ public class RegulationGridPortrayalFactory
     }
 
     void updateGrid() {
-      final LocalDateTime dateTime = schedule.getDateTime();
+      final LocalDateTime dateTime = currentDateTime.get();
       final List<Vessel> fleetVessels = bagToStream(
         vesselField.getField().allObjects,
         Vessel.class

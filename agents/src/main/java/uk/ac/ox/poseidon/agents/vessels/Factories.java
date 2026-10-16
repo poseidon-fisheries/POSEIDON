@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
+
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -71,7 +73,7 @@ public class Factories {
     final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
     final Factory<? super SimulationScope, ? extends MarketGrid> marketGrid
   ) {
-    return new FleetFactory(vesselField, portGrid, marketGrid);
+    return new FleetFactory(vesselField, portGrid, marketGrid, eventManager());
   }
 
   /**
@@ -131,7 +133,8 @@ public class Factories {
       engine,
       behaviour,
       ImmutableList.copyOf(extraFactories),
-      numberOfVesselsToCreate
+      numberOfVesselsToCreate,
+      eventManager()
     );
   }
 

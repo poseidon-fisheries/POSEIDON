@@ -22,12 +22,14 @@
 
 package uk.ac.ox.poseidon.core.providers.random;
 
+import ec.util.MersenneTwisterFast;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.distribution.Poisson;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -45,9 +47,15 @@ public class RandomPoissonFactory
 {
 
   private final double mean;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   @Override
   protected RandomPoisson newInstance(final SimulationScope scope) {
-    return new RandomPoisson(new Poisson(mean, scope.getSimulation().random));
+    return new RandomPoisson(
+      new Poisson(mean, randomNumberGenerator.get(scope))
+    );
   }
 }

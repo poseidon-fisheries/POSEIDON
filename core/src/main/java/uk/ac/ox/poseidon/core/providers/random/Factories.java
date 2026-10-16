@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.core.providers.random;
 
+import uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory;
+
 /**
  * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that draw a
  * fresh random value, from the simulation's shared RNG, on every call.
@@ -33,13 +35,22 @@ public class Factories {
   }
 
   /**
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for the
+   *         simulation's random number generator
+   * @see RandomNumberGeneratorFactory
+   */
+  public static RandomNumberGeneratorFactory randomNumberGenerator() {
+    return new RandomNumberGeneratorFactory();
+  }
+
+  /**
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
    *         {@link RandomBoolean} with an even (0.5) probability of returning
    *         {@code true}
    * @see RandomBoolean
    */
   public static RandomBooleanFactory randomBoolean() {
-    return new RandomBooleanFactory(0.5);
+    return new RandomBooleanFactory(0.5, randomNumberGenerator());
   }
 
   /**
@@ -50,7 +61,7 @@ public class Factories {
    * @see RandomBoolean
    */
   public static RandomBooleanFactory randomBoolean(final double probability) {
-    return new RandomBooleanFactory(probability);
+    return new RandomBooleanFactory(probability, randomNumberGenerator());
   }
 
   /**
@@ -64,7 +75,7 @@ public class Factories {
     final double minimum,
     final double maximum
   ) {
-    return new RandomDoubleFactory(minimum, maximum);
+    return new RandomDoubleFactory(minimum, maximum, randomNumberGenerator());
   }
 
   /**
@@ -78,7 +89,7 @@ public class Factories {
     final int minimum,
     final int maximum
   ) {
-    return new RandomIntFactory(minimum, maximum);
+    return new RandomIntFactory(minimum, maximum, randomNumberGenerator());
   }
 
   /**
@@ -89,6 +100,6 @@ public class Factories {
    * @see RandomPoisson
    */
   public static RandomPoissonFactory randomPoisson(final double mean) {
-    return new RandomPoissonFactory(mean);
+    return new RandomPoissonFactory(mean, randomNumberGenerator());
   }
 }

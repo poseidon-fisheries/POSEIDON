@@ -22,11 +22,13 @@
 
 package uk.ac.ox.poseidon.core.providers.random;
 
+import ec.util.MersenneTwisterFast;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -44,9 +46,13 @@ public class RandomBooleanFactory
 {
 
   private final double probability;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   @Override
   protected RandomBoolean newInstance(final SimulationScope scope) {
-    return new RandomBoolean(probability, scope.getSimulation().random);
+    return new RandomBoolean(probability, randomNumberGenerator.get(scope));
   }
 }

@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.fuel;
 
+import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
+
 import java.util.List;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.Factory;
@@ -62,7 +64,8 @@ public class Factories {
     return new OneFuelStationPerPortFactory(
       portGrid,
       pricePerLitres,
-      pumpRateInLitresPerMinute
+      pumpRateInLitresPerMinute,
+      eventManager()
     );
   }
 }

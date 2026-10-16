@@ -49,10 +49,14 @@ public class OneBiomassMarketPerPortFactory
 {
 
   private final Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends EventManager
+  > eventManager;
 
   @Override
   protected List<BiomassMarket> newInstance(final SimulationScope scope) {
-    final EventManager eventManager = scope.getSimulation().getEventManager();
+    final EventManager eventManager = this.eventManager.get(scope);
     return portGrid
       .get(scope)
       .getPorts()

@@ -34,8 +34,8 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * A {@link SimulationScopeFactory} that resolves the given steppable and
- * registers it as a final process on the simulation (run at {@code finish()}),
- * then returns that same steppable. No separate plain component class here:
+ * registers it, through the scope, as a final process of the simulation (run
+ * at {@code finish()}), then returns that same steppable. No separate plain component class here:
  * registering the final process is a side effect of building the factory, not a
  * distinct behavior class. Built via {@link Factories#finalProcess(Factory)}.
  */
@@ -51,7 +51,7 @@ public class FinalProcessFactory<P extends Steppable> extends SimulationScopeFac
   @Override
   protected P newInstance(final SimulationScope scope) {
     final P process = this.process.get(scope);
-    scope.getSimulation().addFinalProcess(process);
+    scope.addFinalProcess(process);
     return process;
   }
 }

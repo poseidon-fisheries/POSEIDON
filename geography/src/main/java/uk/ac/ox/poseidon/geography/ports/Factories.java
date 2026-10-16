@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
+import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
+
 import java.util.List;
 import java.util.function.Supplier;
 import tech.tablesaw.api.Table;
@@ -127,7 +129,8 @@ public class Factories {
       bathymetricGrid,
       idSupplier,
       numberOfPorts,
-      minimumAdjacentWaterTiles
+      minimumAdjacentWaterTiles,
+      randomNumberGenerator()
     );
   }
 }

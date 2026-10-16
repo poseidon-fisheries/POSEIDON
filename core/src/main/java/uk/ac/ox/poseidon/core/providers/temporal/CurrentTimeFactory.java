@@ -22,11 +22,14 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import java.time.LocalDateTime;
+import java.util.function.Supplier;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -36,13 +39,18 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  */
 @Getter
 @ToString
-@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class CurrentTimeFactory extends SimulationScopeFactory<CurrentTime> {
 
+  private final Factory<
+    ? super SimulationScope,
+    ? extends Supplier<LocalDateTime>
+  > currentDateTime;
+
   @Override
   protected CurrentTime newInstance(final SimulationScope scope) {
-    return new CurrentTime(scope.getSimulation().getTemporalSchedule());
+    return new CurrentTime(currentDateTime.get(scope));
   }
 }

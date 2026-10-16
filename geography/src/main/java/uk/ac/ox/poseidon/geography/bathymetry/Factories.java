@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
+import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
+
 import com.google.common.collect.ImmutableList;
 import java.nio.file.Path;
 import java.util.List;
@@ -146,7 +148,8 @@ public class Factories {
       maximumLandWidth,
       minimumElevation,
       maximumElevation,
-      probabilityOfFlippingLandToWater
+      probabilityOfFlippingLandToWater,
+      randomNumberGenerator()
     );
   }
 

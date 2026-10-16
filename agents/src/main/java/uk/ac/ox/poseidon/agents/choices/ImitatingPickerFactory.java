@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import ec.util.MersenneTwisterFast;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
@@ -58,6 +59,10 @@ public class ImitatingPickerFactory<O> extends VesselScopeFactory<
     ? super VesselScope,
     ? extends Supplier<OptionValues<O>>
   > optionValuesSupplier;
+  private final Factory<
+    ? super VesselScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   @Override
   protected ImitatingPicker<O> newInstance(final VesselScope scope) {
@@ -65,7 +70,7 @@ public class ImitatingPickerFactory<O> extends VesselScopeFactory<
       optionValues.get(scope),
       optionPredicate.get(scope),
       optionValuesSupplier.get(scope),
-      scope.getSimulation().random
+      randomNumberGenerator.get(scope)
     );
   }
 }

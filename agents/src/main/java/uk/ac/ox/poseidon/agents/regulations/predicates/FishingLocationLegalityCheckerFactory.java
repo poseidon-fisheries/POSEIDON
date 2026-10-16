@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.agents.regulations.predicates;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -66,6 +68,10 @@ public class FishingLocationLegalityCheckerFactory
     ? super VesselScope,
     ? extends Duration
   > fishingDuration;
+  private final Factory<
+    ? super VesselScope,
+    ? extends Supplier<LocalDateTime>
+  > currentDateTime;
 
   @Override
   protected FishingLocationLegalityChecker newInstance(
@@ -76,7 +82,7 @@ public class FishingLocationLegalityCheckerFactory
       pathFinder.get(scope),
       distance.get(scope),
       fishingDuration.get(scope),
-      () -> scope.getSimulation().getTemporalSchedule().getDateTime(),
+      currentDateTime.get(scope),
       scope.getVessel()
     );
   }

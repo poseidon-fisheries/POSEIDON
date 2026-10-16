@@ -20,21 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.temporal;
+package uk.ac.ox.poseidon.core;
 
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.providers.temporal.CurrentDateTime;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link CurrentDateTime},
- * built via {@link Factories#currentDateTime()}.
+ * A {@link SimulationScopeFactory} for a {@link CurrentDateTime}: the
+ * simulation's clock, which factories take as an input rather than reading
+ * the simulation's schedule. Built via
+ * {@link uk.ac.ox.poseidon.core.providers.temporal.Factories#currentDateTime()}.
  */
-@Getter
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)

@@ -42,6 +42,7 @@ import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -85,6 +86,10 @@ public class VesselCreatorFactory
   private final ImmutableList<Factory<? super VesselScope, ?>> extraFactories;
 
   private final int numberOfVesselsToCreate;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends EventManager
+  > eventManager;
 
   /** Shorthand for the full constructor with no extra per-vessel factories. */
   public VesselCreatorFactory(
@@ -102,7 +107,8 @@ public class VesselCreatorFactory
     final Factory<? super VesselScope, ? extends Gear> gear,
     final Factory<? super VesselScope, ? extends Engine> engine,
     final Factory<? super VesselScope, ? extends Behaviour> behaviour,
-    final int numberOfVesselsToCreate
+    final int numberOfVesselsToCreate,
+    final Factory<? super SimulationScope, ? extends EventManager> eventManager
   ) {
     this(
       vesselField,
@@ -117,7 +123,8 @@ public class VesselCreatorFactory
       engine,
       behaviour,
       ImmutableList.of(),
-      numberOfVesselsToCreate
+      numberOfVesselsToCreate,
+      eventManager
     );
   }
 
@@ -128,7 +135,7 @@ public class VesselCreatorFactory
   @Override
   protected VesselCreator newInstance(final SimulationScope scope) {
     return new VesselCreator(
-      scope.getSimulation().getEventManager(),
+      eventManager.get(scope),
       checkNotNull(vesselField).get(scope),
       checkNotNull(portGrid).get(scope),
       checkNotNull(marketGrid).get(scope),

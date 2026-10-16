@@ -50,13 +50,13 @@ public class DateTimeAfterStartingFactory
 {
 
   final Factory<? super SimulationScope, ? extends TemporalAmount> amountToAdd;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends LocalDateTime
+  > startingDateTime;
 
   @Override
   protected LocalDateTime newInstance(final SimulationScope scope) {
-    return scope
-      .getSimulation()
-      .getTemporalSchedule()
-      .getStartingDateTime()
-      .plus(amountToAdd.get(scope));
+    return startingDateTime.get(scope).plus(amountToAdd.get(scope));
   }
 }

@@ -22,11 +22,13 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
+import ec.util.MersenneTwisterFast;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -37,17 +39,24 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  */
 @Getter
 @ToString
-@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class RandomBiomassRecruitmentAllocatorFactory
   extends SimulationScopeFactory<BiomassRecruitmentAllocator>
 {
 
+  private final Factory<
+    ? super SimulationScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
+
   @Override
   protected BiomassRecruitmentAllocator newInstance(
     final SimulationScope scope
   ) {
-    return new RandomBiomassRecruitmentAllocator(scope.getSimulation().random);
+    return new RandomBiomassRecruitmentAllocator(
+      randomNumberGenerator.get(scope)
+    );
   }
 }

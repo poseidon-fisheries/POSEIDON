@@ -26,6 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -52,12 +53,13 @@ public class SimulationFolderFactory
 {
 
   private final Factory<? super SimulationScope, ? extends Path> parent;
+  private final Factory<? super SimulationScope, ? extends UUID> runId;
 
   @Override
   protected Path newInstance(final SimulationScope scope) {
     final Path path = checkNotNull(parent, "Parent path factory is null")
       .get(scope)
-      .resolve(scope.getSimulation().getId().toString());
+      .resolve(runId.get(scope).toString());
     if (Files.notExists(path)) {
       try {
         Files.createDirectories(path);

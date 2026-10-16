@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.geography.ports;
 import static com.google.common.base.Preconditions.checkState;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
+import ec.util.MersenneTwisterFast;
 import java.util.List;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
@@ -70,6 +71,10 @@ public class RandomLocationsPortGridFactory
   > idSupplier;
   private final int numberOfPorts;
   private final int minimumAdjacentWaterTiles;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   @Override
   protected PortGrid newInstance(final SimulationScope scope) {
@@ -101,7 +106,7 @@ public class RandomLocationsPortGridFactory
       sparseGrid2D
     );
     final Supplier<String> idSupplier = this.idSupplier.get(scope);
-    shuffledStream(suitableTiles, scope.getSimulation().random)
+    shuffledStream(suitableTiles, randomNumberGenerator.get(scope))
       .limit(numberOfPorts)
       .forEach(cell -> {
         final String portCode = idSupplier.get();

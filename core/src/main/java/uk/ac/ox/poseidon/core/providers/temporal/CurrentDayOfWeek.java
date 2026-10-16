@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,22 +23,24 @@
 package uk.ac.ox.poseidon.core.providers.temporal;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.util.function.Supplier;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.Provider;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 /**
  * A {@link Provider} that returns the simulation's current day of the week,
- * read live from the {@link TemporalSchedule} on every call. Built via
+ * read from the current date-time on every call. Built via
  * {@link Factories#currentDayOfWeek()} in this package.
  */
 @RequiredArgsConstructor
 public class CurrentDayOfWeek implements Provider<DayOfWeek> {
 
-  private final TemporalSchedule temporalSchedule;
+  private final @NonNull Supplier<? extends LocalDateTime> currentDateTime;
 
   @Override
   public DayOfWeek get() {
-    return temporalSchedule.getDateTime().getDayOfWeek();
+    return currentDateTime.get().getDayOfWeek();
   }
 }

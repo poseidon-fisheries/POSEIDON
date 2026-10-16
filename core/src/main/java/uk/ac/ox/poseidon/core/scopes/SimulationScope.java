@@ -25,7 +25,9 @@ package uk.ac.ox.poseidon.core.scopes;
 import java.lang.ref.WeakReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.events.Listener;
 
 /**
  * A {@link Scope} tied to a single {@link Simulation} run, used by factories
@@ -65,5 +67,24 @@ public class SimulationScope extends Scope {
    */
   public Simulation getSimulation() {
     return simulation.get();
+  }
+
+  /**
+   * Registers a listener on the simulation's event manager, so that it
+   * receives the events the simulation's products broadcast from now on.
+   *
+   * @param listener the listener to register
+   */
+  public void addListener(final Listener<?> listener) {
+    getSimulation().getEventManager().addListener(listener);
+  }
+
+  /**
+   * Registers a process to run once, when the simulation finishes.
+   *
+   * @param process the process to run
+   */
+  public void addFinalProcess(final Steppable process) {
+    getSimulation().addFinalProcess(process);
   }
 }

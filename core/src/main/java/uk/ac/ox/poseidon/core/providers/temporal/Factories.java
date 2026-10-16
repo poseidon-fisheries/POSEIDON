@@ -29,7 +29,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAmount;
 import java.util.function.Supplier;
+import uk.ac.ox.poseidon.core.CurrentDateTimeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.StartingDateTimeFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.core.time.DurationFactory;
@@ -50,7 +52,7 @@ public class Factories {
    * @see CurrentDate
    */
   public static CurrentDateFactory currentDate() {
-    return new CurrentDateFactory();
+    return new CurrentDateFactory(currentDateTime());
   }
 
   /**
@@ -59,7 +61,7 @@ public class Factories {
    * @see CurrentYear
    */
   public static CurrentYearFactory currentYear() {
-    return new CurrentYearFactory();
+    return new CurrentYearFactory(currentDateTime());
   }
 
   /**
@@ -72,12 +74,21 @@ public class Factories {
   }
 
   /**
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for the
+   *         date-time the simulation's clock starts at
+   * @see StartingDateTimeFactory
+   */
+  public static StartingDateTimeFactory startingDateTime() {
+    return new StartingDateTimeFactory();
+  }
+
+  /**
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
    *         {@link CurrentDayOfWeek}
    * @see CurrentDayOfWeek
    */
   public static CurrentDayOfWeekFactory currentDayOfWeek() {
-    return new CurrentDayOfWeekFactory();
+    return new CurrentDayOfWeekFactory(currentDateTime());
   }
 
   /**
@@ -86,7 +97,7 @@ public class Factories {
    * @see CurrentTime
    */
   public static CurrentTimeFactory currentTime() {
-    return new CurrentTimeFactory();
+    return new CurrentTimeFactory(currentDateTime());
   }
 
   /**

@@ -39,7 +39,7 @@ import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.core.providers.temporal.CurrentDateTime;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -112,10 +112,10 @@ class RegulationGridPortrayalFactoryTest {
     when(bathymetricGrid.getActiveWaterCells()).thenAnswer(_ ->
       Stream.of(CLOSED_TO_FLEET, CLOSED_TO_ONE_VESSEL, OPEN)
     );
-    final TemporalSchedule schedule = mock(TemporalSchedule.class);
-    when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2013, 1, 2, 0, 0));
+    final CurrentDateTime currentDateTime = mock(CurrentDateTime.class);
+    when(currentDateTime.get()).thenReturn(LocalDateTime.of(2013, 1, 2, 0, 0));
     return new RegulationGridPortrayalFactory.Portrayal(
-      schedule,
+      currentDateTime,
       regulations,
       vesselField,
       fleet,

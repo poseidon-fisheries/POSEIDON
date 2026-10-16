@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.time;
 
+import ec.util.MersenneTwisterFast;
 import java.time.Duration;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -50,6 +51,10 @@ public class ExponentiallyDistributedDurationSupplierFactory
     ? super SimulationScope,
     ? extends Duration
   > meanDuration;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   @Override
   protected ExponentiallyDistributedDuration newInstance(
@@ -57,7 +62,7 @@ public class ExponentiallyDistributedDurationSupplierFactory
   ) {
     return new ExponentiallyDistributedDuration(
       meanDuration.get(scope),
-      scope.getSimulation().random
+      randomNumberGenerator.get(scope)
     );
   }
 }

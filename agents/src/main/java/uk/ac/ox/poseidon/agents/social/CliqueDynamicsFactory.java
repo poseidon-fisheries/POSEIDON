@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.social;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import ec.util.MersenneTwisterFast;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -59,6 +60,10 @@ public class CliqueDynamicsFactory
     ? extends Function<? super Vessel, ?>
   > groupingKey;
   private final int maximumCliqueSize;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   @Override
   protected CliqueDynamics newListener(final SimulationScope scope) {
@@ -68,7 +73,7 @@ public class CliqueDynamicsFactory
       network.get(scope),
       groupingKey.get(scope),
       maximumCliqueSize,
-      scope.getSimulation().random
+      randomNumberGenerator.get(scope)
     );
   }
 }

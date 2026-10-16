@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import ec.util.MersenneTwisterFast;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -55,6 +56,10 @@ public class EpsilonGreedyDestinationSupplierFactory
     ? super VesselScope,
     ? extends Supplier<Int2D>
   > exploiter;
+  private final Factory<
+    ? super VesselScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   /**
    * @return an {@link EpsilonGreedyChooser} over the resolved
@@ -66,7 +71,7 @@ public class EpsilonGreedyDestinationSupplierFactory
       epsilon,
       explorer.get(scope),
       exploiter.get(scope),
-      scope.getSimulation().random
+      randomNumberGenerator.get(scope)
     )::get;
   }
 }

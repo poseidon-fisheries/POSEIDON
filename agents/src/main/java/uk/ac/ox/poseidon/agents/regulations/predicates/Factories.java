@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.regulations.predicates;
 
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+
 import java.time.Duration;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -64,7 +66,8 @@ public class Factories {
       regulations,
       pathFinder,
       distance,
-      fishingDuration
+      fishingDuration,
+      currentDateTime()
     );
   }
 }

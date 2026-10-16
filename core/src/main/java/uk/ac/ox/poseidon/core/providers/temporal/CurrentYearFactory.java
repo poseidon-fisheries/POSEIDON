@@ -22,9 +22,14 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import java.time.LocalDateTime;
+import java.util.function.Supplier;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -32,13 +37,20 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * A {@link SimulationScopeFactory} counterpart of {@link CurrentYear}, built
  * via {@link Factories#currentYear()}.
  */
+@Getter
+@ToString
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class CurrentYearFactory extends SimulationScopeFactory<CurrentYear> {
 
+  private final Factory<
+    ? super SimulationScope,
+    ? extends Supplier<LocalDateTime>
+  > currentDateTime;
+
   @Override
   protected CurrentYear newInstance(final SimulationScope scope) {
-    return new CurrentYear(scope.getSimulation().getTemporalSchedule());
+    return new CurrentYear(currentDateTime.get(scope));
   }
 }

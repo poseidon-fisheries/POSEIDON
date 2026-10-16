@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels.friends;
 
+import ec.util.MersenneTwisterFast;
 import java.util.function.Predicate;
 import lombok.*;
 import lombok.Getter;
@@ -55,6 +56,10 @@ public class DynamicFriendsSupplierFactory
     ? super VesselScope,
     ? extends Predicate<? super Vessel>
   > friendshipCondition;
+  private final Factory<
+    ? super VesselScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   @Override
   protected DynamicFriendsSupplier newInstance(final VesselScope scope) {
@@ -63,7 +68,7 @@ public class DynamicFriendsSupplierFactory
       potentialFriends.get(scope),
       friendshipCondition.get(scope),
       scope.getVessel(),
-      scope.getSimulation().random
+      randomNumberGenerator.get(scope)
     );
   }
 }

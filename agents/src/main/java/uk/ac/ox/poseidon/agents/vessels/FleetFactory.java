@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -54,12 +55,16 @@ public class FleetFactory extends SimulationScopeFactory<Fleet> {
     ? super SimulationScope,
     ? extends MarketGrid
   > marketGrid;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends EventManager
+  > eventManager;
 
   @Override
   protected Fleet newInstance(final SimulationScope scope) {
     return new Fleet(
       scope.getSimulation().getTemporalSchedule(),
-      scope.getSimulation().getEventManager(),
+      eventManager.get(scope),
       vesselField.get(scope),
       portGrid.get(scope),
       marketGrid.get(scope)

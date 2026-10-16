@@ -31,6 +31,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
@@ -50,6 +51,10 @@ public class BiomassMarketFactory
 
   private final Factory<? super SimulationScope, ? extends Port> port;
   private final String marketCode;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends EventManager
+  > eventManager;
 
   @Override
   protected BiomassMarket newInstance(final SimulationScope scope) {
@@ -57,10 +62,6 @@ public class BiomassMarketFactory
     final Port port = this.port.get(scope);
     final String marketCode =
       this.marketCode != null ? this.marketCode : port.getCode();
-    return new BiomassMarket(
-      port,
-      marketCode,
-      scope.getSimulation().getEventManager()
-    );
+    return new BiomassMarket(port, marketCode, eventManager.get(scope));
   }
 }

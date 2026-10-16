@@ -22,22 +22,24 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import java.time.LocalDateTime;
+import java.util.function.Supplier;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.core.providers.IntProvider;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 /**
  * An {@link IntProvider} that returns the simulation's current calendar year,
- * read live from the {@link TemporalSchedule} on every call. Built via
+ * read from the current date-time on every call. Built via
  * {@link Factories#currentYear()} in this package.
  */
 @RequiredArgsConstructor
 public class CurrentYear implements IntProvider {
 
-  private final TemporalSchedule temporalSchedule;
+  private final @NonNull Supplier<? extends LocalDateTime> currentDateTime;
 
   @Override
   public int getAsInt() {
-    return temporalSchedule.getDate().getYear();
+    return currentDateTime.get().getYear();
   }
 }

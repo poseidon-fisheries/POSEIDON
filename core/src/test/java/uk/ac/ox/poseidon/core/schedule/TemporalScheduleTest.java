@@ -105,6 +105,7 @@ class TemporalScheduleTest {
 
   @Test
   void givesTheStartingDateTimeBeforeTheFirstStep() {
+    assertThat(schedule.hasDateTime()).isTrue();
     assertThat(schedule.getDateTime()).isEqualTo(start);
     assertThat(schedule.getTime()).isEqualTo(0.0);
   }
@@ -145,6 +146,7 @@ class TemporalScheduleTest {
   void hasNoDateTimeOnceMasonHasRunOutOfEvents() {
     schedule.step(simState);
     assertThat(schedule.getTime()).isEqualTo(Schedule.AFTER_SIMULATION);
+    assertThat(schedule.hasDateTime()).isFalse();
     assertThat(schedule.getTimestamp()).isEqualTo(
       TemporalSchedule.AFTER_SIMULATION_STRING
     );

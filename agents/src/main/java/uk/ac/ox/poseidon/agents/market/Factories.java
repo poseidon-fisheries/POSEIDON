@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import tech.tablesaw.api.Table;
@@ -53,7 +56,7 @@ public class Factories {
     final Factory<? super SimulationScope, ? extends Port> port,
     final String marketCode
   ) {
-    return new BiomassMarketFactory(port, marketCode);
+    return new BiomassMarketFactory(port, marketCode, eventManager());
   }
 
   /**
@@ -95,7 +98,10 @@ public class Factories {
       ? extends List<MarketPrice>
     >... marketPrices
   ) {
-    return new InitialPricesFactory(ImmutableList.copyOf(marketPrices));
+    return new InitialPricesFactory(
+      ImmutableList.copyOf(marketPrices),
+      currentDateTime()
+    );
   }
 
   /**
@@ -150,7 +156,7 @@ public class Factories {
   public static OneBiomassMarketPerPortFactory oneBiomassMarketPerPort(
     final Factory<? super SimulationScope, ? extends PortGrid> portGrid
   ) {
-    return new OneBiomassMarketPerPortFactory(portGrid);
+    return new OneBiomassMarketPerPortFactory(portGrid, eventManager());
   }
 
   /**

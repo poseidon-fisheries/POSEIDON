@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import ec.util.MersenneTwisterFast;
 import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -66,6 +67,10 @@ public class NeighbourhoodGridExplorerFactory
     ? super VesselScope,
     ? extends Supplier<Int2D>
   > searchCentre;
+  private final Factory<
+    ? super VesselScope,
+    ? extends MersenneTwisterFast
+  > randomNumberGenerator;
 
   @Override
   protected NeighbourhoodCellPicker newInstance(final VesselScope scope) {
@@ -76,7 +81,7 @@ public class NeighbourhoodGridExplorerFactory
       neighbourhoodSizeSupplier.get(scope),
       maximumWidening,
       searchCentre.get(scope),
-      scope.getSimulation().random
+      randomNumberGenerator.get(scope)
     );
   }
 }

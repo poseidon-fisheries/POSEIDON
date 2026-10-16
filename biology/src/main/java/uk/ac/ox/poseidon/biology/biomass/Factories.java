@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
+import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.supplierAllocator;
 import static uk.ac.ox.poseidon.geography.grids.Factories.timeIndexedNetCdfGridReader;
@@ -118,7 +119,8 @@ public class Factories {
     return new BiomassDiffuserFactory(
       biomassGrid,
       carryingCapacityGrid,
-      biomassDiffusionRule
+      biomassDiffusionRule,
+      randomNumberGenerator()
     );
   }
 
@@ -258,7 +260,9 @@ public class Factories {
    * @see RandomBiomassRecruitmentAllocatorFactory
    */
   public static RandomBiomassRecruitmentAllocatorFactory randomBiomassRecruitmentAllocator() {
-    return new RandomBiomassRecruitmentAllocatorFactory();
+    return new RandomBiomassRecruitmentAllocatorFactory(
+      randomNumberGenerator()
+    );
   }
 
   /**
