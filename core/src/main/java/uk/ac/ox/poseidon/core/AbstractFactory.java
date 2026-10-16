@@ -22,9 +22,6 @@
 
 package uk.ac.ox.poseidon.core;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -32,64 +29,88 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link Factory} that memoizes its produced object per scope key, per
- * factory instance: the same factory invocation, for the same scope key, always
- * returns the same {@code C} instance — this is how object identity/sharing is
- * achieved across a scenario graph. Subclasses fix the scope key (via
- * {@link #makeKey}, usually inherited from a {@code *ScopeFactory} base rather
- * than overridden directly) and supply the actual construction logic (via
- * {@link #newInstance}). Extend this rather than implementing {@link Factory}
- * directly unless you have a specific reason not to.
+ * A {@link Factory} that builds its product once per owner: the same factory
+ * object, asked for its product with scopes of the same owner (a simulation, a
+ * vessel), always returns the same {@code P} instance. Products are kept in
+ * {@link ProductStore}s keyed by factory identity, so sharing is declared by
+ * referencing one factory object from several places: two distinct factory
+ * objects never share a product, however equal their values. Subclasses say
+ * which store holds the product (via {@link #productStoreFor}, usually
+ * inherited from a {@code *ScopeFactory} base rather than overridden directly)
+ * and supply the actual construction logic (via {@link #newInstance}). Extend
+ * this rather than implementing {@link Factory} directly unless you have a
+ * specific reason not to.
  *
  * @param <S> the scope this factory resolves against
- * @param <C> the type of object produced
+ * @param <P> the type of the product
  */
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @EqualsAndHashCode()
 public abstract class AbstractFactory<
   S extends Scope,
-  C
-> implements Factory<S, C> {
+  P
+> implements Factory<S, P> {
 
-  // needs to be transient for SnakeYAML not to be confused
-  // when there are no other properties to serialize and to
-  // ensure it's not included in the equals and hashCode implementations
-  private final transient LoadingCache<Object, Cache<Integer, C>> cache =
-    Caffeine.newBuilder()
-      .weakKeys()
-      .build(object -> Caffeine.newBuilder().build());
+  // Transient, so that it is not a property: SnakeYAML doesn't write it,
+  // equality ignores it, and, being final and initialised, it is not a
+  // builder parameter, so a copy made through toBuilder() starts empty.
+  private final transient ProductStore globalStore = new ProductStore();
 
   /**
-   * Resolves and caches the produced object: looks up (creating if absent) the
-   * per-scope-key cache via {@link #makeKey}, then within it looks up (creating
-   * via {@link #newInstance} if absent) the entry for this factory instance's
-   * {@code hashCode()} — so distinct factory instances with the same scope key
-   * still get distinct cached objects, and repeated calls with an equal (by
-   * {@code hashCode()}) factory instance and scope key share one.
+   * Returns the product held for {@code scope}'s owner in the store that
+   * {@link #productStoreFor} gives, building it with {@link #newInstance}
+   * and storing it if it isn't there. A product kept in this factory's own
+   * store is shared by every simulation reaching this factory, possibly at
+   * once, so its build is locked by this factory.
    *
    * @param scope the scope to resolve against, must not be null
-   * @return the cached or newly-built object
+   * @return the stored or newly-built object
    */
   @Override
-  public final synchronized C get(@NonNull final S scope) {
-    return cache.get(makeKey(scope)).get(hashCode(), key -> newInstance(scope));
+  public final P get(@NonNull final S scope) {
+    final ProductStore store = productStoreFor(scope);
+    if (store == globalStore) {
+      synchronized (this) {
+        return getFrom(store, scope);
+      }
+    }
+    return getFrom(store, scope);
+  }
+
+  // Looked up, built and then stored, not filled in one call: the build asks
+  // for its inputs, which may be stored in the same store.
+  private P getFrom(final ProductStore store, final S scope) {
+    if (store.contains(this)) {
+      return store.get(this);
+    }
+    final P product = newInstance(scope);
+    store.put(this, product);
+    return product;
   }
 
   /**
    * @param scope the scope being resolved against
-   * @return the cache key identifying which objects this factory's output may
-   *         be shared with (e.g. the simulation instance, for per-simulation
-   *         scope; a single constant, for global scope)
+   * @return the store holding this factory's product for {@code scope}: its
+   *         owner's (the simulation's, for a simulation-level factory), or
+   *         {@link #globalStore()} for a global factory
    */
-  protected abstract Object makeKey(S scope);
+  protected abstract ProductStore productStoreFor(S scope);
+
+  /**
+   * @return this factory's own store, which holds its product when it is
+   *         shared by every simulation; a copy of this factory starts with an
+   *         empty one
+   */
+  protected final ProductStore globalStore() {
+    return globalStore;
+  }
 
   /**
    * @param scope the scope being resolved against
-   * @return a freshly built {@code C}, called at most once per distinct
-   *         {@link #makeKey} result and factory {@code hashCode()}
+   * @return a freshly built {@code P}, called at most once per store
    */
-  protected abstract C newInstance(S scope);
+  protected abstract P newInstance(S scope);
 
   /**
    * @return the concrete {@link Scope} subclass this factory resolves against

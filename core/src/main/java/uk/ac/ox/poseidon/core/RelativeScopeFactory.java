@@ -42,9 +42,10 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 /**
  * A {@link Factory} whose effective scope is derived from its own
  * {@link Factory}-typed fields rather than fixed: it inspects those fields,
- * finds their common (leaf) scope class, and caches its produced object under
- * that same key — so it inherits whatever scope its inputs resolve at, falling
- * back to {@link Scope#GLOBAL_SCOPE} if it has no {@link Factory}-typed fields.
+ * finds their common (leaf) scope class, and keeps its produced object in the
+ * store of that scope's owner — so it inherits whatever scope its inputs
+ * resolve at, falling back to global scope, in its own store, if they are all
+ * global or it has no {@link Factory}-typed fields.
  * Prefer this over {@link GlobalScopeFactory} for any factory with
  * {@link Factory}-typed input fields: it still ends up at global scope when its
  * inputs do, but safely demotes to a narrower scope instead of silently sharing
@@ -54,8 +55,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @SuperBuilder(toBuilder = true)
 public abstract class RelativeScopeFactory<
   S extends Scope,
-  C
-> extends AbstractFactory<S, C> {
+  P
+> extends AbstractFactory<S, P> {
 
   private final transient Supplier<List<Method>> readMethods =
     Suppliers.memoize(() -> {
@@ -77,28 +78,26 @@ public abstract class RelativeScopeFactory<
   /**
    * Finds this factory's member {@link Factory}-typed fields (recursing into
    * nested {@link Map}s, {@link Collection}s, and other
-   * {@link RelativeScopeFactory}s), determines their single common leaf scope
-   * class, and delegates key generation to one of the member factories that has
-   * that leaf scope — so this factory's cache key matches whichever scope its
-   * inputs are ultimately rooted in. Falls back to {@link Scope#GLOBAL_SCOPE}
-   * if there are no member factories.
+   * {@link RelativeScopeFactory}s) and determines their single common leaf
+   * scope class. If it is narrower than {@link Scope}, delegates to one of the
+   * member factories that has that leaf scope, so that this factory's product
+   * is kept by the owner its inputs are ultimately rooted in. Otherwise (global
+   * inputs, or none), returns this factory's own global store: its product is
+   * then shared by every simulation, and must not be kept in an input's store,
+   * which would outlive this factory.
    *
    * @param scope the scope being resolved against
-   * @return the delegated cache key
+   * @return the store holding this factory's product for {@code scope}
    * @throws IllegalStateException if member factories are rooted in more than
    *                               one leaf scope class
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
-  protected Object makeKey(final S scope) {
+  protected ProductStore productStoreFor(final S scope) {
     final Map<AbstractFactory, Class> scopesByFactory =
       memberFactories().collect(
         toMap(Function.identity(), AbstractFactory::scopeClass)
       );
-
-    if (scopesByFactory.isEmpty()) {
-      return Scope.GLOBAL_SCOPE;
-    }
 
     final Set<Class> scopeClasses = Set.copyOf(scopesByFactory.values());
 
@@ -110,10 +109,14 @@ public abstract class RelativeScopeFactory<
       .toList();
 
     checkState(
-      leafScopes.size() == 1,
+      leafScopes.size() <= 1,
       "More than one leaf scope classes found amongst member factories: %s",
       leafScopes
     );
+
+    if (leafScopes.isEmpty() || leafScopes.getFirst() == Scope.class) {
+      return globalStore();
+    }
 
     final Class leafScope = leafScopes.getFirst();
     return scopesByFactory
@@ -122,7 +125,7 @@ public abstract class RelativeScopeFactory<
       .filter(e -> e.getValue().equals(leafScope))
       .findFirst()
       .map(Map.Entry::getKey)
-      .map(af -> af.makeKey(scope))
+      .map(af -> af.productStoreFor(scope))
       .orElseThrow();
   }
 
@@ -130,7 +133,8 @@ public abstract class RelativeScopeFactory<
    * @throws UnsupportedOperationException always — a relative scope factory's
    *                                       effective scope class is derived per
    *                                       call from its member factories (see
-   *                                       {@link #makeKey}), not fixed, so
+   *                                       {@link #productStoreFor}), not
+   *                                       fixed, so
    *                                       there is no single answer to give
    *                                       here
    */

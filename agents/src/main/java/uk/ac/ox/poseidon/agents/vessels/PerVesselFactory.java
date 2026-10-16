@@ -29,6 +29,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.PerScopeFactory;
+import uk.ac.ox.poseidon.core.ProductStore;
 
 /**
  * A {@link PerScopeFactory} that builds its delegate's product once per vessel,
@@ -51,8 +52,8 @@ public class PerVesselFactory<T> extends PerScopeFactory<VesselScope, T> {
   private final Factory<? super VesselScope, ? extends T> delegate;
 
   @Override
-  protected Object makeKey(final VesselScope scope) {
-    return scope.getVessel();
+  protected ProductStore productStoreFor(final VesselScope scope) {
+    return scope.getVessel().getProductStore();
   }
 
   @Override

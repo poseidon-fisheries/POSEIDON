@@ -24,14 +24,17 @@ package uk.ac.ox.poseidon.agents.social;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -50,6 +53,12 @@ class SocialNetworkFactoryTest {
     mock(MarketGrid.class)
   );
   private final SocialNetworkFactory factory = socialNetwork(fleetFactory());
+
+  @BeforeEach
+  void giveTheMocksStores() {
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
+    when(otherSimulation.getProductStore()).thenReturn(new ProductStore());
+  }
 
   private Factory<SimulationScope, Fleet> fleetFactory() {
     return scope -> fleet;

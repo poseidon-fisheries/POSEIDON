@@ -31,6 +31,7 @@ import java.util.function.IntSupplier;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.providers.FirstIntFromFactory;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -45,6 +46,8 @@ class PerVesselFactoryTest {
     final PerVesselFactory<String> factory = new PerVesselFactory<>(delegate);
 
     final Vessel vessel = mock(Vessel.class);
+
+    when(vessel.getProductStore()).thenReturn(new ProductStore());
     final VesselScope scope1 = mock(VesselScope.class);
     when(scope1.getVessel()).thenReturn(vessel);
     final VesselScope scope2 = mock(VesselScope.class);
@@ -65,10 +68,14 @@ class PerVesselFactoryTest {
     final PerVesselFactory<String> factory = new PerVesselFactory<>(delegate);
 
     final Vessel vesselA = mock(Vessel.class);
+
+    when(vesselA.getProductStore()).thenReturn(new ProductStore());
     final VesselScope scopeA = mock(VesselScope.class);
     when(scopeA.getVessel()).thenReturn(vesselA);
 
     final Vessel vesselB = mock(Vessel.class);
+
+    when(vesselB.getProductStore()).thenReturn(new ProductStore());
     final VesselScope scopeB = mock(VesselScope.class);
     when(scopeB.getVessel()).thenReturn(vesselB);
 
@@ -88,6 +95,8 @@ class PerVesselFactoryTest {
     final PerVesselFactory<String> factory = new PerVesselFactory<>(delegate);
 
     final Vessel vessel = mock(Vessel.class);
+
+    when(vessel.getProductStore()).thenReturn(new ProductStore());
     final VesselScope scope = mock(VesselScope.class);
     when(scope.getVessel()).thenReturn(vessel);
 
@@ -100,6 +109,7 @@ class PerVesselFactoryTest {
 
   private static VesselScope scopeOfNewVessel() {
     final Vessel vessel = mock(Vessel.class);
+    when(vessel.getProductStore()).thenReturn(new ProductStore());
     final VesselScope scope = mock(VesselScope.class);
     when(scope.getVessel()).thenReturn(vessel);
     return scope;

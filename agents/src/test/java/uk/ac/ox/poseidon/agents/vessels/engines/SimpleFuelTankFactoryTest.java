@@ -24,11 +24,14 @@ package uk.ac.ox.poseidon.agents.vessels.engines;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.tank;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.quantities.VolumeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -38,6 +41,13 @@ class SimpleFuelTankFactoryTest {
   private final Simulation simulation = mock(Simulation.class);
   private final Vessel vessel = mock(Vessel.class);
   private final Vessel otherVessel = mock(Vessel.class);
+
+  @BeforeEach
+  void giveTheMocksStores() {
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
+    when(vessel.getProductStore()).thenReturn(new ProductStore());
+    when(otherVessel.getProductStore()).thenReturn(new ProductStore());
+  }
 
   @Test
   void createsSimpleFuelTankUsingVolumeFactories() {

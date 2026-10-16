@@ -49,20 +49,20 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ScheduledByDateTimeFactory<C extends Steppable> extends SimulationScopeFactory<
-  List<Entry<LocalDateTime, C>>
+public class ScheduledByDateTimeFactory<P extends Steppable> extends SimulationScopeFactory<
+  List<Entry<LocalDateTime, P>>
 > {
 
   private final Factory<
     ? super SimulationScope,
-    ? extends List<Entry<LocalDateTime, C>>
+    ? extends List<Entry<LocalDateTime, P>>
   > steppablesByDateTime;
 
   @Override
-  protected List<Entry<LocalDateTime, C>> newInstance(
+  protected List<Entry<LocalDateTime, P>> newInstance(
     final SimulationScope scope
   ) {
-    final List<Entry<LocalDateTime, C>> steppables = steppablesByDateTime.get(
+    final List<Entry<LocalDateTime, P>> steppables = steppablesByDateTime.get(
       scope
     );
     scope.getSimulation().getTemporalSchedule().scheduleByDateTime(steppables);

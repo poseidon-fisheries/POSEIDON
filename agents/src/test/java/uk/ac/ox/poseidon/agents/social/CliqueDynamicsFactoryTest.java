@@ -37,6 +37,7 @@ import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.trips.TripStartEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
@@ -63,6 +64,7 @@ class CliqueDynamicsFactoryTest {
 
   private static Simulation simulation(final EventManager eventManager) {
     final Simulation simulation = mock(Simulation.class);
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
     simulation.random = new MersenneTwisterFast(0);
     when(simulation.getEventManager()).thenReturn(eventManager);
     return simulation;
@@ -70,6 +72,7 @@ class CliqueDynamicsFactoryTest {
 
   private static Vessel vessel(final EventManager simulationEventManager) {
     final Vessel vessel = mock(Vessel.class);
+    when(vessel.getProductStore()).thenReturn(new ProductStore());
     when(vessel.isActive()).thenReturn(true);
     when(vessel.getEventManager()).thenReturn(
       new ForwardingEventManager(simulationEventManager)

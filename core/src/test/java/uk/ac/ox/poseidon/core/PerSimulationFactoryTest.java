@@ -27,6 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
@@ -34,6 +35,7 @@ class PerSimulationFactoryTest {
 
   private static SimulationScope scopeOfNewSimulation() {
     final Simulation simulation = mock(Simulation.class);
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
     final SimulationScope scope = mock(SimulationScope.class);
     when(scope.getSimulation()).thenReturn(simulation);
     return scope;

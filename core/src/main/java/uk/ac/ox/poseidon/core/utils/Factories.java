@@ -61,8 +61,8 @@ public class Factories {
    * @see ListFactory
    */
   @SafeVarargs
-  public static <S extends Scope, C> ListFactory<S, C> listOf(
-    final Factory<S, ? extends C>... values
+  public static <S extends Scope, P> ListFactory<S, P> listOf(
+    final Factory<S, ? extends P>... values
   ) {
     return new ListFactory<>(ImmutableList.copyOf(values));
   }
@@ -161,8 +161,8 @@ public class Factories {
    *         {@code finish()}
    * @see FinalProcessFactory
    */
-  public static <C extends Steppable> FinalProcessFactory<C> finalProcess(
-    final Factory<? super SimulationScope, C> process
+  public static <P extends Steppable> FinalProcessFactory<P> finalProcess(
+    final Factory<? super SimulationScope, P> process
   ) {
     return new FinalProcessFactory<>(process);
   }

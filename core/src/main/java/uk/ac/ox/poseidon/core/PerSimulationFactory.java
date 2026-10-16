@@ -50,8 +50,8 @@ public class PerSimulationFactory<T> extends PerScopeFactory<
   private final Factory<? super SimulationScope, ? extends T> delegate;
 
   @Override
-  protected Object makeKey(final SimulationScope scope) {
-    return scope.getSimulation();
+  protected ProductStore productStoreFor(final SimulationScope scope) {
+    return scope.getSimulation().getProductStore();
   }
 
   @Override

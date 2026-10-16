@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -24,17 +24,25 @@ package uk.ac.ox.poseidon.agents.components;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.components.Factories.registeredVesselComponent;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 class RegisteredVesselComponentFactoryTest {
 
   private final Simulation simulation = mock(Simulation.class);
+
+  @BeforeEach
+  void giveTheMocksStores() {
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
+  }
 
   @Test
   void registersComponentWhenCreated() {
@@ -44,6 +52,8 @@ class RegisteredVesselComponentFactoryTest {
       registeredVesselComponent(scope -> "component", scope -> register);
 
     final Vessel vessel = mock(Vessel.class);
+
+    when(vessel.getProductStore()).thenReturn(new ProductStore());
     final VesselScope scope = new VesselScope(
       new SimulationScope(simulation),
       vessel

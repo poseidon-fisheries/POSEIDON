@@ -31,34 +31,30 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} that picks which of several factories to resolve
- * based on {@link #code} (e.g. a gear type or fleet segment code), falling back
- * to {@link #defaultFactory} if {@link #code} has no entry in
- * {@link #factories}. Built directly via its {@code @SuperBuilder}, not from
- * {@code Factories}.
+ * A {@link Factory} that picks which of several factories to resolve based on
+ * {@link #code} (e.g. a gear type or fleet segment code), falling back to
+ * {@link #defaultFactory} if {@link #code} has no entry in {@link #factories}.
+ * Built directly via its {@code @SuperBuilder}, not from {@code Factories}.
+ * <p>
+ * The vessel register sets {@link #code} from each row before asking for a
+ * vessel's component, so this factory keeps no product of its own: each call
+ * resolves the factory picked for the current code, whose product is kept in
+ * the vessel's store.
  */
 @Data
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
-
-  /* FIXME: Ultimately, I think that VesselScopeFactoriesByCode might broken because changing
-        the code associated with the "default factory" changes the key of the main factory.
-        Maybe that's fine because that code will always be the same as the code of the main
-        factory, but I'm still uneasy about it. Also, this is the main place where having
-        side effects (like putting things on the schedule) in factory (in this case the
-        default factory) can cause problems.
-    */
+@EqualsAndHashCode
+public class VesselScopeFactoriesByCode<P> implements Factory<VesselScope, P> {
 
   @Singular
   private Map<
     String,
-    ? extends Factory<? super VesselScope, ? extends C>
+    ? extends Factory<? super VesselScope, ? extends P>
   > factories;
 
-  private Factory<? super VesselScope, ? extends C> defaultFactory;
+  private Factory<? super VesselScope, ? extends P> defaultFactory;
   private String code;
 
   /**
@@ -71,10 +67,10 @@ public class VesselScopeFactoriesByCode<C> extends VesselScopeFactory<C> {
    *                                  {@link #code}
    */
   @Override
-  protected C newInstance(final VesselScope scope) {
+  public P get(final VesselScope scope) {
     checkNotNull(code, "Cannot create new instance unless code is set.");
     return Optional.ofNullable(factories.get(code))
-      .map(factory -> (C) factory.get(scope))
+      .map(factory -> (P) factory.get(scope))
       .or(() ->
         Optional.ofNullable(defaultFactory).map(factory -> factory.get(scope))
       )

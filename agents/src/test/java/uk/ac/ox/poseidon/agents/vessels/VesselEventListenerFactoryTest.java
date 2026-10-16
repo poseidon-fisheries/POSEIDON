@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
@@ -44,6 +45,7 @@ class VesselEventListenerFactoryTest {
   private static VesselScope scopeOfNewVessel() {
     final EventManager eventManager = new SimpleEventManager();
     final Vessel vessel = mock(Vessel.class);
+    when(vessel.getProductStore()).thenReturn(new ProductStore());
     when(vessel.getEventManager()).thenReturn(eventManager);
     final VesselScope scope = mock(VesselScope.class);
     when(scope.getVessel()).thenReturn(vessel);

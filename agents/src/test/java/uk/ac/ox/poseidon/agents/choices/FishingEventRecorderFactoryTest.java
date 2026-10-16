@@ -37,6 +37,7 @@ import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.util.function.Function;
 import java.util.function.ToDoubleBiFunction;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.PerVesselFactory;
@@ -45,6 +46,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
@@ -74,9 +76,15 @@ class FishingEventRecorderFactoryTest {
       exponentialMovingAverageOfBuckets(0.5)
     );
 
+  @BeforeEach
+  void giveTheMocksStores() {
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
+  }
+
   private static VesselScope scopeOfNewVessel(final Simulation simulation) {
     final EventManager eventManager = new SimpleEventManager();
     final Vessel vessel = mock(Vessel.class);
+    when(vessel.getProductStore()).thenReturn(new ProductStore());
     when(vessel.getEventManager()).thenReturn(eventManager);
     final VesselScope scope = mock(VesselScope.class);
     when(scope.getVessel()).thenReturn(vessel);

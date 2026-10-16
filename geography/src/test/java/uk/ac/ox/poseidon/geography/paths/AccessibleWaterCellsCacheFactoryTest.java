@@ -24,10 +24,13 @@ package uk.ac.ox.poseidon.geography.paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.geography.paths.Factories.accessibleWaterCellsCache;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -38,6 +41,12 @@ class AccessibleWaterCellsCacheFactoryTest {
 
   private final Simulation simulation = mock(Simulation.class);
   private final Simulation otherSimulation = mock(Simulation.class);
+
+  @BeforeEach
+  void giveTheMocksStores() {
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
+    when(otherSimulation.getProductStore()).thenReturn(new ProductStore());
+  }
 
   @Test
   void sharesCacheWhenGridsAreGlobal() {

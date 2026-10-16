@@ -45,17 +45,17 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @SuperBuilder(toBuilder = true)
 public class ListFactory<
   S extends Scope,
-  C
-> extends RelativeScopeFactory<S, List<C>> {
+  P
+> extends RelativeScopeFactory<S, List<P>> {
 
   @Singular
-  private final ImmutableList<Factory<? super S, ? extends C>> factories;
+  private final ImmutableList<Factory<? super S, ? extends P>> factories;
 
   @Override
-  protected List<C> newInstance(final S scope) {
+  protected List<P> newInstance(final S scope) {
     return factories
       .stream()
-      .map(f -> (C) f.get(scope))
+      .map(f -> (P) f.get(scope))
       .toList();
   }
 }

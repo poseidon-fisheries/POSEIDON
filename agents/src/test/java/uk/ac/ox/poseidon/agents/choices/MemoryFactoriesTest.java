@@ -38,17 +38,25 @@ import uk.ac.ox.poseidon.agents.vessels.PerVesselFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 class MemoryFactoriesTest {
 
-  private final Simulation simulation = mock(Simulation.class);
+  private final Simulation simulation = simulation();
   private final VesselScope scopeA = scopeOfNewVessel(simulation);
   private final VesselScope scopeB = scopeOfNewVessel(simulation);
 
+  private static Simulation simulation() {
+    final Simulation simulation = mock(Simulation.class);
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
+    return simulation;
+  }
+
   private static VesselScope scopeOfNewVessel(final Simulation simulation) {
     final Vessel vessel = mock(Vessel.class);
+    when(vessel.getProductStore()).thenReturn(new ProductStore());
     final VesselScope scope = mock(VesselScope.class);
     when(scope.getVessel()).thenReturn(vessel);
     when(scope.getSimulation()).thenReturn(simulation);
@@ -103,9 +111,7 @@ class MemoryFactoriesTest {
     final PerVesselFactory<Memory<String, Double>> perVesselFactory = perVessel(
       factory
     );
-    final VesselScope scopeInOtherSimulation = scopeOfNewVessel(
-      mock(Simulation.class)
-    );
+    final VesselScope scopeInOtherSimulation = scopeOfNewVessel(simulation());
 
     assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeB));
     assertThat(factory.get(scopeA)).isNotSameAs(
@@ -125,9 +131,7 @@ class MemoryFactoriesTest {
     final PerVesselFactory<
       KeyedMemory<String, String, Double>
     > perVesselFactory = perVessel(factory);
-    final VesselScope scopeInOtherSimulation = scopeOfNewVessel(
-      mock(Simulation.class)
-    );
+    final VesselScope scopeInOtherSimulation = scopeOfNewVessel(simulation());
 
     assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeB));
     assertThat(factory.get(scopeA)).isNotSameAs(

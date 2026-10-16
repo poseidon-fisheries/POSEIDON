@@ -31,11 +31,12 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.AgentScope;
 import uk.ac.ox.poseidon.core.AbstractFactory;
+import uk.ac.ox.poseidon.core.ProductStore;
 
 /**
  * An {@link AbstractFactory} base for behavior-tree {@link Task}s: subclasses
- * build the task in {@link #newInstance}, and this base keys resolved instances
- * by agent, so each agent gets its own task instance.
+ * build the task in {@link #newInstance}, and this base keeps it in the
+ * agent's store, so each agent gets its own task instance.
  *
  * @param <G> the type of agent the task runs against
  * @param <S> the agent scope type
@@ -52,9 +53,9 @@ public abstract class TaskFactory<
   T extends Task<G>
 > extends AbstractFactory<S, T> {
 
-  /** @return {@code scope}'s agent, so each agent gets its own resolved task */
+  /** @return {@code scope}'s agent's store, so each agent gets its own task */
   @Override
-  protected Object makeKey(final S scope) {
-    return scope.getAgent();
+  protected ProductStore productStoreFor(final S scope) {
+    return scope.getAgent().getProductStore();
   }
 }

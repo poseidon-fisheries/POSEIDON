@@ -40,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -57,6 +58,7 @@ class InitialPricesFactoryTest {
 
   @BeforeEach
   void setUp() {
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
     when(simulation.getTemporalSchedule()).thenReturn(schedule);
     when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 0, 0));
   }

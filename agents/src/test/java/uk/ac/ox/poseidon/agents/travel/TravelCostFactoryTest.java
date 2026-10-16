@@ -33,10 +33,12 @@ import java.time.Duration;
 import java.util.function.Function;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 
 class TravelCostFactoryTest {
@@ -49,8 +51,14 @@ class TravelCostFactoryTest {
   private final Function<Route, Money> routeCost = route ->
     Money.of(CurrencyUnit.of("EUR"), route.getDistanceInKm());
 
+  @BeforeEach
+  void giveTheMocksStores() {
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
+  }
+
   private static VesselScope scopeOfNewVessel(final Simulation simulation) {
     final Vessel vessel = mock(Vessel.class);
+    when(vessel.getProductStore()).thenReturn(new ProductStore());
     final VesselScope scope = mock(VesselScope.class);
     when(scope.getVessel()).thenReturn(vessel);
     when(scope.getSimulation()).thenReturn(simulation);

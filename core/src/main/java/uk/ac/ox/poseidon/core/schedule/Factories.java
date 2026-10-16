@@ -53,10 +53,10 @@ public class Factories {
    *         each scheduled once at its own date-time
    * @see ScheduledByDateTimeFactory
    */
-  public static <C extends Steppable> ScheduledByDateTimeFactory<C> scheduledByDateTime(
+  public static <P extends Steppable> ScheduledByDateTimeFactory<P> scheduledByDateTime(
     final Factory<
       ? super SimulationScope,
-      ? extends List<Entry<LocalDateTime, C>>
+      ? extends List<Entry<LocalDateTime, P>>
     > steppablesByDateTime
   ) {
     return new ScheduledByDateTimeFactory<>(steppablesByDateTime);
@@ -69,9 +69,9 @@ public class Factories {
    *         scheduled once
    * @see ScheduledOnceFactory
    */
-  public static <C extends Steppable> SimulationScopeFactory<C> scheduledOnce(
+  public static <P extends Steppable> SimulationScopeFactory<P> scheduledOnce(
     final Factory<? super SimulationScope, ? extends Temporal> dateTime,
-    final Factory<? super SimulationScope, ? extends C> steppable
+    final Factory<? super SimulationScope, ? extends P> steppable
   ) {
     return scheduledOnce(dateTime, steppable, DEFAULT_ORDERING);
   }
@@ -84,9 +84,9 @@ public class Factories {
    *         scheduled once
    * @see ScheduledOnceFactory
    */
-  public static <C extends Steppable> SimulationScopeFactory<C> scheduledOnce(
+  public static <P extends Steppable> SimulationScopeFactory<P> scheduledOnce(
     final Factory<? super SimulationScope, ? extends Temporal> dateTime,
-    final Factory<? super SimulationScope, ? extends C> steppable,
+    final Factory<? super SimulationScope, ? extends P> steppable,
     final int ordering
   ) {
     return new ScheduledOnceFactory<>(dateTime, steppable, ordering);
@@ -98,8 +98,8 @@ public class Factories {
    *         scheduled once at the start of the simulation
    * @see ScheduledOnceAtStartFactory
    */
-  public static <C extends Steppable> SimulationScopeFactory<C> scheduledOnceAtStart(
-    final Factory<? super SimulationScope, ? extends C> steppable
+  public static <P extends Steppable> SimulationScopeFactory<P> scheduledOnceAtStart(
+    final Factory<? super SimulationScope, ? extends P> steppable
   ) {
     return scheduledOnceAtStart(steppable, DEFAULT_ORDERING);
   }
@@ -111,8 +111,8 @@ public class Factories {
    *         scheduled once at the start of the simulation
    * @see ScheduledOnceAtStartFactory
    */
-  public static <C extends Steppable> SimulationScopeFactory<C> scheduledOnceAtStart(
-    final Factory<? super SimulationScope, ? extends C> steppable,
+  public static <P extends Steppable> SimulationScopeFactory<P> scheduledOnceAtStart(
+    final Factory<? super SimulationScope, ? extends P> steppable,
     final int ordering
   ) {
     return new ScheduledOnceAtStartFactory<>(steppable, ordering);
@@ -126,10 +126,10 @@ public class Factories {
    *         scheduled repeatedly
    * @see ScheduledRepeatingFactory
    */
-  public static <C extends Steppable> SimulationScopeFactory<C> scheduledRepeating(
+  public static <P extends Steppable> SimulationScopeFactory<P> scheduledRepeating(
     final Factory<? super SimulationScope, ? extends Temporal> dateTime,
     final Factory<? super SimulationScope, ? extends TemporalAmount> interval,
-    final Factory<? super SimulationScope, ? extends C> steppable
+    final Factory<? super SimulationScope, ? extends P> steppable
   ) {
     return scheduledRepeating(dateTime, interval, steppable, DEFAULT_ORDERING);
   }
@@ -143,10 +143,10 @@ public class Factories {
    *         scheduled repeatedly
    * @see ScheduledRepeatingFactory
    */
-  public static <C extends Steppable> SimulationScopeFactory<C> scheduledRepeating(
+  public static <P extends Steppable> SimulationScopeFactory<P> scheduledRepeating(
     final Factory<? super SimulationScope, ? extends Temporal> dateTime,
     final Factory<? super SimulationScope, ? extends TemporalAmount> interval,
-    final Factory<? super SimulationScope, ? extends C> steppable,
+    final Factory<? super SimulationScope, ? extends P> steppable,
     final int ordering
   ) {
     return new ScheduledRepeatingFactory<>(
@@ -165,9 +165,9 @@ public class Factories {
    *         date-time
    * @see ScheduledRepeatingFromStartFactory
    */
-  public static <C extends Steppable> SimulationScopeFactory<C> scheduledRepeatingFromStart(
+  public static <P extends Steppable> SimulationScopeFactory<P> scheduledRepeatingFromStart(
     final Factory<? super SimulationScope, ? extends TemporalAmount> interval,
-    final Factory<? super SimulationScope, ? extends C> steppable
+    final Factory<? super SimulationScope, ? extends P> steppable
   ) {
     return scheduledRepeatingFromStart(interval, steppable, DEFAULT_ORDERING);
   }
@@ -181,9 +181,9 @@ public class Factories {
    *         date-time
    * @see ScheduledRepeatingFromStartFactory
    */
-  public static <C extends Steppable> SimulationScopeFactory<C> scheduledRepeatingFromStart(
+  public static <P extends Steppable> SimulationScopeFactory<P> scheduledRepeatingFromStart(
     final Factory<? super SimulationScope, ? extends TemporalAmount> interval,
-    final Factory<? super SimulationScope, ? extends C> steppable,
+    final Factory<? super SimulationScope, ? extends P> steppable,
     final int ordering
   ) {
     return new ScheduledRepeatingFromStartFactory<>(

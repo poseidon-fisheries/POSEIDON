@@ -55,6 +55,8 @@ public class Simulation extends SimState {
   private final TemporalSchedule temporalSchedule;
   private final UUID id;
   private final List<Steppable> finalProcesses = new ArrayList<>();
+  /** The products of the simulation-level factories built for this run. */
+  private final ProductStore productStore = new ProductStore();
   private boolean started = false;
   /**
    * The resolved components, keyed by the name they were registered under in
@@ -93,12 +95,13 @@ public class Simulation extends SimState {
   }
 
   /**
-   * Runs every registered {@link #addFinalProcess} process, then delegates to
-   * {@code super}.
+   * Runs every registered {@link #addFinalProcess} process, ends this
+   * simulation's {@link ProductStore}, then delegates to {@code super}.
    */
   @Override
   public void finish() {
     finalProcesses.forEach(process -> process.step(this));
+    productStore.end();
     super.finish();
   }
 

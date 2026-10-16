@@ -38,8 +38,9 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * {@link AccessibleWaterCellsCache}, built via
  * {@link Factories#accessibleWaterCellsCache(Factory, Factory)}. Its fields are
  * never read when building the cache: as in {@link DefaultPathCacheFactory},
- * they only shape the factory's identity and scope, so caches are shared
- * exactly when the grids they describe are. Don't drop them.
+ * they only give the factory its scope and make derivation copy it when a grid
+ * changes, so caches are shared exactly when the grids they describe are.
+ * Don't drop them.
  */
 @Getter
 @ToString

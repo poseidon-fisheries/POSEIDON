@@ -23,7 +23,15 @@
 package uk.ac.ox.poseidon.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.ac.ox.poseidon.core.ProductStoreTest.isCollected;
+import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -34,7 +42,10 @@ import uk.ac.ox.poseidon.core.utils.ObjectFactory;
  * Global products are built once and shared by every simulation of a
  * scenario, and by scenarios derived from it that keep the same factory, so
  * that expensive read-only products and pure caches (grids, path caches) are
- * not rebuilt for every run.
+ * not rebuilt for every run. Sharing is by identity: a copy of a factory, as
+ * derivation makes, builds its own product, however equal it is to the
+ * original. A global product is kept by the factory that built it, so a
+ * dropped factory goes even while its inputs live on.
  */
 class GlobalProductSharingTest {
 
@@ -87,6 +98,36 @@ class GlobalProductSharingTest {
     }
   }
 
+  @Test
+  void aCopyOfAGlobalFactoryBuildsItsOwnProduct() {
+    final NewObjectGlobalFactory factory = new NewObjectGlobalFactory();
+    final NewObjectGlobalFactory copy = factory.toBuilder().build();
+
+    assertThat(copy).isEqualTo(factory);
+    assertThat(copy.get(GLOBAL_SCOPE)).isNotSameAs(factory.get(GLOBAL_SCOPE));
+  }
+
+  @Test
+  void aRelativeFactoryOverAGlobalInputCanBeCollectedWhileTheInputLives()
+    throws InterruptedException {
+    final NewObjectGlobalFactory input = new NewObjectGlobalFactory();
+    final WeakReference<NewObjectRelativeFactory<Scope>> factory = builtOver(
+      input
+    );
+
+    assertThat(isCollected(factory)).isTrue();
+    Reference.reachabilityFence(input);
+  }
+
+  private static WeakReference<NewObjectRelativeFactory<Scope>> builtOver(
+    final NewObjectGlobalFactory input
+  ) {
+    final NewObjectRelativeFactory<Scope> factory =
+      new NewObjectRelativeFactory<>(input);
+    factory.get(GLOBAL_SCOPE);
+    return new WeakReference<>(factory);
+  }
+
   private static Scenario scenarioWith(
     final Factory<? super SimulationScope, ?> factory
   ) {
@@ -98,6 +139,8 @@ class GlobalProductSharingTest {
 
   static final class Product {}
 
+  @NoArgsConstructor
+  @SuperBuilder(toBuilder = true)
   static final class NewObjectGlobalFactory
     extends GlobalScopeFactory<Product>
   {
@@ -114,6 +157,21 @@ class GlobalProductSharingTest {
 
     @Override
     protected Product newInstance(final SimulationScope scope) {
+      return new Product();
+    }
+  }
+
+  @Getter
+  @AllArgsConstructor
+  static final class NewObjectRelativeFactory<S extends Scope> extends RelativeScopeFactory<
+    S,
+    Product
+  > {
+
+    private final Factory<? super S, ?> input;
+
+    @Override
+    protected Product newInstance(final S scope) {
       return new Product();
     }
   }

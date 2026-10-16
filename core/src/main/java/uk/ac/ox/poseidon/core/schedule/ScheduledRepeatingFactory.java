@@ -47,7 +47,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ScheduledRepeatingFactory<C extends Steppable> extends SimulationScopeFactory<C> {
+public class ScheduledRepeatingFactory<P extends Steppable> extends SimulationScopeFactory<P> {
 
   private final Factory<
     ? super SimulationScope,
@@ -57,12 +57,12 @@ public class ScheduledRepeatingFactory<C extends Steppable> extends SimulationSc
     ? super SimulationScope,
     ? extends TemporalAmount
   > interval;
-  private final Factory<? super SimulationScope, ? extends C> steppable;
+  private final Factory<? super SimulationScope, ? extends P> steppable;
   private final int ordering;
 
   @Override
-  protected C newInstance(final SimulationScope scope) {
-    final C steppableObject = steppable.get(scope);
+  protected P newInstance(final SimulationScope scope) {
+    final P steppableObject = steppable.get(scope);
     scope
       .getSimulation()
       .getTemporalSchedule()

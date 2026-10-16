@@ -27,7 +27,7 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 /**
  * The core declarative-configuration-to-runtime-object producer of the
  * Factory/Scenario pattern (see {@code docs/agents/architecture.md}): resolves
- * to a {@code C} given a {@code Scope}. Most simulation components are
+ * to a {@code P} given a {@code Scope}. Most simulation components are
  * expressed as a {@link Factory} implementation (typically extending
  * {@link AbstractFactory}) plus a plain value/config class, so scenarios can be
  * built either programmatically or deserialized from YAML. Scenario-building
@@ -36,12 +36,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * framework's job at simulation-start time.
  *
  * @param <S> the scope this factory resolves against
- * @param <C> the type of object produced
+ * @param <P> the type of the product
  */
-public interface Factory<S extends Scope, C> {
+public interface Factory<S extends Scope, P> {
   /**
    * @param scope the scope to resolve this factory against
-   * @return the resolved object, of type {@code C}
+   * @return the resolved object, of type {@code P}
    */
-  C get(S scope);
+  P get(S scope);
 }

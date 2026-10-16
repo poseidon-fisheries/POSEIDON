@@ -36,6 +36,7 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 class BuilderConstructorTest {
@@ -131,14 +132,14 @@ class BuilderConstructorTest {
   }
 
   @SuperBuilder
-  public abstract static class TestFactory<C> extends AbstractFactory<
+  public abstract static class TestFactory<P> extends AbstractFactory<
     Scope,
-    C
+    P
   > {
 
     @Override
-    protected Object makeKey(final Scope scope) {
-      return scope;
+    protected ProductStore productStoreFor(final Scope scope) {
+      return globalStore();
     }
 
     @Override

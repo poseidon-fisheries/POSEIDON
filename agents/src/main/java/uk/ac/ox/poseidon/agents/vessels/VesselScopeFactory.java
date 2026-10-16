@@ -29,6 +29,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ProductStore;
 
 /**
  * A {@link Factory} whose produced object is cached per {@link Vessel} — one
@@ -42,14 +43,14 @@ import uk.ac.ox.poseidon.core.Factory;
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class VesselScopeFactory<C> extends AbstractFactory<
+public abstract class VesselScopeFactory<P> extends AbstractFactory<
   VesselScope,
-  C
+  P
 > {
 
   @Override
-  protected Object makeKey(final VesselScope scope) {
-    return scope.getVessel();
+  protected ProductStore productStoreFor(final VesselScope scope) {
+    return scope.getVessel().getProductStore();
   }
 
   @Override

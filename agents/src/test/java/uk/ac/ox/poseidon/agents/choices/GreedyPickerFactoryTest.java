@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
@@ -45,12 +46,14 @@ class GreedyPickerFactoryTest {
 
   private static Simulation simulation() {
     final Simulation simulation = mock(Simulation.class);
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
     simulation.random = new MersenneTwisterFast(0);
     return simulation;
   }
 
   private static VesselScope scopeOfNewVessel(final Simulation simulation) {
     final Vessel vessel = mock(Vessel.class);
+    when(vessel.getProductStore()).thenReturn(new ProductStore());
     final VesselScope scope = mock(VesselScope.class);
     when(scope.getVessel()).thenReturn(vessel);
     when(scope.getSimulation()).thenReturn(simulation);

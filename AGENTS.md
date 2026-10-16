@@ -47,7 +47,7 @@ core  →  io  →  geography  →  biology  →  agents  →  gui
                             calibration, io, gui, regulations, biology  →  examples
 ```
 
-- **core** — Foundational abstractions used by everything else: `Simulation` (extends MASON's `SimState`), `Scenario` (declarative, serializable simulation configuration), the `Factory<Scope, C>` pattern, `Scope`/`SimulationScope` (dependency-scoping for factories), `TemporalSchedule`. Depends on MASON (vendored jar in `core/libs/mason`), units-of-measurement libs (Indriya/JSR-385), fastutil.
+- **core** — Foundational abstractions used by everything else: `Simulation` (extends MASON's `SimState`), `Scenario` (declarative, serializable simulation configuration), the `Factory<Scope, P>` pattern, `Scope`/`SimulationScope` (dependency-scoping for factories), `TemporalSchedule`. Depends on MASON (vendored jar in `core/libs/mason`), units-of-measurement libs (Indriya/JSR-385), fastutil.
 - **io** — YAML scenario (de)serialization (`ScenarioLoader`, `ScenarioWriter`, backed by SnakeYAML) and tabular data I/O (Tablesaw).
 - **geography** — Spatial primitives and grids: coordinates, envelopes, bathymetry, ports, spatial allocators — built on JTS and GeoTools.
 - **biology** — Biological/ecological model: species, biomass, "fisheable" content on the grid.

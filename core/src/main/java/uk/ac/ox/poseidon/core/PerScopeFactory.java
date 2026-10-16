@@ -29,11 +29,11 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 /**
  * A factory that builds its delegate's product once per scope of its own (once
  * per simulation, once per vessel...), whatever scope the delegate itself has.
- * Subclasses fix that scope through {@link #makeKey} and {@link #scopeClass},
- * as the {@code *ScopeFactory} classes do.
+ * Subclasses fix that scope through {@link #productStoreFor} and
+ * {@link #scopeClass}, as the {@code *ScopeFactory} classes do.
  * <p>
  * Each product is built by calling the delegate's own
- * {@link AbstractFactory#newInstance} directly, bypassing the delegate's cache:
+ * {@link AbstractFactory#newInstance} directly, bypassing the delegate's store:
  * wrapping a global or simulation-scoped delegate does give each scope its own
  * instance, and leaves the instance the delegate shares elsewhere untouched. If
  * the delegate is not an {@link AbstractFactory} (e.g. a lambda in a test), it
@@ -47,33 +47,33 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
  * are themselves.
  *
  * @param <S> the scope this factory resolves against
- * @param <C> the type of object produced
+ * @param <P> the type of the product
  */
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public abstract class PerScopeFactory<
   S extends Scope,
-  C
-> extends AbstractFactory<S, C> {
+  P
+> extends AbstractFactory<S, P> {
 
   /** @return the factory whose product is built once per scope */
-  protected abstract Factory<? super S, ? extends C> getDelegate();
+  protected abstract Factory<? super S, ? extends P> getDelegate();
 
-  /** Builds the delegate's product, bypassing the delegate's cache. */
+  /** Builds the delegate's product, bypassing the delegate's store. */
   @Override
-  protected final C newInstance(final S scope) {
-    final Factory<? super S, ? extends C> delegate = getDelegate();
+  protected final P newInstance(final S scope) {
+    final Factory<? super S, ? extends P> delegate = getDelegate();
     return delegate instanceof final AbstractFactory<?, ?> abstractFactory
       ? newInstanceOf(abstractFactory, scope)
       : delegate.get(scope);
   }
 
   @SuppressWarnings("unchecked")
-  private static <S extends Scope, C> C newInstanceOf(
+  private static <S extends Scope, P> P newInstanceOf(
     final AbstractFactory<?, ?> factory,
     final S scope
   ) {
-    return ((AbstractFactory<? super S, ? extends C>) factory).newInstance(
+    return ((AbstractFactory<? super S, ? extends P>) factory).newInstance(
       scope
     );
   }

@@ -210,8 +210,8 @@ public final class Scenario {
    * @param componentName the component's name, as registered in
    *                      {@link #components}
    * @return the named component's factory, unchecked-cast to a
-   *         {@code Factory<SimulationScope, C>}. The type has no wildcards so
-   *         that the compiler can infer {@code C}, and the scope of a generic
+   *         {@code Factory<SimulationScope, P>}. The type has no wildcards so
+   *         that the compiler can infer {@code P}, and the scope of a generic
    *         factory method given the component, from where the component is
    *         passed: with wildcards, callers need explicit type arguments.
    *         Narrowing the factory's scope to {@link SimulationScope} is safe,
@@ -220,8 +220,8 @@ public final class Scenario {
    *                                  name
    */
   @SuppressWarnings("unchecked")
-  public <C> Factory<SimulationScope, C> component(final String componentName) {
-    return (Factory<SimulationScope, C>) component(
+  public <P> Factory<SimulationScope, P> component(final String componentName) {
+    return (Factory<SimulationScope, P>) component(
       componentName,
       Factory.class
     );

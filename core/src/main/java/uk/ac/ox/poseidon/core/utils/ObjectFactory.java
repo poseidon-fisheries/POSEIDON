@@ -41,12 +41,12 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ObjectFactory<C> extends GlobalScopeFactory<C> {
+public class ObjectFactory<P> extends GlobalScopeFactory<P> {
 
-  private final C value;
+  private final P value;
 
   @Override
-  protected C newInstance(final Scope scope) {
+  protected P newInstance(final Scope scope) {
     return value;
   }
 }

@@ -187,11 +187,11 @@ public class FleetFromVesselRegisterFactory
     return fleet;
   }
 
-  <C> Function<Vessel, C> makeFactoryFunction(
+  <P> Function<Vessel, P> makeFactoryFunction(
     final SimulationScope scope,
     final Map<String, Object> valuesFromRow,
     final ImmutableMap<String, String> mappings,
-    final Factory<? super VesselScope, ? extends C> factory
+    final Factory<? super VesselScope, ? extends P> factory
   ) {
     if (factory == null) {
       return __ -> null;
@@ -199,9 +199,8 @@ public class FleetFromVesselRegisterFactory
       return vessel -> {
         // The mapped values are set on this factory (and the factories it
         // holds) only for the time of the call, then the original values are
-        // put back: factories cache their products by hash code, which depends
-        // on these values, and other simulations of the same scenario may be
-        // using this factory at the same time.
+        // put back: other simulations of the same scenario may be using this
+        // factory at the same time.
         synchronized (this) {
           final Map<String, Object> originalValues = new LinkedHashMap<>();
           mappings

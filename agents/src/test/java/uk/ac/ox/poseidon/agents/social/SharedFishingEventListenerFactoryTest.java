@@ -32,6 +32,7 @@ import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
@@ -39,6 +40,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
@@ -62,8 +64,15 @@ class SharedFishingEventListenerFactoryTest {
   private final SharedFishingEventListenerFactory<RecordingListener> factory =
     sharedFishingEventListener(listener, fishingEventSharer);
 
+  @BeforeEach
+  void giveTheMocksStores() {
+    when(a.getProductStore()).thenReturn(new ProductStore());
+    when(b.getProductStore()).thenReturn(new ProductStore());
+  }
+
   private static Simulation simulation() {
     final Simulation simulation = mock(Simulation.class);
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
     when(simulation.getEventManager()).thenReturn(new SimpleEventManager());
     return simulation;
   }

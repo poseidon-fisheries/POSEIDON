@@ -30,8 +30,10 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.geography.paths.Factories.pathFinder;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
@@ -43,6 +45,12 @@ class DefaultPathFinderFactoryTest {
 
   private final Simulation simulation = mock(Simulation.class);
   private final Simulation otherSimulation = mock(Simulation.class);
+
+  @BeforeEach
+  void giveTheMocksStores() {
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
+    when(otherSimulation.getProductStore()).thenReturn(new ProductStore());
+  }
 
   @Test
   void createsOnePathFinderPerSimulation() {

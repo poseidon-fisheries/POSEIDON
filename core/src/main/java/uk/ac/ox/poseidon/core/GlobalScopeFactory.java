@@ -27,18 +27,18 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
- * A {@link Factory} whose produced object is cached under the single, global
- * {@link Scope#GLOBAL_SCOPE} key regardless of the scope it's resolved against
- * — so one instance is shared across every simulation built from a scenario.
- * Use for components with no per-simulation state.
+ * A {@link Factory} whose produced object is kept in the factory's own store,
+ * regardless of the scope it's resolved against — so one instance is shared
+ * across every simulation that reaches this factory object. Use for components
+ * with no per-simulation state.
  */
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
-public abstract class GlobalScopeFactory<C> extends AbstractFactory<Scope, C> {
+public abstract class GlobalScopeFactory<P> extends AbstractFactory<Scope, P> {
 
   @Override
-  protected Object makeKey(final Scope scope) {
-    return Scope.GLOBAL_SCOPE;
+  protected ProductStore productStoreFor(final Scope scope) {
+    return globalStore();
   }
 
   @Override

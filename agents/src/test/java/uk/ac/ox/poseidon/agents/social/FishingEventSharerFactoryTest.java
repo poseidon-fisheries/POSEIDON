@@ -36,6 +36,7 @@ import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
@@ -58,12 +59,14 @@ class FishingEventSharerFactoryTest {
 
   private static Simulation simulation(final EventManager eventManager) {
     final Simulation simulation = mock(Simulation.class);
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
     when(simulation.getEventManager()).thenReturn(eventManager);
     return simulation;
   }
 
   private static Vessel vessel(final EventManager simulationEventManager) {
     final Vessel vessel = mock(Vessel.class);
+    when(vessel.getProductStore()).thenReturn(new ProductStore());
     when(vessel.getEventManager()).thenReturn(
       new ForwardingEventManager(simulationEventManager)
     );

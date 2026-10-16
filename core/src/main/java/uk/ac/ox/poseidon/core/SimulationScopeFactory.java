@@ -27,22 +27,22 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A {@link Factory} whose produced object is cached per {@link Simulation}
- * instance — one instance per simulation run, shared by every resolution within
+ * A {@link Factory} whose produced object is kept in its {@link Simulation}'s
+ * store — one instance per simulation run, shared by every resolution within
  * that run, but never shared across different runs. Use for components that
  * depend on a live simulation's state (its RNG, its
  * {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}, etc.).
  */
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor
-public abstract class SimulationScopeFactory<C> extends AbstractFactory<
+public abstract class SimulationScopeFactory<P> extends AbstractFactory<
   SimulationScope,
-  C
+  P
 > {
 
   @Override
-  protected Object makeKey(final SimulationScope scope) {
-    return scope.getSimulation();
+  protected ProductStore productStoreFor(final SimulationScope scope) {
+    return scope.getSimulation().getProductStore();
   }
 
   @Override
