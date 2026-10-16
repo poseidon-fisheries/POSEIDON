@@ -82,6 +82,16 @@ class PeterSnapperScenarioTest {
     );
   }
 
+  // Stored from a run, so that a change that was meant to keep behaviour
+  // and does not fails here. A change meant to alter the draws replaces
+  // these values and says why.
+  @Test
+  void landingsMatchTheBaseline() {
+    assertThat(landingsForAYear(new PeterSnapperScenario().get())).isEqualTo(
+      Map.of(1, 2.108111508988373E7)
+    );
+  }
+
   @Test
   void simulationsRunInParallelGiveTheirSequentialLandings() {
     final Scenario scenario = new PeterSnapperScenario().get();
