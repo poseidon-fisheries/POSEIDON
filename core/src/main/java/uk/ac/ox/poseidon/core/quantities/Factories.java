@@ -33,7 +33,7 @@ import javax.measure.quantity.Speed;
 import javax.measure.quantity.Volume;
 import si.uom.quantity.VolumetricFlowRate;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for JSR-385 {@link Quantity} values (e.g. mass, volume), and for

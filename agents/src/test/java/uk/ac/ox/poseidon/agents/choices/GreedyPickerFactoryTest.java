@@ -35,14 +35,23 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.ProductStore;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 
 class GreedyPickerFactoryTest {
 
   private final Simulation simulation = simulation();
-  private final VesselScope scopeA = scopeOfNewVessel(simulation);
-  private final VesselScope scopeB = scopeOfNewVessel(simulation);
+  private final Vessel vesselA = newVessel();
+  private final VesselScope scopeA = new VesselScope(
+    new SimulationScope(simulation),
+    vesselA
+  );
+  private final Vessel vesselB = newVessel();
+  private final VesselScope scopeB = new VesselScope(
+    new SimulationScope(simulation),
+    vesselB
+  );
 
   private static Simulation simulation() {
     final Simulation simulation = mock(Simulation.class);
@@ -51,13 +60,10 @@ class GreedyPickerFactoryTest {
     return simulation;
   }
 
-  private static VesselScope scopeOfNewVessel(final Simulation simulation) {
+  private static Vessel newVessel() {
     final Vessel vessel = mock(Vessel.class);
     when(vessel.getProductStore()).thenReturn(new ProductStore());
-    final VesselScope scope = mock(VesselScope.class);
-    when(scope.getVessel()).thenReturn(vessel);
-    when(scope.getSimulation()).thenReturn(simulation);
-    return scope;
+    return vessel;
   }
 
   private static class OptionValuesFactory

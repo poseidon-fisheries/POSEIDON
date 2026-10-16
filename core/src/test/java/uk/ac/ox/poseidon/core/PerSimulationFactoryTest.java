@@ -28,8 +28,6 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.ProductStore;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 class PerSimulationFactoryTest {
 

@@ -26,7 +26,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Predicate;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for {@link Allocator}s: weight functions used to place things on a

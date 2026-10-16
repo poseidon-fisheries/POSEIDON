@@ -28,7 +28,7 @@ import static uk.ac.ox.poseidon.agents.travel.Factories.routeProperty;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Scenario;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 

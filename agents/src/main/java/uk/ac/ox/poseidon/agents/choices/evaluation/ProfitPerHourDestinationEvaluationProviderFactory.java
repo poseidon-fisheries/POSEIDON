@@ -32,7 +32,7 @@ import lombok.experimental.SuperBuilder;
 import org.joda.money.CurrencyUnit;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of

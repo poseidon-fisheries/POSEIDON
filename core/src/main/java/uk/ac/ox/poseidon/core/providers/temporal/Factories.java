@@ -31,9 +31,9 @@ import java.time.temporal.TemporalAmount;
 import java.util.function.Supplier;
 import uk.ac.ox.poseidon.core.CurrentDateTimeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.StartingDateTimeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.core.time.DurationFactory;
 import uk.ac.ox.poseidon.core.time.PeriodFactory;
 

@@ -46,11 +46,12 @@ import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.SchedulingFactory;
+import uk.ac.ox.poseidon.core.SchedulingScope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} that turns a vessel register table (one row
+ * A {@link SchedulingFactory} that turns a vessel register table (one row
  * per vessel activation/deactivation/modification event) into a {@link Fleet},
  * scheduling every row as a {@link FleetEvent} at its own event date. Built
  * directly via its {@code @SuperBuilder}, not from {@code Factories}, given how
@@ -61,9 +62,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FleetFromVesselRegisterFactory
-  extends SimulationScopeFactory<Fleet>
-{
+public class FleetFromVesselRegisterFactory extends SchedulingFactory<Fleet> {
 
   /** The vessel register table. */
   private Factory<? super SimulationScope, ? extends Table> data;
@@ -168,7 +167,7 @@ public class FleetFromVesselRegisterFactory
    *         {@link #data} scheduled at that row's event date
    */
   @Override
-  protected Fleet newInstance(final SimulationScope scope) {
+  protected Fleet newInstance(final SchedulingScope scope) {
     final Fleet fleet = this.fleet.get(scope);
     final List<Entry<LocalDateTime, FleetEvent>> eventByDateTime = data
       .get(scope)
@@ -180,10 +179,7 @@ public class FleetFromVesselRegisterFactory
         return entry(dateTime, makeUpdate(scope, dateTime, row, fleet));
       })
       .toList();
-    scope
-      .getSimulation()
-      .getTemporalSchedule()
-      .scheduleByDateTime(eventByDateTime);
+    scope.getSchedule().scheduleByDateTime(eventByDateTime);
     return fleet;
   }
 

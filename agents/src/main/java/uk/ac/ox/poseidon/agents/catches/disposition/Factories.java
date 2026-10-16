@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.function.Function;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for the steps of a catch's {@link DispositionProcess}

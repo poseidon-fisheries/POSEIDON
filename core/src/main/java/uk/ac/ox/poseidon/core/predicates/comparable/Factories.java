@@ -26,7 +26,7 @@ import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import java.util.function.Supplier;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for {@link java.util.function.Predicate}s that compare a tested

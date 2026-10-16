@@ -30,7 +30,7 @@ import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventPrope
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 class FishingEventPropertyFactoryTest {
 

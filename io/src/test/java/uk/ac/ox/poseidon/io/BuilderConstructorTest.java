@@ -37,7 +37,7 @@ import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ProductStore;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 class BuilderConstructorTest {
 

@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.core;
 
-import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
+import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 
 import com.google.common.collect.ImmutableMap;
@@ -32,8 +32,6 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.*;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * An immutable-by-convention (Lombok {@link Builder}), declarative bag of named

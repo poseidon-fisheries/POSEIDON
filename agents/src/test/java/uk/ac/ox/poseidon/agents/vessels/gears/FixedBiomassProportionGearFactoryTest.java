@@ -35,7 +35,7 @@ import java.time.Duration;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 
 class FixedBiomassProportionGearFactoryTest {
 

@@ -27,7 +27,7 @@ import static uk.ac.ox.poseidon.biology.species.extractors.Factories.speciesProp
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 class SpeciesPropertyFactoryTest {
 

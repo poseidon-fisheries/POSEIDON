@@ -30,11 +30,12 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.SchedulingFactory;
+import uk.ac.ox.poseidon.core.SchedulingScope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} that schedules the resolved steppable to run
+ * A {@link SchedulingFactory} that schedules the resolved steppable to run
  * repeatedly, at a fixed ordering, starting at the simulation's starting
  * date-time and recurring at a resolved interval, and returns that same
  * steppable. No separate plain component class here: scheduling is a side
@@ -46,7 +47,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ScheduledRepeatingFromStartFactory<P extends Steppable> extends SimulationScopeFactory<P> {
+public class ScheduledRepeatingFromStartFactory<P extends Steppable> extends SchedulingFactory<P> {
 
   private final Factory<
     ? super SimulationScope,
@@ -56,13 +57,12 @@ public class ScheduledRepeatingFromStartFactory<P extends Steppable> extends Sim
   private final int ordering;
 
   @Override
-  protected P newInstance(final SimulationScope scope) {
+  protected P newInstance(final SchedulingScope scope) {
     final P steppableObject = steppable.get(scope);
     scope
-      .getSimulation()
-      .getTemporalSchedule()
+      .getSchedule()
       .scheduleRepeating(
-        scope.getSimulation().getTemporalSchedule().getStartingDateTime(),
+        scope.getSchedule().getStartingDateTime(),
         ordering,
         steppableObject,
         interval.get(scope)

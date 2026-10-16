@@ -24,8 +24,8 @@ package uk.ac.ox.poseidon.examples.petersnapper;
 
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * A {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} counterpart of

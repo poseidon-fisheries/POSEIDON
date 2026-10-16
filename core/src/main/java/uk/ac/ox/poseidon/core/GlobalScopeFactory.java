@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.core;
 
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * A {@link Factory} whose produced object is kept in the factory's own store,

@@ -37,7 +37,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * A {@link Factory} whose effective scope is derived from its own

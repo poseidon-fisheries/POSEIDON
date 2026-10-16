@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.core.providers.math;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that compute

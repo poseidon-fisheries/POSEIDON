@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 
 class ScheduledByDateTimeFactoryTest {
 

@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.regulations;
 import com.google.common.collect.ImmutableList;
 import java.util.function.Predicate;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for {@link Regulations} rules: the two base rules,

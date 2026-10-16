@@ -30,13 +30,14 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.SchedulingFactory;
+import uk.ac.ox.poseidon.core.SchedulingScope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link Fleet}, built via
+ * A {@link SchedulingFactory} counterpart of {@link Fleet}, built via
  * {@link Factories#fleet}.
  */
 @Getter
@@ -44,7 +45,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class FleetFactory extends SimulationScopeFactory<Fleet> {
+public class FleetFactory extends SchedulingFactory<Fleet> {
 
   private final Factory<
     ? super SimulationScope,
@@ -61,9 +62,9 @@ public class FleetFactory extends SimulationScopeFactory<Fleet> {
   > eventManager;
 
   @Override
-  protected Fleet newInstance(final SimulationScope scope) {
+  protected Fleet newInstance(final SchedulingScope scope) {
     return new Fleet(
-      scope.getSimulation().getTemporalSchedule(),
+      scope.getSchedule(),
       eventManager.get(scope),
       vesselField.get(scope),
       portGrid.get(scope),

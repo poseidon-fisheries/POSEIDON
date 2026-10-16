@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 @SuppressWarnings("unchecked")

@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.core;
 
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * A {@link Factory} whose produced object is kept in its {@link Simulation}'s
@@ -43,6 +42,19 @@ public abstract class SimulationScopeFactory<P> extends AbstractFactory<
   @Override
   protected ProductStore productStoreFor(final SimulationScope scope) {
     return scope.getSimulation().getProductStore();
+  }
+
+  /**
+   * Gives the build a plain {@link SimulationScope}, whatever narrower scope
+   * the product is asked for with, so that what a narrower scope offers, such
+   * as a vessel or the simulation's schedule, never reaches a
+   * simulation-level build.
+   */
+  @Override
+  protected SimulationScope scopeForBuild(final SimulationScope scope) {
+    return scope.getClass() == SimulationScope.class
+      ? scope
+      : new SimulationScope(scope);
   }
 
   @Override

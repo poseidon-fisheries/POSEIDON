@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.Listener;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * Registers the vessel's {@link #listener} with the {@link FishingEventSharer},

@@ -32,11 +32,12 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.SchedulingFactory;
+import uk.ac.ox.poseidon.core.SchedulingScope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 
 /**
- * A {@link SimulationScopeFactory} that schedules each resolved steppable to
+ * A {@link SchedulingFactory} that schedules each resolved steppable to
  * run once at its own date-time, via
  * {@link TemporalSchedule#scheduleByDateTime}, and returns those same dated
  * steppables. Steppables dated before the simulation's start all run at the
@@ -49,7 +50,7 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ScheduledByDateTimeFactory<P extends Steppable> extends SimulationScopeFactory<
+public class ScheduledByDateTimeFactory<P extends Steppable> extends SchedulingFactory<
   List<Entry<LocalDateTime, P>>
 > {
 
@@ -60,12 +61,12 @@ public class ScheduledByDateTimeFactory<P extends Steppable> extends SimulationS
 
   @Override
   protected List<Entry<LocalDateTime, P>> newInstance(
-    final SimulationScope scope
+    final SchedulingScope scope
   ) {
     final List<Entry<LocalDateTime, P>> steppables = steppablesByDateTime.get(
       scope
     );
-    scope.getSimulation().getTemporalSchedule().scheduleByDateTime(steppables);
+    scope.getSchedule().scheduleByDateTime(steppables);
     return steppables;
   }
 }

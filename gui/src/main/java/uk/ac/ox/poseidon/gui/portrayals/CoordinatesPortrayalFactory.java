@@ -33,8 +33,8 @@ import sim.portrayal.LocationWrapper;
 import sim.portrayal.SimplePortrayal2D;
 import sim.portrayal.grid.ObjectGridPortrayal2D;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 

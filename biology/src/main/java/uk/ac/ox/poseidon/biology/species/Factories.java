@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for {@link Species} and the collections built from them: standalone

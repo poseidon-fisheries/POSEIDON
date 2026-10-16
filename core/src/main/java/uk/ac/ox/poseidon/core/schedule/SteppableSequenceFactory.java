@@ -31,8 +31,8 @@ import lombok.experimental.SuperBuilder;
 import sim.engine.Sequence;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
  * A {@link SimulationScopeFactory} for a MASON {@link Sequence} that runs the

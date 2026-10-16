@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFactory;
 
 class BathymetricGridFromElevationValuesFactoryTest {

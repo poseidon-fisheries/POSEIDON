@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.function.Supplier;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
 import uk.ac.ox.poseidon.geography.utils.LonLatTable;
 

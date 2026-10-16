@@ -30,9 +30,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.function.Supplier;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.predicates.comparable.GreaterThanFactory;
 import uk.ac.ox.poseidon.core.predicates.comparable.LessThanFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * Factories for {@link java.util.function.Predicate}s that compare a tested

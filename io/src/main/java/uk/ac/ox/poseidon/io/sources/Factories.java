@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.io.sources;
 
 import java.nio.file.Path;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for {@link DataSource}s: sources of readable character data backed

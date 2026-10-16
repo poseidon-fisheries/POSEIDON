@@ -20,19 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.scopes;
+package uk.ac.ox.poseidon.core;
 
 import java.lang.ref.WeakReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import sim.engine.Steppable;
-import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.Listener;
 
 /**
  * A {@link Scope} tied to a single {@link Simulation} run, used by factories
  * whose output must not be shared across simulations (see
- * {@code SimulationScopeFactory}). Holds the simulation via a
+ * {@code SimulationScopeFactory}). It offers a build the registrations it
+ * may make, and not the simulation itself. Holds the simulation via a
  * {@link WeakReference} so a scope kept alive elsewhere doesn't itself keep a
  * finished simulation from being garbage-collected. In tests, keep the
  * simulation in a field: one that only the scope references, such as a local
@@ -62,10 +62,15 @@ public class SimulationScope extends Scope {
   }
 
   /**
+   * Package-private: a build never reads the simulation. It takes the
+   * simulation's services (its random number generator, clock, event manager
+   * and run id) as inputs, whose factories, in this package, are the only
+   * builds that read it.
+   *
    * @return the scoped simulation, or {@code null} if it has already been
    *         garbage-collected.
    */
-  public Simulation getSimulation() {
+  Simulation getSimulation() {
     return simulation.get();
   }
 

@@ -27,7 +27,7 @@ import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble
 import java.util.function.DoubleSupplier;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for {@link uk.ac.ox.poseidon.geography.allocators.Allocator}s over

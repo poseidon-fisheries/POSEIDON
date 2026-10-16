@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.core.ProductStoreTest.isCollected;
-import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
+import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -33,8 +33,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 

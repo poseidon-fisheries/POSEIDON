@@ -27,8 +27,8 @@ import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
 import java.util.List;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**

@@ -40,12 +40,21 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScope;
 
 class TravelCostFactoryTest {
 
   private final Simulation simulation = mock(Simulation.class);
-  private final VesselScope scopeA = scopeOfNewVessel(simulation);
-  private final VesselScope scopeB = scopeOfNewVessel(simulation);
+  private final Vessel vesselA = newVessel();
+  private final VesselScope scopeA = new VesselScope(
+    new SimulationScope(simulation),
+    vesselA
+  );
+  private final Vessel vesselB = newVessel();
+  private final VesselScope scopeB = new VesselScope(
+    new SimulationScope(simulation),
+    vesselB
+  );
   private final Function<Int2D, Route> routeFunction = destination ->
     new Route(destination.x, Duration.ofHours(destination.y));
   private final Function<Route, Money> routeCost = route ->
@@ -56,13 +65,10 @@ class TravelCostFactoryTest {
     when(simulation.getProductStore()).thenReturn(new ProductStore());
   }
 
-  private static VesselScope scopeOfNewVessel(final Simulation simulation) {
+  private static Vessel newVessel() {
     final Vessel vessel = mock(Vessel.class);
     when(vessel.getProductStore()).thenReturn(new ProductStore());
-    final VesselScope scope = mock(VesselScope.class);
-    when(scope.getVessel()).thenReturn(vessel);
-    when(scope.getSimulation()).thenReturn(simulation);
-    return scope;
+    return vessel;
   }
 
   @Test

@@ -22,8 +22,6 @@
 
 package uk.ac.ox.poseidon.core;
 
-import uk.ac.ox.poseidon.core.scopes.Scope;
-
 /**
  * The core declarative-configuration-to-runtime-object producer of the
  * Factory/Scenario pattern (see {@code docs/agents/architecture.md}): resolves

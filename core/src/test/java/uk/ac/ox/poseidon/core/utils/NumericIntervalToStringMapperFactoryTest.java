@@ -23,8 +23,8 @@
 package uk.ac.ox.poseidon.core.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.functions.Factories.numericIntervalToStringMapper;
-import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;

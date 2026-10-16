@@ -30,7 +30,7 @@ import lombok.experimental.SuperBuilder;
 import sim.portrayal.FieldPortrayal2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link RelativeScopeFactory} that wraps a resolved {@link FieldPortrayal2D}

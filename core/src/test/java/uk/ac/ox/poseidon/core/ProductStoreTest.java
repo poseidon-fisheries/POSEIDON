@@ -29,7 +29,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 
 /**

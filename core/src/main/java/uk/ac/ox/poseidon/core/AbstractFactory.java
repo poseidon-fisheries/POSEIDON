@@ -26,7 +26,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * A {@link Factory} that builds its product once per owner: the same factory
@@ -84,7 +83,7 @@ public abstract class AbstractFactory<
     if (store.contains(this)) {
       return store.get(this);
     }
-    final P product = newInstance(scope);
+    final P product = newInstance(scopeForBuild(scope));
     store.put(this, product);
     return product;
   }
@@ -104,6 +103,15 @@ public abstract class AbstractFactory<
    */
   protected final ProductStore globalStore() {
     return globalStore;
+  }
+
+  /**
+   * @param scope the scope a product is asked for with
+   * @return the scope that the build receives: {@code scope} itself, unless a
+   *         level base gives its builds a scope of exactly its level
+   */
+  protected S scopeForBuild(final S scope) {
+    return scope;
   }
 
   /**

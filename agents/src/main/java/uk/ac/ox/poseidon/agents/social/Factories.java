@@ -30,8 +30,8 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.Listener;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /** Factories for the ties between vessels. */
 public class Factories {

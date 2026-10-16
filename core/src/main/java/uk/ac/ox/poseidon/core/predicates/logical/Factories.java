@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 import com.google.common.collect.ImmutableList;
 import java.util.function.Predicate;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for {@link Predicate}s that combine other predicates. For an

@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.core;
 
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.scopes.Scope;
 
 /**
  * A factory that builds its delegate's product once per scope of its own (once

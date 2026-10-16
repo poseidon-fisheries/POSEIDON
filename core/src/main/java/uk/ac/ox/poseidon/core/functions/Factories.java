@@ -29,7 +29,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.function.Function;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for {@link Function}s that transform, combine, or look up values.

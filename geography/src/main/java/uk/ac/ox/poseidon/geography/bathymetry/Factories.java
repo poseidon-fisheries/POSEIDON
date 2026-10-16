@@ -28,9 +28,9 @@ import com.google.common.collect.ImmutableList;
 import java.nio.file.Path;
 import java.util.List;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.utils.ElevationTable;
 

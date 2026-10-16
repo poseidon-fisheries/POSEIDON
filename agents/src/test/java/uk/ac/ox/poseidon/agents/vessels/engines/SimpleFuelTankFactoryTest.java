@@ -33,8 +33,8 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.quantities.VolumeFactory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 class SimpleFuelTankFactoryTest {
 

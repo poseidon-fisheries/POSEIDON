@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.regulations;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.alwaysFalse;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.alwaysTrue;
-import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.regulations.Factories.allOf;
 import static uk.ac.ox.poseidon.regulations.Factories.forbiddenIf;
 import static uk.ac.ox.poseidon.regulations.Factories.permittedIf;
@@ -34,7 +34,7 @@ import static uk.ac.ox.poseidon.regulations.Factories.permittedIf;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 class AllOfRegulationsTest {
 

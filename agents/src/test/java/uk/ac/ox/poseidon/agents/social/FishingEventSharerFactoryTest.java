@@ -38,11 +38,11 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 class FishingEventSharerFactoryTest {
 

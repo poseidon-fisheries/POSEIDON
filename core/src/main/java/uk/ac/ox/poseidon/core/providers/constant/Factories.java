@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.core.providers.constant;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that always

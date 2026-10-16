@@ -30,8 +30,8 @@ import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.PerSimulationFactory;
 import uk.ac.ox.poseidon.core.RunIdFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 
 /**
  * General-purpose factories that don't belong to a more specific domain

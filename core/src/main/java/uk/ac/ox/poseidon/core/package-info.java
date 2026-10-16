@@ -27,7 +27,12 @@
  * {@link uk.ac.ox.poseidon.core.AbstractFactory} base and {@code *ScopeFactory}
  * caching variants ({@link uk.ac.ox.poseidon.core.GlobalScopeFactory},
  * {@link uk.ac.ox.poseidon.core.SimulationScopeFactory},
- * {@link uk.ac.ox.poseidon.core.RelativeScopeFactory}), and
+ * {@link uk.ac.ox.poseidon.core.RelativeScopeFactory}), the scopes a build
+ * receives ({@link uk.ac.ox.poseidon.core.Scope},
+ * {@link uk.ac.ox.poseidon.core.SimulationScope}, and the
+ * {@link uk.ac.ox.poseidon.core.SchedulingScope} of a
+ * {@link uk.ac.ox.poseidon.core.SchedulingFactory}), the factories of the
+ * simulation's services, and
  * {@link uk.ac.ox.poseidon.core.Scenario}/{@link uk.ac.ox.poseidon.core.Simulation},
  * the declarative description of a run and its resolved, runnable form. See
  * {@link uk.ac.ox.poseidon.core.MasonUtils} for MASON-specific helpers used

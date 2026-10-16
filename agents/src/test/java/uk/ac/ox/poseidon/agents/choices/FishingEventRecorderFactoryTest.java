@@ -47,10 +47,11 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.ProductStore;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
-import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -61,8 +62,16 @@ class FishingEventRecorderFactoryTest {
   private static final Int2D CELL = new Int2D(3, 4);
 
   private final Simulation simulation = mock(Simulation.class);
-  private final VesselScope scopeA = scopeOfNewVessel(simulation);
-  private final VesselScope scopeB = scopeOfNewVessel(simulation);
+  private final Vessel vesselA = newVessel();
+  private final VesselScope scopeA = new VesselScope(
+    new SimulationScope(simulation),
+    vesselA
+  );
+  private final Vessel vesselB = newVessel();
+  private final VesselScope scopeB = new VesselScope(
+    new SimulationScope(simulation),
+    vesselB
+  );
   private final PerVesselFactory<
     KeyedMemory<String, Int2D, Bucket>
   > keyedMemory = perVessel(keyedMemory());
@@ -81,15 +90,12 @@ class FishingEventRecorderFactoryTest {
     when(simulation.getProductStore()).thenReturn(new ProductStore());
   }
 
-  private static VesselScope scopeOfNewVessel(final Simulation simulation) {
+  private static Vessel newVessel() {
     final EventManager eventManager = new SimpleEventManager();
     final Vessel vessel = mock(Vessel.class);
     when(vessel.getProductStore()).thenReturn(new ProductStore());
     when(vessel.getEventManager()).thenReturn(eventManager);
-    final VesselScope scope = mock(VesselScope.class);
-    when(scope.getVessel()).thenReturn(vessel);
-    when(scope.getSimulation()).thenReturn(simulation);
-    return scope;
+    return vessel;
   }
 
   private static ModelGrid modelGrid() {

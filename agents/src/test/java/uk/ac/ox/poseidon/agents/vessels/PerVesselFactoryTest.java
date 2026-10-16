@@ -32,8 +32,8 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.ProductStore;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.providers.FirstIntFromFactory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
 
 class PerVesselFactoryTest {
 

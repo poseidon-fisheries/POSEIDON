@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.agents.catches;
 
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for {@link CatchCategory}s and the {@link CatchCategoriser}s that

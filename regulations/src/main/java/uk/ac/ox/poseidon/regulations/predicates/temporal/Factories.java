@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.regulations.predicates.temporal;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.time.MonthDayFactory;
 
 /**

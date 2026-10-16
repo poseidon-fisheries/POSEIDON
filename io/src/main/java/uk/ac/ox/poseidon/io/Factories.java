@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.io;
 
 import java.nio.file.Path;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * Factories for filesystem side-effects performed during a simulation run, such

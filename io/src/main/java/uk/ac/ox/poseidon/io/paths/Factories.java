@@ -27,7 +27,7 @@ import static uk.ac.ox.poseidon.io.paths.PathFactory.pathToString;
 
 import java.nio.file.Path;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
+import uk.ac.ox.poseidon.core.SimulationScope;
 
 /**
  * Factories for {@link PathFactory}s: fixed absolute paths and paths derived
