@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.core.Factory;
 
 /**
  * A {@link VesselTaskFactory} for a gdx-ai {@link Decorator}: builds the
- * decorator node via {@link #newTask} and attaches a single child, resolved
+ * decorator node via {@link #newTask()} and attaches a single child, resolved
  * against the current {@link VesselScope}. See {@link AlwaysFailTaskFactory},
  * {@link AlwaysSucceedTaskFactory}, {@link InvertTaskFactory},
  * {@link UntilFailTaskFactory} and {@link UntilSuccessTaskFactory} for the
@@ -52,25 +52,16 @@ public abstract class DecoratorTaskFactory<T extends Decorator<Vessel>> extends 
   private Factory<? super VesselScope, ? extends Task<Vessel>> child;
 
   /**
-   * @param guard optional task guarding whether this decorator runs at all
-   * @param child factory for the decorator's single child task
-   */
-  public DecoratorTaskFactory(
-    final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
-    final Factory<? super VesselScope, ? extends Task<Vessel>> child
-  ) {
-    super(guard);
-    this.child = child;
-  }
-
-  /**
-   * @return a decorator node built by {@link #newTask} with {@link #child}
+   * @return a decorator node built by {@link #newTask()} with {@link #child}
    *         attached
    */
   @Override
   protected T newInstance(final VesselScope scope) {
-    final T task = super.newInstance(scope);
+    final T task = newTask();
     task.addChild(child.get(scope));
     return task;
   }
+
+  /** @return a freshly built, still childless decorator node */
+  protected abstract T newTask();
 }

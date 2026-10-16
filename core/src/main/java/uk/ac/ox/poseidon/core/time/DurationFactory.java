@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -33,10 +33,8 @@ import uk.ac.ox.poseidon.core.scopes.Scope;
 /**
  * A {@link GlobalScopeFactory} for a fixed {@link Duration}. No separate plain
  * component class here: the produced value is a bare JDK type, with no wrapper
- * to carry documentation. Built via {@link Factories} — {@code duration(...)},
- * {@code days/hours/minutes/seconds(long)}, or the
- * {@code ONE_SECOND}/{@code ONE_MINUTE}/{@code ONE_HOUR}/{@code ONE_DAY}
- * constants.
+ * to carry documentation. Built via {@link Factories} — {@code duration(...)}
+ * or {@code days/hours/minutes/seconds(long)}.
  */
 @Data
 @NoArgsConstructor

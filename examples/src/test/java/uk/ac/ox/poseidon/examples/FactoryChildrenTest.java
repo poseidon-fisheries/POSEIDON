@@ -76,11 +76,17 @@ class FactoryChildrenTest {
 
   static List<Class<?>> factoryClasses(final String packagePrefix)
     throws IOException {
+    return classes(packagePrefix)
+      .stream()
+      .filter(AbstractFactory.class::isAssignableFrom)
+      .toList();
+  }
+
+  static List<Class<?>> classes(final String packagePrefix) throws IOException {
     return ClassPath.from(FactoryChildrenTest.class.getClassLoader())
       .getTopLevelClassesRecursive(packagePrefix)
       .stream()
       .flatMap(info -> withNestedClasses(info.load()).stream())
-      .filter(AbstractFactory.class::isAssignableFrom)
       .toList();
   }
 
@@ -103,7 +109,7 @@ class FactoryChildrenTest {
     }
   }
 
-  private static boolean mentionsFactory(final Type type) {
+  static boolean mentionsFactory(final Type type) {
     return switch (type) {
       case final Class<?> clazz -> clazz.isArray()
         ? mentionsFactory(clazz.getComponentType())

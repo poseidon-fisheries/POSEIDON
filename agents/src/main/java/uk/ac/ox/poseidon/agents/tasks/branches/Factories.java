@@ -58,17 +58,4 @@ public class Factories {
   ) {
     return new SelectorTaskFactory(List.of(children));
   }
-
-  /**
-   * @param children factories for the parallel node's child tasks
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   *         {@link com.badlogic.gdx.ai.btree.branch.Parallel}
-   * @see ParallelTaskFactory
-   */
-  @SafeVarargs
-  public static ParallelTaskFactory parallelTask(
-    final Factory<? super VesselScope, ? extends Task<Vessel>>... children
-  ) {
-    return new ParallelTaskFactory(List.of(children));
-  }
 }

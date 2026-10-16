@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,20 +23,17 @@
 package uk.ac.ox.poseidon.agents.tasks;
 
 import com.badlogic.gdx.ai.btree.Task;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.AgentScope;
 import uk.ac.ox.poseidon.core.AbstractFactory;
-import uk.ac.ox.poseidon.core.Factory;
 
 /**
  * An {@link AbstractFactory} base for behavior-tree {@link Task}s: subclasses
- * supply the task via {@link #newTask}, and this base attaches the optional
- * {@code guard} and keys resolved instances by agent, so each agent gets its
- * own task instance.
+ * build the task in {@link #newInstance}, and this base keys resolved instances
+ * by agent, so each agent gets its own task instance.
  *
  * @param <G> the type of agent the task runs against
  * @param <S> the agent scope type
@@ -44,7 +41,6 @@ import uk.ac.ox.poseidon.core.Factory;
  */
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class TaskFactory<
   G extends Agent,
@@ -52,25 +48,9 @@ public abstract class TaskFactory<
   T extends Task<G>
 > extends AbstractFactory<S, T> {
 
-  private Factory<? super S, ? extends Task<G>> guard;
-
-  /** @return a freshly built, unguarded task */
-  protected abstract T newTask(final S scope);
-
   /** @return {@code scope}'s agent, so each agent gets its own resolved task */
   @Override
   protected Object makeKey(final S scope) {
     return scope.getAgent();
-  }
-
-  /**
-   * @return a task built by {@link #newTask}, with {@link #guard} attached if
-   *         set
-   */
-  @Override
-  protected T newInstance(final S scope) {
-    final T task = newTask(scope);
-    if (guard != null) task.setGuard(guard.get(scope));
-    return task;
   }
 }

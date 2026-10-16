@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
+import static java.time.Period.ofDays;
+import static java.time.Period.ofYears;
 import static tech.units.indriya.unit.Units.*;
 import static uk.ac.ox.poseidon.agents.catches.Factories.uncategorisedCatchCategory;
 import static uk.ac.ox.poseidon.agents.catches.Factories.uniformCatchCategoriser;
@@ -181,7 +183,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
           finalProcess(
             csvTableWriter(
               scheduledRepeatingFromStart(
-                YEARLY,
+                period(ofYears(1)),
                 steppableTable(
                   tableDefinition(
                     columnDefinition("date_time", "LOCAL_DATE_TIME"),
@@ -264,8 +266,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     );
 
     final var biomassDiffuser = scheduledRepeating(
-      dateTimeAfterStarting(ONE_DAY),
-      DAILY,
+      dateTimeAfterStarting(days(1)),
+      period(ofDays(1)),
       biomassDiffuser(
         biomassGrid,
         carryingCapacityGrid,
@@ -275,8 +277,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     );
 
     final var biomassGrower = scheduledRepeating(
-      dateTimeAfterStarting(ONE_YEAR),
-      YEARLY,
+      dateTimeAfterStarting(period(ofYears(1))),
+      period(ofYears(1)),
       commonBiomassGrower(
         biomassGrid,
         carryingCapacityGrid,
@@ -330,7 +332,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       "FGL", // droplines count as "fixed gears and lines"
       0.000641964,
       massOf(1, KILOGRAM),
-      constant(ONE_HOUR),
+      constant(hours(1)),
       volumetricFlowRateOf(70.0, LITRE_PER_HOUR)
     );
 
@@ -416,7 +418,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
           currentTripEventManager()
         ),
         arriveInPort(),
-        landCatches(constant(ONE_HOUR)),
+        landCatches(constant(hours(1))),
         refuel(fuelStationGrid),
         endTrip(),
         waitFor(constant(hours(12)))

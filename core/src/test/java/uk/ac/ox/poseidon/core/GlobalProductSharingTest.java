@@ -32,8 +32,9 @@ import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 /**
  * Global products are built once and shared by every simulation of a
- * scenario, and by scenarios derived from it that keep the same factory
- * (R4 in the factory design brief).
+ * scenario, and by scenarios derived from it that keep the same factory, so
+ * that expensive read-only products and pure caches (grids, path caches) are
+ * not rebuilt for every run.
  */
 class GlobalProductSharingTest {
 

@@ -44,8 +44,8 @@ import static uk.ac.ox.poseidon.agents.vessels.Factories.perVessel;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
 import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.vesselProperty;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
-import static uk.ac.ox.poseidon.core.time.Factories.ONE_DAY;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
+import static uk.ac.ox.poseidon.core.time.Factories.days;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 
@@ -160,7 +160,7 @@ class FishingEventSharingRouteTest {
       .hold(object(hold))
       .gear(object(gear))
       .engine(object(engine))
-      .behaviour(behaviour(waitFor(constant(ONE_DAY))));
+      .behaviour(behaviour(waitFor(constant(days(1)))));
     if (withSharing) {
       loader
         .extraFactory(

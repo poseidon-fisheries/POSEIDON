@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
@@ -81,44 +80,6 @@ public class Factories {
    */
   public static PrefixedIdFactory prefixedId(final String prefix) {
     return new PrefixedIdFactory(prefix);
-  }
-
-  /**
-   * @param fleet     the fleet the vessel belongs (or will belong) to
-   * @param id        the vessel's id
-   * @param name      the vessel's name
-   * @param portCode  the vessel's home port code
-   * @param tags      tags to set on the vessel
-   * @param behaviour builds the vessel's behaviour
-   * @param hold      builds the vessel's hold
-   * @param gear      builds the vessel's gear
-   * @param engine    builds the vessel's engine
-   * @return a {@link SimulationScopeFactory} for a
-   *         {@link FleetEvent.Type#ACTIVATION} event
-   * @see VesselActivationFactory
-   */
-  public static VesselActivationFactory vesselActivation(
-    final Factory<? super SimulationScope, ? extends Fleet> fleet,
-    final String id,
-    final String name,
-    final String portCode,
-    final Map<String, Factory<? super SimulationScope, ?>> tags,
-    final Factory<? super VesselScope, ? extends Behaviour> behaviour,
-    final Factory<? super VesselScope, ? extends Hold> hold,
-    final Factory<? super VesselScope, ? extends Gear> gear,
-    final Factory<? super VesselScope, ? extends Engine> engine
-  ) {
-    return new VesselActivationFactory(
-      fleet,
-      id,
-      name,
-      portCode,
-      tags,
-      behaviour,
-      hold,
-      gear,
-      engine
-    );
   }
 
   /**

@@ -47,7 +47,7 @@ public class RefuelFactory extends VesselTaskFactory<Refuel> {
   > fuelStationGrid;
 
   @Override
-  protected Refuel newTask(final VesselScope scope) {
+  protected Refuel newInstance(final VesselScope scope) {
     return new Refuel(fuelStationGrid.get(scope));
   }
 }

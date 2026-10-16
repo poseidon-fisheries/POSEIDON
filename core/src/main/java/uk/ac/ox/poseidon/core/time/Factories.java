@@ -22,8 +22,6 @@
 
 package uk.ac.ox.poseidon.core.time;
 
-import static java.time.Period.*;
-
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,26 +37,6 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * {@link uk.ac.ox.poseidon.core.providers.temporal.Factories}.
  */
 public class Factories {
-
-  /** A {@link PeriodFactory} for one day. */
-  public static final PeriodFactory DAILY = period(ofDays(1));
-  /** A {@link PeriodFactory} for one calendar month. */
-  public static final PeriodFactory MONTHLY = period(ofMonths(1));
-  /** A {@link PeriodFactory} for one calendar year. */
-  public static final PeriodFactory YEARLY = period(ofYears(1));
-
-  /** A {@link DurationFactory} for one second. */
-  public static final DurationFactory ONE_SECOND = seconds(1);
-  /** A {@link DurationFactory} for one minute. */
-  public static final DurationFactory ONE_MINUTE = minutes(1);
-  /** A {@link DurationFactory} for one hour. */
-  public static final DurationFactory ONE_HOUR = hours(1);
-  /** A {@link DurationFactory} for one day. */
-  public static final DurationFactory ONE_DAY = days(1);
-  /** Alias for {@link #MONTHLY}. */
-  public static final PeriodFactory ONE_MONTH = MONTHLY;
-  /** Alias for {@link #YEARLY}. */
-  public static final PeriodFactory ONE_YEAR = YEARLY;
 
   /**
    * @return a {@link DurationFactory} for the given days/hours/minutes/seconds

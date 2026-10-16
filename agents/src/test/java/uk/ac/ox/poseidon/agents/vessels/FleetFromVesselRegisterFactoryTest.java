@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -30,7 +30,7 @@ import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
-import static uk.ac.ox.poseidon.core.time.Factories.ONE_DAY;
+import static uk.ac.ox.poseidon.core.time.Factories.days;
 import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 
 import java.time.Duration;
@@ -107,7 +107,7 @@ class FleetFromVesselRegisterFactoryTest {
           .gear(gears)
           .dataMapping("gear.code", "gear")
           .engine(new ObjectFactory<>(mock(Engine.class)))
-          .behaviour(behaviour(waitFor(constant(ONE_DAY))))
+          .behaviour(behaviour(waitFor(constant(days(1)))))
           .build()
       )
     ).startNewSimulation();

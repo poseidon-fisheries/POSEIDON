@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link VesselTaskFactory} for a gdx-ai {@link BranchTask}: builds the
  * branch node via {@link #newTask()} and attaches one child, resolved against
  * the current {@link VesselScope}, per entry in {@code children}. See
- * {@link SequenceTaskFactory}, {@link SelectorTaskFactory} and
- * {@link ParallelTaskFactory} for the concrete branch types.
+ * {@link SequenceTaskFactory} and {@link SelectorTaskFactory} for the concrete
+ * branch types.
  *
  * @param <T> the concrete {@link BranchTask} type built
  */
@@ -54,26 +54,11 @@ public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends Ve
   > children;
 
   /**
-   * @param guard    optional task guarding whether this branch runs at all
-   * @param children factories for the branch's child tasks, resolved and
-   *                 attached in order
-   */
-  public BranchTaskFactory(
-    final Factory<? super VesselScope, ? extends Task<Vessel>> guard,
-    final List<
-      ? extends Factory<? super VesselScope, ? extends Task<Vessel>>
-    > children
-  ) {
-    super(guard);
-    this.children = children;
-  }
-
-  /**
    * @return a branch node built by {@link #newTask()} with every child in
    *         {@code children} attached
    */
   @Override
-  protected T newTask(final VesselScope scope) {
+  protected T newInstance(final VesselScope scope) {
     final T task = newTask();
     if (children != null) {
       this.children
