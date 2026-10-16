@@ -45,22 +45,19 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.SimulationStartOptions;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 
 /**
- * A jenetics {@link Problem} that calibrates a subset of a {@link Scenario}'s
- * properties by running it forward for a fixed duration, once per seed, and
+ * A jenetics {@link Problem} that calibrates some of a {@link Scenario}'s
+ * values by running it forward for a fixed duration, once per seed, and
  * scoring the outcome with an {@code evaluator}. A candidate solution is a map
- * of property name to value, each value encoded as an allele in
- * {@code [0.0, 1.0]} that {@link #codec()} rescales to that property's
- * {@code parameterRanges} entry; {@link #fitness()} runs the scenario with
- * those property overrides for every seed in {@code seeds} and returns the
- * average evaluator score. The seeds of one evaluation run in parallel, on the
+ * of address to value, each value encoded as an allele in {@code [0.0, 1.0]}
+ * that {@link #codec()} rescales to that address's {@code parameterRanges}
+ * entry; {@link #fitness()} derives a scenario with those values (see
+ * {@link Scenario#with}), runs it for every seed in {@code seeds} and returns
+ * the average evaluator score. The seeds of one evaluation run in parallel, on the
  * common fork-join pool (where jenetics also evaluates the population), so the
  * simulations running at once are bounded by the processors. It counts the
  * simulations it runs and how long they take; see
@@ -73,15 +70,10 @@ public class CalibrationProblem
 {
 
   /**
-   * The scenario being calibrated; started fresh, with property overrides, for
-   * each seed.
+   * The scenario being calibrated, from which each candidate derives its own.
    */
   protected final @NonNull Scenario scenario;
   private final @NonNull TemporalAmount duration;
-  private final @NonNull ImmutableMap<
-    String,
-    ? extends Factory<? super SimulationScope, ?>
-  > extraComponents;
   private final @NonNull ImmutableMap<String, DoubleRange> parameterRanges;
   private final @NonNull ToDoubleFunction<Simulation> evaluator;
   private final @NonNull ImmutableLongArray seeds;
@@ -91,7 +83,7 @@ public class CalibrationProblem
 
   /**
    * Encodes/decodes a genotype of {@code parameterRanges.size()} alleles in
-   * {@code [0.0, 1.0]} to/from a map of property name to value, by linearly
+   * {@code [0.0, 1.0]} to/from a map of address to value, by linearly
    * rescaling each allele to its corresponding entry in
    * {@code parameterRanges}. Computed lazily, once, on first access.
    */
@@ -124,9 +116,9 @@ public class CalibrationProblem
     );
 
   /**
-   * @return a function that runs {@link #scenario} once per seed in
-   *         {@code seeds}, with the given property overrides, and returns the
-   *         average of {@code evaluator}'s score across seeds
+   * @return a function that derives a scenario from {@link #scenario} with
+   *         the given values, runs it once per seed in {@code seeds}, and
+   *         returns the average of {@code evaluator}'s score across seeds
    */
   public Function<SequencedMap<String, Double>, Double> fitness() {
     return this::evaluate;
@@ -146,29 +138,25 @@ public class CalibrationProblem
   }
 
   private double evaluate(final SequencedMap<String, Double> parameters) {
+    Scenario candidate = scenario;
+    for (final var parameter : parameters.entrySet()) {
+      candidate = candidate.with(parameter.getKey(), parameter.getValue());
+    }
+    final Scenario derived = candidate;
     // Scores are collected in seed order and averaged sequentially, so the
     // result does not depend on which simulation finishes first
     final double[] scores = seeds
       .stream()
       .parallel()
-      .mapToDouble(seed -> evaluate(parameters, seed))
+      .mapToDouble(seed -> evaluate(derived, seed))
       .toArray();
     return Arrays.stream(scores).average().orElseThrow();
   }
 
-  private double evaluate(
-    final SequencedMap<String, Double> parameters,
-    final long seed
-  ) {
+  private double evaluate(final Scenario candidate, final long seed) {
     final long start = System.nanoTime();
     try {
-      final Simulation simulation = scenario.startNewSimulation(
-        SimulationStartOptions.builder()
-          .seed(seed)
-          .propertyOverrides(parameters)
-          .extraComponents(extraComponents)
-          .build()
-      );
+      final Simulation simulation = candidate.startNewSimulation(seed);
       buildingNanos.add(System.nanoTime() - start);
       try {
         final TemporalSchedule temporalSchedule =
@@ -189,8 +177,7 @@ public class CalibrationProblem
    *
    * @param simulations the number of simulations run
    * @param total       their total time, from building each one to finishing it
-   * @param building    the part of {@code total} spent building them, which
-   *                    {@link Scenario#startNewSimulation} does one at a time
+   * @param building    the part of {@code total} spent building them
    */
   public record SimulationTimes(
     long simulations,

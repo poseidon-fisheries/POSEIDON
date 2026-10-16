@@ -51,8 +51,7 @@ public final class PeterSnapperCatchabilityCalibration {
     "peter_snapper",
     "landings.csv"
   );
-  private static final String CATCHABILITY_PROPERTY =
-    "components(gear).proportion";
+  static final String CATCHABILITY_PROPERTY = "gear.proportion";
   private static final double MIN_CATCHABILITY = 0.00001;
   private static final double MAX_CATCHABILITY = 0.005;
   private static final double TUTORIAL_CATCHABILITY = 0.000641964;
@@ -73,12 +72,13 @@ public final class PeterSnapperCatchabilityCalibration {
     final long[] seeds = parseSeeds(args);
     final Map<Integer, Double> observedLandings = readLandings(LANDINGS_PATH);
     final CalibrationProblem problem = new CalibrationProblem(
-      new PeterSnapperScenario().get(),
+      new PeterSnapperScenario()
+        .get()
+        .withComponent(
+          "totalLandingsPerYear",
+          totalLandingsPerYearAccumulator()
+        ),
       Period.ofYears(observedLandings.size()),
-      ImmutableMap.of(
-        "totalLandingsPerYear",
-        totalLandingsPerYearAccumulator()
-      ),
       ImmutableMap.of(
         CATCHABILITY_PROPERTY,
         new DoubleRange(MIN_CATCHABILITY, MAX_CATCHABILITY)

@@ -111,7 +111,6 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.EpsilonGreedyDestinationSupplierFactory;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegisterFactory;
-import uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -147,60 +146,46 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     final Path outputPath = Path.of("outputs", "peter_snapper");
     new ScenarioWriter().write(scenario, outputPath.resolve("scenario.yaml"));
 
-    @SuppressWarnings("RedundantTypeArguments")
-    final Simulation simulation = scenario.startNewSimulation(
-      uk.ac.ox.poseidon.core.SimulationStartOptions.builder()
-        .seed(0)
-        /*                    .propertyOverride(
-                        "components(agentCreators).steppable.steppables.factories[0]" +
-                            ".numberOfVesselsToCreate",
-                        5
-                    )
-                    .propertyOverride(
-                        "components(agentCreators).steppable.steppables.factories[1]" +
-                            ".numberOfVesselsToCreate",
-                        0
-                    )*/
-        .extraComponent(
-          "totalLandingsPerYear",
-          finalProcess(
-            csvTableWriter(
-              tableFromMap(
+    final Simulation simulation = scenario
+      .withComponent(
+        "totalLandingsPerYear",
+        finalProcess(
+          csvTableWriter(
+            tableFromMap(
+              tableDefinition(
+                columnDefinition("year", "INTEGER"),
+                columnDefinition("landings_kg", "DOUBLE")
+              ),
+              totalLandingsPerYearAccumulator()
+            ),
+            path(outputPath.resolve("landings.csv")),
+            false,
+            true
+          )
+        )
+      )
+      .withComponent(
+        "biomass_per_year",
+        finalProcess(
+          csvTableWriter(
+            scheduledRepeatingFromStart(
+              period(ofYears(1)),
+              steppableTable(
                 tableDefinition(
-                  columnDefinition("year", "INTEGER"),
-                  columnDefinition("landings_kg", "DOUBLE")
+                  columnDefinition("date_time", "LOCAL_DATE_TIME"),
+                  columnDefinition("total_biomass", "DOUBLE")
                 ),
-                totalLandingsPerYearAccumulator()
-              ),
-              path(outputPath.resolve("landings.csv")),
-              false,
-              true
-            )
+                currentDateTime(),
+                gridSum(scenario.component("biomassGrid"))
+              )
+            ),
+            path(outputPath.resolve("biomass.csv")),
+            false,
+            true
           )
         )
-        .extraComponent(
-          "biomass_per_year",
-          finalProcess(
-            csvTableWriter(
-              scheduledRepeatingFromStart(
-                period(ofYears(1)),
-                steppableTable(
-                  tableDefinition(
-                    columnDefinition("date_time", "LOCAL_DATE_TIME"),
-                    columnDefinition("total_biomass", "DOUBLE")
-                  ),
-                  currentDateTime(),
-                  gridSum(scenario.component("biomassGrid"))
-                )
-              ),
-              path(outputPath.resolve("biomass.csv")),
-              false,
-              true
-            )
-          )
-        )
-        .build()
-    );
+      )
+      .startNewSimulation(0);
     try {
       final TemporalSchedule temporalSchedule =
         simulation.getTemporalSchedule();
@@ -425,42 +410,38 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       )
     );
 
-    final var agentCreators = scheduledOnceAtStart(
-      steppableSequence(
-        mappedFactory(
-          vesselCreator(
-            vesselField,
-            portGrid,
-            marketGrid,
-            prefixedIdSupplier("V"),
-            prefixedId("Vessel "),
-            account(),
-            null, // mapped over
-            standardBiomassHold(
-              massOf(15_000, KILOGRAM),
-              massOf(1, KILOGRAM),
-              uniformCatchCategoriser(catchCategory)
-            ),
-            gear,
-            simpleEngine(
-              fullTank(volumeOf(100000, LITRE)),
-              speedOf(16, KILOMETRE_PER_HOUR),
-              volumeOf(3, LITRE)
-            ),
-            behaviour, // new InactiveBehaviourFactory(),
-            List.of(tripEvaluator),
-            0 // mapped over
-          ),
-          mappedProperty(
-            VesselCreatorFactory::setHomePort,
-            List.of(benoa, kupang)
-          ),
-          mappedProperty(
-            VesselCreatorFactory::setNumberOfVesselsToCreate,
-            List.of(25, 50)
-          )
-        )
+    final var benoaVesselCreator = vesselCreator(
+      vesselField,
+      portGrid,
+      marketGrid,
+      prefixedIdSupplier("V"),
+      prefixedId("Vessel "),
+      account(),
+      benoa,
+      standardBiomassHold(
+        massOf(15_000, KILOGRAM),
+        massOf(1, KILOGRAM),
+        uniformCatchCategoriser(catchCategory)
       ),
+      gear,
+      simpleEngine(
+        fullTank(volumeOf(100000, LITRE)),
+        speedOf(16, KILOMETRE_PER_HOUR),
+        volumeOf(3, LITRE)
+      ),
+      behaviour, // new InactiveBehaviourFactory(),
+      List.of(tripEvaluator),
+      25
+    );
+    // Kupang's vessels are like Benoa's, but more of them
+    final var kupangVesselCreator = benoaVesselCreator
+      .toBuilder()
+      .homePort(kupang)
+      .numberOfVesselsToCreate(50)
+      .build();
+
+    final var agentCreators = scheduledOnceAtStart(
+      steppableSequence(listOf(benoaVesselCreator, kupangVesselCreator)),
       0
     );
 

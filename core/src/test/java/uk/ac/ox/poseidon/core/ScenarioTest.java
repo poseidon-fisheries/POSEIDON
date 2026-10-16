@@ -22,116 +22,299 @@
 
 package uk.ac.ox.poseidon.core;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.SequencedMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import uk.ac.ox.poseidon.core.scopes.Scope;
+import uk.ac.ox.poseidon.core.scopes.SimulationScope;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
+import uk.ac.ox.poseidon.core.utils.ListFactory;
+import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 class ScenarioTest {
 
+  private static final DateTimeFactory START = new DateTimeFactory(
+    2000,
+    1,
+    1,
+    0,
+    0,
+    0
+  );
+
   @Test
-  void restoresPropertyOverridesAfterStartingSimulation() {
-    final DateTimeFactory startingDateTime = new DateTimeFactory(
-      2000,
-      1,
-      1,
-      0,
-      0,
-      0
+  void aNodeIsReplacedEverywhereItIsHeld() {
+    final NumberFactory number = number(1);
+    final Scenario scenario = scenario(
+      Map.of("number", number, "pair", pair(number, number))
     );
-    final Scenario scenario = Scenario.builder()
-      .startingDateTime(startingDateTime)
-      .build();
+    final NumberFactory replacement = number(2);
 
-    final Simulation simulation = scenario.startNewSimulation(
-      SimulationStartOptions.builder()
-        .propertyOverrides(propertyOverrides("startingDateTime.year", 2001))
-        .build()
-    );
+    final Scenario derived = scenario.with("number", replacement);
 
-    try {
-      assertEquals(
-        LocalDateTime.of(2001, 1, 1, 0, 0, 0),
-        simulation.getTemporalSchedule().getStartingDateTime()
-      );
-      assertEquals(2000, startingDateTime.getYear());
-    } finally {
-      simulation.finish();
-    }
+    final PairFactory pair = derived.component("pair", PairFactory.class);
+    assertThat(derived.component("number")).isSameAs(replacement);
+    assertThat(pair.getFirst()).isSameAs(replacement);
+    assertThat(pair.getSecond()).isSameAs(replacement);
   }
 
   @Test
-  void restoresPropertyOverridesWhenStartingSimulationFails() {
-    final DateTimeFactory startingDateTime = new DateTimeFactory(
-      2000,
-      1,
-      1,
-      0,
-      0,
-      0
+  void aValueIsReplacedInItsContainerEverywhereItIsHeld() {
+    final NumberFactory number = number(1);
+    final Scenario scenario = scenario(
+      Map.of("number", number, "pair", pair(number, number))
     );
-    final Scenario scenario = Scenario.builder()
-      .startingDateTime(startingDateTime)
-      .build();
 
-    assertThrows(RuntimeException.class, () ->
-      scenario.startNewSimulation(
-        SimulationStartOptions.builder()
-          .propertyOverrides(propertyOverrides("startingDateTime.month", 13))
-          .build()
+    final Scenario derived = scenario.with("number.value", 2.0);
+
+    final NumberFactory copy = derived.component("number", NumberFactory.class);
+    final PairFactory pair = derived.component("pair", PairFactory.class);
+    assertThat(copy.getValue()).isEqualTo(2.0);
+    assertThat(pair.getFirst()).isSameAs(copy);
+    assertThat(pair.getSecond()).isSameAs(copy);
+    assertThat(number.getValue()).isEqualTo(1.0);
+  }
+
+  // Both halves of the top pair change, and two components hold it: one
+  // copy must hold both changed halves, and serve both components.
+  @Test
+  void anAncestorWithTwoChangedChildrenIsCopiedOnce() {
+    final NumberFactory number = number(1);
+    final PairFactory top = pair(
+      pair(number, number(3)),
+      pair(number, number(4))
+    );
+    final Scenario scenario = scenario(
+      Map.of("number", number, "top", top, "sameTop", top)
+    );
+
+    final Scenario derived = scenario.with("number.value", 2.0);
+
+    final NumberFactory copy = derived.component("number", NumberFactory.class);
+    final PairFactory topCopy = derived.component("top", PairFactory.class);
+    assertThat(derived.component("sameTop")).isSameAs(topCopy);
+    assertThat(((PairFactory) topCopy.getFirst()).getFirst()).isSameAs(copy);
+    assertThat(((PairFactory) topCopy.getSecond()).getFirst()).isSameAs(copy);
+  }
+
+  @Test
+  void whatAReplacementDoesNotReachIsKept() {
+    final NumberFactory number = number(1);
+    final PairFactory untouched = pair(number(3), number(4));
+    final Scenario scenario = scenario(
+      Map.of("number", number, "untouched", untouched)
+    );
+
+    final Scenario derived = scenario.with("number.value", 2.0);
+
+    assertThat(derived.component("untouched")).isSameAs(untouched);
+    assertThat(derived.getStartingDateTime()).isSameAs(START);
+    assertThat(scenario.component("number")).isSameAs(number);
+  }
+
+  @Test
+  void addressesGoIntoMapsAndLists() {
+    final Scenario scenario = scenario(
+      Map.of(
+        "table",
+        new ObjectFactory<>(Map.of("DBO;adult", 1.0, "HKE;adult", 3.0)),
+        "list",
+        new ListFactory<>(List.of(number(1), number(2)))
       )
     );
-    assertEquals(1, startingDateTime.getMonth());
+
+    final Scenario derived = scenario
+      .with("table.value(DBO;adult)", 2.0)
+      .with("list.factories[1].value", 5.0);
+
+    assertThat(
+      derived.component("table", ObjectFactory.class).getValue()
+    ).isEqualTo(Map.of("DBO;adult", 2.0, "HKE;adult", 3.0));
+    final ListFactory<?, ?> list = derived.component("list", ListFactory.class);
+    assertThat(list.getFactories())
+      .extracting(factory -> ((NumberFactory) factory).getValue())
+      .containsExactly(1.0, 5.0);
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      "missing",
+      "number.missing",
+      "number.value.further",
+      "table.value(missing)",
+      "list.factories[2]"
+    }
+  )
+  void refusesAnAddressThatLeadsNowhere(final String address) {
+    final Scenario scenario = scenario(
+      Map.of(
+        "number",
+        number(1),
+        "table",
+        new ObjectFactory<>(Map.of("key", 1.0)),
+        "list",
+        new ListFactory<>(List.of(number(1)))
+      )
+    );
+
+    assertThatThrownBy(() -> scenario.with(address, 2.0)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = { ".", "(", ")", "[", "]" })
+  void refusesAComponentNameAnAddressCannotStartWith(final String character) {
+    final String name = "a" + character + "b";
+    final Scenario scenario = scenario(Map.of());
+
+    assertThatThrownBy(() -> scenario.withComponent(name, number(1)))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining(name);
   }
 
   @Test
-  void appliesPropertyOverridesInEncounterOrder() {
-    final DateTimeFactory startingDateTime = new DateTimeFactory(
-      2000,
-      1,
-      1,
-      0,
-      0,
-      0
-    );
-    final Scenario scenario = Scenario.builder()
-      .startingDateTime(startingDateTime)
-      .build();
-    final SequencedMap<String, Object> propertyOverrides =
-      new LinkedHashMap<>();
-    propertyOverrides.put(
-      "startingDateTime",
-      new DateTimeFactory(1999, 1, 1, 0, 0, 0)
-    );
-    propertyOverrides.put("startingDateTime.year", 2001);
+  void refusesAComponentNameAlreadyTaken() {
+    final Scenario scenario = scenario(Map.of("number", number(1)));
 
-    final Simulation simulation = scenario.startNewSimulation(
-      SimulationStartOptions.builder()
-        .propertyOverrides(propertyOverrides)
-        .build()
-    );
+    assertThatThrownBy(() ->
+      scenario.withComponent("number", number(2))
+    ).isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void aDerivedStartingDateTimeStartsTheSchedule() {
+    final Scenario scenario = scenario(Map.of());
+
+    final Simulation simulation = scenario
+      .withStartingDateTime(LocalDateTime.of(2001, 2, 3, 4, 5))
+      .startNewSimulation();
 
     try {
-      assertEquals(
-        LocalDateTime.of(2001, 1, 1, 0, 0, 0),
+      assertThat(
         simulation.getTemporalSchedule().getStartingDateTime()
-      );
-      assertSame(startingDateTime, scenario.getStartingDateTime());
+      ).isEqualTo(LocalDateTime.of(2001, 2, 3, 4, 5));
+      assertThat(scenario.getStartingDateTime()).isSameAs(START);
     } finally {
       simulation.finish();
     }
   }
 
-  private static SequencedMap<String, Object> propertyOverrides(
-    final String propertyName,
-    final Object value
+  // Each build waits until the other has started, so the two derived
+  // scenarios are built at the same time.
+  @Test
+  void simulationsOfScenariosDerivedInParallelKeepTheirOwnValues()
+    throws Exception {
+    final CountDownLatch bothBuilding = new CountDownLatch(2);
+    final Scenario scenario = scenario(
+      Map.of(
+        "number",
+        LatchedNumberFactory.builder().value(0).latch(bothBuilding).build()
+      )
+    );
+    try (final ExecutorService executor = Executors.newFixedThreadPool(2)) {
+      final List<CompletableFuture<Object>> numbers = List.of(1.0, 2.0)
+        .stream()
+        .map(value ->
+          CompletableFuture.supplyAsync(
+            () -> builtNumber(scenario.with("number.value", value)),
+            executor
+          )
+        )
+        .toList();
+
+      assertThat(numbers.get(0).get(30, SECONDS)).isEqualTo(1.0);
+      assertThat(numbers.get(1).get(30, SECONDS)).isEqualTo(2.0);
+    }
+  }
+
+  private static Object builtNumber(final Scenario scenario) {
+    final Simulation simulation = scenario.startNewSimulation();
+    try {
+      return simulation.components.get("number");
+    } finally {
+      simulation.finish();
+    }
+  }
+
+  private static Scenario scenario(
+    final Map<String, ? extends Factory<? super SimulationScope, ?>> components
   ) {
-    final SequencedMap<String, Object> propertyOverrides =
-      new LinkedHashMap<>();
-    propertyOverrides.put(propertyName, value);
-    return propertyOverrides;
+    return Scenario.builder()
+      .startingDateTime(START)
+      .components(components)
+      .build();
+  }
+
+  private static NumberFactory number(final double value) {
+    return NumberFactory.builder().value(value).build();
+  }
+
+  private static PairFactory pair(
+    final Factory<? super Scope, ?> first,
+    final Factory<? super Scope, ?> second
+  ) {
+    return PairFactory.builder().first(first).second(second).build();
+  }
+
+  @Getter
+  @SuperBuilder(toBuilder = true)
+  static class NumberFactory extends GlobalScopeFactory<Double> {
+
+    private final double value;
+
+    @Override
+    protected Double newInstance(final Scope scope) {
+      return value;
+    }
+  }
+
+  @Getter
+  @SuperBuilder(toBuilder = true)
+  static class PairFactory extends GlobalScopeFactory<List<Object>> {
+
+    private final Factory<? super Scope, ?> first;
+    private final Factory<? super Scope, ?> second;
+
+    @Override
+    protected List<Object> newInstance(final Scope scope) {
+      return List.of(first.get(scope), second.get(scope));
+    }
+  }
+
+  @Getter
+  @SuperBuilder(toBuilder = true)
+  static class LatchedNumberFactory extends SimulationScopeFactory<Double> {
+
+    private final double value;
+    private final CountDownLatch latch;
+
+    @Override
+    protected Double newInstance(final SimulationScope scope) {
+      latch.countDown();
+      try {
+        if (!latch.await(10, SECONDS)) {
+          throw new IllegalStateException("The builds did not overlap");
+        }
+      } catch (final InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new IllegalStateException(e);
+      }
+      return value;
+    }
   }
 }

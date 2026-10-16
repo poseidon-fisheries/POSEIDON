@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -41,8 +41,8 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
  * The resolved, runnable form of a {@link Scenario}: a MASON {@link SimState}
  * that owns the {@link TemporalSchedule}, an {@link EventManager}, a unique id,
  * and the resolved scenario components, by name. Built exclusively via
- * {@link Scenario#startNewSimulation()} (or the
- * {@link SimulationStartOptions}-taking overload) — never constructed directly,
+ * {@link Scenario#startNewSimulation()} and its overloads — never constructed
+ * directly,
  * since the constructor is package-private.
  */
 @Getter
@@ -58,8 +58,7 @@ public class Simulation extends SimState {
   private boolean started = false;
   /**
    * The resolved components, keyed by the name they were registered under in
-   * the {@link Scenario} (or among the {@code extraComponents} of the
-   * {@link SimulationStartOptions}), in registration order.
+   * the {@link Scenario}, in registration order.
    */
   Map<String, ?> components;
 

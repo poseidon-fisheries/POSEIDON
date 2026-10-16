@@ -56,10 +56,10 @@ class GlobalProductSharingTest {
   @Test
   void aDerivedScenarioSharesTheGlobalProductsOfFactoriesItKeeps() {
     final Scenario scenario = scenarioWith(new NewObjectGlobalFactory());
-    final Scenario derivedScenario = scenario
-      .toBuilder()
-      .component("other", new ObjectFactory<>("another component"))
-      .build();
+    final Scenario derivedScenario = scenario.withComponent(
+      "other",
+      new ObjectFactory<>("another component")
+    );
     final Simulation first = scenario.startNewSimulation();
     final Simulation second = derivedScenario.startNewSimulation();
     try {

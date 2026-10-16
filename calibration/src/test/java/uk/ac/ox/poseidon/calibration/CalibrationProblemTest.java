@@ -28,11 +28,13 @@ import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.ImmutableLongArray;
+import io.jenetics.util.DoubleRange;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.SequencedMap;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeoutException;
@@ -42,6 +44,7 @@ import org.junit.jupiter.api.Timeout;
 import uk.ac.ox.poseidon.calibration.CalibrationProblem.SimulationTimes;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 /**
  * Runs an empty scenario for a day; the evaluator's score is the simulation's
@@ -56,7 +59,6 @@ class CalibrationProblemTest {
     return new CalibrationProblem(
       new Scenario(LocalDate.of(2020, 1, 1), Map.of()),
       Period.ofDays(1),
-      ImmutableMap.of(),
       ImmutableMap.of(),
       evaluator,
       ImmutableLongArray.copyOf(seeds)
@@ -103,6 +105,24 @@ class CalibrationProblemTest {
     );
 
     assertThat(evaluate(problem)).isEqualTo(1.5);
+  }
+
+  @Test
+  void eachCandidateRunsAScenarioDerivedWithItsValues() {
+    final CalibrationProblem problem = new CalibrationProblem(
+      new Scenario(
+        LocalDate.of(2020, 1, 1),
+        Map.of("number", new ObjectFactory<>(1.0))
+      ),
+      Period.ofDays(1),
+      ImmutableMap.of("number.value", new DoubleRange(0, 10)),
+      simulation -> simulation.getComponent(Double.class),
+      ImmutableLongArray.of(1)
+    );
+    final SequencedMap<String, Double> parameters = new LinkedHashMap<>();
+    parameters.put("number.value", 2.0);
+
+    assertThat(problem.fitness().apply(parameters)).isEqualTo(2.0);
   }
 
   @Test

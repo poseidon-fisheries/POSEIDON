@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -26,15 +26,11 @@ import static uk.ac.ox.poseidon.core.scopes.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 
 import com.google.common.collect.ImmutableMap;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.SequencedMap;
-import java.util.stream.Stream;
+import java.util.UUID;
 import lombok.*;
-import org.apache.commons.beanutils.PropertyUtils;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.scopes.Scope;
 import uk.ac.ox.poseidon.core.scopes.SimulationScope;
@@ -46,21 +42,53 @@ import uk.ac.ox.poseidon.core.scopes.SimulationScope;
  * must remain serializable to YAML; don't introduce fields/types that can't
  * survive a SnakeYAML round-trip. {@link #startNewSimulation()} is the entry
  * point: it resolves every component factory against a fresh
- * {@link SimulationScope} to build a runnable {@link Simulation}.
+ * {@link SimulationScope} to build a runnable {@link Simulation}. A scenario
+ * that differs in some value is derived from this one by {@link #with},
+ * {@link #withComponent} or {@link #withStartingDateTime}, which leave this
+ * one untouched, so simulations of several derived scenarios can be built at
+ * the same time.
  */
 @Getter
 @Setter
 @Builder(toBuilder = true)
 @NoArgsConstructor
-@AllArgsConstructor
 public final class Scenario {
 
   /** The simulation's starting date-time. */
   private Factory<Scope, LocalDateTime> startingDateTime;
 
-  /** The named component factories making up the scenario. */
+  /**
+   * The named component factories making up the scenario. A name contains
+   * none of the characters {@code .()[]}, which separate the steps of an address
+   * given to {@link #with}.
+   */
   @Singular
   private Map<String, ? extends Factory<? super SimulationScope, ?>> components;
+
+  /**
+   * @param startingDateTime the simulation's starting date-time
+   * @param components       the named component factories making up the
+   *                         scenario
+   * @throws IllegalArgumentException if a component's name contains one of
+   *                                  the characters {@code .()[]}
+   */
+  public Scenario(
+    final Factory<Scope, LocalDateTime> startingDateTime,
+    final Map<String, ? extends Factory<? super SimulationScope, ?>> components
+  ) {
+    components
+      .keySet()
+      .stream()
+      .filter(name -> name.chars().anyMatch(c -> ".()[]".indexOf(c) >= 0))
+      .findFirst()
+      .ifPresent(name -> {
+        throw new IllegalArgumentException(
+          "A component's name cannot contain any of .()[]: " + name
+        );
+      });
+    this.startingDateTime = startingDateTime;
+    this.components = ImmutableMap.copyOf(components);
+  }
 
   /**
    * @param startingDateTime the simulation's starting date-time
@@ -86,123 +114,95 @@ public final class Scenario {
   }
 
   /**
-   * Equivalent to {@link #startNewSimulation(SimulationStartOptions)} with
-   * default options (a random seed, no property overrides, no extra
-   * components).
+   * Derives a scenario in which the value at {@code address} is {@code value}.
+   * The address starts at a component's name and goes on with commons-beanutils
+   * syntax: {@code .property}, {@code (key)} into a map, {@code [index]} into
+   * a list; {@code gear.proportion}, for instance. A factory, map or list
+   * found there is replaced wherever it appears in the scenario; any other
+   * value is replaced in the factory, map or list the address ends in. Every
+   * factory above a replacement is copied, and every other factory is kept,
+   * so the products of global factories it keeps are shared with this
+   * scenario's simulations.
+   *
+   * @param address the address of the value to replace
+   * @param value   the new value
+   * @return the derived scenario
+   * @throws IllegalArgumentException if the address does not lead to a value
+   */
+  public Scenario with(final String address, final Object value) {
+    return ScenarioDerivation.apply(this, address, value);
+  }
+
+  /**
+   * @param name    the new component's name
+   * @param factory the new component's factory
+   * @return a scenario with this one's components and the new one, last
+   * @throws IllegalArgumentException if a component already has that name, or
+   *                                  the name contains one of the characters
+   *                                  {@code .()[]}
+   */
+  public Scenario withComponent(
+    final String name,
+    final Factory<? super SimulationScope, ?> factory
+  ) {
+    return toBuilder().component(name, factory).build();
+  }
+
+  /**
+   * @param startingDateTime the derived scenario's starting date-time
+   * @return a scenario with this one's components, starting at
+   *         {@code startingDateTime}
+   */
+  public Scenario withStartingDateTime(final LocalDateTime startingDateTime) {
+    return toBuilder().startingDateTime(dateTime(startingDateTime)).build();
+  }
+
+  /**
+   * Equivalent to {@link #startNewSimulation(long)} with the current time in
+   * milliseconds as the seed.
    *
    * @return the started {@link Simulation}
    */
   public Simulation startNewSimulation() {
-    return startNewSimulation(SimulationStartOptions.builder().build());
+    return startNewSimulation(System.currentTimeMillis());
+  }
+
+  /**
+   * Equivalent to {@link #startNewSimulation(long, UUID)} with a fresh random
+   * id.
+   *
+   * @param seed the run's RNG seed
+   * @return the started {@link Simulation}
+   */
+  public Simulation startNewSimulation(final long seed) {
+    return startNewSimulation(seed, UUID.randomUUID());
   }
 
   /**
    * Builds and starts a new {@link Simulation} by resolving every component
-   * factory (plus {@code options}' extra components) against a fresh
-   * {@link SimulationScope}.
-   * <p>
-   * If {@code options} carries property overrides, this method temporarily
-   * mutates {@code this} {@link Scenario}'s bean properties (via reflection,
-   * dotted property paths) to the override values for the duration of the
-   * build, then restores the original values in a {@code finally} block before
-   * returning — even though the method is {@code synchronized} on {@code this},
-   * that only serializes concurrent calls against the same {@link Scenario}
-   * instance; any other code reading this scenario's properties concurrently
-   * could observe the temporarily-overridden values. This is how calibration
-   * varies parameters run-to-run without permanently mutating the original
-   * {@link Scenario}.
+   * factory, in order, against a fresh {@link SimulationScope}.
    *
-   * @param options seed, property overrides, and extra components for this run
+   * @param seed         the run's RNG seed
+   * @param simulationId the run's id
    * @return the started {@link Simulation}
    */
-  public synchronized Simulation startNewSimulation(
-    final SimulationStartOptions options
+  public Simulation startNewSimulation(
+    final long seed,
+    final UUID simulationId
   ) {
-    if (options.getPropertyOverrides().isEmpty()) {
-      return createSimulation(options);
-    }
-    final SequencedMap<String, Object> originalPropertyValues =
-      getPropertyValues(options.getPropertyOverrides());
-    try {
-      setProperties(options.getPropertyOverrides());
-      return createSimulation(options);
-    } finally {
-      restoreProperties(originalPropertyValues);
-    }
-  }
-
-  private Simulation createSimulation(final SimulationStartOptions options) {
     final TemporalSchedule schedule = new TemporalSchedule(
       startingDateTime.get(GLOBAL_SCOPE)
     );
-    final Simulation simulation = new Simulation(
-      options.getSeed(),
-      schedule,
-      options.getSimulationId()
-    );
+    final Simulation simulation = new Simulation(seed, schedule, simulationId);
     final SimulationScope simulationScope = new SimulationScope(simulation);
     simulation.start();
     final ImmutableMap.Builder<String, Object> resolved =
       ImmutableMap.builder();
-    Stream.concat(
-      getComponents().entrySet().stream(),
-      options.getExtraComponents().entrySet().stream()
-    ).forEach(entry ->
-      resolved.put(entry.getKey(), entry.getValue().get(simulationScope))
+    components.forEach((name, factory) ->
+      resolved.put(name, factory.get(simulationScope))
     );
     simulation.components = resolved.buildOrThrow();
     return simulation;
-  }
-
-  private SequencedMap<String, Object> getPropertyValues(
-    final Map<String, Object> properties
-  ) {
-    return properties
-      .entrySet()
-      .stream()
-      .collect(
-        LinkedHashMap::new,
-        (values, entry) ->
-          values.put(entry.getKey(), getProperty(entry.getKey())),
-        Map::putAll
-      );
-  }
-
-  private void restoreProperties(
-    final SequencedMap<String, Object> propertyValues
-  ) {
-    propertyValues.reversed().forEach(this::setProperty);
-  }
-
-  synchronized void setProperties(final Map<String, Object> properties) {
-    properties.forEach(this::setProperty);
-  }
-
-  synchronized Object getProperty(final String propertyName) {
-    try {
-      return PropertyUtils.getProperty(this, propertyName);
-    } catch (
-      final InvocationTargetException
-      | IllegalAccessException
-      | NoSuchMethodException e
-    ) {
-      throw new RuntimeException("Unable to read property " + propertyName, e);
-    }
-  }
-
-  synchronized void setProperty(final String propertyName, final Object value) {
-    try {
-      PropertyUtils.setProperty(this, propertyName, value);
-    } catch (
-      final InvocationTargetException
-      | IllegalAccessException
-      | NoSuchMethodException e
-    ) {
-      throw new RuntimeException(
-        "Unable to set property " + propertyName + " to " + value,
-        e
-      );
-    }
   }
 
   /**

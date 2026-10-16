@@ -27,7 +27,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -37,6 +36,7 @@ import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
 import org.yaml.snakeyaml.nodes.Node;
+import uk.ac.ox.poseidon.core.utils.Builders;
 
 /**
  * A SnakeYAML {@link Constructor} that builds objects through their Lombok
@@ -111,46 +111,6 @@ class BuilderConstructor extends Constructor {
   }
 
   /**
-   * Calls the method of {@code target} named {@code name} that takes as many
-   * arguments as given. Lombok's builders give each property one such method.
-   */
-  static Object invoke(
-    final Object target,
-    final String name,
-    final Object... arguments
-  ) {
-    final List<Method> methods = Arrays.stream(target.getClass().getMethods())
-      // Lombok's builders override their parents' methods with narrower
-      // return types, which leaves bridge methods of the same name
-      .filter(method -> !method.isBridge())
-      .filter(method -> method.getName().equals(name))
-      .filter(method -> method.getParameterCount() == arguments.length)
-      .toList();
-    if (methods.size() != 1) {
-      throw new YAMLException(
-        "Expected one method " +
-          name +
-          " taking " +
-          arguments.length +
-          " arguments on " +
-          target.getClass().getName() +
-          ", found " +
-          methods.size()
-      );
-    }
-    final Method method = methods.getFirst();
-    try {
-      method.setAccessible(true);
-      return method.invoke(target, arguments);
-    } catch (final IllegalAccessException | InvocationTargetException e) {
-      throw new YAMLException(
-        "Cannot call " + name + " on " + target.getClass().getName(),
-        e
-      );
-    }
-  }
-
-  /**
    * Describes a class built through its builder: SnakeYAML gets a builder as
    * its instance, sets each property through the builder's method of that
    * name, and gets the built object at the end.
@@ -190,7 +150,7 @@ class BuilderConstructor extends Constructor {
 
         @Override
         public void set(final Object builder, final Object value) {
-          invoke(builder, name, value);
+          Builders.invoke(builder, name, value);
         }
 
         @Override
@@ -214,7 +174,7 @@ class BuilderConstructor extends Constructor {
 
     @Override
     public Object finalizeConstruction(final Object builder) {
-      return invoke(builder, "build");
+      return Builders.invoke(builder, "build");
     }
   }
 }

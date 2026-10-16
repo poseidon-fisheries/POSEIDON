@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.examples.petersnapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPerYearAccumulator;
+import static uk.ac.ox.poseidon.examples.petersnapper.PeterSnapperCatchabilityCalibration.CATCHABILITY_PROPERTY;
 
 import java.time.Period;
 import java.util.List;
@@ -34,7 +35,6 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.SimulationStartOptions;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
@@ -126,20 +126,50 @@ class PeterSnapperScenarioTest {
     assertThat(new ScenarioWriter().write(scenario)).isEqualTo(before);
   }
 
+  // Calibration varies the gear's proportion through this address. The
+  // derived scenario must be the one written with the value set: the gear
+  // replaced wherever it is shared, nothing else changed.
+  @Test
+  void theCalibratedAddressDerivesTheScenarioWithTheValueSet() {
+    final Scenario scenario = new PeterSnapperScenario().get();
+    final String yaml = new ScenarioWriter().write(scenario);
+    final String yamlWithTheValueSet = yaml.replace(
+      "proportion: 6.41964E-4",
+      "proportion: 0.001"
+    );
+    assertThat(yamlWithTheValueSet).isNotEqualTo(yaml);
+
+    final Scenario derived = scenario.with(CATCHABILITY_PROPERTY, 0.001);
+
+    assertThat(new ScenarioWriter().write(derived)).isEqualTo(
+      yamlWithTheValueSet
+    );
+    assertThat(landingsFor(derived, Period.ofDays(60)))
+      .isNotEmpty()
+      .isEqualTo(
+        landingsFor(
+          new ScenarioLoader().load(yamlWithTheValueSet),
+          Period.ofDays(60)
+        )
+      );
+    assertThat(new ScenarioWriter().write(scenario)).isEqualTo(yaml);
+  }
+
   private static Map<Integer, Double> landingsForAYear(
     final Scenario scenario
   ) {
-    final Simulation simulation = scenario.startNewSimulation(
-      SimulationStartOptions.builder()
-        .seed(0)
-        .extraComponent(
-          "totalLandingsPerYear",
-          totalLandingsPerYearAccumulator()
-        )
-        .build()
-    );
+    return landingsFor(scenario, Period.ofYears(1));
+  }
+
+  private static Map<Integer, Double> landingsFor(
+    final Scenario scenario,
+    final Period period
+  ) {
+    final Simulation simulation = scenario
+      .withComponent("totalLandingsPerYear", totalLandingsPerYearAccumulator())
+      .startNewSimulation(0);
     try {
-      simulation.getTemporalSchedule().stepFor(simulation, Period.ofYears(1));
+      simulation.getTemporalSchedule().stepFor(simulation, period);
       return Map.copyOf(
         simulation.getComponent(TotalLandingsPerYearAccumulator.class).get()
       );

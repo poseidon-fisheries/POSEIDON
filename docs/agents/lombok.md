@@ -23,8 +23,9 @@ almost every case — match the shape to the class's role:
   are still used by code that changes factories in place, which is going. `callSuper = true` makes
   equality include the superclass's fields. Don't add other constructors — see "Factory class
   shape" in `docs/agents/architecture.md`.
-- **Builder-style config objects** (e.g. `Scenario`, `SimulationStartOptions`): `@Getter @Setter
-  @Builder @NoArgsConstructor` — mutable via setters or built fluently via `@Builder`.
+- **`Scenario`**: `@Getter @Builder(toBuilder = true)`, built fluently; its `with…` methods derive
+  changed copies through `toBuilder`. Its all-arguments constructor is hand-written, to check
+  component names. Its `@Setter` and `@NoArgsConstructor` go with the factories' setters.
 
 Use `@Getter(AccessLevel.NONE)` (or `@Setter(AccessLevel.NONE)`) on individual fields to suppress
 just that one accessor rather than dropping `@Data`/`@Getter` for a hand-written class.
