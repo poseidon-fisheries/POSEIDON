@@ -26,14 +26,16 @@ import java.lang.ref.WeakReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import uk.ac.ox.poseidon.core.ProductStore;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.Listener;
 
 /**
  * A {@link SimulationScope} narrowed to a {@link Vessel}, for factories
  * building vessel-owned components. A build registers for its vessel through
- * this scope, which gives the registration's teardown to the vessel's store,
- * so that it is taken back when that store ends. Holds the vessel via a
+ * this scope, which gives the registration's teardown to the scope's store
+ * (the vessel's, or a vessel component's in a narrower scope), so that it is
+ * taken back when that store ends. Holds the vessel via a
  * {@link WeakReference}, so that scoping to a vessel never itself keeps that
  * vessel alive past its natural lifetime. In tests, keep the vessel in a
  * field, for the reason given in {@link SimulationScope}.
@@ -43,6 +45,15 @@ import uk.ac.ox.poseidon.core.events.Listener;
 public class VesselScope extends SimulationScope {
 
   private final WeakReference<Vessel> vessel;
+
+  /**
+   * Copy constructor: a scope of exactly this class over the same simulation
+   * and vessel as {@code vesselScope}, which may be narrower.
+   */
+  VesselScope(final VesselScope vesselScope) {
+    super(vesselScope);
+    this.vessel = vesselScope.vessel;
+  }
 
   /**
    * @param simulationScope the simulation scope to narrow
@@ -76,7 +87,7 @@ public class VesselScope extends SimulationScope {
 
   /**
    * Registers a listener on the vessel's event manager, so that it receives
-   * the events the vessel broadcasts from now on, until the vessel's store
+   * the events the vessel broadcasts from now on, until this scope's store
    * ends.
    *
    * @param listener the listener to register
@@ -85,14 +96,14 @@ public class VesselScope extends SimulationScope {
   public void addListener(final Listener<?> listener) {
     final Vessel vessel = getVessel();
     vessel.getEventManager().addListener(listener);
-    vessel
-      .getProductStore()
-      .addTeardown(() -> vessel.getEventManager().removeListener(listener));
+    getProductStore().addTeardown(() ->
+      vessel.getEventManager().removeListener(listener)
+    );
   }
 
   /**
-   * Registers {@code item} for the vessel in {@code registry}, until the
-   * vessel's store ends.
+   * Registers {@code item} for the vessel in {@code registry}, until this
+   * scope's store ends.
    *
    * @param registry the structure to register {@code item} in
    * @param item     what to register for the vessel
@@ -102,7 +113,11 @@ public class VesselScope extends SimulationScope {
     final VesselRegistry<? super T> registry,
     final T item
   ) {
-    final Vessel vessel = getVessel();
-    vessel.getProductStore().addTeardown(registry.register(vessel, item));
+    getProductStore().addTeardown(registry.register(getVessel(), item));
+  }
+
+  @Override
+  protected Scope at(final Class<? extends Scope> level) {
+    return level == VesselScope.class ? new VesselScope(this) : super.at(level);
   }
 }
