@@ -46,8 +46,9 @@ import uk.ac.ox.poseidon.core.utils.Builders;
  * <p>
  * An address starts at a component's name and goes on with commons-beanutils
  * syntax: {@code .property}, {@code (key)} into a map, {@code [index]} into a
- * list. Following it only reads. If the value found is a node (a factory, a
- * {@link DescriptionNode}, a map or a list), it is replaced in every
+ * list. Following it only reads. If the value found is a node (a
+ * {@link ScenarioNode}, such as a factory, or a map or a list), it is replaced
+ * in every
  * container that holds it, since the same node may be reached in several
  * ways. Any other value is replaced in the container the address ends in,
  * which is then the changed node.
@@ -137,8 +138,7 @@ final class ScenarioDerivation {
 
   private static boolean isNode(final Object object) {
     return (
-      object instanceof Factory<?, ?> ||
-      object instanceof DescriptionNode ||
+      object instanceof ScenarioNode ||
       object instanceof Map<?, ?> ||
       object instanceof Collection<?>
     );
@@ -152,10 +152,7 @@ final class ScenarioDerivation {
       case final Map<?, ?> map -> rebuiltMap(map);
       case final List<?> list -> rebuiltList(list);
       case final Collection<?> collection -> checkedUnchanged(collection);
-      case final Factory<?, ?> factory -> rebuiltBean(factory);
-      case final DescriptionNode descriptionNode -> rebuiltBean(
-        descriptionNode
-      );
+      case final ScenarioNode scenarioNode -> rebuiltBean(scenarioNode);
       case final Scenario scenario -> rebuiltBean(scenario);
       case null, default -> node;
     };
@@ -251,10 +248,7 @@ final class ScenarioDerivation {
   private record Property(String name) implements Step {
     @Override
     public Object read(final Object container, final String address) {
-      if (
-        !(container instanceof Factory<?, ?>) &&
-        !(container instanceof DescriptionNode)
-      ) {
+      if (!(container instanceof ScenarioNode)) {
         throw new IllegalArgumentException(
           "No property " + name + " to follow in " + address
         );

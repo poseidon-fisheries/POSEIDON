@@ -27,8 +27,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import uk.ac.ox.poseidon.core.DescriptionNode;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ScenarioNode;
 
 /**
  * The scenario's single statement of one vessel component: what builds it.
@@ -43,7 +43,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @Getter
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public final class VesselComponent<T> implements DescriptionNode {
+public final class VesselComponent<T> implements ScenarioNode {
 
   /**
    * Builds the component; its own level decides where its product lives: a

@@ -35,14 +35,14 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import uk.ac.ox.poseidon.core.DescriptionCheck.ReachedNode;
+import uk.ac.ox.poseidon.core.ScenarioCheck.ReachedNode;
 
 /**
  * Walks a scenario's description from its components, meeting each node once
- * however many ways it is reached, and runs the {@link DescriptionCheck}s it
+ * however many ways it is reached, and runs the {@link ScenarioCheck}s it
  * meets over every node.
  */
-final class DescriptionWalk {
+final class ScenarioWalk {
 
   private static final ClassValue<List<PropertyDescriptor>> PROPERTIES =
     new ClassValue<>() {
@@ -65,14 +65,14 @@ final class DescriptionWalk {
     new IdentityHashMap<>()
   );
 
-  private DescriptionWalk() {}
+  private ScenarioWalk() {}
 
   /**
    * @param scenario the scenario whose description to check
    * @throws IllegalStateException if a check fails
    */
   static void check(final Scenario scenario) {
-    final DescriptionWalk walk = new DescriptionWalk();
+    final ScenarioWalk walk = new ScenarioWalk();
     scenario
       .getComponents()
       .values()
@@ -81,8 +81,8 @@ final class DescriptionWalk {
     nodes
       .stream()
       .map(ReachedNode::node)
-      .filter(DescriptionCheck.class::isInstance)
-      .forEach(node -> ((DescriptionCheck) node).check(nodes));
+      .filter(ScenarioCheck.class::isInstance)
+      .forEach(node -> ((ScenarioCheck) node).check(nodes));
   }
 
   private void visit(final Object value, final Object parent) {
@@ -93,8 +93,7 @@ final class DescriptionWalk {
       case final Collection<?> collection -> collection.forEach(element ->
         visit(element, parent)
       );
-      case final Factory<?, ?> node -> visitNode(node, parent);
-      case final DescriptionNode node -> visitNode(node, parent);
+      case final ScenarioNode node -> visitNode(node, parent);
       case null, default -> {
       }
     }

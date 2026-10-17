@@ -36,7 +36,7 @@ package uk.ac.ox.poseidon.core;
  * @param <S> the scope this factory resolves against
  * @param <P> the type of the product
  */
-public interface Factory<S extends Scope, P> {
+public interface Factory<S extends Scope, P> extends ScenarioNode {
   /**
    * @param scope the scope to resolve this factory against
    * @return the resolved object, of type {@code P}

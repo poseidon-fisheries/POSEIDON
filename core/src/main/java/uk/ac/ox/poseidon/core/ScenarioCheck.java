@@ -22,12 +22,28 @@
 
 package uk.ac.ox.poseidon.core;
 
+import java.util.List;
+
 /**
- * A part of a scenario's description that is not a factory, such as the
- * declaration of a vessel component: a bean whose properties are other parts
- * of the description. Derivation and the YAML writer walk into it as they do
- * into a factory, and derivation copies it through its builder
- * ({@code toBuilder()}) when a part it holds changes. It is immutable, and
- * compared by identity: the same node reached in two ways is one node.
+ * A part of a scenario's description that checks the whole description it
+ * belongs to, before a simulation of it starts: a wiring error found this way
+ * fails before anything is built, whichever part of the description it lies
+ * in.
  */
-public interface DescriptionNode {}
+public interface ScenarioCheck {
+  /**
+   * @param nodes every {@link ScenarioNode} of the scenario, factories
+   *              included, each once, with the node it was
+   *              first reached from, in the order a walk from the scenario's
+   *              components meets them
+   * @throws IllegalStateException naming what is wrong
+   */
+  void check(List<ReachedNode> nodes);
+
+  /**
+   * @param node   a node of the description
+   * @param parent the node {@code node} was first reached from, or
+   *               {@code null} for a scenario component
+   */
+  record ReachedNode(Object node, Object parent) {}
+}

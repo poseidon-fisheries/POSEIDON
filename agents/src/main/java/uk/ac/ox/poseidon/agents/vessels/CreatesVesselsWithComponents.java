@@ -27,7 +27,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-import uk.ac.ox.poseidon.core.DescriptionCheck;
+import uk.ac.ox.poseidon.core.ScenarioCheck;
 
 /**
  * What creates vessels, and lists the declarations of the components they are
@@ -36,7 +36,7 @@ import uk.ac.ox.poseidon.core.DescriptionCheck;
  * component no vessel has is a wiring error, caught before the first step
  * rather than when the consumer is first used.
  */
-interface CreatesVesselsWithComponents extends DescriptionCheck {
+interface CreatesVesselsWithComponents extends ScenarioCheck {
   /** @return the declarations of the components its vessels are created with */
   Stream<VesselComponent<?>> listedComponents();
 

@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.DescriptionCheck.ReachedNode;
+import uk.ac.ox.poseidon.core.ScenarioCheck.ReachedNode;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 
 /**
@@ -36,7 +36,7 @@ import uk.ac.ox.poseidon.core.time.DateTimeFactory;
  * every node of the description, each met once with the node it was first
  * reached from.
  */
-class DescriptionCheckTest {
+class ScenarioCheckTest {
 
   @Test
   void aCheckSeesEveryNodeOnceWithWhereItWasFirstReachedFrom() {
@@ -89,7 +89,7 @@ class DescriptionCheckTest {
   /** Holds its children, builds them, and records what it sees. */
   static class RecordingCheck
     extends GlobalScopeFactory<Object>
-    implements DescriptionCheck
+    implements ScenarioCheck
   {
 
     private final List<Leaf> children;
