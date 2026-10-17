@@ -179,16 +179,19 @@ public final class Scenario {
 
   /**
    * Builds and starts a new {@link Simulation} by resolving every component
-   * factory, in order, against a fresh {@link SimulationScope}.
+   * factory, in order, against a fresh {@link SimulationScope}, once the
+   * {@link DescriptionCheck}s in the description have passed.
    *
    * @param seed         the run's RNG seed
    * @param simulationId the run's id
    * @return the started {@link Simulation}
+   * @throws IllegalStateException if a check of the description fails
    */
   public Simulation startNewSimulation(
     final long seed,
     final UUID simulationId
   ) {
+    DescriptionWalk.check(this);
     final TemporalSchedule schedule = new TemporalSchedule(
       startingDateTime.get(GLOBAL_SCOPE)
     );

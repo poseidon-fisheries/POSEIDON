@@ -59,7 +59,10 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FleetFromVesselRegisterFactory extends SchedulingFactory<Fleet> {
+public class FleetFromVesselRegisterFactory
+  extends SchedulingFactory<Fleet>
+  implements CreatesVesselsWithComponents
+{
 
   /** The vessel register table. */
   private Factory<? super SimulationScope, ? extends Table> data;
@@ -127,6 +130,15 @@ public class FleetFromVesselRegisterFactory extends SchedulingFactory<Fleet> {
    */
   @Singular
   private Map<String, String> dataMappings;
+
+  /** @return the behaviour's declaration, then the other components' */
+  @Override
+  public Stream<VesselComponent<?>> listedComponents() {
+    return Stream.concat(
+      Stream.ofNullable(behaviour),
+      components == null ? Stream.empty() : components.stream()
+    );
+  }
 
   private Object getProperty(final String propertyName) {
     try {

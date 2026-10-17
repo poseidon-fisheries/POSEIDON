@@ -27,6 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -56,6 +57,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @SuperBuilder(toBuilder = true)
 public class VesselCreatorFactory
   extends SimulationScopeFactory<VesselCreator>
+  implements CreatesVesselsWithComponents
 {
 
   private final Factory<
@@ -85,6 +87,15 @@ public class VesselCreatorFactory
     ? super SimulationScope,
     ? extends EventManager
   > eventManager;
+
+  /** @return the behaviour's declaration, then the other components' */
+  @Override
+  public Stream<VesselComponent<?>> listedComponents() {
+    return Stream.concat(
+      Stream.of(behaviour),
+      components == null ? Stream.empty() : components.stream()
+    );
+  }
 
   /**
    * @return a {@link VesselCreator} ready to create
