@@ -52,7 +52,6 @@ class IndexedBiomassCatchabilityGearTest {
     final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
     final IndexedBiomassCatchabilityGear gear =
       new IndexedBiomassCatchabilityGear(
-        "G1",
         SpeciesIndexedDoubleArray.of(new double[] { 0.2, 0.6 }, speciesIndex),
         MINIMUM_CATCH_THRESHOLD,
         DURATION
@@ -74,7 +73,6 @@ class IndexedBiomassCatchabilityGearTest {
     final SpeciesIndex gearIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
     final IndexedBiomassCatchabilityGear gear =
       new IndexedBiomassCatchabilityGear(
-        "G1",
         SpeciesIndexedDoubleArray.of(new double[] { 0.1, 0.5 }, gearIndex),
         MINIMUM_CATCH_THRESHOLD,
         DURATION
@@ -96,7 +94,6 @@ class IndexedBiomassCatchabilityGearTest {
 
     assertThatThrownBy(() ->
       new IndexedBiomassCatchabilityGear(
-        "G1",
         SpeciesIndexedDoubleArray.of(new double[] { 0.3, 1.2 }, speciesIndex),
         MINIMUM_CATCH_THRESHOLD,
         DURATION
@@ -109,7 +106,6 @@ class IndexedBiomassCatchabilityGearTest {
     final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A);
     final IndexedBiomassCatchabilityGear gear =
       new IndexedBiomassCatchabilityGear(
-        "G1",
         SpeciesIndexedDoubleArray.of(new double[] { 0.5 }, speciesIndex),
         MINIMUM_CATCH_THRESHOLD,
         DURATION
@@ -127,7 +123,6 @@ class IndexedBiomassCatchabilityGearTest {
     final SpeciesIndex speciesIndex = SpeciesIndex.of(SPECIES_A, SPECIES_B);
     assertThatThrownBy(() ->
       new IndexedBiomassCatchabilityGear(
-        "G1",
         SpeciesIndexedDoubleArray.of(new double[] { 0.3, 0.5 }, speciesIndex),
         -1.0,
         DURATION
@@ -140,7 +135,6 @@ class IndexedBiomassCatchabilityGearTest {
   void constructor_rejectsNullProportions() {
     assertThatThrownBy(() ->
       new IndexedBiomassCatchabilityGear(
-        "G1",
         null,
         MINIMUM_CATCH_THRESHOLD,
         DURATION

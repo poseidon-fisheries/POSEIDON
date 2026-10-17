@@ -227,7 +227,6 @@ components:
                       fuelTank: *id011
                       gear: &id020
                         factory: !!uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory
-                          code: FGL
                           duration: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory
                             object: !!uk.ac.ox.poseidon.core.time.DurationFactory {
                               days: 0,

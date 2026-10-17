@@ -127,13 +127,13 @@ class FleetFromVesselRegisterFactoryTest {
     final Vessel v1 = fleet.getVessel("V1").orElseThrow();
     assertThat(v1.getName()).isEqualTo("Vee One");
     assertThat(v1.getHomePort()).isEqualTo(p1);
-    assertThat(v1.getTag("t1").orElseThrow()).isEqualTo(1);
-    assertThat(v1.getTag("t2").orElseThrow()).isEqualTo("a");
+    assertThat(v1.getAttributes().get("t1")).isEqualTo(1);
+    assertThat(v1.getAttributes().get("t2")).isEqualTo("a");
     final Vessel v2 = fleet.getVessel("V2").orElseThrow();
     assertThat(v2.getName()).isEqualTo("Vee Two");
     assertThat(v2.getHomePort()).isEqualTo(p1);
-    assertThat(v2.getTag("t1").orElseThrow()).isEqualTo(2);
-    assertThat(v2.getTag("t2").orElseThrow()).isEqualTo("b");
+    assertThat(v2.getAttributes().get("t1")).isEqualTo(2);
+    assertThat(v2.getAttributes().get("t2")).isEqualTo("b");
   }
 
   @Test
@@ -156,14 +156,27 @@ class FleetFromVesselRegisterFactoryTest {
     assertThat(v1.getName()).isEqualTo("Vee Uno");
     assertThat(v1.getHomePort()).isEqualTo(p1);
     assertThat(gear.of(v1)).isEqualTo(g2);
-    assertThat(v1.getTag("t1").orElseThrow()).isEqualTo(3);
-    assertThat(v1.getTag("t2").orElseThrow()).isEqualTo("c");
+    assertThat(v1.getAttributes().get("t1")).isEqualTo(3);
+    assertThat(v1.getAttributes().get("t2")).isEqualTo("c");
     final Vessel v2 = fleet.getVessel("V2").orElseThrow();
     assertThat(v2.getName()).isEqualTo("Vee Dos");
     assertThat(v2.getHomePort()).isEqualTo(p2);
     assertThat(gear.of(v2)).isEqualTo(g1);
-    assertThat(v2.getTag("t1").orElseThrow()).isEqualTo(4);
-    assertThat(v2.getTag("t2").orElseThrow()).isEqualTo("d");
+    assertThat(v2.getAttributes().get("t1")).isEqualTo(4);
+    assertThat(v2.getAttributes().get("t2")).isEqualTo("d");
+  }
+
+  @Test
+  void aMissingValueIsAnAbsentAttribute() {
+    initSimulation(
+      """
+      V1,Vee Uno,P1,MOD,2001-01-02,G2,,NA
+      """
+    );
+    simulation.stepFor(Duration.ofDays(1).plusMinutes(1));
+    final Vessel v1 = fleet.getVessel("V1").orElseThrow();
+    assertThat(v1.getAttributes()).doesNotContainKeys("t1", "t2");
+    assertThat(v1.getAttributes().get("gear")).isEqualTo("G2");
   }
 
   @Test

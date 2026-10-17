@@ -40,8 +40,8 @@ import sim.engine.Steppable;
 /**
  * A scheduled {@link Steppable} that, when run, activates, deactivates or
  * modifies one vessel in a {@link Fleet}: creating it on first
- * {@link Type#ACTIVATION}, updating its home port, name, tags and components,
- * and flipping its registered-active status.
+ * {@link Type#ACTIVATION}, updating its home port, name, attributes and
+ * components, and flipping its registered-active status.
  */
 @Value
 public class FleetEvent implements Steppable {
@@ -79,9 +79,9 @@ public class FleetEvent implements Steppable {
   @NonNull
   String portCode;
 
-  /** Arbitrary tags to set on the vessel as of this event. */
+  /** The vessel's attributes as of this event, in place of its previous ones. */
   @NonNull
-  Map<String, Object> tags;
+  Map<String, Object> attributes;
 
   /**
    * The declaration of the behaviour the vessel steps, for creating the
@@ -99,8 +99,8 @@ public class FleetEvent implements Steppable {
 
   /**
    * Applies this event to the vessel named {@link #vesselId} in {@link #fleet}:
-   * resolves (or creates) it, updates its home port, name, tags and
-   * components, and flips its registered-active status per
+   * resolves (or creates) it, updates its home port, name, attributes
+   * and components, and flips its registered-active status per
    * {@link #eventType}.
    *
    * @throws IllegalStateException if the vessel doesn't exist and this isn't an
@@ -160,7 +160,7 @@ public class FleetEvent implements Steppable {
       );
 
     vessel.setName(vesselName);
-    tags.forEach(vessel::putTag);
+    vessel.setAttributes(attributes);
     componentFactoryFunctions.forEach(factory -> factory.apply(vessel));
     switch (eventType) {
       case ACTIVATION -> vessel.setRegisteredAsActive(true);

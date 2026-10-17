@@ -58,7 +58,6 @@ public class IndexedBiomassCatchabilityGearFactory<S extends Scope> extends Rela
   IndexedBiomassCatchabilityGear
 > {
 
-  private final String code;
   private final ValueFactory<? super S, ? super Void, Duration> duration;
   private final Factory<
     ? super S,
@@ -80,7 +79,6 @@ public class IndexedBiomassCatchabilityGearFactory<S extends Scope> extends Rela
   protected IndexedBiomassCatchabilityGear newInstance(final S scope) {
     final var function = WithoutContext.function(proportionFunction.get(scope));
     return new IndexedBiomassCatchabilityGear(
-      code,
       SpeciesIndex.of(species.get(scope)).mapToDoubleArray(s ->
         checkUnitRange(function.apply(s), "proportion")
       ),

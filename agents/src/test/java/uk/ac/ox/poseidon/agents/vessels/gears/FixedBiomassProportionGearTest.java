@@ -41,13 +41,7 @@ class FixedBiomassProportionGearTest {
 
   @Test
   void fish_appliesProportion_aboveThreshold() {
-    final var gear = new FixedBiomassProportionGear(
-      "G1",
-      0.25,
-      1.0,
-      DURATION,
-      0.0
-    );
+    final var gear = new FixedBiomassProportionGear(0.25, 1.0, DURATION, 0.0);
     final Bucket availableFish = Bucket.of(SPECIES_A, 10.0);
     final Fisheable fisheable = new StubFisheable(availableFish);
 
@@ -58,13 +52,7 @@ class FixedBiomassProportionGearTest {
 
   @Test
   void fish_returnsZero_belowThreshold() {
-    final var gear = new FixedBiomassProportionGear(
-      "G1",
-      0.25,
-      1.0,
-      DURATION,
-      0.0
-    );
+    final var gear = new FixedBiomassProportionGear(0.25, 1.0, DURATION, 0.0);
     final Bucket availableFish = Bucket.of(SPECIES_A, 3.0);
     final Fisheable fisheable = new StubFisheable(availableFish);
 
@@ -75,13 +63,7 @@ class FixedBiomassProportionGearTest {
 
   @Test
   void fish_returnsPositive_atThreshold() {
-    final var gear = new FixedBiomassProportionGear(
-      "G1",
-      0.25,
-      1.0,
-      DURATION,
-      0.0
-    );
+    final var gear = new FixedBiomassProportionGear(0.25, 1.0, DURATION, 0.0);
     final Bucket availableFish = Bucket.of(SPECIES_A, 4.0);
     final Fisheable fisheable = new StubFisheable(availableFish);
 
@@ -92,13 +74,7 @@ class FixedBiomassProportionGearTest {
 
   @Test
   void fish_zeroProportion_returnsZero() {
-    final var gear = new FixedBiomassProportionGear(
-      "G1",
-      0.0,
-      1.0,
-      DURATION,
-      0.0
-    );
+    final var gear = new FixedBiomassProportionGear(0.0, 1.0, DURATION, 0.0);
     final Bucket availableFish = Bucket.of(SPECIES_A, 100.0);
     final Fisheable fisheable = new StubFisheable(availableFish);
 
@@ -110,14 +86,14 @@ class FixedBiomassProportionGearTest {
   @Test
   void constructor_rejectsNegativeThreshold() {
     assertThatThrownBy(() ->
-      new FixedBiomassProportionGear("G1", 0.25, -1.0, DURATION, 0.0)
+      new FixedBiomassProportionGear(0.25, -1.0, DURATION, 0.0)
     ).isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void constructor_rejectsOutOfRangeProportion() {
     assertThatThrownBy(() ->
-      new FixedBiomassProportionGear("G1", 1.5, 1.0, DURATION, 0.0)
+      new FixedBiomassProportionGear(1.5, 1.0, DURATION, 0.0)
     ).isInstanceOf(IllegalArgumentException.class);
   }
 

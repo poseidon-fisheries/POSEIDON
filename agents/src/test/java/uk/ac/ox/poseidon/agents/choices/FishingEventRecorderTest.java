@@ -26,13 +26,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingOutcome;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import uk.ac.ox.poseidon.agents.vessels.values.attributes.StringAttribute;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -48,9 +49,7 @@ class FishingEventRecorderTest {
   private final FishingEventRecorder fishingEventRecorder =
     new FishingEventRecorder(
       modelGrid(),
-      new KeyedMemorySelector<>(keyedMemory, (FishingEvent event) ->
-        event.getAction().getGear().getCode()
-      ),
+      new KeyedMemorySelector<>(keyedMemory, new StringAttribute("gear")),
       Bucket::add
     );
 
@@ -65,10 +64,8 @@ class FishingEventRecorderTest {
     final Coordinate coordinate,
     final Bucket retained
   ) {
-    final Gear gear = mock(Gear.class);
-    when(gear.getCode()).thenReturn(gearCode);
     final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
-    when(action.getGear()).thenReturn(gear);
+    when(action.getAttributes()).thenReturn(Map.of("gear", gearCode));
     when(action.getStartCoordinate()).thenReturn(coordinate);
     return new FishingEvent(
       action,

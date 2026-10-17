@@ -55,7 +55,6 @@ public class FixedBiomassProportionGearFactory<S extends Scope> extends Relative
   FixedBiomassProportionGear
 > {
 
-  private final String code;
   private final Factory<? super S, ? extends Double> proportion;
   private final Factory<
     ? super S,
@@ -75,7 +74,6 @@ public class FixedBiomassProportionGearFactory<S extends Scope> extends Relative
       .getValue()
       .doubleValue();
     return new FixedBiomassProportionGear(
-      code,
       proportion.get(scope),
       minimumCatchThreshold.get(scope).to(KILOGRAM).getValue().doubleValue(),
       WithoutContext.supplier(duration.get(scope)),

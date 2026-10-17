@@ -21,8 +21,9 @@
  */
 
 /**
- * Extracts a named tag off a {@link uk.ac.ox.poseidon.agents.vessels.Vessel},
- * as a {@link String} or a {@link Double}. See {@link Factories} for the entry
- * points.
+ * Reads a named attribute, as a {@link String} or a {@link Double}, off a
+ * {@link uk.ac.ox.poseidon.agents.vessels.Vessel} (its current attributes) or
+ * an action it made (the attributes it had then). See {@link Factories} for
+ * the entry points.
  */
-package uk.ac.ox.poseidon.agents.vessels.values.tags;
+package uk.ac.ox.poseidon.agents.vessels.values.attributes;

@@ -36,15 +36,14 @@ import static uk.ac.ox.poseidon.agents.social.Factories.fishingEventSharer;
 import static uk.ac.ox.poseidon.agents.social.Factories.sharedFishingEventListener;
 import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
 import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventAccumulator;
-import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventProperty;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
 import static uk.ac.ox.poseidon.agents.vessels.TripFixtures.startTrip;
-import static uk.ac.ox.poseidon.agents.vessels.values.Factories.componentProperty;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.vesselProperty;
+import static uk.ac.ox.poseidon.agents.vessels.values.attributes.Factories.stringAttribute;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.days;
@@ -100,9 +99,9 @@ class FishingEventSharingRouteTest {
   private static final double OWN_ALPHA = 0.5;
   private static final double SOCIAL_ALPHA = 0.25;
   private static final String VESSEL_REGISTER = """
-  cfr,name_of_vessel,place_of_registration,event,event_start_date
-  A,Vessel A,P1,CEN,2001-01-01
-  B,Vessel B,P1,CEN,2001-01-01
+  cfr,name_of_vessel,place_of_registration,event,event_start_date,gear
+  A,Vessel A,P1,CEN,2001-01-01,PS
+  B,Vessel B,P1,CEN,2001-01-01,PS
   """;
 
   private final Species species = new Species("S", null, "S");
@@ -129,10 +128,7 @@ class FishingEventSharingRouteTest {
     keyedMemory();
   private final MemoryBasedOptionValuesFactory<Int2D, Bucket> optionValues =
     memoryBasedOptionValues(
-      keyedMemorySelector(
-        vesselMemory,
-        componentProperty(gearComponent, "code")
-      ),
+      keyedMemorySelector(vesselMemory, stringAttribute("gear")),
       object(kgOfSpecies)
     );
   private final FleetFactory baseFleet = fleet(
@@ -156,7 +152,6 @@ class FishingEventSharingRouteTest {
     when(vesselField.getModelGrid()).thenReturn(modelGrid);
     when(vesselField.getCell(any())).thenReturn(cell);
     when(gear.isActive()).thenReturn(true);
-    when(gear.getCode()).thenReturn("PS");
   }
 
   private void startSimulation(
@@ -177,10 +172,7 @@ class FishingEventSharingRouteTest {
             vesselEventListener(
               fishingEventRecorder(
                 object(modelGrid),
-                keyedMemorySelector(
-                  vesselMemory,
-                  fishingEventProperty("action.gear.code")
-                ),
+                keyedMemorySelector(vesselMemory, stringAttribute("gear")),
                 exponentialMovingAverageOfBuckets(OWN_ALPHA)
               )
             )
@@ -191,10 +183,7 @@ class FishingEventSharingRouteTest {
             sharedFishingEventListener(
               fishingEventRecorder(
                 object(modelGrid),
-                keyedMemorySelector(
-                  vesselMemory,
-                  fishingEventProperty("action.gear.code")
-                ),
+                keyedMemorySelector(vesselMemory, stringAttribute("gear")),
                 exponentialMovingAverageOfBuckets(SOCIAL_ALPHA)
               ),
               fishingEventSharer
@@ -317,7 +306,7 @@ class FishingEventSharingRouteTest {
     startSimulation(
       VESSEL_REGISTER +
         """
-        C,Vessel C,P1,CEN,2001-01-05
+        C,Vessel C,P1,CEN,2001-01-05,PS
         """,
       true
     );

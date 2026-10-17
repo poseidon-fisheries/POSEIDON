@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -24,8 +24,6 @@ package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import java.time.Duration;
 import java.util.function.Supplier;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
@@ -33,11 +31,7 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
  * A {@link Gear} standing for having no gear at all; fishing with it is an
  * error.
  */
-@Getter
-@RequiredArgsConstructor
 public class InactiveGear implements Gear {
-
-  private final String code;
 
   /** @throws IllegalStateException always */
   @Override

@@ -22,9 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.regulations.actions;
 
+import com.google.common.collect.ImmutableMap;
 import java.time.LocalDateTime;
+import java.util.Map;
 import lombok.Getter;
 import lombok.NonNull;
+import uk.ac.ox.poseidon.agents.vessels.HasAttributes;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -37,12 +40,15 @@ import uk.ac.ox.poseidon.regulations.ExtendedAction;
 @Getter
 public class InstantFishingAction
   extends ExtendedAction<Vessel>
-  implements TemporalFishingAction, SpatialFishingAction
+  implements TemporalFishingAction, SpatialFishingAction, HasAttributes
 {
 
   /** The gear the vessel is recorded as fishing with. */
   @NonNull
   private final Gear gear;
+
+  /** The vessel's attributes when it took the action. */
+  private final Map<String, Object> attributes;
 
   /**
    * @param vessel     the vessel taking the action
@@ -57,6 +63,7 @@ public class InstantFishingAction
     @NonNull final Gear gear
   ) {
     super(vessel, dateTime, dateTime, coordinate);
+    this.attributes = ImmutableMap.copyOf(vessel.getAttributes());
     this.gear = gear;
   }
 

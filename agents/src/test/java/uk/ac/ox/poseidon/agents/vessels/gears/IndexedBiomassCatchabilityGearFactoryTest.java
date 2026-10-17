@@ -46,7 +46,6 @@ class IndexedBiomassCatchabilityGearFactoryTest {
     final Factory<Scope, Collection<? extends Species>> species = scope ->
       List.of(new Species("COD", "adult", "Cod"));
     final var factory = Factories.indexedBiomassCatchabilityGear(
-      "G1",
       duration,
       species,
       (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->
@@ -54,7 +53,7 @@ class IndexedBiomassCatchabilityGearFactoryTest {
       massOf(1, KILOGRAM)
     );
     final var gear = factory.get(Scope.GLOBAL_SCOPE);
-    assertThat(gear.getCode()).isEqualTo("G1");
+    assertThat(gear.getProportions().getDouble(0)).isEqualTo(0.5);
   }
 
   @Test
@@ -64,7 +63,6 @@ class IndexedBiomassCatchabilityGearFactoryTest {
     final Factory<Scope, Collection<? extends Species>> species = scope ->
       List.of(new Species("COD", "adult", "Cod"));
     final var factory = Factories.indexedBiomassCatchabilityGear(
-      "G1",
       duration,
       species,
       (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->

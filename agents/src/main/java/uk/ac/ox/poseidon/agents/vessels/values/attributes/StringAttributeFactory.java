@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.values.tags;
+package uk.ac.ox.poseidon.agents.vessels.values.attributes;
 
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
@@ -28,29 +28,29 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.HasAttributes;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link StringTagExtractor}, built
- * via {@link Factories#stringTagExtractor}.
+ * A {@link GlobalScopeFactory} counterpart of {@link StringAttribute}, built
+ * via {@link Factories#stringAttribute}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class StringTagExtractorFactory
-  extends GlobalScopeFactory<Function<Vessel, String>>
-  implements ValueFactory<Scope, Vessel, String>
+public class StringAttributeFactory
+  extends GlobalScopeFactory<Function<HasAttributes, String>>
+  implements ValueFactory<Scope, HasAttributes, String>
 {
 
-  private final String tagName;
+  private final String name;
 
   @Override
-  protected Function<Vessel, String> newInstance(final Scope scope) {
-    return new StringTagExtractor(tagName);
+  protected Function<HasAttributes, String> newInstance(final Scope scope) {
+    return new StringAttribute(name);
   }
 }

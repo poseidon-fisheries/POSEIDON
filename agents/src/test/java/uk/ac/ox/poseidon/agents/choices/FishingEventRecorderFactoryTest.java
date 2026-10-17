@@ -31,7 +31,7 @@ import static uk.ac.ox.poseidon.agents.choices.Factories.keyedMemory;
 import static uk.ac.ox.poseidon.agents.choices.Factories.keyedMemorySelector;
 import static uk.ac.ox.poseidon.agents.choices.Factories.memoryBasedOptionValues;
 import static uk.ac.ox.poseidon.agents.choices.FishingEventRecorderTest.fishingEvent;
-import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventProperty;
+import static uk.ac.ox.poseidon.agents.vessels.values.attributes.Factories.stringAttribute;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.util.function.Function;
@@ -75,10 +75,7 @@ class FishingEventRecorderFactoryTest {
   private final FishingEventRecorderFactory<VesselScope> factory =
     fishingEventRecorder(
       object(modelGrid()),
-      keyedMemorySelector(
-        keyedMemory,
-        fishingEventProperty("action.gear.code")
-      ),
+      keyedMemorySelector(keyedMemory, stringAttribute("gear")),
       exponentialMovingAverageOfBuckets(0.5)
     );
 

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,8 +23,10 @@
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import lombok.Value;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
+import uk.ac.ox.poseidon.agents.vessels.HasAttributes;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
 
 /**
@@ -32,12 +34,18 @@ import uk.ac.ox.poseidon.core.events.ExtendedEvent;
  * caught.
  */
 @Value
-public class FishingEvent implements ExtendedEvent {
+public class FishingEvent implements ExtendedEvent, HasAttributes {
 
   /** The fishing action taken. */
   ExtendedFishingAction action;
   /** What the action caught, and how it was disposed of. */
   FishingOutcome outcome;
+
+  /** @return the vessel's attributes when it took {@link #action} */
+  @Override
+  public Map<String, Object> getAttributes() {
+    return action.getAttributes();
+  }
 
   /** @return {@link #action}'s start time */
   @Override

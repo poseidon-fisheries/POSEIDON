@@ -44,7 +44,6 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param code                  this gear's identifying code
    * @param proportion            factory for the fraction of available
    *                              biomass caught per species
    * @param minimumCatchThreshold per-species catch below this is discarded down
@@ -57,7 +56,6 @@ public class Factories {
    * @see FixedBiomassProportionGear
    */
   public static <S extends Scope> FixedBiomassProportionGearFactory<S> fixedBiomassProportionGear(
-    final String code,
     final Factory<? super S, ? extends Double> proportion,
     final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold,
     final ValueFactory<? super S, ? super Void, Duration> duration,
@@ -67,7 +65,6 @@ public class Factories {
     > fuelConsumptionRate
   ) {
     return new FixedBiomassProportionGearFactory<>(
-      code,
       proportion,
       minimumCatchThreshold,
       duration,
@@ -76,7 +73,6 @@ public class Factories {
   }
 
   /**
-   * @param code                  this gear's identifying code
    * @param proportion            the fraction of available biomass caught per
    *                              species
    * @param minimumCatchThreshold per-species catch below this is discarded down
@@ -89,7 +85,6 @@ public class Factories {
    * @see FixedBiomassProportionGear
    */
   public static <S extends Scope> FixedBiomassProportionGearFactory<S> fixedBiomassProportionGear(
-    final String code,
     final double proportion,
     final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold,
     final ValueFactory<? super S, ? super Void, Duration> duration,
@@ -99,7 +94,6 @@ public class Factories {
     > fuelConsumptionRate
   ) {
     return fixedBiomassProportionGear(
-      code,
       object(proportion),
       minimumCatchThreshold,
       duration,
@@ -108,17 +102,15 @@ public class Factories {
   }
 
   /**
-   * @param code this gear's identifying code
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
    *         {@link InactiveGear}
    * @see InactiveGear
    */
-  public static InactiveGearFactory inactiveGear(final String code) {
-    return new InactiveGearFactory(code);
+  public static InactiveGearFactory inactiveGear() {
+    return new InactiveGearFactory();
   }
 
   /**
-   * @param code                  this gear's identifying code
    * @param duration      how long one fishing event takes, asked with no
    *                      context
    * @param species               the species to index proportions over
@@ -131,7 +123,6 @@ public class Factories {
    * @see IndexedBiomassCatchabilityGear
    */
   public static <S extends Scope> IndexedBiomassCatchabilityGearFactory<S> indexedBiomassCatchabilityGear(
-    final String code,
     final ValueFactory<? super S, ? super Void, Duration> duration,
     final Factory<? super S, ? extends Collection<? extends Species>> species,
     final MappingFactory<
@@ -143,7 +134,6 @@ public class Factories {
     final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold
   ) {
     return new IndexedBiomassCatchabilityGearFactory<S>(
-      code,
       duration,
       species,
       proportionFunction,

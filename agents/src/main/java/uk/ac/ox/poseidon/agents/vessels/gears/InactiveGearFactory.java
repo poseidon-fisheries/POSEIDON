@@ -41,10 +41,8 @@ import uk.ac.ox.poseidon.core.Scope;
 @SuperBuilder(toBuilder = true)
 public class InactiveGearFactory extends GlobalScopeFactory<InactiveGear> {
 
-  private final String code;
-
   @Override
   protected InactiveGear newInstance(final Scope scope) {
-    return new InactiveGear(code);
+    return new InactiveGear();
   }
 }

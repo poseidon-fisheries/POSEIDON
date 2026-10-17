@@ -29,10 +29,9 @@ import static lombok.AccessLevel.NONE;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
+import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -65,7 +64,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * It steps its behaviour only while {@link #isActive()} holds.
  * <p>
  * Its modifiable characteristics (name, account, home port, components,
- * registration and tags) are changed from outside its behaviour, by the fleet
+ * registration and attributes) are changed from outside its behaviour, by the fleet
  * register, so their setters go through {@link #mutate}, which queues them
  * while the behaviour is running: they take effect between runs of the
  * behaviour, never during one, so a vessel isn't deactivated at sea or given a
@@ -83,7 +82,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * step pending, and reactivating it then needs no new step.
  */
 @Getter
-public class Vessel implements Oriented2D {
+public class Vessel implements Oriented2D, HasAttributes {
 
   private static final int VESSEL_STEP_ORDERING = 1;
 
@@ -180,13 +179,13 @@ public class Vessel implements Oriented2D {
     this.behaviour = behaviour;
   }
 
-  /** @return this vessel's tags, unmodifiable */
-  @SuppressWarnings("unused")
-  public @NonNull Map<String, Object> getTags() {
-    return Collections.unmodifiableMap(tags);
-  }
-
-  private final @NonNull Map<String, Object> tags = new HashMap<>();
+  /**
+   * This vessel's attributes, replaced as a whole when they change, so that
+   * an action keeping the map in place when it was made keeps the attributes
+   * the vessel had then.
+   */
+  @Getter(NONE)
+  private ImmutableMap<String, Object> attributes = ImmutableMap.of();
 
   // Modifiable characteristics
   /** This vessel's display name. */
@@ -480,14 +479,23 @@ public class Vessel implements Oriented2D {
     return portGrid.getLocation(homePort);
   }
 
-  /** Sets (or replaces) a tag by name. */
-  public void putTag(final String tagName, final Object tagValue) {
-    mutate(() -> tags.put(tagName, tagValue));
+  /** @return this vessel's current attributes */
+  @Override
+  public Map<String, Object> getAttributes() {
+    return attributes;
   }
 
-  /** @return the named tag's value, if set */
-  public Optional<Object> getTag(final String tagName) {
-    return Optional.ofNullable(tags.get(tagName));
+  /**
+   * Puts {@code attributes} in place of this vessel's attributes.
+   *
+   * @throws NullPointerException if {@code attributes} holds a {@code null}
+   *                              name or value
+   */
+  void setAttributes(final Map<String, ?> attributes) {
+    final ImmutableMap<String, Object> newAttributes = ImmutableMap.copyOf(
+      attributes
+    );
+    mutate(() -> this.attributes = newAttributes);
   }
 
   /**

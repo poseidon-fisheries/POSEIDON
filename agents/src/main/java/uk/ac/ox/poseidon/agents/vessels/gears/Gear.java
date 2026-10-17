@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -32,9 +32,6 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
  * costs in fuel.
  */
 public interface Gear {
-  /** @return this gear's identifying code */
-  String getCode();
-
   /**
    * @return litres of fuel burned per hour of fishing; {@code 0} unless
    *         overridden

@@ -34,8 +34,8 @@ import javax.lang.model.SourceVersion;
 
 /**
  * A mapping that reads a property of the thing mapped, whatever the context, by
- * following a dotted path of getters: {@code "gear.code"} reads
- * {@code getGear().getCode()}, and {@code "active"} reads {@code isActive()} if
+ * following a dotted path of getters: {@code "market.code"} reads
+ * {@code getMarket().getCode()}, and {@code "active"} reads {@code isActive()} if
  * it returns a {@code boolean}. The getters are looked up once, when this is
  * built, from the declared return types along the path, so a wrong path fails
  * when the scenario is built rather than when first read. The last property may

@@ -35,15 +35,14 @@ import uk.ac.ox.poseidon.core.Scope;
 class FishingEventPropertyFactoryTest {
 
   @Test
-  void readsTheCodeOfTheGearTheFishingEventWasMadeWith() {
+  void readsTheGearTheFishingEventWasMadeWith() {
     final Gear gear = mock(Gear.class);
-    when(gear.getCode()).thenReturn("PS");
     final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
     when(action.getGear()).thenReturn(gear);
     assertThat(
-      fishingEventProperty("action.gear.code")
+      fishingEventProperty("action.gear")
         .get(Scope.GLOBAL_SCOPE)
         .apply(new FishingEvent(action, null))
-    ).isEqualTo("PS");
+    ).isSameAs(gear);
   }
 }

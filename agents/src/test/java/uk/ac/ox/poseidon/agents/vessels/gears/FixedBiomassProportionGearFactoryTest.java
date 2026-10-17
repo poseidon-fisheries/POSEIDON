@@ -42,14 +42,12 @@ class FixedBiomassProportionGearFactoryTest {
     final ValueFactory<Scope, Object, Duration> duration = scope -> context ->
       Duration.ofHours(1);
     final var factory = Factories.fixedBiomassProportionGear(
-      "G1",
       0.25,
       massOf(2, KILOGRAM),
       duration,
       volumetricFlowRateOf(0.0, LITRE_PER_HOUR)
     );
     final var gear = factory.get(Scope.GLOBAL_SCOPE);
-    assertThat(gear.getCode()).isEqualTo("G1");
     assertThat(gear.getMinimumCatchThresholdInKg()).isCloseTo(
       2.0,
       offset(1e-9)
@@ -61,7 +59,6 @@ class FixedBiomassProportionGearFactoryTest {
     final ValueFactory<Scope, Object, Duration> duration = scope -> context ->
       Duration.ofHours(1);
     final var factory = Factories.fixedBiomassProportionGear(
-      "G1",
       0.25,
       massOf(-1, KILOGRAM),
       duration,

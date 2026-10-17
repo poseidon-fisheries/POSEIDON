@@ -20,37 +20,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.values.tags;
+package uk.ac.ox.poseidon.agents.vessels.values.attributes;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
+import java.util.function.Function;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.vessels.HasAttributes;
 
 /**
- * Factories for {@code Function<Vessel, ?>}s that extract a vessel's tag by
- * name.
+ * Reads the attribute named {@code name} as a string: the vessel's current
+ * value when given a vessel, the recorded one when given an action.
  */
-public class Factories {
+@RequiredArgsConstructor
+public class StringAttribute implements Function<HasAttributes, String> {
 
-  private Factories() {}
-
-  /**
-   * @param tagName the name of the tag to extract
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   *         {@link DoubleTagExtractor} extracting the {@code tagName} tag
-   * @see DoubleTagExtractor
-   */
-  public static DoubleTagExtractorFactory doubleTagExtractor(
-    final String tagName
-  ) {
-    return new DoubleTagExtractorFactory(tagName);
-  }
+  @NonNull
+  private final String name;
 
   /**
-   * @param tagName the name of the tag to extract
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   *         {@link StringTagExtractor} extracting the {@code tagName} tag
-   * @see StringTagExtractor
+   * @throws IllegalArgumentException if {@code subject} has no attribute named
+   *                                  {@link #name}
    */
-  public static StringTagExtractorFactory stringTagExtractor(
-    final String tagName
-  ) {
-    return new StringTagExtractorFactory(tagName);
+  @Override
+  public String apply(final HasAttributes subject) {
+    final Object value = subject.getAttributes().get(name);
+    checkArgument(value != null, "No attribute %s in %s", name, subject);
+    return value.toString();
   }
 }

@@ -45,9 +45,6 @@ import uk.ac.ox.poseidon.biology.species.SpeciesIndexedDoubleArray;
 @ToString
 public class IndexedBiomassCatchabilityGear implements Gear {
 
-  @NonNull
-  private final String code;
-
   private final SpeciesIndexedDoubleArray proportions;
   private final double minimumCatchThresholdInKg;
 
@@ -58,7 +55,6 @@ public class IndexedBiomassCatchabilityGear implements Gear {
   private boolean active = true;
 
   /**
-   * @param code                      this gear's identifying code
    * @param proportions               the fraction of available biomass caught,
    *                                  per species, each in {@code [0, 1]}
    * @param minimumCatchThresholdInKg per-species catch below this, in
@@ -66,13 +62,11 @@ public class IndexedBiomassCatchabilityGear implements Gear {
    * @param durationSupplier          supplies how long one fishing event takes
    */
   public IndexedBiomassCatchabilityGear(
-    @NonNull final String code,
     @NonNull final SpeciesIndexedDoubleArray proportions,
     final double minimumCatchThresholdInKg,
     @NonNull final Supplier<Duration> durationSupplier
   ) {
     proportions.forEachValue(value -> checkUnitRange(value, "proportion"));
-    this.code = code;
     this.proportions = proportions;
     this.minimumCatchThresholdInKg = checkPositive(
       minimumCatchThresholdInKg,
@@ -98,10 +92,5 @@ public class IndexedBiomassCatchabilityGear implements Gear {
       }
     );
     return fisheable.extract(fishToCatch);
-  }
-
-  @Override
-  public String getCode() {
-    return code;
   }
 }

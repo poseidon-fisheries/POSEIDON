@@ -26,6 +26,7 @@ import static java.time.Duration.ofHours;
 import static java.time.Duration.ofSeconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -38,18 +39,23 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.engine.SimState;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
+import uk.ac.ox.poseidon.agents.market.Sale;
+import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -333,5 +339,22 @@ class VesselTest {
 
     assertNull(vessel.getCurrentTrip());
     assertSame(trip, vessel.getPreviousTrip());
+  }
+
+  @Test
+  void anActionKeepsTheAttributesTheVesselHadWhenItWasMade() {
+    vessel.setAttributes(Map.of("gear", "PS"));
+    final ExtendedFishingAction fishing = new ExtendedFishingAction(
+      vessel,
+      START,
+      ofHours(1),
+      new Coordinate(0, 0),
+      mock(Gear.class)
+    );
+    final Sale sale = new Sale(START, "sale", null, vessel, List.of(), null);
+    vessel.setAttributes(Map.of("gear", "OTB"));
+    assertThat(fishing.getAttributes()).containsExactly(entry("gear", "PS"));
+    assertThat(sale.getAttributes()).containsExactly(entry("gear", "PS"));
+    assertThat(vessel.getAttributes()).containsExactly(entry("gear", "OTB"));
   }
 }

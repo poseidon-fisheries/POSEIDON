@@ -20,31 +20,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.values.tags;
+package uk.ac.ox.poseidon.agents.vessels;
 
-import static uk.ac.ox.poseidon.core.utils.Utils.toTrimmedString;
-
-import java.util.function.Function;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import java.util.Map;
 
 /**
- * Extracts a vessel's tag named {@code tagName} as a trimmed string. Returns
- * {@code null} if the tag is absent, or trims to an empty string or
- * {@code "NA"} (case-insensitive).
+ * Something that has a vessel's attributes: the vessel itself, which has its
+ * current ones, or an action it made, which keeps the ones it had when it made
+ * the action.
  */
-@RequiredArgsConstructor
-public class StringTagExtractor implements Function<Vessel, String> {
-
-  @NonNull
-  private final String tagName;
-
-  @Override
-  public String apply(final Vessel vessel) {
-    return vessel
-      .getTag(tagName)
-      .map(v -> toTrimmedString(v, true))
-      .orElse(null);
-  }
+public interface HasAttributes {
+  /**
+   * @return the attributes, an immutable map from name to value, never
+   *         holding {@code null}: an attribute with no value is absent
+   */
+  Map<String, Object> getAttributes();
 }

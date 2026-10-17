@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Map.entry;
 import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
@@ -90,7 +91,8 @@ public class FleetFromVesselRegisterFactory
   private String eventDateColumn = "event_start_date";
 
   /**
-   * Columns to exclude from a row's tags, on top of the other named columns.
+   * Columns to exclude from a row's attributes, on top of the vessel id, name,
+   * event code and event date columns.
    */
   @Builder.Default
   private List<String> ignoredColumns = List.of("event_end_date");
@@ -242,7 +244,7 @@ public class FleetFromVesselRegisterFactory
       row.getString(vesselIdColumn),
       row.getString(vesselNameColumn),
       row.getString(portCodeColumn),
-      makeTags(row),
+      makeAttributes(row),
       behaviour,
       Stream.concat(Stream.of(behaviour), components.stream())
         .<Function<Vessel, ?>>map(component ->
@@ -252,7 +254,11 @@ public class FleetFromVesselRegisterFactory
     );
   }
 
-  private Map<String, Object> makeTags(final Row row) {
+  /**
+   * @return the value of each of the row's columns but those excluded from its
+   *         attributes, leaving out missing values
+   */
+  private Map<String, Object> makeAttributes(final Row row) {
     final Set<String> ignoredColumns = Streams.concat(
       Stream.of(
         vesselIdColumn,
@@ -263,15 +269,12 @@ public class FleetFromVesselRegisterFactory
       this.ignoredColumns.stream()
     ).collect(toSet());
 
-    // Populating the map with forEach because Collectors.toMap rejects null
-    // values
-    final Map<String, Object> tags = new HashMap<>();
-    row
+    return row
       .columnNames()
       .stream()
       .filter(not(ignoredColumns::contains))
-      .forEach(columName -> tags.put(columName, row.getObject(columName)));
-    return Collections.unmodifiableMap(tags);
+      .filter(not(row::isMissing))
+      .collect(toImmutableMap(identity(), row::getObject));
   }
 
   private FleetEvent.Type eventType(final String eventCode) {

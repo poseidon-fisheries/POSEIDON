@@ -72,8 +72,8 @@ public class Factories {
 
   /**
    * @param propertyPath the dotted path of properties to follow from the
-   *                     fishing event, e.g. {@code "action.gear.code"} for the
-   *                     code of the gear the fishing action was made with
+   *                     fishing event, e.g. {@code "action.gear"} for the gear
+   *                     the fishing action was made with
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
    *         {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a
    *         fishing event

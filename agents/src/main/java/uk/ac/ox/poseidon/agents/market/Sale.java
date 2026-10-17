@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -24,6 +24,8 @@ package uk.ac.ox.poseidon.agents.market;
 
 import static java.math.RoundingMode.HALF_EVEN;
 
+import com.google.common.collect.ImmutableMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,6 +38,7 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
+import uk.ac.ox.poseidon.agents.vessels.HasAttributes;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.Content;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -45,7 +48,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
  * and what didn't.
  */
 @Data
-public class Sale {
+public class Sale implements HasAttributes {
 
   /** When the sale happened. */
   private final LocalDateTime dateTime;
@@ -59,6 +62,39 @@ public class Sale {
   private final List<Item> items;
   /** What was offered but didn't sell. */
   private final CategorisedCatch unsold;
+  /** The selling vessel's attributes when it sold. */
+  private final Map<String, Object> attributes;
+
+  /**
+   * Records {@code vessel}'s attributes as they are now.
+   *
+   * @param dateTime when the sale happened
+   * @param id       the sale's identifying ID
+   * @param market   the market the sale happened at
+   * @param vessel   the selling vessel
+   * @param items    what sold, one item per (category, species) combination
+   * @param unsold   what was offered but didn't sell
+   */
+  @SuppressFBWarnings(
+    value = "EI2",
+    justification = "A sale keeps the vessel that sold and the items sold, as given."
+  )
+  public Sale(
+    final LocalDateTime dateTime,
+    final String id,
+    final Market market,
+    final Vessel vessel,
+    final List<Item> items,
+    final CategorisedCatch unsold
+  ) {
+    this.dateTime = dateTime;
+    this.id = id;
+    this.market = market;
+    this.vessel = vessel;
+    this.items = items;
+    this.unsold = unsold;
+    this.attributes = ImmutableMap.copyOf(vessel.getAttributes());
+  }
 
   /**
    * @return the total sale value, per currency, summed across {@link #items}

@@ -316,7 +316,6 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     final var gear = vesselComponent(
       fixedBiomassProportionGear(
-        "FGL", // droplines count as "fixed gears and lines"
         gearProportion,
         massOf(1, KILOGRAM),
         constant(hours(1)),
