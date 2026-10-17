@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 
 /**
  * A {@link TaskFactory} counterpart of {@link SetDestinationToOrigin},
@@ -44,7 +44,9 @@ public class SetDestinationToOriginFactory
 {
 
   @Override
-  protected SetDestinationToOrigin newInstance(final VesselScope scope) {
+  protected SetDestinationToOrigin newInstance(
+    final VesselComponentScope scope
+  ) {
     return new SetDestinationToOrigin();
   }
 }

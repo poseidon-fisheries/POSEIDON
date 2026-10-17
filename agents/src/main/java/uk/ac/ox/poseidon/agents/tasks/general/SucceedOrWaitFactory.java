@@ -32,7 +32,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
@@ -49,15 +49,21 @@ import uk.ac.ox.poseidon.core.Factory;
 @SuperBuilder(toBuilder = true)
 public class SucceedOrWaitFactory extends TaskFactory<Selector<Vessel>> {
 
-  private final Factory<? super VesselScope, ? extends Task<Vessel>> mainTask;
-  private final Factory<? super VesselScope, ? extends Task<Vessel>> waitTask;
+  private final Factory<
+    ? super VesselComponentScope,
+    ? extends Task<Vessel>
+  > mainTask;
+  private final Factory<
+    ? super VesselComponentScope,
+    ? extends Task<Vessel>
+  > waitTask;
 
   /**
    * @return a {@link Selector} with {@code mainTask} as its first child and an
    *         {@link AlwaysFail}-wrapped {@code waitTask} as its second
    */
   @Override
-  protected Selector<Vessel> newInstance(final VesselScope scope) {
+  protected Selector<Vessel> newInstance(final VesselComponentScope scope) {
     final Selector<Vessel> selector = new Selector<>();
     selector.addChild(mainTask.get(scope));
     selector.addChild(new AlwaysFail<>(waitTask.get(scope)));

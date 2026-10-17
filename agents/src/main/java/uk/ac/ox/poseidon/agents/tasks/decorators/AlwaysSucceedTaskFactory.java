@@ -29,7 +29,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
@@ -47,7 +47,7 @@ public class AlwaysSucceedTaskFactory
 
   /** @param child factory for the child task to always report success for */
   public AlwaysSucceedTaskFactory(
-    final Factory<? super VesselScope, ? extends Task<Vessel>> child
+    final Factory<? super VesselComponentScope, ? extends Task<Vessel>> child
   ) {
     super(child);
   }

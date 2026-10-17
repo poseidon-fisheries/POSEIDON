@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.social.Factories.fishingEventSharer;
 import static uk.ac.ox.poseidon.agents.social.Factories.sharedFishingEventListener;
 import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
+import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.componentScopeOf;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
@@ -55,7 +57,11 @@ class SharedFishingEventListenerFactoryTest {
   private final SimulationScope simulationScope = new SimulationScope(
     simulation
   );
-  private final VesselScope scopeB = new VesselScope(simulationScope, b);
+  private final ProductStore componentStoreB = new ProductStore();
+  private final VesselComponentScope scopeB = componentScopeOf(
+    new VesselScope(simulationScope, b),
+    componentStoreB
+  );
   private final SocialNetworkFactory network = socialNetwork(object(fleet));
   private final FishingEventSharerFactory fishingEventSharer =
     fishingEventSharer(network);
@@ -121,10 +127,10 @@ class SharedFishingEventListenerFactoryTest {
   }
 
   @Test
-  void theListenerHearsNothingOnceTheVesselsStoreEnds() {
+  void theListenerHearsNothingOnceItsComponentEnds() {
     final RecordingListener listenerOfB = factory.get(scopeB);
     network.get(simulationScope).addTie(a, b);
-    b.getProductStore().end();
+    componentStoreB.end();
 
     fishingEventSharer.get(simulationScope).receive(fishingEventBy(a));
 

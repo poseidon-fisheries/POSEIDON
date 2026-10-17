@@ -26,7 +26,7 @@ import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
@@ -47,14 +47,14 @@ public class Factories {
    * @param gear        the declaration of the gear the vessel would fish with
    * @param regulations the regulations a fishing action started now, here, is
    *                    checked against
-   * @return a {@link VesselScope}-relative factory for a
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
    *         {@link CheckIfFishingHereAndNowIsLegal}
    * @see CheckIfFishingHereAndNowIsLegal
    */
   public static CheckIfFishingHereAndNowIsLegalFactory checkIfFishingHereAndNowIsLegal(
     final VesselComponent<? extends Gear> gear,
     final Factory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? extends Regulations<? super ExtendedFishingAction>
     > regulations
   ) {
@@ -92,7 +92,7 @@ public class Factories {
    *                           fuel fishing takes
    * @param fisheable          the fisheable to fish from, read for the vessel
    * @param dispositionProcess sorts the catch into retained/discarded
-   * @return a {@link VesselScope}-relative factory for a {@link Fishing} task
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a {@link Fishing} task
    * @see Fishing
    */
   public static FishingFactory fishing(
@@ -100,12 +100,12 @@ public class Factories {
     final VesselComponent<? extends Hold> hold,
     final VesselComponent<? extends Engine> engine,
     final ValueFactory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? super Vessel,
       Fisheable
     > fisheable,
     final Factory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? extends DispositionProcess
     > dispositionProcess
   ) {

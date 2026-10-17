@@ -31,13 +31,13 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
  * A {@link TaskFactory} for a gdx-ai {@link Decorator}: builds the
  * decorator node via {@link #newTask()} and attaches a single child, resolved
- * against the current {@link VesselScope}. See {@link AlwaysFailTaskFactory},
+ * against the current {@link VesselComponentScope}. See {@link AlwaysFailTaskFactory},
  * {@link AlwaysSucceedTaskFactory}, {@link InvertTaskFactory},
  * {@link UntilFailTaskFactory} and {@link UntilSuccessTaskFactory} for the
  * concrete decorator types.
@@ -51,14 +51,17 @@ import uk.ac.ox.poseidon.core.Factory;
 @SuperBuilder(toBuilder = true)
 public abstract class DecoratorTaskFactory<T extends Decorator<Vessel>> extends TaskFactory<T> {
 
-  private final Factory<? super VesselScope, ? extends Task<Vessel>> child;
+  private final Factory<
+    ? super VesselComponentScope,
+    ? extends Task<Vessel>
+  > child;
 
   /**
    * @return a decorator node built by {@link #newTask()} with {@link #child}
    *         attached
    */
   @Override
-  protected T newInstance(final VesselScope scope) {
+  protected T newInstance(final VesselComponentScope scope) {
     final T task = newTask();
     task.addChild(child.get(scope));
     return task;

@@ -31,7 +31,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
@@ -51,16 +51,19 @@ import uk.ac.ox.poseidon.core.Factory;
 public class RoundTripFactory extends TaskFactory<Sequence<Vessel>> {
 
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends Task<Vessel>
   > startTripTask;
-  private final Factory<? super VesselScope, ? extends Task<Vessel>> travelTask;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
+    ? extends Task<Vessel>
+  > travelTask;
+  private final Factory<
+    ? super VesselComponentScope,
     ? extends Task<Vessel>
   > fishingTask;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends Task<Vessel>
   > landingTask;
 
@@ -72,7 +75,7 @@ public class RoundTripFactory extends TaskFactory<Sequence<Vessel>> {
    */
   @SuppressWarnings("unchecked")
   @Override
-  protected Sequence<Vessel> newInstance(final VesselScope scope) {
+  protected Sequence<Vessel> newInstance(final VesselComponentScope scope) {
     final Task<Vessel> startTripTask = this.startTripTask.get(scope);
     final Task<Vessel> travelTask = this.travelTask.get(scope);
     final Task<Vessel> fishingTask = this.fishingTask.get(scope);

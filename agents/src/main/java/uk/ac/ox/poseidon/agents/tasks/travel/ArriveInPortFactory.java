@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 
 /**
  * A {@link TaskFactory} counterpart of {@link ArriveInPort}, built via
@@ -42,7 +42,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 public class ArriveInPortFactory extends TaskFactory<ArriveInPort> {
 
   @Override
-  protected ArriveInPort newInstance(final VesselScope scope) {
+  protected ArriveInPort newInstance(final VesselComponentScope scope) {
     return new ArriveInPort();
   }
 }

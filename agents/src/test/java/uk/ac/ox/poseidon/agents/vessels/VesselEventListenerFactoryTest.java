@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.componentScopeOf;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
 
 import org.junit.jupiter.api.Test;
@@ -39,8 +40,14 @@ class VesselEventListenerFactoryTest {
   // Kept in fields: a scope holds its vessel weakly
   private final Vessel vesselA = newVessel();
   private final Vessel vesselB = newVessel();
-  private final VesselScope scopeA = scopeOf(vesselA);
-  private final VesselScope scopeB = scopeOf(vesselB);
+  private final ProductStore componentStoreA = new ProductStore();
+  private final VesselComponentScope scopeA = new VesselComponentScope(
+    scopeOf(vesselA),
+    componentStoreA
+  );
+  private final VesselComponentScope scopeB = componentScopeOf(
+    scopeOf(vesselB)
+  );
   private final CountingListenerFactory listener =
     new CountingListenerFactory();
   private final VesselEventListenerFactory<CountingListener> factory =
@@ -96,9 +103,9 @@ class VesselEventListenerFactoryTest {
   }
 
   @Test
-  void removesTheListenerWhenTheVesselsStoreEnds() {
+  void removesTheListenerWhenTheComponentsStoreEnds() {
     final CountingListener vesselListener = factory.get(scopeA);
-    vesselA.getProductStore().end();
+    componentStoreA.end();
     broadcastOn(vesselA);
 
     assertThat(vesselListener.count).isZero();

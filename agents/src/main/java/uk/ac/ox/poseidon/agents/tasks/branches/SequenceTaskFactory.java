@@ -31,7 +31,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
@@ -51,7 +51,7 @@ public class SequenceTaskFactory extends BranchTaskFactory<Sequence<Vessel>> {
    */
   public SequenceTaskFactory(
     final List<
-      ? extends Factory<? super VesselScope, ? extends Task<Vessel>>
+      ? extends Factory<? super VesselComponentScope, ? extends Task<Vessel>>
     > children
   ) {
     super(ImmutableList.copyOf(children));

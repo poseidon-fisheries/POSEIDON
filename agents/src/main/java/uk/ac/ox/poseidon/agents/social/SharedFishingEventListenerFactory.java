@@ -30,8 +30,8 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.Listener;
@@ -52,16 +52,16 @@ import uk.ac.ox.poseidon.core.events.Listener;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class SharedFishingEventListenerFactory<L extends Listener<? super FishingEvent>> extends VesselScopeFactory<L> {
+public class SharedFishingEventListenerFactory<L extends Listener<? super FishingEvent>> extends VesselComponentScopeFactory<L> {
 
-  private final Factory<? super VesselScope, ? extends L> listener;
+  private final Factory<? super VesselComponentScope, ? extends L> listener;
   private final Factory<
     ? super SimulationScope,
     ? extends FishingEventSharer
   > fishingEventSharer;
 
   @Override
-  protected L newInstance(final VesselScope scope) {
+  protected L newInstance(final VesselComponentScope scope) {
     checkNotNull(listener, "listener must not be null");
     checkNotNull(fishingEventSharer, "fishingEventSharer must not be null");
     final L listener = this.listener.get(scope);

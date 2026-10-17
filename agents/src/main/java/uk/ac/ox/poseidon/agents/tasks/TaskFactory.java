@@ -29,13 +29,14 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory;
 
 /**
- * A {@link VesselScopeFactory} base for behavior-tree {@link Task}s run
- * against a {@link Vessel}: subclasses build the task in {@link #newInstance},
- * and this base keeps it in the vessel's store, so each vessel gets its own
- * task instance.
+ * A {@link VesselComponentScopeFactory} base for behavior-tree {@link Task}s
+ * run against a {@link Vessel}: subclasses build the task in
+ * {@link #newInstance}, and this base keeps it in the store of the component
+ * whose tree it is part of, so each vessel's tree gets its own task
+ * instances, and a rebuilt tree fresh ones.
  *
  * @param <T> the concrete task type built
  */
@@ -44,4 +45,4 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public abstract class TaskFactory<T extends Task<Vessel>> extends VesselScopeFactory<T> {}
+public abstract class TaskFactory<T extends Task<Vessel>> extends VesselComponentScopeFactory<T> {}

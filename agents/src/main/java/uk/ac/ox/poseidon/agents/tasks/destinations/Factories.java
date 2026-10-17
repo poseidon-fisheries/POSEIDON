@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.agents.tasks.destinations;
 import java.util.Optional;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
@@ -44,7 +44,7 @@ public class Factories {
    */
   public static StartTripFactory startTrip(
     final ValueFactory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? super Vessel,
       Optional<Int2D>
     > destination
@@ -60,7 +60,7 @@ public class Factories {
    */
   public static ChooseNextDestinationFactory chooseNextDestination(
     final ValueFactory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? super Vessel,
       Optional<Int2D>
     > destination

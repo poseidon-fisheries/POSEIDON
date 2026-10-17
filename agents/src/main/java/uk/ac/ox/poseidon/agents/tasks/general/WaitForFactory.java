@@ -30,7 +30,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
@@ -45,13 +45,13 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 public class WaitForFactory extends TaskFactory<WaitFor<Vessel>> {
 
   private final ValueFactory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? super Vessel,
     Duration
   > duration;
 
   @Override
-  protected WaitFor<Vessel> newInstance(final VesselScope scope) {
+  protected WaitFor<Vessel> newInstance(final VesselComponentScope scope) {
     return new WaitFor<>(duration.get(scope));
   }
 }

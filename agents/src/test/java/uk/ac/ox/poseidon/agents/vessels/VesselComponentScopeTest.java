@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.components.Factories.registeredVesselComponent;
-import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
+import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.arriveInPort;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
@@ -78,6 +78,14 @@ class VesselComponentScopeTest {
   }
 
   @Test
+  void aTaskIsOnePerComponent() {
+    final var task = arriveInPort();
+
+    assertThat(task.get(first)).isSameAs(task.get(first));
+    assertThat(task.get(first)).isNotSameAs(task.get(second));
+  }
+
+  @Test
   void aVesselLevelProductReachedFromComponentsIsOnePerVessel() {
     final ScopeClassFactory factory = new ScopeClassFactory();
 
@@ -97,15 +105,19 @@ class VesselComponentScopeTest {
 
   @Test
   void aVesselLevelRegistrationReachedFromAComponentGoesWithTheVessel() {
-    final CountingListener listener = vesselEventListener(
-      new VesselListenerFactory()
+    final VesselComponentRegister<CountingListener> register =
+      new VesselComponentRegister<>();
+    registeredVesselComponent(
+      new VesselListenerFactory(),
+      scope -> register
     ).get(first);
     firstStore.end();
-    vessel.getEventManager().broadcast("event");
-    vessel.getProductStore().end();
-    vessel.getEventManager().broadcast("event");
 
-    assertThat(listener.count).isEqualTo(1);
+    assertThat(register.getComponent(vessel)).isPresent();
+
+    vessel.getProductStore().end();
+
+    assertThat(register.getComponent(vessel)).isEmpty();
   }
 
   @Test

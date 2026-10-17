@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.choices.evaluation;
 
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
@@ -52,16 +52,18 @@ public final class Factories {
    *                           observation is fed
    * @param evaluationProvider starts a fresh evaluation for each trip's
    *                           destination
-   * @return a {@link VesselScope}-relative factory for a {@link TripEvaluator}
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory}
+   *         for a {@link TripEvaluator}, registered on the vessel's event
+   *         manager
    * @see TripEvaluator
    */
   public static TripEvaluatorFactory tripEvaluator(
     final Factory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? extends MutableOptionValues<Int2D>
     > optionValues,
     final Factory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? extends Evaluator<Int2D>
     > evaluationProvider
   ) {

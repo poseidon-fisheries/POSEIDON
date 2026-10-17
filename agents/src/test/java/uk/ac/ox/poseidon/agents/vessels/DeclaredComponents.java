@@ -25,8 +25,12 @@ package uk.ac.ox.poseidon.agents.vessels;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import uk.ac.ox.poseidon.core.ProductStore;
 
-/** Declarations whose components tests give mocked vessels directly. */
+/**
+ * Declarations whose components tests give mocked vessels directly, and the
+ * scopes of components built outside a vessel's creation.
+ */
 public final class DeclaredComponents {
 
   private DeclaredComponents() {}
@@ -45,6 +49,29 @@ public final class DeclaredComponents {
     );
     giveComponent(vessel, declaration, component);
     return declaration;
+  }
+
+  /**
+   * @param vesselScope the scope of the vessel the component belongs to
+   * @return the scope of a new component of that vessel, with a store of its
+   *         own
+   */
+  public static VesselComponentScope componentScopeOf(
+    final VesselScope vesselScope
+  ) {
+    return componentScopeOf(vesselScope, new ProductStore());
+  }
+
+  /**
+   * @param vesselScope the scope of the vessel the component belongs to
+   * @param store       the store of the component
+   * @return the scope of a component of that vessel, with {@code store}
+   */
+  public static VesselComponentScope componentScopeOf(
+    final VesselScope vesselScope,
+    final ProductStore store
+  ) {
+    return new VesselComponentScope(vesselScope, store);
   }
 
   /**

@@ -26,7 +26,7 @@ import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGene
 
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -96,13 +96,13 @@ public class Factories {
    * @param listener           the factory giving the vessel's shared fishing
    *                           event listener
    * @param fishingEventSharer the sharer to register the listener with
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} that
-   *         registers the vessel's listener with the sharer and gives it;
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory}
+   *         that registers the vessel's listener with the sharer and gives it;
    *         declare it as one of the vessel's components
    * @see SharedFishingEventListenerFactory
    */
   public static <L extends Listener<? super FishingEvent>> SharedFishingEventListenerFactory<L> sharedFishingEventListener(
-    final Factory<? super VesselScope, ? extends L> listener,
+    final Factory<? super VesselComponentScope, ? extends L> listener,
     final Factory<
       ? super SimulationScope,
       ? extends FishingEventSharer

@@ -29,12 +29,13 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link ActiveBehaviour}, built
+ * A {@link VesselComponentScopeFactory} counterpart of {@link ActiveBehaviour},
+ * built
  * via {@link Factories#behaviour}.
  */
 @Getter
@@ -42,16 +43,19 @@ import uk.ac.ox.poseidon.core.Factory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class BehaviourFactory extends VesselScopeFactory<Behaviour> {
+public class BehaviourFactory extends VesselComponentScopeFactory<Behaviour> {
 
-  private final Factory<? super VesselScope, ? extends Task<Vessel>> rootTask;
+  private final Factory<
+    ? super VesselComponentScope,
+    ? extends Task<Vessel>
+  > rootTask;
 
   /**
    * @return an {@link ActiveBehaviour} whose tree is rooted at
    *         {@link #rootTask}
    */
   @Override
-  protected Behaviour newInstance(final VesselScope scope) {
+  protected Behaviour newInstance(final VesselComponentScope scope) {
     return new ActiveBehaviour<>(rootTask.get(scope), scope.getVessel());
   }
 }

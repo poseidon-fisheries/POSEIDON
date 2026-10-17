@@ -31,7 +31,7 @@ import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
@@ -48,13 +48,15 @@ public class ChooseNextDestinationFactory
 {
 
   private final ValueFactory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? super Vessel,
     Optional<Int2D>
   > destination;
 
   @Override
-  protected ChooseNextDestination newInstance(final VesselScope scope) {
+  protected ChooseNextDestination newInstance(
+    final VesselComponentScope scope
+  ) {
     return new ChooseNextDestination(destination.get(scope));
   }
 }

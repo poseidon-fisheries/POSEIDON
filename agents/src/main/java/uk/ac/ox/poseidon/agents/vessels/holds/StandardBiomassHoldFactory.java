@@ -32,12 +32,12 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link StandardBiomassHold},
+ * A {@link VesselComponentScopeFactory} counterpart of {@link StandardBiomassHold},
  * built via {@link Factories#standardBiomassHold}.
  */
 @Getter
@@ -46,21 +46,24 @@ import uk.ac.ox.poseidon.core.Factory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class StandardBiomassHoldFactory
-  extends VesselScopeFactory<StandardBiomassHold>
+  extends VesselComponentScopeFactory<StandardBiomassHold>
 {
 
-  private final Factory<? super VesselScope, ? extends Quantity<Mass>> capacity;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
+    ? extends Quantity<Mass>
+  > capacity;
+  private final Factory<
+    ? super VesselComponentScope,
     ? extends Quantity<Mass>
   > tolerance;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends CatchCategoriser
   > catchCategoriser;
 
   @Override
-  protected StandardBiomassHold newInstance(final VesselScope scope) {
+  protected StandardBiomassHold newInstance(final VesselComponentScope scope) {
     return new StandardBiomassHold(
       catchCategoriser.get(scope),
       capacity.get(scope).to(KILOGRAM).getValue().doubleValue(),

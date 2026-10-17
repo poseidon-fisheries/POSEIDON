@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.agents.tasks.branches;
 import com.badlogic.gdx.ai.btree.Task;
 import java.util.List;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /** Factories for behavior-tree branch nodes (sequence, selector, parallel). */
@@ -35,26 +35,32 @@ public class Factories {
 
   /**
    * @param children factories for the sequence's child tasks
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
    *         {@link com.badlogic.gdx.ai.btree.branch.Sequence}
    * @see SequenceTaskFactory
    */
   @SafeVarargs
   public static SequenceTaskFactory sequenceTask(
-    final Factory<? super VesselScope, ? extends Task<Vessel>>... children
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends Task<Vessel>
+    >... children
   ) {
     return new SequenceTaskFactory(List.of(children));
   }
 
   /**
    * @param children factories for the selector's child tasks
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
    *         {@link com.badlogic.gdx.ai.btree.branch.Selector}
    * @see SelectorTaskFactory
    */
   @SafeVarargs
   public static SelectorTaskFactory selectorTask(
-    final Factory<? super VesselScope, ? extends Task<Vessel>>... children
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends Task<Vessel>
+    >... children
   ) {
     return new SelectorTaskFactory(List.of(children));
   }

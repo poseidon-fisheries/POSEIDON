@@ -31,13 +31,13 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
  * A {@link TaskFactory} for a gdx-ai {@link BranchTask}: builds the
  * branch node via {@link #newTask()} and attaches one child, resolved against
- * the current {@link VesselScope}, per entry in {@code children}. See
+ * the current {@link VesselComponentScope}, per entry in {@code children}. See
  * {@link SequenceTaskFactory} and {@link SelectorTaskFactory} for the concrete
  * branch types.
  *
@@ -52,7 +52,7 @@ public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends Ta
 
   @Singular
   private final ImmutableList<
-    ? extends Factory<? super VesselScope, ? extends Task<Vessel>>
+    ? extends Factory<? super VesselComponentScope, ? extends Task<Vessel>>
   > children;
 
   /**
@@ -60,7 +60,7 @@ public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends Ta
    *         {@code children} attached
    */
   @Override
-  protected T newInstance(final VesselScope scope) {
+  protected T newInstance(final VesselComponentScope scope) {
     final T task = newTask();
     if (children != null) {
       this.children

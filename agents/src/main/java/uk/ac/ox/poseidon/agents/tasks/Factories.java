@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks;
 
 import com.badlogic.gdx.ai.btree.Task;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
@@ -37,12 +37,12 @@ public class Factories {
 
   /**
    * @param rootTask the tree's root task
-   * @return a {@link VesselScope}-relative factory for an
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for an
    *         {@link ActiveBehaviour}
    * @see ActiveBehaviour
    */
   public static BehaviourFactory behaviour(
-    final Factory<? super VesselScope, ? extends Task<Vessel>> rootTask
+    final Factory<? super VesselComponentScope, ? extends Task<Vessel>> rootTask
   ) {
     return new BehaviourFactory(rootTask);
   }

@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
@@ -54,17 +54,17 @@ public class FishingFactory extends TaskFactory<Fishing> {
   private final VesselComponent<? extends Hold> hold;
   private final VesselComponent<? extends Engine> engine;
   private final ValueFactory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? super Vessel,
     Fisheable
   > fisheable;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends DispositionProcess
   > dispositionProcess;
 
   @Override
-  protected Fishing newInstance(final VesselScope scope) {
+  protected Fishing newInstance(final VesselComponentScope scope) {
     return new Fishing(
       gear,
       hold,

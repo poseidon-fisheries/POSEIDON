@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.agents.tasks.landings;
 import java.time.Duration;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
@@ -45,7 +45,11 @@ public class Factories {
    */
   public static LandCatchesFactory landCatches(
     final VesselComponent<? extends Hold> hold,
-    final ValueFactory<? super VesselScope, ? super Vessel, Duration> duration
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      Duration
+    > duration
   ) {
     return new LandCatchesFactory(hold, duration);
   }

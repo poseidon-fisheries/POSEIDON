@@ -27,7 +27,7 @@ import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
 import com.badlogic.gdx.ai.btree.Task;
 import java.time.Duration;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
@@ -47,7 +47,11 @@ public class Factories {
    * @see AgentPredicateTask
    */
   public static VesselPredicateTaskFactory checkThat(
-    final ValueFactory<? super VesselScope, ? super Vessel, Boolean> predicate
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      Boolean
+    > predicate
   ) {
     return new VesselPredicateTaskFactory(predicate);
   }
@@ -61,9 +65,9 @@ public class Factories {
    * @see AgentPredicateTask
    */
   public static <T> VesselPredicateTaskFactory checkThat(
-    final ValueFactory<? super VesselScope, ? super Vessel, T> subject,
+    final ValueFactory<? super VesselComponentScope, ? super Vessel, T> subject,
     final MappingFactory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? super Vessel,
       ? super T,
       Boolean
@@ -80,7 +84,11 @@ public class Factories {
    * @see WaitFor
    */
   public static WaitForFactory waitFor(
-    final ValueFactory<? super VesselScope, ? super Vessel, Duration> duration
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      Duration
+    > duration
   ) {
     return new WaitForFactory(duration);
   }
@@ -95,8 +103,11 @@ public class Factories {
    * @see SucceedOrWaitFactory
    */
   public static SucceedOrWaitFactory succeedOrWait(
-    final Factory<? super VesselScope, ? extends Task<Vessel>> mainTask,
-    final Factory<? super VesselScope, ? extends Task<Vessel>> waitTask
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends Task<Vessel>
+    > mainTask,
+    final Factory<? super VesselComponentScope, ? extends Task<Vessel>> waitTask
   ) {
     return new SucceedOrWaitFactory(mainTask, waitTask);
   }

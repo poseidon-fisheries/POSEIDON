@@ -28,7 +28,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
@@ -47,13 +47,13 @@ public class Factories {
   /**
    * @param engine          the declaration of the engine whose tank is filled
    * @param fuelStationGrid the fuel stations a cell might contain
-   * @return a {@link VesselScope}-relative factory for a {@link Refuel}
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a {@link Refuel}
    * @see Refuel
    */
   public static RefuelFactory refuel(
     final VesselComponent<? extends Engine> engine,
     final Factory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? extends FuelStationGrid
     > fuelStationGrid
   ) {
@@ -66,15 +66,27 @@ public class Factories {
    *                      grounds, resolved once and reused for both legs
    * @param fishingTask   the task that fishes once at the destination
    * @param landingTask   the task that lands the catch after returning
-   * @return a {@link VesselScope}-relative factory for a {@link Sequence}
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a {@link Sequence}
    *         stringing a whole fishing trip together
    * @see RoundTripFactory
    */
   public static RoundTripFactory roundTrip(
-    final Factory<? super VesselScope, ? extends Task<Vessel>> startTripTask,
-    final Factory<? super VesselScope, ? extends Task<Vessel>> travelTask,
-    final Factory<? super VesselScope, ? extends Task<Vessel>> fishingTask,
-    final Factory<? super VesselScope, ? extends Task<Vessel>> landingTask
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends Task<Vessel>
+    > startTripTask,
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends Task<Vessel>
+    > travelTask,
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends Task<Vessel>
+    > fishingTask,
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends Task<Vessel>
+    > landingTask
   ) {
     return new RoundTripFactory(
       startTripTask,
@@ -94,17 +106,27 @@ public class Factories {
    *                     at task start
    * @param eventManager the event manager to broadcast the arrival
    *                     {@link TravelEvent} on, read for the vessel on arrival
-   * @return a {@link VesselScope}-relative factory for a
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
    *         {@link TravelAlongPath}
    * @see TravelAlongPath
    */
   public static TravelAlongPathFactory travelAlongPathTo(
     final VesselComponent<? extends Engine> engine,
-    final Factory<? super VesselScope, ? extends PathFinder<Int2D>> pathFinder,
-    final Factory<? super VesselScope, ? extends DistanceCalculator> distance,
-    final ValueFactory<? super VesselScope, ? super Vessel, Int2D> destination,
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends PathFinder<Int2D>
+    > pathFinder,
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends DistanceCalculator
+    > distance,
     final ValueFactory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
+      ? super Vessel,
+      Int2D
+    > destination,
+    final ValueFactory<
+      ? super VesselComponentScope,
       ? super Vessel,
       EventManager
     > eventManager
@@ -123,18 +145,21 @@ public class Factories {
    *                 the fuel
    * @param distance computes the direct distance, and so the duration, to the
    *                 trip's destination
-   * @return a {@link VesselScope}-relative factory for a {@link TravelDirectly}
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a {@link TravelDirectly}
    * @see TravelDirectly
    */
   public static TravelDirectlyFactory travelDirectly(
     final VesselComponent<? extends Engine> engine,
-    final Factory<? super VesselScope, ? extends DistanceCalculator> distance
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends DistanceCalculator
+    > distance
   ) {
     return new TravelDirectlyFactory(engine, distance);
   }
 
   /**
-   * @return a {@link VesselScope}-relative factory for a
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
    *         {@link SetDestinationToOrigin}
    * @see SetDestinationToOrigin
    */
@@ -143,7 +168,7 @@ public class Factories {
   }
 
   /**
-   * @return a {@link VesselScope}-relative factory for an {@link ArriveInPort}
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for an {@link ArriveInPort}
    * @see ArriveInPort
    */
   public static ArriveInPortFactory arriveInPort() {
@@ -151,7 +176,7 @@ public class Factories {
   }
 
   /**
-   * @return a {@link VesselScope}-relative factory for an {@link EndTrip}
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for an {@link EndTrip}
    * @see EndTrip
    */
   public static EndTripFactory endTrip() {

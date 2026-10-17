@@ -143,13 +143,13 @@ public class Factories {
 
   /**
    * @param listener the factory giving the vessel's listener
-   * @return a {@link VesselScopeFactory} that registers the vessel's listener
-   *         on the vessel's event manager and gives it; declare it as one of
-   *         the vessel's components
+   * @return a {@link VesselComponentScopeFactory} that registers the vessel's
+   *         listener on the vessel's event manager and gives it; declare it as
+   *         one of the vessel's components
    * @see VesselEventListenerFactory
    */
   public static <L extends Listener<?>> VesselEventListenerFactory<L> vesselEventListener(
-    final Factory<? super VesselScope, ? extends L> listener
+    final Factory<? super VesselComponentScope, ? extends L> listener
   ) {
     return new VesselEventListenerFactory<>(listener);
   }

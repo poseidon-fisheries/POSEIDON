@@ -31,7 +31,7 @@ import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
@@ -46,13 +46,13 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 public class StartTripFactory extends TaskFactory<StartTrip> {
 
   private final ValueFactory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? super Vessel,
     Optional<Int2D>
   > destination;
 
   @Override
-  protected StartTrip newInstance(final VesselScope scope) {
+  protected StartTrip newInstance(final VesselComponentScope scope) {
     return new StartTrip(destination.get(scope));
   }
 }

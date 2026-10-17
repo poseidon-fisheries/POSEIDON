@@ -28,12 +28,12 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link InfiniteBiomassHold},
+ * A {@link VesselComponentScopeFactory} counterpart of {@link InfiniteBiomassHold},
  * built via {@link Factories#infiniteBiomassHold}.
  */
 @Getter
@@ -42,16 +42,16 @@ import uk.ac.ox.poseidon.core.Factory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class InfiniteBiomassHoldFactory
-  extends VesselScopeFactory<InfiniteBiomassHold>
+  extends VesselComponentScopeFactory<InfiniteBiomassHold>
 {
 
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends CatchCategoriser
   > catchCategoriser;
 
   @Override
-  protected InfiniteBiomassHold newInstance(final VesselScope scope) {
+  protected InfiniteBiomassHold newInstance(final VesselComponentScope scope) {
     return new InfiniteBiomassHold(catchCategoriser.get(scope));
   }
 }

@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels.holds;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /** Factories for a vessel's {@link Hold}, with unlimited or fixed capacity. */
@@ -35,13 +35,13 @@ public class Factories {
 
   /**
    * @param catchCategoriser sorts uncategorised content added to the hold
-   * @return a {@link VesselScope}-relative factory for an
-   *         {@link InfiniteBiomassHold}
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory}
+   *         for an {@link InfiniteBiomassHold}
    * @see InfiniteBiomassHold
    */
   public static InfiniteBiomassHoldFactory infiniteBiomassHold(
     final Factory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? extends CatchCategoriser
     > catchCategoriser
   ) {
@@ -53,15 +53,21 @@ public class Factories {
    * @param tolerance        how far over capacity the hold may go before
    *                         rejecting content
    * @param catchCategoriser sorts uncategorised content added to the hold
-   * @return a {@link VesselScope}-relative factory for a
-   *         {@link StandardBiomassHold}
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory}
+   *         for a {@link StandardBiomassHold}
    * @see StandardBiomassHold
    */
   public static StandardBiomassHoldFactory standardBiomassHold(
-    final Factory<? super VesselScope, ? extends Quantity<Mass>> capacity,
-    final Factory<? super VesselScope, ? extends Quantity<Mass>> tolerance,
     final Factory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
+      ? extends Quantity<Mass>
+    > capacity,
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends Quantity<Mass>
+    > tolerance,
+    final Factory<
+      ? super VesselComponentScope,
       ? extends CatchCategoriser
     > catchCategoriser
   ) {

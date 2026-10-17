@@ -31,7 +31,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
@@ -52,26 +52,26 @@ public class TravelAlongPathFactory extends TaskFactory<TravelAlongPath> {
 
   private final VesselComponent<? extends Engine> engine;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends PathFinder<Int2D>
   > pathFinder;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends DistanceCalculator
   > distance;
   private final ValueFactory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? super Vessel,
     Int2D
   > destination;
   private final ValueFactory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? super Vessel,
     EventManager
   > eventManager;
 
   @Override
-  protected TravelAlongPath newInstance(final VesselScope scope) {
+  protected TravelAlongPath newInstance(final VesselComponentScope scope) {
     return new TravelAlongPath(
       engine,
       pathFinder.get(scope),

@@ -46,12 +46,12 @@ import uk.ac.ox.poseidon.core.events.Listener;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class VesselEventListenerFactory<L extends Listener<?>> extends VesselScopeFactory<L> {
+public class VesselEventListenerFactory<L extends Listener<?>> extends VesselComponentScopeFactory<L> {
 
-  private final Factory<? super VesselScope, ? extends L> listener;
+  private final Factory<? super VesselComponentScope, ? extends L> listener;
 
   @Override
-  protected L newInstance(final VesselScope scope) {
+  protected L newInstance(final VesselComponentScope scope) {
     final L listener = this.listener.get(scope);
     scope.addListener(listener);
     return listener;

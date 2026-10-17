@@ -29,7 +29,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -47,12 +47,12 @@ public class TravelDirectlyFactory extends TaskFactory<TravelDirectly> {
 
   private final VesselComponent<? extends Engine> engine;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends DistanceCalculator
   > distance;
 
   @Override
-  protected TravelDirectly newInstance(final VesselScope scope) {
+  protected TravelDirectly newInstance(final VesselComponentScope scope) {
     return new TravelDirectly(engine, distance.get(scope));
   }
 }

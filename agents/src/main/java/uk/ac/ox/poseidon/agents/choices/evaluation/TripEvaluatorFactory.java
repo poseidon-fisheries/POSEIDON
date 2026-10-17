@@ -29,12 +29,12 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link TripEvaluator}, built via
+ * A {@link VesselComponentScopeFactory} counterpart of {@link TripEvaluator}, built via
  * {@link Factories#tripEvaluator}.
  */
 @Getter
@@ -42,19 +42,21 @@ import uk.ac.ox.poseidon.core.Factory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class TripEvaluatorFactory extends VesselScopeFactory<TripEvaluator> {
+public class TripEvaluatorFactory
+  extends VesselComponentScopeFactory<TripEvaluator>
+{
 
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends MutableOptionValues<Int2D>
   > optionValues;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends Evaluator<Int2D>
   > evaluationProvider;
 
   @Override
-  protected TripEvaluator newInstance(final VesselScope scope) {
+  protected TripEvaluator newInstance(final VesselComponentScope scope) {
     final TripEvaluator tripEvaluator = new TripEvaluator(
       optionValues.get(scope),
       evaluationProvider.get(scope)

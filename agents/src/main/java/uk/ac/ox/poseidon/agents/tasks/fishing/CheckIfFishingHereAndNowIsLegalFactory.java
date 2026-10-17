@@ -30,7 +30,7 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.regulations.Regulations;
@@ -51,13 +51,13 @@ public class CheckIfFishingHereAndNowIsLegalFactory
 
   private final VesselComponent<? extends Gear> gear;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends Regulations<? super ExtendedFishingAction>
   > regulations;
 
   @Override
   protected CheckIfFishingHereAndNowIsLegal newInstance(
-    final VesselScope scope
+    final VesselComponentScope scope
   ) {
     return new CheckIfFishingHereAndNowIsLegal(gear, regulations.get(scope));
   }
