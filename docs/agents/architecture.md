@@ -81,6 +81,10 @@ the vessel it acts for. It comes in two shapes, each with its factory type in `c
   `MappingFactory<S, C, T, R>` (a comparison with a threshold, a cell's value, a property of a
   route).
 
+A reader of a vessel's state (`currentCell()`, `currentTripStartDateTime()`, `vesselProperty(...)`)
+is a value of the vessel: it reads the vessel it is given and holds none, so one serves every
+vessel and answers for whichever it is given.
+
 A yes/no is a value or a mapping with a `Boolean` result. A value or mapping that reads nothing
 from its context has `Object` as its context, so it fits wherever any context is given. A fixed
 value is `constant(x)` where a value is expected and `always(x)` where a mapping is (a filter, a

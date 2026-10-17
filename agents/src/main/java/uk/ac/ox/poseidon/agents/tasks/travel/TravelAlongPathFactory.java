@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
-import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -61,10 +60,11 @@ public class TravelAlongPathFactory extends VesselTaskFactory<TravelAlongPath> {
     ? super VesselScope,
     ? super Vessel,
     Int2D
-  > destinationCell;
-  private final Factory<
+  > destination;
+  private final ValueFactory<
     ? super VesselScope,
-    ? extends Supplier<EventManager>
+    ? super Vessel,
+    EventManager
   > eventManager;
 
   @Override
@@ -72,7 +72,7 @@ public class TravelAlongPathFactory extends VesselTaskFactory<TravelAlongPath> {
     return new TravelAlongPath(
       pathFinder.get(scope),
       distance.get(scope),
-      destinationCell.get(scope),
+      destination.get(scope),
       eventManager.get(scope)
     );
   }

@@ -35,9 +35,7 @@
  * {@link uk.ac.ox.poseidon.agents.vessels.gears},
  * {@link uk.ac.ox.poseidon.agents.vessels.engines},
  * {@link uk.ac.ox.poseidon.agents.vessels.accounts},
- * {@link uk.ac.ox.poseidon.agents.vessels.predicates},
- * {@link uk.ac.ox.poseidon.agents.vessels.providers},
- * {@link uk.ac.ox.poseidon.agents.vessels.extractors},
+ * {@link uk.ac.ox.poseidon.agents.vessels.values},
  * {@link uk.ac.ox.poseidon.agents.vessels.friends}). See
  * {@link uk.ac.ox.poseidon.agents.vessels.Factories} for this package's own
  * entry points.

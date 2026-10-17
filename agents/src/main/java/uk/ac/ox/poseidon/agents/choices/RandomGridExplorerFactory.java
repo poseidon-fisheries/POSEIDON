@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import ec.util.MersenneTwisterFast;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -31,6 +32,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
@@ -53,7 +55,7 @@ public class RandomGridExplorerFactory
 
   private final ValueFactory<
     ? super VesselScope,
-    ? super Void,
+    ? super Vessel,
     ? extends List<? extends Int2D>
   > cells;
   private final MappingFactory<
@@ -69,8 +71,11 @@ public class RandomGridExplorerFactory
 
   @Override
   protected Supplier<Int2D> newInstance(final VesselScope scope) {
+    final Vessel vessel = scope.getVessel();
+    final Function<? super Vessel, ? extends List<? extends Int2D>> cells =
+      this.cells.get(scope);
     return new RandomPicker<>(
-      WithoutContext.supplier(cells.get(scope)),
+      () -> cells.apply(vessel),
       WithoutContext.predicate(cellPredicate.get(scope)),
       randomNumberGenerator.get(scope)
     );

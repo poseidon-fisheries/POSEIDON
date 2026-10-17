@@ -32,7 +32,6 @@ import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
@@ -52,10 +51,9 @@ public class TravelAlongPath extends AgentTask<Vessel> {
 
   private final PathFinder<Int2D> pathFinder;
   private final DistanceCalculator distanceCalculator;
-  private final Function<? super Vessel, Int2D> destinationCell;
-  private final Supplier<EventManager> eventManagerSupplier;
+  private final Function<? super Vessel, Int2D> destinationSource;
+  private final Function<? super Vessel, EventManager> eventManager;
   private List<Int2D> currentPath;
-  private EventManager eventManager;
 
   private LocalDateTime startDateTime;
   private Int2D origin;
@@ -64,13 +62,11 @@ public class TravelAlongPath extends AgentTask<Vessel> {
   private double distanceToNextCell;
 
   /**
-   * Clears the remaining path and event manager, so the next run resolves them
-   * afresh.
+   * Clears the remaining path, so the next run resolves it afresh.
    */
   @Override
   public void resetTask() {
     currentPath = null;
-    eventManager = null;
     super.resetTask();
   }
 
@@ -82,8 +78,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
   @Override
   public void start() {
     final Vessel vessel = getAgent();
-    destination = checkNotNull(destinationCell.apply(vessel));
-    eventManager = eventManagerSupplier.get();
+    destination = checkNotNull(destinationSource.apply(vessel));
     startDateTime = vessel.getSchedule().getDateTime();
     origin = vessel.getCell();
     currentPath = pathFinder
@@ -125,15 +120,17 @@ public class TravelAlongPath extends AgentTask<Vessel> {
 
     currentPath = currentPath.subList(1, currentPath.size());
     if (currentPath.isEmpty()) {
-      eventManager.broadcast(
-        new TravelEvent(
-          getAgent(),
-          startDateTime,
-          getAgent().getSchedule().getDateTime(),
-          origin,
-          destination
-        )
-      );
+      eventManager
+        .apply(vessel)
+        .broadcast(
+          new TravelEvent(
+            getAgent(),
+            startDateTime,
+            getAgent().getSchedule().getDateTime(),
+            origin,
+            destination
+          )
+        );
       return SUCCEEDED;
     } else {
       final Int2D nextCell = currentPath.getFirst();

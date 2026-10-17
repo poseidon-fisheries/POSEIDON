@@ -390,7 +390,8 @@ public class Factories {
   }
 
   /**
-   * @param cells the candidate cells to pick from
+   * @param cells         the candidate cells to pick from, read for the vessel
+   *                      the picker is built for
    * @param cellPredicate filters which candidate cells are eligible
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
    *         {@link RandomPicker}
@@ -399,7 +400,7 @@ public class Factories {
   public static RandomGridExplorerFactory randomGridExplorer(
     final ValueFactory<
       ? super VesselScope,
-      ? super Void,
+      ? super Vessel,
       ? extends List<? extends Int2D>
     > cells,
     final MappingFactory<

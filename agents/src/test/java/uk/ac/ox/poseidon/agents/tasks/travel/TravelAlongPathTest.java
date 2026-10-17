@@ -55,7 +55,7 @@ class TravelAlongPathTest {
       pathFinder,
       distanceCalculator,
       v -> DESTINATION,
-      () -> mock(EventManager.class)
+      v -> mock(EventManager.class)
     );
     setTaskObject(travelAlongPath, vessel);
 

@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.io.tables;
 
 import static uk.ac.ox.poseidon.core.functions.Factories.composedFunction;
-import static uk.ac.ox.poseidon.core.functions.Factories.mapValueExtractor;
+import static uk.ac.ox.poseidon.core.functions.Factories.mapLookup;
 
 import com.google.common.collect.ImmutableList;
 import java.nio.file.Path;
@@ -267,7 +267,7 @@ public class Factories {
    *         composing {@code key} with a lookup into the map built
    *         from the resolved table
    * @see uk.ac.ox.poseidon.core.functions.ComposedFunction
-   * @see uk.ac.ox.poseidon.core.functions.MapValueExtractor
+   * @see uk.ac.ox.poseidon.core.functions.MapLookup
    */
   public static <S extends Scope, C, T, K, V> ComposedFunctionFactory<
     S,
@@ -289,7 +289,7 @@ public class Factories {
   ) {
     return composedFunction(
       key,
-      mapValueExtractor(mapFromTable(table, rowKeyBuilder, rowValueBuilder))
+      mapLookup(mapFromTable(table, rowKeyBuilder, rowValueBuilder))
     );
   }
 
@@ -303,7 +303,7 @@ public class Factories {
    * @return a {@link ValueFactory} for a value composing {@code key}
    *         with a lookup into the map built from the resolved table
    * @see uk.ac.ox.poseidon.core.functions.ComposedFunctionValue
-   * @see uk.ac.ox.poseidon.core.functions.MapValueExtractor
+   * @see uk.ac.ox.poseidon.core.functions.MapLookup
    */
   public static <S extends Scope, C, K, V> ComposedFunctionValueFactory<
     S,
@@ -324,7 +324,7 @@ public class Factories {
   ) {
     return composedFunction(
       key,
-      mapValueExtractor(mapFromTable(table, rowKeyBuilder, rowValueBuilder))
+      mapLookup(mapFromTable(table, rowKeyBuilder, rowValueBuilder))
     );
   }
 }

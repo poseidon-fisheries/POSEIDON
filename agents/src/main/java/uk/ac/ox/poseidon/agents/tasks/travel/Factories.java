@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.branch.Sequence;
-import java.util.function.Supplier;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -82,13 +81,13 @@ public class Factories {
   }
 
   /**
-   * @param pathFinder      finds a path between two cells
-   * @param distance        computes the distance, and so the duration, of each
-   *                        hop
-   * @param destinationCell the destination to path to, read for the vessel
-   *                        once, at task start
-   * @param eventManager    supplies the event manager to broadcast the arrival
-   *                        {@link TravelEvent} on
+   * @param pathFinder   finds a path between two cells
+   * @param distance     computes the distance, and so the duration, of each
+   *                     hop
+   * @param destination  the destination to path to, read for the vessel once,
+   *                     at task start
+   * @param eventManager the event manager to broadcast the arrival
+   *                     {@link TravelEvent} on, read for the vessel on arrival
    * @return a {@link VesselScope}-relative factory for a
    *         {@link TravelAlongPath}
    * @see TravelAlongPath
@@ -96,20 +95,17 @@ public class Factories {
   public static TravelAlongPathFactory travelAlongPathTo(
     final Factory<? super VesselScope, ? extends PathFinder<Int2D>> pathFinder,
     final Factory<? super VesselScope, ? extends DistanceCalculator> distance,
+    final ValueFactory<? super VesselScope, ? super Vessel, Int2D> destination,
     final ValueFactory<
       ? super VesselScope,
       ? super Vessel,
-      Int2D
-    > destinationCell,
-    final Factory<
-      ? super VesselScope,
-      ? extends Supplier<EventManager>
+      EventManager
     > eventManager
   ) {
     return new TravelAlongPathFactory(
       pathFinder,
       distance,
-      destinationCell,
+      destination,
       eventManager
     );
   }

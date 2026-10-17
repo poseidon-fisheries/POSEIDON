@@ -35,8 +35,8 @@ import uk.ac.ox.poseidon.core.Scope;
 /**
  * A {@link RelativeScopeFactory} that resolves a fixed key against a resolved
  * {@link Map} and returns the corresponding value, once, at resolution time —
- * unlike {@link MapValueExtractor}/{@link MapValueExtractorFactory}, which
- * resolve the map once but look up the key on every call. There's no separate
+ * unlike {@link MapLookup}/{@link MapLookupFactory}, which resolve the map
+ * once but look up the key on every call. There's no separate
  * plain component class here: the produced value {@code V} is returned as-is,
  * with no wrapper type to carry documentation, so this factory carries the
  * behavior doc directly. Built via {@link Factories#mapEntry(Factory, Object)}.

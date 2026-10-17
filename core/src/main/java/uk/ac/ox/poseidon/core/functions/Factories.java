@@ -45,17 +45,13 @@ public class Factories {
   /**
    * @param map factory for the map to look values up in
    * @return a {@link MappingFactory} for a
-   *         {@link MapValueExtractor} over the resolved map
-   * @see MapValueExtractor
+   *         {@link MapLookup} over the resolved map
+   * @see MapLookup
    */
-  public static <S extends Scope, K, V> MapValueExtractorFactory<
-    S,
-    K,
-    V
-  > mapValueExtractor(
+  public static <S extends Scope, K, V> MapLookupFactory<S, K, V> mapLookup(
     final Factory<? super S, ? extends Map<? super K, ? extends V>> map
   ) {
-    return new MapValueExtractorFactory<>(map);
+    return new MapLookupFactory<>(map);
   }
 
   /**

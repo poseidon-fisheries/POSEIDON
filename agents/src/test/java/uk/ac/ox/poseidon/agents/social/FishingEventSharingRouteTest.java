@@ -42,7 +42,7 @@ import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.perVessel;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
-import static uk.ac.ox.poseidon.agents.vessels.extractors.Factories.vesselProperty;
+import static uk.ac.ox.poseidon.agents.vessels.values.Factories.vesselProperty;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.days;

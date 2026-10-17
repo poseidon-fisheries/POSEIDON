@@ -1,0 +1,44 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2026, University of Oxford.
+ *
+ * University of Oxford means the Chancellor, Masters and Scholars of the
+ * University of Oxford, having an administrative office at Wellington
+ * Square, Oxford OX1 2JD, UK.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package uk.ac.ox.poseidon.agents.vessels.values;
+
+import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+
+/**
+ * Holds for a vessel currently at the cell {@code cell} returns for it,
+ * read fresh on each call; never holds if that cell is {@code null}.
+ */
+@RequiredArgsConstructor
+public class VesselIsAt implements Function<Vessel, Boolean> {
+
+  private final Function<? super Vessel, Int2D> cell;
+
+  @Override
+  public Boolean apply(final Vessel vessel) {
+    final Int2D cell = this.cell.apply(vessel);
+    return cell != null && cell.equals(vessel.getCell());
+  }
+}

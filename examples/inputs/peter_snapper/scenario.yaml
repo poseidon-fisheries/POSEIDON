@@ -213,9 +213,9 @@ components:
                       friendsSupplier: !!uk.ac.ox.poseidon.agents.vessels.friends.DynamicFriendsSupplierFactory
                         friendshipCondition: !!uk.ac.ox.poseidon.core.predicates.logical.AllOfValueFactory
                           predicates:
-                          - !!uk.ac.ox.poseidon.agents.vessels.predicates.VesselIsActiveFactory {
+                          - !!uk.ac.ox.poseidon.agents.vessels.values.VesselIsActiveFactory {
                             }
-                          - !!uk.ac.ox.poseidon.agents.vessels.predicates.VesselHasSameHomePortFactory {
+                          - !!uk.ac.ox.poseidon.agents.vessels.values.VesselHasSameHomePortFactory {
                             }
                         potentialFriends: *id009
                         randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
@@ -257,7 +257,7 @@ components:
                     searchCentre: !!uk.ac.ox.poseidon.agents.choices.BestKnownOptionFactory
                       fallback: !!uk.ac.ox.poseidon.agents.choices.RandomGridExplorerFactory
                         cellPredicate: *id011
-                        cells: !!uk.ac.ox.poseidon.agents.vessels.providers.AccessibleWaterCellsFactory
+                        cells: !!uk.ac.ox.poseidon.agents.vessels.values.AccessibleWaterCellsFactory
                           pathFinder: *id012
                         randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                           }
@@ -267,10 +267,10 @@ components:
                   randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                     }
               - !!uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory
-                destinationCell: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripDestinationCellFactory {
+                destination: !!uk.ac.ox.poseidon.agents.vessels.values.CurrentTripDestinationCellFactory {
                   }
                 distance: *id010
-                eventManager: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripEventManagerFactory {
+                eventManager: !!uk.ac.ox.poseidon.agents.vessels.values.CurrentTripEventManagerFactory {
                   }
                 pathFinder: *id012
               - !!uk.ac.ox.poseidon.agents.tasks.decorators.UntilFailTaskFactory
@@ -285,7 +285,7 @@ components:
                     predicate: !!uk.ac.ox.poseidon.core.predicates.logical.AllOfValueFactory
                       predicates:
                       - !!uk.ac.ox.poseidon.core.predicates.ConditionValueFactory
-                        extractor: !!uk.ac.ox.poseidon.agents.vessels.extractors.VesselPropertyFactory {
+                        extractor: !!uk.ac.ox.poseidon.agents.vessels.values.VesselPropertyFactory {
                           propertyPath: hold.availableCapacityInKg
                         }
                         predicate: !!uk.ac.ox.poseidon.core.predicates.comparable.GreaterThanFactory
@@ -294,7 +294,7 @@ components:
                               value: 1.0
                             }
                       - !!uk.ac.ox.poseidon.core.predicates.ConditionValueFactory
-                        extractor: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTimeAtSeaFactory {
+                        extractor: !!uk.ac.ox.poseidon.agents.vessels.values.CurrentTimeAtSeaFactory {
                           }
                         predicate: !!uk.ac.ox.poseidon.core.predicates.comparable.LessThanFactory
                           value: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory
@@ -307,10 +307,10 @@ components:
               - !!uk.ac.ox.poseidon.agents.tasks.travel.SetDestinationToOriginFactory {
                 }
               - !!uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory
-                destinationCell: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripDestinationCellFactory {
+                destination: !!uk.ac.ox.poseidon.agents.vessels.values.CurrentTripDestinationCellFactory {
                   }
                 distance: *id010
-                eventManager: !!uk.ac.ox.poseidon.agents.vessels.providers.CurrentTripEventManagerFactory {
+                eventManager: !!uk.ac.ox.poseidon.agents.vessels.values.CurrentTripEventManagerFactory {
                   }
                 pathFinder: *id012
               - !!uk.ac.ox.poseidon.agents.tasks.travel.ArriveInPortFactory {
