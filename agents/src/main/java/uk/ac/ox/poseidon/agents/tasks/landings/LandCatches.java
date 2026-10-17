@@ -47,7 +47,7 @@ public class LandCatches extends ExtendedTripTask {
   /** @return how long landing takes */
   @Override
   protected Duration getDuration() {
-    return duration.apply(getAgent());
+    return duration.apply(getVessel());
   }
 
   /**
@@ -62,7 +62,7 @@ public class LandCatches extends ExtendedTripTask {
    */
   @Override
   protected Status complete() {
-    final Vessel vessel = getAgent();
+    final Vessel vessel = getVessel();
     checkState(
       getTrip().hasArrivedInPort(),
       "Vessel %s is landing before its trip arrived in port.",

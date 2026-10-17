@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.vessels;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -36,7 +37,6 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
-import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -77,7 +77,7 @@ public class VesselCreatorFactory
   private final ValueFactory<? super VesselScope, ? super Vessel, String> name;
   private final Factory<? super VesselScope, ? extends Account> account;
   private final Factory<? super VesselScope, ? extends Port> homePort;
-  private final VesselComponent<? extends Behaviour> behaviour;
+  private final VesselComponent<? extends Task<Vessel>> behaviour;
 
   @Singular
   private final ImmutableList<VesselComponent<?>> components;

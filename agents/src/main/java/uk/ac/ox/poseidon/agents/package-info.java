@@ -21,10 +21,9 @@
  */
 
 /**
- * The fishing-agent model: {@link uk.ac.ox.poseidon.agents.Agent}, the generic
- * stepping/behaviour machinery shared by every agent. Concrete agents
- * (vessels), their behaviours (tasks, trips, choices), and everything they
- * interact with (catches, fuel, markets, money, regulation enforcement) live
- * in this module's subpackages.
+ * The fishing-agent model: the vessels, the model's agents
+ * ({@link uk.ac.ox.poseidon.agents.vessels.Vessel}), their behaviours (tasks,
+ * trips, choices), and everything they interact with (catches, fuel, markets,
+ * money, regulation enforcement) live in this module's subpackages.
  */
 package uk.ac.ox.poseidon.agents;

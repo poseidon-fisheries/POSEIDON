@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -26,22 +26,19 @@ import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.Agent;
 
 /**
- * An {@link AgentTask} that runs over more than one step: on first execution it
- * sets the agent's task duration to {@link #getDuration()} and reports
+ * An {@link VesselTask} that runs over more than one step: on first execution it
+ * sets the vessel's task duration to {@link #getDuration()} and reports
  * {@code RUNNING}; once that duration has elapsed and the task is executed
  * again, it reports the outcome of {@link #complete()}.
- *
- * @param <G> the type of agent this task runs against
  */
 @RequiredArgsConstructor
-public abstract class ExtendedTask<G extends Agent> extends AgentTask<G> {
+public abstract class ExtendedTask extends VesselTask {
 
   /**
    * @return {@link #complete()}'s outcome if already {@code RUNNING} (the
-   *         task's duration has elapsed), otherwise sets the agent's task
+   *         task's duration has elapsed), otherwise sets the vessel's task
    *         duration to {@link #getDuration()} and returns {@code RUNNING}
    */
   @Override

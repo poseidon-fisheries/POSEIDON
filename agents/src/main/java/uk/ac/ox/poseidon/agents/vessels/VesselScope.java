@@ -68,14 +68,13 @@ public class VesselScope extends SimulationScope {
   }
 
   /**
-   * Read only by the behaviour's factory, which gives the vessel to the tree
-   * it builds: every other build that needs the vessel takes it on each call,
-   * or registers through this scope.
+   * Not public: a scope offers a build no vessel. A build that needs the
+   * vessel takes it on each call, or registers through this scope.
    *
    * @return the scoped vessel, or {@code null} if it has since been
    *         garbage-collected
    */
-  public Vessel getVessel() {
+  Vessel getVessel() {
     return vessel.get();
   }
 

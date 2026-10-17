@@ -29,7 +29,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.tasks.AgentTask;
+import uk.ac.ox.poseidon.agents.tasks.VesselTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
@@ -37,7 +37,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
  * for the vessel; fails, without starting a trip, if it gives none.
  */
 @RequiredArgsConstructor
-public class StartTrip extends AgentTask<Vessel> {
+public class StartTrip extends VesselTask {
 
   private final Function<? super Vessel, Optional<Int2D>> destination;
 
@@ -48,9 +48,9 @@ public class StartTrip extends AgentTask<Vessel> {
   @Override
   public Status execute() {
     return destination
-      .apply(getAgent())
+      .apply(getVessel())
       .map(firstDestination -> {
-        getAgent().startTrip(firstDestination);
+        getVessel().startTrip(firstDestination);
         return SUCCEEDED;
       })
       .orElse(FAILED);

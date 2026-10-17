@@ -31,7 +31,7 @@ import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.tasks.AgentTask;
+import uk.ac.ox.poseidon.agents.tasks.VesselTask;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
@@ -43,7 +43,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
  * operations.
  */
 @RequiredArgsConstructor
-public class ChooseNextDestination extends AgentTask<Vessel> {
+public class ChooseNextDestination extends VesselTask {
 
   private final @NonNull Function<? super Vessel, Optional<Int2D>> destination;
 
@@ -54,14 +54,14 @@ public class ChooseNextDestination extends AgentTask<Vessel> {
    */
   @Override
   public Status execute() {
-    final Trip currentTrip = getAgent().getCurrentTrip();
+    final Trip currentTrip = getVessel().getCurrentTrip();
     checkState(
       currentTrip != null,
       "Vessel %s is not on a trip.",
-      getAgent().getId()
+      getVessel().getId()
     );
     return destination
-      .apply(getAgent())
+      .apply(getVessel())
       .map(nextDestination -> {
         currentTrip.setDestination(nextDestination);
         return SUCCEEDED;

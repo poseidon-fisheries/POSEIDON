@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.tasks.AgentTask;
+import uk.ac.ox.poseidon.agents.tasks.VesselTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
@@ -44,13 +44,13 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 /**
- * A leaf {@link AgentTask} that moves the vessel cell by cell along a path from
+ * A leaf {@link VesselTask} that moves the vessel cell by cell along a path from
  * its current cell to a destination, resolved once at {@link #start()},
  * consuming fuel and taking the travel duration for each hop; broadcasts a
  * {@link TravelEvent} on arrival.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class TravelAlongPath extends AgentTask<Vessel> {
+public class TravelAlongPath extends VesselTask {
 
   private final VesselComponent<? extends Engine> engine;
   private final VesselComponent<? extends FuelTank> fuelTank;
@@ -82,7 +82,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
    */
   @Override
   public void start() {
-    final Vessel vessel = getAgent();
+    final Vessel vessel = getVessel();
     destination = checkNotNull(destinationSource.apply(vessel));
     startDateTime = vessel.getSchedule().getDateTime();
     origin = vessel.getCell();
@@ -111,7 +111,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
    */
   @Override
   public Status execute() {
-    final Vessel vessel = getAgent();
+    final Vessel vessel = getVessel();
     checkState(
       currentPath.getLast().equals(destination),
       "Current path %s does not match current destination %s for vessel %s.",
@@ -133,9 +133,9 @@ public class TravelAlongPath extends AgentTask<Vessel> {
         .apply(vessel)
         .broadcast(
           new TravelEvent(
-            getAgent(),
+            getVessel(),
             startDateTime,
-            getAgent().getSchedule().getDateTime(),
+            getVessel().getSchedule().getDateTime(),
             origin,
             destination
           )

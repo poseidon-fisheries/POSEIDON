@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -24,19 +24,18 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
-import uk.ac.ox.poseidon.agents.tasks.AgentTask;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.tasks.VesselTask;
 
 /**
- * A leaf {@link AgentTask} that records the vessel's arrival in port, ending
+ * A leaf {@link VesselTask} that records the vessel's arrival in port, ending
  * its current trip's time at sea, and always succeeds.
  */
-public class ArriveInPort extends AgentTask<Vessel> {
+public class ArriveInPort extends VesselTask {
 
   /** Records the vessel's arrival in port. */
   @Override
   public Status execute() {
-    getAgent().arriveInPort();
+    getVessel().arriveInPort();
     return SUCCEEDED;
   }
 }

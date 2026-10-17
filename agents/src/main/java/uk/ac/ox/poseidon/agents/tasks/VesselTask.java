@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,37 +23,43 @@
 package uk.ac.ox.poseidon.agents.tasks;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.badlogic.gdx.ai.btree.LeafTask;
 import com.badlogic.gdx.ai.btree.Task;
 import java.time.Duration;
-import uk.ac.ox.poseidon.agents.Agent;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * A gdx-ai {@link LeafTask} run against an {@link Agent}. Behavior trees are
- * built fresh per agent rather than cloned, so {@link #copyTo} is deliberately
- * unsupported.
- *
- * @param <G> the type of agent this task runs against
+ * A gdx-ai {@link LeafTask} run against a {@link Vessel}. Behavior trees are
+ * built fresh per vessel rather than cloned, so {@link #copyTo} is
+ * deliberately unsupported.
  */
-public abstract class AgentTask<G extends Agent> extends LeafTask<G> {
+public abstract class VesselTask extends LeafTask<Vessel> {
 
-  /** @return the agent this task is running against */
-  public G getAgent() {
-    return getObject();
+  /**
+   * @return the vessel this task is running against
+   * @throws IllegalStateException if the vessel is not stepping this task's
+   *                               tree: the tree has its vessel only during
+   *                               the vessel's step
+   */
+  public Vessel getVessel() {
+    final Vessel vessel = getObject();
+    checkState(vessel != null, "%s read its vessel outside a step.", this);
+    return vessel;
   }
 
   /**
-   * Reports this task as running for {@code duration}: the agent executes it
+   * Reports this task as running for {@code duration}: the vessel executes it
    * again once {@code duration} has elapsed. Tasks report {@code RUNNING} only
    * through this method, so each running step sets its own duration, which the
-   * agent clears once it has scheduled its next step.
+   * vessel clears once it has scheduled its next step.
    *
    * @param duration how long until this task is executed again
    * @return {@code RUNNING}
    */
   protected Status runFor(final Duration duration) {
-    getAgent().setTaskDuration(duration);
+    getVessel().setTaskDuration(duration);
     return RUNNING;
   }
 
@@ -62,7 +68,7 @@ public abstract class AgentTask<G extends Agent> extends LeafTask<G> {
    *                                       cloned
    */
   @Override
-  protected Task<G> copyTo(final Task<G> task) {
+  protected Task<Vessel> copyTo(final Task<Vessel> task) {
     throw new UnsupportedOperationException("Not implemented");
   }
 }

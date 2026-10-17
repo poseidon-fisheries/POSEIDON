@@ -43,8 +43,8 @@ public class Factories {
   /**
    * @param predicate the condition to test against the vessel
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for an
-   *         {@link AgentPredicateTask}
-   * @see AgentPredicateTask
+   *         {@link VesselPredicateTask}
+   * @see VesselPredicateTask
    */
   public static VesselPredicateTaskFactory checkThat(
     final ValueFactory<
@@ -60,9 +60,9 @@ public class Factories {
    * @param subject   the value tested, read for the vessel
    * @param predicate the condition to test the subject against
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for an
-   *         {@link AgentPredicateTask} testing {@code predicate} against
+   *         {@link VesselPredicateTask} testing {@code predicate} against
    *         {@code subject}
-   * @see AgentPredicateTask
+   * @see VesselPredicateTask
    */
   public static <T> VesselPredicateTaskFactory checkThat(
     final ValueFactory<? super VesselComponentScope, ? super Vessel, T> subject,

@@ -23,7 +23,7 @@
 /**
  * General-purpose behavior-tree leaves not tied to a specific domain task:
  * predicate checks
- * ({@link uk.ac.ox.poseidon.agents.tasks.general.AgentPredicateTask}),
+ * ({@link uk.ac.ox.poseidon.agents.tasks.general.VesselPredicateTask}),
  * fixed-duration waits
  * ({@link uk.ac.ox.poseidon.agents.tasks.general.WaitFor}), and a try-then-wait
  * retry combinator

@@ -27,24 +27,22 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import java.time.Duration;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTask;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * An {@link ExtendedTask} that runs for a fixed duration, drawn fresh from
  * {@code duration} each time it starts, and then always succeeds.
- *
- * @param <G> the type of agent this task runs against
  */
 @RequiredArgsConstructor
-public class WaitFor<G extends Agent> extends ExtendedTask<G> {
+public class WaitFor extends ExtendedTask {
 
-  final Function<? super G, Duration> duration;
+  final Function<? super Vessel, Duration> duration;
 
   /** @return a fresh duration from {@link #duration} */
   @Override
   protected Duration getDuration() {
-    return duration.apply(getAgent());
+    return duration.apply(getVessel());
   }
 
   /** @return always {@code SUCCEEDED} */

@@ -42,7 +42,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class WaitForFactory extends TaskFactory<WaitFor<Vessel>> {
+public class WaitForFactory extends TaskFactory<WaitFor> {
 
   private final ValueFactory<
     ? super VesselComponentScope,
@@ -51,7 +51,7 @@ public class WaitForFactory extends TaskFactory<WaitFor<Vessel>> {
   > duration;
 
   @Override
-  protected WaitFor<Vessel> newInstance(final VesselComponentScope scope) {
-    return new WaitFor<>(duration.get(scope));
+  protected WaitFor newInstance(final VesselComponentScope scope) {
+    return new WaitFor(duration.get(scope));
   }
 }

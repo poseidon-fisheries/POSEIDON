@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.vessels;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import java.util.Collections;
@@ -69,12 +70,16 @@ public class Fleet implements VesselsGetter {
   }
 
   /**
-   * @param vesselId the new vessel's id
-   * @return a freshly created, inactive vessel with no home port, gear, hold or
-   *         engine yet set
+   * @param vesselId  the new vessel's id
+   * @param behaviour the declaration of the behaviour the vessel steps
+   * @return a freshly created, inactive vessel with no home port and no
+   *         component yet built
    * @throws IllegalStateException if {@code vesselId} is already in use
    */
-  public Vessel createVessel(final String vesselId) {
+  public Vessel createVessel(
+    final String vesselId,
+    final VesselComponent<? extends Task<Vessel>> behaviour
+  ) {
     checkState(
       !vesselsById.containsKey(vesselId),
       "Vessel %s already exists",
@@ -86,7 +91,8 @@ public class Fleet implements VesselsGetter {
       vesselId,
       vesselField,
       portGrid,
-      marketGrid
+      marketGrid,
+      behaviour
     );
     vessel.setAccount(new Account());
     vesselsById.put(vesselId, vessel);

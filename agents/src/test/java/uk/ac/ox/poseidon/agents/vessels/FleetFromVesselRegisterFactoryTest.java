@@ -26,8 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
@@ -111,7 +111,7 @@ class FleetFromVesselRegisterFactoryTest {
           // the gear's declaration is the second component
           .dataMapping("components[1].factory.code", "gear")
           .component(vesselComponent(new ObjectFactory<>(mock(Engine.class))))
-          .behaviour(vesselComponent(behaviour(waitFor(constant(days(1))))))
+          .behaviour(behaviour(waitFor(constant(days(1)))))
           .build()
       )
     ).startNewSimulation();

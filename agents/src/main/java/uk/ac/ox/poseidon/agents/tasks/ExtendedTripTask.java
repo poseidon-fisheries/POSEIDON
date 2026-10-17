@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -27,14 +27,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.trips.Trip;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * An {@link ExtendedTask} run as part of the vessel's current {@link Trip},
  * capturing that trip and the wall-clock start time when the task starts.
  */
 @Getter
-public abstract class ExtendedTripTask extends ExtendedTask<Vessel> {
+public abstract class ExtendedTripTask extends ExtendedTask {
 
   private Trip trip;
   private LocalDateTime startDateTime;
@@ -45,7 +44,7 @@ public abstract class ExtendedTripTask extends ExtendedTask<Vessel> {
    */
   @Override
   public void start() {
-    trip = checkNotNull(getAgent().getCurrentTrip());
-    startDateTime = getAgent().getSchedule().getDateTime();
+    trip = checkNotNull(getVessel().getCurrentTrip());
+    startDateTime = getVessel().getSchedule().getDateTime();
   }
 }

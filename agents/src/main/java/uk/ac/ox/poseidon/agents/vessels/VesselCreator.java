@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import com.badlogic.gdx.ai.btree.Task;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.function.Supplier;
@@ -30,7 +31,6 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
-import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -61,7 +61,7 @@ public class VesselCreator implements Steppable {
   private final ValueFactory<? super VesselScope, ? super Vessel, String> name;
   private final Factory<? super VesselScope, ? extends Account> account;
   private final Factory<? super VesselScope, ? extends Port> homePort;
-  private final VesselComponent<? extends Behaviour> behaviour;
+  private final VesselComponent<? extends Task<Vessel>> behaviour;
   private final List<VesselComponent<?>> components;
 
   private final int numberOfVesselsToCreate;
@@ -83,13 +83,14 @@ public class VesselCreator implements Steppable {
         vesselIdSupplier.get(),
         vesselField,
         portGrid,
-        marketGrid
+        marketGrid,
+        behaviour
       );
       final VesselScope vesselScope = new VesselScope(simulationScope, vessel);
       vessel.setHomePort(homePort.get(vesselScope));
       vessel.setAccount(account.get(vesselScope));
       vessel.setName(name.get(vesselScope).apply(vessel));
-      vessel.setBehaviour(vessel.buildComponent(behaviour, vesselScope));
+      vessel.buildComponent(behaviour, vesselScope);
       components.forEach(component ->
         vessel.buildComponent(component, vesselScope)
       );

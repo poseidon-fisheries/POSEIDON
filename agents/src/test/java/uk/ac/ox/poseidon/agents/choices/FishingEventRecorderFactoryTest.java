@@ -125,8 +125,7 @@ class FishingEventRecorderFactoryTest {
   @Test
   void doesNotRegisterTheRecorderOnTheVesselsEventManager() {
     factory.get(scopeA);
-    scopeA
-      .getVessel()
+    vesselA
       .getEventManager()
       .broadcast(fishingEvent("PS", COORDINATE, Bucket.of(SPECIES, 10)));
 
@@ -145,11 +144,11 @@ class FishingEventRecorderFactoryTest {
       .get(scopeA)
       .receive(fishingEvent("PS", COORDINATE, Bucket.of(SPECIES, 10)));
 
+    assertThat(optionValues.get(scopeA).apply(vesselA).getValue(CELL)).contains(
+      10.0
+    );
     assertThat(
-      optionValues.get(scopeA).apply(scopeA.getVessel()).getValue(CELL)
-    ).contains(10.0);
-    assertThat(
-      optionValues.get(scopeB).apply(scopeB.getVessel()).getValue(CELL)
+      optionValues.get(scopeB).apply(vesselB).getValue(CELL)
     ).isEmpty();
   }
 

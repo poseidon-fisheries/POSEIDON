@@ -22,21 +22,28 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static lombok.AccessLevel.NONE;
 
+import com.badlogic.gdx.ai.btree.BehaviorTree;
+import com.badlogic.gdx.ai.btree.Task;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import lombok.Getter;
 import lombok.NonNull;
+import sim.engine.Steppable;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.trips.Trip;
@@ -50,21 +57,82 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A fishing vessel: an {@link Agent} with components (its gear, engine, hold
- * and the rest, each read through its {@link VesselComponent} declaration), a
- * home port, and a behaviour tree driving its trips. Active only while
- * {@link #isActive()} holds — the base agent is active, it's registered as
- * active, every gear among its components is active, and it has a home port.
+ * A fishing vessel, the model's agent: it has components (its behaviour, gear,
+ * engine, hold and the rest, each read through its {@link VesselComponent}
+ * declaration) and a home port. Its behaviour is the root task of a gdx-ai
+ * behaviour tree, which the vessel runs: it repeatedly steps the tree,
+ * rescheduling itself either after the running task's {@link #taskDuration}
+ * (while the behaviour is running) or on the very next tick (once it isn't).
+ * It steps its behaviour only while {@link #isActive()} holds.
  * <p>
  * Its modifiable characteristics (name, account, home port, components,
- * registration, tags, and behaviour) are changed from outside its behaviour, by
- * the fleet register, so their setters go through {@link #mutate} and take
- * effect between runs of the behaviour. Its current state (cell, heading,
- * trips) is changed by the behaviour itself and changes immediately.
+ * registration and tags) are changed from outside its behaviour, by the fleet
+ * register, so their setters go through {@link #mutate}, which queues them
+ * while the behaviour is running: they take effect between runs of the
+ * behaviour, never during one, so a vessel isn't deactivated at sea or given a
+ * new hold with its catch on board. Its current state (cell, heading, trips)
+ * is changed by the behaviour itself and changes immediately.
+ * <p>
+ * A vessel has at most one step pending on the schedule. The vessel isn't
+ * itself a {@link Steppable}: what goes on the schedule is its private
+ * {@link #stepper}, so nothing outside the vessel can schedule it, and every
+ * step is scheduled through {@link #scheduleNextStep}, which refuses to
+ * schedule a second one. Outside a step, an active vessel always has a step
+ * pending ({@link #mutate} restores this after each mutation). Becoming
+ * inactive doesn't cancel a pending step; the step still runs, finds the
+ * vessel inactive and schedules nothing, so a vessel can be inactive with a
+ * step pending, and reactivating it then needs no new step.
  */
 @Getter
-@SuppressFBWarnings(value = "EI_EXPOSE_REP")
-public class Vessel extends Agent implements Oriented2D {
+public class Vessel implements Oriented2D {
+
+  private static final int VESSEL_STEP_ORDERING = 1;
+
+  private final @NonNull TemporalSchedule schedule;
+  private final @NonNull EventManager eventManager;
+
+  /** The products of the factories built for this vessel. */
+  private final ProductStore productStore = new ProductStore();
+
+  /**
+   * The declaration of the behaviour this vessel runs, the root task of its
+   * tree; a vessel without that component does not act.
+   */
+  @Getter(NONE)
+  private final @NonNull VesselComponent<? extends Task<Vessel>> behaviour;
+
+  /**
+   * The tree this vessel runs over its behaviour component, renewed whenever
+   * that component is built, between runs of the tree; {@code null} until
+   * then. It has this vessel as its object only during a step, so a task
+   * reading its vessel between steps fails at once.
+   */
+  @Getter(NONE)
+  private BehaviorTree<Vessel> tree;
+
+  @Getter(NONE)
+  private final Queue<Runnable> mutationQueue = new LinkedList<>();
+
+  /**
+   * How long until the running behaviour's task is executed again: set by that
+   * task when it reports {@code RUNNING} (see
+   * {@link uk.ac.ox.poseidon.agents.tasks.VesselTask#runFor}), and cleared once
+   * this vessel's next step is scheduled, so each running step must set its
+   * own.
+   */
+  @Getter(NONE)
+  private Duration taskDuration;
+
+  /**
+   * What this vessel puts on the schedule: runs {@link #step()}. Private, so
+   * only it can.
+   */
+  @Getter(NONE)
+  private final Steppable stepper = _ -> step();
+
+  /** Whether this vessel has a step on the schedule that hasn't run yet. */
+  @Getter(NONE)
+  private boolean stepPending;
 
   /** This vessel's identifying id. */
   private final @NonNull String id;
@@ -78,26 +146,39 @@ public class Vessel extends Agent implements Oriented2D {
   private final @NonNull MarketGrid marketGrid;
 
   /**
-   * @param schedule     the simulation's temporal schedule
+   * Creates an inactive vessel, with no behaviour built yet. It starts stepping
+   * once it becomes active, through {@link #mutate}: a vessel never starts
+   * active, so an active vessel always has a step pending.
+   *
+   * @param schedule     the schedule this vessel reschedules itself on after
+   *                     each step
    * @param eventManager the event manager this vessel broadcasts on
    * @param id           the vessel's identifying id
    * @param vesselField  the field the vessel moves within
    * @param portGrid     the grid of ports the vessel can dock at
    * @param marketGrid   the grid of markets the vessel can sell into
+   * @param behaviour    the declaration of the behaviour the vessel steps
    */
+  @SuppressFBWarnings(
+    value = "EI2",
+    justification = "Vessel keeps references to mutable schedule/event manager by design."
+  )
   public Vessel(
     @NonNull final TemporalSchedule schedule,
     @NonNull final EventManager eventManager,
     @NonNull final String id,
     @NonNull final VesselField vesselField,
     @NonNull final PortGrid portGrid,
-    @NonNull final MarketGrid marketGrid
+    @NonNull final MarketGrid marketGrid,
+    @NonNull final VesselComponent<? extends Task<Vessel>> behaviour
   ) {
-    super(schedule, eventManager);
+    this.schedule = schedule;
+    this.eventManager = eventManager;
     this.id = id;
     this.vesselField = vesselField;
     this.portGrid = portGrid;
     this.marketGrid = marketGrid;
+    this.behaviour = behaviour;
   }
 
   /** @return this vessel's tags, unmodifiable */
@@ -148,13 +229,13 @@ public class Vessel extends Agent implements Oriented2D {
   private Trip previousTrip;
 
   /**
-   * @return whether the base agent is active, {@link #registeredAsActive},
-   *         every gear among its components is active, and there's a home port
+   * @return whether this vessel has its behaviour, is
+   *         {@link #registeredAsActive}, every gear among its components is
+   *         active, and it has a home port
    */
-  @Override
   public boolean isActive() {
     return (
-      super.isActive() &&
+      tree != null &&
       registeredAsActive &&
       components
         .values()
@@ -164,6 +245,103 @@ public class Vessel extends Agent implements Oriented2D {
         ) &&
       homePort != null
     );
+  }
+
+  /** @return whether this vessel's behaviour tree is running */
+  boolean isBehaviourRunning() {
+    return tree != null && tree.getStatus() == RUNNING;
+  }
+
+  /**
+   * Drains any queued mutations (only once the behaviour isn't running), then,
+   * if still active, steps the behaviour tree with this vessel and reschedules —
+   * after {@link #taskDuration} if it's now running, or on the next tick
+   * otherwise.
+   */
+  private void step() {
+    stepPending = false;
+    if (!isBehaviourRunning()) {
+      while (!mutationQueue.isEmpty()) {
+        mutationQueue.poll().run();
+      }
+    }
+    if (isActive()) {
+      tree.setObject(this);
+      try {
+        tree.step();
+      } finally {
+        tree.setObject(null);
+      }
+      if (isBehaviourRunning()) {
+        final Duration delay = checkNotNull(
+          taskDuration,
+          "Vessel %s's behaviour is running, but no task set a duration this step.",
+          this
+        );
+        taskDuration = null;
+        scheduleNextStep(delay);
+      } else {
+        checkState(
+          taskDuration == null,
+          "Vessel %s's behaviour is not running, but a task set a duration this step.",
+          this
+        );
+        scheduleNextStep();
+      }
+    }
+  }
+
+  /** Schedules this vessel's next step on the next tick. */
+  private void scheduleNextStep() {
+    checkState(!stepPending, "Vessel %s already has a step pending.", this);
+    stepPending = schedule.scheduleOnce(stepper, VESSEL_STEP_ORDERING);
+  }
+
+  /** Schedules this vessel's next step after {@code delay}. */
+  private void scheduleNextStep(final Duration delay) {
+    checkState(!stepPending, "Vessel %s already has a step pending.", this);
+    stepPending = schedule.scheduleOnceIn(delay, stepper, VESSEL_STEP_ORDERING);
+  }
+
+  /**
+   * Sets how long until the running task is executed again. A vessel runs one
+   * task at a time, so only one task may set it in a step.
+   *
+   * @param taskDuration how long until the running task is executed again
+   * @throws IllegalStateException if a task already set it this step
+   */
+  public void setTaskDuration(final Duration taskDuration) {
+    checkState(
+      this.taskDuration == null,
+      "Vessel %s's task duration was already set this step.",
+      this
+    );
+    this.taskDuration = taskDuration;
+  }
+
+  /**
+   * Applies a change from outside the vessel's behaviour, between runs of the
+   * behaviour. If the behaviour is running, we queue the mutation, and it will
+   * be applied the next time the vessel is stepped and the behaviour is not
+   * running.
+   * <p>
+   * Otherwise, we apply the mutation immediately and then restore the invariant
+   * that, outside a step, an active vessel has a step pending: if the vessel
+   * is active and has none, we schedule one. This depends only on the
+   * vessel's state after the mutation, not on what it was before, so a
+   * sequence of mutations that briefly activates and deactivates the vessel
+   * (as a fleet event's setters can) never leaves it with more than one step
+   * pending.
+   */
+  void mutate(final Runnable mutation) {
+    if (isBehaviourRunning()) {
+      mutationQueue.add(mutation);
+    } else {
+      mutation.run();
+      if (isActive() && !stepPending) {
+        scheduleNextStep();
+      }
+    }
   }
 
   /** Sets the vessel's display name. */
@@ -210,7 +388,12 @@ public class Vessel extends Agent implements Oriented2D {
     final T component = declaration
       .getFactory()
       .get(new VesselComponentScope(scope, store));
-    mutate(() -> components.put(declaration, component));
+    mutate(() -> {
+      components.put(declaration, component);
+      if (declaration == behaviour) {
+        tree = new BehaviorTree<>(behaviour.of(this));
+      }
+    });
     return component;
   }
 

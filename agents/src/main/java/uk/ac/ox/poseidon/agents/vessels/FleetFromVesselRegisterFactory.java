@@ -28,6 +28,7 @@ import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.*;
 import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.*;
 
+import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import java.lang.reflect.InvocationTargetException;
@@ -41,7 +42,6 @@ import lombok.experimental.SuperBuilder;
 import org.apache.commons.beanutils.PropertyUtils;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
-import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SchedulingFactory;
 import uk.ac.ox.poseidon.core.SchedulingScope;
@@ -113,7 +113,7 @@ public class FleetFromVesselRegisterFactory
   private List<String> modificationEventCodes = List.of("MOD");
 
   /** Declares each affected vessel's behaviour. */
-  private VesselComponent<? extends Behaviour> behaviour;
+  private VesselComponent<? extends Task<Vessel>> behaviour;
 
   /**
    * Declares each affected vessel's other components, in the order they are
@@ -135,7 +135,7 @@ public class FleetFromVesselRegisterFactory
   @Override
   public Stream<VesselComponent<?>> listedComponents() {
     return Stream.concat(
-      Stream.ofNullable(behaviour),
+      Stream.of(behaviour),
       components == null ? Stream.empty() : components.stream()
     );
   }
@@ -194,35 +194,31 @@ public class FleetFromVesselRegisterFactory
     final ImmutableMap<String, String> mappings,
     final VesselComponent<? extends P> declaration
   ) {
-    if (declaration == null) {
-      return __ -> null;
-    } else {
-      return vessel -> {
-        // The mapped values are set on this factory (and the factories it
-        // holds) only for the time of the call, then the original values are
-        // put back: other simulations of the same scenario may be using this
-        // factory at the same time.
-        synchronized (this) {
-          final Map<String, Object> originalValues = new LinkedHashMap<>();
-          mappings
-            .keySet()
-            .forEach(propertyName ->
-              originalValues.put(propertyName, getProperty(propertyName))
-            );
-          try {
-            mappings.forEach((propertyName, columnName) ->
-              setProperty(propertyName, valuesFromRow.get(columnName))
-            );
-            return vessel.buildComponent(
-              declaration,
-              new VesselScope(scope, vessel)
-            );
-          } finally {
-            originalValues.forEach(this::setProperty);
-          }
+    return vessel -> {
+      // The mapped values are set on this factory (and the factories it
+      // holds) only for the time of the call, then the original values are
+      // put back: other simulations of the same scenario may be using this
+      // factory at the same time.
+      synchronized (this) {
+        final Map<String, Object> originalValues = new LinkedHashMap<>();
+        mappings
+          .keySet()
+          .forEach(propertyName ->
+            originalValues.put(propertyName, getProperty(propertyName))
+          );
+        try {
+          mappings.forEach((propertyName, columnName) ->
+            setProperty(propertyName, valuesFromRow.get(columnName))
+          );
+          return vessel.buildComponent(
+            declaration,
+            new VesselScope(scope, vessel)
+          );
+        } finally {
+          originalValues.forEach(this::setProperty);
         }
-      };
-    }
+      }
+    };
   }
 
   private FleetEvent makeUpdate(
@@ -247,9 +243,8 @@ public class FleetFromVesselRegisterFactory
       row.getString(vesselNameColumn),
       row.getString(portCodeColumn),
       makeTags(row),
-      makeFactoryFunction(scope, valuesFromRow, dataMappings, behaviour),
-      components
-        .stream()
+      behaviour,
+      Stream.concat(Stream.of(behaviour), components.stream())
         .<Function<Vessel, ?>>map(component ->
           makeFactoryFunction(scope, valuesFromRow, dataMappings, component)
         )

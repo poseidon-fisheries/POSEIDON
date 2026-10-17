@@ -28,19 +28,18 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
-import uk.ac.ox.poseidon.agents.tasks.AgentTask;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.tasks.VesselTask;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
- * A leaf {@link AgentTask} that succeeds if a fishing action started now, at
+ * A leaf {@link VesselTask} that succeeds if a fishing action started now, at
  * the vessel's current cell and with its current gear, would be permitted by
  * {@code regulations}.
  */
 @RequiredArgsConstructor
-public class CheckIfFishingHereAndNowIsLegal extends AgentTask<Vessel> {
+public class CheckIfFishingHereAndNowIsLegal extends VesselTask {
 
   @NonNull
   private final VesselComponent<? extends Gear> gear;
@@ -55,8 +54,8 @@ public class CheckIfFishingHereAndNowIsLegal extends AgentTask<Vessel> {
   @Override
   public Status execute() {
     final ExtendedFishingAction action = new ExtendedFishingAction(
-      getAgent(),
-      gear.of(getAgent())
+      getVessel(),
+      gear.of(getVessel())
     );
     return regulations.isPermitted(action) ? SUCCEEDED : FAILED;
   }

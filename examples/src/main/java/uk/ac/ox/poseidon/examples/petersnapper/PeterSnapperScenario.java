@@ -39,7 +39,6 @@ import static uk.ac.ox.poseidon.agents.fuel.Factories.fuelStationGrid;
 import static uk.ac.ox.poseidon.agents.fuel.Factories.oneFuelStationPerPort;
 import static uk.ac.ox.poseidon.agents.market.Factories.*;
 import static uk.ac.ox.poseidon.agents.money.Factories.money;
-import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.agents.tasks.decorators.Factories.untilFail;
 import static uk.ac.ox.poseidon.agents.tasks.destinations.Factories.startTrip;
@@ -393,53 +392,51 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       tripEvaluator(optionValues, profitPerHour(CURRENCY_CODE))
     );
 
-    final var behaviour = vesselComponent(
-      behaviour(
-        sequenceTask(
-          startTrip(destination),
-          travelAlongPathTo(
-            engine,
-            fuelTank,
-            pathFinder,
-            distance,
-            currentTripDestinationCell(),
-            currentTripEventManager()
-          ),
-          untilFail(
-            sequenceTask(
-              fishing(
-                gear,
-                hold,
-                fuelTank,
-                currentCellFisheable(biomassGrid),
-                proportionallyLimitingBiomassToHold()
-              ),
-              checkThat(
-                allOf(
-                  condition(
-                    componentProperty(hold, "availableCapacityInKg"),
-                    greaterThan(1)
-                  ),
-                  condition(currentTimeAtSea(), lessThan(constant(days(10))))
-                )
+    final var behaviour = behaviour(
+      sequenceTask(
+        startTrip(destination),
+        travelAlongPathTo(
+          engine,
+          fuelTank,
+          pathFinder,
+          distance,
+          currentTripDestinationCell(),
+          currentTripEventManager()
+        ),
+        untilFail(
+          sequenceTask(
+            fishing(
+              gear,
+              hold,
+              fuelTank,
+              currentCellFisheable(biomassGrid),
+              proportionallyLimitingBiomassToHold()
+            ),
+            checkThat(
+              allOf(
+                condition(
+                  componentProperty(hold, "availableCapacityInKg"),
+                  greaterThan(1)
+                ),
+                condition(currentTimeAtSea(), lessThan(constant(days(10))))
               )
             )
-          ),
-          setDestinationToOrigin(),
-          travelAlongPathTo(
-            engine,
-            fuelTank,
-            pathFinder,
-            distance,
-            currentTripDestinationCell(),
-            currentTripEventManager()
-          ),
-          arriveInPort(),
-          landCatches(hold, constant(hours(1))),
-          refuel(fuelTank, fuelStationGrid),
-          endTrip(),
-          waitFor(constant(hours(12)))
-        )
+          )
+        ),
+        setDestinationToOrigin(),
+        travelAlongPathTo(
+          engine,
+          fuelTank,
+          pathFinder,
+          distance,
+          currentTripDestinationCell(),
+          currentTripEventManager()
+        ),
+        arriveInPort(),
+        landCatches(hold, constant(hours(1))),
+        refuel(fuelTank, fuelStationGrid),
+        endTrip(),
+        waitFor(constant(hours(12)))
       )
     );
 

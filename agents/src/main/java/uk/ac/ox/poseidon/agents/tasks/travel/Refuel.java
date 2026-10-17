@@ -56,12 +56,12 @@ public class Refuel extends ExtendedTripTask {
   public void start() {
     super.start();
     final FuelStation.Purchase purchase = fuelStationGrid
-      .getObjectsAt(getAgent().getCell())
+      .getObjectsAt(getVessel().getCell())
       .min(comparing(FuelStation::getPricePerLitre))
-      .map(fuelStation -> fuelStation.refill(fuelTank.of(getAgent())))
+      .map(fuelStation -> fuelStation.refill(fuelTank.of(getVessel())))
       .orElseThrow(() ->
         new IllegalStateException(
-          "No fuel stations found in cell: " + getAgent().getCell()
+          "No fuel stations found in cell: " + getVessel().getCell()
         )
       );
     duration = purchase.getDuration();

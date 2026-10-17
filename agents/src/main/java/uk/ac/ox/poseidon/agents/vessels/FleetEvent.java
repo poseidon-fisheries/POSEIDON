@@ -26,6 +26,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.lang.System.Logger.Level.WARNING;
 import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.ACTIVATION;
 
+import com.badlogic.gdx.ai.btree.Task;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -35,13 +36,12 @@ import lombok.NonNull;
 import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 
 /**
  * A scheduled {@link Steppable} that, when run, activates, deactivates or
  * modifies one vessel in a {@link Fleet}: creating it on first
- * {@link Type#ACTIVATION}, updating its home port, name, tags, behaviour and
- * other components, and flipping its registered-active status.
+ * {@link Type#ACTIVATION}, updating its home port, name, tags and components,
+ * and flipping its registered-active status.
  */
 @Value
 public class FleetEvent implements Steppable {
@@ -83,18 +83,24 @@ public class FleetEvent implements Steppable {
   @NonNull
   Map<String, Object> tags;
 
-  /** Builds the vessel's behaviour as of this event. */
+  /**
+   * The declaration of the behaviour the vessel steps, for creating the
+   * vessel.
+   */
   @NonNull
-  Function<Vessel, Behaviour> behaviourFactoryFunction;
+  VesselComponent<? extends Task<Vessel>> behaviour;
 
-  /** Builds each of the vessel's other components as of this event. */
+  /**
+   * Builds each of the vessel's components as of this event, its behaviour
+   * first.
+   */
   @NonNull
   List<Function<Vessel, ?>> componentFactoryFunctions;
 
   /**
    * Applies this event to the vessel named {@link #vesselId} in {@link #fleet}:
-   * resolves (or creates) it, updates its home port, name, tags, behaviour
-   * and other components, and flips its registered-active status per
+   * resolves (or creates) it, updates its home port, name, tags and
+   * components, and flips its registered-active status per
    * {@link #eventType}.
    *
    * @throws IllegalStateException if the vessel doesn't exist and this isn't an
@@ -105,7 +111,10 @@ public class FleetEvent implements Steppable {
   @Override
   public void step(final SimState simState) {
     final Vessel vessel = fleet.getVessel(vesselId).orElseGet(() -> {
-      if (eventType == ACTIVATION) return fleet.createVessel(vesselId);
+      if (eventType == ACTIVATION) return fleet.createVessel(
+        vesselId,
+        behaviour
+      );
       else throw new IllegalStateException(
         "Vessel " + vesselId + " does not exist"
       );
@@ -125,7 +134,7 @@ public class FleetEvent implements Steppable {
             // something that has already happened, so we refuse a running
             // behaviour instead of deferring the move as mutate would.
             checkState(
-              !vessel.getBehaviour().isRunning(),
+              !vessel.isBehaviourRunning(),
               "Trying to apply retroactive fleet event %s " +
                 "from %s to vessel %s while behaviour is running.",
               eventType,
@@ -152,7 +161,6 @@ public class FleetEvent implements Steppable {
 
     vessel.setName(vesselName);
     tags.forEach(vessel::putTag);
-    vessel.setBehaviour(behaviourFactoryFunction.apply(vessel));
     componentFactoryFunctions.forEach(factory -> factory.apply(vessel));
     switch (eventType) {
       case ACTIVATION -> vessel.setRegisteredAsActive(true);

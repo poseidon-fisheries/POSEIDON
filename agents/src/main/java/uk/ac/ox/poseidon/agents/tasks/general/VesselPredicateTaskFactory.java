@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link TaskFactory} counterpart of {@link AgentPredicateTask}, built
+ * A {@link TaskFactory} counterpart of {@link VesselPredicateTask}, built
  * via {@link Factories Factories.checkThat(...)}.
  */
 @Getter
@@ -42,7 +42,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class VesselPredicateTaskFactory
-  extends TaskFactory<AgentPredicateTask<Vessel>>
+  extends TaskFactory<VesselPredicateTask>
 {
 
   private final ValueFactory<
@@ -52,9 +52,7 @@ public class VesselPredicateTaskFactory
   > predicate;
 
   @Override
-  protected AgentPredicateTask<Vessel> newInstance(
-    final VesselComponentScope scope
-  ) {
-    return new AgentPredicateTask<>(predicate.get(scope));
+  protected VesselPredicateTask newInstance(final VesselComponentScope scope) {
+    return new VesselPredicateTask(predicate.get(scope));
   }
 }

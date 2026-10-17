@@ -25,8 +25,10 @@ package uk.ac.ox.poseidon.agents.vessels;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
 
+import com.badlogic.gdx.ai.btree.leaf.Success;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
@@ -48,7 +50,8 @@ class VesselComponentTest {
     "V1",
     mock(VesselField.class),
     mock(PortGrid.class),
-    mock(MarketGrid.class)
+    mock(MarketGrid.class),
+    behaviour(scope -> new Success<>())
   );
   private final VesselScope scope = new VesselScope(
     mock(SimulationScope.class),

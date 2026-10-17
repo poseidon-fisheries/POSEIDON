@@ -35,10 +35,10 @@ import static uk.ac.ox.poseidon.agents.social.Factories.cliqueDynamics;
 import static uk.ac.ox.poseidon.agents.social.Factories.fishingEventSharer;
 import static uk.ac.ox.poseidon.agents.social.Factories.sharedFishingEventListener;
 import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
-import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventAccumulator;
 import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventProperty;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
@@ -168,7 +168,7 @@ class FishingEventSharingRouteTest {
       .component(vesselComponent(object(hold)))
       .component(gearComponent)
       .component(vesselComponent(object(engine)))
-      .behaviour(vesselComponent(behaviour(waitFor(constant(days(1))))));
+      .behaviour(behaviour(waitFor(constant(days(1)))));
     if (withSharing) {
       loader
         .component(

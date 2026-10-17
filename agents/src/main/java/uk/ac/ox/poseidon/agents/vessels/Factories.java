@@ -24,12 +24,12 @@ package uk.ac.ox.poseidon.agents.vessels;
 
 import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
 
+import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.function.Supplier;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
-import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -111,7 +111,7 @@ public class Factories {
     final ValueFactory<? super VesselScope, ? super Vessel, String> name,
     final Factory<? super VesselScope, ? extends Account> account,
     final Factory<? super VesselScope, ? extends Port> homePort,
-    final VesselComponent<? extends Behaviour> behaviour,
+    final VesselComponent<? extends Task<Vessel>> behaviour,
     final List<VesselComponent<?>> components,
     final int numberOfVesselsToCreate
   ) {
@@ -139,6 +139,19 @@ public class Factories {
     final Factory<? super VesselComponentScope, ? extends T> factory
   ) {
     return new VesselComponent<>(factory);
+  }
+
+  /**
+   * @param rootTask builds the root task of the vessel's behaviour tree, for
+   *                 each vessel
+   * @return the declaration of the behaviour the vessel runs, built by
+   *         {@code rootTask}; pass it where a vessel's behaviour is declared
+   * @see VesselComponent
+   */
+  public static VesselComponent<Task<Vessel>> behaviour(
+    final Factory<? super VesselComponentScope, ? extends Task<Vessel>> rootTask
+  ) {
+    return new VesselComponent<>(rootTask);
   }
 
   /**

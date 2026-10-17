@@ -21,19 +21,17 @@
  */
 
 /**
- * The base machinery for an agent's gdx-ai behavior tree:
- * {@link uk.ac.ox.poseidon.agents.tasks.AgentTask}/
+ * The base machinery for a vessel's gdx-ai behavior tree:
+ * {@link uk.ac.ox.poseidon.agents.tasks.VesselTask}/
  * {@link uk.ac.ox.poseidon.agents.tasks.ExtendedTask} for building leaf tasks,
- * {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for their factories,
- * and {@link uk.ac.ox.poseidon.agents.tasks.Behaviour} for wrapping a whole
- * tree (or none) as the agent's top-level behavior. Concrete leaves and
- * branch/decorator nodes live in sibling packages
+ * and {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for their factories.
+ * A vessel's behaviour is the root task of its tree, declared with
+ * {@link uk.ac.ox.poseidon.agents.vessels.Factories#behaviour}. Concrete
+ * leaves and branch/decorator nodes live in sibling packages
  * ({@link uk.ac.ox.poseidon.agents.tasks.branches},
  * {@link uk.ac.ox.poseidon.agents.tasks.decorators},
  * {@link uk.ac.ox.poseidon.agents.tasks.general},
  * {@link uk.ac.ox.poseidon.agents.tasks.fishing},
- * {@link uk.ac.ox.poseidon.agents.tasks.travel}). See
- * {@link uk.ac.ox.poseidon.agents.tasks.Factories} for this package's own entry
- * points.
+ * {@link uk.ac.ox.poseidon.agents.tasks.travel}).
  */
 package uk.ac.ox.poseidon.agents.tasks;

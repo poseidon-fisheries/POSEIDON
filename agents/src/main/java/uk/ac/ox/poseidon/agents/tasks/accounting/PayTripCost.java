@@ -28,14 +28,14 @@ import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.joda.money.Money;
-import uk.ac.ox.poseidon.agents.tasks.AgentTask;
+import uk.ac.ox.poseidon.agents.tasks.VesselTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * Deducts a vessel's trip cost from its current trip's account, then succeeds.
  */
 @RequiredArgsConstructor
-public class PayTripCost extends AgentTask<Vessel> {
+public class PayTripCost extends VesselTask {
 
   @NonNull
   private final Function<? super Vessel, ? extends Money> tripCost;
@@ -47,7 +47,7 @@ public class PayTripCost extends AgentTask<Vessel> {
    */
   @Override
   public Status execute() {
-    final Vessel vessel = getAgent();
+    final Vessel vessel = getVessel();
     final Money tripCost = checkNotNull(
       this.tripCost.apply(vessel),
       "Unable to extract trip cost for Vessel %s.".formatted(vessel)

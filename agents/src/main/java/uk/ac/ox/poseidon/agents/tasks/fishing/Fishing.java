@@ -69,13 +69,13 @@ public class Fishing extends ExtendedTripTask {
   private ExtendedFishingAction action;
 
   /**
-   * Starts a new {@link ExtendedFishingAction} for the current agent, cell and
+   * Starts a new {@link ExtendedFishingAction} for the current vessel, cell and
    * gear.
    */
   @Override
   public void start() {
     super.start();
-    action = new ExtendedFishingAction(getAgent(), gear.of(getAgent()));
+    action = new ExtendedFishingAction(getVessel(), gear.of(getVessel()));
   }
 
   /**
@@ -97,10 +97,10 @@ public class Fishing extends ExtendedTripTask {
    */
   @Override
   protected Status complete() {
-    final Fisheable fisheable = this.fisheable.apply(getAgent());
-    final Gear gear = this.gear.of(getAgent());
+    final Fisheable fisheable = this.fisheable.apply(getVessel());
+    final Gear gear = this.gear.of(getVessel());
     final Bucket grossCatch = gear.fish(fisheable);
-    final Hold hold = this.hold.of(getAgent());
+    final Hold hold = this.hold.of(getVessel());
     final Disposition disposition = dispositionProcess.partition(
       grossCatch,
       hold.getAvailableCapacityInKg()
@@ -115,7 +115,7 @@ public class Fishing extends ExtendedTripTask {
     final double fuelPerHour = gear.getLitresOfFuelConsumedPerHourOfFishing();
     if (fuelPerHour > 0) {
       final double hours = getDuration().toSeconds() / 3600.0;
-      fuelTank.of(getAgent()).consumeFuel(fuelPerHour * hours);
+      fuelTank.of(getVessel()).consumeFuel(fuelPerHour * hours);
     }
     return SUCCEEDED;
   }

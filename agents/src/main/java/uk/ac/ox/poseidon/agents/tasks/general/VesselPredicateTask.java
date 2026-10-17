@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,29 +20,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks;
+package uk.ac.ox.poseidon.agents.tasks.general;
+
+import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+
+import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * An agent's behavior-tree-driven behavior, steppable once per simulation tick.
- * <p>
- * Changes to the agent from outside its behaviour take effect only between runs
- * of the behaviour (see {@link uk.ac.ox.poseidon.agents.Agent#mutate}), so a
- * tree must finish regularly: one that keeps running forever would never let
- * them apply. A vessel's tree typically finishes in port, at the end of each
- * trip or of each failed departure attempt.
+ * A leaf {@link VesselTask} that succeeds or fails in one step, depending on
+ * whether {@code predicate} holds for the vessel.
  */
-public interface Behaviour {
-  /**
-   * @return {@code true} if this behaviour actually runs a tree (see
-   *         {@link ActiveBehaviour})
-   */
-  boolean isActive();
+@RequiredArgsConstructor
+public class VesselPredicateTask extends VesselTask {
+
+  private final Function<? super Vessel, Boolean> predicate;
 
   /**
-   * @return {@code true} if the underlying tree is currently {@code RUNNING}
+   * @return {@code SUCCEEDED} if {@code predicate} holds for the vessel,
+   *         {@code FAILED} otherwise
    */
-  boolean isRunning();
-
-  /** Advances the behaviour by one simulation tick. */
-  void step();
+  @Override
+  public Status execute() {
+    return predicate.apply(getVessel()) ? SUCCEEDED : FAILED;
+  }
 }

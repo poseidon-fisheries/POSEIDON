@@ -25,8 +25,8 @@ package uk.ac.ox.poseidon.agents.vessels;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.tasks.landings.Factories.landCatches;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.prefixedId;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselCreator;
@@ -90,9 +90,7 @@ class VesselComponentWiringTest {
           prefixedId("V"),
           object(mock(Account.class)),
           object(mock(Port.class)),
-          vesselComponent(
-            behaviour(landCatches(hold, constant(Duration.ZERO)))
-          ),
+          behaviour(landCatches(hold, constant(Duration.ZERO))),
           List.of(listedHold),
           1
         )

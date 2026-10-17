@@ -58,8 +58,8 @@ public class TravelDirectly extends ExtendedTripTask {
   @Override
   public void start() {
     super.start();
-    origin = getAgent().getCell();
-    destination = getAgent().getCurrentTrip().getDestination();
+    origin = getVessel().getCell();
+    destination = getVessel().getCurrentTrip().getDestination();
     distanceInKm = distanceCalculator.distanceInKm(origin, destination);
   }
 
@@ -71,7 +71,7 @@ public class TravelDirectly extends ExtendedTripTask {
   protected Duration getDuration() {
     return travelDuration(
       distanceInKm,
-      engine.of(getAgent()).getCruisingSpeedInKph()
+      engine.of(getVessel()).getCruisingSpeedInKph()
     );
   }
 
@@ -85,18 +85,18 @@ public class TravelDirectly extends ExtendedTripTask {
   @Override
   protected Status complete() {
     fuelTank
-      .of(getAgent())
+      .of(getVessel())
       .consumeFuel(
-        engine.of(getAgent()).getLitresOfFuelConsumedPerKm() * distanceInKm
+        engine.of(getVessel()).getLitresOfFuelConsumedPerKm() * distanceInKm
       );
-    getAgent().setCurrentCell(getAgent().getCurrentTrip().getDestination());
+    getVessel().setCurrentCell(getVessel().getCurrentTrip().getDestination());
     getTrip()
       .getEventManager()
       .broadcast(
         new TravelEvent(
-          getAgent(),
+          getVessel(),
           getStartDateTime(),
-          getAgent().getSchedule().getDateTime(),
+          getVessel().getSchedule().getDateTime(),
           origin,
           destination
         )
