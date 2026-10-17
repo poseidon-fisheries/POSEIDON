@@ -36,12 +36,12 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.providers.constant.Constant;
 
-class FirstValueFromFactoryTest {
+class OneValueFromFactoryTest {
 
   private final AtomicInteger counter = new AtomicInteger(0);
 
-  private final FirstValueFromFactory<Integer> factory =
-    new FirstValueFromFactory<>(new CountingFactory(counter));
+  private final OneValueFromFactory<Integer> factory =
+    new OneValueFromFactory<>(new CountingFactory(counter));
 
   // Kept in fields: a scope holds its vessel weakly
   private final Vessel vesselA = vesselWithAStore();

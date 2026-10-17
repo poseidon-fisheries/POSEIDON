@@ -228,7 +228,7 @@ components:
                         subject: !!uk.ac.ox.poseidon.geography.grids.extractors.CellValueFactory
                           grid: *id004
                       maximumWidening: 3
-                      neighbourhoodSize: !!uk.ac.ox.poseidon.agents.vessels.FirstValueFromFactory
+                      neighbourhoodSize: !!uk.ac.ox.poseidon.agents.vessels.OneValueFromFactory
                         delegate: !!uk.ac.ox.poseidon.core.providers.random.RandomIntFactory
                           maximum: 10
                           minimum: 1

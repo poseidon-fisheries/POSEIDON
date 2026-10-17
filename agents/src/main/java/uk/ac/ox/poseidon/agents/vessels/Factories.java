@@ -50,14 +50,14 @@ public class Factories {
   /**
    * @param delegate factory for the value to ask once per vessel, with no
    *                 context
-   * @return a {@link ValueFactory} for a constant of the delegate's first value
+   * @return a {@link ValueFactory} for a constant of one value of the delegate,
    *         for each vessel
-   * @see FirstValueFromFactory
+   * @see OneValueFromFactory
    */
-  public static <R> FirstValueFromFactory<R> firstValueFrom(
+  public static <R> OneValueFromFactory<R> oneValueFrom(
     final ValueFactory<? super VesselScope, ? super Void, ? extends R> delegate
   ) {
-    return new FirstValueFromFactory<>(delegate);
+    return new OneValueFromFactory<>(delegate);
   }
 
   /**

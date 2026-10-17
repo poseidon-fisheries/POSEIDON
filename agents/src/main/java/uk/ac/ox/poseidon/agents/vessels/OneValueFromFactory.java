@@ -33,12 +33,12 @@ import uk.ac.ox.poseidon.core.providers.constant.Constant;
 
 /**
  * A {@link VesselScopeFactory} that asks the given value once per vessel, when
- * built, and produces a {@link Constant} of that first answer — a snapshot, not
+ * built, and produces a {@link Constant} of that one answer — a snapshot, not
  * a live pass-through to the value, so a random draw, for instance, is drawn
  * once for each vessel and kept. The value is asked with no context. Its level
  * is declared, not derived: asking the value can change what gave it (a draw
  * moves the random number generator), so the level says how many times it is
- * asked. Built via {@link Factories#firstValueFrom(ValueFactory)}.
+ * asked. Built via {@link Factories#oneValueFrom(ValueFactory)}.
  *
  * @param <R> the type of the value
  */
@@ -47,7 +47,7 @@ import uk.ac.ox.poseidon.core.providers.constant.Constant;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class FirstValueFromFactory<R>
+public class OneValueFromFactory<R>
   extends VesselScopeFactory<Function<Object, R>>
   implements ValueFactory<VesselScope, Object, R>
 {

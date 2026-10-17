@@ -361,7 +361,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         neighbourhoodGridExplorer(
           pathFinder,
           validCellPredicate,
-          firstValueFrom(randomInt(1, 10)),
+          oneValueFrom(randomInt(1, 10)),
           MAXIMUM_EXPLORATION_WIDENING,
           bestKnownOption(
             optionValues,
