@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.core;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -33,12 +35,14 @@ import lombok.experimental.SuperBuilder;
  * vessel), always returns the same {@code P} instance. Products are kept in
  * {@link ProductStore}s keyed by factory identity, so sharing is declared by
  * referencing one factory object from several places: two distinct factory
- * objects never share a product, however equal their values. Subclasses say
- * which store holds the product (via {@link #productStoreFor}, usually
- * inherited from a {@code *ScopeFactory} base rather than overridden directly)
- * and supply the actual construction logic (via {@link #newInstance}). Extend
- * this rather than implementing {@link Factory} directly unless you have a
- * specific reason not to.
+ * objects never share a product, however equal their values. A factory's
+ * level says which owner it builds for: declared by a level base class
+ * ({@link GlobalScopeFactory}, {@link SimulationScopeFactory} and the vessel
+ * one), or derived from its inputs by {@link RelativeScopeFactory}.
+ * Subclasses supply the actual construction logic (via {@link #newInstance}).
+ * Extend a level base class or {@link RelativeScopeFactory} rather than
+ * implementing {@link Factory} directly unless you have a specific reason not
+ * to.
  *
  * @param <S> the scope this factory resolves against
  * @param <P> the type of the product
@@ -57,24 +61,39 @@ public abstract class AbstractFactory<
   private final transient ProductStore globalStore = new ProductStore();
 
   /**
-   * Returns the product held for {@code scope}'s owner in the store that
-   * {@link #productStoreFor} gives, building it with {@link #newInstance}
-   * and storing it if it isn't there. A product kept in this factory's own
-   * store is shared by every simulation reaching this factory, possibly at
-   * once, so its build is locked by this factory.
+   * Returns the product held for {@code scope}'s owner at this factory's
+   * level, building it with {@link #newInstance} and storing it if it isn't
+   * there. The scope is first widened to this factory's level: a scope of
+   * exactly that class is constructed over the same owners, so that the build
+   * receives nothing a narrower scope offers, and its registrations go to the
+   * store that holds its product. The product of a global factory is kept in
+   * this factory's own store, shared by every simulation reaching this
+   * factory, possibly at once, so its build is locked by this factory.
    *
    * @param scope the scope to resolve against, must not be null
    * @return the stored or newly-built object
+   * @throws IllegalArgumentException if {@code scope} is wider than this
+   *                                  factory's level
    */
   @Override
   public final P get(@NonNull final S scope) {
-    final ProductStore store = productStoreFor(scope);
-    if (store == globalStore) {
+    final Class<? extends Scope> level = levelFor(scope);
+    checkArgument(
+      level.isInstance(scope),
+      "%s is at the level of %s, but was asked for its product with a " +
+        "wider %s",
+      getClass().getName(),
+      level.getSimpleName(),
+      scope.getClass().getSimpleName()
+    );
+    @SuppressWarnings("unchecked")
+    final S widened = (S) scope.widenedTo(level);
+    if (level == Scope.class) {
       synchronized (this) {
-        return getFrom(store, scope);
+        return getFrom(globalStore, widened);
       }
     }
-    return getFrom(store, scope);
+    return getFrom(((SimulationScope) widened).getProductStore(), widened);
   }
 
   // Looked up, built and then stored, not filled in one call: the build asks
@@ -83,45 +102,30 @@ public abstract class AbstractFactory<
     if (store.contains(this)) {
       return store.get(this);
     }
-    final P product = newInstance(scopeForBuild(scope));
+    final P product = newInstance(scope);
     store.put(this, product);
     return product;
   }
 
   /**
-   * @param scope the scope being resolved against
-   * @return the store holding this factory's product for {@code scope}: its
-   *         owner's (the simulation's, for a simulation-level factory), or
-   *         {@link #globalStore()} for a global factory
-   */
-  protected abstract ProductStore productStoreFor(S scope);
-
-  /**
-   * @return this factory's own store, which holds its product when it is
-   *         shared by every simulation; a copy of this factory starts with an
-   *         empty one
-   */
-  protected final ProductStore globalStore() {
-    return globalStore;
-  }
-
-  /**
    * @param scope the scope a product is asked for with
-   * @return the scope that the build receives: {@code scope} itself, unless a
-   *         level base gives its builds a scope of exactly its level
+   * @return this factory's level, the class of the scope its build receives:
+   *         its declared level, unless it derives one
    */
-  protected S scopeForBuild(final S scope) {
-    return scope;
+  Class<? extends Scope> levelFor(final Scope scope) {
+    return scopeClass();
   }
 
   /**
-   * @param scope the scope being resolved against
+   * @param scope the scope being resolved against, of exactly this factory's
+   *              level
    * @return a freshly built {@code P}, called at most once per store
    */
   protected abstract P newInstance(S scope);
 
   /**
-   * @return the concrete {@link Scope} subclass this factory resolves against
+   * @return the level this factory declares: the concrete {@link Scope}
+   *         subclass it resolves against
    */
   protected abstract Class<S> scopeClass();
 }

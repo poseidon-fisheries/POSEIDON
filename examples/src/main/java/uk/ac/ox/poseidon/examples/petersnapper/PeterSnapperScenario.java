@@ -71,7 +71,6 @@ import static uk.ac.ox.poseidon.core.predicates.Factories.equal;
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.greaterThan;
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
-import static uk.ac.ox.poseidon.core.providers.Factories.firstValueFrom;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
@@ -340,7 +339,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         neighbourhoodGridExplorer(
           pathFinder,
           validCellPredicate,
-          firstValueFrom(perVessel(randomInt(1, 10))),
+          firstValueFrom(randomInt(1, 10)),
           MAXIMUM_EXPLORATION_WIDENING,
           bestKnownOption(
             optionValues,

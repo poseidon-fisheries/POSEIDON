@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +46,7 @@ class CarryingCapacityGridTest {
       1.5,
       -1.5,
       1.5
-    ).get(mock(Scope.class));
+    ).get(Scope.GLOBAL_SCOPE);
     grid = new CarryingCapacityGrid(
       new BaseDoubleGrid(modelGrid, new double[][] {
         { 0, 0, 1 },

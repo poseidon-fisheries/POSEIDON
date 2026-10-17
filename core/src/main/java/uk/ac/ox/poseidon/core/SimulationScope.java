@@ -75,6 +75,23 @@ public class SimulationScope extends Scope {
   }
 
   /**
+   * Protected, so that the narrower scopes that carry a store of their own
+   * override it; only the store routing reads it.
+   *
+   * @return the store of this scope's owner
+   */
+  protected ProductStore getProductStore() {
+    return getSimulation().getProductStore();
+  }
+
+  @Override
+  protected Scope at(final Class<? extends Scope> level) {
+    return level == SimulationScope.class
+      ? new SimulationScope(this)
+      : super.at(level);
+  }
+
+  /**
    * Registers a listener on the simulation's event manager, so that it
    * receives the events the simulation's products broadcast from now on.
    *

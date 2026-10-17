@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -57,7 +56,7 @@ class StaticNetCdfGridReaderFactoryTest {
       );
 
     assertThatCode(() ->
-      factory.get(mock(Scope.class))
+      factory.get(Scope.GLOBAL_SCOPE)
     ).doesNotThrowAnyException();
   }
 
@@ -72,7 +71,7 @@ class StaticNetCdfGridReaderFactoryTest {
         "longitude"
       );
     final Supplier<StaticNetCdfGridReader> supplier = factory.get(
-      mock(Scope.class)
+      Scope.GLOBAL_SCOPE
     );
 
     try (

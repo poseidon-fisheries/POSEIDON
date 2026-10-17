@@ -27,18 +27,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.SimulationScope;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link KeyedMemory}, built
+ * A {@link VesselScopeFactory} counterpart of {@link KeyedMemory}, built
  * via {@link Factories#keyedMemory()}.
  * <p>
- * Being simulation-scoped, the memory it builds is shared by the whole
- * simulation. Wrap it in
- * {@link uk.ac.ox.poseidon.agents.vessels.Factories#perVessel} to give each
- * vessel its own, and give every selector of a vessel's memory that same
- * wrapper (two wrappers make two memories).
+ * A memory is what its vessel knows across components, so it is
+ * vessel-level: each vessel has its own, and every selector of a vessel's
+ * memory reached through this factory object reads the same one.
  */
 @Getter
 @ToString
@@ -49,10 +47,10 @@ public class KeyedMemoryFactory<
   K,
   O,
   M
-> extends SimulationScopeFactory<KeyedMemory<K, O, M>> {
+> extends VesselScopeFactory<KeyedMemory<K, O, M>> {
 
   @Override
-  protected KeyedMemory<K, O, M> newInstance(final SimulationScope scope) {
+  protected KeyedMemory<K, O, M> newInstance(final VesselScope scope) {
     return new KeyedMemory<>();
   }
 }

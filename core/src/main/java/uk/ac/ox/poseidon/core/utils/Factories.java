@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.PerSimulationFactory;
 import uk.ac.ox.poseidon.core.RunIdFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -151,17 +150,6 @@ public class Factories {
     final String prefix
   ) {
     return new PrefixedIdSupplierFactory(prefix);
-  }
-
-  /**
-   * @param delegate factory for the value to resolve once per simulation
-   * @return a {@link PerSimulationFactory} wrapping {@code delegate}
-   * @see uk.ac.ox.poseidon.core.PerSimulationFactory
-   */
-  public static <T> PerSimulationFactory<T> perSimulation(
-    final Factory<? super SimulationScope, ? extends T> delegate
-  ) {
-    return new PerSimulationFactory<>(delegate);
   }
 
   /**

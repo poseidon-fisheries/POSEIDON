@@ -22,33 +22,47 @@
 
 package uk.ac.ox.poseidon.core;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.beans.Introspector.getBeanInfo;
-import static java.util.stream.Collectors.toMap;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import com.google.common.reflect.TypeToken;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
-import java.util.function.Function;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
- * A {@link Factory} whose effective scope is derived from its own
- * {@link Factory}-typed fields rather than fixed: it inspects those fields,
- * finds their common (leaf) scope class, and keeps its produced object in the
- * store of that scope's owner — so it inherits whatever scope its inputs
- * resolve at, falling back to global scope, in its own store, if they are all
- * global or it has no {@link Factory}-typed fields.
- * Prefer this over {@link GlobalScopeFactory} for any factory with
- * {@link Factory}-typed input fields: it still ends up at global scope when its
- * inputs do, but safely demotes to a narrower scope instead of silently sharing
- * stale state if an input ever isn't global.
+ * A {@link Factory} whose level is derived from its inputs rather than
+ * declared: the narrowest level among them, or global if it has none. Its
+ * inputs are the factories its bean properties hold that are typed in its own
+ * scope variable ({@code Factory<? super S, ...>}, or a collection or map of
+ * them); a child typed with a concrete scope class ({@code Factory<? super
+ * VesselScope, ...>}) is held, not an input: the build cannot pass its own
+ * scope to it, so it can only build it later, under a scope it makes, and its
+ * level does not count. A property typed as a factory whose scope argument is
+ * neither, such as a raw {@code Factory} or {@code Factory<?, ?>}, is refused,
+ * since its type cannot tell an input from a held child.
+ * <p>
+ * A relative factory's bound is {@link Scope}: a class that needs a minimum
+ * level, because its product holds mutable state of its own, its build
+ * registers through the scope or has side effects on what its inputs give it,
+ * declares its level with a level base class instead.
+ * <p>
+ * An input that is not an {@link AbstractFactory}, such as a lambda in a test,
+ * has no level to read: the factory then takes the level of the scope it is
+ * asked with, so that it never shares a product too widely.
  */
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
@@ -57,131 +71,264 @@ public abstract class RelativeScopeFactory<
   P
 > extends AbstractFactory<S, P> {
 
-  private final transient Supplier<List<Method>> readMethods =
-    Suppliers.memoize(() -> {
-      final PropertyDescriptor[] props;
-      try {
-        props = getBeanInfo(
-          this.getClass(),
-          Object.class
-        ).getPropertyDescriptors();
-      } catch (final IntrospectionException e) {
-        throw new IllegalStateException(e);
+  private static final ClassValue<List<Method>> INPUT_READ_METHODS =
+    new ClassValue<>() {
+      @Override
+      protected List<Method> computeValue(final Class<?> factoryClass) {
+        return findInputReadMethods(factoryClass);
       }
-      return Arrays.stream(props)
-        .map(PropertyDescriptor::getReadMethod)
+    };
+
+  // The narrowest level of the inputs that have one, here or in nested
+  // relative inputs, or null if none has; and whether an input, here or
+  // nested, has no level to read. Transient, so that neither is a property.
+  private final transient Supplier<Class<? extends Scope>> inputLevel =
+    Suppliers.memoize(() ->
+      inputs()
+        .map(RelativeScopeFactory::levelOf)
         .filter(Objects::nonNull)
-        .toList();
-    });
-
-  /**
-   * Finds this factory's member {@link Factory}-typed fields (recursing into
-   * nested {@link Map}s, {@link Collection}s, and other
-   * {@link RelativeScopeFactory}s) and determines their single common leaf
-   * scope class. If it is narrower than {@link Scope}, delegates to one of the
-   * member factories that has that leaf scope, so that this factory's product
-   * is kept by the owner its inputs are ultimately rooted in. Otherwise (global
-   * inputs, or none), returns this factory's own global store: its product is
-   * then shared by every simulation, and must not be kept in an input's store,
-   * which would outlive this factory.
-   *
-   * @param scope the scope being resolved against
-   * @return the store holding this factory's product for {@code scope}
-   * @throws IllegalStateException if member factories are rooted in more than
-   *                               one leaf scope class
-   */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  @Override
-  protected ProductStore productStoreFor(final S scope) {
-    final Map<AbstractFactory, Class> scopesByFactory =
-      memberFactories().collect(
-        toMap(Function.identity(), AbstractFactory::scopeClass)
-      );
-
-    final Set<Class> scopeClasses = Set.copyOf(scopesByFactory.values());
-
-    final List<Class> leafScopes = scopeClasses
-      .stream()
-      .filter(c ->
-        scopeClasses.stream().noneMatch(d -> c != d && c.isAssignableFrom(d))
+        .reduce(RelativeScopeFactory::narrower)
+        .orElse(null)
+    );
+  private final transient Supplier<Boolean> hasUnlevelledInput =
+    Suppliers.memoize(() ->
+      inputs().anyMatch(input ->
+        input instanceof final RelativeScopeFactory<?, ?> relative
+          ? relative.hasUnlevelledInput.get()
+          : !(input instanceof AbstractFactory)
       )
-      .toList();
-
-    checkState(
-      leafScopes.size() <= 1,
-      "More than one leaf scope classes found amongst member factories: %s",
-      leafScopes
     );
 
-    if (leafScopes.isEmpty() || leafScopes.getFirst() == Scope.class) {
-      return globalStore();
-    }
-
-    final Class leafScope = leafScopes.getFirst();
-    return scopesByFactory
-      .entrySet()
-      .stream()
-      .filter(e -> e.getValue().equals(leafScope))
-      .findFirst()
-      .map(Map.Entry::getKey)
-      .map(af -> af.productStoreFor(scope))
-      .orElseThrow();
+  /**
+   * @param factoryClass a relative factory class
+   * @return the read methods of its properties that hold inputs
+   * @throws IllegalStateException naming the class and the property, if a
+   *                               property typed as a factory cannot be told
+   *                               to be an input or a held child
+   */
+  public static List<Method> inputReadMethodsOf(
+    final Class<? extends RelativeScopeFactory<?, ?>> factoryClass
+  ) {
+    return INPUT_READ_METHODS.get(factoryClass);
   }
 
   /**
-   * @throws UnsupportedOperationException always — a relative scope factory's
-   *                                       effective scope class is derived per
-   *                                       call from its member factories (see
-   *                                       {@link #productStoreFor}), not
-   *                                       fixed, so
-   *                                       there is no single answer to give
-   *                                       here
+   * @return the narrowest level of this factory's inputs, or global if it has
+   *         none; the level of {@code scope} if an input has no level to read
+   * @throws IllegalStateException if two inputs are at levels neither of
+   *                               which is narrower than the other
+   */
+  @Override
+  Class<? extends Scope> levelFor(final Scope scope) {
+    final Class<? extends Scope> level = Objects.requireNonNullElse(
+      inputLevel.get(),
+      Scope.class
+    );
+    return hasUnlevelledInput.get() ? narrower(level, scope.getClass()) : level;
+  }
+
+  /**
+   * @throws UnsupportedOperationException always: a relative factory's level
+   *                                       is derived from its inputs (see
+   *                                       {@link #levelFor}), not declared
    */
   @Override
   protected Class<S> scopeClass() {
     throw new UnsupportedOperationException(
-      "Relative scope factories do not provide a scope class"
+      "Relative scope factories do not declare a level"
     );
   }
 
-  /**
-   * @return this factory's distinct leaf {@link AbstractFactory} inputs: its
-   *         own {@code Factory}-typed bean properties, with any nested
-   *         {@link RelativeScopeFactory}s expanded recursively into their own
-   *         member factories (so only genuine leaves are returned)
-   */
-  @SuppressWarnings("rawtypes")
-  protected synchronized Stream<AbstractFactory> memberFactories() {
-    return leafFactories(
-      readMethods
-        .get()
+  private static Class<? extends Scope> levelOf(final Object input) {
+    return switch (input) {
+      case final RelativeScopeFactory<
+        ?,
+        ?
+      > relative -> relative.inputLevel.get();
+      case final AbstractFactory<?, ?> declared -> declared.scopeClass();
+      default -> null;
+    };
+  }
+
+  private Stream<Object> inputs() {
+    return INPUT_READ_METHODS.get(getClass())
+      .stream()
+      .map(this::read)
+      .flatMap(RelativeScopeFactory::factoriesIn);
+  }
+
+  private Object read(final Method readMethod) {
+    try {
+      return readMethod.invoke(this);
+    } catch (final IllegalAccessException | InvocationTargetException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  private static Stream<Object> factoriesIn(final Object value) {
+    return switch (value) {
+      case null -> Stream.empty();
+      case final Map<?, ?> map -> map
+        .values()
         .stream()
-        .map(readMethod -> {
-          try {
-            return readMethod.invoke(this);
-          } catch (final IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-          }
-        })
-    ).distinct();
+        .flatMap(RelativeScopeFactory::factoriesIn);
+      case final Collection<?> collection -> collection
+        .stream()
+        .flatMap(RelativeScopeFactory::factoriesIn);
+      default -> Stream.of(value);
+    };
   }
 
-  @SuppressWarnings("rawtypes")
-  private <T> Stream<AbstractFactory> leafFactories(final Stream<T> objects) {
-    return objects.flatMap(
-      o ->
-        switch (o) {
-          case final Map<?, ?> map -> leafFactories(map.values().stream());
-          case final Collection<?> collection -> leafFactories(
-            collection.stream()
-          );
-          case final RelativeScopeFactory<
-            ?,
-            ?
-          > factory -> factory.memberFactories();
-          case final AbstractFactory factory -> Stream.of(factory);
-          case null, default -> Stream.empty();
-        }
+  private static Class<? extends Scope> narrower(
+    final Class<? extends Scope> a,
+    final Class<? extends Scope> b
+  ) {
+    if (a.isAssignableFrom(b)) {
+      return b;
+    }
+    if (b.isAssignableFrom(a)) {
+      return a;
+    }
+    throw new IllegalStateException(
+      "Inputs at levels " +
+        a.getSimpleName() +
+        " and " +
+        b.getSimpleName() +
+        ", neither of which is narrower than the other"
     );
+  }
+
+  private static List<Method> findInputReadMethods(
+    final Class<?> factoryClass
+  ) {
+    final TypeToken<?> classType = TypeToken.of(factoryClass);
+    final Type scopeVariable = classType
+      .resolveType(RelativeScopeFactory.class.getTypeParameters()[0])
+      .getType();
+    final PropertyDescriptor[] properties;
+    try {
+      properties = getBeanInfo(
+        factoryClass,
+        Object.class
+      ).getPropertyDescriptors();
+    } catch (final IntrospectionException e) {
+      throw new IllegalStateException(e);
+    }
+    return Arrays.stream(properties)
+      .filter(property -> property.getReadMethod() != null)
+      .filter(property -> {
+        final Type type = classType
+          .resolveType(genericReturnType(property.getReadMethod()))
+          .getType();
+        return switch (kindOf(type, scopeVariable)) {
+          case INPUT -> true;
+          case HELD, NOT_A_FACTORY -> false;
+          case UNTYPED -> throw new IllegalStateException(
+            "Property " +
+              property.getName() +
+              " of " +
+              factoryClass.getName() +
+              " is typed as a factory whose scope argument is neither the " +
+              "class's scope variable (an input) nor a concrete scope class " +
+              "(held): " +
+              type.getTypeName()
+          );
+        };
+      })
+      .map(PropertyDescriptor::getReadMethod)
+      .toList();
+  }
+
+  // A public class inheriting a getter from a package-private one gets a
+  // bridge method with an erased return type; the declared type is the
+  // bridged method's.
+  private static Type genericReturnType(final Method readMethod) {
+    if (!readMethod.isBridge()) {
+      return readMethod.getGenericReturnType();
+    }
+    for (
+      Class<?> c = readMethod.getDeclaringClass().getSuperclass();
+      c != null;
+      c = c.getSuperclass()
+    ) {
+      try {
+        final Method declared = c.getDeclaredMethod(readMethod.getName());
+        if (!declared.isBridge()) {
+          return declared.getGenericReturnType();
+        }
+      } catch (final NoSuchMethodException e) {
+        // not declared here: look further up
+      }
+    }
+    return readMethod.getGenericReturnType();
+  }
+
+  private enum Kind {
+    INPUT,
+    HELD,
+    UNTYPED,
+    NOT_A_FACTORY
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private static Kind kindOf(final Type type, final Type scopeVariable) {
+    final TypeToken token = TypeToken.of(type);
+    final Class<?> rawType = token.getRawType();
+    if (Factory.class.isAssignableFrom(rawType)) {
+      return scopeArgumentKind(
+        token.getSupertype(Factory.class).getType(),
+        scopeVariable
+      );
+    }
+    if (Map.class.isAssignableFrom(rawType)) {
+      return elementKind(token, Map.class, 1, scopeVariable);
+    }
+    if (Collection.class.isAssignableFrom(rawType)) {
+      return elementKind(token, Collection.class, 0, scopeVariable);
+    }
+    return Kind.NOT_A_FACTORY;
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private static Kind elementKind(
+    final TypeToken token,
+    final Class<?> container,
+    final int index,
+    final Type scopeVariable
+  ) {
+    final Type containerType = token.getSupertype(container).getType();
+    if (!(containerType instanceof final ParameterizedType parameterized)) {
+      return Kind.NOT_A_FACTORY;
+    }
+    final Type element = parameterized.getActualTypeArguments()[index];
+    return element instanceof final WildcardType wildcard
+      ? kindOf(wildcard.getUpperBounds()[0], scopeVariable)
+      : kindOf(element, scopeVariable);
+  }
+
+  private static Kind scopeArgumentKind(
+    final Type factoryType,
+    final Type scopeVariable
+  ) {
+    if (!(factoryType instanceof final ParameterizedType parameterized)) {
+      return Kind.UNTYPED;
+    }
+    final Type scopeArgument = parameterized.getActualTypeArguments()[0];
+    final Type scope =
+      scopeArgument instanceof final WildcardType wildcard
+        ? wildcard.getLowerBounds().length == 1
+          ? wildcard.getLowerBounds()[0]
+          : null
+        : scopeArgument;
+    if (scope == null) {
+      return Kind.UNTYPED;
+    }
+    if (scope.equals(scopeVariable)) {
+      return Kind.INPUT;
+    }
+    return scope instanceof final Class<?> scopeClass &&
+      Scope.class.isAssignableFrom(scopeClass)
+      ? Kind.HELD
+      : Kind.UNTYPED;
   }
 }

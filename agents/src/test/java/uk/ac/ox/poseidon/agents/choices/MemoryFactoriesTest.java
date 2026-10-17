@@ -29,11 +29,9 @@ import static uk.ac.ox.poseidon.agents.choices.Factories.keyedMemory;
 import static uk.ac.ox.poseidon.agents.choices.Factories.keyedMemorySelector;
 import static uk.ac.ox.poseidon.agents.choices.Factories.memory;
 import static uk.ac.ox.poseidon.agents.choices.Factories.memoryBasedOptionValues;
-import static uk.ac.ox.poseidon.agents.vessels.Factories.perVessel;
 
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.vessels.PerVesselFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
@@ -119,40 +117,24 @@ class MemoryFactoriesTest {
   }
 
   @Test
-  void memoryIsSharedBySimulationUnlessMadePerVessel() {
+  void memoryIsOnePerVessel() {
     final MemoryFactory<String, Double> factory = memory();
-    final PerVesselFactory<Memory<String, Double>> perVesselFactory = perVessel(
-      factory
-    );
 
-    assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeB));
+    assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
+    assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
     assertThat(factory.get(scopeA)).isNotSameAs(
       factory.get(scopeInOtherSimulation)
-    );
-    assertThat(perVesselFactory.get(scopeA)).isSameAs(
-      perVesselFactory.get(scopeA)
-    );
-    assertThat(perVesselFactory.get(scopeA)).isNotSameAs(
-      perVesselFactory.get(scopeB)
     );
   }
 
   @Test
-  void keyedMemoryIsSharedBySimulationUnlessMadePerVessel() {
+  void keyedMemoryIsOnePerVessel() {
     final KeyedMemoryFactory<String, String, Double> factory = keyedMemory();
-    final PerVesselFactory<
-      KeyedMemory<String, String, Double>
-    > perVesselFactory = perVessel(factory);
 
-    assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeB));
+    assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
+    assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
     assertThat(factory.get(scopeA)).isNotSameAs(
       factory.get(scopeInOtherSimulation)
-    );
-    assertThat(perVesselFactory.get(scopeA)).isSameAs(
-      perVesselFactory.get(scopeA)
-    );
-    assertThat(perVesselFactory.get(scopeA)).isNotSameAs(
-      perVesselFactory.get(scopeB)
     );
   }
 
@@ -164,10 +146,7 @@ class MemoryFactoriesTest {
       String,
       String,
       Double
-    > factory = keyedMemorySelector(
-      perVessel(keyedMemory()),
-      new FirstLetterFactory()
-    );
+    > factory = keyedMemorySelector(keyedMemory(), new FirstLetterFactory());
 
     assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
     assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
@@ -175,8 +154,8 @@ class MemoryFactoriesTest {
 
   @Test
   void selectorsSharingAPerVesselKeyedMemorySelectFromTheSameMemory() {
-    final PerVesselFactory<KeyedMemory<String, String, Double>> keyedMemory =
-      perVessel(keyedMemory());
+    final KeyedMemoryFactory<String, String, Double> keyedMemory =
+      keyedMemory();
     final KeyedMemorySelectorFactory<
       VesselScope,
       String,
@@ -201,29 +180,21 @@ class MemoryFactoriesTest {
   }
 
   @Test
-  void separatePerVesselWrappersGiveSeparateMemories() {
-    final KeyedMemoryFactory<String, String, Double> keyedMemory =
-      keyedMemory();
+  void separateMemoryFactoriesGiveSeparateMemories() {
     final KeyedMemorySelectorFactory<
       VesselScope,
       String,
       String,
       String,
       Double
-    > writer = keyedMemorySelector(
-      perVessel(keyedMemory),
-      new FirstLetterFactory()
-    );
+    > writer = keyedMemorySelector(keyedMemory(), new FirstLetterFactory());
     final KeyedMemorySelectorFactory<
       VesselScope,
       String,
       String,
       String,
       Double
-    > reader = keyedMemorySelector(
-      perVessel(keyedMemory),
-      new UpperCaseFactory()
-    );
+    > reader = keyedMemorySelector(keyedMemory(), new UpperCaseFactory());
 
     assertThat(writer.get(scopeA).apply("Trawl")).isNotSameAs(
       reader.get(scopeA).apply("t")
@@ -232,8 +203,8 @@ class MemoryFactoriesTest {
 
   @Test
   void optionValuesReadTheMemoryTheVesselsSelectorGives() {
-    final PerVesselFactory<KeyedMemory<String, String, Double>> keyedMemory =
-      perVessel(keyedMemory());
+    final KeyedMemoryFactory<String, String, Double> keyedMemory =
+      keyedMemory();
     final MemoryBasedOptionValuesFactory<String, Double> factory =
       memoryBasedOptionValues(
         keyedMemorySelector(keyedMemory, new TrawlKeyFactory()),

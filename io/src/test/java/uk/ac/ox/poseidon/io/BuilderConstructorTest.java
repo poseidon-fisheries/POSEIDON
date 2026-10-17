@@ -36,7 +36,6 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Scope;
 
 class BuilderConstructorTest {
@@ -136,11 +135,6 @@ class BuilderConstructorTest {
     Scope,
     P
   > {
-
-    @Override
-    protected ProductStore productStoreFor(final Scope scope) {
-      return globalStore();
-    }
 
     @Override
     protected Class<Scope> scopeClass() {

@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
@@ -75,7 +74,7 @@ class StaticGridsFromNetCdfFactoryTest {
       );
 
     final ImmutableMap<String, DoubleGridWrapper> result = factory.get(
-      mock(Scope.class)
+      Scope.GLOBAL_SCOPE
     );
 
     assertThat(result).isInstanceOf(ImmutableMap.class);
@@ -105,7 +104,7 @@ class StaticGridsFromNetCdfFactoryTest {
         )
       );
 
-    assertThatThrownBy(() -> factory.get(mock(Scope.class)))
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("does not align");
   }

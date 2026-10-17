@@ -40,7 +40,6 @@ import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventAccum
 import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventProperty;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
-import static uk.ac.ox.poseidon.agents.vessels.Factories.perVessel;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.vesselProperty;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
@@ -58,6 +57,7 @@ import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.agents.choices.KeyedMemory;
+import uk.ac.ox.poseidon.agents.choices.KeyedMemoryFactory;
 import uk.ac.ox.poseidon.agents.choices.MemoryBasedOptionValuesFactory;
 import uk.ac.ox.poseidon.agents.choices.Valuation;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -70,7 +70,6 @@ import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.FleetFactory;
 import uk.ac.ox.poseidon.agents.vessels.FleetFromVesselRegisterFactory;
-import uk.ac.ox.poseidon.agents.vessels.PerVesselFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
@@ -119,9 +118,8 @@ class FishingEventSharingRouteTest {
     bucket
   ) -> bucket.getKg(species);
 
-  private final PerVesselFactory<
-    KeyedMemory<String, Int2D, Bucket>
-  > vesselMemory = perVessel(keyedMemory());
+  private final KeyedMemoryFactory<String, Int2D, Bucket> vesselMemory =
+    keyedMemory();
   private final MemoryBasedOptionValuesFactory<Int2D, Bucket> optionValues =
     memoryBasedOptionValues(
       keyedMemorySelector(vesselMemory, vesselProperty("gear.code")),

@@ -51,27 +51,16 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param delegate the factory whose product is built once per vessel
-   * @return a {@link uk.ac.ox.poseidon.core.PerScopeFactory} for {@code T}, one
-   *         per vessel
-   * @see PerVesselFactory
+   * @param delegate factory for the value to ask once per vessel, with no
+   *                 context
+   * @return a {@link ValueFactory} for a constant of the delegate's first value
+   *         for each vessel
+   * @see FirstValueFromFactory
    */
-  public static <T> PerVesselFactory<T> perVessel(
-    final Factory<? super VesselScope, ? extends T> delegate
+  public static <R> FirstValueFromFactory<R> firstValueFrom(
+    final ValueFactory<? super VesselScope, ? super Void, ? extends R> delegate
   ) {
-    return new PerVesselFactory<>(delegate);
-  }
-
-  /**
-   * @param delegate the value built once per vessel
-   * @return a {@link uk.ac.ox.poseidon.core.ValueFactory} for the value, one
-   *         per vessel
-   * @see PerVesselValueFactory
-   */
-  public static <C, R> PerVesselValueFactory<C, R> perVessel(
-    final ValueFactory<? super VesselScope, C, R> delegate
-  ) {
-    return new PerVesselValueFactory<>(delegate);
+    return new FirstValueFromFactory<>(delegate);
   }
 
   /**

@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.agents.vessels.gears;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.data.Offset.offset;
-import static org.mockito.Mockito.mock;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.quantities.Factories.massOf;
 import static uk.ac.ox.poseidon.core.quantities.Factories.volumetricFlowRateOf;
@@ -33,16 +32,15 @@ import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 class FixedBiomassProportionGearFactoryTest {
 
   @Test
   void resolvesMinimumCatchThreshold() {
-    final ValueFactory<SimulationScope, Object, Duration> duration = scope ->
-      context ->
-        Duration.ofHours(1);
+    final ValueFactory<Scope, Object, Duration> duration = scope -> context ->
+      Duration.ofHours(1);
     final var factory = Factories.fixedBiomassProportionGear(
       "G1",
       0.25,
@@ -50,7 +48,7 @@ class FixedBiomassProportionGearFactoryTest {
       duration,
       volumetricFlowRateOf(0.0, LITRE_PER_HOUR)
     );
-    final var gear = factory.get(mock(SimulationScope.class));
+    final var gear = factory.get(Scope.GLOBAL_SCOPE);
     assertThat(gear.getCode()).isEqualTo("G1");
     assertThat(gear.getMinimumCatchThresholdInKg()).isCloseTo(
       2.0,
@@ -60,9 +58,8 @@ class FixedBiomassProportionGearFactoryTest {
 
   @Test
   void rejectsNegativeThreshold() {
-    final ValueFactory<SimulationScope, Object, Duration> duration = scope ->
-      context ->
-        Duration.ofHours(1);
+    final ValueFactory<Scope, Object, Duration> duration = scope -> context ->
+      Duration.ofHours(1);
     final var factory = Factories.fixedBiomassProportionGear(
       "G1",
       0.25,
@@ -70,8 +67,8 @@ class FixedBiomassProportionGearFactoryTest {
       duration,
       volumetricFlowRateOf(0.0, LITRE_PER_HOUR)
     );
-    assertThatThrownBy(() ->
-      factory.get(mock(SimulationScope.class))
-    ).isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE)).isInstanceOf(
+      IllegalArgumentException.class
+    );
   }
 }

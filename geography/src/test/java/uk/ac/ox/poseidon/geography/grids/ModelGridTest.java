@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.geography.grids;
 import static java.util.stream.IntStream.range;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.Set;
@@ -115,7 +114,7 @@ class ModelGridTest {
       -70,
       -50,
       50
-    ).get(mock(Scope.class));
+    ).get(Scope.GLOBAL_SCOPE);
     final Envelope envelope = modelGrid.getEnvelope();
     final List<Coordinate> coordinates = range(
       (int) envelope.getMinX(),

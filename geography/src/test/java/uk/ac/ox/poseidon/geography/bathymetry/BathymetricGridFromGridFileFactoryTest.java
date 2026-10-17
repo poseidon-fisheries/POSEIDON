@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.geography.bathymetry;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.geography.bathymetry.Factories.bathymetricGridFromGridFile;
 import static uk.ac.ox.poseidon.geography.grids.AscFiles.rowsFromNorth;
 import static uk.ac.ox.poseidon.geography.grids.AscFiles.writeFixture;
@@ -56,12 +55,12 @@ class BathymetricGridFromGridFileFactoryTest {
       scope -> modelGrid,
       scope -> aggregator,
       inverted
-    ).get(mock(Scope.class));
+    ).get(Scope.GLOBAL_SCOPE);
   }
 
   private ModelGrid modelGridFromTheFixture() {
     final Path file = writeFixture(tempDir, "model_grid.asc");
-    return modelGridFromGridFile(scope -> file).get(mock(Scope.class));
+    return modelGridFromGridFile(scope -> file).get(Scope.GLOBAL_SCOPE);
   }
 
   private static double[][] elevations(

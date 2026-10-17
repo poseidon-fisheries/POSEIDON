@@ -32,14 +32,12 @@ import static uk.ac.ox.poseidon.agents.choices.Factories.keyedMemorySelector;
 import static uk.ac.ox.poseidon.agents.choices.Factories.memoryBasedOptionValues;
 import static uk.ac.ox.poseidon.agents.choices.FishingEventRecorderTest.fishingEvent;
 import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventProperty;
-import static uk.ac.ox.poseidon.agents.vessels.Factories.perVessel;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.vessels.PerVesselFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
@@ -72,9 +70,8 @@ class FishingEventRecorderFactoryTest {
     new SimulationScope(simulation),
     vesselB
   );
-  private final PerVesselFactory<
-    KeyedMemory<String, Int2D, Bucket>
-  > keyedMemory = perVessel(keyedMemory());
+  private final KeyedMemoryFactory<String, Int2D, Bucket> keyedMemory =
+    keyedMemory();
   private final FishingEventRecorderFactory<VesselScope> factory =
     fishingEventRecorder(
       object(modelGrid()),
@@ -160,22 +157,5 @@ class FishingEventRecorderFactoryTest {
   void givesOneRecorderPerVessel() {
     assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
     assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
-  }
-
-  @Test
-  void sharesOneRecorderBetweenVesselsSharingAMemory() {
-    final FishingEventRecorderFactory<VesselScope> sharedFactory =
-      fishingEventRecorder(
-        object(modelGrid()),
-        keyedMemorySelector(
-          keyedMemory(),
-          fishingEventProperty("action.gear.code")
-        ),
-        exponentialMovingAverageOfBuckets(0.5)
-      );
-
-    assertThat(sharedFactory.get(scopeA))
-      .isNotNull()
-      .isSameAs(sharedFactory.get(scopeB));
   }
 }

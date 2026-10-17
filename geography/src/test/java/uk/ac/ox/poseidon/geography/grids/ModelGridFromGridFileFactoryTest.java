@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.geography.grids;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.geography.grids.AscFiles.writeFixture;
 import static uk.ac.ox.poseidon.geography.grids.Factories.modelGridFromGridFile;
 
@@ -46,7 +45,7 @@ class ModelGridFromGridFileFactoryTest {
   @BeforeEach
   void setUp() {
     final Path file = writeFixture(tempDir, "fixture.asc");
-    modelGrid = modelGridFromGridFile(scope -> file).get(mock(Scope.class));
+    modelGrid = modelGridFromGridFile(scope -> file).get(Scope.GLOBAL_SCOPE);
   }
 
   @Test

@@ -242,13 +242,12 @@ components:
                       subject: !!uk.ac.ox.poseidon.geography.grids.extractors.CellValueFactory
                         grid: *id004
                     maximumWidening: 3
-                    neighbourhoodSize: !!uk.ac.ox.poseidon.core.providers.FirstValueFromFactory
-                      delegate: !!uk.ac.ox.poseidon.agents.vessels.PerVesselValueFactory
-                        delegate: !!uk.ac.ox.poseidon.core.providers.random.RandomIntFactory
-                          maximum: 10
-                          minimum: 1
-                          randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
-                            }
+                    neighbourhoodSize: !!uk.ac.ox.poseidon.agents.vessels.FirstValueFromFactory
+                      delegate: !!uk.ac.ox.poseidon.core.providers.random.RandomIntFactory
+                        maximum: 10
+                        minimum: 1
+                        randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
+                          }
                     pathFinder: &id012 !!uk.ac.ox.poseidon.geography.paths.DefaultPathFinderFactory
                       accessibleWaterCellsCache: !!uk.ac.ox.poseidon.geography.paths.AccessibleWaterCellsCacheFactory
                         bathymetricGrid: *id003

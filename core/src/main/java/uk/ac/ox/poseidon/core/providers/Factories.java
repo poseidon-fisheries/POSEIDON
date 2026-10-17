@@ -26,24 +26,12 @@ import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * Factories for a value that snapshots another value once at build time, and
- * for a value that shifts another integer value by a fixed amount.
+ * Factories for a value that shifts another integer value by a fixed amount.
  */
 public final class Factories {
 
   private Factories() {
     throw new IllegalStateException("Utility class");
-  }
-
-  /**
-   * @param delegate factory for the value to ask once, with no context
-   * @return a {@link ValueFactory} for a constant of the delegate's first value
-   * @see FirstValueFromFactory
-   */
-  public static <S extends Scope, R> FirstValueFromFactory<S, R> firstValueFrom(
-    final ValueFactory<? super S, ? super Void, ? extends R> delegate
-  ) {
-    return new FirstValueFromFactory<>(delegate);
   }
 
   /**

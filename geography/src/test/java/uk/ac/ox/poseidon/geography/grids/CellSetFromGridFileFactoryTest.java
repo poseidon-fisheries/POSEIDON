@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.geography.grids.AscFiles.writeFixture;
 import static uk.ac.ox.poseidon.geography.grids.Factories.cellSetFromGridFile;
 import static uk.ac.ox.poseidon.geography.grids.Factories.modelGridFromGridFile;
@@ -61,7 +60,7 @@ class CellSetFromGridFileFactoryTest {
       scope -> file,
       scope -> modelGrid,
       includedValue
-    ).get(mock(Scope.class));
+    ).get(Scope.GLOBAL_SCOPE);
   }
 
   private static Set<Int2D> cellsWith(
@@ -106,7 +105,7 @@ class CellSetFromGridFileFactoryTest {
     // where its value is.
     final Path file = writeFixture(tempDir, "fixture.asc");
     final ModelGrid modelGrid = modelGridFromGridFile(scope -> file).get(
-      mock(Scope.class)
+      Scope.GLOBAL_SCOPE
     );
     final Int2D cellWithTwo = cellsWith(file, modelGrid, 2).iterator().next();
     assertThat(modelGrid.toCoordinate(cellWithTwo)).isEqualTo(

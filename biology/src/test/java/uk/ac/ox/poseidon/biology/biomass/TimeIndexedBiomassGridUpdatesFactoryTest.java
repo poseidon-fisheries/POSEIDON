@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.biology.biomass;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,6 +34,7 @@ import java.util.Map.Entry;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.geography.Envelope;
@@ -50,7 +52,13 @@ class TimeIndexedBiomassGridUpdatesFactoryTest {
     new Envelope(0, 1, 0, 1)
   );
 
-  private final Simulation simulation = mock(Simulation.class);
+  private final Simulation simulation = simulationWithAStore();
+
+  private static Simulation simulationWithAStore() {
+    final Simulation simulation = mock(Simulation.class);
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
+    return simulation;
+  }
 
   @Test
   void datesEachUpdateAtItsSnapshotDateTime() {

@@ -68,13 +68,9 @@ public class VesselScope extends SimulationScope {
     return vessel.get();
   }
 
-  /**
-   * Package-private: only the vessel-level factory bases read it, to keep
-   * their products in it.
-   *
-   * @return the scoped vessel's store
-   */
-  ProductStore getProductStore() {
+  /** @return the scoped vessel's store */
+  @Override
+  protected ProductStore getProductStore() {
     return getVessel().getProductStore();
   }
 

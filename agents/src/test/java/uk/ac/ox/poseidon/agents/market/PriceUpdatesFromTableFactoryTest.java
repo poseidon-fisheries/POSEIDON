@@ -41,6 +41,7 @@ import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.catches.CatchCategory;
 import uk.ac.ox.poseidon.biology.species.Species;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -60,6 +61,7 @@ class PriceUpdatesFromTableFactoryTest {
   @BeforeEach
   void setUp() {
     when(simulation.getTemporalSchedule()).thenReturn(schedule);
+    when(simulation.getProductStore()).thenReturn(new ProductStore());
     when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 0, 0));
   }
 

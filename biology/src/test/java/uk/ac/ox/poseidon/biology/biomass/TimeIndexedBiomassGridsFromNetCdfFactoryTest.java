@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.biology.biomass;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -98,7 +97,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
     final ImmutableMap<
       LocalDateTime,
       ImmutableList<ImmutableBiomassGrid>
-    > result = factory.get(mock(Scope.class));
+    > result = factory.get(Scope.GLOBAL_SCOPE);
 
     assertThat(result).isInstanceOf(ImmutableMap.class);
     assertThat(result.keySet()).containsExactly(
@@ -150,7 +149,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
         )
       );
 
-    assertThatThrownBy(() -> factory.get(mock(Scope.class)))
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("Duplicate date");
   }
@@ -178,7 +177,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
         )
       );
 
-    assertThatThrownBy(() -> factory.get(mock(Scope.class)))
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("UNKNOWN_CODE");
   }
@@ -206,7 +205,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
         )
       );
 
-    assertThatThrownBy(() -> factory.get(mock(Scope.class)))
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("ANE");
   }
@@ -238,7 +237,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
         )
       );
 
-    assertThatThrownBy(() -> factory.get(mock(Scope.class)))
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("does not align");
   }
@@ -272,7 +271,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
       );
 
     final ImmutableList<ImmutableBiomassGrid> grids = factory
-      .get(mock(Scope.class))
+      .get(Scope.GLOBAL_SCOPE)
       .get(LocalDate.of(2020, 1, 1).atStartOfDay());
 
     assertThat(grids)
@@ -309,7 +308,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
       );
 
     final ImmutableList<ImmutableBiomassGrid> grids = factory
-      .get(mock(Scope.class))
+      .get(Scope.GLOBAL_SCOPE)
       .get(LocalDate.of(2020, 1, 1).atStartOfDay());
 
     assertThat(grids)
@@ -344,7 +343,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
         )
       );
 
-    assertThatThrownBy(() -> factory.get(mock(Scope.class)))
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("HKE_xxx");
   }
@@ -366,7 +365,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
         )
       );
 
-    assertThatThrownBy(() -> factory.get(mock(Scope.class)))
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("AA_BB");
   }
@@ -447,7 +446,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
         )
       );
 
-    assertThat(factory.get(mock(Scope.class)).keySet()).containsExactly(
+    assertThat(factory.get(Scope.GLOBAL_SCOPE).keySet()).containsExactly(
       LocalDateTime.of(2020, 1, 1, 12, 0)
     );
   }

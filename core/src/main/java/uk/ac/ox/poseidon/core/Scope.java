@@ -41,4 +41,33 @@ public class Scope {
   public static final Scope GLOBAL_SCOPE = new Scope();
 
   Scope() {}
+
+  /**
+   * @param level the class of the scope to widen to: this scope's own class,
+   *              or a superclass of it
+   * @return this scope, if it is of exactly class {@code level}; otherwise a
+   *         scope of exactly that class over the same owners
+   */
+  final Scope widenedTo(final Class<? extends Scope> level) {
+    return getClass() == level ? this : at(level);
+  }
+
+  /**
+   * Each scope class with a narrower subclass constructs itself here, and
+   * hands any wider level to its superclass.
+   *
+   * @param level a superclass of this scope's class
+   * @return a scope of exactly class {@code level} over the same owners
+   */
+  protected Scope at(final Class<? extends Scope> level) {
+    if (level != Scope.class) {
+      throw new IllegalArgumentException(
+        "No way to widen a " +
+          getClass().getSimpleName() +
+          " to a " +
+          level.getSimpleName()
+      );
+    }
+    return GLOBAL_SCOPE;
+  }
 }

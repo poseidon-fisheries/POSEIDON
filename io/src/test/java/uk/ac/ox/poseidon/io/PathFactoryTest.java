@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.io.paths.Factories.path;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,7 +40,7 @@ class PathFactoryTest {
   @Test
   void newInstanceSimpleFile() {
     final PathFactory<Scope> pathFactory = path(FILENAME);
-    assertEquals(Path.of(FILENAME), pathFactory.get(mock(Scope.class)));
+    assertEquals(Path.of(FILENAME), pathFactory.get(Scope.GLOBAL_SCOPE));
   }
 
   @Test
@@ -49,7 +48,7 @@ class PathFactoryTest {
     final PathFactory<Scope> pathFactory = path(FOLDERS + FILENAME);
     assertEquals(
       Path.of(FOLDERS + FILENAME),
-      pathFactory.get(mock(Scope.class))
+      pathFactory.get(Scope.GLOBAL_SCOPE)
     );
   }
 
@@ -58,7 +57,7 @@ class PathFactoryTest {
     final PathFactory<Scope> pathFactory = path(FOLDERS).plus(FILENAME);
     assertEquals(
       Path.of(FOLDERS + FILENAME),
-      pathFactory.get(mock(Scope.class))
+      pathFactory.get(Scope.GLOBAL_SCOPE)
     );
   }
 }

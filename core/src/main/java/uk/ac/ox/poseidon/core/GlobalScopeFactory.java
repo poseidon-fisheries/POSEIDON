@@ -36,11 +36,6 @@ import lombok.experimental.SuperBuilder;
 public abstract class GlobalScopeFactory<P> extends AbstractFactory<Scope, P> {
 
   @Override
-  protected ProductStore productStoreFor(final Scope scope) {
-    return globalStore();
-  }
-
-  @Override
   protected Class<Scope> scopeClass() {
     return Scope.class;
   }

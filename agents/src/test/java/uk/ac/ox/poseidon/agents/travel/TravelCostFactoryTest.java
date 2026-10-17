@@ -37,6 +37,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Scope;
@@ -57,13 +58,37 @@ class TravelCostFactoryTest {
     vesselB
   );
   private final MappingFactory<Scope, Object, Int2D, Route> routeFunction =
-    scope -> (context, destination) -> route(destination);
-  private final MappingFactory<Scope, Object, Route, Money> routeCost = scope ->
-    (context, route) ->
-      Money.of(CurrencyUnit.of("EUR"), route.getDistanceInKm());
+    new GlobalRouteFunctionFactory();
+  private final MappingFactory<Scope, Object, Route, Money> routeCost =
+    new GlobalRouteCostFactory();
 
   private static Route route(final Int2D destination) {
     return new Route(destination.x, Duration.ofHours(destination.y));
+  }
+
+  /** A route function shared by every simulation. */
+  private static final class GlobalRouteFunctionFactory
+    extends GlobalScopeFactory<BiFunction<Object, Int2D, Route>>
+    implements MappingFactory<Scope, Object, Int2D, Route>
+  {
+
+    @Override
+    protected BiFunction<Object, Int2D, Route> newInstance(final Scope scope) {
+      return (context, destination) -> route(destination);
+    }
+  }
+
+  /** A route cost shared by every simulation. */
+  private static final class GlobalRouteCostFactory
+    extends GlobalScopeFactory<BiFunction<Object, Route, Money>>
+    implements MappingFactory<Scope, Object, Route, Money>
+  {
+
+    @Override
+    protected BiFunction<Object, Route, Money> newInstance(final Scope scope) {
+      return (context, route) ->
+        Money.of(CurrencyUnit.of("EUR"), route.getDistanceInKm());
+    }
   }
 
   /** A route function built once per vessel. */

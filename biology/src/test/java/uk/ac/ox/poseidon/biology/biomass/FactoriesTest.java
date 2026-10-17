@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.biology.biomass.Factories.timeIndexedBiomassGridsFromNetCdf;
 
 import com.google.common.collect.ImmutableList;
@@ -71,7 +70,7 @@ class FactoriesTest {
       scope -> modelGrid,
       scope -> List.of(HKE),
       scope -> fixture
-    ).get(mock(Scope.class));
+    ).get(Scope.GLOBAL_SCOPE);
 
     assertThat(result.keySet()).containsExactly(
       LocalDateTime.of(2020, 1, 1, 0, 0)

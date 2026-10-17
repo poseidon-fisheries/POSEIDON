@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 
 /**
  * Every child factory of a factory must be reachable through a bean property,
@@ -72,6 +73,25 @@ class FactoryChildrenTest {
       }
     }
     assertThat(hiddenChildren).isEmpty();
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  void everyRelativeFactoryTellsItsInputsFromItsHeldChildren()
+    throws IOException {
+    final List<String> untypedProperties = new ArrayList<>();
+    for (final Class<?> factoryClass : factoryClasses("uk.ac.ox.poseidon")) {
+      if (RelativeScopeFactory.class.isAssignableFrom(factoryClass)) {
+        try {
+          RelativeScopeFactory.inputReadMethodsOf(
+            (Class<? extends RelativeScopeFactory<?, ?>>) factoryClass
+          );
+        } catch (final IllegalStateException e) {
+          untypedProperties.add(e.getMessage());
+        }
+      }
+    }
+    assertThat(untypedProperties).isEmpty();
   }
 
   static List<Class<?>> factoryClasses(final String packagePrefix)
