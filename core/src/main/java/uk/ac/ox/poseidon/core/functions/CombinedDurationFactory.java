@@ -37,7 +37,7 @@ import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link CombinedDuration}, built
- * via {@link Factories#combinedDuration(MappingFactory...)}.
+ * via {@link Factories Factories.combinedDuration(...)}.
  */
 @Getter
 @ToString

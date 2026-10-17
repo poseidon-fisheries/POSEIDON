@@ -20,25 +20,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.logical;
+package uk.ac.ox.poseidon.core.functions;
 
-import java.util.function.Function;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * A yes/no value that negates a wrapped yes/no value. Built via
- * {@link Factories#not(uk.ac.ox.poseidon.core.ValueFactory)} in this package.
- *
- * @param <C> the type of the context
- */
-@RequiredArgsConstructor
-public class NotValue<C> implements Function<C, Boolean> {
+import java.util.function.BiFunction;
+import org.junit.jupiter.api.Test;
 
-  private final @NonNull Function<? super C, Boolean> predicate;
+class MappingAsValueTest {
 
-  @Override
-  public Boolean apply(final C context) {
-    return !predicate.apply(context);
+  @Test
+  void asksTheMappingUnderTheContextWithNothingToMap() {
+    final BiFunction<String, Void, String> describe = (context, nothing) ->
+      context + (nothing == null ? " with nothing" : " with something");
+    assertThat(new MappingAsValue<>(describe).apply("a")).isEqualTo(
+      "a with nothing"
+    );
   }
 }

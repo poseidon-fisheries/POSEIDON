@@ -29,8 +29,7 @@ import java.util.function.BiFunction;
 /**
  * A mapping that sums the {@link Duration}s produced by several other mappings
  * of the same thing, under the same context. Built via
- * {@link Factories#combinedDuration(uk.ac.ox.poseidon.core.MappingFactory...)}
- * in this package.
+ * {@link Factories Factories.combinedDuration(...)} in this package.
  *
  * @param <C> the type of the context
  * @param <T> the type of the thing mapped

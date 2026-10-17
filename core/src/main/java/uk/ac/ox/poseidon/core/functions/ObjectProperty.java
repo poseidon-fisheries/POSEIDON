@@ -41,7 +41,8 @@ import javax.lang.model.SourceVersion;
  * when the scenario is built rather than when first read. The last property may
  * be {@code null}; a {@code null} part way along the path throws. Built via a
  * subclass of {@link ObjectPropertyFactory}, which fixes the class the path
- * starts from; {@link ObjectPropertyValue} reads the same way a property of the
+ * starts from, or held by a block that reads a property of its input, such as
+ * a route's; {@link ObjectPropertyValue} reads the same way a property of the
  * context.
  *
  * @param <T> the type of the object read
@@ -60,7 +61,7 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
    *                                  Java identifier, or has no public getter
    *                                  on the declared type it is read from
    */
-  ObjectProperty(final Class<T> rootClass, final String propertyPath) {
+  public ObjectProperty(final Class<T> rootClass, final String propertyPath) {
     this.propertyPath = propertyPath;
     this.propertyNames = ImmutableList.copyOf(propertyPath.split("\\.", -1));
     final ImmutableList.Builder<MethodHandle> builder = ImmutableList.builder();

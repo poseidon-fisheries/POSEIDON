@@ -22,10 +22,12 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import com.google.common.collect.ImmutableList;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Map;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
@@ -34,8 +36,9 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * Factories for values and mappings that transform, combine, or look up other
- * values and mappings. A combinator has one overload per shape: built from a
- * value, it gives a value; built from mappings, a mapping.
+ * values and mappings. A combinator, or a block that takes its input, has one
+ * overload per shape: built from values, it gives a value; built from mappings,
+ * a mapping. Both mean the same: the value is the mapping, with nothing to map.
  */
 @SuppressWarnings("Convert2Diamond")
 public class Factories {
@@ -43,15 +46,47 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param map factory for the map to look values up in
-   * @return a {@link MappingFactory} for a
-   *         {@link MapLookup} over the resolved map
+   * @param key factory for the mapping that reads the key from the thing
+   *            mapped
+   * @param map factory for the map to look the key up in
+   * @return a {@link MappingFactory} for a {@link MapLookup} of the key in the
+   *         resolved map
    * @see MapLookup
    */
-  public static <S extends Scope, K, V> MapLookupFactory<S, K, V> mapLookup(
+  public static <S extends Scope, C, T, K, V> MapLookupFactory<
+    S,
+    C,
+    T,
+    K,
+    V
+  > mapLookup(
+    final MappingFactory<? super S, ? super C, ? super T, ? extends K> key,
     final Factory<? super S, ? extends Map<? super K, ? extends V>> map
   ) {
-    return new MapLookupFactory<>(map);
+    return new MapLookupFactory<S, C, T, K, V>(key, map);
+  }
+
+  /**
+   * @param key factory for the value that is the key
+   * @param map factory for the map to look the key up in
+   * @return a {@link ValueFactory} for a {@link MapLookup} of the key in the
+   *         resolved map, made a value by {@link MappingAsValue}
+   * @see MapLookup
+   */
+  public static <S extends Scope, C, K, V> MappingAsValueFactory<
+    S,
+    C,
+    V
+  > mapLookup(
+    final ValueFactory<? super S, ? super C, ? extends K> key,
+    final Factory<? super S, ? extends Map<? super K, ? extends V>> map
+  ) {
+    return new MappingAsValueFactory<S, C, V>(
+      new MapLookupFactory<S, C, Void, K, V>(
+        new ValueAsMappingFactory<S, C, K>(key),
+        map
+      )
+    );
   }
 
   /**
@@ -66,50 +101,6 @@ public class Factories {
     final K key
   ) {
     return new MapEntryFactory<>(map, key);
-  }
-
-  /**
-   * @param function1 the mapping applied first
-   * @param function2 the mapping applied to {@code function1}'s result
-   * @return a {@link MappingFactory} for a {@link ComposedFunction} of the
-   *         resolved mappings
-   * @see ComposedFunction
-   */
-  public static <S extends Scope, C, T, U, R> ComposedFunctionFactory<
-    S,
-    C,
-    T,
-    U,
-    R
-  > composedFunction(
-    final MappingFactory<
-      ? super S,
-      ? super C,
-      ? super T,
-      ? extends U
-    > function1,
-    final MappingFactory<? super S, ? super C, ? super U, ? extends R> function2
-  ) {
-    return new ComposedFunctionFactory<S, C, T, U, R>(function1, function2);
-  }
-
-  /**
-   * @param function1 the value read first
-   * @param function2 the mapping applied to that value
-   * @return a {@link ValueFactory} for a {@link ComposedFunctionValue} of the
-   *         resolved value and mapping
-   * @see ComposedFunctionValue
-   */
-  public static <S extends Scope, C, U, R> ComposedFunctionValueFactory<
-    S,
-    C,
-    U,
-    R
-  > composedFunction(
-    final ValueFactory<? super S, ? super C, ? extends U> function1,
-    final MappingFactory<? super S, ? super C, ? super U, ? extends R> function2
-  ) {
-    return new ComposedFunctionValueFactory<S, C, U, R>(function1, function2);
   }
 
   /**
@@ -138,19 +129,31 @@ public class Factories {
 
   /**
    * @param durations the duration values to sum
-   * @return a {@link ValueFactory} for a {@link CombinedDurationValue} of the
-   *         resolved values
-   * @see CombinedDurationValue
+   * @return a {@link ValueFactory} for a {@link CombinedDuration} of the
+   *         resolved values, made a value by {@link MappingAsValue}
+   * @see CombinedDuration
    */
   @SafeVarargs
-  public static <S extends Scope, C> CombinedDurationValueFactory<
+  public static <S extends Scope, C> MappingAsValueFactory<
     S,
-    C
+    C,
+    Duration
   > combinedDuration(
     final ValueFactory<? super S, ? super C, ? extends Duration>... durations
   ) {
-    return new CombinedDurationValueFactory<S, C>(
-      ImmutableList.copyOf(durations)
+    return new MappingAsValueFactory<S, C, Duration>(
+      new CombinedDurationFactory<S, C, Void>(
+        Arrays.stream(durations)
+          .<
+            MappingFactory<
+              ? super S,
+              ? super C,
+              ? super Void,
+              ? extends Duration
+            >
+          >map(duration -> new ValueAsMappingFactory<S, C, Duration>(duration))
+          .collect(toImmutableList())
+      )
     );
   }
 
@@ -198,11 +201,12 @@ public class Factories {
    * @param delegate     the value to read
    * @param defaultValue factory for the value substituted when {@code delegate}
    *                     is {@code null}
-   * @return a {@link ValueFactory} for a {@link DefaultIfNullValue} wrapping
-   *         the resolved delegate and default
-   * @see DefaultIfNullValue
+   * @return a {@link ValueFactory} for a {@link DefaultIfNull} wrapping the
+   *         resolved delegate and default, made a value by
+   *         {@link MappingAsValue}
+   * @see DefaultIfNull
    */
-  public static <S extends Scope, C, R> DefaultIfNullValueFactory<
+  public static <S extends Scope, C, R> MappingAsValueFactory<
     S,
     C,
     R
@@ -210,18 +214,24 @@ public class Factories {
     final ValueFactory<? super S, ? super C, ? extends R> delegate,
     final Factory<? super S, ? extends R> defaultValue
   ) {
-    return new DefaultIfNullValueFactory<S, C, R>(delegate, defaultValue);
+    return new MappingAsValueFactory<S, C, R>(
+      new DefaultIfNullFactory<S, C, Void, R>(
+        new ValueAsMappingFactory<S, C, R>(delegate),
+        defaultValue
+      )
+    );
   }
 
   /**
    * @param delegate     the value to read
    * @param defaultValue the literal value substituted when {@code delegate} is
    *                     {@code null}
-   * @return a {@link ValueFactory} for a {@link DefaultIfNullValue} wrapping
-   *         the resolved delegate and the given default
-   * @see DefaultIfNullValue
+   * @return a {@link ValueFactory} for a {@link DefaultIfNull} wrapping the
+   *         resolved delegate and the given default, made a value by
+   *         {@link MappingAsValue}
+   * @see DefaultIfNull
    */
-  public static <S extends Scope, C, R> DefaultIfNullValueFactory<
+  public static <S extends Scope, C, R> MappingAsValueFactory<
     S,
     C,
     R
@@ -254,34 +264,77 @@ public class Factories {
 
   /**
    * @param functions the values to read and join into one key
-   * @return a {@link ValueFactory} for a
-   *         {@link MultiStringKeyFromFunctionsValue} of the resolved values
-   * @see MultiStringKeyFromFunctionsValue
+   * @return a {@link ValueFactory} for a {@link MultiStringKeyFromFunctions} of
+   *         the resolved values, made a value by {@link MappingAsValue}
+   * @see MultiStringKeyFromFunctions
    */
   @SafeVarargs
-  public static <S extends Scope, C> MultiStringKeyFromFunctionsValueFactory<
+  public static <S extends Scope, C> MappingAsValueFactory<
     S,
-    C
+    C,
+    String
   > multiStringKeyFromFunctions(
     final ValueFactory<? super S, ? super C, ?>... functions
   ) {
-    return new MultiStringKeyFromFunctionsValueFactory<S, C>(
-      ImmutableList.copyOf(functions)
+    return new MappingAsValueFactory<S, C, String>(
+      new MultiStringKeyFromFunctionsFactory<S, C, Void>(
+        Arrays.stream(functions)
+          .<MappingFactory<? super S, ? super C, ? super Void, ?>>map(
+            function -> new ValueAsMappingFactory<S, C, Object>(function)
+          )
+          .collect(toImmutableList())
+      )
     );
   }
 
   /**
-   * @param intervals the non-overlapping intervals to map numbers into (see
-   *                  {@link NumericIntervalToStringMapperFactory#interval})
-   * @return a {@link MappingFactory} for a {@link NumericIntervalMapper} over
-   *         the given intervals
-   * @see NumericIntervalMapper
+   * @param number    the mapping that reads the number to place
+   * @param intervals the non-overlapping intervals to place it among (see
+   *                  {@link IntervalLabelFactory#interval})
+   * @return a {@link MappingFactory} for an {@link IntervalLabel} of the number
+   *         among the given intervals
+   * @see IntervalLabel
    */
-  public static NumericIntervalToStringMapperFactory numericIntervalToStringMapper(
-    final NumericIntervalToStringMapperFactory.Interval... intervals
+  public static <S extends Scope, C, T> IntervalLabelFactory<
+    S,
+    C,
+    T
+  > intervalLabel(
+    final MappingFactory<
+      ? super S,
+      ? super C,
+      ? super T,
+      ? extends Double
+    > number,
+    final IntervalLabelFactory.Interval... intervals
   ) {
-    return new NumericIntervalToStringMapperFactory(
+    return new IntervalLabelFactory<S, C, T>(
+      number,
       ImmutableList.copyOf(intervals)
+    );
+  }
+
+  /**
+   * @param number    the value that is the number to place
+   * @param intervals the non-overlapping intervals to place it among (see
+   *                  {@link IntervalLabelFactory#interval})
+   * @return a {@link ValueFactory} for an {@link IntervalLabel} of the number
+   *         among the given intervals, made a value by {@link MappingAsValue}
+   * @see IntervalLabel
+   */
+  public static <S extends Scope, C> MappingAsValueFactory<
+    S,
+    C,
+    String
+  > intervalLabel(
+    final ValueFactory<? super S, ? super C, ? extends Double> number,
+    final IntervalLabelFactory.Interval... intervals
+  ) {
+    return new MappingAsValueFactory<S, C, String>(
+      new IntervalLabelFactory<S, C, Void>(
+        new ValueAsMappingFactory<S, C, Double>(number),
+        ImmutableList.copyOf(intervals)
+      )
     );
   }
 }

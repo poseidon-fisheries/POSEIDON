@@ -28,6 +28,8 @@ import java.util.Collection;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.functions.MappingAsValueFactory;
+import uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory;
 
 /**
  * Factories for conditions, which are values or mappings, and for yes/no
@@ -39,11 +41,10 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param extractor the mapping applied to the thing tested before checking
-   *                  {@code predicate}
-   * @param predicate the yes/no mapping the extracted value is tested against
-   * @return a {@link MappingFactory} for a {@link Condition} that composes the
-   *         given extractor and predicate
+   * @param subject   the mapping that reads the subject from the thing tested
+   * @param predicate the yes/no mapping the subject is tested against
+   * @return a {@link MappingFactory} for a {@link Condition} stating the
+   *         predicate of the subject
    * @see Condition
    */
   public static <S extends Scope, C, T, U> ConditionFactory<
@@ -52,33 +53,34 @@ public class Factories {
     T,
     U
   > condition(
-    final MappingFactory<
-      ? super S,
-      ? super C,
-      ? super T,
-      ? extends U
-    > extractor,
+    final MappingFactory<? super S, ? super C, ? super T, ? extends U> subject,
     final MappingFactory<? super S, ? super C, ? super U, Boolean> predicate
   ) {
-    return new ConditionFactory<S, C, T, U>(extractor, predicate);
+    return new ConditionFactory<S, C, T, U>(subject, predicate);
   }
 
   /**
-   * @param extractor the value read under the context and then tested
-   * @param predicate the yes/no mapping the value is tested against
-   * @return a {@link ValueFactory} for a {@link ConditionValue} that composes
-   *         the given value and predicate
-   * @see ConditionValue
+   * @param subject   the value tested
+   * @param predicate the yes/no mapping the subject is tested against
+   * @return a {@link ValueFactory} for a {@link Condition} stating the
+   *         predicate of the subject, made a value by
+   *         {@link uk.ac.ox.poseidon.core.functions.MappingAsValue}
+   * @see Condition
    */
-  public static <S extends Scope, C, U> ConditionValueFactory<
+  public static <S extends Scope, C, U> MappingAsValueFactory<
     S,
     C,
-    U
+    Boolean
   > condition(
-    final ValueFactory<? super S, ? super C, ? extends U> extractor,
+    final ValueFactory<? super S, ? super C, ? extends U> subject,
     final MappingFactory<? super S, ? super C, ? super U, Boolean> predicate
   ) {
-    return new ConditionValueFactory<S, C, U>(extractor, predicate);
+    return new MappingAsValueFactory<S, C, Boolean>(
+      new ConditionFactory<S, C, Void, U>(
+        new ValueAsMappingFactory<S, C, U>(subject),
+        predicate
+      )
+    );
   }
 
   /**

@@ -22,30 +22,44 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
+import java.util.function.BiFunction;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.functions.ObjectProperty;
-import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
 
 /**
- * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a
- * {@link Route}, built via {@link Factories#routeProperty}.
- *
- * @param <R> the type of the property; not checked
+ * A {@link RelativeScopeFactory} counterpart of {@link RouteProperty}, built
+ * via {@link Factories Factories.routeProperty(...)}.
  */
+@Getter
+@ToString
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class RoutePropertyFactory<R> extends ObjectPropertyFactory<Route, R> {
+public class RoutePropertyFactory<S extends Scope, C, T, R>
+  extends RelativeScopeFactory<S, BiFunction<C, T, R>>
+  implements MappingFactory<S, C, T, R>
+{
 
-  /**
-   * @param propertyPath the dotted path of properties to follow from the route
-   */
-  public RoutePropertyFactory(final String propertyPath) {
-    super(propertyPath);
-  }
+  private final MappingFactory<
+    ? super S,
+    ? super C,
+    ? super T,
+    ? extends Route
+  > route;
+  private final String propertyPath;
 
   @Override
-  protected Class<Route> rootClass() {
-    return Route.class;
+  protected BiFunction<C, T, R> newInstance(final S scope) {
+    return new RouteProperty<>(
+      route.get(scope),
+      new ObjectProperty<>(Route.class, propertyPath)
+    );
   }
 }

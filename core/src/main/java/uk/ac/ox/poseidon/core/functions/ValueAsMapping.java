@@ -20,41 +20,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.logical;
+package uk.ac.ox.poseidon.core.functions;
 
-import java.util.Collection;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
- * A yes/no value that is true iff every one of its component values is true
- * under the context (vacuously true for zero predicates). Built via
- * {@link Factories#allOf(uk.ac.ox.poseidon.core.ValueFactory...)} in this
- * package.
+ * A value made a mapping that has nothing to map: on each call, it reads the
+ * value under the same context and ignores the thing mapped, which is always
+ * {@code null}, the only value of {@link Void}. Typed by {@code Void}, it fits
+ * only where nothing is mapped: inside a combinator that {@link MappingAsValue}
+ * makes a value again. Built by the value overloads of the combinators, and of
+ * the blocks that take their input, never by scenario code.
  *
  * @param <C> the type of the context
+ * @param <R> the type of the value
  */
-public class AllOfValue<C> implements Function<C, Boolean> {
+@RequiredArgsConstructor
+public class ValueAsMapping<C, R> implements BiFunction<C, Void, R> {
 
-  // Using an array for performance reasons
-  @NonNull
-  private final Function<? super C, Boolean>[] predicates;
-
-  /** @param predicates the component values */
-  @SuppressWarnings("unchecked")
-  public AllOfValue(
-    final Collection<? extends Function<? super C, Boolean>> predicates
-  ) {
-    this.predicates = predicates.toArray(Function[]::new);
-  }
+  private final @NonNull Function<? super C, ? extends R> value;
 
   @Override
-  public Boolean apply(final C context) {
-    for (final Function<? super C, Boolean> predicate : predicates) {
-      if (!predicate.apply(context)) {
-        return false;
-      }
-    }
-    return true;
+  public R apply(final C context, final Void nothing) {
+    return value.apply(context);
   }
 }

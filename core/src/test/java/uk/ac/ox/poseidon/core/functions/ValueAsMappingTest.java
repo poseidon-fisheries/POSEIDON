@@ -22,36 +22,16 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import java.time.Duration;
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.function.Function;
+import org.junit.jupiter.api.Test;
 
-/**
- * A value that sums the {@link Duration}s of several other values read under
- * the same context. Built via
- * {@link Factories#combinedDuration(uk.ac.ox.poseidon.core.ValueFactory...)} in
- * this package.
- *
- * @param <C> the type of the context
- */
-public class CombinedDurationValue<C> implements Function<C, Duration> {
+class ValueAsMappingTest {
 
-  private final Function<? super C, ? extends Duration>[] durations;
-
-  /** @param durations the values to combine */
-  @SuppressWarnings("unchecked")
-  public CombinedDurationValue(
-    final List<? extends Function<? super C, ? extends Duration>> durations
-  ) {
-    this.durations = durations.toArray(new Function[0]);
-  }
-
-  @Override
-  public Duration apply(final C context) {
-    Duration total = Duration.ZERO;
-    for (int i = 0; i < durations.length; i++) {
-      total = total.plus(durations[i].apply(context));
-    }
-    return total;
+  @Test
+  void readsTheValueUnderTheContext() {
+    final Function<String, Integer> length = String::length;
+    assertThat(new ValueAsMapping<>(length).apply("abc", null)).isEqualTo(3);
   }
 }

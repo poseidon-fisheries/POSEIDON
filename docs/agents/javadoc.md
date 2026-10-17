@@ -56,10 +56,12 @@ The triplet gets documented in four different places, once each, not duplicated 
     `{@link Factories Factories.nextOccurrenceOf(...)/Factories.nextOccurrenceAfter(...)}`.
 
   Don't assume same-name overloads share a target or a distinct name doesn't — check what each
-  overload actually returns (e.g. `allOf(MappingFactory...)` and `allOf(ValueFactory...)` return two
-  *different* factory classes despite sharing a name, so each gets its own direct link; `constant(T)`
-  and `constant(Factory)` both return the same `ConstantFactory`, so that one stays a
-  class-level link). No behavior explanation on the `Factory` subclass — scenario-building code
+  overload actually returns (e.g. `allOf(MappingFactory...)` returns an `AllOfFactory` and
+  `allOf(ValueFactory...)` a `MappingAsValueFactory` holding one: both build an `AllOf`, so `AllOf`
+  and `AllOfFactory` get a class-level link, while `MappingAsValueFactory`, built by the value
+  overload of every combinator, names that category rather than a method; `constant(T)` and
+  `constant(Factory)` both return the same `ConstantFactory`, so that one stays a class-level
+  link). No behavior explanation on the `Factory` subclass — scenario-building code
   never touches these directly (per `docs/agents/architecture.md`), so a reader here just needs to
   be routed to the component and to the helper that builds it.
 - **Scope semantics are documented once, not per factory.** Each `*ScopeFactory` base class

@@ -23,38 +23,50 @@
 package uk.ac.ox.poseidon.agents.travel;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.ac.ox.poseidon.agents.travel.Factories.routeProperty;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Scenario;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.io.ScenarioLoader;
-import uk.ac.ox.poseidon.io.ScenarioWriter;
 
+/**
+ * A property of a route read from the thing mapped or, for a value, under the
+ * context.
+ */
 class RoutePropertyFactoryTest {
 
+  private final Route route = new Route(15.0, Duration.ofMinutes(90));
+
+  /** The thing mapped, a route. */
+  private final MappingFactory<Scope, Object, Route, Route> theRoute = scope ->
+    (context, r) ->
+      r;
+
   @Test
-  void survivesAYamlRoundTripWithOnlyItsPath() {
-    final String written = new ScenarioWriter().write(
-      Scenario.builder()
-        .component("property", routeProperty("duration"))
-        .build()
-    );
-    assertThat(written)
-      .contains("propertyPath: duration")
-      .doesNotContain("rootClass");
+  void readsTheDurationOfTheRouteMapped() {
     assertThat(
-      new ScenarioLoader().load(written).getComponents().get("property")
-    ).isEqualTo(routeProperty("duration"));
+      routeProperty(theRoute, "duration")
+        .get(Scope.GLOBAL_SCOPE)
+        .apply(null, route)
+    ).isEqualTo(Duration.ofMinutes(90));
   }
 
   @Test
-  void readsTheDurationOfARoute() {
+  void readsTheDurationOfARouteValue() {
     assertThat(
-      routeProperty("duration")
+      routeProperty(constant(route), "duration")
         .get(Scope.GLOBAL_SCOPE)
-        .apply(null, new Route(15.0, Duration.ofMinutes(90)))
+        .apply(null)
     ).isEqualTo(Duration.ofMinutes(90));
+  }
+
+  @Test
+  void aWrongPathFailsWhenBuilt() {
+    assertThatThrownBy(() ->
+      routeProperty(theRoute, "speed").get(Scope.GLOBAL_SCOPE)
+    ).isInstanceOf(IllegalArgumentException.class);
   }
 }

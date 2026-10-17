@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link AllOf}, built via
- * {@link Factories#allOf(MappingFactory...)}.
+ * {@link Factories Factories.allOf(...)}.
  */
 @Getter
 @ToString

@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * A yes/no mapping that negates a wrapped yes/no mapping. Built via
- * {@link Factories#not(uk.ac.ox.poseidon.core.MappingFactory)} in this package.
+ * {@link Factories Factories.not(...)} in this package.
  *
  * @param <C> the type of the context
  * @param <T> the type of the thing tested

@@ -20,48 +20,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.logical;
+package uk.ac.ox.poseidon.core.functions;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
-import com.google.common.collect.ImmutableList;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link AllOfValue}, built via
- * {@link Factories#allOf(ValueFactory...)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link MappingAsValue}, built
+ * by the value overloads of the combinators and of the blocks that take their
+ * input.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class AllOfValueFactory<S extends Scope, C>
-  extends RelativeScopeFactory<S, Function<C, Boolean>>
-  implements ValueFactory<S, C, Boolean>
+public class MappingAsValueFactory<S extends Scope, C, R>
+  extends RelativeScopeFactory<S, Function<C, R>>
+  implements ValueFactory<S, C, R>
 {
 
-  @Singular
-  private final ImmutableList<
-    ValueFactory<? super S, ? super C, Boolean>
-  > predicates;
+  private final MappingFactory<
+    ? super S,
+    ? super C,
+    ? super Void,
+    ? extends R
+  > mapping;
 
   @Override
-  protected Function<C, Boolean> newInstance(final S scope) {
-    return new AllOfValue<>(
-      predicates
-        .stream()
-        .map(f -> f.get(scope))
-        .collect(toImmutableList())
-    );
+  protected Function<C, R> newInstance(final S scope) {
+    return new MappingAsValue<>(mapping.get(scope));
   }
 }

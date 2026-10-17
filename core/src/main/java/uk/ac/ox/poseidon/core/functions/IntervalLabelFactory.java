@@ -32,32 +32,38 @@ import lombok.NoArgsConstructor;
 import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link NumericIntervalMapper}
- * (specialized to {@link String} outputs), built via
- * {@link Factories#numericIntervalToStringMapper(Interval...)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link IntervalLabel}, with
+ * labels that are strings, built via
+ * {@link Factories Factories.intervalLabel(...)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class NumericIntervalToStringMapperFactory
-  extends GlobalScopeFactory<BiFunction<Object, Double, String>>
-  implements MappingFactory<Scope, Object, Double, String>
+public class IntervalLabelFactory<S extends Scope, C, T>
+  extends RelativeScopeFactory<S, BiFunction<C, T, String>>
+  implements MappingFactory<S, C, T, String>
 {
+
+  private final MappingFactory<
+    ? super S,
+    ? super C,
+    ? super T,
+    ? extends Double
+  > number;
 
   @Singular
   private final ImmutableList<Interval> intervals;
 
   /**
    * @return an {@link Interval} literal, for use as a
-   *         {@link Factories#numericIntervalToStringMapper(Interval...)}
-   *         argument
+   *         {@link Factories Factories.intervalLabel(...)} argument
    */
   public static Interval interval(
     final Double lowerBoundInclusive,
@@ -68,12 +74,13 @@ public class NumericIntervalToStringMapperFactory
   }
 
   @Override
-  protected BiFunction<Object, Double, String> newInstance(final Scope scope) {
-    return new NumericIntervalMapper<>(
+  protected BiFunction<C, T, String> newInstance(final S scope) {
+    return new IntervalLabel<>(
+      number.get(scope),
       intervals
         .stream()
         .map(interval ->
-          new NumericIntervalMapper.Interval<>(
+          new IntervalLabel.Interval<>(
             interval.getLowerBoundInclusive(),
             interval.getUpperBoundExclusive(),
             interval.getValue()
@@ -83,12 +90,13 @@ public class NumericIntervalToStringMapperFactory
     );
   }
 
+  /** An interval and its label, as written in a scenario. */
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
   public static class Interval {
 
-    // Null means unbounded, matching the runtime mapper interval semantics.
+    // Null means unbounded, as in the intervals of an IntervalLabel.
     private Double lowerBoundInclusive;
     private Double upperBoundExclusive;
     private String value;

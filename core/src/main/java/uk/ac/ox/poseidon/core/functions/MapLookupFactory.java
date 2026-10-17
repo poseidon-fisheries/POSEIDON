@@ -35,23 +35,29 @@ import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link MapLookup},
- * built via {@link Factories#mapLookup(Factory)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link MapLookup}, built via
+ * {@link Factories Factories.mapLookup(...)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class MapLookupFactory<S extends Scope, K, V>
-  extends RelativeScopeFactory<S, BiFunction<Object, K, V>>
-  implements MappingFactory<S, Object, K, V>
+public class MapLookupFactory<S extends Scope, C, T, K, V>
+  extends RelativeScopeFactory<S, BiFunction<C, T, V>>
+  implements MappingFactory<S, C, T, V>
 {
 
+  private final MappingFactory<
+    ? super S,
+    ? super C,
+    ? super T,
+    ? extends K
+  > key;
   private final Factory<? super S, ? extends Map<? super K, ? extends V>> map;
 
   @Override
-  protected BiFunction<Object, K, V> newInstance(final S scope) {
-    return new MapLookup<>(map.get(scope));
+  protected BiFunction<C, T, V> newInstance(final S scope) {
+    return new MapLookup<>(key.get(scope), map.get(scope));
   }
 }

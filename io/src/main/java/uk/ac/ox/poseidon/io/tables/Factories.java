@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import static uk.ac.ox.poseidon.core.functions.Factories.composedFunction;
 import static uk.ac.ox.poseidon.core.functions.Factories.mapLookup;
 
 import com.google.common.collect.ImmutableList;
@@ -38,8 +37,8 @@ import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
-import uk.ac.ox.poseidon.core.functions.ComposedFunctionFactory;
-import uk.ac.ox.poseidon.core.functions.ComposedFunctionValueFactory;
+import uk.ac.ox.poseidon.core.functions.MapLookupFactory;
+import uk.ac.ox.poseidon.core.functions.MappingAsValueFactory;
 import uk.ac.ox.poseidon.core.utils.ListFactory;
 import uk.ac.ox.poseidon.io.sources.DataSource;
 import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
@@ -256,20 +255,19 @@ public class Factories {
   }
 
   /**
-   * @param key    factory for the mapping that computes the lookup
-   *                        key from the thing mapped
+   * @param key             factory for the mapping that reads the lookup key
+   *                        from the thing mapped
    * @param table           factory for the table to look values up in
    * @param rowKeyBuilder   factory for the function deriving each table row's
    *                        map key
    * @param rowValueBuilder factory for the function deriving each table row's
    *                        map value
-   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a mapping
-   *         composing {@code key} with a lookup into the map built
-   *         from the resolved table
-   * @see uk.ac.ox.poseidon.core.functions.ComposedFunction
+   * @return a {@link MappingFactory} for a
+   *         {@link uk.ac.ox.poseidon.core.functions.MapLookup} of the key in
+   *         the map built from the resolved table
    * @see uk.ac.ox.poseidon.core.functions.MapLookup
    */
-  public static <S extends Scope, C, T, K, V> ComposedFunctionFactory<
+  public static <S extends Scope, C, T, K, V> MapLookupFactory<
     S,
     C,
     T,
@@ -287,28 +285,25 @@ public class Factories {
       ? extends Function<? super Row, ? extends V>
     > rowValueBuilder
   ) {
-    return composedFunction(
-      key,
-      mapLookup(mapFromTable(table, rowKeyBuilder, rowValueBuilder))
-    );
+    return mapLookup(key, mapFromTable(table, rowKeyBuilder, rowValueBuilder));
   }
 
   /**
-   * @param key    factory for the value that is the lookup key
+   * @param key             factory for the value that is the lookup key
    * @param table           factory for the table to look values up in
    * @param rowKeyBuilder   factory for the function deriving each table row's
    *                        map key
    * @param rowValueBuilder factory for the function deriving each table row's
    *                        map value
-   * @return a {@link ValueFactory} for a value composing {@code key}
-   *         with a lookup into the map built from the resolved table
-   * @see uk.ac.ox.poseidon.core.functions.ComposedFunctionValue
+   * @return a {@link ValueFactory} for a
+   *         {@link uk.ac.ox.poseidon.core.functions.MapLookup} of the key in
+   *         the map built from the resolved table, made a value by
+   *         {@link uk.ac.ox.poseidon.core.functions.MappingAsValue}
    * @see uk.ac.ox.poseidon.core.functions.MapLookup
    */
-  public static <S extends Scope, C, K, V> ComposedFunctionValueFactory<
+  public static <S extends Scope, C, K, V> MappingAsValueFactory<
     S,
     C,
-    K,
     V
   > tableLookup(
     final ValueFactory<? super S, ? super C, ? extends K> key,
@@ -322,9 +317,6 @@ public class Factories {
       ? extends Function<? super Row, ? extends V>
     > rowValueBuilder
   ) {
-    return composedFunction(
-      key,
-      mapLookup(mapFromTable(table, rowKeyBuilder, rowValueBuilder))
-    );
+    return mapLookup(key, mapFromTable(table, rowKeyBuilder, rowValueBuilder));
   }
 }

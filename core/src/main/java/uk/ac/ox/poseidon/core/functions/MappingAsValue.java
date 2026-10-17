@@ -22,26 +22,35 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A value that reads another value under the context and substitutes a fixed
- * default whenever that value is {@code null}. Built via {@link Factories
- * Factories.defaultIfNull(...)} in this package.
+ * A value read from a mapping that has nothing to map: on each call, it asks
+ * the mapping under the same context, with {@code null}, the only value of
+ * {@link Void}, as the thing mapped. A combinator that makes sense in both
+ * shapes, such as a conjunction, is written once, as a mapping; given values,
+ * it combines them made mappings by {@link ValueAsMapping}, and is made a value
+ * by this. It then means the same in both shapes. Built by the value overloads
+ * of those combinators, and of the blocks that take their input, never by
+ * scenario code.
  *
  * @param <C> the type of the context
- * @param <R> the type of the value, and of the default value
+ * @param <R> the type of the value
  */
 @RequiredArgsConstructor
-public class DefaultIfNullValue<C, R> implements Function<C, R> {
+public class MappingAsValue<C, R> implements Function<C, R> {
 
-  private final Function<? super C, ? extends R> delegate;
-  private final R defaultValue;
+  private final @NonNull BiFunction<
+    ? super C,
+    ? super Void,
+    ? extends R
+  > mapping;
 
   @Override
   public R apply(final C context) {
-    final R result = delegate.apply(context);
-    return result == null ? defaultValue : result;
+    return mapping.apply(context, null);
   }
 }

@@ -37,7 +37,7 @@ import uk.ac.ox.poseidon.core.Scope;
 /**
  * A {@link RelativeScopeFactory} counterpart of
  * {@link MultiStringKeyFromFunctions}, built via
- * {@link Factories#multiStringKeyFromFunctions(MappingFactory...)}.
+ * {@link Factories Factories.multiStringKeyFromFunctions(...)}.
  */
 @Getter
 @ToString

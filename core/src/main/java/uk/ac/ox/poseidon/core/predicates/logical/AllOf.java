@@ -29,8 +29,7 @@ import lombok.NonNull;
 /**
  * A yes/no mapping that is true iff every one of its component mappings is true
  * of the thing tested, under the same context (vacuously true for zero
- * components). Built via
- * {@link Factories#allOf(uk.ac.ox.poseidon.core.MappingFactory...)} in this
+ * components). Built via {@link Factories Factories.allOf(...)} in this
  * package.
  *
  * @param <C> the type of the context

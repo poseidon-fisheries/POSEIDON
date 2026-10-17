@@ -20,39 +20,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.functions;
+package uk.ac.ox.poseidon.agents.travel;
 
 import java.util.function.BiFunction;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.core.functions.ObjectProperty;
 
 /**
- * A mapping equivalent to applying two other mappings in sequence, both under
- * the same context. Built via
- * {@link Factories#composedFunction(uk.ac.ox.poseidon.core.MappingFactory, uk.ac.ox.poseidon.core.MappingFactory)}
- * in this package.
+ * A mapping that reads a property of a route: the route is read from the thing
+ * mapped, under the context, and its property by following a dotted path of
+ * getters, as an {@link ObjectProperty} does. {@code "duration"} reads how long
+ * sailing the route takes. Built via
+ * {@link Factories Factories.routeProperty(...)} in this package.
  *
  * @param <C> the type of the context
  * @param <T> the type of the thing mapped
- * @param <U> the intermediate type produced by {@code function1} and mapped by {@code function2}
- * @param <R> the type of the result
+ * @param <R> the type of the property; not checked
  */
 @RequiredArgsConstructor
-public class ComposedFunction<C, T, U, R> implements BiFunction<C, T, R> {
+public class RouteProperty<C, T, R> implements BiFunction<C, T, R> {
 
   private final @NonNull BiFunction<
     ? super C,
     ? super T,
-    ? extends U
-  > function1;
-  private final @NonNull BiFunction<
-    ? super C,
-    ? super U,
-    ? extends R
-  > function2;
+    ? extends Route
+  > route;
+  private final @NonNull ObjectProperty<Route, R> property;
 
+  /**
+   * @throws NullPointerException if the route, or a property part way along the
+   *                              path, is {@code null}
+   */
   @Override
   public R apply(final C context, final T t) {
-    return function2.apply(context, function1.apply(context, t));
+    return property.read(route.apply(context, t));
   }
 }

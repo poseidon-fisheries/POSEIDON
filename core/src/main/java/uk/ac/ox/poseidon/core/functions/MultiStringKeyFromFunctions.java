@@ -31,8 +31,7 @@ import java.util.function.BiFunction;
  * A mapping that applies several other mappings to the same thing, under the
  * same context, and joins their results into a single composite string key (via
  * {@code Utils.multiStringKey}). Built via
- * {@link Factories#multiStringKeyFromFunctions(uk.ac.ox.poseidon.core.MappingFactory...)}
- * in this package.
+ * {@link Factories Factories.multiStringKeyFromFunctions(...)} in this package.
  *
  * @param <C> the type of the context
  * @param <T> the type of the thing mapped

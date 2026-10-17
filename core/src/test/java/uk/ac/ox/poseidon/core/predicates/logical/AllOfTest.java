@@ -25,10 +25,17 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.functions.MappingAsValue;
+import uk.ac.ox.poseidon.core.functions.ValueAsMapping;
 
+/**
+ * A conjunction of mappings, and of values through the adapter and the lift,
+ * as the value overload builds it.
+ */
 class AllOfTest {
 
   private static final BiFunction<Object, Object, Boolean> YES = (c, t) -> true;
@@ -77,29 +84,35 @@ class AllOfTest {
 
   @Test
   void valueWithOneTrueComponentAmongFalseOnes() {
-    assertThat(
-      new AllOfValue<>(ImmutableList.of(NO_VALUE, YES_VALUE)).apply(null)
-    ).isEqualTo(false);
+    assertThat(allOfValues(List.of(NO_VALUE, YES_VALUE)).apply(null)).isEqualTo(
+      false
+    );
   }
 
   @Test
   void valueIsTrueWhenEveryComponentIs() {
-    assertThat(
-      new AllOfValue<>(ImmutableList.of(YES_VALUE, YES_VALUE)).apply(null)
-    ).isTrue();
+    assertThat(allOfValues(List.of(YES_VALUE, YES_VALUE)).apply(null)).isTrue();
   }
 
   @Test
   void valueWithNoComponents() {
     assertThat(
-      new AllOfValue<Object>(ImmutableList.of()).apply(null)
+      allOfValues(List.<Function<Object, Boolean>>of()).apply(null)
     ).isEqualTo(true);
   }
 
   @Test
   void valuePassesTheContextToItsComponents() {
     final Function<String, Boolean> isA = "a"::equals;
-    assertThat(new AllOfValue<>(ImmutableList.of(isA)).apply("a")).isTrue();
-    assertThat(new AllOfValue<>(ImmutableList.of(isA)).apply("b")).isFalse();
+    assertThat(allOfValues(List.of(isA)).apply("a")).isTrue();
+    assertThat(allOfValues(List.of(isA)).apply("b")).isFalse();
+  }
+
+  private static <C> Function<C, Boolean> allOfValues(
+    final List<? extends Function<? super C, Boolean>> values
+  ) {
+    return new MappingAsValue<>(
+      new AllOf<C, Void>(values.stream().map(ValueAsMapping::new).toList())
+    );
   }
 }

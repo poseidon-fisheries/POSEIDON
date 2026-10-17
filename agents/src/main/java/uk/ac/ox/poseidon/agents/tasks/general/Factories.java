@@ -53,15 +53,15 @@ public class Factories {
   }
 
   /**
-   * @param extractor pulls a value off the vessel
-   * @param predicate the condition to test the extracted value against
+   * @param subject   the value tested, read for the vessel
+   * @param predicate the condition to test the subject against
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for an
-   *         {@link AgentPredicateTask} testing {@code predicate} against the
-   *         value {@code extractor} pulls off the vessel
+   *         {@link AgentPredicateTask} testing {@code predicate} against
+   *         {@code subject}
    * @see AgentPredicateTask
    */
   public static <T> VesselPredicateTaskFactory checkThat(
-    final ValueFactory<? super VesselScope, ? super Vessel, T> extractor,
+    final ValueFactory<? super VesselScope, ? super Vessel, T> subject,
     final MappingFactory<
       ? super VesselScope,
       ? super Vessel,
@@ -69,7 +69,7 @@ public class Factories {
       Boolean
     > predicate
   ) {
-    return checkThat(condition(extractor, predicate));
+    return checkThat(condition(subject, predicate));
   }
 
   /**

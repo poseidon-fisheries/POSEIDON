@@ -22,15 +22,22 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 import com.google.common.collect.ImmutableList;
+import java.util.Arrays;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.functions.MappingAsValue;
+import uk.ac.ox.poseidon.core.functions.MappingAsValueFactory;
+import uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory;
 
 /**
  * Factories for yes/no values and mappings combining other yes/no values or
  * mappings. Each combinator has one overload per shape: combining values gives
- * a value, combining mappings gives a mapping, and the two cannot be mixed. For
+ * a value, combining mappings gives a mapping, and the two cannot be mixed. The
+ * value is the mapping, with nothing to map, so both mean the same. For
  * a constant yes/no mapping, use
  * {@link uk.ac.ox.poseidon.core.providers.constant.Factories#always(Object)
  * always(true)} or {@code always(false)}.
@@ -55,15 +62,23 @@ public class Factories {
 
   /**
    * @param predicates factories for the component values
-   * @return a {@link ValueFactory} for an {@link AllOfValue} over the
-   *         resolved predicates
-   * @see AllOfValue
+   * @return a {@link ValueFactory} for an {@link AllOf} over the resolved
+   *         predicates, made a value by {@link MappingAsValue}
+   * @see AllOf
    */
   @SafeVarargs
-  public static <S extends Scope, C> AllOfValueFactory<S, C> allOf(
+  public static <S extends Scope, C> MappingAsValueFactory<S, C, Boolean> allOf(
     final ValueFactory<? super S, ? super C, Boolean>... predicates
   ) {
-    return new AllOfValueFactory<S, C>(ImmutableList.copyOf(predicates));
+    return new MappingAsValueFactory<S, C, Boolean>(
+      new AllOfFactory<S, C, Void>(
+        Arrays.stream(predicates)
+          .<MappingFactory<? super S, ? super C, ? super Void, Boolean>>map(
+            predicate -> new ValueAsMappingFactory<S, C, Boolean>(predicate)
+          )
+          .collect(toImmutableList())
+      )
+    );
   }
 
   /**
@@ -81,15 +96,23 @@ public class Factories {
 
   /**
    * @param predicates factories for the component values
-   * @return a {@link ValueFactory} for an {@link AnyOfValue} over the
-   *         resolved predicates
-   * @see AnyOfValue
+   * @return a {@link ValueFactory} for an {@link AnyOf} over the resolved
+   *         predicates, made a value by {@link MappingAsValue}
+   * @see AnyOf
    */
   @SafeVarargs
-  public static <S extends Scope, C> AnyOfValueFactory<S, C> anyOf(
+  public static <S extends Scope, C> MappingAsValueFactory<S, C, Boolean> anyOf(
     final ValueFactory<? super S, ? super C, Boolean>... predicates
   ) {
-    return new AnyOfValueFactory<S, C>(ImmutableList.copyOf(predicates));
+    return new MappingAsValueFactory<S, C, Boolean>(
+      new AnyOfFactory<S, C, Void>(
+        Arrays.stream(predicates)
+          .<MappingFactory<? super S, ? super C, ? super Void, Boolean>>map(
+            predicate -> new ValueAsMappingFactory<S, C, Boolean>(predicate)
+          )
+          .collect(toImmutableList())
+      )
+    );
   }
 
   /**
@@ -106,13 +129,17 @@ public class Factories {
 
   /**
    * @param predicate factory for the value to negate
-   * @return a {@link ValueFactory} for a {@link NotValue} wrapping the
-   *         resolved value
-   * @see NotValue
+   * @return a {@link ValueFactory} for a {@link Not} wrapping the resolved
+   *         value, made a value by {@link MappingAsValue}
+   * @see Not
    */
-  public static <S extends Scope, C> NotValueFactory<S, C> not(
+  public static <S extends Scope, C> MappingAsValueFactory<S, C, Boolean> not(
     final ValueFactory<? super S, ? super C, Boolean> predicate
   ) {
-    return new NotValueFactory<S, C>(predicate);
+    return new MappingAsValueFactory<S, C, Boolean>(
+      new NotFactory<S, C, Void>(
+        new ValueAsMappingFactory<S, C, Boolean>(predicate)
+      )
+    );
   }
 }

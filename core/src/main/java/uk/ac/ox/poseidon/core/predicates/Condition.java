@@ -26,23 +26,23 @@ import java.util.function.BiFunction;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A yes/no mapping that extracts something from the thing tested, then tests
- * that against another yes/no mapping, both under the same context. Built via
- * {@link Factories#condition(uk.ac.ox.poseidon.core.MappingFactory, uk.ac.ox.poseidon.core.MappingFactory)}
- * in this package.
+ * A yes/no mapping that states a predicate of a subject: it reads the subject
+ * from the thing tested, then tests it against the predicate, both under the
+ * same context. Built via {@link Factories Factories.condition(...)} in this
+ * package.
  *
  * @param <C> the type of the context
  * @param <T> the type of the thing tested
- * @param <U> the type extracted from it and actually tested
+ * @param <U> the type of the subject, read from it and actually tested
  */
 @RequiredArgsConstructor
 public class Condition<C, T, U> implements BiFunction<C, T, Boolean> {
 
-  private final BiFunction<? super C, ? super T, ? extends U> extractor;
+  private final BiFunction<? super C, ? super T, ? extends U> subject;
   private final BiFunction<? super C, ? super U, Boolean> predicate;
 
   @Override
   public Boolean apply(final C context, final T t) {
-    return predicate.apply(context, extractor.apply(context, t));
+    return predicate.apply(context, subject.apply(context, t));
   }
 }

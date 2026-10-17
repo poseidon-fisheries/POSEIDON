@@ -34,7 +34,7 @@ import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link Condition}, built via
- * {@link Factories#condition(MappingFactory, MappingFactory)}.
+ * {@link Factories Factories.condition(...)}.
  */
 @Getter
 @ToString
@@ -51,7 +51,7 @@ public class ConditionFactory<S extends Scope, C, T, U>
     ? super C,
     ? super T,
     ? extends U
-  > extractor;
+  > subject;
   private final MappingFactory<
     ? super S,
     ? super C,
@@ -61,6 +61,6 @@ public class ConditionFactory<S extends Scope, C, T, U>
 
   @Override
   protected BiFunction<C, T, Boolean> newInstance(final S scope) {
-    return new Condition<>(extractor.get(scope), predicate.get(scope));
+    return new Condition<>(subject.get(scope), predicate.get(scope));
   }
 }

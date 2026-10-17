@@ -24,7 +24,10 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.functions.MappingAsValue;
+import uk.ac.ox.poseidon.core.functions.ValueAsMapping;
 
 class NotTest {
 
@@ -37,7 +40,10 @@ class NotTest {
 
   @Test
   void valueNegatesItsComponentUnderTheSameContext() {
-    final NotValue<String> notA = new NotValue<>("a"::equals);
+    final Function<String, Boolean> isA = "a"::equals;
+    final Function<String, Boolean> notA = new MappingAsValue<>(
+      new Not<String, Void>(new ValueAsMapping<>(isA))
+    );
     assertThat(notA.apply("a")).isFalse();
     assertThat(notA.apply("b")).isTrue();
   }

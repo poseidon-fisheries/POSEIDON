@@ -20,48 +20,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.predicates.logical;
+package uk.ac.ox.poseidon.core.functions;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
-import com.google.common.collect.ImmutableList;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link AnyOfValue}, built via
- * {@link Factories#anyOf(ValueFactory...)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link ValueAsMapping}, built
+ * by the value overloads of the combinators and of the blocks that take their
+ * input.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class AnyOfValueFactory<S extends Scope, C>
-  extends RelativeScopeFactory<S, Function<C, Boolean>>
-  implements ValueFactory<S, C, Boolean>
+public class ValueAsMappingFactory<S extends Scope, C, R>
+  extends RelativeScopeFactory<S, BiFunction<C, Void, R>>
+  implements MappingFactory<S, C, Void, R>
 {
 
-  @Singular
-  private final ImmutableList<
-    ValueFactory<? super S, ? super C, Boolean>
-  > predicates;
+  private final ValueFactory<? super S, ? super C, ? extends R> value;
 
   @Override
-  protected Function<C, Boolean> newInstance(final S scope) {
-    return new AnyOfValue<>(
-      predicates
-        .stream()
-        .map(f -> f.get(scope))
-        .collect(toImmutableList())
-    );
+  protected BiFunction<C, Void, R> newInstance(final S scope) {
+    return new ValueAsMapping<>(value.get(scope));
   }
 }

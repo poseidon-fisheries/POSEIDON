@@ -31,6 +31,8 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.functions.MappingAsValueFactory;
+import uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
@@ -100,15 +102,50 @@ public class Factories {
   }
 
   /**
+   * @param route        the mapping that reads the route from the thing mapped
    * @param propertyPath the dotted path of properties to follow from the route,
    *                     e.g. {@code "duration"} for how long sailing it takes
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
-   *         {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a route
-   * @see RoutePropertyFactory
+   * @return a {@link MappingFactory} for a {@link RouteProperty} of the route
+   * @see RouteProperty
    */
-  public static <R> RoutePropertyFactory<R> routeProperty(
+  public static <S extends Scope, C, T, R> RoutePropertyFactory<
+    S,
+    C,
+    T,
+    R
+  > routeProperty(
+    final MappingFactory<
+      ? super S,
+      ? super C,
+      ? super T,
+      ? extends Route
+    > route,
     final String propertyPath
   ) {
-    return new RoutePropertyFactory<>(propertyPath);
+    return new RoutePropertyFactory<S, C, T, R>(route, propertyPath);
+  }
+
+  /**
+   * @param route        the value that is the route
+   * @param propertyPath the dotted path of properties to follow from the route,
+   *                     e.g. {@code "duration"} for how long sailing it takes
+   * @return a {@link ValueFactory} for a {@link RouteProperty} of the route,
+   *         made a value by {@link uk.ac.ox.poseidon.core.functions.MappingAsValue}
+   * @see RouteProperty
+   */
+  public static <S extends Scope, C, R> MappingAsValueFactory<
+    S,
+    C,
+    R
+  > routeProperty(
+    final ValueFactory<? super S, ? super C, ? extends Route> route,
+    final String propertyPath
+  ) {
+    return new MappingAsValueFactory<S, C, R>(
+      new RoutePropertyFactory<S, C, Void, R>(
+        new ValueAsMappingFactory<S, C, Route>(route),
+        propertyPath
+      )
+    );
   }
 }

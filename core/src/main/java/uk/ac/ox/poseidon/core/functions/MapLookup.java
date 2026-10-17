@@ -28,20 +28,25 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A mapping that looks up the thing mapped in a fixed, resolved {@link Map} on
- * every call, whatever the context. Unlike {@link MapEntryFactory}, the key is
- * supplied per-call rather than fixed at resolution time. Built via
- * {@link Factories#mapLookup(uk.ac.ox.poseidon.core.Factory)} in this
- * package.
+ * A mapping that looks a key up in a fixed, resolved {@link Map} on every call:
+ * the key is read from the thing mapped, under the context. Unlike
+ * {@link MapEntryFactory}, the key is read per call rather than fixed at
+ * resolution time. Built via
+ * {@link Factories Factories.mapLookup(...)} in this package.
+ *
+ * @param <C> the type of the context
+ * @param <T> the type of the thing mapped
+ * @param <K> the type of the key
+ * @param <V> the type of the value looked up
  */
 @RequiredArgsConstructor
-public class MapLookup<K, V> implements BiFunction<Object, K, V> {
+public class MapLookup<C, T, K, V> implements BiFunction<C, T, V> {
 
-  @NonNull
-  private final Map<? super K, ? extends V> map;
+  private final @NonNull BiFunction<? super C, ? super T, ? extends K> key;
+  private final @NonNull Map<? super K, ? extends V> map;
 
   @Override
-  public V apply(final Object context, final K k) {
-    return map.get(k);
+  public V apply(final C context, final T t) {
+    return map.get(key.apply(context, t));
   }
 }

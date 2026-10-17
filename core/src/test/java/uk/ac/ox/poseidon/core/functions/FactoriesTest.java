@@ -25,15 +25,17 @@ package uk.ac.ox.poseidon.core.functions;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.functions.Factories.combinedDuration;
-import static uk.ac.ox.poseidon.core.functions.Factories.composedFunction;
 import static uk.ac.ox.poseidon.core.functions.Factories.defaultIfNull;
+import static uk.ac.ox.poseidon.core.functions.Factories.mapLookup;
 import static uk.ac.ox.poseidon.core.functions.Factories.multiStringKeyFromFunctions;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
@@ -58,22 +60,27 @@ class FactoriesTest {
     context ->
       context.isEmpty() ? null : context;
 
+  /** Names of a few numbers. */
+  private final Factory<Scope, Map<Integer, String>> names = scope ->
+    Map.of(3, "three", 5, "five");
+
   @Test
-  void composingAValueWithAMappingGivesAValue() {
-    final Function<String, Integer> value = composedFunction(
-      contextLength,
-      plusLength
-    ).get(GLOBAL_SCOPE);
-    assertThat(value.apply("abc")).isEqualTo(6);
+  void lookingUpAValueGivesAValue() {
+    final Function<String, String> value = mapLookup(contextLength, names).get(
+      GLOBAL_SCOPE
+    );
+    assertThat(value.apply("abc")).isEqualTo("three");
+    assertThat(value.apply("ab")).isNull();
   }
 
   @Test
-  void composingTwoMappingsGivesAMapping() {
-    final BiFunction<String, Integer, Integer> mapping = composedFunction(
+  void lookingUpAMappingGivesAMapping() {
+    final BiFunction<String, Integer, String> mapping = mapLookup(
       plusLength,
-      plusLength
+      names
     ).get(GLOBAL_SCOPE);
-    assertThat(mapping.apply("ab", 1)).isEqualTo(5);
+    assertThat(mapping.apply("ab", 3)).isEqualTo("five");
+    assertThat(mapping.apply("ab", 2)).isNull();
   }
 
   @Test
