@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.prefixedId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +90,7 @@ class VesselCreatorTest {
       portGrid,
       marketGrid,
       () -> Integer.toString(id.incrementAndGet()),
-      scope -> "Vessel " + scope.getVessel().getId(),
+      prefixedId("Vessel "),
       scope -> account,
       scope -> port,
       scope -> hold,
@@ -136,7 +137,7 @@ class VesselCreatorTest {
       portGrid,
       marketGrid,
       () -> "1",
-      scope -> "Vessel " + scope.getVessel().getId(),
+      prefixedId("Vessel "),
       scope -> account,
       scope -> port,
       scope -> hold,
@@ -178,7 +179,7 @@ class VesselCreatorTest {
       portGrid,
       marketGrid,
       () -> Integer.toString(id.incrementAndGet()),
-      scope -> "Vessel " + scope.getVessel().getId(),
+      prefixedId("Vessel "),
       scope -> account,
       scope -> port,
       scope -> hold,

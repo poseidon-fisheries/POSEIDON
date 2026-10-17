@@ -28,12 +28,12 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselTaskFactory} counterpart of {@link Refuel}, built via
+ * A {@link TaskFactory} counterpart of {@link Refuel}, built via
  * {@link Factories#refuel}.
  */
 @Getter
@@ -41,7 +41,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class RefuelFactory extends VesselTaskFactory<Refuel> {
+public class RefuelFactory extends TaskFactory<Refuel> {
 
   private final Factory<
     ? super VesselScope,

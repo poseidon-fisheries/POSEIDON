@@ -28,13 +28,13 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
- * A {@link VesselTaskFactory} counterpart of
+ * A {@link TaskFactory} counterpart of
  * {@link CheckIfFishingHereAndNowIsLegal}, built via
  * {@link Factories#checkIfFishingHereAndNowIsLegal}.
  */
@@ -44,7 +44,7 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class CheckIfFishingHereAndNowIsLegalFactory
-  extends VesselTaskFactory<CheckIfFishingHereAndNowIsLegal>
+  extends TaskFactory<CheckIfFishingHereAndNowIsLegal>
 {
 
   private final Factory<

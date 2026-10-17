@@ -43,6 +43,7 @@ import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -74,7 +75,7 @@ public class VesselCreatorFactory
     ? extends Supplier<String>
   > vesselIdSupplier;
 
-  private final Factory<? super VesselScope, ? extends String> name;
+  private final ValueFactory<? super VesselScope, ? super Vessel, String> name;
   private final Factory<? super VesselScope, ? extends Account> account;
   private final Factory<? super VesselScope, ? extends Port> homePort;
   private final Factory<? super VesselScope, ? extends Hold> hold;
@@ -100,7 +101,7 @@ public class VesselCreatorFactory
       ? super SimulationScope,
       ? extends Supplier<String>
     > vesselIdSupplier,
-    final Factory<? super VesselScope, ? extends String> name,
+    final ValueFactory<? super VesselScope, ? super Vessel, String> name,
     final Factory<? super VesselScope, ? extends Account> account,
     final Factory<? super VesselScope, ? extends Port> homePort,
     final Factory<? super VesselScope, ? extends Hold> hold,

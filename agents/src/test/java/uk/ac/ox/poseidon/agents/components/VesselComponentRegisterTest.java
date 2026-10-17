@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -36,7 +36,7 @@ class VesselComponentRegisterTest {
       new VesselComponentRegister<>();
     final Vessel vessel = mock(Vessel.class);
 
-    register.putComponent(vessel, "component");
+    register.register(vessel, "component");
 
     assertThat(register.getComponent(vessel)).contains("component");
     assertThat(register.getVessels()).contains(vessel);
@@ -46,14 +46,27 @@ class VesselComponentRegisterTest {
   }
 
   @Test
+  void aTeardownRemovesOnlyTheComponentItRegistered() {
+    final VesselComponentRegister<String> register =
+      new VesselComponentRegister<>();
+    final Vessel vessel = mock(Vessel.class);
+    final Runnable firstTeardown = register.register(vessel, "first");
+    register.register(vessel, "second");
+
+    firstTeardown.run();
+
+    assertThat(register.getComponent(vessel)).contains("second");
+  }
+
+  @Test
   void getOtherEntriesExcludesProvidedVessel() {
     final VesselComponentRegister<String> register =
       new VesselComponentRegister<>();
     final Vessel first = mock(Vessel.class);
     final Vessel second = mock(Vessel.class);
 
-    register.putComponent(first, "first");
-    register.putComponent(second, "second");
+    register.register(first, "first");
+    register.register(second, "second");
 
     assertThat(register.getOtherEntries(first))
       .extracting(entry -> entry.getKey())

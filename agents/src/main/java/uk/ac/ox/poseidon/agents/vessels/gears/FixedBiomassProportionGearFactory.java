@@ -36,7 +36,7 @@ import lombok.experimental.SuperBuilder;
 import si.uom.quantity.VolumetricFlowRate;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
@@ -50,7 +50,7 @@ import uk.ac.ox.poseidon.core.functions.WithoutContext;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class FixedBiomassProportionGearFactory<S extends SimulationScope> extends RelativeScopeFactory<
+public class FixedBiomassProportionGearFactory<S extends Scope> extends RelativeScopeFactory<
   S,
   FixedBiomassProportionGear
 > {

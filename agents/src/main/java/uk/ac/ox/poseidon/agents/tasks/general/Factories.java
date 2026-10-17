@@ -42,7 +42,7 @@ public class Factories {
 
   /**
    * @param predicate the condition to test against the vessel
-   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for an
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for an
    *         {@link AgentPredicateTask}
    * @see AgentPredicateTask
    */
@@ -55,7 +55,7 @@ public class Factories {
   /**
    * @param subject   the value tested, read for the vessel
    * @param predicate the condition to test the subject against
-   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for an
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for an
    *         {@link AgentPredicateTask} testing {@code predicate} against
    *         {@code subject}
    * @see AgentPredicateTask
@@ -75,7 +75,7 @@ public class Factories {
   /**
    * @param duration the duration to wait, read for the vessel each time the
    *                 task starts
-   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
    *         {@link WaitFor}
    * @see WaitFor
    */
@@ -89,7 +89,7 @@ public class Factories {
    * @param mainTask the task to try first
    * @param waitTask the task to fall back to, every step, until
    *                 {@code mainTask} succeeds
-   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
    *         {@link com.badlogic.gdx.ai.btree.branch.Selector} combining the
    *         two, see {@link SucceedOrWaitFactory} for the exact semantics
    * @see SucceedOrWaitFactory

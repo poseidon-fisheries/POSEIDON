@@ -91,7 +91,8 @@ public class Factories {
 
   /**
    * @param prefix the prefix to prepend to the vessel's own id
-   * @return a {@link VesselScopeFactory} for a simple vessel name
+   * @return a {@link ValueFactory} for a simple vessel name, read off the
+   *         vessel it is given
    * @see PrefixedIdFactory
    */
   public static PrefixedIdFactory prefixedId(final String prefix) {
@@ -103,7 +104,7 @@ public class Factories {
    * @param portGrid                the vessels' ports
    * @param marketGrid              the vessels' markets
    * @param vesselIdSupplier        supplies each new vessel's id
-   * @param name                    builds each vessel's name
+   * @param name                    reads each vessel's name off it
    * @param account                 builds each vessel's account
    * @param homePort                builds each vessel's home port
    * @param hold                    builds each vessel's hold
@@ -123,7 +124,7 @@ public class Factories {
       ? super SimulationScope,
       ? extends Supplier<String>
     > vesselIdSupplier,
-    final Factory<? super VesselScope, ? extends String> name,
+    final ValueFactory<? super VesselScope, ? super Vessel, String> name,
     final Factory<? super VesselScope, ? extends Account> account,
     final Factory<? super VesselScope, ? extends Port> homePort,
     final Factory<? super VesselScope, ? extends Hold> hold,

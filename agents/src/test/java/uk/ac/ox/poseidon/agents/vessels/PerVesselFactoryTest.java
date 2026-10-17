@@ -46,13 +46,9 @@ class PerVesselFactoryTest {
 
     final PerVesselFactory<String> factory = new PerVesselFactory<>(delegate);
 
-    final Vessel vessel = mock(Vessel.class);
-
-    when(vessel.getProductStore()).thenReturn(new ProductStore());
-    final VesselScope scope1 = mock(VesselScope.class);
-    when(scope1.getVessel()).thenReturn(vessel);
-    final VesselScope scope2 = mock(VesselScope.class);
-    when(scope2.getVessel()).thenReturn(vessel);
+    final ProductStore store = new ProductStore();
+    final VesselScope scope1 = scopeWith(store);
+    final VesselScope scope2 = scopeWith(store);
 
     final String first = factory.get(scope1);
     final String second = factory.get(scope2);
@@ -68,17 +64,8 @@ class PerVesselFactoryTest {
 
     final PerVesselFactory<String> factory = new PerVesselFactory<>(delegate);
 
-    final Vessel vesselA = mock(Vessel.class);
-
-    when(vesselA.getProductStore()).thenReturn(new ProductStore());
-    final VesselScope scopeA = mock(VesselScope.class);
-    when(scopeA.getVessel()).thenReturn(vesselA);
-
-    final Vessel vesselB = mock(Vessel.class);
-
-    when(vesselB.getProductStore()).thenReturn(new ProductStore());
-    final VesselScope scopeB = mock(VesselScope.class);
-    when(scopeB.getVessel()).thenReturn(vesselB);
+    final VesselScope scopeA = scopeOfNewVessel();
+    final VesselScope scopeB = scopeOfNewVessel();
 
     final String fromA = factory.get(scopeA);
     final String fromB = factory.get(scopeB);
@@ -95,11 +82,7 @@ class PerVesselFactoryTest {
 
     final PerVesselFactory<String> factory = new PerVesselFactory<>(delegate);
 
-    final Vessel vessel = mock(Vessel.class);
-
-    when(vessel.getProductStore()).thenReturn(new ProductStore());
-    final VesselScope scope = mock(VesselScope.class);
-    when(scope.getVessel()).thenReturn(vessel);
+    final VesselScope scope = scopeOfNewVessel();
 
     factory.get(scope);
     factory.get(scope);
@@ -108,12 +91,15 @@ class PerVesselFactoryTest {
     assertThat(counter).hasValue(1);
   }
 
-  private static VesselScope scopeOfNewVessel() {
-    final Vessel vessel = mock(Vessel.class);
-    when(vessel.getProductStore()).thenReturn(new ProductStore());
+  /** @return a scope of a vessel whose store is {@code store} */
+  private static VesselScope scopeWith(final ProductStore store) {
     final VesselScope scope = mock(VesselScope.class);
-    when(scope.getVessel()).thenReturn(vessel);
+    when(scope.getProductStore()).thenReturn(store);
     return scope;
+  }
+
+  private static VesselScope scopeOfNewVessel() {
+    return scopeWith(new ProductStore());
   }
 
   private static class CountingValueFactory

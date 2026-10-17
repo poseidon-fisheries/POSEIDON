@@ -56,7 +56,7 @@ public class PerVesselValueFactory<C, R>
 
   @Override
   protected ProductStore productStoreFor(final VesselScope scope) {
-    return scope.getVessel().getProductStore();
+    return scope.getProductStore();
   }
 
   @Override

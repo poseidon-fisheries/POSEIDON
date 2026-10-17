@@ -28,7 +28,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 /**
- * A {@link VesselTaskFactory} counterpart of {@link TravelAlongPath}, built via
+ * A {@link TaskFactory} counterpart of {@link TravelAlongPath}, built via
  * {@link Factories#travelAlongPathTo}.
  */
 @Getter
@@ -46,7 +46,7 @@ import uk.ac.ox.poseidon.geography.paths.PathFinder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class TravelAlongPathFactory extends VesselTaskFactory<TravelAlongPath> {
+public class TravelAlongPathFactory extends TaskFactory<TravelAlongPath> {
 
   private final Factory<
     ? super VesselScope,

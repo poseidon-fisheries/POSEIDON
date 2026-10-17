@@ -24,6 +24,8 @@ package uk.ac.ox.poseidon.core;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -31,7 +33,8 @@ import java.util.Map;
  * The products built for one owner (a simulation or an agent), keyed by the
  * identity of the factory that built them: two factory objects never share a
  * product here, however equal they are. A store ends with its owner, and an
- * ended store refuses every later use.
+ * ended store refuses every later use. Ending it first runs the teardowns of
+ * the registrations made for its products, last made first.
  *
  * <p>A store is used by one thread at a time: the simulation that owns it, or
  * its agent, is built and stepped by one thread. A factory's own store, which
@@ -40,6 +43,7 @@ import java.util.Map;
 public final class ProductStore {
 
   private final Map<Factory<?, ?>, Object> products = new IdentityHashMap<>();
+  private final Deque<Runnable> teardowns = new ArrayDeque<>();
   private boolean ended;
 
   /**
@@ -75,12 +79,29 @@ public final class ProductStore {
   }
 
   /**
-   * Drops this store's products. Every later use of this store throws.
+   * Public, since the scopes that make registrations are not all in this
+   * package; a build never reaches a store.
+   *
+   * @param teardown takes back a registration made for one of this store's
+   *                 products, when this store ends
+   * @throws IllegalStateException if this store has ended
+   */
+  public void addTeardown(final Runnable teardown) {
+    checkNotEnded();
+    teardowns.push(teardown);
+  }
+
+  /**
+   * Runs this store's teardowns, the last added first, then drops its
+   * products. Every later use of this store throws.
    *
    * @throws IllegalStateException if this store has already ended
    */
   public void end() {
     checkNotEnded();
+    while (!teardowns.isEmpty()) {
+      teardowns.pop().run();
+    }
     products.clear();
     ended = true;
   }

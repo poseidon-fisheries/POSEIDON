@@ -26,13 +26,17 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselRegistry;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 
 /**
  * Stores per-vessel components for a simulation so other systems can query them
- * by vessel.
+ * by vessel. A build registers a component through its
+ * {@link uk.ac.ox.poseidon.agents.vessels.VesselScope}.
  */
-public class VesselComponentRegister<T> implements VesselsGetter {
+public class VesselComponentRegister<T> implements
+  VesselsGetter,
+  VesselRegistry<T> {
 
   // Insertion order, not hash order: vessels hash by identity, so a HashMap's
   // order would change from run to run with the same seed
@@ -40,9 +44,14 @@ public class VesselComponentRegister<T> implements VesselsGetter {
 
   /**
    * Associates the given component with the vessel.
+   *
+   * @return the teardown that removes the association, unless another
+   *         component has replaced it since
    */
-  public void putComponent(final Vessel vessel, final T component) {
+  @Override
+  public Runnable register(final Vessel vessel, final T component) {
     map.put(vessel, component);
+    return () -> map.remove(vessel, component);
   }
 
   /**

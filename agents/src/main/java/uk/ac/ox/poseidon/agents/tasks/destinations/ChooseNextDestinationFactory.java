@@ -29,13 +29,13 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link VesselTaskFactory} counterpart of {@link ChooseNextDestination},
+ * A {@link TaskFactory} counterpart of {@link ChooseNextDestination},
  * built via {@link Factories#chooseNextDestination(ValueFactory)}.
  */
 @Getter
@@ -44,7 +44,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class ChooseNextDestinationFactory
-  extends VesselTaskFactory<ChooseNextDestination>
+  extends TaskFactory<ChooseNextDestination>
 {
 
   private final ValueFactory<

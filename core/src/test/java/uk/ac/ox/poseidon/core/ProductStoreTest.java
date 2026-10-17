@@ -28,11 +28,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 
 /**
- * A store ends with its owner, and an ended store refuses every later use; a
+ * A store ends with its owner, running its teardowns in reverse order, and an
+ * ended store refuses every later use; a
  * finished simulation, with the products in its store, goes once nothing
  * references it, even though its scenario lives on.
  */
@@ -55,7 +58,26 @@ class ProductStoreTest {
     assertThatThrownBy(() ->
       store.put(factory, new Product(null))
     ).isInstanceOf(IllegalStateException.class);
+    assertThatThrownBy(() -> store.addTeardown(() -> {})).isInstanceOf(
+      IllegalStateException.class
+    );
     assertThatThrownBy(store::end).isInstanceOf(IllegalStateException.class);
+  }
+
+  @Test
+  void endingAStoreRunsItsTeardownsInReverseOrderBeforeDroppingItsProducts() {
+    final ProductStore store = new ProductStore();
+    final List<String> run = new ArrayList<>();
+    store.put(factory, new Product(null));
+    store.addTeardown(() -> run.add("first"));
+    store.addTeardown(() -> {
+      run.add("second");
+      assertThat(store.contains(factory)).isTrue();
+    });
+    store.addTeardown(() -> run.add("third"));
+    store.end();
+
+    assertThat(run).containsExactly("third", "second", "first");
   }
 
   @Test

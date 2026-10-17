@@ -29,13 +29,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselTaskFactory} for a gdx-ai {@link Decorator}: builds the
+ * A {@link TaskFactory} for a gdx-ai {@link Decorator}: builds the
  * decorator node via {@link #newTask()} and attaches a single child, resolved
  * against the current {@link VesselScope}. See {@link AlwaysFailTaskFactory},
  * {@link AlwaysSucceedTaskFactory}, {@link InvertTaskFactory},
@@ -49,7 +49,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public abstract class DecoratorTaskFactory<T extends Decorator<Vessel>> extends VesselTaskFactory<T> {
+public abstract class DecoratorTaskFactory<T extends Decorator<Vessel>> extends TaskFactory<T> {
 
   private final Factory<? super VesselScope, ? extends Task<Vessel>> child;
 

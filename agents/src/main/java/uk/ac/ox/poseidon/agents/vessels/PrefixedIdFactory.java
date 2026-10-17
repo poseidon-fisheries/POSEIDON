@@ -22,28 +22,34 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link VesselScopeFactory} for a simple vessel name: {@link #prefix}
- * prepended to the vessel's own id. Built via {@link Factories#prefixedId}.
+ * A {@link GlobalScopeFactory} counterpart of {@link PrefixedId}, built via
+ * {@link Factories#prefixedId}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class PrefixedIdFactory extends VesselScopeFactory<String> {
+public class PrefixedIdFactory
+  extends GlobalScopeFactory<Function<Vessel, String>>
+  implements ValueFactory<Scope, Vessel, String>
+{
 
   private final String prefix;
 
-  /** @return {@link #prefix} followed by the scoped vessel's id */
   @Override
-  protected String newInstance(final VesselScope scope) {
-    return prefix + scope.getVessel().getId();
+  protected Function<Vessel, String> newInstance(final Scope scope) {
+    return new PrefixedId(prefix);
   }
 }

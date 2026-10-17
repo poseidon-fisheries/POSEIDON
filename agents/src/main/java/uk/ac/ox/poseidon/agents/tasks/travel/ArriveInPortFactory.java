@@ -27,11 +27,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 
 /**
- * A {@link VesselTaskFactory} counterpart of {@link ArriveInPort}, built via
+ * A {@link TaskFactory} counterpart of {@link ArriveInPort}, built via
  * {@link Factories#arriveInPort()}.
  */
 @Getter
@@ -39,7 +39,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ArriveInPortFactory extends VesselTaskFactory<ArriveInPort> {
+public class ArriveInPortFactory extends TaskFactory<ArriveInPort> {
 
   @Override
   protected ArriveInPort newInstance(final VesselScope scope) {

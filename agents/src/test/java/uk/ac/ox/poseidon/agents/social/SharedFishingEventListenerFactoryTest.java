@@ -121,6 +121,17 @@ class SharedFishingEventListenerFactoryTest {
   }
 
   @Test
+  void theListenerHearsNothingOnceTheVesselsStoreEnds() {
+    final RecordingListener listenerOfB = factory.get(scopeB);
+    network.get(simulationScope).addTie(a, b);
+    b.getProductStore().end();
+
+    fishingEventSharer.get(simulationScope).receive(fishingEventBy(a));
+
+    assertThat(listenerOfB.heard).isEmpty();
+  }
+
+  @Test
   void givesTheListenerTheListenersFactoryGivesForTheVessel() {
     assertThat(factory.get(scopeB)).isNotNull().isSameAs(listener.get(scopeB));
   }

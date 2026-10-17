@@ -67,7 +67,9 @@ class TripEvaluatorTest {
     when(trip.getDestination()).thenReturn(destination);
     when(trip.getEventManager()).thenReturn(tripEventManager);
 
-    new TripEvaluator(vesselEventManager, new StubOptionValues(), evaluator);
+    vesselEventManager.addListener(
+      new TripEvaluator(new StubOptionValues(), evaluator)
+    );
     vesselEventManager.broadcast(new TripStartEvent(trip));
 
     assertThat(evaluationEventManager).hasValue(tripEventManager);

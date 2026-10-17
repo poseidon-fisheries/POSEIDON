@@ -38,7 +38,7 @@ public class Factories {
 
   /**
    * @param destination chooses the trip's destination for the vessel
-   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
    *         {@link StartTrip}
    * @see StartTripFactory
    */
@@ -54,7 +54,7 @@ public class Factories {
 
   /**
    * @param destination chooses the trip's next destination for the vessel
-   * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
    *         {@link ChooseNextDestination}
    * @see ChooseNextDestination
    */

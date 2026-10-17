@@ -31,7 +31,6 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
@@ -55,7 +54,7 @@ public class Factories {
    *         {@link FixedBiomassProportionGear}
    * @see FixedBiomassProportionGear
    */
-  public static <S extends SimulationScope> FixedBiomassProportionGearFactory<S> fixedBiomassProportionGear(
+  public static <S extends Scope> FixedBiomassProportionGearFactory<S> fixedBiomassProportionGear(
     final String code,
     final double proportion,
     final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold,

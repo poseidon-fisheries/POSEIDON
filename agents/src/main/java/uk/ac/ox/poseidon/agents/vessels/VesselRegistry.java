@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,36 +20,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks;
-
-import com.badlogic.gdx.ai.btree.Task;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+package uk.ac.ox.poseidon.agents.vessels;
 
 /**
- * A {@link TaskFactory} base for tasks run against a {@link Vessel}.
+ * A structure that holds something for each vessel registered in it, such as
+ * a listener or a component. A build registers in it through
+ * {@link VesselScope#register}, never directly, so that what it registers is
+ * taken back when the vessel's store ends.
  *
- * @param <T> the concrete task type built
+ * @param <T> the type of what is registered
  */
-@Getter
-@ToString
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder(toBuilder = true)
-public abstract class VesselTaskFactory<T extends Task<Vessel>> extends TaskFactory<
-  Vessel,
-  VesselScope,
-  T
-> {
-
-  /** @return {@link VesselScope}{@code .class} */
-  @Override
-  protected Class<VesselScope> scopeClass() {
-    return VesselScope.class;
-  }
+@FunctionalInterface
+public interface VesselRegistry<T> {
+  /**
+   * @param vessel the vessel to register {@code item} for
+   * @param item   what to register for {@code vessel}
+   * @return the teardown that takes {@code item} back out
+   */
+  Runnable register(Vessel vessel, T item);
 }

@@ -64,4 +64,19 @@ class RegisteredVesselComponentFactoryTest {
     assertThat(component).isEqualTo("component");
     assertThat(register.getComponent(vessel)).contains("component");
   }
+
+  @Test
+  void theComponentLeavesTheRegisterWhenTheVesselsStoreEnds() {
+    final VesselComponentRegister<String> register =
+      new VesselComponentRegister<>();
+    final Vessel vessel = mock(Vessel.class);
+    final ProductStore store = new ProductStore();
+    when(vessel.getProductStore()).thenReturn(store);
+    registeredVesselComponent(scope -> "component", scope -> register).get(
+      new VesselScope(new SimulationScope(simulation), vessel)
+    );
+    store.end();
+
+    assertThat(register.getComponent(vessel)).isEmpty();
+  }
 }

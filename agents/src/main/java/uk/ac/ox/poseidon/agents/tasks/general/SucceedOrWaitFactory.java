@@ -30,13 +30,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselTaskFactory} for a {@link Selector} that tries
+ * A {@link TaskFactory} for a {@link Selector} that tries
  * {@code mainTask} first; if it fails, the selector runs {@code waitTask} but
  * reports failure regardless of that task's outcome (via {@link AlwaysFail}) —
  * so a parent driving this on a loop keeps retrying {@code mainTask} every
@@ -47,7 +47,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class SucceedOrWaitFactory extends VesselTaskFactory<Selector<Vessel>> {
+public class SucceedOrWaitFactory extends TaskFactory<Selector<Vessel>> {
 
   private final Factory<? super VesselScope, ? extends Task<Vessel>> mainTask;
   private final Factory<? super VesselScope, ? extends Task<Vessel>> waitTask;

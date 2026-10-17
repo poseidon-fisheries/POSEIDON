@@ -65,9 +65,7 @@ public class SharedFishingEventListenerFactory<L extends Listener<? super Fishin
     checkNotNull(listener, "listener must not be null");
     checkNotNull(fishingEventSharer, "fishingEventSharer must not be null");
     final L listener = this.listener.get(scope);
-    fishingEventSharer
-      .get(scope)
-      .registerSharedFishingEventListener(scope.getVessel(), listener);
+    scope.register(fishingEventSharer.get(scope), listener);
     return listener;
   }
 }

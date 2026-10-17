@@ -86,7 +86,7 @@ class FishingEventSharerFactoryTest {
   void aFishingEventBroadcastOnAVesselsEventManagerReachesItsRecipientThroughForwarding() {
     final SimulationScope scope = new SimulationScope(simulation);
     final List<FishingEvent> heardByB = new ArrayList<>();
-    factory.get(scope).registerSharedFishingEventListener(
+    factory.get(scope).register(
       b,
       new Listener<FishingEvent>() {
         @Override

@@ -27,13 +27,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link VesselTaskFactory} counterpart of {@link AgentPredicateTask}, built
+ * A {@link TaskFactory} counterpart of {@link AgentPredicateTask}, built
  * via {@link Factories Factories.checkThat(...)}.
  */
 @Getter
@@ -42,7 +42,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class VesselPredicateTaskFactory
-  extends VesselTaskFactory<AgentPredicateTask<Vessel>>
+  extends TaskFactory<AgentPredicateTask<Vessel>>
 {
 
   private final ValueFactory<

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -27,14 +27,13 @@ import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
 import uk.ac.ox.poseidon.agents.trips.TripEvent;
 import uk.ac.ox.poseidon.agents.trips.TripStartEvent;
-import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.Listener;
 
 /**
  * Listens for a vessel's trip start/end events and feeds each completed trip's
  * destination and score into {@code optionValues}, so future destination
- * choices can learn from past outcomes. Registers itself with
- * {@code eventManager} on construction.
+ * choices can learn from past outcomes. Its factory registers it on the
+ * vessel's event manager.
  */
 public class TripEvaluator implements Listener<TripEvent> {
 
@@ -43,21 +42,17 @@ public class TripEvaluator implements Listener<TripEvent> {
   private Evaluation<Int2D> currentEvaluation;
 
   /**
-   * @param eventManager the event manager to listen on for trip start/end
-   *                     events
    * @param optionValues where each completed trip's (destination, score)
    *                     observation is fed
    * @param evaluator    starts a fresh {@link Evaluation} for each trip's
    *                     destination
    */
   public TripEvaluator(
-    final EventManager eventManager,
     final MutableOptionValues<Int2D> optionValues,
     final Evaluator<Int2D> evaluator
   ) {
     this.optionValues = optionValues;
     this.evaluator = evaluator;
-    eventManager.addListener(this);
   }
 
   /** @return {@link TripEvent}{@code .class} */

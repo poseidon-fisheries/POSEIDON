@@ -22,23 +22,27 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import java.lang.ref.WeakReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import uk.ac.ox.poseidon.agents.AgentScope;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.events.Listener;
 
 /**
- * An {@link AgentScope} narrowed to a {@link Vessel}, for factories building
- * vessel-owned components.
+ * A {@link SimulationScope} narrowed to a {@link Vessel}, for factories
+ * building vessel-owned components. A build registers for its vessel through
+ * this scope, which gives the registration's teardown to the vessel's store,
+ * so that it is taken back when that store ends. Holds the vessel via a
+ * {@link WeakReference}, so that scoping to a vessel never itself keeps that
+ * vessel alive past its natural lifetime. In tests, keep the vessel in a
+ * field, for the reason given in {@link SimulationScope}.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class VesselScope extends AgentScope<Vessel> {
+public class VesselScope extends SimulationScope {
 
-  /** @param vesselScope the scope to copy */
-  public VesselScope(final VesselScope vesselScope) {
-    super(vesselScope);
-  }
+  private final WeakReference<Vessel> vessel;
 
   /**
    * @param simulationScope the simulation scope to narrow
@@ -48,14 +52,61 @@ public class VesselScope extends AgentScope<Vessel> {
     final SimulationScope simulationScope,
     final Vessel vessel
   ) {
-    super(new AgentScope<>(simulationScope, vessel));
+    super(simulationScope);
+    this.vessel = new WeakReference<>(vessel);
   }
 
   /**
+   * Read only by the behaviour's factory, which gives the vessel to the tree
+   * it builds: every other build that needs the vessel takes it on each call,
+   * or registers through this scope.
+   *
    * @return the scoped vessel, or {@code null} if it has since been
    *         garbage-collected
    */
   public Vessel getVessel() {
-    return getAgent();
+    return vessel.get();
+  }
+
+  /**
+   * Package-private: only the vessel-level factory bases read it, to keep
+   * their products in it.
+   *
+   * @return the scoped vessel's store
+   */
+  ProductStore getProductStore() {
+    return getVessel().getProductStore();
+  }
+
+  /**
+   * Registers a listener on the vessel's event manager, so that it receives
+   * the events the vessel broadcasts from now on, until the vessel's store
+   * ends.
+   *
+   * @param listener the listener to register
+   */
+  @Override
+  public void addListener(final Listener<?> listener) {
+    final Vessel vessel = getVessel();
+    vessel.getEventManager().addListener(listener);
+    vessel
+      .getProductStore()
+      .addTeardown(() -> vessel.getEventManager().removeListener(listener));
+  }
+
+  /**
+   * Registers {@code item} for the vessel in {@code registry}, until the
+   * vessel's store ends.
+   *
+   * @param registry the structure to register {@code item} in
+   * @param item     what to register for the vessel
+   * @param <T>      the type of what is registered
+   */
+  public <T> void register(
+    final VesselRegistry<? super T> registry,
+    final T item
+  ) {
+    final Vessel vessel = getVessel();
+    vessel.getProductStore().addTeardown(registry.register(vessel, item));
   }
 }

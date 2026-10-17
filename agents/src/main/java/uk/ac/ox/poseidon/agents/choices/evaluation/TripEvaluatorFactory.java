@@ -55,10 +55,11 @@ public class TripEvaluatorFactory extends VesselScopeFactory<TripEvaluator> {
 
   @Override
   protected TripEvaluator newInstance(final VesselScope scope) {
-    return new TripEvaluator(
-      scope.getVessel().getEventManager(),
+    final TripEvaluator tripEvaluator = new TripEvaluator(
       optionValues.get(scope),
       evaluationProvider.get(scope)
     );
+    scope.addListener(tripEvaluator);
+    return tripEvaluator;
   }
 }

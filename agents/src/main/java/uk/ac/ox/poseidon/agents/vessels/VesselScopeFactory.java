@@ -50,7 +50,7 @@ public abstract class VesselScopeFactory<P> extends AbstractFactory<
 
   @Override
   protected ProductStore productStoreFor(final VesselScope scope) {
-    return scope.getVessel().getProductStore();
+    return scope.getProductStore();
   }
 
   @Override

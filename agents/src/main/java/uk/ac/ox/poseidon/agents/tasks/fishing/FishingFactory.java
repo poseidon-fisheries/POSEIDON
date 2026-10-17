@@ -28,7 +28,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.biology.Fisheable;
@@ -36,7 +36,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link VesselTaskFactory} counterpart of {@link Fishing}, built via
+ * A {@link TaskFactory} counterpart of {@link Fishing}, built via
  * {@link Factories#fishing}.
  */
 @Getter
@@ -44,7 +44,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class FishingFactory extends VesselTaskFactory<Fishing> {
+public class FishingFactory extends TaskFactory<Fishing> {
 
   private final ValueFactory<
     ? super VesselScope,

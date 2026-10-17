@@ -28,18 +28,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.Agent;
-import uk.ac.ox.poseidon.agents.AgentScope;
-import uk.ac.ox.poseidon.core.AbstractFactory;
-import uk.ac.ox.poseidon.core.ProductStore;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 
 /**
- * An {@link AbstractFactory} base for behavior-tree {@link Task}s: subclasses
- * build the task in {@link #newInstance}, and this base keeps it in the
- * agent's store, so each agent gets its own task instance.
+ * A {@link VesselScopeFactory} base for behavior-tree {@link Task}s run
+ * against a {@link Vessel}: subclasses build the task in {@link #newInstance},
+ * and this base keeps it in the vessel's store, so each vessel gets its own
+ * task instance.
  *
- * @param <G> the type of agent the task runs against
- * @param <S> the agent scope type
  * @param <T> the concrete task type built
  */
 @Getter
@@ -47,15 +44,4 @@ import uk.ac.ox.poseidon.core.ProductStore;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public abstract class TaskFactory<
-  G extends Agent,
-  S extends AgentScope<G>,
-  T extends Task<G>
-> extends AbstractFactory<S, T> {
-
-  /** @return {@code scope}'s agent's store, so each agent gets its own task */
-  @Override
-  protected ProductStore productStoreFor(final S scope) {
-    return scope.getAgent().getProductStore();
-  }
-}
+public abstract class TaskFactory<T extends Task<Vessel>> extends VesselScopeFactory<T> {}

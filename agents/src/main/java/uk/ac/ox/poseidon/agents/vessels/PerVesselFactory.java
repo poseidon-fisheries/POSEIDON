@@ -53,7 +53,7 @@ public class PerVesselFactory<T> extends PerScopeFactory<VesselScope, T> {
 
   @Override
   protected ProductStore productStoreFor(final VesselScope scope) {
-    return scope.getVessel().getProductStore();
+    return scope.getProductStore();
   }
 
   @Override

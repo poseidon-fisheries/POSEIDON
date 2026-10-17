@@ -70,14 +70,8 @@ class FishingEventSharerTest {
 
   @Test
   void aFishingEventReachesTheSendersRecipientsOnly() {
-    fishingEventSharer.registerSharedFishingEventListener(
-      a,
-      listener(heardByA)
-    );
-    fishingEventSharer.registerSharedFishingEventListener(
-      b,
-      listener(heardByB)
-    );
+    fishingEventSharer.register(a, listener(heardByA));
+    fishingEventSharer.register(b, listener(heardByB));
     network.addTie(a, b);
     final FishingEvent fishingEventByA = fishingEventBy(a);
 
@@ -90,14 +84,8 @@ class FishingEventSharerTest {
 
   @Test
   void aFishingEventIsNotDeliveredBackToItsSender() {
-    fishingEventSharer.registerSharedFishingEventListener(
-      a,
-      listener(heardByA)
-    );
-    fishingEventSharer.registerSharedFishingEventListener(
-      b,
-      listener(heardByB)
-    );
+    fishingEventSharer.register(a, listener(heardByA));
+    fishingEventSharer.register(b, listener(heardByB));
     network.addTie(a, b);
     network.addTie(b, a);
 
@@ -116,14 +104,8 @@ class FishingEventSharerTest {
 
   @Test
   void deliversNothingWithoutTies() {
-    fishingEventSharer.registerSharedFishingEventListener(
-      a,
-      listener(heardByA)
-    );
-    fishingEventSharer.registerSharedFishingEventListener(
-      b,
-      listener(heardByB)
-    );
+    fishingEventSharer.register(a, listener(heardByA));
+    fishingEventSharer.register(b, listener(heardByB));
 
     fishingEventSharer.receive(fishingEventBy(a));
 
@@ -133,16 +115,10 @@ class FishingEventSharerTest {
 
   @Test
   void rejectsASecondSharedFishingEventListenerForTheSameVessel() {
-    fishingEventSharer.registerSharedFishingEventListener(
-      a,
-      listener(heardByA)
-    );
+    fishingEventSharer.register(a, listener(heardByA));
 
     assertThatThrownBy(() ->
-      fishingEventSharer.registerSharedFishingEventListener(
-        a,
-        listener(heardByB)
-      )
+      fishingEventSharer.register(a, listener(heardByB))
     ).isInstanceOf(IllegalStateException.class);
   }
 }

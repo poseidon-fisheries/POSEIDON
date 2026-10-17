@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselRegistry;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
 import uk.ac.ox.poseidon.core.events.Listener;
 
@@ -38,9 +39,13 @@ import uk.ac.ox.poseidon.core.events.Listener;
  * calls that recipient's shared fishing event listener, right away, with the
  * event. A recipient with no shared fishing event listener registered is
  * skipped. The shared fishing event listeners are only called from here, not
- * registered with any event manager.
+ * registered with any event manager; a build registers one through its
+ * {@link uk.ac.ox.poseidon.agents.vessels.VesselScope}.
  */
-public class FishingEventSharer extends AbstractListener<FishingEvent> {
+public class FishingEventSharer
+  extends AbstractListener<FishingEvent>
+  implements VesselRegistry<Listener<? super FishingEvent>>
+{
 
   private final SocialNetwork network;
   private final Map<
@@ -58,10 +63,12 @@ public class FishingEventSharer extends AbstractListener<FishingEvent> {
    *                                   fishing events for
    * @param sharedFishingEventListener hears the fishing events shared with
    *                                   {@code vessel}
+   * @return the teardown that removes {@code sharedFishingEventListener}
    * @throws IllegalStateException if {@code vessel} already has a shared
    *                               fishing event listener
    */
-  public void registerSharedFishingEventListener(
+  @Override
+  public Runnable register(
     final Vessel vessel,
     final Listener<? super FishingEvent> sharedFishingEventListener
   ) {
@@ -74,6 +81,7 @@ public class FishingEventSharer extends AbstractListener<FishingEvent> {
       checkNotNull(vessel),
       checkNotNull(sharedFishingEventListener)
     );
+    return () -> sharedFishingEventListeners.remove(vessel);
   }
 
   @Override

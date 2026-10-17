@@ -38,6 +38,7 @@ import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -48,7 +49,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * A scheduled {@link Steppable} that, when run, creates
  * {@link #numberOfVesselsToCreate} vessels, resolving each one's
  * name/account/home port/hold/gear/engine/behaviour against a fresh
- * {@link VesselScope}, and marks them registered-active.
+ * {@link VesselScope}, reading the name off the vessel, and marks them
+ * registered-active.
  */
 @RequiredArgsConstructor
 public class VesselCreator implements Steppable {
@@ -59,7 +61,7 @@ public class VesselCreator implements Steppable {
   private final MarketGrid marketGrid;
   private final Supplier<String> vesselIdSupplier;
 
-  private final Factory<? super VesselScope, ? extends String> name;
+  private final ValueFactory<? super VesselScope, ? super Vessel, String> name;
   private final Factory<? super VesselScope, ? extends Account> account;
   private final Factory<? super VesselScope, ? extends Port> homePort;
   private final Factory<? super VesselScope, ? extends Hold> hold;
@@ -95,7 +97,7 @@ public class VesselCreator implements Steppable {
       vessel.setGear(gear.get(vesselScope));
       vessel.setEngine(engine.get(vesselScope));
       vessel.setHold(hold.get(vesselScope));
-      vessel.setName(name.get(vesselScope));
+      vessel.setName(name.get(vesselScope).apply(vessel));
       vessel.setBehaviour(behaviour.get(vesselScope));
       extraFactories.forEach(factory -> factory.get(vesselScope));
       vessel.setRegisteredAsActive(true);

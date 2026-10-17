@@ -29,13 +29,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselTaskFactory} for a {@link Sequence} stringing together a whole
+ * A {@link TaskFactory} for a {@link Sequence} stringing together a whole
  * fishing trip: start trip, travel out, fish, turn back, travel back (reusing
  * the same resolved {@code travelTask} instance for both legs — safe because
  * every task here fully re-initializes its own state in {@code start()}, which
@@ -48,7 +48,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class RoundTripFactory extends VesselTaskFactory<Sequence<Vessel>> {
+public class RoundTripFactory extends TaskFactory<Sequence<Vessel>> {
 
   private final Factory<
     ? super VesselScope,

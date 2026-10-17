@@ -51,9 +51,7 @@ public class RegisteredVesselComponentFactory<T> extends VesselScopeFactory<T> {
   @Override
   protected T newInstance(final VesselScope scope) {
     final T component = componentFactory.get(scope);
-    final VesselComponentRegister<T> vesselComponentRegister =
-      this.componentRegister.get(scope);
-    vesselComponentRegister.putComponent(scope.getVessel(), component);
+    scope.register(componentRegister.get(scope), component);
     return component;
   }
 }

@@ -62,7 +62,7 @@ class BestOptionsFromFriendsTest {
 
     final VesselComponentRegister<OptionValues<String>> register =
       new VesselComponentRegister<>();
-    register.putComponent(friend, friendValues);
+    register.register(friend, friendValues);
 
     final Function<Vessel, List<Vessel>> friends = vessel -> List.of(friend);
     final BestOptionsFromFriends<String> bestOptionsFromFriends =
@@ -94,8 +94,8 @@ class BestOptionsFromFriendsTest {
 
     final VesselComponentRegister<OptionValues<String>> register =
       new VesselComponentRegister<>();
-    register.putComponent(friendA, valuesA);
-    register.putComponent(friendB, valuesB);
+    register.register(friendA, valuesA);
+    register.register(friendB, valuesB);
 
     final Function<Vessel, List<Vessel>> friends = vessel ->
       List.of(friendA, friendB);
@@ -123,7 +123,7 @@ class BestOptionsFromFriendsTest {
 
     final VesselComponentRegister<OptionValues<String>> register =
       new VesselComponentRegister<>();
-    register.putComponent(friend, friendValues);
+    register.register(friend, friendValues);
 
     final Function<Vessel, List<Vessel>> friends = vessel -> List.of(friend);
     final BestOptionsFromFriends<String> bestOptionsFromFriends =
@@ -141,10 +141,7 @@ class BestOptionsFromFriendsTest {
 
     final VesselComponentRegister<OptionValues<String>> register =
       new VesselComponentRegister<>();
-    register.putComponent(
-      friend,
-      new ExponentialMovingAverageOptionValues<>(1.0)
-    );
+    register.register(friend, new ExponentialMovingAverageOptionValues<>(1.0));
 
     final Function<Vessel, List<Vessel>> friends = vessel -> List.of(friend);
     final BestOptionsFromFriends<String> bestOptionsFromFriends =
@@ -174,8 +171,8 @@ class BestOptionsFromFriendsTest {
 
     final VesselComponentRegister<OptionValues<String>> register =
       new VesselComponentRegister<>();
-    register.putComponent(friendA, valuesA);
-    register.putComponent(friendB, valuesB);
+    register.register(friendA, valuesA);
+    register.register(friendB, valuesB);
 
     final Function<Vessel, List<Vessel>> friends = vessel ->
       List.of(friendA, friendB);
@@ -201,7 +198,7 @@ class BestOptionsFromFriendsTest {
     final VesselComponentRegister<
       Function<Vessel, OptionValues<String>>
     > register = new VesselComponentRegister<>();
-    register.putComponent(friend, valuedFor ->
+    register.register(friend, valuedFor ->
       valuedFor == friend ? friendsOwnValues : valuesForAnotherVessel
     );
     final BestOptionsFromFriends<String> bestOptionsFromFriends =

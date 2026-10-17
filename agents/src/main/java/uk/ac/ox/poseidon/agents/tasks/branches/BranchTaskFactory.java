@@ -29,13 +29,13 @@ import lombok.*;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselTaskFactory} for a gdx-ai {@link BranchTask}: builds the
+ * A {@link TaskFactory} for a gdx-ai {@link BranchTask}: builds the
  * branch node via {@link #newTask()} and attaches one child, resolved against
  * the current {@link VesselScope}, per entry in {@code children}. See
  * {@link SequenceTaskFactory} and {@link SelectorTaskFactory} for the concrete
@@ -48,7 +48,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends VesselTaskFactory<T> {
+public abstract class BranchTaskFactory<T extends BranchTask<Vessel>> extends TaskFactory<T> {
 
   @Singular
   private final ImmutableList<

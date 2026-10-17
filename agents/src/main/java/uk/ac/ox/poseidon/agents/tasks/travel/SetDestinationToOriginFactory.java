@@ -27,11 +27,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 
 /**
- * A {@link VesselTaskFactory} counterpart of {@link SetDestinationToOrigin},
+ * A {@link TaskFactory} counterpart of {@link SetDestinationToOrigin},
  * built via {@link Factories#setDestinationToOrigin()}.
  */
 @Getter
@@ -40,7 +40,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class SetDestinationToOriginFactory
-  extends VesselTaskFactory<SetDestinationToOrigin>
+  extends TaskFactory<SetDestinationToOrigin>
 {
 
   @Override

@@ -24,8 +24,7 @@
  * The base machinery for an agent's gdx-ai behavior tree:
  * {@link uk.ac.ox.poseidon.agents.tasks.AgentTask}/
  * {@link uk.ac.ox.poseidon.agents.tasks.ExtendedTask} for building leaf tasks,
- * {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory}/
- * {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for their factories,
+ * {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for their factories,
  * and {@link uk.ac.ox.poseidon.agents.tasks.Behaviour} for wrapping a whole
  * tree (or none) as the agent's top-level behavior. Concrete leaves and
  * branch/decorator nodes live in sibling packages

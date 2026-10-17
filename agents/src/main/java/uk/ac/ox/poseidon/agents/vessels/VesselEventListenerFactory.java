@@ -53,7 +53,7 @@ public class VesselEventListenerFactory<L extends Listener<?>> extends VesselSco
   @Override
   protected L newInstance(final VesselScope scope) {
     final L listener = this.listener.get(scope);
-    scope.getVessel().getEventManager().addListener(listener);
+    scope.addListener(listener);
     return listener;
   }
 }
