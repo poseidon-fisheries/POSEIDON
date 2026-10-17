@@ -32,6 +32,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
 /**
@@ -44,6 +45,7 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 public class TravelDirectly extends ExtendedTripTask {
 
   private final VesselComponent<? extends Engine> engine;
+  private final VesselComponent<? extends FuelTank> fuelTank;
   private final DistanceCalculator distanceCalculator;
   private Int2D origin;
   private Int2D destination;
@@ -74,14 +76,19 @@ public class TravelDirectly extends ExtendedTripTask {
   }
 
   /**
-   * Consumes the fuel for {@link #distanceInKm}, moves the vessel to the
+   * Takes the fuel the engine burns over {@link #distanceInKm} from the tank,
+   * moves the vessel to the
    * destination, and broadcasts a {@link TravelEvent}.
    *
    * @return always {@code SUCCEEDED}
    */
   @Override
   protected Status complete() {
-    engine.of(getAgent()).consumeFuelForDistance(distanceInKm);
+    fuelTank
+      .of(getAgent())
+      .consumeFuel(
+        engine.of(getAgent()).getLitresOfFuelConsumedPerKm() * distanceInKm
+      );
     getAgent().setCurrentCell(getAgent().getCurrentTrip().getDestination());
     getTrip()
       .getEventManager()

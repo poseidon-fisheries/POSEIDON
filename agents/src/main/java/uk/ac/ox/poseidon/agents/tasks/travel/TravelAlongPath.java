@@ -38,6 +38,7 @@ import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
@@ -52,6 +53,7 @@ import uk.ac.ox.poseidon.geography.paths.PathFinder;
 public class TravelAlongPath extends AgentTask<Vessel> {
 
   private final VesselComponent<? extends Engine> engine;
+  private final VesselComponent<? extends FuelTank> fuelTank;
   private final PathFinder<Int2D> pathFinder;
   private final DistanceCalculator distanceCalculator;
   private final Function<? super Vessel, Int2D> destinationSource;
@@ -102,8 +104,8 @@ public class TravelAlongPath extends AgentTask<Vessel> {
   }
 
   /**
-   * Moves the vessel to the next cell on the path, consuming the fuel for the
-   * hop just completed. Broadcasts a {@link TravelEvent} and succeeds once the
+   * Moves the vessel to the next cell on the path, taking the fuel the engine
+   * burned over the hop just completed from the tank. Broadcasts a {@link TravelEvent} and succeeds once the
    * destination is reached; otherwise computes the next hop's distance/duration
    * and reports {@code RUNNING}.
    */
@@ -119,7 +121,11 @@ public class TravelAlongPath extends AgentTask<Vessel> {
     );
 
     vessel.setCurrentCell(currentPath.getFirst());
-    engine.of(vessel).consumeFuelForDistance(distanceToNextCell);
+    fuelTank
+      .of(vessel)
+      .consumeFuel(
+        engine.of(vessel).getLitresOfFuelConsumedPerKm() * distanceToNextCell
+      );
 
     currentPath = currentPath.subList(1, currentPath.size());
     if (currentPath.isEmpty()) {

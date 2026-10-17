@@ -34,9 +34,9 @@ import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
-import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
@@ -45,8 +45,8 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
  * vessel's gear: runs for the gear's own duration, then sorts the catch via
  * {@code dispositionProcess}, adds the retained portion to the hold, releases
  * what's discarded alive back to the fisheable, broadcasts a
- * {@link FishingEvent}, and consumes the fuel the gear burns per hour of
- * fishing.
+ * {@link FishingEvent}, and takes the fuel the gear burns per hour of fishing
+ * from the tank.
  */
 @RequiredArgsConstructor
 public class Fishing extends ExtendedTripTask {
@@ -58,7 +58,7 @@ public class Fishing extends ExtendedTripTask {
   private final VesselComponent<? extends Hold> hold;
 
   @NonNull
-  private final VesselComponent<? extends Engine> engine;
+  private final VesselComponent<? extends FuelTank> fuelTank;
 
   @NonNull
   private final Function<? super Vessel, Fisheable> fisheable;
@@ -115,7 +115,7 @@ public class Fishing extends ExtendedTripTask {
     final double fuelPerHour = gear.getLitresOfFuelConsumedPerHourOfFishing();
     if (fuelPerHour > 0) {
       final double hours = getDuration().toSeconds() / 3600.0;
-      engine.of(getAgent()).consumeFuel(fuelPerHour * hours);
+      fuelTank.of(getAgent()).consumeFuel(fuelPerHour * hours);
     }
     return SUCCEEDED;
   }

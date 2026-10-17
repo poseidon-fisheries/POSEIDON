@@ -33,6 +33,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -51,6 +52,7 @@ import uk.ac.ox.poseidon.geography.paths.PathFinder;
 public class TravelAlongPathFactory extends TaskFactory<TravelAlongPath> {
 
   private final VesselComponent<? extends Engine> engine;
+  private final VesselComponent<? extends FuelTank> fuelTank;
   private final Factory<
     ? super VesselComponentScope,
     ? extends PathFinder<Int2D>
@@ -74,6 +76,7 @@ public class TravelAlongPathFactory extends TaskFactory<TravelAlongPath> {
   protected TravelAlongPath newInstance(final VesselComponentScope scope) {
     return new TravelAlongPath(
       engine,
+      fuelTank,
       pathFinder.get(scope),
       distance.get(scope),
       destination.get(scope),

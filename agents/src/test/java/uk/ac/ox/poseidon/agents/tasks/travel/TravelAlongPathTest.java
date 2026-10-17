@@ -41,22 +41,13 @@ class TravelAlongPathTest {
 
   @Test
   void takesEachHopsDistanceOverTheCruisingSpeed() throws Exception {
-    @SuppressWarnings("unchecked")
-    final PathFinder<Int2D> pathFinder = mock(PathFinder.class);
-    when(pathFinder.getPath(ORIGIN, DESTINATION)).thenReturn(
-      Optional.of(ImmutableList.of(ORIGIN, DESTINATION))
-    );
     final DistanceCalculator distanceCalculator = mock(
       DistanceCalculator.class
     );
     when(distanceCalculator.distanceInKm(ORIGIN, DESTINATION)).thenReturn(5.0);
     final Vessel vessel = vesselCruisingAtTenKph();
-    final TravelAlongPath travelAlongPath = new TravelAlongPath(
-      ENGINE,
-      pathFinder,
-      distanceCalculator,
-      v -> DESTINATION,
-      v -> mock(EventManager.class)
+    final TravelAlongPath travelAlongPath = travelingFromOriginToDestination(
+      distanceCalculator
     );
     setTaskObject(travelAlongPath, vessel);
 
@@ -64,5 +55,42 @@ class TravelAlongPathTest {
     travelAlongPath.execute();
 
     verify(vessel).setTaskDuration(Duration.ofMinutes(30));
+  }
+
+  @Test
+  void takesTheFuelTheEngineBurnsOverEachHopFromTheTank() throws Exception {
+    final DistanceCalculator distanceCalculator = mock(
+      DistanceCalculator.class
+    );
+    when(distanceCalculator.distanceInKm(ORIGIN, DESTINATION)).thenReturn(5.0);
+    final Vessel vessel = vesselCruisingAtTenKph();
+    final TravelAlongPath travelAlongPath = travelingFromOriginToDestination(
+      distanceCalculator
+    );
+    setTaskObject(travelAlongPath, vessel);
+
+    travelAlongPath.start();
+    travelAlongPath.execute();
+    travelAlongPath.execute();
+
+    verify(FUEL_TANK.of(vessel)).consumeFuel(15.0);
+  }
+
+  private static TravelAlongPath travelingFromOriginToDestination(
+    final DistanceCalculator distanceCalculator
+  ) {
+    @SuppressWarnings("unchecked")
+    final PathFinder<Int2D> pathFinder = mock(PathFinder.class);
+    when(pathFinder.getPath(ORIGIN, DESTINATION)).thenReturn(
+      Optional.of(ImmutableList.of(ORIGIN, DESTINATION))
+    );
+    return new TravelAlongPath(
+      ENGINE,
+      FUEL_TANK,
+      pathFinder,
+      distanceCalculator,
+      v -> DESTINATION,
+      v -> mock(EventManager.class)
+    );
   }
 }

@@ -27,9 +27,9 @@ import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
-import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
@@ -88,8 +88,8 @@ public class Factories {
   /**
    * @param gear               the declaration of the gear to fish with
    * @param hold               the declaration of the hold the catch goes in
-   * @param engine             the declaration of the engine that burns the
-   *                           fuel fishing takes
+   * @param fuelTank           the declaration of the tank the fuel fishing
+   *                           burns is taken from
    * @param fisheable          the fisheable to fish from, read for the vessel
    * @param dispositionProcess sorts the catch into retained/discarded
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a {@link Fishing} task
@@ -98,7 +98,7 @@ public class Factories {
   public static FishingFactory fishing(
     final VesselComponent<? extends Gear> gear,
     final VesselComponent<? extends Hold> hold,
-    final VesselComponent<? extends Engine> engine,
+    final VesselComponent<? extends FuelTank> fuelTank,
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
@@ -112,7 +112,7 @@ public class Factories {
     return new FishingFactory(
       gear,
       hold,
-      engine,
+      fuelTank,
       fisheable,
       dispositionProcess
     );

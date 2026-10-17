@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
@@ -46,6 +47,7 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 public class TravelDirectlyFactory extends TaskFactory<TravelDirectly> {
 
   private final VesselComponent<? extends Engine> engine;
+  private final VesselComponent<? extends FuelTank> fuelTank;
   private final Factory<
     ? super VesselComponentScope,
     ? extends DistanceCalculator
@@ -53,6 +55,6 @@ public class TravelDirectlyFactory extends TaskFactory<TravelDirectly> {
 
   @Override
   protected TravelDirectly newInstance(final VesselComponentScope scope) {
-    return new TravelDirectly(engine, distance.get(scope));
+    return new TravelDirectly(engine, fuelTank, distance.get(scope));
   }
 }

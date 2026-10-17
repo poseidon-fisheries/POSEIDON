@@ -22,66 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
-import static tech.units.indriya.unit.Units.LITRE;
-import static uk.ac.ox.poseidon.core.quantities.Factories.volumeOf;
-
 import javax.measure.Quantity;
 import javax.measure.quantity.Speed;
 import javax.measure.quantity.Volume;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 
-/** Factories for a vessel's {@link FuelTank} and {@link Engine}. */
+/** Factories for a vessel's {@link Engine}. */
 public class Factories {
 
   /**
-   * @param capacity    the tank's total capacity
-   * @param currentFuel the tank's starting fuel level
-   * @return a {@link VesselScope}-relative factory for a {@link SimpleFuelTank}
-   * @see SimpleFuelTank
-   */
-  public static SimpleFuelTankFactory tank(
-    final Factory<? super VesselScope, ? extends Quantity<Volume>> capacity,
-    final Factory<? super VesselScope, ? extends Quantity<Volume>> currentFuel
-  ) {
-    return new SimpleFuelTankFactory(capacity, currentFuel);
-  }
-
-  /**
-   * @param capacity the tank's total capacity, also its starting fuel level
-   * @return a {@link VesselScope}-relative factory for a full
-   *         {@link SimpleFuelTank}
-   * @see SimpleFuelTank
-   */
-  public static SimpleFuelTankFactory fullTank(
-    final Factory<? super VesselScope, ? extends Quantity<Volume>> capacity
-  ) {
-    return tank(capacity, capacity);
-  }
-
-  /**
-   * @param capacity the tank's total capacity
-   * @return a {@link VesselScope}-relative factory for an empty
-   *         {@link SimpleFuelTank}
-   * @see SimpleFuelTank
-   */
-  public static SimpleFuelTankFactory emptyTank(
-    final Factory<? super VesselScope, ? extends Quantity<Volume>> capacity
-  ) {
-    return tank(capacity, volumeOf(0, LITRE));
-  }
-
-  /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
-   *         {@link InfiniteFuelTank}
-   * @see InfiniteFuelTank
-   */
-  public static InfiniteFuelTankFactory infiniteTank() {
-    return new InfiniteFuelTankFactory();
-  }
-
-  /**
-   * @param fuelTank          the tank this engine draws fuel from
    * @param cruisingSpeed     this engine's cruising speed
    * @param fuelConsumedPerKm this engine's fuel consumption rate, per kilometre
    *                          travelled
@@ -89,17 +39,12 @@ public class Factories {
    * @see SimpleEngine
    */
   public static SimpleEngineFactory<VesselScope> simpleEngine(
-    final Factory<? super VesselScope, ? extends FuelTank> fuelTank,
     final Factory<? super VesselScope, ? extends Quantity<Speed>> cruisingSpeed,
     final Factory<
       ? super VesselScope,
       ? extends Quantity<Volume>
     > fuelConsumedPerKm
   ) {
-    return new SimpleEngineFactory<>(
-      fuelTank,
-      cruisingSpeed,
-      fuelConsumedPerKm
-    );
+    return new SimpleEngineFactory<>(cruisingSpeed, fuelConsumedPerKm);
   }
 }

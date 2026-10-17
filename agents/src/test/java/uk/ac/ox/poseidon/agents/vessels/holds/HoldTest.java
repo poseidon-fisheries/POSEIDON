@@ -20,27 +20,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.engines;
+package uk.ac.ox.poseidon.agents.vessels.holds;
 
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Scope;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-/**
- * A {@link GlobalScopeFactory} counterpart of {@link InfiniteFuelTank}, built
- * via {@link Factories#infiniteTank()}.
- */
-@EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
-@SuperBuilder(toBuilder = true)
-public class InfiniteFuelTankFactory
-  extends GlobalScopeFactory<InfiniteFuelTank>
-{
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
 
-  @Override
-  protected InfiniteFuelTank newInstance(final Scope scope) {
-    return new InfiniteFuelTank();
+class HoldTest {
+
+  @Test
+  void aHoldOverItsCapacityHasNoCapacityAvailable() {
+    final CategorisedCatch content = mock(CategorisedCatch.class);
+    when(content.getTotalBiomassInKg()).thenReturn(10.5);
+    final Hold hold = mock(Hold.class, CALLS_REAL_METHODS);
+    when(hold.getTotalCapacityInKg()).thenReturn(10.0);
+    when(hold.getContent()).thenReturn(content);
+
+    assertThat(hold.getAvailableCapacityInKg()).isZero();
+    assertThat(hold.isFull()).isTrue();
   }
 }

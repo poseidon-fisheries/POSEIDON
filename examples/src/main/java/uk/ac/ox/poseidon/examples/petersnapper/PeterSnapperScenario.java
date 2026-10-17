@@ -50,11 +50,11 @@ import static uk.ac.ox.poseidon.agents.tasks.landings.Factories.landCatches;
 import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.*;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.*;
 import static uk.ac.ox.poseidon.agents.vessels.accounts.Factories.account;
-import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.fullTank;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.simpleEngine;
 import static uk.ac.ox.poseidon.agents.vessels.friends.Factories.dynamicFriends;
 import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.fixedBiomassProportionGear;
 import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.standardBiomassHold;
+import static uk.ac.ox.poseidon.agents.vessels.tanks.Factories.fullTank;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.accessibleWaterCells;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.componentProperty;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.currentTimeAtSea;
@@ -335,12 +335,10 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     );
 
     final var engine = vesselComponent(
-      simpleEngine(
-        fullTank(volumeOf(100000, LITRE)),
-        speedOf(16, KILOMETRE_PER_HOUR),
-        volumeOf(3, LITRE)
-      )
+      simpleEngine(speedOf(16, KILOMETRE_PER_HOUR), volumeOf(3, LITRE))
     );
+
+    final var fuelTank = vesselComponent(fullTank(volumeOf(100000, LITRE)));
 
     final VesselComponentRegisterFactory<
       MutableOptionValues<Int2D>
@@ -401,6 +399,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
           startTrip(destination),
           travelAlongPathTo(
             engine,
+            fuelTank,
             pathFinder,
             distance,
             currentTripDestinationCell(),
@@ -411,7 +410,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
               fishing(
                 gear,
                 hold,
-                engine,
+                fuelTank,
                 currentCellFisheable(biomassGrid),
                 proportionallyLimitingBiomassToHold()
               ),
@@ -429,6 +428,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
           setDestinationToOrigin(),
           travelAlongPathTo(
             engine,
+            fuelTank,
             pathFinder,
             distance,
             currentTripDestinationCell(),
@@ -436,7 +436,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
           ),
           arriveInPort(),
           landCatches(hold, constant(hours(1))),
-          refuel(engine, fuelStationGrid),
+          refuel(fuelTank, fuelStationGrid),
           endTrip(),
           waitFor(constant(hours(12)))
         )
@@ -452,7 +452,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       account(),
       benoa,
       behaviour,
-      List.of(gear, engine, hold, tripEvaluator),
+      List.of(gear, engine, fuelTank, hold, tripEvaluator),
       25
     );
     // Kupang's vessels are like Benoa's, but more of them

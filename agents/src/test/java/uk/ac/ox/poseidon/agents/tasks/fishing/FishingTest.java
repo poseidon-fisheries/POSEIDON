@@ -38,9 +38,9 @@ import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
-import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
@@ -83,7 +83,7 @@ class FishingTest {
     final ExposedFishing fishing = new ExposedFishing(
       declaredFor(vessel, gear),
       declaredFor(vessel, hold),
-      declaredFor(vessel, mock(Engine.class)),
+      declaredFor(vessel, mock(FuelTank.class)),
       v -> fisheable,
       dispositionProcess
     );
@@ -141,7 +141,7 @@ class FishingTest {
     final ExposedFishing fishing = new ExposedFishing(
       declaredFor(vessel, gear),
       declaredFor(vessel, hold),
-      declaredFor(vessel, mock(Engine.class)),
+      declaredFor(vessel, mock(FuelTank.class)),
       v -> fisheable,
       dispositionProcess
     );
@@ -173,11 +173,11 @@ class FishingTest {
     private ExposedFishing(
       final VesselComponent<Gear> gear,
       final VesselComponent<Hold> hold,
-      final VesselComponent<Engine> engine,
+      final VesselComponent<FuelTank> fuelTank,
       final Function<? super Vessel, Fisheable> fisheable,
       final DispositionProcess dispositionProcess
     ) {
-      super(gear, hold, engine, fisheable, dispositionProcess);
+      super(gear, hold, fuelTank, fisheable, dispositionProcess);
     }
 
     private Task.Status invokeComplete() {

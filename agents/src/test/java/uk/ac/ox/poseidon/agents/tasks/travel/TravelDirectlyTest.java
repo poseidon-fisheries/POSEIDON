@@ -43,6 +43,7 @@ class TravelDirectlyTest {
     final Vessel vessel = vesselCruisingAtTenKph();
     final TravelDirectly travelDirectly = new TravelDirectly(
       ENGINE,
+      FUEL_TANK,
       distanceCalculator
     );
     setTaskObject(travelDirectly, vessel);
@@ -51,5 +52,25 @@ class TravelDirectlyTest {
     travelDirectly.execute();
 
     verify(vessel).setTaskDuration(Duration.ofMinutes(30));
+  }
+
+  @Test
+  void takesTheFuelTheEngineBurnsFromTheTank() throws Exception {
+    final DistanceCalculator distanceCalculator = mock(
+      DistanceCalculator.class
+    );
+    when(distanceCalculator.distanceInKm(ORIGIN, DESTINATION)).thenReturn(5.0);
+    final Vessel vessel = vesselCruisingAtTenKph();
+    final TravelDirectly travelDirectly = new TravelDirectly(
+      ENGINE,
+      FUEL_TANK,
+      distanceCalculator
+    );
+    setTaskObject(travelDirectly, vessel);
+
+    travelDirectly.start();
+    travelDirectly.complete();
+
+    verify(FUEL_TANK.of(vessel)).consumeFuel(15.0);
   }
 }

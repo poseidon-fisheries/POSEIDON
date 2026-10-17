@@ -30,6 +30,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -45,19 +46,19 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param engine          the declaration of the engine whose tank is filled
+   * @param fuelTank        the declaration of the tank to fill
    * @param fuelStationGrid the fuel stations a cell might contain
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a {@link Refuel}
    * @see Refuel
    */
   public static RefuelFactory refuel(
-    final VesselComponent<? extends Engine> engine,
+    final VesselComponent<? extends FuelTank> fuelTank,
     final Factory<
       ? super VesselComponentScope,
       ? extends FuelStationGrid
     > fuelStationGrid
   ) {
-    return new RefuelFactory(engine, fuelStationGrid);
+    return new RefuelFactory(fuelTank, fuelStationGrid);
   }
 
   /**
@@ -98,7 +99,8 @@ public class Factories {
 
   /**
    * @param engine       the declaration of the engine that sets the speed and
-   *                     burns the fuel
+   *                     the fuel burned
+   * @param fuelTank     the declaration of the tank the fuel is taken from
    * @param pathFinder   finds a path between two cells
    * @param distance     computes the distance, and so the duration, of each
    *                     hop
@@ -112,6 +114,7 @@ public class Factories {
    */
   public static TravelAlongPathFactory travelAlongPathTo(
     final VesselComponent<? extends Engine> engine,
+    final VesselComponent<? extends FuelTank> fuelTank,
     final Factory<
       ? super VesselComponentScope,
       ? extends PathFinder<Int2D>
@@ -133,6 +136,7 @@ public class Factories {
   ) {
     return new TravelAlongPathFactory(
       engine,
+      fuelTank,
       pathFinder,
       distance,
       destination,
@@ -141,8 +145,9 @@ public class Factories {
   }
 
   /**
-   * @param engine   the declaration of the engine that sets the speed and burns
-   *                 the fuel
+   * @param engine   the declaration of the engine that sets the speed and the
+   *                 fuel burned
+   * @param fuelTank the declaration of the tank the fuel is taken from
    * @param distance computes the direct distance, and so the duration, to the
    *                 trip's destination
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a {@link TravelDirectly}
@@ -150,12 +155,13 @@ public class Factories {
    */
   public static TravelDirectlyFactory travelDirectly(
     final VesselComponent<? extends Engine> engine,
+    final VesselComponent<? extends FuelTank> fuelTank,
     final Factory<
       ? super VesselComponentScope,
       ? extends DistanceCalculator
     > distance
   ) {
-    return new TravelDirectlyFactory(engine, distance);
+    return new TravelDirectlyFactory(engine, fuelTank, distance);
   }
 
   /**

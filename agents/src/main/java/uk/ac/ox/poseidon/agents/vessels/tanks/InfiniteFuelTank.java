@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.engines;
+package uk.ac.ox.poseidon.agents.vessels.tanks;
 
 /**
  * A {@link FuelTank} with unlimited capacity; adding or consuming fuel is a

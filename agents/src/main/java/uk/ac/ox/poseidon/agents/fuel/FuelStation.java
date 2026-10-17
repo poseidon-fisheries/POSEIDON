@@ -34,7 +34,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.Value;
 import org.joda.money.Money;
-import uk.ac.ox.poseidon.agents.vessels.engines.FuelTank;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
@@ -103,14 +103,17 @@ public class FuelStation {
   }
 
   /**
-   * Tops {@code fuelTank} up to full, charges for and times the fill, and
-   * broadcasts the resulting {@link Purchase} through {@link #eventManager}.
+   * Tops {@code fuelTank} up to its capacity, charges for and times the fill,
+   * and broadcasts the resulting {@link Purchase} through
+   * {@link #eventManager}. A tank holding more than its capacity gets nothing.
    *
    * @return the completed purchase: litres added, price charged, and time taken
    */
   public Purchase refill(final FuelTank fuelTank) {
-    final double litresToAdd =
-      fuelTank.getCapacityInLitres() - fuelTank.getCurrentFuelInLitres();
+    final double litresToAdd = Math.max(
+      0,
+      fuelTank.getCapacityInLitres() - fuelTank.getCurrentFuelInLitres()
+    );
     fuelTank.addFuel(litresToAdd);
     final Purchase purchase = new Purchase(
       litresToAdd,

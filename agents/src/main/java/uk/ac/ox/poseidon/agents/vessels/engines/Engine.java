@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,13 +23,12 @@
 package uk.ac.ox.poseidon.agents.vessels.engines;
 
 /**
- * A vessel's propulsion: a fixed cruising speed and fuel consumption rate,
- * drawing on a tank.
+ * A vessel's propulsion: a fixed cruising speed and fuel consumption rate. The
+ * fuel itself is in a
+ * {@link uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank}, a component of its
+ * own, so that a new engine keeps the fuel.
  */
 public interface Engine {
-  /** @return the tank this engine draws fuel from */
-  FuelTank getFuelTank();
-
   /** @return this engine's cruising speed, in kilometres per hour */
   double getCruisingSpeedInKph();
 
@@ -38,17 +37,4 @@ public interface Engine {
    *         travelled
    */
   double getLitresOfFuelConsumedPerKm();
-
-  /**
-   * Consumes {@link #getLitresOfFuelConsumedPerKm()} times {@code distanceInKm}
-   * litres.
-   */
-  default void consumeFuelForDistance(final double distanceInKm) {
-    getFuelTank().consumeFuel(getLitresOfFuelConsumedPerKm() * distanceInKm);
-  }
-
-  /** Consumes {@code litres} directly from {@link #getFuelTank()}. */
-  default void consumeFuel(final double litres) {
-    getFuelTank().consumeFuel(litres);
-  }
 }

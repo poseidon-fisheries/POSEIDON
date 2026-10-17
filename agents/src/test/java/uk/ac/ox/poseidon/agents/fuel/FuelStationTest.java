@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.vessels.engines.FuelTank;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
@@ -99,5 +99,19 @@ class FuelStationTest {
     assertThat(purchase.getLitres()).isEqualTo(60.0);
     assertThat(purchase.getPrice()).isEqualTo(station.priceFor(60.0));
     verify(eventManager).broadcast(purchase);
+  }
+
+  @Test
+  void refillGivesATankOverItsCapacityNothing() {
+    final FuelStation station = newStation(mock(EventManager.class));
+
+    final FuelTank fuelTank = mock(FuelTank.class);
+    when(fuelTank.getCapacityInLitres()).thenReturn(100.0);
+    when(fuelTank.getCurrentFuelInLitres()).thenReturn(120.0);
+
+    final FuelStation.Purchase purchase = station.refill(fuelTank);
+
+    verify(fuelTank).addFuel(eq(0.0));
+    assertThat(purchase.getLitres()).isZero();
   }
 }

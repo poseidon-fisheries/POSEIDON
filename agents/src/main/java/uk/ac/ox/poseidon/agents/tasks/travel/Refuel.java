@@ -31,17 +31,17 @@ import uk.ac.ox.poseidon.agents.fuel.FuelStation;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
-import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 
 /**
- * An {@link ExtendedTripTask} that refuels the vessel at the cheapest fuel
+ * An {@link ExtendedTripTask} that fills the vessel's tank at the cheapest fuel
  * station in its current cell, running for that purchase's duration and
  * charging its price to the trip account.
  */
 @RequiredArgsConstructor
 public class Refuel extends ExtendedTripTask {
 
-  private final @NonNull VesselComponent<? extends Engine> engine;
+  private final @NonNull VesselComponent<? extends FuelTank> fuelTank;
   private final @NonNull FuelStationGrid fuelStationGrid;
   private Duration duration;
 
@@ -58,9 +58,7 @@ public class Refuel extends ExtendedTripTask {
     final FuelStation.Purchase purchase = fuelStationGrid
       .getObjectsAt(getAgent().getCell())
       .min(comparing(FuelStation::getPricePerLitre))
-      .map(fuelStation ->
-        fuelStation.refill(engine.of(getAgent()).getFuelTank())
-      )
+      .map(fuelStation -> fuelStation.refill(fuelTank.of(getAgent())))
       .orElseThrow(() ->
         new IllegalStateException(
           "No fuel stations found in cell: " + getAgent().getCell()

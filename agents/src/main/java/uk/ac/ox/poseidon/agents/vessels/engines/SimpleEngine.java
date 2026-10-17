@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -28,8 +28,6 @@ import lombok.Value;
 @Value
 public class SimpleEngine implements Engine {
 
-  /** The tank this engine draws fuel from. */
-  FuelTank fuelTank;
   /** This engine's cruising speed, in kilometres per hour. */
   double cruisingSpeedInKph;
   /** This engine's fuel consumption rate, in litres per kilometre travelled. */

@@ -51,7 +51,6 @@ public class SimpleEngineFactory<S extends Scope> extends RelativeScopeFactory<
   Engine
 > {
 
-  private final Factory<? super S, ? extends FuelTank> fuelTank;
   private final Factory<? super S, ? extends Quantity<Speed>> cruisingSpeed;
   private final Factory<
     ? super S,
@@ -61,7 +60,6 @@ public class SimpleEngineFactory<S extends Scope> extends RelativeScopeFactory<
   @Override
   protected Engine newInstance(final S scope) {
     return new SimpleEngine(
-      fuelTank.get(scope),
       cruisingSpeed.get(scope).to(KILOMETRE_PER_HOUR).getValue().doubleValue(),
       fuelConsumedPerKm.get(scope).to(LITRE).getValue().doubleValue()
     );

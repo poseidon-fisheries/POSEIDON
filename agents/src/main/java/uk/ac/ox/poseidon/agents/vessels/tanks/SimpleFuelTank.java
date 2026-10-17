@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.engines;
+package uk.ac.ox.poseidon.agents.vessels.tanks;
 
 import static com.google.common.base.Preconditions.checkArgument;
 

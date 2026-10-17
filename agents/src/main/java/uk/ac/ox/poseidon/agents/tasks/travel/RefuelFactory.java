@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
-import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
@@ -45,7 +45,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @SuperBuilder(toBuilder = true)
 public class RefuelFactory extends TaskFactory<Refuel> {
 
-  private final VesselComponent<? extends Engine> engine;
+  private final VesselComponent<? extends FuelTank> fuelTank;
   private final Factory<
     ? super VesselComponentScope,
     ? extends FuelStationGrid
@@ -53,6 +53,6 @@ public class RefuelFactory extends TaskFactory<Refuel> {
 
   @Override
   protected Refuel newInstance(final VesselComponentScope scope) {
-    return new Refuel(engine, fuelStationGrid.get(scope));
+    return new Refuel(fuelTank, fuelStationGrid.get(scope));
   }
 }

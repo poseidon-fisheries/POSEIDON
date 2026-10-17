@@ -20,16 +20,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.engines;
+package uk.ac.ox.poseidon.agents.vessels.tanks;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.tank;
+import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.componentScopeOf;
+import static uk.ac.ox.poseidon.agents.vessels.tanks.Factories.tank;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -56,7 +58,7 @@ class SimpleFuelTankFactoryTest {
       new VolumeFactory(0.1255, "m3")
     );
 
-    final FuelTank tank = factory.get(vesselScope(vessel));
+    final FuelTank tank = factory.get(componentScope(vessel));
 
     assertThat(tank).isInstanceOf(SimpleFuelTank.class);
     assertThat(tank.getCapacityInLitres()).isEqualTo(2000.0);
@@ -70,8 +72,8 @@ class SimpleFuelTankFactoryTest {
       new VolumeFactory(100.0, "l")
     );
 
-    final FuelTank firstTank = factory.get(vesselScope(vessel));
-    final FuelTank secondTank = factory.get(vesselScope(otherVessel));
+    final FuelTank firstTank = factory.get(componentScope(vessel));
+    final FuelTank secondTank = factory.get(componentScope(otherVessel));
 
     firstTank.consumeFuel(10.0);
 
@@ -79,7 +81,9 @@ class SimpleFuelTankFactoryTest {
     assertThat(secondTank.getCurrentFuelInLitres()).isEqualTo(100.0);
   }
 
-  private VesselScope vesselScope(final Vessel vessel) {
-    return new VesselScope(new SimulationScope(simulation), vessel);
+  private VesselComponentScope componentScope(final Vessel vessel) {
+    return componentScopeOf(
+      new VesselScope(new SimulationScope(simulation), vessel)
+    );
   }
 }

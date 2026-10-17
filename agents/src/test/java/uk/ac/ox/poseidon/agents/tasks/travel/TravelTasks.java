@@ -34,11 +34,13 @@ import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
+import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 /**
  * Shared set-up for the travel task tests: a vessel at {@link #ORIGIN} cruising
- * at 10 km/h.
+ * at 10 km/h, burning 3 litres per kilometre.
  */
 final class TravelTasks {
 
@@ -50,6 +52,11 @@ final class TravelTasks {
     mock(Engine.class)
   );
 
+  /** The declaration of the fuel tank of the vessels made here. */
+  static final VesselComponent<FuelTank> FUEL_TANK = new VesselComponent<>(
+    scope -> mock(FuelTank.class)
+  );
+
   private TravelTasks() {}
 
   static Vessel vesselCruisingAtTenKph() {
@@ -57,8 +64,11 @@ final class TravelTasks {
     final Engine engine = mock(Engine.class);
     final Trip trip = mock(Trip.class);
     when(engine.getCruisingSpeedInKph()).thenReturn(10.0);
+    when(engine.getLitresOfFuelConsumedPerKm()).thenReturn(3.0);
     when(trip.getDestination()).thenReturn(DESTINATION);
+    when(trip.getEventManager()).thenReturn(mock(EventManager.class));
     giveComponent(vessel, ENGINE, engine);
+    giveComponent(vessel, FUEL_TANK, mock(FuelTank.class));
     when(vessel.getCell()).thenReturn(ORIGIN);
     when(vessel.getCurrentTrip()).thenReturn(trip);
     when(vessel.getSchedule()).thenReturn(mock(TemporalSchedule.class));

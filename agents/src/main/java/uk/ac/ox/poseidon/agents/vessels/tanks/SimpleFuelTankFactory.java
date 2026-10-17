@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.engines;
+package uk.ac.ox.poseidon.agents.vessels.tanks;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.units.indriya.unit.Units.LITRE;
@@ -32,12 +32,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link SimpleFuelTank}, built via
+ * A {@link VesselComponentScopeFactory} counterpart of {@link SimpleFuelTank}, built via
  * {@link Factories
  * Factories.tank(...)/Factories.fullTank(...)/Factories.emptyTank(...)}.
  */
@@ -46,19 +46,21 @@ import uk.ac.ox.poseidon.core.Factory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class SimpleFuelTankFactory extends VesselScopeFactory<FuelTank> {
+public class SimpleFuelTankFactory
+  extends VesselComponentScopeFactory<FuelTank>
+{
 
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends Quantity<Volume>
   > capacity;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends Quantity<Volume>
   > currentFuel;
 
   @Override
-  protected FuelTank newInstance(final VesselScope scope) {
+  protected FuelTank newInstance(final VesselComponentScope scope) {
     final double capacityInLitres = checkNotNull(
       capacity,
       "capacity must not be null"
