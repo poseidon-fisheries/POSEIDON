@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link ConstantMapping}, built
- * via {@link Factories#alwaysTrue()} and {@link Factories#alwaysFalse()}.
+ * via {@link Factories Factories.always(...)}.
  */
 @Getter
 @ToString

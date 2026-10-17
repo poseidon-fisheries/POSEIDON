@@ -27,8 +27,10 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * A mapping whose result is the same whatever the context and whatever it maps,
- * such as a filter that lets every option through. Built via
- * {@link Factories#alwaysTrue()} and {@link Factories#alwaysFalse()}.
+ * such as a filter that lets every option through, or one part of a key that
+ * is the same for every species. Built via
+ * {@link Factories Factories.always(...)}; {@link Constant} is its counterpart
+ * where a value is expected.
  *
  * @param <R> the type of the result
  */

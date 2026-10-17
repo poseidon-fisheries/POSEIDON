@@ -82,7 +82,9 @@ the vessel it acts for. It comes in two shapes, each with its factory type in `c
   route).
 
 A yes/no is a value or a mapping with a `Boolean` result. A value or mapping that reads nothing
-from its context has `Object` as its context, so it fits wherever any context is given. A
+from its context has `Object` as its context, so it fits wherever any context is given. A fixed
+value is `constant(x)` where a value is expected and `always(x)` where a mapping is (a filter, a
+part of a key, a term of a sum over routes); the compiler refuses the wrong one. A
 combinator that makes sense in both shapes (`condition`, `allOf`, `anyOf`, `not`,
 `composedFunction`, `defaultIfNull`…) has one overload per shape; a helper method returning a live
 value must therefore declare its shape type, or it matches no overload. So must a wrapper:

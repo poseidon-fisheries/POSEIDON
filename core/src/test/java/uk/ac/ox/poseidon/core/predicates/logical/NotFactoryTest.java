@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.not;
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.alwaysTrue;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import java.util.function.BiFunction;
@@ -38,7 +38,7 @@ class NotFactoryTest {
 
   @Test
   void negatingAMappingGivesAMapping() {
-    final BiFunction<Object, Object, Boolean> mapping = not(alwaysTrue()).get(
+    final BiFunction<Object, Object, Boolean> mapping = not(always(true)).get(
       Scope.GLOBAL_SCOPE
     );
     assertThat(mapping.apply(null, "t")).isFalse();

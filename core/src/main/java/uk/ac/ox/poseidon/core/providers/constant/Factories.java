@@ -37,34 +37,10 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
-   *         {@link ConstantMapping} that always answers {@code true}, such as a
-   *         filter letting everything through
-   * @see ConstantMapping
-   */
-  public static <S extends Scope> ConstantMappingFactory<
-    S,
-    Boolean
-  > alwaysTrue() {
-    return new ConstantMappingFactory<>(object(true));
-  }
-
-  /**
-   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
-   *         {@link ConstantMapping} that always answers {@code false}
-   * @see ConstantMapping
-   */
-  public static <S extends Scope> ConstantMappingFactory<
-    S,
-    Boolean
-  > alwaysFalse() {
-    return new ConstantMappingFactory<>(object(false));
-  }
-
-  /**
    * @param value the value
    * @return a {@link uk.ac.ox.poseidon.core.ValueFactory} for a
-   *         {@link Constant} of the given value
+   *         {@link Constant} of the given value; where a mapping is expected
+   *         instead (a filter, a part of a key), use {@link #always}
    * @see Constant
    */
   public static <S extends Scope, R> ConstantFactory<S, R> constant(
@@ -76,12 +52,43 @@ public class Factories {
   /**
    * @param value factory for the value
    * @return a {@link uk.ac.ox.poseidon.core.ValueFactory} for a
-   *         {@link Constant} of the resolved value
+   *         {@link Constant} of the resolved value; where a mapping is
+   *         expected instead, use {@link #always}
    * @see Constant
    */
   public static <S extends Scope, R> ConstantFactory<S, R> constant(
     final Factory<? super S, ? extends R> value
   ) {
     return new ConstantFactory<>(value);
+  }
+
+  /**
+   * @param result the result
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
+   *         {@link ConstantMapping} that always gives the given result,
+   *         whatever it maps: {@code always(true)} as a filter letting
+   *         everything through, {@code always(GEAR_CODE)} as one part of a
+   *         key; where a value is expected instead, use {@link #constant}
+   * @see ConstantMapping
+   */
+  public static <S extends Scope, R> ConstantMappingFactory<S, R> always(
+    final R result
+  ) {
+    return new ConstantMappingFactory<>(object(result));
+  }
+
+  /**
+   * @param result factory for the result
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
+   *         {@link ConstantMapping} that always gives the resolved result,
+   *         whatever it maps, e.g. {@code always(hours(1))} as one term of a
+   *         sum over routes; where a value is expected instead, use
+   *         {@link #constant}
+   * @see ConstantMapping
+   */
+  public static <S extends Scope, R> ConstantMappingFactory<S, R> always(
+    final Factory<? super S, ? extends R> result
+  ) {
+    return new ConstantMappingFactory<>(result);
   }
 }

@@ -25,8 +25,7 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.alwaysFalse;
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.alwaysTrue;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import java.util.function.BiFunction;
@@ -40,8 +39,8 @@ class AllOfFactoryTest {
   @Test
   void combiningMappingsGivesAMapping() {
     final BiFunction<Object, Object, Boolean> mapping = allOf(
-      alwaysTrue(),
-      alwaysFalse()
+      always(true),
+      always(false)
     ).get(Scope.GLOBAL_SCOPE);
     assertThat(mapping.apply(null, "t")).isEqualTo(false);
   }

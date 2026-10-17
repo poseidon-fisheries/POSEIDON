@@ -27,7 +27,8 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * A value that is the same whatever the context it is asked under. Built via
- * {@link Factories Factories.constant(...)} in this package.
+ * {@link Factories Factories.constant(...)} in this package;
+ * {@link ConstantMapping} is its counterpart where a mapping is expected.
  *
  * @param <R> the type of the value
  */

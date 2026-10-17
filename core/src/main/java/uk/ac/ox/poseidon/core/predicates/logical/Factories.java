@@ -32,8 +32,8 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  * mappings. Each combinator has one overload per shape: combining values gives
  * a value, combining mappings gives a mapping, and the two cannot be mixed. For
  * a constant yes/no mapping, use
- * {@link uk.ac.ox.poseidon.core.providers.constant.Factories#alwaysTrue()} or
- * {@link uk.ac.ox.poseidon.core.providers.constant.Factories#alwaysFalse()}.
+ * {@link uk.ac.ox.poseidon.core.providers.constant.Factories#always(Object)
+ * always(true)} or {@code always(false)}.
  */
 @SuppressWarnings("Convert2Diamond")
 public class Factories {

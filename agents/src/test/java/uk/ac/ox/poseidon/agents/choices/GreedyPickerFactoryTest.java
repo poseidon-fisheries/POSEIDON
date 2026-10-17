@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.choices.Factories.greedyPicker;
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.alwaysTrue;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
 
 import ec.util.MersenneTwisterFast;
 import java.util.Map;
@@ -80,7 +80,7 @@ class GreedyPickerFactoryTest {
   void givesOnePickerPerVessel() {
     final GreedyPickerFactory<String> factory = greedyPicker(
       new OptionValuesFactory(),
-      alwaysTrue()
+      always(true)
     );
 
     assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));

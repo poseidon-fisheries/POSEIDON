@@ -51,8 +51,9 @@ The triplet gets documented in four different places, once each, not duplicated 
     `BetweenFactory`): link the class with a custom label instead of picking one overload to stand
     for all of them: `{@link Factories Factories.method(...)}`.
   - **More than one distinct method *name* builds this component** (not overloads, e.g.
-    `alwaysTrue()`/`alwaysFalse()` both returning `ConstantMappingFactory`): combine them
-    in one class-level link's label: `{@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()}`.
+    `nextOccurrenceOf(...)`/`nextOccurrenceAfter(...)` both returning
+    `NextOccurrenceOfTimeOfDayFactory`): combine them in one class-level link's label:
+    `{@link Factories Factories.nextOccurrenceOf(...)/Factories.nextOccurrenceAfter(...)}`.
 
   Don't assume same-name overloads share a target or a distinct name doesn't — check what each
   overload actually returns (e.g. `allOf(MappingFactory...)` and `allOf(ValueFactory...)` return two
