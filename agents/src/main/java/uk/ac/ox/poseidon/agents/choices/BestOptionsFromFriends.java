@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -24,43 +24,46 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import static lombok.AccessLevel.PACKAGE;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Supplies the best options across a vessel's active friends' own
- * {@link OptionValues} components, merging ties by keeping the highest value
- * seen for each option. Reuses a single {@link ReusableOptionValues} instance
- * across calls — the returned {@link OptionValues} is only valid until the next
- * call to {@link #get()}.
+ * Gives the best options across a vessel's active friends' own
+ * {@link OptionValues} components, each valued for that friend, merging ties
+ * by keeping the highest value seen for each option. Reuses a single
+ * {@link ReusableOptionValues} instance across calls — the returned
+ * {@link OptionValues} is only valid until the next call to {@link #apply}.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-class BestOptionsFromFriends<O> implements Supplier<OptionValues<O>> {
+class BestOptionsFromFriends<O> implements Function<Vessel, OptionValues<O>> {
 
   private final VesselComponentRegister<
-    ? extends OptionValues<O>
+    ? extends Function<? super Vessel, ? extends OptionValues<O>>
   > optionValuesRegister;
-  private final Supplier<? extends Iterable<? extends Vessel>> friendsSupplier;
+  private final Function<
+    ? super Vessel,
+    ? extends Iterable<? extends Vessel>
+  > friends;
   private final ReusableOptionValues<O> aggregatedValues =
     new ReusableOptionValues<>();
 
   /**
+   * @param vessel the vessel whose friends' best options are asked for
    * @return every active friend's best options, merged by keeping the highest
    *         value for each option; the same reused instance every call,
    *         invalidated by the next call
    */
   @Override
-  public OptionValues<O> get() {
+  public OptionValues<O> apply(final Vessel vessel) {
     aggregatedValues.clear();
-    for (final Vessel friend : friendsSupplier.get()) {
+    for (final Vessel friend : friends.apply(vessel)) {
       if (!friend.isActive()) continue;
-      final OptionValues<O> values = optionValuesRegister
-        .getComponent(friend)
-        .orElse(null);
+      final Function<? super Vessel, ? extends OptionValues<O>> values =
+        optionValuesRegister.getComponent(friend).orElse(null);
       if (values == null) continue;
-      values.forEachBestEntry(aggregatedValues::putIfGreater);
+      values.apply(friend).forEachBestEntry(aggregatedValues::putIfGreater);
     }
     return aggregatedValues;
   }

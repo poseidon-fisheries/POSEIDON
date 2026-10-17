@@ -56,11 +56,15 @@ class ChooseNextDestinationTest {
   }
 
   @Test
-  void redirectsTheCurrentTripToTheChosenDestinationAndSucceeds() {
+  void redirectsTheCurrentTripToTheDestinationChosenForItsVesselAndSucceeds() {
     when(vessel.getCurrentTrip()).thenReturn(trip);
 
     assertThat(
-      run(new ChooseNextDestination(() -> Optional.of(NEXT)))
+      run(
+        new ChooseNextDestination(chosenFor ->
+          chosenFor == vessel ? Optional.of(NEXT) : Optional.empty()
+        )
+      )
     ).isEqualTo(Status.SUCCEEDED);
     verify(trip).setDestination(NEXT);
   }
@@ -69,9 +73,9 @@ class ChooseNextDestinationTest {
   void failsAndLeavesTheTripAloneWhenNoDestinationIsChosen() {
     when(vessel.getCurrentTrip()).thenReturn(trip);
 
-    assertThat(run(new ChooseNextDestination(Optional::empty))).isEqualTo(
-      Status.FAILED
-    );
+    assertThat(
+      run(new ChooseNextDestination(chosenFor -> Optional.empty()))
+    ).isEqualTo(Status.FAILED);
     verify(trip, never()).setDestination(any());
   }
 
@@ -80,7 +84,7 @@ class ChooseNextDestinationTest {
     when(vessel.getCurrentTrip()).thenReturn(null);
 
     assertThatThrownBy(() ->
-      run(new ChooseNextDestination(() -> Optional.of(NEXT)))
+      run(new ChooseNextDestination(chosenFor -> Optional.of(NEXT)))
     ).isInstanceOf(IllegalStateException.class);
   }
 }

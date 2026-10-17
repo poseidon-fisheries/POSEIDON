@@ -24,32 +24,42 @@ package uk.ac.ox.poseidon.agents.travel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import org.joda.money.CurrencyMismatchException;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 class TravelCostTest {
 
   private static final CurrencyUnit EUR = CurrencyUnit.of("EUR");
   private static final CurrencyUnit USD = CurrencyUnit.of("USD");
 
+  private final Vessel vessel = mock(Vessel.class);
   private final Int2D cell = new Int2D(3, 2);
   private final AtomicInteger routesComputed = new AtomicInteger();
-  private final Function<Int2D, Route> routeFunction = destination -> {
+  private final BiFunction<Vessel, Int2D, Route> routeFunction = (
+    sailedBy,
+    destination
+  ) -> {
     routesComputed.incrementAndGet();
     return new Route(destination.x, Duration.ofHours(destination.y));
   };
-  private final Function<Route, Money> distanceCost = route ->
-    Money.of(EUR, route.getDistanceInKm());
-  private final Function<Route, Money> durationCost = route ->
-    Money.of(EUR, route.getDuration().toHours());
+  private final BiFunction<Vessel, Route, Money> distanceCost = (
+    chargedTo,
+    route
+  ) -> Money.of(EUR, route.getDistanceInKm());
+  private final BiFunction<Vessel, Route, Money> durationCost = (
+    chargedTo,
+    route
+  ) -> Money.of(EUR, route.getDuration().toHours());
 
   @Test
   void sumsItsCostsOverTheRouteToTheCell() {
@@ -58,7 +68,7 @@ class TravelCostTest {
       List.of(distanceCost, durationCost)
     );
 
-    assertThat(travelCost.applyAsDouble(cell, null)).isEqualTo(5.0);
+    assertThat(travelCost.valueOf(vessel, cell, null)).isEqualTo(5.0);
   }
 
   @Test
@@ -68,7 +78,7 @@ class TravelCostTest {
       List.of(distanceCost, durationCost)
     );
 
-    travelCost.applyAsDouble(cell, null);
+    travelCost.valueOf(vessel, cell, null);
 
     assertThat(routesComputed).hasValue(1);
   }
@@ -77,18 +87,33 @@ class TravelCostTest {
   void throwsWhenCostsAreInDifferentCurrencies() {
     final TravelCost travelCost = new TravelCost(
       routeFunction,
-      List.of(distanceCost, route -> Money.of(USD, 1))
+      List.of(distanceCost, (chargedTo, route) -> Money.of(USD, 1))
     );
 
-    assertThatThrownBy(() -> travelCost.applyAsDouble(cell, null)).isInstanceOf(
-      CurrencyMismatchException.class
+    assertThatThrownBy(() ->
+      travelCost.valueOf(vessel, cell, null)
+    ).isInstanceOf(CurrencyMismatchException.class);
+  }
+
+  @Test
+  void givesTheVesselToTheRouteAndToEachCost() {
+    final Vessel otherVessel = mock(Vessel.class);
+    final TravelCost travelCost = new TravelCost(
+      (sailedBy, destination) ->
+        new Route(sailedBy == vessel ? 1 : 10, Duration.ZERO),
+      List.of(distanceCost, (chargedTo, route) ->
+        Money.of(EUR, chargedTo == vessel ? 0 : 100)
+      )
     );
+
+    assertThat(travelCost.valueOf(vessel, cell, null)).isEqualTo(1.0);
+    assertThat(travelCost.valueOf(otherVessel, cell, null)).isEqualTo(110.0);
   }
 
   @Test
   void isZeroWithoutCosts() {
     final TravelCost travelCost = new TravelCost(routeFunction, List.of());
 
-    assertThat(travelCost.applyAsDouble(cell, null)).isEqualTo(0.0);
+    assertThat(travelCost.valueOf(vessel, cell, null)).isEqualTo(0.0);
   }
 }

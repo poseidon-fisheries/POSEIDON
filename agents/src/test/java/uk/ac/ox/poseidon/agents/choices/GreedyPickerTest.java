@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.choices;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
+import static org.mockito.Mockito.mock;
 
 import ec.util.MersenneTwisterFast;
 import java.util.ArrayList;
@@ -35,10 +36,12 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 class GreedyPickerTest {
 
   private final MersenneTwisterFast rng = new MersenneTwisterFast(0);
+  private final Vessel vessel = mock(Vessel.class);
 
   private GreedyPicker<String> picker(
     final Map<String, Double> values,
@@ -46,9 +49,28 @@ class GreedyPickerTest {
   ) {
     return new GreedyPicker<>(
       new ImmutableOptionValues<>(values),
-      optionPredicate,
+      (pickedFor, option) -> optionPredicate.test(option),
       rng
     );
+  }
+
+  @Test
+  void picksAmongTheOptionValuesOfTheVesselGivenWithItsPredicate() {
+    final Vessel otherVessel = mock(Vessel.class);
+    final OptionValues<String> values = new ImmutableOptionValues<>(
+      Map.of("A", 1.0, "B", 3.0)
+    );
+    final OptionValues<String> otherValues = new ImmutableOptionValues<>(
+      Map.of("C", 2.0, "D", 1.0)
+    );
+    final GreedyPicker<String> picker = new GreedyPicker<>(
+      pickedFor -> pickedFor == vessel ? values : otherValues,
+      (pickedFor, option) -> pickedFor == vessel || !option.equals("C"),
+      rng
+    );
+
+    assertThat(picker.apply(vessel)).isEqualTo("B");
+    assertThat(picker.apply(otherVessel)).isEqualTo("D");
   }
 
   @Test
@@ -58,7 +80,7 @@ class GreedyPickerTest {
       option -> true
     );
 
-    assertThat(picker.get()).isEqualTo("B");
+    assertThat(picker.apply(vessel)).isEqualTo("B");
   }
 
   @Test
@@ -68,7 +90,7 @@ class GreedyPickerTest {
       option -> !option.equals("B")
     );
 
-    assertThat(picker.get()).isEqualTo("C");
+    assertThat(picker.apply(vessel)).isEqualTo("C");
   }
 
   @Test
@@ -78,12 +100,12 @@ class GreedyPickerTest {
       option -> false
     );
 
-    assertThat(picker.get()).isNull();
+    assertThat(picker.apply(vessel)).isNull();
   }
 
   @Test
   void givesNullWhenThereAreNoOptions() {
-    assertThat(picker(Map.of(), option -> true).get()).isNull();
+    assertThat(picker(Map.of(), option -> true).apply(vessel)).isNull();
   }
 
   @Test
@@ -93,7 +115,7 @@ class GreedyPickerTest {
       option -> true
     );
 
-    assertThat(picker.get()).isEqualTo("B");
+    assertThat(picker.apply(vessel)).isEqualTo("B");
   }
 
   @Test
@@ -104,7 +126,7 @@ class GreedyPickerTest {
     );
     final Set<String> picked = new HashSet<>();
     for (int i = 0; i < 100; i++) {
-      picked.add(picker.get());
+      picked.add(picker.apply(vessel));
     }
 
     assertThat(picked).containsExactlyInAnyOrder("A", "B");
@@ -121,7 +143,7 @@ class GreedyPickerTest {
       }
     );
 
-    assertThat(picker.get()).isEqualTo("D");
+    assertThat(picker.apply(vessel)).isEqualTo("D");
     assertThat(tested).doesNotContain("A", "C");
   }
 
@@ -136,7 +158,7 @@ class GreedyPickerTest {
       }
     );
 
-    picker.get();
+    picker.apply(vessel);
 
     assertThat(tested).hasSize(1);
   }
@@ -149,7 +171,7 @@ class GreedyPickerTest {
       option -> true
     );
 
-    assertThatThrownBy(picker::get)
+    assertThatThrownBy(() -> picker.apply(vessel))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("A")
       .hasMessageContaining("NaN");
@@ -163,7 +185,7 @@ class GreedyPickerTest {
       option -> true
     );
 
-    assertThatThrownBy(picker::get)
+    assertThatThrownBy(() -> picker.apply(vessel))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("B")
       .hasMessageContaining("NaN");
@@ -180,9 +202,9 @@ class GreedyPickerTest {
       Double.NEGATIVE_INFINITY
     );
 
-    assertThat(picker(values, option -> true).get()).isEqualTo("A");
-    assertThat(picker(values, option -> option.equals("C")).get()).isEqualTo(
-      "C"
-    );
+    assertThat(picker(values, option -> true).apply(vessel)).isEqualTo("A");
+    assertThat(
+      picker(values, option -> option.equals("C")).apply(vessel)
+    ).isEqualTo("C");
   }
 }

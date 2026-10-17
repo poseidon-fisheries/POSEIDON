@@ -74,8 +74,9 @@ public class Factories {
   }
 
   /**
-   * @param routeFunction gives the route via a cell
-   * @param routeCosts    what is charged for a route, each in money
+   * @param routeFunction gives the route a vessel would sail via a cell
+   * @param routeCosts    what is charged to a vessel for a route, each in
+   *                      money
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link TravelCost}
    * @see TravelCost
@@ -84,13 +85,13 @@ public class Factories {
   public static <S extends Scope> TravelCostFactory<S> travelCost(
     final MappingFactory<
       ? super S,
-      ? super Void,
+      ? super Vessel,
       ? super Int2D,
       ? extends Route
     > routeFunction,
     final MappingFactory<
       ? super S,
-      ? super Void,
+      ? super Vessel,
       ? super Route,
       ? extends Money
     >... routeCosts

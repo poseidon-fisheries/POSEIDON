@@ -35,6 +35,8 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * Factories for values of a vessel: functions given the vessel to read. They
  * read its state (its cell, trips, event managers), test it (whether it is
  * active, where it is) or derive a value from it (a property, a trip cost).
+ * {@link #other} reads such a value off another vessel, in a test relating the
+ * two.
  */
 public class Factories {
 
@@ -134,13 +136,22 @@ public class Factories {
   }
 
   /**
-   * @return a {@link VesselScope}-relative factory for a
-   *         {@link VesselHasSameHomePort} matching the scoped vessel's home
-   *         port
-   * @see VesselHasSameHomePort
+   * Reads a value of a vessel off the other vessel, in a test relating the
+   * vessel a call is for to another vessel, such as a friendship condition:
+   * {@code condition(other(vesselProperty("homePort")),
+   * equal(vesselProperty("homePort")))} holds when the other vessel's home port
+   * is the vessel's. A value of a vessel used there without it reads the vessel
+   * the call is for.
+   *
+   * @param value the value to read off the other vessel
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   *         {@link Other}
+   * @see Other
    */
-  public static VesselHasSameHomePortFactory vesselHasSameHomePort() {
-    return new VesselHasSameHomePortFactory();
+  public static <S extends Scope, R> OtherFactory<S, R> other(
+    final ValueFactory<? super S, ? super Vessel, ? extends R> value
+  ) {
+    return new OtherFactory<>(value);
   }
 
   /**

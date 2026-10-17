@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,26 +22,28 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import static lombok.AccessLevel.PACKAGE;
-
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+import java.util.function.Function;
+import lombok.NonNull;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A {@link DestinationSupplier} that always returns the vessel's home port
- * cell.
+ * A destination that is the same fixed cell whatever the vessel, or none if
+ * there is no cell.
  */
-@RequiredArgsConstructor(access = PACKAGE)
-public class HomePortDestinationSupplier implements DestinationSupplier {
+public class ConstantDestination implements Function<Object, Optional<Int2D>> {
 
-  private final Vessel vessel;
-  private final PortGrid portGrid;
+  @NonNull
+  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+  private final Optional<Int2D> destination;
+
+  /** @param destination the cell to always return; may be {@code null} */
+  public ConstantDestination(final Int2D destination) {
+    this.destination = Optional.ofNullable(destination);
+  }
 
   @Override
-  public Optional<Int2D> get() {
-    return Optional.of(portGrid.getLocation(vessel.getHomePort()));
+  public Optional<Int2D> apply(final Object vessel) {
+    return destination;
   }
 }

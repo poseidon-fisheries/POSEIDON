@@ -20,30 +20,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.values;
+package uk.ac.ox.poseidon.agents.choices;
 
-import java.util.function.Function;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link VesselHasSameHomePort},
- * built via {@link Factories#vesselHasSameHomePort()}.
+ * Values an option for a vessel, given what is remembered about the option:
+ * what the remembered catch would sell for at the vessel's home port, what it
+ * would cost the vessel to travel there, or a combination of such valuations.
+ * A valuation that does not depend on the option, or on what is remembered,
+ * ignores it, so that it can be combined with others of the same shape.
+ *
+ * @param <O> the type of option valued
+ * @param <M> the type of what is remembered about an option
  */
-@NoArgsConstructor
-@SuperBuilder(toBuilder = true)
-public class VesselHasSameHomePortFactory
-  extends VesselScopeFactory<Function<Vessel, Boolean>>
-  implements ValueFactory<VesselScope, Vessel, Boolean>
-{
-
-  /** @return a predicate matching {@code scope}'s vessel's home port */
-  @Override
-  protected Function<Vessel, Boolean> newInstance(final VesselScope scope) {
-    return new VesselHasSameHomePort(scope.getVessel());
-  }
+@FunctionalInterface
+public interface Valuation<O, M> {
+  /**
+   * @param vessel       the vessel the option is valued for
+   * @param option       the option valued
+   * @param recollection what is remembered about the option
+   * @return the value of {@code option} for {@code vessel}
+   */
+  double valueOf(Vessel vessel, O option, M recollection);
 }

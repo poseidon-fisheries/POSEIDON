@@ -48,7 +48,7 @@ class CellWasFishedThisTripTest {
 
   private final Vessel vessel = mock(Vessel.class);
   private final CellWasFishedThisTrip cellWasFishedThisTrip =
-    new CellWasFishedThisTrip(vessel);
+    new CellWasFishedThisTrip();
 
   CellWasFishedThisTripTest() {
     final VesselField vesselField = mock(VesselField.class);
@@ -60,33 +60,43 @@ class CellWasFishedThisTripTest {
   }
 
   @Test
+  void readsTheTripOfTheVesselGiven() {
+    onTripWithFishingEventsAt(FIRST_COORDINATE);
+    final Vessel otherVessel = mock(Vessel.class);
+    when(otherVessel.getCurrentTrip()).thenReturn(null);
+
+    assertTrue(cellWasFishedThisTrip.apply(vessel, FIRST_CELL));
+    assertFalse(cellWasFishedThisTrip.apply(otherVessel, FIRST_CELL));
+  }
+
+  @Test
   void neverHoldsWhenTheVesselIsNotOnATrip() {
     when(vessel.getCurrentTrip()).thenReturn(null);
 
-    assertFalse(cellWasFishedThisTrip.apply(null, FIRST_CELL));
+    assertFalse(cellWasFishedThisTrip.apply(vessel, FIRST_CELL));
   }
 
   @Test
   void holdsForTheCellOfAFishingEventOfTheCurrentTrip() {
     onTripWithFishingEventsAt(FIRST_COORDINATE);
 
-    assertTrue(cellWasFishedThisTrip.apply(null, FIRST_CELL));
+    assertTrue(cellWasFishedThisTrip.apply(vessel, FIRST_CELL));
   }
 
   @Test
   void doesNotHoldForACellNotFishedThisTrip() {
     onTripWithFishingEventsAt(FIRST_COORDINATE);
 
-    assertFalse(cellWasFishedThisTrip.apply(null, UNFISHED_CELL));
+    assertFalse(cellWasFishedThisTrip.apply(vessel, UNFISHED_CELL));
   }
 
   @Test
   void holdsForTheCellsOfEveryFishingEventOfTheCurrentTrip() {
     onTripWithFishingEventsAt(FIRST_COORDINATE, SECOND_COORDINATE);
 
-    assertTrue(cellWasFishedThisTrip.apply(null, FIRST_CELL));
-    assertTrue(cellWasFishedThisTrip.apply(null, SECOND_CELL));
-    assertFalse(cellWasFishedThisTrip.apply(null, UNFISHED_CELL));
+    assertTrue(cellWasFishedThisTrip.apply(vessel, FIRST_CELL));
+    assertTrue(cellWasFishedThisTrip.apply(vessel, SECOND_CELL));
+    assertFalse(cellWasFishedThisTrip.apply(vessel, UNFISHED_CELL));
   }
 
   private void onTripWithFishingEventsAt(final Coordinate... coordinates) {

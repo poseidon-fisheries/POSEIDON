@@ -22,9 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.tasks.destinations;
 
-import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
+import java.util.Optional;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * Factories for tasks that pick a destination and start a trip towards it or
@@ -35,31 +37,34 @@ public class Factories {
   private Factories() {}
 
   /**
+   * @param destination chooses the trip's destination for the vessel
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
    *         {@link StartTrip}
    * @see StartTripFactory
    */
   public static StartTripFactory startTrip(
-    final Factory<
+    final ValueFactory<
       ? super VesselScope,
-      ? extends DestinationSupplier
-    > destinationSupplier
+      ? super Vessel,
+      Optional<Int2D>
+    > destination
   ) {
-    return new StartTripFactory(destinationSupplier);
+    return new StartTripFactory(destination);
   }
 
   /**
-   * @param destinationSupplier chooses the trip's next destination
+   * @param destination chooses the trip's next destination for the vessel
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
    *         {@link ChooseNextDestination}
    * @see ChooseNextDestination
    */
   public static ChooseNextDestinationFactory chooseNextDestination(
-    final Factory<
+    final ValueFactory<
       ? super VesselScope,
-      ? extends DestinationSupplier
-    > destinationSupplier
+      ? super Vessel,
+      Optional<Int2D>
+    > destination
   ) {
-    return new ChooseNextDestinationFactory(destinationSupplier);
+    return new ChooseNextDestinationFactory(destination);
   }
 }

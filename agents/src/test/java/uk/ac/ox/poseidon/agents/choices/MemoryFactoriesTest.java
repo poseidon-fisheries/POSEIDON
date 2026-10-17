@@ -32,7 +32,6 @@ import static uk.ac.ox.poseidon.agents.choices.Factories.memoryBasedOptionValues
 import static uk.ac.ox.poseidon.agents.vessels.Factories.perVessel;
 
 import java.util.function.Function;
-import java.util.function.ToDoubleBiFunction;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.PerVesselFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -110,14 +109,12 @@ class MemoryFactoriesTest {
   }
 
   private static class RecollectionValuationFactory
-    extends GlobalScopeFactory<ToDoubleBiFunction<String, Double>>
+    extends GlobalScopeFactory<Valuation<String, Double>>
   {
 
     @Override
-    protected ToDoubleBiFunction<String, Double> newInstance(
-      final Scope scope
-    ) {
-      return (option, recollection) -> recollection;
+    protected Valuation<String, Double> newInstance(final Scope scope) {
+      return (vessel, option, recollection) -> recollection;
     }
   }
 
@@ -245,7 +242,7 @@ class MemoryFactoriesTest {
     keyedMemory.get(scopeA).get("trawl").observe("X", 3.0, Double::sum);
 
     assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
-    assertThat(factory.get(scopeA).getValue("X")).contains(3.0);
-    assertThat(factory.get(scopeB).getValue("X")).isEmpty();
+    assertThat(factory.get(scopeA).apply(vesselA).getValue("X")).contains(3.0);
+    assertThat(factory.get(scopeB).apply(vesselB).getValue("X")).isEmpty();
   }
 }

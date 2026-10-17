@@ -31,9 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * This picker will look for better options than the current option in a list of
@@ -48,37 +49,45 @@ import lombok.RequiredArgsConstructor;
  * in a chain of explorers; it needs another one to fall back on.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class ImitatingPicker<O> implements Supplier<O> {
+public class ImitatingPicker<O> implements Function<Vessel, O> {
 
-  private final OptionValues<O> optionValues;
-  private final Predicate<? super O> optionPredicate;
-  private final Supplier<OptionValues<O>> candidatesSupplier;
+  private final Function<
+    ? super Vessel,
+    ? extends OptionValues<O>
+  > optionValues;
+  private final BiFunction<? super Vessel, ? super O, Boolean> optionPredicate;
+  private final Function<
+    ? super Vessel,
+    ? extends OptionValues<O>
+  > imitatedOptionValues;
   private final MersenneTwisterFast rng;
 
   /**
+   * @param vessel the vessel to pick for
    * @return a uniformly random candidate strictly better than the current
    *         best-known option, if any are accessible; otherwise the current
    *         best-known option; {@code null} if there is none
    */
   @Override
-  public O get() {
-    final Optional<Entry<O, Double>> currentBestEntry =
-      optionValues.getBestEntry(rng);
+  public O apply(final Vessel vessel) {
+    final Optional<Entry<O, Double>> currentBestEntry = optionValues
+      .apply(vessel)
+      .getBestEntry(rng);
 
     final double currentBestValue = currentBestEntry
       .map(Entry::getValue)
       .orElse(NEGATIVE_INFINITY);
 
     final List<O> candidates = new ArrayList<>();
-    candidatesSupplier.get().forEachBestEntry((key, value) -> {
+    imitatedOptionValues.apply(vessel).forEachBestEntry((key, value) -> {
       if (value > currentBestValue) candidates.add(key);
     });
 
     return shuffledStream(candidates, rng)
-      .filter(optionPredicate)
+      .filter(option -> optionPredicate.apply(vessel, option))
       .findFirst()
       .or(() -> currentBestEntry.map(Entry::getKey))
-      .filter(optionPredicate)
+      .filter(option -> optionPredicate.apply(vessel, option))
       .orElse(null);
   }
 }

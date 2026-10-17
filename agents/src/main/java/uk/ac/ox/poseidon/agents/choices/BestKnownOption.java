@@ -25,26 +25,34 @@ package uk.ac.ox.poseidon.agents.choices;
 import static lombok.AccessLevel.PACKAGE;
 
 import ec.util.MersenneTwisterFast;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Gives the option with the highest value, ties broken at random, read anew
- * from the option values on each call; when no option is known, gives what the
- * fallback supplies (which may be {@code null}).
+ * Gives, for a vessel, the option with the highest value, ties broken at
+ * random, read anew from the vessel's option values on each call; when no
+ * option is known, gives what the fallback gives for the vessel (which may be
+ * {@code null}).
  *
  * @param <O> the type of option
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class BestKnownOption<O> implements Supplier<O> {
+public class BestKnownOption<O> implements Function<Vessel, O> {
 
-  private final @NonNull OptionValues<O> optionValues;
-  private final @NonNull Supplier<O> fallback;
+  private final @NonNull Function<
+    ? super Vessel,
+    ? extends OptionValues<O>
+  > optionValues;
+  private final @NonNull Function<? super Vessel, ? extends O> fallback;
   private final @NonNull MersenneTwisterFast rng;
 
   @Override
-  public O get() {
-    return optionValues.getBestOption(rng).orElseGet(fallback);
+  public O apply(final Vessel vessel) {
+    return optionValues
+      .apply(vessel)
+      .getBestOption(rng)
+      .orElseGet(() -> fallback.apply(vessel));
   }
 }

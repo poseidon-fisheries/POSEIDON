@@ -26,6 +26,7 @@ import java.util.function.BiFunction;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.MappingFactory;
@@ -37,14 +38,14 @@ import uk.ac.ox.poseidon.core.MappingFactory;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class CellWasFishedThisTripFactory
-  extends VesselScopeFactory<BiFunction<Object, Int2D, Boolean>>
-  implements MappingFactory<VesselScope, Object, Int2D, Boolean>
+  extends VesselScopeFactory<BiFunction<Vessel, Int2D, Boolean>>
+  implements MappingFactory<VesselScope, Vessel, Int2D, Boolean>
 {
 
   @Override
-  protected BiFunction<Object, Int2D, Boolean> newInstance(
+  protected BiFunction<Vessel, Int2D, Boolean> newInstance(
     final VesselScope scope
   ) {
-    return new CellWasFishedThisTrip(scope.getVessel());
+    return new CellWasFishedThisTrip();
   }
 }

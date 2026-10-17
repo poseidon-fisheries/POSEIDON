@@ -28,11 +28,11 @@ import static lombok.AccessLevel.PACKAGE;
 import java.time.LocalDateTime;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.function.ToDoubleBiFunction;
 import lombok.RequiredArgsConstructor;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
+import uk.ac.ox.poseidon.agents.choices.Valuation;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
@@ -52,15 +52,12 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
  * same way.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class HomePortCatchValuation
-  implements ToDoubleBiFunction<Object, Bucket>
-{
+public class HomePortCatchValuation implements Valuation<Object, Bucket> {
 
   // Catches no longer remembered would pile up here, so it is cleared past this
   // size. Weak keys would drop them precisely, but made NW Med runs 10% slower.
   private static final int MAXIMUM_NUMBER_OF_VALUES = 10_000;
 
-  private final Vessel vessel;
   private final CatchCategoriser catchCategoriser;
   // By identity: cheaper than comparing catches, and a catch never changes.
   private final Map<Bucket, Double> values = new IdentityHashMap<>();
@@ -69,12 +66,20 @@ public class HomePortCatchValuation
   private LocalDateTime valuedSince;
 
   /**
+   * @param vessel the vessel that would sell the catch
+   * @param option ignored
+   * @param bucket the catch to value
+   * @return what {@code bucket} would sell for at {@code vessel}'s home port now
    * @throws IllegalStateException if the vessel has no home port, its home port
    *                               does not have exactly one market, or the
    *                               catch is priced in more than one currency
    */
   @Override
-  public double applyAsDouble(final Object option, final Bucket bucket) {
+  public double valueOf(
+    final Vessel vessel,
+    final Object option,
+    final Bucket bucket
+  ) {
     checkState(
       vessel.getHomePort() != null,
       "Vessel %s has no home port.",
@@ -92,7 +97,7 @@ public class HomePortCatchValuation
       valuedMarket = market;
       valuedSince = vessel.getSchedule().getDateTime();
     }
-    return values.computeIfAbsent(bucket, key -> valueAt(market, key));
+    return values.computeIfAbsent(bucket, key -> valueAt(vessel, market, key));
   }
 
   // Strictly before: a price set in the same second as a valuation may have
@@ -107,7 +112,11 @@ public class HomePortCatchValuation
       .orElse(false);
   }
 
-  private double valueAt(final Market market, final Bucket bucket) {
+  private double valueAt(
+    final Vessel vessel,
+    final Market market,
+    final Bucket bucket
+  ) {
     final Map<CurrencyUnit, Money> summary = Sale.summarise(
       market.quote(catchCategoriser.apply(bucket))
     );

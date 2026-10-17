@@ -22,7 +22,7 @@
 
 /**
  * A vessel's "social network":
- * {@link uk.ac.ox.poseidon.agents.vessels.friends.DynamicFriendsSupplier}
+ * {@link uk.ac.ox.poseidon.agents.vessels.friends.DynamicFriends}
  * maintains a bounded, randomly sampled, pruned-and-refilled set of friend
  * vessels drawn from a candidate pool, e.g. for choice models that draw on
  * friends' recent experience. See

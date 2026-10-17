@@ -26,36 +26,52 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToDoubleBiFunction;
+import java.util.function.BiFunction;
 import org.joda.money.Money;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.choices.Valuation;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Values the cost of travelling to fish at a cell: computes the {@link Route}
- * via the cell once, then sums what each route cost charges for it. The
+ * Values the cost of a vessel travelling to fish at a cell: computes the
+ * {@link Route} via the cell once, then sums what each route cost charges the
+ * vessel for it. The
  * recollection the cell is valued for is ignored, so that this can be combined
  * with other valuations of the same shape. Route costs in different currencies
  * cannot be summed.
  */
-public class TravelCost implements ToDoubleBiFunction<Int2D, Object> {
+public class TravelCost implements Valuation<Int2D, Object> {
 
-  private final Function<? super Int2D, ? extends Route> routeFunction;
-  private final List<Function<? super Route, ? extends Money>> routeCosts;
+  private final BiFunction<
+    ? super Vessel,
+    ? super Int2D,
+    ? extends Route
+  > routeFunction;
+  private final List<
+    BiFunction<? super Vessel, ? super Route, ? extends Money>
+  > routeCosts;
 
   /**
-   * @param routeFunction gives the route via a cell
-   * @param routeCosts    what is charged for a route, each in money
+   * @param routeFunction gives the route a vessel would sail via a cell
+   * @param routeCosts    what is charged to a vessel for a route, each in
+   *                      money
    */
   TravelCost(
-    final Function<? super Int2D, ? extends Route> routeFunction,
-    final List<? extends Function<? super Route, ? extends Money>> routeCosts
+    final BiFunction<
+      ? super Vessel,
+      ? super Int2D,
+      ? extends Route
+    > routeFunction,
+    final List<
+      ? extends BiFunction<? super Vessel, ? super Route, ? extends Money>
+    > routeCosts
   ) {
     this.routeFunction = checkNotNull(routeFunction);
     this.routeCosts = ImmutableList.copyOf(routeCosts);
   }
 
   /**
+   * @param vessel       the vessel that would travel
    * @param cell         the cell to fish at
    * @param recollection ignored
    * @return the sum of the route costs of the route via {@code cell}, as an
@@ -64,11 +80,15 @@ public class TravelCost implements ToDoubleBiFunction<Int2D, Object> {
    *                                                  different currencies
    */
   @Override
-  public double applyAsDouble(final Int2D cell, final Object recollection) {
-    final Route route = routeFunction.apply(cell);
+  public double valueOf(
+    final Vessel vessel,
+    final Int2D cell,
+    final Object recollection
+  ) {
+    final Route route = routeFunction.apply(vessel, cell);
     return routeCosts
       .stream()
-      .<Money>map(routeCost -> routeCost.apply(route))
+      .<Money>map(routeCost -> routeCost.apply(vessel, route))
       .reduce(Money::plus)
       .map(money -> money.getAmount().doubleValue())
       .orElse(0.0);

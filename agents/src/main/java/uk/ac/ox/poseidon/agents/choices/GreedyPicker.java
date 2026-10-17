@@ -33,12 +33,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Picks the option with the highest value that passes a predicate, breaking
- * ties at random, or gives {@code null} when no option passes (so that an
+ * Picks, for a vessel, the option with the highest value among its option
+ * values that passes a predicate for that vessel, breaking ties at random, or
+ * gives {@code null} when no option passes (so that an
  * {@link EpsilonGreedyChooser} falls back to exploring).
  * <p>
  * Options are tested from the highest value down, one value at a time, and
@@ -54,20 +56,23 @@ import java.util.function.Supplier;
  *
  * @param <O> the type of option
  */
-public class GreedyPicker<O> implements Supplier<O> {
+public class GreedyPicker<O> implements Function<Vessel, O> {
 
-  private final OptionValues<O> optionValues;
-  private final Predicate<? super O> optionPredicate;
+  private final Function<
+    ? super Vessel,
+    ? extends OptionValues<O>
+  > optionValues;
+  private final BiFunction<? super Vessel, ? super O, Boolean> optionPredicate;
   private final MersenneTwisterFast rng;
 
   /**
-   * @param optionValues    the values of the options to pick from
-   * @param optionPredicate which options can be picked
+   * @param optionValues    gives a vessel's values of the options to pick from
+   * @param optionPredicate which options can be picked for a vessel
    * @param rng             breaks ties between options with the same value
    */
   GreedyPicker(
-    final OptionValues<O> optionValues,
-    final Predicate<? super O> optionPredicate,
+    final Function<? super Vessel, ? extends OptionValues<O>> optionValues,
+    final BiFunction<? super Vessel, ? super O, Boolean> optionPredicate,
     final MersenneTwisterFast rng
   ) {
     this.optionValues = checkNotNull(optionValues);
@@ -76,14 +81,15 @@ public class GreedyPicker<O> implements Supplier<O> {
   }
 
   /**
+   * @param vessel the vessel to pick for
    * @return the picked option, or {@code null} if no option passes the
    *         predicate
    * @throws IllegalStateException if the value of any option is {@code NaN}
    */
   @Override
-  public O get() {
+  public O apply(final Vessel vessel) {
     final List<Entry<O, Double>> entries = new ArrayList<>();
-    optionValues.forEachEntry((option, value) -> {
+    optionValues.apply(vessel).forEachEntry((option, value) -> {
       checkState(!Double.isNaN(value), "Value of option %s is NaN.", option);
       entries.add(entry(option, value));
     });
@@ -103,7 +109,7 @@ public class GreedyPicker<O> implements Supplier<O> {
       // The first option to pass, in a random order, is a uniformly random pick
       // among the passing ones, without testing the others.
       final Optional<O> picked = shuffledStream(tied, rng)
-        .filter(optionPredicate)
+        .filter(option -> optionPredicate.apply(vessel, option))
         .findFirst();
       if (picked.isPresent()) return picked.get();
       start = end;

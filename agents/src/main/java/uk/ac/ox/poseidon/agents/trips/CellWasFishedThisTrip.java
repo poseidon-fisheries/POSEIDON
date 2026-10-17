@@ -23,8 +23,6 @@
 package uk.ac.ox.poseidon.agents.trips;
 
 import java.util.function.BiFunction;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -35,15 +33,12 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * {@link Trip#getFishingEvents() fishing events}, in the vessel's model grid.
  * Never holds when the vessel is not on a trip.
  */
-@RequiredArgsConstructor
 public class CellWasFishedThisTrip
-  implements BiFunction<Object, Int2D, Boolean>
+  implements BiFunction<Vessel, Int2D, Boolean>
 {
 
-  private final @NonNull Vessel vessel;
-
   @Override
-  public Boolean apply(final Object context, final Int2D cell) {
+  public Boolean apply(final Vessel vessel, final Int2D cell) {
     final Trip currentTrip = vessel.getCurrentTrip();
     if (currentTrip == null) {
       return false;

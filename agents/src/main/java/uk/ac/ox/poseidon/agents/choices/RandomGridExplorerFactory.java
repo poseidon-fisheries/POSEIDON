@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.agents.choices;
 import ec.util.MersenneTwisterFast;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -38,7 +37,6 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link RandomPicker}, built via
@@ -50,7 +48,8 @@ import uk.ac.ox.poseidon.core.functions.WithoutContext;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class RandomGridExplorerFactory
-  extends VesselScopeFactory<Supplier<Int2D>>
+  extends VesselScopeFactory<Function<Vessel, Int2D>>
+  implements ValueFactory<VesselScope, Vessel, Int2D>
 {
 
   private final ValueFactory<
@@ -60,7 +59,7 @@ public class RandomGridExplorerFactory
   > cells;
   private final MappingFactory<
     ? super VesselScope,
-    ? super Void,
+    ? super Vessel,
     ? super Int2D,
     Boolean
   > cellPredicate;
@@ -70,13 +69,10 @@ public class RandomGridExplorerFactory
   > randomNumberGenerator;
 
   @Override
-  protected Supplier<Int2D> newInstance(final VesselScope scope) {
-    final Vessel vessel = scope.getVessel();
-    final Function<? super Vessel, ? extends List<? extends Int2D>> cells =
-      this.cells.get(scope);
+  protected Function<Vessel, Int2D> newInstance(final VesselScope scope) {
     return new RandomPicker<>(
-      () -> cells.apply(vessel),
-      WithoutContext.predicate(cellPredicate.get(scope)),
+      cells.get(scope),
+      cellPredicate.get(scope),
       randomNumberGenerator.get(scope)
     );
   }

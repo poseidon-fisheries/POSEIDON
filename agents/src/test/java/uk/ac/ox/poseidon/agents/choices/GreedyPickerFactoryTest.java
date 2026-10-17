@@ -85,6 +85,6 @@ class GreedyPickerFactoryTest {
 
     assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
     assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
-    assertThat(factory.get(scopeA).get()).isEqualTo("B");
+    assertThat(factory.get(scopeA).apply(vesselA)).isEqualTo("B");
   }
 }

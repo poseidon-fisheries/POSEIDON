@@ -26,31 +26,33 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 import ec.util.MersenneTwisterFast;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Picks a uniformly random option from a supplied list, subject to a predicate,
- * or {@code null} if none qualify.
+ * Picks, for a vessel, a uniformly random option from the vessel's list of
+ * options, subject to a predicate for the vessel, or {@code null} if none
+ * qualify.
  */
 @RequiredArgsConstructor
-public class RandomPicker<O> implements Supplier<O> {
+public class RandomPicker<O> implements Function<Vessel, O> {
 
   @NonNull
-  private final Supplier<? extends List<? extends O>> options;
+  private final Function<? super Vessel, ? extends List<? extends O>> options;
 
   @NonNull
-  private final Predicate<? super O> optionPredicate;
+  private final BiFunction<? super Vessel, ? super O, Boolean> optionPredicate;
 
   @NonNull
   private final MersenneTwisterFast rng;
 
   @Override
-  public O get() {
-    return shuffledStream(options.get(), rng)
-      .filter(optionPredicate)
+  public O apply(final Vessel vessel) {
+    return shuffledStream(options.apply(vessel), rng)
+      .filter(option -> optionPredicate.apply(vessel, option))
       .findFirst()
       .orElse(null);
   }

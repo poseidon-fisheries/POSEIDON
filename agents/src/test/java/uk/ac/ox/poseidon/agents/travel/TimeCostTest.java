@@ -41,19 +41,28 @@ class TimeCostTest {
   private final AtomicReference<Money> hourlyCost = new AtomicReference<>(
     Money.of(EUR, 10)
   );
-  private final TimeCost timeCost = new TimeCost(vessel, _ -> hourlyCost.get());
+  private final TimeCost timeCost = new TimeCost(costOf ->
+    costOf == vessel ? hourlyCost.get() : Money.of(EUR, 100)
+  );
   private final Route route = new Route(15.0, Duration.ofMinutes(90));
 
   @Test
   void chargesTheHourlyCostForEachHourOfTheRoute() {
-    assertThat(timeCost.apply(null, route)).isEqualTo(Money.of(EUR, 15));
+    assertThat(timeCost.apply(vessel, route)).isEqualTo(Money.of(EUR, 15));
+  }
+
+  @Test
+  void chargesTheHourlyCostOfTheVesselGiven() {
+    assertThat(timeCost.apply(mock(Vessel.class), route)).isEqualTo(
+      Money.of(EUR, 150)
+    );
   }
 
   @Test
   void readsTheVesselsHourlyCostAtEachCall() {
-    final Money costBefore = timeCost.apply(null, route);
+    final Money costBefore = timeCost.apply(vessel, route);
     hourlyCost.set(Money.of(EUR, 20));
-    final Money costAfter = timeCost.apply(null, route);
+    final Money costAfter = timeCost.apply(vessel, route);
 
     assertThat(costBefore).isEqualTo(Money.of(EUR, 15));
     assertThat(costAfter).isEqualTo(Money.of(EUR, 30));
@@ -63,7 +72,7 @@ class TimeCostTest {
   void throwsWithoutAnHourlyCost() {
     hourlyCost.set(null);
 
-    assertThatThrownBy(() -> timeCost.apply(null, route)).isInstanceOf(
+    assertThatThrownBy(() -> timeCost.apply(vessel, route)).isInstanceOf(
       NullPointerException.class
     );
   }

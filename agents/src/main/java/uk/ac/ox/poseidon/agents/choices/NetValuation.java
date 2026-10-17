@@ -24,13 +24,13 @@ package uk.ac.ox.poseidon.agents.choices;
 
 import static lombok.AccessLevel.PACKAGE;
 
-import java.util.function.ToDoubleBiFunction;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * Values an option net of its cost: a revenue valuation minus a cost valuation,
- * both given the same option and recollection (in NW Med, the value of the
- * remembered catch minus the cost of travelling to fish there). The two are
+ * both given the same vessel, option and recollection (in NW Med, the value of
+ * the remembered catch minus the cost of travelling to fish there). The two are
  * assumed to give amounts in the same currency; this is not checked, since
  * valuations give bare amounts.
  *
@@ -38,17 +38,21 @@ import lombok.RequiredArgsConstructor;
  * @param <M> the type of what is remembered about an option
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class NetValuation<O, M> implements ToDoubleBiFunction<O, M> {
+public class NetValuation<O, M> implements Valuation<O, M> {
 
-  private final ToDoubleBiFunction<? super O, ? super M> revenueValuation;
-  private final ToDoubleBiFunction<? super O, ? super M> costValuation;
+  private final Valuation<? super O, ? super M> revenueValuation;
+  private final Valuation<? super O, ? super M> costValuation;
 
   /** @return the revenue valuation of the option minus its cost valuation */
   @Override
-  public double applyAsDouble(final O option, final M recollection) {
+  public double valueOf(
+    final Vessel vessel,
+    final O option,
+    final M recollection
+  ) {
     return (
-      revenueValuation.applyAsDouble(option, recollection) -
-      costValuation.applyAsDouble(option, recollection)
+      revenueValuation.valueOf(vessel, option, recollection) -
+      costValuation.valueOf(vessel, option, recollection)
     );
   }
 }

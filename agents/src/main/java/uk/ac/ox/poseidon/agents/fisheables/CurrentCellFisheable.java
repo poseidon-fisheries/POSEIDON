@@ -31,18 +31,17 @@ import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 
 /**
- * Resupplies the {@link Fisheable} at {@code vessel}'s current cell on every
- * call, tracking the vessel as it moves rather than fixing on a single cell at
- * construction time.
+ * Gives the {@link Fisheable} at the current cell of the vessel it is given,
+ * read on every call, tracking the vessel as it moves rather than fixing on a
+ * single cell at construction time.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class CurrentCellFisheable implements Function<Object, Fisheable> {
+public class CurrentCellFisheable implements Function<Vessel, Fisheable> {
 
-  private final Vessel vessel;
   private final FisheableGrid fisheableGrid;
 
   @Override
-  public Fisheable apply(final Object context) {
+  public Fisheable apply(final Vessel vessel) {
     return fisheableGrid.getFisheableCell(vessel.getCell());
   }
 }

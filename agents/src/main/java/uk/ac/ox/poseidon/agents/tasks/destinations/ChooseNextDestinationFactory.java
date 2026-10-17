@@ -22,19 +22,21 @@
 
 package uk.ac.ox.poseidon.agents.tasks.destinations;
 
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link VesselTaskFactory} counterpart of {@link ChooseNextDestination},
- * built via {@link Factories#chooseNextDestination(Factory)}.
+ * built via {@link Factories#chooseNextDestination(ValueFactory)}.
  */
 @Getter
 @ToString
@@ -45,13 +47,14 @@ public class ChooseNextDestinationFactory
   extends VesselTaskFactory<ChooseNextDestination>
 {
 
-  private final Factory<
+  private final ValueFactory<
     ? super VesselScope,
-    ? extends DestinationSupplier
-  > destinationSupplier;
+    ? super Vessel,
+    Optional<Int2D>
+  > destination;
 
   @Override
   protected ChooseNextDestination newInstance(final VesselScope scope) {
-    return new ChooseNextDestination(destinationSupplier.get(scope));
+    return new ChooseNextDestination(destination.get(scope));
   }
 }

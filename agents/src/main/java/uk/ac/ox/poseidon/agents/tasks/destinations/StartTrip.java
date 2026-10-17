@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -25,20 +25,21 @@ package uk.ac.ox.poseidon.agents.tasks.destinations;
 import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
+import java.util.Optional;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Starts a vessel's trip towards whatever destination
- * {@code destinationSupplier} yields; fails, without starting a trip, if the
- * supplier yields none.
+ * Starts a vessel's trip towards whatever destination {@code destination} gives
+ * for the vessel; fails, without starting a trip, if it gives none.
  */
 @RequiredArgsConstructor
 public class StartTrip extends AgentTask<Vessel> {
 
-  private final DestinationSupplier destinationSupplier;
+  private final Function<? super Vessel, Optional<Int2D>> destination;
 
   /**
    * @return {@link Status#SUCCEEDED} if a destination was found and the trip
@@ -46,10 +47,10 @@ public class StartTrip extends AgentTask<Vessel> {
    */
   @Override
   public Status execute() {
-    return destinationSupplier
-      .get()
-      .map(destination -> {
-        getAgent().startTrip(destination);
+    return destination
+      .apply(getAgent())
+      .map(firstDestination -> {
+        getAgent().startTrip(firstDestination);
         return SUCCEEDED;
       })
       .orElse(FAILED);

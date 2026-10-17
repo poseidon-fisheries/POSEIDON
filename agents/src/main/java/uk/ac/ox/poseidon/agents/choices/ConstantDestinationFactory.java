@@ -22,46 +22,49 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
+import java.util.Optional;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of
- * {@link ConstantDestinationSupplier}, built via
- * {@link Factories#constantDestination}.
+ * A {@link RelativeScopeFactory} counterpart of {@link ConstantDestination},
+ * built via {@link Factories#constantDestination}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ConstantDestinationSupplierFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  DestinationSupplier
-> {
+public class ConstantDestinationFactory<S extends Scope>
+  extends RelativeScopeFactory<S, Function<Object, Optional<Int2D>>>
+  implements ValueFactory<S, Object, Optional<Int2D>>
+{
 
   private final Factory<? super S, ? extends ModelGrid> modelGrid;
   private final Factory<? super S, ? extends Coordinate> coordinate;
 
   /**
-   * @return a {@link ConstantDestinationSupplier} for {@link #coordinate}'s
+   * @return a {@link ConstantDestination} for {@link #coordinate}'s
    *         cell in {@link #modelGrid}
    * @throws IllegalArgumentException if {@link #coordinate} falls outside
    *                                  {@link #modelGrid}
    */
   @Override
-  protected DestinationSupplier newInstance(final S scope) {
+  protected Function<Object, Optional<Int2D>> newInstance(final S scope) {
     final ModelGrid modelGrid = this.modelGrid.get(scope);
     final Coordinate coordinate = this.coordinate.get(scope);
     modelGrid.checkIsInGrid(coordinate);
-    return new ConstantDestinationSupplier(modelGrid.toCell(coordinate));
+    return new ConstantDestination(modelGrid.toCell(coordinate));
   }
 }

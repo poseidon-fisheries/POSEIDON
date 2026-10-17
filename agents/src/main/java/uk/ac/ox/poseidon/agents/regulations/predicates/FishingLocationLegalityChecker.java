@@ -38,11 +38,12 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
- * Predicate matching cells the vessel could legally fish at: builds a
- * hypothetical {@link ExtendedFishingAction} for arriving at the candidate cell
- * (travel time included, via {@code pathFinder}/{@code distanceCalculator}) and
- * lasting {@code fishingDuration}, and checks it against {@code regulations}.
- * Used to filter fishing-location candidates before committing to a trip there.
+ * Predicate matching cells the vessel it is given could legally fish at:
+ * builds a hypothetical {@link ExtendedFishingAction} for arriving at the
+ * candidate cell (travel time included, via {@code pathFinder}/
+ * {@code distanceCalculator}) and lasting {@code fishingDuration}, and checks
+ * it against {@code regulations}. Used to filter fishing-location candidates
+ * before committing to a trip there.
  * <p>
  * {@code fishingDuration} is the typical duration of a fishing action: fishers
  * don't know how long a given set or haul will take, so they plan with a
@@ -51,7 +52,7 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class FishingLocationLegalityChecker
-  implements BiFunction<Object, Int2D, Boolean>
+  implements BiFunction<Vessel, Int2D, Boolean>
 {
 
   private final Regulations<? super ExtendedFishingAction> regulations;
@@ -59,15 +60,16 @@ public class FishingLocationLegalityChecker
   private final DistanceCalculator distanceCalculator;
   private final Duration fishingDuration;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
-  private final Vessel vessel;
 
   /**
+   * @param vessel          the vessel that would fish
+   * @param fishingLocation the cell it would fish at
    * @return whether fishing at {@code fishingLocation} would currently be
-   *         permitted
+   *         permitted for {@code vessel}
    */
   @Override
-  public Boolean apply(final Object context, final Int2D fishingLocation) {
-    return regulations.isPermitted(makeAction(fishingLocation));
+  public Boolean apply(final Vessel vessel, final Int2D fishingLocation) {
+    return regulations.isPermitted(makeAction(vessel, fishingLocation));
   }
 
   /**
@@ -78,7 +80,10 @@ public class FishingLocationLegalityChecker
    * @throws RuntimeException if no path exists from the vessel's current cell
    *                          to {@code fishingLocation}
    */
-  private ExtendedFishingAction makeAction(final Int2D fishingLocation) {
+  private ExtendedFishingAction makeAction(
+    final Vessel vessel,
+    final Int2D fishingLocation
+  ) {
     final List<Int2D> pathToFishingLocation = pathFinder
       .getPath(vessel.getCell(), fishingLocation)
       .orElseThrow(() ->

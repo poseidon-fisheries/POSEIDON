@@ -52,14 +52,14 @@ import static uk.ac.ox.poseidon.agents.vessels.Factories.*;
 import static uk.ac.ox.poseidon.agents.vessels.accounts.Factories.account;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.fullTank;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.simpleEngine;
-import static uk.ac.ox.poseidon.agents.vessels.friends.Factories.dynamicFriendsSupplier;
+import static uk.ac.ox.poseidon.agents.vessels.friends.Factories.dynamicFriends;
 import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.fixedBiomassProportionGear;
 import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.standardBiomassHold;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.accessibleWaterCells;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.currentTimeAtSea;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.currentTripDestinationCell;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.currentTripEventManager;
-import static uk.ac.ox.poseidon.agents.vessels.values.Factories.vesselHasSameHomePort;
+import static uk.ac.ox.poseidon.agents.vessels.values.Factories.other;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.vesselIsActive;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.vesselProperty;
 import static uk.ac.ox.poseidon.biology.allocators.Factories.proportionOfCarryingCapacityAllocator;
@@ -67,6 +67,7 @@ import static uk.ac.ox.poseidon.biology.biomass.Factories.*;
 import static uk.ac.ox.poseidon.biology.species.Factories.species;
 import static uk.ac.ox.poseidon.core.aggregators.Factories.meanAggregator;
 import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
+import static uk.ac.ox.poseidon.core.predicates.Factories.equal;
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.greaterThan;
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
@@ -107,7 +108,7 @@ import java.time.Period;
 import java.util.List;
 import java.util.function.Supplier;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.choices.EpsilonGreedyDestinationSupplierFactory;
+import uk.ac.ox.poseidon.agents.choices.EpsilonGreedyDestinationFactory;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegisterFactory;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
@@ -333,7 +334,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       cellValue(carryingCapacityGrid),
       greaterThan(0)
     );
-    final EpsilonGreedyDestinationSupplierFactory destinationSupplier =
+    final EpsilonGreedyDestinationFactory destination =
       epsilonGreedyDestination(
         EXPLORATION_PROBABILITY,
         neighbourhoodGridExplorer(
@@ -354,10 +355,16 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
           always(true),
           bestOptionsFromFriends(
             optionValuesRegister,
-            dynamicFriendsSupplier(
+            dynamicFriends(
               2,
               optionValuesRegister,
-              allOf(vesselIsActive(), vesselHasSameHomePort())
+              allOf(
+                other(vesselIsActive()),
+                condition(
+                  other(vesselProperty("homePort")),
+                  equal(vesselProperty("homePort"))
+                )
+              )
             )
           )
         )
@@ -370,7 +377,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     final var behaviour = behaviour(
       sequenceTask(
-        startTrip(destinationSupplier),
+        startTrip(destination),
         travelAlongPathTo(
           pathFinder,
           distance,

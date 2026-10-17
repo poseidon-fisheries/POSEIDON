@@ -36,7 +36,6 @@ import static uk.ac.ox.poseidon.agents.vessels.Factories.perVessel;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.util.function.Function;
-import java.util.function.ToDoubleBiFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
@@ -117,12 +116,12 @@ class FishingEventRecorderFactoryTest {
   }
 
   private static class KgOfSpeciesValuationFactory
-    extends GlobalScopeFactory<ToDoubleBiFunction<Int2D, Bucket>>
+    extends GlobalScopeFactory<Valuation<Int2D, Bucket>>
   {
 
     @Override
-    protected ToDoubleBiFunction<Int2D, Bucket> newInstance(final Scope scope) {
-      return (cell, bucket) -> bucket.getKg(SPECIES);
+    protected Valuation<Int2D, Bucket> newInstance(final Scope scope) {
+      return (vessel, cell, bucket) -> bucket.getKg(SPECIES);
     }
   }
 
@@ -149,8 +148,12 @@ class FishingEventRecorderFactoryTest {
       .get(scopeA)
       .receive(fishingEvent("PS", COORDINATE, Bucket.of(SPECIES, 10)));
 
-    assertThat(optionValues.get(scopeA).getValue(CELL)).contains(10.0);
-    assertThat(optionValues.get(scopeB).getValue(CELL)).isEmpty();
+    assertThat(
+      optionValues.get(scopeA).apply(scopeA.getVessel()).getValue(CELL)
+    ).contains(10.0);
+    assertThat(
+      optionValues.get(scopeB).apply(scopeB.getVessel()).getValue(CELL)
+    ).isEmpty();
   }
 
   @Test

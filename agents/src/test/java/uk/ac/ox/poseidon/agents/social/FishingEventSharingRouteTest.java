@@ -52,7 +52,6 @@ import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.function.ToDoubleBiFunction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,6 +59,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.agents.choices.KeyedMemory;
 import uk.ac.ox.poseidon.agents.choices.MemoryBasedOptionValuesFactory;
+import uk.ac.ox.poseidon.agents.choices.Valuation;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
@@ -113,7 +113,8 @@ class FishingEventSharingRouteTest {
   private final Gear gear = mock(Gear.class);
   private final Hold hold = mock(Hold.class);
   private final Engine engine = mock(Engine.class);
-  private final ToDoubleBiFunction<Int2D, Bucket> kgOfSpecies = (
+  private final Valuation<Int2D, Bucket> kgOfSpecies = (
+    valuedFor,
     option,
     bucket
   ) -> bucket.getKg(species);
@@ -223,7 +224,7 @@ class FishingEventSharingRouteTest {
   }
 
   private Optional<Double> valueOfTheCellFor(final Vessel vessel) {
-    return optionValues.get(scopeOf(vessel)).getValue(cell);
+    return optionValues.get(scopeOf(vessel)).apply(vessel).getValue(cell);
   }
 
   /**

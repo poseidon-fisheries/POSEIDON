@@ -25,9 +25,11 @@
  * the vessel to read. They read its state (its cell, home port cell, current
  * trip's destination, start, time at sea and event manager, its own event
  * manager, the water cells reachable from its cell), test it (whether it is
- * active, has started a trip today, is at a cell, shares a home port) or derive
- * a value from it (a property, a trip cost, a tag in
- * {@link uk.ac.ox.poseidon.agents.vessels.values.tags}). See
+ * active, has started a trip today, is at a cell) or derive a value from it (a
+ * property, a trip cost, a tag in
+ * {@link uk.ac.ox.poseidon.agents.vessels.values.tags}). In a test relating a
+ * vessel to another vessel, {@link uk.ac.ox.poseidon.agents.vessels.values.Other}
+ * reads such a value off the other vessel. See
  * {@link uk.ac.ox.poseidon.agents.vessels.values.Factories} for the entry
  * points.
  */

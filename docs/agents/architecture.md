@@ -83,7 +83,17 @@ the vessel it acts for. It comes in two shapes, each with its factory type in `c
 
 A reader of a vessel's state (`currentCell()`, `currentTripStartDateTime()`, `vesselProperty(...)`)
 is a value of the vessel: it reads the vessel it is given and holds none, so one serves every
-vessel and answers for whichever it is given.
+vessel and answers for whichever it is given. Every other object that reads a vessel takes it on
+each call too, from its caller, and holds none: a route, a cell checker, a time cost, a valuation, a
+picker. A picker takes the option values of the vessel it picks for as a function of that vessel:
+values worked out from a memory are valued for it, while a learned table is the same for every
+vessel and gives itself.
+
+The context is always the vessel the call is for. A test relating it to another vessel, such as a
+friendship condition, is a mapping of that other vessel, and reads values off it with
+`other(...)`: `condition(other(vesselProperty("homePort")), equal(vesselProperty("homePort")))`
+holds when the other vessel's home port is the vessel's. A value without `other(...)` reads the
+vessel the call is for, and leaving it out where a mapping is expected does not compile.
 
 A yes/no is a value or a mapping with a `Boolean` result. A value or mapping that reads nothing
 from its context has `Object` as its context, so it fits wherever any context is given. A fixed
@@ -104,7 +114,8 @@ intervals…)`, `tableLookup(key, table, …)`, and `condition(subject, predicat
 predicate of its subject. There is no generic composition: a mapping of one's own becomes a block
 that takes its input, so the YAML says what it is.
 
-A component passes the context it has: a task passes its vessel. A component that has none (a grid
+A component passes the context it has: a task passes its vessel, and a picker the vessel it picks
+for. A component that has none (a grid
 built cell by cell, a regulation judging an action, a gear fishing, a table's columns) has its
 factory take the value with `Void` as its context, so that a value reading a vessel is refused when
 the scenario is compiled, and convert it once, when it builds, into the plain `Supplier`,

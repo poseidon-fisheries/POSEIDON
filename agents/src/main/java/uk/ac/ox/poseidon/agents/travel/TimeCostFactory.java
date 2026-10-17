@@ -46,8 +46,8 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class TimeCostFactory
-  extends VesselScopeFactory<BiFunction<Object, Route, Money>>
-  implements MappingFactory<VesselScope, Object, Route, Money>
+  extends VesselScopeFactory<BiFunction<Vessel, Route, Money>>
+  implements MappingFactory<VesselScope, Vessel, Route, Money>
 {
 
   private final ValueFactory<
@@ -57,9 +57,9 @@ public class TimeCostFactory
   > hourlyCost;
 
   @Override
-  protected BiFunction<Object, Route, Money> newInstance(
+  protected BiFunction<Vessel, Route, Money> newInstance(
     final VesselScope scope
   ) {
-    return new TimeCost(scope.getVessel(), hourlyCost.get(scope));
+    return new TimeCost(hourlyCost.get(scope));
   }
 }

@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.biology.Fisheable;
@@ -46,8 +47,8 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class CurrentCellFisheableFactory
-  extends VesselScopeFactory<Function<Object, Fisheable>>
-  implements ValueFactory<VesselScope, Object, Fisheable>
+  extends VesselScopeFactory<Function<Vessel, Fisheable>>
+  implements ValueFactory<VesselScope, Vessel, Fisheable>
 {
 
   private final Factory<
@@ -56,10 +57,7 @@ public class CurrentCellFisheableFactory
   > fisheableGrid;
 
   @Override
-  protected Function<Object, Fisheable> newInstance(final VesselScope scope) {
-    return new CurrentCellFisheable(
-      scope.getVessel(),
-      fisheableGrid.get(scope)
-    );
+  protected Function<Vessel, Fisheable> newInstance(final VesselScope scope) {
+    return new CurrentCellFisheable(fisheableGrid.get(scope));
   }
 }

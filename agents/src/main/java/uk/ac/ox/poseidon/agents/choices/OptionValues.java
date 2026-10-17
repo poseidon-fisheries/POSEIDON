@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -27,14 +27,31 @@ import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Function;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * A learned value per option (e.g. per destination cell), supporting lookup of
  * the current best option(s) — the highest-valued one(s), possibly tied.
+ * <p>
+ * A picker takes the option values of the vessel it picks for, as a function of
+ * that vessel, since some (those worked out from a memory) are valued for a
+ * vessel. Option values that are the same for every vessel, such as a learned
+ * table, are such a function themselves: they give themselves, whatever the
+ * vessel.
  *
  * @param <O> the type of option valued
  */
-public interface OptionValues<O> {
+public interface OptionValues<O> extends Function<Vessel, OptionValues<O>> {
+  /**
+   * @param vessel ignored
+   * @return these option values, the same for every vessel
+   */
+  @Override
+  default OptionValues<O> apply(final Vessel vessel) {
+    return this;
+  }
+
   /** @return {@code option}'s current value, if it has been observed */
   Optional<Double> getValue(O option);
 

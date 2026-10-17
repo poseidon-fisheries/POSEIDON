@@ -52,9 +52,6 @@ public class HomePortCatchValuationFactory
 
   @Override
   protected HomePortCatchValuation newInstance(final VesselScope scope) {
-    return new HomePortCatchValuation(
-      scope.getVessel(),
-      catchCategoriser.get(scope)
-    );
+    return new HomePortCatchValuation(catchCategoriser.get(scope));
   }
 }

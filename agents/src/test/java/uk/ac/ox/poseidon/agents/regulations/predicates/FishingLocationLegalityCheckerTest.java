@@ -107,8 +107,7 @@ class FishingLocationLegalityCheckerTest {
       pathFinder,
       distance,
       TYPICAL_SET,
-      v -> now,
-      vessel
+      v -> now
     );
   }
 
@@ -118,7 +117,7 @@ class FishingLocationLegalityCheckerTest {
     final boolean permitted = checker(
       action -> checked.add(action),
       LocalDateTime.of(2013, 1, 19, 20, 30)
-    ).apply(null, CANDIDATE);
+    ).apply(vessel, CANDIDATE);
     assertThat(permitted).isTrue();
     assertThat(checked)
       .singleElement()
@@ -141,6 +140,35 @@ class FishingLocationLegalityCheckerTest {
   }
 
   @Test
+  void checksTheActionOfTheVesselGiven() {
+    final Vessel otherVessel = mock(Vessel.class);
+    final Gear otherGear = mock(Gear.class);
+    final Engine otherEngine = mock(Engine.class);
+    when(otherEngine.getCruisingSpeedInKph()).thenReturn(SPEED_IN_KPH);
+    final VesselField vesselField = mock(VesselField.class);
+    when(vesselField.getModelGrid()).thenReturn(MODEL_GRID);
+    when(otherVessel.getCell()).thenReturn(PORT);
+    when(otherVessel.getEngine()).thenReturn(otherEngine);
+    when(otherVessel.getVesselField()).thenReturn(vesselField);
+    when(otherVessel.getGear()).thenReturn(otherGear);
+    final List<ExtendedFishingAction> checked = new ArrayList<>();
+    final FishingLocationLegalityChecker checker = checker(
+      action -> checked.add(action),
+      LocalDateTime.of(2013, 1, 19, 20, 30)
+    );
+
+    checker.apply(vessel, CANDIDATE);
+    checker.apply(otherVessel, CANDIDATE);
+
+    assertThat(checked)
+      .extracting(ExtendedFishingAction::getAgent)
+      .containsExactly(vessel, otherVessel);
+    assertThat(checked)
+      .extracting(ExtendedFishingAction::getGear)
+      .containsExactly(gear, otherGear);
+  }
+
+  @Test
   void aCandidateInTheVesselsOwnCellIsReachedWithoutTravel() {
     when(vessel.getCell()).thenReturn(CANDIDATE);
     when(pathFinder.getPath(CANDIDATE, CANDIDATE)).thenReturn(
@@ -153,9 +181,8 @@ class FishingLocationLegalityCheckerTest {
       pathFinder,
       new CartesianDistanceCalculator(MODEL_GRID, 1.0),
       TYPICAL_SET,
-      v -> now,
-      vessel
-    ).apply(null, CANDIDATE);
+      v -> now
+    ).apply(vessel, CANDIDATE);
     assertThat(checked)
       .singleElement()
       .satisfies(action ->
@@ -171,7 +198,7 @@ class FishingLocationLegalityCheckerTest {
       checker(
         CLOSED_FROM_20_JANUARY,
         LocalDateTime.of(2013, 1, 19, 21, 30)
-      ).apply(null, CANDIDATE)
+      ).apply(vessel, CANDIDATE)
     ).isFalse();
   }
 
@@ -183,7 +210,7 @@ class FishingLocationLegalityCheckerTest {
       checker(
         CLOSED_FROM_20_JANUARY,
         LocalDateTime.of(2013, 1, 19, 21, 0)
-      ).apply(null, CANDIDATE)
+      ).apply(vessel, CANDIDATE)
     ).isTrue();
   }
 
@@ -193,7 +220,7 @@ class FishingLocationLegalityCheckerTest {
       checker(
         CLOSED_FROM_20_JANUARY,
         LocalDateTime.of(2013, 2, 1, 21, 0)
-      ).apply(null, CANDIDATE)
+      ).apply(vessel, CANDIDATE)
     ).isFalse();
   }
 
@@ -205,7 +232,7 @@ class FishingLocationLegalityCheckerTest {
       checker(
         CLOSED_FROM_20_JANUARY,
         LocalDateTime.of(2013, 2, 18, 22, 0)
-      ).apply(null, CANDIDATE)
+      ).apply(vessel, CANDIDATE)
     ).isTrue();
   }
 
@@ -216,7 +243,7 @@ class FishingLocationLegalityCheckerTest {
       action -> true,
       LocalDateTime.of(2013, 1, 19, 20, 30)
     );
-    assertThatThrownBy(() -> checker.apply(null, CANDIDATE))
+    assertThatThrownBy(() -> checker.apply(vessel, CANDIDATE))
       .isInstanceOf(RuntimeException.class)
       .hasMessageContaining("No path");
   }

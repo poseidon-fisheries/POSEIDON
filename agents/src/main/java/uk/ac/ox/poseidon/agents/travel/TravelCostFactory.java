@@ -31,11 +31,11 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link TravelCost}, built via
@@ -53,23 +53,23 @@ public class TravelCostFactory<S extends Scope> extends RelativeScopeFactory<
 
   private final MappingFactory<
     ? super S,
-    ? super Void,
+    ? super Vessel,
     ? super Int2D,
     ? extends Route
   > routeFunction;
 
   @Singular
   private final ImmutableList<
-    MappingFactory<? super S, ? super Void, ? super Route, ? extends Money>
+    MappingFactory<? super S, ? super Vessel, ? super Route, ? extends Money>
   > routeCosts;
 
   @Override
   protected TravelCost newInstance(final S scope) {
     return new TravelCost(
-      WithoutContext.function(routeFunction.get(scope)),
+      routeFunction.get(scope),
       routeCosts
         .stream()
-        .map(routeCost -> WithoutContext.function(routeCost.get(scope)))
+        .map(routeCost -> routeCost.get(scope))
         .toList()
     );
   }

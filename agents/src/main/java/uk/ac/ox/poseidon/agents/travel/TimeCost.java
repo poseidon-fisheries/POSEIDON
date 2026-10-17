@@ -32,34 +32,30 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * The cost of the time a vessel would spend sailing a {@link Route}: its hourly
- * cost times the route's hours. The hourly cost is read at each call.
+ * cost times the route's hours. The hourly cost is read at each call, for the
+ * vessel given.
  */
-public class TimeCost implements BiFunction<Object, Route, Money> {
+public class TimeCost implements BiFunction<Vessel, Route, Money> {
 
-  private final Vessel vessel;
   private final Function<? super Vessel, ? extends Money> hourlyCost;
 
   /**
-   * @param vessel     the vessel that would sail the route
-   * @param hourlyCost gives the vessel's cost per hour at sea
+   * @param hourlyCost gives a vessel's cost per hour at sea
    */
-  TimeCost(
-    final Vessel vessel,
-    final Function<? super Vessel, ? extends Money> hourlyCost
-  ) {
-    this.vessel = checkNotNull(vessel);
+  TimeCost(final Function<? super Vessel, ? extends Money> hourlyCost) {
     this.hourlyCost = checkNotNull(hourlyCost);
   }
 
   /**
-   * @param route the route the vessel would sail
+   * @param vessel the vessel that would sail the route
+   * @param route  the route the vessel would sail
    * @return the vessel's hourly cost times the hours {@code route} takes to
    *         sail
    * @throws NullPointerException if {@code hourlyCost} gives no cost for the
    *                              vessel
    */
   @Override
-  public Money apply(final Object context, final Route route) {
+  public Money apply(final Vessel vessel, final Route route) {
     return checkNotNull(
       hourlyCost.apply(vessel),
       "Unable to extract hourly cost for Vessel %s.",

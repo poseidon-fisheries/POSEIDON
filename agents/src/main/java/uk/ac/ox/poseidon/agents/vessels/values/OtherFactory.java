@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,39 +20,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices;
+package uk.ac.ox.poseidon.agents.vessels.values;
 
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.geography.ports.PortGrid;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of
- * {@link HomePortDestinationSupplier}, built via
- * {@link Factories#homePortDestination}.
+ * A {@link RelativeScopeFactory} counterpart of {@link Other}, built via
+ * {@link Factories#other(ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class HomePortDestinationSupplierFactory
-  extends VesselScopeFactory<HomePortDestinationSupplier>
+public class OtherFactory<S extends Scope, R>
+  extends RelativeScopeFactory<S, BiFunction<Object, Vessel, R>>
+  implements MappingFactory<S, Object, Vessel, R>
 {
 
-  private final Factory<? super VesselScope, ? extends PortGrid> portGrid;
+  private final ValueFactory<? super S, ? super Vessel, ? extends R> value;
 
   @Override
-  protected HomePortDestinationSupplier newInstance(final VesselScope scope) {
-    return new HomePortDestinationSupplier(
-      scope.getVessel(),
-      portGrid.get(scope)
-    );
+  protected BiFunction<Object, Vessel, R> newInstance(final S scope) {
+    return new Other<>(value.get(scope));
   }
 }

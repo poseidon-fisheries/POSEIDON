@@ -28,34 +28,40 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 
 /**
- * Factories for suppliers of a vessel's dynamically-maintained set of "friend"
- * vessels.
+ * Factories for a vessel's dynamically-maintained set of "friend" vessels.
  */
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   *         {@link DynamicFriendsSupplier}
-   * @see DynamicFriendsSupplierFactory
+   * @param targetNumberOfFriends how many friends to keep
+   * @param potentialFriends      the vessels friends are drawn from
+   * @param friendshipCondition   which other vessels can be friends of a
+   *                              vessel: a mapping of the other vessel, read
+   *                              with {@code other(...)} (see
+   *                              {@link uk.ac.ox.poseidon.agents.vessels.values.Factories#other})
+   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for
+   *         {@link DynamicFriends}
+   * @see DynamicFriendsFactory
    */
-  public static DynamicFriendsSupplierFactory dynamicFriendsSupplier(
+  public static DynamicFriendsFactory dynamicFriends(
     final int targetNumberOfFriends,
     final Factory<
       ? super VesselScope,
       ? extends VesselsGetter
     > potentialFriends,
-    final ValueFactory<
+    final MappingFactory<
       ? super VesselScope,
+      ? super Vessel,
       ? super Vessel,
       Boolean
     > friendshipCondition
   ) {
-    return new DynamicFriendsSupplierFactory(
+    return new DynamicFriendsFactory(
       targetNumberOfFriends,
       potentialFriends,
       friendshipCondition,

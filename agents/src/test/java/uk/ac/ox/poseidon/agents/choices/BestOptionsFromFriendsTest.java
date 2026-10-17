@@ -27,7 +27,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Map;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -35,14 +36,16 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 
 class BestOptionsFromFriendsTest {
 
+  private final Vessel vessel = mock(Vessel.class);
+
   @Test
   void testGetWhenEmptyRegister() {
     final VesselComponentRegister<OptionValues<String>> register =
       new VesselComponentRegister<>();
-    final Supplier<List<Vessel>> friendsSupplier = List::of;
-    final BestOptionsFromFriends<String> supplier =
-      new BestOptionsFromFriends<>(register, friendsSupplier);
-    assertThat(supplier.get().getBestEntries()).isEmpty();
+    final Function<Vessel, List<Vessel>> friends = vessel -> List.of();
+    final BestOptionsFromFriends<String> bestOptionsFromFriends =
+      new BestOptionsFromFriends<>(register, friends);
+    assertThat(bestOptionsFromFriends.apply(vessel).getBestEntries()).isEmpty();
   }
 
   @Test
@@ -61,11 +64,13 @@ class BestOptionsFromFriendsTest {
       new VesselComponentRegister<>();
     register.putComponent(friend, friendValues);
 
-    final Supplier<List<Vessel>> friendsSupplier = () -> List.of(friend);
-    final BestOptionsFromFriends<String> supplier =
-      new BestOptionsFromFriends<>(register, friendsSupplier);
+    final Function<Vessel, List<Vessel>> friends = vessel -> List.of(friend);
+    final BestOptionsFromFriends<String> bestOptionsFromFriends =
+      new BestOptionsFromFriends<>(register, friends);
 
-    assertThat(supplier.get().getBestOptions()).containsExactly("B");
+    assertThat(
+      bestOptionsFromFriends.apply(vessel).getBestOptions()
+    ).containsExactly("B");
   }
 
   @Test
@@ -92,13 +97,17 @@ class BestOptionsFromFriendsTest {
     register.putComponent(friendA, valuesA);
     register.putComponent(friendB, valuesB);
 
-    final Supplier<List<Vessel>> friendsSupplier = () ->
+    final Function<Vessel, List<Vessel>> friends = vessel ->
       List.of(friendA, friendB);
-    final BestOptionsFromFriends<String> supplier =
-      new BestOptionsFromFriends<>(register, friendsSupplier);
+    final BestOptionsFromFriends<String> bestOptionsFromFriends =
+      new BestOptionsFromFriends<>(register, friends);
 
-    assertThat(supplier.get().getBestOptions()).containsExactly("X");
-    assertThat(supplier.get().getBestValue()).hasValue(30.0);
+    assertThat(
+      bestOptionsFromFriends.apply(vessel).getBestOptions()
+    ).containsExactly("X");
+    assertThat(bestOptionsFromFriends.apply(vessel).getBestValue()).hasValue(
+      30.0
+    );
   }
 
   @Test
@@ -116,11 +125,11 @@ class BestOptionsFromFriendsTest {
       new VesselComponentRegister<>();
     register.putComponent(friend, friendValues);
 
-    final Supplier<List<Vessel>> friendsSupplier = () -> List.of(friend);
-    final BestOptionsFromFriends<String> supplier =
-      new BestOptionsFromFriends<>(register, friendsSupplier);
+    final Function<Vessel, List<Vessel>> friends = vessel -> List.of(friend);
+    final BestOptionsFromFriends<String> bestOptionsFromFriends =
+      new BestOptionsFromFriends<>(register, friends);
 
-    assertThat(supplier.get().getBestEntries()).isEmpty();
+    assertThat(bestOptionsFromFriends.apply(vessel).getBestEntries()).isEmpty();
   }
 
   @Test
@@ -137,11 +146,11 @@ class BestOptionsFromFriendsTest {
       new ExponentialMovingAverageOptionValues<>(1.0)
     );
 
-    final Supplier<List<Vessel>> friendsSupplier = () -> List.of(friend);
-    final BestOptionsFromFriends<String> supplier =
-      new BestOptionsFromFriends<>(register, friendsSupplier);
+    final Function<Vessel, List<Vessel>> friends = vessel -> List.of(friend);
+    final BestOptionsFromFriends<String> bestOptionsFromFriends =
+      new BestOptionsFromFriends<>(register, friends);
 
-    assertThat(supplier.get().getBestEntries()).isEmpty();
+    assertThat(bestOptionsFromFriends.apply(vessel).getBestEntries()).isEmpty();
   }
 
   @Test
@@ -168,14 +177,43 @@ class BestOptionsFromFriendsTest {
     register.putComponent(friendA, valuesA);
     register.putComponent(friendB, valuesB);
 
-    final Supplier<List<Vessel>> friendsSupplier = () ->
+    final Function<Vessel, List<Vessel>> friends = vessel ->
       List.of(friendA, friendB);
-    final BestOptionsFromFriends<String> supplier =
-      new BestOptionsFromFriends<>(register, friendsSupplier);
+    final BestOptionsFromFriends<String> bestOptionsFromFriends =
+      new BestOptionsFromFriends<>(register, friends);
 
-    final OptionValues<String> result = supplier.get();
+    final OptionValues<String> result = bestOptionsFromFriends.apply(vessel);
     assertThat(result.getValue("A")).hasValue(10.0);
     assertThat(result.getValue("B")).hasValue(20.0);
     assertThat(result.getBestOptions()).containsExactly("B");
+  }
+
+  @Test
+  void readsTheFriendsOfTheVesselGivenAndValuesEachFriendsOptionsForThatFriend() {
+    final Vessel otherVessel = mock(Vessel.class);
+    final Vessel friend = mock(Vessel.class);
+    when(friend.isActive()).thenReturn(true);
+    final OptionValues<String> friendsOwnValues = new ImmutableOptionValues<>(
+      Map.of("A", 10.0)
+    );
+    final OptionValues<String> valuesForAnotherVessel =
+      new ImmutableOptionValues<>(Map.of("B", 20.0));
+    final VesselComponentRegister<
+      Function<Vessel, OptionValues<String>>
+    > register = new VesselComponentRegister<>();
+    register.putComponent(friend, valuedFor ->
+      valuedFor == friend ? friendsOwnValues : valuesForAnotherVessel
+    );
+    final BestOptionsFromFriends<String> bestOptionsFromFriends =
+      new BestOptionsFromFriends<>(register, friendsOf ->
+        friendsOf == vessel ? List.of(friend) : List.of()
+      );
+
+    assertThat(
+      bestOptionsFromFriends.apply(vessel).getBestOptions()
+    ).containsExactly("A");
+    assertThat(
+      bestOptionsFromFriends.apply(otherVessel).getBestEntries()
+    ).isEmpty();
   }
 }

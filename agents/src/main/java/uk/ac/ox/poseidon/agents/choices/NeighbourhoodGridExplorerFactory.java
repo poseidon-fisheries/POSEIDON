@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import ec.util.MersenneTwisterFast;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -48,7 +48,8 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class NeighbourhoodGridExplorerFactory
-  extends VesselScopeFactory<NeighbourhoodCellPicker>
+  extends VesselScopeFactory<Function<Vessel, Int2D>>
+  implements ValueFactory<VesselScope, Vessel, Int2D>
 {
 
   private final Factory<
@@ -67,9 +68,10 @@ public class NeighbourhoodGridExplorerFactory
     Integer
   > neighbourhoodSize;
   private final int maximumWidening;
-  private final Factory<
+  private final ValueFactory<
     ? super VesselScope,
-    ? extends Supplier<Int2D>
+    ? super Vessel,
+    ? extends Int2D
   > searchCentre;
   private final Factory<
     ? super VesselScope,
@@ -77,9 +79,8 @@ public class NeighbourhoodGridExplorerFactory
   > randomNumberGenerator;
 
   @Override
-  protected NeighbourhoodCellPicker newInstance(final VesselScope scope) {
+  protected Function<Vessel, Int2D> newInstance(final VesselScope scope) {
     return new NeighbourhoodCellPicker(
-      scope.getVessel(),
       pathFinder.get(scope),
       cellPredicate.get(scope),
       neighbourhoodSize.get(scope),

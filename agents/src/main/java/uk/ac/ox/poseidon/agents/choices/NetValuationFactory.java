@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import java.util.function.ToDoubleBiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -49,11 +48,11 @@ public class NetValuationFactory<
 
   private final Factory<
     ? super S,
-    ? extends ToDoubleBiFunction<? super O, ? super M>
+    ? extends Valuation<? super O, ? super M>
   > revenueValuation;
   private final Factory<
     ? super S,
-    ? extends ToDoubleBiFunction<? super O, ? super M>
+    ? extends Valuation<? super O, ? super M>
   > costValuation;
 
   @Override

@@ -23,43 +23,49 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 class NetValuationTest {
+
+  private final Vessel vessel = mock(Vessel.class);
 
   @Test
   void subtractsTheCostValuationFromTheRevenueValuation() {
     final NetValuation<String, Double> netValuation = new NetValuation<>(
-      (option, recollection) -> 10.0,
-      (option, recollection) -> 4.0
+      (valuedFor, option, recollection) -> 10.0,
+      (valuedFor, option, recollection) -> 4.0
     );
 
-    assertThat(netValuation.applyAsDouble("A", 1.0)).isEqualTo(6.0);
+    assertThat(netValuation.valueOf(vessel, "A", 1.0)).isEqualTo(6.0);
   }
 
   @Test
-  void givesBothValuationsTheSameOptionAndRecollection() {
+  void givesBothValuationsTheSameVesselOptionAndRecollection() {
     final List<Object> revenueArguments = new ArrayList<>();
     final List<Object> costArguments = new ArrayList<>();
     final NetValuation<String, Double> netValuation = new NetValuation<>(
-      (option, recollection) -> {
+      (valuedFor, option, recollection) -> {
+        revenueArguments.add(valuedFor);
         revenueArguments.add(option);
         revenueArguments.add(recollection);
         return 0.0;
       },
-      (option, recollection) -> {
+      (valuedFor, option, recollection) -> {
+        costArguments.add(valuedFor);
         costArguments.add(option);
         costArguments.add(recollection);
         return 0.0;
       }
     );
 
-    netValuation.applyAsDouble("A", 1.0);
+    netValuation.valueOf(vessel, "A", 1.0);
 
-    assertThat(revenueArguments).containsExactly("A", 1.0);
-    assertThat(costArguments).containsExactly("A", 1.0);
+    assertThat(revenueArguments).containsExactly(vessel, "A", 1.0);
+    assertThat(costArguments).containsExactly(vessel, "A", 1.0);
   }
 }

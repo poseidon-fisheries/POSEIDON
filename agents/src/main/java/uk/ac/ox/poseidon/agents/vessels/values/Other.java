@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,26 +20,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.choices;
+package uk.ac.ox.poseidon.agents.vessels.values;
 
-import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import lombok.NonNull;
-import sim.util.Int2D;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-/** A {@link DestinationSupplier} that always returns the same fixed cell. */
-public class ConstantDestinationSupplier implements DestinationSupplier {
+/**
+ * A value of a vessel read off the other vessel: in a test that relates the
+ * vessel a call is for (the context) to another vessel (the thing mapped), it
+ * reads the value off that other vessel and ignores the context. A value of a
+ * vessel used there without it reads the vessel the call is for, so the other
+ * vessel is always named.
+ *
+ * @param <R> the type of the value
+ */
+@RequiredArgsConstructor
+public class Other<R> implements BiFunction<Object, Vessel, R> {
 
-  @NonNull
-  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-  private final Optional<Int2D> destination;
-
-  /** @param destination the cell to always return; may be {@code null} */
-  public ConstantDestinationSupplier(final Int2D destination) {
-    this.destination = Optional.ofNullable(destination);
-  }
+  private final @NonNull Function<? super Vessel, ? extends R> value;
 
   @Override
-  public Optional<Int2D> get() {
-    return destination;
+  public R apply(final Object context, final Vessel otherVessel) {
+    return value.apply(otherVessel);
   }
 }

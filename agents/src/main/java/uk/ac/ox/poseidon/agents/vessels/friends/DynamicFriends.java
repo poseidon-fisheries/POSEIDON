@@ -28,22 +28,23 @@ import ec.util.MersenneTwisterFast;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 
 /**
- * A per-vessel supplier that maintains a bounded, randomly sampled set of
- * "friends" from a pool of candidate vessels.
+ * The friends of a vessel: a bounded, randomly sampled set of "friends" from a
+ * pool of candidate vessels, kept for one vessel.
  *
  * <p>
- * Each call to {@link #get()} first prunes friends that no longer satisfy the
- * friendship condition. If the target count has not been reached, new friends
- * are sampled uniformly (without replacement) from the pool, filtered by the
- * condition and excluding current friends.
+ * Each call to {@link #apply} first prunes friends that no longer satisfy the
+ * friendship condition, which relates the vessel given to each other vessel. If
+ * the target count has not been reached, new friends are sampled uniformly
+ * (without replacement) from the pool, filtered by the condition and excluding
+ * the vessel and its current friends.
  *
  * <p>
  * The sampling uses reservoir sampling
@@ -51,7 +52,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
  * for O(target) allocation at the cost of O(pool) predicate evaluations.
  */
 @RequiredArgsConstructor
-public class DynamicFriendsSupplier implements Supplier<Set<Vessel>> {
+public class DynamicFriends implements Function<Vessel, Set<Vessel>> {
 
   private final int targetNumberOfFriends;
 
@@ -59,10 +60,11 @@ public class DynamicFriendsSupplier implements Supplier<Set<Vessel>> {
   private final VesselsGetter potentialFriends;
 
   @NonNull
-  private final Function<? super Vessel, Boolean> friendshipCondition;
-
-  @NonNull
-  private final Vessel vessel;
+  private final BiFunction<
+    ? super Vessel,
+    ? super Vessel,
+    Boolean
+  > friendshipCondition;
 
   @NonNull
   private final MersenneTwisterFast rng;
@@ -71,17 +73,17 @@ public class DynamicFriendsSupplier implements Supplier<Set<Vessel>> {
   private final Set<Vessel> currentFriends = new LinkedHashSet<>();
 
   @Override
-  public Set<Vessel> get() {
-    currentFriends.removeIf(v -> !friendshipCondition.apply(v));
+  public Set<Vessel> apply(final Vessel vessel) {
+    currentFriends.removeIf(v -> !friendshipCondition.apply(vessel, v));
 
     if (currentFriends.size() < targetNumberOfFriends) {
       reservoirSample(
         potentialFriends.getVessels(),
         targetNumberOfFriends - currentFriends.size(),
         v ->
-          v != this.vessel &&
+          v != vessel &&
           !currentFriends.contains(v) &&
-          friendshipCondition.apply(v),
+          friendshipCondition.apply(vessel, v),
         rng
       ).forEach(currentFriends::add);
     }

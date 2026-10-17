@@ -22,15 +22,17 @@
 
 package uk.ac.ox.poseidon.agents.tasks.destinations;
 
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link VesselTaskFactory} for a {@link StartTrip}. Built via
@@ -43,13 +45,14 @@ import uk.ac.ox.poseidon.core.Factory;
 @SuperBuilder(toBuilder = true)
 public class StartTripFactory extends VesselTaskFactory<StartTrip> {
 
-  private final Factory<
+  private final ValueFactory<
     ? super VesselScope,
-    ? extends DestinationSupplier
-  > destinationSupplier;
+    ? super Vessel,
+    Optional<Int2D>
+  > destination;
 
   @Override
   protected StartTrip newInstance(final VesselScope scope) {
-    return new StartTrip(destinationSupplier.get(scope));
+    return new StartTrip(destination.get(scope));
   }
 }

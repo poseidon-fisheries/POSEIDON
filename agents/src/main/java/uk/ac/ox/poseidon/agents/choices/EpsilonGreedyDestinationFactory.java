@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2026, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,55 +20,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.friends;
+package uk.ac.ox.poseidon.agents.choices;
 
 import ec.util.MersenneTwisterFast;
-import lombok.*;
+import java.util.Optional;
+import java.util.function.Function;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link VesselScopeFactory} for a {@link DynamicFriendsSupplier}. Built via
- * {@link Factories#dynamicFriendsSupplier}.
+ * A {@link VesselScopeFactory} counterpart of {@link EpsilonGreedyChooser},
+ * built via {@link Factories#epsilonGreedyDestination}.
  */
 @Getter
 @ToString
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class DynamicFriendsSupplierFactory
-  extends VesselScopeFactory<DynamicFriendsSupplier>
+public class EpsilonGreedyDestinationFactory
+  extends VesselScopeFactory<Function<Vessel, Optional<Int2D>>>
+  implements ValueFactory<VesselScope, Vessel, Optional<Int2D>>
 {
 
-  private final int targetNumberOfFriends;
-  private final Factory<
-    ? super VesselScope,
-    ? extends VesselsGetter
-  > potentialFriends;
+  private final double epsilon;
   private final ValueFactory<
     ? super VesselScope,
     ? super Vessel,
-    Boolean
-  > friendshipCondition;
+    ? extends Int2D
+  > explorer;
+  private final ValueFactory<
+    ? super VesselScope,
+    ? super Vessel,
+    ? extends Int2D
+  > exploiter;
   private final Factory<
     ? super VesselScope,
     ? extends MersenneTwisterFast
   > randomNumberGenerator;
 
+  /**
+   * @return an {@link EpsilonGreedyChooser} of destinations over the resolved
+   *         explorer and exploiter
+   */
   @Override
-  protected DynamicFriendsSupplier newInstance(final VesselScope scope) {
-    return new DynamicFriendsSupplier(
-      targetNumberOfFriends,
-      potentialFriends.get(scope),
-      friendshipCondition.get(scope),
-      scope.getVessel(),
+  protected Function<Vessel, Optional<Int2D>> newInstance(
+    final VesselScope scope
+  ) {
+    return new EpsilonGreedyChooser<>(
+      epsilon,
+      explorer.get(scope),
+      exploiter.get(scope),
       randomNumberGenerator.get(scope)
     );
   }

@@ -25,12 +25,12 @@
  * {@link uk.ac.ox.poseidon.agents.choices.OptionValues} holds what's been
  * learned about each candidate option (see
  * {@link uk.ac.ox.poseidon.agents.choices.evaluation} for how those
- * observations are produced), and a
- * {@link uk.ac.ox.poseidon.agents.choices.DestinationSupplier} (or, at a lower
- * level, a {@link java.util.function.Supplier} of a cell) picks the next
- * destination — exploring randomly or in a neighbourhood, exploiting the
- * best-known option, imitating friends' best options, or an epsilon-greedy mix
- * of exploring and exploiting. See
+ * observations are produced), and a picker, a function of the vessel it picks
+ * for, picks the next destination — exploring randomly or in a neighbourhood,
+ * exploiting the best-known option, imitating friends' best options, or an
+ * epsilon-greedy mix of exploring and exploiting. A picker takes the option
+ * values of that vessel, and a {@link uk.ac.ox.poseidon.agents.choices.Valuation}
+ * values an option for it. See
  * {@link uk.ac.ox.poseidon.agents.choices.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.agents.choices;

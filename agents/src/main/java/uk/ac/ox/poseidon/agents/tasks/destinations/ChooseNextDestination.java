@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -26,24 +26,26 @@ import static com.badlogic.gdx.ai.btree.Task.Status.FAILED;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.Optional;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.choices.DestinationSupplier;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * Redirects the vessel's current trip to whatever destination
- * {@code destinationSupplier} yields; fails, leaving the trip's destination
- * unchanged, if the supplier yields none. The mid-trip counterpart of
+ * {@code destination} gives for the vessel; fails, leaving the trip's
+ * destination unchanged, if it gives none. The mid-trip counterpart of
  * {@link StartTrip}: within a trip, a failure ends a loop of fishing
  * operations.
  */
 @RequiredArgsConstructor
 public class ChooseNextDestination extends AgentTask<Vessel> {
 
-  private final @NonNull DestinationSupplier destinationSupplier;
+  private final @NonNull Function<? super Vessel, Optional<Int2D>> destination;
 
   /**
    * @return {@link Status#SUCCEEDED} if a destination was found and the trip
@@ -58,10 +60,10 @@ public class ChooseNextDestination extends AgentTask<Vessel> {
       "Vessel %s is not on a trip.",
       getAgent().getId()
     );
-    return destinationSupplier
-      .get()
-      .map(destination -> {
-        currentTrip.setDestination(destination);
+    return destination
+      .apply(getAgent())
+      .map(nextDestination -> {
+        currentTrip.setDestination(nextDestination);
         return SUCCEEDED;
       })
       .orElse(FAILED);

@@ -32,12 +32,12 @@ import ec.util.MersenneTwisterFast;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
-class DynamicFriendsSupplierTest {
+class DynamicFriendsTest {
 
   private static final int TARGET_FRIENDS = 3;
   private MersenneTwisterFast rng;
@@ -60,14 +60,13 @@ class DynamicFriendsSupplierTest {
   @Test
   void testEmptyPoolReturnsEmpty() {
     final Vessel self = mockVessel();
-    final DynamicFriendsSupplier supplier = new DynamicFriendsSupplier(
+    final DynamicFriends dynamicFriends = new DynamicFriends(
       TARGET_FRIENDS,
       List::of,
-      v -> true,
-      self,
+      (vessel, other) -> true,
       rng
     );
-    assertThat(supplier.get()).isEmpty();
+    assertThat(dynamicFriends.apply(self)).isEmpty();
   }
 
   @Test
@@ -80,42 +79,39 @@ class DynamicFriendsSupplierTest {
       mockVessel(),
       mockVessel()
     );
-    final DynamicFriendsSupplier supplier = new DynamicFriendsSupplier(
+    final DynamicFriends dynamicFriends = new DynamicFriends(
       TARGET_FRIENDS,
       () -> pool,
-      v -> true,
-      self,
+      (vessel, other) -> true,
       rng
     );
-    assertThat(supplier.get()).hasSize(TARGET_FRIENDS);
+    assertThat(dynamicFriends.apply(self)).hasSize(TARGET_FRIENDS);
   }
 
   @Test
   void testReturnsAllWhenPoolSmallerThanTarget() {
     final Vessel self = mockVessel();
     final List<Vessel> pool = List.of(mockVessel(), mockVessel());
-    final DynamicFriendsSupplier supplier = new DynamicFriendsSupplier(
+    final DynamicFriends dynamicFriends = new DynamicFriends(
       TARGET_FRIENDS,
       () -> pool,
-      v -> true,
-      self,
+      (vessel, other) -> true,
       rng
     );
-    assertThat(supplier.get()).hasSize(2);
+    assertThat(dynamicFriends.apply(self)).hasSize(2);
   }
 
   @Test
   void testExcludesSelf() {
     final Vessel self = mockVessel();
     final List<Vessel> pool = List.of(mockVessel(), mockVessel(), mockVessel());
-    final DynamicFriendsSupplier supplier = new DynamicFriendsSupplier(
+    final DynamicFriends dynamicFriends = new DynamicFriends(
       TARGET_FRIENDS,
       () -> pool,
-      v -> true,
-      self,
+      (vessel, other) -> true,
       rng
     );
-    assertThat(supplier.get()).doesNotContain(self);
+    assertThat(dynamicFriends.apply(self)).doesNotContain(self);
   }
 
   @Test
@@ -124,14 +120,30 @@ class DynamicFriendsSupplierTest {
     final Vessel active = mockVessel(true);
     final Vessel inactive = mockVessel(false);
     final List<Vessel> pool = List.of(active, inactive);
-    final DynamicFriendsSupplier supplier = new DynamicFriendsSupplier(
+    final DynamicFriends dynamicFriends = new DynamicFriends(
       1,
       () -> pool,
-      v -> ((Vessel) v).isActive(),
-      self,
+      (vessel, other) -> other.isActive(),
       rng
     );
-    assertThat(supplier.get()).containsExactly(active);
+    assertThat(dynamicFriends.apply(self)).containsExactly(active);
+  }
+
+  @Test
+  void testRelatesTheVesselGivenToEachCandidate() {
+    final Vessel self = mockVessel();
+    final Vessel sameGroup = mockVessel();
+    final Vessel otherGroup = mockVessel();
+    final List<Vessel> pool = List.of(sameGroup, otherGroup);
+    final DynamicFriends dynamicFriends = new DynamicFriends(
+      TARGET_FRIENDS,
+      () -> pool,
+      (vessel, other) ->
+        (vessel == self && other == sameGroup) ||
+        (vessel != self && other == otherGroup),
+      rng
+    );
+    assertThat(dynamicFriends.apply(self)).containsExactly(sameGroup);
   }
 
   @Test
@@ -144,15 +156,14 @@ class DynamicFriendsSupplierTest {
       mockVessel(),
       mockVessel()
     );
-    final DynamicFriendsSupplier supplier = new DynamicFriendsSupplier(
+    final DynamicFriends dynamicFriends = new DynamicFriends(
       TARGET_FRIENDS,
       () -> pool,
-      v -> true,
-      self,
+      (vessel, other) -> true,
       rng
     );
-    final Set<Vessel> first = supplier.get();
-    final Set<Vessel> second = supplier.get();
+    final Set<Vessel> first = dynamicFriends.apply(self);
+    final Set<Vessel> second = dynamicFriends.apply(self);
     assertThat(first).isEqualTo(second);
   }
 
@@ -160,22 +171,22 @@ class DynamicFriendsSupplierTest {
   void testPrunesFriendsThatNoLongerSatisfyCondition() {
     final Vessel self = mockVessel();
     final Vessel friend = mockVessel(true);
-    final Function<Vessel, Boolean> isActive = Vessel::isActive;
+    final BiFunction<Vessel, Vessel, Boolean> isActive = (vessel, other) ->
+      other.isActive();
     final List<Vessel> pool = new ArrayList<>(List.of(friend));
-    final DynamicFriendsSupplier supplier = new DynamicFriendsSupplier(
+    final DynamicFriends dynamicFriends = new DynamicFriends(
       1,
       () -> pool,
       isActive,
-      self,
       rng
     );
 
-    assertThat(supplier.get()).containsExactly(friend);
+    assertThat(dynamicFriends.apply(self)).containsExactly(friend);
 
     // Friend becomes inactive
     when(friend.isActive()).thenReturn(false);
 
-    assertThat(supplier.get()).doesNotContain(friend);
+    assertThat(dynamicFriends.apply(self)).doesNotContain(friend);
   }
 
   @Test
@@ -184,20 +195,20 @@ class DynamicFriendsSupplierTest {
     final Vessel friendA = mockVessel(true);
     final Vessel friendB = mockVessel(true);
     final Vessel friendC = mockVessel(true);
-    final Function<Vessel, Boolean> isActive = Vessel::isActive;
+    final BiFunction<Vessel, Vessel, Boolean> isActive = (vessel, other) ->
+      other.isActive();
     final List<Vessel> pool = new ArrayList<>(
       List.of(friendA, friendB, friendC)
     );
-    final DynamicFriendsSupplier supplier = new DynamicFriendsSupplier(
+    final DynamicFriends dynamicFriends = new DynamicFriends(
       2,
       () -> pool,
       isActive,
-      self,
       rng
     );
 
     // Initial fill: gets 2 friends
-    final Set<Vessel> first = supplier.get();
+    final Set<Vessel> first = dynamicFriends.apply(self);
     assertThat(first).hasSize(2);
 
     // One friend becomes inactive; pool still has the other
@@ -206,7 +217,7 @@ class DynamicFriendsSupplierTest {
     pool.remove(removed);
 
     // Replenishment: should drop the inactive one and still have 2
-    final Set<Vessel> second = supplier.get();
+    final Set<Vessel> second = dynamicFriends.apply(self);
     assertThat(second).hasSize(2).doesNotContain(removed);
   }
 
@@ -214,16 +225,15 @@ class DynamicFriendsSupplierTest {
   void testReturnsUnmodifiableSet() {
     final Vessel self = mockVessel();
     final List<Vessel> pool = List.of(mockVessel(), mockVessel(), mockVessel());
-    final DynamicFriendsSupplier supplier = new DynamicFriendsSupplier(
+    final DynamicFriends dynamicFriends = new DynamicFriends(
       TARGET_FRIENDS,
       () -> pool,
-      v -> true,
-      self,
+      (vessel, other) -> true,
       rng
     );
-    assertThatThrownBy(() -> supplier.get().add(mockVessel())).isInstanceOf(
-      UnsupportedOperationException.class
-    );
+    assertThatThrownBy(() ->
+      dynamicFriends.apply(self).add(mockVessel())
+    ).isInstanceOf(UnsupportedOperationException.class);
   }
 
   @Test
@@ -243,15 +253,14 @@ class DynamicFriendsSupplierTest {
 
     final int[] counts = new int[poolSize];
     for (int t = 0; t < trials; t++) {
-      // Fresh supplier each trial so sampling happens from scratch
-      final DynamicFriendsSupplier supplier = new DynamicFriendsSupplier(
+      // Fresh friends each trial so sampling happens from scratch
+      final DynamicFriends dynamicFriends = new DynamicFriends(
         sampleSize,
         () -> pool,
-        v -> true,
-        self,
+        (vessel, other) -> true,
         uniformRng
       );
-      for (final Vessel v : supplier.get()) {
+      for (final Vessel v : dynamicFriends.apply(self)) {
         final int idx = pool.indexOf(v);
         if (idx >= 0) counts[idx]++;
       }

@@ -52,8 +52,8 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class FishingLocationLegalityCheckerFactory
-  extends VesselScopeFactory<BiFunction<Object, Int2D, Boolean>>
-  implements MappingFactory<VesselScope, Object, Int2D, Boolean>
+  extends VesselScopeFactory<BiFunction<Vessel, Int2D, Boolean>>
+  implements MappingFactory<VesselScope, Vessel, Int2D, Boolean>
 {
 
   private final Factory<
@@ -80,7 +80,7 @@ public class FishingLocationLegalityCheckerFactory
   > currentDateTime;
 
   @Override
-  protected BiFunction<Object, Int2D, Boolean> newInstance(
+  protected BiFunction<Vessel, Int2D, Boolean> newInstance(
     final VesselScope scope
   ) {
     return new FishingLocationLegalityChecker(
@@ -88,8 +88,7 @@ public class FishingLocationLegalityCheckerFactory
       pathFinder.get(scope),
       distance.get(scope),
       fishingDuration.get(scope),
-      currentDateTime.get(scope),
-      scope.getVessel()
+      currentDateTime.get(scope)
     );
   }
 }

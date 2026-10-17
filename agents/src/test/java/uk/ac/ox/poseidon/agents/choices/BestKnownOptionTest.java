@@ -29,20 +29,22 @@ import static org.mockito.Mockito.when;
 import ec.util.MersenneTwisterFast;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 class BestKnownOptionTest {
 
   private static final Int2D BEST = new Int2D(4, 2);
   private static final Int2D WORSE = new Int2D(1, 1);
   private static final Int2D FALLBACK = new Int2D(2, 2);
-  private static final Supplier<Int2D> NO_FALLBACK = () -> {
+  private static final Function<Vessel, Int2D> NO_FALLBACK = vessel -> {
     throw new AssertionError("The fallback should not be asked for an option.");
   };
 
   private final MersenneTwisterFast rng = new MersenneTwisterFast(0);
+  private final Vessel vessel = mock(Vessel.class);
 
   @Test
   void givesTheBestKnownOption() {
@@ -52,18 +54,37 @@ class BestKnownOptionTest {
       rng
     );
 
-    assertThat(bestKnownOption.get()).isEqualTo(BEST);
+    assertThat(bestKnownOption.apply(vessel)).isEqualTo(BEST);
   }
 
   @Test
-  void givesTheFallbackWhenNoOptionIsKnown() {
+  void givesTheFallbackForTheVesselWhenNoOptionIsKnown() {
     final BestKnownOption<Int2D> bestKnownOption = new BestKnownOption<>(
       new ImmutableOptionValues<>(Map.of()),
-      () -> FALLBACK,
+      pickedFor -> pickedFor == vessel ? FALLBACK : null,
       rng
     );
 
-    assertThat(bestKnownOption.get()).isEqualTo(FALLBACK);
+    assertThat(bestKnownOption.apply(vessel)).isEqualTo(FALLBACK);
+  }
+
+  @Test
+  void readsTheOptionValuesOfTheVesselGiven() {
+    final Vessel otherVessel = mock(Vessel.class);
+    final OptionValues<Int2D> bestValues = new ImmutableOptionValues<>(
+      Map.of(BEST, 1.0)
+    );
+    final OptionValues<Int2D> worseValues = new ImmutableOptionValues<>(
+      Map.of(WORSE, 1.0)
+    );
+    final BestKnownOption<Int2D> bestKnownOption = new BestKnownOption<>(
+      pickedFor -> pickedFor == vessel ? bestValues : worseValues,
+      NO_FALLBACK,
+      rng
+    );
+
+    assertThat(bestKnownOption.apply(vessel)).isEqualTo(BEST);
+    assertThat(bestKnownOption.apply(otherVessel)).isEqualTo(WORSE);
   }
 
   @Test
@@ -74,12 +95,12 @@ class BestKnownOptionTest {
       .thenReturn(Optional.of(BEST))
       .thenReturn(Optional.of(WORSE));
     final BestKnownOption<Int2D> bestKnownOption = new BestKnownOption<>(
-      optionValues,
+      pickedFor -> optionValues,
       NO_FALLBACK,
       rng
     );
 
-    assertThat(bestKnownOption.get()).isEqualTo(BEST);
-    assertThat(bestKnownOption.get()).isEqualTo(WORSE);
+    assertThat(bestKnownOption.apply(vessel)).isEqualTo(BEST);
+    assertThat(bestKnownOption.apply(vessel)).isEqualTo(WORSE);
   }
 }

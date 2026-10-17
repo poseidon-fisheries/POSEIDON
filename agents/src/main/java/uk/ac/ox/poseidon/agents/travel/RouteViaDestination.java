@@ -41,9 +41,8 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * first summed: it only depends on the two cells, and the path finder gives the
  * same path for them throughout a run.
  */
-public class RouteViaDestination implements BiFunction<Object, Int2D, Route> {
+public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
 
-  private final Vessel vessel;
   private final GridPathFinder pathFinder;
   private final DistanceCalculator distanceCalculator;
   // Keyed by the two cells packed into a long (see cellPairKey): the map grows
@@ -52,28 +51,26 @@ public class RouteViaDestination implements BiFunction<Object, Int2D, Route> {
   private final Long2DoubleMap pathLengthsInKm = new Long2DoubleOpenHashMap();
 
   /**
-   * @param vessel             the vessel that would sail the route
    * @param pathFinder         finds the paths of the route's two legs
    * @param distanceCalculator measures the paths
    */
   RouteViaDestination(
-    final Vessel vessel,
     final GridPathFinder pathFinder,
     final DistanceCalculator distanceCalculator
   ) {
-    this.vessel = checkNotNull(vessel);
     this.pathFinder = checkNotNull(pathFinder);
     this.distanceCalculator = checkNotNull(distanceCalculator);
   }
 
   /**
+   * @param vessel      the vessel that would sail the route
    * @param destination the cell to fish at
    * @return the route from the vessel's current cell to {@code destination},
    *         then back to its home port
    * @throws IllegalStateException if either leg has no path
    */
   @Override
-  public Route apply(final Object context, final Int2D destination) {
+  public Route apply(final Vessel vessel, final Int2D destination) {
     final double distanceInKm =
       distanceInKm(vessel.getCell(), destination) +
       distanceInKm(destination, vessel.getHomePortLocation());

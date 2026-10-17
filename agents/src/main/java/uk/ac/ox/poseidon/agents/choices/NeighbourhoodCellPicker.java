@@ -32,25 +32,23 @@ import ec.util.MersenneTwisterFast;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
- * Picks a random accessible water cell in the neighbourhood of a search centre,
- * asked for anew on each pick (the vessel's own cell if it gives none), growing
- * the search radius until a cell satisfies the option predicate. The radius
- * grows by at most {@code maximumWidening} cells beyond the initial one, and
- * never beyond the grid's larger dimension: when no cell is legal anywhere,
- * which is common (a closed port, no time left), an unbounded search would test
- * every water cell of the grid.
+ * Picks, for a vessel, a random accessible water cell in the neighbourhood of a
+ * search centre, asked for anew on each pick (the vessel's own cell if it gives
+ * none), growing the search radius until a cell satisfies the option predicate
+ * for the vessel. The radius grows by at most {@code maximumWidening} cells
+ * beyond the initial one, and never beyond the grid's larger dimension: when no
+ * cell is legal anywhere, which is common (a closed port, no time left), an
+ * unbounded search would test every water cell of the grid.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class NeighbourhoodCellPicker implements Supplier<Int2D> {
+public class NeighbourhoodCellPicker implements Function<Vessel, Int2D> {
 
-  private final Vessel vessel;
   private final GridPathFinder pathFinder;
   private final BiFunction<
     ? super Vessel,
@@ -59,17 +57,18 @@ public class NeighbourhoodCellPicker implements Supplier<Int2D> {
   > optionPredicate;
   private final Function<? super Vessel, Integer> neighbourhoodSize;
   private final int maximumWidening;
-  private final Supplier<Int2D> searchCentre;
+  private final Function<? super Vessel, ? extends Int2D> searchCentre;
   private final MersenneTwisterFast rng;
 
   /**
+   * @param vessel the vessel to pick for
    * @return a uniformly random accessible water cell satisfying the option
    *         predicate, within the smallest searched neighbourhood that has any;
    *         {@code null} if none qualify within the largest neighbourhood
    *         searched
    */
   @Override
-  public Int2D get() {
+  public Int2D apply(final Vessel vessel) {
     final int initialNeighbourhoodSize = neighbourhoodSize.apply(vessel);
     final int gridExtent = max(
       pathFinder.getModelGrid().getGridWidth(),
@@ -78,7 +77,7 @@ public class NeighbourhoodCellPicker implements Supplier<Int2D> {
     final int maxNeighbourhoodSize =
       initialNeighbourhoodSize +
       min(maximumWidening, gridExtent - initialNeighbourhoodSize);
-    final Int2D suppliedCentre = searchCentre.get();
+    final Int2D suppliedCentre = searchCentre.apply(vessel);
     final Int2D centre =
       suppliedCentre != null ? suppliedCentre : vessel.getCell();
     for (
