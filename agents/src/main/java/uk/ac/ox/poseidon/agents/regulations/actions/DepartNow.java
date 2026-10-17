@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.agents.regulations.actions;
 
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 
 /**
  * An {@link InstantFishingAction} standing for a vessel departing immediately,
@@ -30,8 +31,11 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
  */
 public class DepartNow extends InstantFishingAction {
 
-  /** @param vessel the vessel departing */
-  public DepartNow(final Vessel vessel) {
-    super(vessel);
+  /**
+   * @param vessel the vessel departing
+   * @param gear   the vessel's current gear
+   */
+  public DepartNow(final Vessel vessel, final Gear gear) {
+    super(vessel, gear);
   }
 }

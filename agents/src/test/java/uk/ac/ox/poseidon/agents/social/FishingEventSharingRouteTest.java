@@ -40,7 +40,9 @@ import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventAccum
 import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishingEventProperty;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
+import static uk.ac.ox.poseidon.agents.vessels.values.Factories.componentProperty;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.vesselProperty;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
@@ -71,6 +73,7 @@ import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.FleetFactory;
 import uk.ac.ox.poseidon.agents.vessels.FleetFromVesselRegisterFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
@@ -112,6 +115,9 @@ class FishingEventSharingRouteTest {
   private final Gear gear = mock(Gear.class);
   private final Hold hold = mock(Hold.class);
   private final Engine engine = mock(Engine.class);
+  private final VesselComponent<Gear> gearComponent = vesselComponent(
+    object(gear)
+  );
   private final Valuation<Int2D, Bucket> kgOfSpecies = (
     valuedFor,
     option,
@@ -122,7 +128,10 @@ class FishingEventSharingRouteTest {
     keyedMemory();
   private final MemoryBasedOptionValuesFactory<Int2D, Bucket> optionValues =
     memoryBasedOptionValues(
-      keyedMemorySelector(vesselMemory, vesselProperty("gear.code")),
+      keyedMemorySelector(
+        vesselMemory,
+        componentProperty(gearComponent, "code")
+      ),
       object(kgOfSpecies)
     );
   private final FleetFactory baseFleet = fleet(
@@ -156,35 +165,39 @@ class FishingEventSharingRouteTest {
     final var loader = FleetFromVesselRegisterFactory.builder()
       .fleet(baseFleet)
       .data(tableFromCsvString(vesselRegister))
-      .hold(object(hold))
-      .gear(object(gear))
-      .engine(object(engine))
-      .behaviour(behaviour(waitFor(constant(days(1)))));
+      .component(vesselComponent(object(hold)))
+      .component(gearComponent)
+      .component(vesselComponent(object(engine)))
+      .behaviour(vesselComponent(behaviour(waitFor(constant(days(1))))));
     if (withSharing) {
       loader
-        .extraFactory(
-          vesselEventListener(
-            fishingEventRecorder(
-              object(modelGrid),
-              keyedMemorySelector(
-                vesselMemory,
-                fishingEventProperty("action.gear.code")
-              ),
-              exponentialMovingAverageOfBuckets(OWN_ALPHA)
+        .component(
+          vesselComponent(
+            vesselEventListener(
+              fishingEventRecorder(
+                object(modelGrid),
+                keyedMemorySelector(
+                  vesselMemory,
+                  fishingEventProperty("action.gear.code")
+                ),
+                exponentialMovingAverageOfBuckets(OWN_ALPHA)
+              )
             )
           )
         )
-        .extraFactory(
-          sharedFishingEventListener(
-            fishingEventRecorder(
-              object(modelGrid),
-              keyedMemorySelector(
-                vesselMemory,
-                fishingEventProperty("action.gear.code")
+        .component(
+          vesselComponent(
+            sharedFishingEventListener(
+              fishingEventRecorder(
+                object(modelGrid),
+                keyedMemorySelector(
+                  vesselMemory,
+                  fishingEventProperty("action.gear.code")
+                ),
+                exponentialMovingAverageOfBuckets(SOCIAL_ALPHA)
               ),
-              exponentialMovingAverageOfBuckets(SOCIAL_ALPHA)
-            ),
-            fishingEventSharer
+              fishingEventSharer
+            )
           )
         );
     }
@@ -236,7 +249,7 @@ class FishingEventSharingRouteTest {
       vessel.getSchedule().getDateTime(),
       Duration.ofHours(1),
       coordinate,
-      vessel.getGear()
+      gear
     );
     final Bucket retained = Bucket.of(species, kg);
     trip

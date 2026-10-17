@@ -47,9 +47,10 @@ import uk.ac.ox.poseidon.core.utils.Builders;
  * An address starts at a component's name and goes on with commons-beanutils
  * syntax: {@code .property}, {@code (key)} into a map, {@code [index]} into a
  * list. Following it only reads. If the value found is a node (a factory, a
- * map or a list), it is replaced in every container that holds it, since the
- * same node may be reached in several ways. Any other value is replaced in
- * the container the address ends in, which is then the changed node.
+ * {@link DescriptionNode}, a map or a list), it is replaced in every
+ * container that holds it, since the same node may be reached in several
+ * ways. Any other value is replaced in the container the address ends in,
+ * which is then the changed node.
  * <p>
  * Every node that holds a changed node, directly or not, up to the scenario,
  * is then copied once, through its builder, with each changed child replaced
@@ -137,6 +138,7 @@ final class ScenarioDerivation {
   private static boolean isNode(final Object object) {
     return (
       object instanceof Factory<?, ?> ||
+      object instanceof DescriptionNode ||
       object instanceof Map<?, ?> ||
       object instanceof Collection<?>
     );
@@ -151,6 +153,9 @@ final class ScenarioDerivation {
       case final List<?> list -> rebuiltList(list);
       case final Collection<?> collection -> checkedUnchanged(collection);
       case final Factory<?, ?> factory -> rebuiltBean(factory);
+      case final DescriptionNode descriptionNode -> rebuiltBean(
+        descriptionNode
+      );
       case final Scenario scenario -> rebuiltBean(scenario);
       case null, default -> node;
     };
@@ -246,7 +251,10 @@ final class ScenarioDerivation {
   private record Property(String name) implements Step {
     @Override
     public Object read(final Object container, final String address) {
-      if (!(container instanceof Factory<?, ?>)) {
+      if (
+        !(container instanceof Factory<?, ?>) &&
+        !(container instanceof DescriptionNode)
+      ) {
         throw new IllegalArgumentException(
           "No property " + name + " to follow in " + address
         );

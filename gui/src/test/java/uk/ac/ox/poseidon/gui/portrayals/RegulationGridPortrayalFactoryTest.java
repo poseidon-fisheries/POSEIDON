@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.gui.portrayals;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_DAY;
@@ -38,6 +39,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
@@ -112,6 +114,7 @@ class RegulationGridPortrayalFactoryTest {
       Stream.of(CLOSED_TO_FLEET, CLOSED_TO_ONE_VESSEL, OPEN)
     );
     return new RegulationGridPortrayalFactory.Portrayal(
+      gear(),
       () -> LocalDateTime.of(2013, 1, 2, 0, 0),
       () -> true,
       regulations,
@@ -127,7 +130,14 @@ class RegulationGridPortrayalFactoryTest {
   private static Vessel vessel() {
     final Vessel vessel = mock(Vessel.class);
     when(vessel.isActive()).thenReturn(true);
-    when(vessel.getGear()).thenReturn(mock(Gear.class));
     return vessel;
+  }
+
+  /** @return a gear declaration giving every vessel a gear */
+  @SuppressWarnings("unchecked")
+  private static VesselComponent<Gear> gear() {
+    final VesselComponent<Gear> gear = mock(VesselComponent.class);
+    when(gear.of(any())).thenReturn(mock(Gear.class));
+    return gear;
   }
 }

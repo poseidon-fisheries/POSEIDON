@@ -47,6 +47,8 @@ import sim.portrayal.simple.ImagePortrayal2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -73,6 +75,7 @@ public class RegulationGridPortrayalFactory
   extends SimulationScopeFactory<ObjectGridPortrayal2D>
 {
 
+  private final VesselComponent<? extends Gear> gear;
   private final Factory<
     ? super SimulationScope,
     ? extends Regulations<? super ExtendedFishingAction>
@@ -110,6 +113,7 @@ public class RegulationGridPortrayalFactory
   @Override
   protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
     return new Portrayal(
+      gear,
       WithoutContext.supplier(currentDateTime.get(scope)),
       WithoutContext.supplier(hasDateTime.get(scope)),
       regulations.get(scope),
@@ -150,6 +154,7 @@ public class RegulationGridPortrayalFactory
       }
     }
 
+    private final VesselComponent<? extends Gear> gear;
     private final Supplier<LocalDateTime> currentDateTime;
     private final Supplier<Boolean> hasDateTime;
     private final Regulations<? super ExtendedFishingAction> regulations;
@@ -161,6 +166,7 @@ public class RegulationGridPortrayalFactory
     private long lastUpdated;
 
     Portrayal(
+      final VesselComponent<? extends Gear> gear,
       final Supplier<LocalDateTime> currentDateTime,
       final Supplier<Boolean> hasDateTime,
       final Regulations<? super ExtendedFishingAction> regulations,
@@ -172,6 +178,7 @@ public class RegulationGridPortrayalFactory
       final int displayHeight
     ) {
       super();
+      this.gear = gear;
       this.regulations = regulations;
       this.vesselField = vesselField;
       this.fleet = fleet;
@@ -232,7 +239,7 @@ public class RegulationGridPortrayalFactory
                 dateTime,
                 Duration.ZERO,
                 bathymetricGrid.getModelGrid().toCoordinate(cell),
-                vessel.getGear()
+                gear.of(vessel)
               )
             )
             .allMatch(regulations::isForbidden);

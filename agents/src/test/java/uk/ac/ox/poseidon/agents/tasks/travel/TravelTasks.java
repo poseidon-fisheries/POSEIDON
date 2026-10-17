@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.giveComponent;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
@@ -31,6 +32,7 @@ import java.lang.reflect.Field;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
@@ -43,6 +45,11 @@ final class TravelTasks {
   static final Int2D ORIGIN = new Int2D(0, 0);
   static final Int2D DESTINATION = new Int2D(1, 0);
 
+  /** The declaration of the engine of the vessels made here. */
+  static final VesselComponent<Engine> ENGINE = new VesselComponent<>(scope ->
+    mock(Engine.class)
+  );
+
   private TravelTasks() {}
 
   static Vessel vesselCruisingAtTenKph() {
@@ -51,7 +58,7 @@ final class TravelTasks {
     final Trip trip = mock(Trip.class);
     when(engine.getCruisingSpeedInKph()).thenReturn(10.0);
     when(trip.getDestination()).thenReturn(DESTINATION);
-    when(vessel.getEngine()).thenReturn(engine);
+    giveComponent(vessel, ENGINE, engine);
     when(vessel.getCell()).thenReturn(ORIGIN);
     when(vessel.getCurrentTrip()).thenReturn(trip);
     when(vessel.getSchedule()).thenReturn(mock(TemporalSchedule.class));

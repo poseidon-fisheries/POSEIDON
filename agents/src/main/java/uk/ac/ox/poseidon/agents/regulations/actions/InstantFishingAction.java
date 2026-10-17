@@ -61,16 +61,17 @@ public class InstantFishingAction
   }
 
   /**
-   * Happens now, at the vessel's current cell, with the vessel's current gear.
+   * Happens now, at the vessel's current cell, with {@code gear}.
    *
    * @param vessel the vessel taking the action
+   * @param gear   the vessel's current gear
    */
-  public InstantFishingAction(final Vessel vessel) {
+  public InstantFishingAction(final Vessel vessel, final Gear gear) {
     this(
       vessel,
       vessel.getSchedule().getDateTime(),
       vessel.getVesselField().getModelGrid().toCoordinate(vessel.getCell()),
-      vessel.getGear()
+      gear
     );
   }
 }

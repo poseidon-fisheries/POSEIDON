@@ -30,6 +30,8 @@ import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import java.util.function.BiFunction;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
@@ -43,6 +45,7 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  */
 public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
 
+  private final VesselComponent<? extends Engine> engine;
   private final GridPathFinder pathFinder;
   private final DistanceCalculator distanceCalculator;
   // Keyed by the two cells packed into a long (see cellPairKey): the map grows
@@ -51,13 +54,17 @@ public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
   private final Long2DoubleMap pathLengthsInKm = new Long2DoubleOpenHashMap();
 
   /**
+   * @param engine             the declaration of the engine whose speed gives
+   *                           the route's duration
    * @param pathFinder         finds the paths of the route's two legs
    * @param distanceCalculator measures the paths
    */
   RouteViaDestination(
+    final VesselComponent<? extends Engine> engine,
     final GridPathFinder pathFinder,
     final DistanceCalculator distanceCalculator
   ) {
+    this.engine = checkNotNull(engine);
     this.pathFinder = checkNotNull(pathFinder);
     this.distanceCalculator = checkNotNull(distanceCalculator);
   }
@@ -78,7 +85,7 @@ public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
       distanceInKm,
       DistanceCalculator.travelDuration(
         distanceInKm,
-        vessel.getEngine().getCruisingSpeedInKph()
+        engine.of(vessel).getCruisingSpeedInKph()
       )
     );
   }

@@ -40,7 +40,7 @@ public class Factories {
 
   /**
    * @param candidates gives the vessels ties can be made with; pass the base
-   *                   fleet, not a loader whose extra factories depend on this
+   *                   fleet, not a loader whose components depend on this
    *                   network, which would be a factory cycle
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
    *         {@link SocialNetwork} with no ties
@@ -97,8 +97,8 @@ public class Factories {
    *                           event listener
    * @param fishingEventSharer the sharer to register the listener with
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} that
-   *         registers the vessel's listener with the sharer and gives it; add
-   *         it to the vessel's extra factories
+   *         registers the vessel's listener with the sharer and gives it;
+   *         declare it as one of the vessel's components
    * @see SharedFishingEventListenerFactory
    */
   public static <L extends Listener<? super FishingEvent>> SharedFishingEventListenerFactory<L> sharedFishingEventListener(

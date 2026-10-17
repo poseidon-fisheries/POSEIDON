@@ -52,6 +52,7 @@ class TravelAlongPathTest {
     when(distanceCalculator.distanceInKm(ORIGIN, DESTINATION)).thenReturn(5.0);
     final Vessel vessel = vesselCruisingAtTenKph();
     final TravelAlongPath travelAlongPath = new TravelAlongPath(
+      ENGINE,
       pathFinder,
       distanceCalculator,
       v -> DESTINATION,

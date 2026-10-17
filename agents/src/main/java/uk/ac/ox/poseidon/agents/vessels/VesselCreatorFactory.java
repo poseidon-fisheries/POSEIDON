@@ -37,9 +37,6 @@ import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
-import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -78,56 +75,16 @@ public class VesselCreatorFactory
   private final ValueFactory<? super VesselScope, ? super Vessel, String> name;
   private final Factory<? super VesselScope, ? extends Account> account;
   private final Factory<? super VesselScope, ? extends Port> homePort;
-  private final Factory<? super VesselScope, ? extends Hold> hold;
-  private final Factory<? super VesselScope, ? extends Gear> gear;
-  private final Factory<? super VesselScope, ? extends Engine> engine;
-  private final Factory<? super VesselScope, ? extends Behaviour> behaviour;
+  private final VesselComponent<? extends Behaviour> behaviour;
 
   @Singular
-  private final ImmutableList<Factory<? super VesselScope, ?>> extraFactories;
+  private final ImmutableList<VesselComponent<?>> components;
 
   private final int numberOfVesselsToCreate;
   private final Factory<
     ? super SimulationScope,
     ? extends EventManager
   > eventManager;
-
-  /** Shorthand for the full constructor with no extra per-vessel factories. */
-  public VesselCreatorFactory(
-    final Factory<? super SimulationScope, ? extends VesselField> vesselField,
-    final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
-    final Factory<? super SimulationScope, ? extends MarketGrid> marketGrid,
-    final Factory<
-      ? super SimulationScope,
-      ? extends Supplier<String>
-    > vesselIdSupplier,
-    final ValueFactory<? super VesselScope, ? super Vessel, String> name,
-    final Factory<? super VesselScope, ? extends Account> account,
-    final Factory<? super VesselScope, ? extends Port> homePort,
-    final Factory<? super VesselScope, ? extends Hold> hold,
-    final Factory<? super VesselScope, ? extends Gear> gear,
-    final Factory<? super VesselScope, ? extends Engine> engine,
-    final Factory<? super VesselScope, ? extends Behaviour> behaviour,
-    final int numberOfVesselsToCreate,
-    final Factory<? super SimulationScope, ? extends EventManager> eventManager
-  ) {
-    this(
-      vesselField,
-      portGrid,
-      marketGrid,
-      vesselIdSupplier,
-      name,
-      account,
-      homePort,
-      hold,
-      gear,
-      engine,
-      behaviour,
-      ImmutableList.of(),
-      numberOfVesselsToCreate,
-      eventManager
-    );
-  }
 
   /**
    * @return a {@link VesselCreator} ready to create
@@ -144,11 +101,8 @@ public class VesselCreatorFactory
       checkNotNull(name),
       checkNotNull(account),
       checkNotNull(homePort),
-      checkNotNull(hold),
-      checkNotNull(gear),
-      checkNotNull(engine),
       checkNotNull(behaviour),
-      extraFactories == null ? List.of() : extraFactories,
+      components == null ? List.of() : components,
       numberOfVesselsToCreate
     );
   }

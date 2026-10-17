@@ -30,7 +30,9 @@ import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -48,6 +50,7 @@ import uk.ac.ox.poseidon.geography.paths.PathFinder;
 @SuperBuilder(toBuilder = true)
 public class TravelAlongPathFactory extends TaskFactory<TravelAlongPath> {
 
+  private final VesselComponent<? extends Engine> engine;
   private final Factory<
     ? super VesselScope,
     ? extends PathFinder<Int2D>
@@ -70,6 +73,7 @@ public class TravelAlongPathFactory extends TaskFactory<TravelAlongPath> {
   @Override
   protected TravelAlongPath newInstance(final VesselScope scope) {
     return new TravelAlongPath(
+      engine,
       pathFinder.get(scope),
       distance.get(scope),
       destination.get(scope),

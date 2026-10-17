@@ -51,7 +51,7 @@ public final class PeterSnapperCatchabilityCalibration {
     "peter_snapper",
     "landings.csv"
   );
-  static final String CATCHABILITY_PROPERTY = "gear.proportion";
+  static final String CATCHABILITY_PROPERTY = "gearProportion.value";
   private static final double MIN_CATCHABILITY = 0.00001;
   private static final double MAX_CATCHABILITY = 0.005;
   private static final double TUTORIAL_CATCHABILITY = 0.000641964;

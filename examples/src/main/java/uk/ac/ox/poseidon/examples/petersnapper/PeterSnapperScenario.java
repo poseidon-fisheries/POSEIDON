@@ -56,6 +56,7 @@ import static uk.ac.ox.poseidon.agents.vessels.friends.Factories.dynamicFriends;
 import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.fixedBiomassProportionGear;
 import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.standardBiomassHold;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.accessibleWaterCells;
+import static uk.ac.ox.poseidon.agents.vessels.values.Factories.componentProperty;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.currentTimeAtSea;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.currentTripDestinationCell;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.currentTripEventManager;
@@ -312,12 +313,33 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     final var pathFinder = pathFinder(bathymetricGrid, portGrid, distance);
 
-    final var gear = fixedBiomassProportionGear(
-      "FGL", // droplines count as "fixed gears and lines"
-      0.000641964,
-      massOf(1, KILOGRAM),
-      constant(hours(1)),
-      volumetricFlowRateOf(70.0, LITRE_PER_HOUR)
+    // The proportion is a scenario component, so that calibration can vary it
+    final var gearProportion = object(0.000641964);
+
+    final var gear = vesselComponent(
+      fixedBiomassProportionGear(
+        "FGL", // droplines count as "fixed gears and lines"
+        gearProportion,
+        massOf(1, KILOGRAM),
+        constant(hours(1)),
+        volumetricFlowRateOf(70.0, LITRE_PER_HOUR)
+      )
+    );
+
+    final var hold = vesselComponent(
+      standardBiomassHold(
+        massOf(15_000, KILOGRAM),
+        massOf(1, KILOGRAM),
+        uniformCatchCategoriser(catchCategory)
+      )
+    );
+
+    final var engine = vesselComponent(
+      simpleEngine(
+        fullTank(volumeOf(100000, LITRE)),
+        speedOf(16, KILOMETRE_PER_HOUR),
+        volumeOf(3, LITRE)
+      )
     );
 
     final VesselComponentRegisterFactory<
@@ -369,49 +391,55 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         )
       );
 
-    final var tripEvaluator = tripEvaluator(
-      optionValues,
-      profitPerHour(CURRENCY_CODE)
+    final var tripEvaluator = vesselComponent(
+      tripEvaluator(optionValues, profitPerHour(CURRENCY_CODE))
     );
 
-    final var behaviour = behaviour(
-      sequenceTask(
-        startTrip(destination),
-        travelAlongPathTo(
-          pathFinder,
-          distance,
-          currentTripDestinationCell(),
-          currentTripEventManager()
-        ),
-        untilFail(
-          sequenceTask(
-            fishing(
-              currentCellFisheable(biomassGrid),
-              proportionallyLimitingBiomassToHold()
-            ),
-            checkThat(
-              allOf(
-                condition(
-                  vesselProperty("hold.availableCapacityInKg"),
-                  greaterThan(1)
-                ),
-                condition(currentTimeAtSea(), lessThan(constant(days(10))))
+    final var behaviour = vesselComponent(
+      behaviour(
+        sequenceTask(
+          startTrip(destination),
+          travelAlongPathTo(
+            engine,
+            pathFinder,
+            distance,
+            currentTripDestinationCell(),
+            currentTripEventManager()
+          ),
+          untilFail(
+            sequenceTask(
+              fishing(
+                gear,
+                hold,
+                engine,
+                currentCellFisheable(biomassGrid),
+                proportionallyLimitingBiomassToHold()
+              ),
+              checkThat(
+                allOf(
+                  condition(
+                    componentProperty(hold, "availableCapacityInKg"),
+                    greaterThan(1)
+                  ),
+                  condition(currentTimeAtSea(), lessThan(constant(days(10))))
+                )
               )
             )
-          )
-        ),
-        setDestinationToOrigin(),
-        travelAlongPathTo(
-          pathFinder,
-          distance,
-          currentTripDestinationCell(),
-          currentTripEventManager()
-        ),
-        arriveInPort(),
-        landCatches(constant(hours(1))),
-        refuel(fuelStationGrid),
-        endTrip(),
-        waitFor(constant(hours(12)))
+          ),
+          setDestinationToOrigin(),
+          travelAlongPathTo(
+            engine,
+            pathFinder,
+            distance,
+            currentTripDestinationCell(),
+            currentTripEventManager()
+          ),
+          arriveInPort(),
+          landCatches(hold, constant(hours(1))),
+          refuel(engine, fuelStationGrid),
+          endTrip(),
+          waitFor(constant(hours(12)))
+        )
       )
     );
 
@@ -423,19 +451,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       prefixedId("Vessel "),
       account(),
       benoa,
-      standardBiomassHold(
-        massOf(15_000, KILOGRAM),
-        massOf(1, KILOGRAM),
-        uniformCatchCategoriser(catchCategory)
-      ),
-      gear,
-      simpleEngine(
-        fullTank(volumeOf(100000, LITRE)),
-        speedOf(16, KILOMETRE_PER_HOUR),
-        volumeOf(3, LITRE)
-      ),
-      behaviour, // new InactiveBehaviourFactory(),
-      List.of(tripEvaluator),
+      behaviour,
+      List.of(gear, engine, hold, tripEvaluator),
       25
     );
     // Kupang's vessels are like Benoa's, but more of them
@@ -461,7 +478,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       .component("portGrid", portGrid)
       .component("marketGrid", marketGrid)
       .component("initialPrices", initialPrices)
-      .component("gear", gear)
+      .component("gearProportion", gearProportion)
       .component("vesselField", vesselField)
       .component("agentCreators", agentCreators)
       .build();

@@ -30,6 +30,8 @@ import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 
 /**
  * Sells the vessel's hold contents to the market of its home port, where it
@@ -39,6 +41,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 @RequiredArgsConstructor
 public class LandCatches extends ExtendedTripTask {
 
+  private final VesselComponent<? extends Hold> hold;
   private final Function<? super Vessel, Duration> duration;
 
   /** @return how long landing takes */
@@ -82,7 +85,7 @@ public class LandCatches extends ExtendedTripTask {
       .getMarket(vessel.getHomePort())
       .sell(
         vessel,
-        vessel.getHold().extractContent(),
+        hold.of(vessel).extractContent(),
         vessel.getSchedule().getDateTime()
       )
       .summary()

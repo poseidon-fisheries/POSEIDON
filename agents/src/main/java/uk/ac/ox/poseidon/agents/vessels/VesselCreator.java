@@ -32,9 +32,6 @@ import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
-import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -47,10 +44,10 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
  * A scheduled {@link Steppable} that, when run, creates
- * {@link #numberOfVesselsToCreate} vessels, resolving each one's
- * name/account/home port/hold/gear/engine/behaviour against a fresh
- * {@link VesselScope}, reading the name off the vessel, and marks them
- * registered-active.
+ * {@link #numberOfVesselsToCreate} vessels, resolving each one's home port
+ * and account against a fresh {@link VesselScope}, reading its name off it,
+ * building its behaviour and its other components from their declarations,
+ * in that order, and marks them registered-active.
  */
 @RequiredArgsConstructor
 public class VesselCreator implements Steppable {
@@ -64,11 +61,8 @@ public class VesselCreator implements Steppable {
   private final ValueFactory<? super VesselScope, ? super Vessel, String> name;
   private final Factory<? super VesselScope, ? extends Account> account;
   private final Factory<? super VesselScope, ? extends Port> homePort;
-  private final Factory<? super VesselScope, ? extends Hold> hold;
-  private final Factory<? super VesselScope, ? extends Gear> gear;
-  private final Factory<? super VesselScope, ? extends Engine> engine;
-  private final Factory<? super VesselScope, ? extends Behaviour> behaviour;
-  private final List<Factory<? super VesselScope, ?>> extraFactories;
+  private final VesselComponent<? extends Behaviour> behaviour;
+  private final List<VesselComponent<?>> components;
 
   private final int numberOfVesselsToCreate;
 
@@ -94,12 +88,11 @@ public class VesselCreator implements Steppable {
       final VesselScope vesselScope = new VesselScope(simulationScope, vessel);
       vessel.setHomePort(homePort.get(vesselScope));
       vessel.setAccount(account.get(vesselScope));
-      vessel.setGear(gear.get(vesselScope));
-      vessel.setEngine(engine.get(vesselScope));
-      vessel.setHold(hold.get(vesselScope));
       vessel.setName(name.get(vesselScope).apply(vessel));
-      vessel.setBehaviour(behaviour.get(vesselScope));
-      extraFactories.forEach(factory -> factory.get(vesselScope));
+      vessel.setBehaviour(vessel.buildComponent(behaviour, vesselScope));
+      components.forEach(component ->
+        vessel.buildComponent(component, vesselScope)
+      );
       vessel.setRegisteredAsActive(true);
     }
   }

@@ -42,6 +42,7 @@ class TravelDirectlyTest {
     when(distanceCalculator.distanceInKm(ORIGIN, DESTINATION)).thenReturn(5.0);
     final Vessel vessel = vesselCruisingAtTenKph();
     final TravelDirectly travelDirectly = new TravelDirectly(
+      ENGINE,
       distanceCalculator
     );
     setTaskObject(travelDirectly, vessel);

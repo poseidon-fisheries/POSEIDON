@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels.values;
 import org.joda.money.Money;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
@@ -179,8 +180,8 @@ public class Factories {
 
   /**
    * @param propertyPath the dotted path of properties to follow from the
-   *                     vessel, e.g. {@code "gear.code"} for the code of the
-   *                     vessel's current gear
+   *                     vessel, e.g. {@code "homePort.code"} for the code of
+   *                     the vessel's home port
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
    *         {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a vessel
    * @see VesselPropertyFactory
@@ -189,5 +190,21 @@ public class Factories {
     final String propertyPath
   ) {
     return new VesselPropertyFactory<>(propertyPath);
+  }
+
+  /**
+   * @param component    the declaration of the component to read
+   * @param propertyPath the dotted path of properties to follow from the
+   *                     component, e.g. {@code "availableCapacityInKg"} of a
+   *                     hold
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link ComponentProperty} of a vessel
+   * @see ComponentPropertyFactory
+   */
+  public static <R> ComponentPropertyFactory<R> componentProperty(
+    final VesselComponent<?> component,
+    final String propertyPath
+  ) {
+    return new ComponentPropertyFactory<>(component, propertyPath);
   }
 }

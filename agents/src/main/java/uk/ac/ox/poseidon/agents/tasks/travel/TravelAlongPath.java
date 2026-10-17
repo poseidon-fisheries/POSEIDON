@@ -36,6 +36,8 @@ import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
@@ -49,6 +51,7 @@ import uk.ac.ox.poseidon.geography.paths.PathFinder;
 @RequiredArgsConstructor(access = PACKAGE)
 public class TravelAlongPath extends AgentTask<Vessel> {
 
+  private final VesselComponent<? extends Engine> engine;
   private final PathFinder<Int2D> pathFinder;
   private final DistanceCalculator distanceCalculator;
   private final Function<? super Vessel, Int2D> destinationSource;
@@ -94,7 +97,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
         )
       );
     distanceToNextCell = 0;
-    cruisingSpeedInKph = vessel.getEngine().getCruisingSpeedInKph();
+    cruisingSpeedInKph = engine.of(vessel).getCruisingSpeedInKph();
     super.start();
   }
 
@@ -116,7 +119,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
     );
 
     vessel.setCurrentCell(currentPath.getFirst());
-    vessel.getEngine().consumeFuelForDistance(distanceToNextCell);
+    engine.of(vessel).consumeFuelForDistance(distanceToNextCell);
 
     currentPath = currentPath.subList(1, currentPath.size());
     if (currentPath.isEmpty()) {

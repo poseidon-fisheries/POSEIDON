@@ -33,8 +33,11 @@ import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
@@ -55,6 +58,9 @@ public class FishingLocationLegalityCheckerFactory
   extends VesselScopeFactory<BiFunction<Vessel, Int2D, Boolean>>
   implements MappingFactory<VesselScope, Vessel, Int2D, Boolean>
 {
+
+  private final VesselComponent<? extends Gear> gear;
+  private final VesselComponent<? extends Engine> engine;
 
   private final Factory<
     ? super VesselScope,
@@ -84,6 +90,8 @@ public class FishingLocationLegalityCheckerFactory
     final VesselScope scope
   ) {
     return new FishingLocationLegalityChecker(
+      gear,
+      engine,
       regulations.get(scope),
       pathFinder.get(scope),
       distance.get(scope),

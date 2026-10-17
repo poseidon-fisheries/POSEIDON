@@ -31,9 +31,6 @@ import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.tasks.Behaviour;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
-import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -96,11 +93,9 @@ public class Factories {
    * @param name                    reads each vessel's name off it
    * @param account                 builds each vessel's account
    * @param homePort                builds each vessel's home port
-   * @param hold                    builds each vessel's hold
-   * @param gear                    builds each vessel's gear
-   * @param engine                  builds each vessel's engine
-   * @param behaviour               builds each vessel's behaviour
-   * @param extraFactories          extra per-vessel components to build
+   * @param behaviour               declares each vessel's behaviour
+   * @param components              declares each vessel's other components,
+   *                                in the order they are built
    * @param numberOfVesselsToCreate how many vessels to create
    * @return a {@link SimulationScopeFactory} for a {@link VesselCreator}
    * @see VesselCreator
@@ -116,11 +111,8 @@ public class Factories {
     final ValueFactory<? super VesselScope, ? super Vessel, String> name,
     final Factory<? super VesselScope, ? extends Account> account,
     final Factory<? super VesselScope, ? extends Port> homePort,
-    final Factory<? super VesselScope, ? extends Hold> hold,
-    final Factory<? super VesselScope, ? extends Gear> gear,
-    final Factory<? super VesselScope, ? extends Engine> engine,
-    final Factory<? super VesselScope, ? extends Behaviour> behaviour,
-    final List<Factory<? super VesselScope, ?>> extraFactories,
+    final VesselComponent<? extends Behaviour> behaviour,
+    final List<VesselComponent<?>> components,
     final int numberOfVesselsToCreate
   ) {
     return new VesselCreatorFactory(
@@ -131,21 +123,29 @@ public class Factories {
       name,
       account,
       homePort,
-      hold,
-      gear,
-      engine,
       behaviour,
-      ImmutableList.copyOf(extraFactories),
+      ImmutableList.copyOf(components),
       numberOfVesselsToCreate,
       eventManager()
     );
   }
 
   /**
+   * @param factory builds the component, for each vessel
+   * @return the declaration of a vessel component built by {@code factory}
+   * @see VesselComponent
+   */
+  public static <T> VesselComponent<T> vesselComponent(
+    final Factory<? super VesselComponentScope, ? extends T> factory
+  ) {
+    return new VesselComponent<>(factory);
+  }
+
+  /**
    * @param listener the factory giving the vessel's listener
    * @return a {@link VesselScopeFactory} that registers the vessel's listener
-   *         on the vessel's event manager and gives it; add it to the vessel's
-   *         extra factories
+   *         on the vessel's event manager and gives it; declare it as one of
+   *         the vessel's components
    * @see VesselEventListenerFactory
    */
   public static <L extends Listener<?>> VesselEventListenerFactory<L> vesselEventListener(

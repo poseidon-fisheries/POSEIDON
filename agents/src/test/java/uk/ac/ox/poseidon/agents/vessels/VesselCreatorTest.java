@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.prefixedId;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 class VesselCreatorTest {
 
   @Test
-  void appliesExtraFactoriesAfterCoreFactories() {
+  void buildsTheComponentsInOrderAfterTheBehaviour() {
     final Simulation simulation = mock(Simulation.class);
     when(simulation.getTemporalSchedule()).thenReturn(
       mock(TemporalSchedule.class)
@@ -61,28 +62,34 @@ class VesselCreatorTest {
     final PortGrid portGrid = mock(PortGrid.class);
     final MarketGrid marketGrid = mock(MarketGrid.class);
     final Account account = mock(Account.class);
-    final Hold hold = mock(Hold.class);
-    final Gear gear = mock(Gear.class);
-    final Engine engine = mock(Engine.class);
+    final VesselComponent<Hold> hold = vesselComponent(scope ->
+      mock(Hold.class)
+    );
+    final VesselComponent<Gear> gear = vesselComponent(scope ->
+      mock(Gear.class)
+    );
+    final VesselComponent<Engine> engine = vesselComponent(scope ->
+      mock(Engine.class)
+    );
     final Behaviour behaviour = mock(Behaviour.class);
     final EventManager eventManager = mock(EventManager.class);
     final Port port = mock(Port.class);
     when(portGrid.getLocation(port)).thenReturn(new Int2D(1, 2));
 
     final AtomicInteger id = new AtomicInteger();
-    final AtomicInteger extraFactoryCalls = new AtomicInteger();
-    final Factory<VesselScope, Object> extraFactory = scope -> {
+    final AtomicInteger lastComponentBuilds = new AtomicInteger();
+    final VesselComponent<Object> lastComponent = vesselComponent(scope -> {
       final Vessel vessel = scope.getVessel();
       assertThat(vessel.getAccount()).isSameAs(account);
-      assertThat(vessel.getHold()).isSameAs(hold);
-      assertThat(vessel.getGear()).isSameAs(gear);
-      assertThat(vessel.getEngine()).isSameAs(engine);
+      assertThat(hold.of(vessel)).isNotNull();
+      assertThat(gear.of(vessel)).isNotNull();
+      assertThat(engine.of(vessel)).isNotNull();
       assertThat(vessel.getBehaviour()).isSameAs(behaviour);
       assertThat(vessel.getName()).isEqualTo("Vessel " + vessel.getId());
       assertThat(vessel.getHomePort()).isSameAs(port);
-      extraFactoryCalls.incrementAndGet();
+      lastComponentBuilds.incrementAndGet();
       return new Object();
-    };
+    });
 
     final VesselCreator creator = new VesselCreator(
       eventManager,
@@ -93,17 +100,14 @@ class VesselCreatorTest {
       prefixedId("Vessel "),
       scope -> account,
       scope -> port,
-      scope -> hold,
-      scope -> gear,
-      scope -> engine,
-      scope -> behaviour,
-      List.of(extraFactory),
+      vesselComponent(scope -> behaviour),
+      List.of(hold, gear, engine, lastComponent),
       2
     );
 
     creator.step(simulation);
 
-    assertThat(extraFactoryCalls).hasValue(2);
+    assertThat(lastComponentBuilds).hasValue(2);
   }
 
   @Test
@@ -117,15 +121,12 @@ class VesselCreatorTest {
     final PortGrid portGrid = mock(PortGrid.class);
     final MarketGrid marketGrid = mock(MarketGrid.class);
     final Account account = mock(Account.class);
-    final Hold hold = mock(Hold.class);
-    final Gear gear = mock(Gear.class);
-    final Engine engine = mock(Engine.class);
     final Behaviour behaviour = mock(Behaviour.class);
     final Port port = mock(Port.class);
     when(portGrid.getLocation(port)).thenReturn(new Int2D(1, 2));
 
     final AtomicInteger behaviourFactoryCalls = new AtomicInteger();
-    final Factory<VesselScope, Behaviour> behaviourFactory = scope -> {
+    final Factory<VesselComponentScope, Behaviour> behaviourFactory = scope -> {
       assertThat(scope.getVessel().getHomePort()).isSameAs(port);
       behaviourFactoryCalls.incrementAndGet();
       return behaviour;
@@ -140,10 +141,7 @@ class VesselCreatorTest {
       prefixedId("Vessel "),
       scope -> account,
       scope -> port,
-      scope -> hold,
-      scope -> gear,
-      scope -> engine,
-      behaviourFactory,
+      vesselComponent(behaviourFactory),
       List.of(),
       1
     );
@@ -164,9 +162,6 @@ class VesselCreatorTest {
     final PortGrid portGrid = mock(PortGrid.class);
     final MarketGrid marketGrid = mock(MarketGrid.class);
     final Account account = mock(Account.class);
-    final Hold hold = mock(Hold.class);
-    final Gear gear = mock(Gear.class);
-    final Engine engine = mock(Engine.class);
     final Behaviour behaviour = mock(Behaviour.class);
     final Port port = mock(Port.class);
     when(portGrid.getLocation(port)).thenReturn(new Int2D(1, 2));
@@ -182,14 +177,13 @@ class VesselCreatorTest {
       prefixedId("Vessel "),
       scope -> account,
       scope -> port,
-      scope -> hold,
-      scope -> gear,
-      scope -> engine,
-      scope -> behaviour,
-      List.of(scope -> {
-        vessels.add(scope.getVessel());
-        return new Object();
-      }),
+      vesselComponent(scope -> behaviour),
+      List.of(
+        vesselComponent(scope -> {
+          vessels.add(scope.getVessel());
+          return new Object();
+        })
+      ),
       2
     );
 

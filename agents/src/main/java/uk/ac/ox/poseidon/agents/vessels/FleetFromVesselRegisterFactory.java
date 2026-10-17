@@ -42,9 +42,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.tasks.Behaviour;
-import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SchedulingFactory;
 import uk.ac.ox.poseidon.core.SchedulingScope;
@@ -112,24 +109,20 @@ public class FleetFromVesselRegisterFactory extends SchedulingFactory<Fleet> {
   @Builder.Default
   private List<String> modificationEventCodes = List.of("MOD");
 
-  /** Builds each affected vessel's behaviour. */
-  private Factory<? super VesselScope, ? extends Behaviour> behaviour;
-  /** Builds each affected vessel's hold. */
-  private Factory<? super VesselScope, ? extends Hold> hold;
-  /** Builds each affected vessel's gear. */
-  private Factory<? super VesselScope, ? extends Gear> gear;
-  /** Builds each affected vessel's engine. */
-  private Factory<? super VesselScope, ? extends Engine> engine;
+  /** Declares each affected vessel's behaviour. */
+  private VesselComponent<? extends Behaviour> behaviour;
 
-  /** Extra per-vessel components to build for each affected vessel. */
+  /**
+   * Declares each affected vessel's other components, in the order they are
+   * built.
+   */
   @Singular
-  private List<Factory<? super VesselScope, ?>> extraFactories;
+  private List<VesselComponent<?>> components;
 
   /**
    * Maps a bean property path on this factory to a table column: before
    * resolving
-   * {@link #behaviour}/{@link #hold}/{@link #gear}/{@link #engine}/{@link #extraFactories}
-   * for a row, each mapped property is set to that row's value in the named
+   * {@link #behaviour} and the {@link #components} for a row, each mapped property is set to that row's value in the named
    * column.
    */
   @Singular
@@ -187,9 +180,9 @@ public class FleetFromVesselRegisterFactory extends SchedulingFactory<Fleet> {
     final SimulationScope scope,
     final Map<String, Object> valuesFromRow,
     final ImmutableMap<String, String> mappings,
-    final Factory<? super VesselScope, ? extends P> factory
+    final VesselComponent<? extends P> declaration
   ) {
-    if (factory == null) {
+    if (declaration == null) {
       return __ -> null;
     } else {
       return vessel -> {
@@ -208,7 +201,10 @@ public class FleetFromVesselRegisterFactory extends SchedulingFactory<Fleet> {
             mappings.forEach((propertyName, columnName) ->
               setProperty(propertyName, valuesFromRow.get(columnName))
             );
-            return factory.get(new VesselScope(scope, vessel));
+            return vessel.buildComponent(
+              declaration,
+              new VesselScope(scope, vessel)
+            );
           } finally {
             originalValues.forEach(this::setProperty);
           }
@@ -240,12 +236,11 @@ public class FleetFromVesselRegisterFactory extends SchedulingFactory<Fleet> {
       row.getString(portCodeColumn),
       makeTags(row),
       makeFactoryFunction(scope, valuesFromRow, dataMappings, behaviour),
-      makeFactoryFunction(scope, valuesFromRow, dataMappings, hold),
-      makeFactoryFunction(scope, valuesFromRow, dataMappings, gear),
-      makeFactoryFunction(scope, valuesFromRow, dataMappings, engine),
-      extraFactories
+      components
         .stream()
-        .map(f -> makeFactoryFunction(scope, valuesFromRow, dataMappings, f))
+        .<Function<Vessel, ?>>map(component ->
+          makeFactoryFunction(scope, valuesFromRow, dataMappings, component)
+        )
         .collect(toList())
     );
   }

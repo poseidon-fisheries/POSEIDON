@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -30,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.AgentTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
@@ -41,6 +43,9 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 public class CheckIfFishingHereAndNowIsLegal extends AgentTask<Vessel> {
 
   @NonNull
+  private final VesselComponent<? extends Gear> gear;
+
+  @NonNull
   private final Regulations<? super ExtendedFishingAction> regulations;
 
   /**
@@ -49,7 +54,10 @@ public class CheckIfFishingHereAndNowIsLegal extends AgentTask<Vessel> {
    */
   @Override
   public Status execute() {
-    final ExtendedFishingAction action = new ExtendedFishingAction(getAgent());
+    final ExtendedFishingAction action = new ExtendedFishingAction(
+      getAgent(),
+      gear.of(getAgent())
+    );
     return regulations.isPermitted(action) ? SUCCEEDED : FAILED;
   }
 }

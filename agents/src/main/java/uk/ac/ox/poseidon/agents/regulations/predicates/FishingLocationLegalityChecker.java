@@ -33,6 +33,9 @@ import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.regulations.Regulations;
@@ -55,6 +58,8 @@ public class FishingLocationLegalityChecker
   implements BiFunction<Vessel, Int2D, Boolean>
 {
 
+  private final VesselComponent<? extends Gear> gear;
+  private final VesselComponent<? extends Engine> engine;
   private final Regulations<? super ExtendedFishingAction> regulations;
   private final GridPathFinder pathFinder;
   private final DistanceCalculator distanceCalculator;
@@ -96,7 +101,7 @@ public class FishingLocationLegalityChecker
       );
     final Duration travelDuration = distanceCalculator.travelDuration(
       pathToFishingLocation,
-      vessel.getEngine().getCruisingSpeedInKph()
+      engine.of(vessel).getCruisingSpeedInKph()
     );
 
     return new ExtendedFishingAction(
@@ -104,7 +109,7 @@ public class FishingLocationLegalityChecker
       currentDateTime.apply(vessel).plus(travelDuration),
       fishingDuration,
       vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation),
-      vessel.getGear()
+      gear.of(vessel)
     );
   }
 }

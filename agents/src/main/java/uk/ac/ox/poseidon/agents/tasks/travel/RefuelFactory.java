@@ -29,7 +29,9 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
@@ -43,6 +45,7 @@ import uk.ac.ox.poseidon.core.Factory;
 @SuperBuilder(toBuilder = true)
 public class RefuelFactory extends TaskFactory<Refuel> {
 
+  private final VesselComponent<? extends Engine> engine;
   private final Factory<
     ? super VesselScope,
     ? extends FuelStationGrid
@@ -50,6 +53,6 @@ public class RefuelFactory extends TaskFactory<Refuel> {
 
   @Override
   protected Refuel newInstance(final VesselScope scope) {
-    return new Refuel(fuelStationGrid.get(scope));
+    return new Refuel(engine, fuelStationGrid.get(scope));
   }
 }

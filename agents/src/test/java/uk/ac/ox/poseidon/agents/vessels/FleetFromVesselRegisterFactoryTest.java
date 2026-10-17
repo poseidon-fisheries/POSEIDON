@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.tasks.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.time.Factories.days;
 import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
@@ -66,6 +67,7 @@ class FleetFromVesselRegisterFactoryTest {
   private Gear g2;
   private Hold h1;
   private VesselScopeFactoriesByCode<Gear> gears;
+  private VesselComponent<Gear> gear;
 
   void initSimulation(final String extraData) {
     p1 = mock(Port.class);
@@ -89,6 +91,7 @@ class FleetFromVesselRegisterFactoryTest {
       .factory("G1", new ObjectFactory<>(g1))
       .factory("G2", new ObjectFactory<>(g2))
       .build();
+    gear = vesselComponent(gears);
 
     simulation = new Scenario(
       LocalDate.of(2000, 1, 1),
@@ -103,11 +106,12 @@ class FleetFromVesselRegisterFactoryTest {
             )
           )
           .data(tableFromCsvString(initialData + extraData))
-          .hold(new ObjectFactory<>(h1))
-          .gear(gears)
-          .dataMapping("gear.code", "gear")
-          .engine(new ObjectFactory<>(mock(Engine.class)))
-          .behaviour(behaviour(waitFor(constant(days(1)))))
+          .component(vesselComponent(new ObjectFactory<>(h1)))
+          .component(gear)
+          // the gear's declaration is the second component
+          .dataMapping("components[1].factory.code", "gear")
+          .component(vesselComponent(new ObjectFactory<>(mock(Engine.class))))
+          .behaviour(vesselComponent(behaviour(waitFor(constant(days(1))))))
           .build()
       )
     ).startNewSimulation();
@@ -151,13 +155,13 @@ class FleetFromVesselRegisterFactoryTest {
     final Vessel v1 = fleet.getVessel("V1").orElseThrow();
     assertThat(v1.getName()).isEqualTo("Vee Uno");
     assertThat(v1.getHomePort()).isEqualTo(p1);
-    assertThat(v1.getGear()).isEqualTo(g2);
+    assertThat(gear.of(v1)).isEqualTo(g2);
     assertThat(v1.getTag("t1").orElseThrow()).isEqualTo(3);
     assertThat(v1.getTag("t2").orElseThrow()).isEqualTo("c");
     final Vessel v2 = fleet.getVessel("V2").orElseThrow();
     assertThat(v2.getName()).isEqualTo("Vee Dos");
     assertThat(v2.getHomePort()).isEqualTo(p2);
-    assertThat(v2.getGear()).isEqualTo(g1);
+    assertThat(gear.of(v2)).isEqualTo(g1);
     assertThat(v2.getTag("t1").orElseThrow()).isEqualTo(4);
     assertThat(v2.getTag("t2").orElseThrow()).isEqualTo("d");
   }

@@ -24,7 +24,9 @@ package uk.ac.ox.poseidon.agents.tasks.landings;
 
 import java.time.Duration;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
@@ -35,13 +37,16 @@ public class Factories {
   private Factories() {}
 
   /**
+   * @param hold     the declaration of the hold whose catch is landed
+   * @param duration how long landing takes, read for the vessel
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
    *         {@link LandCatches}
    * @see LandCatchesFactory
    */
   public static LandCatchesFactory landCatches(
+    final VesselComponent<? extends Hold> hold,
     final ValueFactory<? super VesselScope, ? super Vessel, Duration> duration
   ) {
-    return new LandCatchesFactory(duration);
+    return new LandCatchesFactory(hold, duration);
   }
 }

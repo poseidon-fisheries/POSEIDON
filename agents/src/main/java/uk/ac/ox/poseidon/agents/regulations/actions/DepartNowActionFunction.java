@@ -25,13 +25,20 @@ package uk.ac.ox.poseidon.agents.regulations.actions;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 
-/** Builds a {@link DepartNow} action for a given vessel. */
+/**
+ * Builds a {@link DepartNow} action for a given vessel, with its current
+ * gear.
+ */
 @RequiredArgsConstructor
 public class DepartNowActionFunction implements Function<Vessel, DepartNow> {
 
+  private final VesselComponent<? extends Gear> gear;
+
   @Override
   public DepartNow apply(final Vessel vessel) {
-    return new DepartNow(vessel);
+    return new DepartNow(vessel, gear.of(vessel));
   }
 }

@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels.gears;
 
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
+
 import java.time.Duration;
 import java.util.Collection;
 import javax.measure.Quantity;
@@ -43,8 +45,8 @@ public class Factories {
 
   /**
    * @param code                  this gear's identifying code
-   * @param proportion            the fraction of available biomass caught per
-   *                              species
+   * @param proportion            factory for the fraction of available
+   *                              biomass caught per species
    * @param minimumCatchThreshold per-species catch below this is discarded down
    *                              to zero
    * @param duration      how long one fishing event takes, asked with no
@@ -52,6 +54,38 @@ public class Factories {
    * @param fuelConsumptionRate   fuel burned per hour of fishing
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link FixedBiomassProportionGear}
+   * @see FixedBiomassProportionGear
+   */
+  public static <S extends Scope> FixedBiomassProportionGearFactory<S> fixedBiomassProportionGear(
+    final String code,
+    final Factory<? super S, ? extends Double> proportion,
+    final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold,
+    final ValueFactory<? super S, ? super Void, Duration> duration,
+    final Factory<
+      ? super S,
+      ? extends Quantity<VolumetricFlowRate>
+    > fuelConsumptionRate
+  ) {
+    return new FixedBiomassProportionGearFactory<>(
+      code,
+      proportion,
+      minimumCatchThreshold,
+      duration,
+      fuelConsumptionRate
+    );
+  }
+
+  /**
+   * @param code                  this gear's identifying code
+   * @param proportion            the fraction of available biomass caught per
+   *                              species
+   * @param minimumCatchThreshold per-species catch below this is discarded down
+   *                              to zero
+   * @param duration              how long one fishing event takes, asked with
+   *                              no context
+   * @param fuelConsumptionRate   fuel burned per hour of fishing
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link FixedBiomassProportionGear}, with a fixed proportion
    * @see FixedBiomassProportionGear
    */
   public static <S extends Scope> FixedBiomassProportionGearFactory<S> fixedBiomassProportionGear(
@@ -64,9 +98,9 @@ public class Factories {
       ? extends Quantity<VolumetricFlowRate>
     > fuelConsumptionRate
   ) {
-    return new FixedBiomassProportionGearFactory<>(
+    return fixedBiomassProportionGear(
       code,
-      proportion,
+      object(proportion),
       minimumCatchThreshold,
       duration,
       fuelConsumptionRate

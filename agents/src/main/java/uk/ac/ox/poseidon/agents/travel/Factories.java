@@ -26,7 +26,9 @@ import com.google.common.collect.ImmutableList;
 import org.joda.money.Money;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
@@ -44,6 +46,8 @@ public class Factories {
   private Factories() {}
 
   /**
+   * @param engine     the declaration of the engine whose speed gives the
+   *                   route's duration
    * @param pathFinder finds the paths of the route's two legs
    * @param distance   measures the paths
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
@@ -51,10 +55,11 @@ public class Factories {
    * @see RouteViaDestination
    */
   public static RouteViaDestinationFactory routeViaDestination(
+    final VesselComponent<? extends Engine> engine,
     final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
     final Factory<? super VesselScope, ? extends DistanceCalculator> distance
   ) {
-    return new RouteViaDestinationFactory(pathFinder, distance);
+    return new RouteViaDestinationFactory(engine, pathFinder, distance);
   }
 
   /**

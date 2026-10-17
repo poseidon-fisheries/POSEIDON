@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,9 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import static com.google.common.base.Preconditions.checkState;
+import static lombok.AccessLevel.NONE;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
@@ -37,9 +41,8 @@ import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
-import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
+import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -47,12 +50,13 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A fishing vessel: an {@link Agent} with a hold, gear, engine, home port, and
- * behaviour tree driving its trips. Active only while {@link #isActive()} holds
- * — the base agent is active, it's registered as active, its gear is active,
- * and it has a home port.
+ * A fishing vessel: an {@link Agent} with components (its gear, engine, hold
+ * and the rest, each read through its {@link VesselComponent} declaration), a
+ * home port, and a behaviour tree driving its trips. Active only while
+ * {@link #isActive()} holds — the base agent is active, it's registered as
+ * active, every gear among its components is active, and it has a home port.
  * <p>
- * Its modifiable characteristics (name, account, home port, hold, gear, engine,
+ * Its modifiable characteristics (name, account, home port, components,
  * registration, tags, and behaviour) are changed from outside its behaviour, by
  * the fleet register, so their setters go through {@link #mutate} and take
  * effect between runs of the behaviour. Its current state (cell, heading,
@@ -111,12 +115,20 @@ public class Vessel extends Agent implements Oriented2D {
   private Account account;
   /** This vessel's home port. */
   private Port homePort;
-  /** This vessel's hold. */
-  private Hold hold;
-  /** This vessel's gear. */
-  private Gear gear;
-  /** This vessel's engine. */
-  private Engine engine;
+
+  /**
+   * The store this vessel keeps for each of its components, by the
+   * declaration the component is built from, in the order they were first
+   * built.
+   */
+  @Getter(NONE)
+  private final Map<VesselComponent<?>, ProductStore> componentStores =
+    new LinkedHashMap<>();
+
+  /** This vessel's components, by the declaration each is built from. */
+  @Getter(NONE)
+  private final Map<VesselComponent<?>, Object> components =
+    new LinkedHashMap<>();
 
   /**
    * Whether this vessel is currently registered as active (see
@@ -136,15 +148,20 @@ public class Vessel extends Agent implements Oriented2D {
   private Trip previousTrip;
 
   /**
-   * @return whether the base agent is active, {@link #registeredAsActive}, the
-   *         gear is active, and there's a home port
+   * @return whether the base agent is active, {@link #registeredAsActive},
+   *         every gear among its components is active, and there's a home port
    */
   @Override
   public boolean isActive() {
     return (
       super.isActive() &&
       registeredAsActive &&
-      gear.isActive() &&
+      components
+        .values()
+        .stream()
+        .noneMatch(
+          component -> component instanceof final Gear gear && !gear.isActive()
+        ) &&
       homePort != null
     );
   }
@@ -173,19 +190,47 @@ public class Vessel extends Agent implements Oriented2D {
     });
   }
 
-  /** Sets the vessel's hold. */
-  public void setHold(final @NonNull Hold hold) {
-    mutate(() -> this.hold = hold);
+  /**
+   * Builds the component {@code declaration} declares under a scope carrying
+   * the store this vessel keeps for it, opened the first time, and makes it
+   * this vessel's component for that declaration. Built at once, it replaces
+   * the previous one through {@link #mutate}, between runs of the behaviour.
+   *
+   * @param declaration the declaration of the component
+   * @param scope       this vessel's scope
+   * @return the component built
+   */
+  <T> T buildComponent(
+    final VesselComponent<T> declaration,
+    final VesselScope scope
+  ) {
+    final ProductStore store = componentStores.computeIfAbsent(declaration, _ ->
+      new ProductStore()
+    );
+    final T component = declaration
+      .getFactory()
+      .get(new VesselComponentScope(scope, store));
+    mutate(() -> components.put(declaration, component));
+    return component;
   }
 
-  /** Sets the vessel's gear. */
-  public void setGear(final @NonNull Gear gear) {
-    mutate(() -> this.gear = gear);
-  }
-
-  /** Sets the vessel's engine. */
-  public void setEngine(final @NonNull Engine engine) {
-    mutate(() -> this.engine = engine);
+  /**
+   * @param declaration the declaration of the component
+   * @return this vessel's component for {@code declaration}, if it has one
+   * @throws IllegalStateException if this vessel was not created with
+   *                               {@code declaration}: a wiring error, not an
+   *                               absence
+   */
+  // The vessel keeps under a declaration only what its factory built, a T
+  @SuppressWarnings("unchecked")
+  <T> Optional<T> findComponent(final VesselComponent<T> declaration) {
+    checkState(
+      componentStores.containsKey(declaration),
+      "Vessel %s was not created with the declaration %s",
+      id,
+      declaration
+    );
+    return Optional.ofNullable((T) components.get(declaration));
   }
 
   /** Sets whether the vessel is registered as active. */

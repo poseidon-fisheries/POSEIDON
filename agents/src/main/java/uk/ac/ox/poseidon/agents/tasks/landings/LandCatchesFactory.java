@@ -30,7 +30,9 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
@@ -44,6 +46,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 @SuperBuilder(toBuilder = true)
 public class LandCatchesFactory extends TaskFactory<LandCatches> {
 
+  private final VesselComponent<? extends Hold> hold;
   private final ValueFactory<
     ? super VesselScope,
     ? super Vessel,
@@ -52,6 +55,6 @@ public class LandCatchesFactory extends TaskFactory<LandCatches> {
 
   @Override
   protected LandCatches newInstance(final VesselScope scope) {
-    return new LandCatches(duration.get(scope));
+    return new LandCatches(hold, duration.get(scope));
   }
 }

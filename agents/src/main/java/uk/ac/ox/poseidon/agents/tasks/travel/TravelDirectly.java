@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -30,6 +30,8 @@ import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
 /**
@@ -41,6 +43,7 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 @RequiredArgsConstructor(access = PACKAGE)
 public class TravelDirectly extends ExtendedTripTask {
 
+  private final VesselComponent<? extends Engine> engine;
   private final DistanceCalculator distanceCalculator;
   private Int2D origin;
   private Int2D destination;
@@ -66,7 +69,7 @@ public class TravelDirectly extends ExtendedTripTask {
   protected Duration getDuration() {
     return travelDuration(
       distanceInKm,
-      getAgent().getEngine().getCruisingSpeedInKph()
+      engine.of(getAgent()).getCruisingSpeedInKph()
     );
   }
 
@@ -78,7 +81,7 @@ public class TravelDirectly extends ExtendedTripTask {
    */
   @Override
   protected Status complete() {
-    getAgent().getEngine().consumeFuelForDistance(distanceInKm);
+    engine.of(getAgent()).consumeFuelForDistance(distanceInKm);
     getAgent().setCurrentCell(getAgent().getCurrentTrip().getDestination());
     getTrip()
       .getEventManager()

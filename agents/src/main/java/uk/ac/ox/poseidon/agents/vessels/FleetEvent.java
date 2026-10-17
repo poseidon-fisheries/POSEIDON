@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -36,15 +36,12 @@ import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.tasks.Behaviour;
-import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 
 /**
  * A scheduled {@link Steppable} that, when run, activates, deactivates or
  * modifies one vessel in a {@link Fleet}: creating it on first
- * {@link Type#ACTIVATION}, updating its home port, name, tags, behaviour, hold,
- * gear and engine, and flipping its registered-active status.
+ * {@link Type#ACTIVATION}, updating its home port, name, tags, behaviour and
+ * other components, and flipping its registered-active status.
  */
 @Value
 public class FleetEvent implements Steppable {
@@ -90,27 +87,15 @@ public class FleetEvent implements Steppable {
   @NonNull
   Function<Vessel, Behaviour> behaviourFactoryFunction;
 
-  /** Builds the vessel's hold as of this event. */
+  /** Builds each of the vessel's other components as of this event. */
   @NonNull
-  Function<Vessel, Hold> holdFactoryFunction;
-
-  /** Builds the vessel's gear as of this event. */
-  @NonNull
-  Function<Vessel, Gear> gearFactoryFunction;
-
-  /** Builds the vessel's engine as of this event. */
-  @NonNull
-  Function<Vessel, Engine> engineFactoryFunction;
-
-  /** Builds any extra per-vessel components as of this event. */
-  @NonNull
-  List<Function<Vessel, ?>> extraFactoryFunctions;
+  List<Function<Vessel, ?>> componentFactoryFunctions;
 
   /**
    * Applies this event to the vessel named {@link #vesselId} in {@link #fleet}:
-   * resolves (or creates) it, updates its home
-   * port/name/tags/behaviour/hold/gear/engine, and flips its registered-active
-   * status per {@link #eventType}.
+   * resolves (or creates) it, updates its home port, name, tags, behaviour
+   * and other components, and flips its registered-active status per
+   * {@link #eventType}.
    *
    * @throws IllegalStateException if the vessel doesn't exist and this isn't an
    *                               {@link Type#ACTIVATION} event, or if a
@@ -168,10 +153,7 @@ public class FleetEvent implements Steppable {
     vessel.setName(vesselName);
     tags.forEach(vessel::putTag);
     vessel.setBehaviour(behaviourFactoryFunction.apply(vessel));
-    vessel.setHold(holdFactoryFunction.apply(vessel));
-    vessel.setGear(gearFactoryFunction.apply(vessel));
-    vessel.setEngine(engineFactoryFunction.apply(vessel));
-    extraFactoryFunctions.forEach(factory -> factory.apply(vessel));
+    componentFactoryFunctions.forEach(factory -> factory.apply(vessel));
     switch (eventType) {
       case ACTIVATION -> vessel.setRegisteredAsActive(true);
       case DEACTIVATION -> vessel.setRegisteredAsActive(false);

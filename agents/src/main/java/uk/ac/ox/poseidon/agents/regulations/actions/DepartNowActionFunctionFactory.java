@@ -23,32 +23,36 @@
 package uk.ac.ox.poseidon.agents.regulations.actions;
 
 import java.util.function.Function;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of {@link DepartNowActionFunction},
- * built via {@link Factories#departNow()}.
+ * built via {@link Factories#departNow}.
  */
 @Getter
 @ToString
 @EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
+@AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class DepartNowActionFunctionFactory
   extends GlobalScopeFactory<Function<Vessel, DepartNow>>
   implements ValueFactory<Scope, Vessel, DepartNow>
 {
 
+  private final VesselComponent<? extends Gear> gear;
+
   @Override
   protected Function<Vessel, DepartNow> newInstance(final Scope scope) {
-    return new DepartNowActionFunction();
+    return new DepartNowActionFunction(gear);
   }
 }

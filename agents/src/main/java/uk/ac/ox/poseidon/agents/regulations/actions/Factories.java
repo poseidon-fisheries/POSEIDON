@@ -22,17 +22,23 @@
 
 package uk.ac.ox.poseidon.agents.regulations.actions;
 
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+
 /**
  * Factories for {@link FishingAction}s tested against the regulations engine.
  */
 public class Factories {
 
   /**
+   * @param gear the declaration of the gear the vessel departs with
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
    *         {@link DepartNowActionFunction}
    * @see DepartNow
    */
-  public static DepartNowActionFunctionFactory departNow() {
-    return new DepartNowActionFunctionFactory();
+  public static DepartNowActionFunctionFactory departNow(
+    final VesselComponent<? extends Gear> gear
+  ) {
+    return new DepartNowActionFunctionFactory(gear);
   }
 }

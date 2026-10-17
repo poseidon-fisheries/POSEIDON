@@ -26,7 +26,10 @@ import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTim
 
 import java.time.Duration;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
@@ -41,6 +44,10 @@ public class Factories {
   private Factories() {}
 
   /**
+   * @param gear            the declaration of the gear the vessel would fish
+   *                        with
+   * @param engine          the declaration of the engine whose speed gives the
+   *                        time to get there
    * @param regulations     the regulations a candidate fishing action must be
    *                        permitted by
    * @param pathFinder      finds the path from the vessel's current cell to the
@@ -54,6 +61,8 @@ public class Factories {
    * @see FishingLocationLegalityCheckerFactory
    */
   public static FishingLocationLegalityCheckerFactory fishingLocationLegalityChecker(
+    final VesselComponent<? extends Gear> gear,
+    final VesselComponent<? extends Engine> engine,
     final Factory<
       ? super VesselScope,
       ? extends Regulations<? super ExtendedFishingAction>
@@ -63,6 +72,8 @@ public class Factories {
     final Factory<? super VesselScope, ? extends Duration> fishingDuration
   ) {
     return new FishingLocationLegalityCheckerFactory(
+      gear,
+      engine,
       regulations,
       pathFinder,
       distance,

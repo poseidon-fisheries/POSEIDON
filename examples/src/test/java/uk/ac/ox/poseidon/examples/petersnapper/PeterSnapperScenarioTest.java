@@ -126,16 +126,17 @@ class PeterSnapperScenarioTest {
     assertThat(new ScenarioWriter().write(scenario)).isEqualTo(before);
   }
 
-  // Calibration varies the gear's proportion through this address. The
-  // derived scenario must be the one written with the value set: the gear
-  // replaced wherever it is shared, nothing else changed.
+  // Calibration varies the gear's proportion through this address, a scenario
+  // component's value. The derived scenario must be the one written with the
+  // value set: the component, the gear and the declarations above it replaced
+  // wherever they are shared, nothing else changed.
   @Test
   void theCalibratedAddressDerivesTheScenarioWithTheValueSet() {
     final Scenario scenario = new PeterSnapperScenario().get();
     final String yaml = new ScenarioWriter().write(scenario);
     final String yamlWithTheValueSet = yaml.replace(
-      "proportion: 6.41964E-4",
-      "proportion: 0.001"
+      "value: 6.41964E-4",
+      "value: 0.001"
     );
     assertThat(yamlWithTheValueSet).isNotEqualTo(yaml);
 

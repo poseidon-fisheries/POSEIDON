@@ -25,7 +25,11 @@ package uk.ac.ox.poseidon.agents.tasks.fishing;
 import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
@@ -40,6 +44,7 @@ public class Factories {
   private Factories() {}
 
   /**
+   * @param gear        the declaration of the gear the vessel would fish with
    * @param regulations the regulations a fishing action started now, here, is
    *                    checked against
    * @return a {@link VesselScope}-relative factory for a
@@ -47,12 +52,13 @@ public class Factories {
    * @see CheckIfFishingHereAndNowIsLegal
    */
   public static CheckIfFishingHereAndNowIsLegalFactory checkIfFishingHereAndNowIsLegal(
+    final VesselComponent<? extends Gear> gear,
     final Factory<
       ? super VesselScope,
       ? extends Regulations<? super ExtendedFishingAction>
     > regulations
   ) {
-    return new CheckIfFishingHereAndNowIsLegalFactory(regulations);
+    return new CheckIfFishingHereAndNowIsLegalFactory(gear, regulations);
   }
 
   /**
@@ -80,12 +86,19 @@ public class Factories {
   }
 
   /**
-   * @param fisheable  the fisheable to fish from, read for the vessel
+   * @param gear               the declaration of the gear to fish with
+   * @param hold               the declaration of the hold the catch goes in
+   * @param engine             the declaration of the engine that burns the
+   *                           fuel fishing takes
+   * @param fisheable          the fisheable to fish from, read for the vessel
    * @param dispositionProcess sorts the catch into retained/discarded
    * @return a {@link VesselScope}-relative factory for a {@link Fishing} task
    * @see Fishing
    */
   public static FishingFactory fishing(
+    final VesselComponent<? extends Gear> gear,
+    final VesselComponent<? extends Hold> hold,
+    final VesselComponent<? extends Engine> engine,
     final ValueFactory<
       ? super VesselScope,
       ? super Vessel,
@@ -96,6 +109,12 @@ public class Factories {
       ? extends DispositionProcess
     > dispositionProcess
   ) {
-    return new FishingFactory(fisheable, dispositionProcess);
+    return new FishingFactory(
+      gear,
+      hold,
+      engine,
+      fisheable,
+      dispositionProcess
+    );
   }
 }

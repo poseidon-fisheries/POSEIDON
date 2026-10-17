@@ -33,6 +33,9 @@ import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
+import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
@@ -49,6 +52,15 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 public class Fishing extends ExtendedTripTask {
 
   @NonNull
+  private final VesselComponent<? extends Gear> gear;
+
+  @NonNull
+  private final VesselComponent<? extends Hold> hold;
+
+  @NonNull
+  private final VesselComponent<? extends Engine> engine;
+
+  @NonNull
   private final Function<? super Vessel, Fisheable> fisheable;
 
   @NonNull
@@ -63,7 +75,7 @@ public class Fishing extends ExtendedTripTask {
   @Override
   public void start() {
     super.start();
-    action = new ExtendedFishingAction(getAgent());
+    action = new ExtendedFishingAction(getAgent(), gear.of(getAgent()));
   }
 
   /**
@@ -86,8 +98,9 @@ public class Fishing extends ExtendedTripTask {
   @Override
   protected Status complete() {
     final Fisheable fisheable = this.fisheable.apply(getAgent());
-    final Bucket grossCatch = getAgent().getGear().fish(fisheable);
-    final Hold hold = getAgent().getHold();
+    final Gear gear = this.gear.of(getAgent());
+    final Bucket grossCatch = gear.fish(fisheable);
+    final Hold hold = this.hold.of(getAgent());
     final Disposition disposition = dispositionProcess.partition(
       grossCatch,
       hold.getAvailableCapacityInKg()
@@ -99,14 +112,10 @@ public class Fishing extends ExtendedTripTask {
       .broadcast(
         new FishingEvent(action, new FishingOutcome(grossCatch, disposition))
       );
-    final double fuelPerHour = getAgent()
-      .getGear()
-      .getLitresOfFuelConsumedPerHourOfFishing();
+    final double fuelPerHour = gear.getLitresOfFuelConsumedPerHourOfFishing();
     if (fuelPerHour > 0) {
       final double hours = getDuration().toSeconds() / 3600.0;
-      getAgent()
-        .getEngine()
-        .consumeFuel(fuelPerHour * hours);
+      engine.of(getAgent()).consumeFuel(fuelPerHour * hours);
     }
     return SUCCEEDED;
   }

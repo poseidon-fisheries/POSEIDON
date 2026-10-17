@@ -30,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.fuel.FuelStation;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 
 /**
  * An {@link ExtendedTripTask} that refuels the vessel at the cheapest fuel
@@ -39,6 +41,7 @@ import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
 @RequiredArgsConstructor
 public class Refuel extends ExtendedTripTask {
 
+  private final @NonNull VesselComponent<? extends Engine> engine;
   private final @NonNull FuelStationGrid fuelStationGrid;
   private Duration duration;
 
@@ -56,7 +59,7 @@ public class Refuel extends ExtendedTripTask {
       .getObjectsAt(getAgent().getCell())
       .min(comparing(FuelStation::getPricePerLitre))
       .map(fuelStation ->
-        fuelStation.refill(getAgent().getEngine().getFuelTank())
+        fuelStation.refill(engine.of(getAgent()).getFuelTank())
       )
       .orElseThrow(() ->
         new IllegalStateException(

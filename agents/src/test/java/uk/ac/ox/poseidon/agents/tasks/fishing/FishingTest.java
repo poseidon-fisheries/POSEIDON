@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks.fishing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.declaredFor;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
@@ -36,6 +37,8 @@ import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.biology.Fisheable;
@@ -70,8 +73,6 @@ class FishingTest {
       Bucket.empty()
     );
 
-    when(vessel.getGear()).thenReturn(gear);
-    when(vessel.getHold()).thenReturn(hold);
     when(gear.fish(fisheable)).thenReturn(grossCatch);
     when(hold.getAvailableCapacityInKg()).thenReturn(42.0);
     when(dispositionProcess.partition(grossCatch, 42.0)).thenReturn(
@@ -80,6 +81,9 @@ class FishingTest {
     when(trip.getEventManager()).thenReturn(eventManager);
 
     final ExposedFishing fishing = new ExposedFishing(
+      declaredFor(vessel, gear),
+      declaredFor(vessel, hold),
+      declaredFor(vessel, mock(Engine.class)),
       v -> fisheable,
       dispositionProcess
     );
@@ -129,14 +133,15 @@ class FishingTest {
     final Bucket grossCatch = Bucket.empty();
     final Disposition disposition = Disposition.empty();
 
-    when(vessel.getGear()).thenReturn(gear);
-    when(vessel.getHold()).thenReturn(hold);
     when(gear.fish(fisheable)).thenReturn(grossCatch);
     when(hold.getAvailableCapacityInKg()).thenReturn(0.0);
     when(dispositionProcess.partition(grossCatch, 0.0)).thenReturn(disposition);
     when(trip.getEventManager()).thenReturn(eventManager);
 
     final ExposedFishing fishing = new ExposedFishing(
+      declaredFor(vessel, gear),
+      declaredFor(vessel, hold),
+      declaredFor(vessel, mock(Engine.class)),
       v -> fisheable,
       dispositionProcess
     );
@@ -166,10 +171,13 @@ class FishingTest {
   private static final class ExposedFishing extends Fishing {
 
     private ExposedFishing(
+      final VesselComponent<Gear> gear,
+      final VesselComponent<Hold> hold,
+      final VesselComponent<Engine> engine,
       final Function<? super Vessel, Fisheable> fisheable,
       final DispositionProcess dispositionProcess
     ) {
-      super(fisheable, dispositionProcess);
+      super(gear, hold, engine, fisheable, dispositionProcess);
     }
 
     private Task.Status invokeComplete() {

@@ -29,19 +29,19 @@ import static uk.ac.ox.poseidon.agents.vessels.values.Factories.vesselProperty;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 class VesselPropertyFactoryTest {
 
-  private static Vessel vesselWithGearCode(final String gearCode) {
-    final Gear gear = mock(Gear.class);
-    when(gear.getCode()).thenReturn(gearCode);
+  private static Vessel vesselWithHomePortCode(final String portCode) {
+    final Port port = mock(Port.class);
+    when(port.getCode()).thenReturn(portCode);
     final Vessel vessel = mock(Vessel.class);
-    when(vessel.getGear()).thenReturn(gear);
+    when(vessel.getHomePort()).thenReturn(port);
     return vessel;
   }
 
@@ -49,32 +49,32 @@ class VesselPropertyFactoryTest {
   void survivesAYamlRoundTripWithOnlyItsPath() {
     final String written = new ScenarioWriter().write(
       Scenario.builder()
-        .component("property", vesselProperty("gear.code"))
+        .component("property", vesselProperty("homePort.code"))
         .build()
     );
     assertThat(written)
-      .contains("propertyPath: gear.code")
+      .contains("propertyPath: homePort.code")
       .doesNotContain("rootClass");
     assertThat(
       new ScenarioLoader().load(written).getComponents().get("property")
-    ).isEqualTo(vesselProperty("gear.code"));
+    ).isEqualTo(vesselProperty("homePort.code"));
   }
 
   @Test
-  void readsTheCodeOfTheVesselsCurrentGear() {
+  void readsTheCodeOfTheVesselsHomePort() {
     assertThat(
-      vesselProperty("gear.code")
+      vesselProperty("homePort.code")
         .get(Scope.GLOBAL_SCOPE)
-        .apply(vesselWithGearCode("OTB"))
-    ).isEqualTo("OTB");
+        .apply(vesselWithHomePortCode("P1"))
+    ).isEqualTo("P1");
   }
 
   @Test
-  void readsNullForAGearWithoutCode() {
+  void readsNullForAHomePortWithoutCode() {
     assertThat(
-      vesselProperty("gear.code")
+      vesselProperty("homePort.code")
         .get(Scope.GLOBAL_SCOPE)
-        .apply(vesselWithGearCode(null))
+        .apply(vesselWithHomePortCode(null))
     ).isNull();
   }
 }

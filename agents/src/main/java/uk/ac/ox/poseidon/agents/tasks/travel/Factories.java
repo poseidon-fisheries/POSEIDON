@@ -27,7 +27,9 @@ import com.badlogic.gdx.ai.btree.branch.Sequence;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -43,17 +45,19 @@ public class Factories {
   private Factories() {}
 
   /**
+   * @param engine          the declaration of the engine whose tank is filled
    * @param fuelStationGrid the fuel stations a cell might contain
    * @return a {@link VesselScope}-relative factory for a {@link Refuel}
    * @see Refuel
    */
   public static RefuelFactory refuel(
+    final VesselComponent<? extends Engine> engine,
     final Factory<
       ? super VesselScope,
       ? extends FuelStationGrid
     > fuelStationGrid
   ) {
-    return new RefuelFactory(fuelStationGrid);
+    return new RefuelFactory(engine, fuelStationGrid);
   }
 
   /**
@@ -81,6 +85,8 @@ public class Factories {
   }
 
   /**
+   * @param engine       the declaration of the engine that sets the speed and
+   *                     burns the fuel
    * @param pathFinder   finds a path between two cells
    * @param distance     computes the distance, and so the duration, of each
    *                     hop
@@ -93,6 +99,7 @@ public class Factories {
    * @see TravelAlongPath
    */
   public static TravelAlongPathFactory travelAlongPathTo(
+    final VesselComponent<? extends Engine> engine,
     final Factory<? super VesselScope, ? extends PathFinder<Int2D>> pathFinder,
     final Factory<? super VesselScope, ? extends DistanceCalculator> distance,
     final ValueFactory<? super VesselScope, ? super Vessel, Int2D> destination,
@@ -103,6 +110,7 @@ public class Factories {
     > eventManager
   ) {
     return new TravelAlongPathFactory(
+      engine,
       pathFinder,
       distance,
       destination,
@@ -111,15 +119,18 @@ public class Factories {
   }
 
   /**
+   * @param engine   the declaration of the engine that sets the speed and burns
+   *                 the fuel
    * @param distance computes the direct distance, and so the duration, to the
    *                 trip's destination
    * @return a {@link VesselScope}-relative factory for a {@link TravelDirectly}
    * @see TravelDirectly
    */
   public static TravelDirectlyFactory travelDirectly(
+    final VesselComponent<? extends Engine> engine,
     final Factory<? super VesselScope, ? extends DistanceCalculator> distance
   ) {
-    return new TravelDirectlyFactory(distance);
+    return new TravelDirectlyFactory(engine, distance);
   }
 
   /**

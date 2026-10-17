@@ -30,6 +30,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.declaredFor;
+import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.giveComponent;
 
 import com.google.common.collect.ImmutableList;
 import java.time.Duration;
@@ -39,6 +41,7 @@ import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import sim.util.Number2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
@@ -55,13 +58,16 @@ class RouteViaDestinationTest {
   private final DistanceCalculator distanceCalculator = mock(
     DistanceCalculator.class
   );
+  private final VesselComponent<Engine> engineDeclaration = declaredFor(
+    vessel,
+    engine
+  );
   private final RouteViaDestination routeViaDestination =
-    new RouteViaDestination(pathFinder, distanceCalculator);
+    new RouteViaDestination(engineDeclaration, pathFinder, distanceCalculator);
 
   @BeforeEach
   void setUp() {
     when(engine.getCruisingSpeedInKph()).thenReturn(10.0);
-    when(vessel.getEngine()).thenReturn(engine);
     when(vessel.getCell()).thenReturn(vesselCell);
     when(vessel.getHomePortLocation()).thenReturn(portCell);
     when(
@@ -109,7 +115,7 @@ class RouteViaDestinationTest {
     final Vessel otherVessel = mock(Vessel.class);
     final Engine otherEngine = mock(Engine.class);
     when(otherEngine.getCruisingSpeedInKph()).thenReturn(20.0);
-    when(otherVessel.getEngine()).thenReturn(otherEngine);
+    giveComponent(otherVessel, engineDeclaration, otherEngine);
     when(otherVessel.getCell()).thenReturn(destination);
     when(otherVessel.getHomePortLocation()).thenReturn(portCell);
     when(pathFinder.getPath(destination, destination)).thenReturn(
