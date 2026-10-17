@@ -36,7 +36,7 @@ import tech.tablesaw.api.Table;
  * A {@link Table} that grows one row per simulation step: each {@link #step}
  * call appends the current values of a fixed list of per-column
  * {@link Supplier}s. Built via
- * {@link Factories#steppableTable(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory[])}
+ * {@link Factories#steppableTable(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.ValueFactory[])}
  * in this package.
  */
 public class SteppableTable implements Steppable, Supplier<Table> {

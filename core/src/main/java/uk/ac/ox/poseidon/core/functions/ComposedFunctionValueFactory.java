@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,35 +20,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.constant;
+package uk.ac.ox.poseidon.core.functions;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.providers.IntProvider;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link ConstantInt}, built via
- * {@link Factories#constantInt(int)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link ComposedFunctionValue},
+ * built via {@link Factories#composedFunction(ValueFactory, MappingFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ConstantIntFromValueFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  IntProvider
-> {
+public class ComposedFunctionValueFactory<S extends Scope, C, U, R>
+  extends RelativeScopeFactory<S, Function<C, R>>
+  implements ValueFactory<S, C, R>
+{
 
-  private final int value;
+  private final ValueFactory<? super S, ? super C, ? extends U> function1;
+  private final MappingFactory<
+    ? super S,
+    ? super C,
+    ? super U,
+    ? extends R
+  > function2;
 
   @Override
-  protected IntProvider newInstance(final S scope) {
-    return new ConstantInt(value);
+  protected Function<C, R> newInstance(final S scope) {
+    return new ComposedFunctionValue<>(
+      function1.get(scope),
+      function2.get(scope)
+    );
   }
 }

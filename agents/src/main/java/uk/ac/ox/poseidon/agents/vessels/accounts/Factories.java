@@ -22,12 +22,12 @@
 
 package uk.ac.ox.poseidon.agents.vessels.accounts;
 
-import java.util.function.Function;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * Factories for a vessel's {@link Account} and for
@@ -48,7 +48,7 @@ public class Factories {
 
   /**
    * @param fleet         the fleet whose active vessels get charged
-   * @param costExtractor computes the amount to subtract from each vessel's
+   * @param cost computes the amount to subtract from each vessel's
    *                      account
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link FixedCostCollector}
@@ -56,11 +56,8 @@ public class Factories {
    */
   public static <S extends Scope> FixedCostCollectorFactory<S> fixedCostCollector(
     final Factory<? super S, ? extends Fleet> fleet,
-    final Factory<
-      ? super S,
-      ? extends Function<? super Vessel, ? extends Money>
-    > costExtractor
+    final ValueFactory<? super S, ? super Vessel, ? extends Money> cost
   ) {
-    return new FixedCostCollectorFactory<>(fleet, costExtractor);
+    return new FixedCostCollectorFactory<>(fleet, cost);
   }
 }

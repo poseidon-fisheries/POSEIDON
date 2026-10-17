@@ -23,22 +23,22 @@
 package uk.ac.ox.poseidon.core.providers.random;
 
 import ec.util.MersenneTwisterFast;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.BooleanProvider;
 
 /**
- * A {@link BooleanProvider} that returns {@code true} with the given
- * probability on each call, drawn from the simulation's shared RNG. Built via
+ * A value that is {@code true} with the given probability on each call, drawn
+ * from the simulation's shared RNG. Built via
  * {@link Factories Factories.randomBoolean(...)} in this package.
  */
 @RequiredArgsConstructor
-public class RandomBoolean implements BooleanProvider {
+public class RandomBoolean implements Function<Object, Boolean> {
 
   private final double probability;
   private final MersenneTwisterFast rng;
 
   @Override
-  public boolean getAsBoolean() {
+  public Boolean apply(final Object context) {
     return rng.nextBoolean(probability);
   }
 }

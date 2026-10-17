@@ -22,15 +22,16 @@
 
 package uk.ac.ox.poseidon.core.predicates.comparable;
 
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link GreaterThan}, built via
@@ -41,15 +42,15 @@ import uk.ac.ox.poseidon.core.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class GreaterThanFactory<
-  S extends Scope,
-  T
-> extends RelativeScopeFactory<S, GreaterThan<T>> {
+public class GreaterThanFactory<S extends Scope, C, T>
+  extends RelativeScopeFactory<S, BiFunction<C, Comparable<T>, Boolean>>
+  implements MappingFactory<S, C, Comparable<T>, Boolean>
+{
 
-  private final Factory<? super S, ? extends Supplier<? extends T>> value;
+  private final ValueFactory<? super S, ? super C, ? extends T> value;
 
   @Override
-  protected GreaterThan<T> newInstance(final S scope) {
+  protected BiFunction<C, Comparable<T>, Boolean> newInstance(final S scope) {
     return new GreaterThan<>(value.get(scope));
   }
 }

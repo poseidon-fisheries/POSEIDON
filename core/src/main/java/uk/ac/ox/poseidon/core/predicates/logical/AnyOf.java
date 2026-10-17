@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,40 +23,42 @@
 package uk.ac.ox.poseidon.core.predicates.logical;
 
 import java.util.Collection;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.function.BiFunction;
 import lombok.NonNull;
 
 /**
- * A {@link Predicate} that is true iff at least one of its component predicates
- * is true for the given input (false for zero predicates). Built via
- * {@link Factories#anyOf(uk.ac.ox.poseidon.core.Factory...)} in this package.
+ * A yes/no mapping that is true iff at least one of its component mappings is
+ * true of the thing tested, under the same context (false for zero predicates).
+ * Built via {@link Factories#anyOf(uk.ac.ox.poseidon.core.MappingFactory...)}
+ * in this package.
  *
- * @param <T> the type of input tested
+ * @param <C> the type of the context
+ * @param <T> the type of the thing tested
  */
-public class AnyOf<T> implements Predicate<T> {
+public class AnyOf<C, T> implements BiFunction<C, T, Boolean> {
 
   // Using an array for performance reasons
   @NonNull
-  private final Predicate<? super T>[] predicates;
+  private final BiFunction<? super C, ? super T, Boolean>[] predicates;
 
-  /**
-   * @param predicates the component predicates, at least one of which must pass
-   */
+  /** @param predicates the component mappings */
   @SuppressWarnings("unchecked")
-  public AnyOf(final Collection<? extends Predicate<? super T>> predicates) {
-    this.predicates = predicates.toArray(Predicate[]::new);
-  }
-
-  /** @return the component predicates */
-  public Stream<Predicate<? super T>> getPredicates() {
-    return Stream.of(predicates);
+  public AnyOf(
+    final Collection<
+      ? extends BiFunction<? super C, ? super T, Boolean>
+    > predicates
+  ) {
+    this.predicates = predicates.toArray(BiFunction[]::new);
   }
 
   @Override
-  public boolean test(final T t) {
-    for (final Predicate<? super T> predicate : predicates) {
-      if (predicate.test(t)) {
+  public Boolean apply(final C context, final T t) {
+    for (final BiFunction<
+      ? super C,
+      ? super T,
+      Boolean
+    > predicate : predicates) {
+      if (predicate.apply(context, t)) {
         return true;
       }
     }

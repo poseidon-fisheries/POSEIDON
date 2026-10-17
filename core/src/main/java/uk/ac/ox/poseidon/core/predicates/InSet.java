@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,24 +23,29 @@
 package uk.ac.ox.poseidon.core.predicates;
 
 import java.util.Collection;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} that is true iff the tested value is a member of a
- * supplied collection. Built via
- * {@link Factories#in(uk.ac.ox.poseidon.core.Factory)} in this package.
+ * A yes/no mapping that is true iff the thing tested is a member of a
+ * collection read under the context. Built via
+ * {@link Factories#in(uk.ac.ox.poseidon.core.ValueFactory)} in this package.
  *
- * @param <T> the type of input tested
+ * @param <C> the type of the context the reference is read under
+ * @param <T> the type of the thing tested
  */
 @RequiredArgsConstructor
-public class InSet<T> implements Predicate<T> {
+public class InSet<C, T> implements BiFunction<C, T, Boolean> {
 
-  private final Supplier<? extends Collection<? extends T>> values;
+  private final @NonNull Function<
+    ? super C,
+    ? extends Collection<? extends T>
+  > values;
 
   @Override
-  public boolean test(final T t) {
-    return values.get().contains(t);
+  public Boolean apply(final C context, final T mapped) {
+    return values.apply(context).contains(mapped);
   }
 }

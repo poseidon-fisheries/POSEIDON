@@ -22,11 +22,11 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
-import java.util.function.Supplier;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * Factories for {@code Predicate<Vessel>}s testing a vessel's activity, trips,
@@ -65,13 +65,14 @@ public class Factories {
   }
 
   /**
-   * @param cellSupplier supplies the cell to test the vessel's location against
+   * @param cell the cell, read for the vessel tested, to test its
+   *                     location against
    * @return a {@link VesselScope}-relative factory for a {@link VesselIsAt}
    * @see VesselIsAt
    */
   public static <S extends Scope> VesselIsAtFactory<S> vesselIsAt(
-    final Factory<? super S, ? extends Supplier<Int2D>> cellSupplier
+    final ValueFactory<? super S, ? super Vessel, Int2D> cell
   ) {
-    return new VesselIsAtFactory<>(cellSupplier);
+    return new VesselIsAtFactory<>(cell);
   }
 }

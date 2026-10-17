@@ -22,13 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.regulations.actions;
 
+import java.util.function.Function;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of {@link DepartNowActionFunction},
@@ -40,11 +43,12 @@ import uk.ac.ox.poseidon.core.Scope;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class DepartNowActionFunctionFactory
-  extends GlobalScopeFactory<DepartNowActionFunction>
+  extends GlobalScopeFactory<Function<Vessel, DepartNow>>
+  implements ValueFactory<Scope, Vessel, DepartNow>
 {
 
   @Override
-  protected DepartNowActionFunction newInstance(final Scope scope) {
+  protected Function<Vessel, DepartNow> newInstance(final Scope scope) {
     return new DepartNowActionFunction();
   }
 }

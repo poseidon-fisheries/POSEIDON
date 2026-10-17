@@ -46,14 +46,14 @@ class TimeCostTest {
 
   @Test
   void chargesTheHourlyCostForEachHourOfTheRoute() {
-    assertThat(timeCost.apply(route)).isEqualTo(Money.of(EUR, 15));
+    assertThat(timeCost.apply(null, route)).isEqualTo(Money.of(EUR, 15));
   }
 
   @Test
   void readsTheVesselsHourlyCostAtEachCall() {
-    final Money costBefore = timeCost.apply(route);
+    final Money costBefore = timeCost.apply(null, route);
     hourlyCost.set(Money.of(EUR, 20));
-    final Money costAfter = timeCost.apply(route);
+    final Money costAfter = timeCost.apply(null, route);
 
     assertThat(costBefore).isEqualTo(Money.of(EUR, 15));
     assertThat(costAfter).isEqualTo(Money.of(EUR, 30));
@@ -63,7 +63,7 @@ class TimeCostTest {
   void throwsWithoutAnHourlyCost() {
     hourlyCost.set(null);
 
-    assertThatThrownBy(() -> timeCost.apply(route)).isInstanceOf(
+    assertThatThrownBy(() -> timeCost.apply(null, route)).isInstanceOf(
       NullPointerException.class
     );
   }

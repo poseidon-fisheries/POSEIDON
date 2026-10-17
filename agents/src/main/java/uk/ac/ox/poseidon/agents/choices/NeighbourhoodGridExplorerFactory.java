@@ -23,8 +23,6 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import ec.util.MersenneTwisterFast;
-import java.util.function.IntSupplier;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -32,9 +30,12 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
@@ -54,14 +55,17 @@ public class NeighbourhoodGridExplorerFactory
     ? super VesselScope,
     ? extends GridPathFinder
   > pathFinder;
-  private final Factory<
+  private final MappingFactory<
     ? super VesselScope,
-    ? extends Predicate<? super Int2D>
+    ? super Vessel,
+    ? super Int2D,
+    Boolean
   > cellPredicate;
-  private final Factory<
+  private final ValueFactory<
     ? super VesselScope,
-    ? extends IntSupplier
-  > neighbourhoodSizeSupplier;
+    ? super Vessel,
+    Integer
+  > neighbourhoodSize;
   private final int maximumWidening;
   private final Factory<
     ? super VesselScope,
@@ -78,7 +82,7 @@ public class NeighbourhoodGridExplorerFactory
       scope.getVessel(),
       pathFinder.get(scope),
       cellPredicate.get(scope),
-      neighbourhoodSizeSupplier.get(scope),
+      neighbourhoodSize.get(scope),
       maximumWidening,
       searchCentre.get(scope),
       randomNumberGenerator.get(scope)

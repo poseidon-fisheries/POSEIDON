@@ -22,26 +22,27 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Function} that delegates to another function and substitutes a fixed
- * default whenever that delegate returns {@code null}. Built via
- * {@link Factories Factories.defaultIfNull(...)} in this package.
+ * A mapping that delegates to another mapping, under the same context, and
+ * substitutes a fixed default whenever that delegate returns {@code null}.
+ * Built via {@link Factories Factories.defaultIfNull(...)} in this package.
  *
- * @param <T> the type of input
- * @param <R> the type of output, and of the default value
+ * @param <C> the type of the context
+ * @param <T> the type of the thing mapped
+ * @param <R> the type of the result, and of the default value
  */
 @RequiredArgsConstructor
-public class DefaultIfNull<T, R> implements Function<T, R> {
+public class DefaultIfNull<C, T, R> implements BiFunction<C, T, R> {
 
-  private final Function<? super T, ? extends R> delegate;
+  private final BiFunction<? super C, ? super T, ? extends R> delegate;
   private final R defaultValue;
 
   @Override
-  public R apply(final T value) {
-    final R result = delegate.apply(value);
+  public R apply(final C context, final T t) {
+    final R result = delegate.apply(context, t);
     return result == null ? defaultValue : result;
   }
 }

@@ -31,16 +31,35 @@ import org.junit.jupiter.api.Test;
 public class ObjectPropertyTest {
 
   @Test
+  void asAMappingReadsTheThingMappedWhateverTheContext() {
+    assertThat(
+      new ObjectProperty<Outer, String>(Outer.class, "inner.code").apply(
+        "any context",
+        new Outer()
+      )
+    ).isEqualTo("code");
+  }
+
+  @Test
+  void asAValueReadsTheContext() {
+    assertThat(
+      new ObjectPropertyValue<Outer, String>(Outer.class, "name").apply(
+        new Outer()
+      )
+    ).isEqualTo("outer");
+  }
+
+  @Test
   void readsASingleProperty() {
     assertThat(
-      new ObjectProperty<Outer, String>(Outer.class, "name").apply(new Outer())
+      new ObjectProperty<Outer, String>(Outer.class, "name").read(new Outer())
     ).isEqualTo("outer");
   }
 
   @Test
   void followsANestedPath() {
     assertThat(
-      new ObjectProperty<Outer, String>(Outer.class, "inner.code").apply(
+      new ObjectProperty<Outer, String>(Outer.class, "inner.code").read(
         new Outer()
       )
     ).isEqualTo("code");
@@ -49,7 +68,7 @@ public class ObjectPropertyTest {
   @Test
   void readsABooleanPropertyThroughItsIsGetter() {
     assertThat(
-      new ObjectProperty<Outer, Boolean>(Outer.class, "active").apply(
+      new ObjectProperty<Outer, Boolean>(Outer.class, "active").read(
         new Outer()
       )
     ).isTrue();
@@ -58,14 +77,14 @@ public class ObjectPropertyTest {
   @Test
   void readsAGetterInheritedFromAnInterface() {
     assertThat(
-      new ObjectProperty<Coded, String>(Coded.class, "code").apply(new Inner())
+      new ObjectProperty<Coded, String>(Coded.class, "code").read(new Inner())
     ).isEqualTo("code");
   }
 
   @Test
   void givesNullWhenTheLastPropertyIsNull() {
     assertThat(
-      new ObjectProperty<Outer, String>(Outer.class, "inner.missingCode").apply(
+      new ObjectProperty<Outer, String>(Outer.class, "inner.missingCode").read(
         new Outer()
       )
     ).isNull();
@@ -77,7 +96,7 @@ public class ObjectPropertyTest {
       Outer.class,
       "missingInner.code"
     );
-    assertThatThrownBy(() -> property.apply(new Outer()))
+    assertThatThrownBy(() -> property.read(new Outer()))
       .isInstanceOf(NullPointerException.class)
       .hasMessageContaining("missingInner");
   }
@@ -124,7 +143,7 @@ public class ObjectPropertyTest {
       Outer.class,
       "broken"
     );
-    assertThatThrownBy(() -> property.apply(new Outer())).isExactlyInstanceOf(
+    assertThatThrownBy(() -> property.read(new Outer())).isExactlyInstanceOf(
       UnsupportedOperationException.class
     );
   }

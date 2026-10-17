@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
 import java.lang.reflect.Field;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
@@ -80,7 +80,7 @@ class FishingTest {
     when(trip.getEventManager()).thenReturn(eventManager);
 
     final ExposedFishing fishing = new ExposedFishing(
-      () -> fisheable,
+      v -> fisheable,
       dispositionProcess
     );
     setTaskObject(fishing, vessel);
@@ -137,7 +137,7 @@ class FishingTest {
     when(trip.getEventManager()).thenReturn(eventManager);
 
     final ExposedFishing fishing = new ExposedFishing(
-      () -> fisheable,
+      v -> fisheable,
       dispositionProcess
     );
     setTaskObject(fishing, vessel);
@@ -166,10 +166,10 @@ class FishingTest {
   private static final class ExposedFishing extends Fishing {
 
     private ExposedFishing(
-      final Supplier<Fisheable> fisheableSupplier,
+      final Function<? super Vessel, Fisheable> fisheable,
       final DispositionProcess dispositionProcess
     ) {
-      super(fisheableSupplier, dispositionProcess);
+      super(fisheable, dispositionProcess);
     }
 
     private Task.Status invokeComplete() {

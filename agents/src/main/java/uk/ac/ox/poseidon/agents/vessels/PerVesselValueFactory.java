@@ -20,41 +20,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers;
+package uk.ac.ox.poseidon.agents.vessels;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.providers.constant.ConstantDouble;
+import uk.ac.ox.poseidon.core.PerScopeFactory;
+import uk.ac.ox.poseidon.core.ProductStore;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link RelativeScopeFactory} that resolves the given delegate
- * {@link DoubleSupplier} once, when built, and returns a {@link DoubleProvider}
- * that keeps handing out that same first-resolved value thereafter — a
- * snapshot, not a live pass-through to the delegate. No separate plain
- * component class here: the produced value is a {@link ConstantDouble} wrapping
- * the snapshot, built via {@link Factories#firstDoubleFrom(Factory)}.
+ * A {@link PerVesselFactory} counterpart for a value, which keeps its shape: a
+ * value built once per vessel is still a {@link ValueFactory}, so it can go
+ * wherever a value is expected, e.g.
+ * {@code firstValueFrom(perVessel(randomInt(1, 10)))} draws a separate number
+ * for each vessel. Built via {@link Factories#perVessel(ValueFactory)}.
+ *
+ * @param <C> the type of the context
+ * @param <R> the type of the value
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class FirstDoubleFromFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  DoubleProvider
-> {
+public class PerVesselValueFactory<C, R>
+  extends PerScopeFactory<VesselScope, Function<C, R>>
+  implements ValueFactory<VesselScope, C, R>
+{
 
-  private final Factory<? super S, ? extends DoubleSupplier> delegate;
+  private final ValueFactory<? super VesselScope, C, R> delegate;
 
   @Override
-  protected DoubleProvider newInstance(final S scope) {
-    return new ConstantDouble(delegate.get(scope).getAsDouble());
+  protected ProductStore productStoreFor(final VesselScope scope) {
+    return scope.getVessel().getProductStore();
+  }
+
+  @Override
+  protected Class<VesselScope> scopeClass() {
+    return VesselScope.class;
   }
 }

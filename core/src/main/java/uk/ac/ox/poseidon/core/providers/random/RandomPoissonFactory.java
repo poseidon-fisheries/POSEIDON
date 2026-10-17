@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.providers.random;
 
 import ec.util.MersenneTwisterFast;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,6 +33,7 @@ import sim.util.distribution.Poisson;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link RandomPoisson}, built
@@ -43,7 +45,8 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class RandomPoissonFactory
-  extends SimulationScopeFactory<RandomPoisson>
+  extends SimulationScopeFactory<Function<Object, Integer>>
+  implements ValueFactory<SimulationScope, Object, Integer>
 {
 
   private final double mean;
@@ -53,7 +56,7 @@ public class RandomPoissonFactory
   > randomNumberGenerator;
 
   @Override
-  protected RandomPoisson newInstance(final SimulationScope scope) {
+  protected Function<Object, Integer> newInstance(final SimulationScope scope) {
     return new RandomPoisson(
       new Poisson(mean, randomNumberGenerator.get(scope))
     );

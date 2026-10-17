@@ -33,7 +33,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalField;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import javax.imageio.ImageIO;
 import lombok.*;
 import lombok.Getter;
@@ -49,7 +50,8 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.providers.temporal.CurrentDateTime;
+import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
@@ -79,18 +81,25 @@ public class RegulationGridPortrayalFactory
     ? super SimulationScope,
     ? extends VesselField
   > vesselField;
-  private final Factory<
+  private final ValueFactory<
     ? super SimulationScope,
-    ? extends Predicate<? super Vessel>
+    ? super Vessel,
+    Boolean
   > fleet;
   private final Factory<
     ? super SimulationScope,
     ? extends BathymetricGrid
   > bathymetric;
-  private final Factory<
+  private final ValueFactory<
     ? super SimulationScope,
-    ? extends CurrentDateTime
+    ? super Void,
+    LocalDateTime
   > currentDateTime;
+  private final ValueFactory<
+    ? super SimulationScope,
+    ? super Void,
+    Boolean
+  > hasDateTime;
   private final int displayWidth;
   private final int displayHeight;
 
@@ -101,7 +110,8 @@ public class RegulationGridPortrayalFactory
   @Override
   protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
     return new Portrayal(
-      currentDateTime.get(scope),
+      WithoutContext.supplier(currentDateTime.get(scope)),
+      WithoutContext.supplier(hasDateTime.get(scope)),
       regulations.get(scope),
       vesselField.get(scope),
       fleet.get(scope),
@@ -140,20 +150,22 @@ public class RegulationGridPortrayalFactory
       }
     }
 
-    private final CurrentDateTime currentDateTime;
+    private final Supplier<LocalDateTime> currentDateTime;
+    private final Supplier<Boolean> hasDateTime;
     private final Regulations<? super ExtendedFishingAction> regulations;
     private final VesselField vesselField;
-    private final Predicate<? super Vessel> fleet;
+    private final Function<? super Vessel, Boolean> fleet;
     private final BathymetricGrid bathymetricGrid;
     private final ObjectGrid2D grid;
     private final UpdateFrequency updateFrequency;
     private long lastUpdated;
 
     Portrayal(
-      final CurrentDateTime currentDateTime,
+      final Supplier<LocalDateTime> currentDateTime,
+      final Supplier<Boolean> hasDateTime,
       final Regulations<? super ExtendedFishingAction> regulations,
       final VesselField vesselField,
-      final Predicate<? super Vessel> fleet,
+      final Function<? super Vessel, Boolean> fleet,
       final BathymetricGrid bathymetricGrid,
       final UpdateFrequency updateFrequency,
       final int displayWidth,
@@ -168,6 +180,7 @@ public class RegulationGridPortrayalFactory
       final int gridHeight = bathymetricGrid.getModelGrid().getGridHeight();
       this.grid = new ObjectGrid2D(gridWidth, gridHeight);
       this.currentDateTime = currentDateTime;
+      this.hasDateTime = hasDateTime;
       this.updateFrequency = updateFrequency;
       setField(grid);
 
@@ -186,7 +199,7 @@ public class RegulationGridPortrayalFactory
       final Graphics2D graphics,
       final DrawInfo2D info
     ) {
-      if (currentDateTime.hasDateTime()) {
+      if (hasDateTime.get()) {
         final long currentFieldValue = currentDateTime
           .get()
           .toLocalDate()
@@ -206,7 +219,7 @@ public class RegulationGridPortrayalFactory
         Vessel.class
       )
         .filter(Vessel::isActive)
-        .filter(fleet)
+        .filter(fleet::apply)
         .toList();
       bathymetricGrid.getActiveWaterCells().forEach(cell -> {
         final boolean forbidden =

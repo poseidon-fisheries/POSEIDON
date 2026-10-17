@@ -20,35 +20,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.constant;
+package uk.ac.ox.poseidon.core.functions;
 
+import com.google.common.collect.ImmutableList;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link ConstantInt}, built via
- * {@link Factories#constantInt(Factory)}.
+ * A {@link RelativeScopeFactory} counterpart of
+ * {@link MultiStringKeyFromFunctionsValue}, built via
+ * {@link Factories#multiStringKeyFromFunctions(ValueFactory...)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ConstantIntFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  ConstantInt
-> {
+public class MultiStringKeyFromFunctionsValueFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, String>>
+  implements ValueFactory<S, C, String>
+{
 
-  private final Factory<? super S, ? extends Integer> integerFactory;
+  @Singular
+  private final ImmutableList<ValueFactory<? super S, ? super C, ?>> functions;
 
   @Override
-  protected ConstantInt newInstance(final S scope) {
-    return new ConstantInt(integerFactory.get(scope));
+  protected Function<C, String> newInstance(final S scope) {
+    return new MultiStringKeyFromFunctionsValue<>(
+      functions
+        .stream()
+        .map(f -> f.get(scope))
+        .toList()
+    );
   }
 }

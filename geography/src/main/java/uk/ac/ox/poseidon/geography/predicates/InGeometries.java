@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,19 +23,19 @@
 package uk.ac.ox.poseidon.geography.predicates;
 
 import java.util.Collection;
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
 import lombok.NonNull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 /**
- * A {@link Predicate} testing whether a {@link Coordinate} falls within any of
- * a fixed set of JTS {@link Geometry}s. Built via
+ * A yes/no mapping, whatever the context, testing whether a {@link Coordinate}
+ * falls within any of a fixed set of JTS {@link Geometry}s. Built via
  * {@link Factories#inGeometries(uk.ac.ox.poseidon.core.Factory)} in this
  * package.
  */
-public class InGeometries implements Predicate<Coordinate> {
+public class InGeometries implements BiFunction<Object, Coordinate, Boolean> {
 
   private final Geometry[] geometries;
 
@@ -51,7 +51,7 @@ public class InGeometries implements Predicate<Coordinate> {
    *         geometries
    */
   @Override
-  public boolean test(final Coordinate coordinate) {
+  public Boolean apply(final Object context, final Coordinate coordinate) {
     for (final Geometry geometry : geometries) {
       final Point point = geometry.getFactory().createPoint(coordinate.toJTS());
       if (geometry.contains(point)) {

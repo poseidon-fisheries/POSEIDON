@@ -24,54 +24,40 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static uk.ac.ox.poseidon.core.predicates.logical.Factories.not;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.alwaysTrue;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
-@SuppressWarnings("unchecked")
 class NotFactoryTest {
 
-  /**
-   * Tests the `newInstance` method of the NotFactory class. Verifies that the
-   * method creates a `Not` instance correctly when a valid `Factory` for a
-   * `Predicate<Object>` is provided and is functional.
-   */
   @Test
-  void testNewInstanceWithValidPredicateFactory() {
-    // Arrange
-    final Predicate<Object> predicate = value -> true;
-    final ObjectFactory<Predicate<Object>> factory = new ObjectFactory<>(
-      predicate
+  void negatingAMappingGivesAMapping() {
+    final BiFunction<Object, Object, Boolean> mapping = not(alwaysTrue()).get(
+      Scope.GLOBAL_SCOPE
     );
-
-    final NotFactory<Scope, Object> notFactory = new NotFactory<>(factory);
-
-    // Act
-    final Not<Object> result = notFactory.get(Scope.GLOBAL_SCOPE);
-
-    // Assert
-    assertThat(result.test("value"))
-      .as("Not should negate the underlying predicate result")
-      .isFalse();
+    assertThat(mapping.apply(null, "t")).isFalse();
   }
 
-  /**
-   * Tests the `newInstance` method to ensure it throws a NullPointerException
-   * when the factory provides a null predicate.
-   */
   @Test
-  void testNewInstanceWithNullPredicateThrowsException() {
-    // Arrange
-    final Factory<Scope, Predicate<Object>> nullFactory = scope -> null;
+  void negatingAValueGivesAValue() {
+    final Function<Object, Boolean> value = not(constant(true)).get(
+      Scope.GLOBAL_SCOPE
+    );
+    assertThat(value.apply(null)).isFalse();
+  }
 
-    final NotFactory<Scope, Object> notFactory = new NotFactory<>(nullFactory);
-
-    // Act & Assert
-    assertThatThrownBy(() -> notFactory.get(Scope.GLOBAL_SCOPE))
-      .as("Expected Not to fail when the predicate factory returns null.")
-      .isInstanceOf(NullPointerException.class);
+  @Test
+  void aNullComponentFailsWhenBuilt() {
+    final MappingFactory<Scope, Object, Object, Boolean> nullFactory = scope ->
+      null;
+    assertThatThrownBy(() ->
+      not(nullFactory).get(Scope.GLOBAL_SCOPE)
+    ).isInstanceOf(NullPointerException.class);
   }
 }

@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.choices;
 
 import ec.util.MersenneTwisterFast;
-import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,10 +31,12 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link GreedyPicker}, built via
- * {@link Factories#greedyPicker(Factory, Factory)}.
+ * {@link Factories#greedyPicker(Factory, MappingFactory)}.
  */
 @Getter
 @ToString
@@ -50,9 +51,11 @@ public class GreedyPickerFactory<O> extends VesselScopeFactory<
     ? super VesselScope,
     ? extends OptionValues<O>
   > optionValues;
-  private final Factory<
+  private final MappingFactory<
     ? super VesselScope,
-    ? extends Predicate<? super O>
+    ? super Void,
+    ? super O,
+    Boolean
   > optionPredicate;
   private final Factory<
     ? super VesselScope,
@@ -63,7 +66,7 @@ public class GreedyPickerFactory<O> extends VesselScopeFactory<
   protected GreedyPicker<O> newInstance(final VesselScope scope) {
     return new GreedyPicker<>(
       optionValues.get(scope),
-      optionPredicate.get(scope),
+      WithoutContext.predicate(optionPredicate.get(scope)),
       randomNumberGenerator.get(scope)
     );
   }

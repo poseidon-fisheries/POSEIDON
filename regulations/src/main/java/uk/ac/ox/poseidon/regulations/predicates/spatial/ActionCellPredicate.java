@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
@@ -33,13 +34,15 @@ import uk.ac.ox.poseidon.regulations.SpatialAction;
  * its coordinates via {@code modelGrid}) satisfies {@code cellPredicate}.
  */
 @RequiredArgsConstructor
-public class ActionCellPredicate implements Predicate<SpatialAction<?>> {
+public class ActionCellPredicate
+  implements BiFunction<Object, SpatialAction<?>, Boolean>
+{
 
   private final ModelGrid modelGrid;
   private final Predicate<Int2D> cellPredicate;
 
   @Override
-  public boolean test(final SpatialAction<?> action) {
+  public Boolean apply(final Object context, final SpatialAction<?> action) {
     return (
       cellPredicate.test(modelGrid.toCell(action.getStartCoordinate())) ||
       cellPredicate.test(modelGrid.toCell(action.getEndCoordinate()))

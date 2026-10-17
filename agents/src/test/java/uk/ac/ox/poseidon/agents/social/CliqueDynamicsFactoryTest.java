@@ -31,15 +31,16 @@ import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import ec.util.MersenneTwisterFast;
 import java.util.List;
-import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.trips.TripStartEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.ProductStore;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
@@ -54,11 +55,13 @@ class CliqueDynamicsFactoryTest {
   private final Vessel a = vessel(simulationEventManager);
   private final Vessel b = vessel(simulationEventManager);
   private final VesselsGetter fleet = () -> List.of(a, b);
-  private final Function<Vessel, String> groupingKey = vessel -> "X";
+  private final ValueFactory<Scope, Vessel, String> groupingKey = scope ->
+    vessel ->
+      "X";
   private final SocialNetworkFactory network = socialNetwork(object(fleet));
   private final CliqueDynamicsFactory factory = cliqueDynamics(
     network,
-    object(groupingKey),
+    groupingKey,
     5
   );
 

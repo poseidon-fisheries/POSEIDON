@@ -39,7 +39,10 @@ class NextOccurrenceOfTimeOfDayTest {
     final LocalDateTime referenceDateTime,
     final LocalTime... times
   ) {
-    return new NextOccurrenceOfTimeOfDay(() -> referenceDateTime, times).get();
+    return new NextOccurrenceOfTimeOfDay<>(
+      context -> referenceDateTime,
+      times
+    ).apply(null);
   }
 
   @Test
@@ -87,18 +90,18 @@ class NextOccurrenceOfTimeOfDayTest {
   @Test
   void readsTheReferenceAnewOnEachCall() {
     final LocalDateTime[] reference = { LocalDateTime.of(2025, 6, 1, 22, 30) };
-    final NextOccurrenceOfTimeOfDay nextOccurrence =
-      new NextOccurrenceOfTimeOfDay(
-        () -> reference[0],
+    final NextOccurrenceOfTimeOfDay<Object> nextOccurrence =
+      new NextOccurrenceOfTimeOfDay<>(
+        context -> reference[0],
         new LocalTime[] { LocalTime.of(6, 30) }
       );
-    assertThat(nextOccurrence.get()).isEqualTo(
+    assertThat(nextOccurrence.apply(null)).isEqualTo(
       LocalDateTime.of(2025, 6, 2, 6, 30)
     );
 
     reference[0] = LocalDateTime.of(2025, 6, 2, 22, 30);
 
-    assertThat(nextOccurrence.get()).isEqualTo(
+    assertThat(nextOccurrence.apply(null)).isEqualTo(
       LocalDateTime.of(2025, 6, 3, 6, 30)
     );
   }

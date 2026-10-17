@@ -21,8 +21,8 @@
  */
 
 /**
- * {@link java.util.function.Predicate}s that compare a tested date, time, or
- * date-time against a reference. See
+ * Yes/no mappings that compare a tested date, time, or date-time against a
+ * reference read under the context. See
  * {@link uk.ac.ox.poseidon.core.predicates.temporal.Factories} for the entry
  * points.
  */

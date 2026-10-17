@@ -22,13 +22,16 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.regulations.TemporalAction;
 
 /**
  * A {@link GlobalScopeFactory} for an {@link InYear}. Built via
@@ -39,12 +42,17 @@ import uk.ac.ox.poseidon.core.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class InYearFactory extends GlobalScopeFactory<InYear> {
+public class InYearFactory
+  extends GlobalScopeFactory<BiFunction<Object, TemporalAction<?>, Boolean>>
+  implements MappingFactory<Scope, Object, TemporalAction<?>, Boolean>
+{
 
   private final int year;
 
   @Override
-  protected InYear newInstance(final Scope scope) {
+  protected BiFunction<Object, TemporalAction<?>, Boolean> newInstance(
+    final Scope scope
+  ) {
     return new InYear(year);
   }
 }

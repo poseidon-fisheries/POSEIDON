@@ -33,7 +33,10 @@ class DurationUntilTest {
   private static final LocalDateTime NOW = LocalDateTime.of(2025, 6, 1, 7, 0);
 
   private static Duration durationUntil(final LocalDateTime referenceDateTime) {
-    return new DurationUntil(() -> NOW, () -> referenceDateTime).get();
+    return new DurationUntil<>(
+      context -> NOW,
+      context -> referenceDateTime
+    ).apply(null);
   }
 
   @Test

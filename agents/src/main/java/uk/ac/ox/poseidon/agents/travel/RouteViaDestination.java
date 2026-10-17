@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import it.unimi.dsi.fastutil.longs.Long2DoubleMap;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
@@ -41,7 +41,7 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * first summed: it only depends on the two cells, and the path finder gives the
  * same path for them throughout a run.
  */
-public class RouteViaDestination implements Function<Int2D, Route> {
+public class RouteViaDestination implements BiFunction<Object, Int2D, Route> {
 
   private final Vessel vessel;
   private final GridPathFinder pathFinder;
@@ -73,7 +73,7 @@ public class RouteViaDestination implements Function<Int2D, Route> {
    * @throws IllegalStateException if either leg has no path
    */
   @Override
-  public Route apply(final Int2D destination) {
+  public Route apply(final Object context, final Int2D destination) {
     final double distanceInKm =
       distanceInKm(vessel.getCell(), destination) +
       distanceInKm(destination, vessel.getHomePortLocation());

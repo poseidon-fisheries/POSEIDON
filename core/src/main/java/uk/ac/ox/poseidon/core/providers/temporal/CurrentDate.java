@@ -24,23 +24,25 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
- * A {@link Provider} that returns the simulation's current date, read from
- * the current date-time on every call. Built via
- * {@link Factories#currentDate()} in this package.
+ * A value that is the simulation's current date, read from the current
+ * date-time on every call. Built via {@link Factories#currentDate()} in this
+ * package.
  */
 @RequiredArgsConstructor
-public class CurrentDate implements Provider<LocalDate> {
+public class CurrentDate<C> implements Function<C, LocalDate> {
 
-  private final @NonNull Supplier<? extends LocalDateTime> currentDateTime;
+  private final @NonNull Function<
+    ? super C,
+    ? extends LocalDateTime
+  > currentDateTime;
 
   @Override
-  public LocalDate get() {
-    return currentDateTime.get().toLocalDate();
+  public LocalDate apply(final C context) {
+    return currentDateTime.apply(context).toLocalDate();
   }
 }

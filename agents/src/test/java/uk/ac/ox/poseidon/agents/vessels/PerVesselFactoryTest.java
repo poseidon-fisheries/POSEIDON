@@ -27,13 +27,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.IntSupplier;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.providers.FirstIntFromFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.providers.FirstValueFromFactory;
 
 class PerVesselFactoryTest {
 
@@ -115,24 +116,23 @@ class PerVesselFactoryTest {
     return scope;
   }
 
-  private static class CountingIntSupplierFactory
-    extends GlobalScopeFactory<IntSupplier>
+  private static class CountingValueFactory
+    extends GlobalScopeFactory<Function<Object, Integer>>
+    implements ValueFactory<Scope, Object, Integer>
   {
 
     @Override
-    protected IntSupplier newInstance(final Scope scope) {
+    protected Function<Object, Integer> newInstance(final Scope scope) {
       final AtomicInteger counter = new AtomicInteger(0);
-      return counter::incrementAndGet;
+      return context -> counter.incrementAndGet();
     }
   }
 
   @Test
   void eachVesselGetsItsOwnInstanceEvenFromASharedDelegate() {
-    final CountingIntSupplierFactory delegate =
-      new CountingIntSupplierFactory();
-    final PerVesselFactory<IntSupplier> factory = new PerVesselFactory<>(
-      delegate
-    );
+    final CountingValueFactory delegate = new CountingValueFactory();
+    final PerVesselFactory<Function<Object, Integer>> factory =
+      new PerVesselFactory<>(delegate);
     final VesselScope scopeA = scopeOfNewVessel();
     final VesselScope scopeB = scopeOfNewVessel();
 
@@ -143,9 +143,10 @@ class PerVesselFactoryTest {
 
   @Test
   void factoriesBuiltOnItAreResolvedOncePerVessel() {
-    final FirstIntFromFactory<VesselScope> factory = new FirstIntFromFactory<>(
-      new PerVesselFactory<>(new CountingIntSupplierFactory())
-    );
+    final FirstValueFromFactory<VesselScope, Integer> factory =
+      new FirstValueFromFactory<>(
+        new PerVesselValueFactory<>(new CountingValueFactory())
+      );
     final VesselScope scopeA = scopeOfNewVessel();
     final VesselScope scopeB = scopeOfNewVessel();
 

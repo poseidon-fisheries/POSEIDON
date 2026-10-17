@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.tasks.accounting;
 
-import java.util.function.Function;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * Factories for tasks that account for a trip's costs.
@@ -41,11 +40,8 @@ public class Factories {
    * @see PayTripCostFactory
    */
   public static <S extends Scope> PayTripCostFactory<S> payTripCost(
-    final Factory<
-      ? super S,
-      ? extends Function<? super Vessel, ? extends Money>
-    > tripCostExtractor
+    final ValueFactory<? super S, ? super Vessel, ? extends Money> tripCost
   ) {
-    return new PayTripCostFactory<>(tripCostExtractor);
+    return new PayTripCostFactory<>(tripCost);
   }
 }

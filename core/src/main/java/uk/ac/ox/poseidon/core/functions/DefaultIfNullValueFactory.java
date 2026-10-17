@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,34 +20,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.constant;
+package uk.ac.ox.poseidon.core.functions;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link ConstantDouble}, built
- * via {@link Factories#constantDouble(double)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link DefaultIfNullValue},
+ * built via {@link Factories Factories.defaultIfNull(...)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ConstantDoubleFromValueFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  ConstantDouble
-> {
+public class DefaultIfNullValueFactory<S extends Scope, C, R>
+  extends RelativeScopeFactory<S, Function<C, R>>
+  implements ValueFactory<S, C, R>
+{
 
-  private final double value;
+  private final ValueFactory<? super S, ? super C, ? extends R> delegate;
+  private final Factory<? super S, ? extends R> defaultValue;
 
   @Override
-  protected ConstantDouble newInstance(final S scope) {
-    return new ConstantDouble(value);
+  protected Function<C, R> newInstance(final S scope) {
+    return new DefaultIfNullValue<>(
+      delegate.get(scope),
+      defaultValue.get(scope)
+    );
   }
 }

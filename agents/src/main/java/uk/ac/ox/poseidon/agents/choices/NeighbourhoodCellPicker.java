@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -30,13 +30,12 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 import ec.util.MersenneTwisterFast;
 import java.util.List;
-import java.util.function.IntSupplier;
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.providers.Provider;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
@@ -49,12 +48,16 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * every water cell of the grid.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class NeighbourhoodCellPicker implements Provider<Int2D> {
+public class NeighbourhoodCellPicker implements Supplier<Int2D> {
 
   private final Vessel vessel;
   private final GridPathFinder pathFinder;
-  private final Predicate<? super Int2D> optionPredicate;
-  private final IntSupplier neighbourhoodSizeSupplier;
+  private final BiFunction<
+    ? super Vessel,
+    ? super Int2D,
+    Boolean
+  > optionPredicate;
+  private final Function<? super Vessel, Integer> neighbourhoodSize;
   private final int maximumWidening;
   private final Supplier<Int2D> searchCentre;
   private final MersenneTwisterFast rng;
@@ -67,7 +70,7 @@ public class NeighbourhoodCellPicker implements Provider<Int2D> {
    */
   @Override
   public Int2D get() {
-    final int initialNeighbourhoodSize = neighbourhoodSizeSupplier.getAsInt();
+    final int initialNeighbourhoodSize = neighbourhoodSize.apply(vessel);
     final int gridExtent = max(
       pathFinder.getModelGrid().getGridWidth(),
       pathFinder.getModelGrid().getGridHeight()
@@ -94,7 +97,7 @@ public class NeighbourhoodCellPicker implements Provider<Int2D> {
           ? neighbours
           : ring(neighbours, centre, neighbourhoodSize);
       final Int2D picked = shuffledStream(candidates, rng)
-        .filter(optionPredicate)
+        .filter(cell -> optionPredicate.apply(vessel, cell))
         .findFirst()
         .orElse(null);
       if (picked != null) {

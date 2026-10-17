@@ -20,16 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.geography.predicates;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
-import java.util.function.Predicate;
-import sim.util.Int2D;
+import java.util.function.Function;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} over grid cells. Built via
- * {@link uk.ac.ox.poseidon.geography.predicates.Factories}.
+ * A yes/no value that negates a wrapped yes/no value. Built via
+ * {@link Factories#not(uk.ac.ox.poseidon.core.ValueFactory)} in this package.
+ *
+ * @param <C> the type of the context
  */
-public interface CellPredicate extends Predicate<Int2D> {
+@RequiredArgsConstructor
+public class NotValue<C> implements Function<C, Boolean> {
+
+  private final @NonNull Function<? super C, Boolean> predicate;
+
   @Override
-  boolean test(Int2D cell);
+  public Boolean apply(final C context) {
+    return !predicate.apply(context);
+  }
 }

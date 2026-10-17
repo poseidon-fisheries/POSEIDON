@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.agents.tasks.landings;
 
 import java.time.Duration;
-import java.util.function.Supplier;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * Factories for tasks that land a vessel's catch at market.
@@ -40,11 +40,8 @@ public class Factories {
    * @see LandCatchesFactory
    */
   public static LandCatchesFactory landCatches(
-    final Factory<
-      ? super VesselScope,
-      ? extends Supplier<Duration>
-    > durationSupplier
+    final ValueFactory<? super VesselScope, ? super Vessel, Duration> duration
   ) {
-    return new LandCatchesFactory(durationSupplier);
+    return new LandCatchesFactory(duration);
   }
 }

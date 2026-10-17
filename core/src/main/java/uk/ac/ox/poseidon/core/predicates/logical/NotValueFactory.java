@@ -20,39 +20,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
 import java.util.function.Function;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
-import java.util.function.ToIntFunction;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * An {@link IntSupplier} that can also be used anywhere a {@link ToIntFunction}
- * or {@link Function} of {@link Integer} is required, in which case it ignores
- * the argument passed to {@link #applyAsInt}/{@link #apply} and just returns
- * the int it would have supplied anyway. Lets the same object be wired into any
- * of those call sites without an adapter.
+ * A {@link RelativeScopeFactory} counterpart of {@link NotValue}, built via
+ * {@link Factories#not(ValueFactory)}.
  */
-public interface IntProvider
-  extends
-    IntSupplier,
-    Supplier<Integer>,
-    ToIntFunction<Object>,
-    Function<Object, Integer>
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
+public class NotValueFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, Boolean>>
+  implements ValueFactory<S, C, Boolean>
 {
-  @Override
-  default Integer get() {
-    return getAsInt();
-  }
+
+  private final ValueFactory<? super S, ? super C, Boolean> predicate;
 
   @Override
-  default int applyAsInt(final Object value) {
-    return getAsInt();
-  }
-
-  @Override
-  default Integer apply(final Object o) {
-    return getAsInt();
+  protected Function<C, Boolean> newInstance(final S scope) {
+    return new NotValue<>(predicate.get(scope));
   }
 }

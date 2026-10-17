@@ -24,13 +24,12 @@ package uk.ac.ox.poseidon.core.predicates.comparable;
 
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
-import java.util.function.Supplier;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * Factories for {@link java.util.function.Predicate}s that compare a tested
- * value against one or two thresholds.
+ * Factories for yes/no mappings that compare a tested value against one or two
+ * thresholds read under the context.
  */
 public class Factories {
 
@@ -38,11 +37,11 @@ public class Factories {
 
   /**
    * @param threshold the value the resulting predicate tests against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
    *         {@link LessThan} predicate over the given literal threshold
    * @see LessThan
    */
-  public static <S extends Scope> LessThanFactory<S, Double> lessThan(
+  public static <S extends Scope> LessThanFactory<S, Object, Double> lessThan(
     final double threshold
   ) {
     return lessThan(constant(threshold));
@@ -50,36 +49,38 @@ public class Factories {
 
   /**
    * @param value factory for the value the resulting predicate tests against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
    *         {@link LessThan} predicate over the resolved threshold
    * @see LessThan
    */
-  public static <S extends Scope, T> LessThanFactory<S, T> lessThan(
-    final Factory<? super S, ? extends Supplier<? extends T>> value
+  public static <S extends Scope, C, T> LessThanFactory<S, C, T> lessThan(
+    final ValueFactory<? super S, ? super C, ? extends T> value
   ) {
     return new LessThanFactory<>(value);
   }
 
   /**
    * @param threshold the value the resulting predicate tests against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
    *         {@link GreaterThan} predicate over the given literal threshold
    * @see GreaterThan
    */
-  public static <S extends Scope> GreaterThanFactory<S, Double> greaterThan(
-    final double threshold
-  ) {
+  public static <S extends Scope> GreaterThanFactory<
+    S,
+    Object,
+    Double
+  > greaterThan(final double threshold) {
     return greaterThan(constant(threshold));
   }
 
   /**
    * @param value factory for the value the resulting predicate tests against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
    *         {@link GreaterThan} predicate over the resolved threshold
    * @see GreaterThan
    */
-  public static <S extends Scope, T> GreaterThanFactory<S, T> greaterThan(
-    final Factory<? super S, ? extends Supplier<? extends T>> value
+  public static <S extends Scope, C, T> GreaterThanFactory<S, C, T> greaterThan(
+    final ValueFactory<? super S, ? super C, ? extends T> value
   ) {
     return new GreaterThanFactory<>(value);
   }
@@ -87,11 +88,11 @@ public class Factories {
   /**
    * @param minimum inclusive lower bound
    * @param maximum inclusive upper bound
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
    *         {@link Between} predicate over the given literal bounds
    * @see Between
    */
-  public static <S extends Scope> BetweenFactory<S, Double> between(
+  public static <S extends Scope> BetweenFactory<S, Object, Double> between(
     final double minimum,
     final double maximum
   ) {
@@ -105,11 +106,11 @@ public class Factories {
    *                       resulting predicate
    * @param includeMaximum whether {@code maximum} itself satisfies the
    *                       resulting predicate
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
    *         {@link Between} predicate over the given literal bounds
    * @see Between
    */
-  public static <S extends Scope> BetweenFactory<S, Double> between(
+  public static <S extends Scope> BetweenFactory<S, Object, Double> between(
     final double minimum,
     final double maximum,
     final boolean includeMinimum,
@@ -126,13 +127,13 @@ public class Factories {
   /**
    * @param minimum factory for the inclusive lower bound
    * @param maximum factory for the inclusive upper bound
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
    *         {@link Between} predicate over the resolved bounds
    * @see Between
    */
-  public static <S extends Scope, T> BetweenFactory<S, T> between(
-    final Factory<? super S, ? extends Supplier<? extends T>> minimum,
-    final Factory<? super S, ? extends Supplier<? extends T>> maximum
+  public static <S extends Scope, C, T> BetweenFactory<S, C, T> between(
+    final ValueFactory<? super S, ? super C, ? extends T> minimum,
+    final ValueFactory<? super S, ? super C, ? extends T> maximum
   ) {
     return between(minimum, maximum, true, true);
   }
@@ -144,13 +145,13 @@ public class Factories {
    *                       resulting predicate
    * @param includeMaximum whether {@code maximum} itself satisfies the
    *                       resulting predicate
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
    *         {@link Between} predicate over the resolved bounds
    * @see Between
    */
-  public static <S extends Scope, T> BetweenFactory<S, T> between(
-    final Factory<? super S, ? extends Supplier<? extends T>> minimum,
-    final Factory<? super S, ? extends Supplier<? extends T>> maximum,
+  public static <S extends Scope, C, T> BetweenFactory<S, C, T> between(
+    final ValueFactory<? super S, ? super C, ? extends T> minimum,
+    final ValueFactory<? super S, ? super C, ? extends T> maximum,
     final boolean includeMinimum,
     final boolean includeMaximum
   ) {

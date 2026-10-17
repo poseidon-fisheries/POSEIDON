@@ -37,7 +37,7 @@ class RandomIntTest {
     final RandomInt supplier = new RandomInt(rng, 1, 3);
 
     for (int i = 0; i < 1000; i++) {
-      final int value = supplier.getAsInt();
+      final int value = supplier.apply(null);
       assertThat(value)
         .as("Value should be within inclusive bounds")
         .isBetween(1, 3);
@@ -50,7 +50,7 @@ class RandomIntTest {
     final RandomInt supplier = new RandomInt(rng, 7, 7);
 
     for (int i = 0; i < 10; i++) {
-      assertThat(supplier.getAsInt())
+      assertThat(supplier.apply(null))
         .as("Single-value range should return minimum")
         .isEqualTo(7);
     }

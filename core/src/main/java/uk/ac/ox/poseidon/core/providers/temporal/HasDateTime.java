@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,22 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.constant;
+package uk.ac.ox.poseidon.core.providers.temporal;
 
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.DoubleProvider;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 /**
- * A {@link DoubleProvider} that always returns the same, fixed value. Built via
- * {@link Factories Factories.constantDouble(...)} in this package.
+ * A yes/no value, whatever the context: whether the simulation's clock has a
+ * date-time ({@link CurrentDateTime} has one to give), read live from the
+ * {@link TemporalSchedule} on every call. It has none once the schedule has run
+ * out of events. Built via {@link Factories#hasDateTime()} in this package.
  */
 @RequiredArgsConstructor
-public class ConstantDouble implements DoubleProvider {
+public class HasDateTime implements Function<Object, Boolean> {
 
-  private final double value;
+  private final TemporalSchedule temporalSchedule;
 
   @Override
-  public double getAsDouble() {
-    return value;
+  public Boolean apply(final Object context) {
+    return temporalSchedule.hasDateTime();
   }
 }

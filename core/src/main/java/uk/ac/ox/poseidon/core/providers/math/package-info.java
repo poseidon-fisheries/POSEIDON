@@ -21,9 +21,8 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.core.providers.Provider}s that compute a numeric
- * result from other supplied values via a basic math operation (currently max
- * and min). See {@link uk.ac.ox.poseidon.core.providers.math.Factories} for the
- * entry points.
+ * Values computed from two other values via a basic math operation (currently
+ * max and min). See {@link uk.ac.ox.poseidon.core.providers.math.Factories} for
+ * the entry points.
  */
 package uk.ac.ox.poseidon.core.providers.math;

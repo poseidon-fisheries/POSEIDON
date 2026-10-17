@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.time.ZoneOffset.UTC;
 
 import java.time.LocalDate;
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
 import lombok.Getter;
 import lombok.NonNull;
 import org.threeten.extra.Interval;
@@ -44,7 +44,9 @@ import uk.ac.ox.poseidon.regulations.TemporalAction;
  * Preconditions: the start date must not be after the end date.
  */
 @Getter
-public final class BetweenDates implements Predicate<TemporalAction<?>> {
+public class BetweenDates
+  implements BiFunction<Object, TemporalAction<?>, Boolean>
+{
 
   @NonNull
   private final Interval interval;
@@ -70,7 +72,7 @@ public final class BetweenDates implements Predicate<TemporalAction<?>> {
   }
 
   @Override
-  public boolean test(final TemporalAction<?> action) {
+  public Boolean apply(final Object context, final TemporalAction<?> action) {
     return action.getInterval().overlaps(this.interval);
   }
 }

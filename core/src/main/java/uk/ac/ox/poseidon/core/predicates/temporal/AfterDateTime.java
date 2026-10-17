@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,25 +23,29 @@
 package uk.ac.ox.poseidon.core.predicates.temporal;
 
 import java.time.LocalDateTime;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import lombok.Getter;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} that is true iff the tested date-time is strictly after a
- * supplied reference date-time. Built via
- * {@link Factories#afterDateTime(uk.ac.ox.poseidon.core.Factory)} in this
+ * A yes/no mapping that is true iff the date-time tested is strictly after a
+ * reference date-time read under the context. Built via
+ * {@link Factories#afterDateTime(uk.ac.ox.poseidon.core.ValueFactory)} in this
  * package.
+ *
+ * @param <C> the type of the context the reference is read under
  */
-@Getter
 @RequiredArgsConstructor
-public class AfterDateTime implements Predicate<LocalDateTime> {
+public class AfterDateTime<C> implements BiFunction<C, LocalDateTime, Boolean> {
 
-  private final Supplier<? extends LocalDateTime> referenceDateTime;
+  private final @NonNull Function<
+    ? super C,
+    ? extends LocalDateTime
+  > referenceDateTime;
 
   @Override
-  public boolean test(final LocalDateTime dateTime) {
-    return dateTime.isAfter(referenceDateTime.get());
+  public Boolean apply(final C context, final LocalDateTime mapped) {
+    return mapped.isAfter(referenceDateTime.apply(context));
   }
 }

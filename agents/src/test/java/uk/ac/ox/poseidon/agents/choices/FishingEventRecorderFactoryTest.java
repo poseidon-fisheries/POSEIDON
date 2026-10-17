@@ -50,6 +50,7 @@ import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -106,6 +107,7 @@ class FishingEventRecorderFactoryTest {
 
   private static class PurseSeineKeyFactory
     extends GlobalScopeFactory<Function<Vessel, String>>
+    implements ValueFactory<Scope, Vessel, String>
   {
 
     @Override

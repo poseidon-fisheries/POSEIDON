@@ -22,9 +22,9 @@
 
 package uk.ac.ox.poseidon.regulations.predicates;
 
-import java.util.function.Function;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.regulations.Action;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
@@ -37,7 +37,10 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
+   * @param actionFunction the value building, from the agent, the action to
+   *                       judge
+   * @param regulations    the rule judging it
+   * @return a {@link uk.ac.ox.poseidon.core.ValueFactory} for an
    *         {@link IsPermittedPredicate}
    * @see IsPermittedPredicateFactory
    */
@@ -46,7 +49,7 @@ public class Factories {
     G,
     A extends Action<G>
   > IsPermittedPredicateFactory<S, G, A> isPermitted(
-    final Factory<? super S, ? extends Function<G, A>> actionFunction,
+    final ValueFactory<? super S, ? super G, ? extends A> actionFunction,
     final Factory<? super S, ? extends Regulations<? super A>> regulations
   ) {
     return new IsPermittedPredicateFactory<>(actionFunction, regulations);

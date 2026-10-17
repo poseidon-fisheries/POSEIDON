@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -30,14 +30,13 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
  * Picks a uniformly random option from a supplied list, subject to a predicate,
  * or {@code null} if none qualify.
  */
 @RequiredArgsConstructor
-public class RandomPicker<O> implements Provider<O> {
+public class RandomPicker<O> implements Supplier<O> {
 
   @NonNull
   private final Supplier<? extends List<? extends O>> options;

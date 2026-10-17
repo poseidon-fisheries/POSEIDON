@@ -25,17 +25,17 @@ package uk.ac.ox.poseidon.agents.vessels.providers;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.time.Duration;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
  * Provides the time at sea of a vessel's current trip
  * ({@link Trip#getTimeAtSea()}); only checks made during a trip read it.
  */
 @RequiredArgsConstructor
-public class CurrentTimeAtSea implements Provider<Duration> {
+public class CurrentTimeAtSea implements Function<Object, Duration> {
 
   private final Vessel vessel;
 
@@ -44,7 +44,7 @@ public class CurrentTimeAtSea implements Provider<Duration> {
    * @throws IllegalStateException if the vessel is not on a trip
    */
   @Override
-  public Duration get() {
+  public Duration apply(final Object context) {
     final Trip currentTrip = vessel.getCurrentTrip();
     checkState(
       currentTrip != null,

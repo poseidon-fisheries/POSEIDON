@@ -34,9 +34,12 @@ import java.util.function.Supplier;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.functions.ComposedFunctionFactory;
+import uk.ac.ox.poseidon.core.functions.ComposedFunctionValueFactory;
 import uk.ac.ox.poseidon.core.utils.ListFactory;
 import uk.ac.ox.poseidon.io.sources.DataSource;
 import uk.ac.ox.poseidon.io.sources.FileDataSourceFactory;
@@ -45,8 +48,8 @@ import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
 /**
  * Factories for {@code tablesaw} {@link Table} components: building tables from
  * CSV or from a resolved {@link Map}, writing them back out to CSV, growing one
- * incrementally over the course of a simulation, and deriving a lookup
- * {@link Function} from a table's contents.
+ * incrementally over the course of a simulation, and deriving a lookup from a
+ * table's contents.
  */
 public class Factories {
 
@@ -135,39 +138,21 @@ public class Factories {
 
   /**
    * @param tableDefinition factory for the shape of the table to grow
-   * @param valueSuppliers  one value-supplier factory per column, in column
-   *                        order
+   * @param values          one value per column, in column order, each asked
+   *                        with no context
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
    *         {@link SteppableTable}
    * @see SteppableTable
    */
   @SafeVarargs
-  public static <C extends Supplier<?>> SteppableTableFactory steppableTable(
+  public static SteppableTableFactory steppableTable(
     final Factory<? super SimulationScope, TableDefinition> tableDefinition,
-    final Factory<? super SimulationScope, ? extends C>... valueSuppliers
+    final ValueFactory<? super SimulationScope, ? super Void, ?>... values
   ) {
     return new SteppableTableFactory(
       tableDefinition,
-      new ListFactory<SimulationScope, C>(ImmutableList.copyOf(valueSuppliers))
+      ImmutableList.copyOf(values)
     );
-  }
-
-  /**
-   * @param tableDefinition factory for the shape of the table to grow
-   * @param valueSuppliers  factory for the list of value suppliers, one per
-   *                        column, in column order
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
-   *         {@link SteppableTable}
-   * @see SteppableTable
-   */
-  public static SteppableTableFactory steppableTable(
-    final Factory<? super SimulationScope, TableDefinition> tableDefinition,
-    final Factory<
-      ? super SimulationScope,
-      List<? extends Supplier<?>>
-    > valueSuppliers
-  ) {
-    return new SteppableTableFactory(tableDefinition, valueSuppliers);
   }
 
   /**
@@ -194,12 +179,12 @@ public class Factories {
   @SafeVarargs
   public static <
     S extends Scope,
-    C extends ColumnDefinition
+    T extends ColumnDefinition
   > TableDefinitionFactory<S> tableDefinition(
-    final Factory<? super S, C>... columnDefinitions
+    final Factory<? super S, T>... columnDefinitions
   ) {
     return tableDefinition(
-      new ListFactory<S, C>(ImmutableList.copyOf(columnDefinitions))
+      new ListFactory<S, T>(ImmutableList.copyOf(columnDefinitions))
     );
   }
 
@@ -271,29 +256,27 @@ public class Factories {
   }
 
   /**
-   * @param keyExtractor    factory for the function that computes the lookup
-   *                        key from an arbitrary input
+   * @param key    factory for the mapping that computes the lookup
+   *                        key from the thing mapped
    * @param table           factory for the table to look values up in
    * @param rowKeyBuilder   factory for the function deriving each table row's
    *                        map key
    * @param rowValueBuilder factory for the function deriving each table row's
    *                        map value
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         function composing {@code keyExtractor} with a lookup into the map
-   *         built from the resolved table
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a mapping
+   *         composing {@code key} with a lookup into the map built
+   *         from the resolved table
    * @see uk.ac.ox.poseidon.core.functions.ComposedFunction
    * @see uk.ac.ox.poseidon.core.functions.MapValueExtractor
    */
-  public static <S extends Scope, T, K, V> ComposedFunctionFactory<
+  public static <S extends Scope, C, T, K, V> ComposedFunctionFactory<
     S,
+    C,
     T,
     K,
     V
   > tableLookup(
-    final Factory<
-      ? super S,
-      ? extends Function<? super T, ? extends K>
-    > keyExtractor,
+    final MappingFactory<? super S, ? super C, ? super T, ? extends K> key,
     final Factory<? super S, Table> table,
     final Factory<
       ? super S,
@@ -305,7 +288,42 @@ public class Factories {
     > rowValueBuilder
   ) {
     return composedFunction(
-      keyExtractor,
+      key,
+      mapValueExtractor(mapFromTable(table, rowKeyBuilder, rowValueBuilder))
+    );
+  }
+
+  /**
+   * @param key    factory for the value that is the lookup key
+   * @param table           factory for the table to look values up in
+   * @param rowKeyBuilder   factory for the function deriving each table row's
+   *                        map key
+   * @param rowValueBuilder factory for the function deriving each table row's
+   *                        map value
+   * @return a {@link ValueFactory} for a value composing {@code key}
+   *         with a lookup into the map built from the resolved table
+   * @see uk.ac.ox.poseidon.core.functions.ComposedFunctionValue
+   * @see uk.ac.ox.poseidon.core.functions.MapValueExtractor
+   */
+  public static <S extends Scope, C, K, V> ComposedFunctionValueFactory<
+    S,
+    C,
+    K,
+    V
+  > tableLookup(
+    final ValueFactory<? super S, ? super C, ? extends K> key,
+    final Factory<? super S, Table> table,
+    final Factory<
+      ? super S,
+      ? extends Function<? super Row, ? extends K>
+    > rowKeyBuilder,
+    final Factory<
+      ? super S,
+      ? extends Function<? super Row, ? extends V>
+    > rowValueBuilder
+  ) {
+    return composedFunction(
+      key,
       mapValueExtractor(mapFromTable(table, rowKeyBuilder, rowValueBuilder))
     );
   }

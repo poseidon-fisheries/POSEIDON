@@ -27,11 +27,11 @@ import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.between;
 import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
 
 import java.util.Collection;
-import java.util.function.Predicate;
 import org.locationtech.jts.geom.Geometry;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.predicates.ConditionFactory;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
@@ -60,12 +60,15 @@ public class Factories {
    * @param minimumDepth    the minimum depth (in the same units as the grid,
    *                        positive downward)
    * @param maximumDepth    the maximum depth
-   * @return a {@link Factory} for a predicate testing whether a cell's depth
-   *         falls within {@code [minimumDepth, maximumDepth]}
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a yes/no
+   *         mapping testing whether a cell's depth falls within
+   *         {@code [minimumDepth, maximumDepth]}
    */
-  public static <S extends Scope> Factory<
+  public static <S extends Scope> ConditionFactory<
     S,
-    ? extends Predicate<Int2D>
+    Object,
+    Int2D,
+    Double
   > inDepthRange(
     final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,
     final double minimumDepth,

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -66,7 +66,7 @@ class BetweenDatesTest {
     );
 
     // Act & Assert
-    assertThat(betweenDates.test(action)).isTrue();
+    assertThat(betweenDates.apply(null, action)).isTrue();
   }
 
   @Test
@@ -82,7 +82,7 @@ class BetweenDatesTest {
     );
 
     // Act & Assert
-    assertThat(betweenDates.test(action)).isTrue();
+    assertThat(betweenDates.apply(null, action)).isTrue();
   }
 
   @Test
@@ -98,7 +98,7 @@ class BetweenDatesTest {
     );
 
     // Act & Assert
-    assertThat(betweenDates.test(action)).isTrue();
+    assertThat(betweenDates.apply(null, action)).isTrue();
   }
 
   @Test
@@ -114,7 +114,7 @@ class BetweenDatesTest {
     );
 
     // Act & Assert
-    assertThat(betweenDates.test(action)).isTrue();
+    assertThat(betweenDates.apply(null, action)).isTrue();
   }
 
   @Test
@@ -130,7 +130,7 @@ class BetweenDatesTest {
     );
 
     // Act & Assert
-    assertThat(betweenDates.test(action)).isFalse();
+    assertThat(betweenDates.apply(null, action)).isFalse();
   }
 
   @Test
@@ -146,7 +146,7 @@ class BetweenDatesTest {
     );
 
     // Act & Assert
-    assertThat(betweenDates.test(action)).isFalse();
+    assertThat(betweenDates.apply(null, action)).isFalse();
   }
 
   @Test
@@ -162,7 +162,7 @@ class BetweenDatesTest {
     );
 
     // Act & Assert
-    assertThat(betweenDates.test(action)).isTrue();
+    assertThat(betweenDates.apply(null, action)).isTrue();
   }
 
   @Test
@@ -178,7 +178,7 @@ class BetweenDatesTest {
     );
 
     // Act & Assert
-    assertThat(betweenDates.test(action)).isTrue();
+    assertThat(betweenDates.apply(null, action)).isTrue();
   }
 
   @Test
@@ -193,7 +193,7 @@ class BetweenDatesTest {
       LocalDateTime.of(2023, 1, 1, 0, 0)
     );
 
-    assertThat(betweenDates.test(action)).isFalse();
+    assertThat(betweenDates.apply(null, action)).isFalse();
   }
 
   @Test
@@ -208,7 +208,7 @@ class BetweenDatesTest {
       LocalDateTime.of(2024, 1, 1, 1, 0)
     );
 
-    assertThat(betweenDates.test(action)).isFalse();
+    assertThat(betweenDates.apply(null, action)).isFalse();
   }
 
   @Test
@@ -223,7 +223,7 @@ class BetweenDatesTest {
       LocalDateTime.of(2023, 6, 1, 12, 0)
     );
 
-    assertThat(betweenDates.test(action)).isTrue();
+    assertThat(betweenDates.apply(null, action)).isTrue();
   }
 
   @Test
@@ -238,7 +238,7 @@ class BetweenDatesTest {
       LocalDateTime.of(2024, 1, 1, 12, 0)
     );
 
-    assertThat(betweenDates.test(action)).isFalse();
+    assertThat(betweenDates.apply(null, action)).isFalse();
   }
 
   private static TemporalAction<?> mockTemporalAction(

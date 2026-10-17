@@ -22,24 +22,24 @@
 
 package uk.ac.ox.poseidon.geography.grids.extractors;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 /**
- * A {@link Function} that reads a fixed, resolved {@link DoubleGrid}'s value at
- * a given cell. Built via
+ * A mapping that reads a fixed, resolved {@link DoubleGrid}'s value at the cell
+ * mapped, whatever the context. Built via
  * {@link Factories#cellValue(uk.ac.ox.poseidon.core.Factory)} in this package.
  */
 @RequiredArgsConstructor
-public class CellValue implements Function<Int2D, Double> {
+public class CellValue implements BiFunction<Object, Int2D, Double> {
 
   private final @NonNull DoubleGrid grid;
 
   @Override
-  public Double apply(final Int2D int2D) {
+  public Double apply(final Object context, final Int2D int2D) {
     return grid.getValue(int2D);
   }
 }

@@ -22,17 +22,12 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * Factories for {@link Provider}s that snapshot another factory's value once at
- * build time, and for a {@link Provider} that shifts a delegate's int value by
- * a fixed amount.
+ * Factories for a value that snapshots another value once at build time, and
+ * for a value that shifts another integer value by a fixed amount.
  */
 public final class Factories {
 
@@ -41,69 +36,26 @@ public final class Factories {
   }
 
   /**
-   * @param delegate factory for the supplier whose value is resolved once and
-   *                 snapshotted
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link Provider} of that snapshotted value
+   * @param delegate factory for the value to ask once, with no context
+   * @return a {@link ValueFactory} for a constant of the delegate's first value
    * @see FirstValueFromFactory
    */
-  public static <S extends Scope, T> FirstValueFromFactory<S, T> firstValueFrom(
-    final Factory<? super S, ? extends Supplier<? extends T>> delegate
+  public static <S extends Scope, R> FirstValueFromFactory<S, R> firstValueFrom(
+    final ValueFactory<? super S, ? super Void, ? extends R> delegate
   ) {
     return new FirstValueFromFactory<>(delegate);
   }
 
   /**
-   * @param delegate factory for the int supplier whose value is resolved once
-   *                 and snapshotted
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   *         {@link IntProvider} of that snapshotted value
-   * @see FirstIntFromFactory
+   * @param delegate factory for the integer value to shift
+   * @param shift    the amount to add to the delegate's value
+   * @return a {@link ValueFactory} for the shifted value
+   * @see ShiftedIntFactory
    */
-  public static <S extends Scope> FirstIntFromFactory<S> firstIntFrom(
-    final Factory<? super S, ? extends IntSupplier> delegate
-  ) {
-    return new FirstIntFromFactory<>(delegate);
-  }
-
-  /**
-   * @param delegate factory for the double supplier whose value is resolved
-   *                 once and snapshotted
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link DoubleProvider} of that snapshotted value
-   * @see FirstDoubleFromFactory
-   */
-  public static <S extends Scope> FirstDoubleFromFactory<S> firstDoubleFrom(
-    final Factory<? super S, ? extends DoubleSupplier> delegate
-  ) {
-    return new FirstDoubleFromFactory<>(delegate);
-  }
-
-  /**
-   * @param delegate factory for the boolean supplier whose value is resolved
-   *                 once and snapshotted
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link BooleanProvider} of that snapshotted value
-   * @see FirstBooleanFromFactory
-   */
-  public static <S extends Scope> FirstBooleanFromFactory<S> firstBooleanFrom(
-    final Factory<? super S, ? extends BooleanSupplier> delegate
-  ) {
-    return new FirstBooleanFromFactory<>(delegate);
-  }
-
-  /**
-   * @param delegateIntProvider factory for the int provider to shift
-   * @param shift               the amount to add to the delegate's value on
-   *                            every call
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link ShiftedInt} over the resolved delegate
-   * @see ShiftedInt
-   */
-  public static <S extends Scope> ShiftedIntFactory<S> shiftedInt(
-    final Factory<? super S, ? extends IntProvider> delegateIntProvider,
+  public static <S extends Scope, C> ShiftedIntFactory<S, C> shiftedInt(
+    final ValueFactory<? super S, ? super C, Integer> delegate,
     final int shift
   ) {
-    return new ShiftedIntFactory<>(delegateIntProvider, shift);
+    return new ShiftedIntFactory<>(delegate, shift);
   }
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,56 +22,40 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
-
-import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.utils.ObjectFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link InSet}, built via
- * {@link Factories#in(Factory)} or the literal-values convenience
- * {@link #of(Object[])} on this class.
+ * {@link Factories#in(uk.ac.ox.poseidon.core.ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class InSetFactory<
-  S extends Scope,
-  T
-> extends RelativeScopeFactory<S, InSet<T>> {
+public class InSetFactory<S extends Scope, C, T>
+  extends RelativeScopeFactory<S, BiFunction<C, T, Boolean>>
+  implements MappingFactory<S, C, T, Boolean>
+{
 
-  private final Factory<
+  private final ValueFactory<
     ? super S,
-    ? extends Supplier<? extends Collection<? extends T>>
+    ? super C,
+    ? extends Collection<? extends T>
   > values;
 
-  /**
-   * @param values the literal values the resulting predicate tests membership
-   *               against
-   * @return an {@link InSetFactory} for an {@link InSet} predicate over the
-   *         given values
-   */
-  @SafeVarargs
-  public static <T> InSetFactory<Scope, T> of(final T... values) {
-    return new InSetFactory<>(
-      constant(new ObjectFactory<>(ImmutableSet.copyOf(values)))
-    );
-  }
-
   @Override
-  protected InSet<T> newInstance(final S scope) {
+  protected BiFunction<C, T, Boolean> newInstance(final S scope) {
     return new InSet<>(values.get(scope));
   }
 }

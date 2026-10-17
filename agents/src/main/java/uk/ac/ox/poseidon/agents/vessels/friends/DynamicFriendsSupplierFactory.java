@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.vessels.friends;
 
 import ec.util.MersenneTwisterFast;
-import java.util.function.Predicate;
 import lombok.*;
 import lombok.Getter;
 import lombok.ToString;
@@ -33,6 +32,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link VesselScopeFactory} for a {@link DynamicFriendsSupplier}. Built via
@@ -52,9 +52,10 @@ public class DynamicFriendsSupplierFactory
     ? super VesselScope,
     ? extends VesselsGetter
   > potentialFriends;
-  private final Factory<
+  private final ValueFactory<
     ? super VesselScope,
-    ? extends Predicate<? super Vessel>
+    ? super Vessel,
+    Boolean
   > friendshipCondition;
   private final Factory<
     ? super VesselScope,

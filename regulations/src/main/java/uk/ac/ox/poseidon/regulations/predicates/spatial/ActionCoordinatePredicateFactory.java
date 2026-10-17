@@ -22,16 +22,18 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.regulations.SpatialAction;
 
 /**
  * A {@link RelativeScopeFactory} for an {@link ActionCoordinatePredicate}.
@@ -42,18 +44,24 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ActionCoordinatePredicateFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  ActionCoordinatePredicate
-> {
+public class ActionCoordinatePredicateFactory<S extends Scope>
+  extends RelativeScopeFactory<S, BiFunction<Object, SpatialAction<?>, Boolean>>
+  implements MappingFactory<S, Object, SpatialAction<?>, Boolean>
+{
 
-  private final Factory<
+  private final MappingFactory<
     ? super S,
-    ? extends Predicate<Coordinate>
+    ? super Void,
+    ? super Coordinate,
+    Boolean
   > coordinatePredicate;
 
   @Override
-  protected ActionCoordinatePredicate newInstance(final S scope) {
-    return new ActionCoordinatePredicate(coordinatePredicate.get(scope));
+  protected BiFunction<Object, SpatialAction<?>, Boolean> newInstance(
+    final S scope
+  ) {
+    return new ActionCoordinatePredicate(
+      WithoutContext.predicate(coordinatePredicate.get(scope))
+    );
   }
 }

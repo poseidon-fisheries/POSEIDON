@@ -22,37 +22,37 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Function} equivalent to applying two other functions in sequence
- * ({@code function2.compose(function1)}). Built via
- * {@link Factories#composedFunction(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * A mapping equivalent to applying two other mappings in sequence, both under
+ * the same context. Built via
+ * {@link Factories#composedFunction(uk.ac.ox.poseidon.core.MappingFactory, uk.ac.ox.poseidon.core.MappingFactory)}
  * in this package.
  *
- * @param <T1> the type of the composed function's input
- * @param <T2> the intermediate type produced by {@code function1} and consumed
- *             by {@code function2}
- * @param <R>  the type of the composed function's output
+ * @param <C> the type of the context
+ * @param <T> the type of the thing mapped
+ * @param <U> the intermediate type produced by {@code function1} and mapped by {@code function2}
+ * @param <R> the type of the result
  */
-public class ComposedFunction<T1, T2, R> implements Function<T1, R> {
+@RequiredArgsConstructor
+public class ComposedFunction<C, T, U, R> implements BiFunction<C, T, R> {
 
-  private final Function<? super T1, ? extends R> composedFunction;
-
-  /**
-   * @param function1 the function applied first, {@code T1 -> T2}
-   * @param function2 the function applied to {@code function1}'s result,
-   *                  {@code T2 -> R}
-   */
-  public ComposedFunction(
-    final Function<? super T1, ? extends T2> function1,
-    final Function<? super T2, ? extends R> function2
-  ) {
-    this.composedFunction = function2.compose(function1);
-  }
+  private final @NonNull BiFunction<
+    ? super C,
+    ? super T,
+    ? extends U
+  > function1;
+  private final @NonNull BiFunction<
+    ? super C,
+    ? super U,
+    ? extends R
+  > function2;
 
   @Override
-  public R apply(final T1 t1) {
-    return composedFunction.apply(t1);
+  public R apply(final C context, final T t) {
+    return function2.apply(context, function1.apply(context, t));
   }
 }

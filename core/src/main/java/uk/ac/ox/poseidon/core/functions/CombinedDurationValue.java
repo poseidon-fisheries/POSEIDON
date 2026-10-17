@@ -20,40 +20,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers;
+package uk.ac.ox.poseidon.core.functions;
 
-import java.util.function.DoubleSupplier;
+import java.time.Duration;
+import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.ToDoubleFunction;
 
 /**
- * A {@link DoubleSupplier} that can also be used anywhere a
- * {@link ToDoubleFunction} or {@link Function} of {@link Double} is required,
- * in which case it ignores the argument passed to
- * {@link #applyAsDouble}/{@link #apply} and just returns the double it would
- * have supplied anyway. Lets the same object be wired into any of those call
- * sites without an adapter.
+ * A value that sums the {@link Duration}s of several other values read under
+ * the same context. Built via
+ * {@link Factories#combinedDuration(uk.ac.ox.poseidon.core.ValueFactory...)} in
+ * this package.
+ *
+ * @param <C> the type of the context
  */
-public interface DoubleProvider
-  extends
-    DoubleSupplier,
-    Supplier<Double>,
-    ToDoubleFunction<Object>,
-    Function<Object, Double>
-{
-  @Override
-  default double applyAsDouble(final Object ignored) {
-    return getAsDouble();
+public class CombinedDurationValue<C> implements Function<C, Duration> {
+
+  private final Function<? super C, ? extends Duration>[] durations;
+
+  /** @param durations the values to combine */
+  @SuppressWarnings("unchecked")
+  public CombinedDurationValue(
+    final List<? extends Function<? super C, ? extends Duration>> durations
+  ) {
+    this.durations = durations.toArray(new Function[0]);
   }
 
   @Override
-  default Double apply(final Object o) {
-    return getAsDouble();
-  }
-
-  @Override
-  default Double get() {
-    return getAsDouble();
+  public Duration apply(final C context) {
+    Duration total = Duration.ZERO;
+    for (int i = 0; i < durations.length; i++) {
+      total = total.plus(durations[i].apply(context));
+    }
+    return total;
   }
 }

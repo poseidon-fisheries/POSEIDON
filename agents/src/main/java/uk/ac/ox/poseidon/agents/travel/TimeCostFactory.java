@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,25 +33,33 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link TimeCost}, built via
- * {@link Factories#timeCost(Factory)}.
+ * {@link Factories#timeCost(ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class TimeCostFactory extends VesselScopeFactory<TimeCost> {
+public class TimeCostFactory
+  extends VesselScopeFactory<BiFunction<Object, Route, Money>>
+  implements MappingFactory<VesselScope, Object, Route, Money>
+{
 
-  private final Factory<
+  private final ValueFactory<
     ? super VesselScope,
-    ? extends Function<? super Vessel, ? extends Money>
+    ? super Vessel,
+    ? extends Money
   > hourlyCost;
 
   @Override
-  protected TimeCost newInstance(final VesselScope scope) {
+  protected BiFunction<Object, Route, Money> newInstance(
+    final VesselScope scope
+  ) {
     return new TimeCost(scope.getVessel(), hourlyCost.get(scope));
   }
 }

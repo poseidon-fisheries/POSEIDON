@@ -31,10 +31,12 @@ class GreaterThanTest {
   @Test
   void testValueAboveThresholdShouldReturnTrue() {
     final double threshold = 10.0;
-    final GreaterThan<Double> greaterThan = new GreaterThan<>(() -> threshold);
+    final GreaterThan<Object, Double> greaterThan = new GreaterThan<>(
+      context -> threshold
+    );
 
     assertTrue(
-      greaterThan.test(15.0),
+      greaterThan.apply(null, 15.0),
       "Expected the test to return true when the value is above the threshold"
     );
   }
@@ -42,10 +44,12 @@ class GreaterThanTest {
   @Test
   void testValueBelowThresholdShouldReturnFalse() {
     final double threshold = 10.0;
-    final GreaterThan<Double> greaterThan = new GreaterThan<>(() -> threshold);
+    final GreaterThan<Object, Double> greaterThan = new GreaterThan<>(
+      context -> threshold
+    );
 
     assertFalse(
-      greaterThan.test(5.0),
+      greaterThan.apply(null, 5.0),
       "Expected the test to return false when the value is below the threshold"
     );
   }
@@ -53,10 +57,12 @@ class GreaterThanTest {
   @Test
   void testValueEqualToThresholdShouldReturnFalse() {
     final double threshold = 10.0;
-    final GreaterThan<Double> greaterThan = new GreaterThan<>(() -> threshold);
+    final GreaterThan<Object, Double> greaterThan = new GreaterThan<>(
+      context -> threshold
+    );
 
     assertFalse(
-      greaterThan.test(10.0),
+      greaterThan.apply(null, 10.0),
       "Expected the test to return false when the value is equal to the threshold"
     );
   }
@@ -64,10 +70,12 @@ class GreaterThanTest {
   @Test
   void testValueIsNotNull() {
     final double threshold = 10.0;
-    final GreaterThan<Double> greaterThan = new GreaterThan<>(() -> threshold);
+    final GreaterThan<Object, Double> greaterThan = new GreaterThan<>(
+      context -> threshold
+    );
 
     assertDoesNotThrow(
-      () -> greaterThan.test(12.0),
+      () -> greaterThan.apply(null, 12.0),
       "Expected the test to execute without throwing a NullPointerException when the value " +
         "is not null"
     );
@@ -76,11 +84,13 @@ class GreaterThanTest {
   @Test
   void testValueIsNullShouldThrowException() {
     final double threshold = 10.0;
-    final GreaterThan<Double> greaterThan = new GreaterThan<>(() -> threshold);
+    final GreaterThan<Object, Double> greaterThan = new GreaterThan<>(
+      context -> threshold
+    );
 
     assertThrows(
       NullPointerException.class,
-      () -> greaterThan.test(null),
+      () -> greaterThan.apply(null, null),
       "Expected the test to throw NullPointerException when the value is null"
     );
   }

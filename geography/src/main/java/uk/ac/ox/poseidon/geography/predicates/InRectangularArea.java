@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,21 +22,23 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
- * A {@link Predicate} testing whether a {@link Coordinate} falls within a fixed
- * {@link Envelope}. Built via
+ * A yes/no mapping, whatever the context, testing whether a {@link Coordinate}
+ * falls within a fixed {@link Envelope}. Built via
  * {@link Factories#inRectangularArea(uk.ac.ox.poseidon.core.Factory)} in this
  * package.
  */
 @Getter
 @RequiredArgsConstructor
-public class InRectangularArea implements Predicate<Coordinate> {
+public class InRectangularArea
+  implements BiFunction<Object, Coordinate, Boolean>
+{
 
   private final Envelope envelope;
 
@@ -44,7 +46,7 @@ public class InRectangularArea implements Predicate<Coordinate> {
    * @return whether {@code coordinate} falls within this predicate's envelope
    */
   @Override
-  public boolean test(final Coordinate coordinate) {
+  public Boolean apply(final Object context, final Coordinate coordinate) {
     return envelope.contains(coordinate);
   }
 }

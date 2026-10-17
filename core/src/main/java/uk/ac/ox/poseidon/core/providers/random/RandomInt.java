@@ -26,16 +26,15 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import ec.util.MersenneTwisterFast;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.function.Function;
 import lombok.NonNull;
-import uk.ac.ox.poseidon.core.providers.IntProvider;
 
 /**
- * An {@link IntProvider} that returns a uniformly distributed random integer in
- * the inclusive range {@code [minimum, maximum]} on each call, drawn from the
- * simulation's shared RNG. Built via {@link Factories#randomInt(int, int)} in
- * this package.
+ * A value that is a uniformly distributed random integer in the inclusive range
+ * {@code [minimum, maximum]} on each call, drawn from the simulation's shared
+ * RNG. Built via {@link Factories#randomInt(int, int)} in this package.
  */
-public class RandomInt implements IntProvider {
+public class RandomInt implements Function<Object, Integer> {
 
   private final @NonNull MersenneTwisterFast rng;
   private final int minimum;
@@ -71,7 +70,7 @@ public class RandomInt implements IntProvider {
   }
 
   @Override
-  public int getAsInt() {
+  public Integer apply(final Object context) {
     return minimum + rng.nextInt(range);
   }
 }

@@ -56,7 +56,9 @@ class LandCatchesTest {
   private final MarketGrid marketGrid = mock(MarketGrid.class);
   private final Vessel vessel = mock(Vessel.class);
   private final Trip trip = mock(Trip.class);
-  private final LandCatches landCatches = new LandCatches(() -> Duration.ZERO);
+  private final LandCatches landCatches = new LandCatches(
+    vessel -> Duration.ZERO
+  );
 
   @BeforeEach
   void setUp() throws Exception {

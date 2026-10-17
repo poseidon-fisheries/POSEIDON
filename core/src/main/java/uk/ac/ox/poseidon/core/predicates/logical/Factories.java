@@ -23,16 +23,17 @@
 package uk.ac.ox.poseidon.core.predicates.logical;
 
 import com.google.common.collect.ImmutableList;
-import java.util.function.Predicate;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * Factories for {@link Predicate}s that combine other predicates. For an
- * always-true/always-false leaf predicate to combine with these, see
- * {@link uk.ac.ox.poseidon.core.providers.constant.Factories#alwaysTrue()}/
- * {@link uk.ac.ox.poseidon.core.providers.constant.Factories#alwaysFalse()} — a
- * {@code BooleanProvider} already doubles as a {@code Predicate<Object>}.
+ * Factories for yes/no values and mappings combining other yes/no values or
+ * mappings. Each combinator has one overload per shape: combining values gives
+ * a value, combining mappings gives a mapping, and the two cannot be mixed. For
+ * a constant yes/no mapping, use
+ * {@link uk.ac.ox.poseidon.core.providers.constant.Factories#alwaysTrue()} or
+ * {@link uk.ac.ox.poseidon.core.providers.constant.Factories#alwaysFalse()}.
  */
 @SuppressWarnings("Convert2Diamond")
 public class Factories {
@@ -40,40 +41,78 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param predicates the predicates to combine
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   *         {@link AllOf} of the given predicates
+   * @param predicates factories for the component mappings
+   * @return a {@link MappingFactory} for an {@link AllOf} over the resolved
+   *         predicates
    * @see AllOf
    */
   @SafeVarargs
-  public static <S extends Scope, T> AllOfFactory<S, T> allOf(
-    final Factory<? super S, ? extends Predicate<? super T>>... predicates
+  public static <S extends Scope, C, T> AllOfFactory<S, C, T> allOf(
+    final MappingFactory<? super S, ? super C, ? super T, Boolean>... predicates
   ) {
-    return new AllOfFactory<S, T>(ImmutableList.copyOf(predicates));
+    return new AllOfFactory<S, C, T>(ImmutableList.copyOf(predicates));
   }
 
   /**
-   * @param predicates the predicates to combine
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   *         {@link AnyOf} of the given predicates
+   * @param predicates factories for the component values
+   * @return a {@link ValueFactory} for an {@link AllOfValue} over the
+   *         resolved predicates
+   * @see AllOfValue
+   */
+  @SafeVarargs
+  public static <S extends Scope, C> AllOfValueFactory<S, C> allOf(
+    final ValueFactory<? super S, ? super C, Boolean>... predicates
+  ) {
+    return new AllOfValueFactory<S, C>(ImmutableList.copyOf(predicates));
+  }
+
+  /**
+   * @param predicates factories for the component mappings
+   * @return a {@link MappingFactory} for an {@link AnyOf} over the resolved
+   *         predicates
    * @see AnyOf
    */
   @SafeVarargs
-  public static <S extends Scope, T> AnyOfFactory<S, T> anyOf(
-    final Factory<? super S, ? extends Predicate<? super T>>... predicates
+  public static <S extends Scope, C, T> AnyOfFactory<S, C, T> anyOf(
+    final MappingFactory<? super S, ? super C, ? super T, Boolean>... predicates
   ) {
-    return new AnyOfFactory<S, T>(ImmutableList.copyOf(predicates));
+    return new AnyOfFactory<S, C, T>(ImmutableList.copyOf(predicates));
   }
 
   /**
-   * @param predicate the predicate to negate
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link Not} of the given predicate
+   * @param predicates factories for the component values
+   * @return a {@link ValueFactory} for an {@link AnyOfValue} over the
+   *         resolved predicates
+   * @see AnyOfValue
+   */
+  @SafeVarargs
+  public static <S extends Scope, C> AnyOfValueFactory<S, C> anyOf(
+    final ValueFactory<? super S, ? super C, Boolean>... predicates
+  ) {
+    return new AnyOfValueFactory<S, C>(ImmutableList.copyOf(predicates));
+  }
+
+  /**
+   * @param predicate factory for the mapping to negate
+   * @return a {@link MappingFactory} for a {@link Not} wrapping the resolved
+   *         mapping
    * @see Not
    */
-  public static <S extends Scope, T> NotFactory<S, T> not(
-    final Factory<? super S, ? extends Predicate<? super T>> predicate
+  public static <S extends Scope, C, T> NotFactory<S, C, T> not(
+    final MappingFactory<? super S, ? super C, ? super T, Boolean> predicate
   ) {
-    return new NotFactory<S, T>(predicate);
+    return new NotFactory<S, C, T>(predicate);
+  }
+
+  /**
+   * @param predicate factory for the value to negate
+   * @return a {@link ValueFactory} for a {@link NotValue} wrapping the
+   *         resolved value
+   * @see NotValue
+   */
+  public static <S extends Scope, C> NotValueFactory<S, C> not(
+    final ValueFactory<? super S, ? super C, Boolean> predicate
+  ) {
+    return new NotValueFactory<S, C>(predicate);
   }
 }

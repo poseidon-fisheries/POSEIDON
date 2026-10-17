@@ -38,18 +38,18 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 public class PayTripCost extends AgentTask<Vessel> {
 
   @NonNull
-  private final Function<? super Vessel, ? extends Money> tripCostExtractor;
+  private final Function<? super Vessel, ? extends Money> tripCost;
 
   /**
    * @return {@link Status#SUCCEEDED}
-   * @throws NullPointerException if {@code tripCostExtractor} yields no cost
+   * @throws NullPointerException if {@code tripCost} yields no cost
    *                              for the vessel
    */
   @Override
   public Status execute() {
     final Vessel vessel = getAgent();
     final Money tripCost = checkNotNull(
-      tripCostExtractor.apply(vessel),
+      this.tripCost.apply(vessel),
       "Unable to extract trip cost for Vessel %s.".formatted(vessel)
     );
     vessel.getCurrentTrip().getAccount().subtract(tripCost);

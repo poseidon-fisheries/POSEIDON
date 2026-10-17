@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -31,6 +31,7 @@ import static uk.ac.ox.poseidon.geography.distance.DistanceCalculator.travelDura
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
@@ -51,7 +52,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
 
   private final PathFinder<Int2D> pathFinder;
   private final DistanceCalculator distanceCalculator;
-  private final Supplier<Int2D> destinationCell;
+  private final Function<? super Vessel, Int2D> destinationCell;
   private final Supplier<EventManager> eventManagerSupplier;
   private List<Int2D> currentPath;
   private EventManager eventManager;
@@ -81,7 +82,7 @@ public class TravelAlongPath extends AgentTask<Vessel> {
   @Override
   public void start() {
     final Vessel vessel = getAgent();
-    destination = checkNotNull(destinationCell.get());
+    destination = checkNotNull(destinationCell.apply(vessel));
     eventManager = eventManagerSupplier.get();
     startDateTime = vessel.getSchedule().getDateTime();
     origin = vessel.getCell();

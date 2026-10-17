@@ -15,7 +15,7 @@ The model is built around a declarative configuration → runtime object pattern
   A stateless product built only from what its inputs give it (`TravelCost`, `FishingEventRecorder`, `NetValuation`) gets a relative factory, typed `<S extends Scope>` like `NetValuationFactory`: it is then per vessel when an input is, and shared when none is.
 - `Scenario` is an immutable (Lombok `@Builder`) bag of named component `Factory` instances plus a starting date/time. `Scenario.startNewSimulation(...)` builds a `Simulation` by resolving every component factory against a fresh `SimulationScope`. A scenario that differs in some value is derived from it, leaving it untouched: `with(address, value)` replaces the value at an address that starts at a component's name (commons-beanutils syntax, e.g. `gear.proportion`), copying every factory above the replacement and keeping every other one, so global products stay shared; `withComponent(name, factory)` adds a component, and `withStartingDateTime(start)` moves the start. Calibration derives one scenario per candidate. A run is started with its seed and, optionally, its id: `startNewSimulation(seed[, simulationId])`.
 - `Simulation` extends MASON's `SimState` and owns the `TemporalSchedule`, an `EventManager`, and the list of resolved components; `finalProcesses` run at `finish()`.
-- The simulation's services are inputs: its random number generator (`randomNumberGenerator()`), its clock (`currentDateTime()`, `startingDateTime()`), its event manager (`eventManager()`) and the run's id (`runId()`). A factory that draws, reads the date, publishes events or needs the run's id takes the service's factory as an input, which its helper passes, so scenario code never names it. A scope does not offer the simulation to a build: `SimulationScope`'s accessor is package-private, and the only readers, all in `core`, are the services' own factories, the store routing (`SimulationScopeFactory`, `PerSimulationFactory`), the scope's registration methods and the `SchedulingScope`. A service is simulation-level, so a relative factory that takes one is at least simulation-level.
+- The simulation's services are inputs: its random number generator (`randomNumberGenerator()`), its clock (`currentDateTime()`, `hasDateTime()`, `startingDateTime()`), its event manager (`eventManager()`) and the run's id (`runId()`). A factory that draws, reads the date, publishes events or needs the run's id takes the service's factory as an input, which its helper passes, so scenario code never names it. A scope does not offer the simulation to a build: `SimulationScope`'s accessor is package-private, and the only readers, all in `core`, are the services' own factories, the store routing (`SimulationScopeFactory`, `PerSimulationFactory`), the scope's registration methods and the `SchedulingScope`. A service is simulation-level, so a relative factory that takes one is at least simulation-level.
 - Scheduling is not something a scope offers. Only scheduling factories schedule: core's scheduling wrappers (`scheduledOnce`, `scheduledRepeating`, `scheduledByDateTime` and the rest, in `core/.../schedule/Factories.java`) and the fleet factories. They extend `SchedulingFactory`, whose build receives a `SchedulingScope` offering the simulation's schedule. A `SimulationScopeFactory`'s build always receives a plain `SimulationScope`, and a wrapper's input is typed `Factory<? super SimulationScope, ...>`, which no factory typed in `SchedulingScope` is, so the steppable a wrapper schedules cannot schedule anything itself. What runs when is said in the scenario, by wrapping a steppable.
 - Scenarios are serialized to/from YAML via SnakeYAML (`io/.../ScenarioLoader`, `ScenarioWriter`); `ScenarioLoader` restricts deserializable classes to configured prefixes (`uk.ac.ox.poseidon`, `java`, plus caller-supplied extras) as a safety measure — keep this in mind if adding factories in new packages that scenarios need to reference.
 - **Every `Scenario` must remain serializable to YAML.** Anything hung off a `Scenario` (components, factories, nested config) has to survive a SnakeYAML round-trip — don't introduce fields/types that can't be represented that way.
@@ -52,6 +52,10 @@ Don't add other constructors to a factory class — construct it either via YAML
 
 When designing a new factory, favor composition over a new bespoke implementation: check whether existing factories (in the same package or in `core`, e.g. constant/random/temporal providers) can be combined or parameterized to produce the desired behavior before writing a new `Factory` class from scratch.
 
+Type parameters keep one meaning throughout: `S` the scope, `P` a factory's product, `C` the
+context of a live value, `T` the thing a mapping maps (or, outside the two shapes, the main type a
+class is about), `R` a result.
+
 Not every field on a factory needs to be `Factory`-typed. Wrap a field in `Factory<? super S,
 ? extends X>` only when its value must be *resolved against the scope* — a nested component
 (`ModelGrid`, a species list), something computed at build time, or a value that legitimately
@@ -64,15 +68,39 @@ differently through, and every call site has to write `scope -> "value"` for no 
 ## Live parameters, with a plain-value overload
 
 A building block reads its model parameters (a threshold, a duration, an amount of time, a rate)
-through a `Supplier` each time it is used, rather than fixing them when it is built. It then works
-the same whether the value is fixed, depends on the date, the vessel or the state of the
-simulation, or is changed mid-run, and any provider in `core/providers` can feed it. Its package's
-`Factories` class offers the live version, taking a `Factory<? super S, ? extends Supplier<…>>`,
-plus an overload taking a plain value that it wraps in `constant(...)`:
+each time it is used, rather than fixing them when it is built. It then works the same whether the
+value is fixed, depends on the date, the vessel or the state of the simulation, or is changed
+mid-run, and any value in `core/providers` can feed it.
 
-- `lessThan(double)` and `lessThan(Factory)` in `core/predicates/comparable`;
+A live parameter is a function of a *context*: what the caller has at hand when it asks, usually
+the vessel it acts for. It comes in two shapes, each with its factory type in `core`:
+
+- a *value* of the context, `Function<C, R>`, built by a `ValueFactory<S, C, R>` (a constant, the
+  current date-time, a property of the vessel);
+- a *mapping* of something under the context, `BiFunction<C, T, R>`, built by a
+  `MappingFactory<S, C, T, R>` (a comparison with a threshold, a cell's value, a property of a
+  route).
+
+A yes/no is a value or a mapping with a `Boolean` result. A value or mapping that reads nothing
+from its context has `Object` as its context, so it fits wherever any context is given. A
+combinator that makes sense in both shapes (`condition`, `allOf`, `anyOf`, `not`,
+`composedFunction`, `defaultIfNull`…) has one overload per shape; a helper method returning a live
+value must therefore declare its shape type, or it matches no overload. So must a wrapper:
+`perVessel` has an overload for values that keeps them values.
+
+A component passes the context it has: a task passes its vessel. A component that has none (a grid
+built cell by cell, a regulation judging an action, a gear fishing, a table's columns) has its
+factory take the value with `Void` as its context, so that a value reading a vessel is refused when
+the scenario is compiled, and convert it once, when it builds, into the plain `Supplier`,
+`Predicate` or `Function` the component holds (`WithoutContext`). Numbers are boxed: there are no
+primitive shapes.
+
+The package's `Factories` class offers the live version plus an overload taking a plain value
+that it wraps in `constant(...)`:
+
+- `lessThan(double)` and `lessThan(ValueFactory)` in `core/predicates/comparable`;
 - `dateTimeAfter(referenceDateTime, DurationFactory)` and
-  `dateTimeAfter(referenceDateTime, Factory)` in `core/providers/temporal`.
+  `dateTimeAfter(referenceDateTime, ValueFactory)` in `core/providers/temporal`.
 
 Use this shape for new building blocks even when no caller needs a varying value yet. Reading a
 `Constant` costs a call that the JIT inlines; it doesn't show next to the work around it.
@@ -86,9 +114,10 @@ What counts as a plain value depends on the YAML:
   `TimeFactory`…), which is what scenario code holds anyway (`hours(3)`).
 
 Never write the overload as a generic `foo(T value)` for such types: `foo(hours(3))` would then
-compile with `T = DurationFactory` and wrap the factory itself as the value. An overload taking
-`Factory<? super S, ? extends X>` isn't possible either, because it erases to the same signature
-as the live version; a concrete value-factory class such as `DurationFactory` doesn't clash.
+compile with `T = DurationFactory` and wrap the factory itself as the value. Nor should it take a
+plain `Factory<? super S, ? extends X>`: a value factory is a factory too, so the two overloads
+would differ only in how specific they are. A concrete value-factory class such as
+`DurationFactory` is unambiguous.
 
 This doesn't apply to the configuration literals of the previous section (a column name, a
 separator, a file path): they say how to build or read something, not how the model behaves, and

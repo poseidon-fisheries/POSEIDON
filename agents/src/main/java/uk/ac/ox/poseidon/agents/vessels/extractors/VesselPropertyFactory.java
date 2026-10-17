@@ -25,18 +25,21 @@ package uk.ac.ox.poseidon.agents.vessels.extractors;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.functions.ObjectProperty;
-import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
+import uk.ac.ox.poseidon.core.functions.ObjectPropertyValue;
+import uk.ac.ox.poseidon.core.functions.ObjectPropertyValueFactory;
 
 /**
- * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a
+ * An {@link ObjectPropertyValueFactory} for an {@link ObjectPropertyValue} of a
  * {@link Vessel}, built via {@link Factories#vesselProperty}.
  *
  * @param <R> the type of the property; not checked
  */
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class VesselPropertyFactory<R> extends ObjectPropertyFactory<Vessel, R> {
+public class VesselPropertyFactory<R> extends ObjectPropertyValueFactory<
+  Vessel,
+  R
+> {
 
   /**
    * @param propertyPath the dotted path of properties to follow from the vessel

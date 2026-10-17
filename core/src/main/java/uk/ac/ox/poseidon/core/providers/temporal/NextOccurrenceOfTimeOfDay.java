@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -29,30 +29,30 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
-import java.util.function.Supplier;
-import uk.ac.ox.poseidon.core.providers.Provider;
+import java.util.function.Function;
 
 /**
- * A {@link Provider} of the next occurrence of one of the given times of day
- * strictly after a reference date-time, read anew on every call: the same day
- * if one of the times is still to come, else the earliest of them on the
- * following day. The reference is usually the current date-time
+ * A value of the next occurrence of one of the given times of day strictly
+ * after a reference date-time, read anew on every call: the same day if one of
+ * the times is still to come, else the earliest of them on the following day.
+ * The reference is usually the current date-time
  * ({@link Factories#nextOccurrenceOf}), but can be any other, such as when a
  * vessel departed ({@link Factories#nextOccurrenceAfter}); the occurrence can
  * then already be in the past.
  */
-public class NextOccurrenceOfTimeOfDay implements Provider<LocalDateTime> {
+public class NextOccurrenceOfTimeOfDay<C> implements
+  Function<C, LocalDateTime> {
 
-  private final Supplier<? extends LocalDateTime> referenceDateTime;
+  private final Function<? super C, ? extends LocalDateTime> referenceDateTime;
   private final LocalTime[] times;
 
   /**
-   * @param referenceDateTime supplies the date-time the occurrence must be
-   *                          strictly after
+   * @param referenceDateTime the date-time the occurrence must be strictly
+   *                          after
    * @param times             the times of day, at least one
    */
   public NextOccurrenceOfTimeOfDay(
-    final Supplier<? extends LocalDateTime> referenceDateTime,
+    final Function<? super C, ? extends LocalDateTime> referenceDateTime,
     final LocalTime[] times
   ) {
     checkArgument(times.length > 0, "At least one time of day is required.");
@@ -62,8 +62,8 @@ public class NextOccurrenceOfTimeOfDay implements Provider<LocalDateTime> {
   }
 
   @Override
-  public LocalDateTime get() {
-    final LocalDateTime reference = referenceDateTime.get();
+  public LocalDateTime apply(final C context) {
+    final LocalDateTime reference = referenceDateTime.apply(context);
     final LocalDate day = reference.toLocalDate();
     final LocalTime timeOfDay = reference.toLocalTime();
     for (final LocalTime time : times) {

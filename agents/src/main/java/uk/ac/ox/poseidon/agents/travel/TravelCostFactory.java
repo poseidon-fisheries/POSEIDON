@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.travel;
 
 import com.google.common.collect.ImmutableList;
-import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,12 +32,14 @@ import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link TravelCost}, built via
- * {@link Factories#travelCost(Factory, Factory...)}.
+ * {@link Factories#travelCost(MappingFactory, MappingFactory...)}.
  */
 @Getter
 @ToString
@@ -50,23 +51,25 @@ public class TravelCostFactory<S extends Scope> extends RelativeScopeFactory<
   TravelCost
 > {
 
-  private final Factory<
+  private final MappingFactory<
     ? super S,
-    ? extends Function<? super Int2D, ? extends Route>
+    ? super Void,
+    ? super Int2D,
+    ? extends Route
   > routeFunction;
 
   @Singular
   private final ImmutableList<
-    Factory<? super S, ? extends Function<? super Route, ? extends Money>>
+    MappingFactory<? super S, ? super Void, ? super Route, ? extends Money>
   > routeCosts;
 
   @Override
   protected TravelCost newInstance(final S scope) {
     return new TravelCost(
-      routeFunction.get(scope),
+      WithoutContext.function(routeFunction.get(scope)),
       routeCosts
         .stream()
-        .map(routeCost -> routeCost.get(scope))
+        .map(routeCost -> WithoutContext.function(routeCost.get(scope)))
         .toList()
     );
   }

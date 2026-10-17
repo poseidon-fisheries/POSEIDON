@@ -42,19 +42,21 @@ class VesselHasStartedTripTodayTest {
 
   @Test
   void isFalseForAVesselThatHasNeverMadeATrip() {
-    assertFalse(vesselHasStartedTripToday.test(vesselWith(null, null)));
+    assertFalse(vesselHasStartedTripToday.apply(vesselWith(null, null)));
   }
 
   @Test
   void isTrueWhenThePreviousTripStartedToday() {
     final Trip previousTrip = tripStartedAt(NOW.withHour(7));
-    assertTrue(vesselHasStartedTripToday.test(vesselWith(null, previousTrip)));
+    assertTrue(vesselHasStartedTripToday.apply(vesselWith(null, previousTrip)));
   }
 
   @Test
   void isFalseWhenThePreviousTripStartedYesterday() {
     final Trip previousTrip = tripStartedAt(NOW.minusDays(1).withHour(23));
-    assertFalse(vesselHasStartedTripToday.test(vesselWith(null, previousTrip)));
+    assertFalse(
+      vesselHasStartedTripToday.apply(vesselWith(null, previousTrip))
+    );
   }
 
   @Test
@@ -62,14 +64,14 @@ class VesselHasStartedTripTodayTest {
     final Trip currentTrip = tripStartedAt(NOW.withHour(7));
     final Trip previousTrip = tripStartedAt(NOW.minusDays(1).withHour(7));
     assertTrue(
-      vesselHasStartedTripToday.test(vesselWith(currentTrip, previousTrip))
+      vesselHasStartedTripToday.apply(vesselWith(currentTrip, previousTrip))
     );
   }
 
   @Test
   void isFalseWhenTheCurrentTripStartedYesterday() {
     final Trip currentTrip = tripStartedAt(NOW.minusDays(1).withHour(22));
-    assertFalse(vesselHasStartedTripToday.test(vesselWith(currentTrip, null)));
+    assertFalse(vesselHasStartedTripToday.apply(vesselWith(currentTrip, null)));
   }
 
   private static Trip tripStartedAt(final LocalDateTime startDateTime) {

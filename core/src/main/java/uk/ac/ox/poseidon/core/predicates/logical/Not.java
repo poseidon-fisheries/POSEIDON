@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,26 +22,24 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import java.util.function.Predicate;
-import lombok.Getter;
+import java.util.function.BiFunction;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} that negates the result of a wrapped predicate. Built via
- * {@link Factories#not(uk.ac.ox.poseidon.core.Factory)} in this package.
+ * A yes/no mapping that negates a wrapped yes/no mapping. Built via
+ * {@link Factories#not(uk.ac.ox.poseidon.core.MappingFactory)} in this package.
  *
- * @param <T> the type of input tested
+ * @param <C> the type of the context
+ * @param <T> the type of the thing tested
  */
-@Getter
 @RequiredArgsConstructor
-public class Not<T> implements Predicate<T> {
+public class Not<C, T> implements BiFunction<C, T, Boolean> {
 
-  @NonNull
-  private final Predicate<? super T> predicate;
+  private final @NonNull BiFunction<? super C, ? super T, Boolean> predicate;
 
   @Override
-  public boolean test(final T t) {
-    return !predicate.test(t);
+  public Boolean apply(final C context, final T t) {
+    return !predicate.apply(context, t);
   }
 }

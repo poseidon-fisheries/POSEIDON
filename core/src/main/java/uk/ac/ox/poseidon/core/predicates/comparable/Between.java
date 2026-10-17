@@ -22,30 +22,32 @@
 
 package uk.ac.ox.poseidon.core.predicates.comparable;
 
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} that is true iff the tested value lies between a minimum
- * and a maximum (each supplied, and each independently inclusive or exclusive).
- * Built via {@link Factories Factories.between(...)} in this package.
+ * A yes/no mapping that is true iff the thing tested lies between a minimum and
+ * a maximum, both read under the context, and each independently inclusive or
+ * exclusive. Built via {@link Factories Factories.between(...)} in this
+ * package.
  *
+ * @param <C> the type of the context the reference is read under
  * @param <T> the {@link Comparable} type of the bounds
  */
 @RequiredArgsConstructor
-public class Between<T> implements Predicate<Comparable<T>> {
+public class Between<C, T> implements BiFunction<C, Comparable<T>, Boolean> {
 
-  private final @NonNull Supplier<? extends T> minimum;
-  private final @NonNull Supplier<? extends T> maximum;
+  private final @NonNull Function<? super C, ? extends T> minimum;
+  private final @NonNull Function<? super C, ? extends T> maximum;
   private final boolean includeMinimum;
   private final boolean includeMaximum;
 
   @Override
-  public boolean test(final @NonNull Comparable<T> other) {
-    final int comparedToMinimum = other.compareTo(minimum.get());
-    final int comparedToMaximum = other.compareTo(maximum.get());
+  public Boolean apply(final C context, final Comparable<T> mapped) {
+    final int comparedToMinimum = mapped.compareTo(minimum.apply(context));
+    final int comparedToMaximum = mapped.compareTo(maximum.apply(context));
     return (
       (includeMinimum ? comparedToMinimum >= 0 : comparedToMinimum > 0) &&
       (includeMaximum ? comparedToMaximum <= 0 : comparedToMaximum < 0)

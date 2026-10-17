@@ -23,14 +23,17 @@
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
 import java.time.MonthDay;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.regulations.TemporalAction;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link BetweenYearlyDates}. Built via
@@ -41,16 +44,21 @@ import uk.ac.ox.poseidon.core.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class BetweenYearlyDatesFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  BetweenYearlyDates
-> {
+public class BetweenYearlyDatesFactory<S extends Scope>
+  extends RelativeScopeFactory<
+    S,
+    BiFunction<Object, TemporalAction<?>, Boolean>
+  >
+  implements MappingFactory<S, Object, TemporalAction<?>, Boolean>
+{
 
   private final Factory<? super S, ? extends MonthDay> start;
   private final Factory<? super S, ? extends MonthDay> end;
 
   @Override
-  protected BetweenYearlyDates newInstance(final S scope) {
+  protected BiFunction<Object, TemporalAction<?>, Boolean> newInstance(
+    final S scope
+  ) {
     return new BetweenYearlyDates(start.get(scope), end.get(scope));
   }
 }

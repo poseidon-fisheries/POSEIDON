@@ -22,35 +22,35 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link MinDouble}, built via
- * {@link Factories#minDouble(Factory, Factory)}.
+ * {@link Factories#minDouble(ValueFactory, ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class MinDoubleFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  MinDouble
-> {
+public class MinDoubleFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, Double>>
+  implements ValueFactory<S, C, Double>
+{
 
-  private final Factory<? super S, ? extends DoubleSupplier> a;
-  private final Factory<? super S, ? extends DoubleSupplier> b;
+  private final ValueFactory<? super S, ? super C, Double> a;
+  private final ValueFactory<? super S, ? super C, Double> b;
 
   @Override
-  protected MinDouble newInstance(final S scope) {
-    return new MinDouble(a.get(scope), b.get(scope));
+  protected Function<C, Double> newInstance(final S scope) {
+    return new MinDouble<>(a.get(scope), b.get(scope));
   }
 }

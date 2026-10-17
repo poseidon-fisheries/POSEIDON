@@ -27,8 +27,6 @@ import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGene
 import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
-import java.util.function.IntSupplier;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleBiFunction;
 import sim.util.Int2D;
@@ -38,7 +36,9 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
@@ -159,9 +159,11 @@ public class Factories {
    */
   public static <O> GreedyPickerFactory<O> greedyPicker(
     final Factory<? super VesselScope, ? extends OptionValues<O>> optionValues,
-    final Factory<
+    final MappingFactory<
       ? super VesselScope,
-      ? extends Predicate<? super O>
+      ? super Void,
+      ? super O,
+      Boolean
     > optionPredicate
   ) {
     return new GreedyPickerFactory<>(
@@ -220,9 +222,11 @@ public class Factories {
    */
   public static <O> ImitatingPickerFactory<O> imitatingPicker(
     final Factory<? super VesselScope, ? extends OptionValues<O>> optionValues,
-    final Factory<
+    final MappingFactory<
       ? super VesselScope,
-      ? extends Predicate<? super O>
+      ? super Void,
+      ? super O,
+      Boolean
     > optionPredicate,
     final Factory<
       ? super VesselScope,
@@ -251,7 +255,7 @@ public class Factories {
 
   /**
    * @param keyedMemory  the keyed memory to select from
-   * @param keyExtractor extracts the key from the selector's input
+   * @param key the key, read from the selector's input
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link KeyedMemorySelector}
    * @see KeyedMemorySelector
@@ -264,12 +268,9 @@ public class Factories {
     M
   > keyedMemorySelector(
     final Factory<? super S, ? extends KeyedMemory<K, O, M>> keyedMemory,
-    final Factory<
-      ? super S,
-      ? extends Function<? super T, ? extends K>
-    > keyExtractor
+    final ValueFactory<? super S, ? super T, ? extends K> key
   ) {
-    return new KeyedMemorySelectorFactory<>(keyedMemory, keyExtractor);
+    return new KeyedMemorySelectorFactory<>(keyedMemory, key);
   }
 
   /**
@@ -309,7 +310,7 @@ public class Factories {
   /**
    * @param pathFinder                finds accessible water neighbours
    * @param cellPredicate             filters which candidate cells are eligible
-   * @param neighbourhoodSizeSupplier the initial search radius
+   * @param neighbourhoodSize the initial search radius
    * @param maximumWidening           how many cells the radius may grow beyond
    *                                  the initial one while no cell satisfies
    *                                  {@code cellPredicate}
@@ -321,21 +322,24 @@ public class Factories {
    */
   public static NeighbourhoodGridExplorerFactory neighbourhoodGridExplorer(
     final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
-    final Factory<
+    final MappingFactory<
       ? super VesselScope,
-      ? extends Predicate<? super Int2D>
+      ? super Vessel,
+      ? super Int2D,
+      Boolean
     > cellPredicate,
-    final Factory<
+    final ValueFactory<
       ? super VesselScope,
-      ? extends IntSupplier
-    > neighbourhoodSizeSupplier,
+      ? super Vessel,
+      Integer
+    > neighbourhoodSize,
     final int maximumWidening,
     final Factory<? super VesselScope, ? extends Supplier<Int2D>> searchCentre
   ) {
     return new NeighbourhoodGridExplorerFactory(
       pathFinder,
       cellPredicate,
-      neighbourhoodSizeSupplier,
+      neighbourhoodSize,
       maximumWidening,
       searchCentre,
       randomNumberGenerator()
@@ -386,24 +390,27 @@ public class Factories {
   }
 
   /**
-   * @param cellsSupplier the candidate cells to pick from
+   * @param cells the candidate cells to pick from
    * @param cellPredicate filters which candidate cells are eligible
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
    *         {@link RandomPicker}
    * @see RandomPicker
    */
   public static RandomGridExplorerFactory randomGridExplorer(
-    final Factory<
+    final ValueFactory<
       ? super VesselScope,
-      ? extends Supplier<? extends List<? extends Int2D>>
-    > cellsSupplier,
-    final Factory<
+      ? super Void,
+      ? extends List<? extends Int2D>
+    > cells,
+    final MappingFactory<
       ? super VesselScope,
-      ? extends Predicate<? super Int2D>
+      ? super Void,
+      ? super Int2D,
+      Boolean
     > cellPredicate
   ) {
     return new RandomGridExplorerFactory(
-      cellsSupplier,
+      cells,
       cellPredicate,
       randomNumberGenerator()
     );

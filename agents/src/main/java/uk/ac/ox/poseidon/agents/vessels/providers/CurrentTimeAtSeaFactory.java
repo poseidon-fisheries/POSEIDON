@@ -22,10 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
+import java.time.Duration;
+import java.util.function.Function;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link CurrentTimeAtSea}, built
@@ -34,11 +37,12 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class CurrentTimeAtSeaFactory
-  extends VesselScopeFactory<CurrentTimeAtSea>
+  extends VesselScopeFactory<Function<Object, Duration>>
+  implements ValueFactory<VesselScope, Object, Duration>
 {
 
   @Override
-  protected CurrentTimeAtSea newInstance(final VesselScope scope) {
+  protected Function<Object, Duration> newInstance(final VesselScope scope) {
     return new CurrentTimeAtSea(scope.getVessel());
   }
 }

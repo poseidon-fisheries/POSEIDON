@@ -31,17 +31,17 @@ import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * A {@link Steppable} that, on each step, subtracts {@code costExtractor}'s
+ * A {@link Steppable} that, on each step, subtracts {@code cost}'s
  * result from the {@link Account} of every active vessel in {@code fleet}.
  */
 @RequiredArgsConstructor
 public class FixedCostCollector implements Steppable {
 
   private final Fleet fleet;
-  private final Function<? super Vessel, ? extends Money> costExtractor;
+  private final Function<? super Vessel, ? extends Money> cost;
 
   /**
-   * Subtracts {@code costExtractor}'s result from every active vessel's
+   * Subtracts {@code cost}'s result from every active vessel's
    * {@link Account}.
    */
   @Override
@@ -51,7 +51,7 @@ public class FixedCostCollector implements Steppable {
       .stream()
       .filter(Vessel::isActive)
       .forEach(vessel -> {
-        vessel.getAccount().subtract(costExtractor.apply(vessel));
+        vessel.getAccount().subtract(cost.apply(vessel));
       });
   }
 }

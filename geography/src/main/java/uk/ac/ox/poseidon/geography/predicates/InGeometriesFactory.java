@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.geography.predicates;
 
 import java.util.Collection;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,8 +31,10 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.locationtech.jts.geom.Geometry;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.geography.Coordinate;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link InGeometries}, built via
@@ -42,10 +45,10 @@ import uk.ac.ox.poseidon.core.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class InGeometriesFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  InGeometries
-> {
+public class InGeometriesFactory<S extends Scope>
+  extends RelativeScopeFactory<S, BiFunction<Object, Coordinate, Boolean>>
+  implements MappingFactory<S, Object, Coordinate, Boolean>
+{
 
   private final Factory<
     ? super S,
@@ -53,7 +56,7 @@ public class InGeometriesFactory<S extends Scope> extends RelativeScopeFactory<
   > geometries;
 
   @Override
-  protected InGeometries newInstance(final S scope) {
+  protected BiFunction<Object, Coordinate, Boolean> newInstance(final S scope) {
     return new InGeometries(geometries.get(scope));
   }
 }

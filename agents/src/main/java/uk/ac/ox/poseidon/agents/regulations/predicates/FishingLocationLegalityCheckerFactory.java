@@ -24,16 +24,20 @@ package uk.ac.ox.poseidon.agents.regulations.predicates;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.regulations.Regulations;
@@ -48,7 +52,8 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class FishingLocationLegalityCheckerFactory
-  extends VesselScopeFactory<FishingLocationLegalityChecker>
+  extends VesselScopeFactory<BiFunction<Object, Int2D, Boolean>>
+  implements MappingFactory<VesselScope, Object, Int2D, Boolean>
 {
 
   private final Factory<
@@ -68,13 +73,14 @@ public class FishingLocationLegalityCheckerFactory
     ? super VesselScope,
     ? extends Duration
   > fishingDuration;
-  private final Factory<
+  private final ValueFactory<
     ? super VesselScope,
-    ? extends Supplier<LocalDateTime>
+    ? super Vessel,
+    LocalDateTime
   > currentDateTime;
 
   @Override
-  protected FishingLocationLegalityChecker newInstance(
+  protected BiFunction<Object, Int2D, Boolean> newInstance(
     final VesselScope scope
   ) {
     return new FishingLocationLegalityChecker(

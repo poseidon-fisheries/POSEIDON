@@ -24,15 +24,15 @@ package uk.ac.ox.poseidon.agents.vessels.gears;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import si.uom.quantity.VolumetricFlowRate;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * Factories for a vessel's {@link Gear}: inactive, a fixed proportion, or a
@@ -48,7 +48,8 @@ public class Factories {
    *                              species
    * @param minimumCatchThreshold per-species catch below this is discarded down
    *                              to zero
-   * @param durationSupplier      supplies how long one fishing event takes
+   * @param duration      how long one fishing event takes, asked with no
+   *                      context
    * @param fuelConsumptionRate   fuel burned per hour of fishing
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link FixedBiomassProportionGear}
@@ -58,7 +59,7 @@ public class Factories {
     final String code,
     final double proportion,
     final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold,
-    final Factory<? super S, ? extends Supplier<Duration>> durationSupplier,
+    final ValueFactory<? super S, ? super Void, Duration> duration,
     final Factory<
       ? super S,
       ? extends Quantity<VolumetricFlowRate>
@@ -68,7 +69,7 @@ public class Factories {
       code,
       proportion,
       minimumCatchThreshold,
-      durationSupplier,
+      duration,
       fuelConsumptionRate
     );
   }
@@ -85,7 +86,8 @@ public class Factories {
 
   /**
    * @param code                  this gear's identifying code
-   * @param durationSupplier      supplies how long one fishing event takes
+   * @param duration      how long one fishing event takes, asked with no
+   *                      context
    * @param species               the species to index proportions over
    * @param proportionFunction    the fraction of available biomass caught, per
    *                              species
@@ -97,17 +99,19 @@ public class Factories {
    */
   public static <S extends Scope> IndexedBiomassCatchabilityGearFactory<S> indexedBiomassCatchabilityGear(
     final String code,
-    final Factory<? super S, ? extends Supplier<Duration>> durationSupplier,
+    final ValueFactory<? super S, ? super Void, Duration> duration,
     final Factory<? super S, ? extends Collection<? extends Species>> species,
-    final Factory<
+    final MappingFactory<
       ? super S,
-      ? extends Function<? super Species, Double>
+      ? super Void,
+      ? super Species,
+      Double
     > proportionFunction,
     final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold
   ) {
     return new IndexedBiomassCatchabilityGearFactory<S>(
       code,
-      durationSupplier,
+      duration,
       species,
       proportionFunction,
       minimumCatchThreshold

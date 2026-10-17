@@ -22,28 +22,29 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.DoubleProvider;
 
 /**
- * A {@link DoubleProvider} that returns the lesser of two supplied double
- * values, recomputed on every call. Built via
- * {@link Factories#minDouble(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * A value that is the smaller of two double values, both asked under the same
+ * context, recomputed on every call, as by {@link Math#min}. Built via
+ * {@link Factories#minDouble(uk.ac.ox.poseidon.core.ValueFactory, uk.ac.ox.poseidon.core.ValueFactory)}
  * in this package.
+ *
+ * @param <C> the type of the context
  */
 @RequiredArgsConstructor
-public class MinDouble implements DoubleProvider {
+public class MinDouble<C> implements Function<C, Double> {
 
   @NonNull
-  private final DoubleSupplier a;
+  private final Function<? super C, Double> a;
 
   @NonNull
-  private final DoubleSupplier b;
+  private final Function<? super C, Double> b;
 
   @Override
-  public double getAsDouble() {
-    return Math.min(a.getAsDouble(), b.getAsDouble());
+  public Double apply(final C context) {
+    return Math.min(a.apply(context), b.apply(context));
   }
 }

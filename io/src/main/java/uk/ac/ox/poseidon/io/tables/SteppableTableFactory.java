@@ -22,21 +22,23 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
-import java.util.List;
-import java.util.function.Supplier;
+import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link SteppableTable}, built
- * via {@link Factories#steppableTable(Factory, Factory[])}/
- * {@link Factories#steppableTable(Factory, Factory)}.
+ * via {@link Factories#steppableTable(Factory, ValueFactory[])}. Each column's
+ * value is asked with no context.
  */
 @Getter
 @ToString
@@ -51,16 +53,20 @@ public class SteppableTableFactory
     ? super SimulationScope,
     TableDefinition
   > tableDefinition;
-  private final Factory<
-    ? super SimulationScope,
-    ? extends List<? extends Supplier<?>>
-  > valueSuppliers;
+
+  @Singular
+  private final ImmutableList<
+    ValueFactory<? super SimulationScope, ? super Void, ?>
+  > values;
 
   @Override
   protected SteppableTable newInstance(final SimulationScope scope) {
     return new SteppableTable(
       tableDefinition.get(scope),
-      valueSuppliers.get(scope)
+      values
+        .stream()
+        .map(value -> WithoutContext.supplier(value.get(scope)))
+        .toList()
     );
   }
 }

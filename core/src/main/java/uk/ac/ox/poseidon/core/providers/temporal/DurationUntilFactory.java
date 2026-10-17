@@ -22,8 +22,9 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,33 +33,36 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link DurationUntil}, built
- * via {@link Factories#durationUntil(Factory)}.
+ * via {@link Factories#durationUntil(ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class DurationUntilFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  DurationUntil
-> {
+public class DurationUntilFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, Duration>>
+  implements ValueFactory<S, C, Duration>
+{
 
-  private final Factory<
+  private final ValueFactory<
     ? super S,
-    ? extends Supplier<LocalDateTime>
+    ? super C,
+    LocalDateTime
   > currentDateTime;
-  private final Factory<
+  private final ValueFactory<
     ? super S,
-    ? extends Supplier<LocalDateTime>
+    ? super C,
+    LocalDateTime
   > referenceDateTime;
 
   @Override
-  protected DurationUntil newInstance(final S scope) {
-    return new DurationUntil(
+  protected Function<C, Duration> newInstance(final S scope) {
+    return new DurationUntil<>(
       currentDateTime.get(scope),
       referenceDateTime.get(scope)
     );

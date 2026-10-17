@@ -21,8 +21,9 @@
  */
 
 /**
- * {@link java.util.function.Predicate}s that test a value derived from, or
- * drawn against, other factory-resolved inputs. See
+ * Yes/no mappings, and conditions, which can be values or mappings: see
+ * {@link uk.ac.ox.poseidon.core.ValueFactory} and
+ * {@link uk.ac.ox.poseidon.core.MappingFactory} for the two shapes. See
  * {@link uk.ac.ox.poseidon.core.predicates.Factories} for the entry points.
  * Sibling packages {@link uk.ac.ox.poseidon.core.predicates.logical} and
  * {@link uk.ac.ox.poseidon.core.predicates.comparable} hold predicate

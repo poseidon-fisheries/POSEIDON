@@ -22,16 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
-import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link DiscardMortality}, built
@@ -47,13 +47,17 @@ public class DiscardMortalityFactory<S extends Scope> extends RelativeScopeFacto
   DiscardMortality
 > {
 
-  private final Factory<
+  private final MappingFactory<
     ? super S,
-    ? extends Function<? super Species, Double>
+    ? super Void,
+    ? super Species,
+    Double
   > mortalityRate;
 
   @Override
   protected DiscardMortality newInstance(final S scope) {
-    return new DiscardMortality(mortalityRate.get(scope));
+    return new DiscardMortality(
+      WithoutContext.function(mortalityRate.get(scope))
+    );
   }
 }

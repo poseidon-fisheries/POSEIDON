@@ -40,12 +40,12 @@ class NumericIntervalMapperTest {
       )
     );
 
-    assertThat(mapper.apply(0.0)).isEqualTo("VL0612");
-    assertThat(mapper.apply(11.999)).isEqualTo("VL0612");
-    assertThat(mapper.apply(12.0)).isEqualTo("VL1218");
-    assertThat(mapper.apply(17.999)).isEqualTo("VL1218");
-    assertThat(mapper.apply(-0.001)).isNull();
-    assertThat(mapper.apply(18.0)).isNull();
+    assertThat(mapper.apply(null, 0.0)).isEqualTo("VL0612");
+    assertThat(mapper.apply(null, 11.999)).isEqualTo("VL0612");
+    assertThat(mapper.apply(null, 12.0)).isEqualTo("VL1218");
+    assertThat(mapper.apply(null, 17.999)).isEqualTo("VL1218");
+    assertThat(mapper.apply(null, -0.001)).isNull();
+    assertThat(mapper.apply(null, 18.0)).isNull();
   }
 
   @Test
@@ -57,9 +57,9 @@ class NumericIntervalMapperTest {
       )
     );
 
-    assertThat(mapper.apply(39.999)).isEqualTo("VL2440");
-    assertThat(mapper.apply(40.0)).isEqualTo("VL40XX");
-    assertThat(mapper.apply(500.0)).isEqualTo("VL40XX");
+    assertThat(mapper.apply(null, 39.999)).isEqualTo("VL2440");
+    assertThat(mapper.apply(null, 40.0)).isEqualTo("VL40XX");
+    assertThat(mapper.apply(null, 500.0)).isEqualTo("VL40XX");
   }
 
   @Test
@@ -71,10 +71,10 @@ class NumericIntervalMapperTest {
       )
     );
 
-    assertThat(mapper.apply(-500.0)).isEqualTo("VL0006");
-    assertThat(mapper.apply(0.0)).isEqualTo("VL0006");
-    assertThat(mapper.apply(5.999)).isEqualTo("VL0006");
-    assertThat(mapper.apply(6.0)).isEqualTo("VL0612");
+    assertThat(mapper.apply(null, -500.0)).isEqualTo("VL0006");
+    assertThat(mapper.apply(null, 0.0)).isEqualTo("VL0006");
+    assertThat(mapper.apply(null, 5.999)).isEqualTo("VL0006");
+    assertThat(mapper.apply(null, 6.0)).isEqualTo("VL0612");
   }
 
   @Test

@@ -77,7 +77,7 @@ class FishingLocationLegalityCheckerTest {
       !new BetweenDates(
         LocalDate.of(2013, 1, 20),
         LocalDate.of(2013, 2, 18)
-      ).test(action);
+      ).apply(null, action);
 
   private final Vessel vessel = mock(Vessel.class);
   private final Gear gear = mock(Gear.class);
@@ -107,7 +107,7 @@ class FishingLocationLegalityCheckerTest {
       pathFinder,
       distance,
       TYPICAL_SET,
-      () -> now,
+      v -> now,
       vessel
     );
   }
@@ -118,7 +118,7 @@ class FishingLocationLegalityCheckerTest {
     final boolean permitted = checker(
       action -> checked.add(action),
       LocalDateTime.of(2013, 1, 19, 20, 30)
-    ).test(CANDIDATE);
+    ).apply(null, CANDIDATE);
     assertThat(permitted).isTrue();
     assertThat(checked)
       .singleElement()
@@ -153,9 +153,9 @@ class FishingLocationLegalityCheckerTest {
       pathFinder,
       new CartesianDistanceCalculator(MODEL_GRID, 1.0),
       TYPICAL_SET,
-      () -> now,
+      v -> now,
       vessel
-    ).test(CANDIDATE);
+    ).apply(null, CANDIDATE);
     assertThat(checked)
       .singleElement()
       .satisfies(action ->
@@ -171,7 +171,7 @@ class FishingLocationLegalityCheckerTest {
       checker(
         CLOSED_FROM_20_JANUARY,
         LocalDateTime.of(2013, 1, 19, 21, 30)
-      ).test(CANDIDATE)
+      ).apply(null, CANDIDATE)
     ).isFalse();
   }
 
@@ -183,16 +183,17 @@ class FishingLocationLegalityCheckerTest {
       checker(
         CLOSED_FROM_20_JANUARY,
         LocalDateTime.of(2013, 1, 19, 21, 0)
-      ).test(CANDIDATE)
+      ).apply(null, CANDIDATE)
     ).isTrue();
   }
 
   @Test
   void aSetDuringAClosureIsRefused() {
     assertThat(
-      checker(CLOSED_FROM_20_JANUARY, LocalDateTime.of(2013, 2, 1, 21, 0)).test(
-        CANDIDATE
-      )
+      checker(
+        CLOSED_FROM_20_JANUARY,
+        LocalDateTime.of(2013, 2, 1, 21, 0)
+      ).apply(null, CANDIDATE)
     ).isFalse();
   }
 
@@ -204,7 +205,7 @@ class FishingLocationLegalityCheckerTest {
       checker(
         CLOSED_FROM_20_JANUARY,
         LocalDateTime.of(2013, 2, 18, 22, 0)
-      ).test(CANDIDATE)
+      ).apply(null, CANDIDATE)
     ).isTrue();
   }
 
@@ -215,7 +216,7 @@ class FishingLocationLegalityCheckerTest {
       action -> true,
       LocalDateTime.of(2013, 1, 19, 20, 30)
     );
-    assertThatThrownBy(() -> checker.test(CANDIDATE))
+    assertThatThrownBy(() -> checker.apply(null, CANDIDATE))
       .isInstanceOf(RuntimeException.class)
       .hasMessageContaining("No path");
   }

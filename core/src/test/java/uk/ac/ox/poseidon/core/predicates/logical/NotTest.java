@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,49 +22,23 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-@SuppressWarnings("unchecked")
 class NotTest {
 
   @Test
-  void testWhenInnerPredicateReturnsTrue() {
-    // Arrange
-    final Predicate<Object> innerPredicate = Mockito.mock(Predicate.class);
-    Mockito.when(innerPredicate.test(Mockito.any())).thenReturn(true);
-    final Not<Object> notPredicate = new Not<>(innerPredicate);
-    final Object mockObject = Mockito.mock(Object.class);
-
-    // Act
-    final boolean result = notPredicate.test(mockObject);
-
-    // Assert
-    assertFalse(
-      result,
-      "The Not predicate should return false when the inner predicate returns true."
-    );
+  void mappingNegatesItsComponentUnderTheSameContext() {
+    final Not<String, String> notSame = new Not<>(String::equals);
+    assertThat(notSame.apply("a", "a")).isFalse();
+    assertThat(notSame.apply("a", "b")).isTrue();
   }
 
   @Test
-  void testWhenInnerPredicateReturnsFalse() {
-    // Arrange
-    final Predicate<Object> innerPredicate = Mockito.mock(Predicate.class);
-    Mockito.when(innerPredicate.test(Mockito.any())).thenReturn(false);
-    final Not<Object> notPredicate = new Not<>(innerPredicate);
-    final Object mockObject = Mockito.mock(Object.class);
-
-    // Act
-    final boolean result = notPredicate.test(mockObject);
-
-    // Assert
-    assertTrue(
-      result,
-      "The Not predicate should return true when the inner predicate returns false."
-    );
+  void valueNegatesItsComponentUnderTheSameContext() {
+    final NotValue<String> notA = new NotValue<>("a"::equals);
+    assertThat(notA.apply("a")).isFalse();
+    assertThat(notA.apply("b")).isTrue();
   }
 }

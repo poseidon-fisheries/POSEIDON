@@ -30,59 +30,59 @@ class BetweenTest {
 
   @Test
   void inclusiveBoundsIncludeEndpoints() {
-    final Between<Double> between = new Between<>(
-      () -> 0.0,
-      () -> 10.0,
+    final Between<Object, Double> between = new Between<>(
+      context -> 0.0,
+      context -> 10.0,
       true,
       true
     );
 
-    assertTrue(between.test(0.0));
-    assertTrue(between.test(5.0));
-    assertTrue(between.test(10.0));
-    assertFalse(between.test(-0.1));
-    assertFalse(between.test(10.1));
+    assertTrue(between.apply(null, 0.0));
+    assertTrue(between.apply(null, 5.0));
+    assertTrue(between.apply(null, 10.0));
+    assertFalse(between.apply(null, -0.1));
+    assertFalse(between.apply(null, 10.1));
   }
 
   @Test
   void exclusiveMinimumExcludesLowerEndpointOnly() {
-    final Between<Double> between = new Between<>(
-      () -> 0.0,
-      () -> 10.0,
+    final Between<Object, Double> between = new Between<>(
+      context -> 0.0,
+      context -> 10.0,
       false,
       true
     );
 
-    assertFalse(between.test(0.0));
-    assertTrue(between.test(5.0));
-    assertTrue(between.test(10.0));
+    assertFalse(between.apply(null, 0.0));
+    assertTrue(between.apply(null, 5.0));
+    assertTrue(between.apply(null, 10.0));
   }
 
   @Test
   void exclusiveMaximumExcludesUpperEndpointOnly() {
-    final Between<Double> between = new Between<>(
-      () -> 0.0,
-      () -> 10.0,
+    final Between<Object, Double> between = new Between<>(
+      context -> 0.0,
+      context -> 10.0,
       true,
       false
     );
 
-    assertTrue(between.test(0.0));
-    assertTrue(between.test(5.0));
-    assertFalse(between.test(10.0));
+    assertTrue(between.apply(null, 0.0));
+    assertTrue(between.apply(null, 5.0));
+    assertFalse(between.apply(null, 10.0));
   }
 
   @Test
   void exclusiveBothBoundsExcludeBothEndpoints() {
-    final Between<Double> between = new Between<>(
-      () -> 0.0,
-      () -> 10.0,
+    final Between<Object, Double> between = new Between<>(
+      context -> 0.0,
+      context -> 10.0,
       false,
       false
     );
 
-    assertFalse(between.test(0.0));
-    assertTrue(between.test(5.0));
-    assertFalse(between.test(10.0));
+    assertFalse(between.apply(null, 0.0));
+    assertTrue(between.apply(null, 5.0));
+    assertFalse(between.apply(null, 10.0));
   }
 }

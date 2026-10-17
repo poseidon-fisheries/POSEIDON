@@ -27,8 +27,6 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import lombok.AllArgsConstructor;
@@ -39,8 +37,11 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of
@@ -58,18 +59,17 @@ public class IndexedBiomassCatchabilityGearFactory<S extends Scope> extends Rela
 > {
 
   private final String code;
-  private final Factory<
-    ? super S,
-    ? extends Supplier<Duration>
-  > durationSupplier;
+  private final ValueFactory<? super S, ? super Void, Duration> duration;
   private final Factory<
     ? super S,
     ? extends Collection<? extends Species>
   > species;
 
-  private final Factory<
+  private final MappingFactory<
     ? super S,
-    ? extends Function<? super Species, Double>
+    ? super Void,
+    ? super Species,
+    Double
   > proportionFunction;
   private final Factory<
     ? super S,
@@ -78,14 +78,14 @@ public class IndexedBiomassCatchabilityGearFactory<S extends Scope> extends Rela
 
   @Override
   protected IndexedBiomassCatchabilityGear newInstance(final S scope) {
-    final var function = proportionFunction.get(scope);
+    final var function = WithoutContext.function(proportionFunction.get(scope));
     return new IndexedBiomassCatchabilityGear(
       code,
       SpeciesIndex.of(species.get(scope)).mapToDoubleArray(s ->
         checkUnitRange(function.apply(s), "proportion")
       ),
       minimumCatchThreshold.get(scope).to(KILOGRAM).getValue().doubleValue(),
-      durationSupplier.get(scope)
+      WithoutContext.supplier(duration.get(scope))
     );
   }
 }

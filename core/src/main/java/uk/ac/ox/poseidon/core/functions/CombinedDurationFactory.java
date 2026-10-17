@@ -24,42 +24,42 @@ package uk.ac.ox.poseidon.core.functions;
 
 import com.google.common.collect.ImmutableList;
 import java.time.Duration;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link CombinedDuration}, built
- * via {@link Factories#combinedDuration(Factory...)}.
+ * via {@link Factories#combinedDuration(MappingFactory...)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class CombinedDurationFactory<
-  S extends Scope,
-  T
-> extends RelativeScopeFactory<S, CombinedDuration<T>> {
+public class CombinedDurationFactory<S extends Scope, C, T>
+  extends RelativeScopeFactory<S, BiFunction<C, T, Duration>>
+  implements MappingFactory<S, C, T, Duration>
+{
 
   @Singular
   private final ImmutableList<
-    Factory<? super S, ? extends Function<? super T, ? extends Duration>>
+    MappingFactory<? super S, ? super C, ? super T, ? extends Duration>
   > durations;
 
   @Override
-  protected CombinedDuration<T> newInstance(final S scope) {
+  protected BiFunction<C, T, Duration> newInstance(final S scope) {
     return new CombinedDuration<>(
       durations
         .stream()
-        .map(d -> d.get(scope))
+        .map(f -> f.get(scope))
         .toList()
     );
   }

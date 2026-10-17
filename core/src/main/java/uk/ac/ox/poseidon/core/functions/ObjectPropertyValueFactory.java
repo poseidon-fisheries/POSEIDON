@@ -20,41 +20,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers;
+package uk.ac.ox.poseidon.core.functions;
 
-import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.providers.constant.ConstantBoolean;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link RelativeScopeFactory} that resolves the given delegate
- * {@link BooleanSupplier} once, when built, and returns a
- * {@link BooleanProvider} that keeps handing out that same first-resolved value
- * thereafter — a snapshot, not a live pass-through to the delegate. No separate
- * plain component class here: the produced value is a {@link ConstantBoolean}
- * wrapping the snapshot, built via {@link Factories#firstBooleanFrom(Factory)}.
+ * A {@link GlobalScopeFactory} counterpart of {@link ObjectPropertyValue}. Each
+ * subclass fixes the class the property path starts from, so that only the path
+ * appears in a scenario.
+ *
+ * @param <C> the type of the context read
+ * @param <R> the type of the property; not checked
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class FirstBooleanFromFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  BooleanProvider
-> {
+public abstract class ObjectPropertyValueFactory<C, R>
+  extends GlobalScopeFactory<Function<C, R>>
+  implements ValueFactory<Scope, C, R>
+{
 
-  private final Factory<? super S, ? extends BooleanSupplier> delegate;
+  private final String propertyPath;
+
+  /**
+   * @return the class the property path starts from; deliberately not named as
+   *         a getter, so that it isn't taken for a property when the scenario
+   *         is written out
+   */
+  protected abstract Class<C> rootClass();
 
   @Override
-  protected BooleanProvider newInstance(final S scope) {
-    return new ConstantBoolean(delegate.get(scope).getAsBoolean());
+  protected Function<C, R> newInstance(final Scope scope) {
+    return new ObjectPropertyValue<>(rootClass(), propertyPath);
   }
 }

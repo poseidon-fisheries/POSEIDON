@@ -31,20 +31,20 @@ class EqualTest {
 
   @Test
   void testEqualValueShouldReturnTrue() {
-    final Equal<String> equal = new Equal<>(() -> "foo");
+    final Equal<Object, String> equal = new Equal<>(context -> "foo");
 
     assertTrue(
-      equal.test("foo"),
+      equal.apply(null, "foo"),
       "Expected the test to return true for an equal value"
     );
   }
 
   @Test
   void testDifferentValueShouldReturnFalse() {
-    final Equal<String> equal = new Equal<>(() -> "foo");
+    final Equal<Object, String> equal = new Equal<>(context -> "foo");
 
     assertFalse(
-      equal.test("bar"),
+      equal.apply(null, "bar"),
       "Expected the test to return false for a different value"
     );
   }

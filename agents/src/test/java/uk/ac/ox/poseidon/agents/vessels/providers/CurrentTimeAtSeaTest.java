@@ -41,7 +41,9 @@ class CurrentTimeAtSeaTest {
 
     final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea(vessel);
 
-    assertThrows(IllegalStateException.class, currentTimeAtSea::get);
+    assertThrows(IllegalStateException.class, () ->
+      currentTimeAtSea.apply(null)
+    );
   }
 
   @Test
@@ -54,6 +56,6 @@ class CurrentTimeAtSeaTest {
 
     final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea(vessel);
 
-    assertEquals(Duration.ofHours(3), currentTimeAtSea.get());
+    assertEquals(Duration.ofHours(3), currentTimeAtSea.apply(null));
   }
 }

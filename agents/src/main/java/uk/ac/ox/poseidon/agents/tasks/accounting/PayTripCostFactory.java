@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.agents.tasks.accounting;
 
-import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,9 +29,9 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link PayTripCost}. Built via
@@ -48,13 +47,14 @@ public class PayTripCostFactory<S extends Scope> extends RelativeScopeFactory<
   PayTripCost
 > {
 
-  private final Factory<
+  private final ValueFactory<
     ? super S,
-    ? extends Function<? super Vessel, ? extends Money>
-  > tripCostExtractor;
+    ? super Vessel,
+    ? extends Money
+  > tripCost;
 
   @Override
   protected PayTripCost newInstance(final S scope) {
-    return new PayTripCost(tripCostExtractor.get(scope));
+    return new PayTripCost(tripCost.get(scope));
   }
 }

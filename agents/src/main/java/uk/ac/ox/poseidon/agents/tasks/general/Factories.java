@@ -26,12 +26,11 @@ import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
 
 import com.badlogic.gdx.ai.btree.Task;
 import java.time.Duration;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * Factories for general-purpose vessel behavior-tree leaves: checks, waits, and
@@ -48,7 +47,7 @@ public class Factories {
    * @see AgentPredicateTask
    */
   public static VesselPredicateTaskFactory checkThat(
-    final Factory<? super VesselScope, ? extends Predicate<Vessel>> predicate
+    final ValueFactory<? super VesselScope, ? super Vessel, Boolean> predicate
   ) {
     return new VesselPredicateTaskFactory(predicate);
   }
@@ -62,29 +61,28 @@ public class Factories {
    * @see AgentPredicateTask
    */
   public static <T> VesselPredicateTaskFactory checkThat(
-    final Factory<
+    final ValueFactory<? super VesselScope, ? super Vessel, T> extractor,
+    final MappingFactory<
       ? super VesselScope,
-      ? extends Function<? super Vessel, T>
-    > extractor,
-    final Factory<? super VesselScope, ? extends Predicate<? super T>> predicate
+      ? super Vessel,
+      ? super T,
+      Boolean
+    > predicate
   ) {
     return checkThat(condition(extractor, predicate));
   }
 
   /**
-   * @param durationSupplier supplies the duration to wait, resolved fresh each
-   *                         time the task starts
+   * @param duration the duration to wait, read for the vessel each time the
+   *                 task starts
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory} for a
    *         {@link WaitFor}
    * @see WaitFor
    */
   public static WaitForFactory waitFor(
-    final Factory<
-      ? super VesselScope,
-      ? extends Supplier<Duration>
-    > durationSupplier
+    final ValueFactory<? super VesselScope, ? super Vessel, Duration> duration
   ) {
-    return new WaitForFactory(durationSupplier);
+    return new WaitForFactory(duration);
   }
 
   /**

@@ -22,12 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
-import java.util.function.Supplier;
 import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
@@ -79,21 +80,22 @@ public class Factories {
   }
 
   /**
-   * @param fisheableSupplier  supplies the fisheable to fish from
+   * @param fisheable  the fisheable to fish from, read for the vessel
    * @param dispositionProcess sorts the catch into retained/discarded
    * @return a {@link VesselScope}-relative factory for a {@link Fishing} task
    * @see Fishing
    */
   public static FishingFactory fishing(
-    final Factory<
+    final ValueFactory<
       ? super VesselScope,
-      ? extends Supplier<Fisheable>
-    > fisheableSupplier,
+      ? super Vessel,
+      Fisheable
+    > fisheable,
     final Factory<
       ? super VesselScope,
       ? extends DispositionProcess
     > dispositionProcess
   ) {
-    return new FishingFactory(fisheableSupplier, dispositionProcess);
+    return new FishingFactory(fisheable, dispositionProcess);
   }
 }

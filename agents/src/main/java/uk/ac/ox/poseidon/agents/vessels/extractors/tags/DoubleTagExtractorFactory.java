@@ -22,13 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors.tags;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of {@link DoubleTagExtractor}, built
@@ -40,13 +43,14 @@ import uk.ac.ox.poseidon.core.Scope;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class DoubleTagExtractorFactory
-  extends GlobalScopeFactory<DoubleTagExtractor>
+  extends GlobalScopeFactory<Function<Vessel, Double>>
+  implements ValueFactory<Scope, Vessel, Double>
 {
 
   private final String tagName;
 
   @Override
-  protected DoubleTagExtractor newInstance(final Scope scope) {
+  protected Function<Vessel, Double> newInstance(final Scope scope) {
     return new DoubleTagExtractor(tagName);
   }
 }

@@ -22,22 +22,22 @@
 
 package uk.ac.ox.poseidon.geography.grids.suppliers;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 /**
- * A {@link Supplier} of a fixed, resolved {@link DoubleGrid}'s current sum.
- * Built via {@link Factories#gridSum(uk.ac.ox.poseidon.core.Factory)} in this
- * package.
+ * A value that is a fixed, resolved {@link DoubleGrid}'s current sum, whatever
+ * the context. Built via
+ * {@link Factories#gridSum(uk.ac.ox.poseidon.core.Factory)} in this package.
  */
 @RequiredArgsConstructor
-public class GridSumSupplier implements Supplier<Double> {
+public class GridSumSupplier implements Function<Object, Double> {
 
   private final DoubleGrid grid;
 
   @Override
-  public Double get() {
+  public Double apply(final Object context) {
     return grid.getSum();
   }
 }

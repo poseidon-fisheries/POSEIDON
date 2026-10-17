@@ -22,14 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels.friends;
 
-import static java.util.function.Predicate.not;
 import static uk.ac.ox.poseidon.core.MasonUtils.reservoirSample;
 
 import ec.util.MersenneTwisterFast;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +59,7 @@ public class DynamicFriendsSupplier implements Supplier<Set<Vessel>> {
   private final VesselsGetter potentialFriends;
 
   @NonNull
-  private final Predicate<? super Vessel> friendshipCondition;
+  private final Function<? super Vessel, Boolean> friendshipCondition;
 
   @NonNull
   private final Vessel vessel;
@@ -73,7 +72,7 @@ public class DynamicFriendsSupplier implements Supplier<Set<Vessel>> {
 
   @Override
   public Set<Vessel> get() {
-    currentFriends.removeIf(not(friendshipCondition));
+    currentFriends.removeIf(v -> !friendshipCondition.apply(v));
 
     if (currentFriends.size() < targetNumberOfFriends) {
       reservoirSample(
@@ -82,7 +81,7 @@ public class DynamicFriendsSupplier implements Supplier<Set<Vessel>> {
         v ->
           v != this.vessel &&
           !currentFriends.contains(v) &&
-          friendshipCondition.test(v),
+          friendshipCondition.apply(v),
         rng
       ).forEach(currentFriends::add);
     }

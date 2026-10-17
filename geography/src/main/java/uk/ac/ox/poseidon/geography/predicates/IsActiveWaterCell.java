@@ -22,25 +22,26 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
+import java.util.function.BiFunction;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
 /**
- * A {@link CellPredicate} that delegates to a resolved
+ * A yes/no mapping of cells, whatever the context, that delegates to a resolved
  * {@link BathymetricGrid}'s {@code isActiveWater} check. Built via
  * {@link Factories#isActiveWaterCell(uk.ac.ox.poseidon.core.Factory)} in this
  * package.
  */
 @RequiredArgsConstructor
-public class IsActiveWaterCell implements CellPredicate {
+public class IsActiveWaterCell implements BiFunction<Object, Int2D, Boolean> {
 
   @NonNull
   private final BathymetricGrid bathymetricGrid;
 
   @Override
-  public boolean test(final Int2D cell) {
+  public Boolean apply(final Object context, final Int2D cell) {
     return bathymetricGrid.isActiveWater(cell);
   }
 }

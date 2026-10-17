@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,28 +22,27 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} that extracts a value from its input via a
- * {@link Function}, then tests that extracted value against another predicate.
- * Built via
- * {@link Factories#condition(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * A yes/no mapping that extracts something from the thing tested, then tests
+ * that against another yes/no mapping, both under the same context. Built via
+ * {@link Factories#condition(uk.ac.ox.poseidon.core.MappingFactory, uk.ac.ox.poseidon.core.MappingFactory)}
  * in this package.
  *
- * @param <T> the type of input tested
- * @param <U> the type extracted from the input and actually tested
+ * @param <C> the type of the context
+ * @param <T> the type of the thing tested
+ * @param <U> the type extracted from it and actually tested
  */
 @RequiredArgsConstructor
-public class Condition<T, U> implements Predicate<T> {
+public class Condition<C, T, U> implements BiFunction<C, T, Boolean> {
 
-  private final Function<? super T, ? extends U> extractor;
-  private final Predicate<? super U> predicate;
+  private final BiFunction<? super C, ? super T, ? extends U> extractor;
+  private final BiFunction<? super C, ? super U, Boolean> predicate;
 
   @Override
-  public boolean test(final T t) {
-    return predicate.test(extractor.apply(t));
+  public Boolean apply(final C context, final T t) {
+    return predicate.apply(context, extractor.apply(context, t));
   }
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -36,7 +36,10 @@ class DateTimeBeforeTest {
   @Test
   void subtractsTheAmountFromTheReference() {
     assertThat(
-      new DateTimeBefore(() -> NOW, () -> Duration.ofHours(3)).get()
+      new DateTimeBefore<>(
+        context -> NOW,
+        context -> Duration.ofHours(3)
+      ).apply(null)
     ).isEqualTo(NOW.minusHours(3));
   }
 
@@ -44,12 +47,12 @@ class DateTimeBeforeTest {
   void readsTheReferenceAnewOnEveryCall() {
     final AtomicReference<LocalDateTime> referenceDateTime =
       new AtomicReference<>(NOW);
-    final DateTimeBefore dateTimeBefore = new DateTimeBefore(
-      referenceDateTime::get,
-      () -> Duration.ofHours(3)
+    final DateTimeBefore<Object> dateTimeBefore = new DateTimeBefore<>(
+      context -> referenceDateTime.get(),
+      context -> Duration.ofHours(3)
     );
-    dateTimeBefore.get();
+    dateTimeBefore.apply(null);
     referenceDateTime.set(NOW.plusHours(1));
-    assertThat(dateTimeBefore.get()).isEqualTo(NOW.minusHours(2));
+    assertThat(dateTimeBefore.apply(null)).isEqualTo(NOW.minusHours(2));
   }
 }

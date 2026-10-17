@@ -22,12 +22,14 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /**
@@ -43,10 +45,10 @@ import uk.ac.ox.poseidon.core.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public abstract class ObjectPropertyFactory<
-  T,
-  R
-> extends GlobalScopeFactory<ObjectProperty<T, R>> {
+public abstract class ObjectPropertyFactory<T, R>
+  extends GlobalScopeFactory<BiFunction<Object, T, R>>
+  implements MappingFactory<Scope, Object, T, R>
+{
 
   private final String propertyPath;
 
@@ -58,7 +60,7 @@ public abstract class ObjectPropertyFactory<
   protected abstract Class<T> rootClass();
 
   @Override
-  protected ObjectProperty<T, R> newInstance(final Scope scope) {
+  protected BiFunction<Object, T, R> newInstance(final Scope scope) {
     return new ObjectProperty<>(rootClass(), propertyPath);
   }
 }

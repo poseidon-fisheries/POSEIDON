@@ -22,9 +22,9 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
-import java.util.function.Predicate;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -45,7 +45,12 @@ public class Factories {
    */
   public static <S extends Scope> ActionCellPredicateFactory<S> actionCellPredicate(
     final Factory<? super S, ? extends ModelGrid> modelGrid,
-    final Factory<? super S, ? extends Predicate<Int2D>> cellPredicate
+    final MappingFactory<
+      ? super S,
+      ? super Void,
+      ? super Int2D,
+      Boolean
+    > cellPredicate
   ) {
     return new ActionCellPredicateFactory<>(modelGrid, cellPredicate);
   }
@@ -56,9 +61,11 @@ public class Factories {
    * @see ActionCoordinatePredicateFactory
    */
   public static <S extends Scope> ActionCoordinatePredicateFactory<S> actionCoordinatePredicate(
-    final Factory<
+    final MappingFactory<
       ? super S,
-      ? extends Predicate<Coordinate>
+      ? super Void,
+      ? super Coordinate,
+      Boolean
     > coordinatePredicate
   ) {
     return new ActionCoordinatePredicateFactory<>(coordinatePredicate);

@@ -22,10 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
+import java.time.LocalDateTime;
+import java.util.function.Function;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link CurrentTripStartDateTime},
@@ -34,11 +37,14 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class CurrentTripStartDateTimeFactory
-  extends VesselScopeFactory<CurrentTripStartDateTime>
+  extends VesselScopeFactory<Function<Object, LocalDateTime>>
+  implements ValueFactory<VesselScope, Object, LocalDateTime>
 {
 
   @Override
-  protected CurrentTripStartDateTime newInstance(final VesselScope scope) {
+  protected Function<Object, LocalDateTime> newInstance(
+    final VesselScope scope
+  ) {
     return new CurrentTripStartDateTime(scope.getVessel());
   }
 }

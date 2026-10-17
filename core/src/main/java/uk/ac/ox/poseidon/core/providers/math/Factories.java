@@ -22,15 +22,13 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.IntSupplier;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that compute
- * a numeric result from other supplied values via a basic math operation
- * (currently max and min).
+ * Factories for values computed from two other values via a basic math
+ * operation (currently max and min). Each keeps {@link Math}'s behaviour, NaN
+ * included, so the {@code Double} and {@code Integer} variants stay apart.
  */
 public class Factories {
 
@@ -39,13 +37,13 @@ public class Factories {
   /**
    * @param a one of the two values to compare
    * @param b the other value to compare
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.core.ValueFactory} for a
    *         {@link MaxDouble}
    * @see MaxDouble
    */
-  public static <S extends Scope> MaxDoubleFactory<S> maxDouble(
-    final Factory<? super S, ? extends DoubleSupplier> a,
-    final Factory<? super S, ? extends DoubleSupplier> b
+  public static <S extends Scope, C> MaxDoubleFactory<S, C> maxDouble(
+    final ValueFactory<? super S, ? super C, Double> a,
+    final ValueFactory<? super S, ? super C, Double> b
   ) {
     return new MaxDoubleFactory<>(a, b);
   }
@@ -53,27 +51,13 @@ public class Factories {
   /**
    * @param a one of the two values to compare
    * @param b the other value to compare
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link MinDouble}
-   * @see MinDouble
-   */
-  public static <S extends Scope> MinDoubleFactory<S> minDouble(
-    final Factory<? super S, ? extends DoubleSupplier> a,
-    final Factory<? super S, ? extends DoubleSupplier> b
-  ) {
-    return new MinDoubleFactory<>(a, b);
-  }
-
-  /**
-   * @param a one of the two values to compare
-   * @param b the other value to compare
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.core.ValueFactory} for a
    *         {@link MaxInt}
    * @see MaxInt
    */
-  public static <S extends Scope> MaxIntFactory<S> maxInt(
-    final Factory<? super S, ? extends IntSupplier> a,
-    final Factory<? super S, ? extends IntSupplier> b
+  public static <S extends Scope, C> MaxIntFactory<S, C> maxInt(
+    final ValueFactory<? super S, ? super C, Integer> a,
+    final ValueFactory<? super S, ? super C, Integer> b
   ) {
     return new MaxIntFactory<>(a, b);
   }
@@ -81,13 +65,27 @@ public class Factories {
   /**
    * @param a one of the two values to compare
    * @param b the other value to compare
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.core.ValueFactory} for a
+   *         {@link MinDouble}
+   * @see MinDouble
+   */
+  public static <S extends Scope, C> MinDoubleFactory<S, C> minDouble(
+    final ValueFactory<? super S, ? super C, Double> a,
+    final ValueFactory<? super S, ? super C, Double> b
+  ) {
+    return new MinDoubleFactory<>(a, b);
+  }
+
+  /**
+   * @param a one of the two values to compare
+   * @param b the other value to compare
+   * @return a {@link uk.ac.ox.poseidon.core.ValueFactory} for a
    *         {@link MinInt}
    * @see MinInt
    */
-  public static <S extends Scope> MinIntFactory<S> minInt(
-    final Factory<? super S, ? extends IntSupplier> a,
-    final Factory<? super S, ? extends IntSupplier> b
+  public static <S extends Scope, C> MinIntFactory<S, C> minInt(
+    final ValueFactory<? super S, ? super C, Integer> a,
+    final ValueFactory<? super S, ? super C, Integer> b
   ) {
     return new MinIntFactory<>(a, b);
   }

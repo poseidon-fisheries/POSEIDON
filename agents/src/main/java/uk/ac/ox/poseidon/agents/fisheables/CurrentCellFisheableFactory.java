@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.fisheables;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,6 +33,7 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link VesselScopeFactory} for a {@link CurrentCellFisheable} over the
@@ -45,7 +46,8 @@ import uk.ac.ox.poseidon.core.Factory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class CurrentCellFisheableFactory
-  extends VesselScopeFactory<Supplier<Fisheable>>
+  extends VesselScopeFactory<Function<Object, Fisheable>>
+  implements ValueFactory<VesselScope, Object, Fisheable>
 {
 
   private final Factory<
@@ -54,7 +56,7 @@ public class CurrentCellFisheableFactory
   > fisheableGrid;
 
   @Override
-  protected Supplier<Fisheable> newInstance(final VesselScope scope) {
+  protected Function<Object, Fisheable> newInstance(final VesselScope scope) {
     return new CurrentCellFisheable(
       scope.getVessel(),
       fisheableGrid.get(scope)

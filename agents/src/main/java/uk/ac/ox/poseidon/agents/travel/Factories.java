@@ -23,13 +23,14 @@
 package uk.ac.ox.poseidon.agents.travel;
 
 import com.google.common.collect.ImmutableList;
-import java.util.function.Function;
 import org.joda.money.Money;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
@@ -61,9 +62,10 @@ public class Factories {
    * @see TimeCost
    */
   public static TimeCostFactory timeCost(
-    final Factory<
+    final ValueFactory<
       ? super VesselScope,
-      ? extends Function<? super Vessel, ? extends Money>
+      ? super Vessel,
+      ? extends Money
     > hourlyCost
   ) {
     return new TimeCostFactory(hourlyCost);
@@ -78,13 +80,17 @@ public class Factories {
    */
   @SafeVarargs
   public static <S extends Scope> TravelCostFactory<S> travelCost(
-    final Factory<
+    final MappingFactory<
       ? super S,
-      ? extends Function<? super Int2D, ? extends Route>
+      ? super Void,
+      ? super Int2D,
+      ? extends Route
     > routeFunction,
-    final Factory<
+    final MappingFactory<
       ? super S,
-      ? extends Function<? super Route, ? extends Money>
+      ? super Void,
+      ? super Route,
+      ? extends Money
     >... routeCosts
   ) {
     return new TravelCostFactory<>(

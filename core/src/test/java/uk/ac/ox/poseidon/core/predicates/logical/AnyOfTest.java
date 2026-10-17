@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,150 +22,84 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("unchecked")
 class AnyOfTest {
 
+  private static final BiFunction<Object, Object, Boolean> YES = (c, t) -> true;
+  private static final BiFunction<Object, Object, Boolean> NO = (c, t) -> false;
+  private static final Function<Object, Boolean> YES_VALUE = c -> true;
+  private static final Function<Object, Boolean> NO_VALUE = c -> false;
+
   @Test
-  void test_allPredicatesReturnFalse_shouldReturnFalse() {
-    // Arrange
-    final Object object = mock(Object.class);
-    final Predicate<Object> falsePredicate1 = act -> false;
-    final Predicate<Object> falsePredicate2 = act -> false;
-
-    final AnyOf<Object> anyOf = new AnyOf<>(
-      ImmutableList.of(falsePredicate1, falsePredicate2)
-    );
-
-    // Act
-    final boolean result = anyOf.test(object);
-
-    // Assert
-    assertFalse(result, "Expected false when all predicates return false.");
+  void mappingIsTrueWhenEveryComponentIs() {
+    assertThat(
+      new AnyOf<>(ImmutableList.of(YES, YES)).apply(null, "t")
+    ).isTrue();
   }
 
   @Test
-  void test_mixedPredicates_someTrueSomeFalse_shouldReturnTrue() {
-    // Arrange
-    final Object object = mock(Object.class);
-    final Predicate<Object> falsePredicate = act -> false;
-    final Predicate<Object> truePredicate = act -> true;
-
-    final AnyOf<Object> anyOf = new AnyOf<>(
-      ImmutableList.of(falsePredicate, truePredicate)
-    );
-
-    // Act
-    final boolean result = anyOf.test(object);
-
-    // Assert
-    assertTrue(
-      result,
-      "Expected true when at least one predicate returns true."
-    );
-  }
-
-  /**
-   * Tests the {@link AnyOf} class, which holds a collection of predicates and
-   * evaluates if any of them return true when applied to a given
-   * {@link Object}.
-   */
-
-  @Test
-  void test_whenAnyPredicateMatches_shouldReturnTrue() {
-    // Arrange
-    final Object object = mock(Object.class);
-    final Predicate<Object> predicate1 = mock(Predicate.class);
-    final Predicate<Object> predicate2 = mock(Predicate.class);
-
-    when(predicate1.test(object)).thenReturn(false);
-    when(predicate2.test(object)).thenReturn(true);
-
-    final AnyOf<Object> anyOf = new AnyOf<>(
-      ImmutableList.of(predicate1, predicate2)
-    );
-
-    // Act
-    final boolean result = anyOf.test(object);
-
-    // Assert
-    assertTrue(result);
+  void mappingWithOneTrueComponentAmongFalseOnes() {
+    assertThat(
+      new AnyOf<>(ImmutableList.of(NO, YES, NO)).apply(null, "t")
+    ).isEqualTo(true);
   }
 
   @Test
-  void test_whenNoPredicatesMatch_shouldReturnFalse() {
-    // Arrange
-    final Object object = mock(Object.class);
-    final Predicate<Object> predicate1 = mock(Predicate.class);
-    final Predicate<Object> predicate2 = mock(Predicate.class);
-
-    when(predicate1.test(object)).thenReturn(false);
-    when(predicate2.test(object)).thenReturn(false);
-
-    final AnyOf<Object> anyOf = new AnyOf<>(
-      ImmutableList.of(predicate1, predicate2)
-    );
-
-    // Act
-    final boolean result = anyOf.test(object);
-
-    // Assert
-    assertFalse(result);
+  void mappingIsFalseWhenEveryComponentIs() {
+    assertThat(
+      new AnyOf<>(ImmutableList.of(NO, NO)).apply(null, "t")
+    ).isFalse();
   }
 
   @Test
-  void test_whenNoPredicatesProvided_shouldReturnFalse() {
-    // Arrange
-    final Object object = mock(Object.class);
-
-    final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of());
-
-    // Act
-    final boolean result = anyOf.test(object);
-
-    // Assert
-    assertFalse(result);
+  void mappingWithNoComponents() {
+    assertThat(
+      new AnyOf<Object, Object>(ImmutableList.of()).apply(null, "t")
+    ).isEqualTo(false);
   }
 
   @Test
-  void test_whenSinglePredicateMatches_shouldReturnTrue() {
-    // Arrange
-    final Object object = mock(Object.class);
-    final Predicate<Object> predicate = mock(Predicate.class);
-
-    when(predicate.test(object)).thenReturn(true);
-
-    final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(predicate));
-
-    // Act
-    final boolean result = anyOf.test(object);
-
-    // Assert
-    assertTrue(result);
+  void mappingPassesTheContextAndTheThingToItsComponents() {
+    final BiFunction<String, String, Boolean> sameAsContext = String::equals;
+    assertThat(
+      new AnyOf<>(ImmutableList.of(sameAsContext)).apply("a", "a")
+    ).isTrue();
+    assertThat(
+      new AnyOf<>(ImmutableList.of(sameAsContext)).apply("a", "b")
+    ).isFalse();
   }
 
   @Test
-  void test_whenSinglePredicateDoesNotMatch_shouldReturnFalse() {
-    // Arrange
-    final Object object = mock(Object.class);
-    final Predicate<Object> predicate = mock(Predicate.class);
+  void valueWithOneTrueComponentAmongFalseOnes() {
+    assertThat(
+      new AnyOfValue<>(ImmutableList.of(NO_VALUE, YES_VALUE)).apply(null)
+    ).isEqualTo(true);
+  }
 
-    when(predicate.test(object)).thenReturn(false);
+  @Test
+  void valueIsTrueWhenEveryComponentIs() {
+    assertThat(
+      new AnyOfValue<>(ImmutableList.of(YES_VALUE, YES_VALUE)).apply(null)
+    ).isTrue();
+  }
 
-    final AnyOf<Object> anyOf = new AnyOf<>(ImmutableList.of(predicate));
+  @Test
+  void valueWithNoComponents() {
+    assertThat(
+      new AnyOfValue<Object>(ImmutableList.of()).apply(null)
+    ).isEqualTo(false);
+  }
 
-    // Act
-    final boolean result = anyOf.test(object);
-
-    // Assert
-    assertFalse(result);
+  @Test
+  void valuePassesTheContextToItsComponents() {
+    final Function<String, Boolean> isA = "a"::equals;
+    assertThat(new AnyOfValue<>(ImmutableList.of(isA)).apply("a")).isTrue();
+    assertThat(new AnyOfValue<>(ImmutableList.of(isA)).apply("b")).isFalse();
   }
 }

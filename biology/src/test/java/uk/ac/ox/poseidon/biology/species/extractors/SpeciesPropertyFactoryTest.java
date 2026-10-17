@@ -36,21 +36,23 @@ class SpeciesPropertyFactoryTest {
   @Test
   void readsTheCode() {
     assertThat(
-      speciesProperty("code").get(Scope.GLOBAL_SCOPE).apply(juvenileHake)
+      speciesProperty("code").get(Scope.GLOBAL_SCOPE).apply(null, juvenileHake)
     ).isEqualTo("HKE");
   }
 
   @Test
   void readsTheKey() {
     assertThat(
-      speciesProperty("key").get(Scope.GLOBAL_SCOPE).apply(juvenileHake)
+      speciesProperty("key").get(Scope.GLOBAL_SCOPE).apply(null, juvenileHake)
     ).isEqualTo(juvenileHake.getKey());
   }
 
   @Test
   void readsTheLifeStage() {
     assertThat(
-      speciesProperty("lifeStage").get(Scope.GLOBAL_SCOPE).apply(juvenileHake)
+      speciesProperty("lifeStage")
+        .get(Scope.GLOBAL_SCOPE)
+        .apply(null, juvenileHake)
     ).isEqualTo("juvenile");
   }
 
@@ -59,7 +61,7 @@ class SpeciesPropertyFactoryTest {
     assertThat(
       speciesProperty("lifeStage")
         .get(Scope.GLOBAL_SCOPE)
-        .apply(new Species("HKE", null, null))
+        .apply(null, new Species("HKE", null, null))
     ).isNull();
   }
 }

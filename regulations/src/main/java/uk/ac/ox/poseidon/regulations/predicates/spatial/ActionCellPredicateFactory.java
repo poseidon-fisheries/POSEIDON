@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,9 +30,12 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.regulations.SpatialAction;
 
 /**
  * A {@link RelativeScopeFactory} for an {@link ActionCellPredicate}. Built via
@@ -43,19 +46,26 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ActionCellPredicateFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  ActionCellPredicate
-> {
+public class ActionCellPredicateFactory<S extends Scope>
+  extends RelativeScopeFactory<S, BiFunction<Object, SpatialAction<?>, Boolean>>
+  implements MappingFactory<S, Object, SpatialAction<?>, Boolean>
+{
 
   private final Factory<? super S, ? extends ModelGrid> modelGrid;
-  private final Factory<? super S, ? extends Predicate<Int2D>> cellPredicate;
+  private final MappingFactory<
+    ? super S,
+    ? super Void,
+    ? super Int2D,
+    Boolean
+  > cellPredicate;
 
   @Override
-  protected ActionCellPredicate newInstance(final S scope) {
+  protected BiFunction<Object, SpatialAction<?>, Boolean> newInstance(
+    final S scope
+  ) {
     return new ActionCellPredicate(
       modelGrid.get(scope),
-      cellPredicate.get(scope)
+      WithoutContext.predicate(cellPredicate.get(scope))
     );
   }
 }

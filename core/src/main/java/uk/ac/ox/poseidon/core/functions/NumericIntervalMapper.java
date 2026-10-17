@@ -26,19 +26,19 @@ import static java.util.Comparator.comparing;
 import static java.util.Comparator.nullsFirst;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.Value;
 
 /**
- * A {@link Function} that maps numeric values to labels using non-overlapping
- * intervals. Bounds are lower-inclusive and upper-exclusive; null bounds are
- * unbounded. Built via
+ * A mapping of numeric values to labels, whatever the context, using
+ * non-overlapping intervals. Bounds are lower-inclusive and upper-exclusive;
+ * null bounds are unbounded. Built via
  * {@link Factories#numericIntervalToStringMapper(NumericIntervalToStringMapperFactory.Interval...)}
  * in this package (currently the only Factory-facing specialization, with
  * {@code T} fixed to {@link String}).
  */
 @Value
-public class NumericIntervalMapper<T> implements Function<Double, T> {
+public class NumericIntervalMapper<T> implements BiFunction<Object, Double, T> {
 
   List<Interval<T>> intervals;
 
@@ -57,7 +57,7 @@ public class NumericIntervalMapper<T> implements Function<Double, T> {
    *         {@code null} if no interval contains it
    */
   @Override
-  public T apply(final Double value) {
+  public T apply(final Object context, final Double value) {
     // A loop, not a stream: this runs for every cell valued, and the stream's
     // overhead showed in profiles.
     for (final Interval<T> interval : intervals) {

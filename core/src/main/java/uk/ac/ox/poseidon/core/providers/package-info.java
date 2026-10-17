@@ -21,10 +21,10 @@
  */
 
 /**
- * The {@link Provider} family of supplier/function adapter interfaces, and
- * factories that snapshot or transform another provider's value. See
- * {@link Factories} for the entry points. Subpackages (e.g. {@code constant},
- * {@code random}) hold their own component/Factory families and each have their
- * own {@code Factories} class.
+ * Values: live parameters read by a component when it uses them, as functions
+ * of a context (see {@link uk.ac.ox.poseidon.core.ValueFactory}), and factories
+ * that snapshot or transform another value. See {@link Factories} for the entry
+ * points. Subpackages (e.g. {@code constant}, {@code random}) hold their own
+ * component/Factory families and each have their own {@code Factories} class.
  */
 package uk.ac.ox.poseidon.core.providers;

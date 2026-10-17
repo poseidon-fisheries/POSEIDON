@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.agents.choices;
 
-import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,10 +30,11 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link KeyedMemorySelector},
- * built via {@link Factories#keyedMemorySelector(Factory, Factory)}.
+ * built via {@link Factories#keyedMemorySelector(Factory, ValueFactory)}.
  */
 @Getter
 @ToString
@@ -50,16 +50,10 @@ public class KeyedMemorySelectorFactory<
 > extends RelativeScopeFactory<S, KeyedMemorySelector<T, K, O, M>> {
 
   private final Factory<? super S, ? extends KeyedMemory<K, O, M>> keyedMemory;
-  private final Factory<
-    ? super S,
-    ? extends Function<? super T, ? extends K>
-  > keyExtractor;
+  private final ValueFactory<? super S, ? super T, ? extends K> key;
 
   @Override
   protected KeyedMemorySelector<T, K, O, M> newInstance(final S scope) {
-    return new KeyedMemorySelector<>(
-      keyedMemory.get(scope),
-      keyExtractor.get(scope)
-    );
+    return new KeyedMemorySelector<>(keyedMemory.get(scope), key.get(scope));
   }
 }

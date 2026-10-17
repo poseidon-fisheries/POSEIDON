@@ -22,14 +22,17 @@
 
 package uk.ac.ox.poseidon.agents.travel;
 
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
@@ -43,7 +46,8 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class RouteViaDestinationFactory
-  extends VesselScopeFactory<RouteViaDestination>
+  extends VesselScopeFactory<BiFunction<Object, Int2D, Route>>
+  implements MappingFactory<VesselScope, Object, Int2D, Route>
 {
 
   private final Factory<
@@ -56,7 +60,9 @@ public class RouteViaDestinationFactory
   > distance;
 
   @Override
-  protected RouteViaDestination newInstance(final VesselScope scope) {
+  protected BiFunction<Object, Int2D, Route> newInstance(
+    final VesselScope scope
+  ) {
     return new RouteViaDestination(
       scope.getVessel(),
       pathFinder.get(scope),

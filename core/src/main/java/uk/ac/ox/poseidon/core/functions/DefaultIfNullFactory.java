@@ -22,13 +22,14 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
@@ -41,20 +42,21 @@ import uk.ac.ox.poseidon.core.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class DefaultIfNullFactory<
-  S extends Scope,
-  T,
-  R
-> extends RelativeScopeFactory<S, DefaultIfNull<T, R>> {
+public class DefaultIfNullFactory<S extends Scope, C, T, R>
+  extends RelativeScopeFactory<S, BiFunction<C, T, R>>
+  implements MappingFactory<S, C, T, R>
+{
 
-  private final Factory<
+  private final MappingFactory<
     ? super S,
-    ? extends Function<? super T, ? extends R>
+    ? super C,
+    ? super T,
+    ? extends R
   > delegate;
   private final Factory<? super S, ? extends R> defaultValue;
 
   @Override
-  protected DefaultIfNull<T, R> newInstance(final S scope) {
+  protected BiFunction<C, T, R> newInstance(final S scope) {
     return new DefaultIfNull<>(delegate.get(scope), defaultValue.get(scope));
   }
 }

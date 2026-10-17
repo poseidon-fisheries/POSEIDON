@@ -22,25 +22,29 @@
 
 package uk.ac.ox.poseidon.core.predicates.comparable;
 
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Predicate} that is true iff the tested value is strictly greater
- * than a supplied threshold. Built via {@link Factories
- * Factories.greaterThan(...)} in this package.
+ * A yes/no mapping that is true iff the thing tested is strictly greater than a
+ * threshold read under the context. Built via
+ * {@link Factories Factories.greaterThan(...)} in this package.
  *
+ * @param <C> the type of the context the reference is read under
  * @param <T> the {@link Comparable} type of the threshold
  */
 @RequiredArgsConstructor
-public class GreaterThan<T> implements Predicate<Comparable<T>> {
+public class GreaterThan<
+  C,
+  T
+> implements BiFunction<C, Comparable<T>, Boolean> {
 
-  private final @NonNull Supplier<? extends T> value;
+  private final @NonNull Function<? super C, ? extends T> value;
 
   @Override
-  public boolean test(final @NonNull Comparable<T> other) {
-    return other.compareTo(value.get()) > 0;
+  public Boolean apply(final C context, final Comparable<T> mapped) {
+    return mapped.compareTo(value.apply(context)) > 0;
   }
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,40 +22,45 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link Condition}, built via
- * {@link Factories#condition(Factory, Factory)}.
+ * {@link Factories#condition(MappingFactory, MappingFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ConditionFactory<
-  S extends Scope,
-  T,
-  U
-> extends RelativeScopeFactory<S, Condition<T, U>> {
+public class ConditionFactory<S extends Scope, C, T, U>
+  extends RelativeScopeFactory<S, BiFunction<C, T, Boolean>>
+  implements MappingFactory<S, C, T, Boolean>
+{
 
-  private final Factory<
+  private final MappingFactory<
     ? super S,
-    ? extends Function<? super T, ? extends U>
+    ? super C,
+    ? super T,
+    ? extends U
   > extractor;
-  private final Factory<? super S, ? extends Predicate<? super U>> predicate;
+  private final MappingFactory<
+    ? super S,
+    ? super C,
+    ? super U,
+    Boolean
+  > predicate;
 
   @Override
-  protected Condition<T, U> newInstance(final S scope) {
+  protected BiFunction<C, T, Boolean> newInstance(final S scope) {
     return new Condition<>(extractor.get(scope), predicate.get(scope));
   }
 }

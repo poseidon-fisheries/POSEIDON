@@ -24,18 +24,18 @@ package uk.ac.ox.poseidon.agents.tasks.fishing;
 
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.functions.ObjectProperty;
-import uk.ac.ox.poseidon.core.functions.ObjectPropertyFactory;
+import uk.ac.ox.poseidon.core.functions.ObjectPropertyValue;
+import uk.ac.ox.poseidon.core.functions.ObjectPropertyValueFactory;
 
 /**
- * An {@link ObjectPropertyFactory} for an {@link ObjectProperty} of a
+ * An {@link ObjectPropertyValueFactory} for an {@link ObjectPropertyValue} of a
  * {@link FishingEvent}, built via {@link Factories#fishingEventProperty}.
  *
  * @param <R> the type of the property; not checked
  */
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class FishingEventPropertyFactory<R> extends ObjectPropertyFactory<
+public class FishingEventPropertyFactory<R> extends ObjectPropertyValueFactory<
   FishingEvent,
   R
 > {

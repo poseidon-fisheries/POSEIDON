@@ -22,22 +22,22 @@
 
 package uk.ac.ox.poseidon.core.providers.random;
 
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import sim.util.distribution.Poisson;
-import uk.ac.ox.poseidon.core.providers.IntProvider;
 
 /**
- * An {@link IntProvider} that returns a Poisson-distributed random integer with
- * the given mean on each call, drawn from the simulation's shared RNG. Built
- * via {@link Factories#randomPoisson(double)} in this package.
+ * A value that is a Poisson-distributed random integer with the given mean on
+ * each call, drawn from the simulation's shared RNG. Built via
+ * {@link Factories#randomPoisson(double)} in this package.
  */
 @RequiredArgsConstructor
-public class RandomPoisson implements IntProvider {
+public class RandomPoisson implements Function<Object, Integer> {
 
   private final Poisson poisson;
 
   @Override
-  public int getAsInt() {
+  public Integer apply(final Object context) {
     return poisson.nextInt();
   }
 }

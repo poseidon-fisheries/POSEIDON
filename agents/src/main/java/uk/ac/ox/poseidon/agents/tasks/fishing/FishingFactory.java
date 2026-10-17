@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
-import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,9 +29,11 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link VesselTaskFactory} counterpart of {@link Fishing}, built via
@@ -45,10 +46,11 @@ import uk.ac.ox.poseidon.core.Factory;
 @SuperBuilder(toBuilder = true)
 public class FishingFactory extends VesselTaskFactory<Fishing> {
 
-  private final Factory<
+  private final ValueFactory<
     ? super VesselScope,
-    ? extends Supplier<Fisheable>
-  > fisheableSupplier;
+    ? super Vessel,
+    Fisheable
+  > fisheable;
   private final Factory<
     ? super VesselScope,
     ? extends DispositionProcess
@@ -56,9 +58,6 @@ public class FishingFactory extends VesselTaskFactory<Fishing> {
 
   @Override
   protected Fishing newInstance(final VesselScope scope) {
-    return new Fishing(
-      fisheableSupplier.get(scope),
-      dispositionProcess.get(scope)
-    );
+    return new Fishing(fisheable.get(scope), dispositionProcess.get(scope));
   }
 }

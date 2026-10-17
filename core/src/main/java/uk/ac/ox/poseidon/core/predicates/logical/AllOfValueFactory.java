@@ -20,35 +20,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.constant;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import com.google.common.collect.ImmutableList;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link ConstantDouble}, built
- * via {@link Factories#constantDouble(Factory)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link AllOfValue}, built via
+ * {@link Factories#allOf(ValueFactory...)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ConstantDoubleFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  ConstantDouble
-> {
+public class AllOfValueFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, Boolean>>
+  implements ValueFactory<S, C, Boolean>
+{
 
-  private final Factory<? super S, ? extends Double> doubleFactory;
+  @Singular
+  private final ImmutableList<
+    ValueFactory<? super S, ? super C, Boolean>
+  > predicates;
 
   @Override
-  protected ConstantDouble newInstance(final S scope) {
-    return new ConstantDouble(doubleFactory.get(scope));
+  protected Function<C, Boolean> newInstance(final S scope) {
+    return new AllOfValue<>(
+      predicates
+        .stream()
+        .map(f -> f.get(scope))
+        .collect(toImmutableList())
+    );
   }
 }

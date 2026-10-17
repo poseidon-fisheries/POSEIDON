@@ -50,7 +50,7 @@ class CurrentTripStartDateTimeTest {
     when(vessel.getCurrentTrip()).thenReturn(null);
 
     assertThatThrownBy(() ->
-      new CurrentTripStartDateTime(vessel).get()
+      new CurrentTripStartDateTime(vessel).apply(null)
     ).isInstanceOf(IllegalStateException.class);
   }
 
@@ -60,7 +60,7 @@ class CurrentTripStartDateTimeTest {
     when(trip.getStartDateTime()).thenReturn(NOW.minusHours(5));
     when(vessel.getCurrentTrip()).thenReturn(trip);
 
-    assertThat(new CurrentTripStartDateTime(vessel).get()).isEqualTo(
+    assertThat(new CurrentTripStartDateTime(vessel).apply(null)).isEqualTo(
       NOW.minusHours(5)
     );
   }

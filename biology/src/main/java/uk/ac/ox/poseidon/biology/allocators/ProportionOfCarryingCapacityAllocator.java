@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.biology.allocators;
 
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
@@ -41,7 +41,7 @@ import uk.ac.ox.poseidon.geography.allocators.Allocator;
 public class ProportionOfCarryingCapacityAllocator implements Allocator {
 
   private final CarryingCapacityGrid carryingCapacityGrid;
-  private final DoubleSupplier proportionSupplier;
+  private final Supplier<Double> proportionSupplier;
 
   /**
    * @throws IllegalArgumentException if the resolved proportion isn't in
@@ -49,7 +49,7 @@ public class ProportionOfCarryingCapacityAllocator implements Allocator {
    */
   @Override
   public double applyAsDouble(final Int2D cell) {
-    final double proportion = proportionSupplier.getAsDouble();
+    final double proportion = proportionSupplier.get();
     checkUnitRange(proportion, "proportion of carrying capacity");
     return proportion * carryingCapacityGrid.getCarryingCapacity(cell);
   }

@@ -23,39 +23,39 @@
 package uk.ac.ox.poseidon.core.functions;
 
 import com.google.common.collect.ImmutableList;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of
  * {@link MultiStringKeyFromFunctions}, built via
- * {@link Factories#multiStringKeyFromFunctions(Factory...)}.
+ * {@link Factories#multiStringKeyFromFunctions(MappingFactory...)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class MultiStringKeyFromFunctionsFactory<
-  S extends Scope,
-  T
-> extends RelativeScopeFactory<S, MultiStringKeyFromFunctions<T>> {
+public class MultiStringKeyFromFunctionsFactory<S extends Scope, C, T>
+  extends RelativeScopeFactory<S, BiFunction<C, T, String>>
+  implements MappingFactory<S, C, T, String>
+{
 
   @Singular
   private final ImmutableList<
-    Factory<? super S, ? extends Function<? super T, ?>>
+    MappingFactory<? super S, ? super C, ? super T, ?>
   > functions;
 
   @Override
-  protected MultiStringKeyFromFunctions<T> newInstance(final S scope) {
+  protected BiFunction<C, T, String> newInstance(final S scope) {
     return new MultiStringKeyFromFunctions<>(
       functions
         .stream()

@@ -70,10 +70,9 @@ import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.greaterThan;
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
-import static uk.ac.ox.poseidon.core.providers.Factories.firstIntFrom;
+import static uk.ac.ox.poseidon.core.providers.Factories.firstValueFrom;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.alwaysTrue;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomInt;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
@@ -230,7 +229,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       normalisedDoubleGridFromAllocator(
         modelGrid,
         filteredAllocator(
-          supplierAllocator(constantDouble(1.0)),
+          supplierAllocator(constant(1.0)),
           allOf(
             isActiveWaterCell(bathymetricGrid),
             inDepthRange(bathymetricGrid, 30, 800)
@@ -340,7 +339,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         neighbourhoodGridExplorer(
           pathFinder,
           validCellPredicate,
-          firstIntFrom(perVessel(randomInt(1, 10))),
+          firstValueFrom(perVessel(randomInt(1, 10))),
           MAXIMUM_EXPLORATION_WIDENING,
           bestKnownOption(
             optionValues,

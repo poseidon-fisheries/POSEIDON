@@ -108,8 +108,8 @@ class NeighbourhoodCellPickerTest {
     return new NeighbourhoodCellPicker(
       vessel,
       pathFinder,
-      optionPredicate,
-      () -> neighbourhoodSize,
+      (v, cell) -> optionPredicate.test(cell),
+      v -> neighbourhoodSize,
       maximumWidening,
       searchCentre,
       rng

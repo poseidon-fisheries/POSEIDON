@@ -20,23 +20,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.constant;
+package uk.ac.ox.poseidon.core.functions;
 
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.BooleanProvider;
 
 /**
- * A {@link BooleanProvider} that always returns the same, fixed value. Built
- * via {@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()} in this
- * package.
+ * A value that reads another value under the context and substitutes a fixed
+ * default whenever that value is {@code null}. Built via {@link Factories
+ * Factories.defaultIfNull(...)} in this package.
+ *
+ * @param <C> the type of the context
+ * @param <R> the type of the value, and of the default value
  */
 @RequiredArgsConstructor
-public class ConstantBoolean implements BooleanProvider {
+public class DefaultIfNullValue<C, R> implements Function<C, R> {
 
-  private final boolean value;
+  private final Function<? super C, ? extends R> delegate;
+  private final R defaultValue;
 
   @Override
-  public boolean getAsBoolean() {
-    return value;
+  public R apply(final C context) {
+    final R result = delegate.apply(context);
+    return result == null ? defaultValue : result;
   }
 }

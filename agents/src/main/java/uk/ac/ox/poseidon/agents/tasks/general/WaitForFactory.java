@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.tasks.general;
 
 import java.time.Duration;
-import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,7 +31,7 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.VesselTaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link VesselTaskFactory} counterpart of {@link WaitFor}, built via
@@ -45,13 +44,14 @@ import uk.ac.ox.poseidon.core.Factory;
 @SuperBuilder(toBuilder = true)
 public class WaitForFactory extends VesselTaskFactory<WaitFor<Vessel>> {
 
-  private final Factory<
+  private final ValueFactory<
     ? super VesselScope,
-    ? extends Supplier<Duration>
-  > durationSupplier;
+    ? super Vessel,
+    Duration
+  > duration;
 
   @Override
   protected WaitFor<Vessel> newInstance(final VesselScope scope) {
-    return new WaitFor<>(durationSupplier.get(scope));
+    return new WaitFor<>(duration.get(scope));
   }
 }

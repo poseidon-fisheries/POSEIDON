@@ -32,23 +32,23 @@ import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
  * Stores per-vessel components for a simulation so other systems can query them
  * by vessel.
  */
-public class VesselComponentRegister<C> implements VesselsGetter {
+public class VesselComponentRegister<T> implements VesselsGetter {
 
   // Insertion order, not hash order: vessels hash by identity, so a HashMap's
   // order would change from run to run with the same seed
-  private final Map<Vessel, C> map = new LinkedHashMap<>();
+  private final Map<Vessel, T> map = new LinkedHashMap<>();
 
   /**
    * Associates the given component with the vessel.
    */
-  public void putComponent(final Vessel vessel, final C component) {
+  public void putComponent(final Vessel vessel, final T component) {
     map.put(vessel, component);
   }
 
   /**
    * Retrieves the component for the vessel, if available.
    */
-  public Optional<C> getComponent(final Vessel vessel) {
+  public Optional<T> getComponent(final Vessel vessel) {
     return Optional.ofNullable(map.get(vessel));
   }
 
@@ -63,14 +63,14 @@ public class VesselComponentRegister<C> implements VesselsGetter {
   /**
    * Returns a stream of all vessel/component entries.
    */
-  public Stream<Map.Entry<Vessel, C>> getAllEntries() {
+  public Stream<Map.Entry<Vessel, T>> getAllEntries() {
     return map.entrySet().stream();
   }
 
   /**
    * Returns a stream of entries excluding the provided vessel.
    */
-  public Stream<Entry<Vessel, C>> getOtherEntries(final Vessel vessel) {
+  public Stream<Entry<Vessel, T>> getOtherEntries(final Vessel vessel) {
     return getAllEntries().filter(entry -> !entry.getKey().equals(vessel));
   }
 }

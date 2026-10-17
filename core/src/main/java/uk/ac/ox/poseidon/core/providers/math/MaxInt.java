@@ -22,28 +22,29 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
-import java.util.function.IntSupplier;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.IntProvider;
 
 /**
- * An {@link IntProvider} that returns the greater of two supplied int values,
- * recomputed on every call. Built via
- * {@link Factories#maxInt(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * A value that is the greater of two integer values, both asked under the same
+ * context, recomputed on every call, as by {@link Math#max}. Built via
+ * {@link Factories#maxInt(uk.ac.ox.poseidon.core.ValueFactory, uk.ac.ox.poseidon.core.ValueFactory)}
  * in this package.
+ *
+ * @param <C> the type of the context
  */
 @RequiredArgsConstructor
-public class MaxInt implements IntProvider {
+public class MaxInt<C> implements Function<C, Integer> {
 
   @NonNull
-  private final IntSupplier a;
+  private final Function<? super C, Integer> a;
 
   @NonNull
-  private final IntSupplier b;
+  private final Function<? super C, Integer> b;
 
   @Override
-  public int getAsInt() {
-    return Math.max(a.getAsInt(), b.getAsInt());
+  public Integer apply(final C context) {
+    return Math.max(a.apply(context), b.apply(context));
   }
 }

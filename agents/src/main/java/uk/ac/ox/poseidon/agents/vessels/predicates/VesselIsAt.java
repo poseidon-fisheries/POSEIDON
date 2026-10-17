@@ -22,25 +22,23 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Holds for a vessel currently at the cell {@code cellSupplier} returns,
- * resolved fresh on each {@link #test}; never holds if the supplied cell is
- * {@code null}.
+ * Holds for a vessel currently at the cell {@code cell} returns for it,
+ * read fresh on each call; never holds if that cell is {@code null}.
  */
 @RequiredArgsConstructor
-public class VesselIsAt implements Predicate<Vessel> {
+public class VesselIsAt implements Function<Vessel, Boolean> {
 
-  private final Supplier<Int2D> cellSupplier;
+  private final Function<? super Vessel, Int2D> cell;
 
   @Override
-  public boolean test(final Vessel vessel) {
-    final Int2D cell = cellSupplier.get();
+  public Boolean apply(final Vessel vessel) {
+    final Int2D cell = this.cell.apply(vessel);
     return cell != null && cell.equals(vessel.getCell());
   }
 }

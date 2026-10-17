@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,35 +22,35 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
-import java.util.function.IntSupplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link ShiftedInt}, built via
- * {@link Factories#shiftedInt(Factory, int)}.
+ * {@link Factories#shiftedInt(ValueFactory, int)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ShiftedIntFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  IntProvider
-> {
+public class ShiftedIntFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, Integer>>
+  implements ValueFactory<S, C, Integer>
+{
 
-  private final Factory<? super S, ? extends IntSupplier> delegateIntProvider;
+  private final ValueFactory<? super S, ? super C, Integer> delegate;
   private final int shift;
 
   @Override
-  protected IntProvider newInstance(final S scope) {
-    return new ShiftedInt(delegateIntProvider.get(scope), shift);
+  protected Function<C, Integer> newInstance(final S scope) {
+    return new ShiftedInt<>(delegate.get(scope), shift);
   }
 }

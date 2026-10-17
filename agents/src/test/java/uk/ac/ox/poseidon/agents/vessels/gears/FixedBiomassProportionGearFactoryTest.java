@@ -32,22 +32,22 @@ import static uk.ac.ox.poseidon.core.quantities.Factories.volumetricFlowRateOf;
 import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_PER_HOUR;
 
 import java.time.Duration;
-import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 class FixedBiomassProportionGearFactoryTest {
 
   @Test
   void resolvesMinimumCatchThreshold() {
-    final Factory<SimulationScope, Supplier<Duration>> durationSupplier =
-      scope -> () -> Duration.ofHours(1);
+    final ValueFactory<SimulationScope, Object, Duration> duration = scope ->
+      context ->
+        Duration.ofHours(1);
     final var factory = Factories.fixedBiomassProportionGear(
       "G1",
       0.25,
       massOf(2, KILOGRAM),
-      durationSupplier,
+      duration,
       volumetricFlowRateOf(0.0, LITRE_PER_HOUR)
     );
     final var gear = factory.get(mock(SimulationScope.class));
@@ -60,13 +60,14 @@ class FixedBiomassProportionGearFactoryTest {
 
   @Test
   void rejectsNegativeThreshold() {
-    final Factory<SimulationScope, Supplier<Duration>> durationSupplier =
-      scope -> () -> Duration.ofHours(1);
+    final ValueFactory<SimulationScope, Object, Duration> duration = scope ->
+      context ->
+        Duration.ofHours(1);
     final var factory = Factories.fixedBiomassProportionGear(
       "G1",
       0.25,
       massOf(-1, KILOGRAM),
-      durationSupplier,
+      duration,
       volumetricFlowRateOf(0.0, LITRE_PER_HOUR)
     );
     assertThatThrownBy(() ->

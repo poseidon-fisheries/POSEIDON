@@ -63,30 +63,30 @@ class CellWasFishedThisTripTest {
   void neverHoldsWhenTheVesselIsNotOnATrip() {
     when(vessel.getCurrentTrip()).thenReturn(null);
 
-    assertFalse(cellWasFishedThisTrip.test(FIRST_CELL));
+    assertFalse(cellWasFishedThisTrip.apply(null, FIRST_CELL));
   }
 
   @Test
   void holdsForTheCellOfAFishingEventOfTheCurrentTrip() {
     onTripWithFishingEventsAt(FIRST_COORDINATE);
 
-    assertTrue(cellWasFishedThisTrip.test(FIRST_CELL));
+    assertTrue(cellWasFishedThisTrip.apply(null, FIRST_CELL));
   }
 
   @Test
   void doesNotHoldForACellNotFishedThisTrip() {
     onTripWithFishingEventsAt(FIRST_COORDINATE);
 
-    assertFalse(cellWasFishedThisTrip.test(UNFISHED_CELL));
+    assertFalse(cellWasFishedThisTrip.apply(null, UNFISHED_CELL));
   }
 
   @Test
   void holdsForTheCellsOfEveryFishingEventOfTheCurrentTrip() {
     onTripWithFishingEventsAt(FIRST_COORDINATE, SECOND_COORDINATE);
 
-    assertTrue(cellWasFishedThisTrip.test(FIRST_CELL));
-    assertTrue(cellWasFishedThisTrip.test(SECOND_CELL));
-    assertFalse(cellWasFishedThisTrip.test(UNFISHED_CELL));
+    assertTrue(cellWasFishedThisTrip.apply(null, FIRST_CELL));
+    assertTrue(cellWasFishedThisTrip.apply(null, SECOND_CELL));
+    assertFalse(cellWasFishedThisTrip.apply(null, UNFISHED_CELL));
   }
 
   private void onTripWithFishingEventsAt(final Coordinate... coordinates) {

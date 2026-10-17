@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.geography.allocators;
 
-import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,12 +29,14 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link FilteredAllocator},
- * built via {@link Factories#filteredAllocator(Factory, Factory)}.
+ * built via {@link Factories#filteredAllocator(Factory, MappingFactory)}.
  */
 @Getter
 @ToString
@@ -48,16 +49,18 @@ public class FilteredAllocatorFactory<S extends Scope> extends RelativeScopeFact
 > {
 
   private final Factory<? super S, ? extends Allocator> delegateAllocator;
-  private final Factory<
+  private final MappingFactory<
     ? super S,
-    ? extends Predicate<? super Int2D>
+    ? super Void,
+    ? super Int2D,
+    Boolean
   > cellPredicate;
 
   @Override
   protected FilteredAllocator newInstance(final S scope) {
     return new FilteredAllocator(
       delegateAllocator.get(scope),
-      cellPredicate.get(scope)
+      WithoutContext.predicate(cellPredicate.get(scope))
     );
   }
 }

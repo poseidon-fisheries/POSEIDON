@@ -22,35 +22,35 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link MaxDouble}, built via
- * {@link Factories#maxDouble(Factory, Factory)}.
+ * {@link Factories#maxDouble(ValueFactory, ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class MaxDoubleFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  MaxDouble
-> {
+public class MaxDoubleFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, Double>>
+  implements ValueFactory<S, C, Double>
+{
 
-  private final Factory<? super S, ? extends DoubleSupplier> a;
-  private final Factory<? super S, ? extends DoubleSupplier> b;
+  private final ValueFactory<? super S, ? super C, Double> a;
+  private final ValueFactory<? super S, ? super C, Double> b;
 
   @Override
-  protected MaxDouble newInstance(final S scope) {
-    return new MaxDouble(a.get(scope), b.get(scope));
+  protected Function<C, Double> newInstance(final S scope) {
+    return new MaxDouble<>(a.get(scope), b.get(scope));
   }
 }

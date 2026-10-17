@@ -22,14 +22,14 @@
 
 package uk.ac.ox.poseidon.regulations;
 
-import java.util.function.Predicate;
 import lombok.*;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link PermittedIf}. Built via
@@ -45,13 +45,17 @@ public class PermittedIfFactory<
   A extends Action<?>
 > extends RelativeScopeFactory<S, PermittedIf<A>> {
 
-  private final Factory<
+  private final MappingFactory<
     ? super S,
-    ? extends Predicate<? super A>
+    ? super Void,
+    ? super A,
+    Boolean
   > actionPredicate;
 
   @Override
   protected PermittedIf<A> newInstance(final S scope) {
-    return new PermittedIf<>(actionPredicate.get(scope));
+    return new PermittedIf<>(
+      WithoutContext.predicate(actionPredicate.get(scope))
+    );
   }
 }

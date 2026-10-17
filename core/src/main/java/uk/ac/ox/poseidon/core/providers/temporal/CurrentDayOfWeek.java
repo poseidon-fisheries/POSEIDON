@@ -24,23 +24,25 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
- * A {@link Provider} that returns the simulation's current day of the week,
- * read from the current date-time on every call. Built via
+ * A value that is the simulation's current day of the week, read from the
+ * current date-time on every call. Built via
  * {@link Factories#currentDayOfWeek()} in this package.
  */
 @RequiredArgsConstructor
-public class CurrentDayOfWeek implements Provider<DayOfWeek> {
+public class CurrentDayOfWeek<C> implements Function<C, DayOfWeek> {
 
-  private final @NonNull Supplier<? extends LocalDateTime> currentDateTime;
+  private final @NonNull Function<
+    ? super C,
+    ? extends LocalDateTime
+  > currentDateTime;
 
   @Override
-  public DayOfWeek get() {
-    return currentDateTime.get().getDayOfWeek();
+  public DayOfWeek apply(final C context) {
+    return currentDateTime.apply(context).getDayOfWeek();
   }
 }

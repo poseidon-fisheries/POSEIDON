@@ -23,30 +23,29 @@
 package uk.ac.ox.poseidon.regulations.predicates;
 
 import java.util.function.Function;
-import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.regulations.Action;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
- * Turns a {@link Regulations} rule back into a {@link Predicate} over the
- * agent, by first building the {@link Action} the rule judges via
- * {@code actionFunction}. This is what lets a rule be composed with ordinary
- * predicate logic (see {@link uk.ac.ox.poseidon.core.predicates.logical})
- * alongside other agent predicates, rather than composing {@code Regulations}
- * instances directly.
+ * Turns a {@link Regulations} rule back into a yes/no value of the agent, the
+ * context it is asked under, by first building the {@link Action} the rule
+ * judges via {@code actionFunction}. This is what lets a rule be composed with
+ * ordinary yes/no logic (see {@link uk.ac.ox.poseidon.core.predicates.logical})
+ * alongside other values of the agent, rather than composing
+ * {@code Regulations} instances directly.
  */
 @RequiredArgsConstructor
 public class IsPermittedPredicate<
   G,
   A extends Action<G>
-> implements Predicate<G> {
+> implements Function<G, Boolean> {
 
-  private final Function<? super G, A> actionFunction;
+  private final Function<? super G, ? extends A> actionFunction;
   private final Regulations<? super A> regulations;
 
   @Override
-  public boolean test(final G agent) {
+  public Boolean apply(final G agent) {
     return regulations.isPermitted(actionFunction.apply(agent));
   }
 }

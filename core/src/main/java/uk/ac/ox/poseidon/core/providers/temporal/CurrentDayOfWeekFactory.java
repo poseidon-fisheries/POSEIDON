@@ -22,16 +22,17 @@
 
 package uk.ac.ox.poseidon.core.providers.temporal;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link CurrentDayOfWeek},
@@ -42,17 +43,19 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class CurrentDayOfWeekFactory
-  extends SimulationScopeFactory<CurrentDayOfWeek>
+public class CurrentDayOfWeekFactory<C>
+  extends SimulationScopeFactory<Function<C, DayOfWeek>>
+  implements ValueFactory<SimulationScope, C, DayOfWeek>
 {
 
-  private final Factory<
+  private final ValueFactory<
     ? super SimulationScope,
-    ? extends Supplier<LocalDateTime>
+    ? super C,
+    LocalDateTime
   > currentDateTime;
 
   @Override
-  protected CurrentDayOfWeek newInstance(final SimulationScope scope) {
-    return new CurrentDayOfWeek(currentDateTime.get(scope));
+  protected Function<C, DayOfWeek> newInstance(final SimulationScope scope) {
+    return new CurrentDayOfWeek<>(currentDateTime.get(scope));
   }
 }

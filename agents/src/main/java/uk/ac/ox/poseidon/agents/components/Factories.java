@@ -38,11 +38,11 @@ public class Factories {
    *         builds the component and registers it against the resolving vessel
    * @see RegisteredVesselComponentFactory
    */
-  public static <C> RegisteredVesselComponentFactory<C> registeredVesselComponent(
-    final Factory<? super VesselScope, ? extends C> componentFactory,
+  public static <T> RegisteredVesselComponentFactory<T> registeredVesselComponent(
+    final Factory<? super VesselScope, ? extends T> componentFactory,
     final Factory<
       ? super VesselScope,
-      ? extends VesselComponentRegister<C>
+      ? extends VesselComponentRegister<T>
     > componentRegister
   ) {
     return new RegisteredVesselComponentFactory<>(
@@ -56,7 +56,7 @@ public class Factories {
    *         empty {@link VesselComponentRegister}
    * @see VesselComponentRegisterFactory
    */
-  public static <C> VesselComponentRegisterFactory<C> vesselComponentRegister() {
+  public static <T> VesselComponentRegisterFactory<T> vesselComponentRegister() {
     return new VesselComponentRegisterFactory<>();
   }
 }

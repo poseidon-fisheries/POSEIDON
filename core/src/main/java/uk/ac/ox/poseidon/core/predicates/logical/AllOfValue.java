@@ -20,39 +20,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
-import java.util.function.BooleanSupplier;
+import java.util.Collection;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import lombok.NonNull;
 
 /**
- * A {@link BooleanSupplier} that can also be used anywhere a {@link Predicate}
- * or {@link Function} of {@link Boolean} is required, in which case it ignores
- * the argument passed to {@link #test}/ {@link #apply} and just returns the
- * boolean it would have supplied anyway. Lets the same object be wired into any
- * of those call sites without an adapter.
+ * A yes/no value that is true iff every one of its component values is true
+ * under the context (vacuously true for zero predicates). Built via
+ * {@link Factories#allOf(uk.ac.ox.poseidon.core.ValueFactory...)} in this
+ * package.
+ *
+ * @param <C> the type of the context
  */
-public interface BooleanProvider
-  extends
-    BooleanSupplier,
-    Supplier<Boolean>,
-    Predicate<Object>,
-    Function<Object, Boolean>
-{
-  @Override
-  default boolean test(final Object ignored) {
-    return getAsBoolean();
+public class AllOfValue<C> implements Function<C, Boolean> {
+
+  // Using an array for performance reasons
+  @NonNull
+  private final Function<? super C, Boolean>[] predicates;
+
+  /** @param predicates the component values */
+  @SuppressWarnings("unchecked")
+  public AllOfValue(
+    final Collection<? extends Function<? super C, Boolean>> predicates
+  ) {
+    this.predicates = predicates.toArray(Function[]::new);
   }
 
   @Override
-  default Boolean apply(final Object o) {
-    return getAsBoolean();
-  }
-
-  @Override
-  default Boolean get() {
-    return getAsBoolean();
+  public Boolean apply(final C context) {
+    for (final Function<? super C, Boolean> predicate : predicates) {
+      if (!predicate.apply(context)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

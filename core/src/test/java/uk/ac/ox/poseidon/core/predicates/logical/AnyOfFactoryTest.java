@@ -24,121 +24,43 @@ package uk.ac.ox.poseidon.core.predicates.logical;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static uk.ac.ox.poseidon.core.predicates.logical.Factories.anyOf;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.alwaysFalse;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.alwaysTrue;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
-import com.google.common.collect.ImmutableList;
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
-@SuppressWarnings("unchecked")
 class AnyOfFactoryTest {
 
-  /**
-   * Tests the `get` method of the AnyOfFactory class. Verifies that the method
-   * creates an `AnyOf` instance correctly when a valid list of factories for
-   * `Predicate<Object>` is provided and preserves predicate order.
-   */
   @Test
-  void testGetWithValidPredicateFactories() {
-    // Arrange
-    final Predicate<Object> predicate1 = value -> true;
-    final Predicate<Object> predicate2 = value -> false;
-    final ObjectFactory<Predicate<Object>> factory1 = new ObjectFactory<>(
-      predicate1
-    );
-    final ObjectFactory<Predicate<Object>> factory2 = new ObjectFactory<>(
-      predicate2
-    );
-
-    final AnyOfFactory<Scope, Object> anyOfFactory = new AnyOfFactory<>(
-      ImmutableList.of(factory1, factory2)
-    );
-
-    // Act
-    final AnyOf<Object> result = anyOfFactory.get(Scope.GLOBAL_SCOPE);
-
-    // Assert
-    assertThat(result.getPredicates().toList())
-      .as("Predicates should be preserved in the factory order")
-      .containsExactly(predicate1, predicate2);
+  void combiningMappingsGivesAMapping() {
+    final BiFunction<Object, Object, Boolean> mapping = anyOf(
+      alwaysTrue(),
+      alwaysFalse()
+    ).get(Scope.GLOBAL_SCOPE);
+    assertThat(mapping.apply(null, "t")).isEqualTo(true);
   }
 
-  /**
-   * Tests the `get` method with an empty list of factories. Verifies that an
-   * `AnyOf` instance is still created successfully.
-   */
   @Test
-  void testGetWithEmptyFactoryList() {
-    // Arrange
-    final AnyOfFactory<Scope, Object> anyOfFactory = new AnyOfFactory<>(
-      ImmutableList.of()
-    );
-
-    // Act
-    final AnyOf<Object> result = anyOfFactory.get(Scope.GLOBAL_SCOPE);
-
-    // Assert
-    assertThat(result)
-      .as(
-        "The resulting AnyOf instance should not be null even with empty list."
-      )
-      .isNotNull();
-    assertThat(result.test("value"))
-      .as("AnyOf with no predicates should return false")
-      .isFalse();
+  void combiningValuesGivesAValue() {
+    final Function<Object, Boolean> value = anyOf(
+      constant(true),
+      constant(false)
+    ).get(Scope.GLOBAL_SCOPE);
+    assertThat(value.apply(null)).isEqualTo(true);
   }
 
-  /**
-   * Tests the `get` method to ensure it throws a NullPointerException when one
-   * of the factories provides a null predicate.
-   */
   @Test
-  void testGetWithNullPredicateThrowsException() {
-    // Arrange
-    final Factory<Scope, Predicate<Object>> nullFactory = scope -> null;
-
-    final AnyOfFactory<Scope, Object> anyOfFactory = new AnyOfFactory<>(
-      ImmutableList.of(nullFactory)
-    );
-
-    // Act & Assert
-    final AnyOf<Object> result = anyOfFactory.get(Scope.GLOBAL_SCOPE);
-    assertThatThrownBy(() -> result.test("value"))
-      .as(
-        "Expected AnyOf to throw NullPointerException when a predicate is null."
-      )
-      .isInstanceOf(NullPointerException.class);
-  }
-
-  /**
-   * Tests the `get` method with multiple valid predicate factories to ensure
-   * AnyOf returns true when at least one predicate matches.
-   */
-  @Test
-  void testGetWithMultipleValidFactories() {
-    // Arrange
-    final ObjectFactory<Predicate<String>> factory1 = new ObjectFactory<>(
-      value -> false
-    );
-    final ObjectFactory<Predicate<String>> factory2 = new ObjectFactory<>(
-      value -> true
-    );
-    final ObjectFactory<Predicate<String>> factory3 = new ObjectFactory<>(
-      value -> false
-    );
-
-    final AnyOfFactory<Scope, String> anyOfFactory = new AnyOfFactory<>(
-      ImmutableList.of(factory1, factory2, factory3)
-    );
-
-    // Act
-    final AnyOf<String> result = anyOfFactory.get(Scope.GLOBAL_SCOPE);
-
-    // Assert
-    assertThat(result.test("value"))
-      .as("AnyOf should return true when any predicate is true")
-      .isTrue();
+  void aNullComponentFailsWhenBuilt() {
+    final MappingFactory<Scope, Object, Object, Boolean> nullFactory = scope ->
+      null;
+    assertThatThrownBy(() ->
+      anyOf(nullFactory).get(Scope.GLOBAL_SCOPE)
+    ).isInstanceOf(NullPointerException.class);
   }
 }

@@ -21,8 +21,7 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.core.providers.Provider}s that always return the
- * same, fixed value. See
+ * Values and mappings that are the same whatever they are asked. See
  * {@link uk.ac.ox.poseidon.core.providers.constant.Factories} for the entry
  * points.
  */

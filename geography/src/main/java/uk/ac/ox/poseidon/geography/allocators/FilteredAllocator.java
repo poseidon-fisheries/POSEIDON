@@ -31,7 +31,7 @@ import sim.util.Int2D;
  * An {@link Allocator} that delegates to another allocator only for cells
  * matching a predicate, returning {@link Double#NaN} (excluded) for the rest.
  * Built via
- * {@link Factories#filteredAllocator(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * {@link Factories#filteredAllocator(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.MappingFactory)}
  * in this package.
  */
 @RequiredArgsConstructor

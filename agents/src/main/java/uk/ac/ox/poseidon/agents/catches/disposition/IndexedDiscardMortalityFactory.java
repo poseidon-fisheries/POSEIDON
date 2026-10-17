@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import java.util.Collection;
-import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,8 +31,10 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of
@@ -55,16 +56,18 @@ public class IndexedDiscardMortalityFactory<S extends Scope> extends RelativeSco
     ? extends Collection<? extends Species>
   > species;
 
-  private final Factory<
+  private final MappingFactory<
     ? super S,
-    ? extends Function<? super Species, Double>
+    ? super Void,
+    ? super Species,
+    Double
   > rateFunction;
 
   @Override
   protected IndexedDiscardMortality newInstance(final S scope) {
     return new IndexedDiscardMortality(
       SpeciesIndex.of(species.get(scope)).mapToDoubleArray(
-        rateFunction.get(scope)
+        WithoutContext.function(rateFunction.get(scope))
       )
     );
   }

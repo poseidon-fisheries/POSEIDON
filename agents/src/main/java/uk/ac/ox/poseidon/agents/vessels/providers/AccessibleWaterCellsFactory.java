@@ -22,14 +22,18 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
+import java.util.List;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
@@ -42,7 +46,8 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class AccessibleWaterCellsFactory
-  extends VesselScopeFactory<AccessibleWaterCells>
+  extends VesselScopeFactory<Function<Object, List<Int2D>>>
+  implements ValueFactory<VesselScope, Object, List<Int2D>>
 {
 
   private final Factory<
@@ -51,7 +56,7 @@ public class AccessibleWaterCellsFactory
   > pathFinder;
 
   @Override
-  protected AccessibleWaterCells newInstance(final VesselScope scope) {
+  protected Function<Object, List<Int2D>> newInstance(final VesselScope scope) {
     return new AccessibleWaterCells(scope.getVessel(), pathFinder.get(scope));
   }
 }

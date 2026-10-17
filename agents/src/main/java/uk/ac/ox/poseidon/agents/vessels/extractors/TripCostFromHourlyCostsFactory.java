@@ -30,9 +30,9 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link TripCostFromHourlyCosts}. Built
@@ -43,18 +43,19 @@ import uk.ac.ox.poseidon.core.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class TripCostFromHourlyCostsFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  TripCostFromHourlyCosts
-> {
+public class TripCostFromHourlyCostsFactory<S extends Scope>
+  extends RelativeScopeFactory<S, Function<Vessel, Money>>
+  implements ValueFactory<S, Vessel, Money>
+{
 
-  private final Factory<
+  private final ValueFactory<
     ? super S,
-    ? extends Function<? super Vessel, ? extends Money>
-  > hourlyCostsExtractor;
+    ? super Vessel,
+    ? extends Money
+  > hourlyCosts;
 
   @Override
-  protected TripCostFromHourlyCosts newInstance(final S scope) {
-    return new TripCostFromHourlyCosts(hourlyCostsExtractor.get(scope));
+  protected Function<Vessel, Money> newInstance(final S scope) {
+    return new TripCostFromHourlyCosts(hourlyCosts.get(scope));
   }
 }

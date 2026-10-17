@@ -31,10 +31,12 @@ class LessThanTest {
   @Test
   void testValueLessThanThreshold() {
     final double threshold = 10.0;
-    final LessThan<Double> lessThan = new LessThan<>(() -> threshold);
+    final LessThan<Object, Double> lessThan = new LessThan<>(
+      context -> threshold
+    );
 
     assertTrue(
-      lessThan.test(5.0),
+      lessThan.apply(null, 5.0),
       "The value 5.0 should be less than the threshold 10.0"
     );
   }
@@ -42,10 +44,12 @@ class LessThanTest {
   @Test
   void testValueEqualsThreshold() {
     final double threshold = 10.0;
-    final LessThan<Double> lessThan = new LessThan<>(() -> threshold);
+    final LessThan<Object, Double> lessThan = new LessThan<>(
+      context -> threshold
+    );
 
     assertFalse(
-      lessThan.test(10.0),
+      lessThan.apply(null, 10.0),
       "The value 10.0 should not be less than the threshold 10.0"
     );
   }
@@ -53,10 +57,12 @@ class LessThanTest {
   @Test
   void testValueAboveThreshold() {
     final double threshold = 10.0;
-    final LessThan<Double> lessThan = new LessThan<>(() -> threshold);
+    final LessThan<Object, Double> lessThan = new LessThan<>(
+      context -> threshold
+    );
 
     assertFalse(
-      lessThan.test(15.0),
+      lessThan.apply(null, 15.0),
       "The value 15.0 should not be less than the threshold 10.0"
     );
   }
@@ -64,10 +70,12 @@ class LessThanTest {
   @Test
   void testNegativeValueLessThanNegativeThreshold() {
     final double threshold = -5.0;
-    final LessThan<Double> lessThan = new LessThan<>(() -> threshold);
+    final LessThan<Object, Double> lessThan = new LessThan<>(
+      context -> threshold
+    );
 
     assertTrue(
-      lessThan.test(-10.0),
+      lessThan.apply(null, -10.0),
       "The value -10.0 should be less than the threshold -5.0"
     );
   }
@@ -75,10 +83,12 @@ class LessThanTest {
   @Test
   void testNegativeValueEqualsNegativeThreshold() {
     final double threshold = -5.0;
-    final LessThan<Double> lessThan = new LessThan<>(() -> threshold);
+    final LessThan<Object, Double> lessThan = new LessThan<>(
+      context -> threshold
+    );
 
     assertFalse(
-      lessThan.test(-5.0),
+      lessThan.apply(null, -5.0),
       "The value -5.0 should not be less than the threshold -5.0"
     );
   }
@@ -86,10 +96,12 @@ class LessThanTest {
   @Test
   void testNegativeValueGreaterThanNegativeThreshold() {
     final double threshold = -10.0;
-    final LessThan<Double> lessThan = new LessThan<>(() -> threshold);
+    final LessThan<Object, Double> lessThan = new LessThan<>(
+      context -> threshold
+    );
 
     assertFalse(
-      lessThan.test(-5.0),
+      lessThan.apply(null, -5.0),
       "The value -5.0 should not be less than the threshold -10.0"
     );
   }
@@ -97,10 +109,12 @@ class LessThanTest {
   @Test
   void testWithZeroValue() {
     final double threshold = 0.0;
-    final LessThan<Double> lessThan = new LessThan<>(() -> threshold);
+    final LessThan<Object, Double> lessThan = new LessThan<>(
+      context -> threshold
+    );
 
     assertTrue(
-      lessThan.test(-1.0),
+      lessThan.apply(null, -1.0),
       "The value -1.0 should be less than the threshold 0.0"
     );
   }
@@ -108,11 +122,13 @@ class LessThanTest {
   @Test
   void testValueIsNull() {
     final double threshold = 10.0;
-    final LessThan<Double> lessThan = new LessThan<>(() -> threshold);
+    final LessThan<Object, Double> lessThan = new LessThan<>(
+      context -> threshold
+    );
 
     assertThrows(
       NullPointerException.class,
-      () -> lessThan.test(null),
+      () -> lessThan.apply(null, null),
       "Passing null should throw NullPointerException"
     );
   }

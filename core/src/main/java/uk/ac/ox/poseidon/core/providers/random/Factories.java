@@ -25,8 +25,8 @@ package uk.ac.ox.poseidon.core.providers.random;
 import uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory;
 
 /**
- * Factories for {@link uk.ac.ox.poseidon.core.providers.Provider}s that draw a
- * fresh random value, from the simulation's shared RNG, on every call.
+ * Factories for values that draw a fresh random value, from the simulation's
+ * shared RNG, on every call, whatever the context they are asked under.
  */
 public class Factories {
 

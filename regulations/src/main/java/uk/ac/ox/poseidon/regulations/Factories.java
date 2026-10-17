@@ -23,8 +23,8 @@
 package uk.ac.ox.poseidon.regulations;
 
 import com.google.common.collect.ImmutableList;
-import java.util.function.Predicate;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /**
@@ -45,7 +45,12 @@ public class Factories {
     S,
     A
   > forbiddenIf(
-    final Factory<? super S, ? extends Predicate<? super A>> actionPredicate
+    final MappingFactory<
+      ? super S,
+      ? super Void,
+      ? super A,
+      Boolean
+    > actionPredicate
   ) {
     return new ForbiddenIfFactory<S, A>(actionPredicate);
   }
@@ -59,7 +64,12 @@ public class Factories {
     S,
     A
   > permittedIf(
-    final Factory<? super S, ? extends Predicate<? super A>> actionPredicate
+    final MappingFactory<
+      ? super S,
+      ? super Void,
+      ? super A,
+      Boolean
+    > actionPredicate
   ) {
     return new PermittedIfFactory<S, A>(actionPredicate);
   }

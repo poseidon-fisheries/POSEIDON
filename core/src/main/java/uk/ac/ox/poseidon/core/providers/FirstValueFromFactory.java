@@ -22,39 +22,38 @@
 
 package uk.ac.ox.poseidon.core.providers;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.providers.constant.Constant;
 
 /**
- * A {@link RelativeScopeFactory} that resolves the given delegate
- * {@link Supplier} once, when built, and returns a {@link Provider} that keeps
- * handing out that same first-resolved value thereafter — a snapshot, not a
- * live pass-through to the delegate. No separate plain component class here:
- * the produced value is a {@link Constant} wrapping the snapshot, built via
- * {@link Factories#firstValueFrom(Factory)}.
+ * A {@link RelativeScopeFactory} that asks the given value once, when built,
+ * and produces a {@link Constant} of that first answer — a snapshot, not a live
+ * pass-through to the value, so a random draw, for instance, is drawn once. The
+ * value is asked with no context. Built via
+ * {@link Factories#firstValueFrom(ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class FirstValueFromFactory<
-  S extends Scope,
-  T
-> extends RelativeScopeFactory<S, Provider<T>> {
+public class FirstValueFromFactory<S extends Scope, R>
+  extends RelativeScopeFactory<S, Function<Object, R>>
+  implements ValueFactory<S, Object, R>
+{
 
-  private final Factory<? super S, ? extends Supplier<? extends T>> delegate;
+  private final ValueFactory<? super S, ? super Void, ? extends R> delegate;
 
   @Override
-  protected Provider<T> newInstance(final S scope) {
-    return new Constant<>(delegate.get(scope).get());
+  protected Function<Object, R> newInstance(final S scope) {
+    return new Constant<>(delegate.get(scope).apply(null));
   }
 }

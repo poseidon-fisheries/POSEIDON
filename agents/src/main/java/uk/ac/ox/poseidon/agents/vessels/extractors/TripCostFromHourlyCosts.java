@@ -34,22 +34,22 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 /**
  * Extracts the cost of a vessel's current trip so far, as its time at sea
  * ({@link Trip#getTimeAtSea()}) times an hourly rate from
- * {@code hourlyCostsExtractor}.
+ * {@code hourlyCosts}.
  */
 @RequiredArgsConstructor
 public class TripCostFromHourlyCosts implements Function<Vessel, Money> {
 
   @NonNull
-  private final Function<? super Vessel, ? extends Money> hourlyCostsExtractor;
+  private final Function<? super Vessel, ? extends Money> hourlyCosts;
 
   /**
-   * @return {@code hourlyCostsExtractor}'s rate for {@code vessel}, times its
+   * @return {@code hourlyCosts}'s rate for {@code vessel}, times its
    *         current trip's hours at sea
    */
   @Override
   public Money apply(final Vessel vessel) {
     final Duration timeAtSea = vessel.getCurrentTrip().getTimeAtSea();
-    return hourlyCostsExtractor
+    return hourlyCosts
       .apply(vessel)
       .multipliedBy(timeAtSea.toSeconds() / 3600.0, RoundingMode.HALF_EVEN);
   }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -24,25 +24,32 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
- * A {@link Provider} of a reference date-time minus an amount of time, both
- * read anew on every call. Built via
- * {@link Factories#dateTimeBefore(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * A value of a reference date-time minus an amount of time, both read anew on
+ * every call. Built via
+ * {@link Factories#dateTimeBefore(uk.ac.ox.poseidon.core.ValueFactory, uk.ac.ox.poseidon.core.ValueFactory)}
  * in this package.
  */
 @RequiredArgsConstructor
-public class DateTimeBefore implements Provider<LocalDateTime> {
+public class DateTimeBefore<C> implements Function<C, LocalDateTime> {
 
-  private final @NonNull Supplier<? extends LocalDateTime> referenceDateTime;
-  private final @NonNull Supplier<? extends TemporalAmount> amountToSubtract;
+  private final @NonNull Function<
+    ? super C,
+    ? extends LocalDateTime
+  > referenceDateTime;
+  private final @NonNull Function<
+    ? super C,
+    ? extends TemporalAmount
+  > amountToSubtract;
 
   @Override
-  public LocalDateTime get() {
-    return referenceDateTime.get().minus(amountToSubtract.get());
+  public LocalDateTime apply(final C context) {
+    return referenceDateTime
+      .apply(context)
+      .minus(amountToSubtract.apply(context));
   }
 }

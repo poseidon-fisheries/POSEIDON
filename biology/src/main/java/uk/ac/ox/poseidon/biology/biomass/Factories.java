@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.supplierAllocator;
@@ -151,9 +151,7 @@ public class Factories {
       new DoubleGridFromAllocatorFactory<>(
         modelGrid,
         filteredAllocator(
-          supplierAllocator(
-            constantDouble(new KilogramsFactory<>(carryingCapacity))
-          ),
+          supplierAllocator(constant(new KilogramsFactory<>(carryingCapacity))),
           new IsActiveWaterCellFactory<>(bathymetricGrid)
         )
       )
@@ -175,7 +173,7 @@ public class Factories {
       new NormalisedDoubleGridFromAllocatorFactory<>(
         modelGrid,
         filteredAllocator(
-          supplierAllocator(constantDouble(1.0)),
+          supplierAllocator(constant(1.0)),
           new IsActiveWaterCellFactory<>(bathymetricGrid)
         ),
         new KilogramsFactory<>(totalCarryingCapacity)

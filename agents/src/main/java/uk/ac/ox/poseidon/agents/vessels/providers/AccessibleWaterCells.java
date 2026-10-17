@@ -23,11 +23,11 @@
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
 import java.util.List;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.providers.Provider;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * {@code pathFinder}.
  */
 @RequiredArgsConstructor
-public class AccessibleWaterCells implements Provider<List<Int2D>> {
+public class AccessibleWaterCells implements Function<Object, List<Int2D>> {
 
   @NonNull
   private final Vessel vessel;
@@ -44,7 +44,7 @@ public class AccessibleWaterCells implements Provider<List<Int2D>> {
   private final GridPathFinder pathFinder;
 
   @Override
-  public List<Int2D> get() {
+  public List<Int2D> apply(final Object context) {
     return pathFinder.getAccessibleWaterCells(vessel.getCell());
   }
 }

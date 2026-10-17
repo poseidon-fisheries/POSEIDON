@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,34 +20,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers.constant;
+package uk.ac.ox.poseidon.core.predicates;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.providers.BooleanProvider;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link ConstantBoolean}, built
- * via {@link Factories Factories.alwaysTrue()/Factories.alwaysFalse()}.
+ * A {@link RelativeScopeFactory} counterpart of {@link ConditionValue}, built
+ * via {@link Factories#condition(ValueFactory, MappingFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ConstantBooleanFactory
-  extends GlobalScopeFactory<BooleanProvider>
+public class ConditionValueFactory<S extends Scope, C, U>
+  extends RelativeScopeFactory<S, Function<C, Boolean>>
+  implements ValueFactory<S, C, Boolean>
 {
 
-  private final boolean value;
+  private final ValueFactory<? super S, ? super C, ? extends U> extractor;
+  private final MappingFactory<
+    ? super S,
+    ? super C,
+    ? super U,
+    Boolean
+  > predicate;
 
   @Override
-  protected BooleanProvider newInstance(final Scope scope) {
-    return new ConstantBoolean(value);
+  protected Function<C, Boolean> newInstance(final S scope) {
+    return new ConditionValue<>(extractor.get(scope), predicate.get(scope));
   }
 }

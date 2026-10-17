@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.travel;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.math.RoundingMode.HALF_EVEN;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -33,7 +34,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
  * The cost of the time a vessel would spend sailing a {@link Route}: its hourly
  * cost times the route's hours. The hourly cost is read at each call.
  */
-public class TimeCost implements Function<Route, Money> {
+public class TimeCost implements BiFunction<Object, Route, Money> {
 
   private final Vessel vessel;
   private final Function<? super Vessel, ? extends Money> hourlyCost;
@@ -58,7 +59,7 @@ public class TimeCost implements Function<Route, Money> {
    *                              vessel
    */
   @Override
-  public Money apply(final Route route) {
+  public Money apply(final Object context, final Route route) {
     return checkNotNull(
       hourlyCost.apply(vessel),
       "Unable to extract hourly cost for Vessel %s.",

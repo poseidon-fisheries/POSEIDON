@@ -27,20 +27,24 @@ import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import com.google.common.collect.ImmutableList;
 import java.time.Duration;
 import java.util.Map;
-import java.util.function.Function;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * Factories for {@link Function}s that transform, combine, or look up values.
+ * Factories for values and mappings that transform, combine, or look up other
+ * values and mappings. A combinator has one overload per shape: built from a
+ * value, it gives a value; built from mappings, a mapping.
  */
+@SuppressWarnings("Convert2Diamond")
 public class Factories {
 
   private Factories() {}
 
   /**
    * @param map factory for the map to look values up in
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   * @return a {@link MappingFactory} for a
    *         {@link MapValueExtractor} over the resolved map
    * @see MapValueExtractor
    */
@@ -69,110 +73,203 @@ public class Factories {
   }
 
   /**
-   * @param function1 the function applied first
-   * @param function2 the function applied to {@code function1}'s result
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link ComposedFunction} of the two resolved functions
+   * @param function1 the mapping applied first
+   * @param function2 the mapping applied to {@code function1}'s result
+   * @return a {@link MappingFactory} for a {@link ComposedFunction} of the
+   *         resolved mappings
    * @see ComposedFunction
    */
-  public static <S extends Scope, T1, T2, R> ComposedFunctionFactory<
+  public static <S extends Scope, C, T, U, R> ComposedFunctionFactory<
     S,
-    T1,
-    T2,
+    C,
+    T,
+    U,
     R
   > composedFunction(
-    final Factory<
+    final MappingFactory<
       ? super S,
-      ? extends Function<? super T1, ? extends T2>
+      ? super C,
+      ? super T,
+      ? extends U
     > function1,
-    final Factory<
-      ? super S,
-      ? extends Function<? super T2, ? extends R>
-    > function2
+    final MappingFactory<? super S, ? super C, ? super U, ? extends R> function2
   ) {
-    return new ComposedFunctionFactory<>(function1, function2);
+    return new ComposedFunctionFactory<S, C, T, U, R>(function1, function2);
   }
 
   /**
-   * @param durations the duration-producing functions to sum
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link CombinedDuration} of the resolved functions
+   * @param function1 the value read first
+   * @param function2 the mapping applied to that value
+   * @return a {@link ValueFactory} for a {@link ComposedFunctionValue} of the
+   *         resolved value and mapping
+   * @see ComposedFunctionValue
+   */
+  public static <S extends Scope, C, U, R> ComposedFunctionValueFactory<
+    S,
+    C,
+    U,
+    R
+  > composedFunction(
+    final ValueFactory<? super S, ? super C, ? extends U> function1,
+    final MappingFactory<? super S, ? super C, ? super U, ? extends R> function2
+  ) {
+    return new ComposedFunctionValueFactory<S, C, U, R>(function1, function2);
+  }
+
+  /**
+   * @param durations the duration-producing mappings to sum
+   * @return a {@link MappingFactory} for a {@link CombinedDuration} of the
+   *         resolved mappings
    * @see CombinedDuration
    */
   @SafeVarargs
-  public static <S extends Scope, T> CombinedDurationFactory<
+  public static <S extends Scope, C, T> CombinedDurationFactory<
     S,
+    C,
     T
   > combinedDuration(
-    final Factory<
+    final MappingFactory<
       ? super S,
-      ? extends Function<? super T, ? extends Duration>
+      ? super C,
+      ? super T,
+      ? extends Duration
     >... durations
   ) {
-    return new CombinedDurationFactory<S, T>(ImmutableList.copyOf(durations));
+    return new CombinedDurationFactory<S, C, T>(
+      ImmutableList.copyOf(durations)
+    );
   }
 
   /**
-   * @param delegate     the function to delegate to
+   * @param durations the duration values to sum
+   * @return a {@link ValueFactory} for a {@link CombinedDurationValue} of the
+   *         resolved values
+   * @see CombinedDurationValue
+   */
+  @SafeVarargs
+  public static <S extends Scope, C> CombinedDurationValueFactory<
+    S,
+    C
+  > combinedDuration(
+    final ValueFactory<? super S, ? super C, ? extends Duration>... durations
+  ) {
+    return new CombinedDurationValueFactory<S, C>(
+      ImmutableList.copyOf(durations)
+    );
+  }
+
+  /**
+   * @param delegate     the mapping to delegate to
    * @param defaultValue factory for the value substituted when {@code delegate}
    *                     returns {@code null}
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link DefaultIfNull} wrapping the resolved delegate and default
+   * @return a {@link MappingFactory} for a {@link DefaultIfNull} wrapping the
+   *         resolved delegate and default
    * @see DefaultIfNull
    */
-  public static <S extends Scope, T, R> DefaultIfNullFactory<
+  public static <S extends Scope, C, T, R> DefaultIfNullFactory<
     S,
+    C,
     T,
     R
   > defaultIfNull(
-    final Factory<
-      ? super S,
-      ? extends Function<? super T, ? extends R>
-    > delegate,
+    final MappingFactory<? super S, ? super C, ? super T, ? extends R> delegate,
     final Factory<? super S, ? extends R> defaultValue
   ) {
-    return new DefaultIfNullFactory<>(delegate, defaultValue);
+    return new DefaultIfNullFactory<S, C, T, R>(delegate, defaultValue);
   }
 
   /**
-   * @param delegate     the function to delegate to
+   * @param delegate     the mapping to delegate to
    * @param defaultValue the literal value substituted when {@code delegate}
    *                     returns {@code null}
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link DefaultIfNull} wrapping the resolved delegate and the given
-   *         default
+   * @return a {@link MappingFactory} for a {@link DefaultIfNull} wrapping the
+   *         resolved delegate and the given default
    * @see DefaultIfNull
    */
-  public static <S extends Scope, T, R> DefaultIfNullFactory<
+  public static <S extends Scope, C, T, R> DefaultIfNullFactory<
     S,
+    C,
     T,
     R
   > defaultIfNull(
-    final Factory<
-      ? super S,
-      ? extends Function<? super T, ? extends R>
-    > delegate,
+    final MappingFactory<? super S, ? super C, ? super T, ? extends R> delegate,
     final R defaultValue
   ) {
     return defaultIfNull(delegate, object(defaultValue));
   }
 
   /**
-   * @param functions the functions to apply to the same input and join into one
+   * @param delegate     the value to read
+   * @param defaultValue factory for the value substituted when {@code delegate}
+   *                     is {@code null}
+   * @return a {@link ValueFactory} for a {@link DefaultIfNullValue} wrapping
+   *         the resolved delegate and default
+   * @see DefaultIfNullValue
+   */
+  public static <S extends Scope, C, R> DefaultIfNullValueFactory<
+    S,
+    C,
+    R
+  > defaultIfNull(
+    final ValueFactory<? super S, ? super C, ? extends R> delegate,
+    final Factory<? super S, ? extends R> defaultValue
+  ) {
+    return new DefaultIfNullValueFactory<S, C, R>(delegate, defaultValue);
+  }
+
+  /**
+   * @param delegate     the value to read
+   * @param defaultValue the literal value substituted when {@code delegate} is
+   *                     {@code null}
+   * @return a {@link ValueFactory} for a {@link DefaultIfNullValue} wrapping
+   *         the resolved delegate and the given default
+   * @see DefaultIfNullValue
+   */
+  public static <S extends Scope, C, R> DefaultIfNullValueFactory<
+    S,
+    C,
+    R
+  > defaultIfNull(
+    final ValueFactory<? super S, ? super C, ? extends R> delegate,
+    final R defaultValue
+  ) {
+    return defaultIfNull(delegate, object(defaultValue));
+  }
+
+  /**
+   * @param functions the mappings to apply to the same thing and join into one
    *                  key
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link MultiStringKeyFromFunctions} of the resolved functions
+   * @return a {@link MappingFactory} for a {@link MultiStringKeyFromFunctions}
+   *         of the resolved mappings
    * @see MultiStringKeyFromFunctions
    */
   @SafeVarargs
-  public static <S extends Scope, T> MultiStringKeyFromFunctionsFactory<
+  public static <S extends Scope, C, T> MultiStringKeyFromFunctionsFactory<
     S,
+    C,
     T
   > multiStringKeyFromFunctions(
-    final Factory<? super S, ? extends Function<? super T, ?>>... functions
+    final MappingFactory<? super S, ? super C, ? super T, ?>... functions
   ) {
-    // noinspection Convert2Diamond
-    return new MultiStringKeyFromFunctionsFactory<S, T>(
+    return new MultiStringKeyFromFunctionsFactory<S, C, T>(
+      ImmutableList.copyOf(functions)
+    );
+  }
+
+  /**
+   * @param functions the values to read and join into one key
+   * @return a {@link ValueFactory} for a
+   *         {@link MultiStringKeyFromFunctionsValue} of the resolved values
+   * @see MultiStringKeyFromFunctionsValue
+   */
+  @SafeVarargs
+  public static <S extends Scope, C> MultiStringKeyFromFunctionsValueFactory<
+    S,
+    C
+  > multiStringKeyFromFunctions(
+    final ValueFactory<? super S, ? super C, ?>... functions
+  ) {
+    return new MultiStringKeyFromFunctionsValueFactory<S, C>(
       ImmutableList.copyOf(functions)
     );
   }
@@ -180,8 +277,8 @@ public class Factories {
   /**
    * @param intervals the non-overlapping intervals to map numbers into (see
    *                  {@link NumericIntervalToStringMapperFactory#interval})
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   *         {@link NumericIntervalMapper} over the given intervals
+   * @return a {@link MappingFactory} for a {@link NumericIntervalMapper} over
+   *         the given intervals
    * @see NumericIntervalMapper
    */
   public static NumericIntervalToStringMapperFactory numericIntervalToStringMapper(

@@ -20,22 +20,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
+import java.util.Collection;
 import java.util.function.Function;
-import java.util.function.Supplier;
+import lombok.NonNull;
 
 /**
- * A {@link Supplier} of {@code T} that can also be used anywhere a
- * {@link Function} is required, in which case it ignores the argument passed to
- * {@link #apply} and just returns the value it would have supplied anyway. Lets
- * the same object be wired into either kind of call site without an adapter.
+ * A yes/no value that is true iff at least one of its component values is true
+ * under the context (false for zero predicates). Built via
+ * {@link Factories#anyOf(uk.ac.ox.poseidon.core.ValueFactory...)} in this
+ * package.
  *
- * @param <T> the type of object returned by the provider
+ * @param <C> the type of the context
  */
-public interface Provider<T> extends Supplier<T>, Function<Object, T> {
+public class AnyOfValue<C> implements Function<C, Boolean> {
+
+  // Using an array for performance reasons
+  @NonNull
+  private final Function<? super C, Boolean>[] predicates;
+
+  /** @param predicates the component values */
+  @SuppressWarnings("unchecked")
+  public AnyOfValue(
+    final Collection<? extends Function<? super C, Boolean>> predicates
+  ) {
+    this.predicates = predicates.toArray(Function[]::new);
+  }
+
   @Override
-  default T apply(final Object ignored) {
-    return get();
+  public Boolean apply(final C context) {
+    for (final Function<? super C, Boolean> predicate : predicates) {
+      if (predicate.apply(context)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

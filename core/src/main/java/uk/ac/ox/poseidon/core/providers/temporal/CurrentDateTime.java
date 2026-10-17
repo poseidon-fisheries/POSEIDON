@@ -23,30 +23,23 @@
 package uk.ac.ox.poseidon.core.providers.temporal;
 
 import java.time.LocalDateTime;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 /**
- * A {@link Provider} that returns the simulation's current date-time, read live
- * from the {@link TemporalSchedule} on every call. Built via
- * {@link Factories#currentDateTime()} in this package.
+ * A value that is the simulation's current date-time, whatever the context,
+ * read live from the {@link TemporalSchedule} on every call; it throws once the
+ * schedule has run out of events ({@link HasDateTime} says whether it has).
+ * Built via {@link Factories#currentDateTime()} in this package.
  */
 @RequiredArgsConstructor
-public class CurrentDateTime implements Provider<LocalDateTime> {
+public class CurrentDateTime implements Function<Object, LocalDateTime> {
 
   private final TemporalSchedule temporalSchedule;
 
   @Override
-  public LocalDateTime get() {
+  public LocalDateTime apply(final Object context) {
     return temporalSchedule.getDateTime();
-  }
-
-  /**
-   * @return whether there is a current date-time to {@link #get}: there is
-   *         none once the schedule has run out of events
-   */
-  public boolean hasDateTime() {
-    return temporalSchedule.hasDateTime();
   }
 }

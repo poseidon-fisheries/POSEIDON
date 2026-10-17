@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.geography.allocators;
 
-import java.util.function.DoubleSupplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,10 +30,12 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link SupplierAllocator},
- * built via {@link Factories#supplierAllocator(Factory)}.
+ * built via {@link Factories#supplierAllocator(ValueFactory)}.
  */
 @Getter
 @ToString
@@ -46,10 +47,10 @@ public class SupplierAllocatorFactory<S extends Scope> extends RelativeScopeFact
   SupplierAllocator
 > {
 
-  private final Factory<? super S, ? extends DoubleSupplier> doubleSupplier;
+  private final ValueFactory<? super S, ? super Void, Double> value;
 
   @Override
   protected SupplierAllocator newInstance(final S scope) {
-    return new SupplierAllocator(doubleSupplier.get(scope));
+    return new SupplierAllocator(WithoutContext.supplier(value.get(scope)));
   }
 }

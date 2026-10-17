@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -25,26 +25,26 @@ package uk.ac.ox.poseidon.agents.tasks.general;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 import java.time.Duration;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.Agent;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTask;
 
 /**
  * An {@link ExtendedTask} that runs for a fixed duration, drawn fresh from
- * {@code durationSupplier} each time it starts, and then always succeeds.
+ * {@code duration} each time it starts, and then always succeeds.
  *
  * @param <G> the type of agent this task runs against
  */
 @RequiredArgsConstructor
 public class WaitFor<G extends Agent> extends ExtendedTask<G> {
 
-  final Supplier<Duration> durationSupplier;
+  final Function<? super G, Duration> duration;
 
-  /** @return a fresh duration from {@link #durationSupplier} */
+  /** @return a fresh duration from {@link #duration} */
   @Override
   protected Duration getDuration() {
-    return durationSupplier.get();
+    return duration.apply(getAgent());
   }
 
   /** @return always {@code SUCCEEDED} */

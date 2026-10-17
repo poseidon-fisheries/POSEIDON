@@ -24,13 +24,13 @@ package uk.ac.ox.poseidon.agents.social;
 
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
 
-import java.util.function.Function;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.Listener;
 
 /** Factories for the ties between vessels. */
@@ -67,10 +67,7 @@ public class Factories {
    */
   public static CliqueDynamicsFactory cliqueDynamics(
     final Factory<? super SimulationScope, ? extends SocialNetwork> network,
-    final Factory<
-      ? super SimulationScope,
-      ? extends Function<? super Vessel, ?>
-    > groupingKey,
+    final ValueFactory<? super SimulationScope, ? super Vessel, ?> groupingKey,
     final int maximumCliqueSize
   ) {
     return new CliqueDynamicsFactory(

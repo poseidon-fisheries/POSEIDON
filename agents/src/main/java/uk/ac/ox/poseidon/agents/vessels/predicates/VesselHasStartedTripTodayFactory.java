@@ -22,10 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
+import java.util.function.Function;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of
@@ -35,11 +38,12 @@ import uk.ac.ox.poseidon.core.Scope;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class VesselHasStartedTripTodayFactory
-  extends GlobalScopeFactory<VesselHasStartedTripToday>
+  extends GlobalScopeFactory<Function<Vessel, Boolean>>
+  implements ValueFactory<Scope, Vessel, Boolean>
 {
 
   @Override
-  protected VesselHasStartedTripToday newInstance(final Scope scope) {
+  protected Function<Vessel, Boolean> newInstance(final Scope scope) {
     return new VesselHasStartedTripToday();
   }
 }

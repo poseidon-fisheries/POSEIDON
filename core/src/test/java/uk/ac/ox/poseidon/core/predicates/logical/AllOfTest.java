@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,88 +22,84 @@
 
 package uk.ac.ox.poseidon.core.predicates.logical;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-@SuppressWarnings("unchecked")
 class AllOfTest {
 
-  /**
-   * Tests the {@link AllOf#test(Object)} method which checks if all predicates
-   * in the collection return true for the given object.
-   */
+  private static final BiFunction<Object, Object, Boolean> YES = (c, t) -> true;
+  private static final BiFunction<Object, Object, Boolean> NO = (c, t) -> false;
+  private static final Function<Object, Boolean> YES_VALUE = c -> true;
+  private static final Function<Object, Boolean> NO_VALUE = c -> false;
 
   @Test
-  void testAllPredicatesReturnTrue() {
-    final Object object = Mockito.mock(Object.class);
-
-    final Predicate<Object> predicate1 = Mockito.mock(Predicate.class);
-    final Predicate<Object> predicate2 = Mockito.mock(Predicate.class);
-    final Predicate<Object> predicate3 = Mockito.mock(Predicate.class);
-
-    Mockito.when(predicate1.test(object)).thenReturn(true);
-    Mockito.when(predicate2.test(object)).thenReturn(true);
-    Mockito.when(predicate3.test(object)).thenReturn(true);
-
-    final AllOf<Object> allOf = new AllOf<>(
-      ImmutableList.of(predicate1, predicate2, predicate3)
-    );
-    assertTrue(allOf.test(object), "Expected all predicates to return true.");
+  void mappingIsTrueWhenEveryComponentIs() {
+    assertThat(
+      new AllOf<>(ImmutableList.of(YES, YES)).apply(null, "t")
+    ).isTrue();
   }
 
   @Test
-  void testOnePredicateReturnsFalse() {
-    final Object object = Mockito.mock(Object.class);
-
-    final Predicate<Object> predicate1 = Mockito.mock(Predicate.class);
-    final Predicate<Object> predicate2 = Mockito.mock(Predicate.class);
-    final Predicate<Object> predicate3 = Mockito.mock(Predicate.class);
-
-    Mockito.when(predicate1.test(object)).thenReturn(true);
-    Mockito.when(predicate2.test(object)).thenReturn(false);
-    Mockito.when(predicate3.test(object)).thenReturn(true);
-
-    final AllOf<Object> allOf = new AllOf<>(
-      ImmutableList.of(predicate1, predicate2, predicate3)
-    );
-    assertFalse(
-      allOf.test(object),
-      "Expected test to return false as one predicate returned false."
-    );
+  void mappingWithOneTrueComponentAmongFalseOnes() {
+    assertThat(
+      new AllOf<>(ImmutableList.of(NO, YES, NO)).apply(null, "t")
+    ).isEqualTo(false);
   }
 
   @Test
-  void testAllPredicatesReturnFalse() {
-    final Object object = Mockito.mock(Object.class);
-
-    final Predicate<Object> predicate1 = Mockito.mock(Predicate.class);
-    final Predicate<Object> predicate2 = Mockito.mock(Predicate.class);
-
-    Mockito.when(predicate1.test(object)).thenReturn(false);
-    Mockito.when(predicate2.test(object)).thenReturn(false);
-
-    final AllOf<Object> allOf = new AllOf<>(
-      ImmutableList.of(predicate1, predicate2)
-    );
-    assertFalse(
-      allOf.test(object),
-      "Expected test to return false as all predicates returned false."
-    );
+  void mappingIsFalseWhenEveryComponentIs() {
+    assertThat(
+      new AllOf<>(ImmutableList.of(NO, NO)).apply(null, "t")
+    ).isFalse();
   }
 
   @Test
-  void testEmptyPredicates() {
-    final Object object = Mockito.mock(Object.class);
+  void mappingWithNoComponents() {
+    assertThat(
+      new AllOf<Object, Object>(ImmutableList.of()).apply(null, "t")
+    ).isEqualTo(true);
+  }
 
-    final AllOf<Object> allOf = new AllOf<>(ImmutableList.of());
-    assertTrue(
-      allOf.test(object),
-      "Expected test to return true as no predicates are present."
-    );
+  @Test
+  void mappingPassesTheContextAndTheThingToItsComponents() {
+    final BiFunction<String, String, Boolean> sameAsContext = String::equals;
+    assertThat(
+      new AllOf<>(ImmutableList.of(sameAsContext)).apply("a", "a")
+    ).isTrue();
+    assertThat(
+      new AllOf<>(ImmutableList.of(sameAsContext)).apply("a", "b")
+    ).isFalse();
+  }
+
+  @Test
+  void valueWithOneTrueComponentAmongFalseOnes() {
+    assertThat(
+      new AllOfValue<>(ImmutableList.of(NO_VALUE, YES_VALUE)).apply(null)
+    ).isEqualTo(false);
+  }
+
+  @Test
+  void valueIsTrueWhenEveryComponentIs() {
+    assertThat(
+      new AllOfValue<>(ImmutableList.of(YES_VALUE, YES_VALUE)).apply(null)
+    ).isTrue();
+  }
+
+  @Test
+  void valueWithNoComponents() {
+    assertThat(
+      new AllOfValue<Object>(ImmutableList.of()).apply(null)
+    ).isEqualTo(true);
+  }
+
+  @Test
+  void valuePassesTheContextToItsComponents() {
+    final Function<String, Boolean> isA = "a"::equals;
+    assertThat(new AllOfValue<>(ImmutableList.of(isA)).apply("a")).isTrue();
+    assertThat(new AllOfValue<>(ImmutableList.of(isA)).apply("b")).isFalse();
   }
 }

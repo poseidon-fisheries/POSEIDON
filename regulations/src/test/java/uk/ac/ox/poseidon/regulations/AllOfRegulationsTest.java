@@ -76,8 +76,9 @@ class AllOfRegulationsTest {
     final Regulations<Action<Object>> first = a -> asked.add("first") && false;
     final Regulations<Action<Object>> second = a -> asked.add("second");
 
-    new AllOfRegulations<>(List.of(first, second)).isPermitted(action);
-
+    assertThat(
+      new AllOfRegulations<>(List.of(first, second)).isPermitted(action)
+    ).isFalse();
     assertThat(asked).containsExactly("first");
   }
 

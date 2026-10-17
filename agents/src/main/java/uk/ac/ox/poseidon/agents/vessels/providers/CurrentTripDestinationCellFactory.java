@@ -22,10 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels.providers;
 
+import java.util.function.Function;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link VesselScopeFactory} counterpart of
@@ -35,11 +38,12 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class CurrentTripDestinationCellFactory
-  extends VesselScopeFactory<CurrentTripDestinationCell>
+  extends VesselScopeFactory<Function<Object, Int2D>>
+  implements ValueFactory<VesselScope, Object, Int2D>
 {
 
   @Override
-  protected CurrentTripDestinationCell newInstance(final VesselScope scope) {
+  protected Function<Object, Int2D> newInstance(final VesselScope scope) {
     return new CurrentTripDestinationCell(scope.getVessel());
   }
 }

@@ -23,10 +23,9 @@
 package uk.ac.ox.poseidon.agents.catches.disposition;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /**
@@ -47,9 +46,11 @@ public class Factories {
    */
   public static <S extends Scope> IndexedDiscardRatesFactory<S> discardRates(
     final Factory<? super S, ? extends Collection<? extends Species>> species,
-    final Factory<
+    final MappingFactory<
       ? super S,
-      ? extends Function<? super Species, Double>
+      ? super Void,
+      ? super Species,
+      Double
     > rateFunction
   ) {
     return new IndexedDiscardRatesFactory<S>(species, rateFunction);
@@ -64,9 +65,11 @@ public class Factories {
    */
   public static <S extends Scope> IndexedDiscardMortalityFactory<S> indexedDiscardMortality(
     final Factory<? super S, ? extends Collection<? extends Species>> species,
-    final Factory<
+    final MappingFactory<
       ? super S,
-      ? extends Function<? super Species, Double>
+      ? super Void,
+      ? super Species,
+      Double
     > rateFunction
   ) {
     return new IndexedDiscardMortalityFactory<S>(species, rateFunction);
@@ -110,9 +113,11 @@ public class Factories {
    * @see DiscardMortality
    */
   public static <S extends Scope> DiscardMortalityFactory<S> discardMortality(
-    final Factory<
+    final MappingFactory<
       ? super S,
-      ? extends Function<? super Species, Double>
+      ? super Void,
+      ? super Species,
+      Double
     > mortalityRate
   ) {
     return new DiscardMortalityFactory<>(mortalityRate);

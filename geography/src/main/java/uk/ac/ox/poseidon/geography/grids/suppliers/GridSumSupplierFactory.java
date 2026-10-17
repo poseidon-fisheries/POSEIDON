@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.grids.suppliers;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,6 +31,7 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 /**
@@ -41,15 +43,15 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class GridSumSupplierFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  GridSumSupplier
-> {
+public class GridSumSupplierFactory<S extends Scope>
+  extends RelativeScopeFactory<S, Function<Object, Double>>
+  implements ValueFactory<S, Object, Double>
+{
 
   private final Factory<? super S, ? extends DoubleGrid> doubleGrid;
 
   @Override
-  protected GridSumSupplier newInstance(final S scope) {
+  protected Function<Object, Double> newInstance(final S scope) {
     return new GridSumSupplier(doubleGrid.get(scope));
   }
 }

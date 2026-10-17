@@ -26,16 +26,15 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import ec.util.MersenneTwisterFast;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.function.Function;
 import lombok.NonNull;
-import uk.ac.ox.poseidon.core.providers.DoubleProvider;
 
 /**
- * A {@link DoubleProvider} that returns a uniformly distributed random value in
- * {@code [minimum, maximum)} on each call, drawn from the simulation's shared
- * RNG. Built via {@link Factories#randomDouble(double, double)} in this
- * package.
+ * A value that is a uniformly distributed random value in {@code [minimum,
+ * maximum)} on each call, drawn from the simulation's shared RNG. Built via
+ * {@link Factories#randomDouble(double, double)} in this package.
  */
-public class RandomDouble implements DoubleProvider {
+public class RandomDouble implements Function<Object, Double> {
 
   private final MersenneTwisterFast rng;
   private final double minimum;
@@ -60,7 +59,7 @@ public class RandomDouble implements DoubleProvider {
   }
 
   @Override
-  public double getAsDouble() {
+  public Double apply(final Object context) {
     return minimum + rng.nextDouble() * (maximum - minimum);
   }
 }

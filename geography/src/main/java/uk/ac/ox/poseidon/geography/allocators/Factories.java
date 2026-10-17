@@ -22,11 +22,11 @@
 
 package uk.ac.ox.poseidon.geography.allocators;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.Predicate;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * Factories for {@link Allocator}s: weight functions used to place things on a
@@ -47,21 +47,25 @@ public class Factories {
    */
   public static <S extends Scope> FilteredAllocatorFactory<S> filteredAllocator(
     final Factory<? super S, ? extends Allocator> delegateAllocator,
-    final Factory<? super S, ? extends Predicate<? super Int2D>> cellPredicate
+    final MappingFactory<
+      ? super S,
+      ? super Void,
+      ? super Int2D,
+      Boolean
+    > cellPredicate
   ) {
     return new FilteredAllocatorFactory<>(delegateAllocator, cellPredicate);
   }
 
   /**
-   * @param doubleSupplier factory for the supplier providing every cell's
-   *                       weight
+   * @param value every cell's weight, asked with no context
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link SupplierAllocator}
    * @see SupplierAllocator
    */
   public static <S extends Scope> SupplierAllocatorFactory<S> supplierAllocator(
-    final Factory<? super S, ? extends DoubleSupplier> doubleSupplier
+    final ValueFactory<? super S, ? super Void, Double> value
   ) {
-    return new SupplierAllocatorFactory<>(doubleSupplier);
+    return new SupplierAllocatorFactory<>(value);
   }
 }

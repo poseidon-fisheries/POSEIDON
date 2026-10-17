@@ -26,7 +26,6 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_PER_HOUR;
 
 import java.time.Duration;
-import java.util.function.Supplier;
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import lombok.AllArgsConstructor;
@@ -38,6 +37,8 @@ import si.uom.quantity.VolumetricFlowRate;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of
@@ -60,10 +61,7 @@ public class FixedBiomassProportionGearFactory<S extends SimulationScope> extend
     ? super S,
     ? extends Quantity<Mass>
   > minimumCatchThreshold;
-  private final Factory<
-    ? super S,
-    ? extends Supplier<Duration>
-  > durationSupplier;
+  private final ValueFactory<? super S, ? super Void, Duration> duration;
   private final Factory<
     ? super S,
     ? extends Quantity<VolumetricFlowRate>
@@ -80,7 +78,7 @@ public class FixedBiomassProportionGearFactory<S extends SimulationScope> extend
       code,
       proportion,
       minimumCatchThreshold.get(scope).to(KILOGRAM).getValue().doubleValue(),
-      durationSupplier.get(scope),
+      WithoutContext.supplier(duration.get(scope)),
       fuelPerHour
     );
   }

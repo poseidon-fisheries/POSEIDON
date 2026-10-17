@@ -26,11 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.travel.Factories.travelCost;
-import static uk.ac.ox.poseidon.agents.vessels.Factories.perVessel;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.time.Duration;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +36,10 @@ import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.ProductStore;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 
@@ -55,10 +56,29 @@ class TravelCostFactoryTest {
     new SimulationScope(simulation),
     vesselB
   );
-  private final Function<Int2D, Route> routeFunction = destination ->
-    new Route(destination.x, Duration.ofHours(destination.y));
-  private final Function<Route, Money> routeCost = route ->
-    Money.of(CurrencyUnit.of("EUR"), route.getDistanceInKm());
+  private final MappingFactory<Scope, Object, Int2D, Route> routeFunction =
+    scope -> (context, destination) -> route(destination);
+  private final MappingFactory<Scope, Object, Route, Money> routeCost = scope ->
+    (context, route) ->
+      Money.of(CurrencyUnit.of("EUR"), route.getDistanceInKm());
+
+  private static Route route(final Int2D destination) {
+    return new Route(destination.x, Duration.ofHours(destination.y));
+  }
+
+  /** A route function built once per vessel. */
+  private static final class PerVesselRouteFunctionFactory
+    extends VesselScopeFactory<BiFunction<Object, Int2D, Route>>
+    implements MappingFactory<VesselScope, Object, Int2D, Route>
+  {
+
+    @Override
+    protected BiFunction<Object, Int2D, Route> newInstance(
+      final VesselScope scope
+    ) {
+      return (context, destination) -> route(destination);
+    }
+  }
 
   @BeforeEach
   void giveTheMocksStores() {
@@ -74,8 +94,8 @@ class TravelCostFactoryTest {
   @Test
   void sharesOneTravelCostBetweenVesselsWhenItsInputsAreShared() {
     final TravelCostFactory<VesselScope> factory = travelCost(
-      object(routeFunction),
-      object(routeCost)
+      routeFunction,
+      routeCost
     );
 
     assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeB));
@@ -84,8 +104,8 @@ class TravelCostFactoryTest {
   @Test
   void givesOneTravelCostPerVesselWhenAnInputIsPerVessel() {
     final TravelCostFactory<VesselScope> factory = travelCost(
-      perVessel(object(routeFunction)),
-      object(routeCost)
+      new PerVesselRouteFunctionFactory(),
+      routeCost
     );
 
     assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));

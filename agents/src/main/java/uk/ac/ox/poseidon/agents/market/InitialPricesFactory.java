@@ -27,7 +27,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import com.google.common.collect.ImmutableList;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -37,6 +36,7 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link SimulationScopeFactory} that applies the resolved
@@ -62,9 +62,10 @@ public class InitialPricesFactory
     Factory<? super SimulationScope, ? extends List<MarketPrice>>
   > marketPrices;
 
-  private final Factory<
+  private final ValueFactory<
     ? super SimulationScope,
-    ? extends Supplier<LocalDateTime>
+    ? super Void,
+    LocalDateTime
   > currentDateTime;
 
   @Override
@@ -73,7 +74,7 @@ public class InitialPricesFactory
       .stream()
       .flatMap(factory -> factory.get(scope).stream())
       .collect(toImmutableList());
-    final LocalDateTime dateTime = currentDateTime.get(scope).get();
+    final LocalDateTime dateTime = currentDateTime.get(scope).apply(null);
     resolved.forEach(marketPrice -> marketPrice.apply(dateTime));
     return resolved;
   }

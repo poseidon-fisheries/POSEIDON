@@ -29,7 +29,7 @@ import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.Up
 
 import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import sim.field.continuous.Continuous2D;
@@ -39,7 +39,6 @@ import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.core.providers.temporal.CurrentDateTime;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -90,7 +89,7 @@ class RegulationGridPortrayalFactoryTest {
    * to both seiners.
    */
   private RegulationGridPortrayalFactory.Portrayal portrayal(
-    final Predicate<Vessel> fleet
+    final Function<? super Vessel, Boolean> fleet
   ) {
     final Regulations<ExtendedFishingAction> regulations = action -> {
       final Int2D cell = modelGrid.toCell(action.getStartCoordinate());
@@ -112,10 +111,9 @@ class RegulationGridPortrayalFactoryTest {
     when(bathymetricGrid.getActiveWaterCells()).thenAnswer(_ ->
       Stream.of(CLOSED_TO_FLEET, CLOSED_TO_ONE_VESSEL, OPEN)
     );
-    final CurrentDateTime currentDateTime = mock(CurrentDateTime.class);
-    when(currentDateTime.get()).thenReturn(LocalDateTime.of(2013, 1, 2, 0, 0));
     return new RegulationGridPortrayalFactory.Portrayal(
-      currentDateTime,
+      () -> LocalDateTime.of(2013, 1, 2, 0, 0),
+      () -> true,
       regulations,
       vesselField,
       fleet,

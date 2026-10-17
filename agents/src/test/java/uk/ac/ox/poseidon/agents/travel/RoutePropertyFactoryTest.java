@@ -54,7 +54,7 @@ class RoutePropertyFactoryTest {
     assertThat(
       routeProperty("duration")
         .get(Scope.GLOBAL_SCOPE)
-        .apply(new Route(15.0, Duration.ofMinutes(90)))
+        .apply(null, new Route(15.0, Duration.ofMinutes(90)))
     ).isEqualTo(Duration.ofMinutes(90));
   }
 }

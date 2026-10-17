@@ -21,8 +21,8 @@
  */
 
 /**
- * {@link java.util.function.Predicate}s that compare a tested
- * {@link Comparable} value against one or two thresholds. See
+ * Yes/no mappings that compare a tested {@link Comparable} value against one or
+ * two thresholds read under the context. See
  * {@link uk.ac.ox.poseidon.core.predicates.comparable.Factories} for the entry
  * points.
  */

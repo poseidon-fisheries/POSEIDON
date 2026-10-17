@@ -48,10 +48,10 @@ public class KeyedMemorySelector<
 > implements Function<T, Memory<O, M>> {
 
   private final KeyedMemory<K, O, M> keyedMemory;
-  private final Function<? super T, ? extends K> keyExtractor;
+  private final Function<? super T, ? extends K> key;
 
   @Override
   public Memory<O, M> apply(final T input) {
-    return keyedMemory.get(keyExtractor.apply(input));
+    return keyedMemory.get(key.apply(input));
   }
 }

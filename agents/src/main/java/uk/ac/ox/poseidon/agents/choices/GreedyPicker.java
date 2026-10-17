@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Predicate;
-import uk.ac.ox.poseidon.core.providers.Provider;
+import java.util.function.Supplier;
 
 /**
  * Picks the option with the highest value that passes a predicate, breaking
@@ -54,7 +54,7 @@ import uk.ac.ox.poseidon.core.providers.Provider;
  *
  * @param <O> the type of option
  */
-public class GreedyPicker<O> implements Provider<O> {
+public class GreedyPicker<O> implements Supplier<O> {
 
   private final OptionValues<O> optionValues;
   private final Predicate<? super O> optionPredicate;

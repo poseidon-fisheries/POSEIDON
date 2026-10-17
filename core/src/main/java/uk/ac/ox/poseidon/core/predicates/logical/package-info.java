@@ -21,9 +21,8 @@
  */
 
 /**
- * {@link java.util.function.Predicate} combinators that build a predicate out
- * of other predicates. See
- * {@link uk.ac.ox.poseidon.core.predicates.logical.Factories} for the entry
- * points.
+ * Combinators building a yes/no value or mapping out of others of the same
+ * shape. See {@link uk.ac.ox.poseidon.core.predicates.logical.Factories} for
+ * the entry points.
  */
 package uk.ac.ox.poseidon.core.predicates.logical;

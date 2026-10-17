@@ -24,34 +24,40 @@ package uk.ac.ox.poseidon.core.functions;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
- * A {@link Function} that sums the {@link Duration}s produced by applying
- * several other functions to the same input. Built via
- * {@link Factories#combinedDuration(uk.ac.ox.poseidon.core.Factory...)} in this
- * package.
+ * A mapping that sums the {@link Duration}s produced by several other mappings
+ * of the same thing, under the same context. Built via
+ * {@link Factories#combinedDuration(uk.ac.ox.poseidon.core.MappingFactory...)}
+ * in this package.
  *
- * @param <T> the type of input the wrapped duration-producing functions are
- *            applied to
+ * @param <C> the type of the context
+ * @param <T> the type of the thing mapped
  */
-public class CombinedDuration<T> implements Function<T, Duration> {
+public class CombinedDuration<C, T> implements BiFunction<C, T, Duration> {
 
-  private final Function<T, ? extends Duration>[] durations;
+  private final BiFunction<
+    ? super C,
+    ? super T,
+    ? extends Duration
+  >[] durations;
 
-  /** @param durations the duration-producing functions to sum */
+  /** @param durations the mappings to combine */
   @SuppressWarnings("unchecked")
   public CombinedDuration(
-    final List<? extends Function<? super T, ? extends Duration>> durations
+    final List<
+      ? extends BiFunction<? super C, ? super T, ? extends Duration>
+    > durations
   ) {
-    this.durations = durations.toArray(new Function[0]);
+    this.durations = durations.toArray(new BiFunction[0]);
   }
 
   @Override
-  public Duration apply(final T t) {
+  public Duration apply(final C context, final T t) {
     Duration total = Duration.ZERO;
-    for (final Function<T, ? extends Duration> duration : durations) {
-      total = total.plus(duration.apply(t));
+    for (int i = 0; i < durations.length; i++) {
+      total = total.plus(durations[i].apply(context, t));
     }
     return total;
   }

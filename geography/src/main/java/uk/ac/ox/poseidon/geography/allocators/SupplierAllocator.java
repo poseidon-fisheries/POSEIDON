@@ -22,25 +22,25 @@
 
 package uk.ac.ox.poseidon.geography.allocators;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 
 /**
  * An {@link Allocator} that ignores the cell entirely and returns the same
- * resolved {@link DoubleSupplier}'s value for every cell. Built via
- * {@link Factories#supplierAllocator(uk.ac.ox.poseidon.core.Factory)} in this
+ * resolved {@link Supplier}'s value for every cell. Built via
+ * {@link Factories#supplierAllocator(uk.ac.ox.poseidon.core.ValueFactory)} in this
  * package.
  */
 @RequiredArgsConstructor
 public class SupplierAllocator implements Allocator {
 
   @NonNull
-  private final DoubleSupplier supplier;
+  private final Supplier<Double> supplier;
 
   @Override
   public double applyAsDouble(final Int2D cell) {
-    return supplier.getAsDouble();
+    return supplier.get();
   }
 }

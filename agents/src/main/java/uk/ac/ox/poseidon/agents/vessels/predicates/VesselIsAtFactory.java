@@ -22,16 +22,17 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link VesselIsAt}, built via
@@ -42,15 +43,15 @@ import uk.ac.ox.poseidon.core.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class VesselIsAtFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  VesselIsAt
-> {
+public class VesselIsAtFactory<S extends Scope>
+  extends RelativeScopeFactory<S, Function<Vessel, Boolean>>
+  implements ValueFactory<S, Vessel, Boolean>
+{
 
-  private final Factory<? super S, ? extends Supplier<Int2D>> cellSupplier;
+  private final ValueFactory<? super S, ? super Vessel, Int2D> cell;
 
   @Override
-  protected VesselIsAt newInstance(final S scope) {
-    return new VesselIsAt(cellSupplier.get(scope));
+  protected Function<Vessel, Boolean> newInstance(final S scope) {
+    return new VesselIsAt(cell.get(scope));
   }
 }

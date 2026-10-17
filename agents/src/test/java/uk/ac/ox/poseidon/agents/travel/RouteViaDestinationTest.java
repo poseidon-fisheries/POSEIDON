@@ -78,7 +78,7 @@ class RouteViaDestinationTest {
 
   @Test
   void addsUpTheLegsToTheDestinationAndBackToPort() {
-    final Route route = routeViaDestination.apply(destination);
+    final Route route = routeViaDestination.apply(null, destination);
 
     assertThat(route.getDistanceInKm()).isEqualTo(15.0);
     assertThat(route.getDuration()).isEqualTo(Duration.ofMinutes(90));
@@ -86,7 +86,7 @@ class RouteViaDestinationTest {
 
   @Test
   void readsTheVesselsCurrentCellHomePortAndSpeedAtEachCall() {
-    final Route routeBefore = routeViaDestination.apply(destination);
+    final Route routeBefore = routeViaDestination.apply(null, destination);
 
     final Int2D otherPortCell = new Int2D(3, 3);
     when(vessel.getCell()).thenReturn(destination);
@@ -98,7 +98,7 @@ class RouteViaDestinationTest {
     when(pathFinder.getPath(destination, otherPortCell)).thenReturn(
       Optional.of(ImmutableList.of(destination, waypoint, otherPortCell))
     );
-    final Route routeAfter = routeViaDestination.apply(destination);
+    final Route routeAfter = routeViaDestination.apply(null, destination);
 
     assertThat(routeBefore).isEqualTo(new Route(15.0, Duration.ofMinutes(90)));
     assertThat(routeAfter).isEqualTo(new Route(10.0, Duration.ofMinutes(30)));
@@ -111,7 +111,7 @@ class RouteViaDestinationTest {
       Optional.of(ImmutableList.of(destination))
     );
 
-    final Route route = routeViaDestination.apply(destination);
+    final Route route = routeViaDestination.apply(null, destination);
 
     assertThat(route.getDistanceInKm()).isEqualTo(5.0);
     assertThat(route.getDuration()).isEqualTo(Duration.ofMinutes(30));
@@ -119,8 +119,8 @@ class RouteViaDestinationTest {
 
   @Test
   void sumsThePathBetweenTwoCellsOnlyOnce() {
-    routeViaDestination.apply(destination);
-    routeViaDestination.apply(destination);
+    routeViaDestination.apply(null, destination);
+    routeViaDestination.apply(null, destination);
 
     verify(distanceCalculator, times(2)).distanceInKm(anyList());
   }
@@ -132,7 +132,7 @@ class RouteViaDestinationTest {
     );
 
     assertThatThrownBy(() ->
-      routeViaDestination.apply(destination)
+      routeViaDestination.apply(null, destination)
     ).isInstanceOf(IllegalStateException.class);
   }
 }

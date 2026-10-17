@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -50,7 +50,7 @@ class InRectangularAreaTest {
     final InRectangularArea predicate = new InRectangularArea(envelope);
 
     // Act
-    final boolean result = predicate.test(coordinate);
+    final boolean result = predicate.apply(null, coordinate);
 
     // Assert
     assertTrue(
@@ -69,7 +69,7 @@ class InRectangularAreaTest {
     final InRectangularArea predicate = new InRectangularArea(envelope);
 
     // Act
-    final boolean result = predicate.test(coordinate);
+    final boolean result = predicate.apply(null, coordinate);
 
     // Assert
     assertFalse(
@@ -87,7 +87,7 @@ class InRectangularAreaTest {
     final InRectangularArea predicate = new InRectangularArea(envelope);
 
     // Act
-    final boolean result = predicate.test(coordinate);
+    final boolean result = predicate.apply(null, coordinate);
 
     // Assert
     assertFalse(

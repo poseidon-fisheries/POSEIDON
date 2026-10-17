@@ -22,20 +22,35 @@
 
 package uk.ac.ox.poseidon.core.providers.constant;
 
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.IntProvider;
+import java.util.function.BiFunction;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
- * An {@link IntProvider} that always returns the same, fixed value. Built via
- * {@link Factories Factories.constantInt(...)} in this package.
+ * A {@link RelativeScopeFactory} counterpart of {@link ConstantMapping}, built
+ * via {@link Factories#alwaysTrue()} and {@link Factories#alwaysFalse()}.
  */
-@RequiredArgsConstructor
-public class ConstantInt implements IntProvider {
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
+public class ConstantMappingFactory<S extends Scope, R>
+  extends RelativeScopeFactory<S, BiFunction<Object, Object, R>>
+  implements MappingFactory<S, Object, Object, R>
+{
 
-  private final int value;
+  private final Factory<? super S, ? extends R> result;
 
   @Override
-  public int getAsInt() {
-    return value;
+  protected BiFunction<Object, Object, R> newInstance(final S scope) {
+    return new ConstantMapping<>(result.get(scope));
   }
 }

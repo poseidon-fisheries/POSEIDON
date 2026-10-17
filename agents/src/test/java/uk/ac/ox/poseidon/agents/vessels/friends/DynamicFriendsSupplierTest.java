@@ -32,11 +32,10 @@ import ec.util.MersenneTwisterFast;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 
 class DynamicFriendsSupplierTest {
 
@@ -161,7 +160,7 @@ class DynamicFriendsSupplierTest {
   void testPrunesFriendsThatNoLongerSatisfyCondition() {
     final Vessel self = mockVessel();
     final Vessel friend = mockVessel(true);
-    final Predicate<Vessel> isActive = v -> ((Vessel) v).isActive();
+    final Function<Vessel, Boolean> isActive = Vessel::isActive;
     final List<Vessel> pool = new ArrayList<>(List.of(friend));
     final DynamicFriendsSupplier supplier = new DynamicFriendsSupplier(
       1,
@@ -185,7 +184,7 @@ class DynamicFriendsSupplierTest {
     final Vessel friendA = mockVessel(true);
     final Vessel friendB = mockVessel(true);
     final Vessel friendC = mockVessel(true);
-    final Predicate<Vessel> isActive = v -> ((Vessel) v).isActive();
+    final Function<Vessel, Boolean> isActive = Vessel::isActive;
     final List<Vessel> pool = new ArrayList<>(
       List.of(friendA, friendB, friendC)
     );

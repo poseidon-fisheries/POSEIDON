@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,37 +23,39 @@
 package uk.ac.ox.poseidon.core.predicates.temporal;
 
 import java.time.LocalDate;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link DateIsBefore}, built via
- * {@link Factories#dateIsBefore(Factory)}.
+ * {@link Factories#dateIsBefore(uk.ac.ox.poseidon.core.ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class DateIsBeforeFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  DateIsBefore
-> {
+public class DateIsBeforeFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, BiFunction<C, LocalDate, Boolean>>
+  implements MappingFactory<S, C, LocalDate, Boolean>
+{
 
-  private final Factory<
+  private final ValueFactory<
     ? super S,
-    ? extends Supplier<? extends LocalDate>
+    ? super C,
+    ? extends LocalDate
   > referenceDate;
 
   @Override
-  protected DateIsBefore newInstance(final S scope) {
-    return new DateIsBefore(referenceDate.get(scope));
+  protected BiFunction<C, LocalDate, Boolean> newInstance(final S scope) {
+    return new DateIsBefore<>(referenceDate.get(scope));
   }
 }

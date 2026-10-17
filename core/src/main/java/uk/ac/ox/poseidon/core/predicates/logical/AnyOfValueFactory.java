@@ -20,41 +20,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.core.providers;
+package uk.ac.ox.poseidon.core.predicates.logical;
 
-import java.util.function.IntSupplier;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import com.google.common.collect.ImmutableList;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.providers.constant.ConstantInt;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link RelativeScopeFactory} that resolves the given delegate
- * {@link IntSupplier} once, when built, and returns an {@link IntProvider} that
- * keeps handing out that same first-resolved value thereafter — a snapshot, not
- * a live pass-through to the delegate. No separate plain component class here:
- * the produced value is a {@link ConstantInt} wrapping the snapshot, built via
- * {@link Factories#firstIntFrom(Factory)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link AnyOfValue}, built via
+ * {@link Factories#anyOf(ValueFactory...)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class FirstIntFromFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  IntProvider
-> {
+public class AnyOfValueFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, Boolean>>
+  implements ValueFactory<S, C, Boolean>
+{
 
-  private final Factory<? super S, ? extends IntSupplier> delegate;
+  @Singular
+  private final ImmutableList<
+    ValueFactory<? super S, ? super C, Boolean>
+  > predicates;
 
   @Override
-  protected IntProvider newInstance(final S scope) {
-    return new ConstantInt(delegate.get(scope).getAsInt());
+  protected Function<C, Boolean> newInstance(final S scope) {
+    return new AnyOfValue<>(
+      predicates
+        .stream()
+        .map(f -> f.get(scope))
+        .collect(toImmutableList())
+    );
   }
 }

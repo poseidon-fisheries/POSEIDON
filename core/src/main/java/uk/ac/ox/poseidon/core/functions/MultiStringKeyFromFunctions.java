@@ -25,37 +25,38 @@ package uk.ac.ox.poseidon.core.functions;
 import static uk.ac.ox.poseidon.core.utils.Utils.multiStringKey;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
- * A {@link Function} that applies several other functions to the same input and
- * joins their results into a single composite string key (via
+ * A mapping that applies several other mappings to the same thing, under the
+ * same context, and joins their results into a single composite string key (via
  * {@code Utils.multiStringKey}). Built via
- * {@link Factories#multiStringKeyFromFunctions(uk.ac.ox.poseidon.core.Factory...)}
+ * {@link Factories#multiStringKeyFromFunctions(uk.ac.ox.poseidon.core.MappingFactory...)}
  * in this package.
  *
- * @param <T> the type of input the wrapped functions are applied to
+ * @param <C> the type of the context
+ * @param <T> the type of the thing mapped
  */
-public class MultiStringKeyFromFunctions<T> implements Function<T, String> {
+public class MultiStringKeyFromFunctions<
+  C,
+  T
+> implements BiFunction<C, T, String> {
 
-  private final Function<T, ?>[] functions;
+  private final BiFunction<? super C, ? super T, ?>[] functions;
 
-  /**
-   * @param functions the functions whose results are joined into the composite
-   *                  key
-   */
+  /** @param functions the mappings to combine */
   @SuppressWarnings("unchecked")
   public MultiStringKeyFromFunctions(
-    final List<? extends Function<? super T, ?>> functions
+    final List<? extends BiFunction<? super C, ? super T, ?>> functions
   ) {
-    this.functions = functions.toArray(new Function[0]);
+    this.functions = functions.toArray(new BiFunction[0]);
   }
 
   @Override
-  public String apply(final T t) {
+  public String apply(final C context, final T t) {
     final Object[] keys = new Object[functions.length];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = functions[i].apply(t);
+    for (int i = 0; i < functions.length; i++) {
+      keys[i] = functions[i].apply(context, t);
     }
     return multiStringKey(keys);
   }

@@ -22,12 +22,12 @@
 
 package uk.ac.ox.poseidon.biology.allocators;
 
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.constantDouble;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
-import java.util.function.DoubleSupplier;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * Factories for {@link uk.ac.ox.poseidon.geography.allocators.Allocator}s over
@@ -39,8 +39,8 @@ public class Factories {
 
   /**
    * @param carryingCapacityGrid factory for the grid to weigh cells by
-   * @param proportionSupplier   factory for the supplier of the proportion (in
-   *                             {@code [0, 1]}) to weigh each cell by
+   * @param proportion           the proportion (in {@code [0, 1]}) to weigh
+   *                             each cell by, asked with no context
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link ProportionOfCarryingCapacityAllocator}
    * @see ProportionOfCarryingCapacityAllocator
@@ -50,11 +50,11 @@ public class Factories {
       ? super S,
       ? extends CarryingCapacityGrid
     > carryingCapacityGrid,
-    final Factory<? super S, ? extends DoubleSupplier> proportionSupplier
+    final ValueFactory<? super S, ? super Void, Double> proportion
   ) {
     return new ProportionOfCarryingCapacityAllocatorFactory<>(
       carryingCapacityGrid,
-      proportionSupplier
+      proportion
     );
   }
 
@@ -73,7 +73,7 @@ public class Factories {
   ) {
     return new ProportionOfCarryingCapacityAllocatorFactory<>(
       carryingCapacityGrid,
-      constantDouble(1.0)
+      constant(1.0)
     );
   }
 }

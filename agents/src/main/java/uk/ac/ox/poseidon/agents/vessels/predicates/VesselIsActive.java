@@ -22,14 +22,14 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
-import java.util.function.Predicate;
+import java.util.function.Function;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /** Holds for a vessel that is currently active. */
-public class VesselIsActive implements Predicate<Vessel> {
+public class VesselIsActive implements Function<Vessel, Boolean> {
 
   @Override
-  public boolean test(final Vessel vessel) {
+  public Boolean apply(final Vessel vessel) {
     return vessel.isActive();
   }
 }

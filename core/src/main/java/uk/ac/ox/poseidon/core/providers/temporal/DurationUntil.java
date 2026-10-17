@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -24,26 +24,34 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
- * A {@link Provider} of the time left from the current date-time until a
- * reference date-time, both read anew on every call: negative once the
- * reference has passed, so a deadline that has gone by leaves no time. Built
- * via {@link Factories#durationUntil(uk.ac.ox.poseidon.core.Factory)} in this
+ * A value of the time left from the current date-time until a reference
+ * date-time, both read anew on every call: negative once the reference has
+ * passed, so a deadline that has gone by leaves no time. Built via
+ * {@link Factories#durationUntil(uk.ac.ox.poseidon.core.ValueFactory)} in this
  * package.
  */
 @RequiredArgsConstructor
-public class DurationUntil implements Provider<Duration> {
+public class DurationUntil<C> implements Function<C, Duration> {
 
-  private final @NonNull Supplier<? extends LocalDateTime> currentDateTime;
-  private final @NonNull Supplier<? extends LocalDateTime> referenceDateTime;
+  private final @NonNull Function<
+    ? super C,
+    ? extends LocalDateTime
+  > currentDateTime;
+  private final @NonNull Function<
+    ? super C,
+    ? extends LocalDateTime
+  > referenceDateTime;
 
   @Override
-  public Duration get() {
-    return Duration.between(currentDateTime.get(), referenceDateTime.get());
+  public Duration apply(final C context) {
+    return Duration.between(
+      currentDateTime.apply(context),
+      referenceDateTime.apply(context)
+    );
   }
 }

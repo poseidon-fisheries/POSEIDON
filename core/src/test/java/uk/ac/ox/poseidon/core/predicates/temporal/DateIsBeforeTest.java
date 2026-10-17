@@ -30,17 +30,17 @@ import org.junit.jupiter.api.Test;
 
 class DateIsBeforeTest {
 
-  private final DateIsBefore predicate = new DateIsBefore(() ->
+  private final DateIsBefore<Object> predicate = new DateIsBefore<>(context ->
     LocalDate.of(2025, 6, 15)
   );
 
   @Test
   void testEarlierDateIsBefore() {
-    assertTrue(predicate.test(LocalDate.of(2025, 6, 14)));
+    assertTrue(predicate.apply(null, LocalDate.of(2025, 6, 14)));
   }
 
   @Test
   void testLaterDateIsNotBefore() {
-    assertFalse(predicate.test(LocalDate.of(2025, 6, 16)));
+    assertFalse(predicate.apply(null, LocalDate.of(2025, 6, 16)));
   }
 }

@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.core.providers.temporal;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,33 +33,36 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link DateTimeAfter}. Built via
- * {@link Factories#dateTimeAfter(Factory, Factory)}.
+ * {@link Factories#dateTimeAfter(ValueFactory, ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class DateTimeAfterFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  DateTimeAfter
-> {
+public class DateTimeAfterFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, LocalDateTime>>
+  implements ValueFactory<S, C, LocalDateTime>
+{
 
-  private final Factory<
+  private final ValueFactory<
     ? super S,
-    ? extends Supplier<LocalDateTime>
+    ? super C,
+    LocalDateTime
   > referenceDateTime;
-  private final Factory<
+  private final ValueFactory<
     ? super S,
-    ? extends Supplier<? extends TemporalAmount>
+    ? super C,
+    ? extends TemporalAmount
   > amountToAdd;
 
   @Override
-  protected DateTimeAfter newInstance(final S scope) {
-    return new DateTimeAfter(
+  protected Function<C, LocalDateTime> newInstance(final S scope) {
+    return new DateTimeAfter<>(
       referenceDateTime.get(scope),
       amountToAdd.get(scope)
     );

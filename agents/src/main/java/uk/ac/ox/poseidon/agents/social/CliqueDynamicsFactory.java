@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.agents.social;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import ec.util.MersenneTwisterFast;
-import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,6 +33,7 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
 
 /**
@@ -55,9 +55,10 @@ public class CliqueDynamicsFactory
     ? super SimulationScope,
     ? extends SocialNetwork
   > network;
-  private final Factory<
+  private final ValueFactory<
     ? super SimulationScope,
-    ? extends Function<? super Vessel, ?>
+    ? super Vessel,
+    ?
   > groupingKey;
   private final int maximumCliqueSize;
   private final Factory<

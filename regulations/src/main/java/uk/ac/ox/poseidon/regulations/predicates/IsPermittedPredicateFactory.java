@@ -31,6 +31,7 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.regulations.Action;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
@@ -44,22 +45,22 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class IsPermittedPredicateFactory<
-  S extends Scope,
-  G,
-  A extends Action<G>
-> extends RelativeScopeFactory<S, IsPermittedPredicate<G, A>> {
+    S extends Scope,
+    G,
+    A extends Action<G>
+  >
+  extends RelativeScopeFactory<S, Function<G, Boolean>>
+  implements ValueFactory<S, G, Boolean>
+{
 
-  private final Factory<
-    ? super S,
-    ? extends Function<? super G, A>
-  > actionFunction;
+  private final ValueFactory<? super S, ? super G, ? extends A> actionFunction;
   private final Factory<
     ? super S,
     ? extends Regulations<? super A>
   > regulations;
 
   @Override
-  protected IsPermittedPredicate<G, A> newInstance(final S scope) {
+  protected Function<G, Boolean> newInstance(final S scope) {
     return new IsPermittedPredicate<>(
       actionFunction.get(scope),
       regulations.get(scope)

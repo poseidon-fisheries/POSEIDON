@@ -27,8 +27,8 @@ import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.functions.Factories.numericIntervalToStringMapper;
 
 import com.google.common.collect.ImmutableList;
+import java.util.function.BiFunction;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.core.functions.NumericIntervalMapper;
 import uk.ac.ox.poseidon.core.functions.NumericIntervalToStringMapperFactory;
 
 class NumericIntervalToStringMapperFactoryTest {
@@ -44,11 +44,11 @@ class NumericIntervalToStringMapperFactoryTest {
         )
       );
 
-    final NumericIntervalMapper<String> mapper = factory.get(GLOBAL_SCOPE);
+    final BiFunction<Object, Double, String> mapper = factory.get(GLOBAL_SCOPE);
 
-    assertThat(mapper.apply(5.999)).isEqualTo("VL0006");
-    assertThat(mapper.apply(6.0)).isEqualTo("VL0612");
-    assertThat(mapper.apply(40.0)).isEqualTo("VL40XX");
+    assertThat(mapper.apply(null, 5.999)).isEqualTo("VL0006");
+    assertThat(mapper.apply(null, 6.0)).isEqualTo("VL0612");
+    assertThat(mapper.apply(null, 40.0)).isEqualTo("VL40XX");
   }
 
   @Test
@@ -62,14 +62,15 @@ class NumericIntervalToStringMapperFactoryTest {
 
   @Test
   void buildsFactoryViaFactoriesHelper() {
-    final NumericIntervalMapper<String> mapper = numericIntervalToStringMapper(
-      NumericIntervalToStringMapperFactory.interval(0.0, 6.0, "VL0006"),
-      NumericIntervalToStringMapperFactory.interval(6.0, 12.0, "VL0612"),
-      NumericIntervalToStringMapperFactory.interval(40.0, null, "VL40XX")
-    ).get(GLOBAL_SCOPE);
+    final BiFunction<Object, Double, String> mapper =
+      numericIntervalToStringMapper(
+        NumericIntervalToStringMapperFactory.interval(0.0, 6.0, "VL0006"),
+        NumericIntervalToStringMapperFactory.interval(6.0, 12.0, "VL0612"),
+        NumericIntervalToStringMapperFactory.interval(40.0, null, "VL40XX")
+      ).get(GLOBAL_SCOPE);
 
-    assertThat(mapper.apply(5.999)).isEqualTo("VL0006");
-    assertThat(mapper.apply(6.0)).isEqualTo("VL0612");
-    assertThat(mapper.apply(40.0)).isEqualTo("VL40XX");
+    assertThat(mapper.apply(null, 5.999)).isEqualTo("VL0006");
+    assertThat(mapper.apply(null, 6.0)).isEqualTo("VL0612");
+    assertThat(mapper.apply(null, 40.0)).isEqualTo("VL40XX");
   }
 }

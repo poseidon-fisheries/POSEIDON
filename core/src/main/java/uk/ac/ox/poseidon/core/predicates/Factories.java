@@ -25,53 +25,82 @@ package uk.ac.ox.poseidon.core.predicates;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import java.util.Collection;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * Factories for {@link Predicate}s that test a value derived from, or drawn
- * against, other factory-resolved inputs.
+ * Factories for conditions, which are values or mappings, and for yes/no
+ * mappings testing the thing mapped against values read under the context.
  */
+@SuppressWarnings("Convert2Diamond")
 public class Factories {
 
   private Factories() {}
 
   /**
-   * @param extractor the function applied to the tested input before checking
+   * @param extractor the mapping applied to the thing tested before checking
    *                  {@code predicate}
-   * @param predicate the predicate the extracted value is tested against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link Condition} that composes the given extractor and predicate
+   * @param predicate the yes/no mapping the extracted value is tested against
+   * @return a {@link MappingFactory} for a {@link Condition} that composes the
+   *         given extractor and predicate
    * @see Condition
    */
-  public static <S extends Scope, T, U> ConditionFactory<S, T, U> condition(
-    final Factory<? super S, ? extends Function<? super T, U>> extractor,
-    final Factory<? super S, ? extends Predicate<? super U>> predicate
+  public static <S extends Scope, C, T, U> ConditionFactory<
+    S,
+    C,
+    T,
+    U
+  > condition(
+    final MappingFactory<
+      ? super S,
+      ? super C,
+      ? super T,
+      ? extends U
+    > extractor,
+    final MappingFactory<? super S, ? super C, ? super U, Boolean> predicate
   ) {
-    return new ConditionFactory<>(extractor, predicate);
+    return new ConditionFactory<S, C, T, U>(extractor, predicate);
+  }
+
+  /**
+   * @param extractor the value read under the context and then tested
+   * @param predicate the yes/no mapping the value is tested against
+   * @return a {@link ValueFactory} for a {@link ConditionValue} that composes
+   *         the given value and predicate
+   * @see ConditionValue
+   */
+  public static <S extends Scope, C, U> ConditionValueFactory<
+    S,
+    C,
+    U
+  > condition(
+    final ValueFactory<? super S, ? super C, ? extends U> extractor,
+    final MappingFactory<? super S, ? super C, ? super U, Boolean> predicate
+  ) {
+    return new ConditionValueFactory<S, C, U>(extractor, predicate);
   }
 
   /**
    * @param value the value the resulting predicate tests against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   *         {@link Equal} predicate over the given literal value
+   * @return a {@link MappingFactory} for an {@link Equal} predicate over the
+   *         given literal value
    * @see Equal
    */
-  public static <S extends Scope, T> EqualFactory<S, T> equal(final T value) {
+  public static <S extends Scope, T> EqualFactory<S, Object, T> equal(
+    final T value
+  ) {
     return equal(constant(value));
   }
 
   /**
    * @param value factory for the value the resulting predicate tests against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   *         {@link Equal} predicate over the resolved value
+   * @return a {@link MappingFactory} for an {@link Equal} predicate over the
+   *         resolved value
    * @see Equal
    */
-  public static <S extends Scope, T> EqualFactory<S, T> equal(
-    final Factory<? super S, ? extends Supplier<? extends T>> value
+  public static <S extends Scope, C, T> EqualFactory<S, C, T> equal(
+    final ValueFactory<? super S, ? super C, ? extends T> value
   ) {
     return new EqualFactory<>(value);
   }
@@ -79,14 +108,15 @@ public class Factories {
   /**
    * @param values factory for the collection the resulting predicate tests
    *               membership against
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
-   *         {@link InSet} predicate over the resolved collection
+   * @return a {@link MappingFactory} for an {@link InSet} predicate over the
+   *         resolved collection
    * @see InSet
    */
-  public static <S extends Scope, T> InSetFactory<S, T> in(
-    final Factory<
+  public static <S extends Scope, C, T> InSetFactory<S, C, T> in(
+    final ValueFactory<
       ? super S,
-      ? extends Supplier<? extends Collection<? extends T>>
+      ? super C,
+      ? extends Collection<? extends T>
     > values
   ) {
     return new InSetFactory<>(values);

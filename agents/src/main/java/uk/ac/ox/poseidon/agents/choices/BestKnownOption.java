@@ -28,7 +28,6 @@ import ec.util.MersenneTwisterFast;
 import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
  * Gives the option with the highest value, ties broken at random, read anew
@@ -38,7 +37,7 @@ import uk.ac.ox.poseidon.core.providers.Provider;
  * @param <O> the type of option
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class BestKnownOption<O> implements Provider<O> {
+public class BestKnownOption<O> implements Supplier<O> {
 
   private final @NonNull OptionValues<O> optionValues;
   private final @NonNull Supplier<O> fallback;

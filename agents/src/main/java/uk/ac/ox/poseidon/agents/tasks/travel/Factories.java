@@ -30,6 +30,7 @@ import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
@@ -84,8 +85,8 @@ public class Factories {
    * @param pathFinder      finds a path between two cells
    * @param distance        computes the distance, and so the duration, of each
    *                        hop
-   * @param destinationCell supplies the destination to path to, resolved once
-   *                        at task start
+   * @param destinationCell the destination to path to, read for the vessel
+   *                        once, at task start
    * @param eventManager    supplies the event manager to broadcast the arrival
    *                        {@link TravelEvent} on
    * @return a {@link VesselScope}-relative factory for a
@@ -95,9 +96,10 @@ public class Factories {
   public static TravelAlongPathFactory travelAlongPathTo(
     final Factory<? super VesselScope, ? extends PathFinder<Int2D>> pathFinder,
     final Factory<? super VesselScope, ? extends DistanceCalculator> distance,
-    final Factory<
+    final ValueFactory<
       ? super VesselScope,
-      ? extends Supplier<Int2D>
+      ? super Vessel,
+      Int2D
     > destinationCell,
     final Factory<
       ? super VesselScope,

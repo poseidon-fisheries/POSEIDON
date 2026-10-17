@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -25,13 +25,14 @@ package uk.ac.ox.poseidon.agents.tasks.fishing;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 import java.time.Duration;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.agents.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
@@ -48,7 +49,7 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 public class Fishing extends ExtendedTripTask {
 
   @NonNull
-  private final Supplier<Fisheable> fisheableSupplier;
+  private final Function<? super Vessel, Fisheable> fisheable;
 
   @NonNull
   private final DispositionProcess dispositionProcess;
@@ -75,7 +76,7 @@ public class Fishing extends ExtendedTripTask {
   }
 
   /**
-   * Fishes the fisheable {@link #fisheableSupplier} supplies, sorts the catch
+   * Fishes the fisheable {@link #fisheable} supplies, sorts the catch
    * via {@link #dispositionProcess}, retains what fits in the hold, releases
    * the rest alive back to the fisheable, broadcasts a {@link FishingEvent},
    * and consumes fuel for the elapsed duration.
@@ -84,7 +85,7 @@ public class Fishing extends ExtendedTripTask {
    */
   @Override
   protected Status complete() {
-    final Fisheable fisheable = fisheableSupplier.get();
+    final Fisheable fisheable = this.fisheable.apply(getAgent());
     final Bucket grossCatch = getAgent().getGear().fish(fisheable);
     final Hold hold = getAgent().getHold();
     final Disposition disposition = dispositionProcess.partition(

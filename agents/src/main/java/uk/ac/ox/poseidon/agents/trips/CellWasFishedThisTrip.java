@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.trips;
 
-import java.util.function.Predicate;
+import java.util.function.BiFunction;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
@@ -36,12 +36,14 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * Never holds when the vessel is not on a trip.
  */
 @RequiredArgsConstructor
-public class CellWasFishedThisTrip implements Predicate<Int2D> {
+public class CellWasFishedThisTrip
+  implements BiFunction<Object, Int2D, Boolean>
+{
 
   private final @NonNull Vessel vessel;
 
   @Override
-  public boolean test(final Int2D cell) {
+  public Boolean apply(final Object context, final Int2D cell) {
     final Trip currentTrip = vessel.getCurrentTrip();
     if (currentTrip == null) {
       return false;

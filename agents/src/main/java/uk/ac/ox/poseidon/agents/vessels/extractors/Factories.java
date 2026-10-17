@@ -22,11 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.vessels.extractors;
 
-import java.util.function.Function;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * Factories for functions extracting a value from a vessel.
@@ -41,12 +40,9 @@ public class Factories {
    * @see TripCostFromHourlyCostsFactory
    */
   public static <S extends Scope> TripCostFromHourlyCostsFactory<S> tripCostFromHourlyCosts(
-    final Factory<
-      ? super S,
-      ? extends Function<? super Vessel, ? extends Money>
-    > hourlyCostsExtractor
+    final ValueFactory<? super S, ? super Vessel, ? extends Money> hourlyCosts
   ) {
-    return new TripCostFromHourlyCostsFactory<>(hourlyCostsExtractor);
+    return new TripCostFromHourlyCostsFactory<>(hourlyCosts);
   }
 
   /**

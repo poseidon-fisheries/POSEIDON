@@ -23,25 +23,25 @@
 package uk.ac.ox.poseidon.core.functions;
 
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Function} that looks up its input in a fixed, resolved {@link Map}
- * on every call. Unlike {@link MapEntryFactory}, the key is supplied per-call
- * rather than fixed at resolution time. Built via
+ * A mapping that looks up the thing mapped in a fixed, resolved {@link Map} on
+ * every call, whatever the context. Unlike {@link MapEntryFactory}, the key is
+ * supplied per-call rather than fixed at resolution time. Built via
  * {@link Factories#mapValueExtractor(uk.ac.ox.poseidon.core.Factory)} in this
  * package.
  */
 @RequiredArgsConstructor
-public class MapValueExtractor<K, V> implements Function<K, V> {
+public class MapValueExtractor<K, V> implements BiFunction<Object, K, V> {
 
   @NonNull
   private final Map<? super K, ? extends V> map;
 
   @Override
-  public V apply(final K k) {
+  public V apply(final Object context, final K k) {
     return map.get(k);
   }
 }

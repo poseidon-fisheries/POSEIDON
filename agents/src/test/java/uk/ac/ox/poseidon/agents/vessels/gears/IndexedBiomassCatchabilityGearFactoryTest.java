@@ -30,27 +30,27 @@ import static uk.ac.ox.poseidon.core.quantities.Factories.massOf;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 class IndexedBiomassCatchabilityGearFactoryTest {
 
   @Test
   void appliesFunctionPerSpecies() {
-    final Factory<Scope, Supplier<Duration>> durationSupplier = scope -> () ->
+    final ValueFactory<Scope, Object, Duration> duration = scope -> context ->
       Duration.ofHours(1);
     final Factory<Scope, Collection<? extends Species>> species = scope ->
       List.of(new Species("COD", "adult", "Cod"));
     final var factory = Factories.indexedBiomassCatchabilityGear(
       "G1",
-      durationSupplier,
+      duration,
       species,
-      scope -> s -> 0.5,
+      (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->
+        0.5,
       massOf(1, KILOGRAM)
     );
     final var gear = factory.get(Scope.GLOBAL_SCOPE);
@@ -59,15 +59,16 @@ class IndexedBiomassCatchabilityGearFactoryTest {
 
   @Test
   void rejectsOutOfRangeProportions() {
-    final Factory<Scope, Supplier<Duration>> durationSupplier = scope -> () ->
+    final ValueFactory<Scope, Object, Duration> duration = scope -> context ->
       Duration.ofHours(1);
     final Factory<Scope, Collection<? extends Species>> species = scope ->
       List.of(new Species("COD", "adult", "Cod"));
     final var factory = Factories.indexedBiomassCatchabilityGear(
       "G1",
-      durationSupplier,
+      duration,
       species,
-      scope -> s -> 1.5,
+      (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->
+        1.5,
       massOf(1, KILOGRAM)
     );
     assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE)).isInstanceOf(

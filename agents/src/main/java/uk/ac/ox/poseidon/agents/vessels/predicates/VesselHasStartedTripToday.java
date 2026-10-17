@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
-import java.util.function.Predicate;
+import java.util.function.Function;
 import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
@@ -31,10 +31,10 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
  * trip, else the previous one) started on the current calendar date. Never
  * holds for a vessel that has made no trip yet.
  */
-public class VesselHasStartedTripToday implements Predicate<Vessel> {
+public class VesselHasStartedTripToday implements Function<Vessel, Boolean> {
 
   @Override
-  public boolean test(final Vessel vessel) {
+  public Boolean apply(final Vessel vessel) {
     final Trip mostRecentTrip =
       vessel.getCurrentTrip() != null
         ? vessel.getCurrentTrip()

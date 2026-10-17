@@ -37,6 +37,7 @@ import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -59,6 +60,18 @@ public class Factories {
     final Factory<? super VesselScope, ? extends T> delegate
   ) {
     return new PerVesselFactory<>(delegate);
+  }
+
+  /**
+   * @param delegate the value built once per vessel
+   * @return a {@link uk.ac.ox.poseidon.core.ValueFactory} for the value, one
+   *         per vessel
+   * @see PerVesselValueFactory
+   */
+  public static <C, R> PerVesselValueFactory<C, R> perVessel(
+    final ValueFactory<? super VesselScope, C, R> delegate
+  ) {
+    return new PerVesselValueFactory<>(delegate);
   }
 
   /**

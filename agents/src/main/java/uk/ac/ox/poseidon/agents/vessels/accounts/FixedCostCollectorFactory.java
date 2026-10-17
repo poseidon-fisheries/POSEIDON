@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.agents.vessels.accounts;
 
-import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,6 +33,7 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link FixedCostCollector},
@@ -50,13 +50,10 @@ public class FixedCostCollectorFactory<S extends Scope> extends RelativeScopeFac
 > {
 
   private final Factory<? super S, ? extends Fleet> fleet;
-  private final Factory<
-    ? super S,
-    ? extends Function<? super Vessel, ? extends Money>
-  > costExtractor;
+  private final ValueFactory<? super S, ? super Vessel, ? extends Money> cost;
 
   @Override
   protected FixedCostCollector newInstance(final S scope) {
-    return new FixedCostCollector(fleet.get(scope), costExtractor.get(scope));
+    return new FixedCostCollector(fleet.get(scope), cost.get(scope));
   }
 }

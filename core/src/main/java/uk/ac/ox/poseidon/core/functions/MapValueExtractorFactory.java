@@ -23,12 +23,14 @@
 package uk.ac.ox.poseidon.core.functions;
 
 import java.util.Map;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
@@ -41,16 +43,15 @@ import uk.ac.ox.poseidon.core.Scope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class MapValueExtractorFactory<
-  S extends Scope,
-  K,
-  V
-> extends RelativeScopeFactory<S, MapValueExtractor<K, V>> {
+public class MapValueExtractorFactory<S extends Scope, K, V>
+  extends RelativeScopeFactory<S, BiFunction<Object, K, V>>
+  implements MappingFactory<S, Object, K, V>
+{
 
   private final Factory<? super S, ? extends Map<? super K, ? extends V>> map;
 
   @Override
-  protected MapValueExtractor<K, V> newInstance(final S scope) {
+  protected BiFunction<Object, K, V> newInstance(final S scope) {
     return new MapValueExtractor<>(map.get(scope));
   }
 }

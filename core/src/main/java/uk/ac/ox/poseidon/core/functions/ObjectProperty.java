@@ -29,23 +29,25 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import javax.lang.model.SourceVersion;
 
 /**
- * Reads a property of an object by following a dotted path of getters:
- * {@code "gear.code"} reads {@code getGear().getCode()}, and {@code "active"}
- * reads {@code isActive()} if it returns a {@code boolean}. The getters are
- * looked up once, when this is built, from the declared return types along the
- * path, so a wrong path fails when the scenario is built rather than when first
- * read. The last property may be {@code null}; a {@code null} part way along
- * the path throws. Built via a subclass of {@link ObjectPropertyFactory}, which
- * fixes the class the path starts from.
+ * A mapping that reads a property of the thing mapped, whatever the context, by
+ * following a dotted path of getters: {@code "gear.code"} reads
+ * {@code getGear().getCode()}, and {@code "active"} reads {@code isActive()} if
+ * it returns a {@code boolean}. The getters are looked up once, when this is
+ * built, from the declared return types along the path, so a wrong path fails
+ * when the scenario is built rather than when first read. The last property may
+ * be {@code null}; a {@code null} part way along the path throws. Built via a
+ * subclass of {@link ObjectPropertyFactory}, which fixes the class the path
+ * starts from; {@link ObjectPropertyValue} reads the same way a property of the
+ * context.
  *
  * @param <T> the type of the object read
  * @param <R> the type of the property; not checked
  */
-public class ObjectProperty<T, R> implements Function<T, R> {
+public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
 
   private final String propertyPath;
   private final List<String> propertyNames;
@@ -112,8 +114,18 @@ public class ObjectProperty<T, R> implements Function<T, R> {
    *                              {@code null}
    */
   @Override
+  public R apply(final Object context, final T object) {
+    return read(object);
+  }
+
+  /**
+   * @param object the object to read the property of
+   * @return the property
+   * @throws NullPointerException if a property part way along the path is
+   *                              {@code null}
+   */
   @SuppressWarnings("unchecked")
-  public R apply(final T object) {
+  public R read(final T object) {
     Object value = object;
     for (int i = 0; i < getters.size(); i++) {
       if (value == null) {

@@ -26,10 +26,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.choices.Factories.greedyPicker;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.alwaysTrue;
 
 import ec.util.MersenneTwisterFast;
 import java.util.Map;
-import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -76,21 +76,11 @@ class GreedyPickerFactoryTest {
     }
   }
 
-  private static class AnyOptionFactory
-    extends GlobalScopeFactory<Predicate<String>>
-  {
-
-    @Override
-    protected Predicate<String> newInstance(final Scope scope) {
-      return option -> true;
-    }
-  }
-
   @Test
   void givesOnePickerPerVessel() {
     final GreedyPickerFactory<String> factory = greedyPicker(
       new OptionValuesFactory(),
-      new AnyOptionFactory()
+      alwaysTrue()
     );
 
     assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));

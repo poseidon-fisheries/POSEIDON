@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.functions;
 
 import com.google.common.collect.ImmutableList;
+import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,6 +33,7 @@ import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /**
@@ -45,7 +47,8 @@ import uk.ac.ox.poseidon.core.Scope;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class NumericIntervalToStringMapperFactory
-  extends GlobalScopeFactory<NumericIntervalMapper<String>>
+  extends GlobalScopeFactory<BiFunction<Object, Double, String>>
+  implements MappingFactory<Scope, Object, Double, String>
 {
 
   @Singular
@@ -65,7 +68,7 @@ public class NumericIntervalToStringMapperFactory
   }
 
   @Override
-  protected NumericIntervalMapper<String> newInstance(final Scope scope) {
+  protected BiFunction<Object, Double, String> newInstance(final Scope scope) {
     return new NumericIntervalMapper<>(
       intervals
         .stream()

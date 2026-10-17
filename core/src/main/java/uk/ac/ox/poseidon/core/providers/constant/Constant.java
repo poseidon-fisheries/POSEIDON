@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,23 +22,22 @@
 
 package uk.ac.ox.poseidon.core.providers.constant;
 
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
- * A {@link Provider} that always returns the same, fixed value, no matter how
- * many times {@link #get()} is called. Built via {@link Factories
- * Factories.constant(...)} in this package.
+ * A value that is the same whatever the context it is asked under. Built via
+ * {@link Factories Factories.constant(...)} in this package.
  *
- * @param <T> the type of the constant value returned
+ * @param <R> the type of the value
  */
 @RequiredArgsConstructor
-public class Constant<T> implements Provider<T> {
+public class Constant<R> implements Function<Object, R> {
 
-  private final T value;
+  private final R value;
 
   @Override
-  public T get() {
+  public R apply(final Object context) {
     return value;
   }
 }

@@ -25,65 +25,57 @@ package uk.ac.ox.poseidon.core.providers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.providers.constant.Constant;
 
 class FirstValueFromFactoryTest {
 
-  @Test
-  void returnedProviderIsStable() {
-    final AtomicInteger counter = new AtomicInteger(0);
-    final FirstValueFromFactory<Scope, Integer> factory =
-      new FirstValueFromFactory<>(
-        new GlobalScopeFactory<Supplier<? extends Integer>>() {
-          @Override
-          protected Supplier<? extends Integer> newInstance(final Scope scope) {
-            return counter::incrementAndGet;
-          }
-        }
-      );
+  private final AtomicInteger counter = new AtomicInteger(0);
 
-    final Provider<Integer> provider = factory.get(Scope.GLOBAL_SCOPE);
-    assertThat(provider.get()).isEqualTo(1);
-    assertThat(provider.get()).isEqualTo(1);
-    assertThat(provider.get()).isEqualTo(1);
+  private final FirstValueFromFactory<Scope, Integer> factory =
+    new FirstValueFromFactory<>(new CountingFactory(counter));
+
+  @Test
+  void returnedValueIsStable() {
+    final Function<Object, Integer> value = factory.get(Scope.GLOBAL_SCOPE);
+    assertThat(value.apply(null)).isEqualTo(1);
+    assertThat(value.apply(null)).isEqualTo(1);
+    assertThat(value.apply(null)).isEqualTo(1);
   }
 
   @Test
-  void delegateSupplierCalledOnlyOnce() {
-    final AtomicInteger counter = new AtomicInteger(0);
-    final FirstValueFromFactory<Scope, Integer> factory =
-      new FirstValueFromFactory<>(
-        new GlobalScopeFactory<Supplier<? extends Integer>>() {
-          @Override
-          protected Supplier<? extends Integer> newInstance(final Scope scope) {
-            return counter::incrementAndGet;
-          }
-        }
-      );
-
+  void delegateCalledOnlyOnce() {
     factory.get(Scope.GLOBAL_SCOPE);
     assertThat(counter).hasValue(1);
   }
 
   @Test
-  void returnsConstantProvider() {
-    final FirstValueFromFactory<Scope, String> factory =
-      new FirstValueFromFactory<>(
-        new GlobalScopeFactory<Supplier<? extends String>>() {
-          @Override
-          protected Supplier<? extends String> newInstance(final Scope scope) {
-            return () -> "hello";
-          }
-        }
-      );
-
+  void returnsConstant() {
     assertThat(factory.get(Scope.GLOBAL_SCOPE))
       .isInstanceOf(Constant.class)
-      .extracting(Provider::get)
-      .isEqualTo("hello");
+      .extracting(value -> value.apply(null))
+      .isEqualTo(1);
+  }
+
+  /** A value counting how many times it is asked. */
+  private static final class CountingFactory
+    extends GlobalScopeFactory<Function<Object, Integer>>
+    implements ValueFactory<Scope, Object, Integer>
+  {
+
+    private final transient AtomicInteger counter;
+
+    CountingFactory(final AtomicInteger counter) {
+      this.counter = counter;
+    }
+
+    @Override
+    protected Function<Object, Integer> newInstance(final Scope scope) {
+      return context -> counter.incrementAndGet();
+    }
   }
 }

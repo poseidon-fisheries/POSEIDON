@@ -27,8 +27,8 @@ import static lombok.AccessLevel.PACKAGE;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
@@ -50,13 +50,15 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  * one that actually runs longer than planned is not this checker's concern.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class FishingLocationLegalityChecker implements Predicate<Int2D> {
+public class FishingLocationLegalityChecker
+  implements BiFunction<Object, Int2D, Boolean>
+{
 
   private final Regulations<? super ExtendedFishingAction> regulations;
   private final GridPathFinder pathFinder;
   private final DistanceCalculator distanceCalculator;
   private final Duration fishingDuration;
-  private final Supplier<LocalDateTime> currentDateTimeSupplier;
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
   private final Vessel vessel;
 
   /**
@@ -64,7 +66,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
    *         permitted
    */
   @Override
-  public boolean test(final Int2D fishingLocation) {
+  public Boolean apply(final Object context, final Int2D fishingLocation) {
     return regulations.isPermitted(makeAction(fishingLocation));
   }
 
@@ -94,7 +96,7 @@ public class FishingLocationLegalityChecker implements Predicate<Int2D> {
 
     return new ExtendedFishingAction(
       vessel,
-      currentDateTimeSupplier.get().plus(travelDuration),
+      currentDateTime.apply(vessel).plus(travelDuration),
       fishingDuration,
       vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation),
       vessel.getGear()

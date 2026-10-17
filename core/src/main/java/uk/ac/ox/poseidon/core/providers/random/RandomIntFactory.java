@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.providers.random;
 
 import ec.util.MersenneTwisterFast;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,6 +32,7 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link RandomInt}, built via
@@ -41,7 +43,10 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class RandomIntFactory extends SimulationScopeFactory<RandomInt> {
+public class RandomIntFactory
+  extends SimulationScopeFactory<Function<Object, Integer>>
+  implements ValueFactory<SimulationScope, Object, Integer>
+{
 
   private final int minimum;
   private final int maximum;
@@ -51,7 +56,7 @@ public class RandomIntFactory extends SimulationScopeFactory<RandomInt> {
   > randomNumberGenerator;
 
   @Override
-  protected RandomInt newInstance(final SimulationScope scope) {
+  protected Function<Object, Integer> newInstance(final SimulationScope scope) {
     return new RandomInt(randomNumberGenerator.get(scope), minimum, maximum);
   }
 }

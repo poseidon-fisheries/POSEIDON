@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.core;
 
+import java.time.LocalDateTime;
+import java.util.function.Function;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -29,9 +31,9 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.providers.temporal.CurrentDateTime;
 
 /**
- * A {@link SimulationScopeFactory} for a {@link CurrentDateTime}: the
- * simulation's clock, which factories take as an input rather than reading
- * the simulation's schedule. Built via
+ * A {@link ValueFactory} for a {@link CurrentDateTime}: the simulation's clock,
+ * which factories take as an input rather than reading the simulation's
+ * schedule. Built via
  * {@link uk.ac.ox.poseidon.core.providers.temporal.Factories#currentDateTime()}.
  */
 @ToString
@@ -39,11 +41,14 @@ import uk.ac.ox.poseidon.core.providers.temporal.CurrentDateTime;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class CurrentDateTimeFactory
-  extends SimulationScopeFactory<CurrentDateTime>
+  extends SimulationScopeFactory<Function<Object, LocalDateTime>>
+  implements ValueFactory<SimulationScope, Object, LocalDateTime>
 {
 
   @Override
-  protected CurrentDateTime newInstance(final SimulationScope scope) {
+  protected Function<Object, LocalDateTime> newInstance(
+    final SimulationScope scope
+  ) {
     return new CurrentDateTime(scope.getSimulation().getTemporalSchedule());
   }
 }

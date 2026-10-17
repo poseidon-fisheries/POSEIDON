@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -34,7 +34,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.Provider;
 
 /**
  * This picker will look for better options than the current option in a list of
@@ -49,7 +48,7 @@ import uk.ac.ox.poseidon.core.providers.Provider;
  * in a chain of explorers; it needs another one to fall back on.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class ImitatingPicker<O> implements Provider<O> {
+public class ImitatingPicker<O> implements Supplier<O> {
 
   private final OptionValues<O> optionValues;
   private final Predicate<? super O> optionPredicate;

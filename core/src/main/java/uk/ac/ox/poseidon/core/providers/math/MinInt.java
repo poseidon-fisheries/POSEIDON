@@ -22,28 +22,29 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
-import java.util.function.IntSupplier;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.core.providers.IntProvider;
 
 /**
- * An {@link IntProvider} that returns the lesser of two supplied int values,
- * recomputed on every call. Built via
- * {@link Factories#minInt(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
+ * A value that is the smaller of two integer values, both asked under the same
+ * context, recomputed on every call, as by {@link Math#min}. Built via
+ * {@link Factories#minInt(uk.ac.ox.poseidon.core.ValueFactory, uk.ac.ox.poseidon.core.ValueFactory)}
  * in this package.
+ *
+ * @param <C> the type of the context
  */
 @RequiredArgsConstructor
-public class MinInt implements IntProvider {
+public class MinInt<C> implements Function<C, Integer> {
 
   @NonNull
-  private final IntSupplier a;
+  private final Function<? super C, Integer> a;
 
   @NonNull
-  private final IntSupplier b;
+  private final Function<? super C, Integer> b;
 
   @Override
-  public int getAsInt() {
-    return Math.min(a.getAsInt(), b.getAsInt());
+  public Integer apply(final C context) {
+    return Math.min(a.apply(context), b.apply(context));
   }
 }

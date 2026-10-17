@@ -22,35 +22,35 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
-import java.util.function.IntSupplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link MinInt}, built via
- * {@link Factories#minInt(Factory, Factory)}.
+ * {@link Factories#minInt(ValueFactory, ValueFactory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class MinIntFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  MinInt
-> {
+public class MinIntFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, Integer>>
+  implements ValueFactory<S, C, Integer>
+{
 
-  private final Factory<? super S, ? extends IntSupplier> a;
-  private final Factory<? super S, ? extends IntSupplier> b;
+  private final ValueFactory<? super S, ? super C, Integer> a;
+  private final ValueFactory<? super S, ? super C, Integer> b;
 
   @Override
-  protected MinInt newInstance(final S scope) {
-    return new MinInt(a.get(scope), b.get(scope));
+  protected Function<C, Integer> newInstance(final S scope) {
+    return new MinInt<>(a.get(scope), b.get(scope));
   }
 }

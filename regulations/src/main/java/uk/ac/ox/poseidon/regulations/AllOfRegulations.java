@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,33 +23,37 @@
 package uk.ac.ox.poseidon.regulations;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.function.Predicate;
 import lombok.NonNull;
-import uk.ac.ox.poseidon.core.predicates.logical.AllOf;
 
 /**
  * The conjunction of several rules: permits an action only when every one of
  * them permits it (every action when there are none), asking them in order and
- * stopping at the first that forbids it. An {@link AllOf} that is itself a
- * rule. Built via {@link Factories#allOf(uk.ac.ox.poseidon.core.Factory...)}.
+ * stopping at the first that forbids it. Built via
+ * {@link Factories#allOf(uk.ac.ox.poseidon.core.Factory...)}.
  *
  * @param <A> the type of action judged
  */
-public class AllOfRegulations<A extends Action<?>>
-  extends AllOf<A>
-  implements Regulations<A>
-{
+public class AllOfRegulations<A extends Action<?>> implements Regulations<A> {
+
+  // Using an array for performance reasons
+  @NonNull
+  private final Regulations<? super A>[] regulations;
 
   /** @param regulations the rules, all of which must permit an action */
+  @SuppressWarnings("unchecked")
   public AllOfRegulations(
     @NonNull final Collection<? extends Regulations<? super A>> regulations
   ) {
-    super(List.<Predicate<? super A>>copyOf(regulations));
+    this.regulations = regulations.toArray(Regulations[]::new);
   }
 
   @Override
   public boolean isPermitted(final A action) {
-    return test(action);
+    for (final Regulations<? super A> regulation : regulations) {
+      if (!regulation.isPermitted(action)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

@@ -21,11 +21,11 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.core.providers.Provider}s and suppliers of values
- * and services derived from a vessel's current state: its cell, home port,
- * current trip's destination/ duration/event manager, its own event manager,
- * accessible water cells, and travel time to port via a candidate destination.
- * See {@link uk.ac.ox.poseidon.agents.vessels.providers.Factories} for the
- * entry points.
+ * Values and suppliers of values and services derived from a vessel's current
+ * state: its cell, home port, current trip's destination/ duration/event
+ * manager, its own event manager, accessible water cells, and travel time to
+ * port via a candidate destination. See
+ * {@link uk.ac.ox.poseidon.agents.vessels.providers.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.agents.vessels.providers;

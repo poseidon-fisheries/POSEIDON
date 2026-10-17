@@ -22,10 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels.predicates;
 
+import java.util.function.Function;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link VesselHasSameHomePort},
@@ -34,12 +37,13 @@ import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class VesselHasSameHomePortFactory
-  extends VesselScopeFactory<VesselHasSameHomePort>
+  extends VesselScopeFactory<Function<Vessel, Boolean>>
+  implements ValueFactory<VesselScope, Vessel, Boolean>
 {
 
   /** @return a predicate matching {@code scope}'s vessel's home port */
   @Override
-  protected VesselHasSameHomePort newInstance(final VesselScope scope) {
+  protected Function<Vessel, Boolean> newInstance(final VesselScope scope) {
     return new VesselHasSameHomePort(scope.getVessel());
   }
 }

@@ -22,13 +22,16 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
+import java.util.function.BiFunction;
 import lombok.*;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
@@ -40,16 +43,16 @@ import uk.ac.ox.poseidon.geography.Envelope;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class InRectangularAreaFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  InRectangularArea
-> {
+public class InRectangularAreaFactory<S extends Scope>
+  extends RelativeScopeFactory<S, BiFunction<Object, Coordinate, Boolean>>
+  implements MappingFactory<S, Object, Coordinate, Boolean>
+{
 
   @NonNull
   private final Factory<? super S, ? extends Envelope> envelope;
 
   @Override
-  protected InRectangularArea newInstance(final S scope) {
+  protected BiFunction<Object, Coordinate, Boolean> newInstance(final S scope) {
     return new InRectangularArea(envelope.get(scope));
   }
 }

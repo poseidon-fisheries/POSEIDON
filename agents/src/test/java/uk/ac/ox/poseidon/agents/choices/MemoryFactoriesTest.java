@@ -42,6 +42,7 @@ import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 class MemoryFactoriesTest {
 
@@ -77,6 +78,7 @@ class MemoryFactoriesTest {
 
   private static class FirstLetterFactory
     extends GlobalScopeFactory<Function<String, String>>
+    implements ValueFactory<Scope, String, String>
   {
 
     @Override
@@ -87,6 +89,7 @@ class MemoryFactoriesTest {
 
   private static class UpperCaseFactory
     extends GlobalScopeFactory<Function<String, String>>
+    implements ValueFactory<Scope, String, String>
   {
 
     @Override
@@ -97,6 +100,7 @@ class MemoryFactoriesTest {
 
   private static class TrawlKeyFactory
     extends GlobalScopeFactory<Function<Vessel, String>>
+    implements ValueFactory<Scope, Vessel, String>
   {
 
     @Override
