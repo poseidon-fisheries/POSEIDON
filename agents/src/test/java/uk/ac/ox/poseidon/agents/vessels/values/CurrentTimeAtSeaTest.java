@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.trips.Trip;
+import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 class CurrentTimeAtSeaTest {

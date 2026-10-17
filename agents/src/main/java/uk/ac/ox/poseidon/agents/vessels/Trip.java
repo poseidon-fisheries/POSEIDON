@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,12 +20,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.trips;
+package uk.ac.ox.poseidon.agents.vessels;
 
 import static com.google.common.base.Preconditions.checkState;
 import static lombok.AccessLevel.NONE;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,7 +34,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
+import uk.ac.ox.poseidon.agents.trips.TripStartEvent;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
@@ -43,7 +43,8 @@ import uk.ac.ox.poseidon.core.events.SimpleListener;
 
 /**
  * A single fishing trip: the span between a vessel leaving its current cell
- * with a destination in mind and {@link #endTrip()} being called. Broadcasts a
+ * with a destination in mind and {@link #endTrip()} being called. Only a
+ * {@link TripBlock}, through the vessel, starts and ends a trip. Broadcasts a
  * {@link TripStartEvent} at construction and a {@link TripEndEvent} on
  * {@link #endTrip()}, through an {@link EventManager} that forwards to the
  * vessel's own, so trip-scoped listeners can be added without affecting
@@ -61,7 +62,6 @@ import uk.ac.ox.poseidon.core.events.SimpleListener;
  * the trip ends, e.g. landing the catch.
  */
 @Getter
-@SuppressFBWarnings(value = "EI_EXPOSE_REP")
 public class Trip {
 
   private final @NonNull Vessel vessel;
@@ -83,7 +83,7 @@ public class Trip {
    * @param destination where the trip is initially headed; must be a cell in
    *                    the vessel's grid
    */
-  public Trip(final @NonNull Vessel vessel, final @NonNull Int2D destination) {
+  Trip(final @NonNull Vessel vessel, final @NonNull Int2D destination) {
     this.vessel = vessel;
     this.destination = checkInGrid(destination);
     this.eventManager = new ForwardingEventManager(vessel.getEventManager());
@@ -170,7 +170,7 @@ public class Trip {
    *
    * @throws IllegalStateException if the trip has not arrived in port
    */
-  public void endTrip() {
+  void endTrip() {
     checkState(
       hasArrivedInPort(),
       "The trip of vessel %s cannot end before arriving in port.",

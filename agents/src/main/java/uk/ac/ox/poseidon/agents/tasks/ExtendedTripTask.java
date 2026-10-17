@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.time.LocalDateTime;
 import lombok.Getter;
-import uk.ac.ox.poseidon.agents.trips.Trip;
+import uk.ac.ox.poseidon.agents.vessels.Trip;
 
 /**
  * An {@link ExtendedTask} run as part of the vessel's current {@link Trip},

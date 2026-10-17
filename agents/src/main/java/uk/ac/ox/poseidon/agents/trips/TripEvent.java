@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -21,6 +21,8 @@
  */
 
 package uk.ac.ox.poseidon.agents.trips;
+
+import uk.ac.ox.poseidon.agents.vessels.Trip;
 
 /**
  * An event broadcast by a {@link Trip}, e.g. {@link TripStartEvent} or

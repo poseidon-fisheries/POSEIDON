@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.agents.trips;
 
 import java.util.function.BiFunction;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 

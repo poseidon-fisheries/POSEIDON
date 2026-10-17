@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.agents.vessels.values;
 
 import java.util.function.Function;
-import uk.ac.ox.poseidon.agents.trips.Trip;
+import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**

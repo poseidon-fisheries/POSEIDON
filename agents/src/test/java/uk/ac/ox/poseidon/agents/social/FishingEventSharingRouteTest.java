@@ -42,6 +42,7 @@ import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
+import static uk.ac.ox.poseidon.agents.vessels.TripFixtures.startTrip;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.componentProperty;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.vesselProperty;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
@@ -68,10 +69,10 @@ import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEventAccumulator;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingOutcome;
-import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.FleetFactory;
 import uk.ac.ox.poseidon.agents.vessels.FleetFromVesselRegisterFactory;
+import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
@@ -272,7 +273,7 @@ class FishingEventSharingRouteTest {
     final Vessel b = vessel("B");
     remember(a, 10);
     remember(b, 10);
-    final Trip trip = new Trip(a, cell);
+    final Trip trip = startTrip(a, cell);
 
     fishingEvent(trip, 20);
 
@@ -288,7 +289,7 @@ class FishingEventSharingRouteTest {
     startSimulation(VESSEL_REGISTER, true);
     final Vessel a = vessel("A");
     final Vessel b = vessel("B");
-    final Trip trip = new Trip(a, cell);
+    final Trip trip = startTrip(a, cell);
 
     fishingEvent(trip, 20);
 
@@ -305,7 +306,7 @@ class FishingEventSharingRouteTest {
     final Vessel a = vessel("A");
     final Vessel b = vessel("B");
 
-    new Trip(a, cell);
+    startTrip(a, cell);
 
     assertThat(socialNetwork.getRecipients(a)).containsExactly(b);
     assertThat(socialNetwork.getRecipients(b)).containsExactly(a);
@@ -325,12 +326,12 @@ class FishingEventSharingRouteTest {
     );
     final Vessel a = vessel("A");
     final Vessel b = vessel("B");
-    new Trip(a, cell);
+    startTrip(a, cell);
     assertThat(fleet.getVessel("C")).isEmpty();
 
     simulation.stepFor(Duration.ofDays(5));
     final Vessel c = vessel("C");
-    new Trip(c, cell);
+    startTrip(c, cell);
 
     assertThat(socialNetwork.getRecipients(c)).containsExactlyInAnyOrder(a, b);
     assertThat(socialNetwork.getRecipients(a)).containsExactlyInAnyOrder(b, c);

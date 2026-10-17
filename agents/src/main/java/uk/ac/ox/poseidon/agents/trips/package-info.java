@@ -21,11 +21,11 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.agents.trips.Trip}, a single fishing trip's
- * lifecycle, and the {@link uk.ac.ox.poseidon.agents.trips.TripEvent}s it
- * broadcasts. Trips are built directly by the tasks that drive a vessel through
- * a trip (see {@code uk.ac.ox.poseidon.agents.tasks}), not via a
- * {@code Factories} class; {@link uk.ac.ox.poseidon.agents.trips.Factories}
+ * The {@link uk.ac.ox.poseidon.agents.trips.TripEvent}s a
+ * {@link uk.ac.ox.poseidon.agents.vessels.Trip} broadcasts. Trips are opened
+ * and closed only by a {@link uk.ac.ox.poseidon.agents.vessels.TripBlock}, so
+ * {@code Trip} lives with it in the vessels package;
+ * {@link uk.ac.ox.poseidon.agents.trips.Factories}
  * builds predicates about a vessel's trips, such as
  * {@link uk.ac.ox.poseidon.agents.trips.CellWasFishedThisTrip}.
  */

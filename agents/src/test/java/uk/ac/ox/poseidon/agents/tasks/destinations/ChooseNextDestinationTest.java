@@ -35,7 +35,7 @@ import com.badlogic.gdx.ai.btree.Task.Status;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.trips.Trip;
+import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 class ChooseNextDestinationTest {

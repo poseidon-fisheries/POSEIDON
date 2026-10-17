@@ -23,9 +23,10 @@
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import com.badlogic.gdx.ai.btree.Task;
-import com.badlogic.gdx.ai.btree.branch.Sequence;
+import java.util.Optional;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fuel.FuelStationGrid;
+import uk.ac.ox.poseidon.agents.vessels.TripBlock;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
@@ -62,20 +63,22 @@ public class Factories {
   }
 
   /**
-   * @param startTripTask the task that starts the trip
-   * @param travelTask    the task that travels between origin and fishing
-   *                      grounds, resolved once and reused for both legs
-   * @param fishingTask   the task that fishes once at the destination
-   * @param landingTask   the task that lands the catch after returning
-   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a {@link Sequence}
-   *         stringing a whole fishing trip together
+   * @param initialDestination gives the trip's first destination for the
+   *                           vessel, or none if it should not leave
+   * @param travelTask         the task that travels between origin and fishing
+   *                           grounds, resolved once and reused for both legs
+   * @param fishingTask        the task that fishes once at the destination
+   * @param landingTask        the task that lands the catch after returning
+   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
+   *         {@link TripBlock} running a whole fishing trip
    * @see RoundTripFactory
    */
   public static RoundTripFactory roundTrip(
-    final Factory<
+    final ValueFactory<
       ? super VesselComponentScope,
-      ? extends Task<Vessel>
-    > startTripTask,
+      ? super Vessel,
+      Optional<Int2D>
+    > initialDestination,
     final Factory<
       ? super VesselComponentScope,
       ? extends Task<Vessel>
@@ -90,7 +93,7 @@ public class Factories {
     > landingTask
   ) {
     return new RoundTripFactory(
-      startTripTask,
+      initialDestination,
       travelTask,
       fishingTask,
       landingTask
@@ -179,13 +182,5 @@ public class Factories {
    */
   public static ArriveInPortFactory arriveInPort() {
     return new ArriveInPortFactory();
-  }
-
-  /**
-   * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for an {@link EndTrip}
-   * @see EndTrip
-   */
-  public static EndTripFactory endTrip() {
-    return new EndTripFactory();
   }
 }

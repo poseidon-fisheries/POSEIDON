@@ -32,15 +32,15 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
-import uk.ac.ox.poseidon.agents.trips.Trip;
+import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * Redirects the vessel's current trip to whatever destination
  * {@code destination} gives for the vessel; fails, leaving the trip's
- * destination unchanged, if it gives none. The mid-trip counterpart of
- * {@link StartTrip}: within a trip, a failure ends a loop of fishing
- * operations.
+ * destination unchanged, if it gives none. The mid-trip counterpart of a
+ * {@link uk.ac.ox.poseidon.agents.vessels.TripBlock}'s initial destination:
+ * within a trip, a failure ends a loop of fishing operations.
  */
 @RequiredArgsConstructor
 public class ChooseNextDestination extends VesselTask {

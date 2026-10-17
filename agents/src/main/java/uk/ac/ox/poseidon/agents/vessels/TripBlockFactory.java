@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,39 +20,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.destinations;
+package uk.ac.ox.poseidon.agents.vessels;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
+import com.badlogic.gdx.ai.btree.Task;
+import com.google.common.collect.ImmutableList;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
-import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link TaskFactory} for a {@link StartTrip}. Built via
- * {@link Factories#startTrip}.
+ * A {@link TaskFactory} for a {@link TripBlock}. Built via
+ * {@link Factories#trip}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class StartTripFactory extends TaskFactory<StartTrip> {
+public class TripBlockFactory extends TaskFactory<TripBlock> {
 
   private final ValueFactory<
     ? super VesselComponentScope,
     ? super Vessel,
     Optional<Int2D>
-  > destination;
+  > initialDestination;
+
+  @Singular
+  private final ImmutableList<
+    ? extends Factory<? super VesselComponentScope, ? extends Task<Vessel>>
+  > children;
 
   @Override
-  protected StartTrip newInstance(final VesselComponentScope scope) {
-    return new StartTrip(destination.get(scope));
+  protected TripBlock newInstance(final VesselComponentScope scope) {
+    return new TripBlock(
+      initialDestination.get(scope),
+      children
+        .stream()
+        .<Task<Vessel>>map(child -> child.get(scope))
+        .collect(toImmutableList())
+    );
   }
 }

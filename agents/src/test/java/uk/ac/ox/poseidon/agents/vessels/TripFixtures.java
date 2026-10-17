@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,22 +20,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.tasks.travel;
+package uk.ac.ox.poseidon.agents.vessels;
 
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
-
-import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import sim.util.Int2D;
 
 /**
- * A leaf {@link VesselTask} that ends the vessel's current trip and always
- * succeeds.
+ * Starts trips for tests outside the vessels package, which cannot open one
+ * without running a {@link TripBlock}.
  */
-public class EndTrip extends VesselTask {
+public final class TripFixtures {
 
-  /** Ends the vessel's current trip. */
-  @Override
-  public Status execute() {
-    getVessel().endTrip();
-    return SUCCEEDED;
+  private TripFixtures() {}
+
+  /**
+   * @return the trip started for {@code vessel} towards {@code destination}
+   */
+  public static Trip startTrip(final Vessel vessel, final Int2D destination) {
+    vessel.startTrip(destination);
+    return vessel.getCurrentTrip();
   }
 }

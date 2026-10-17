@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.time.Duration;
 import java.util.function.Function;
-import uk.ac.ox.poseidon.agents.trips.Trip;
+import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**

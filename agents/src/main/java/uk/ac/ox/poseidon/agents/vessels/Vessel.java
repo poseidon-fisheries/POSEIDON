@@ -46,7 +46,6 @@ import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
-import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.ProductStore;
@@ -491,8 +490,14 @@ public class Vessel implements Oriented2D {
     return Optional.ofNullable(tags.get(tagName));
   }
 
-  /** Starts a new {@link Trip} to {@code destination}. */
-  public void startTrip(final Int2D destination) {
+  /**
+   * Starts a new {@link Trip} to {@code destination}. Only a
+   * {@link TripBlock} opens a trip.
+   *
+   * @throws IllegalStateException if the vessel is already on a trip
+   */
+  void startTrip(final Int2D destination) {
+    checkState(currentTrip == null, "Vessel %s is already on a trip.", id);
     this.currentTrip = new Trip(this, destination);
   }
 
@@ -506,9 +511,9 @@ public class Vessel implements Oriented2D {
 
   /**
    * Ends the current trip, folding its account into the vessel's own, and keeps
-   * it as the {@link #previousTrip}.
+   * it as the {@link #previousTrip}. Only a {@link TripBlock} closes a trip.
    */
-  public void endTrip() {
+  void endTrip() {
     currentTrip.endTrip();
     this.account.add(currentTrip.getAccount());
     this.previousTrip = currentTrip;

@@ -21,12 +21,10 @@
  */
 
 /**
- * {@link uk.ac.ox.poseidon.agents.tasks.destinations.StartTrip}: draws a
- * destination for the vessel, from a chooser such as
+ * {@link uk.ac.ox.poseidon.agents.tasks.destinations.ChooseNextDestination}:
+ * draws a destination for the vessel, from a chooser such as
  * {@link uk.ac.ox.poseidon.agents.choices.Factories#epsilonGreedyDestination},
- * and starts the vessel's trip towards it;
- * {@link uk.ac.ox.poseidon.agents.tasks.destinations.ChooseNextDestination}
- * redirects the current trip to the next one it draws. See
+ * and redirects the current trip to it. See
  * {@link uk.ac.ox.poseidon.agents.tasks.destinations.Factories} for the entry
  * points.
  */

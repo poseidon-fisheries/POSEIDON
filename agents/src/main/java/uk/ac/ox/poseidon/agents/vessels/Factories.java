@@ -27,9 +27,12 @@ import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
 import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
+import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -152,6 +155,32 @@ public class Factories {
     final Factory<? super VesselComponentScope, ? extends Task<Vessel>> rootTask
   ) {
     return new VesselComponent<>(rootTask);
+  }
+
+  /**
+   * @param initialDestination gives the trip's first destination for the
+   *                           vessel, or none if it should not leave
+   * @param children           the tasks run in sequence during the trip
+   * @return a {@link TaskFactory} for a {@link TripBlock}, which opens a trip,
+   *         runs {@code children} and closes the trip
+   * @see TripBlockFactory
+   */
+  @SafeVarargs
+  public static TripBlockFactory trip(
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      Optional<Int2D>
+    > initialDestination,
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends Task<Vessel>
+    >... children
+  ) {
+    return new TripBlockFactory(
+      initialDestination,
+      ImmutableList.copyOf(children)
+    );
   }
 
   /**

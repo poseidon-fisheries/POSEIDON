@@ -29,8 +29,8 @@ import lombok.Getter;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.trips.Trip;
 import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
+import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.Listener;
 
