@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -34,37 +34,32 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
-import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link ConstantDestination},
- * built via {@link Factories#constantDestination}.
+ * A {@link RelativeScopeFactory} counterpart of {@link DestinationAtCoordinate},
+ * built via {@link Factories#destinationAt}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ConstantDestinationFactory<S extends Scope>
-  extends RelativeScopeFactory<S, Function<Object, Optional<Int2D>>>
-  implements ValueFactory<S, Object, Optional<Int2D>>
+public class DestinationAtCoordinateFactory<S extends Scope, C>
+  extends RelativeScopeFactory<S, Function<C, Optional<Int2D>>>
+  implements ValueFactory<S, C, Optional<Int2D>>
 {
 
   private final Factory<? super S, ? extends ModelGrid> modelGrid;
-  private final Factory<? super S, ? extends Coordinate> coordinate;
+  private final ValueFactory<? super S, ? super C, ? extends Double> longitude;
+  private final ValueFactory<? super S, ? super C, ? extends Double> latitude;
 
-  /**
-   * @return a {@link ConstantDestination} for {@link #coordinate}'s
-   *         cell in {@link #modelGrid}
-   * @throws IllegalArgumentException if {@link #coordinate} falls outside
-   *                                  {@link #modelGrid}
-   */
   @Override
-  protected Function<Object, Optional<Int2D>> newInstance(final S scope) {
-    final ModelGrid modelGrid = this.modelGrid.get(scope);
-    final Coordinate coordinate = this.coordinate.get(scope);
-    modelGrid.checkIsInGrid(coordinate);
-    return new ConstantDestination(modelGrid.toCell(coordinate));
+  protected Function<C, Optional<Int2D>> newInstance(final S scope) {
+    return new DestinationAtCoordinate<>(
+      modelGrid.get(scope),
+      longitude.get(scope),
+      latitude.get(scope)
+    );
   }
 }

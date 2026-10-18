@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.choices;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
 
 import java.util.List;
@@ -38,7 +39,6 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
-import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
@@ -72,17 +72,46 @@ public class Factories {
   }
 
   /**
-   * @param modelGrid  the grid {@code coordinate} is resolved against
-   * @param coordinate the fixed destination
+   * @param modelGrid the grid the coordinate is placed in
+   * @param longitude the longitude of the destination, a value of the vessel
+   * @param latitude  the latitude of the destination, a value of the vessel
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link ConstantDestination}
-   * @see ConstantDestination
+   *         {@link DestinationAtCoordinate}
+   * @see DestinationAtCoordinate
    */
-  public static <S extends Scope> ConstantDestinationFactory<S> constantDestination(
+  public static <S extends Scope, C> DestinationAtCoordinateFactory<
+    S,
+    C
+  > destinationAt(
     final Factory<? super S, ? extends ModelGrid> modelGrid,
-    final Factory<? super S, ? extends Coordinate> coordinate
+    final ValueFactory<? super S, ? super C, ? extends Double> longitude,
+    final ValueFactory<? super S, ? super C, ? extends Double> latitude
   ) {
-    return new ConstantDestinationFactory<>(modelGrid, coordinate);
+    return new DestinationAtCoordinateFactory<>(modelGrid, longitude, latitude);
+  }
+
+  /**
+   * @param modelGrid the grid the coordinate is placed in
+   * @param longitude the longitude of the destination
+   * @param latitude  the latitude of the destination
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link DestinationAtCoordinate} at the same coordinate for every
+   *         vessel
+   * @see DestinationAtCoordinate
+   */
+  public static <S extends Scope> DestinationAtCoordinateFactory<
+    S,
+    Object
+  > destinationAt(
+    final Factory<? super S, ? extends ModelGrid> modelGrid,
+    final double longitude,
+    final double latitude
+  ) {
+    return new DestinationAtCoordinateFactory<>(
+      modelGrid,
+      constant(longitude),
+      constant(latitude)
+    );
   }
 
   /**
