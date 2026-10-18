@@ -23,27 +23,42 @@
 package uk.ac.ox.poseidon.agents.vessels.values;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.function.Function;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link CurrentTimeAtSea}, built
+ * A {@link SimulationScopeFactory} counterpart of {@link CurrentTimeAtSea}, built
  * via {@link Factories#currentTimeAtSea()}.
  */
-@NoArgsConstructor
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class CurrentTimeAtSeaFactory
-  extends GlobalScopeFactory<Function<Vessel, Duration>>
-  implements ValueFactory<Scope, Vessel, Duration>
+  extends SimulationScopeFactory<Function<Vessel, Duration>>
+  implements ValueFactory<SimulationScope, Vessel, Duration>
 {
 
+  private final ValueFactory<
+    ? super SimulationScope,
+    ? super Vessel,
+    LocalDateTime
+  > currentDateTime;
+
   @Override
-  protected Function<Vessel, Duration> newInstance(final Scope scope) {
-    return new CurrentTimeAtSea();
+  protected Function<Vessel, Duration> newInstance(
+    final SimulationScope scope
+  ) {
+    return new CurrentTimeAtSea(currentDateTime.get(scope));
   }
 }

@@ -44,7 +44,8 @@ class TravelDirectlyTest {
     final TravelDirectly travelDirectly = new TravelDirectly(
       ENGINE,
       FUEL_TANK,
-      distanceCalculator
+      distanceCalculator,
+      v -> NOW
     );
     setTaskObject(travelDirectly, vessel);
 
@@ -64,7 +65,8 @@ class TravelDirectlyTest {
     final TravelDirectly travelDirectly = new TravelDirectly(
       ENGINE,
       FUEL_TANK,
-      distanceCalculator
+      distanceCalculator,
+      v -> NOW
     );
     setTaskObject(travelDirectly, vessel);
 

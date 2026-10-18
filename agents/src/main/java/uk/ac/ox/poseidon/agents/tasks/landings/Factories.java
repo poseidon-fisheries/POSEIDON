@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.tasks.landings;
 
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+
 import java.time.Duration;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
@@ -51,6 +53,6 @@ public class Factories {
       Duration
     > duration
   ) {
-    return new LandCatchesFactory(hold, duration);
+    return new LandCatchesFactory(hold, duration, currentDateTime());
   }
 }

@@ -79,6 +79,10 @@ public class FleetEvent implements Steppable {
   @NonNull
   Consumer<Vessel> rebuild;
 
+  /** The clock, which tells whether this event is in the past. */
+  @NonNull
+  Supplier<LocalDateTime> currentDateTime;
+
   /**
    * Applies this event to the vessel named {@link #vesselId} in {@link #fleet}:
    * creates it, or updates its attributes and components and flips its
@@ -100,9 +104,7 @@ public class FleetEvent implements Steppable {
     final Vessel vessel = existingVessel.get();
     vessel.setAttributes(attributes);
     final Port homePort = vessel.getHomePort();
-    if (
-      homePort != null && dateTime.isBefore(vessel.getSchedule().getDateTime())
-    ) {
+    if (homePort != null && dateTime.isBefore(currentDateTime.get())) {
       // if the change of port is something that happened in the past
       // (i.e., before the start of the simulation) we move the vessel
       // to its new location right away. This is a change from outside the

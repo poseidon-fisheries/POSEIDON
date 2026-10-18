@@ -22,17 +22,20 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
 /**
@@ -52,9 +55,19 @@ public class TravelDirectlyFactory extends TaskFactory<TravelDirectly> {
     ? super VesselComponentScope,
     ? extends DistanceCalculator
   > distance;
+  private final ValueFactory<
+    ? super VesselComponentScope,
+    ? super Vessel,
+    LocalDateTime
+  > currentDateTime;
 
   @Override
   protected TravelDirectly newInstance(final VesselComponentScope scope) {
-    return new TravelDirectly(engine, fuelTank, distance.get(scope));
+    return new TravelDirectly(
+      engine,
+      fuelTank,
+      distance.get(scope),
+      currentDateTime.get(scope)
+    );
   }
 }

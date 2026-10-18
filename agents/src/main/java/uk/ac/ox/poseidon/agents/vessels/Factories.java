@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
@@ -177,6 +178,7 @@ public class Factories {
   ) {
     return new TripBlockFactory(
       initialDestination,
+      currentDateTime(),
       ImmutableList.copyOf(children)
     );
   }

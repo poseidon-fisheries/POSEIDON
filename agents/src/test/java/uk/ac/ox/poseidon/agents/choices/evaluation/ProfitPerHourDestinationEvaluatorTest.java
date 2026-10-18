@@ -55,7 +55,7 @@ class ProfitPerHourDestinationEvaluatorTest {
 
     final Trip trip = mock(Trip.class);
     when(trip.getAccount()).thenReturn(account);
-    when(trip.getTimeAtSea()).thenReturn(Duration.ofHours(3));
+    when(trip.getTotalTimeAtSea()).thenReturn(Duration.ofHours(3));
     when(trip.getTotalDuration()).thenReturn(Duration.ofHours(4));
 
     eventManager.broadcast(new TripEndEvent(trip));

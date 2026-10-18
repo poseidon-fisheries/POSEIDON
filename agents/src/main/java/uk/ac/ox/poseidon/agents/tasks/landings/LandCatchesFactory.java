@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.agents.tasks.landings;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -52,9 +53,18 @@ public class LandCatchesFactory extends TaskFactory<LandCatches> {
     ? super Vessel,
     Duration
   > duration;
+  private final ValueFactory<
+    ? super VesselComponentScope,
+    ? super Vessel,
+    LocalDateTime
+  > currentDateTime;
 
   @Override
   protected LandCatches newInstance(final VesselComponentScope scope) {
-    return new LandCatches(hold, duration.get(scope));
+    return new LandCatches(
+      hold,
+      duration.get(scope),
+      currentDateTime.get(scope)
+    );
   }
 }

@@ -22,13 +22,16 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link TaskFactory} counterpart of {@link ArriveInPort}, built via
@@ -36,13 +39,19 @@ import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
  */
 @Getter
 @ToString
-@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class ArriveInPortFactory extends TaskFactory<ArriveInPort> {
 
+  private final ValueFactory<
+    ? super VesselComponentScope,
+    ? super Vessel,
+    LocalDateTime
+  > currentDateTime;
+
   @Override
   protected ArriveInPort newInstance(final VesselComponentScope scope) {
-    return new ArriveInPort();
+    return new ArriveInPort(currentDateTime.get(scope));
   }
 }

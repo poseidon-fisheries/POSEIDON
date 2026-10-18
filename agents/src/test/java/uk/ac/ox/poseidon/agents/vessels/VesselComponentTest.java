@@ -27,14 +27,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
-import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.specificationOf;
+import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.newVessel;
 
 import com.badlogic.gdx.ai.btree.leaf.Success;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
-import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.core.SimulationScope;
-import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -45,14 +43,11 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  */
 class VesselComponentTest {
 
-  private final Vessel vessel = new Vessel(
+  private final Vessel vessel = newVessel(
     mock(TemporalSchedule.class),
-    new SimpleEventManager(),
-    "V1",
     mock(VesselField.class),
     mock(PortGrid.class),
-    mock(MarketGrid.class),
-    specificationOf(behaviour(scope -> new Success<>()))
+    behaviour(scope -> new Success<>())
   );
   private final VesselScope scope = new VesselScope(
     mock(SimulationScope.class),
@@ -101,7 +96,7 @@ class VesselComponentTest {
 
     assertThatThrownBy(() -> declaration.of(vessel))
       .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("V1");
+      .hasMessageContaining("Vessel vessel");
     assertThatThrownBy(() -> declaration.findIn(vessel)).isInstanceOf(
       IllegalStateException.class
     );

@@ -26,6 +26,7 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
@@ -43,6 +44,7 @@ public class LandCatches extends ExtendedTripTask {
 
   private final VesselComponent<? extends Hold> hold;
   private final Function<? super Vessel, Duration> duration;
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
 
   /** @return how long landing takes */
   @Override
@@ -86,7 +88,7 @@ public class LandCatches extends ExtendedTripTask {
       .sell(
         vessel,
         hold.of(vessel).extractContent(),
-        vessel.getSchedule().getDateTime()
+        currentDateTime.apply(vessel)
       )
       .summary()
       .values()

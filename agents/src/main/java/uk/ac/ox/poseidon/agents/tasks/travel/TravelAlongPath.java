@@ -58,6 +58,7 @@ public class TravelAlongPath extends VesselTask {
   private final DistanceCalculator distanceCalculator;
   private final Function<? super Vessel, Int2D> destinationSource;
   private final Function<? super Vessel, EventManager> eventManager;
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
   private List<Int2D> currentPath;
 
   private LocalDateTime startDateTime;
@@ -84,7 +85,7 @@ public class TravelAlongPath extends VesselTask {
   public void start() {
     final Vessel vessel = getVessel();
     destination = checkNotNull(destinationSource.apply(vessel));
-    startDateTime = vessel.getSchedule().getDateTime();
+    startDateTime = currentDateTime.apply(vessel);
     origin = vessel.getCell();
     currentPath = pathFinder
       .getPath(vessel.getCell(), destination)
@@ -135,7 +136,7 @@ public class TravelAlongPath extends VesselTask {
           new TravelEvent(
             getVessel(),
             startDateTime,
-            getVessel().getSchedule().getDateTime(),
+            currentDateTime.apply(vessel),
             origin,
             destination
           )

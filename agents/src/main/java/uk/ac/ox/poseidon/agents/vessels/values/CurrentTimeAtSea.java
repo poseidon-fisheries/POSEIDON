@@ -25,18 +25,28 @@ package uk.ac.ox.poseidon.agents.vessels.values;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.function.Function;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Provides the time at sea of a vessel's current trip
- * ({@link Trip#getTimeAtSea()}); only checks made during a trip read it.
+ * Provides the time at sea of a vessel's current trip so far: from its start to
+ * now while the vessel is at sea, and its
+ * {@linkplain Trip#getTotalTimeAtSea() total time at sea} once it has arrived
+ * in port. Only checks made during a trip read it.
  */
+@RequiredArgsConstructor
 public class CurrentTimeAtSea implements Function<Vessel, Duration> {
 
+  /** The clock, which gives the time at sea so far. */
+  @NonNull
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+
   /**
-   * @return the current trip's time at sea
+   * @return the current trip's time at sea so far
    * @throws IllegalStateException if the vessel is not on a trip
    */
   @Override
@@ -47,6 +57,11 @@ public class CurrentTimeAtSea implements Function<Vessel, Duration> {
       "Vessel %s is not on a trip.",
       vessel.getId()
     );
-    return currentTrip.getTimeAtSea();
+    return currentTrip.hasArrivedInPort()
+      ? currentTrip.getTotalTimeAtSea()
+      : Duration.between(
+          currentTrip.getStartDateTime(),
+          currentDateTime.apply(vessel)
+        );
   }
 }

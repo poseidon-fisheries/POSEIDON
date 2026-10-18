@@ -24,27 +24,21 @@ package uk.ac.ox.poseidon.agents.tasks;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.time.LocalDateTime;
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.vessels.Trip;
 
 /**
  * An {@link ExtendedTask} run as part of the vessel's current {@link Trip},
- * capturing that trip and the wall-clock start time when the task starts.
+ * capturing that trip when the task starts.
  */
 @Getter
 public abstract class ExtendedTripTask extends ExtendedTask {
 
   private Trip trip;
-  private LocalDateTime startDateTime;
 
-  /**
-   * Captures the vessel's current trip (must not be {@code null}) and the
-   * current date/time.
-   */
+  /** Captures the vessel's current trip (must not be {@code null}). */
   @Override
   public void start() {
     trip = checkNotNull(getVessel().getCurrentTrip());
-    startDateTime = getVessel().getSchedule().getDateTime();
   }
 }

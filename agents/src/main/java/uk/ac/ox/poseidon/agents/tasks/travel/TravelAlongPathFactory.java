@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -71,6 +72,11 @@ public class TravelAlongPathFactory extends TaskFactory<TravelAlongPath> {
     ? super Vessel,
     EventManager
   > eventManager;
+  private final ValueFactory<
+    ? super VesselComponentScope,
+    ? super Vessel,
+    LocalDateTime
+  > currentDateTime;
 
   @Override
   protected TravelAlongPath newInstance(final VesselComponentScope scope) {
@@ -80,7 +86,8 @@ public class TravelAlongPathFactory extends TaskFactory<TravelAlongPath> {
       pathFinder.get(scope),
       distance.get(scope),
       destination.get(scope),
-      eventManager.get(scope)
+      eventManager.get(scope),
+      currentDateTime.get(scope)
     );
   }
 }

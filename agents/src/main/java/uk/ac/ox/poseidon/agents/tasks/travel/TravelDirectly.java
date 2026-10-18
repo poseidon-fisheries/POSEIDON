@@ -27,9 +27,12 @@ import static lombok.AccessLevel.PACKAGE;
 import static uk.ac.ox.poseidon.geography.distance.DistanceCalculator.travelDuration;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.tasks.ExtendedTripTask;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
@@ -47,17 +50,20 @@ public class TravelDirectly extends ExtendedTripTask {
   private final VesselComponent<? extends Engine> engine;
   private final VesselComponent<? extends FuelTank> fuelTank;
   private final DistanceCalculator distanceCalculator;
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private LocalDateTime startDateTime;
   private Int2D origin;
   private Int2D destination;
   private double distanceInKm;
 
   /**
-   * Resolves the origin, the trip's destination, and the direct distance
-   * between them.
+   * Resolves the start date, the origin, the trip's destination, and the
+   * direct distance between them.
    */
   @Override
   public void start() {
     super.start();
+    startDateTime = currentDateTime.apply(getVessel());
     origin = getVessel().getCell();
     destination = getVessel().getCurrentTrip().getDestination();
     distanceInKm = distanceCalculator.distanceInKm(origin, destination);
@@ -95,8 +101,8 @@ public class TravelDirectly extends ExtendedTripTask {
       .broadcast(
         new TravelEvent(
           getVessel(),
-          getStartDateTime(),
-          getVessel().getSchedule().getDateTime(),
+          startDateTime,
+          currentDateTime.apply(getVessel()),
           origin,
           destination
         )

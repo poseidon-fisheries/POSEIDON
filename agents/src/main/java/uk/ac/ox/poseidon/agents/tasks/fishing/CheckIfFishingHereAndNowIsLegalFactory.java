@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -29,10 +30,12 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
@@ -54,11 +57,20 @@ public class CheckIfFishingHereAndNowIsLegalFactory
     ? super VesselComponentScope,
     ? extends Regulations<? super ExtendedFishingAction>
   > regulations;
+  private final ValueFactory<
+    ? super VesselComponentScope,
+    ? super Vessel,
+    LocalDateTime
+  > currentDateTime;
 
   @Override
   protected CheckIfFishingHereAndNowIsLegal newInstance(
     final VesselComponentScope scope
   ) {
-    return new CheckIfFishingHereAndNowIsLegal(gear, regulations.get(scope));
+    return new CheckIfFishingHereAndNowIsLegal(
+      gear,
+      regulations.get(scope),
+      currentDateTime.get(scope)
+    );
   }
 }

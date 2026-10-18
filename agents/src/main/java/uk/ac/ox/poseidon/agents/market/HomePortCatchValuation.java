@@ -28,6 +28,7 @@ import static lombok.AccessLevel.PACKAGE;
 import java.time.LocalDateTime;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -59,6 +60,7 @@ public class HomePortCatchValuation implements Valuation<Object, Bucket> {
   private static final int MAXIMUM_NUMBER_OF_VALUES = 10_000;
 
   private final CatchCategoriser catchCategoriser;
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
   // By identity: cheaper than comparing catches, and a catch never changes.
   private final Map<Bucket, Double> values = new IdentityHashMap<>();
   // The market and the time from which the values above hold.
@@ -95,7 +97,7 @@ public class HomePortCatchValuation implements Valuation<Object, Bucket> {
     if (!valuesHold) {
       values.clear();
       valuedMarket = market;
-      valuedSince = vessel.getSchedule().getDateTime();
+      valuedSince = currentDateTime.apply(vessel);
     }
     return values.computeIfAbsent(bucket, key -> valueAt(vessel, market, key));
   }

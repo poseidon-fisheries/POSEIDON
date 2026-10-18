@@ -71,16 +71,21 @@ public class ExtendedFishingAction
   }
 
   /**
-   * Starts now, at the vessel's current cell, for the gear's own duration,
-   * fishing with {@code gear}.
+   * Starts at {@code startDateTime}, at the vessel's current cell, for the
+   * gear's own duration, fishing with {@code gear}.
    *
-   * @param vessel the vessel taking the action
-   * @param gear   the vessel's current gear
+   * @param vessel        the vessel taking the action
+   * @param startDateTime when the action starts
+   * @param gear          the vessel's current gear
    */
-  public ExtendedFishingAction(final Vessel vessel, final Gear gear) {
+  public ExtendedFishingAction(
+    final Vessel vessel,
+    final LocalDateTime startDateTime,
+    final Gear gear
+  ) {
     this(
       vessel,
-      vessel.getSchedule().getDateTime(),
+      startDateTime,
       gear.getDurationSupplier().get(),
       vessel.getVesselField().getModelGrid().toCoordinate(vessel.getCell()),
       gear

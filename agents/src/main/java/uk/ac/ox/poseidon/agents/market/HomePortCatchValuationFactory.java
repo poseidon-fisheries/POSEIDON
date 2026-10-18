@@ -22,15 +22,18 @@
 
 package uk.ac.ox.poseidon.agents.market;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link HomePortCatchValuation},
@@ -49,9 +52,17 @@ public class HomePortCatchValuationFactory
     ? super VesselScope,
     ? extends CatchCategoriser
   > catchCategoriser;
+  private final ValueFactory<
+    ? super VesselScope,
+    ? super Vessel,
+    LocalDateTime
+  > currentDateTime;
 
   @Override
   protected HomePortCatchValuation newInstance(final VesselScope scope) {
-    return new HomePortCatchValuation(catchCategoriser.get(scope));
+    return new HomePortCatchValuation(
+      catchCategoriser.get(scope),
+      currentDateTime.get(scope)
+    );
   }
 }

@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import java.time.LocalDateTime;
 import sim.util.Int2D;
 
 /**
@@ -33,10 +34,15 @@ public final class TripFixtures {
   private TripFixtures() {}
 
   /**
-   * @return the trip started for {@code vessel} towards {@code destination}
+   * @return the trip started for {@code vessel} towards {@code destination},
+   *         at {@code startDateTime}
    */
-  public static Trip startTrip(final Vessel vessel, final Int2D destination) {
-    vessel.startTrip(destination);
+  public static Trip startTrip(
+    final Vessel vessel,
+    final Int2D destination,
+    final LocalDateTime startDateTime
+  ) {
+    vessel.startTrip(destination, startDateTime);
     return vessel.getCurrentTrip();
   }
 }

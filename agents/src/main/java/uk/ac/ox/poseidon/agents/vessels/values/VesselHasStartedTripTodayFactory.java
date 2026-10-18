@@ -22,28 +22,41 @@
 
 package uk.ac.ox.poseidon.agents.vessels.values;
 
+import java.time.LocalDateTime;
 import java.util.function.Function;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of
+ * A {@link SimulationScopeFactory} counterpart of
  * {@link VesselHasStartedTripToday}, built via
  * {@link Factories#vesselHasStartedTripToday()}.
  */
-@NoArgsConstructor
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class VesselHasStartedTripTodayFactory
-  extends GlobalScopeFactory<Function<Vessel, Boolean>>
-  implements ValueFactory<Scope, Vessel, Boolean>
+  extends SimulationScopeFactory<Function<Vessel, Boolean>>
+  implements ValueFactory<SimulationScope, Vessel, Boolean>
 {
 
+  private final ValueFactory<
+    ? super SimulationScope,
+    ? super Vessel,
+    LocalDateTime
+  > currentDateTime;
+
   @Override
-  protected Function<Vessel, Boolean> newInstance(final Scope scope) {
-    return new VesselHasStartedTripToday();
+  protected Function<Vessel, Boolean> newInstance(final SimulationScope scope) {
+    return new VesselHasStartedTripToday(currentDateTime.get(scope));
   }
 }

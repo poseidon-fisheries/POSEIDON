@@ -196,7 +196,7 @@ public class FleetFromVesselRegisterFactory extends SchedulingFactory<Fleet> {
   }
 
   private FleetEvent makeUpdate(
-    final SimulationScope scope,
+    final SchedulingScope scope,
     final LocalDateTime dateTime,
     final Row row,
     final VesselSpecification specification
@@ -230,7 +230,8 @@ public class FleetFromVesselRegisterFactory extends SchedulingFactory<Fleet> {
               vessel.buildComponent(component, vesselScope)
             );
           return vessel;
-        })
+        }),
+      scope.getSchedule()::getDateTime
     );
   }
 

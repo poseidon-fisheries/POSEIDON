@@ -22,7 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.vessels.values;
 
+import java.time.LocalDateTime;
 import java.util.function.Function;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
@@ -31,7 +34,12 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
  * trip, else the previous one) started on the current calendar date. Never
  * holds for a vessel that has made no trip yet.
  */
+@RequiredArgsConstructor
 public class VesselHasStartedTripToday implements Function<Vessel, Boolean> {
+
+  /** The clock, which gives the current date. */
+  @NonNull
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
 
   @Override
   public Boolean apply(final Vessel vessel) {
@@ -44,7 +52,7 @@ public class VesselHasStartedTripToday implements Function<Vessel, Boolean> {
       mostRecentTrip
         .getStartDateTime()
         .toLocalDate()
-        .equals(vessel.getSchedule().getDateTime().toLocalDate())
+        .equals(currentDateTime.apply(vessel).toLocalDate())
     );
   }
 }

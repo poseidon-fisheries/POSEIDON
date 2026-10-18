@@ -34,7 +34,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.HOME_PORT;
-import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.specificationOf;
+import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.newVessel;
 
 import com.badlogic.gdx.ai.btree.Task;
 import java.time.Duration;
@@ -48,15 +48,12 @@ import org.junit.jupiter.api.Test;
 import sim.engine.SimState;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
-import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.market.Sale;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
-import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
-import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -117,14 +114,11 @@ class VesselTest {
   ) {
     final PortGrid portGrid = mock(PortGrid.class);
     when(portGrid.getObject("P1")).thenReturn(Optional.of(mock(Port.class)));
-    final Vessel vessel = new Vessel(
+    final Vessel vessel = newVessel(
       schedule,
-      mock(EventManager.class),
-      "vessel",
       mock(VesselField.class),
       portGrid,
-      mock(MarketGrid.class),
-      specificationOf(declaration)
+      declaration
     );
     vessel.setAttributes(Map.of(HOME_PORT, "P1"));
     return vessel;
@@ -321,28 +315,22 @@ class VesselTest {
 
   @Test
   void endTripKeepsTheFinishedTripAsThePreviousTrip() {
-    final TemporalSchedule schedule = mock(TemporalSchedule.class);
-    when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 7, 0));
     final VesselField vesselField = mock(VesselField.class, RETURNS_DEEP_STUBS);
     final PortGrid portGrid = mock(PortGrid.class);
-    final Vessel vessel = new Vessel(
-      schedule,
-      mock(EventManager.class),
-      "vessel",
+    final Vessel vessel = newVessel(
+      mock(TemporalSchedule.class),
       vesselField,
       portGrid,
-      mock(MarketGrid.class),
-      specificationOf(behaviour(scope -> behaviour))
+      behaviour(scope -> behaviour)
     );
     when(vesselField.getCell(vessel)).thenReturn(new Int2D(0, 0));
     when(portGrid.anyObjectsAt(new Int2D(0, 0))).thenReturn(true);
-    vessel.setAccount(new Account());
 
     assertNull(vessel.getPreviousTrip());
-    vessel.startTrip(new Int2D(1, 0));
+    vessel.startTrip(new Int2D(1, 0), START);
     final Trip trip = vessel.getCurrentTrip();
-    vessel.arriveInPort();
-    vessel.endTrip();
+    vessel.arriveInPort(START.plusHours(8));
+    vessel.endTrip(START.plusHours(9));
 
     assertNull(vessel.getCurrentTrip());
     assertSame(trip, vessel.getPreviousTrip());

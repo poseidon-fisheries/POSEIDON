@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.regulations.actions;
 
+import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -36,9 +37,14 @@ import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 public class DepartNowActionFunction implements Function<Vessel, DepartNow> {
 
   private final VesselComponent<? extends Gear> gear;
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
 
   @Override
   public DepartNow apply(final Vessel vessel) {
-    return new DepartNow(vessel, gear.of(vessel));
+    return new DepartNow(
+      vessel,
+      currentDateTime.apply(vessel),
+      gear.of(vessel)
+    );
   }
 }

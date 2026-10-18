@@ -176,6 +176,8 @@ components:
         - !!uk.ac.ox.poseidon.agents.vessels.TripBlockFactory
           children:
           - !!uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory
+            currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+              }
             destination: !!uk.ac.ox.poseidon.agents.vessels.values.CurrentTripDestinationCellFactory {
               }
             distance: *id009
@@ -213,6 +215,8 @@ components:
             child: !!uk.ac.ox.poseidon.agents.tasks.branches.SequenceTaskFactory
               children:
               - !!uk.ac.ox.poseidon.agents.tasks.fishing.FishingFactory
+                currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+                  }
                 dispositionProcess: !!uk.ac.ox.poseidon.agents.catches.disposition.ProportionallyLimitingBiomassToHoldFactory {
                   }
                 fisheable: !!uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory
@@ -276,11 +280,14 @@ components:
                                 seconds: 0
                               }
                           subject: !!uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory
-                            value: !!uk.ac.ox.poseidon.agents.vessels.values.CurrentTimeAtSeaFactory {
-                              }
+                            value: !!uk.ac.ox.poseidon.agents.vessels.values.CurrentTimeAtSeaFactory
+                              currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+                                }
           - !!uk.ac.ox.poseidon.agents.tasks.travel.SetDestinationToOriginFactory {
             }
           - !!uk.ac.ox.poseidon.agents.tasks.travel.TravelAlongPathFactory
+            currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+              }
             destination: !!uk.ac.ox.poseidon.agents.vessels.values.CurrentTripDestinationCellFactory {
               }
             distance: *id009
@@ -289,9 +296,12 @@ components:
               }
             fuelTank: *id011
             pathFinder: *id016
-          - !!uk.ac.ox.poseidon.agents.tasks.travel.ArriveInPortFactory {
-            }
+          - !!uk.ac.ox.poseidon.agents.tasks.travel.ArriveInPortFactory
+            currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+              }
           - !!uk.ac.ox.poseidon.agents.tasks.landings.LandCatchesFactory
+            currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+              }
             duration: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory
               object: !!uk.ac.ox.poseidon.core.time.DurationFactory {
                 days: 0,
@@ -313,6 +323,8 @@ components:
                 pumpRateInLitresPerMinute: 200.0
               portGrid: *id006
             fuelTank: *id011
+          currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
+            }
           initialDestination: !!uk.ac.ox.poseidon.agents.choices.EpsilonGreedyDestinationFactory
             epsilon: 0.2
             exploiter: !!uk.ac.ox.poseidon.agents.choices.ImitatingPickerFactory

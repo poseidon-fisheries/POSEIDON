@@ -29,26 +29,26 @@ import static lombok.AccessLevel.NONE;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.google.common.collect.ImmutableMap;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.function.Function;
 import lombok.Getter;
 import lombok.NonNull;
-import sim.engine.Steppable;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
+import uk.ac.ox.poseidon.agents.vessels.Fleet.StepScheduler;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.events.EventManager;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -72,22 +72,25 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * new hold with its catch on board. Its current state (cell, heading, trips)
  * is changed by the behaviour itself and changes immediately.
  * <p>
- * A vessel has at most one step pending on the schedule. The vessel isn't
- * itself a {@link Steppable}: what goes on the schedule is its private
- * {@link #stepper}, so nothing outside the vessel can schedule it, and every
- * step is scheduled through {@link #scheduleNextStep}, which refuses to
- * schedule a second one. Outside a step, an active vessel always has a step
- * pending ({@link #mutate} restores this after each mutation). Becoming
+ * A vessel has at most one step pending on the schedule. It holds no
+ * schedule: its fleet gives it a {@link StepScheduler} that schedules its step
+ * and nothing else, and refuses to schedule a second one. Nothing outside the
+ * vessel can schedule its step. Outside a step, an active vessel always has a
+ * step pending ({@link #mutate} restores this after each mutation). Becoming
  * inactive doesn't cancel a pending step; the step still runs, finds the
  * vessel inactive and schedules nothing, so a vessel can be inactive with a
  * step pending, and reactivating it then needs no new step.
+ * <p>
+ * Nor does it hold a clock: what reads the date takes the clock as an input,
+ * and gives the vessel the dates it records, such as those of its trips.
  */
 @Getter
 public class Vessel implements Oriented2D, HasAttributes {
 
-  private static final int VESSEL_STEP_ORDERING = 1;
+  /** Puts this vessel's step on the schedule. */
+  @Getter(NONE)
+  private final @NonNull StepScheduler stepScheduler;
 
-  private final @NonNull TemporalSchedule schedule;
   private final @NonNull EventManager eventManager;
 
   /** The products of the factories built for this vessel. */
@@ -123,17 +126,6 @@ public class Vessel implements Oriented2D, HasAttributes {
   @Getter(NONE)
   private Duration taskDuration;
 
-  /**
-   * What this vessel puts on the schedule: runs {@link #step()}. Private, so
-   * only it can.
-   */
-  @Getter(NONE)
-  private final Steppable stepper = _ -> step();
-
-  /** Whether this vessel has a step on the schedule that hasn't run yet. */
-  @Getter(NONE)
-  private boolean stepPending;
-
   /** This vessel's identifying id. */
   private final @NonNull String id;
   /** The field this vessel moves within. */
@@ -150,21 +142,17 @@ public class Vessel implements Oriented2D, HasAttributes {
    * once it becomes active, through {@link #mutate}: a vessel never starts
    * active, so an active vessel always has a step pending.
    *
-   * @param schedule     the schedule this vessel reschedules itself on after
-   *                     each step
-   * @param eventManager the event manager this vessel broadcasts on
-   * @param id           the vessel's identifying id
-   * @param vesselField  the field the vessel moves within
-   * @param portGrid     the grid of ports the vessel can dock at
-   * @param marketGrid    the grid of markets the vessel can sell into
-   * @param specification what the vessel is made of
+   * @param newStepScheduler makes, from this vessel's step, what schedules
+   *                         that step and nothing else
+   * @param eventManager     the event manager this vessel broadcasts on
+   * @param id               the vessel's identifying id
+   * @param vesselField      the field the vessel moves within
+   * @param portGrid         the grid of ports the vessel can dock at
+   * @param marketGrid       the grid of markets the vessel can sell into
+   * @param specification    what the vessel is made of
    */
-  @SuppressFBWarnings(
-    value = "EI2",
-    justification = "Vessel keeps references to mutable schedule/event manager by design."
-  )
-  public Vessel(
-    @NonNull final TemporalSchedule schedule,
+  Vessel(
+    @NonNull final Function<Runnable, StepScheduler> newStepScheduler,
     @NonNull final EventManager eventManager,
     @NonNull final String id,
     @NonNull final VesselField vesselField,
@@ -172,7 +160,7 @@ public class Vessel implements Oriented2D, HasAttributes {
     @NonNull final MarketGrid marketGrid,
     @NonNull final VesselSpecification specification
   ) {
-    this.schedule = schedule;
+    this.stepScheduler = newStepScheduler.apply(this::step);
     this.eventManager = eventManager;
     this.id = id;
     this.vesselField = vesselField;
@@ -255,7 +243,6 @@ public class Vessel implements Oriented2D, HasAttributes {
    * otherwise.
    */
   private void step() {
-    stepPending = false;
     if (!isBehaviourRunning()) {
       while (!mutationQueue.isEmpty()) {
         mutationQueue.poll().run();
@@ -275,28 +262,16 @@ public class Vessel implements Oriented2D, HasAttributes {
           this
         );
         taskDuration = null;
-        scheduleNextStep(delay);
+        stepScheduler.scheduleNextStep(delay);
       } else {
         checkState(
           taskDuration == null,
           "Vessel %s's behaviour is not running, but a task set a duration this step.",
           this
         );
-        scheduleNextStep();
+        stepScheduler.scheduleNextStep();
       }
     }
-  }
-
-  /** Schedules this vessel's next step on the next tick. */
-  private void scheduleNextStep() {
-    checkState(!stepPending, "Vessel %s already has a step pending.", this);
-    stepPending = schedule.scheduleOnce(stepper, VESSEL_STEP_ORDERING);
-  }
-
-  /** Schedules this vessel's next step after {@code delay}. */
-  private void scheduleNextStep(final Duration delay) {
-    checkState(!stepPending, "Vessel %s already has a step pending.", this);
-    stepPending = schedule.scheduleOnceIn(delay, stepper, VESSEL_STEP_ORDERING);
   }
 
   /**
@@ -334,8 +309,8 @@ public class Vessel implements Oriented2D, HasAttributes {
       mutationQueue.add(mutation);
     } else {
       mutation.run();
-      if (isActive() && !stepPending) {
-        scheduleNextStep();
+      if (isActive() && !stepScheduler.isStepPending()) {
+        stepScheduler.scheduleNextStep();
       }
     }
   }
@@ -514,27 +489,33 @@ public class Vessel implements Oriented2D, HasAttributes {
    * Starts a new {@link Trip} to {@code destination}. Only a
    * {@link TripBlock} opens a trip.
    *
+   * @param destination   where the trip is initially headed
+   * @param startDateTime when the trip starts
    * @throws IllegalStateException if the vessel is already on a trip
    */
-  void startTrip(final Int2D destination) {
+  void startTrip(final Int2D destination, final LocalDateTime startDateTime) {
     checkState(currentTrip == null, "Vessel %s is already on a trip.", id);
-    this.currentTrip = new Trip(this, destination);
+    this.currentTrip = new Trip(this, destination, startDateTime);
   }
 
   /**
    * Records the current trip's arrival in port; see
-   * {@link Trip#arriveInPort()}.
+   * {@link Trip#arriveInPort}.
+   *
+   * @param arrivalDateTime when the vessel arrives
    */
-  public void arriveInPort() {
-    currentTrip.arriveInPort();
+  public void arriveInPort(final LocalDateTime arrivalDateTime) {
+    currentTrip.arriveInPort(arrivalDateTime);
   }
 
   /**
    * Ends the current trip, folding its account into the vessel's own, and keeps
    * it as the {@link #previousTrip}. Only a {@link TripBlock} closes a trip.
+   *
+   * @param endDateTime when the trip ends
    */
-  void endTrip() {
-    currentTrip.endTrip();
+  void endTrip(final LocalDateTime endDateTime) {
+    currentTrip.endTrip(endDateTime);
     this.account.add(currentTrip.getAccount());
     this.previousTrip = currentTrip;
     this.currentTrip = null;

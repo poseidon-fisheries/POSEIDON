@@ -32,7 +32,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
-import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.specificationOf;
+import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.newVessel;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
@@ -46,11 +46,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
-import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
 import uk.ac.ox.poseidon.agents.tasks.travel.ArriveInPort;
-import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
-import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -58,6 +55,7 @@ class TripBlockTest {
 
   private static final Int2D PORT = new Int2D(0, 0);
   private static final Int2D DESTINATION = new Int2D(1, 0);
+  private static final LocalDateTime NOW = LocalDateTime.of(2026, 1, 1, 7, 0);
 
   private Vessel vessel;
 
@@ -85,22 +83,16 @@ class TripBlockTest {
   /** A vessel in port, on no trip, with an account to fold trips into. */
   @BeforeEach
   void setUp() {
-    final TemporalSchedule schedule = mock(TemporalSchedule.class);
-    when(schedule.getDateTime()).thenReturn(LocalDateTime.of(2026, 1, 1, 7, 0));
     final VesselField vesselField = mock(VesselField.class, RETURNS_DEEP_STUBS);
     final PortGrid portGrid = mock(PortGrid.class);
-    vessel = new Vessel(
-      schedule,
-      mock(EventManager.class),
-      "vessel",
+    vessel = newVessel(
+      mock(TemporalSchedule.class),
       vesselField,
       portGrid,
-      mock(MarketGrid.class),
-      specificationOf(behaviour(_ -> new ScriptedTask()))
+      behaviour(_ -> new ScriptedTask())
     );
     when(vesselField.getCell(vessel)).thenReturn(PORT);
     when(portGrid.anyObjectsAt(PORT)).thenReturn(true);
-    vessel.setAccount(new Account());
   }
 
   @SafeVarargs
@@ -108,7 +100,7 @@ class TripBlockTest {
     final Optional<Int2D> initialDestination,
     final Task<Vessel>... children
   ) {
-    return new TripBlock(_ -> initialDestination, List.of(children));
+    return new TripBlock(_ -> initialDestination, _ -> NOW, List.of(children));
   }
 
   private BehaviorTree<Vessel> treeOver(final TripBlock tripBlock) {
@@ -121,7 +113,7 @@ class TripBlockTest {
     final TripBlock tripBlock = tripTo(
       Optional.of(DESTINATION),
       fishing,
-      new ArriveInPort()
+      new ArriveInPort(_ -> NOW)
     );
     final BehaviorTree<Vessel> tree = treeOver(tripBlock);
 
@@ -135,6 +127,8 @@ class TripBlockTest {
     assertThat(fishing.tripsSeen).containsExactly(trip, trip);
     assertThat(vessel.getCurrentTrip()).isNull();
     assertThat(vessel.getPreviousTrip()).isSameAs(trip);
+    assertThat(trip.getStartDateTime()).isEqualTo(NOW);
+    assertThat(trip.getEndDateTime()).isEqualTo(NOW);
   }
 
   @Test
@@ -181,7 +175,7 @@ class TripBlockTest {
   void aTripBlockInsideAnotherThrows() {
     final TripBlock tripBlock = tripTo(
       Optional.of(DESTINATION),
-      tripTo(Optional.of(DESTINATION), new ArriveInPort())
+      tripTo(Optional.of(DESTINATION), new ArriveInPort(_ -> NOW))
     );
 
     assertThatThrownBy(treeOver(tripBlock)::step)

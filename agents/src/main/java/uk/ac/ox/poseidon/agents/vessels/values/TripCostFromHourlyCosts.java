@@ -32,8 +32,8 @@ import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
- * Extracts the cost of a vessel's current trip so far, as its time at sea
- * ({@link Trip#getTimeAtSea()}) times an hourly rate from
+ * Extracts the cost of a vessel's current trip once it has arrived in port, as
+ * its total time at sea ({@link Trip#getTotalTimeAtSea()}) times an hourly rate from
  * {@code hourlyCosts}.
  */
 @RequiredArgsConstructor
@@ -45,10 +45,11 @@ public class TripCostFromHourlyCosts implements Function<Vessel, Money> {
   /**
    * @return {@code hourlyCosts}'s rate for {@code vessel}, times its
    *         current trip's hours at sea
+   * @throws IllegalStateException if the current trip has not arrived in port
    */
   @Override
   public Money apply(final Vessel vessel) {
-    final Duration timeAtSea = vessel.getCurrentTrip().getTimeAtSea();
+    final Duration timeAtSea = vessel.getCurrentTrip().getTotalTimeAtSea();
     return hourlyCosts
       .apply(vessel)
       .multipliedBy(timeAtSea.toSeconds() / 3600.0, RoundingMode.HALF_EVEN);

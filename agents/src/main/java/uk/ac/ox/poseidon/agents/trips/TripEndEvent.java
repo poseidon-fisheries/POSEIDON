@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.agents.trips;
 import lombok.Value;
 import uk.ac.ox.poseidon.agents.vessels.Trip;
 
-/** Broadcast when a {@link Trip} ends, via {@link Trip#endTrip()}. */
+/** Broadcast when a {@link Trip} ends, via {@link Trip#endTrip}. */
 @Value
 public class TripEndEvent implements TripEvent {
 

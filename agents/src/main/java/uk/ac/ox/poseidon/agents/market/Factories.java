@@ -82,7 +82,10 @@ public class Factories {
       ? extends CatchCategoriser
     > catchCategoriser
   ) {
-    return new HomePortCatchValuationFactory(catchCategoriser);
+    return new HomePortCatchValuationFactory(
+      catchCategoriser,
+      currentDateTime()
+    );
   }
 
   /**

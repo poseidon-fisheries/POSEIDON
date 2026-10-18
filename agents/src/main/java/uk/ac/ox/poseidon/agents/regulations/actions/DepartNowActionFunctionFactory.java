@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.regulations.actions;
 
+import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -31,12 +32,12 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link DepartNowActionFunction},
+ * A {@link SimulationScopeFactory} counterpart of {@link DepartNowActionFunction},
  * built via {@link Factories#departNow}.
  */
 @Getter
@@ -45,14 +46,21 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class DepartNowActionFunctionFactory
-  extends GlobalScopeFactory<Function<Vessel, DepartNow>>
-  implements ValueFactory<Scope, Vessel, DepartNow>
+  extends SimulationScopeFactory<Function<Vessel, DepartNow>>
+  implements ValueFactory<SimulationScope, Vessel, DepartNow>
 {
 
   private final VesselComponent<? extends Gear> gear;
+  private final ValueFactory<
+    ? super SimulationScope,
+    ? super Vessel,
+    LocalDateTime
+  > currentDateTime;
 
   @Override
-  protected Function<Vessel, DepartNow> newInstance(final Scope scope) {
-    return new DepartNowActionFunction(gear);
+  protected Function<Vessel, DepartNow> newInstance(
+    final SimulationScope scope
+  ) {
+    return new DepartNowActionFunction(gear, currentDateTime.get(scope));
   }
 }

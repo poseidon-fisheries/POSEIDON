@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.regulations.actions;
 
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 
@@ -39,6 +41,6 @@ public class Factories {
   public static DepartNowActionFunctionFactory departNow(
     final VesselComponent<? extends Gear> gear
   ) {
-    return new DepartNowActionFunctionFactory(gear);
+    return new DepartNowActionFunctionFactory(gear, currentDateTime());
   }
 }

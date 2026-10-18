@@ -37,7 +37,7 @@ import uk.ac.ox.poseidon.core.events.Listener;
 /**
  * An {@link Evaluator} that scores a destination by the vessel's trip profit
  * (in a fixed currency), divided by the trip's time at sea
- * ({@link Trip#getTimeAtSea()}) in hours.
+ * ({@link Trip#getTotalTimeAtSea()}) in hours.
  */
 public class ProfitPerHourDestinationEvaluator implements Evaluator<Int2D> {
 
@@ -108,7 +108,7 @@ public class ProfitPerHourDestinationEvaluator implements Evaluator<Int2D> {
         .getAccount()
         .getBalances()
         .getOrDefault(currencyUnit, Money.zero(currencyUnit));
-      final double hours = trip.getTimeAtSea().toSeconds() / 3600.0;
+      final double hours = trip.getTotalTimeAtSea().toSeconds() / 3600.0;
       checkState(hours > 0, "Time at sea must be positive.");
       return profit.getAmount().doubleValue() / hours;
     }

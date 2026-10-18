@@ -31,6 +31,7 @@ import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
 import java.lang.reflect.Field;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Map;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -44,7 +45,6 @@ import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 class LandCatchesTest {
@@ -59,7 +59,8 @@ class LandCatchesTest {
   private final Trip trip = mock(Trip.class);
   private final LandCatches landCatches = new LandCatches(
     declaredFor(vessel, mock(Hold.class)),
-    vessel -> Duration.ZERO
+    vessel -> Duration.ZERO,
+    vessel -> LocalDateTime.of(2026, 1, 1, 0, 0)
   );
 
   @BeforeEach
@@ -76,7 +77,6 @@ class LandCatchesTest {
     when(vessel.getHomePortLocation()).thenReturn(homePortCell);
     when(vessel.getCell()).thenReturn(homePortCell);
     when(vessel.getMarketGrid()).thenReturn(marketGrid);
-    when(vessel.getSchedule()).thenReturn(mock(TemporalSchedule.class));
     when(trip.getAccount()).thenReturn(mock(Account.class));
     when(trip.hasArrivedInPort()).thenReturn(true);
     setTaskObject(landCatches, vessel);

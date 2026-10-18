@@ -43,7 +43,7 @@ class TripCostFromHourlyCostsTest {
     final Vessel vessel = mock(Vessel.class);
     final Trip trip = mock(Trip.class);
     when(vessel.getCurrentTrip()).thenReturn(trip);
-    when(trip.getTimeAtSea()).thenReturn(Duration.ofHours(3));
+    when(trip.getTotalTimeAtSea()).thenReturn(Duration.ofHours(3));
 
     final TripCostFromHourlyCosts tripCost = new TripCostFromHourlyCosts(
       v -> hourlyCost

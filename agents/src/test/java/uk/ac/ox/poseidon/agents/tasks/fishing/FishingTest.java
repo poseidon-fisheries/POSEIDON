@@ -29,6 +29,7 @@ import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.declaredFor;
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -177,7 +178,9 @@ class FishingTest {
       final Function<? super Vessel, Fisheable> fisheable,
       final DispositionProcess dispositionProcess
     ) {
-      super(gear, hold, fuelTank, fisheable, dispositionProcess);
+      super(gear, hold, fuelTank, fisheable, dispositionProcess, _ ->
+        LocalDateTime.of(2026, 1, 1, 0, 0)
+      );
     }
 
     private Task.Status invokeComplete() {

@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.vessels.values;
 
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+
 import org.joda.money.Money;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -88,7 +90,7 @@ public class Factories {
    * @see CurrentTimeAtSea
    */
   public static CurrentTimeAtSeaFactory currentTimeAtSea() {
-    return new CurrentTimeAtSeaFactory();
+    return new CurrentTimeAtSeaFactory(currentDateTime());
   }
 
   /**
@@ -133,7 +135,7 @@ public class Factories {
    * @see VesselHasStartedTripToday
    */
   public static VesselHasStartedTripTodayFactory vesselHasStartedTripToday() {
-    return new VesselHasStartedTripTodayFactory();
+    return new VesselHasStartedTripTodayFactory(currentDateTime());
   }
 
   /**

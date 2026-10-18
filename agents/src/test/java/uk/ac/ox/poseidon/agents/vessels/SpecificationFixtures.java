@@ -22,12 +22,19 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import static org.mockito.Mockito.mock;
+
 import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableMap;
+import uk.ac.ox.poseidon.agents.fields.VesselField;
+import uk.ac.ox.poseidon.agents.market.MarketGrid;
+import uk.ac.ox.poseidon.core.events.SimpleEventManager;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * Specifications for tests that construct vessels themselves rather than
- * creating them through a specification.
+ * Specifications for tests that have a fleet construct vessels rather than
+ * creating them through a specification, and the vessels constructed so.
  */
 final class SpecificationFixtures {
 
@@ -52,5 +59,26 @@ final class SpecificationFixtures {
       HOME_PORT,
       null
     );
+  }
+
+  /**
+   * @return a vessel {@code "vessel"} constructed by a fleet over
+   *         {@code schedule}, {@code vesselField} and {@code portGrid}, with
+   *         an account and {@code behaviour}, but no attribute and no
+   *         component built yet
+   */
+  static Vessel newVessel(
+    final TemporalSchedule schedule,
+    final VesselField vesselField,
+    final PortGrid portGrid,
+    final VesselComponent<? extends Task<Vessel>> behaviour
+  ) {
+    return new Fleet(
+      schedule,
+      new SimpleEventManager(),
+      vesselField,
+      portGrid,
+      mock(MarketGrid.class)
+    ).createVessel("vessel", specificationOf(behaviour));
   }
 }

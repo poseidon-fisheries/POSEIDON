@@ -24,18 +24,28 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
+import java.time.LocalDateTime;
+import java.util.function.Function;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 /**
  * A leaf {@link VesselTask} that records the vessel's arrival in port, ending
  * its current trip's time at sea, and always succeeds.
  */
+@RequiredArgsConstructor
 public class ArriveInPort extends VesselTask {
+
+  /** The clock, which dates the arrival. */
+  @NonNull
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
 
   /** Records the vessel's arrival in port. */
   @Override
   public Status execute() {
-    getVessel().arriveInPort();
+    getVessel().arriveInPort(currentDateTime.apply(getVessel()));
     return SUCCEEDED;
   }
 }

@@ -23,8 +23,10 @@
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import com.badlogic.gdx.ai.btree.Task;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -71,6 +73,11 @@ public class RoundTripFactory extends TaskFactory<TripBlock> {
     ? super VesselComponentScope,
     ? extends Task<Vessel>
   > landingTask;
+  private final ValueFactory<
+    ? super VesselComponentScope,
+    ? super Vessel,
+    LocalDateTime
+  > currentDateTime;
 
   /**
    * @return a {@link TripBlock} to {@code initialDestination} of:
@@ -83,14 +90,17 @@ public class RoundTripFactory extends TaskFactory<TripBlock> {
     final Task<Vessel> travelTask = this.travelTask.get(scope);
     final Task<Vessel> fishingTask = this.fishingTask.get(scope);
     final Task<Vessel> landingTask = this.landingTask.get(scope);
+    final Function<? super Vessel, LocalDateTime> currentDateTime =
+      this.currentDateTime.get(scope);
     return new TripBlock(
       initialDestination.get(scope),
+      currentDateTime,
       List.of(
         travelTask,
         fishingTask,
         new SetDestinationToOrigin(),
         travelTask,
-        new ArriveInPort(),
+        new ArriveInPort(currentDateTime),
         landingTask
       )
     );

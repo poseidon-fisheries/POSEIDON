@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.agents.tasks.fishing;
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -66,6 +67,10 @@ public class Fishing extends ExtendedTripTask {
   @NonNull
   private final DispositionProcess dispositionProcess;
 
+  /** The clock, which dates the start of each fishing action. */
+  @NonNull
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+
   private ExtendedFishingAction action;
 
   /**
@@ -75,7 +80,11 @@ public class Fishing extends ExtendedTripTask {
   @Override
   public void start() {
     super.start();
-    action = new ExtendedFishingAction(getVessel(), gear.of(getVessel()));
+    action = new ExtendedFishingAction(
+      getVessel(),
+      currentDateTime.apply(getVessel()),
+      gear.of(getVessel())
+    );
   }
 
   /**

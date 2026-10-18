@@ -26,6 +26,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +35,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
@@ -94,7 +96,7 @@ public class Fleet implements VesselsGetter {
       vesselId
     );
     final Vessel vessel = new Vessel(
-      schedule,
+      step -> new StepScheduler(schedule, step),
       new ForwardingEventManager(eventManager),
       vesselId,
       vesselField,
@@ -119,5 +121,64 @@ public class Fleet implements VesselsGetter {
   /** Tells every entry listener that {@code vessel} has entered this fleet. */
   void announceEntry(final Vessel vessel) {
     entryListeners.forEach(listener -> listener.accept(vessel));
+  }
+
+  /**
+   * Schedules one vessel's step and nothing else: a fleet gives one to each
+   * vessel it creates, and only a fleet can make one, so a vessel can put its
+   * own step on the schedule without holding the schedule. It keeps at most
+   * one step pending.
+   */
+  static final class StepScheduler {
+
+    private static final int VESSEL_STEP_ORDERING = 1;
+
+    private final TemporalSchedule schedule;
+
+    /** The vessel's step, as it goes on the schedule. */
+    private final Steppable step;
+
+    /** Whether the vessel's step is on the schedule and has not run yet. */
+    private boolean stepPending;
+
+    /**
+     * @param schedule   the schedule the vessel's step goes on
+     * @param vesselStep the vessel's step, the only one this schedules
+     */
+    private StepScheduler(
+      final TemporalSchedule schedule,
+      final Runnable vesselStep
+    ) {
+      this.schedule = schedule;
+      this.step = _ -> {
+        stepPending = false;
+        vesselStep.run();
+      };
+    }
+
+    /** @return whether the vessel's step is pending */
+    boolean isStepPending() {
+      return stepPending;
+    }
+
+    /**
+     * Schedules the vessel's step on the next tick.
+     *
+     * @throws IllegalStateException if the step is already pending
+     */
+    void scheduleNextStep() {
+      checkState(!stepPending, "The vessel already has a step pending.");
+      stepPending = schedule.scheduleOnce(step, VESSEL_STEP_ORDERING);
+    }
+
+    /**
+     * Schedules the vessel's step after {@code delay}.
+     *
+     * @throws IllegalStateException if the step is already pending
+     */
+    void scheduleNextStep(final Duration delay) {
+      checkState(!stepPending, "The vessel already has a step pending.");
+      stepPending = schedule.scheduleOnceIn(delay, step, VESSEL_STEP_ORDERING);
+    }
   }
 }

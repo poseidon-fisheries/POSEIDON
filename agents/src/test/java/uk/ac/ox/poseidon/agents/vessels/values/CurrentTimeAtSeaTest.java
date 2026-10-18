@@ -28,18 +28,23 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 
 class CurrentTimeAtSeaTest {
 
+  private static final LocalDateTime START = LocalDateTime.of(2026, 1, 1, 6, 0);
+
+  private final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea(_ ->
+    START.plusHours(5)
+  );
+
   @Test
   void throwsWhenNoTripIsInProgress() {
     final Vessel vessel = mock(Vessel.class);
     when(vessel.getCurrentTrip()).thenReturn(null);
-
-    final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea();
 
     assertThrows(IllegalStateException.class, () ->
       currentTimeAtSea.apply(vessel)
@@ -47,14 +52,22 @@ class CurrentTimeAtSeaTest {
   }
 
   @Test
-  void isTheCurrentTripsTimeAtSea() {
+  void runsFromTheTripsStartToNowWhileAtSea() {
     final Vessel vessel = mock(Vessel.class);
     final Trip trip = mock(Trip.class);
-
     when(vessel.getCurrentTrip()).thenReturn(trip);
-    when(trip.getTimeAtSea()).thenReturn(Duration.ofHours(3));
+    when(trip.getStartDateTime()).thenReturn(START);
 
-    final CurrentTimeAtSea currentTimeAtSea = new CurrentTimeAtSea();
+    assertEquals(Duration.ofHours(5), currentTimeAtSea.apply(vessel));
+  }
+
+  @Test
+  void isTheTripsTimeAtSeaOnceItHasArrivedInPort() {
+    final Vessel vessel = mock(Vessel.class);
+    final Trip trip = mock(Trip.class);
+    when(vessel.getCurrentTrip()).thenReturn(trip);
+    when(trip.hasArrivedInPort()).thenReturn(true);
+    when(trip.getTotalTimeAtSea()).thenReturn(Duration.ofHours(3));
 
     assertEquals(Duration.ofHours(3), currentTimeAtSea.apply(vessel));
   }

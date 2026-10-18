@@ -29,6 +29,7 @@ import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.giveComponent;
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
@@ -36,7 +37,6 @@ import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
 import uk.ac.ox.poseidon.agents.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.core.events.EventManager;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 /**
  * Shared set-up for the travel task tests: a vessel at {@link #ORIGIN} cruising
@@ -46,6 +46,8 @@ final class TravelTasks {
 
   static final Int2D ORIGIN = new Int2D(0, 0);
   static final Int2D DESTINATION = new Int2D(1, 0);
+  /** The date the clock of the tasks made here reads. */
+  static final LocalDateTime NOW = LocalDateTime.of(2026, 1, 1, 0, 0);
 
   /** The declaration of the engine of the vessels made here. */
   static final VesselComponent<Engine> ENGINE = new VesselComponent<>(scope ->
@@ -71,7 +73,6 @@ final class TravelTasks {
     giveComponent(vessel, FUEL_TANK, mock(FuelTank.class));
     when(vessel.getCell()).thenReturn(ORIGIN);
     when(vessel.getCurrentTrip()).thenReturn(trip);
-    when(vessel.getSchedule()).thenReturn(mock(TemporalSchedule.class));
     return vessel;
   }
 

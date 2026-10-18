@@ -28,6 +28,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.branch.Sequence;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -49,20 +50,24 @@ import sim.util.Int2D;
 public class TripBlock extends Sequence<Vessel> {
 
   private final Function<? super Vessel, Optional<Int2D>> initialDestination;
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
   private boolean tripOpen;
 
   /**
    * @param initialDestination gives the trip's first destination for the
    *                           vessel, or none if it should not leave
+   * @param currentDateTime    the clock, which dates the trip's start and end
    * @param children           the tasks run in sequence during the trip
    * @throws IllegalArgumentException if {@code children} is empty
    */
   public TripBlock(
     final Function<? super Vessel, Optional<Int2D>> initialDestination,
+    final Function<? super Vessel, LocalDateTime> currentDateTime,
     final List<? extends Task<Vessel>> children
   ) {
     checkArgument(!children.isEmpty(), "A trip needs at least one task.");
     this.initialDestination = initialDestination;
+    this.currentDateTime = currentDateTime;
     children.forEach(this::addChild);
   }
 
@@ -84,7 +89,10 @@ public class TripBlock extends Sequence<Vessel> {
         fail();
         return;
       }
-      getVessel().startTrip(destination.get());
+      getVessel().startTrip(
+        destination.get(),
+        currentDateTime.apply(getVessel())
+      );
       tripOpen = true;
     }
     super.run();
@@ -105,7 +113,7 @@ public class TripBlock extends Sequence<Vessel> {
           "sailing home.",
         getStatus()
       );
-      getVessel().endTrip();
+      getVessel().endTrip(currentDateTime.apply(getVessel()));
       tripOpen = false;
     }
   }

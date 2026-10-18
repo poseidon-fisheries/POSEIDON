@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.tasks.fishing;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -62,6 +63,11 @@ public class FishingFactory extends TaskFactory<Fishing> {
     ? super VesselComponentScope,
     ? extends DispositionProcess
   > dispositionProcess;
+  private final ValueFactory<
+    ? super VesselComponentScope,
+    ? super Vessel,
+    LocalDateTime
+  > currentDateTime;
 
   @Override
   protected Fishing newInstance(final VesselComponentScope scope) {
@@ -70,7 +76,8 @@ public class FishingFactory extends TaskFactory<Fishing> {
       hold,
       fuelTank,
       fisheable.get(scope),
-      dispositionProcess.get(scope)
+      dispositionProcess.get(scope),
+      currentDateTime.get(scope)
     );
   }
 }

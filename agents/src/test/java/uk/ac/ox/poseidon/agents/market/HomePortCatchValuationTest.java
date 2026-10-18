@@ -45,7 +45,6 @@ import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.events.EventManager;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 class HomePortCatchValuationTest {
@@ -57,7 +56,6 @@ class HomePortCatchValuationTest {
     new CategorisedCatch(Map.of(category, bucket));
   private final Port homePort = mock(Port.class);
   private final Vessel vessel = mock(Vessel.class);
-  private final TemporalSchedule schedule = mock(TemporalSchedule.class);
   private LocalDateTime now = LocalDateTime.of(2026, 1, 1, 0, 0);
   private final BiomassMarket market = new BiomassMarket(
     homePort,
@@ -65,14 +63,13 @@ class HomePortCatchValuationTest {
     mock(EventManager.class)
   );
   private final HomePortCatchValuation valuation = new HomePortCatchValuation(
-    catchCategoriser
+    catchCategoriser,
+    _ -> now
   );
 
   @BeforeEach
   void setUp() {
     when(vessel.getHomePort()).thenReturn(homePort);
-    when(vessel.getSchedule()).thenReturn(schedule);
-    when(schedule.getDateTime()).thenAnswer(invocation -> now);
     givenMarkets(market);
   }
 
@@ -180,7 +177,6 @@ class HomePortCatchValuationTest {
     givenMarkets(market, otherMarket);
     final Vessel otherVessel = mock(Vessel.class);
     when(otherVessel.getHomePort()).thenReturn(otherPort);
-    when(otherVessel.getSchedule()).thenReturn(schedule);
     final MarketGrid marketGrid = vessel.getMarketGrid();
     when(otherVessel.getMarketGrid()).thenReturn(marketGrid);
     final Bucket bucket = Bucket.of(pricedSpecies, 10.0);

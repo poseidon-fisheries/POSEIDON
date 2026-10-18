@@ -137,7 +137,8 @@ class TravelAlongPathTest {
       pathFinder,
       distanceCalculator,
       v -> v.getCurrentTrip().getDestination(),
-      v -> eventManager
+      v -> eventManager,
+      v -> NOW
     );
     @SuppressWarnings("unchecked")
     final BehaviorTree<Vessel> tree = new BehaviorTree<>(
@@ -173,7 +174,8 @@ class TravelAlongPathTest {
       pathFinder,
       distanceCalculator,
       v -> DESTINATION,
-      v -> mock(EventManager.class)
+      v -> mock(EventManager.class),
+      v -> NOW
     );
   }
 }

@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.agents.tasks.travel;
 
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+
 import com.badlogic.gdx.ai.btree.Task;
 import java.util.Optional;
 import sim.util.Int2D;
@@ -96,7 +98,8 @@ public class Factories {
       initialDestination,
       travelTask,
       fishingTask,
-      landingTask
+      landingTask,
+      currentDateTime()
     );
   }
 
@@ -143,7 +146,8 @@ public class Factories {
       pathFinder,
       distance,
       destination,
-      eventManager
+      eventManager,
+      currentDateTime()
     );
   }
 
@@ -164,7 +168,12 @@ public class Factories {
       ? extends DistanceCalculator
     > distance
   ) {
-    return new TravelDirectlyFactory(engine, fuelTank, distance);
+    return new TravelDirectlyFactory(
+      engine,
+      fuelTank,
+      distance,
+      currentDateTime()
+    );
   }
 
   /**
@@ -181,6 +190,6 @@ public class Factories {
    * @see ArriveInPort
    */
   public static ArriveInPortFactory arriveInPort() {
-    return new ArriveInPortFactory();
+    return new ArriveInPortFactory(currentDateTime());
   }
 }

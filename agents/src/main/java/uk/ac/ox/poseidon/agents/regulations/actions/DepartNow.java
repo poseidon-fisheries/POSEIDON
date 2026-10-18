@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.regulations.actions;
 
+import java.time.LocalDateTime;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 
@@ -32,10 +33,15 @@ import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 public class DepartNow extends InstantFishingAction {
 
   /**
-   * @param vessel the vessel departing
-   * @param gear   the vessel's current gear
+   * @param vessel   the vessel departing
+   * @param dateTime the current date-time, when the vessel would depart
+   * @param gear     the vessel's current gear
    */
-  public DepartNow(final Vessel vessel, final Gear gear) {
-    super(vessel, gear);
+  public DepartNow(
+    final Vessel vessel,
+    final LocalDateTime dateTime,
+    final Gear gear
+  ) {
+    super(vessel, dateTime, gear);
   }
 }

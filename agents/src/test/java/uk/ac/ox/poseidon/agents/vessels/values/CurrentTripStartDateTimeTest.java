@@ -31,19 +31,12 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 
 class CurrentTripStartDateTimeTest {
 
   private static final LocalDateTime NOW = LocalDateTime.of(2026, 1, 1, 3, 0);
 
   private final Vessel vessel = mock(Vessel.class);
-
-  CurrentTripStartDateTimeTest() {
-    final TemporalSchedule schedule = mock(TemporalSchedule.class);
-    when(schedule.getDateTime()).thenReturn(NOW);
-    when(vessel.getSchedule()).thenReturn(schedule);
-  }
 
   @Test
   void throwsWhenTheVesselIsNotOnATrip() {
