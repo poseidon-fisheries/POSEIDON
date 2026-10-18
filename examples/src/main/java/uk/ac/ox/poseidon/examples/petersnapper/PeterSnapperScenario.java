@@ -459,7 +459,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       .build();
 
     final var agentCreators = scheduledOnceAtStart(
-      steppableSequence(listOf(benoaVesselCreator, kupangVesselCreator)),
+      steppableSequence(benoaVesselCreator, kupangVesselCreator),
       0
     );
 

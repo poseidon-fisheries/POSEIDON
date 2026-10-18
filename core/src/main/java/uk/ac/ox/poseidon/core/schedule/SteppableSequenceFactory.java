@@ -22,10 +22,11 @@
 
 package uk.ac.ox.poseidon.core.schedule;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.engine.Sequence;
@@ -36,10 +37,10 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
 /**
  * A {@link SimulationScopeFactory} for a MASON {@link Sequence} that runs the
- * resolved list of steppables, in order, on every step. No separate plain
+ * resolved steppables, in order, on every step. No separate plain
  * component class here: the produced value is a bare MASON type, with no
  * wrapper to carry documentation. Built via
- * {@link Factories#steppableSequence(Factory)}.
+ * {@link Factories#steppableSequence}.
  */
 @Getter
 @ToString
@@ -50,13 +51,18 @@ public class SteppableSequenceFactory
   extends SimulationScopeFactory<Steppable>
 {
 
-  private final Factory<
-    ? super SimulationScope,
-    ? extends List<? extends Steppable>
+  @Singular
+  private final ImmutableList<
+    Factory<? super SimulationScope, ? extends Steppable>
   > steppables;
 
   @Override
   protected Steppable newInstance(final SimulationScope scope) {
-    return new Sequence(steppables.get(scope));
+    return new Sequence(
+      steppables
+        .stream()
+        .map(steppable -> steppable.get(scope))
+        .toList()
+    );
   }
 }

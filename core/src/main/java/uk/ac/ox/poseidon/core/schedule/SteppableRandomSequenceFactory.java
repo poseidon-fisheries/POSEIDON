@@ -22,10 +22,11 @@
 
 package uk.ac.ox.poseidon.core.schedule;
 
-import java.util.Collection;
+import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.engine.RandomSequence;
@@ -36,10 +37,9 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
 /**
  * A {@link SimulationScopeFactory} for a MASON {@link RandomSequence} that runs
- * the resolved collection of steppables, in a freshly shuffled order, on every
- * step. No separate plain component class here: the produced value is a bare
+ * the resolved steppables, in a freshly shuffled order, on every step. No separate plain component class here: the produced value is a bare
  * MASON type, with no wrapper to carry documentation. Built via
- * {@link Factories#steppableRandomSequence(Factory)}.
+ * {@link Factories#steppableRandomSequence}.
  */
 @Getter
 @ToString
@@ -50,13 +50,18 @@ public class SteppableRandomSequenceFactory
   extends SimulationScopeFactory<RandomSequence>
 {
 
-  private final Factory<
-    ? super SimulationScope,
-    ? extends Collection<? extends Steppable>
+  @Singular
+  private final ImmutableList<
+    Factory<? super SimulationScope, ? extends Steppable>
   > steppables;
 
   @Override
   protected RandomSequence newInstance(final SimulationScope scope) {
-    return new RandomSequence(steppables.get(scope));
+    return new RandomSequence(
+      steppables
+        .stream()
+        .map(steppable -> steppable.get(scope))
+        .toList()
+    );
   }
 }

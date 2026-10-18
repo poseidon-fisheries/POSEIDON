@@ -24,10 +24,10 @@ package uk.ac.ox.poseidon.core.schedule;
 
 import static uk.ac.ox.poseidon.core.schedule.TemporalSchedule.DEFAULT_ORDERING;
 
+import com.google.common.collect.ImmutableList;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 import sim.engine.RandomSequence;
@@ -195,33 +195,28 @@ public class Factories {
   }
 
   /**
-   * @param steppables factory for the list of steppables to run in order
+   * @param steppables factories for the steppables to run in order
    * @return a {@link SimulationScopeFactory} for a {@link Sequence} over the
    *         resolved steppables
    * @see SteppableSequenceFactory
    */
+  @SafeVarargs
   public static SteppableSequenceFactory steppableSequence(
-    final Factory<
-      ? super SimulationScope,
-      ? extends List<? extends Steppable>
-    > steppables
+    final Factory<? super SimulationScope, ? extends Steppable>... steppables
   ) {
-    return new SteppableSequenceFactory(steppables);
+    return new SteppableSequenceFactory(ImmutableList.copyOf(steppables));
   }
 
   /**
-   * @param steppables factory for the collection of steppables to run in random
-   *                   order
+   * @param steppables factories for the steppables to run in random order
    * @return a {@link SimulationScopeFactory} for a {@link RandomSequence} over
    *         the resolved steppables
    * @see SteppableRandomSequenceFactory
    */
+  @SafeVarargs
   public static SteppableRandomSequenceFactory steppableRandomSequence(
-    final Factory<
-      ? super SimulationScope,
-      ? extends Collection<? extends Steppable>
-    > steppables
+    final Factory<? super SimulationScope, ? extends Steppable>... steppables
   ) {
-    return new SteppableRandomSequenceFactory(steppables);
+    return new SteppableRandomSequenceFactory(ImmutableList.copyOf(steppables));
   }
 }
