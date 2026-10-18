@@ -28,7 +28,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static lombok.AccessLevel.NONE;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
-import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
@@ -55,16 +54,18 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A fishing vessel, the model's agent: it has components (its behaviour, gear,
- * engine, hold and the rest, each read through its {@link VesselComponent}
- * declaration) and a home port. Its behaviour is the root task of a gdx-ai
- * behaviour tree, which the vessel runs: it repeatedly steps the tree,
- * rescheduling itself either after the running task's {@link #taskDuration}
- * (while the behaviour is running) or on the very next tick (once it isn't).
- * It steps its behaviour only while {@link #isActive()} holds.
+ * A fishing vessel, the model's agent: it has attributes, among them its home
+ * port's code and its name, and components (its behaviour, gear, engine, hold
+ * and the rest, each read through its {@link VesselComponent} declaration),
+ * both as its {@link VesselSpecification} says. Its behaviour is the root
+ * task of a gdx-ai behaviour tree, which the vessel runs: it repeatedly steps
+ * the tree, rescheduling itself either after the running task's
+ * {@link #taskDuration} (while the behaviour is running) or on the very next
+ * tick (once it isn't). It steps its behaviour only while {@link #isActive()}
+ * holds.
  * <p>
- * Its modifiable characteristics (name, account, home port, components,
- * registration and attributes) are changed from outside its behaviour, by the fleet
+ * Its modifiable characteristics (account, components, registration and
+ * attributes) are changed from outside its behaviour, by the fleet
  * register, so their setters go through {@link #mutate}, which queues them
  * while the behaviour is running: they take effect between runs of the
  * behaviour, never during one, so a vessel isn't deactivated at sea or given a
@@ -93,11 +94,12 @@ public class Vessel implements Oriented2D, HasAttributes {
   private final ProductStore productStore = new ProductStore();
 
   /**
-   * The declaration of the behaviour this vessel runs, the root task of its
-   * tree; a vessel without that component does not act.
+   * What this vessel is made of: among others, the declaration of the
+   * behaviour it runs, the root task of its tree (a vessel without that
+   * component does not act), and the attributes giving its home port and name.
    */
   @Getter(NONE)
-  private final @NonNull VesselComponent<? extends Task<Vessel>> behaviour;
+  private final @NonNull VesselSpecification specification;
 
   /**
    * The tree this vessel runs over its behaviour component, renewed whenever
@@ -154,8 +156,8 @@ public class Vessel implements Oriented2D, HasAttributes {
    * @param id           the vessel's identifying id
    * @param vesselField  the field the vessel moves within
    * @param portGrid     the grid of ports the vessel can dock at
-   * @param marketGrid   the grid of markets the vessel can sell into
-   * @param behaviour    the declaration of the behaviour the vessel steps
+   * @param marketGrid    the grid of markets the vessel can sell into
+   * @param specification what the vessel is made of
    */
   @SuppressFBWarnings(
     value = "EI2",
@@ -168,7 +170,7 @@ public class Vessel implements Oriented2D, HasAttributes {
     @NonNull final VesselField vesselField,
     @NonNull final PortGrid portGrid,
     @NonNull final MarketGrid marketGrid,
-    @NonNull final VesselComponent<? extends Task<Vessel>> behaviour
+    @NonNull final VesselSpecification specification
   ) {
     this.schedule = schedule;
     this.eventManager = eventManager;
@@ -176,7 +178,7 @@ public class Vessel implements Oriented2D, HasAttributes {
     this.vesselField = vesselField;
     this.portGrid = portGrid;
     this.marketGrid = marketGrid;
-    this.behaviour = behaviour;
+    this.specification = specification;
   }
 
   /**
@@ -188,12 +190,8 @@ public class Vessel implements Oriented2D, HasAttributes {
   private ImmutableMap<String, Object> attributes = ImmutableMap.of();
 
   // Modifiable characteristics
-  /** This vessel's display name. */
-  private String name;
   /** This vessel's running balance. */
   private Account account;
-  /** This vessel's home port. */
-  private Port homePort;
 
   /**
    * The store this vessel keeps for each of its components, by the
@@ -241,7 +239,7 @@ public class Vessel implements Oriented2D, HasAttributes {
         .noneMatch(
           component -> component instanceof final Gear gear && !gear.isActive()
         ) &&
-      homePort != null
+      getHomePort() != null
     );
   }
 
@@ -342,28 +340,9 @@ public class Vessel implements Oriented2D, HasAttributes {
     }
   }
 
-  /** Sets the vessel's display name. */
-  public void setName(final String name) {
-    mutate(() -> this.name = name);
-  }
-
   /** Sets the vessel's running balance. */
   public void setAccount(final Account account) {
     mutate(() -> this.account = account);
-  }
-
-  /**
-   * Sets the vessel's home port, moving it there if it has no current cell yet.
-   */
-  public void setHomePort(final Port homePort) {
-    mutate(() -> {
-      this.homePort = homePort;
-      // TODO: if location were to be stored in port we wouldn't need the port
-      // grid here
-      if (this.homePort != null && getCell() == null) setCurrentCell(
-        portGrid.getLocation(homePort)
-      );
-    });
   }
 
   /**
@@ -388,8 +367,8 @@ public class Vessel implements Oriented2D, HasAttributes {
       .get(new VesselComponentScope(scope, store));
     mutate(() -> {
       components.put(declaration, component);
-      if (declaration == behaviour) {
-        tree = new BehaviorTree<>(behaviour.of(this));
+      if (declaration == specification.getBehaviour()) {
+        tree = new BehaviorTree<>(specification.getBehaviour().of(this));
       }
     });
     return component;
@@ -464,7 +443,33 @@ public class Vessel implements Oriented2D, HasAttributes {
 
   @Override
   public String toString() {
-    return name == null ? id : name + " (" + id + ")";
+    return getName()
+      .map(name -> name + " (" + id + ")")
+      .orElse(id);
+  }
+
+  /**
+   * @return this vessel's name, the value of the attribute its specification
+   *         names for it, or nothing if it has none
+   */
+  public Optional<String> getName() {
+    return specification
+      .getNameAttribute()
+      .map(attributes::get)
+      .map(Object::toString);
+  }
+
+  /**
+   * @return this vessel's home port, the port in the port grid whose code is
+   *         the value of the attribute its specification names for it, or
+   *         {@code null} if it has no such attribute or no port has that code
+   */
+  public Port getHomePort() {
+    return Optional.ofNullable(
+      attributes.get(specification.getHomePortAttribute())
+    )
+      .flatMap(code -> portGrid.getObject(code.toString()))
+      .orElse(null);
   }
 
   /**
@@ -476,7 +481,7 @@ public class Vessel implements Oriented2D, HasAttributes {
 
   /** @return the home port's grid cell */
   public Int2D getHomePortLocation() {
-    return portGrid.getLocation(homePort);
+    return portGrid.getLocation(getHomePort());
   }
 
   /** @return this vessel's current attributes */
@@ -486,7 +491,8 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Puts {@code attributes} in place of this vessel's attributes.
+   * Puts {@code attributes} in place of this vessel's attributes, and places
+   * the vessel at its home port if it has no position yet.
    *
    * @throws NullPointerException if {@code attributes} holds a {@code null}
    *                              name or value
@@ -495,7 +501,13 @@ public class Vessel implements Oriented2D, HasAttributes {
     final ImmutableMap<String, Object> newAttributes = ImmutableMap.copyOf(
       attributes
     );
-    mutate(() -> this.attributes = newAttributes);
+    mutate(() -> {
+      this.attributes = newAttributes;
+      final Port homePort = getHomePort();
+      if (homePort != null && getCell() == null) {
+        setCurrentCell(portGrid.getLocation(homePort));
+      }
+    });
   }
 
   /**

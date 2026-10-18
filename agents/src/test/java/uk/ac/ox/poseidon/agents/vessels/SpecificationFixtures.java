@@ -22,22 +22,35 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.badlogic.gdx.ai.btree.Task;
+import com.google.common.collect.ImmutableMap;
 
-import java.util.function.Function;
+/**
+ * Specifications for tests that construct vessels themselves rather than
+ * creating them through a specification.
+ */
+final class SpecificationFixtures {
 
-/** A simple vessel name: a prefix prepended to the vessel's own id. */
-public class PrefixedId implements Function<Vessel, String> {
+  /** The attribute giving a vessel's home port, in these specifications. */
+  static final String HOME_PORT = "home_port";
 
-  private final String prefix;
+  private SpecificationFixtures() {}
 
-  /** @param prefix the prefix to prepend to the vessel's own id */
-  public PrefixedId(final String prefix) {
-    this.prefix = checkNotNull(prefix);
-  }
-
-  @Override
-  public String apply(final Vessel vessel) {
-    return prefix + vessel.getId();
+  /**
+   * @return a specification of vessels with {@code behaviour} and no other
+   *         component, whose home port is given by {@link #HOME_PORT}; it has
+   *         no fleet, so it creates no vessel
+   */
+  static VesselSpecification specificationOf(
+    final VesselComponent<? extends Task<Vessel>> behaviour
+  ) {
+    return new VesselSpecification(
+      null,
+      null,
+      behaviour,
+      ImmutableMap.of(),
+      HOME_PORT,
+      null
+    );
   }
 }

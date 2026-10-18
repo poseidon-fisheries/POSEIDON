@@ -27,28 +27,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.agents.tasks.landings.Factories.landCatches;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
-import static uk.ac.ox.poseidon.agents.vessels.Factories.prefixedId;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
-import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselCreator;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselSpecification;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
-import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.holds.Hold;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
-import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A declaration a consumer uses but no vessel creator lists is a wiring
- * error, caught before a simulation of the scenario starts.
+ * A declaration a consumer uses but the vessel specification does not list is
+ * a wiring error, caught before a simulation of the scenario starts.
  */
 class VesselComponentWiringTest {
 
@@ -57,7 +53,7 @@ class VesselComponentWiringTest {
   );
 
   @Test
-  void aDeclarationEveryCreatorLeavesOutFailsBeforeTheSimulationStarts() {
+  void aDeclarationTheSpecificationLeavesOutFailsBeforeTheSimulationStarts() {
     final VesselComponent<Hold> unlistedHold = vesselComponent(
       object(mock(Hold.class))
     );
@@ -66,34 +62,32 @@ class VesselComponentWiringTest {
     assertThatThrownBy(() -> scenario.startNewSimulation(0))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("LandCatchesFactory")
-      .hasMessageContaining("listed by no vessel creator");
+      .hasMessageContaining("not in the vessel specification");
   }
 
   @Test
-  void aDeclarationACreatorListsPasses() {
+  void aDeclarationTheSpecificationListsPasses() {
     assertThatCode(() ->
       scenarioLanding(listedHold).startNewSimulation(0).finish()
     ).doesNotThrowAnyException();
   }
 
   private Scenario scenarioLanding(final VesselComponent<Hold> hold) {
-    final Supplier<String> ids = () -> "V1";
     return Scenario.builder()
       .startingDateTime(new DateTimeFactory(2000, 1, 1, 0, 0, 0))
       .component(
-        "vesselCreator",
-        vesselCreator(
-          object(mock(VesselField.class)),
-          object(mock(PortGrid.class)),
-          object(mock(MarketGrid.class)),
-          object(ids),
-          prefixedId("V"),
-          object(mock(Account.class)),
-          object(mock(Port.class)),
-          behaviour(landCatches(hold, constant(Duration.ZERO))),
-          List.of(listedHold),
-          1
+        "vesselSpecification",
+        vesselSpecification(
+          fleet(
+            object(mock(VesselField.class)),
+            object(mock(PortGrid.class)),
+            object(mock(MarketGrid.class))
+          ),
+          behaviour(landCatches(hold, constant(Duration.ZERO)))
         )
+          .homePortAttribute("home_port")
+          .component("hold", listedHold)
+          .build()
       )
       .build();
   }

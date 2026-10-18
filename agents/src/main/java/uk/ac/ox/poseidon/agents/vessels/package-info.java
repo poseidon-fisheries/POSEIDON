@@ -24,13 +24,14 @@
  * {@link uk.ac.ox.poseidon.agents.vessels.Vessel}, the core fishing agent, and
  * {@link uk.ac.ox.poseidon.agents.vessels.Fleet}, the set of vessels operating
  * out of a set of ports. {@link uk.ac.ox.poseidon.agents.vessels.VesselScope}
- * narrows factory resolution to a single vessel. Vessels are created and
- * updated via {@link uk.ac.ox.poseidon.agents.vessels.FleetEvent}s, either
- * scripted directly
- * ({@link uk.ac.ox.poseidon.agents.vessels.VesselCreatorFactory}) or read from
- * a vessel register table
- * ({@link uk.ac.ox.poseidon.agents.vessels.FleetFromVesselRegisterFactory}). A
- * vessel's hold/gear/engine/behaviour/etc. live in sibling packages
+ * narrows factory resolution to a single vessel. Vessels are created by the
+ * {@link uk.ac.ox.poseidon.agents.vessels.VesselSpecification}, what a vessel
+ * of the scenario is made of, when a source asks: a scripted one
+ * ({@link uk.ac.ox.poseidon.agents.vessels.CreateVesselsAtPort}) or a
+ * vessel register table
+ * ({@link uk.ac.ox.poseidon.agents.vessels.FleetFromVesselRegisterFactory}),
+ * whose {@link uk.ac.ox.poseidon.agents.vessels.FleetEvent}s also update them.
+ * A vessel's hold/gear/engine/behaviour/etc. live in sibling packages
  * ({@link uk.ac.ox.poseidon.agents.vessels.holds},
  * {@link uk.ac.ox.poseidon.agents.vessels.gears},
  * {@link uk.ac.ox.poseidon.agents.vessels.engines},

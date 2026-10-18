@@ -27,8 +27,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselSpecification;
 
 import com.badlogic.gdx.ai.btree.leaf.Success;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -79,10 +81,14 @@ class SocialNetworkFactoryTest {
   void vesselsAddedToTheFleetLaterAreCandidates() {
     final SocialNetwork network = factory.get(new SimulationScope(simulation));
 
-    final Vessel vessel = fleet.createVessel(
-      "A",
+    final Vessel vessel = vesselSpecification(
+      fleetFactory(),
       behaviour(scope -> new Success<>())
-    );
+    )
+      .homePortAttribute("home_port")
+      .build()
+      .get(new SimulationScope(simulation))
+      .create("A", Map.of());
 
     assertThat(network.getCandidates()).containsExactly(vessel);
   }

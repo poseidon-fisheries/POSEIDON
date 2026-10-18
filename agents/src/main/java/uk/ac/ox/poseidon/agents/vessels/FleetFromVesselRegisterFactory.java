@@ -29,14 +29,13 @@ import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.*;
 import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.*;
 
-import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -50,8 +49,9 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 
 /**
  * A {@link SchedulingFactory} that turns a vessel register table (one row
- * per vessel activation/deactivation/modification event) into a {@link Fleet},
- * scheduling every row as a {@link FleetEvent} at its own event date. Built
+ * per vessel activation/deactivation/modification event) into the
+ * {@link Fleet} of a {@link VesselSpecification}, scheduling every row as a
+ * {@link FleetEvent} at its own event date. Built
  * directly via its {@code @SuperBuilder}, not from {@code Factories}, given how
  * many optional columns/mappings it takes.
  */
@@ -60,27 +60,21 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class FleetFromVesselRegisterFactory
-  extends SchedulingFactory<Fleet>
-  implements CreatesVesselsWithComponents
-{
+public class FleetFromVesselRegisterFactory extends SchedulingFactory<Fleet> {
 
   /** The vessel register table. */
   private Factory<? super SimulationScope, ? extends Table> data;
-  /** The fleet every row's event is applied to. */
-  private Factory<? super SimulationScope, ? extends Fleet> fleet;
+  /**
+   * Creates the vessels; every row's event is applied to its fleet.
+   */
+  private Factory<
+    ? super SimulationScope,
+    ? extends VesselSpecification
+  > vesselSpecification;
 
   /** Column giving each row's vessel id. */
   @Builder.Default
   private String vesselIdColumn = "cfr";
-
-  /** Column giving each row's vessel name. */
-  @Builder.Default
-  private String vesselNameColumn = "name_of_vessel";
-
-  /** Column giving each row's home port code. */
-  @Builder.Default
-  private String portCodeColumn = "place_of_registration";
 
   /** Column giving each row's event code. */
   @Builder.Default
@@ -91,8 +85,8 @@ public class FleetFromVesselRegisterFactory
   private String eventDateColumn = "event_start_date";
 
   /**
-   * Columns to exclude from a row's attributes, on top of the vessel id, name,
-   * event code and event date columns.
+   * Columns to exclude from a row's attributes, on top of the vessel id, event
+   * code and event date columns.
    */
   @Builder.Default
   private List<String> ignoredColumns = List.of("event_end_date");
@@ -114,33 +108,13 @@ public class FleetFromVesselRegisterFactory
   @Builder.Default
   private List<String> modificationEventCodes = List.of("MOD");
 
-  /** Declares each affected vessel's behaviour. */
-  private VesselComponent<? extends Task<Vessel>> behaviour;
-
   /**
-   * Declares each affected vessel's other components, in the order they are
-   * built.
-   */
-  @Singular
-  private List<VesselComponent<?>> components;
-
-  /**
-   * Maps a bean property path on this factory to a table column: before
-   * resolving
-   * {@link #behaviour} and the {@link #components} for a row, each mapped property is set to that row's value in the named
-   * column.
+   * Maps a bean property path on this factory to a table column: before a
+   * row's event builds a vessel's components, each mapped property is set to
+   * that row's value in the named column.
    */
   @Singular
   private Map<String, String> dataMappings;
-
-  /** @return the behaviour's declaration, then the other components' */
-  @Override
-  public Stream<VesselComponent<?>> listedComponents() {
-    return Stream.concat(
-      Stream.of(behaviour),
-      components == null ? Stream.empty() : components.stream()
-    );
-  }
 
   private Object getProperty(final String propertyName) {
     try {
@@ -170,12 +144,13 @@ public class FleetFromVesselRegisterFactory
   }
 
   /**
-   * @return {@link #fleet}, with one {@link FleetEvent} per row of
-   *         {@link #data} scheduled at that row's event date
+   * @return the fleet of {@link #vesselSpecification}, with one
+   *         {@link FleetEvent} per row of {@link #data} scheduled at that row's
+   *         event date
    */
   @Override
   protected Fleet newInstance(final SchedulingScope scope) {
-    final Fleet fleet = this.fleet.get(scope);
+    final VesselSpecification specification = vesselSpecification.get(scope);
     final List<Entry<LocalDateTime, FleetEvent>> eventByDateTime = data
       .get(scope)
       .stream()
@@ -183,51 +158,48 @@ public class FleetFromVesselRegisterFactory
         final LocalDateTime dateTime = row
           .getDate(eventDateColumn)
           .atStartOfDay();
-        return entry(dateTime, makeUpdate(scope, dateTime, row, fleet));
+        return entry(dateTime, makeUpdate(scope, dateTime, row, specification));
       })
       .toList();
     scope.getSchedule().scheduleByDateTime(eventByDateTime);
-    return fleet;
+    return specification.getFleet();
   }
 
-  <P> Function<Vessel, P> makeFactoryFunction(
-    final SimulationScope scope,
+  /**
+   * Builds with each mapped property set to its value from the row: the
+   * values are set on this factory (and the factories it holds) only for the
+   * time of the build, then the original values are put back, since other
+   * simulations of the same scenario may be using this factory at the same
+   * time.
+   */
+  private <T> T withMappedValues(
     final Map<String, Object> valuesFromRow,
     final ImmutableMap<String, String> mappings,
-    final VesselComponent<? extends P> declaration
+    final Supplier<T> build
   ) {
-    return vessel -> {
-      // The mapped values are set on this factory (and the factories it
-      // holds) only for the time of the call, then the original values are
-      // put back: other simulations of the same scenario may be using this
-      // factory at the same time.
-      synchronized (this) {
-        final Map<String, Object> originalValues = new LinkedHashMap<>();
-        mappings
-          .keySet()
-          .forEach(propertyName ->
-            originalValues.put(propertyName, getProperty(propertyName))
-          );
-        try {
-          mappings.forEach((propertyName, columnName) ->
-            setProperty(propertyName, valuesFromRow.get(columnName))
-          );
-          return vessel.buildComponent(
-            declaration,
-            new VesselScope(scope, vessel)
-          );
-        } finally {
-          originalValues.forEach(this::setProperty);
-        }
+    synchronized (this) {
+      final Map<String, Object> originalValues = new LinkedHashMap<>();
+      mappings
+        .keySet()
+        .forEach(propertyName ->
+          originalValues.put(propertyName, getProperty(propertyName))
+        );
+      try {
+        mappings.forEach((propertyName, columnName) ->
+          setProperty(propertyName, valuesFromRow.get(columnName))
+        );
+        return build.get();
+      } finally {
+        originalValues.forEach(this::setProperty);
       }
-    };
+    }
   }
 
   private FleetEvent makeUpdate(
     final SimulationScope scope,
     final LocalDateTime dateTime,
     final Row row,
-    final Fleet fleet
+    final VesselSpecification specification
   ) {
     final ImmutableMap<String, String> dataMappings = ImmutableMap.copyOf(
       this.dataMappings
@@ -237,20 +209,28 @@ public class FleetFromVesselRegisterFactory
       .stream()
       .distinct()
       .collect(toMap(identity(), row::getObject));
+    final String vesselId = row.getString(vesselIdColumn);
+    final Map<String, Object> attributes = makeAttributes(row);
     return new FleetEvent(
       dateTime,
-      fleet,
+      specification.getFleet(),
       eventType(row.getString(eventCodeColumn)),
-      row.getString(vesselIdColumn),
-      row.getString(vesselNameColumn),
-      row.getString(portCodeColumn),
-      makeAttributes(row),
-      behaviour,
-      Stream.concat(Stream.of(behaviour), components.stream())
-        .<Function<Vessel, ?>>map(component ->
-          makeFactoryFunction(scope, valuesFromRow, dataMappings, component)
-        )
-        .collect(toList())
+      vesselId,
+      attributes,
+      () ->
+        withMappedValues(valuesFromRow, dataMappings, () ->
+          specification.create(vesselId, attributes)
+        ),
+      vessel ->
+        withMappedValues(valuesFromRow, dataMappings, () -> {
+          final VesselScope vesselScope = new VesselScope(scope, vessel);
+          specification
+            .listedComponents()
+            .forEach(component ->
+              vessel.buildComponent(component, vesselScope)
+            );
+          return vessel;
+        })
     );
   }
 
@@ -260,12 +240,7 @@ public class FleetFromVesselRegisterFactory
    */
   private Map<String, Object> makeAttributes(final Row row) {
     final Set<String> ignoredColumns = Streams.concat(
-      Stream.of(
-        vesselIdColumn,
-        vesselNameColumn,
-        eventCodeColumn,
-        eventDateColumn
-      ),
+      Stream.of(vesselIdColumn, eventCodeColumn, eventDateColumn),
       this.ignoredColumns.stream()
     ).collect(toSet());
 

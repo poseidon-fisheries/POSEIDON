@@ -41,6 +41,7 @@ import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselSpecification;
 import static uk.ac.ox.poseidon.agents.vessels.TripFixtures.startTrip;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.vesselProperty;
 import static uk.ac.ox.poseidon.agents.vessels.values.attributes.Factories.stringAttribute;
@@ -158,16 +159,19 @@ class FishingEventSharingRouteTest {
     final String vesselRegister,
     final boolean withSharing
   ) {
-    final var loader = FleetFromVesselRegisterFactory.builder()
-      .fleet(baseFleet)
-      .data(tableFromCsvString(vesselRegister))
-      .component(vesselComponent(object(hold)))
-      .component(gearComponent)
-      .component(vesselComponent(object(engine)))
-      .behaviour(behaviour(waitFor(constant(days(1)))));
+    final var vesselSpecification = vesselSpecification(
+      baseFleet,
+      behaviour(waitFor(constant(days(1))))
+    )
+      .homePortAttribute("place_of_registration")
+      .nameAttribute("name_of_vessel")
+      .component("hold", vesselComponent(object(hold)))
+      .component("gear", gearComponent)
+      .component("engine", vesselComponent(object(engine)));
     if (withSharing) {
-      loader
+      vesselSpecification
         .component(
+          "ownCatchRecorder",
           vesselComponent(
             vesselEventListener(
               fishingEventRecorder(
@@ -179,6 +183,7 @@ class FishingEventSharingRouteTest {
           )
         )
         .component(
+          "friendsCatchRecorder",
           vesselComponent(
             sharedFishingEventListener(
               fishingEventRecorder(
@@ -193,7 +198,13 @@ class FishingEventSharingRouteTest {
     }
     final var scenario = Scenario.builder()
       .startingDateTime(dateTime(LocalDate.of(2000, 1, 1).atStartOfDay()))
-      .component("fleet", loader.build())
+      .component(
+        "fleet",
+        FleetFromVesselRegisterFactory.builder()
+          .vesselSpecification(vesselSpecification.build())
+          .data(tableFromCsvString(vesselRegister))
+          .build()
+      )
       .component("socialNetwork", network)
       .component(
         "cliqueDynamics",

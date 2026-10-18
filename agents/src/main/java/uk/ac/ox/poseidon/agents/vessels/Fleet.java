@@ -24,12 +24,14 @@ package uk.ac.ox.poseidon.agents.vessels;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
@@ -42,12 +44,15 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
  * The set of vessels operating out of a set of ports, indexed by id, and the
- * markets they sell into.
+ * markets they sell into. It announces each vessel's entry to whatever
+ * follows the fleet.
  */
 @AllArgsConstructor
 public class Fleet implements VesselsGetter {
 
   private final BiMap<String, Vessel> vesselsById = HashBiMap.create();
+  private final List<Consumer<? super Vessel>> entryListeners =
+    new ArrayList<>();
   private final TemporalSchedule schedule;
   private final EventManager eventManager;
   private final VesselField vesselField;
@@ -70,15 +75,18 @@ public class Fleet implements VesselsGetter {
   }
 
   /**
-   * @param vesselId  the new vessel's id
-   * @param behaviour the declaration of the behaviour the vessel steps
-   * @return a freshly created, inactive vessel with no home port and no
+   * Constructs a vessel, with an account, and makes it a member of this fleet.
+   * Only a {@link VesselSpecification} creates vessels.
+   *
+   * @param vesselId      the new vessel's id
+   * @param specification what the vessel is made of
+   * @return a freshly constructed, inactive vessel with no attribute and no
    *         component yet built
    * @throws IllegalStateException if {@code vesselId} is already in use
    */
-  public Vessel createVessel(
+  Vessel createVessel(
     final String vesselId,
-    final VesselComponent<? extends Task<Vessel>> behaviour
+    final VesselSpecification specification
   ) {
     checkState(
       !vesselsById.containsKey(vesselId),
@@ -92,10 +100,24 @@ public class Fleet implements VesselsGetter {
       vesselField,
       portGrid,
       marketGrid,
-      behaviour
+      specification
     );
     vessel.setAccount(new Account());
     vesselsById.put(vesselId, vessel);
     return vessel;
+  }
+
+  /**
+   * @param listener told of each vessel that enters this fleet, once it is
+   *                 complete and before its first step, in the order the
+   *                 vessels are created
+   */
+  public void addEntryListener(final Consumer<? super Vessel> listener) {
+    entryListeners.add(listener);
+  }
+
+  /** Tells every entry listener that {@code vessel} has entered this fleet. */
+  void announceEntry(final Vessel vessel) {
+    entryListeners.forEach(listener -> listener.accept(vessel));
   }
 }

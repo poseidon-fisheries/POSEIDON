@@ -22,34 +22,33 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
-import java.util.function.Function;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.ValueFactory;
+import java.util.Map;
+import java.util.function.Supplier;
+import lombok.RequiredArgsConstructor;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link PrefixedId}, built via
- * {@link Factories#prefixedId}.
+ * A scheduled {@link Steppable} that, when run, creates
+ * {@link #numberOfVessels} vessels from a {@link VesselSpecification}, each
+ * with a new id and with {@link #port} as its home port.
  */
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder(toBuilder = true)
-public class PrefixedIdFactory
-  extends GlobalScopeFactory<Function<Vessel, String>>
-  implements ValueFactory<Scope, Vessel, String>
-{
+@RequiredArgsConstructor
+public class CreateVesselsAtPort implements Steppable {
 
-  private final String prefix;
+  private final VesselSpecification specification;
+  private final Supplier<String> vesselIds;
+  private final Port port;
+  private final int numberOfVessels;
 
   @Override
-  protected Function<Vessel, String> newInstance(final Scope scope) {
-    return new PrefixedId(prefix);
+  public void step(final SimState simState) {
+    for (int i = 0; i < numberOfVessels; i++) {
+      specification.create(
+        vesselIds.get(),
+        Map.of(specification.getHomePortAttribute(), port.getCode())
+      );
+    }
   }
 }

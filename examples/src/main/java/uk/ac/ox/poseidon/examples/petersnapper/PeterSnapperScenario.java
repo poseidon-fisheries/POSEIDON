@@ -47,7 +47,6 @@ import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.agents.tasks.landings.Factories.landCatches;
 import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.*;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.*;
-import static uk.ac.ox.poseidon.agents.vessels.accounts.Factories.account;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.simpleEngine;
 import static uk.ac.ox.poseidon.agents.vessels.friends.Factories.dynamicFriends;
 import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.fixedBiomassProportionGear;
@@ -103,7 +102,6 @@ import static uk.ac.ox.poseidon.io.tables.Factories.*;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
 import java.util.function.Supplier;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.EpsilonGreedyDestinationFactory;
@@ -439,27 +437,25 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       )
     );
 
-    final var benoaVesselCreator = vesselCreator(
-      vesselField,
-      portGrid,
-      marketGrid,
-      prefixedIdSupplier("V"),
-      prefixedId("Vessel "),
-      account(),
-      benoa,
-      behaviour,
-      List.of(gear, engine, fuelTank, hold, tripEvaluator),
-      25
-    );
-    // Kupang's vessels are like Benoa's, but more of them
-    final var kupangVesselCreator = benoaVesselCreator
-      .toBuilder()
-      .homePort(kupang)
-      .numberOfVesselsToCreate(50)
+    final var vesselSpecification = vesselSpecification(
+      fleet(vesselField, portGrid, marketGrid),
+      behaviour
+    )
+      .homePortAttribute("home_port")
+      .component("gear", gear)
+      .component("engine", engine)
+      .component("fuelTank", fuelTank)
+      .component("hold", hold)
+      .component("tripEvaluator", tripEvaluator)
       .build();
 
-    final var agentCreators = scheduledOnceAtStart(
-      steppableSequence(benoaVesselCreator, kupangVesselCreator),
+    // Benoa's vessels are created first, then Kupang's
+    final var vesselIds = prefixedIdSupplier("V");
+    final var vesselCreation = scheduledOnceAtStart(
+      steppableSequence(
+        createVesselsAtPort(vesselSpecification, vesselIds, benoa, 25),
+        createVesselsAtPort(vesselSpecification, vesselIds, kupang, 50)
+      ),
       0
     );
 
@@ -476,7 +472,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       .component("initialPrices", initialPrices)
       .component("gearProportion", gearProportion)
       .component("vesselField", vesselField)
-      .component("agentCreators", agentCreators)
+      .component("vesselSpecification", vesselSpecification)
+      .component("vesselCreation", vesselCreation)
       .build();
   }
 }

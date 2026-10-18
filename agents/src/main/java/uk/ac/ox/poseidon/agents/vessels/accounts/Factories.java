@@ -30,21 +30,12 @@ import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * Factories for a vessel's {@link Account} and for
- * {@link sim.engine.Steppable}s that draw on it.
+ * Factories for {@link sim.engine.Steppable}s that draw on vessels'
+ * {@link Account}s.
  */
 public class Factories {
 
   private Factories() {}
-
-  /**
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for
-   *         an {@link Account}
-   * @see Account
-   */
-  public static AccountFactory account() {
-    return new AccountFactory();
-  }
 
   /**
    * @param fleet         the fleet whose active vessels get charged

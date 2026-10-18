@@ -20,29 +20,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.accounts;
+package uk.ac.ox.poseidon.agents.vessels;
 
+import java.util.function.Supplier;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link Account}, built via
- * {@link Factories#account()}.
+ * A {@link SimulationScopeFactory} counterpart of
+ * {@link CreateVesselsAtPort}, built via
+ * {@link Factories#createVesselsAtPort}.
  */
 @Getter
 @ToString
-@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class AccountFactory extends VesselScopeFactory<Account> {
+public class CreateVesselsAtPortFactory
+  extends SimulationScopeFactory<CreateVesselsAtPort>
+{
+
+  private final Factory<
+    ? super SimulationScope,
+    ? extends VesselSpecification
+  > vesselSpecification;
+  private final Factory<
+    ? super SimulationScope,
+    ? extends Supplier<String>
+  > vesselIds;
+  private final Factory<? super SimulationScope, ? extends Port> port;
+  private final int numberOfVessels;
 
   @Override
-  protected Account newInstance(final VesselScope scope) {
-    return new Account();
+  protected CreateVesselsAtPort newInstance(final SimulationScope scope) {
+    return new CreateVesselsAtPort(
+      vesselSpecification.get(scope),
+      vesselIds.get(scope),
+      port.get(scope),
+      numberOfVessels
+    );
   }
 }

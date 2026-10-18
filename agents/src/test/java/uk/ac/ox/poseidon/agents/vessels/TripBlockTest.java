@@ -32,6 +32,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
+import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.specificationOf;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
@@ -95,7 +96,7 @@ class TripBlockTest {
       vesselField,
       portGrid,
       mock(MarketGrid.class),
-      behaviour(_ -> new ScriptedTask())
+      specificationOf(behaviour(_ -> new ScriptedTask()))
     );
     when(vesselField.getCell(vessel)).thenReturn(PORT);
     when(portGrid.anyObjectsAt(PORT)).thenReturn(true);

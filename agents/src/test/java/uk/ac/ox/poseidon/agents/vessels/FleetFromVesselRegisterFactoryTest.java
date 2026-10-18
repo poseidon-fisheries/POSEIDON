@@ -30,6 +30,7 @@ import static uk.ac.ox.poseidon.agents.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselSpecification;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.time.Factories.days;
 import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
@@ -98,20 +99,30 @@ class FleetFromVesselRegisterFactoryTest {
       Map.of(
         "fleet",
         FleetFromVesselRegisterFactory.builder()
-          .fleet(
-            fleet(
-              new ObjectFactory<>(mock(VesselField.class)),
-              new ObjectFactory<>(portGrid),
-              new ObjectFactory<>(marketGrid)
+          .vesselSpecification(
+            vesselSpecification(
+              fleet(
+                new ObjectFactory<>(mock(VesselField.class)),
+                new ObjectFactory<>(portGrid),
+                new ObjectFactory<>(marketGrid)
+              ),
+              behaviour(waitFor(constant(days(1))))
             )
+              .homePortAttribute("place_of_registration")
+              .nameAttribute("name_of_vessel")
+              .component("hold", vesselComponent(new ObjectFactory<>(h1)))
+              .component("gear", gear)
+              .component(
+                "engine",
+                vesselComponent(new ObjectFactory<>(mock(Engine.class)))
+              )
+              .build()
           )
           .data(tableFromCsvString(initialData + extraData))
-          .component(vesselComponent(new ObjectFactory<>(h1)))
-          .component(gear)
-          // the gear's declaration is the second component
-          .dataMapping("components[1].factory.code", "gear")
-          .component(vesselComponent(new ObjectFactory<>(mock(Engine.class))))
-          .behaviour(behaviour(waitFor(constant(days(1)))))
+          .dataMapping(
+            "vesselSpecification.components.gear.factory.code",
+            "gear"
+          )
           .build()
       )
     ).startNewSimulation();
@@ -125,12 +136,12 @@ class FleetFromVesselRegisterFactoryTest {
     initSimulation("");
     assertThat(fleet.getVessels()).hasSize(2);
     final Vessel v1 = fleet.getVessel("V1").orElseThrow();
-    assertThat(v1.getName()).isEqualTo("Vee One");
+    assertThat(v1.getName()).contains("Vee One");
     assertThat(v1.getHomePort()).isEqualTo(p1);
     assertThat(v1.getAttributes().get("t1")).isEqualTo(1);
     assertThat(v1.getAttributes().get("t2")).isEqualTo("a");
     final Vessel v2 = fleet.getVessel("V2").orElseThrow();
-    assertThat(v2.getName()).isEqualTo("Vee Two");
+    assertThat(v2.getName()).contains("Vee Two");
     assertThat(v2.getHomePort()).isEqualTo(p1);
     assertThat(v2.getAttributes().get("t1")).isEqualTo(2);
     assertThat(v2.getAttributes().get("t2")).isEqualTo("b");
@@ -153,13 +164,13 @@ class FleetFromVesselRegisterFactoryTest {
     );
     simulation.stepFor(Duration.ofDays(1).plusMinutes(1));
     final Vessel v1 = fleet.getVessel("V1").orElseThrow();
-    assertThat(v1.getName()).isEqualTo("Vee Uno");
+    assertThat(v1.getName()).contains("Vee Uno");
     assertThat(v1.getHomePort()).isEqualTo(p1);
     assertThat(gear.of(v1)).isEqualTo(g2);
     assertThat(v1.getAttributes().get("t1")).isEqualTo(3);
     assertThat(v1.getAttributes().get("t2")).isEqualTo("c");
     final Vessel v2 = fleet.getVessel("V2").orElseThrow();
-    assertThat(v2.getName()).isEqualTo("Vee Dos");
+    assertThat(v2.getName()).contains("Vee Dos");
     assertThat(v2.getHomePort()).isEqualTo(p2);
     assertThat(gear.of(v2)).isEqualTo(g1);
     assertThat(v2.getAttributes().get("t1")).isEqualTo(4);

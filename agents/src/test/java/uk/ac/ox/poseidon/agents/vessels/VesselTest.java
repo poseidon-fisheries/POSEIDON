@@ -33,6 +33,8 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
+import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.HOME_PORT;
+import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.specificationOf;
 
 import com.badlogic.gdx.ai.btree.Task;
 import java.time.Duration;
@@ -40,6 +42,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.engine.SimState;
@@ -97,20 +100,33 @@ class VesselTest {
     final VesselComponent<Task<Vessel>> declaration = behaviour(
       scope -> behaviour
     );
+    final Vessel vessel = vesselWithAHomePort(declaration);
+    vessel.buildComponent(
+      declaration,
+      new VesselScope(new SimulationScope(mock(Simulation.class)), vessel)
+    );
+    return vessel;
+  }
+
+  /**
+   * @return a vessel on {@link #schedule} with a home port, which steps the
+   *         behaviour {@code declaration} declares, with no component built
+   */
+  private Vessel vesselWithAHomePort(
+    final VesselComponent<? extends Task<Vessel>> declaration
+  ) {
+    final PortGrid portGrid = mock(PortGrid.class);
+    when(portGrid.getObject("P1")).thenReturn(Optional.of(mock(Port.class)));
     final Vessel vessel = new Vessel(
       schedule,
       mock(EventManager.class),
       "vessel",
       mock(VesselField.class),
-      mock(PortGrid.class),
+      portGrid,
       mock(MarketGrid.class),
-      declaration
+      specificationOf(declaration)
     );
-    vessel.setHomePort(mock(Port.class));
-    vessel.buildComponent(
-      declaration,
-      new VesselScope(new SimulationScope(mock(Simulation.class)), vessel)
-    );
+    vessel.setAttributes(Map.of(HOME_PORT, "P1"));
     return vessel;
   }
 
@@ -143,16 +159,7 @@ class VesselTest {
 
   @Test
   void aVesselWhoseBehaviourIsNotBuiltIsInactive() {
-    final Vessel vessel = new Vessel(
-      schedule,
-      mock(EventManager.class),
-      "vessel",
-      mock(VesselField.class),
-      mock(PortGrid.class),
-      mock(MarketGrid.class),
-      behaviour(scope -> behaviour)
-    );
-    vessel.setHomePort(mock(Port.class));
+    final Vessel vessel = vesselWithAHomePort(behaviour(scope -> behaviour));
     vessel.setRegisteredAsActive(true);
     assertThat(vessel.isActive()).isFalse();
   }
@@ -325,7 +332,7 @@ class VesselTest {
       vesselField,
       portGrid,
       mock(MarketGrid.class),
-      behaviour(scope -> behaviour)
+      specificationOf(behaviour(scope -> behaviour))
     );
     when(vesselField.getCell(vessel)).thenReturn(new Int2D(0, 0));
     when(portGrid.anyObjectsAt(new Int2D(0, 0))).thenReturn(true);

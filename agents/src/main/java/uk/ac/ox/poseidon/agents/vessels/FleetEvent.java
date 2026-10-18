@@ -23,32 +23,28 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import static com.google.common.base.Preconditions.checkState;
-import static java.lang.System.Logger.Level.WARNING;
 import static uk.ac.ox.poseidon.agents.vessels.FleetEvent.Type.ACTIVATION;
 
-import com.badlogic.gdx.ai.btree.Task;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
  * A scheduled {@link Steppable} that, when run, activates, deactivates or
  * modifies one vessel in a {@link Fleet}: creating it on first
- * {@link Type#ACTIVATION}, updating its home port, name, attributes and
- * components, and flipping its registered-active status.
+ * {@link Type#ACTIVATION}, and otherwise updating its attributes and
+ * components and flipping its registered-active status.
  */
 @Value
 public class FleetEvent implements Steppable {
-
-  private static final System.Logger logger = System.getLogger(
-    FleetEvent.class.getName()
-  );
 
   /** When this event takes effect. */
   @NonNull
@@ -71,37 +67,22 @@ public class FleetEvent implements Steppable {
   @NonNull
   String vesselId;
 
-  /** The vessel's name as of this event. */
-  @NonNull
-  String vesselName;
-
-  /** The vessel's home port code as of this event. */
-  @NonNull
-  String portCode;
-
   /** The vessel's attributes as of this event, in place of its previous ones. */
   @NonNull
   Map<String, Object> attributes;
 
-  /**
-   * The declaration of the behaviour the vessel steps, for creating the
-   * vessel.
-   */
+  /** Creates the vessel, with {@link #attributes}, on its first activation. */
   @NonNull
-  VesselComponent<? extends Task<Vessel>> behaviour;
+  Supplier<Vessel> creation;
 
-  /**
-   * Builds each of the vessel's components as of this event, its behaviour
-   * first.
-   */
+  /** Rebuilds each of the vessel's components, its behaviour first. */
   @NonNull
-  List<Function<Vessel, ?>> componentFactoryFunctions;
+  Consumer<Vessel> rebuild;
 
   /**
    * Applies this event to the vessel named {@link #vesselId} in {@link #fleet}:
-   * resolves (or creates) it, updates its home port, name, attributes
-   * and components, and flips its registered-active status per
-   * {@link #eventType}.
+   * creates it, or updates its attributes and components and flips its
+   * registered-active status per {@link #eventType}.
    *
    * @throws IllegalStateException if the vessel doesn't exist and this isn't an
    *                               {@link Type#ACTIVATION} event, or if a
@@ -110,58 +91,35 @@ public class FleetEvent implements Steppable {
    */
   @Override
   public void step(final SimState simState) {
-    final Vessel vessel = fleet.getVessel(vesselId).orElseGet(() -> {
-      if (eventType == ACTIVATION) return fleet.createVessel(
-        vesselId,
-        behaviour
-      );
-      else throw new IllegalStateException(
-        "Vessel " + vesselId + " does not exist"
-      );
-    });
-
-    fleet
-      .getPortGrid()
-      .getObject(portCode)
-      .ifPresentOrElse(
-        port -> {
-          vessel.setHomePort(port);
-          if (dateTime.isBefore(vessel.getSchedule().getDateTime())) {
-            // if the change of port is something that happened in the past
-            // (i.e., before the start of the simulation) we move the vessel
-            // to its new location right away. This is a change from outside the
-            // behaviour, so it must not happen during a run; but it records
-            // something that has already happened, so we refuse a running
-            // behaviour instead of deferring the move as mutate would.
-            checkState(
-              !vessel.isBehaviourRunning(),
-              "Trying to apply retroactive fleet event %s " +
-                "from %s to vessel %s while behaviour is running.",
-              eventType,
-              dateTime,
-              vesselId
-            );
-            vessel.setCurrentCell(vessel.getPortGrid().getLocation(port));
-          }
-        },
-        // this will only get applied once current vessel behaviour is done
-        // running so it shouldn't pause any problems to ongoing trips as long
-        // as vessel behaviours always end with the vessel at a port.
-        () -> {
-          logger.log(
-            WARNING,
-            "Port {0} not found for {1} event on vessel {2}; clearing its home port.",
-            portCode,
-            eventType,
-            vesselId
-          );
-          vessel.setHomePort(null);
-        }
-      );
-
-    vessel.setName(vesselName);
+    final Optional<Vessel> existingVessel = fleet.getVessel(vesselId);
+    if (existingVessel.isEmpty()) {
+      checkState(eventType == ACTIVATION, "Vessel %s does not exist", vesselId);
+      creation.get();
+      return;
+    }
+    final Vessel vessel = existingVessel.get();
     vessel.setAttributes(attributes);
-    componentFactoryFunctions.forEach(factory -> factory.apply(vessel));
+    final Port homePort = vessel.getHomePort();
+    if (
+      homePort != null && dateTime.isBefore(vessel.getSchedule().getDateTime())
+    ) {
+      // if the change of port is something that happened in the past
+      // (i.e., before the start of the simulation) we move the vessel
+      // to its new location right away. This is a change from outside the
+      // behaviour, so it must not happen during a run; but it records
+      // something that has already happened, so we refuse a running
+      // behaviour instead of deferring the move as mutate would.
+      checkState(
+        !vessel.isBehaviourRunning(),
+        "Trying to apply retroactive fleet event %s " +
+          "from %s to vessel %s while behaviour is running.",
+        eventType,
+        dateTime,
+        vesselId
+      );
+      vessel.setCurrentCell(vessel.getPortGrid().getLocation(homePort));
+    }
+    rebuild.accept(vessel);
     switch (eventType) {
       case ACTIVATION -> vessel.setRegisteredAsActive(true);
       case DEACTIVATION -> vessel.setRegisteredAsActive(false);

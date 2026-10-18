@@ -26,14 +26,12 @@ import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
-import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -43,8 +41,8 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * Factories for a vessel's scope, its fleet, and the events that create/update
- * vessels.
+ * Factories for a vessel's scope, its fleet, what it is made of, and what
+ * creates it.
  */
 public class Factories {
 
@@ -79,57 +77,57 @@ public class Factories {
   }
 
   /**
-   * @param prefix the prefix to prepend to the vessel's own id
-   * @return a {@link ValueFactory} for a simple vessel name, read off the
-   *         vessel it is given
-   * @see PrefixedIdFactory
+   * The specification is built by the returned builder, given the
+   * declarations of the vessel's other components with {@code component(name,
+   * declaration)}, in the order they are built, and the attributes that give a
+   * vessel's home port, with {@code homePortAttribute(name)}, and, if vessels
+   * have names, its name, with {@code nameAttribute(name)}.
+   *
+   * @param fleet     the fleet the vessels join
+   * @param behaviour declares the behaviour each vessel steps
+   * @return a builder for a {@link SimulationScopeFactory} for a
+   *         {@link VesselSpecification}
+   * @see VesselSpecification
    */
-  public static PrefixedIdFactory prefixedId(final String prefix) {
-    return new PrefixedIdFactory(prefix);
+  public static VesselSpecificationFactory.VesselSpecificationFactoryBuilder<
+    ?,
+    ?
+  > vesselSpecification(
+    final Factory<? super SimulationScope, ? extends Fleet> fleet,
+    final VesselComponent<? extends Task<Vessel>> behaviour
+  ) {
+    return VesselSpecificationFactory.builder()
+      .fleet(fleet)
+      .behaviour(behaviour);
   }
 
   /**
-   * @param vesselField             the field vessels move within
-   * @param portGrid                the vessels' ports
-   * @param marketGrid              the vessels' markets
-   * @param vesselIdSupplier        supplies each new vessel's id
-   * @param name                    reads each vessel's name off it
-   * @param account                 builds each vessel's account
-   * @param homePort                builds each vessel's home port
-   * @param behaviour               declares each vessel's behaviour
-   * @param components              declares each vessel's other components,
-   *                                in the order they are built
-   * @param numberOfVesselsToCreate how many vessels to create
-   * @return a {@link SimulationScopeFactory} for a {@link VesselCreator}
-   * @see VesselCreator
+   * @param vesselSpecification what the vessels are made of
+   * @param vesselIds           supplies each new vessel's id
+   * @param port                the vessels' home port
+   * @param numberOfVessels     how many vessels to create
+   * @return a {@link SimulationScopeFactory} for a
+   *         {@link CreateVesselsAtPort}, which creates the vessels when it is
+   *         stepped
+   * @see CreateVesselsAtPort
    */
-  public static VesselCreatorFactory vesselCreator(
-    final Factory<? super SimulationScope, ? extends VesselField> vesselField,
-    final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
-    final Factory<? super SimulationScope, ? extends MarketGrid> marketGrid,
+  public static CreateVesselsAtPortFactory createVesselsAtPort(
+    final Factory<
+      ? super SimulationScope,
+      ? extends VesselSpecification
+    > vesselSpecification,
     final Factory<
       ? super SimulationScope,
       ? extends Supplier<String>
-    > vesselIdSupplier,
-    final ValueFactory<? super VesselScope, ? super Vessel, String> name,
-    final Factory<? super VesselScope, ? extends Account> account,
-    final Factory<? super VesselScope, ? extends Port> homePort,
-    final VesselComponent<? extends Task<Vessel>> behaviour,
-    final List<VesselComponent<?>> components,
-    final int numberOfVesselsToCreate
+    > vesselIds,
+    final Factory<? super SimulationScope, ? extends Port> port,
+    final int numberOfVessels
   ) {
-    return new VesselCreatorFactory(
-      vesselField,
-      portGrid,
-      marketGrid,
-      vesselIdSupplier,
-      name,
-      account,
-      homePort,
-      behaviour,
-      ImmutableList.copyOf(components),
-      numberOfVesselsToCreate,
-      eventManager()
+    return new CreateVesselsAtPortFactory(
+      vesselSpecification,
+      vesselIds,
+      port,
+      numberOfVessels
     );
   }
 
