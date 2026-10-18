@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.geography.grids;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
 
 import com.google.common.collect.Streams;
@@ -33,6 +32,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import sim.field.grid.SparseGrid2D;
+import sim.util.Bag;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.MasonUtils;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -138,13 +138,17 @@ public abstract class ObjectGrid<T>
   /** @return {@code object}'s unique id, used by {@link #getObject} */
   protected abstract String getObjectId(T object);
 
-  private Map<String, T> getObjectsById() {
-    return Streams.stream(iterator()).collect(toMap(this::getObjectId, o -> o));
-  }
-
   /** @return the object with the given id, if one exists on this grid */
+  @SuppressWarnings("unchecked")
   public Optional<T> getObject(final String id) {
-    return Optional.ofNullable(getObjectsById().get(id));
+    // A plain scan of the field, which allocates nothing: vessels look up their
+    // home port by code every time they read it, and a grid holds few objects.
+    final Bag objects = field.allObjects;
+    for (int i = 0; i < objects.numObjs; i++) {
+      final T object = (T) objects.objs[i];
+      if (getObjectId(object).equals(id)) return Optional.of(object);
+    }
+    return Optional.empty();
   }
 
   /** @return an independent copy of the underlying field */

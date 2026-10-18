@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -56,5 +57,21 @@ class MutablePortGridTest {
     Set.of(portA, portB).forEach(port ->
       assertEquals(source.getLocation(port), copy.getLocation(port))
     );
+  }
+
+  @Test
+  void findsAPortByItsCode() {
+    final DefaultBathymetricGrid bathymetricGrid = new DefaultBathymetricGrid(
+      new double[][] { { +1d, -1d, -1d }, { +1d, +1d, -1d }, { -1d, -1d, -1d } }
+    );
+    final Port portA = new Port("PA", "Port A");
+    final Port portB = new Port("PB", "Port B");
+    final MutablePortGrid portGrid = new MutablePortGrid(
+      bathymetricGrid,
+      Map.of(portA, new Coordinate(0.5, 2.5), portB, new Coordinate(1.5, 1.5))
+    );
+
+    assertEquals(Optional.of(portB), portGrid.getObject("PB"));
+    assertEquals(Optional.empty(), portGrid.getObject("PC"));
   }
 }
