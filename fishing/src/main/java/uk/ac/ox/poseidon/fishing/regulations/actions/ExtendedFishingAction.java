@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.Getter;
 import lombok.NonNull;
-import uk.ac.ox.poseidon.fishing.vessels.HasAttributes;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -41,7 +40,7 @@ import uk.ac.ox.poseidon.regulations.ExtendedAction;
 @Getter
 public class ExtendedFishingAction
   extends ExtendedAction<Vessel>
-  implements TemporalFishingAction, SpatialFishingAction, HasAttributes
+  implements TemporalFishingAction, SpatialFishingAction
 {
 
   /** The gear the vessel fishes with over the action's duration. */

@@ -22,11 +22,13 @@
 
 package uk.ac.ox.poseidon.fishing.regulations.actions;
 
+import uk.ac.ox.poseidon.fishing.vessels.HasAttributes;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.regulations.Action;
 
 /**
  * An {@link Action} taken by a {@link Vessel}, tested against the regulations
- * engine.
+ * engine. It keeps the attributes the vessel had when it took the action, so
+ * that a rule judges it by the vessel as it was then.
  */
-public interface FishingAction extends Action<Vessel> {}
+public interface FishingAction extends Action<Vessel>, HasAttributes {}
