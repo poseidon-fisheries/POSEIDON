@@ -202,6 +202,14 @@ public class Vessel implements Oriented2D, HasAttributes {
   @Getter(NONE)
   private ImmutableMap<String, Object> attributes = ImmutableMap.of();
 
+  /**
+   * The port in the port grid whose code the home port attribute gave when the
+   * attributes were last set, or {@code null} if none; looked up then, not on
+   * each read, because it is read on every valuation of a fishing option.
+   */
+  @Getter(NONE)
+  private Port homePort;
+
   /** This vessel's running balance, which changes at once, from any call. */
   private final Account account = new Account();
 
@@ -526,16 +534,13 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * @return this vessel's home port, the port in the port grid whose code is
-   *         the value of the attribute its specification names for it, or
-   *         {@code null} if it has no such attribute or no port has that code
+   * @return this vessel's home port, the port in the port grid whose code was
+   *         the value of the attribute its specification names for it when
+   *         its attributes were last set, or {@code null} if it had no such
+   *         attribute or no port had that code
    */
   public Port getHomePort() {
-    return Optional.ofNullable(
-      attributes.get(specification.getHomePortAttribute())
-    )
-      .flatMap(code -> portGrid.getObject(code.toString()))
-      .orElse(null);
+    return homePort;
   }
 
   /**
@@ -568,7 +573,11 @@ public class Vessel implements Oriented2D, HasAttributes {
       attributes
     );
     this.attributes = newAttributes;
-    final Port homePort = getHomePort();
+    this.homePort = Optional.ofNullable(
+      newAttributes.get(specification.getHomePortAttribute())
+    )
+      .flatMap(code -> portGrid.getObject(code.toString()))
+      .orElse(null);
     if (homePort != null && getCell() == null) {
       setCurrentCell(portGrid.getLocation(homePort));
     }
