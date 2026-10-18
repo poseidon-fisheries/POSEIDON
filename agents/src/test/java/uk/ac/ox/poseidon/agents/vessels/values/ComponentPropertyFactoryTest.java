@@ -25,8 +25,8 @@ package uk.ac.ox.poseidon.agents.vessels.values;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.declaredFor;
-import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.giveComponent;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.componentGiving;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.giveComponent;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.componentProperty;
 
 import org.junit.jupiter.api.Test;
@@ -46,11 +46,11 @@ class ComponentPropertyFactoryTest {
     final Hold otherHold = mock(Hold.class);
     when(hold.getAvailableCapacityInKg()).thenReturn(1.0);
     when(otherHold.getAvailableCapacityInKg()).thenReturn(2.0);
-    final VesselComponent<Hold> declaration = declaredFor(vessel, hold);
-    giveComponent(otherVessel, declaration, otherHold);
+    final VesselComponent<Hold> component = componentGiving(vessel, hold);
+    giveComponent(otherVessel, component, otherHold);
 
     final var property = componentProperty(
-      declaration,
+      component,
       "availableCapacityInKg"
     ).get(Scope.GLOBAL_SCOPE);
 
@@ -64,11 +64,11 @@ class ComponentPropertyFactoryTest {
     final Vessel otherVessel = mock(Vessel.class);
     final Hold hold = mock(Hold.class);
     when(hold.getAvailableCapacityInKg()).thenReturn(1.0);
-    final VesselComponent<Hold> declaration = declaredFor(vessel, hold);
-    giveComponent(otherVessel, declaration, new InfiniteBiomassHold(null));
+    final VesselComponent<Hold> component = componentGiving(vessel, hold);
+    giveComponent(otherVessel, component, new InfiniteBiomassHold(null));
 
     final var property = componentProperty(
-      declaration,
+      component,
       "availableCapacityInKg"
     ).get(Scope.GLOBAL_SCOPE);
 

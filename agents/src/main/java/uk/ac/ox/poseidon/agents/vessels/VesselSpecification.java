@@ -36,9 +36,9 @@ import lombok.NonNull;
 import uk.ac.ox.poseidon.core.SimulationScope;
 
 /**
- * What a vessel of a scenario is made of: the declaration of the behaviour it
- * steps, the declarations of its other components, by name, and the attributes
- * that give its home port and its name. It creates vessels, and receives
+ * What a vessel of a scenario is made of: the component that is the behaviour
+ * it steps, its other components, by name, and the attributes that give its
+ * home port and its name. It creates vessels, and receives
  * nothing about a vessel that already exists.
  * <p>
  * A vessel is created in a fixed order: it is constructed and joins the
@@ -61,13 +61,12 @@ public class VesselSpecification {
   /** The fleet the vessels join. */
   private final Fleet fleet;
 
-  /** The declaration of the behaviour each vessel steps. */
+  /** The component that is the behaviour each vessel steps. */
   @NonNull
   private final VesselComponent<? extends Task<Vessel>> behaviour;
 
   /**
-   * The declarations of each vessel's other components, by name, in the order
-   * they are built.
+   * Each vessel's other components, by name, in the order they are built.
    */
   @NonNull
   private final ImmutableMap<String, VesselComponent<?>> components;
@@ -89,8 +88,8 @@ public class VesselSpecification {
   }
 
   /**
-   * @return the behaviour's declaration, then the other components', in the
-   *         order they are built
+   * @return the behaviour, then the other components, in the order they are
+   *         built
    */
   public Stream<VesselComponent<?>> listedComponents() {
     return Stream.concat(Stream.of(behaviour), components.values().stream());

@@ -28,15 +28,19 @@ import static org.mockito.Mockito.when;
 
 import ec.util.MersenneTwisterFast;
 import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
+import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
 import uk.ac.ox.poseidon.agents.trips.TripStartEvent;
 import uk.ac.ox.poseidon.agents.vessels.Trip;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 
@@ -68,17 +72,59 @@ class TripEvaluatorTest {
     when(trip.getEventManager()).thenReturn(tripEventManager);
 
     vesselEventManager.addListener(
-      new TripEvaluator(new StubOptionValues(), evaluator)
+      new TripEvaluator(vessel -> new StubOptionValues(), evaluator)
     );
     vesselEventManager.broadcast(new TripStartEvent(trip));
 
     assertThat(evaluationEventManager).hasValue(tripEventManager);
   }
 
+  @Test
+  void feedsATripsResultIntoTheTableOfTheTripsVesselWhenTheTripEnds() {
+    final Vessel vessel = mock(Vessel.class);
+    final StubOptionValues vesselsTable = new StubOptionValues();
+    final StubOptionValues otherTable = new StubOptionValues();
+    final Evaluator<Int2D> evaluator = (option, eventManager) ->
+      new Evaluation<>() {
+        @Override
+        public Int2D getOption() {
+          return option;
+        }
+
+        @Override
+        public double getResult() {
+          return 5;
+        }
+      };
+    final Trip trip = mock(Trip.class);
+    final Int2D destination = new Int2D(1, 2);
+    when(trip.getVessel()).thenReturn(vessel);
+    when(trip.getDestination()).thenReturn(destination);
+    when(trip.getEventManager()).thenReturn(new SimpleEventManager());
+    final TripEvaluator tripEvaluator = new TripEvaluator(
+      tableOf -> tableOf == vessel ? vesselsTable : otherTable,
+      evaluator
+    );
+
+    tripEvaluator.receive(new TripStartEvent(trip));
+    assertThat(vesselsTable.observations).isEmpty();
+    tripEvaluator.receive(new TripEndEvent(trip));
+
+    assertThat(vesselsTable.observations).containsExactly(
+      Map.entry(destination, 5.0)
+    );
+    assertThat(otherTable.observations).isEmpty();
+  }
+
+  /** Records what it observes, and knows no value. */
   private static class StubOptionValues implements MutableOptionValues<Int2D> {
 
+    private final List<Entry<Int2D, Double>> observations = new ArrayList<>();
+
     @Override
-    public void observe(final Int2D option, final double value) {}
+    public void observe(final Int2D option, final double value) {
+      observations.add(Map.entry(option, value));
+    }
 
     @Override
     public Optional<Double> getValue(final Int2D option) {

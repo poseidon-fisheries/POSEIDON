@@ -22,33 +22,42 @@
 
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
+import java.util.function.Function;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.agents.trips.TripEndEvent;
 import uk.ac.ox.poseidon.agents.trips.TripEvent;
 import uk.ac.ox.poseidon.agents.trips.TripStartEvent;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.core.events.Listener;
 
 /**
  * Listens for a vessel's trip start/end events and feeds each completed trip's
- * destination and score into {@code optionValues}, so future destination
- * choices can learn from past outcomes. Its factory registers it on the
- * vessel's event manager.
+ * destination and score into the option values of the trip's vessel, read
+ * when the trip ends, so future destination choices can learn from past
+ * outcomes. Its factory registers it on the vessel's event manager.
  */
 public class TripEvaluator implements Listener<TripEvent> {
 
-  private final MutableOptionValues<Int2D> optionValues;
+  private final Function<
+    ? super Vessel,
+    ? extends MutableOptionValues<Int2D>
+  > optionValues;
   private final Evaluator<Int2D> evaluator;
   private Evaluation<Int2D> currentEvaluation;
 
   /**
-   * @param optionValues where each completed trip's (destination, score)
-   *                     observation is fed
+   * @param optionValues gives the option values of a vessel, where each of its
+   *                     completed trips' (destination, score) observation is
+   *                     fed
    * @param evaluator    starts a fresh {@link Evaluation} for each trip's
    *                     destination
    */
   public TripEvaluator(
-    final MutableOptionValues<Int2D> optionValues,
+    final Function<
+      ? super Vessel,
+      ? extends MutableOptionValues<Int2D>
+    > optionValues,
     final Evaluator<Int2D> evaluator
   ) {
     this.optionValues = optionValues;
@@ -64,7 +73,7 @@ public class TripEvaluator implements Listener<TripEvent> {
   /**
    * On a {@link TripStartEvent}, starts a fresh evaluation of the trip's
    * destination. On a {@link TripEndEvent}, feeds that evaluation's (option,
-   * result) pair into {@link #optionValues}.
+   * result) pair into the option values of the trip's vessel.
    */
   @Override
   public void receive(final TripEvent event) {
@@ -74,10 +83,9 @@ public class TripEvaluator implements Listener<TripEvent> {
         event.getTrip().getEventManager()
       );
     } else if (event instanceof TripEndEvent) {
-      optionValues.observe(
-        currentEvaluation.getOption(),
-        currentEvaluation.getResult()
-      );
+      optionValues
+        .apply(event.getTrip().getVessel())
+        .observe(currentEvaluation.getOption(), currentEvaluation.getResult());
     }
   }
 }

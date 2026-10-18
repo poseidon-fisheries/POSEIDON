@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.core.functions.ObjectProperty;
 
 /**
  * Reads a property of a vessel's component, following a dotted path of
- * getters from the component the declaration gives for the vessel, e.g.
+ * getters from what the component built for the vessel, e.g.
  * {@code "availableCapacityInKg"} of its hold.
  *
  * @param <R> the type of the property; not checked
@@ -53,7 +53,7 @@ public class ComponentProperty<R> implements Function<Vessel, R> {
     };
 
   /**
-   * @param component    the declaration of the component to read
+   * @param component    the component to read
    * @param propertyPath the dotted path of properties to follow from it
    */
   public ComponentProperty(

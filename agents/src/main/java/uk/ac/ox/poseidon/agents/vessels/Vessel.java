@@ -60,8 +60,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 /**
  * A fishing vessel, the model's agent: it has attributes, among them its home
  * port's code and its name, and components (its behaviour, gear, engine, hold
- * and the rest, each read through its {@link VesselComponent} declaration),
- * both as its {@link VesselSpecification} says. Its behaviour is the root
+ * and the rest, each read through its {@link VesselComponent}), both as its
+ * {@link VesselSpecification} says. Its behaviour is the root
  * task of a gdx-ai behaviour tree, which the vessel runs: it repeatedly steps
  * the tree, rescheduling itself either after the running task's
  * {@link #taskDuration} (while the behaviour is running) or on the very next
@@ -111,7 +111,7 @@ public class Vessel implements Oriented2D, HasAttributes {
   private final ProductStore productStore = new ProductStore();
 
   /**
-   * What this vessel is made of: among others, the declaration of the
+   * What this vessel is made of: among others, the component that is the
    * behaviour it runs, the root task of its tree (a vessel without that
    * component does not act), and the attributes giving its home port and name.
    */
@@ -206,15 +206,14 @@ public class Vessel implements Oriented2D, HasAttributes {
   private final Account account = new Account();
 
   /**
-   * The store this vessel keeps for each of its components, by the
-   * declaration the component is built from; a declaration that gives this
-   * vessel no component has none.
+   * The store this vessel keeps for each of its components; a component whose
+   * choice gives this vessel nothing has none.
    */
   @Getter(NONE)
   private final Map<VesselComponent<?>, ProductStore> componentStores =
     new LinkedHashMap<>();
 
-  /** This vessel's components, by the declaration each is built from. */
+  /** What each of this vessel's components built for it, by component. */
   @Getter(NONE)
   private final Map<VesselComponent<?>, Object> components =
     new LinkedHashMap<>();
@@ -351,32 +350,31 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Builds every component this vessel's specification declares, in its
-   * order: the behaviour first, then the others as listed.
+   * Builds every component this vessel's specification lists, in its order:
+   * the behaviour first, then the others as listed.
    */
   void buildComponents() {
     specification.listedComponents().forEach(this::buildComponent);
   }
 
   /**
-   * Gives this vessel the component {@code declaration} declares for it, if
-   * any: built under a scope carrying a fresh store, which this vessel keeps
-   * for it. Renews the tree if that is the behaviour. The behaviour must not
-   * be running, and this vessel must have no component for
-   * {@code declaration}.
+   * Builds what {@code component} gives this vessel, if anything: under a
+   * scope carrying a fresh store, which this vessel keeps for it. Renews the
+   * tree if that is the behaviour. The behaviour must not be running, and
+   * this vessel must have nothing built for {@code component}.
    */
-  private <T> void buildComponent(final VesselComponent<T> declaration) {
-    factoryFor(declaration).ifPresent(factory -> {
+  private <T> void buildComponent(final VesselComponent<T> component) {
+    factoryFor(component).ifPresent(factory -> {
       final ProductStore store = new ProductStore();
-      componentStores.put(declaration, store);
+      componentStores.put(component, store);
       components.put(
-        declaration,
+        component,
         factory.get(
           new VesselComponentScope(specification.scopeOf(this), store)
         )
       );
     });
-    if (declaration == specification.getBehaviour()) {
+    if (component == specification.getBehaviour()) {
       tree = specification
         .getBehaviour()
         .findIn(this)
@@ -386,14 +384,14 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * @return what builds this vessel's component for {@code declaration}: its
-   *         single factory, or what its choice gives for this vessel's
-   *         attributes; nothing if that is no component
+   * @return what builds {@code component} for this vessel: its single
+   *         factory, or what its choice gives for this vessel's attributes;
+   *         nothing if that is no component
    */
   private <T> Optional<
     Factory<? super VesselComponentScope, ? extends T>
-  > factoryFor(final VesselComponent<T> declaration) {
-    return switch (declaration) {
+  > factoryFor(final VesselComponent<T> component) {
+    return switch (component) {
       case final FactoryComponent<T> single -> Optional.of(single.getFactory());
       case final ChosenComponent<T> chosen -> switch (chosen.outcomeFor(this)) {
         case final BuildOutcome<? extends T> build -> Optional.of(
@@ -411,11 +409,11 @@ public class Vessel implements Oriented2D, HasAttributes {
    * specification builds them, then builds them in that order.
    */
   private void rebuildChosenAnew(final Map<String, Object> previousAttributes) {
-    final List<VesselComponent<?>> declarations = specification
+    final List<VesselComponent<?>> componentsToRebuild = specification
       .listedComponents()
       .filter(
-        declaration ->
-          declaration instanceof final ChosenComponent<?> chosen &&
+        component ->
+          component instanceof final ChosenComponent<?> chosen &&
           chosen
             .getAttributes()
             .stream()
@@ -428,42 +426,42 @@ public class Vessel implements Oriented2D, HasAttributes {
             )
       )
       .toList();
-    declarations.reversed().forEach(this::dropComponent);
-    declarations.forEach(this::buildComponent);
+    componentsToRebuild.reversed().forEach(this::dropComponent);
+    componentsToRebuild.forEach(this::buildComponent);
   }
 
   /**
-   * Ends the store of this vessel's component for {@code declaration}, if it
-   * has one, and drops the component.
+   * Ends the store this vessel keeps for {@code component}, if it has one,
+   * and drops what the component built.
    */
-  private void dropComponent(final VesselComponent<?> declaration) {
-    final ProductStore store = componentStores.remove(declaration);
+  private void dropComponent(final VesselComponent<?> component) {
+    final ProductStore store = componentStores.remove(component);
     if (store != null) store.end();
-    components.remove(declaration);
+    components.remove(component);
   }
 
   /**
-   * @param declaration the declaration of the component
-   * @return this vessel's component for {@code declaration}, if it has one
+   * @param component the component to read
+   * @return what {@code component} built for this vessel, if anything
    * @throws IllegalStateException if this vessel was not created with
-   *                               {@code declaration}: a wiring error, not an
+   *                               {@code component}: a wiring error, not an
    *                               absence
    */
-  // The vessel keeps under a declaration only what its factory built, a T
+  // The vessel keeps under a component only what its factory built, a T
   @SuppressWarnings("unchecked")
-  <T> Optional<T> findComponent(final VesselComponent<T> declaration) {
-    final T component = (T) components.get(declaration);
-    if (component == null) {
+  <T> Optional<T> findComponent(final VesselComponent<T> component) {
+    final T product = (T) components.get(component);
+    if (product == null) {
       checkState(
         specification
           .listedComponents()
-          .anyMatch(listed -> listed == declaration),
-        "Vessel %s was not created with the declaration %s",
+          .anyMatch(listed -> listed == component),
+        "Vessel %s was not created with the component %s",
         id,
-        declaration
+        component
       );
     }
-    return Optional.ofNullable(component);
+    return Optional.ofNullable(product);
   }
 
   /** @return {@link #heading} */

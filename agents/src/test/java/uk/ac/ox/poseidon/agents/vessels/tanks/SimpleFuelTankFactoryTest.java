@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.agents.vessels.tanks;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.componentScopeOf;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.componentScopeOf;
 import static uk.ac.ox.poseidon.agents.vessels.tanks.Factories.tank;
 
 import org.junit.jupiter.api.BeforeEach;

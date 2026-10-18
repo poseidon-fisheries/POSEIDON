@@ -38,7 +38,8 @@ import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
  * Directed ties between vessels, where a tie from A to B means that A tells B.
  * The network is passive: it holds the ties and a live source of candidate
  * vessels, and knows nothing of what is told through the ties or of what adds
- * and removes them (network dynamics do that). A tie from a vessel to itself is
+ * and removes them (network dynamics do that), except that a vessel leaving
+ * the fleet takes its ties with it. A tie from a vessel to itself is
  * rejected.
  */
 @RequiredArgsConstructor(access = PACKAGE)
@@ -85,5 +86,13 @@ public class SocialNetwork {
    */
   public void removeTie(final Vessel source, final Vessel recipient) {
     ties.removeEdge(source, recipient);
+  }
+
+  /**
+   * Removes every tie in and out of {@code vessel}, if it has any: its factory
+   * calls this for each vessel that exits the fleet.
+   */
+  void removeVessel(final Vessel vessel) {
+    ties.removeNode(vessel);
   }
 }

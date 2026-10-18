@@ -39,7 +39,7 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param hold     the declaration of the hold whose catch is landed
+   * @param hold     the hold whose catch is landed
    * @param duration how long landing takes, read for the vessel
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
    *         {@link LandCatches}

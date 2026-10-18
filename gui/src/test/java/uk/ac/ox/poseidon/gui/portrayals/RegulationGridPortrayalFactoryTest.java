@@ -134,7 +134,7 @@ class RegulationGridPortrayalFactoryTest {
     return vessel;
   }
 
-  /** @return a gear declaration giving every vessel a gear */
+  /** @return a gear component giving every vessel a gear */
   @SuppressWarnings("unchecked")
   private static VesselComponent<Gear> gear() {
     final VesselComponent<Gear> gear = mock(FactoryComponent.class);

@@ -29,14 +29,16 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
+import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link SocialNetwork}, built
- * via {@link Factories#socialNetwork}. The network starts with no ties.
+ * via {@link Factories#socialNetwork}. The network starts with no ties, takes
+ * the fleet's vessels as its candidates, and listens to the fleet for exits,
+ * so that an exited vessel has no tie left.
  */
 @Getter
 @ToString
@@ -47,14 +49,14 @@ public class SocialNetworkFactory
   extends SimulationScopeFactory<SocialNetwork>
 {
 
-  private final Factory<
-    ? super SimulationScope,
-    ? extends VesselsGetter
-  > candidates;
+  private final Factory<? super SimulationScope, ? extends Fleet> fleet;
 
   @Override
   protected SocialNetwork newInstance(final SimulationScope scope) {
-    checkNotNull(candidates, "candidates must not be null");
-    return new SocialNetwork(candidates.get(scope));
+    checkNotNull(fleet, "fleet must not be null");
+    final Fleet fleet = this.fleet.get(scope);
+    final SocialNetwork network = new SocialNetwork(fleet);
+    fleet.addExitListener(network::removeVessel);
+    return network;
   }
 }

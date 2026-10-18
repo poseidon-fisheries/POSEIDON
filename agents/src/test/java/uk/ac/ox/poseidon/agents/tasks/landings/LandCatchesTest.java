@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.agents.tasks.landings;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.declaredFor;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.componentGiving;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
@@ -58,7 +58,7 @@ class LandCatchesTest {
   private final Vessel vessel = mock(Vessel.class);
   private final Trip trip = mock(Trip.class);
   private final LandCatches landCatches = new LandCatches(
-    declaredFor(vessel, mock(Hold.class)),
+    componentGiving(vessel, mock(Hold.class)),
     vessel -> Duration.ZERO,
     vessel -> LocalDateTime.of(2026, 1, 1, 0, 0)
   );

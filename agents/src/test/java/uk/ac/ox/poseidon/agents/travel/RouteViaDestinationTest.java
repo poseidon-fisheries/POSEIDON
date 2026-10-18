@@ -30,8 +30,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.declaredFor;
-import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.giveComponent;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.componentGiving;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.giveComponent;
 
 import com.google.common.collect.ImmutableList;
 import java.time.Duration;
@@ -58,12 +58,12 @@ class RouteViaDestinationTest {
   private final DistanceCalculator distanceCalculator = mock(
     DistanceCalculator.class
   );
-  private final VesselComponent<Engine> engineDeclaration = declaredFor(
+  private final VesselComponent<Engine> engineComponent = componentGiving(
     vessel,
     engine
   );
   private final RouteViaDestination routeViaDestination =
-    new RouteViaDestination(engineDeclaration, pathFinder, distanceCalculator);
+    new RouteViaDestination(engineComponent, pathFinder, distanceCalculator);
 
   @BeforeEach
   void setUp() {
@@ -115,7 +115,7 @@ class RouteViaDestinationTest {
     final Vessel otherVessel = mock(Vessel.class);
     final Engine otherEngine = mock(Engine.class);
     when(otherEngine.getCruisingSpeedInKph()).thenReturn(20.0);
-    giveComponent(otherVessel, engineDeclaration, otherEngine);
+    giveComponent(otherVessel, engineComponent, otherEngine);
     when(otherVessel.getCell()).thenReturn(destination);
     when(otherVessel.getHomePortLocation()).thenReturn(portCell);
     when(pathFinder.getPath(destination, destination)).thenReturn(

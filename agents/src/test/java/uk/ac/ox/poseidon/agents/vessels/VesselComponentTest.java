@@ -33,22 +33,24 @@ import static uk.ac.ox.poseidon.agents.vessels.Factories.otherwise;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.when;
 import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.newVessel;
+import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 
 import com.badlogic.gdx.ai.btree.leaf.Success;
 import java.util.Map;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A vessel keeps each component under the declaration it is built from, with
- * a store of its own; a declaration the vessel was not created with is a
- * wiring error, not an absence.
+ * A vessel keeps each of its components, with a store of its own; a component
+ * the vessel was not created with is a wiring error, not an absence. A
+ * component is also a value of the vessel it is read for.
  */
 class VesselComponentTest {
 
-  private final VesselComponent<Object> declaration = vesselComponent(
+  private final VesselComponent<Object> component = vesselComponent(
     new NewObjectFactory()
   );
 
@@ -66,15 +68,35 @@ class VesselComponentTest {
   }
 
   @Test
-  void theVesselHasTheComponentItsDeclarationBuilt() {
-    final Vessel vessel = vesselWith(declaration);
+  void theVesselHasTheComponentItsFactoryBuilt() {
+    final Vessel vessel = vesselWith(component);
 
-    assertThat(declaration.of(vessel)).isInstanceOf(Object.class);
-    assertThat(declaration.findIn(vessel)).containsSame(declaration.of(vessel));
+    assertThat(component.of(vessel)).isInstanceOf(Object.class);
+    assertThat(component.findIn(vessel)).containsSame(component.of(vessel));
   }
 
   @Test
-  void twoDeclarationsOfOneFactoryAreTwoKeysAndGiveTwoComponents() {
+  void asAVesselValueAComponentGivesTheComponentOfTheVesselItIsReadFor() {
+    final Vessel vessel = vesselWith(component);
+    final Vessel otherVessel = vesselWith(component);
+
+    final Function<Vessel, Object> value = component.get(GLOBAL_SCOPE);
+
+    assertThat(value.apply(vessel)).isSameAs(component.of(vessel));
+    assertThat(value.apply(otherVessel)).isSameAs(component.of(otherVessel));
+  }
+
+  @Test
+  void asAVesselValueAComponentTheVesselLacksIsAWiringError() {
+    final Vessel vessel = vesselWith();
+
+    assertThatThrownBy(() -> component.get(GLOBAL_SCOPE).apply(vessel))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("Vessel vessel");
+  }
+
+  @Test
+  void twoEqualComponentsAreTwoKeysAndGiveTwoComponents() {
     final NewObjectFactory factory = new NewObjectFactory();
     final VesselComponent<Object> first = vesselComponent(factory);
     final VesselComponent<Object> second = vesselComponent(factory);
@@ -85,13 +107,13 @@ class VesselComponentTest {
   }
 
   @Test
-  void aDeclarationTheVesselWasNotCreatedWithIsAWiringError() {
+  void aComponentTheVesselWasNotCreatedWithIsAWiringError() {
     final Vessel vessel = vesselWith();
 
-    assertThatThrownBy(() -> declaration.of(vessel))
+    assertThatThrownBy(() -> component.of(vessel))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("Vessel vessel");
-    assertThatThrownBy(() -> declaration.findIn(vessel)).isInstanceOf(
+    assertThatThrownBy(() -> component.findIn(vessel)).isInstanceOf(
       IllegalStateException.class
     );
   }

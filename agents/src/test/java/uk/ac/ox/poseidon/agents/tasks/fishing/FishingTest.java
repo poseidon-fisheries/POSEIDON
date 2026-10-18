@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks.fishing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
-import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.declaredFor;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.componentGiving;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
@@ -82,9 +82,9 @@ class FishingTest {
     when(trip.getEventManager()).thenReturn(eventManager);
 
     final ExposedFishing fishing = new ExposedFishing(
-      declaredFor(vessel, gear),
-      declaredFor(vessel, hold),
-      declaredFor(vessel, mock(FuelTank.class)),
+      componentGiving(vessel, gear),
+      componentGiving(vessel, hold),
+      componentGiving(vessel, mock(FuelTank.class)),
       v -> fisheable,
       dispositionProcess
     );
@@ -140,9 +140,9 @@ class FishingTest {
     when(trip.getEventManager()).thenReturn(eventManager);
 
     final ExposedFishing fishing = new ExposedFishing(
-      declaredFor(vessel, gear),
-      declaredFor(vessel, hold),
-      declaredFor(vessel, mock(FuelTank.class)),
+      componentGiving(vessel, gear),
+      componentGiving(vessel, hold),
+      componentGiving(vessel, mock(FuelTank.class)),
       v -> fisheable,
       dispositionProcess
     );

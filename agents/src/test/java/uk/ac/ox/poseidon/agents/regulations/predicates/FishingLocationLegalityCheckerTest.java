@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.giveComponent;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.giveComponent;
 
 import com.google.common.collect.ImmutableList;
 import java.time.Duration;
@@ -86,10 +86,10 @@ class FishingLocationLegalityCheckerTest {
   private final Gear gear = mock(Gear.class);
   private final GridPathFinder pathFinder = mock(GridPathFinder.class);
   private final DistanceCalculator distance = mock(DistanceCalculator.class);
-  private final VesselComponent<Gear> gearDeclaration = new FactoryComponent<>(
+  private final VesselComponent<Gear> gearComponent = new FactoryComponent<>(
     scope -> gear
   );
-  private final VesselComponent<Engine> engineDeclaration =
+  private final VesselComponent<Engine> engineComponent =
     new FactoryComponent<>(scope -> mock(Engine.class));
 
   @BeforeEach
@@ -99,9 +99,9 @@ class FishingLocationLegalityCheckerTest {
     final VesselField vesselField = mock(VesselField.class);
     when(vesselField.getModelGrid()).thenReturn(MODEL_GRID);
     when(vessel.getCell()).thenReturn(PORT);
-    giveComponent(vessel, engineDeclaration, engine);
+    giveComponent(vessel, engineComponent, engine);
     when(vessel.getVesselField()).thenReturn(vesselField);
-    giveComponent(vessel, gearDeclaration, gear);
+    giveComponent(vessel, gearComponent, gear);
     when(pathFinder.getPath(PORT, CANDIDATE)).thenReturn(Optional.of(PATH));
     when(distance.travelDuration(PATH, SPEED_IN_KPH)).thenReturn(TRAVEL);
   }
@@ -111,8 +111,8 @@ class FishingLocationLegalityCheckerTest {
     final LocalDateTime now
   ) {
     return new FishingLocationLegalityChecker(
-      gearDeclaration,
-      engineDeclaration,
+      gearComponent,
+      engineComponent,
       regulations,
       pathFinder,
       distance,
@@ -158,9 +158,9 @@ class FishingLocationLegalityCheckerTest {
     final VesselField vesselField = mock(VesselField.class);
     when(vesselField.getModelGrid()).thenReturn(MODEL_GRID);
     when(otherVessel.getCell()).thenReturn(PORT);
-    giveComponent(otherVessel, engineDeclaration, otherEngine);
+    giveComponent(otherVessel, engineComponent, otherEngine);
     when(otherVessel.getVesselField()).thenReturn(vesselField);
-    giveComponent(otherVessel, gearDeclaration, otherGear);
+    giveComponent(otherVessel, gearComponent, otherGear);
     final List<ExtendedFishingAction> checked = new ArrayList<>();
     final FishingLocationLegalityChecker checker = checker(
       action -> checked.add(action),
@@ -187,8 +187,8 @@ class FishingLocationLegalityCheckerTest {
     final List<ExtendedFishingAction> checked = new ArrayList<>();
     final LocalDateTime now = LocalDateTime.of(2013, 1, 19, 20, 30);
     new FishingLocationLegalityChecker(
-      gearDeclaration,
-      engineDeclaration,
+      gearComponent,
+      engineComponent,
       action -> checked.add(action),
       pathFinder,
       new CartesianDistanceCalculator(MODEL_GRID, 1.0),

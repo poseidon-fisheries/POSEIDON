@@ -195,7 +195,7 @@ public class Factories {
   }
 
   /**
-   * @param component    the declaration of the component to read
+   * @param component    the component to read
    * @param propertyPath the dotted path of properties to follow from the
    *                     component, e.g. {@code "availableCapacityInKg"} of a
    *                     hold

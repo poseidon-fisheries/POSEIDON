@@ -22,28 +22,51 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
- * The declaration of a vessel component that one factory builds, for every
- * vessel alike: it has no choice, so it is never rebuilt. Built via
- * {@link Factories#vesselComponent} or {@link Factories#behaviour}.
+ * A vessel component that one factory builds, for every vessel alike: it has
+ * no choice, so it is never rebuilt. Built via {@link Factories#vesselComponent}
+ * or {@link Factories#behaviour}.
  *
  * @param <T> the type of the component
  */
 @Getter
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public final class FactoryComponent<T> implements VesselComponent<T> {
+public final class FactoryComponent<T>
+  extends GlobalScopeFactory<Function<Vessel, T>>
+  implements VesselComponent<T>
+{
 
   /**
    * Builds the component; its own level decides where its product lives: a
-   * component-level factory gives each vessel its own, built fresh.
+   * component-level factory gives each vessel its own, built fresh. Only the
+   * vessel builds it.
    */
   @NonNull
   private final Factory<? super VesselComponentScope, ? extends T> factory;
+
+  @Override
+  protected Function<Vessel, T> newInstance(final Scope scope) {
+    return this::of;
+  }
+
+  /** @return whether {@code other} is this very component */
+  @Override
+  public boolean equals(final Object other) {
+    return this == other;
+  }
+
+  @Override
+  public int hashCode() {
+    return System.identityHashCode(this);
+  }
 }

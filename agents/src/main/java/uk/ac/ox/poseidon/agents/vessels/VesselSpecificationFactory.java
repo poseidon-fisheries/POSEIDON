@@ -46,7 +46,7 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
  * A {@link SimulationScopeFactory} counterpart of {@link VesselSpecification},
  * built via {@link Factories#vesselSpecification}.
  * <p>
- * It checks, before a simulation starts, that every declaration the
+ * It checks, before a simulation starts, that every vessel component the
  * description uses is one it lists: a consumer reading a component no vessel
  * has is a wiring error, caught before the first step rather than when the
  * consumer is first used.
@@ -71,17 +71,17 @@ public class VesselSpecificationFactory
   private final String nameAttribute;
 
   /**
-   * @return the behaviour's declaration, then the other components', in the
-   *         order they are built
+   * @return the behaviour, then the other components, in the order they are
+   *         built
    */
   private Stream<VesselComponent<?>> listedComponents() {
     return Stream.concat(Stream.of(behaviour), components.values().stream());
   }
 
   /**
-   * @throws IllegalStateException naming the consumer of a declaration that
-   *                               no vessel specification in the description
-   *                               lists
+   * @throws IllegalStateException naming the consumer of a vessel component
+   *                               that no vessel specification in the
+   *                               description lists
    */
   @Override
   public void check(final List<ReachedNode> nodes) {
@@ -101,7 +101,7 @@ public class VesselSpecificationFactory
       .findFirst()
       .ifPresent(reached -> {
         throw new IllegalStateException(
-          "A vessel component declaration used by " +
+          "A vessel component used by " +
             (reached.parent() == null
               ? "the scenario"
               : reached.parent().getClass().getName()) +

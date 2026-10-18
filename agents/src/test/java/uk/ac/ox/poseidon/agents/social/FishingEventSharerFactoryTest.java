@@ -29,13 +29,14 @@ import static uk.ac.ox.poseidon.agents.social.Factories.fishingEventSharer;
 import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -53,7 +54,7 @@ class FishingEventSharerFactoryTest {
   );
   private final Vessel a = vessel(simulationEventManager);
   private final Vessel b = vessel(simulationEventManager);
-  private final VesselsGetter fleet = () -> List.of(a, b);
+  private final Fleet fleet = fleetOf(a, b);
   private final SocialNetworkFactory network = socialNetwork(object(fleet));
   private final FishingEventSharerFactory factory = fishingEventSharer(network);
 
@@ -71,6 +72,13 @@ class FishingEventSharerFactoryTest {
       new ForwardingEventManager(simulationEventManager)
     );
     return vessel;
+  }
+
+  /** @return a mocked fleet of {@code vessels}, in that order */
+  private static Fleet fleetOf(final Vessel... vessels) {
+    final Fleet fleet = mock(Fleet.class);
+    when(fleet.getVessels()).thenReturn(ImmutableSet.copyOf(vessels));
+    return fleet;
   }
 
   @Test

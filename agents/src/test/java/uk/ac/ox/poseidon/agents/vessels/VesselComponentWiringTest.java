@@ -43,8 +43,8 @@ import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A declaration a consumer uses but the vessel specification does not list is
- * a wiring error, caught before a simulation of the scenario starts.
+ * A vessel component a consumer uses but the vessel specification does not
+ * list is a wiring error, caught before a simulation of the scenario starts.
  */
 class VesselComponentWiringTest {
 
@@ -53,7 +53,7 @@ class VesselComponentWiringTest {
   );
 
   @Test
-  void aDeclarationTheSpecificationLeavesOutFailsBeforeTheSimulationStarts() {
+  void aComponentTheSpecificationLeavesOutFailsBeforeTheSimulationStarts() {
     final VesselComponent<Hold> unlistedHold = vesselComponent(
       object(mock(Hold.class))
     );
@@ -66,7 +66,7 @@ class VesselComponentWiringTest {
   }
 
   @Test
-  void aDeclarationTheSpecificationListsPasses() {
+  void aComponentTheSpecificationListsPasses() {
     assertThatCode(() ->
       scenarioLanding(listedHold).startNewSimulation(0).finish()
     ).doesNotThrowAnyException();

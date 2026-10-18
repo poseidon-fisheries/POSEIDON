@@ -25,184 +25,168 @@ package uk.ac.ox.poseidon.agents.choices;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.componentGiving;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.giveComponent;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.ports.Port;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 
 class BestOptionsFromFriendsTest {
 
   private final Vessel vessel = mock(Vessel.class);
 
-  @Test
-  void testGetWhenEmptyRegister() {
-    final VesselComponentRegister<OptionValues<String>> register =
-      new VesselComponentRegister<>();
-    final Function<Vessel, List<Vessel>> friends = vessel -> List.of();
-    final BestOptionsFromFriends<String> bestOptionsFromFriends =
-      new BestOptionsFromFriends<>(register, friends);
-    assertThat(bestOptionsFromFriends.apply(vessel).getBestEntries()).isEmpty();
+  private static Vessel activeVessel() {
+    final Vessel vessel = mock(Vessel.class);
+    when(vessel.isActive()).thenReturn(true);
+    return vessel;
   }
 
-  @Test
-  void testGetWithSingleFriend() {
-    final Port port = mock(Port.class);
-    final Vessel friend = mock(Vessel.class);
-    when(friend.isActive()).thenReturn(true);
-    when(friend.getHomePort()).thenReturn(port);
-
-    final ExponentialMovingAverageOptionValues<String> friendValues =
+  private static ExponentialMovingAverageOptionValues<String> valuesOf(
+    final Map<String, Double> observations
+  ) {
+    final ExponentialMovingAverageOptionValues<String> values =
       new ExponentialMovingAverageOptionValues<>(1.0);
-    friendValues.observe("A", 10.0);
-    friendValues.observe("B", 20.0);
-
-    final VesselComponentRegister<OptionValues<String>> register =
-      new VesselComponentRegister<>();
-    register.register(friend, friendValues);
-
-    final Function<Vessel, List<Vessel>> friends = vessel -> List.of(friend);
-    final BestOptionsFromFriends<String> bestOptionsFromFriends =
-      new BestOptionsFromFriends<>(register, friends);
-
-    assertThat(
-      bestOptionsFromFriends.apply(vessel).getBestOptions()
-    ).containsExactly("B");
+    observations.forEach(values::observe);
+    return values;
   }
 
-  @Test
-  void testGetWithMultipleFriendsMergeSameOption() {
-    final Port port = mock(Port.class);
-    final Vessel friendA = mock(Vessel.class);
-    when(friendA.isActive()).thenReturn(true);
-    when(friendA.getHomePort()).thenReturn(port);
-
-    final Vessel friendB = mock(Vessel.class);
-    when(friendB.isActive()).thenReturn(true);
-    when(friendB.getHomePort()).thenReturn(port);
-
-    final ExponentialMovingAverageOptionValues<String> valuesA =
-      new ExponentialMovingAverageOptionValues<>(1.0);
-    valuesA.observe("X", 10.0);
-
-    final ExponentialMovingAverageOptionValues<String> valuesB =
-      new ExponentialMovingAverageOptionValues<>(1.0);
-    valuesB.observe("X", 30.0);
-
-    final VesselComponentRegister<OptionValues<String>> register =
-      new VesselComponentRegister<>();
-    register.register(friendA, valuesA);
-    register.register(friendB, valuesB);
-
-    final Function<Vessel, List<Vessel>> friends = vessel ->
-      List.of(friendA, friendB);
-    final BestOptionsFromFriends<String> bestOptionsFromFriends =
-      new BestOptionsFromFriends<>(register, friends);
-
-    assertThat(
-      bestOptionsFromFriends.apply(vessel).getBestOptions()
-    ).containsExactly("X");
-    assertThat(bestOptionsFromFriends.apply(vessel).getBestValue()).hasValue(
-      30.0
+  private static BestOptionsFromFriends<String> bestOptionsFrom(
+    final VesselComponent<? extends OptionValues<String>> optionValues,
+    final Vessel... friends
+  ) {
+    return new BestOptionsFromFriends<>(optionValues, friendsOf ->
+      List.of(friends)
     );
   }
 
   @Test
-  void testGetWithInactiveFriend() {
-    final Port port = mock(Port.class);
-    final Vessel friend = mock(Vessel.class);
-    when(friend.isActive()).thenReturn(false);
-    when(friend.getHomePort()).thenReturn(port);
+  void aVesselWithNoFriendHasNoOptionFromThem() {
+    final VesselComponent<OptionValues<String>> optionValues = componentGiving(
+      activeVessel(),
+      valuesOf(Map.of("A", 10.0))
+    );
 
-    final ExponentialMovingAverageOptionValues<String> friendValues =
-      new ExponentialMovingAverageOptionValues<>(1.0);
-    friendValues.observe("A", 10.0);
-
-    final VesselComponentRegister<OptionValues<String>> register =
-      new VesselComponentRegister<>();
-    register.register(friend, friendValues);
-
-    final Function<Vessel, List<Vessel>> friends = vessel -> List.of(friend);
-    final BestOptionsFromFriends<String> bestOptionsFromFriends =
-      new BestOptionsFromFriends<>(register, friends);
-
-    assertThat(bestOptionsFromFriends.apply(vessel).getBestEntries()).isEmpty();
+    assertThat(
+      bestOptionsFrom(optionValues).apply(vessel).getBestEntries()
+    ).isEmpty();
   }
 
   @Test
-  void testGetWithFriendHavingNoBestEntries() {
-    final Port port = mock(Port.class);
-    final Vessel friend = mock(Vessel.class);
-    when(friend.isActive()).thenReturn(true);
-    when(friend.getHomePort()).thenReturn(port);
+  void givesTheBestOptionsOfAFriendsOwnTable() {
+    final Vessel friend = activeVessel();
+    final VesselComponent<OptionValues<String>> optionValues = componentGiving(
+      friend,
+      valuesOf(Map.of("A", 10.0, "B", 20.0))
+    );
 
-    final VesselComponentRegister<OptionValues<String>> register =
-      new VesselComponentRegister<>();
-    register.register(friend, new ExponentialMovingAverageOptionValues<>(1.0));
-
-    final Function<Vessel, List<Vessel>> friends = vessel -> List.of(friend);
-    final BestOptionsFromFriends<String> bestOptionsFromFriends =
-      new BestOptionsFromFriends<>(register, friends);
-
-    assertThat(bestOptionsFromFriends.apply(vessel).getBestEntries()).isEmpty();
+    assertThat(
+      bestOptionsFrom(optionValues, friend).apply(vessel).getBestOptions()
+    ).containsExactly("B");
   }
 
   @Test
-  void testGetWithMultipleFriendsWithDifferentOptions() {
-    final Port port = mock(Port.class);
-    final Vessel friendA = mock(Vessel.class);
-    when(friendA.isActive()).thenReturn(true);
-    when(friendA.getHomePort()).thenReturn(port);
+  void keepsTheHighestValueOfAnOptionSeveralFriendsKnow() {
+    final Vessel friendA = activeVessel();
+    final Vessel friendB = activeVessel();
+    final VesselComponent<OptionValues<String>> optionValues = componentGiving(
+      friendA,
+      valuesOf(Map.of("X", 10.0))
+    );
+    giveComponent(friendB, optionValues, valuesOf(Map.of("X", 30.0)));
 
-    final Vessel friendB = mock(Vessel.class);
-    when(friendB.isActive()).thenReturn(true);
-    when(friendB.getHomePort()).thenReturn(port);
+    final OptionValues<String> result = bestOptionsFrom(
+      optionValues,
+      friendA,
+      friendB
+    ).apply(vessel);
 
-    final ExponentialMovingAverageOptionValues<String> valuesA =
-      new ExponentialMovingAverageOptionValues<>(1.0);
-    valuesA.observe("A", 10.0);
+    assertThat(result.getBestOptions()).containsExactly("X");
+    assertThat(result.getBestValue()).hasValue(30.0);
+  }
 
-    final ExponentialMovingAverageOptionValues<String> valuesB =
-      new ExponentialMovingAverageOptionValues<>(1.0);
-    valuesB.observe("B", 20.0);
+  @Test
+  void mergesTheDifferentOptionsOfSeveralFriends() {
+    final Vessel friendA = activeVessel();
+    final Vessel friendB = activeVessel();
+    final VesselComponent<OptionValues<String>> optionValues = componentGiving(
+      friendA,
+      valuesOf(Map.of("A", 10.0))
+    );
+    giveComponent(friendB, optionValues, valuesOf(Map.of("B", 20.0)));
 
-    final VesselComponentRegister<OptionValues<String>> register =
-      new VesselComponentRegister<>();
-    register.register(friendA, valuesA);
-    register.register(friendB, valuesB);
+    final OptionValues<String> result = bestOptionsFrom(
+      optionValues,
+      friendA,
+      friendB
+    ).apply(vessel);
 
-    final Function<Vessel, List<Vessel>> friends = vessel ->
-      List.of(friendA, friendB);
-    final BestOptionsFromFriends<String> bestOptionsFromFriends =
-      new BestOptionsFromFriends<>(register, friends);
-
-    final OptionValues<String> result = bestOptionsFromFriends.apply(vessel);
     assertThat(result.getValue("A")).hasValue(10.0);
     assertThat(result.getValue("B")).hasValue(20.0);
     assertThat(result.getBestOptions()).containsExactly("B");
   }
 
   @Test
+  void skipsAnInactiveFriend() {
+    final Vessel friend = mock(Vessel.class);
+    when(friend.isActive()).thenReturn(false);
+    final VesselComponent<OptionValues<String>> optionValues = componentGiving(
+      friend,
+      valuesOf(Map.of("A", 10.0))
+    );
+
+    assertThat(
+      bestOptionsFrom(optionValues, friend).apply(vessel).getBestEntries()
+    ).isEmpty();
+  }
+
+  @Test
+  void skipsAFriendWithNoTable() {
+    final Vessel friendWithTable = activeVessel();
+    final Vessel friendWithout = activeVessel();
+    final VesselComponent<OptionValues<String>> optionValues = componentGiving(
+      friendWithTable,
+      valuesOf(Map.of("A", 10.0))
+    );
+
+    assertThat(
+      bestOptionsFrom(optionValues, friendWithout, friendWithTable)
+        .apply(vessel)
+        .getBestOptions()
+    ).containsExactly("A");
+  }
+
+  @Test
+  void aFriendWhoseTableHasNoEntryGivesNoOption() {
+    final Vessel friend = activeVessel();
+    final VesselComponent<OptionValues<String>> optionValues = componentGiving(
+      friend,
+      valuesOf(Map.of())
+    );
+
+    assertThat(
+      bestOptionsFrom(optionValues, friend).apply(vessel).getBestEntries()
+    ).isEmpty();
+  }
+
+  @Test
   void readsTheFriendsOfTheVesselGivenAndValuesEachFriendsOptionsForThatFriend() {
     final Vessel otherVessel = mock(Vessel.class);
-    final Vessel friend = mock(Vessel.class);
-    when(friend.isActive()).thenReturn(true);
+    final Vessel friend = activeVessel();
     final OptionValues<String> friendsOwnValues = new ImmutableOptionValues<>(
       Map.of("A", 10.0)
     );
     final OptionValues<String> valuesForAnotherVessel =
       new ImmutableOptionValues<>(Map.of("B", 20.0));
-    final VesselComponentRegister<
-      Function<Vessel, OptionValues<String>>
-    > register = new VesselComponentRegister<>();
-    register.register(friend, valuedFor ->
-      valuedFor == friend ? friendsOwnValues : valuesForAnotherVessel
-    );
+    final VesselComponent<Function<Vessel, OptionValues<String>>> optionValues =
+      componentGiving(friend, valuedFor ->
+        valuedFor == friend ? friendsOwnValues : valuesForAnotherVessel
+      );
     final BestOptionsFromFriends<String> bestOptionsFromFriends =
-      new BestOptionsFromFriends<>(register, friendsOf ->
+      new BestOptionsFromFriends<>(optionValues, friendsOf ->
         friendsOf == vessel ? List.of(friend) : List.of()
       );
 

@@ -106,7 +106,7 @@ class FactoryChildrenTest {
   /**
    * @return the classes of scenario nodes under {@code packagePrefix}: the
    *         factories, and the parts of a scenario that build nothing
-   *         themselves, such as declarations and the rows of choices
+   *         themselves, such as the rows of choices
    */
   static List<Class<?>> nodeClasses(final String packagePrefix)
     throws IOException {

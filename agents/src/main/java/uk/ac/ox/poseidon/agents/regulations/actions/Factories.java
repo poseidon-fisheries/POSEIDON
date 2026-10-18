@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 public class Factories {
 
   /**
-   * @param gear the declaration of the gear the vessel departs with
+   * @param gear the gear the vessel departs with
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
    *         {@link DepartNowActionFunction}
    * @see DepartNow

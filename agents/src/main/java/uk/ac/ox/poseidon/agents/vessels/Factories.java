@@ -85,14 +85,14 @@ public class Factories {
   }
 
   /**
-   * The specification is built by the returned builder, given the
-   * declarations of the vessel's other components with {@code component(name,
-   * declaration)}, in the order they are built, and the attributes that give a
-   * vessel's home port, with {@code homePortAttribute(name)}, and, if vessels
-   * have names, its name, with {@code nameAttribute(name)}.
+   * The specification is built by the returned builder, given the vessel's
+   * other components with {@code component(name, component)}, in the order
+   * they are built, and the attributes that give a vessel's home port, with
+   * {@code homePortAttribute(name)}, and, if vessels have names, its name,
+   * with {@code nameAttribute(name)}.
    *
    * @param fleet     the fleet the vessels join
-   * @param behaviour declares the behaviour each vessel steps
+   * @param behaviour the component that is the behaviour each vessel steps
    * @return a builder for a {@link SimulationScopeFactory} for a
    *         {@link VesselSpecification}
    * @see VesselSpecification
@@ -176,7 +176,7 @@ public class Factories {
 
   /**
    * @param factory builds the component, for each vessel
-   * @return the declaration of a vessel component built by {@code factory}
+   * @return a vessel component built by {@code factory}
    * @see FactoryComponent
    */
   public static <T> FactoryComponent<T> vesselComponent(
@@ -190,8 +190,7 @@ public class Factories {
    *                   gives their values; from {@link #by}
    * @param entries    the rows, from {@link #when}, and at most one default,
    *                   from {@link #otherwise}
-   * @return the declaration of a vessel component chosen by
-   *         {@code attributes}
+   * @return a vessel component chosen by {@code attributes}
    * @throws IllegalArgumentException if there are two defaults, a row does not
    *                                  give one value for each attribute, or two
    *                                  rows give the same values
@@ -272,8 +271,9 @@ public class Factories {
   /**
    * @param rootTask builds the root task of the vessel's behaviour tree, for
    *                 each vessel
-   * @return the declaration of the behaviour the vessel runs, built by
-   *         {@code rootTask}; pass it where a vessel's behaviour is declared
+   * @return the component that is the behaviour the vessel runs, built by
+   *         {@code rootTask}; pass it where a specification takes a vessel's
+   *         behaviour
    * @see FactoryComponent
    */
   public static FactoryComponent<Task<Vessel>> behaviour(
@@ -312,8 +312,8 @@ public class Factories {
   /**
    * @param listener the factory giving the vessel's listener
    * @return a {@link VesselComponentScopeFactory} that registers the vessel's
-   *         listener on the vessel's event manager and gives it; declare it as
-   *         one of the vessel's components
+   *         listener on the vessel's event manager and gives it; make it one
+   *         of the vessel's components
    * @see VesselEventListenerFactory
    */
   public static <L extends Listener<?>> VesselEventListenerFactory<L> vesselEventListener(

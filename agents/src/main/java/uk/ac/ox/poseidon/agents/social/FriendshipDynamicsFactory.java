@@ -20,58 +20,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.friends;
+package uk.ac.ox.poseidon.agents.social;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import ec.util.MersenneTwisterFast;
 import java.util.Set;
 import java.util.function.Function;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link VesselScopeFactory} for a {@link DynamicFriends}. Built via
- * {@link Factories#dynamicFriends}.
+ * A {@link SimulationScopeFactory} for {@link FriendshipDynamics}, built via
+ * {@link Factories#friendshipDynamics}: a value of a vessel, its friends. The
+ * dynamics use the simulation's random number generator.
  */
 @Getter
 @ToString
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class DynamicFriendsFactory
-  extends VesselScopeFactory<Function<Vessel, Set<Vessel>>>
-  implements ValueFactory<VesselScope, Vessel, Set<Vessel>>
+public class FriendshipDynamicsFactory
+  extends SimulationScopeFactory<Function<Vessel, Set<Vessel>>>
+  implements ValueFactory<SimulationScope, Vessel, Set<Vessel>>
 {
 
-  private final int targetNumberOfFriends;
   private final Factory<
-    ? super VesselScope,
-    ? extends VesselsGetter
-  > potentialFriends;
+    ? super SimulationScope,
+    ? extends SocialNetwork
+  > network;
+  private final int targetNumberOfFriends;
   private final MappingFactory<
-    ? super VesselScope,
+    ? super SimulationScope,
     ? super Vessel,
     ? super Vessel,
     Boolean
   > friendshipCondition;
   private final Factory<
-    ? super VesselScope,
+    ? super SimulationScope,
     ? extends MersenneTwisterFast
   > randomNumberGenerator;
 
   @Override
-  protected Function<Vessel, Set<Vessel>> newInstance(final VesselScope scope) {
-    return new DynamicFriends(
+  protected Function<Vessel, Set<Vessel>> newInstance(
+    final SimulationScope scope
+  ) {
+    checkNotNull(network, "network must not be null");
+    checkNotNull(friendshipCondition, "friendshipCondition must not be null");
+    return new FriendshipDynamics(
+      network.get(scope),
       targetNumberOfFriends,
-      potentialFriends.get(scope),
       friendshipCondition.get(scope),
       randomNumberGenerator.get(scope)
     );

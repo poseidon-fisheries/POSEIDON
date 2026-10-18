@@ -31,14 +31,14 @@ import static uk.ac.ox.poseidon.agents.catches.disposition.Factories.proportiona
 import static uk.ac.ox.poseidon.agents.choices.Factories.*;
 import static uk.ac.ox.poseidon.agents.choices.evaluation.Factories.profitPerHour;
 import static uk.ac.ox.poseidon.agents.choices.evaluation.Factories.tripEvaluator;
-import static uk.ac.ox.poseidon.agents.components.Factories.registeredVesselComponent;
-import static uk.ac.ox.poseidon.agents.components.Factories.vesselComponentRegister;
 import static uk.ac.ox.poseidon.agents.fields.Factories.vesselField;
 import static uk.ac.ox.poseidon.agents.fisheables.Factories.currentCellFisheable;
 import static uk.ac.ox.poseidon.agents.fuel.Factories.fuelStationGrid;
 import static uk.ac.ox.poseidon.agents.fuel.Factories.oneFuelStationPerPort;
 import static uk.ac.ox.poseidon.agents.market.Factories.*;
 import static uk.ac.ox.poseidon.agents.money.Factories.money;
+import static uk.ac.ox.poseidon.agents.social.Factories.friendshipDynamics;
+import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
 import static uk.ac.ox.poseidon.agents.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.agents.tasks.decorators.Factories.untilFail;
 import static uk.ac.ox.poseidon.agents.tasks.fishing.Factories.fishing;
@@ -48,7 +48,6 @@ import static uk.ac.ox.poseidon.agents.tasks.landings.Factories.landCatches;
 import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.*;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.*;
 import static uk.ac.ox.poseidon.agents.vessels.engines.Factories.simpleEngine;
-import static uk.ac.ox.poseidon.agents.vessels.friends.Factories.dynamicFriends;
 import static uk.ac.ox.poseidon.agents.vessels.gears.Factories.fixedBiomassProportionGear;
 import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.standardBiomassHold;
 import static uk.ac.ox.poseidon.agents.vessels.tanks.Factories.fullTank;
@@ -106,7 +105,7 @@ import java.util.function.Supplier;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.EpsilonGreedyDestinationFactory;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
-import uk.ac.ox.poseidon.agents.components.VesselComponentRegisterFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -335,14 +334,12 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     final var fuelTank = vesselComponent(fullTank(volumeOf(100000, LITRE)));
 
-    final VesselComponentRegisterFactory<
-      MutableOptionValues<Int2D>
-    > optionValuesRegister = vesselComponentRegister();
+    // Each vessel's own table of what its destinations are worth, which its
+    // friends read too
+    final VesselComponent<MutableOptionValues<Int2D>> optionValues =
+      vesselComponent(exponentialMovingAverageOptionValues(LEARNING_ALPHA));
 
-    final var optionValues = registeredVesselComponent(
-      exponentialMovingAverageOptionValues(LEARNING_ALPHA),
-      optionValuesRegister
-    );
+    final var fleet = fleet(vesselField, portGrid, marketGrid);
 
     final var validCellPredicate = condition(
       cellValue(carryingCapacityGrid),
@@ -368,10 +365,10 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
           optionValues,
           always(true),
           bestOptionsFromFriends(
-            optionValuesRegister,
-            dynamicFriends(
+            optionValues,
+            friendshipDynamics(
+              socialNetwork(fleet),
               2,
-              optionValuesRegister,
               allOf(
                 other(vesselIsActive()),
                 condition(
@@ -437,15 +434,13 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       )
     );
 
-    final var vesselSpecification = vesselSpecification(
-      fleet(vesselField, portGrid, marketGrid),
-      behaviour
-    )
+    final var vesselSpecification = vesselSpecification(fleet, behaviour)
       .homePortAttribute("home_port")
       .component("gear", gear)
       .component("engine", engine)
       .component("fuelTank", fuelTank)
       .component("hold", hold)
+      .component("optionValues", optionValues)
       .component("tripEvaluator", tripEvaluator)
       .build();
 

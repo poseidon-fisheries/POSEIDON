@@ -23,44 +23,46 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import java.util.Optional;
-import uk.ac.ox.poseidon.core.ScenarioNode;
+import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * The scenario's single statement of one vessel component: a single factory
- * that builds it ({@link FactoryComponent}), or a choice of what builds it by
- * the vessel's attributes ({@link ChosenComponent}). Consumers hold the
- * declaration and read the vessel's current component through it, when they
- * use it; the vessel keeps its components by declaration. A declaration is
- * not a factory, so that a consumer holding one never builds it: the vessel
- * does, when it is created, and again when a change of attributes makes a
- * choice pick anew. It is compared by identity, as the key it is.
+ * One of a vessel's components, such as its gear: what builds it, a single
+ * factory ({@link FactoryComponent}) or a choice by the vessel's attributes
+ * ({@link ChosenComponent}), and the key under which each vessel keeps what
+ * was built, with a store of its own, so with a lifetime of its own. The
+ * vessel builds it, when it is created and again when a change of attributes
+ * makes a choice pick anew. Readers get a vessel's current component when
+ * they use it, through {@link #of} or {@link #findIn}, or by taking this as a
+ * value of the vessel: its product is a function from a vessel to that
+ * vessel's component, and building it never builds the component. It is
+ * compared by identity, as the key it is.
  *
  * @param <T> the type of the component
  */
 public sealed interface VesselComponent<T>
-  extends ScenarioNode
+  extends ValueFactory<Scope, Vessel, T>
   permits FactoryComponent, ChosenComponent
 {
   /**
    * @param vessel the vessel whose component to read
-   * @return {@code vessel}'s component for this declaration
-   * @throws IllegalStateException if {@code vessel} has no such component, or
-   *                               was not created with this declaration
+   * @return {@code vessel}'s current component
+   * @throws IllegalStateException if {@code vessel} has none, or was not
+   *                               created with this component
    */
   default T of(final Vessel vessel) {
     return findIn(vessel).orElseThrow(() ->
       new IllegalStateException(
-        "Vessel " + vessel.getId() + " has no component declared by " + this
+        "Vessel " + vessel.getId() + " has no component " + this
       )
     );
   }
 
   /**
    * @param vessel the vessel whose component to read
-   * @return {@code vessel}'s component for this declaration, or nothing if it
-   *         has none
+   * @return {@code vessel}'s current component, or nothing if it has none
    * @throws IllegalStateException if {@code vessel} was not created with this
-   *                               declaration
+   *                               component
    */
   default Optional<T> findIn(final Vessel vessel) {
     return vessel.findComponent(this);

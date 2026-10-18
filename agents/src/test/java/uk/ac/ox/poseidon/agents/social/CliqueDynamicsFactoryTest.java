@@ -29,13 +29,13 @@ import static uk.ac.ox.poseidon.agents.social.Factories.cliqueDynamics;
 import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
+import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.trips.TripStartEvent;
+import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -54,7 +54,7 @@ class CliqueDynamicsFactoryTest {
   );
   private final Vessel a = vessel(simulationEventManager);
   private final Vessel b = vessel(simulationEventManager);
-  private final VesselsGetter fleet = () -> List.of(a, b);
+  private final Fleet fleet = fleetOf(a, b);
   private final ValueFactory<Scope, Vessel, String> groupingKey = scope ->
     vessel ->
       "X";
@@ -81,6 +81,13 @@ class CliqueDynamicsFactoryTest {
       new ForwardingEventManager(simulationEventManager)
     );
     return vessel;
+  }
+
+  /** @return a mocked fleet of {@code vessels}, in that order */
+  private static Fleet fleetOf(final Vessel... vessels) {
+    final Fleet fleet = mock(Fleet.class);
+    when(fleet.getVessels()).thenReturn(ImmutableSet.copyOf(vessels));
+    return fleet;
   }
 
   @Test

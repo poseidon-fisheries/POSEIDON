@@ -186,7 +186,7 @@ class FleetTest {
         .getComponents()
         .values()
         .stream()
-        .map(declaration -> declaration.findIn(vessel))
+        .map(component -> component.findIn(vessel))
     ).allMatch(Optional::isEmpty);
     assertThat(vessel.isActive()).isFalse();
   }

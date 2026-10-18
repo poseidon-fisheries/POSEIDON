@@ -167,7 +167,7 @@ components:
   gearProportion: &id012 !!uk.ac.ox.poseidon.core.utils.ObjectFactory {
     value: 6.41964E-4
   }
-  vesselField: &id021 !!uk.ac.ox.poseidon.agents.fields.VesselFieldFactory
+  vesselField: &id017 !!uk.ac.ox.poseidon.agents.fields.VesselFieldFactory
     modelGrid: *id002
   vesselSpecification: &id023 !!uk.ac.ox.poseidon.agents.vessels.VesselSpecificationFactory
     behaviour: !!uk.ac.ox.poseidon.agents.vessels.FactoryComponent
@@ -329,7 +329,7 @@ components:
             epsilon: 0.2
             exploiter: !!uk.ac.ox.poseidon.agents.choices.ImitatingPickerFactory
               imitatedOptionValues: !!uk.ac.ox.poseidon.agents.choices.BestOptionsFromFriendsFactory
-                friends: !!uk.ac.ox.poseidon.agents.vessels.friends.DynamicFriendsFactory
+                friends: !!uk.ac.ox.poseidon.agents.social.FriendshipDynamicsFactory
                   friendshipCondition: !!uk.ac.ox.poseidon.core.predicates.logical.AllOfFactory
                     predicates:
                     - !!uk.ac.ox.poseidon.agents.vessels.values.OtherFactory
@@ -344,25 +344,29 @@ components:
                         value: !!uk.ac.ox.poseidon.agents.vessels.values.VesselPropertyFactory {
                           propertyPath: homePort
                         }
-                  potentialFriends: &id017 !!uk.ac.ox.poseidon.agents.components.VesselComponentRegisterFactory {
-                    }
+                  network: !!uk.ac.ox.poseidon.agents.social.SocialNetworkFactory
+                    fleet: &id021 !!uk.ac.ox.poseidon.agents.vessels.FleetFactory
+                      eventManager: !!uk.ac.ox.poseidon.core.EventManagerFactory {
+                        }
+                      marketGrid: *id007
+                      portGrid: *id006
+                      vesselField: *id017
                   randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                     }
                   targetNumberOfFriends: 2
-                optionValuesRegister: *id017
+                optionValues: &id018 !!uk.ac.ox.poseidon.agents.vessels.FactoryComponent
+                  factory: !!uk.ac.ox.poseidon.agents.choices.ExponentialMovingAverageOptionValuesFactory {
+                    alpha: 1.0
+                  }
               optionPredicate: !!uk.ac.ox.poseidon.core.providers.constant.ConstantMappingFactory
                 result: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {
                   value: true
                 }
-              optionValues: &id019 !!uk.ac.ox.poseidon.agents.components.RegisteredVesselComponentFactory
-                componentFactory: !!uk.ac.ox.poseidon.agents.choices.ExponentialMovingAverageOptionValuesFactory {
-                  alpha: 1.0
-                }
-                componentRegister: *id017
+              optionValues: *id018
               randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                 }
             explorer: !!uk.ac.ox.poseidon.agents.choices.NeighbourhoodGridExplorerFactory
-              cellPredicate: &id018 !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
+              cellPredicate: &id019 !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
                 predicate: !!uk.ac.ox.poseidon.core.predicates.comparable.GreaterThanFactory
                   value: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory
                     object: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {
@@ -382,12 +386,12 @@ components:
                 }
               searchCentre: !!uk.ac.ox.poseidon.agents.choices.BestKnownOptionFactory
                 fallback: !!uk.ac.ox.poseidon.agents.choices.RandomGridExplorerFactory
-                  cellPredicate: *id018
+                  cellPredicate: *id019
                   cells: !!uk.ac.ox.poseidon.agents.vessels.values.AccessibleWaterCellsFactory
                     pathFinder: *id016
                   randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                     }
-                optionValues: *id019
+                optionValues: *id018
                 randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                   }
             randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
@@ -405,18 +409,14 @@ components:
       engine: *id015
       fuelTank: *id011
       hold: *id014
+      optionValues: *id018
       tripEvaluator: !!uk.ac.ox.poseidon.agents.vessels.FactoryComponent
         factory: !!uk.ac.ox.poseidon.agents.choices.evaluation.TripEvaluatorFactory
           evaluationProvider: !!uk.ac.ox.poseidon.agents.choices.evaluation.ProfitPerHourDestinationEvaluationProviderFactory {
             currencyCode: IDR
           }
-          optionValues: *id019
-    fleet: !!uk.ac.ox.poseidon.agents.vessels.FleetFactory
-      eventManager: !!uk.ac.ox.poseidon.core.EventManagerFactory {
-        }
-      marketGrid: *id007
-      portGrid: *id006
-      vesselField: *id021
+          optionValues: *id018
+    fleet: *id021
     homePortAttribute: home_port
     nameAttribute: null
   vesselCreation: !!uk.ac.ox.poseidon.core.schedule.ScheduledOnceAtStartFactory

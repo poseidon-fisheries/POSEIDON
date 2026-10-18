@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.vessels;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.componentScopeOf;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.componentScopeOf;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;

@@ -128,7 +128,7 @@ class PeterSnapperScenarioTest {
 
   // Calibration varies the gear's proportion through this address, a scenario
   // component's value. The derived scenario must be the one written with the
-  // value set: the component, the gear and the declarations above it replaced
+  // value set: the component, the gear and the vessel components above it replaced
   // wherever they are shared, nothing else changed.
   @Test
   void theCalibratedAddressDerivesTheScenarioWithTheValueSet() {

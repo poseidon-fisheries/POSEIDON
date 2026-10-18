@@ -49,7 +49,7 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param fuelTank        the declaration of the tank to fill
+   * @param fuelTank        the tank to fill
    * @param fuelStationGrid the fuel stations a cell might contain
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a {@link Refuel}
    * @see Refuel
@@ -104,9 +104,8 @@ public class Factories {
   }
 
   /**
-   * @param engine       the declaration of the engine that sets the speed and
-   *                     the fuel burned
-   * @param fuelTank     the declaration of the tank the fuel is taken from
+   * @param engine       the engine that sets the speed and the fuel burned
+   * @param fuelTank     the tank the fuel is taken from
    * @param pathFinder   finds a path between two cells
    * @param distance     computes the distance, and so the duration, of each
    *                     hop
@@ -152,9 +151,8 @@ public class Factories {
   }
 
   /**
-   * @param engine   the declaration of the engine that sets the speed and the
-   *                 fuel burned
-   * @param fuelTank the declaration of the tank the fuel is taken from
+   * @param engine   the engine that sets the speed and the fuel burned
+   * @param fuelTank the tank the fuel is taken from
    * @param distance computes the direct distance, and so the duration, to the
    *                 trip's destination
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a {@link TravelDirectly}

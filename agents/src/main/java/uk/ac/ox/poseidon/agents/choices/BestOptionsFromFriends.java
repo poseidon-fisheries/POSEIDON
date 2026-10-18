@@ -26,12 +26,13 @@ import static lombok.AccessLevel.PACKAGE;
 
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 
 /**
  * Gives the best options across a vessel's active friends' own
- * {@link OptionValues} components, each valued for that friend, merging ties
+ * {@link OptionValues} components, each valued for that friend, skipping a
+ * friend that has no such component, and merging ties
  * by keeping the highest value seen for each option. Reuses a single
  * {@link ReusableOptionValues} instance across calls — the returned
  * {@link OptionValues} is only valid until the next call to {@link #apply}.
@@ -39,9 +40,9 @@ import uk.ac.ox.poseidon.agents.vessels.Vessel;
 @RequiredArgsConstructor(access = PACKAGE)
 class BestOptionsFromFriends<O> implements Function<Vessel, OptionValues<O>> {
 
-  private final VesselComponentRegister<
+  private final VesselComponent<
     ? extends Function<? super Vessel, ? extends OptionValues<O>>
-  > optionValuesRegister;
+  > optionValues;
   private final Function<
     ? super Vessel,
     ? extends Iterable<? extends Vessel>
@@ -60,10 +61,11 @@ class BestOptionsFromFriends<O> implements Function<Vessel, OptionValues<O>> {
     aggregatedValues.clear();
     for (final Vessel friend : friends.apply(vessel)) {
       if (!friend.isActive()) continue;
-      final Function<? super Vessel, ? extends OptionValues<O>> values =
-        optionValuesRegister.getComponent(friend).orElse(null);
-      if (values == null) continue;
-      values.apply(friend).forEachBestEntry(aggregatedValues::putIfGreater);
+      optionValues
+        .findIn(friend)
+        .ifPresent(values ->
+          values.apply(friend).forEachBestEntry(aggregatedValues::putIfGreater)
+        );
     }
     return aggregatedValues;
   }

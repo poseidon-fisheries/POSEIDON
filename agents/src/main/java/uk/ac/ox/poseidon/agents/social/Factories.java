@@ -25,10 +25,11 @@ package uk.ac.ox.poseidon.agents.social;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
 
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.Listener;
@@ -39,17 +40,46 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param candidates gives the vessels ties can be made with; pass the base
-   *                   fleet, not a loader whose components depend on this
-   *                   network, which would be a factory cycle
+   * @param fleet the fleet whose vessels ties can be made with; an exit from
+   *              it removes every tie in and out of the vessel
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
    *         {@link SocialNetwork} with no ties
    * @see SocialNetwork
    */
   public static SocialNetworkFactory socialNetwork(
-    final Factory<? super SimulationScope, ? extends VesselsGetter> candidates
+    final Factory<? super SimulationScope, ? extends Fleet> fleet
   ) {
-    return new SocialNetworkFactory(candidates);
+    return new SocialNetworkFactory(fleet);
+  }
+
+  /**
+   * @param network               the network whose ties are the friendships
+   * @param targetNumberOfFriends how many friends each vessel is drawn
+   * @param friendshipCondition   which other vessels count as friends of a
+   *                              vessel when its friends are read: a mapping
+   *                              of the other vessel, read with
+   *                              {@code other(...)} (see
+   *                              {@link uk.ac.ox.poseidon.agents.vessels.values.Factories#other})
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link FriendshipDynamics}, a value of a vessel: its friends
+   * @see FriendshipDynamics
+   */
+  public static FriendshipDynamicsFactory friendshipDynamics(
+    final Factory<? super SimulationScope, ? extends SocialNetwork> network,
+    final int targetNumberOfFriends,
+    final MappingFactory<
+      ? super SimulationScope,
+      ? super Vessel,
+      ? super Vessel,
+      Boolean
+    > friendshipCondition
+  ) {
+    return new FriendshipDynamicsFactory(
+      network,
+      targetNumberOfFriends,
+      friendshipCondition,
+      randomNumberGenerator()
+    );
   }
 
   /**
@@ -98,7 +128,7 @@ public class Factories {
    * @param fishingEventSharer the sharer to register the listener with
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory}
    *         that registers the vessel's listener with the sharer and gives it;
-   *         declare it as one of the vessel's components
+   *         make it one of the vessel's components
    * @see SharedFishingEventListenerFactory
    */
   public static <L extends Listener<? super FishingEvent>> SharedFishingEventListenerFactory<L> sharedFishingEventListener(

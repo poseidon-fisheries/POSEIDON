@@ -28,20 +28,21 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.agents.social.Factories.fishingEventSharer;
 import static uk.ac.ox.poseidon.agents.social.Factories.sharedFishingEventListener;
 import static uk.ac.ox.poseidon.agents.social.Factories.socialNetwork;
-import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.componentScopeOf;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.componentScopeOf;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.agents.vessels.VesselsGetter;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -53,7 +54,7 @@ class SharedFishingEventListenerFactoryTest {
   private final Simulation simulation = simulation();
   private final Vessel a = mock(Vessel.class);
   private final Vessel b = mock(Vessel.class);
-  private final VesselsGetter fleet = () -> List.of(a, b);
+  private final Fleet fleet = fleetOf(a, b);
   private final SimulationScope simulationScope = new SimulationScope(
     simulation
   );
@@ -69,6 +70,13 @@ class SharedFishingEventListenerFactoryTest {
     new RecordingListenerFactory();
   private final SharedFishingEventListenerFactory<RecordingListener> factory =
     sharedFishingEventListener(listener, fishingEventSharer);
+
+  /** @return a mocked fleet of {@code vessels}, in that order */
+  private static Fleet fleetOf(final Vessel... vessels) {
+    final Fleet fleet = mock(Fleet.class);
+    when(fleet.getVessels()).thenReturn(ImmutableSet.copyOf(vessels));
+    return fleet;
+  }
 
   @BeforeEach
   void giveTheMocksStores() {

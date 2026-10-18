@@ -36,8 +36,8 @@ import uk.ac.ox.poseidon.core.events.Listener;
  * {@link Factories#vesselEventListener(Factory)}.
  * <p>
  * A listener nothing else reads would never be built for a vessel, since
- * factories only build when asked: declare this factory as one of the
- * vessel's components, which are built when the vessel is created.
+ * factories only build when asked: make this factory one of the vessel's
+ * components, which are built when the vessel is created.
  *
  * @param <L> the type of listener
  */

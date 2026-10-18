@@ -31,13 +31,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Singular;
+import uk.ac.ox.poseidon.core.GlobalScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
 
 /**
- * The declaration of a vessel component chosen by the vessel's attributes: a
+ * A vessel component chosen by the vessel's attributes: a
  * table of exact values of the attributes it reads, each combination giving
  * what to build, or no component, with an optional default for the
  * combinations it does not list. The rows have no order, and a combination
@@ -49,7 +52,10 @@ import lombok.Singular;
  * @param <T> the type of the component
  */
 @Getter
-public final class ChosenComponent<T> implements VesselComponent<T> {
+public final class ChosenComponent<T>
+  extends GlobalScopeFactory<Function<Vessel, T>>
+  implements VesselComponent<T>
+{
 
   /** The attributes the choice reads, in the order each row gives values. */
   @NonNull
@@ -94,6 +100,22 @@ public final class ChosenComponent<T> implements VesselComponent<T> {
     this.attributes = attributes;
     this.rows = rows;
     this.defaultOutcome = defaultOutcome;
+  }
+
+  @Override
+  protected Function<Vessel, T> newInstance(final Scope scope) {
+    return this::of;
+  }
+
+  /** @return whether {@code other} is this very component */
+  @Override
+  public boolean equals(final Object other) {
+    return this == other;
+  }
+
+  @Override
+  public int hashCode() {
+    return System.identityHashCode(this);
   }
 
   /**

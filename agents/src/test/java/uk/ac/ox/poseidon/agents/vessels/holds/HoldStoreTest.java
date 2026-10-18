@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.componentScopeOf;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.componentScopeOf;
 import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.infiniteBiomassHold;
 import static uk.ac.ox.poseidon.agents.vessels.holds.Factories.standardBiomassHold;
 

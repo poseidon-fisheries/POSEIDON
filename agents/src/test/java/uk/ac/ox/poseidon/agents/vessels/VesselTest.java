@@ -95,20 +95,20 @@ class VesselTest {
    *         behaviour} built, whose first step is not yet scheduled
    */
   private Vessel vesselWithItsBehaviour(final Task<Vessel> behaviour) {
-    final VesselComponent<Task<Vessel>> declaration = behaviour(
+    final VesselComponent<Task<Vessel>> behaviourComponent = behaviour(
       scope -> behaviour
     );
-    final Vessel vessel = vesselWithAHomePort(declaration);
+    final Vessel vessel = vesselWithAHomePort(behaviourComponent);
     vessel.buildComponents();
     return vessel;
   }
 
   /**
    * @return a vessel on {@link #schedule} with a home port, which steps the
-   *         behaviour {@code declaration} declares, with no component built
+   *         behaviour {@code behaviour} builds, with no component built
    */
   private Vessel vesselWithAHomePort(
-    final VesselComponent<? extends Task<Vessel>> declaration
+    final VesselComponent<? extends Task<Vessel>> behaviour
   ) {
     final PortGrid portGrid = mock(PortGrid.class);
     when(portGrid.getObject("P1")).thenReturn(Optional.of(mock(Port.class)));
@@ -116,7 +116,7 @@ class VesselTest {
       schedule,
       mock(VesselField.class),
       portGrid,
-      declaration
+      behaviour
     );
     vessel.setAttributes(Map.of(HOME_PORT, "P1"));
     return vessel;

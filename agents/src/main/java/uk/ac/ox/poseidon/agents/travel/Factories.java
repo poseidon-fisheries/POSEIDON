@@ -46,8 +46,7 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param engine     the declaration of the engine whose speed gives the
-   *                   route's duration
+   * @param engine     the engine whose speed gives the route's duration
    * @param pathFinder finds the paths of the route's two legs
    * @param distance   measures the paths
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a

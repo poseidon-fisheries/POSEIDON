@@ -66,6 +66,32 @@ class SocialNetworkTest {
   }
 
   @Test
+  void removingAVesselRemovesEveryTieInAndOutOfItOnly() {
+    final Vessel c = mock(Vessel.class);
+    network.addTie(a, b);
+    network.addTie(b, a);
+    network.addTie(c, a);
+    network.addTie(b, c);
+
+    network.removeVessel(a);
+
+    assertThat(network.getRecipients(a)).isEmpty();
+    assertThat(network.getSources(a)).isEmpty();
+    assertThat(network.getRecipients(b)).containsExactly(c);
+    assertThat(network.getSources(b)).isEmpty();
+    assertThat(network.getRecipients(c)).isEmpty();
+  }
+
+  @Test
+  void removingAVesselNeverTiedDoesNothing() {
+    network.addTie(a, b);
+
+    network.removeVessel(mock(Vessel.class));
+
+    assertThat(network.getRecipients(a)).containsExactly(b);
+  }
+
+  @Test
   void rejectsATieFromAVesselToItself() {
     assertThatThrownBy(() -> network.addTie(a, a)).isInstanceOf(
       IllegalArgumentException.class

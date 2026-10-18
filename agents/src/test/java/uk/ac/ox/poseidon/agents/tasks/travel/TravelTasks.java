@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.agents.tasks.travel;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.giveComponent;
+import static uk.ac.ox.poseidon.agents.vessels.GivenComponents.giveComponent;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
@@ -50,12 +50,12 @@ final class TravelTasks {
   /** The date the clock of the tasks made here reads. */
   static final LocalDateTime NOW = LocalDateTime.of(2026, 1, 1, 0, 0);
 
-  /** The declaration of the engine of the vessels made here. */
+  /** The engine component of the vessels made here. */
   static final VesselComponent<Engine> ENGINE = new FactoryComponent<>(scope ->
     mock(Engine.class)
   );
 
-  /** The declaration of the fuel tank of the vessels made here. */
+  /** The fuel tank component of the vessels made here. */
   static final VesselComponent<FuelTank> FUEL_TANK = new FactoryComponent<>(
     scope -> mock(FuelTank.class)
   );

@@ -202,7 +202,7 @@ class ChosenComponentTest {
   }
 
   @Test
-  void rowsOfTwoGearClassesGiveADeclarationOfAGear() {
+  void rowsOfTwoGearClassesGiveAComponentOfAGear() {
     final Factory<VesselComponentScope, SeineGear> seine = _ -> new SeineGear();
     final Factory<VesselComponentScope, TrawlGear> trawl = _ -> new TrawlGear();
 

@@ -28,27 +28,27 @@ import java.util.Optional;
 import uk.ac.ox.poseidon.core.ProductStore;
 
 /**
- * Declarations whose components tests give mocked vessels directly, and the
- * scopes of components built outside a vessel's creation.
+ * Vessel components through which tests give mocked vessels what they hold
+ * directly, and the scopes of components built outside a vessel's creation.
  */
-public final class DeclaredComponents {
+public final class GivenComponents {
 
-  private DeclaredComponents() {}
+  private GivenComponents() {}
 
   /**
-   * @param vessel    a mocked vessel
-   * @param component the component {@code vessel} has
-   * @return a declaration through which {@code vessel} has {@code component}
+   * @param vessel  a mocked vessel
+   * @param product what {@code vessel} holds
+   * @return a component through which {@code vessel} holds {@code product}
    */
-  public static <T> VesselComponent<T> declaredFor(
+  public static <T> VesselComponent<T> componentGiving(
     final Vessel vessel,
-    final T component
+    final T product
   ) {
-    final VesselComponent<T> declaration = new FactoryComponent<>(
-      scope -> component
+    final VesselComponent<T> component = new FactoryComponent<>(
+      scope -> product
     );
-    giveComponent(vessel, declaration, component);
-    return declaration;
+    giveComponent(vessel, component, product);
+    return component;
   }
 
   /**
@@ -75,15 +75,15 @@ public final class DeclaredComponents {
   }
 
   /**
-   * @param vessel      a mocked vessel
-   * @param declaration the declaration to give the component through
-   * @param component   the component {@code vessel} has
+   * @param vessel    a mocked vessel
+   * @param component the component to give {@code product} through
+   * @param product   what {@code vessel} holds
    */
   public static <T> void giveComponent(
     final Vessel vessel,
-    final VesselComponent<T> declaration,
-    final T component
+    final VesselComponent<T> component,
+    final T product
   ) {
-    when(vessel.findComponent(declaration)).thenReturn(Optional.of(component));
+    when(vessel.findComponent(component)).thenReturn(Optional.of(product));
   }
 }

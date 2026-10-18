@@ -28,11 +28,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
@@ -49,12 +48,9 @@ public class BestOptionsFromFriendsFactory<O>
   implements ValueFactory<VesselScope, Vessel, OptionValues<O>>
 {
 
-  private final Factory<
-    ? super VesselScope,
-    ? extends VesselComponentRegister<
-      ? extends Function<? super Vessel, ? extends OptionValues<O>>
-    >
-  > optionValuesRegister;
+  private final VesselComponent<
+    ? extends Function<? super Vessel, ? extends OptionValues<O>>
+  > optionValues;
 
   private final ValueFactory<
     ? super VesselScope,
@@ -66,9 +62,6 @@ public class BestOptionsFromFriendsFactory<O>
   protected Function<Vessel, OptionValues<O>> newInstance(
     final VesselScope scope
   ) {
-    return new BestOptionsFromFriends<>(
-      optionValuesRegister.get(scope),
-      friends.get(scope)
-    );
+    return new BestOptionsFromFriends<>(optionValues, friends.get(scope));
   }
 }

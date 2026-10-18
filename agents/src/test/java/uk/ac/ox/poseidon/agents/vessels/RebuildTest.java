@@ -59,8 +59,8 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A change of the attributes a choice reads rebuilds, once, the components
- * that choice declares, and nothing else; on register rows given inline.
+ * A change of the attributes a choice reads rebuilds, once, the component
+ * chosen so, and nothing else; on register rows given inline.
  */
 class RebuildTest {
 

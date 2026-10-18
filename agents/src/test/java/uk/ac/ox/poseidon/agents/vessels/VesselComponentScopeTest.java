@@ -25,11 +25,11 @@ package uk.ac.ox.poseidon.agents.vessels;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.agents.components.Factories.registeredVesselComponent;
 import static uk.ac.ox.poseidon.agents.tasks.travel.Factories.setDestinationToOrigin;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
@@ -59,6 +59,15 @@ class VesselComponentScopeTest {
     vesselScope,
     secondStore
   );
+  /** What builds registered and teardowns have not removed. */
+  private final List<CountingListener> registered = new ArrayList<>();
+  private final VesselRegistry<CountingListener> registry = (
+    registeredVessel,
+    listener
+  ) -> {
+    registered.add(listener);
+    return () -> registered.remove(listener);
+  };
 
   private static Vessel newVessel() {
     final SimpleEventManager eventManager = new SimpleEventManager();
@@ -105,32 +114,22 @@ class VesselComponentScopeTest {
 
   @Test
   void aVesselLevelRegistrationReachedFromAComponentGoesWithTheVessel() {
-    final VesselComponentRegister<CountingListener> register =
-      new VesselComponentRegister<>();
-    registeredVesselComponent(
-      new VesselListenerFactory(),
-      scope -> register
-    ).get(first);
+    new RegisteringVesselListenerFactory().get(first);
     firstStore.end();
 
-    assertThat(register.getComponent(vessel)).isPresent();
+    assertThat(registered).hasSize(1);
 
     vessel.getProductStore().end();
 
-    assertThat(register.getComponent(vessel)).isEmpty();
+    assertThat(registered).isEmpty();
   }
 
   @Test
   void vesselKnowledgeReachedFromTwoComponentsRegistersOnce() {
-    final VesselComponentRegister<CountingListener> register =
-      new VesselComponentRegister<>();
-    final var factory = registeredVesselComponent(
-      new VesselListenerFactory(),
-      scope -> register
-    );
+    final var factory = new RegisteringVesselListenerFactory();
 
     assertThat(factory.get(first)).isSameAs(factory.get(second));
-    assertThat(register.getAllEntries()).hasSize(1);
+    assertThat(registered).hasSize(1);
   }
 
   private static final class CountingListener extends AbstractListener<String> {
@@ -160,13 +159,16 @@ class VesselComponentScopeTest {
     }
   }
 
-  private static final class VesselListenerFactory
+  /** Registers its listener with the registry when built. */
+  private final class RegisteringVesselListenerFactory
     extends VesselScopeFactory<CountingListener>
   {
 
     @Override
     protected CountingListener newInstance(final VesselScope scope) {
-      return new CountingListener();
+      final CountingListener listener = new CountingListener();
+      scope.register(registry, listener);
+      return listener;
     }
   }
 

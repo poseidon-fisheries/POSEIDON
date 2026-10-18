@@ -44,10 +44,8 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param gear            the declaration of the gear the vessel would fish
-   *                        with
-   * @param engine          the declaration of the engine whose speed gives the
-   *                        time to get there
+   * @param gear            the gear the vessel would fish with
+   * @param engine          the engine whose speed gives the time to get there
    * @param regulations     the regulations a candidate fishing action must be
    *                        permitted by
    * @param pathFinder      finds the path from the vessel's current cell to the

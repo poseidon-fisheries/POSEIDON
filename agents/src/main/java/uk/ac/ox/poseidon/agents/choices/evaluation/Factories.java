@@ -22,8 +22,10 @@
 
 package uk.ac.ox.poseidon.agents.choices.evaluation;
 
+import java.util.function.Function;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.choices.MutableOptionValues;
+import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.core.Factory;
 
@@ -48,8 +50,10 @@ public final class Factories {
   }
 
   /**
-   * @param optionValues       where each completed trip's (destination, score)
-   *                           observation is fed
+   * @param optionValues       gives the option values of a vessel, where each
+   *                           of its completed trips' (destination, score)
+   *                           observation is fed: the option values'
+   *                           component, say
    * @param evaluationProvider starts a fresh evaluation for each trip's
    *                           destination
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory}
@@ -60,7 +64,7 @@ public final class Factories {
   public static TripEvaluatorFactory tripEvaluator(
     final Factory<
       ? super VesselComponentScope,
-      ? extends MutableOptionValues<Int2D>
+      ? extends Function<? super Vessel, ? extends MutableOptionValues<Int2D>>
     > optionValues,
     final Factory<
       ? super VesselComponentScope,

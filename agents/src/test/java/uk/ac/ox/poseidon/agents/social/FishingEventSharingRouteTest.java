@@ -65,6 +65,7 @@ import uk.ac.ox.poseidon.agents.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.agents.choices.KeyedMemory;
 import uk.ac.ox.poseidon.agents.choices.KeyedMemoryFactory;
 import uk.ac.ox.poseidon.agents.choices.MemoryBasedOptionValuesFactory;
+import uk.ac.ox.poseidon.agents.choices.OptionValues;
 import uk.ac.ox.poseidon.agents.choices.Valuation;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
@@ -343,6 +344,38 @@ class FishingEventSharingRouteTest {
 
     assertThat(socialNetwork.getRecipients(c)).containsExactlyInAnyOrder(a, b);
     assertThat(socialNetwork.getRecipients(a)).containsExactlyInAnyOrder(b, c);
+  }
+
+  @Test
+  void anExitedVesselLeavesTheNetworkAndHearsNoMoreSharedFishingEvents() {
+    startSimulation(
+      VESSEL_REGISTER +
+        """
+        B,Vessel B,P1,DES,2001-01-05,PS
+        """,
+      true
+    );
+    final SocialNetwork socialNetwork = simulation.getComponent(
+      SocialNetwork.class
+    );
+    final Vessel a = vessel("A");
+    final Vessel b = vessel("B");
+    final OptionValues<Int2D> valuesOfB = optionValues.get(scopeOf(b)).apply(b);
+    final Trip trip = startTrip(a, cell, now());
+    assertThat(socialNetwork.getRecipients(a)).containsExactly(b);
+
+    simulation.stepFor(Duration.ofDays(6));
+    assertThat(fleet.getVessel("B")).isEmpty();
+    assertThat(socialNetwork.getRecipients(a)).isEmpty();
+    assertThat(socialNetwork.getSources(a)).isEmpty();
+    assertThat(socialNetwork.getRecipients(b)).isEmpty();
+
+    // Tied by hand, past the network's own rule, so that only the sharer's
+    // entry for B stands between A's fishing event and B's recorder
+    socialNetwork.addTie(a, b);
+    fishingEvent(trip, 20);
+
+    assertThat(valuesOfB.getValue(cell)).isEmpty();
   }
 
   @AfterEach

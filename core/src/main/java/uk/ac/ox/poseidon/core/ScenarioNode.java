@@ -25,8 +25,7 @@ package uk.ac.ox.poseidon.core;
 /**
  * A node of a scenario: a bean whose properties are other parts of the
  * scenario. Every {@link Factory} is one, and so are the parts of a scenario
- * that build nothing themselves, such as the declaration of a vessel
- * component. Derivation and the YAML writer walk into every node, and
+ * that build nothing themselves, such as the rows of a choice. Derivation and the YAML writer walk into every node, and
  * derivation copies one through its builder ({@code toBuilder()}) when a part
  * it holds changes, so a node is immutable. The same node reached in two ways
  * is one node.

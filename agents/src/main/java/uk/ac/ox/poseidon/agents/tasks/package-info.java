@@ -25,7 +25,7 @@
  * {@link uk.ac.ox.poseidon.agents.tasks.VesselTask}/
  * {@link uk.ac.ox.poseidon.agents.tasks.ExtendedTask} for building leaf tasks,
  * and {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for their factories.
- * A vessel's behaviour is the root task of its tree, declared with
+ * A vessel's behaviour is the root task of its tree, made a component with
  * {@link uk.ac.ox.poseidon.agents.vessels.Factories#behaviour}. Concrete
  * leaves and branch/decorator nodes live in sibling packages
  * ({@link uk.ac.ox.poseidon.agents.tasks.branches},

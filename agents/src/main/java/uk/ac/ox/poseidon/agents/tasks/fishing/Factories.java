@@ -46,7 +46,7 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param gear        the declaration of the gear the vessel would fish with
+   * @param gear        the gear the vessel would fish with
    * @param regulations the regulations a fishing action started now, here, is
    *                    checked against
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a
@@ -92,10 +92,9 @@ public class Factories {
   }
 
   /**
-   * @param gear               the declaration of the gear to fish with
-   * @param hold               the declaration of the hold the catch goes in
-   * @param fuelTank           the declaration of the tank the fuel fishing
-   *                           burns is taken from
+   * @param gear               the gear to fish with
+   * @param hold               the hold the catch goes in
+   * @param fuelTank           the tank the fuel fishing burns is taken from
    * @param fisheable          the fisheable to fish from, read for the vessel
    * @param dispositionProcess sorts the catch into retained/discarded
    * @return a {@link uk.ac.ox.poseidon.agents.tasks.TaskFactory} for a {@link Fishing} task

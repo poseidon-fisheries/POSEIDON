@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
@@ -52,27 +52,23 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param optionValuesRegister looks up each other vessel's own option-values
-   *                             component
-   * @param friends              gives a vessel's current friends
+   * @param optionValues the component holding each vessel's own option values
+   * @param friends      gives a vessel's current friends
    * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for
    *         a vessel's friends' best options
    * @see BestOptionsFromFriends
    */
   public static <O> BestOptionsFromFriendsFactory<O> bestOptionsFromFriends(
-    final Factory<
-      ? super VesselScope,
-      ? extends VesselComponentRegister<
-        ? extends Function<? super Vessel, ? extends OptionValues<O>>
-      >
-    > optionValuesRegister,
+    final VesselComponent<
+      ? extends Function<? super Vessel, ? extends OptionValues<O>>
+    > optionValues,
     final ValueFactory<
       ? super VesselScope,
       ? super Vessel,
       ? extends Iterable<? extends Vessel>
     > friends
   ) {
-    return new BestOptionsFromFriendsFactory<>(optionValuesRegister, friends);
+    return new BestOptionsFromFriendsFactory<>(optionValues, friends);
   }
 
   /**

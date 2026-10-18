@@ -54,8 +54,7 @@ public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
   private final Long2DoubleMap pathLengthsInKm = new Long2DoubleOpenHashMap();
 
   /**
-   * @param engine             the declaration of the engine whose speed gives
-   *                           the route's duration
+   * @param engine             the engine whose speed gives the route's duration
    * @param pathFinder         finds the paths of the route's two legs
    * @param distanceCalculator measures the paths
    */
