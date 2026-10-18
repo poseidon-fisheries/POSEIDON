@@ -27,9 +27,12 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -38,7 +41,6 @@ import lombok.Getter;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
-import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -46,8 +48,11 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
  * The set of vessels operating out of a set of ports, indexed by id, and the
- * markets they sell into. It announces each vessel's entry to whatever
- * follows the fleet.
+ * markets they sell into. It announces each vessel's entry and exit to
+ * whatever follows the fleet, and routes each statement about a vessel to that
+ * vessel. It keeps the id of every vessel that exited, with the date it
+ * exited: ids are never reused, and a statement about an exited vessel is an
+ * error.
  */
 @AllArgsConstructor
 public class Fleet implements VesselsGetter {
@@ -55,6 +60,10 @@ public class Fleet implements VesselsGetter {
   private final BiMap<String, Vessel> vesselsById = HashBiMap.create();
   private final List<Consumer<? super Vessel>> entryListeners =
     new ArrayList<>();
+  private final List<Consumer<? super Vessel>> exitListeners =
+    new ArrayList<>();
+  /** The date each exited vessel exited, by its id. */
+  private final Map<String, LocalDateTime> exitDatesById = new HashMap<>();
   private final TemporalSchedule schedule;
   private final EventManager eventManager;
   private final VesselField vesselField;
@@ -84,7 +93,8 @@ public class Fleet implements VesselsGetter {
    * @param specification what the vessel is made of
    * @return a freshly constructed, inactive vessel with no attribute and no
    *         component yet built
-   * @throws IllegalStateException if {@code vesselId} is already in use
+   * @throws IllegalStateException if {@code vesselId} is in use, or was used
+   *                               by a vessel that exited
    */
   Vessel createVessel(
     final String vesselId,
@@ -95,8 +105,10 @@ public class Fleet implements VesselsGetter {
       "Vessel %s already exists",
       vesselId
     );
+    checkNotExited(vesselId);
     final Vessel vessel = new Vessel(
       step -> new StepScheduler(schedule, step),
+      member -> () -> remove(member),
       new ForwardingEventManager(eventManager),
       vesselId,
       vesselField,
@@ -104,7 +116,6 @@ public class Fleet implements VesselsGetter {
       marketGrid,
       specification
     );
-    vessel.setAccount(new Account());
     vesselsById.put(vesselId, vessel);
     return vessel;
   }
@@ -121,6 +132,69 @@ public class Fleet implements VesselsGetter {
   /** Tells every entry listener that {@code vessel} has entered this fleet. */
   void announceEntry(final Vessel vessel) {
     entryListeners.forEach(listener -> listener.accept(vessel));
+  }
+
+  /**
+   * @param listener told of each vessel that exits this fleet, once nothing of
+   *                 it is registered anywhere and it has no step pending, in
+   *                 the order the vessels exit
+   */
+  public void addExitListener(final Consumer<? super Vessel> listener) {
+    exitListeners.add(listener);
+  }
+
+  /**
+   * Queues {@code statement} on the vessel registered under {@code vesselId}.
+   *
+   * @throws IllegalStateException if no vessel is registered under
+   *                               {@code vesselId}, naming the date it exited
+   *                               if it did
+   */
+  void queue(final String vesselId, final VesselStatement statement) {
+    checkNotExited(vesselId);
+    getVessel(vesselId)
+      .orElseThrow(() ->
+        new IllegalStateException("Vessel " + vesselId + " does not exist")
+      )
+      .queue(statement);
+  }
+
+  /**
+   * Records that the vessel {@code vesselId}, which never was a member of this
+   * fleet, exited on {@code exitDate}: a source records so a vessel that exited
+   * before the start.
+   *
+   * @throws IllegalStateException if {@code vesselId} is in use, or was used
+   *                               by a vessel that exited
+   */
+  void recordExit(final String vesselId, final LocalDateTime exitDate) {
+    checkState(
+      !vesselsById.containsKey(vesselId),
+      "Vessel %s is in the fleet",
+      vesselId
+    );
+    checkNotExited(vesselId);
+    exitDatesById.put(vesselId, exitDate);
+  }
+
+  /**
+   * Removes {@code vessel} from this fleet, recording its id with the current
+   * date, and tells every exit listener. Only the vessel, as it exits, calls
+   * this, through the handle the fleet gave it.
+   */
+  private void remove(final Vessel vessel) {
+    vesselsById.remove(vessel.getId());
+    exitDatesById.put(vessel.getId(), schedule.getDateTime());
+    exitListeners.forEach(listener -> listener.accept(vessel));
+  }
+
+  /**
+   * @throws IllegalStateException if a vessel with {@code vesselId} exited,
+   *                               naming the date it exited
+   */
+  private void checkNotExited(final String vesselId) {
+    final LocalDateTime exitDate = exitDatesById.get(vesselId);
+    checkState(exitDate == null, "Vessel %s exited on %s", vesselId, exitDate);
   }
 
   /**

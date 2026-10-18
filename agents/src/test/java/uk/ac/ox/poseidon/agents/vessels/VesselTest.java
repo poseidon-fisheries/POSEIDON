@@ -37,6 +37,8 @@ import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.HOME_PORT;
 import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.newVessel;
 
 import com.badlogic.gdx.ai.btree.Task;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -51,6 +53,7 @@ import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.Sale;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
+import uk.ac.ox.poseidon.agents.vessels.VesselStatement.AttributeChange;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -91,7 +94,7 @@ class VesselTest {
 
   /**
    * @return a vessel on {@link #schedule} with a home port and {@code
-   *         behaviour} built, not yet registered as active
+   *         behaviour} built, whose first step is not yet scheduled
    */
   private Vessel vesselWithItsBehaviour(final Task<Vessel> behaviour) {
     final VesselComponent<Task<Vessel>> declaration = behaviour(
@@ -132,12 +135,18 @@ class VesselTest {
     schedule.scheduleRepeating(_ -> {}, 0, 1.0);
   }
 
-  private void activate() {
-    vessel.setRegisteredAsActive(true);
+  private static AttributeChange setting(
+    final String attribute,
+    final Object value
+  ) {
+    return new AttributeChange(
+      ImmutableMap.of(attribute, value),
+      ImmutableSet.of()
+    );
   }
 
-  private void deactivate() {
-    vessel.setRegisteredAsActive(false);
+  private static AttributeChange removing(final String attribute) {
+    return new AttributeChange(ImmutableMap.of(), ImmutableSet.of(attribute));
   }
 
   private void stepFor(final Duration duration) {
@@ -145,29 +154,32 @@ class VesselTest {
   }
 
   @Test
-  void aNewVesselIsInactive() {
-    assertThat(
-      vesselWithItsBehaviour(new RecordingTask()).isActive()
-    ).isFalse();
+  void aVesselWithItsBehaviourAndAHomePortIsActive() {
+    assertThat(vessel.isActive()).isTrue();
+  }
+
+  @Test
+  void aVesselWithoutAHomePortIsInactive() {
+    vessel.setAttributes(Map.of());
+    assertThat(vessel.isActive()).isFalse();
   }
 
   @Test
   void aVesselWhoseBehaviourIsNotBuiltIsInactive() {
     final Vessel vessel = vesselWithAHomePort(behaviour(scope -> behaviour));
-    vessel.setRegisteredAsActive(true);
     assertThat(vessel.isActive()).isFalse();
   }
 
   @Test
-  void aVesselThatIsNeverActivatedIsNeverStepped() {
+  void aVesselIsNotSteppedBeforeItsFirstStepIsScheduled() {
     stepFor(ofSeconds(3));
     assertThat(behaviour.stepDateTimes).isEmpty();
   }
 
   @Test
   void theBehaviourReachesItsVesselOnlyDuringAStep() {
-    activate();
-    stepFor(ofSeconds(2));
+    vessel.scheduleFirstStep();
+    stepFor(ofSeconds(1));
     assertThat(behaviour.vesselsRead).containsExactly(vessel);
     assertThatThrownBy(behaviour::getVessel)
       .isInstanceOf(IllegalStateException.class)
@@ -175,72 +187,89 @@ class VesselTest {
   }
 
   @Test
-  void activatingAVesselStepsItEveryTickWhileItsBehaviourIsNotRunning() {
-    activate();
-    stepFor(ofSeconds(4));
-    assertThat(behaviour.stepDateTimes).containsExactly(
-      START.plusSeconds(1),
-      START.plusSeconds(2),
-      START.plusSeconds(3)
-    );
-  }
-
-  @Test
-  void mutatingAnInactiveVesselThatStaysInactiveSchedulesNothing() {
-    vessel.mutate(() -> {});
-    stepFor(ofSeconds(3));
-    assertThat(behaviour.stepDateTimes).isEmpty();
-  }
-
-  @Test
-  void mutatingAnActiveVesselKeepsASingleStepChain() {
-    activate();
-    stepFor(ofSeconds(2));
-    vessel.mutate(() -> {});
-    activate();
-    stepFor(ofSeconds(2));
-    assertThat(behaviour.stepDateTimes).containsExactly(
-      START.plusSeconds(1),
-      START.plusSeconds(2),
-      START.plusSeconds(3)
-    );
-  }
-
-  @Test
-  void reactivatingWhileAStepIsPendingDoesNotScheduleASecondStep() {
-    activate();
-    deactivate();
-    activate();
+  void aVesselStepsFirstAtOnceThenEveryTickWhileItsBehaviourIsNotRunning() {
+    vessel.scheduleFirstStep();
     stepFor(ofSeconds(3));
     assertThat(behaviour.stepDateTimes).containsExactly(
+      START,
       START.plusSeconds(1),
       START.plusSeconds(2)
     );
   }
 
   @Test
-  void aDeactivatedVesselStopsAfterItsPendingStepAndCanBeReactivated() {
-    activate();
+  void aStatementOnAVesselWithNoStepPendingSchedulesOneAtOnce() {
+    vessel.setAttributes(Map.of());
+    vessel.scheduleFirstStep();
     stepFor(ofSeconds(2));
-    deactivate();
-    stepFor(ofSeconds(3));
-    activate();
+    vessel.queue(setting(HOME_PORT, "P1"));
+    assertThat(vessel.getAttributes()).doesNotContainKey(HOME_PORT);
     stepFor(ofSeconds(2));
     assertThat(behaviour.stepDateTimes).containsExactly(
+      START.plusSeconds(2),
+      START.plusSeconds(3)
+    );
+  }
+
+  @Test
+  void aStatementOnAVesselWithAStepPendingKeepsASingleStepChain() {
+    vessel.scheduleFirstStep();
+    stepFor(ofSeconds(2));
+    vessel.queue(setting("gear", "PS"));
+    vessel.queue(setting("gear", "OTB"));
+    stepFor(ofSeconds(2));
+    assertThat(behaviour.stepDateTimes).containsExactly(
+      START,
       START.plusSeconds(1),
+      START.plusSeconds(2),
+      START.plusSeconds(3)
+    );
+    assertThat(vessel.getAttributes()).containsEntry("gear", "OTB");
+  }
+
+  @Test
+  void aVesselThatLosesItsHomePortStopsUntilAStatementGivesItOneBack() {
+    vessel.scheduleFirstStep();
+    stepFor(ofSeconds(2));
+    vessel.queue(removing(HOME_PORT));
+    stepFor(ofSeconds(3));
+    vessel.queue(setting(HOME_PORT, "P1"));
+    stepFor(ofSeconds(2));
+    assertThat(behaviour.stepDateTimes).containsExactly(
+      START,
+      START.plusSeconds(1),
+      START.plusSeconds(5),
       START.plusSeconds(6)
     );
   }
 
   @Test
+  void aStatementMadeDuringTheVesselsOwnStepIsAppliedAtItsNextStep() {
+    final class StatesItsGearTask extends VesselTask {
+
+      @Override
+      public Status execute() {
+        getVessel().queue(setting("gear", "PS"));
+        return Status.SUCCEEDED;
+      }
+    }
+    final Vessel vessel = vesselWithItsBehaviour(new StatesItsGearTask());
+    vessel.scheduleFirstStep();
+    stepFor(ofSeconds(1));
+    assertThat(vessel.getAttributes()).doesNotContainKey("gear");
+    stepFor(ofSeconds(1));
+    assertThat(vessel.getAttributes()).containsEntry("gear", "PS");
+  }
+
+  @Test
   void aRunningBehaviourIsSteppedAgainAfterItsTaskDuration() {
     behaviour.taskDuration = ofHours(1);
-    activate();
+    vessel.scheduleFirstStep();
     stepFor(ofHours(2));
     assertThat(behaviour.stepDateTimes).startsWith(
-      START.plusSeconds(1),
-      START.plusHours(1).plusSeconds(1),
-      START.plusHours(1).plusSeconds(2)
+      START,
+      START.plusHours(1),
+      START.plusHours(1).plusSeconds(1)
     );
   }
 
@@ -255,8 +284,8 @@ class VesselTest {
           : runFor(ofHours(1));
       }
     }
-    vesselWithItsBehaviour(new KeepsRunningTask()).setRegisteredAsActive(true);
-    stepFor(ofSeconds(2));
+    vesselWithItsBehaviour(new KeepsRunningTask()).scheduleFirstStep();
+    stepFor(ofSeconds(1));
     assertThatThrownBy(() -> stepFor(ofHours(2)))
       .isInstanceOf(NullPointerException.class)
       .hasMessageContaining("no task set a duration this step");
@@ -272,10 +301,8 @@ class VesselTest {
         return runFor(ofHours(2));
       }
     }
-    vesselWithItsBehaviour(new SetsTwoDurationsTask()).setRegisteredAsActive(
-      true
-    );
-    assertThatThrownBy(() -> stepFor(ofSeconds(2)))
+    vesselWithItsBehaviour(new SetsTwoDurationsTask()).scheduleFirstStep();
+    assertThatThrownBy(() -> stepFor(ofSeconds(1)))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("task duration was already set this step");
   }
@@ -290,27 +317,23 @@ class VesselTest {
         return Status.SUCCEEDED;
       }
     }
-    vesselWithItsBehaviour(
-      new FinishesWithADurationTask()
-    ).setRegisteredAsActive(true);
-    assertThatThrownBy(() -> stepFor(ofSeconds(2)))
+    vesselWithItsBehaviour(new FinishesWithADurationTask()).scheduleFirstStep();
+    assertThatThrownBy(() -> stepFor(ofSeconds(1)))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("not running, but a task set a duration");
   }
 
   @Test
-  void mutationsWhileTheBehaviourIsRunningWaitUntilItStopsRunning() {
+  void aStatementWaitsForTheStepAfterTheBehaviourStopsRunning() {
     behaviour.taskDuration = ofHours(1);
-    activate();
-    stepFor(ofSeconds(2));
-    deactivate();
-    assertThat(vessel.isRegisteredAsActive()).isTrue();
-    stepFor(ofHours(2));
-    assertThat(vessel.isRegisteredAsActive()).isFalse();
-    assertThat(behaviour.stepDateTimes).containsExactly(
-      START.plusSeconds(1),
-      START.plusHours(1).plusSeconds(1)
-    );
+    vessel.scheduleFirstStep();
+    stepFor(ofSeconds(1));
+    vessel.queue(setting("gear", "PS"));
+    // Up to the step at one hour, in which the behaviour stops running
+    stepFor(ofHours(1));
+    assertThat(vessel.getAttributes()).doesNotContainKey("gear");
+    stepFor(ofSeconds(1));
+    assertThat(vessel.getAttributes()).containsEntry("gear", "PS");
   }
 
   @Test

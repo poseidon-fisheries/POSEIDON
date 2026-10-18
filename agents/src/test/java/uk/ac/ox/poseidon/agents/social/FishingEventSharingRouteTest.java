@@ -41,11 +41,13 @@ import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselEventListener;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselRegister;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselSpecification;
 import static uk.ac.ox.poseidon.agents.vessels.TripFixtures.startTrip;
 import static uk.ac.ox.poseidon.agents.vessels.values.Factories.vesselProperty;
 import static uk.ac.ox.poseidon.agents.vessels.values.attributes.Factories.stringAttribute;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
+import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledByDateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.days;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
@@ -72,7 +74,6 @@ import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEventAccumulator;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingOutcome;
 import uk.ac.ox.poseidon.agents.vessels.Fleet;
 import uk.ac.ox.poseidon.agents.vessels.FleetFactory;
-import uk.ac.ox.poseidon.agents.vessels.FleetFromVesselRegisterFactory;
 import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
@@ -92,8 +93,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
  * The complete route of a fishing event, wired as in NW Med: one base fleet
- * factory given both to the register loader creating the vessels and to the
- * social network, an own and a shared fishing event recorder per vessel on the
+ * factory given both to the specification the register creates the vessels
+ * from and to the social network, an own and a shared fishing event recorder per vessel on the
  * same memory, and real event managers from trip to vessel to simulation.
  */
 class FishingEventSharingRouteTest {
@@ -199,12 +200,15 @@ class FishingEventSharingRouteTest {
     }
     final var scenario = Scenario.builder()
       .startingDateTime(dateTime(LocalDate.of(2000, 1, 1).atStartOfDay()))
+      .component("fleet", baseFleet)
       .component(
-        "fleet",
-        FleetFromVesselRegisterFactory.builder()
-          .vesselSpecification(vesselSpecification.build())
-          .data(tableFromCsvString(vesselRegister))
-          .build()
+        "vesselRegister",
+        scheduledByDateTime(
+          vesselRegister(
+            tableFromCsvString(vesselRegister),
+            vesselSpecification.build()
+          )
+        )
       )
       .component("socialNetwork", network)
       .component(
@@ -318,7 +322,7 @@ class FishingEventSharingRouteTest {
   }
 
   @Test
-  void aVesselActivatedDuringTheRunJoinsACliqueAtItsFirstTripStart() {
+  void aVesselCreatedDuringTheRunJoinsACliqueAtItsFirstTripStart() {
     startSimulation(
       VESSEL_REGISTER +
         """

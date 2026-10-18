@@ -24,12 +24,14 @@ package uk.ac.ox.poseidon.agents.vessels;
 
 import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.startingDateTime;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
 import java.util.function.Supplier;
 import sim.util.Int2D;
+import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.tasks.TaskFactory;
@@ -43,7 +45,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
  * Factories for a vessel's scope, its fleet, what it is made of, and what
- * creates it.
+ * creates it and states things about it.
  */
 public class Factories {
 
@@ -129,6 +131,41 @@ public class Factories {
       vesselIds,
       port,
       numberOfVessels
+    );
+  }
+
+  /**
+   * The register's columns and event codes are those of the EU fleet register:
+   * the vessel id in {@code cfr}, the event code in {@code event}, the event
+   * date in {@code event_start_date}, with {@code event_end_date} left out of
+   * the attributes; CEN, CST, IMP and CHA create a vessel, MOD changes it, and
+   * DES, EXP and RET make it exit. Change them on the factory's builder.
+   *
+   * @param data                the vessel register table
+   * @param vesselSpecification what the vessels are made of
+   * @return a {@link SimulationScopeFactory} for the register's statements,
+   *         dated; pass it to
+   *         {@link uk.ac.ox.poseidon.core.schedule.Factories#scheduledByDateTime(Factory)}
+   * @see VesselRegisterFactory
+   */
+  public static VesselRegisterFactory vesselRegister(
+    final Factory<? super SimulationScope, ? extends Table> data,
+    final Factory<
+      ? super SimulationScope,
+      ? extends VesselSpecification
+    > vesselSpecification
+  ) {
+    return new VesselRegisterFactory(
+      data,
+      vesselSpecification,
+      startingDateTime(),
+      "cfr",
+      "event",
+      "event_start_date",
+      ImmutableList.of("event_end_date"),
+      ImmutableList.of("CEN", "CST", "IMP", "CHA"),
+      ImmutableList.of("MOD"),
+      ImmutableList.of("DES", "EXP", "RET")
     );
   }
 

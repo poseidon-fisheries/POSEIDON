@@ -29,8 +29,9 @@
  * of the scenario is made of, when a source asks: a scripted one
  * ({@link uk.ac.ox.poseidon.agents.vessels.CreateVesselsAtPort}) or a
  * vessel register table
- * ({@link uk.ac.ox.poseidon.agents.vessels.FleetFromVesselRegisterFactory}),
- * whose {@link uk.ac.ox.poseidon.agents.vessels.FleetEvent}s also update them.
+ * ({@link uk.ac.ox.poseidon.agents.vessels.VesselRegisterFactory}), whose
+ * later rows change the vessels' attributes or make them exit, through the
+ * fleet.
  * A vessel's hold/gear/engine/behaviour/etc. live in sibling packages
  * ({@link uk.ac.ox.poseidon.agents.vessels.holds},
  * {@link uk.ac.ox.poseidon.agents.vessels.gears},

@@ -45,7 +45,8 @@ import uk.ac.ox.poseidon.core.SimulationScope;
  * fleet, with an account; it takes its attributes, which place it at its home
  * port; its components are built, the behaviour first, then the others in the
  * order they are listed; the fleet announces its entry, so that a listener
- * only ever sees a complete vessel; and it takes its first step.
+ * only ever sees a complete vessel; and its first step is scheduled, at that
+ * instant.
  * <p>
  * Built via {@link Factories#vesselSpecification}.
  */
@@ -96,13 +97,13 @@ public class VesselSpecification {
   }
 
   /**
-   * Creates a vessel and lets it take its first step.
+   * Creates a vessel and schedules its first step, at the current instant.
    *
    * @param id         the new vessel's id
    * @param attributes the new vessel's attributes
    * @return the vessel created
    * @throws IllegalStateException if the fleet already has a vessel with that
-   *                               id
+   *                               id, or had one that exited
    */
   public Vessel create(final String id, final Map<String, ?> attributes) {
     final Vessel vessel = fleet.createVessel(id, this);
@@ -112,7 +113,7 @@ public class VesselSpecification {
       vessel.buildComponent(component, vesselScope)
     );
     fleet.announceEntry(vessel);
-    vessel.setRegisteredAsActive(true);
+    vessel.scheduleFirstStep();
     return vessel;
   }
 }

@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.SequencedMap;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.NonNull;
@@ -45,6 +46,8 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
 import uk.ac.ox.poseidon.agents.vessels.Fleet.StepScheduler;
+import uk.ac.ox.poseidon.agents.vessels.VesselStatement.AttributeChange;
+import uk.ac.ox.poseidon.agents.vessels.VesselStatement.Exit;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
 import uk.ac.ox.poseidon.core.ProductStore;
@@ -64,22 +67,23 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * tick (once it isn't). It steps its behaviour only while {@link #isActive()}
  * holds.
  * <p>
- * Its modifiable characteristics (account, components, registration and
- * attributes) are changed from outside its behaviour, by the fleet
- * register, so their setters go through {@link #mutate}, which queues them
- * while the behaviour is running: they take effect between runs of the
- * behaviour, never during one, so a vessel isn't deactivated at sea or given a
- * new hold with its catch on board. Its current state (cell, heading, trips)
- * is changed by the behaviour itself and changes immediately.
+ * What a source states about it, a change of attributes or its exit, joins
+ * its queue of statements and takes effect at the start of its next step in
+ * which the behaviour is not running, never during a run of the behaviour and
+ * never inside the call that made the statement: so a vessel doesn't exit at
+ * sea, and a change takes effect in port. A statement queued on a vessel with
+ * no step pending schedules one, at once. An exit ends the queue: the vessel
+ * leaves its fleet with no component left, and so inactive, and nothing after
+ * it in the queue applies. Its current
+ * state (cell, heading, trips) is changed by the behaviour itself, at once.
  * <p>
  * A vessel has at most one step pending on the schedule. It holds no
  * schedule: its fleet gives it a {@link StepScheduler} that schedules its step
  * and nothing else, and refuses to schedule a second one. Nothing outside the
- * vessel can schedule its step. Outside a step, an active vessel always has a
- * step pending ({@link #mutate} restores this after each mutation). Becoming
- * inactive doesn't cancel a pending step; the step still runs, finds the
- * vessel inactive and schedules nothing, so a vessel can be inactive with a
- * step pending, and reactivating it then needs no new step.
+ * vessel can schedule its step. Its first step is at the instant it is
+ * created; outside a step, an active vessel always has a step pending. A
+ * vessel that becomes inactive schedules nothing more, until a statement
+ * gives it a step.
  * <p>
  * Nor does it hold a clock: what reads the date takes the clock as an input,
  * and gives the vessel the dates it records, such as those of its trips.
@@ -90,6 +94,13 @@ public class Vessel implements Oriented2D, HasAttributes {
   /** Puts this vessel's step on the schedule. */
   @Getter(NONE)
   private final @NonNull StepScheduler stepScheduler;
+
+  /**
+   * Takes this vessel out of its fleet, which announces the exit, and nothing
+   * else: the vessel leaves its fleet without holding it.
+   */
+  @Getter(NONE)
+  private final @NonNull Runnable fleetExit;
 
   private final @NonNull EventManager eventManager;
 
@@ -113,8 +124,16 @@ public class Vessel implements Oriented2D, HasAttributes {
   @Getter(NONE)
   private BehaviorTree<Vessel> tree;
 
+  /** The statements about this vessel not yet applied, in order. */
   @Getter(NONE)
-  private final Queue<Runnable> mutationQueue = new LinkedList<>();
+  private final Queue<VesselStatement> statements = new LinkedList<>();
+
+  /**
+   * Whether this vessel is stepping its behaviour, during which a statement
+   * waits for the step to schedule the next one.
+   */
+  @Getter(NONE)
+  private boolean steppingBehaviour;
 
   /**
    * How long until the running behaviour's task is executed again: set by that
@@ -139,11 +158,12 @@ public class Vessel implements Oriented2D, HasAttributes {
 
   /**
    * Creates an inactive vessel, with no behaviour built yet. It starts stepping
-   * once it becomes active, through {@link #mutate}: a vessel never starts
-   * active, so an active vessel always has a step pending.
+   * once its first step is scheduled ({@link #scheduleFirstStep}).
    *
    * @param newStepScheduler makes, from this vessel's step, what schedules
    *                         that step and nothing else
+   * @param newFleetExit     makes, from this vessel, what takes it out of its
+   *                         fleet and nothing else
    * @param eventManager     the event manager this vessel broadcasts on
    * @param id               the vessel's identifying id
    * @param vesselField      the field the vessel moves within
@@ -153,6 +173,7 @@ public class Vessel implements Oriented2D, HasAttributes {
    */
   Vessel(
     @NonNull final Function<Runnable, StepScheduler> newStepScheduler,
+    @NonNull final Function<Vessel, Runnable> newFleetExit,
     @NonNull final EventManager eventManager,
     @NonNull final String id,
     @NonNull final VesselField vesselField,
@@ -161,6 +182,7 @@ public class Vessel implements Oriented2D, HasAttributes {
     @NonNull final VesselSpecification specification
   ) {
     this.stepScheduler = newStepScheduler.apply(this::step);
+    this.fleetExit = newFleetExit.apply(this);
     this.eventManager = eventManager;
     this.id = id;
     this.vesselField = vesselField;
@@ -177,9 +199,8 @@ public class Vessel implements Oriented2D, HasAttributes {
   @Getter(NONE)
   private ImmutableMap<String, Object> attributes = ImmutableMap.of();
 
-  // Modifiable characteristics
-  /** This vessel's running balance. */
-  private Account account;
+  /** This vessel's running balance, which changes at once, from any call. */
+  private final Account account = new Account();
 
   /**
    * The store this vessel keeps for each of its components, by the
@@ -187,19 +208,13 @@ public class Vessel implements Oriented2D, HasAttributes {
    * built.
    */
   @Getter(NONE)
-  private final Map<VesselComponent<?>, ProductStore> componentStores =
+  private final SequencedMap<VesselComponent<?>, ProductStore> componentStores =
     new LinkedHashMap<>();
 
   /** This vessel's components, by the declaration each is built from. */
   @Getter(NONE)
   private final Map<VesselComponent<?>, Object> components =
     new LinkedHashMap<>();
-
-  /**
-   * Whether this vessel is currently registered as active (see
-   * {@link #setRegisteredAsActive}).
-   */
-  private boolean registeredAsActive;
 
   // Current state variables
   /** This vessel's current heading, in radians. */
@@ -213,14 +228,12 @@ public class Vessel implements Oriented2D, HasAttributes {
   private Trip previousTrip;
 
   /**
-   * @return whether this vessel has its behaviour, is
-   *         {@link #registeredAsActive}, every gear among its components is
-   *         active, and it has a home port
+   * @return whether this vessel has its behaviour, every gear among its
+   *         components is active, and it has a home port
    */
   public boolean isActive() {
     return (
       tree != null &&
-      registeredAsActive &&
       components
         .values()
         .stream()
@@ -232,27 +245,37 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /** @return whether this vessel's behaviour tree is running */
-  boolean isBehaviourRunning() {
+  private boolean isBehaviourRunning() {
     return tree != null && tree.getStatus() == RUNNING;
   }
 
   /**
-   * Drains any queued mutations (only once the behaviour isn't running), then,
-   * if still active, steps the behaviour tree with this vessel and reschedules —
-   * after {@link #taskDuration} if it's now running, or on the next tick
-   * otherwise.
+   * Applies the queued statements (only once the behaviour isn't running),
+   * then, if the vessel has not exited and is active, steps the behaviour tree
+   * with this vessel and reschedules — after {@link #taskDuration} if it's now
+   * running, or on the next tick otherwise.
    */
   private void step() {
     if (!isBehaviourRunning()) {
-      while (!mutationQueue.isEmpty()) {
-        mutationQueue.poll().run();
+      while (!statements.isEmpty()) {
+        switch (statements.poll()) {
+          case final AttributeChange change -> setAttributes(
+            change.applyTo(attributes)
+          );
+          case final Exit _ -> {
+            exit();
+            return;
+          }
+        }
       }
     }
     if (isActive()) {
       tree.setObject(this);
+      steppingBehaviour = true;
       try {
         tree.step();
       } finally {
+        steppingBehaviour = false;
         tree.setObject(null);
       }
       if (isBehaviourRunning()) {
@@ -291,40 +314,49 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Applies a change from outside the vessel's behaviour, between runs of the
-   * behaviour. If the behaviour is running, we queue the mutation, and it will
-   * be applied the next time the vessel is stepped and the behaviour is not
-   * running.
-   * <p>
-   * Otherwise, we apply the mutation immediately and then restore the invariant
-   * that, outside a step, an active vessel has a step pending: if the vessel
-   * is active and has none, we schedule one. This depends only on the
-   * vessel's state after the mutation, not on what it was before, so a
-   * sequence of mutations that briefly activates and deactivates the vessel
-   * (as a fleet event's setters can) never leaves it with more than one step
-   * pending.
+   * Schedules this vessel's first step, at the current instant, after the
+   * events already due then: the statements due at that instant, which run
+   * before vessel steps, are applied in it.
    */
-  void mutate(final Runnable mutation) {
-    if (isBehaviourRunning()) {
-      mutationQueue.add(mutation);
-    } else {
-      mutation.run();
-      if (isActive() && !stepScheduler.isStepPending()) {
-        stepScheduler.scheduleNextStep();
-      }
+  void scheduleFirstStep() {
+    if (!stepScheduler.isStepPending()) {
+      stepScheduler.scheduleNextStep(Duration.ZERO);
     }
   }
 
-  /** Sets the vessel's running balance. */
-  public void setAccount(final Account account) {
-    mutate(() -> this.account = account);
+  /**
+   * Queues {@code statement}, to be applied at the start of this vessel's next
+   * step in which the behaviour is not running. If no step is pending, one is
+   * scheduled at the current instant; a statement made during this vessel's own
+   * step waits for the step to schedule the next one.
+   */
+  void queue(final VesselStatement statement) {
+    statements.add(statement);
+    if (!steppingBehaviour && !stepScheduler.isStepPending()) {
+      stepScheduler.scheduleNextStep(Duration.ZERO);
+    }
+  }
+
+  /**
+   * Ends this vessel's component stores, in the reverse of the order they were
+   * built, and drops the components, which are no longer its own, so that it
+   * has no behaviour and is inactive; ends its own store; takes it off the
+   * vessel field; and takes it out of its fleet, which announces the exit.
+   */
+  private void exit() {
+    componentStores.sequencedValues().reversed().forEach(ProductStore::end);
+    components.clear();
+    tree = null;
+    productStore.end();
+    vesselField.remove(this);
+    fleetExit.run();
   }
 
   /**
    * Builds the component {@code declaration} declares under a scope carrying
    * the store this vessel keeps for it, opened the first time, and makes it
-   * this vessel's component for that declaration. Built at once, it replaces
-   * the previous one through {@link #mutate}, between runs of the behaviour.
+   * this vessel's component for that declaration, in place of the previous one.
+   * The behaviour must not be running.
    *
    * @param declaration the declaration of the component
    * @param scope       this vessel's scope
@@ -340,12 +372,10 @@ public class Vessel implements Oriented2D, HasAttributes {
     final T component = declaration
       .getFactory()
       .get(new VesselComponentScope(scope, store));
-    mutate(() -> {
-      components.put(declaration, component);
-      if (declaration == specification.getBehaviour()) {
-        tree = new BehaviorTree<>(specification.getBehaviour().of(this));
-      }
-    });
+    components.put(declaration, component);
+    if (declaration == specification.getBehaviour()) {
+      tree = new BehaviorTree<>(specification.getBehaviour().of(this));
+    }
     return component;
   }
 
@@ -366,11 +396,6 @@ public class Vessel implements Oriented2D, HasAttributes {
       declaration
     );
     return Optional.ofNullable((T) components.get(declaration));
-  }
-
-  /** Sets whether the vessel is registered as active. */
-  public void setRegisteredAsActive(final boolean registeredAsActive) {
-    mutate(() -> this.registeredAsActive = registeredAsActive);
   }
 
   /** @return {@link #heading} */
@@ -476,13 +501,11 @@ public class Vessel implements Oriented2D, HasAttributes {
     final ImmutableMap<String, Object> newAttributes = ImmutableMap.copyOf(
       attributes
     );
-    mutate(() -> {
-      this.attributes = newAttributes;
-      final Port homePort = getHomePort();
-      if (homePort != null && getCell() == null) {
-        setCurrentCell(portGrid.getLocation(homePort));
-      }
-    });
+    this.attributes = newAttributes;
+    final Port homePort = getHomePort();
+    if (homePort != null && getCell() == null) {
+      setCurrentCell(portGrid.getLocation(homePort));
+    }
   }
 
   /**
