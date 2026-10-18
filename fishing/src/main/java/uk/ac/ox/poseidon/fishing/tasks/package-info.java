@@ -1,0 +1,37 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2025-2026, University of Oxford.
+ *
+ * University of Oxford means the Chancellor, Masters and Scholars of the
+ * University of Oxford, having an administrative office at Wellington
+ * Square, Oxford OX1 2JD, UK.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * The base machinery for a vessel's gdx-ai behavior tree:
+ * {@link uk.ac.ox.poseidon.fishing.tasks.VesselTask}/
+ * {@link uk.ac.ox.poseidon.fishing.tasks.ExtendedTask} for building leaf tasks,
+ * and {@link uk.ac.ox.poseidon.fishing.tasks.TaskFactory} for their factories.
+ * A vessel's behaviour is the root task of its tree, made a component with
+ * {@link uk.ac.ox.poseidon.fishing.vessels.Factories#behaviour}. Concrete
+ * leaves and branch/decorator nodes live in sibling packages
+ * ({@link uk.ac.ox.poseidon.fishing.tasks.branches},
+ * {@link uk.ac.ox.poseidon.fishing.tasks.decorators},
+ * {@link uk.ac.ox.poseidon.fishing.tasks.general},
+ * {@link uk.ac.ox.poseidon.fishing.tasks.fishing},
+ * {@link uk.ac.ox.poseidon.fishing.tasks.travel}).
+ */
+package uk.ac.ox.poseidon.fishing.tasks;

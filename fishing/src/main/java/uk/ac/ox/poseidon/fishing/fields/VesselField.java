@@ -1,0 +1,89 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2024-2026, University of Oxford.
+ *
+ * University of Oxford means the Chancellor, Masters and Scholars of the
+ * University of Oxford, having an administrative office at Wellington
+ * Square, Oxford OX1 2JD, UK.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package uk.ac.ox.poseidon.fishing.fields;
+
+import lombok.Getter;
+import sim.field.continuous.Continuous2D;
+import sim.util.Double2D;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+
+/**
+ * Tracks each vessel's continuous-space location, backed by a MASON
+ * {@link Continuous2D} sized to the model grid's dimensions — read both by the
+ * GUI's portrayal layer and by code (e.g. regulation checks) that needs a
+ * vessel's current cell. A vessel with no recorded location (never placed, or
+ * off-grid) reports {@code null} from {@link #getPoint}/{@link #getCell}.
+ */
+@Getter
+public class VesselField {
+
+  private final Continuous2D field;
+  private final ModelGrid modelGrid;
+
+  VesselField(final ModelGrid modelGrid) {
+    this.field = new Continuous2D(
+      1,
+      modelGrid.getGridWidth(),
+      modelGrid.getGridHeight()
+    );
+    this.modelGrid = modelGrid;
+  }
+
+  /**
+   * Places {@code vessel} at the continuous-space point corresponding to
+   * {@code cell}.
+   */
+  @SuppressWarnings("UnusedReturnValue")
+  public boolean setCell(final Vessel vessel, final Int2D cell) {
+    return setPoint(vessel, modelGrid.toPoint(cell));
+  }
+
+  /** Places {@code vessel} at {@code location}. */
+  @SuppressWarnings("WeakerAccess")
+  public boolean setPoint(final Vessel vessel, final Double2D location) {
+    return field.setObjectLocation(vessel, location);
+  }
+
+  /** Takes {@code vessel} off this field: it has no location afterwards. */
+  public void remove(final Vessel vessel) {
+    field.remove(vessel);
+  }
+
+  /**
+   * @return {@code vessel}'s recorded location, or {@code null} if it has none
+   */
+  public Double2D getPoint(final Vessel vessel) {
+    return field.getObjectLocation(vessel);
+  }
+
+  /**
+   * @return the cell containing {@code vessel}'s recorded location, or
+   *         {@code null} if it has none
+   */
+  public Int2D getCell(final Vessel vessel) {
+    final Double2D point = getPoint(vessel);
+    return point != null ? modelGrid.toCell(point) : null;
+  }
+}

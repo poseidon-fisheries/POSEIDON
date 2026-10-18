@@ -30,15 +30,17 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
- * The products built for one owner (a simulation or an agent), keyed by the
- * identity of the factory that built them: two factory objects never share a
- * product here, however equal they are. A store ends with its owner, and an
- * ended store refuses every later use. Ending it first runs the teardowns of
- * the registrations made for its products, last made first.
+ * The products built for one owner (a factory, for its global product; a
+ * simulation; or something a simulation holds, such as a vessel or one of its
+ * components), keyed by the identity of the factory that built them: two
+ * factory objects never share a product here, however equal they are. A store
+ * ends with its owner, and an ended store refuses every later use. Ending it
+ * first runs the teardowns of the registrations made for its products, last
+ * made first.
  *
  * <p>A store is used by one thread at a time: the simulation that owns it, or
- * its agent, is built and stepped by one thread. A factory's own store, which
- * holds its product when it is global, is locked by that factory.
+ * that holds its owner, is built and stepped by one thread. A factory's own
+ * store, which holds its product when it is global, is locked by that factory.
  */
 public final class ProductStore {
 

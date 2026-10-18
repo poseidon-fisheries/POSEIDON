@@ -1,0 +1,72 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2025-2026, University of Oxford.
+ *
+ * University of Oxford means the Chancellor, Masters and Scholars of the
+ * University of Oxford, having an administrative office at Wellington
+ * Square, Oxford OX1 2JD, UK.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package uk.ac.ox.poseidon.fishing.tasks.general;
+
+import com.badlogic.gdx.ai.btree.Task;
+import com.badlogic.gdx.ai.btree.branch.Selector;
+import com.badlogic.gdx.ai.btree.decorator.AlwaysFail;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
+import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
+
+/**
+ * A {@link TaskFactory} for a {@link Selector} that tries
+ * {@code mainTask} first; if it fails, the selector runs {@code waitTask} but
+ * reports failure regardless of that task's outcome (via {@link AlwaysFail}) —
+ * so a parent driving this on a loop keeps retrying {@code mainTask} every
+ * step, waiting in between. Built via {@link Factories#succeedOrWait}.
+ */
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
+public class SucceedOrWaitFactory extends TaskFactory<Selector<Vessel>> {
+
+  private final Factory<
+    ? super VesselComponentScope,
+    ? extends Task<Vessel>
+  > mainTask;
+  private final Factory<
+    ? super VesselComponentScope,
+    ? extends Task<Vessel>
+  > waitTask;
+
+  /**
+   * @return a {@link Selector} with {@code mainTask} as its first child and an
+   *         {@link AlwaysFail}-wrapped {@code waitTask} as its second
+   */
+  @Override
+  protected Selector<Vessel> newInstance(final VesselComponentScope scope) {
+    final Selector<Vessel> selector = new Selector<>();
+    selector.addChild(mainTask.get(scope));
+    selector.addChild(new AlwaysFail<>(waitTask.get(scope)));
+    return selector;
+  }
+}

@@ -32,7 +32,7 @@ The triplet gets documented in four different places, once each, not duplicated 
   {@link GlobalScopeFactory} counterpart of {@link Component}, built via
   {@link Factories#method(Factory)}.` — naming whichever `*ScopeFactory` the leaf class's ancestry
   is rooted in (`GlobalScopeFactory`, `SimulationScopeFactory`, `RelativeScopeFactory` in `core`;
-  domain-specific ones like `VesselScopeFactory` in `agents`) in place of the generic `Factory`.
+  domain-specific ones like `VesselScopeFactory` in `fishing`) in place of the generic `Factory`.
   When the leaf extends a `*ScopeFactory` directly, that's the one to name. When it instead
   extends an intermediate abstract template base that isn't itself a `*ScopeFactory` (e.g.
   `RelativeDateTimeFactory`, `AbstractQuantityFactory`), walk up to the `*ScopeFactory` that base

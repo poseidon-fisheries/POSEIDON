@@ -26,8 +26,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Supplier;
-import uk.ac.ox.poseidon.agents.market.Sale;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
+import uk.ac.ox.poseidon.fishing.market.Sale;
 
 /**
  * An {@link AbstractListener} that accumulates total biomass sold (in kg), per

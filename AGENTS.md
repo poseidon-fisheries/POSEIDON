@@ -18,7 +18,7 @@ POSEIDON is an agent-based model of fisheries, built on the [MASON](https://cs.g
 ```
 ./gradlew build                     # build all modules, run all tests + spotbugs
 ./gradlew test                      # run all unit tests
-./gradlew :core:test                # run tests for a single module (core, io, geography, biology, agents, regulations, calibration, gui, examples)
+./gradlew :core:test                # run tests for a single module (core, io, geography, biology, fishing, regulations, calibration, gui, examples)
 ./gradlew :core:test --tests "uk.ac.ox.poseidon.core.ScenarioTest"          # run a single test class
 ./gradlew :core:test --tests "uk.ac.ox.poseidon.core.ScenarioTest.methodName"  # run a single test method
 ./gradlew jacocoTestReport          # generate coverage reports (build/reports/jacoco/test/…) per module
@@ -41,9 +41,9 @@ Modules are Gradle subprojects under the root; dependencies flow one way (no cyc
 
 ```
 core  →  calibration
-core  →  io  →  geography  →  biology  →  agents  →  gui
-                geography  →  regulations  →  agents
-                                              agents  →  examples
+core  →  io  →  geography  →  biology  →  fishing  →  gui
+                geography  →  regulations  →  fishing
+                                              fishing  →  examples
                             calibration, io, gui, regulations, biology  →  examples
 ```
 
@@ -52,7 +52,7 @@ core  →  io  →  geography  →  biology  →  agents  →  gui
 - **geography** — Spatial primitives and grids: coordinates, envelopes, bathymetry, ports, spatial allocators — built on JTS and GeoTools.
 - **biology** — Biological/ecological model: species, biomass, "fisheable" content on the grid.
 - **regulations** — Fishing regulation rules: `Regulations`, `ForbiddenIf`/`PermittedIf`, spatial/temporal actions/predicates.
-- **agents** — The fishing-agent model itself: vessels, trips, tasks, choices, catches, fuel, markets/money, regulation enforcement on agents.
+- **fishing** — The vessels, the model's agents, and what they do and deal with: trips, tasks, choices, catches, fuel, markets/money, regulation enforcement on vessels.
 - **calibration** — Parameter calibration using Jenetics (genetic algorithms); `CalibrationProblem`, `CalibrationRunner`.
 - **gui** — Swing-based visualization (FlatLaf look-and-feel, Batik for SVG) built on MASON's UI facilities (`ScenarioWithUI`, portrayals, palettes).
 - **examples** — Runnable example scenarios (e.g. `petersnapper`) that wire the other modules together into an application; also contains scenario-writing/calibration entry points with `main` methods.

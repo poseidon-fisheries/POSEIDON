@@ -1,0 +1,93 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2025-2026, University of Oxford.
+ *
+ * University of Oxford means the Chancellor, Masters and Scholars of the
+ * University of Oxford, having an administrative office at Wellington
+ * Square, Oxford OX1 2JD, UK.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package uk.ac.ox.poseidon.fishing.vessels.holds;
+
+import static com.google.common.base.Preconditions.checkState;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.fishing.catches.CatchCategoriser;
+import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
+import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
+
+/**
+ * A {@link Hold} base that sorts uncategorised content via
+ * {@link #catchCategoriser} and keeps the running content in {@link #content}.
+ * Subclasses supply {@link #getTotalCapacityInKg()} and may override
+ * {@link #addContent(CategorisedCatch)} to enforce it (this base does not).
+ */
+@Getter
+@RequiredArgsConstructor
+public abstract class BiomassHold implements Hold {
+
+  private final CatchCategoriser catchCategoriser;
+
+  /** The hold's current content. */
+  protected CategorisedCatch content = CategorisedCatch.empty();
+
+  /**
+   * Sorts {@code uncategorisedCatch} via {@link #catchCategoriser}, then adds
+   * it.
+   */
+  @Override
+  public void addContent(final Bucket uncategorisedCatch) {
+    addContent(catchCategoriser.apply(uncategorisedCatch));
+  }
+
+  /** Adds {@code categorisedCatch} to {@link #content} unconditionally. */
+  @Override
+  public void addContent(final CategorisedCatch categorisedCatch) {
+    content = content.add(categorisedCatch);
+  }
+
+  /**
+   * Makes the store of {@code scope} refuse to end while {@code hold} holds
+   * catch: a component holding catch is never dropped, so it never needs to
+   * hand its catch over.
+   *
+   * @throws IllegalStateException when the store ends, if {@code hold} is not
+   *                               empty, naming the vessel and the mass
+   */
+  static void refuseToEndWithCatch(
+    final VesselComponentScope scope,
+    final Hold hold
+  ) {
+    scope.addTeardown(vessel ->
+      checkState(
+        hold.isEmpty(),
+        "Vessel %s's hold still holds %s kg of catch",
+        vessel,
+        hold.getContent().getTotalBiomassInKg()
+      )
+    );
+  }
+
+  /** Empties {@link #content} and returns what was removed. */
+  @Override
+  public CategorisedCatch extractContent() {
+    final CategorisedCatch removedContent = content;
+    content = CategorisedCatch.empty();
+    return removedContent;
+  }
+}

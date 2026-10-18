@@ -1,0 +1,138 @@
+/*
+ * POSEIDON: an agent-based model of fisheries
+ * Copyright (c) 2026, University of Oxford.
+ *
+ * University of Oxford means the Chancellor, Masters and Scholars of the
+ * University of Oxford, having an administrative office at Wellington
+ * Square, Oxford OX1 2JD, UK.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package uk.ac.ox.poseidon.fishing.market;
+
+import static com.google.common.base.Preconditions.checkState;
+import static lombok.AccessLevel.PACKAGE;
+
+import java.time.LocalDateTime;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
+import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import uk.ac.ox.poseidon.fishing.catches.CatchCategoriser;
+import uk.ac.ox.poseidon.fishing.choices.Valuation;
+import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+
+/**
+ * Values a catch at the prices of the market at a vessel's home port, as it
+ * would sell there now: the catch is sorted by the vessel's own
+ * {@link CatchCategoriser}, priced by {@link Market#quote}, and summed by
+ * {@link Sale#summarise}. Species without a price count as zero. The option the
+ * catch is remembered for is ignored, so that this can be combined with other
+ * valuations of the same shape. A change of home port or of prices shows
+ * straight away. Assumes a single currency.
+ * <p>
+ * Values are remembered per catch, and forgotten when the home port's market
+ * changes or its prices change ({@link Market#getLastPriceChangeDateTime}).
+ * This assumes that a catch never changes once remembered, as {@link Bucket}s
+ * are immutable, and that the catch categoriser always sorts the same catch the
+ * same way.
+ */
+@RequiredArgsConstructor(access = PACKAGE)
+public class HomePortCatchValuation implements Valuation<Object, Bucket> {
+
+  // Catches no longer remembered would pile up here, so it is cleared past this
+  // size. Weak keys would drop them precisely, but made NW Med runs 10% slower.
+  private static final int MAXIMUM_NUMBER_OF_VALUES = 10_000;
+
+  private final CatchCategoriser catchCategoriser;
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  // By identity: cheaper than comparing catches, and a catch never changes.
+  private final Map<Bucket, Double> values = new IdentityHashMap<>();
+  // The market and the time from which the values above hold.
+  private Market valuedMarket;
+  private LocalDateTime valuedSince;
+
+  /**
+   * @param vessel the vessel that would sell the catch
+   * @param option ignored
+   * @param bucket the catch to value
+   * @return what {@code bucket} would sell for at {@code vessel}'s home port now
+   * @throws IllegalStateException if the vessel has no home port, its home port
+   *                               does not have exactly one market, or the
+   *                               catch is priced in more than one currency
+   */
+  @Override
+  public double valueOf(
+    final Vessel vessel,
+    final Object option,
+    final Bucket bucket
+  ) {
+    checkState(
+      vessel.getHomePort() != null,
+      "Vessel %s has no home port.",
+      vessel.getId()
+    );
+    final Market market = vessel
+      .getMarketGrid()
+      .getMarket(vessel.getHomePort());
+    final boolean valuesHold =
+      market == valuedMarket &&
+      !pricesChangedSince(market, valuedSince) &&
+      values.size() <= MAXIMUM_NUMBER_OF_VALUES;
+    if (!valuesHold) {
+      values.clear();
+      valuedMarket = market;
+      valuedSince = currentDateTime.apply(vessel);
+    }
+    return values.computeIfAbsent(bucket, key -> valueAt(vessel, market, key));
+  }
+
+  // Strictly before: a price set in the same second as a valuation may have
+  // come after it.
+  private static boolean pricesChangedSince(
+    final Market market,
+    final LocalDateTime dateTime
+  ) {
+    return market
+      .getLastPriceChangeDateTime()
+      .map(lastPriceChange -> !lastPriceChange.isBefore(dateTime))
+      .orElse(false);
+  }
+
+  private double valueAt(
+    final Vessel vessel,
+    final Market market,
+    final Bucket bucket
+  ) {
+    final Map<CurrencyUnit, Money> summary = Sale.summarise(
+      market.quote(catchCategoriser.apply(bucket))
+    );
+    checkState(
+      summary.size() <= 1,
+      "Catch of vessel %s priced in more than one currency: %s.",
+      vessel.getId(),
+      summary.keySet()
+    );
+    return summary
+      .values()
+      .stream()
+      .findAny()
+      .map(money -> money.getAmount().doubleValue())
+      .orElse(0.0);
+  }
+}
