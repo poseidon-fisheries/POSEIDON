@@ -170,7 +170,7 @@ components:
   vesselField: &id021 !!uk.ac.ox.poseidon.agents.fields.VesselFieldFactory
     modelGrid: *id002
   vesselSpecification: &id023 !!uk.ac.ox.poseidon.agents.vessels.VesselSpecificationFactory
-    behaviour:
+    behaviour: !!uk.ac.ox.poseidon.agents.vessels.FactoryComponent
       factory: !!uk.ac.ox.poseidon.agents.tasks.branches.SequenceTaskFactory
         children:
         - !!uk.ac.ox.poseidon.agents.vessels.TripBlockFactory
@@ -181,7 +181,7 @@ components:
             destination: !!uk.ac.ox.poseidon.agents.vessels.values.CurrentTripDestinationCellFactory {
               }
             distance: *id009
-            engine: &id015
+            engine: &id015 !!uk.ac.ox.poseidon.agents.vessels.FactoryComponent
               factory: !!uk.ac.ox.poseidon.agents.vessels.engines.SimpleEngineFactory
                 cruisingSpeed: !!uk.ac.ox.poseidon.core.quantities.SpeedFactory {
                   unitString: km/h,
@@ -193,7 +193,7 @@ components:
                 }
             eventManager: !!uk.ac.ox.poseidon.agents.vessels.values.CurrentTripEventManagerFactory {
               }
-            fuelTank: &id011
+            fuelTank: &id011 !!uk.ac.ox.poseidon.agents.vessels.FactoryComponent
               factory: !!uk.ac.ox.poseidon.agents.vessels.tanks.SimpleFuelTankFactory
                 capacity: &id010 !!uk.ac.ox.poseidon.core.quantities.VolumeFactory {
                   unitString: l,
@@ -222,7 +222,7 @@ components:
                 fisheable: !!uk.ac.ox.poseidon.agents.fisheables.CurrentCellFisheableFactory
                   fisheableGrid: *id005
                 fuelTank: *id011
-                gear: &id020
+                gear: &id020 !!uk.ac.ox.poseidon.agents.vessels.FactoryComponent
                   factory: !!uk.ac.ox.poseidon.agents.vessels.gears.FixedBiomassProportionGearFactory
                     duration: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory
                       object: !!uk.ac.ox.poseidon.core.time.DurationFactory {
@@ -240,7 +240,7 @@ components:
                       value: 1.0
                     }
                     proportion: *id012
-                hold: &id014
+                hold: &id014 !!uk.ac.ox.poseidon.agents.vessels.FactoryComponent
                   factory: !!uk.ac.ox.poseidon.agents.vessels.holds.StandardBiomassHoldFactory
                     capacity: !!uk.ac.ox.poseidon.core.quantities.MassFactory {
                       unitString: kg,
@@ -405,7 +405,7 @@ components:
       engine: *id015
       fuelTank: *id011
       hold: *id014
-      tripEvaluator:
+      tripEvaluator: !!uk.ac.ox.poseidon.agents.vessels.FactoryComponent
         factory: !!uk.ac.ox.poseidon.agents.choices.evaluation.TripEvaluatorFactory
           evaluationProvider: !!uk.ac.ox.poseidon.agents.choices.evaluation.ProfitPerHourDestinationEvaluationProviderFactory {
             currencyCode: IDR

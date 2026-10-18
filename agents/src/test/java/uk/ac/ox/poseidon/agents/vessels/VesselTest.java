@@ -55,8 +55,6 @@ import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.agents.tasks.VesselTask;
 import uk.ac.ox.poseidon.agents.vessels.VesselStatement.AttributeChange;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
-import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -101,10 +99,7 @@ class VesselTest {
       scope -> behaviour
     );
     final Vessel vessel = vesselWithAHomePort(declaration);
-    vessel.buildComponent(
-      declaration,
-      new VesselScope(new SimulationScope(mock(Simulation.class)), vessel)
-    );
+    vessel.buildComponents();
     return vessel;
   }
 

@@ -154,7 +154,6 @@ class FishingEventSharingRouteTest {
     when(modelGrid.toCell(coordinate)).thenReturn(cell);
     when(vesselField.getModelGrid()).thenReturn(modelGrid);
     when(vesselField.getCell(any())).thenReturn(cell);
-    when(gear.isActive()).thenReturn(true);
   }
 
   private void startSimulation(

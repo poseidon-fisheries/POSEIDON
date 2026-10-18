@@ -33,10 +33,11 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
-import java.util.SequencedMap;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.NonNull;
@@ -49,7 +50,7 @@ import uk.ac.ox.poseidon.agents.vessels.Fleet.StepScheduler;
 import uk.ac.ox.poseidon.agents.vessels.VesselStatement.AttributeChange;
 import uk.ac.ox.poseidon.agents.vessels.VesselStatement.Exit;
 import uk.ac.ox.poseidon.agents.vessels.accounts.Account;
-import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -72,9 +73,11 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * which the behaviour is not running, never during a run of the behaviour and
  * never inside the call that made the statement: so a vessel doesn't exit at
  * sea, and a change takes effect in port. A statement queued on a vessel with
- * no step pending schedules one, at once. An exit ends the queue: the vessel
- * leaves its fleet with no component left, and so inactive, and nothing after
- * it in the queue applies. Its current
+ * no step pending schedules one, at once. Once the queue is applied, every
+ * component whose choice reads an attribute that changed is rebuilt, once;
+ * the others, and what the vessel's own store holds, stay. An exit ends the
+ * queue: the vessel leaves its fleet with no component left, and so inactive,
+ * and nothing after it in the queue applies, nor any rebuild. Its current
  * state (cell, heading, trips) is changed by the behaviour itself, at once.
  * <p>
  * A vessel has at most one step pending on the schedule. It holds no
@@ -204,11 +207,11 @@ public class Vessel implements Oriented2D, HasAttributes {
 
   /**
    * The store this vessel keeps for each of its components, by the
-   * declaration the component is built from, in the order they were first
-   * built.
+   * declaration the component is built from; a declaration that gives this
+   * vessel no component has none.
    */
   @Getter(NONE)
-  private final SequencedMap<VesselComponent<?>, ProductStore> componentStores =
+  private final Map<VesselComponent<?>, ProductStore> componentStores =
     new LinkedHashMap<>();
 
   /** This vessel's components, by the declaration each is built from. */
@@ -227,21 +230,9 @@ public class Vessel implements Oriented2D, HasAttributes {
    */
   private Trip previousTrip;
 
-  /**
-   * @return whether this vessel has its behaviour, every gear among its
-   *         components is active, and it has a home port
-   */
+  /** @return whether this vessel has its behaviour and a home port */
   public boolean isActive() {
-    return (
-      tree != null &&
-      components
-        .values()
-        .stream()
-        .noneMatch(
-          component -> component instanceof final Gear gear && !gear.isActive()
-        ) &&
-      getHomePort() != null
-    );
+    return tree != null && getHomePort() != null;
   }
 
   /** @return whether this vessel's behaviour tree is running */
@@ -250,13 +241,15 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Applies the queued statements (only once the behaviour isn't running),
-   * then, if the vessel has not exited and is active, steps the behaviour tree
-   * with this vessel and reschedules — after {@link #taskDuration} if it's now
-   * running, or on the next tick otherwise.
+   * Applies the queued statements (only once the behaviour isn't running) and
+   * rebuilds what their changes choose anew, then, if the vessel has not
+   * exited and is active, steps the behaviour tree with this vessel and
+   * reschedules — after {@link #taskDuration} if it's now running, or on the
+   * next tick otherwise.
    */
   private void step() {
     if (!isBehaviourRunning()) {
+      final Map<String, Object> previousAttributes = attributes;
       while (!statements.isEmpty()) {
         switch (statements.poll()) {
           case final AttributeChange change -> setAttributes(
@@ -268,6 +261,7 @@ public class Vessel implements Oriented2D, HasAttributes {
           }
         }
       }
+      rebuildChosenAnew(previousAttributes);
     }
     if (isActive()) {
       tree.setObject(this);
@@ -338,14 +332,18 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Ends this vessel's component stores, in the reverse of the order they were
-   * built, and drops the components, which are no longer its own, so that it
-   * has no behaviour and is inactive; ends its own store; takes it off the
-   * vessel field; and takes it out of its fleet, which announces the exit.
+   * Ends this vessel's component stores, in the reverse of the order its
+   * specification builds them, and drops the components, which are no longer
+   * its own, so that it has no behaviour and is inactive; ends its own store;
+   * takes it off the vessel field; and takes it out of its fleet, which
+   * announces the exit.
    */
   private void exit() {
-    componentStores.sequencedValues().reversed().forEach(ProductStore::end);
-    components.clear();
+    specification
+      .listedComponents()
+      .toList()
+      .reversed()
+      .forEach(this::dropComponent);
     tree = null;
     productStore.end();
     vesselField.remove(this);
@@ -353,30 +351,95 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Builds the component {@code declaration} declares under a scope carrying
-   * the store this vessel keeps for it, opened the first time, and makes it
-   * this vessel's component for that declaration, in place of the previous one.
-   * The behaviour must not be running.
-   *
-   * @param declaration the declaration of the component
-   * @param scope       this vessel's scope
-   * @return the component built
+   * Builds every component this vessel's specification declares, in its
+   * order: the behaviour first, then the others as listed.
    */
-  <T> T buildComponent(
-    final VesselComponent<T> declaration,
-    final VesselScope scope
-  ) {
-    final ProductStore store = componentStores.computeIfAbsent(declaration, _ ->
-      new ProductStore()
-    );
-    final T component = declaration
-      .getFactory()
-      .get(new VesselComponentScope(scope, store));
-    components.put(declaration, component);
+  void buildComponents() {
+    specification.listedComponents().forEach(this::buildComponent);
+  }
+
+  /**
+   * Gives this vessel the component {@code declaration} declares for it, if
+   * any: built under a scope carrying a fresh store, which this vessel keeps
+   * for it. Renews the tree if that is the behaviour. The behaviour must not
+   * be running, and this vessel must have no component for
+   * {@code declaration}.
+   */
+  private <T> void buildComponent(final VesselComponent<T> declaration) {
+    factoryFor(declaration).ifPresent(factory -> {
+      final ProductStore store = new ProductStore();
+      componentStores.put(declaration, store);
+      components.put(
+        declaration,
+        factory.get(
+          new VesselComponentScope(specification.scopeOf(this), store)
+        )
+      );
+    });
     if (declaration == specification.getBehaviour()) {
-      tree = new BehaviorTree<>(specification.getBehaviour().of(this));
+      tree = specification
+        .getBehaviour()
+        .findIn(this)
+        .map(task -> new BehaviorTree<Vessel>(task))
+        .orElse(null);
     }
-    return component;
+  }
+
+  /**
+   * @return what builds this vessel's component for {@code declaration}: its
+   *         single factory, or what its choice gives for this vessel's
+   *         attributes; nothing if that is no component
+   */
+  private <T> Optional<
+    Factory<? super VesselComponentScope, ? extends T>
+  > factoryFor(final VesselComponent<T> declaration) {
+    return switch (declaration) {
+      case final FactoryComponent<T> single -> Optional.of(single.getFactory());
+      case final ChosenComponent<T> chosen -> switch (chosen.outcomeFor(this)) {
+        case final BuildOutcome<? extends T> build -> Optional.of(
+          build.getFactory()
+        );
+        case final NoComponent<? extends T> _ -> Optional.empty();
+      };
+    };
+  }
+
+  /**
+   * Gives this vessel anew every component whose choice reads an attribute
+   * whose value differs from {@code previousAttributes}, even if the same row
+   * is picked: ends their stores in the reverse of the order its
+   * specification builds them, then builds them in that order.
+   */
+  private void rebuildChosenAnew(final Map<String, Object> previousAttributes) {
+    final List<VesselComponent<?>> declarations = specification
+      .listedComponents()
+      .filter(
+        declaration ->
+          declaration instanceof final ChosenComponent<?> chosen &&
+          chosen
+            .getAttributes()
+            .stream()
+            .anyMatch(
+              attribute ->
+                !Objects.equals(
+                  previousAttributes.get(attribute),
+                  attributes.get(attribute)
+                )
+            )
+      )
+      .toList();
+    declarations.reversed().forEach(this::dropComponent);
+    declarations.forEach(this::buildComponent);
+  }
+
+  /**
+   * Ends the store of this vessel's component for {@code declaration}, if it
+   * has one, and drops the component.
+   */
+  private void dropComponent(final VesselComponent<?> declaration) {
+    final ProductStore store = componentStores.remove(declaration);
+    if (store != null) store.end();
+    components.remove(declaration);
   }
 
   /**
@@ -389,13 +452,18 @@ public class Vessel implements Oriented2D, HasAttributes {
   // The vessel keeps under a declaration only what its factory built, a T
   @SuppressWarnings("unchecked")
   <T> Optional<T> findComponent(final VesselComponent<T> declaration) {
-    checkState(
-      componentStores.containsKey(declaration),
-      "Vessel %s was not created with the declaration %s",
-      id,
-      declaration
-    );
-    return Optional.ofNullable((T) components.get(declaration));
+    final T component = (T) components.get(declaration);
+    if (component == null) {
+      checkState(
+        specification
+          .listedComponents()
+          .anyMatch(listed -> listed == declaration),
+        "Vessel %s was not created with the declaration %s",
+        id,
+        declaration
+      );
+    }
+    return Optional.ofNullable(component);
   }
 
   /** @return {@link #heading} */

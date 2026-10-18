@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.examples;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.ac.ox.poseidon.examples.FactoryChildrenTest.factoryClasses;
+import static uk.ac.ox.poseidon.examples.FactoryChildrenTest.nodeClasses;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -48,9 +48,9 @@ import org.yaml.snakeyaml.introspector.PropertyUtils;
 class FactoryBuildersTest {
 
   @Test
-  void everyConcreteFactoryHasABuilder() throws IOException {
+  void everyConcreteNodeHasABuilder() throws IOException {
     assertThat(
-      factoryClasses("uk.ac.ox.poseidon")
+      nodeClasses("uk.ac.ox.poseidon")
         .stream()
         .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
         .filter(clazz -> !hasBuilders(clazz))
@@ -63,7 +63,7 @@ class FactoryBuildersTest {
     final PropertyUtils propertyUtils = new PropertyUtils();
     propertyUtils.setAllowReadOnlyProperties(true);
     assertThat(
-      factoryClasses("uk.ac.ox.poseidon")
+      nodeClasses("uk.ac.ox.poseidon")
         .stream()
         .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
         .filter(clazz -> {

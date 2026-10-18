@@ -44,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.AbstractFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.ScenarioNode;
 
 /**
  * Every child factory of a factory must be reachable through a bean property,
@@ -57,7 +58,7 @@ class FactoryChildrenTest {
   @Test
   void everyFieldHoldingAFactoryIsABeanProperty() throws IOException {
     final List<String> hiddenChildren = new ArrayList<>();
-    for (final Class<?> factoryClass : factoryClasses("uk.ac.ox.poseidon")) {
+    for (final Class<?> factoryClass : nodeClasses("uk.ac.ox.poseidon")) {
       final Set<String> readableProperties = readableProperties(factoryClass);
       for (final Field field : factoryClass.getDeclaredFields()) {
         final int modifiers = field.getModifiers();
@@ -99,6 +100,20 @@ class FactoryChildrenTest {
     return classes(packagePrefix)
       .stream()
       .filter(AbstractFactory.class::isAssignableFrom)
+      .toList();
+  }
+
+  /**
+   * @return the classes of scenario nodes under {@code packagePrefix}: the
+   *         factories, and the parts of a scenario that build nothing
+   *         themselves, such as declarations and the rows of choices
+   */
+  static List<Class<?>> nodeClasses(final String packagePrefix)
+    throws IOException {
+    return classes(packagePrefix)
+      .stream()
+      .filter(ScenarioNode.class::isAssignableFrom)
+      .filter(clazz -> !clazz.isInterface())
       .toList();
   }
 

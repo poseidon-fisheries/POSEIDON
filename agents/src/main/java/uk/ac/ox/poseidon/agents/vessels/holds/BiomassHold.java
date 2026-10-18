@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,10 +22,13 @@
 
 package uk.ac.ox.poseidon.agents.vessels.holds;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.agents.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.agents.catches.CategorisedCatch;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /**
@@ -56,6 +59,28 @@ public abstract class BiomassHold implements Hold {
   @Override
   public void addContent(final CategorisedCatch categorisedCatch) {
     content = content.add(categorisedCatch);
+  }
+
+  /**
+   * Makes the store of {@code scope} refuse to end while {@code hold} holds
+   * catch: a component holding catch is never dropped, so it never needs to
+   * hand its catch over.
+   *
+   * @throws IllegalStateException when the store ends, if {@code hold} is not
+   *                               empty, naming the vessel and the mass
+   */
+  static void refuseToEndWithCatch(
+    final VesselComponentScope scope,
+    final Hold hold
+  ) {
+    scope.addTeardown(vessel ->
+      checkState(
+        hold.isEmpty(),
+        "Vessel %s's hold still holds %s kg of catch",
+        vessel,
+        hold.getContent().getTotalBiomassInKg()
+      )
+    );
   }
 
   /** Empties {@link #content} and returns what was removed. */

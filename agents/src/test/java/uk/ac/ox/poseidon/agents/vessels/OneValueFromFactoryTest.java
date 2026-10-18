@@ -24,13 +24,12 @@ package uk.ac.ox.poseidon.agents.vessels;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.agents.vessels.DeclaredComponents.componentScopeOf;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
@@ -44,21 +43,13 @@ class OneValueFromFactoryTest {
     new OneValueFromFactory<>(new CountingFactory(counter));
 
   // Kept in fields: a scope holds its vessel weakly
-  private final Vessel vesselA = vesselWithAStore();
-  private final Vessel vesselB = vesselWithAStore();
-  private final VesselScope scopeA = scopeOf(vesselA);
-  private final VesselScope scopeB = scopeOf(vesselB);
-
-  private static Vessel vesselWithAStore() {
-    final ProductStore store = new ProductStore();
-    final Vessel vessel = mock(Vessel.class);
-    when(vessel.getProductStore()).thenReturn(store);
-    return vessel;
-  }
-
-  private static VesselScope scopeOf(final Vessel vessel) {
-    return new VesselScope(mock(SimulationScope.class), vessel);
-  }
+  private final Vessel vessel = mock(Vessel.class);
+  private final VesselComponentScope scopeA = componentScopeOf(
+    new VesselScope(mock(SimulationScope.class), vessel)
+  );
+  private final VesselComponentScope scopeB = componentScopeOf(
+    new VesselScope(mock(SimulationScope.class), vessel)
+  );
 
   @Test
   void returnedValueIsStable() {
@@ -69,14 +60,14 @@ class OneValueFromFactoryTest {
   }
 
   @Test
-  void delegateCalledOnlyOncePerVessel() {
+  void delegateCalledOnlyOncePerComponent() {
     factory.get(scopeA);
     factory.get(scopeA);
     assertThat(counter).hasValue(1);
   }
 
   @Test
-  void eachVesselAsksTheValueOnceForItself() {
+  void eachComponentAsksTheValueOnceForItself() {
     assertThat(factory.get(scopeA).apply(null)).isEqualTo(1);
     assertThat(factory.get(scopeB).apply(null)).isEqualTo(2);
   }

@@ -27,8 +27,8 @@ almost every case — match the shape to the class's role:
   `ImmutableList` or `ImmutableMap` with `@Singular`, so the builder copies what it is given;
   the static helpers copy their arguments into one. `callSuper = true` makes equality include the
   superclass's fields. Don't add other constructors — see "Factory class shape" in
-  `docs/agents/architecture.md`. `VesselScopeFactoriesByCode` still has setters and a no-args
-  constructor, made for an older vessel register that set its code from a column.
+  `docs/agents/architecture.md`. The other scenario nodes (declarations, the rows and outcomes of
+  choices) are immutable beans with a builder and `toBuilder` too, checked by the same test.
 - **`Scenario`**: `@Getter @Builder(toBuilder = true)`, built fluently; its `with…` methods derive
   changed copies through `toBuilder`. Its all-arguments constructor is hand-written, to check
   component names.

@@ -31,15 +31,15 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link NeighbourhoodCellPicker},
+ * A {@link VesselComponentScopeFactory} counterpart of {@link NeighbourhoodCellPicker},
  * built via {@link Factories#neighbourhoodGridExplorer}.
  */
 @Getter
@@ -48,38 +48,40 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class NeighbourhoodGridExplorerFactory
-  extends VesselScopeFactory<Function<Vessel, Int2D>>
-  implements ValueFactory<VesselScope, Vessel, Int2D>
+  extends VesselComponentScopeFactory<Function<Vessel, Int2D>>
+  implements ValueFactory<VesselComponentScope, Vessel, Int2D>
 {
 
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends GridPathFinder
   > pathFinder;
   private final MappingFactory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? super Vessel,
     ? super Int2D,
     Boolean
   > cellPredicate;
   private final ValueFactory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? super Vessel,
     Integer
   > neighbourhoodSize;
   private final int maximumWidening;
   private final ValueFactory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? super Vessel,
     ? extends Int2D
   > searchCentre;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends MersenneTwisterFast
   > randomNumberGenerator;
 
   @Override
-  protected Function<Vessel, Int2D> newInstance(final VesselScope scope) {
+  protected Function<Vessel, Int2D> newInstance(
+    final VesselComponentScope scope
+  ) {
     return new NeighbourhoodCellPicker(
       pathFinder.get(scope),
       cellPredicate.get(scope),

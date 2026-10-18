@@ -28,6 +28,8 @@ import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.market.MarketGrid;
+import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -44,18 +46,25 @@ final class SpecificationFixtures {
   private SpecificationFixtures() {}
 
   /**
-   * @return a specification of vessels with {@code behaviour} and no other
-   *         component, whose home port is given by {@link #HOME_PORT}; it has
-   *         no fleet, so it creates no vessel
+   * @return a specification of vessels with {@code behaviour} and the other
+   *         {@code components}, whose home port is given by {@link #HOME_PORT},
+   *         building over a simulation scope of a mocked simulation; it has no
+   *         fleet, so it creates no vessel
    */
   static VesselSpecification specificationOf(
-    final VesselComponent<? extends Task<Vessel>> behaviour
+    final VesselComponent<? extends Task<Vessel>> behaviour,
+    final VesselComponent<?>... components
   ) {
+    final ImmutableMap.Builder<String, VesselComponent<?>> componentsByName =
+      ImmutableMap.builder();
+    for (int i = 0; i < components.length; i++) {
+      componentsByName.put("component" + i, components[i]);
+    }
     return new VesselSpecification(
-      null,
+      new SimulationScope(mock(Simulation.class)),
       null,
       behaviour,
-      ImmutableMap.of(),
+      componentsByName.build(),
       HOME_PORT,
       null
     );
@@ -64,14 +73,15 @@ final class SpecificationFixtures {
   /**
    * @return a vessel {@code "vessel"} constructed by a fleet over
    *         {@code schedule}, {@code vesselField} and {@code portGrid}, with
-   *         an account and {@code behaviour}, but no attribute and no
-   *         component built yet
+   *         an account, {@code behaviour} and the other {@code components},
+   *         but no attribute and no component built yet
    */
   static Vessel newVessel(
     final TemporalSchedule schedule,
     final VesselField vesselField,
     final PortGrid portGrid,
-    final VesselComponent<? extends Task<Vessel>> behaviour
+    final VesselComponent<? extends Task<Vessel>> behaviour,
+    final VesselComponent<?>... components
   ) {
     return new Fleet(
       schedule,
@@ -79,6 +89,6 @@ final class SpecificationFixtures {
       vesselField,
       portGrid,
       mock(MarketGrid.class)
-    ).createVessel("vessel", specificationOf(behaviour));
+    ).createVessel("vessel", specificationOf(behaviour, components));
   }
 }

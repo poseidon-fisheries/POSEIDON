@@ -31,7 +31,11 @@
  * vessel register table
  * ({@link uk.ac.ox.poseidon.agents.vessels.VesselRegisterFactory}), whose
  * later rows change the vessels' attributes or make them exit, through the
- * fleet.
+ * fleet. Each component is declared once, by a single factory
+ * ({@link uk.ac.ox.poseidon.agents.vessels.FactoryComponent}) or by a choice
+ * on the vessel's attributes
+ * ({@link uk.ac.ox.poseidon.agents.vessels.ChosenComponent}), which the
+ * vessel picks anew whenever an attribute it reads changes.
  * A vessel's hold/gear/engine/behaviour/etc. live in sibling packages
  * ({@link uk.ac.ox.poseidon.agents.vessels.holds},
  * {@link uk.ac.ox.poseidon.agents.vessels.gears},

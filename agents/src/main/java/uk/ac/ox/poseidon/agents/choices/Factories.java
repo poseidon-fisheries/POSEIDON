@@ -31,6 +31,7 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.components.VesselComponentRegister;
 import uk.ac.ox.poseidon.agents.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.agents.vessels.VesselScope;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.Factory;
@@ -92,19 +93,21 @@ public class Factories {
    * @param epsilon   probability of exploring instead of exploiting
    * @param explorer  gives an exploratory destination for a vessel
    * @param exploiter gives the currently-best-known destination for a vessel
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for
-   *         a vessel's destination chosen by an {@link EpsilonGreedyChooser}
+   * @return a
+   *         {@link uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory}
+   *         for a vessel's destination chosen by an
+   *         {@link EpsilonGreedyChooser}
    * @see EpsilonGreedyChooser
    */
   public static EpsilonGreedyDestinationFactory epsilonGreedyDestination(
     final double epsilon,
     final ValueFactory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? super Vessel,
       ? extends Int2D
     > explorer,
     final ValueFactory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? super Vessel,
       ? extends Int2D
     > exploiter
@@ -314,26 +317,30 @@ public class Factories {
    *                                  {@code cellPredicate}
    * @param searchCentre              gives the cell to search around for a
    *                                  vessel, asked for anew on each pick
-   * @return a {@link uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory} for a
-   *         {@link NeighbourhoodCellPicker}
+   * @return a
+   *         {@link uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory}
+   *         for a {@link NeighbourhoodCellPicker}
    * @see NeighbourhoodCellPicker
    */
   public static NeighbourhoodGridExplorerFactory neighbourhoodGridExplorer(
-    final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends GridPathFinder
+    > pathFinder,
     final MappingFactory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? super Vessel,
       ? super Int2D,
       Boolean
     > cellPredicate,
     final ValueFactory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? super Vessel,
       Integer
     > neighbourhoodSize,
     final int maximumWidening,
     final ValueFactory<
-      ? super VesselScope,
+      ? super VesselComponentScope,
       ? super Vessel,
       ? extends Int2D
     > searchCentre

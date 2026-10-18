@@ -44,7 +44,7 @@ public final class DeclaredComponents {
     final Vessel vessel,
     final T component
   ) {
-    final VesselComponent<T> declaration = new VesselComponent<>(
+    final VesselComponent<T> declaration = new FactoryComponent<>(
       scope -> component
     );
     giveComponent(vessel, declaration, component);

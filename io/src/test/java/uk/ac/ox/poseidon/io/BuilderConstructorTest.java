@@ -27,7 +27,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Singular;
 import lombok.experimental.SuperBuilder;
 import org.junit.jupiter.api.Test;
@@ -69,6 +72,21 @@ class BuilderConstructorTest {
     ).isEqualTo(3.5);
     assertThat(loaded.getLabel()).isEqualTo("a pair");
     assertThat(writer().dump(loaded)).isEqualTo(yaml);
+  }
+
+  @Test
+  void loadsUntaggedElementsOfAListThroughTheirBuildersIfTheyAreNodes() {
+    final ListsFactory lists = ListsFactory.builder()
+      .number(NumberFactory.builder().value(1.5).build())
+      .plainValue(new PlainValue(2.5))
+      .build();
+
+    final String yaml = writer().dump(lists);
+    final ListsFactory loaded = loader(ListsFactory.class).load(yaml);
+
+    assertThat(yaml).contains("{value: 1.5}").doesNotContain("NumberFactory");
+    assertThat(loaded.getNumbers().getFirst().getValue()).isEqualTo(1.5);
+    assertThat(loaded.getPlainValues().getFirst().getValue()).isEqualTo(2.5);
   }
 
   @Test
@@ -123,6 +141,31 @@ class BuilderConstructorTest {
     protected Map<String, T> newInstance(final Scope scope) {
       return Map.of("first", first.get(scope), "second", second.get(scope));
     }
+  }
+
+  @Getter
+  @SuperBuilder
+  public static class ListsFactory extends TestFactory<Double> {
+
+    @Singular
+    private final List<NumberFactory> numbers;
+
+    @Singular
+    private final List<PlainValue> plainValues;
+
+    @Override
+    protected Double newInstance(final Scope scope) {
+      return 0.0;
+    }
+  }
+
+  /** A value with setters and no builder, which SnakeYAML builds itself. */
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class PlainValue {
+
+    private double value;
   }
 
   public static class NoBuilderFactory {

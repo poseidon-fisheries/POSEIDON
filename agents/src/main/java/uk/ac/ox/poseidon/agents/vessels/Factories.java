@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.agents.vessels;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.startingDateTime;
@@ -52,14 +53,18 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param delegate factory for the value to ask once per vessel, with no
-   *                 context
+   * @param delegate factory for the value to ask once per vessel component,
+   *                 with no context
    * @return a {@link ValueFactory} for a constant of one value of the delegate,
-   *         for each vessel
+   *         for each vessel component
    * @see OneValueFromFactory
    */
   public static <R> OneValueFromFactory<R> oneValueFrom(
-    final ValueFactory<? super VesselScope, ? super Void, ? extends R> delegate
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Void,
+      ? extends R
+    > delegate
   ) {
     return new OneValueFromFactory<>(delegate);
   }
@@ -172,12 +177,96 @@ public class Factories {
   /**
    * @param factory builds the component, for each vessel
    * @return the declaration of a vessel component built by {@code factory}
-   * @see VesselComponent
+   * @see FactoryComponent
    */
-  public static <T> VesselComponent<T> vesselComponent(
+  public static <T> FactoryComponent<T> vesselComponent(
     final Factory<? super VesselComponentScope, ? extends T> factory
   ) {
-    return new VesselComponent<>(factory);
+    return new FactoryComponent<>(factory);
+  }
+
+  /**
+   * @param attributes the attributes the choice reads, in the order each row
+   *                   gives their values; from {@link #by}
+   * @param entries    the rows, from {@link #when}, and at most one default,
+   *                   from {@link #otherwise}
+   * @return the declaration of a vessel component chosen by
+   *         {@code attributes}
+   * @throws IllegalArgumentException if there are two defaults, a row does not
+   *                                  give one value for each attribute, or two
+   *                                  rows give the same values
+   * @see ChosenComponent
+   */
+  @SafeVarargs
+  public static <T> ChosenComponent<T> choice(
+    final ImmutableList<String> attributes,
+    final ChoiceEntry<? extends T>... entries
+  ) {
+    final ChosenComponent.ChosenComponentBuilder<T> choice =
+      ChosenComponent.<T>builder().attributes(attributes);
+    ChoiceOutcome<? extends T> defaultOutcome = null;
+    for (final ChoiceEntry<? extends T> entry : entries) {
+      switch (entry) {
+        case final ChoiceRow<? extends T> row -> choice.row(row);
+        case final ChoiceDefault<? extends T> choiceDefault -> {
+          checkArgument(
+            defaultOutcome == null,
+            "The choice by %s has two defaults",
+            attributes
+          );
+          defaultOutcome = choiceDefault.outcome();
+        }
+      }
+    }
+    return choice.defaultOutcome(defaultOutcome).build();
+  }
+
+  /**
+   * @param attributes the attributes a choice reads
+   * @return {@code attributes}, in their order, for {@link #choice}
+   */
+  public static ImmutableList<String> by(final String... attributes) {
+    return ImmutableList.copyOf(attributes);
+  }
+
+  /**
+   * @param values exact values of the attributes a choice reads, in their
+   *               order
+   * @return the start of a row of the choice for these values, to which
+   *         {@link ChoiceCondition#then} gives what they give
+   */
+  public static ChoiceCondition when(final Object... values) {
+    return new ChoiceCondition(ImmutableList.copyOf(values));
+  }
+
+  /**
+   * @param factory builds the component for a vessel whose values no row
+   *                lists
+   * @return the default of a choice, giving what {@code factory} builds
+   */
+  public static <T> ChoiceDefault<T> otherwise(
+    final Factory<? super VesselComponentScope, ? extends T> factory
+  ) {
+    return new ChoiceDefault<>(new BuildOutcome<>(factory));
+  }
+
+  /**
+   * @param noComponent {@link #none}
+   * @return the default of a choice, giving a vessel whose values no row
+   *         lists no component
+   */
+  public static <T> ChoiceDefault<T> otherwise(
+    final NoComponent<T> noComponent
+  ) {
+    return new ChoiceDefault<>(noComponent);
+  }
+
+  /**
+   * @return the outcome of a choice that gives no component, for what the
+   *         scenario does not model
+   */
+  public static <T> NoComponent<T> none() {
+    return new NoComponent<>();
   }
 
   /**
@@ -185,12 +274,12 @@ public class Factories {
    *                 each vessel
    * @return the declaration of the behaviour the vessel runs, built by
    *         {@code rootTask}; pass it where a vessel's behaviour is declared
-   * @see VesselComponent
+   * @see FactoryComponent
    */
-  public static VesselComponent<Task<Vessel>> behaviour(
+  public static FactoryComponent<Task<Vessel>> behaviour(
     final Factory<? super VesselComponentScope, ? extends Task<Vessel>> rootTask
   ) {
-    return new VesselComponent<>(rootTask);
+    return new FactoryComponent<>(rootTask);
   }
 
   /**

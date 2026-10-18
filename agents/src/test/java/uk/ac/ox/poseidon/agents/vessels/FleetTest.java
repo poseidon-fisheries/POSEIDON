@@ -182,8 +182,12 @@ class FleetTest {
 
     assertThat(specification.getBehaviour().findIn(vessel)).isEmpty();
     assertThat(
-      specification.getComponents().get("gear").findIn(vessel)
-    ).isEmpty();
+      specification
+        .getComponents()
+        .values()
+        .stream()
+        .map(declaration -> declaration.findIn(vessel))
+    ).allMatch(Optional::isEmpty);
     assertThat(vessel.isActive()).isFalse();
   }
 

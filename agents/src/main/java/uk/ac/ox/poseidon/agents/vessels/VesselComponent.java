@@ -23,42 +23,31 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import java.util.Optional;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ScenarioNode;
 
 /**
- * The scenario's single statement of one vessel component: what builds it.
- * Consumers hold the declaration and read the vessel's current component
- * through it, when they use it; the vessel keeps its components by
- * declaration. A declaration is not a factory, so that a consumer holding
- * one never builds it: the vessel does, when it is created. It is compared
- * by identity, as the key it is. Built via {@link Factories#vesselComponent}.
+ * The scenario's single statement of one vessel component: a single factory
+ * that builds it ({@link FactoryComponent}), or a choice of what builds it by
+ * the vessel's attributes ({@link ChosenComponent}). Consumers hold the
+ * declaration and read the vessel's current component through it, when they
+ * use it; the vessel keeps its components by declaration. A declaration is
+ * not a factory, so that a consumer holding one never builds it: the vessel
+ * does, when it is created, and again when a change of attributes makes a
+ * choice pick anew. It is compared by identity, as the key it is.
  *
  * @param <T> the type of the component
  */
-@Getter
-@AllArgsConstructor
-@Builder(toBuilder = true)
-public final class VesselComponent<T> implements ScenarioNode {
-
-  /**
-   * Builds the component; its own level decides where its product lives: a
-   * component-level factory gives each vessel its own, built fresh.
-   */
-  @NonNull
-  private final Factory<? super VesselComponentScope, ? extends T> factory;
-
+public sealed interface VesselComponent<T>
+  extends ScenarioNode
+  permits FactoryComponent, ChosenComponent
+{
   /**
    * @param vessel the vessel whose component to read
    * @return {@code vessel}'s component for this declaration
    * @throws IllegalStateException if {@code vessel} has no such component, or
    *                               was not created with this declaration
    */
-  public T of(final Vessel vessel) {
+  default T of(final Vessel vessel) {
     return findIn(vessel).orElseThrow(() ->
       new IllegalStateException(
         "Vessel " + vessel.getId() + " has no component declared by " + this
@@ -73,7 +62,7 @@ public final class VesselComponent<T> implements ScenarioNode {
    * @throws IllegalStateException if {@code vessel} was not created with this
    *                               declaration
    */
-  public Optional<T> findIn(final Vessel vessel) {
+  default Optional<T> findIn(final Vessel vessel) {
     return vessel.findComponent(this);
   }
 }

@@ -38,6 +38,7 @@ import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
+import uk.ac.ox.poseidon.agents.vessels.FactoryComponent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.gears.Gear;
@@ -136,7 +137,7 @@ class RegulationGridPortrayalFactoryTest {
   /** @return a gear declaration giving every vessel a gear */
   @SuppressWarnings("unchecked")
   private static VesselComponent<Gear> gear() {
-    final VesselComponent<Gear> gear = mock(VesselComponent.class);
+    final VesselComponent<Gear> gear = mock(FactoryComponent.class);
     when(gear.of(any())).thenReturn(mock(Gear.class));
     return gear;
   }

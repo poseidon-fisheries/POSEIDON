@@ -97,6 +97,13 @@ public class VesselSpecification {
   }
 
   /**
+   * @return the scope of {@code vessel}, under which its components are built
+   */
+  VesselScope scopeOf(final Vessel vessel) {
+    return new VesselScope(scope, vessel);
+  }
+
+  /**
    * Creates a vessel and schedules its first step, at the current instant.
    *
    * @param id         the new vessel's id
@@ -108,10 +115,7 @@ public class VesselSpecification {
   public Vessel create(final String id, final Map<String, ?> attributes) {
     final Vessel vessel = fleet.createVessel(id, this);
     vessel.setAttributes(attributes);
-    final VesselScope vesselScope = new VesselScope(scope, vessel);
-    listedComponents().forEach(component ->
-      vessel.buildComponent(component, vesselScope)
-    );
+    vessel.buildComponents();
     fleet.announceEntry(vessel);
     vessel.scheduleFirstStep();
     return vessel;

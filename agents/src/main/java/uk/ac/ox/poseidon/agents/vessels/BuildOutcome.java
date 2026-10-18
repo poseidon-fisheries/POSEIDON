@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,29 +20,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.gears;
+package uk.ac.ox.poseidon.agents.vessels;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.GlobalScopeFactory;
-import uk.ac.ox.poseidon.core.Scope;
+import lombok.NonNull;
+import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of {@link InactiveGear}, built via
- * {@link Factories#inactiveGear}.
+ * The outcome of a choice that builds the component with a factory, under a
+ * fresh store each time the vessel is given it. Built via
+ * {@link ChoiceCondition#then(Factory)} or {@link Factories#otherwise(Factory)}.
+ *
+ * @param <T> the type of the component
  */
 @Getter
-@ToString
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder(toBuilder = true)
-public class InactiveGearFactory extends GlobalScopeFactory<InactiveGear> {
+@Builder(toBuilder = true)
+public final class BuildOutcome<T> implements ChoiceOutcome<T> {
 
-  @Override
-  protected InactiveGear newInstance(final Scope scope) {
-    return new InactiveGear();
-  }
+  /** Builds the component; its own level decides where its product lives. */
+  @NonNull
+  private final Factory<? super VesselComponentScope, ? extends T> factory;
 }

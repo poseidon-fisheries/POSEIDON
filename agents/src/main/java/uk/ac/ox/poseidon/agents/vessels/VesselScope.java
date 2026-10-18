@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.agents.vessels;
 
 import java.lang.ref.WeakReference;
+import java.util.function.Consumer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import uk.ac.ox.poseidon.core.ProductStore;
@@ -98,6 +99,18 @@ public class VesselScope extends SimulationScope {
     getProductStore().addTeardown(() ->
       vessel.getEventManager().removeListener(listener)
     );
+  }
+
+  /**
+   * Runs {@code teardown} with the vessel when this scope's store ends, as
+   * the store's own teardowns run, the last added first. A teardown that
+   * throws refuses the end.
+   *
+   * @param teardown takes back, for the vessel, what a build did
+   */
+  public void addTeardown(final Consumer<? super Vessel> teardown) {
+    final Vessel vessel = getVessel();
+    getProductStore().addTeardown(() -> teardown.accept(vessel));
   }
 
   /**

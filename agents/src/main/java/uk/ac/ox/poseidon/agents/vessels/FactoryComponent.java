@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,34 +20,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.agents.vessels.gears;
+package uk.ac.ox.poseidon.agents.vessels;
 
-import java.time.Duration;
-import java.util.function.Supplier;
-import uk.ac.ox.poseidon.biology.Fisheable;
-import uk.ac.ox.poseidon.biology.buckets.Bucket;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link Gear} standing for having no gear at all; fishing with it is an
- * error.
+ * The declaration of a vessel component that one factory builds, for every
+ * vessel alike: it has no choice, so it is never rebuilt. Built via
+ * {@link Factories#vesselComponent} or {@link Factories#behaviour}.
+ *
+ * @param <T> the type of the component
  */
-public class InactiveGear implements Gear {
+@Getter
+@AllArgsConstructor
+@Builder(toBuilder = true)
+public final class FactoryComponent<T> implements VesselComponent<T> {
 
-  /** @throws IllegalStateException always */
-  @Override
-  public Supplier<Duration> getDurationSupplier() {
-    throw new IllegalStateException("Gear is inactive");
-  }
-
-  /** @throws IllegalStateException always */
-  @Override
-  public Bucket fish(final Fisheable fisheable) {
-    throw new IllegalStateException("Gear is inactive");
-  }
-
-  /** @return always {@code false} */
-  @Override
-  public boolean isActive() {
-    return false;
-  }
+  /**
+   * Builds the component; its own level decides where its product lives: a
+   * component-level factory gives each vessel its own, built fresh.
+   */
+  @NonNull
+  private final Factory<? super VesselComponentScope, ? extends T> factory;
 }

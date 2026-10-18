@@ -27,6 +27,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -36,6 +37,7 @@ import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
 import org.yaml.snakeyaml.nodes.Node;
+import uk.ac.ox.poseidon.core.ScenarioNode;
 import uk.ac.ox.poseidon.core.utils.Builders;
 
 /**
@@ -142,6 +144,18 @@ class BuilderConstructor extends Constructor {
     public Property getProperty(final String name) {
       final Property readable = readOnlyProperties.getProperty(getType(), name);
       register(readable.getType());
+      // The elements of a collection are written without a tag too when their
+      // class is the collection's element type; a scenario node among them is
+      // built through its builder, and a plain value as SnakeYAML builds it
+      final Class<?>[] typeArguments = readable.getActualTypeArguments();
+      if (
+        Collection.class.isAssignableFrom(readable.getType()) &&
+        typeArguments != null
+      ) {
+        Arrays.stream(typeArguments)
+          .filter(ScenarioNode.class::isAssignableFrom)
+          .forEach(BuilderConstructor.this::register);
+      }
       return new Property(name, readable.getType()) {
         @Override
         public Class<?>[] getActualTypeArguments() {

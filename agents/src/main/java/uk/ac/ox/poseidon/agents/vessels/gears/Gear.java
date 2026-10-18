@@ -48,7 +48,4 @@ public interface Gear {
    *         the process
    */
   Bucket fish(Fisheable fisheable);
-
-  /** @return {@code true} if this gear can actually be fished with */
-  boolean isActive();
 }

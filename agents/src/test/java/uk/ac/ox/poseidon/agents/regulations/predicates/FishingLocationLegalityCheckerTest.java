@@ -40,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
 import uk.ac.ox.poseidon.agents.regulations.actions.ExtendedFishingAction;
+import uk.ac.ox.poseidon.agents.vessels.FactoryComponent;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
 import uk.ac.ox.poseidon.agents.vessels.engines.Engine;
@@ -85,11 +86,11 @@ class FishingLocationLegalityCheckerTest {
   private final Gear gear = mock(Gear.class);
   private final GridPathFinder pathFinder = mock(GridPathFinder.class);
   private final DistanceCalculator distance = mock(DistanceCalculator.class);
-  private final VesselComponent<Gear> gearDeclaration = new VesselComponent<>(
+  private final VesselComponent<Gear> gearDeclaration = new FactoryComponent<>(
     scope -> gear
   );
   private final VesselComponent<Engine> engineDeclaration =
-    new VesselComponent<>(scope -> mock(Engine.class));
+    new FactoryComponent<>(scope -> mock(Engine.class));
 
   @BeforeEach
   void setUp() {

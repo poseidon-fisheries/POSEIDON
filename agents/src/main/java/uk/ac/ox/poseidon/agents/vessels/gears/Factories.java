@@ -102,15 +102,6 @@ public class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
-   *         {@link InactiveGear}
-   * @see InactiveGear
-   */
-  public static InactiveGearFactory inactiveGear() {
-    return new InactiveGearFactory();
-  }
-
-  /**
    * @param duration      how long one fishing event takes, asked with no
    *                      context
    * @param species               the species to index proportions over

@@ -33,8 +33,9 @@ import uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselComponentScopeFactory} counterpart of {@link InfiniteBiomassHold},
- * built via {@link Factories#infiniteBiomassHold}.
+ * A {@link VesselComponentScopeFactory} counterpart of
+ * {@link InfiniteBiomassHold}, which refuses to have its store ended while it holds
+ * catch, built via {@link Factories#infiniteBiomassHold}.
  */
 @Getter
 @ToString
@@ -52,6 +53,10 @@ public class InfiniteBiomassHoldFactory
 
   @Override
   protected InfiniteBiomassHold newInstance(final VesselComponentScope scope) {
-    return new InfiniteBiomassHold(catchCategoriser.get(scope));
+    final InfiniteBiomassHold hold = new InfiniteBiomassHold(
+      catchCategoriser.get(scope)
+    );
+    BiomassHold.refuseToEndWithCatch(scope, hold);
+    return hold;
   }
 }

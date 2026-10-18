@@ -26,13 +26,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.behaviour;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.by;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.choice;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.none;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.otherwise;
 import static uk.ac.ox.poseidon.agents.vessels.Factories.vesselComponent;
+import static uk.ac.ox.poseidon.agents.vessels.Factories.when;
 import static uk.ac.ox.poseidon.agents.vessels.SpecificationFixtures.newVessel;
 
 import com.badlogic.gdx.ai.btree.leaf.Success;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.agents.fields.VesselField;
-import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -43,56 +48,45 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  */
 class VesselComponentTest {
 
-  private final Vessel vessel = newVessel(
-    mock(TemporalSchedule.class),
-    mock(VesselField.class),
-    mock(PortGrid.class),
-    behaviour(scope -> new Success<>())
+  private final VesselComponent<Object> declaration = vesselComponent(
+    new NewObjectFactory()
   );
-  private final VesselScope scope = new VesselScope(
-    mock(SimulationScope.class),
-    vessel
-  );
+
+  /** @return a vessel created with {@code components}, all built */
+  private static Vessel vesselWith(final VesselComponent<?>... components) {
+    final Vessel vessel = newVessel(
+      mock(TemporalSchedule.class),
+      mock(VesselField.class),
+      mock(PortGrid.class),
+      behaviour(scope -> new Success<>()),
+      components
+    );
+    vessel.buildComponents();
+    return vessel;
+  }
 
   @Test
   void theVesselHasTheComponentItsDeclarationBuilt() {
-    final VesselComponent<Object> declaration = vesselComponent(
-      new NewObjectFactory()
-    );
+    final Vessel vessel = vesselWith(declaration);
 
-    final Object component = vessel.buildComponent(declaration, scope);
-
-    assertThat(declaration.of(vessel)).isSameAs(component);
-    assertThat(declaration.findIn(vessel)).containsSame(component);
+    assertThat(declaration.of(vessel)).isInstanceOf(Object.class);
+    assertThat(declaration.findIn(vessel)).containsSame(declaration.of(vessel));
   }
 
   @Test
-  void buildingAComponentAgainReusesItsStore() {
-    final VesselComponent<Object> declaration = vesselComponent(
-      new NewObjectFactory()
-    );
-
-    assertThat(vessel.buildComponent(declaration, scope)).isSameAs(
-      vessel.buildComponent(declaration, scope)
-    );
-  }
-
-  @Test
-  void twoDeclarationsOfOneFactoryGiveTwoComponents() {
+  void twoDeclarationsOfOneFactoryAreTwoKeysAndGiveTwoComponents() {
     final NewObjectFactory factory = new NewObjectFactory();
     final VesselComponent<Object> first = vesselComponent(factory);
     final VesselComponent<Object> second = vesselComponent(factory);
-    vessel.buildComponent(first, scope);
-    vessel.buildComponent(second, scope);
+    final Vessel vessel = vesselWith(first, second);
 
+    assertThat(first).isNotEqualTo(second);
     assertThat(first.of(vessel)).isNotSameAs(second.of(vessel));
   }
 
   @Test
   void aDeclarationTheVesselWasNotCreatedWithIsAWiringError() {
-    final VesselComponent<Object> declaration = vesselComponent(
-      new NewObjectFactory()
-    );
+    final Vessel vessel = vesselWith();
 
     assertThatThrownBy(() -> declaration.of(vessel))
       .isInstanceOf(IllegalStateException.class)
@@ -100,6 +94,26 @@ class VesselComponentTest {
     assertThatThrownBy(() -> declaration.findIn(vessel)).isInstanceOf(
       IllegalStateException.class
     );
+  }
+
+  @Test
+  void aChoiceOfNoComponentLeavesTheComponentAbsent() {
+    final VesselComponent<Object> chosen = choice(
+      by("gear"),
+      when("PS").then(new NewObjectFactory()),
+      otherwise(none())
+    );
+    final Vessel vessel = newVessel(
+      mock(TemporalSchedule.class),
+      mock(VesselField.class),
+      mock(PortGrid.class),
+      behaviour(scope -> new Success<>()),
+      chosen
+    );
+    vessel.setAttributes(Map.of("gear", "GNS"));
+    vessel.buildComponents();
+
+    assertThat(chosen.findIn(vessel)).isEmpty();
   }
 
   private static final class NewObjectFactory

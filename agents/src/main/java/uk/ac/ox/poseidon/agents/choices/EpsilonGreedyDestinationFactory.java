@@ -32,13 +32,13 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
-import uk.ac.ox.poseidon.agents.vessels.VesselScope;
-import uk.ac.ox.poseidon.agents.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link EpsilonGreedyChooser},
+ * A {@link VesselComponentScopeFactory} counterpart of {@link EpsilonGreedyChooser},
  * built via {@link Factories#epsilonGreedyDestination}.
  */
 @Getter
@@ -47,23 +47,23 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class EpsilonGreedyDestinationFactory
-  extends VesselScopeFactory<Function<Vessel, Optional<Int2D>>>
-  implements ValueFactory<VesselScope, Vessel, Optional<Int2D>>
+  extends VesselComponentScopeFactory<Function<Vessel, Optional<Int2D>>>
+  implements ValueFactory<VesselComponentScope, Vessel, Optional<Int2D>>
 {
 
   private final double epsilon;
   private final ValueFactory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? super Vessel,
     ? extends Int2D
   > explorer;
   private final ValueFactory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? super Vessel,
     ? extends Int2D
   > exploiter;
   private final Factory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? extends MersenneTwisterFast
   > randomNumberGenerator;
 
@@ -73,7 +73,7 @@ public class EpsilonGreedyDestinationFactory
    */
   @Override
   protected Function<Vessel, Optional<Int2D>> newInstance(
-    final VesselScope scope
+    final VesselComponentScope scope
   ) {
     return new EpsilonGreedyChooser<>(
       epsilon,

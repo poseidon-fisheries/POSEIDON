@@ -31,6 +31,7 @@ import com.badlogic.gdx.ai.btree.Task;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.agents.vessels.FactoryComponent;
 import uk.ac.ox.poseidon.agents.vessels.Trip;
 import uk.ac.ox.poseidon.agents.vessels.Vessel;
 import uk.ac.ox.poseidon.agents.vessels.VesselComponent;
@@ -50,12 +51,12 @@ final class TravelTasks {
   static final LocalDateTime NOW = LocalDateTime.of(2026, 1, 1, 0, 0);
 
   /** The declaration of the engine of the vessels made here. */
-  static final VesselComponent<Engine> ENGINE = new VesselComponent<>(scope ->
+  static final VesselComponent<Engine> ENGINE = new FactoryComponent<>(scope ->
     mock(Engine.class)
   );
 
   /** The declaration of the fuel tank of the vessels made here. */
-  static final VesselComponent<FuelTank> FUEL_TANK = new VesselComponent<>(
+  static final VesselComponent<FuelTank> FUEL_TANK = new FactoryComponent<>(
     scope -> mock(FuelTank.class)
   );
 

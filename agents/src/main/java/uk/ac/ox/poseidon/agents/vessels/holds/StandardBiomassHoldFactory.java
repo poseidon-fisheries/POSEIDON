@@ -37,8 +37,9 @@ import uk.ac.ox.poseidon.agents.vessels.VesselComponentScopeFactory;
 import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A {@link VesselComponentScopeFactory} counterpart of {@link StandardBiomassHold},
- * built via {@link Factories#standardBiomassHold}.
+ * A {@link VesselComponentScopeFactory} counterpart of
+ * {@link StandardBiomassHold}, which refuses to have its store ended while
+ * it holds catch, built via {@link Factories#standardBiomassHold}.
  */
 @Getter
 @ToString
@@ -64,10 +65,12 @@ public class StandardBiomassHoldFactory
 
   @Override
   protected StandardBiomassHold newInstance(final VesselComponentScope scope) {
-    return new StandardBiomassHold(
+    final StandardBiomassHold hold = new StandardBiomassHold(
       catchCategoriser.get(scope),
       capacity.get(scope).to(KILOGRAM).getValue().doubleValue(),
       tolerance.get(scope).to(KILOGRAM).getValue().doubleValue()
     );
+    BiomassHold.refuseToEndWithCatch(scope, hold);
+    return hold;
   }
 }
