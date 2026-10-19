@@ -248,54 +248,82 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Applies the queued statements (only once the behaviour isn't running) and
-   * rebuilds what their changes choose anew, then, if the vessel has not
-   * exited and is active, steps the behaviour tree with this vessel and
-   * reschedules — after {@link #taskDuration} if it's now running, or on the
-   * next tick otherwise.
+   * Steps the running task, if the behaviour tree is running. If the tree is
+   * then not running, applies the queued statements and, if the vessel has not
+   * exited and is active, starts the tree afresh, in this same step. Then, if
+   * the vessel is active, schedules the next step after {@link #taskDuration}.
+   *
+   * @throws IllegalStateException if the tree, started afresh, finishes
+   *                               without starting a task: restarting it would
+   *                               never move time on
    */
   private void step() {
+    if (isBehaviourRunning()) {
+      stepBehaviour();
+    }
     if (!isBehaviourRunning()) {
-      final Map<String, Object> previousAttributes = attributes;
-      while (!statements.isEmpty()) {
-        switch (statements.poll()) {
-          case final AttributeChange change -> setAttributes(
-            change.applyTo(attributes)
-          );
-          case final Exit _ -> {
-            exit();
-            return;
-          }
-        }
+      applyStatements();
+      if (isActive()) {
+        stepBehaviour();
+        checkState(
+          isBehaviourRunning(),
+          "Vessel %s's behaviour finished without starting a task.",
+          this
+        );
       }
-      rebuildChosenAnew(previousAttributes);
     }
     if (isActive()) {
-      tree.setObject(this);
-      steppingBehaviour = true;
-      try {
-        tree.step();
-      } finally {
-        steppingBehaviour = false;
-        tree.setObject(null);
-      }
-      if (isBehaviourRunning()) {
-        final Duration delay = checkNotNull(
-          taskDuration,
-          "Vessel %s's behaviour is running, but no task set a duration this step.",
-          this
+      final Duration delay = checkNotNull(
+        taskDuration,
+        "Vessel %s's behaviour is running, but no task set a duration this step.",
+        this
+      );
+      taskDuration = null;
+      stepScheduler.scheduleNextStep(delay);
+    }
+  }
+
+  /**
+   * Applies the queued statements in order and rebuilds what their changes
+   * choose anew; an exit ends this vessel, and the statements after it are
+   * never applied.
+   */
+  private void applyStatements() {
+    final Map<String, Object> previousAttributes = attributes;
+    while (!statements.isEmpty()) {
+      switch (statements.poll()) {
+        case final AttributeChange change -> setAttributes(
+          change.applyTo(attributes)
         );
-        taskDuration = null;
-        stepScheduler.scheduleNextStep(delay);
-      } else {
-        checkState(
-          taskDuration == null,
-          "Vessel %s's behaviour is not running, but a task set a duration this step.",
-          this
-        );
-        stepScheduler.scheduleNextStep();
+        case final Exit _ -> {
+          exit();
+          return;
+        }
       }
     }
+    rebuildChosenAnew(previousAttributes);
+  }
+
+  /**
+   * Steps the behaviour tree, which reaches this vessel only meanwhile.
+   *
+   * @throws IllegalStateException if the tree is no longer running but a task
+   *                               set a duration
+   */
+  private void stepBehaviour() {
+    tree.setObject(this);
+    steppingBehaviour = true;
+    try {
+      tree.step();
+    } finally {
+      steppingBehaviour = false;
+      tree.setObject(null);
+    }
+    checkState(
+      isBehaviourRunning() || taskDuration == null,
+      "Vessel %s's behaviour is not running, but a task set a duration this step.",
+      this
+    );
   }
 
   /**

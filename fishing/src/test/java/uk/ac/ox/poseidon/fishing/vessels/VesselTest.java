@@ -70,23 +70,22 @@ class VesselTest {
   private final Vessel vessel = vesselWithItsBehaviour(behaviour);
 
   /**
-   * A behaviour that records when it is run. With a {@link #taskDuration},
-   * each run alternates between starting a task of that duration and
-   * finishing it; without one, it is never running.
+   * A behaviour that records when it is run. Each run alternates between
+   * starting a task of {@link #taskDuration} and finishing it.
    */
   private class RecordingTask extends VesselTask {
 
     private final List<LocalDateTime> stepDateTimes = new ArrayList<>();
     private final List<Vessel> vesselsRead = new ArrayList<>();
-    private Duration taskDuration;
+    private Duration taskDuration = ofSeconds(1);
 
     @Override
     public Status execute() {
       stepDateTimes.add(schedule.getDateTime());
       vesselsRead.add(getVessel());
-      return taskDuration != null && getStatus() != Status.RUNNING
-        ? runFor(taskDuration)
-        : Status.SUCCEEDED;
+      return getStatus() == Status.RUNNING
+        ? Status.SUCCEEDED
+        : runFor(taskDuration);
     }
   }
 
@@ -182,14 +181,31 @@ class VesselTest {
   }
 
   @Test
-  void aVesselStepsFirstAtOnceThenEveryTickWhileItsBehaviourIsNotRunning() {
+  void aBehaviourThatFinishesItsTaskRestartsInTheSameStep() {
     vessel.scheduleFirstStep();
     stepFor(ofSeconds(3));
     assertThat(behaviour.stepDateTimes).containsExactly(
       START,
       START.plusSeconds(1),
+      START.plusSeconds(1),
+      START.plusSeconds(2),
       START.plusSeconds(2)
     );
+  }
+
+  @Test
+  void aBehaviourThatFinishesWithoutStartingATaskFails() {
+    final class FinishesAtOnceTask extends VesselTask {
+
+      @Override
+      public Status execute() {
+        return Status.SUCCEEDED;
+      }
+    }
+    vesselWithItsBehaviour(new FinishesAtOnceTask()).scheduleFirstStep();
+    assertThatThrownBy(() -> stepFor(ofSeconds(1)))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("finished without starting a task");
   }
 
   @Test
@@ -202,6 +218,7 @@ class VesselTest {
     stepFor(ofSeconds(2));
     assertThat(behaviour.stepDateTimes).containsExactly(
       START.plusSeconds(2),
+      START.plusSeconds(3),
       START.plusSeconds(3)
     );
   }
@@ -216,7 +233,10 @@ class VesselTest {
     assertThat(behaviour.stepDateTimes).containsExactly(
       START,
       START.plusSeconds(1),
+      START.plusSeconds(1),
       START.plusSeconds(2),
+      START.plusSeconds(2),
+      START.plusSeconds(3),
       START.plusSeconds(3)
     );
     assertThat(vessel.getAttributes()).containsEntry("gear", "OTB");
@@ -230,22 +250,29 @@ class VesselTest {
     stepFor(ofSeconds(3));
     vessel.queue(setting(HOME_PORT, "P1"));
     stepFor(ofSeconds(2));
+    // The task running when the home port goes is finished at 2 seconds
     assertThat(behaviour.stepDateTimes).containsExactly(
       START,
       START.plusSeconds(1),
+      START.plusSeconds(1),
+      START.plusSeconds(2),
       START.plusSeconds(5),
+      START.plusSeconds(6),
       START.plusSeconds(6)
     );
   }
 
   @Test
-  void aStatementMadeDuringTheVesselsOwnStepIsAppliedAtItsNextStep() {
+  void aStatementMadeDuringTheVesselsOwnStepIsAppliedWhenItsTaskFinishes() {
     final class StatesItsGearTask extends VesselTask {
 
       @Override
       public Status execute() {
+        if (getStatus() == Status.RUNNING) {
+          return Status.SUCCEEDED;
+        }
         getVessel().queue(setting("gear", "PS"));
-        return Status.SUCCEEDED;
+        return runFor(ofSeconds(1));
       }
     }
     final Vessel vessel = vesselWithItsBehaviour(new StatesItsGearTask());
@@ -261,10 +288,10 @@ class VesselTest {
     behaviour.taskDuration = ofHours(1);
     vessel.scheduleFirstStep();
     stepFor(ofHours(2));
-    assertThat(behaviour.stepDateTimes).startsWith(
+    assertThat(behaviour.stepDateTimes).containsExactly(
       START,
       START.plusHours(1),
-      START.plusHours(1).plusSeconds(1)
+      START.plusHours(1)
     );
   }
 
@@ -319,13 +346,13 @@ class VesselTest {
   }
 
   @Test
-  void aStatementWaitsForTheStepAfterTheBehaviourStopsRunning() {
+  void aStatementWaitsUntilTheBehaviourFinishesItsTask() {
     behaviour.taskDuration = ofHours(1);
     vessel.scheduleFirstStep();
     stepFor(ofSeconds(1));
     vessel.queue(setting("gear", "PS"));
-    // Up to the step at one hour, in which the behaviour stops running
-    stepFor(ofHours(1));
+    // Up to just before the step at one hour, in which the task finishes
+    stepFor(ofHours(1).minusSeconds(1));
     assertThat(vessel.getAttributes()).doesNotContainKey("gear");
     stepFor(ofSeconds(1));
     assertThat(vessel.getAttributes()).containsEntry("gear", "PS");

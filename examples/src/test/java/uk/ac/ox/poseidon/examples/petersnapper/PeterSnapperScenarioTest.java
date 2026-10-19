@@ -89,7 +89,7 @@ class PeterSnapperScenarioTest {
   @Test
   void landingsMatchTheBaseline() {
     assertThat(landingsForAYear(new PeterSnapperScenario().get())).isEqualTo(
-      Map.of(1, 2.108111508988373E7)
+      Map.of(1, 2.1606374013265967E7)
     );
   }
 

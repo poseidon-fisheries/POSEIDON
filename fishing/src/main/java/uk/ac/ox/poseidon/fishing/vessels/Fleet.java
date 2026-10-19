@@ -236,16 +236,6 @@ public class Fleet implements VesselsGetter {
     }
 
     /**
-     * Schedules the vessel's step on the next tick.
-     *
-     * @throws IllegalStateException if the step is already pending
-     */
-    void scheduleNextStep() {
-      checkState(!stepPending, "The vessel already has a step pending.");
-      stepPending = schedule.scheduleOnce(step, VESSEL_STEP_ORDERING);
-    }
-
-    /**
      * Schedules the vessel's step after {@code delay}.
      *
      * @throws IllegalStateException if the step is already pending

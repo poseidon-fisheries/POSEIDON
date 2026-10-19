@@ -102,13 +102,19 @@ class FleetTest {
     null
   );
 
-  /** A behaviour that records each step of its vessel. */
+  /**
+   * A behaviour that records each time it starts, then runs for a second and
+   * finishes.
+   */
   private class RecordingTask extends VesselTask {
 
     @Override
     public Status execute() {
+      if (getStatus() == Status.RUNNING) {
+        return Status.SUCCEEDED;
+      }
       events.add("step " + getVessel().getId());
-      return Status.SUCCEEDED;
+      return runFor(ofSeconds(1));
     }
   }
 
