@@ -76,7 +76,7 @@ public class LandCatches extends ExtendedTripTask {
       vessel.getId()
     );
     checkState(
-      vessel.getCell().equals(vessel.getHomePortLocation()),
+      vessel.getCell().equals(vessel.getHomePortCell()),
       "Vessel %s is landing at %s, not at its home port %s.",
       vessel.getId(),
       vessel.getCell(),

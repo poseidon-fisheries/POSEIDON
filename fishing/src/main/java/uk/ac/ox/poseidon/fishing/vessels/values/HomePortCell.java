@@ -31,6 +31,6 @@ public class HomePortCell implements Function<Vessel, Int2D> {
 
   @Override
   public Int2D apply(final Vessel vessel) {
-    return vessel.getHomePortLocation();
+    return vessel.getHomePortCell();
   }
 }

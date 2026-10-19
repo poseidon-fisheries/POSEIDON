@@ -76,7 +76,7 @@ class RouteViaDestinationTest {
     );
     when(engine.getCruisingSpeedInKph()).thenReturn(10.0);
     when(vessel.getCell()).thenReturn(vesselCell);
-    when(vessel.getHomePortLocation()).thenReturn(portCell);
+    when(vessel.getHomePortCell()).thenReturn(portCell);
     when(
       distanceCalculator.distanceInKm(any(Number2D.class), any(Number2D.class))
     ).thenReturn(5.0);
@@ -103,7 +103,7 @@ class RouteViaDestinationTest {
 
     final Int2D otherPortCell = new Int2D(3, 3);
     when(vessel.getCell()).thenReturn(destination);
-    when(vessel.getHomePortLocation()).thenReturn(otherPortCell);
+    when(vessel.getHomePortCell()).thenReturn(otherPortCell);
     when(engine.getCruisingSpeedInKph()).thenReturn(20.0);
     when(pathFinder.getPath(destination, destination)).thenReturn(
       Optional.of(ImmutableList.of(destination))
@@ -124,7 +124,7 @@ class RouteViaDestinationTest {
     when(otherEngine.getCruisingSpeedInKph()).thenReturn(20.0);
     giveComponent(otherVessel, engineComponent, otherEngine);
     when(otherVessel.getCell()).thenReturn(destination);
-    when(otherVessel.getHomePortLocation()).thenReturn(portCell);
+    when(otherVessel.getHomePortCell()).thenReturn(portCell);
     when(pathFinder.getPath(destination, destination)).thenReturn(
       Optional.of(ImmutableList.of(destination))
     );

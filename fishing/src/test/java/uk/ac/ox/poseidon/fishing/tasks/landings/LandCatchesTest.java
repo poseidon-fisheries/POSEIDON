@@ -74,7 +74,7 @@ class LandCatchesTest {
     when(homePortMarket.sell(any(), any(), any())).thenReturn(sale);
     when(otherPortMarket.sell(any(), any(), any())).thenReturn(sale);
     when(vessel.getHomePort()).thenReturn(homePort);
-    when(vessel.getHomePortLocation()).thenReturn(homePortCell);
+    when(vessel.getHomePortCell()).thenReturn(homePortCell);
     when(vessel.getCell()).thenReturn(homePortCell);
     when(vessel.getMarketGrid()).thenReturn(marketGrid);
     when(trip.getAccount()).thenReturn(mock(Account.class));

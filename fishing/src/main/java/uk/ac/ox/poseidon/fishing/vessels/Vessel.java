@@ -29,6 +29,7 @@ import static lombok.AccessLevel.NONE;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.google.common.collect.ImmutableMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -209,6 +210,14 @@ public class Vessel implements Oriented2D, HasAttributes {
    */
   @Getter(NONE)
   private Port homePort;
+
+  /**
+   * The cell {@link #homePort} is placed on, or {@code null} if there is no
+   * home port; looked up with it, since ports do not move and the cell is read
+   * on every route to a fishing option.
+   */
+  @Getter(NONE)
+  private Int2D homePortCell;
 
   /** This vessel's running balance, which changes at once, from any call. */
   private final Account account = new Account();
@@ -575,12 +584,16 @@ public class Vessel implements Oriented2D, HasAttributes {
    * @return {@code true} if the vessel's current cell is its home port's cell
    */
   public boolean isAtHomePort() {
-    return getCell().equals(getHomePortLocation());
+    return getCell().equals(getHomePortCell());
   }
 
   /** @return the home port's grid cell */
-  public Int2D getHomePortLocation() {
-    return portGrid.getLocation(getHomePort());
+  @SuppressFBWarnings(
+    value = "EI",
+    justification = "A cell is an Int2D, whose coordinates are final."
+  )
+  public Int2D getHomePortCell() {
+    return homePortCell;
   }
 
   /** @return this vessel's current attributes */
@@ -606,8 +619,10 @@ public class Vessel implements Oriented2D, HasAttributes {
     )
       .flatMap(code -> portGrid.getObject(code.toString()))
       .orElse(null);
-    if (homePort != null && getCell() == null) {
-      setCurrentCell(portGrid.getLocation(homePort));
+    this.homePortCell =
+      homePort == null ? null : portGrid.getLocation(homePort);
+    if (homePortCell != null && getCell() == null) {
+      setCurrentCell(homePortCell);
     }
   }
 
