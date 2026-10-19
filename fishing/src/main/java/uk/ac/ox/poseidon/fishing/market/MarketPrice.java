@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.market;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import lombok.Value;
 
@@ -47,6 +48,10 @@ public class MarketPrice {
    * @throws IllegalArgumentException if the entry's price is not in the
    *                                  market's currency
    */
+  @SuppressFBWarnings(
+    value = "EI2",
+    justification = "A market price applies to the market it is given, which it keeps as is."
+  )
   public MarketPrice(final BiomassMarket market, final PriceEntry priceEntry) {
     market.checkCurrencyUnit(priceEntry.getPrice());
     this.market = market;

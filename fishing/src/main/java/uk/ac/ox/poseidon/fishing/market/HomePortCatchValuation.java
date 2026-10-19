@@ -30,8 +30,6 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.fishing.choices.ContextualisedValuation;
@@ -41,12 +39,11 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 /**
  * Values a catch at the prices of the market at a vessel's home port, as it
  * would sell there now: the catch is sorted by the vessel's own
- * {@link CatchCategoriser}, priced by {@link Market#quote}, and summed by
- * {@link Sale#summarise}. Species without a price count as zero. The option the
- * catch is remembered for is ignored, so that this can be combined with other
+ * {@link CatchCategoriser} and priced by {@link Market#quote}, in the market's
+ * currency. Species without a price count as zero. The option the catch is
+ * remembered for is ignored, so that this can be combined with other
  * valuations of the same shape. A change of home port or of prices shows the
- * next time the valuation is put in a vessel's context. Assumes a single
- * currency.
+ * next time the valuation is put in a vessel's context.
  * <p>
  * Values are remembered per catch, and forgotten when the home port's market
  * changes or its prices change ({@link Market#getLastPriceChangeDateTime}).
@@ -75,9 +72,8 @@ public class HomePortCatchValuation implements Valuation<Object, Bucket> {
    * @param vessel the vessel that would sell the catches
    * @return what a catch would sell for at {@code vessel}'s home port now; the
    *         option the catch is remembered for is ignored
-   * @throws IllegalStateException if the vessel has no home port, its home port
-   *                               does not have exactly one market, or a catch
-   *                               valued is priced in more than one currency
+   * @throws IllegalStateException if the vessel has no home port, or its home
+   *                               port does not have exactly one market
    */
   @Override
   public ContextualisedValuation<Object, Bucket> inContextOf(
@@ -101,7 +97,9 @@ public class HomePortCatchValuation implements Valuation<Object, Bucket> {
       valuedSince = currentDateTime.apply(vessel);
     }
     return (option, bucket) ->
-      values.computeIfAbsent(bucket, key -> valueAt(vessel, market, key));
+      values.computeIfAbsent(bucket, key ->
+        market.quote(catchCategoriser.apply(key)).getAmount().doubleValue()
+      );
   }
 
   // Strictly before: a price set in the same second as a valuation may have
@@ -114,27 +112,5 @@ public class HomePortCatchValuation implements Valuation<Object, Bucket> {
       .getLastPriceChangeDateTime()
       .map(lastPriceChange -> !lastPriceChange.isBefore(dateTime))
       .orElse(false);
-  }
-
-  private double valueAt(
-    final Vessel vessel,
-    final Market market,
-    final Bucket bucket
-  ) {
-    final Map<CurrencyUnit, Money> summary = Sale.summarise(
-      market.quote(catchCategoriser.apply(bucket))
-    );
-    checkState(
-      summary.size() <= 1,
-      "Catch of vessel %s priced in more than one currency: %s.",
-      vessel.getId(),
-      summary.keySet()
-    );
-    return summary
-      .values()
-      .stream()
-      .findAny()
-      .map(money -> money.getAmount().doubleValue())
-      .orElse(0.0);
   }
 }

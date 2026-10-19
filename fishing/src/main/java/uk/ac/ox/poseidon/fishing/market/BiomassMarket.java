@@ -37,6 +37,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.ToString;
 import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.buckets.BucketBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -134,13 +135,32 @@ public class BiomassMarket implements Market {
 
   /**
    * Prices {@code categorisedCatch} via {@link #getPrice}, as {@link #sell}
-   * does.
+   * does: what has no price pays nothing. The total is rounded once, to the
+   * nearest minor unit of {@link #currencyUnit}, as {@link Sale#summarise}
+   * rounds a sale's total.
    */
   @Override
-  public List<Sale.Item> quote(final CategorisedCatch categorisedCatch) {
-    final List<Sale.Item> items = new ArrayList<>();
-    split(categorisedCatch, items::add, (catchCategory, bucket) -> {});
-    return items;
+  public Money quote(final CategorisedCatch categorisedCatch) {
+    final double[] total = { 0.0 };
+    categorisedCatch.getBuckets().forEach((catchCategory, bucket) -> {
+      final Map<Species, Price> pricePerSpecies = prices.get(catchCategory);
+      if (pricePerSpecies == null) return;
+      final Map<Species, Optional<Price>> priceCacheBySpecies =
+        priceCache.computeIfAbsent(catchCategory, key -> new HashMap<>());
+      bucket.forEachBiomassValue((species, biomass) -> {
+        final Optional<Price> price = priceCacheBySpecies.computeIfAbsent(
+          species,
+          key -> resolvePrice(pricePerSpecies, key)
+        );
+        if (price.isPresent()) {
+          total[0] += price.get().valueForKgDouble(biomass);
+        }
+      });
+    });
+    return Money.ofMinor(
+      currencyUnit,
+      (long) Math.rint(total[0] * Math.pow(10, currencyUnit.getDecimalPlaces()))
+    );
   }
 
   /**

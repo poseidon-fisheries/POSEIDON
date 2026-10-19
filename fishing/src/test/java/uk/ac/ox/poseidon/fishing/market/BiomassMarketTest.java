@@ -31,7 +31,6 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.joda.money.CurrencyUnit;
@@ -165,15 +164,12 @@ class BiomassMarketTest {
   }
 
   @Test
-  void quotePricesOnlyWhatHasAPriceWithoutBroadcasting() {
+  void quotesWhatTheSaleWouldMakeWithoutBroadcasting() {
     final CatchCategory pricedCategory = new CatchCategory("C1");
     final CatchCategory unpricedCategory = new CatchCategory("C2");
     final Species pricedSpecies = new Species("S1", null, null);
+    final Species coveredSpecies = new Species("S1", "juvenile", null);
     final Species unpricedSpecies = new Species("S2", null, null);
-    final Price price = new Price(
-      Money.of(CurrencyUnit.of("EUR"), 2.0),
-      KILOGRAM
-    );
     final EventManager eventManager = mock(EventManager.class);
     final BiomassMarket market = new BiomassMarket(
       mock(Port.class),
@@ -181,30 +177,63 @@ class BiomassMarketTest {
       CurrencyUnit.EUR,
       eventManager
     );
-    market.setPrice(pricedCategory, pricedSpecies, price, DATE_TIME);
-
-    final List<Sale.Item> items = market.quote(
-      new CategorisedCatch(
-        Map.of(
-          pricedCategory,
-          Bucket.of(
-            Map.of(
-              pricedSpecies,
-              Biomass.ofKg(10.0),
-              unpricedSpecies,
-              Biomass.ofKg(20.0)
-            )
-          ),
-          unpricedCategory,
-          Bucket.of(pricedSpecies, 30.0)
-        )
+    market.setPrice(pricedCategory, pricedSpecies, eurosPerKg(2.37), DATE_TIME);
+    final CategorisedCatch categorisedCatch = new CategorisedCatch(
+      Map.of(
+        pricedCategory,
+        Bucket.of(
+          Map.of(
+            pricedSpecies,
+            Biomass.ofKg(10.3),
+            coveredSpecies,
+            Biomass.ofKg(5.5),
+            unpricedSpecies,
+            Biomass.ofKg(20.0)
+          )
+        ),
+        unpricedCategory,
+        Bucket.of(pricedSpecies, 30.0)
       )
     );
 
-    assertThat(items).containsExactly(
-      new Sale.Item(pricedCategory, pricedSpecies, Biomass.ofKg(10.0), price)
-    );
+    final Money quote = market.quote(categorisedCatch);
+
     verifyNoInteractions(eventManager);
+    // (10.3 + 5.5) kg at 2.37 EUR/kg is 37.446 EUR.
+    assertThat(quote).isEqualTo(Money.of(CurrencyUnit.EUR, 37.45));
+    assertThat(quote).isEqualTo(saleTotal(market, categorisedCatch));
+  }
+
+  @Test
+  void quotesNothingForAnEmptyCatch() {
+    final BiomassMarket market = marketWithPrices("M5", Map.of());
+
+    assertThat(market.quote(CategorisedCatch.empty())).isEqualTo(
+      Money.zero(CurrencyUnit.EUR)
+    );
+  }
+
+  @Test
+  void quotesAtTheNewPriceAfterAPriceChange() {
+    final CatchCategory category = new CatchCategory("C1");
+    final Species species = new Species("S1", null, null);
+    final BiomassMarket market = marketWithPrices(
+      "M8",
+      Map.of(category, Map.of(species, eurosPerKg(2.0)))
+    );
+    final CategorisedCatch categorisedCatch = new CategorisedCatch(
+      Map.of(category, Bucket.of(species, 10.0))
+    );
+    market.quote(categorisedCatch);
+
+    market.setPrice(category, species, eurosPerKg(3.0), DATE_TIME);
+
+    assertThat(market.quote(categorisedCatch)).isEqualTo(
+      Money.of(CurrencyUnit.EUR, 30.0)
+    );
+    assertThat(market.quote(categorisedCatch)).isEqualTo(
+      saleTotal(market, categorisedCatch)
+    );
   }
 
   @Test
@@ -272,6 +301,20 @@ class BiomassMarketTest {
       .hasMessage("Market M7 trades in EUR, not USD.");
     assertThat(market.getPrices()).isEmpty();
     assertThat(market.getLastPriceChangeDateTime()).isEmpty();
+  }
+
+  private static Price eurosPerKg(final double amount) {
+    return new Price(Money.of(CurrencyUnit.EUR, amount), KILOGRAM);
+  }
+
+  private static Money saleTotal(
+    final BiomassMarket market,
+    final CategorisedCatch categorisedCatch
+  ) {
+    return market
+      .sell(mock(Vessel.class), categorisedCatch, DATE_TIME)
+      .summary()
+      .getOrDefault(CurrencyUnit.EUR, Money.zero(CurrencyUnit.EUR));
   }
 
   private static BiomassMarket marketWithPrices(

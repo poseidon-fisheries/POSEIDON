@@ -22,8 +22,6 @@
 
 package uk.ac.ox.poseidon.fishing.market;
 
-import static java.math.RoundingMode.HALF_EVEN;
-
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -103,7 +101,10 @@ public class Sale implements HasAttributes {
     return summarise(items);
   }
 
-  /** @return the total value of {@code items}, per currency */
+  /**
+   * @return the total value of {@code items}, per currency, each rounded once
+   *         to the nearest minor unit of its currency
+   */
   public static Map<CurrencyUnit, Money> summarise(
     final Collection<Item> items
   ) {
@@ -122,7 +123,15 @@ public class Sale implements HasAttributes {
     }
     final Map<CurrencyUnit, Money> result = new HashMap<>();
     totals.forEach((currencyUnit, total) ->
-      result.put(currencyUnit, Money.of(currencyUnit, total, HALF_EVEN))
+      result.put(
+        currencyUnit,
+        Money.ofMinor(
+          currencyUnit,
+          (long) Math.rint(
+            total * Math.pow(10, currencyUnit.getDecimalPlaces())
+          )
+        )
+      )
     );
     return result;
   }

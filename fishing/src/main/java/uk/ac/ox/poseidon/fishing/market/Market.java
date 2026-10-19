@@ -23,8 +23,8 @@
 package uk.ac.ox.poseidon.fishing.market;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
+import org.joda.money.Money;
 import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -57,10 +57,11 @@ public interface Market {
    * nothing is broadcast and no sale ID is used.
    *
    * @param categorisedCatch the catch to price
-   * @return the items that would sell, one per priced (category, species)
-   *         combination; what has no price is left out
+   * @return what the catch would sell for, in this market's currency: the
+   *         total of the sale {@link #sell} would make; what has no price
+   *         counts as nothing
    */
-  List<Sale.Item> quote(CategorisedCatch categorisedCatch);
+  Money quote(CategorisedCatch categorisedCatch);
 
   /**
    * @return when this market's prices last changed, or empty if they never
