@@ -93,11 +93,26 @@ public class GreedyPicker<O> implements Function<Vessel, O> {
       checkState(!Double.isNaN(value), "Value of option %s is NaN.", option);
       entries.add(entry(option, value));
     });
+
+    // Most picks take an option at the best value, so the options are sorted
+    // only when none of those passes.
+    double bestValue = Double.NEGATIVE_INFINITY;
+    final List<O> best = new ArrayList<>();
+    for (final Entry<O, Double> entry : entries) {
+      final double value = entry.getValue();
+      if (value > bestValue) {
+        bestValue = value;
+        best.clear();
+      }
+      if (value == bestValue) best.add(entry.getKey());
+    }
+    final Optional<O> bestPicked = pickAmongTied(vessel, best);
+    if (bestPicked.isPresent()) return bestPicked.get();
+
     entries.sort(
       comparingDouble((Entry<O, Double> entry) -> entry.getValue()).reversed()
     );
-
-    int start = 0;
+    int start = best.size();
     while (start < entries.size()) {
       final double value = entries.get(start).getValue();
       final List<O> tied = new ArrayList<>();
@@ -106,14 +121,20 @@ public class GreedyPicker<O> implements Function<Vessel, O> {
         tied.add(entries.get(end).getKey());
         end++;
       }
-      // The first option to pass, in a random order, is a uniformly random pick
-      // among the passing ones, without testing the others.
-      final Optional<O> picked = shuffledStream(tied, rng)
-        .filter(option -> optionPredicate.apply(vessel, option))
-        .findFirst();
+      final Optional<O> picked = pickAmongTied(vessel, tied);
       if (picked.isPresent()) return picked.get();
       start = end;
     }
     return null;
+  }
+
+  /**
+   * The first option to pass, in a random order, is a uniformly random pick
+   * among the passing ones, without testing the others.
+   */
+  private Optional<O> pickAmongTied(final Vessel vessel, final List<O> tied) {
+    return shuffledStream(tied, rng)
+      .filter(option -> optionPredicate.apply(vessel, option))
+      .findFirst();
   }
 }
