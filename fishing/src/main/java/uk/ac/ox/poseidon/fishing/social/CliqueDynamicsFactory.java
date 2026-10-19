@@ -24,10 +24,12 @@ package uk.ac.ox.poseidon.fishing.social;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
@@ -55,11 +57,12 @@ public class CliqueDynamicsFactory
     ? super SimulationScope,
     ? extends SocialNetwork
   > network;
-  private final ValueFactory<
-    ? super SimulationScope,
-    ? super Vessel,
-    ?
-  > groupingKey;
+
+  @Singular
+  private final ImmutableList<
+    ValueFactory<? super SimulationScope, ? super Vessel, ?>
+  > groupingValues;
+
   private final int maximumCliqueSize;
   private final Factory<
     ? super SimulationScope,
@@ -69,10 +72,13 @@ public class CliqueDynamicsFactory
   @Override
   protected CliqueDynamics newListener(final SimulationScope scope) {
     checkNotNull(network, "network must not be null");
-    checkNotNull(groupingKey, "groupingKey must not be null");
+    checkNotNull(groupingValues, "groupingValues must not be null");
     return new CliqueDynamics(
       network.get(scope),
-      groupingKey.get(scope),
+      groupingValues
+        .stream()
+        .map(value -> value.get(scope))
+        .toList(),
       maximumCliqueSize,
       randomNumberGenerator.get(scope)
     );

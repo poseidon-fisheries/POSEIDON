@@ -24,6 +24,8 @@ package uk.ac.ox.poseidon.fishing.social;
 
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
 
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -84,9 +86,9 @@ public class Factories {
 
   /**
    * @param network           the network whose ties the dynamics add and remove
-   * @param groupingKey       gives a vessel's grouping key: vessels are
+   * @param groupingValues    give the values that group vessels: vessels are
    *                          eligible for each other when both are active and
-   *                          their keys are equal
+   *                          each of these gives them equal values
    * @param maximumCliqueSize the largest clique a vessel joins, itself
    *                          included; 1 means no vessel ever has partners
    * @return a
@@ -97,12 +99,14 @@ public class Factories {
    */
   public static CliqueDynamicsFactory cliqueDynamics(
     final Factory<? super SimulationScope, ? extends SocialNetwork> network,
-    final ValueFactory<? super SimulationScope, ? super Vessel, ?> groupingKey,
+    final List<
+      ? extends ValueFactory<? super SimulationScope, ? super Vessel, ?>
+    > groupingValues,
     final int maximumCliqueSize
   ) {
     return new CliqueDynamicsFactory(
       network,
-      groupingKey,
+      ImmutableList.copyOf(groupingValues),
       maximumCliqueSize,
       randomNumberGenerator()
     );

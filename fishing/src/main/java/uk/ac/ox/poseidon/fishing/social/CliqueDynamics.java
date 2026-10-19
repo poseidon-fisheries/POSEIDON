@@ -38,20 +38,20 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 /**
  * Network dynamics that keep vessels in cliques of at most
  * {@link #maximumCliqueSize} vessels eligible for each other: both active, with
- * equal grouping keys (in NW Med, the same home port and gear). Every tie goes
- * both ways, so a vessel's clique is itself and its partners, its recipients in
- * the network.
+ * equal values for every one of the {@link #groupingValues} (in NW Med, the
+ * same home port and gear). Every tie goes both ways, so a vessel's clique is
+ * itself and its partners, its recipients in the network.
  */
 public class CliqueDynamics implements Listener<TripStartEvent> {
 
   private final SocialNetwork network;
-  private final Function<? super Vessel, ?> groupingKey;
+  private final ImmutableList<Function<? super Vessel, ?>> groupingValues;
   private final int maximumCliqueSize;
   private final MersenneTwisterFast rng;
 
   CliqueDynamics(
     final SocialNetwork network,
-    final Function<? super Vessel, ?> groupingKey,
+    final List<? extends Function<? super Vessel, ?>> groupingValues,
     final int maximumCliqueSize,
     final MersenneTwisterFast rng
   ) {
@@ -61,7 +61,7 @@ public class CliqueDynamics implements Listener<TripStartEvent> {
       maximumCliqueSize
     );
     this.network = checkNotNull(network);
-    this.groupingKey = checkNotNull(groupingKey);
+    this.groupingValues = ImmutableList.copyOf(groupingValues);
     this.maximumCliqueSize = maximumCliqueSize;
     this.rng = checkNotNull(rng);
   }
@@ -136,11 +136,14 @@ public class CliqueDynamics implements Listener<TripStartEvent> {
       .build();
   }
 
+  /** Reads the grouping values in order, only until one differs. */
   private boolean areEligible(final Vessel a, final Vessel b) {
     return (
       a.isActive() &&
       b.isActive() &&
-      Objects.equals(groupingKey.apply(a), groupingKey.apply(b))
+      groupingValues
+        .stream()
+        .allMatch(value -> Objects.equals(value.apply(a), value.apply(b)))
     );
   }
 

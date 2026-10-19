@@ -108,7 +108,7 @@ class CliqueDynamicsPropertyTest {
     final SocialNetwork network = new SocialNetwork(() -> fleet);
     final CliqueDynamics dynamics = new CliqueDynamics(
       network,
-      keys::get,
+      List.of(keys::get),
       maximumCliqueSize,
       new MersenneTwisterFast(seed)
     );

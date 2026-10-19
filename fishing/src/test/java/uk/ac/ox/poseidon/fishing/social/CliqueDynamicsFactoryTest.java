@@ -31,6 +31,7 @@ import static uk.ac.ox.poseidon.fishing.social.Factories.socialNetwork;
 
 import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Scope;
@@ -55,13 +56,13 @@ class CliqueDynamicsFactoryTest {
   private final Vessel a = vessel(simulationEventManager);
   private final Vessel b = vessel(simulationEventManager);
   private final Fleet fleet = fleetOf(a, b);
-  private final ValueFactory<Scope, Vessel, String> groupingKey = scope ->
+  private final ValueFactory<Scope, Vessel, String> groupingValue = scope ->
     vessel ->
       "X";
   private final SocialNetworkFactory network = socialNetwork(object(fleet));
   private final CliqueDynamicsFactory factory = cliqueDynamics(
     network,
-    groupingKey,
+    List.of(groupingValue),
     5
   );
 

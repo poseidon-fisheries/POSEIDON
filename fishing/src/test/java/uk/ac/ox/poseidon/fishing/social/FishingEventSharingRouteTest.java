@@ -56,6 +56,7 @@ import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -211,7 +212,7 @@ class FishingEventSharingRouteTest {
       .component("socialNetwork", network)
       .component(
         "cliqueDynamics",
-        cliqueDynamics(network, vesselProperty("homePort.code"), 5)
+        cliqueDynamics(network, List.of(vesselProperty("homePort.code")), 5)
       )
       .component("fishingEventAccumulator", fishingEventAccumulator());
     if (withSharing) {

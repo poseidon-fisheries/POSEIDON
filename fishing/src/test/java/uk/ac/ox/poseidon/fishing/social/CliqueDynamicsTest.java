@@ -62,7 +62,7 @@ class CliqueDynamicsTest {
   private CliqueDynamics dynamics(final int maximumCliqueSize) {
     return new CliqueDynamics(
       network,
-      ports::get,
+      List.of(ports::get),
       maximumCliqueSize,
       new MersenneTwisterFast(0)
     );
@@ -86,10 +86,29 @@ class CliqueDynamicsTest {
   }
 
   @Test
-  void splitsACliqueByGroupingKey() {
+  void splitsACliqueByGroupingValue() {
     tieAll(a, b, c, d);
     ports.put(c, "Y");
     ports.put(d, "Y");
+
+    dynamics.settle(a);
+
+    assertPartners(a, b);
+    assertPartners(b, a);
+    assertPartners(c, d);
+    assertPartners(d, c);
+  }
+
+  @Test
+  void splitsACliqueByALaterGroupingValue() {
+    tieAll(a, b, c, d);
+    final Map<Vessel, String> gears = Map.of(a, "G", b, "G", c, "H", d, "H");
+    final CliqueDynamics dynamics = new CliqueDynamics(
+      network,
+      List.of(ports::get, gears::get),
+      5,
+      new MersenneTwisterFast(0)
+    );
 
     dynamics.settle(a);
 
@@ -199,7 +218,7 @@ class CliqueDynamicsTest {
     final SocialNetwork network = new SocialNetwork(() -> List.of(a));
     final CliqueDynamics dynamics = new CliqueDynamics(
       network,
-      ports::get,
+      List.of(ports::get),
       5,
       new MersenneTwisterFast(0)
     );
@@ -247,7 +266,7 @@ class CliqueDynamicsTest {
     final SocialNetwork network = new SocialNetwork(() -> fleet);
     final CliqueDynamics dynamics = new CliqueDynamics(
       network,
-      vessel -> "X",
+      List.of(vessel -> "X"),
       3,
       new MersenneTwisterFast(42)
     );
@@ -300,7 +319,7 @@ class CliqueDynamicsTest {
     final SocialNetwork network = new SocialNetwork(() -> fleet);
     final CliqueDynamics dynamics = new CliqueDynamics(
       network,
-      ports::get,
+      List.of(ports::get),
       3,
       new MersenneTwisterFast(0)
     );
