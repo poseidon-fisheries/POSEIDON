@@ -67,7 +67,7 @@ public abstract class ObjectGrid<T>
   }
 
   /** @return the cell {@code object} is placed on */
-  public Int2D getLocation(final T object) {
+  public Int2D getCell(final T object) {
     return field.getObjectLocation(object);
   }
 

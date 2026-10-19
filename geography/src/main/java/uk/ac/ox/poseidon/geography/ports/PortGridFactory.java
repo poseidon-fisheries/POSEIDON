@@ -113,7 +113,7 @@ public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
   ) {
     final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
     final Int2D cell = modelGrid.toCell(coordinate);
-    if (validPortLocation(bathymetricGrid, cell)) {
+    if (isValidPortCell(bathymetricGrid, cell)) {
       return Optional.of(cell);
     } else {
       return bathymetricGrid
@@ -129,7 +129,7 @@ public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
     }
   }
 
-  private boolean validPortLocation(
+  private boolean isValidPortCell(
     final BathymetricGrid bathymetricGrid,
     final Int2D cell
   ) {

@@ -120,7 +120,7 @@ class VoyageHomeTest {
     @Override
     public Status execute() {
       if (getStatus() == Status.RUNNING) {
-        getVessel().setCurrentCell(portGrid.getLocation(destination));
+        getVessel().setCurrentCell(portGrid.getCell(destination));
         log.add("arrive at " + destination.getCode());
         return Status.SUCCEEDED;
       }
@@ -150,7 +150,7 @@ class VoyageHomeTest {
     final Port port = mock(Port.class);
     when(port.getCode()).thenReturn(code);
     when(portGrid.getObject(code)).thenReturn(Optional.of(port));
-    when(portGrid.getLocation(port)).thenReturn(cell);
+    when(portGrid.getCell(port)).thenReturn(cell);
   }
 
   private void stepFor(final Duration duration) {

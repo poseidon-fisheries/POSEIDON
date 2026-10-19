@@ -36,7 +36,7 @@ import uk.ac.ox.poseidon.geography.bathymetry.DefaultBathymetricGrid;
 class MutablePortGridTest {
 
   @Test
-  void copyOfKeepsLocations() {
+  void copyOfKeepsCells() {
     final DefaultBathymetricGrid bathymetricGrid = new DefaultBathymetricGrid(
       new double[][] { { +1d, -1d, -1d }, { +1d, +1d, -1d }, { -1d, -1d, -1d } }
     );
@@ -55,7 +55,7 @@ class MutablePortGridTest {
       copy.getPorts().collect(Collectors.toSet())
     );
     Set.of(portA, portB).forEach(port ->
-      assertEquals(source.getLocation(port), copy.getLocation(port))
+      assertEquals(source.getCell(port), copy.getCell(port))
     );
   }
 

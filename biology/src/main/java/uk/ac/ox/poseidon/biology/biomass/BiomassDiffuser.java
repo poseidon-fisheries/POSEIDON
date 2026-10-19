@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -55,7 +55,7 @@ public class BiomassDiffuser implements Steppable {
 
   private final transient BiomassDiffusionRule biomassDiffusionRule;
 
-  private final List<Int2D> habitableLocations;
+  private final List<Int2D> habitableCells;
 
   private final Map<Int2D, List<Int2D>> habitableNeighbours;
 
@@ -82,21 +82,17 @@ public class BiomassDiffuser implements Steppable {
     this.carryingCapacityGrid = carryingCapacityGrid;
     this.biomassDiffusionRule = biomassDiffusionRule;
     this.rng = rng;
-    this.habitableLocations = List.copyOf(
-      carryingCapacityGrid.getHabitableCells()
-    );
-    final HashSet<Int2D> habitableLocationsSet = new HashSet<>(
-      habitableLocations
-    );
-    this.habitableNeighbours = habitableLocations
+    this.habitableCells = List.copyOf(carryingCapacityGrid.getHabitableCells());
+    final HashSet<Int2D> habitableCellsSet = new HashSet<>(habitableCells);
+    this.habitableNeighbours = habitableCells
       .stream()
       .collect(
-        toMap(identity(), location ->
+        toMap(identity(), cell ->
           carryingCapacityGrid
             .getModelGrid()
-            .getActiveNeighbours(location)
+            .getActiveNeighbours(cell)
             .stream()
-            .filter(habitableLocationsSet::contains)
+            .filter(habitableCellsSet::contains)
             .toList()
         )
       );
@@ -108,20 +104,17 @@ public class BiomassDiffuser implements Steppable {
    */
   @Override
   public void step(final SimState simState) {
-    shuffledStream(habitableLocations, rng).forEach(location -> {
-      shuffledStream(habitableNeighbours.get(location), rng).forEach(
-        neighbour -> {
-          final Double2D updatedBiomasses =
-            biomassDiffusionRule.updatedBiomasses(
-              biomassGrid.getValue(location),
-              carryingCapacityGrid.getCarryingCapacity(location),
-              biomassGrid.getValue(neighbour),
-              carryingCapacityGrid.getCarryingCapacity(neighbour)
-            );
-          biomassGrid.setBiomass(location, updatedBiomasses.x);
-          biomassGrid.setBiomass(neighbour, updatedBiomasses.y);
-        }
-      );
+    shuffledStream(habitableCells, rng).forEach(cell -> {
+      shuffledStream(habitableNeighbours.get(cell), rng).forEach(neighbour -> {
+        final Double2D updatedBiomasses = biomassDiffusionRule.updatedBiomasses(
+          biomassGrid.getValue(cell),
+          carryingCapacityGrid.getCarryingCapacity(cell),
+          biomassGrid.getValue(neighbour),
+          carryingCapacityGrid.getCarryingCapacity(neighbour)
+        );
+        biomassGrid.setBiomass(cell, updatedBiomasses.x);
+        biomassGrid.setBiomass(neighbour, updatedBiomasses.y);
+      });
     });
   }
 }

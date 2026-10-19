@@ -43,7 +43,7 @@ public interface PortGrid extends Iterable<Port> {
   Stream<Port> getPorts();
 
   /** @return the cell {@code port} is placed on */
-  Int2D getLocation(Port port);
+  Int2D getCell(Port port);
 
   /** @return the ports placed on {@code cell}, usually at most one */
   Stream<Port> getObjectsAt(Int2D cell);
@@ -58,38 +58,21 @@ public interface PortGrid extends Iterable<Port> {
   Optional<Port> getObject(String id);
 
   /**
-   * @throws IllegalStateException if {@code coordinate}'s cell isn't a valid
-   *                               port location (see
-   *                               {@link #validateLocation(Int2D, Coordinate)})
-   */
-  default void validateLocation(final Coordinate coordinate) {
-    validateLocation(getModelGrid().toCell(coordinate), coordinate);
-  }
-
-  /**
-   * @throws IllegalStateException if {@code cell} isn't a valid port location
-   *                               (see
-   *                               {@link #validateLocation(Int2D, Coordinate)})
-   */
-  default void validateLocation(final Int2D cell) {
-    validateLocation(cell, getModelGrid().toCoordinate(cell));
-  }
-
-  /**
    * @throws IllegalStateException if {@code cell} isn't land, or has no active
    *                               water cell adjacent to it
    */
-  default void validateLocation(final Int2D cell, final Coordinate coordinate) {
+  default void validateCell(final Int2D cell) {
+    final Coordinate coordinate = getModelGrid().toCoordinate(cell);
     checkState(
       getBathymetricGrid().isLand(cell),
-      "Invalid port location: cell %s (coordinate %s) is not on land.",
+      "Invalid port cell: cell %s (centred on %s) is not on land.",
       cell,
       coordinate
     );
     checkState(
       getBathymetricGrid().getActiveWaterNeighbours(cell).findAny().isPresent(),
-      "Invalid location: coordinate cell %s (coordinate %s) does not have any active water " +
-        "neighbors.",
+      "Invalid port cell: cell %s (centred on %s) has no active water " +
+        "neighbour.",
       cell,
       coordinate
     );

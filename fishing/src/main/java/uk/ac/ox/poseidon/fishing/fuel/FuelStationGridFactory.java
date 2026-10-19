@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
  * A {@link RelativeScopeFactory} for an {@link ImmutableFuelStationGrid}
- * placing each resolved {@link FuelStation} at its own port's location in
+ * placing each resolved {@link FuelStation} at its own port's cell in
  * {@code portGrid}. Built via {@link Factories#fuelStationGrid}.
  */
 @Getter
@@ -67,7 +67,7 @@ public class FuelStationGridFactory<S extends Scope> extends RelativeScopeFactor
         .stream()
         .collect(
           toMap(identity(), fuelStation ->
-            portGrid.getLocation(fuelStation.getPort())
+            portGrid.getCell(fuelStation.getPort())
           )
         )
     );

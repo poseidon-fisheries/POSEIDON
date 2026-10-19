@@ -59,7 +59,7 @@ import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenDates;
  * away, with sets of a typical one hour. A port closure starts on 20 January
  * 2013 at midnight.
  */
-class FishingLocationLegalityCheckerTest {
+class FishingCellLegalityCheckerTest {
 
   private static final Int2D PORT = new Int2D(0, 0);
   private static final Int2D CANDIDATE = new Int2D(2, 0);
@@ -108,11 +108,11 @@ class FishingLocationLegalityCheckerTest {
     when(distance.distanceInKm(PATH)).thenReturn(PATH_LENGTH_IN_KM);
   }
 
-  private FishingLocationLegalityChecker checker(
+  private FishingCellLegalityChecker checker(
     final Regulations<? super ExtendedFishingAction> regulations,
     final LocalDateTime now
   ) {
-    return new FishingLocationLegalityChecker(
+    return new FishingCellLegalityChecker(
       gearComponent,
       engineComponent,
       regulations,
@@ -163,7 +163,7 @@ class FishingLocationLegalityCheckerTest {
     when(otherVessel.getVesselField()).thenReturn(vesselField);
     giveComponent(otherVessel, gearComponent, otherGear);
     final List<ExtendedFishingAction> checked = new ArrayList<>();
-    final FishingLocationLegalityChecker checker = checker(
+    final FishingCellLegalityChecker checker = checker(
       action -> checked.add(action),
       LocalDateTime.of(2013, 1, 19, 20, 30)
     );
@@ -187,7 +187,7 @@ class FishingLocationLegalityCheckerTest {
     );
     final List<ExtendedFishingAction> checked = new ArrayList<>();
     final LocalDateTime now = LocalDateTime.of(2013, 1, 19, 20, 30);
-    new FishingLocationLegalityChecker(
+    new FishingCellLegalityChecker(
       gearComponent,
       engineComponent,
       action -> checked.add(action),
@@ -254,7 +254,7 @@ class FishingLocationLegalityCheckerTest {
   @Test
   void aCandidateWithNoPathFails() {
     when(pathFinder.getPath(PORT, CANDIDATE)).thenReturn(Optional.empty());
-    final FishingLocationLegalityChecker checker = checker(
+    final FishingCellLegalityChecker checker = checker(
       action -> true,
       LocalDateTime.of(2013, 1, 19, 20, 30)
     );

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -30,7 +30,7 @@ import lombok.Value;
 /**
  * A named port, uniquely identified by its {@code code} within a
  * {@link PortGrid}. Only constructible within this package (via
- * {@link PortGridFactory}, {@link RandomLocationsPortGridFactory},
+ * {@link PortGridFactory}, {@link RandomCellsPortGridFactory},
  * {@link PortsFromTableFactory}, or {@code MutablePortGrid.createPort}) or via
  * {@link Factories#port(String, String)} for a standalone
  * {@link uk.ac.ox.poseidon.core.GlobalScopeFactory}-resolved instance; a

@@ -32,7 +32,7 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
  * A {@link MarketGrid} placed once, at construction, from a fixed set of market
- * locations. Since its markets never change, it indexes them by port, so
+ * cells. Since its markets never change, it indexes them by port, so
  * finding the market of a port does not scan every market.
  */
 public class ImmutableMarketGrid extends MarketGrid {
@@ -41,14 +41,11 @@ public class ImmutableMarketGrid extends MarketGrid {
 
   ImmutableMarketGrid(
     final ModelGrid modelGrid,
-    final Map<Market, Int2D> marketLocations
+    final Map<Market, Int2D> marketCells
   ) {
     super(modelGrid);
-    marketLocations.forEach(field::setObjectLocation);
-    this.marketsByPort = Multimaps.index(
-      marketLocations.keySet(),
-      Market::getPort
-    );
+    marketCells.forEach(field::setObjectLocation);
+    this.marketsByPort = Multimaps.index(marketCells.keySet(), Market::getPort);
   }
 
   @Override

@@ -115,7 +115,7 @@ class VesselSpecificationTest {
   @BeforeEach
   void setUp() {
     when(portGrid.getObject("P1")).thenReturn(Optional.of(port));
-    when(portGrid.getLocation(port)).thenReturn(PORT_CELL);
+    when(portGrid.getCell(port)).thenReturn(PORT_CELL);
     fleet.addEntryListener(vessel -> events.add("entry " + vessel.getId()));
     // Keeps the schedule from running out of events, which would stop it.
     schedule.scheduleRepeating(_ -> {}, 0, 1.0);

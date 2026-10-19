@@ -96,8 +96,8 @@ class VesselRegisterFactoryTest {
     when(portGrid.getObject("P1")).thenReturn(Optional.of(p1));
     when(portGrid.getObject("P2")).thenReturn(Optional.of(p2));
     when(portGrid.getObject("P3")).thenReturn(Optional.empty());
-    when(portGrid.getLocation(p1)).thenReturn(P1_CELL);
-    when(portGrid.getLocation(p2)).thenReturn(new Int2D(2, 2));
+    when(portGrid.getCell(p1)).thenReturn(P1_CELL);
+    when(portGrid.getCell(p2)).thenReturn(new Int2D(2, 2));
   }
 
   private void startSimulation(final String rows) {

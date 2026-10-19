@@ -44,7 +44,7 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  * builds a hypothetical {@link ExtendedFishingAction} for arriving at the
  * candidate cell (travel time included, via {@code pathLengthCalculator}) and
  * lasting {@code fishingDuration}, and checks it against {@code regulations}.
- * Used to filter fishing-location candidates before committing to a trip
+ * Used to filter fishing-cell candidates before committing to a trip
  * there.
  * <p>
  * {@code fishingDuration} is the typical duration of a fishing action: fishers
@@ -53,7 +53,7 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  * one that actually runs longer than planned is not this checker's concern.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class FishingLocationLegalityChecker
+public class FishingCellLegalityChecker
   implements BiFunction<Vessel, Int2D, Boolean>
 {
 
@@ -66,29 +66,29 @@ public class FishingLocationLegalityChecker
 
   /**
    * @param vessel          the vessel that would fish
-   * @param fishingLocation the cell it would fish at
-   * @return whether fishing at {@code fishingLocation} would currently be
+   * @param fishingCell the cell it would fish at
+   * @return whether fishing at {@code fishingCell} would currently be
    *         permitted for {@code vessel}
    */
   @Override
-  public Boolean apply(final Vessel vessel, final Int2D fishingLocation) {
-    return regulations.isPermitted(makeAction(vessel, fishingLocation));
+  public Boolean apply(final Vessel vessel, final Int2D fishingCell) {
+    return regulations.isPermitted(makeAction(vessel, fishingCell));
   }
 
   /**
    * Builds the {@link ExtendedFishingAction} the vessel would plan at
-   * {@code fishingLocation}: starting whenever it would arrive there from its
+   * {@code fishingCell}: starting whenever it would arrive there from its
    * current cell, and lasting {@code fishingDuration}.
    *
    * @throws IllegalArgumentException if no path exists from the vessel's
-   *                                  current cell to {@code fishingLocation}
+   *                                  current cell to {@code fishingCell}
    */
   private ExtendedFishingAction makeAction(
     final Vessel vessel,
-    final Int2D fishingLocation
+    final Int2D fishingCell
   ) {
     final Duration travelDuration = DistanceCalculator.travelDuration(
-      pathLengthCalculator.lengthInKm(vessel.getCell(), fishingLocation),
+      pathLengthCalculator.lengthInKm(vessel.getCell(), fishingCell),
       engine.of(vessel).getCruisingSpeedInKph()
     );
 
@@ -96,7 +96,7 @@ public class FishingLocationLegalityChecker
       vessel,
       currentDateTime.apply(vessel).plus(travelDuration),
       fishingDuration,
-      vessel.getVesselField().getModelGrid().toCoordinate(fishingLocation),
+      vessel.getVesselField().getModelGrid().toCoordinate(fishingCell),
       gear.of(vessel)
     );
   }

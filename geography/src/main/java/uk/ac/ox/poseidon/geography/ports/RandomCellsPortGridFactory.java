@@ -49,7 +49,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * class here: the produced {@link PortGrid} is returned as-is, with no wrapper
  * type to carry documentation, so this factory carries the behavior doc
  * directly. Built via
- * {@link Factories#randomLocationsPortGrid(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, int, int)}
+ * {@link Factories#randomCellsPortGrid(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, int, int)}
  * in this package.
  */
 @Getter
@@ -57,7 +57,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class RandomLocationsPortGridFactory
+public class RandomCellsPortGridFactory
   extends SimulationScopeFactory<PortGrid>
 {
 

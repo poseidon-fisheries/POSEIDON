@@ -45,15 +45,15 @@ import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
- * A {@link RelativeScopeFactory} for a {@link FishingLocationLegalityChecker}.
- * Built via {@link Factories#fishingLocationLegalityChecker}.
+ * A {@link RelativeScopeFactory} for a {@link FishingCellLegalityChecker}.
+ * Built via {@link Factories#fishingCellLegalityChecker}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class FishingLocationLegalityCheckerFactory<S extends Scope>
+public class FishingCellLegalityCheckerFactory<S extends Scope>
   extends RelativeScopeFactory<S, BiFunction<Vessel, Int2D, Boolean>>
   implements MappingFactory<S, Vessel, Int2D, Boolean>
 {
@@ -79,7 +79,7 @@ public class FishingLocationLegalityCheckerFactory<S extends Scope>
 
   @Override
   protected BiFunction<Vessel, Int2D, Boolean> newInstance(final S scope) {
-    return new FishingLocationLegalityChecker(
+    return new FishingCellLegalityChecker(
       gear,
       engine,
       regulations.get(scope),

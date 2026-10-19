@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 /**
  * Factories for {@link Port}s and {@link PortGrid}s: standalone ports, ports
  * placed at fixed coordinates (directly or read from a table), and ports placed
- * at random suitable locations.
+ * at random suitable cells.
  */
 public class Factories {
 
@@ -108,12 +108,12 @@ public class Factories {
    * @param numberOfPorts             how many ports to place
    * @param minimumAdjacentWaterTiles the minimum number of active water
    *                                  neighbours a land cell must have to be a
-   *                                  candidate port location
+   *                                  candidate port cell
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
    *         {@link MutablePortGrid} with randomly-placed ports
-   * @see RandomLocationsPortGridFactory
+   * @see RandomCellsPortGridFactory
    */
-  public static RandomLocationsPortGridFactory randomLocationsPortGrid(
+  public static RandomCellsPortGridFactory randomCellsPortGrid(
     final Factory<
       ? super SimulationScope,
       ? extends BathymetricGrid
@@ -125,7 +125,7 @@ public class Factories {
     final int numberOfPorts,
     final int minimumAdjacentWaterTiles
   ) {
-    return new RandomLocationsPortGridFactory(
+    return new RandomCellsPortGridFactory(
       bathymetricGrid,
       idSupplier,
       numberOfPorts,

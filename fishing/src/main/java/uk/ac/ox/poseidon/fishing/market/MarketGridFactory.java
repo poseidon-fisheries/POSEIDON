@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link ImmutableMarketGrid},
- * placing each resolved {@link Market} at its own port's location in
+ * placing each resolved {@link Market} at its own port's cell in
  * {@link #portGrid}, built via {@link Factories#marketGrid}.
  */
 @Getter
@@ -66,7 +66,7 @@ public class MarketGridFactory<S extends Scope> extends RelativeScopeFactory<
         // change from run to run with the same seed
         .collect(
           toImmutableMap(identity(), market ->
-            portGrid.getLocation(market.getPort())
+            portGrid.getCell(market.getPort())
           )
         )
     );

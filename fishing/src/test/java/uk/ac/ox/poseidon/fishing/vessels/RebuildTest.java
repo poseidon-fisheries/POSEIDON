@@ -132,7 +132,7 @@ class RebuildTest {
   void stubPorts() {
     final Port port = mock(Port.class);
     Mockito.when(portGrid.getObject("P1")).thenReturn(Optional.of(port));
-    Mockito.when(portGrid.getLocation(port)).thenReturn(new Int2D(1, 1));
+    Mockito.when(portGrid.getCell(port)).thenReturn(new Int2D(1, 1));
   }
 
   private void startSimulation(

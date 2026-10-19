@@ -27,16 +27,16 @@ import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link FuelStationGrid} whose station locations are fixed at construction,
+ * A {@link FuelStationGrid} whose station cells are fixed at construction,
  * from a station-to-cell map, rather than mutated afterwards.
  */
 public class ImmutableFuelStationGrid extends FuelStationGrid {
 
   ImmutableFuelStationGrid(
     final ModelGrid modelGrid,
-    final Map<FuelStation, Int2D> fuelStationLocations
+    final Map<FuelStation, Int2D> fuelStationCells
   ) {
     super(modelGrid);
-    fuelStationLocations.forEach(field::setObjectLocation);
+    fuelStationCells.forEach(field::setObjectLocation);
   }
 }

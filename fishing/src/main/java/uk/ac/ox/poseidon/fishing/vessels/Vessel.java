@@ -619,8 +619,7 @@ public class Vessel implements Oriented2D, HasAttributes {
     )
       .flatMap(code -> portGrid.getObject(code.toString()))
       .orElse(null);
-    this.homePortCell =
-      homePort == null ? null : portGrid.getLocation(homePort);
+    this.homePortCell = homePort == null ? null : portGrid.getCell(homePort);
     if (homePortCell != null && getCell() == null) {
       setCurrentCell(homePortCell);
     }

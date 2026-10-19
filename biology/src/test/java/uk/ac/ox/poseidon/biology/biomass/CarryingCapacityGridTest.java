@@ -67,7 +67,7 @@ class CarryingCapacityGridTest {
   }
 
   @Test
-  void getHabitableLocations() {
+  void getHabitableCells() {
     assertEquals(
       Set.of(new Int2D(0, 2), new Int2D(1, 2), new Int2D(2, 2)),
       new HashSet<>(grid.getHabitableCells())

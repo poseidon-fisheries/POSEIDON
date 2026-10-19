@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -56,7 +56,7 @@ public class MutablePortGrid
     source
       .getPorts()
       .forEach(port ->
-        sparseGrid2D.setObjectLocation(port, source.getLocation(port))
+        sparseGrid2D.setObjectLocation(port, source.getCell(port))
       );
     return new MutablePortGrid(source.getBathymetricGrid(), sparseGrid2D);
   }
@@ -75,8 +75,8 @@ public class MutablePortGrid
   /**
    * @param bathymetricGrid the bathymetric grid ports are placed relative to
    * @param portCoordinates the ports to place, each at its given coordinate
-   * @throws IllegalArgumentException if any port's coordinate isn't a valid
-   *                                  port location
+   * @throws IllegalArgumentException if any port's coordinate isn't on a valid
+   *                                  port cell
    */
   public MutablePortGrid(
     final BathymetricGrid bathymetricGrid,
@@ -103,7 +103,7 @@ public class MutablePortGrid
       "Port code %s already exists",
       portCode
     );
-    validateLocation(cell);
+    validateCell(cell);
     final Port port = new Port(portCode, portName);
     field.setObjectLocation(port, cell);
     return port;

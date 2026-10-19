@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * {@link Factories#port(String, String)}. Produces a standalone port not placed
  * on any {@link PortGrid} — most ports are created as a side effect of building
  * a grid instead (via {@link PortGridFactory},
- * {@link RandomLocationsPortGridFactory}, or {@link PortsFromTableFactory}).
+ * {@link RandomCellsPortGridFactory}, or {@link PortsFromTableFactory}).
  */
 @Getter
 @ToString

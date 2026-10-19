@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
- * Factories for predicates over candidate fishing locations, built on the
+ * Factories for predicates over candidate fishing cells, built on the
  * {@link uk.ac.ox.poseidon.regulations} model.
  */
 public class Factories {
@@ -52,12 +52,12 @@ public class Factories {
    *                             cell to the candidate
    * @param fishingDuration      the typical duration of a fishing action,
    *                             which the candidate action lasts (see
-   *                             {@link FishingLocationLegalityChecker})
+   *                             {@link FishingCellLegalityChecker})
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link FishingLocationLegalityChecker}
-   * @see FishingLocationLegalityCheckerFactory
+   *         {@link FishingCellLegalityChecker}
+   * @see FishingCellLegalityCheckerFactory
    */
-  public static <S extends SimulationScope> FishingLocationLegalityCheckerFactory<S> fishingLocationLegalityChecker(
+  public static <S extends SimulationScope> FishingCellLegalityCheckerFactory<S> fishingCellLegalityChecker(
     final VesselComponent<? extends Gear> gear,
     final VesselComponent<? extends Engine> engine,
     final Factory<
@@ -70,7 +70,7 @@ public class Factories {
     > pathLengthCalculator,
     final Factory<? super S, ? extends Duration> fishingDuration
   ) {
-    return new FishingLocationLegalityCheckerFactory<>(
+    return new FishingCellLegalityCheckerFactory<>(
       gear,
       engine,
       regulations,
