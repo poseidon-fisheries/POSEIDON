@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.travel;
 
-import java.util.function.BiFunction;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,7 +30,6 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
@@ -46,8 +45,8 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class TimeCostFactory
-  extends VesselScopeFactory<BiFunction<Vessel, Route, Money>>
-  implements MappingFactory<VesselScope, Vessel, Route, Money>
+  extends VesselScopeFactory<Function<Vessel, Function<Route, Money>>>
+  implements ValueFactory<VesselScope, Vessel, Function<Route, Money>>
 {
 
   private final ValueFactory<
@@ -57,7 +56,7 @@ public class TimeCostFactory
   > hourlyCost;
 
   @Override
-  protected BiFunction<Vessel, Route, Money> newInstance(
+  protected Function<Vessel, Function<Route, Money>> newInstance(
     final VesselScope scope
   ) {
     return new TimeCost(hourlyCost.get(scope));

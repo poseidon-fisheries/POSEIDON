@@ -37,11 +37,13 @@ class NetValuationTest {
   @Test
   void subtractsTheCostValuationFromTheRevenueValuation() {
     final NetValuation<String, Double> netValuation = new NetValuation<>(
-      (valuedFor, option, recollection) -> 10.0,
-      (valuedFor, option, recollection) -> 4.0
+      valuedFor -> (option, recollection) -> 10.0,
+      valuedFor -> (option, recollection) -> 4.0
     );
 
-    assertThat(netValuation.valueOf(vessel, "A", 1.0)).isEqualTo(6.0);
+    assertThat(netValuation.inContextOf(vessel).valueOf("A", 1.0)).isEqualTo(
+      6.0
+    );
   }
 
   @Test
@@ -49,13 +51,13 @@ class NetValuationTest {
     final List<Object> revenueArguments = new ArrayList<>();
     final List<Object> costArguments = new ArrayList<>();
     final NetValuation<String, Double> netValuation = new NetValuation<>(
-      (valuedFor, option, recollection) -> {
+      valuedFor -> (option, recollection) -> {
         revenueArguments.add(valuedFor);
         revenueArguments.add(option);
         revenueArguments.add(recollection);
         return 0.0;
       },
-      (valuedFor, option, recollection) -> {
+      valuedFor -> (option, recollection) -> {
         costArguments.add(valuedFor);
         costArguments.add(option);
         costArguments.add(recollection);
@@ -63,7 +65,7 @@ class NetValuationTest {
       }
     );
 
-    netValuation.valueOf(vessel, "A", 1.0);
+    netValuation.inContextOf(vessel).valueOf("A", 1.0);
 
     assertThat(revenueArguments).containsExactly(vessel, "A", 1.0);
     assertThat(costArguments).containsExactly(vessel, "A", 1.0);

@@ -28,6 +28,7 @@ import static org.mockito.Mockito.mock;
 import ec.util.MersenneTwisterFast;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BinaryOperator;
 import org.junit.jupiter.api.Test;
@@ -43,15 +44,18 @@ class MemoryBasedOptionValuesTest {
     "trawl"
   );
   private final AtomicReference<Valuation<String, Double>> valuation =
-    new AtomicReference<>((valuedFor, option, recollection) -> recollection);
+    new AtomicReference<>(valuedFor -> (option, recollection) -> recollection);
+  private final AtomicInteger timesPutInContext = new AtomicInteger();
   private final Vessel vessel = mock(Vessel.class);
   private final MemoryBasedOptionValues<
     String,
     Double
   > memoryBasedOptionValues = new MemoryBasedOptionValues<>(
     new KeyedMemorySelector<>(keyedMemory, valuedFor -> contextKey.get()),
-    (valuedFor, option, recollection) ->
-      valuation.get().valueOf(valuedFor, option, recollection)
+    valuedFor -> {
+      timesPutInContext.incrementAndGet();
+      return valuation.get().inContextOf(valuedFor);
+    }
   );
 
   /** The option values of the vessel, asked for anew, as each pick does. */
@@ -65,7 +69,7 @@ class MemoryBasedOptionValuesTest {
     keyedMemory.get("trawl").observe("B", 2.0, SUM);
     assertThat(optionValues().getBestOptions()).containsExactly("B");
 
-    valuation.set((valuedFor, option, recollection) -> -recollection);
+    valuation.set(valuedFor -> (option, recollection) -> -recollection);
 
     assertThat(optionValues().getBestOptions()).containsExactly("A");
     assertThat(optionValues().getBestValue()).contains(-1.0);
@@ -121,7 +125,7 @@ class MemoryBasedOptionValuesTest {
   void valuesGoThroughTheValuation() {
     keyedMemory.get("trawl").observe("A", 1.0, SUM);
     keyedMemory.get("trawl").observe("B", 2.0, SUM);
-    valuation.set((valuedFor, option, recollection) -> recollection * 10);
+    valuation.set(valuedFor -> (option, recollection) -> recollection * 10);
 
     assertThat(optionValues().getValue("A")).contains(10.0);
     assertThat(optionValues().getValue("C")).isEmpty();
@@ -138,7 +142,7 @@ class MemoryBasedOptionValuesTest {
     keyedMemory.get("trawl").observe("near", 1.0, SUM);
     keyedMemory.get("trawl").observe("far", 2.0, SUM);
     valuation.set(
-      (valuedFor, option, recollection) ->
+      valuedFor -> (option, recollection) ->
         recollection - (option.equals("far") ? 5 : 0)
     );
 
@@ -154,7 +158,7 @@ class MemoryBasedOptionValuesTest {
         new KeyedMemorySelector<>(keyedMemory, valuedFor ->
           valuedFor == vessel ? "trawl" : "seine"
         ),
-        (valuedFor, option, recollection) ->
+        valuedFor -> (option, recollection) ->
           valuedFor == vessel ? recollection : recollection * 10
       );
     keyedMemory.get("trawl").observe("A", 1.0, SUM);
@@ -178,5 +182,37 @@ class MemoryBasedOptionValuesTest {
 
     assertThat(forOnePick.getBestOptions()).containsExactly("A");
     assertThat(optionValues().getBestOptions()).containsExactly("B");
+  }
+
+  @Test
+  void putsTheValuationInContextOnceForAllTheOptionsOfOnePick() {
+    keyedMemory.get("trawl").observe("A", 1.0, SUM);
+    keyedMemory.get("trawl").observe("B", 2.0, SUM);
+    final OptionValues<String> forOnePick = optionValues();
+
+    forOnePick.getBestEntries();
+    forOnePick.getValue("A");
+
+    assertThat(timesPutInContext).hasValue(1);
+  }
+
+  @Test
+  void putsTheValuationInContextAgainForEachPick() {
+    keyedMemory.get("trawl").observe("A", 1.0, SUM);
+
+    optionValues().getBestEntries();
+    optionValues().getBestEntries();
+
+    assertThat(timesPutInContext).hasValue(2);
+  }
+
+  @Test
+  void doesNotPutTheValuationInContextWithNothingRemembered() {
+    final OptionValues<String> forOnePick = optionValues();
+
+    forOnePick.getBestEntries();
+    forOnePick.getValue("A");
+
+    assertThat(timesPutInContext).hasValue(0);
   }
 }

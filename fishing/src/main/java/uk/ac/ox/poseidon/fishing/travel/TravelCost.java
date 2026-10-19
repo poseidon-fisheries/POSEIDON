@@ -25,17 +25,21 @@ package uk.ac.ox.poseidon.fishing.travel;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.joda.money.Money;
 import sim.util.Int2D;
+import uk.ac.ox.poseidon.fishing.choices.ContextualisedValuation;
 import uk.ac.ox.poseidon.fishing.choices.Valuation;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
  * Values the cost of a vessel travelling to fish at a cell: computes the
  * {@link Route} via the cell once, then sums what each route cost charges the
- * vessel for it. The
+ * vessel for it. Each route cost is given the vessel once, when the valuation
+ * is put in its context, and then costs every route valued for it. The
  * recollection the cell is valued for is ignored, so that this can be combined
  * with other valuations of the same shape. Route costs in different currencies
  * cannot be summed.
@@ -48,13 +52,13 @@ public class TravelCost implements Valuation<Int2D, Object> {
     ? extends Route
   > routeFunction;
   private final List<
-    BiFunction<? super Vessel, ? super Route, ? extends Money>
+    Function<? super Vessel, ? extends Function<? super Route, ? extends Money>>
   > routeCosts;
 
   /**
    * @param routeFunction gives the route a vessel would travel via a cell
-   * @param routeCosts    what is charged to a vessel for a route, each in
-   *                      money
+   * @param routeCosts    each gives what is charged to a vessel for a route,
+   *                      in money
    */
   TravelCost(
     final BiFunction<
@@ -63,7 +67,10 @@ public class TravelCost implements Valuation<Int2D, Object> {
       ? extends Route
     > routeFunction,
     final List<
-      ? extends BiFunction<? super Vessel, ? super Route, ? extends Money>
+      ? extends Function<
+        ? super Vessel,
+        ? extends Function<? super Route, ? extends Money>
+      >
     > routeCosts
   ) {
     this.routeFunction = checkNotNull(routeFunction);
@@ -71,26 +78,29 @@ public class TravelCost implements Valuation<Int2D, Object> {
   }
 
   /**
-   * @param vessel       the vessel that would travel
-   * @param cell         the cell to fish at
-   * @param recollection ignored
-   * @return the sum of the route costs of the route via {@code cell}, as an
-   *         amount in their currency; zero without route costs
-   * @throws org.joda.money.CurrencyMismatchException if the route costs are in
-   *                                                  different currencies
+   * @param vessel the vessel that would travel
+   * @return the sum of the route costs of the route via a cell, as an amount
+   *         in their currency; zero without route costs. It throws a
+   *         {@link org.joda.money.CurrencyMismatchException} if the route costs
+   *         are in different currencies.
    */
   @Override
-  public double valueOf(
-    final Vessel vessel,
-    final Int2D cell,
-    final Object recollection
+  public ContextualisedValuation<Int2D, Object> inContextOf(
+    final Vessel vessel
   ) {
-    final Route route = routeFunction.apply(vessel, cell);
-    return routeCosts
-      .stream()
-      .<Money>map(routeCost -> routeCost.apply(vessel, route))
-      .reduce(Money::plus)
-      .map(money -> money.getAmount().doubleValue())
-      .orElse(0.0);
+    final List<Function<? super Route, ? extends Money>> vesselRouteCosts =
+      new ArrayList<>(routeCosts.size());
+    for (final var routeCost : routeCosts) {
+      vesselRouteCosts.add(routeCost.apply(vessel));
+    }
+    return (cell, recollection) -> {
+      final Route route = routeFunction.apply(vessel, cell);
+      Money sum = null;
+      for (final var routeCost : vesselRouteCosts) {
+        final Money cost = routeCost.apply(route);
+        sum = sum == null ? cost : sum.plus(cost);
+      }
+      return sum == null ? 0.0 : sum.getAmount().doubleValue();
+    };
   }
 }

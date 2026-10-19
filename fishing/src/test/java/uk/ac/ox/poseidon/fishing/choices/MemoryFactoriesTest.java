@@ -112,7 +112,7 @@ class MemoryFactoriesTest {
 
     @Override
     protected Valuation<String, Double> newInstance(final Scope scope) {
-      return (vessel, option, recollection) -> recollection;
+      return vessel -> (option, recollection) -> recollection;
     }
   }
 

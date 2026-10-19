@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.travel;
 
 import com.google.common.collect.ImmutableList;
+import java.util.function.Function;
 import org.joda.money.Money;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -80,8 +81,8 @@ public class Factories {
 
   /**
    * @param routeFunction gives the route a vessel would travel via a cell
-   * @param routeCosts    what is charged to a vessel for a route, each in
-   *                      money
+   * @param routeCosts    each gives what is charged to a vessel for a route,
+   *                      in money
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link TravelCost}
    * @see TravelCost
@@ -94,11 +95,10 @@ public class Factories {
       ? super Int2D,
       ? extends Route
     > routeFunction,
-    final MappingFactory<
+    final ValueFactory<
       ? super S,
       ? super Vessel,
-      ? super Route,
-      ? extends Money
+      ? extends Function<? super Route, ? extends Money>
     >... routeCosts
   ) {
     return new TravelCostFactory<>(

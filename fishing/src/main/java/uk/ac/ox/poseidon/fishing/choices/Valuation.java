@@ -25,11 +25,25 @@ package uk.ac.ox.poseidon.fishing.choices;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * Values an option for a vessel, given what is remembered about the option:
- * what the remembered catch would sell for at the vessel's home port, what it
- * would cost the vessel to travel there, or a combination of such valuations.
- * A valuation that does not depend on the option, or on what is remembered,
- * ignores it, so that it can be combined with others of the same shape.
+ * Values options for a vessel, given what is remembered about each: what the
+ * remembered catch would sell for at the vessel's home port, what it would cost
+ * the vessel to travel there, or a combination of such valuations. A valuation
+ * that does not depend on the option, or on what is remembered, ignores it, so
+ * that it can be combined with others of the same shape.
+ * <p>
+ * Valuing happens in two stages. Put in the context of a vessel, a valuation
+ * takes stock of the vessel's circumstances at the moment of choosing (its
+ * hourly cost, its home port's market...); the {@link ContextualisedValuation}
+ * it gives then values each option the vessel compares under those
+ * circumstances, which are the same for every option of one choice and are so
+ * read only once.
+ * <p>
+ * A contextualised valuation is used synchronously, for one view of the
+ * vessel's option values, and is not kept beyond it: the circumstances it read
+ * may since have changed. The model state it reads must not change while it is
+ * used. A valuation does not change the vessel, the market or any other model
+ * state, though it may keep a store of its own, and the value it gives an
+ * option does not depend on the order in which options are valued.
  *
  * @param <O> the type of option valued
  * @param <M> the type of what is remembered about an option
@@ -37,10 +51,9 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 @FunctionalInterface
 public interface Valuation<O, M> {
   /**
-   * @param vessel       the vessel the option is valued for
-   * @param option       the option valued
-   * @param recollection what is remembered about the option
-   * @return the value of {@code option} for {@code vessel}
+   * @param vessel the vessel options are valued for
+   * @return the valuation of options for {@code vessel} in its current
+   *         circumstances, to use for one view of its option values
    */
-  double valueOf(Vessel vessel, O option, M recollection);
+  ContextualisedValuation<O, M> inContextOf(Vessel vessel);
 }

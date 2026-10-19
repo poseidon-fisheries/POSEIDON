@@ -24,19 +24,20 @@ package uk.ac.ox.poseidon.fishing.travel;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
  * The cost of the time a vessel would spend travelling a {@link Route}: its
- * hourly cost times the route's hours. The hourly cost is read at each call,
- * for the vessel given. The cost is computed in floating point and rounded
+ * hourly cost times the route's hours. The hourly cost is read when the vessel
+ * is given, and serves every route costed for it then, for one view of its
+ * option values. The cost is computed in floating point and rounded
  * half-even to the currency's minor unit, which is much faster than exact
  * decimal arithmetic.
  */
-public class TimeCost implements BiFunction<Vessel, Route, Money> {
+public class TimeCost implements Function<Vessel, Function<Route, Money>> {
 
   private final Function<? super Vessel, ? extends Money> hourlyCost;
 
@@ -48,24 +49,27 @@ public class TimeCost implements BiFunction<Vessel, Route, Money> {
   }
 
   /**
-   * @param vessel the vessel that would travel the route
-   * @param route  the route the vessel would travel
-   * @return the vessel's hourly cost times the hours {@code route} takes to
+   * @param vessel the vessel that would travel the routes
+   * @return the vessel's current hourly cost times the hours a route takes to
    *         travel, rounded half-even to the currency's minor unit
    * @throws NullPointerException if {@code hourlyCost} gives no cost for the
    *                              vessel
    */
   @Override
-  public Money apply(final Vessel vessel, final Route route) {
+  public Function<Route, Money> apply(final Vessel vessel) {
     final Money costPerHour = checkNotNull(
       hourlyCost.apply(vessel),
       "Unable to extract hourly cost for Vessel %s.",
       vessel
     );
-    final double hours = route.getDuration().toSeconds() / 3600.0;
-    return Money.ofMinor(
-      costPerHour.getCurrencyUnit(),
-      (long) Math.rint(costPerHour.getAmountMinorLong() * hours)
-    );
+    final CurrencyUnit currency = costPerHour.getCurrencyUnit();
+    final long minorUnitsPerHour = costPerHour.getAmountMinorLong();
+    return route -> {
+      final double hours = route.getDuration().toSeconds() / 3600.0;
+      return Money.ofMinor(
+        currency,
+        (long) Math.rint(minorUnitsPerHour * hours)
+      );
+    };
   }
 }

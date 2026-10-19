@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.travel;
 
 import com.google.common.collect.ImmutableList;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,11 +36,12 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link TravelCost}, built via
- * {@link Factories#travelCost(MappingFactory, MappingFactory...)}.
+ * {@link Factories#travelCost(MappingFactory, ValueFactory...)}.
  */
 @Getter
 @ToString
@@ -60,7 +62,11 @@ public class TravelCostFactory<S extends Scope> extends RelativeScopeFactory<
 
   @Singular
   private final ImmutableList<
-    MappingFactory<? super S, ? super Vessel, ? super Route, ? extends Money>
+    ValueFactory<
+      ? super S,
+      ? super Vessel,
+      ? extends Function<? super Route, ? extends Money>
+    >
   > routeCosts;
 
   @Override

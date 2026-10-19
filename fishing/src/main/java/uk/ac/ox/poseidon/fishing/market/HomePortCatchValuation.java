@@ -34,6 +34,7 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategoriser;
+import uk.ac.ox.poseidon.fishing.choices.ContextualisedValuation;
 import uk.ac.ox.poseidon.fishing.choices.Valuation;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
@@ -43,8 +44,9 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
  * {@link CatchCategoriser}, priced by {@link Market#quote}, and summed by
  * {@link Sale#summarise}. Species without a price count as zero. The option the
  * catch is remembered for is ignored, so that this can be combined with other
- * valuations of the same shape. A change of home port or of prices shows
- * straight away. Assumes a single currency.
+ * valuations of the same shape. A change of home port or of prices shows the
+ * next time the valuation is put in a vessel's context. Assumes a single
+ * currency.
  * <p>
  * Values are remembered per catch, and forgotten when the home port's market
  * changes or its prices change ({@link Market#getLastPriceChangeDateTime}).
@@ -57,6 +59,8 @@ public class HomePortCatchValuation implements Valuation<Object, Bucket> {
 
   // Catches no longer remembered would pile up here, so it is cleared past this
   // size. Weak keys would drop them precisely, but made NW Med runs 10% slower.
+  // The size is checked when put in context, so the values of one choice can
+  // take it past the limit until the next.
   private static final int MAXIMUM_NUMBER_OF_VALUES = 10_000;
 
   private final CatchCategoriser catchCategoriser;
@@ -68,19 +72,16 @@ public class HomePortCatchValuation implements Valuation<Object, Bucket> {
   private LocalDateTime valuedSince;
 
   /**
-   * @param vessel the vessel that would sell the catch
-   * @param option ignored
-   * @param bucket the catch to value
-   * @return what {@code bucket} would sell for at {@code vessel}'s home port now
+   * @param vessel the vessel that would sell the catches
+   * @return what a catch would sell for at {@code vessel}'s home port now; the
+   *         option the catch is remembered for is ignored
    * @throws IllegalStateException if the vessel has no home port, its home port
-   *                               does not have exactly one market, or the
-   *                               catch is priced in more than one currency
+   *                               does not have exactly one market, or a catch
+   *                               valued is priced in more than one currency
    */
   @Override
-  public double valueOf(
-    final Vessel vessel,
-    final Object option,
-    final Bucket bucket
+  public ContextualisedValuation<Object, Bucket> inContextOf(
+    final Vessel vessel
   ) {
     checkState(
       vessel.getHomePort() != null,
@@ -99,7 +100,8 @@ public class HomePortCatchValuation implements Valuation<Object, Bucket> {
       valuedMarket = market;
       valuedSince = currentDateTime.apply(vessel);
     }
-    return values.computeIfAbsent(bucket, key -> valueAt(vessel, market, key));
+    return (option, bucket) ->
+      values.computeIfAbsent(bucket, key -> valueAt(vessel, market, key));
   }
 
   // Strictly before: a price set in the same second as a valuation may have

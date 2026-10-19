@@ -122,11 +122,9 @@ class FishingEventSharingRouteTest {
   private final VesselComponent<Gear> gearComponent = vesselComponent(
     object(gear)
   );
-  private final Valuation<Int2D, Bucket> kgOfSpecies = (
-    valuedFor,
-    option,
-    bucket
-  ) -> bucket.getKg(species);
+  private final Valuation<Int2D, Bucket> kgOfSpecies = valuedFor ->
+    (option, bucket) ->
+      bucket.getKg(species);
 
   private final KeyedMemoryFactory<String, Int2D, Bucket> vesselMemory =
     keyedMemory();

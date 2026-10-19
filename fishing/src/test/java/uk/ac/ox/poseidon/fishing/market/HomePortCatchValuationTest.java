@@ -33,6 +33,7 @@ import static uk.ac.ox.poseidon.fishing.market.MarketGridTest.marketGrid;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,7 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategory;
 import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
+import uk.ac.ox.poseidon.fishing.choices.ContextualisedValuation;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
@@ -52,8 +54,11 @@ class HomePortCatchValuationTest {
   private final CatchCategory category = new CatchCategory("C");
   private final Species pricedSpecies = new Species("S1", null, null);
   private final Species unpricedSpecies = new Species("S2", null, null);
-  private final CatchCategoriser catchCategoriser = bucket ->
-    new CategorisedCatch(Map.of(category, bucket));
+  private final AtomicInteger catchesCategorised = new AtomicInteger();
+  private final CatchCategoriser catchCategoriser = bucket -> {
+    catchesCategorised.incrementAndGet();
+    return new CategorisedCatch(Map.of(category, bucket));
+  };
   private final Port homePort = mock(Port.class);
   private final Vessel vessel = mock(Vessel.class);
   private LocalDateTime now = LocalDateTime.of(2026, 1, 1, 0, 0);
@@ -77,7 +82,9 @@ class HomePortCatchValuationTest {
   void valuesTheCatchAtHomePortPrices() {
     market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
     assertThat(
-      valuation.valueOf(vessel, new Object(), Bucket.of(pricedSpecies, 10.0))
+      valuation
+        .inContextOf(vessel)
+        .valueOf(new Object(), Bucket.of(pricedSpecies, 10.0))
     ).isEqualTo(20.0);
   }
 
@@ -90,7 +97,9 @@ class HomePortCatchValuationTest {
     givenMarkets(market, otherMarket);
     market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
     assertThat(
-      valuation.valueOf(vessel, new Object(), Bucket.of(pricedSpecies, 10.0))
+      valuation
+        .inContextOf(vessel)
+        .valueOf(new Object(), Bucket.of(pricedSpecies, 10.0))
     ).isEqualTo(20.0);
   }
 
@@ -105,13 +114,17 @@ class HomePortCatchValuationTest {
         Biomass.ofKg(30.0)
       )
     );
-    assertThat(valuation.valueOf(vessel, new Object(), bucket)).isEqualTo(20.0);
+    assertThat(
+      valuation.inContextOf(vessel).valueOf(new Object(), bucket)
+    ).isEqualTo(20.0);
   }
 
   @Test
   void noPricesAtAllGiveZero() {
     assertThat(
-      valuation.valueOf(vessel, new Object(), Bucket.of(pricedSpecies, 10.0))
+      valuation
+        .inContextOf(vessel)
+        .valueOf(new Object(), Bucket.of(pricedSpecies, 10.0))
     ).isEqualTo(0.0);
   }
 
@@ -120,11 +133,15 @@ class HomePortCatchValuationTest {
     market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
     final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
     now = now.plusHours(1);
-    assertThat(valuation.valueOf(vessel, new Object(), bucket)).isEqualTo(20.0);
+    assertThat(
+      valuation.inContextOf(vessel).valueOf(new Object(), bucket)
+    ).isEqualTo(20.0);
     now = now.plusHours(1);
     market.setPrice(category, pricedSpecies, eurosPerKg(3.0), now);
     now = now.plusHours(1);
-    assertThat(valuation.valueOf(vessel, new Object(), bucket)).isEqualTo(30.0);
+    assertThat(
+      valuation.inContextOf(vessel).valueOf(new Object(), bucket)
+    ).isEqualTo(30.0);
   }
 
   @Test
@@ -136,9 +153,13 @@ class HomePortCatchValuationTest {
       now.minusHours(1)
     );
     final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
-    assertThat(valuation.valueOf(vessel, new Object(), bucket)).isEqualTo(20.0);
+    assertThat(
+      valuation.inContextOf(vessel).valueOf(new Object(), bucket)
+    ).isEqualTo(20.0);
     market.setPrice(category, pricedSpecies, eurosPerKg(3.0), now);
-    assertThat(valuation.valueOf(vessel, new Object(), bucket)).isEqualTo(30.0);
+    assertThat(
+      valuation.inContextOf(vessel).valueOf(new Object(), bucket)
+    ).isEqualTo(30.0);
   }
 
   @Test
@@ -146,7 +167,9 @@ class HomePortCatchValuationTest {
     market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
     final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
     now = now.plusHours(1);
-    assertThat(valuation.valueOf(vessel, new Object(), bucket)).isEqualTo(20.0);
+    assertThat(
+      valuation.inContextOf(vessel).valueOf(new Object(), bucket)
+    ).isEqualTo(20.0);
     final Port otherPort = mock(Port.class);
     final BiomassMarket otherMarket = new BiomassMarket(
       otherPort,
@@ -161,7 +184,9 @@ class HomePortCatchValuationTest {
     );
     givenMarkets(market, otherMarket);
     when(vessel.getHomePort()).thenReturn(otherPort);
-    assertThat(valuation.valueOf(vessel, new Object(), bucket)).isEqualTo(30.0);
+    assertThat(
+      valuation.inContextOf(vessel).valueOf(new Object(), bucket)
+    ).isEqualTo(30.0);
   }
 
   @Test
@@ -181,17 +206,21 @@ class HomePortCatchValuationTest {
     when(otherVessel.getMarketGrid()).thenReturn(marketGrid);
     final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
     now = now.plusHours(1);
-    assertThat(valuation.valueOf(vessel, new Object(), bucket)).isEqualTo(20.0);
-    assertThat(valuation.valueOf(otherVessel, new Object(), bucket)).isEqualTo(
-      30.0
-    );
+    assertThat(
+      valuation.inContextOf(vessel).valueOf(new Object(), bucket)
+    ).isEqualTo(20.0);
+    assertThat(
+      valuation.inContextOf(otherVessel).valueOf(new Object(), bucket)
+    ).isEqualTo(30.0);
   }
 
   @Test
   void throwsWithoutAHomePort() {
     when(vessel.getHomePort()).thenReturn(null);
     assertThatThrownBy(() ->
-      valuation.valueOf(vessel, new Object(), Bucket.of(pricedSpecies, 10.0))
+      valuation
+        .inContextOf(vessel)
+        .valueOf(new Object(), Bucket.of(pricedSpecies, 10.0))
     ).isInstanceOf(IllegalStateException.class);
   }
 
@@ -199,7 +228,9 @@ class HomePortCatchValuationTest {
   void throwsWithoutAMarketForTheHomePort() {
     givenMarkets(market(mock(Port.class)));
     assertThatThrownBy(() ->
-      valuation.valueOf(vessel, new Object(), Bucket.of(pricedSpecies, 10.0))
+      valuation
+        .inContextOf(vessel)
+        .valueOf(new Object(), Bucket.of(pricedSpecies, 10.0))
     ).isInstanceOf(IllegalStateException.class);
   }
 
@@ -212,7 +243,9 @@ class HomePortCatchValuationTest {
     );
     givenMarkets(market, otherMarket);
     assertThatThrownBy(() ->
-      valuation.valueOf(vessel, new Object(), Bucket.of(pricedSpecies, 10.0))
+      valuation
+        .inContextOf(vessel)
+        .valueOf(new Object(), Bucket.of(pricedSpecies, 10.0))
     ).isInstanceOf(IllegalStateException.class);
   }
 
@@ -234,8 +267,37 @@ class HomePortCatchValuationTest {
       )
     );
     assertThatThrownBy(() ->
-      valuation.valueOf(vessel, new Object(), bucket)
+      valuation.inContextOf(vessel).valueOf(new Object(), bucket)
     ).isInstanceOf(IllegalStateException.class);
+  }
+
+  @Test
+  void keepsTheValuesOfCatchesFromOnePickToTheNext() {
+    market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
+    final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
+    now = now.plusHours(1);
+    valuation.inContextOf(vessel).valueOf(new Object(), bucket);
+    valuation.inContextOf(vessel).valueOf(new Object(), bucket);
+
+    assertThat(catchesCategorised).hasValue(1);
+  }
+
+  @Test
+  void forgetsTheValuesOfCatchesOncePastTheLimitAtTheNextPick() {
+    market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
+    final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
+    now = now.plusHours(1);
+    final ContextualisedValuation<Object, Bucket> forOnePick =
+      valuation.inContextOf(vessel);
+    forOnePick.valueOf(new Object(), bucket);
+    for (int i = 0; i < 10_000; i++) {
+      forOnePick.valueOf(new Object(), Bucket.of(pricedSpecies, 1.0));
+    }
+    catchesCategorised.set(0);
+
+    valuation.inContextOf(vessel).valueOf(new Object(), bucket);
+
+    assertThat(catchesCategorised).hasValue(1);
   }
 
   private void givenMarkets(final Market... markets) {

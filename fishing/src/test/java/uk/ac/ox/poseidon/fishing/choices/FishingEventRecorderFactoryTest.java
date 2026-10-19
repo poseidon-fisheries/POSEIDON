@@ -115,7 +115,7 @@ class FishingEventRecorderFactoryTest {
 
     @Override
     protected Valuation<Int2D, Bucket> newInstance(final Scope scope) {
-      return (vessel, cell, bucket) -> bucket.getKg(SPECIES);
+      return vessel -> (cell, bucket) -> bucket.getKg(SPECIES);
     }
   }
 

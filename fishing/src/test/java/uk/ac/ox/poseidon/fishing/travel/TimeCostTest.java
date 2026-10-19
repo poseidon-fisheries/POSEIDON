@@ -28,6 +28,7 @@ import static org.mockito.Mockito.mock;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
@@ -48,31 +49,41 @@ class TimeCostTest {
 
   @Test
   void chargesTheHourlyCostForEachHourOfTheRoute() {
-    assertThat(timeCost.apply(vessel, route)).isEqualTo(Money.of(EUR, 15));
+    assertThat(timeCost.apply(vessel).apply(route)).isEqualTo(
+      Money.of(EUR, 15)
+    );
   }
 
   @Test
   void chargesTheHourlyCostOfTheVesselGiven() {
-    assertThat(timeCost.apply(mock(Vessel.class), route)).isEqualTo(
+    assertThat(timeCost.apply(mock(Vessel.class)).apply(route)).isEqualTo(
       Money.of(EUR, 150)
     );
   }
 
   @Test
-  void readsTheVesselsHourlyCostAtEachCall() {
-    final Money costBefore = timeCost.apply(vessel, route);
+  void readsTheVesselsHourlyCostEachTimeTheVesselIsGiven() {
+    final Money costBefore = timeCost.apply(vessel).apply(route);
     hourlyCost.set(Money.of(EUR, 20));
-    final Money costAfter = timeCost.apply(vessel, route);
+    final Money costAfter = timeCost.apply(vessel).apply(route);
 
     assertThat(costBefore).isEqualTo(Money.of(EUR, 15));
     assertThat(costAfter).isEqualTo(Money.of(EUR, 30));
   }
 
   @Test
+  void keepsTheHourlyCostReadForEveryRouteCostedThen() {
+    final Function<Route, Money> costOfRoute = timeCost.apply(vessel);
+    hourlyCost.set(Money.of(EUR, 20));
+
+    assertThat(costOfRoute.apply(route)).isEqualTo(Money.of(EUR, 15));
+  }
+
+  @Test
   void throwsWithoutAnHourlyCost() {
     hourlyCost.set(null);
 
-    assertThatThrownBy(() -> timeCost.apply(vessel, route)).isInstanceOf(
+    assertThatThrownBy(() -> timeCost.apply(vessel)).isInstanceOf(
       NullPointerException.class
     );
   }

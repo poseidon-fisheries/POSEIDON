@@ -50,10 +50,13 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
  * <p>
  * The option values given for a vessel serve one pick and are not to be kept:
  * their memory is the one selected when they were given, which a later change
- * (of gear, say) can make the wrong one. The values themselves are worked out
- * afresh on every call, with nothing cached, so a change of context (e.g. a
- * move, new prices) shows straight away, without any new observation. Finding
- * the best options therefore values every remembered option each time.
+ * (of gear, say) can make the wrong one. The valuation is put in the vessel's
+ * context once, the first time an option is valued, and serves every option
+ * valued through the same option values; a vessel that remembers nothing is
+ * never put in context. Each new call puts it in context afresh, so a change of
+ * context (e.g. a move, new prices) shows at the next pick, without any new
+ * observation. Finding the best options values every remembered option each
+ * time.
  *
  * @param <O> the type of option valued
  * @param <M> the type of what is remembered about an option
@@ -81,18 +84,29 @@ public class MemoryBasedOptionValues<
 
     private final Vessel vessel;
     private final Memory<O, M> memory;
+    private ContextualisedValuation<
+      ? super O,
+      ? super M
+    > contextualisedValuation;
+
+    private double valueOf(final O option, final M recollection) {
+      if (contextualisedValuation == null) {
+        contextualisedValuation = valuation.inContextOf(vessel);
+      }
+      return contextualisedValuation.valueOf(option, recollection);
+    }
 
     @Override
     public Optional<Double> getValue(final O option) {
       return memory
         .get(option)
-        .map(recollection -> valuation.valueOf(vessel, option, recollection));
+        .map(recollection -> valueOf(option, recollection));
     }
 
     @Override
     public void forEachEntry(final ObjectDoubleBiConsumer<? super O> consumer) {
       memory.forEach((option, recollection) ->
-        consumer.accept(option, valuation.valueOf(vessel, option, recollection))
+        consumer.accept(option, valueOf(option, recollection))
       );
     }
 

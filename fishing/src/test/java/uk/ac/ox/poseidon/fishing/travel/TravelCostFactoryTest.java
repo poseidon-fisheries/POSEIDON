@@ -29,6 +29,7 @@ import static uk.ac.ox.poseidon.fishing.travel.Factories.travelCost;
 
 import java.time.Duration;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +41,7 @@ import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
@@ -59,7 +61,7 @@ class TravelCostFactoryTest {
   );
   private final MappingFactory<Scope, Object, Int2D, Route> routeFunction =
     new GlobalRouteFunctionFactory();
-  private final MappingFactory<Scope, Object, Route, Money> routeCost =
+  private final ValueFactory<Scope, Object, Function<Route, Money>> routeCost =
     new GlobalRouteCostFactory();
 
   private static Route route(final Int2D destination) {
@@ -80,13 +82,15 @@ class TravelCostFactoryTest {
 
   /** A route cost shared by every simulation. */
   private static final class GlobalRouteCostFactory
-    extends GlobalScopeFactory<BiFunction<Object, Route, Money>>
-    implements MappingFactory<Scope, Object, Route, Money>
+    extends GlobalScopeFactory<Function<Object, Function<Route, Money>>>
+    implements ValueFactory<Scope, Object, Function<Route, Money>>
   {
 
     @Override
-    protected BiFunction<Object, Route, Money> newInstance(final Scope scope) {
-      return (context, route) ->
+    protected Function<Object, Function<Route, Money>> newInstance(
+      final Scope scope
+    ) {
+      return context -> route ->
         Money.of(CurrencyUnit.of("EUR"), route.getDistanceInKm());
     }
   }

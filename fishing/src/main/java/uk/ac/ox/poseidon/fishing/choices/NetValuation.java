@@ -29,10 +29,10 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
  * Values an option net of its cost: a revenue valuation minus a cost valuation,
- * both given the same vessel, option and recollection (in NW Med, the value of
- * the remembered catch minus the cost of travelling to fish there). The two are
- * assumed to give amounts in the same currency; this is not checked, since
- * valuations give bare amounts.
+ * both in the context of the same vessel and given the same option and
+ * recollection (in NW Med, the value of the remembered catch minus the cost of
+ * travelling to fish there). The two are assumed to give amounts in the same
+ * currency; this is not checked, since valuations give bare amounts.
  *
  * @param <O> the type of option valued
  * @param <M> the type of what is remembered about an option
@@ -43,16 +43,18 @@ public class NetValuation<O, M> implements Valuation<O, M> {
   private final Valuation<? super O, ? super M> revenueValuation;
   private final Valuation<? super O, ? super M> costValuation;
 
-  /** @return the revenue valuation of the option minus its cost valuation */
+  /**
+   * @return the revenue valuation of an option minus its cost valuation, each
+   *         put in the context of {@code vessel}
+   */
   @Override
-  public double valueOf(
-    final Vessel vessel,
-    final O option,
-    final M recollection
-  ) {
-    return (
-      revenueValuation.valueOf(vessel, option, recollection) -
-      costValuation.valueOf(vessel, option, recollection)
-    );
+  public ContextualisedValuation<O, M> inContextOf(final Vessel vessel) {
+    final ContextualisedValuation<? super O, ? super M> revenue =
+      revenueValuation.inContextOf(vessel);
+    final ContextualisedValuation<? super O, ? super M> cost =
+      costValuation.inContextOf(vessel);
+    return (option, recollection) ->
+      revenue.valueOf(option, recollection) -
+      cost.valueOf(option, recollection);
   }
 }
