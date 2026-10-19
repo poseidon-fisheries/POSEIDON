@@ -34,7 +34,6 @@ import uk.ac.ox.poseidon.core.functions.MappingAsValueFactory;
 import uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
-import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 
@@ -66,18 +65,14 @@ public class Factories {
 
   /**
    * @param hourlyCost gives the vessel's cost per hour at sea
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for a
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link TimeCost}
    * @see TimeCost
    */
-  public static TimeCostFactory timeCost(
-    final ValueFactory<
-      ? super VesselScope,
-      ? super Vessel,
-      ? extends Money
-    > hourlyCost
+  public static <S extends Scope> TimeCostFactory<S> timeCost(
+    final ValueFactory<? super S, ? super Vessel, ? extends Money> hourlyCost
   ) {
-    return new TimeCostFactory(hourlyCost);
+    return new TimeCostFactory<>(hourlyCost);
   }
 
   /**
