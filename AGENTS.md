@@ -73,6 +73,8 @@ Prefer lambdas to anonymous classes, and method references to lambdas, wherever 
 
 Prefer streams to loops and to Guava's collection views (`Maps.transformValues`, `Lists.transform`): build an immutable map with `collect(toImmutableMap(...))`, for instance, rather than `ImmutableMap.copyOf(Maps.transformValues(...))`. Where a profile shows a stream's overhead on a hot path, a plain loop is fine; code that runs once, such as a constructor, is not a hot path.
 
+Write control flow that reads top to bottom. Guard clauses may return at the start of a method; past them, branch with `if`/`else`, so that the method's paths show in its structure. A loop that runs a fixed, small number of times is written out as its steps. When a change alters what a method does, rewrite the method as the new sequence of steps rather than wrapping the old body.
+
 ## Licensing
 
 All source files carry a GNU GPLv3 header (University of Oxford copyright); `./gradlew spotlessApply` adds it to new Java files. Spotless keeps whatever year a header has, so when you modify a file, end its year range at the current year yourself: with `YYYY` the current year, `2024` and `2024-2025` both become `2024-YYYY`, and `YYYY` stays.
