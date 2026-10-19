@@ -26,13 +26,12 @@ import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTim
 
 import java.time.Duration;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
-import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
-import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
@@ -44,37 +43,38 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param gear            the gear the vessel would fish with
-   * @param engine          the engine whose speed gives the time to get there
-   * @param regulations     the regulations a candidate fishing action must be
-   *                        permitted by
-   * @param pathFinder      finds the path from the vessel's current cell to the
-   *                        candidate
-   * @param distance        gives the travel time along that path
-   * @param fishingDuration the typical duration of a fishing action, which the
-   *                        candidate action lasts (see
-   *                        {@link FishingLocationLegalityChecker})
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for a
+   * @param gear                 the gear the vessel would fish with
+   * @param engine               the engine whose speed gives the time to get
+   *                             there
+   * @param regulations          the regulations a candidate fishing action must
+   *                             be permitted by
+   * @param pathLengthCalculator measures the path from the vessel's current
+   *                             cell to the candidate
+   * @param fishingDuration      the typical duration of a fishing action,
+   *                             which the candidate action lasts (see
+   *                             {@link FishingLocationLegalityChecker})
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link FishingLocationLegalityChecker}
    * @see FishingLocationLegalityCheckerFactory
    */
-  public static FishingLocationLegalityCheckerFactory fishingLocationLegalityChecker(
+  public static <S extends SimulationScope> FishingLocationLegalityCheckerFactory<S> fishingLocationLegalityChecker(
     final VesselComponent<? extends Gear> gear,
     final VesselComponent<? extends Engine> engine,
     final Factory<
-      ? super VesselScope,
+      ? super S,
       ? extends Regulations<? super ExtendedFishingAction>
     > regulations,
-    final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
-    final Factory<? super VesselScope, ? extends DistanceCalculator> distance,
-    final Factory<? super VesselScope, ? extends Duration> fishingDuration
+    final Factory<
+      ? super S,
+      ? extends PathLengthCalculator
+    > pathLengthCalculator,
+    final Factory<? super S, ? extends Duration> fishingDuration
   ) {
-    return new FishingLocationLegalityCheckerFactory(
+    return new FishingLocationLegalityCheckerFactory<>(
       gear,
       engine,
       regulations,
-      pathFinder,
-      distance,
+      pathLengthCalculator,
       fishingDuration,
       currentDateTime()
     );

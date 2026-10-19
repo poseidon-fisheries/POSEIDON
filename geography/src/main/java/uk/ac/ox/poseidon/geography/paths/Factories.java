@@ -30,11 +30,9 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * Factories for pathfinding over a
- * {@link uk.ac.ox.poseidon.geography.grids.ModelGrid}: caches shared with any
- * other cache built from the same dependencies (see
- * {@link DefaultPathCacheFactory}), and this package's default
- * {@link GridPathFinder}.
+ * Factories for finding and measuring paths over a
+ * {@link uk.ac.ox.poseidon.geography.grids.ModelGrid}: path finders, the
+ * caches they consult, and what measures the paths they find.
  */
 public class Factories {
 
@@ -96,5 +94,22 @@ public class Factories {
       pathCache(bathymetricGrid, portGrid, distance),
       accessibleWaterCellsCache(bathymetricGrid, portGrid)
     );
+  }
+
+  /**
+   * @param pathFinder finds the path between two cells
+   * @param distance   measures the paths
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
+   *         {@link PathLengthCalculator}
+   * @see PathLengthCalculator
+   */
+  public static PathLengthCalculatorFactory pathLengthCalculator(
+    final Factory<? super SimulationScope, ? extends GridPathFinder> pathFinder,
+    final Factory<
+      ? super SimulationScope,
+      ? extends DistanceCalculator
+    > distance
+  ) {
+    return new PathLengthCalculatorFactory(pathFinder, distance);
   }
 }

@@ -31,46 +31,35 @@ import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
-import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
-import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
-import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link RouteViaDestination},
- * built via {@link Factories#routeViaDestination(Factory, Factory)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link RouteViaDestination},
+ * built via {@link Factories#routeViaDestination(VesselComponent, Factory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class RouteViaDestinationFactory
-  extends VesselScopeFactory<BiFunction<Vessel, Int2D, Route>>
-  implements MappingFactory<VesselScope, Vessel, Int2D, Route>
+public class RouteViaDestinationFactory<S extends Scope>
+  extends RelativeScopeFactory<S, BiFunction<Vessel, Int2D, Route>>
+  implements MappingFactory<S, Vessel, Int2D, Route>
 {
 
   private final VesselComponent<? extends Engine> engine;
   private final Factory<
-    ? super VesselScope,
-    ? extends GridPathFinder
-  > pathFinder;
-  private final Factory<
-    ? super VesselScope,
-    ? extends DistanceCalculator
-  > distance;
+    ? super S,
+    ? extends PathLengthCalculator
+  > pathLengthCalculator;
 
   @Override
-  protected BiFunction<Vessel, Int2D, Route> newInstance(
-    final VesselScope scope
-  ) {
-    return new RouteViaDestination(
-      engine,
-      pathFinder.get(scope),
-      distance.get(scope)
-    );
+  protected BiFunction<Vessel, Int2D, Route> newInstance(final S scope) {
+    return new RouteViaDestination(engine, pathLengthCalculator.get(scope));
   }
 }

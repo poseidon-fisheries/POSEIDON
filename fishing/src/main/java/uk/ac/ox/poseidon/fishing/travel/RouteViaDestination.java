@@ -24,47 +24,36 @@ package uk.ac.ox.poseidon.fishing.travel;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import it.unimi.dsi.fastutil.longs.Long2DoubleMap;
-import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import java.util.function.BiFunction;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 
 /**
  * The {@link Route} a vessel would travel to fish at a destination cell: from
  * its current cell to the destination, then back to its home port (from port,
  * the round trip). The vessel's cell, home port and cruising speed are read at
- * each call. The length of the path between two cells is remembered after it
- * is first summed: it only depends on the two cells, and the path finder gives
- * the same path for them throughout a run.
+ * each call.
  */
 public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
 
   private final VesselComponent<? extends Engine> engine;
-  private final GridPathFinder pathFinder;
-  private final DistanceCalculator distanceCalculator;
-  // Keyed by the two cells' ModelGrid.cellPairKey: the map grows with every
-  // (vessel cell, destination) pair valued, and object keys made lookups a
-  // sixth of a NW Med run.
-  private final Long2DoubleMap pathLengthsInKm = new Long2DoubleOpenHashMap();
+  private final PathLengthCalculator pathLengthCalculator;
 
   /**
-   * @param engine             the engine whose speed gives the route's duration
-   * @param pathFinder         finds the paths of the route's two legs
-   * @param distanceCalculator measures the paths
+   * @param engine               the engine whose speed gives the route's
+   *                             duration
+   * @param pathLengthCalculator measures the route's two legs
    */
   RouteViaDestination(
     final VesselComponent<? extends Engine> engine,
-    final GridPathFinder pathFinder,
-    final DistanceCalculator distanceCalculator
+    final PathLengthCalculator pathLengthCalculator
   ) {
     this.engine = checkNotNull(engine);
-    this.pathFinder = checkNotNull(pathFinder);
-    this.distanceCalculator = checkNotNull(distanceCalculator);
+    this.pathLengthCalculator = checkNotNull(pathLengthCalculator);
   }
 
   /**
@@ -72,33 +61,22 @@ public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
    * @param destination the cell to fish at
    * @return the route from the vessel's current cell to {@code destination},
    *         then back to its home port
-   * @throws IllegalStateException if either leg has no path
+   * @throws IllegalArgumentException if either leg has no path
    */
   @Override
   public Route apply(final Vessel vessel, final Int2D destination) {
     final double distanceInKm =
-      distanceInKm(vessel.getCell(), destination) +
-      distanceInKm(destination, vessel.getHomePortLocation());
+      pathLengthCalculator.lengthInKm(vessel.getCell(), destination) +
+      pathLengthCalculator.lengthInKm(
+        destination,
+        vessel.getHomePortLocation()
+      );
     return new Route(
       distanceInKm,
       DistanceCalculator.travelDuration(
         distanceInKm,
         engine.of(vessel).getCruisingSpeedInKph()
       )
-    );
-  }
-
-  private double distanceInKm(final Int2D start, final Int2D end) {
-    return pathLengthsInKm.computeIfAbsent(
-      pathFinder.getModelGrid().cellPairKey(start, end),
-      _ ->
-        distanceCalculator.distanceInKm(
-          pathFinder
-            .getPath(start, end)
-            .orElseThrow(() ->
-              new IllegalStateException("No path from " + start + " to " + end)
-            )
-        )
     );
   }
 }

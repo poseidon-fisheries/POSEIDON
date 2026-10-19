@@ -50,6 +50,7 @@ import uk.ac.ox.poseidon.geography.distance.CartesianDistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 import uk.ac.ox.poseidon.regulations.Regulations;
 import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenDates;
 
@@ -68,7 +69,7 @@ class FishingLocationLegalityCheckerTest {
     CANDIDATE
   );
   private static final double SPEED_IN_KPH = 10;
-  private static final Duration TRAVEL = Duration.ofHours(2);
+  private static final double PATH_LENGTH_IN_KM = 20;
   private static final Duration TYPICAL_SET = Duration.ofHours(1);
   private static final ModelGrid MODEL_GRID = ModelGrid.create(
     3,
@@ -102,8 +103,9 @@ class FishingLocationLegalityCheckerTest {
     giveComponent(vessel, engineComponent, engine);
     when(vessel.getVesselField()).thenReturn(vesselField);
     giveComponent(vessel, gearComponent, gear);
+    when(pathFinder.getModelGrid()).thenReturn(MODEL_GRID);
     when(pathFinder.getPath(PORT, CANDIDATE)).thenReturn(Optional.of(PATH));
-    when(distance.travelDuration(PATH, SPEED_IN_KPH)).thenReturn(TRAVEL);
+    when(distance.distanceInKm(PATH)).thenReturn(PATH_LENGTH_IN_KM);
   }
 
   private FishingLocationLegalityChecker checker(
@@ -114,8 +116,7 @@ class FishingLocationLegalityCheckerTest {
       gearComponent,
       engineComponent,
       regulations,
-      pathFinder,
-      distance,
+      new PathLengthCalculator(pathFinder, distance),
       TYPICAL_SET,
       v -> now
     );
@@ -190,8 +191,10 @@ class FishingLocationLegalityCheckerTest {
       gearComponent,
       engineComponent,
       action -> checked.add(action),
-      pathFinder,
-      new CartesianDistanceCalculator(MODEL_GRID, 1.0),
+      new PathLengthCalculator(
+        pathFinder,
+        new CartesianDistanceCalculator(MODEL_GRID, 1.0)
+      ),
       TYPICAL_SET,
       v -> now
     ).apply(vessel, CANDIDATE);
@@ -256,7 +259,7 @@ class FishingLocationLegalityCheckerTest {
       LocalDateTime.of(2013, 1, 19, 20, 30)
     );
     assertThatThrownBy(() -> checker.apply(vessel, CANDIDATE))
-      .isInstanceOf(RuntimeException.class)
+      .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining("No path");
   }
 }

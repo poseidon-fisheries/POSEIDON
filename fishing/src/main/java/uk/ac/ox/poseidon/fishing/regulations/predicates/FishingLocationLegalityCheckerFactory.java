@@ -33,20 +33,19 @@ import lombok.experimental.SuperBuilder;
 import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
-import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
-import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
-import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
- * A {@link VesselScopeFactory} for a {@link FishingLocationLegalityChecker}.
+ * A {@link RelativeScopeFactory} for a {@link FishingLocationLegalityChecker}.
  * Built via {@link Factories#fishingLocationLegalityChecker}.
  */
 @Getter
@@ -54,47 +53,37 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class FishingLocationLegalityCheckerFactory
-  extends VesselScopeFactory<BiFunction<Vessel, Int2D, Boolean>>
-  implements MappingFactory<VesselScope, Vessel, Int2D, Boolean>
+public class FishingLocationLegalityCheckerFactory<S extends Scope>
+  extends RelativeScopeFactory<S, BiFunction<Vessel, Int2D, Boolean>>
+  implements MappingFactory<S, Vessel, Int2D, Boolean>
 {
 
   private final VesselComponent<? extends Gear> gear;
   private final VesselComponent<? extends Engine> engine;
 
   private final Factory<
-    ? super VesselScope,
+    ? super S,
     ? extends Regulations<? super ExtendedFishingAction>
   > regulations;
 
   private final Factory<
-    ? super VesselScope,
-    ? extends GridPathFinder
-  > pathFinder;
-  private final Factory<
-    ? super VesselScope,
-    ? extends DistanceCalculator
-  > distance;
-  private final Factory<
-    ? super VesselScope,
-    ? extends Duration
-  > fishingDuration;
+    ? super S,
+    ? extends PathLengthCalculator
+  > pathLengthCalculator;
+  private final Factory<? super S, ? extends Duration> fishingDuration;
   private final ValueFactory<
-    ? super VesselScope,
+    ? super S,
     ? super Vessel,
     LocalDateTime
   > currentDateTime;
 
   @Override
-  protected BiFunction<Vessel, Int2D, Boolean> newInstance(
-    final VesselScope scope
-  ) {
+  protected BiFunction<Vessel, Int2D, Boolean> newInstance(final S scope) {
     return new FishingLocationLegalityChecker(
       gear,
       engine,
       regulations.get(scope),
-      pathFinder.get(scope),
-      distance.get(scope),
+      pathLengthCalculator.get(scope),
       fishingDuration.get(scope),
       currentDateTime.get(scope)
     );

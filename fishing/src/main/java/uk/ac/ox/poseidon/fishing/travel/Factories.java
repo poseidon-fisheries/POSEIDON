@@ -36,8 +36,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
-import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 
 /**
  * Factories for the routes vessels would travel and what travelling them
@@ -48,19 +47,21 @@ public class Factories {
   private Factories() {}
 
   /**
-   * @param engine     the engine whose speed gives the route's duration
-   * @param pathFinder finds the paths of the route's two legs
-   * @param distance   measures the paths
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for a
+   * @param engine               the engine whose speed gives the route's
+   *                             duration
+   * @param pathLengthCalculator measures the route's two legs
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link RouteViaDestination}
    * @see RouteViaDestination
    */
-  public static RouteViaDestinationFactory routeViaDestination(
+  public static <S extends Scope> RouteViaDestinationFactory<S> routeViaDestination(
     final VesselComponent<? extends Engine> engine,
-    final Factory<? super VesselScope, ? extends GridPathFinder> pathFinder,
-    final Factory<? super VesselScope, ? extends DistanceCalculator> distance
+    final Factory<
+      ? super S,
+      ? extends PathLengthCalculator
+    > pathLengthCalculator
   ) {
-    return new RouteViaDestinationFactory(engine, pathFinder, distance);
+    return new RouteViaDestinationFactory<>(engine, pathLengthCalculator);
   }
 
   /**

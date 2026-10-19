@@ -26,7 +26,6 @@ import static lombok.AccessLevel.PACKAGE;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
@@ -37,16 +36,16 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
-import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
  * Predicate matching cells the vessel it is given could legally fish at:
  * builds a hypothetical {@link ExtendedFishingAction} for arriving at the
- * candidate cell (travel time included, via {@code pathFinder}/
- * {@code distanceCalculator}) and lasting {@code fishingDuration}, and checks
- * it against {@code regulations}. Used to filter fishing-location candidates
- * before committing to a trip there.
+ * candidate cell (travel time included, via {@code pathLengthCalculator}) and
+ * lasting {@code fishingDuration}, and checks it against {@code regulations}.
+ * Used to filter fishing-location candidates before committing to a trip
+ * there.
  * <p>
  * {@code fishingDuration} is the typical duration of a fishing action: fishers
  * don't know how long a given set or haul will take, so they plan with a
@@ -61,8 +60,7 @@ public class FishingLocationLegalityChecker
   private final VesselComponent<? extends Gear> gear;
   private final VesselComponent<? extends Engine> engine;
   private final Regulations<? super ExtendedFishingAction> regulations;
-  private final GridPathFinder pathFinder;
-  private final DistanceCalculator distanceCalculator;
+  private final PathLengthCalculator pathLengthCalculator;
   private final Duration fishingDuration;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
 
@@ -82,25 +80,15 @@ public class FishingLocationLegalityChecker
    * {@code fishingLocation}: starting whenever it would arrive there from its
    * current cell, and lasting {@code fishingDuration}.
    *
-   * @throws RuntimeException if no path exists from the vessel's current cell
-   *                          to {@code fishingLocation}
+   * @throws IllegalArgumentException if no path exists from the vessel's
+   *                                  current cell to {@code fishingLocation}
    */
   private ExtendedFishingAction makeAction(
     final Vessel vessel,
     final Int2D fishingLocation
   ) {
-    final List<Int2D> pathToFishingLocation = pathFinder
-      .getPath(vessel.getCell(), fishingLocation)
-      .orElseThrow(() ->
-        new RuntimeException(
-          "No path from current vessel location " +
-            vessel.getCell() +
-            " to fishing location " +
-            fishingLocation
-        )
-      );
-    final Duration travelDuration = distanceCalculator.travelDuration(
-      pathToFishingLocation,
+    final Duration travelDuration = DistanceCalculator.travelDuration(
+      pathLengthCalculator.lengthInKm(vessel.getCell(), fishingLocation),
       engine.of(vessel).getCruisingSpeedInKph()
     );
 

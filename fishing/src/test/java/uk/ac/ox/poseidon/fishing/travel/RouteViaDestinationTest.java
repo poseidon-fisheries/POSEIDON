@@ -27,8 +27,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.fishing.vessels.GivenComponents.componentGiving;
 import static uk.ac.ox.poseidon.fishing.vessels.GivenComponents.giveComponent;
@@ -47,6 +45,7 @@ import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 
 class RouteViaDestinationTest {
 
@@ -65,7 +64,10 @@ class RouteViaDestinationTest {
     engine
   );
   private final RouteViaDestination routeViaDestination =
-    new RouteViaDestination(engineComponent, pathFinder, distanceCalculator);
+    new RouteViaDestination(
+      engineComponent,
+      new PathLengthCalculator(pathFinder, distanceCalculator)
+    );
 
   @BeforeEach
   void setUp() {
@@ -149,14 +151,6 @@ class RouteViaDestinationTest {
   }
 
   @Test
-  void sumsThePathBetweenTwoCellsOnlyOnce() {
-    routeViaDestination.apply(vessel, destination);
-    routeViaDestination.apply(vessel, destination);
-
-    verify(distanceCalculator, times(2)).distanceInKm(anyList());
-  }
-
-  @Test
   void throwsWhenThereIsNoPath() {
     when(pathFinder.getPath(destination, portCell)).thenReturn(
       Optional.empty()
@@ -164,6 +158,6 @@ class RouteViaDestinationTest {
 
     assertThatThrownBy(() ->
       routeViaDestination.apply(vessel, destination)
-    ).isInstanceOf(IllegalStateException.class);
+    ).isInstanceOf(IllegalArgumentException.class);
   }
 }
