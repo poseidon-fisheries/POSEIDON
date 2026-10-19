@@ -22,14 +22,15 @@
 
 package uk.ac.ox.poseidon.core.functions;
 
-import static com.google.common.base.Throwables.throwIfUnchecked;
-
 import com.google.common.collect.ImmutableList;
+import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import javax.lang.model.SourceVersion;
 
 /**
@@ -52,7 +53,9 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
 
   private final String propertyPath;
   private final List<String> propertyNames;
-  private final List<MethodHandle> getters;
+  // Each getter is made into a function when built: the JIT can inline a
+  // function's call, but not that of a method handle held in a field.
+  private final Function<Object, Object>[] getters;
 
   /**
    * @param rootClass    the class the path starts from
@@ -61,10 +64,12 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
    *                                  Java identifier, or has no public getter
    *                                  on the declared type it is read from
    */
+  @SuppressWarnings("unchecked")
   public ObjectProperty(final Class<T> rootClass, final String propertyPath) {
     this.propertyPath = propertyPath;
     this.propertyNames = ImmutableList.copyOf(propertyPath.split("\\.", -1));
-    final ImmutableList.Builder<MethodHandle> builder = ImmutableList.builder();
+    final ImmutableList.Builder<Function<Object, Object>> builder =
+      ImmutableList.builder();
     Class<?> currentClass = rootClass;
     for (final String propertyName : propertyNames) {
       if (!SourceVersion.isIdentifier(propertyName)) {
@@ -77,7 +82,7 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
       }
       final Method getter = findGetter(currentClass, propertyName);
       try {
-        builder.add(MethodHandles.publicLookup().unreflect(getter));
+        builder.add(function(getter));
       } catch (final IllegalAccessException e) {
         throw new IllegalArgumentException(
           "Getter %s is not accessible.".formatted(getter),
@@ -86,7 +91,30 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
       }
       currentClass = getter.getReturnType();
     }
-    this.getters = builder.build();
+    this.getters = builder.build().toArray(new Function[0]);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static Function<Object, Object> function(final Method getter)
+    throws IllegalAccessException {
+    final MethodHandles.Lookup lookup = MethodHandles.lookup();
+    final MethodHandle handle = lookup.unreflect(getter);
+    try {
+      return (Function<Object, Object>) LambdaMetafactory.metafactory(
+        lookup,
+        "apply",
+        MethodType.methodType(Function.class),
+        MethodType.genericMethodType(1),
+        handle,
+        handle.type().wrap()
+      )
+        .getTarget()
+        .invokeExact();
+    } catch (final IllegalAccessException e) {
+      throw e;
+    } catch (final Throwable throwable) {
+      throw new IllegalStateException(throwable);
+    }
   }
 
   private static Method findGetter(
@@ -128,7 +156,7 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
   @SuppressWarnings("unchecked")
   public R read(final T object) {
     Object value = object;
-    for (int i = 0; i < getters.size(); i++) {
+    for (int i = 0; i < getters.length; i++) {
       if (value == null) {
         throw new NullPointerException(
           "%s is null in property path %s.".formatted(
@@ -137,12 +165,7 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
           )
         );
       }
-      try {
-        value = getters.get(i).invoke(value);
-      } catch (final Throwable throwable) {
-        throwIfUnchecked(throwable);
-        throw new IllegalStateException(throwable);
-      }
+      value = getters[i].apply(value);
     }
     return (R) value;
   }
