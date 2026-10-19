@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,28 +22,37 @@
 
 package uk.ac.ox.poseidon.geography.paths;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableList;
-import java.util.List;
 import java.util.Optional;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
  * The default {@link PathCache}: an in-memory, unbounded Caffeine {@link Cache}
- * keyed by (start, end) pairs. Built via
+ * keyed by (start, end) pairs of cells of one {@link ModelGrid}. Built via
  * {@link Factories#pathCache(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
  * in this package.
  */
-public class DefaultPathCache<P> implements PathCache<P> {
+public class DefaultPathCache implements PathCache<Int2D> {
 
-  // Keyed by List.of(start, end): Map.entry's hash, the XOR of the two points'
-  // hashes, collides badly on grid cells (A to B and B to A always collide).
-  private final Cache<List<P>, Optional<ImmutableList<P>>> memory =
+  private final ModelGrid modelGrid;
+  // Keyed by the two cells' ModelGrid.cellPairKey: object keys cost hashing
+  // and comparing two cells on every lookup.
+  private final Cache<Long, Optional<ImmutableList<Int2D>>> memory =
     Caffeine.newBuilder().build();
 
+  /** @param modelGrid the grid whose cells the cached paths go through */
+  DefaultPathCache(final ModelGrid modelGrid) {
+    this.modelGrid = checkNotNull(modelGrid);
+  }
+
   /**
-   * @param start The point at which the path should start
-   * @param end   The point at which the path should end
+   * @param start The cell at which the path should start
+   * @param end   The cell at which the path should end
    * @return Either:
    *         <ul>
    *         <li>An immutable list of sea tiles wrapped in an Optional if a path
@@ -52,18 +61,23 @@ public class DefaultPathCache<P> implements PathCache<P> {
    *         impossible;</li>
    *         <li>null if nothing was stored for start to end.</li>
    *         </ul>
+   * @throws IllegalArgumentException if either cell is outside the grid
    */
   @Override
-  public Optional<ImmutableList<P>> getPath(final P start, final P end) {
-    return memory.getIfPresent(List.of(start, end));
+  public Optional<ImmutableList<Int2D>> getPath(
+    final Int2D start,
+    final Int2D end
+  ) {
+    return memory.getIfPresent(modelGrid.cellPairKey(start, end));
   }
 
+  /** @throws IllegalArgumentException if either cell is outside the grid */
   @Override
   public void putPath(
-    final P start,
-    final P end,
-    final Optional<ImmutableList<P>> path
+    final Int2D start,
+    final Int2D end,
+    final Optional<ImmutableList<Int2D>> path
   ) {
-    memory.put(List.of(start, end), path);
+    memory.put(modelGrid.cellPairKey(start, end), path);
   }
 }

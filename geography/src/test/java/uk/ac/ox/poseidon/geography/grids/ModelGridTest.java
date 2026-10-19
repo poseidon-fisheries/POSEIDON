@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import static java.util.stream.Collectors.toSet;
 import static java.util.stream.IntStream.range;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -155,5 +156,28 @@ class ModelGridTest {
         coordinate.toString()
       );
     });
+  }
+
+  @Test
+  void everyOrderedPairOfCellsHasItsOwnKey() {
+    final ModelGrid grid = ModelGrid.create(3, 2, new Envelope(0, 3, 0, 2));
+    final List<Int2D> cells = grid.getAllCells().toList();
+    final Set<Long> keys = cells
+      .stream()
+      .flatMap(start -> cells.stream().map(end -> grid.cellPairKey(start, end)))
+      .collect(toSet());
+    assertEquals(cells.size() * cells.size(), keys.size());
+  }
+
+  @Test
+  void aCellOutsideTheGridHasNoPairKey() {
+    final Int2D inside = new Int2D(0, 0);
+    final Int2D outside = new Int2D(10, 0);
+    assertThrows(IllegalArgumentException.class, () ->
+      modelGrid.cellPairKey(inside, outside)
+    );
+    assertThrows(IllegalArgumentException.class, () ->
+      modelGrid.cellPairKey(outside, inside)
+    );
   }
 }

@@ -39,15 +39,16 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 /**
  * A {@link RelativeScopeFactory} for a {@link DefaultPathCache}, built via
  * {@link Factories#pathCache(Factory, Factory, Factory)}. {@link #newInstance}
- * builds a bare, empty {@link DefaultPathCache} regardless of the resolved
- * dependencies — {@code bathymetricGrid}, {@code portGrid}, and
- * {@code distance} are never read there. They are inputs all the same: they
- * give this factory its scope (one cache shared by every simulation when they
- * are global, one per simulation otherwise), and a change to any of them, made
- * by deriving a scenario, copies this factory, so that the derived scenario
- * gets a new cache rather than paths found on other grids. Don't "simplify"
- * this by dropping the unused fields — the cache would then be global whatever
- * grids it was actually built for, and outlive a change to them.
+ * builds an empty {@link DefaultPathCache} over the cells of
+ * {@code bathymetricGrid}'s model grid; {@code portGrid} and {@code distance}
+ * are never read there. They are inputs all the same: with
+ * {@code bathymetricGrid}, they give this factory its scope (one cache shared
+ * by every simulation when they are global, one per simulation otherwise), and
+ * a change to any of them, made by deriving a scenario, copies this factory, so
+ * that the derived scenario gets a new cache rather than paths found on other
+ * grids. Don't "simplify" this by dropping the unread fields — the cache would
+ * then be global whatever grids it was actually built for, and outlive a
+ * change to them.
  */
 @Getter
 @ToString
@@ -65,6 +66,6 @@ public class DefaultPathCacheFactory<S extends Scope> extends RelativeScopeFacto
 
   @Override
   protected PathCache<Int2D> newInstance(final S scope) {
-    return new DefaultPathCache<>();
+    return new DefaultPathCache(bathymetricGrid.get(scope).getModelGrid());
   }
 }

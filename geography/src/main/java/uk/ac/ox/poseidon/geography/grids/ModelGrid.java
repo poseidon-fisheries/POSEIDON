@@ -184,6 +184,28 @@ public interface ModelGrid {
   }
 
   /**
+   * A key for the ordered pair of cells, for maps keyed by a start and an end
+   * cell: two pairs of this grid's cells have the same key only if they have
+   * the same start and the same end. A primitive key spares such maps the
+   * hashing and comparing of objects on every lookup.
+   *
+   * @param start the first cell of the pair
+   * @param end   the second cell of the pair
+   * @return the pair's key, unique among pairs of this grid's cells
+   * @throws IllegalArgumentException if either cell is outside the grid
+   */
+  default long cellPairKey(final Int2D start, final Int2D end) {
+    checkIsInGrid(start);
+    checkIsInGrid(end);
+    final long cellCount = (long) getGridWidth() * getGridHeight();
+    return cellIndex(start) * cellCount + cellIndex(end);
+  }
+
+  private long cellIndex(final Int2D cell) {
+    return (long) cell.x * getGridHeight() + cell.y;
+  }
+
+  /**
    * @throws IllegalArgumentException if {@code coordinate} is outside the grid
    */
   default void checkIsInGrid(final Coordinate coordinate) {

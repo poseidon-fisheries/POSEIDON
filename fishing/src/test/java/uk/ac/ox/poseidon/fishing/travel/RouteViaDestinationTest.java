@@ -43,7 +43,9 @@ import sim.util.Number2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
+import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 class RouteViaDestinationTest {
@@ -67,6 +69,9 @@ class RouteViaDestinationTest {
 
   @BeforeEach
   void setUp() {
+    when(pathFinder.getModelGrid()).thenReturn(
+      ModelGrid.create(4, 4, new Envelope(0, 4, 0, 4))
+    );
     when(engine.getCruisingSpeedInKph()).thenReturn(10.0);
     when(vessel.getCell()).thenReturn(vesselCell);
     when(vessel.getHomePortLocation()).thenReturn(portCell);

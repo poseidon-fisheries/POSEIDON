@@ -27,54 +27,66 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
  * {@link DefaultPathCache}'s contract: {@code null} for a path it knows nothing
  * about, an empty {@code Optional} for one it knows is impossible, and the path
- * otherwise. Points are letters, so {@code path("A", "B", "C")} goes from A to
- * C through B.
+ * otherwise. Cells are named by letters, so {@code path(A, B, C)} goes from A
+ * to C through B.
  */
 class DefaultPathCacheTest {
 
-  private final DefaultPathCache<String> cache = new DefaultPathCache<>();
+  private static final Int2D A = new Int2D(0, 0);
+  private static final Int2D B = new Int2D(0, 1);
+  private static final Int2D C = new Int2D(1, 0);
+  private static final Int2D D = new Int2D(1, 1);
+  private static final Int2D E = new Int2D(2, 0);
+  private static final Int2D F = new Int2D(2, 1);
 
-  private static ImmutableList<String> path(final String... points) {
-    return ImmutableList.copyOf(points);
+  private final DefaultPathCache cache = new DefaultPathCache(
+    ModelGrid.create(3, 2, new Envelope(0, 3, 0, 2))
+  );
+
+  private static ImmutableList<Int2D> path(final Int2D... cells) {
+    return ImmutableList.copyOf(cells);
   }
 
   @Test
   void anUnknownPathIsNull() {
-    assertThat(cache.getPath("A", "B")).isNull();
+    assertThat(cache.getPath(A, B)).isNull();
   }
 
   @Test
   void aStoredPathIsReturned() {
-    cache.putPath("A", "C", Optional.of(path("A", "B", "C")));
-    assertThat(cache.getPath("A", "C")).contains(path("A", "B", "C"));
+    cache.putPath(A, C, Optional.of(path(A, B, C)));
+    assertThat(cache.getPath(A, C)).contains(path(A, B, C));
   }
 
   @Test
   void anImpossiblePathIsEmptyNotNull() {
-    cache.putPath("A", "B", Optional.empty());
-    assertThat(cache.getPath("A", "B")).isNotNull().isEmpty();
+    cache.putPath(A, B, Optional.empty());
+    assertThat(cache.getPath(A, B)).isNotNull().isEmpty();
   }
 
   @Test
   void onlyTheStoredStartAndEndAreKnown() {
-    cache.putPath("A", "D", Optional.of(path("A", "B", "C", "D")));
-    cache.putPath("E", "F", Optional.empty());
+    cache.putPath(A, D, Optional.of(path(A, B, C, D)));
+    cache.putPath(E, F, Optional.empty());
     // Neither reversed nor a tail of a stored path
-    assertThat(cache.getPath("D", "A")).isNull();
-    assertThat(cache.getPath("B", "D")).isNull();
-    assertThat(cache.getPath("F", "E")).isNull();
+    assertThat(cache.getPath(D, A)).isNull();
+    assertThat(cache.getPath(B, D)).isNull();
+    assertThat(cache.getPath(F, E)).isNull();
   }
 
   @Test
   void aLaterPathReplacesAnEarlierOne() {
-    cache.putPath("A", "C", Optional.empty());
-    cache.putPath("A", "C", Optional.of(path("A", "B", "C")));
-    assertThat(cache.getPath("A", "C")).contains(path("A", "B", "C"));
-    cache.putPath("A", "C", Optional.of(path("A", "D", "C")));
-    assertThat(cache.getPath("A", "C")).contains(path("A", "D", "C"));
+    cache.putPath(A, C, Optional.empty());
+    cache.putPath(A, C, Optional.of(path(A, B, C)));
+    assertThat(cache.getPath(A, C)).contains(path(A, B, C));
+    cache.putPath(A, C, Optional.of(path(A, D, C)));
+    assertThat(cache.getPath(A, C)).contains(path(A, D, C));
   }
 }

@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.fishing.travel;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import it.unimi.dsi.fastutil.longs.Long2DoubleMap;
@@ -48,9 +47,9 @@ public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
   private final VesselComponent<? extends Engine> engine;
   private final GridPathFinder pathFinder;
   private final DistanceCalculator distanceCalculator;
-  // Keyed by the two cells packed into a long (see cellPairKey): the map grows
-  // with every (vessel cell, destination) pair valued, and object keys made
-  // lookups a sixth of a NW Med run.
+  // Keyed by the two cells' ModelGrid.cellPairKey: the map grows with every
+  // (vessel cell, destination) pair valued, and object keys made lookups a
+  // sixth of a NW Med run.
   private final Long2DoubleMap pathLengthsInKm = new Long2DoubleOpenHashMap();
 
   /**
@@ -90,33 +89,16 @@ public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
   }
 
   private double distanceInKm(final Int2D start, final Int2D end) {
-    return pathLengthsInKm.computeIfAbsent(cellPairKey(start, end), _ ->
-      distanceCalculator.distanceInKm(
-        pathFinder
-          .getPath(start, end)
-          .orElseThrow(() ->
-            new IllegalStateException("No path from " + start + " to " + end)
-          )
-      )
+    return pathLengthsInKm.computeIfAbsent(
+      pathFinder.getModelGrid().cellPairKey(start, end),
+      _ ->
+        distanceCalculator.distanceInKm(
+          pathFinder
+            .getPath(start, end)
+            .orElseThrow(() ->
+              new IllegalStateException("No path from " + start + " to " + end)
+            )
+        )
     );
-  }
-
-  // Each coordinate in 16 bits: grids are far smaller than 65,536 cells a side.
-  private static long cellPairKey(final Int2D start, final Int2D end) {
-    return (
-      ((long) coordinate(start.x) << 48) |
-      ((long) coordinate(start.y) << 32) |
-      ((long) coordinate(end.x) << 16) |
-      coordinate(end.y)
-    );
-  }
-
-  private static int coordinate(final int value) {
-    checkArgument(
-      value >= 0 && value < 1 << 16,
-      "Cell coordinate out of range: %s.",
-      value
-    );
-    return value;
   }
 }

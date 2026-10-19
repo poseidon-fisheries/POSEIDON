@@ -35,8 +35,10 @@ import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 class DefaultPathCacheFactoryTest {
@@ -53,7 +55,7 @@ class DefaultPathCacheFactoryTest {
   @Test
   void sharesCacheWhenRoutingInputsAreGlobal() {
     final DefaultPathCacheFactory<SimulationScope> factory = pathCache(
-      object(mock(BathymetricGrid.class)),
+      object(bathymetricGrid()),
       object(mock(PortGrid.class)),
       object(mock(DistanceCalculator.class))
     );
@@ -82,13 +84,21 @@ class DefaultPathCacheFactoryTest {
     assertThat(first).isNotSameAs(second);
   }
 
+  private static BathymetricGrid bathymetricGrid() {
+    final BathymetricGrid bathymetricGrid = mock(BathymetricGrid.class);
+    when(bathymetricGrid.getModelGrid()).thenReturn(
+      ModelGrid.create(1, 1, new Envelope(0, 1, 0, 1))
+    );
+    return bathymetricGrid;
+  }
+
   private static final class SimulationBathymetricGridFactory
     extends SimulationScopeFactory<BathymetricGrid>
   {
 
     @Override
     protected BathymetricGrid newInstance(final SimulationScope scope) {
-      return mock(BathymetricGrid.class);
+      return bathymetricGrid();
     }
   }
 }
