@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
+import static java.lang.Math.abs;
+
+import sim.util.Int2D;
 import sim.util.Number2D;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -31,18 +34,63 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * are converted to coordinates first, via {@link ModelGrid#toCoordinate}.
  * Subclassed by {@link EquirectangularDistanceCalculator} and
  * {@link HaversineDistanceCalculator}, which supply the actual formula.
+ * <p>
+ * The length of a step between two neighbouring cells is computed once, when
+ * the calculator is built, and looked up afterwards: on a regular lon/lat grid
+ * it depends only on the starting row and the direction of the step. Because
+ * the formula runs in the constructor, a subclass's formula must not read the
+ * subclass's own fields.
  */
 public abstract class CoordinateBasedDistanceCalculator
   extends AbstractDistanceCalculator
 {
 
+  /**
+   * Indexed by {@link #stepIndex}; {@code NaN} for steps leaving the grid.
+   */
+  private final double[] stepLengthsInKm;
+
   /** @param modelGrid the grid this calculator measures distances over */
   public CoordinateBasedDistanceCalculator(final ModelGrid modelGrid) {
     super(modelGrid);
+    final int gridHeight = modelGrid.getGridHeight();
+    stepLengthsInKm = new double[gridHeight * 3 * 2];
+    // A westward step is as long as the eastward one, so only steps from
+    // column 0 to columns 0 and 1 are measured.
+    for (int y = 0; y < gridHeight; y++) {
+      final Int2D start = new Int2D(0, y);
+      for (int dy = -1; dy <= 1; dy++) {
+        for (int dx = 0; dx <= 1; dx++) {
+          final Int2D end = new Int2D(dx, y + dy);
+          stepLengthsInKm[stepIndex(y, dx, dy)] = modelGrid.isInGrid(end)
+            ? distanceInKm(
+                modelGrid.toCoordinate(start),
+                modelGrid.toCoordinate(end)
+              )
+            : Double.NaN;
+        }
+      }
+    }
+  }
+
+  private static int stepIndex(final int startY, final int dx, final int dy) {
+    return (startY * 3 + dy + 1) * 2 + abs(dx);
   }
 
   @Override
   public double distanceInKm(final Number2D start, final Number2D end) {
+    if (
+      start instanceof final Int2D startCell &&
+      end instanceof final Int2D endCell &&
+      modelGrid.isInGrid(startCell) &&
+      modelGrid.isInGrid(endCell)
+    ) {
+      final int dx = endCell.x - startCell.x;
+      final int dy = endCell.y - startCell.y;
+      if (abs(dx) <= 1 && abs(dy) <= 1) {
+        return stepLengthsInKm[stepIndex(startCell.y, dx, dy)];
+      }
+    }
     return distanceInKm(
       modelGrid.toCoordinate(start),
       modelGrid.toCoordinate(end)
