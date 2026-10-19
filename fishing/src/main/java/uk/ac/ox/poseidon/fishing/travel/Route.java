@@ -26,14 +26,14 @@ import java.time.Duration;
 import lombok.Value;
 
 /**
- * A route a vessel would sail, by its length and how long sailing it takes:
- * what the costs of travelling it depend on.
+ * A route a vessel would travel, by its length and how long travelling it
+ * takes: what the costs of travelling it depend on.
  */
 @Value
 public class Route {
 
   /** The length of the route, in kilometres. */
   double distanceInKm;
-  /** How long sailing the route takes. */
+  /** How long travelling the route takes. */
   Duration duration;
 }

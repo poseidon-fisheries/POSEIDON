@@ -23,8 +23,9 @@
 /**
  * Travel as something with a cost:
  * {@link uk.ac.ox.poseidon.fishing.travel.Route} describes a route a vessel
- * would sail, and {@link uk.ac.ox.poseidon.fishing.travel.RouteViaDestination}
- * gives the route to fish at a cell and return to port. See
+ * would travel, and
+ * {@link uk.ac.ox.poseidon.fishing.travel.RouteViaDestination} gives the route
+ * to fish at a cell and return to port. See
  * {@link uk.ac.ox.poseidon.fishing.travel.Factories} for the entry points. The
  * travel tasks themselves are in {@code uk.ac.ox.poseidon.fishing.tasks.travel}.
  */

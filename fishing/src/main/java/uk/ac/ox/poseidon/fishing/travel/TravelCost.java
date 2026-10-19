@@ -52,7 +52,7 @@ public class TravelCost implements Valuation<Int2D, Object> {
   > routeCosts;
 
   /**
-   * @param routeFunction gives the route a vessel would sail via a cell
+   * @param routeFunction gives the route a vessel would travel via a cell
    * @param routeCosts    what is charged to a vessel for a route, each in
    *                      money
    */

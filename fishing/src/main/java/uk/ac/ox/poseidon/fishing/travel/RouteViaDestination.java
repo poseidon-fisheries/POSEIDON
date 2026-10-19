@@ -36,12 +36,12 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
- * The {@link Route} a vessel would sail to fish at a destination cell: from its
- * current cell to the destination, then back to its home port (from port, the
- * round trip). The vessel's cell, home port and cruising speed are read at each
- * call. The length of the path between two cells is remembered after it is
- * first summed: it only depends on the two cells, and the path finder gives the
- * same path for them throughout a run.
+ * The {@link Route} a vessel would travel to fish at a destination cell: from
+ * its current cell to the destination, then back to its home port (from port,
+ * the round trip). The vessel's cell, home port and cruising speed are read at
+ * each call. The length of the path between two cells is remembered after it
+ * is first summed: it only depends on the two cells, and the path finder gives
+ * the same path for them throughout a run.
  */
 public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
 
@@ -69,7 +69,7 @@ public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
   }
 
   /**
-   * @param vessel      the vessel that would sail the route
+   * @param vessel      the vessel that would travel the route
    * @param destination the cell to fish at
    * @return the route from the vessel's current cell to {@code destination},
    *         then back to its home port

@@ -39,7 +39,8 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
- * Factories for the routes vessels would sail and what travelling them costs.
+ * Factories for the routes vessels would travel and what travelling them
+ * costs.
  */
 public class Factories {
 
@@ -78,7 +79,7 @@ public class Factories {
   }
 
   /**
-   * @param routeFunction gives the route a vessel would sail via a cell
+   * @param routeFunction gives the route a vessel would travel via a cell
    * @param routeCosts    what is charged to a vessel for a route, each in
    *                      money
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
@@ -109,7 +110,8 @@ public class Factories {
   /**
    * @param route        the mapping that reads the route from the thing mapped
    * @param propertyPath the dotted path of properties to follow from the route,
-   *                     e.g. {@code "duration"} for how long sailing it takes
+   *                     e.g. {@code "duration"} for how long travelling it
+   *                     takes
    * @return a {@link MappingFactory} for a {@link RouteProperty} of the route
    * @see RouteProperty
    */
@@ -133,7 +135,8 @@ public class Factories {
   /**
    * @param route        the value that is the route
    * @param propertyPath the dotted path of properties to follow from the route,
-   *                     e.g. {@code "duration"} for how long sailing it takes
+   *                     e.g. {@code "duration"} for how long travelling it
+   *                     takes
    * @return a {@link ValueFactory} for a {@link RouteProperty} of the route,
    *         made a value by {@link uk.ac.ox.poseidon.core.functions.MappingAsValue}
    * @see RouteProperty

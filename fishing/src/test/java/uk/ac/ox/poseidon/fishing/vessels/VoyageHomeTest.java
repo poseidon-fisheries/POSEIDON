@@ -57,8 +57,8 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
- * A home port changed while a vessel sails home, on a behaviour of NW Med's
- * shape: at its home port, the vessel departs on a trip; elsewhere, it sails
+ * A home port changed while a vessel travels home, on a behaviour of NW Med's
+ * shape: at its home port, the vessel departs on a trip; elsewhere, it travels
  * home, in a run of its own.
  */
 class VoyageHomeTest {
@@ -112,7 +112,7 @@ class VoyageHomeTest {
     }
   }
 
-  /** Sails three hours to the home port it has as it sets off. */
+  /** Travels three hours to the home port it has as it sets off. */
   private final class VoyageHome extends VesselTask {
 
     private Port destination;
@@ -125,7 +125,7 @@ class VoyageHomeTest {
         return Status.SUCCEEDED;
       }
       destination = getVessel().getHomePort();
-      log.add("sail home to " + destination.getCode());
+      log.add("travel home to " + destination.getCode());
       return runFor(ofHours(3));
     }
   }
@@ -175,9 +175,9 @@ class VoyageHomeTest {
 
     assertThat(log).containsExactly(
       "depart from P1",
-      "sail home to P2",
+      "travel home to P2",
       "arrive at P2",
-      "sail home to P3",
+      "travel home to P3",
       "arrive at P3",
       "depart from P3"
     );

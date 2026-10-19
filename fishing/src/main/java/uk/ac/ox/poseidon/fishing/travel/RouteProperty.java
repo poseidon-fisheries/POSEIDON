@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.core.functions.ObjectProperty;
  * A mapping that reads a property of a route: the route is read from the thing
  * mapped, under the context, and its property by following a dotted path of
  * getters, as an {@link ObjectProperty} does. {@code "duration"} reads how long
- * sailing the route takes. Built via
+ * travelling the route takes. Built via
  * {@link Factories Factories.routeProperty(...)} in this package.
  *
  * @param <C> the type of the context
