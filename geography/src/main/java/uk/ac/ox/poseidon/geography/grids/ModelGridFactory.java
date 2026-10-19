@@ -54,11 +54,22 @@ public class ModelGridFactory extends GlobalScopeFactory<ModelGrid> {
   private final double northLatitude;
 
   /**
-   * @throws IllegalStateException if the width or height (in degrees) isn't an
-   *                               exact multiple of {@code resolutionInDegrees}
+   * @throws IllegalStateException if {@code westLongitude} isn't less than
+   *                               {@code eastLongitude}, or if the width or
+   *                               height (in degrees) isn't an exact multiple
+   *                               of {@code resolutionInDegrees}
    */
   @Override
   protected ModelGrid newInstance(final Scope scope) {
+    // A grid crossing the antimeridian would otherwise get a negative width.
+    checkState(
+      westLongitude < eastLongitude,
+      "West longitude %s is not less than east longitude %s. A grid " +
+        "crossing the antimeridian needs longitudes past 180 (e.g. 170 to " +
+        "190).",
+      westLongitude,
+      eastLongitude
+    );
     final double widthInDegrees = eastLongitude - westLongitude;
     final double heightInDegrees = northLatitude - southLatitude;
     final int gridWidth = validateDimension(

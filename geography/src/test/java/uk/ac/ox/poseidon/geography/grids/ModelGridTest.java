@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.geography.grids;
 import static java.util.stream.IntStream.range;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Set;
@@ -104,6 +105,24 @@ class ModelGridTest {
     assertEquals(new Int2D(0, 0), modelGrid.toCell(new Coordinate(-4.5, 4.5)));
     assertEquals(new Int2D(9, 9), modelGrid.toCell(new Coordinate(4.5, -4.5)));
     assertEquals(new Int2D(10, 10), modelGrid.toCell(new Coordinate(5, -5)));
+  }
+
+  @Test
+  void rejectsAWestLongitudeEastOfTheEastLongitude() {
+    final ModelGridFactory factory = new ModelGridFactory(1.0, 170, -170, 0, 1);
+    final IllegalStateException exception = assertThrows(
+      IllegalStateException.class,
+      () -> factory.get(Scope.GLOBAL_SCOPE)
+    );
+    assertTrue(exception.getMessage().contains("antimeridian"));
+  }
+
+  @Test
+  void crossesTheAntimeridianWithLongitudesPast180() {
+    final ModelGrid modelGrid = new ModelGridFactory(1.0, 170, 190, 0, 1).get(
+      Scope.GLOBAL_SCOPE
+    );
+    assertEquals(20, modelGrid.getGridWidth());
   }
 
   @Test
