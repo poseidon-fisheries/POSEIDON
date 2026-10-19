@@ -47,12 +47,12 @@ import uk.ac.ox.poseidon.core.Scope;
 public class MoneyFactory extends GlobalScopeFactory<Money> {
 
   private final double amount;
-  private final String currencyUnit;
+  private final String currencyCode;
 
   @Override
   protected Money newInstance(final Scope scope) {
-    checkNotNull(currencyUnit, "currencyUnit must not be null");
+    checkNotNull(currencyCode, "currencyCode must not be null");
 
-    return Money.of(CurrencyUnit.of(currencyUnit), amount, HALF_EVEN);
+    return Money.of(CurrencyUnit.of(currencyCode), amount, HALF_EVEN);
   }
 }

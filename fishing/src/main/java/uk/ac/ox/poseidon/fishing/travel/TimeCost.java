@@ -62,12 +62,12 @@ public class TimeCost implements Function<Vessel, Function<Route, Money>> {
       "Unable to extract hourly cost for Vessel %s.",
       vessel
     );
-    final CurrencyUnit currency = costPerHour.getCurrencyUnit();
+    final CurrencyUnit currencyUnit = costPerHour.getCurrencyUnit();
     final long minorUnitsPerHour = costPerHour.getAmountMinorLong();
     return route -> {
       final double hours = route.getDuration().toSeconds() / 3600.0;
       return Money.ofMinor(
-        currency,
+        currencyUnit,
         (long) Math.rint(minorUnitsPerHour * hours)
       );
     };

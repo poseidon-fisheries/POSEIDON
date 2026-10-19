@@ -65,6 +65,7 @@ class HomePortCatchValuationTest {
   private final BiomassMarket market = new BiomassMarket(
     homePort,
     "M",
+    CurrencyUnit.EUR,
     mock(EventManager.class)
   );
   private final HomePortCatchValuation valuation = new HomePortCatchValuation(
@@ -174,6 +175,7 @@ class HomePortCatchValuationTest {
     final BiomassMarket otherMarket = new BiomassMarket(
       otherPort,
       "N",
+      CurrencyUnit.EUR,
       mock(EventManager.class)
     );
     otherMarket.setPrice(
@@ -195,6 +197,7 @@ class HomePortCatchValuationTest {
     final BiomassMarket otherMarket = new BiomassMarket(
       otherPort,
       "N",
+      CurrencyUnit.EUR,
       mock(EventManager.class)
     );
     market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
@@ -239,6 +242,7 @@ class HomePortCatchValuationTest {
     final BiomassMarket otherMarket = new BiomassMarket(
       homePort,
       "N",
+      CurrencyUnit.EUR,
       mock(EventManager.class)
     );
     givenMarkets(market, otherMarket);
@@ -246,28 +250,6 @@ class HomePortCatchValuationTest {
       valuation
         .inContextOf(vessel)
         .valueOf(new Object(), Bucket.of(pricedSpecies, 10.0))
-    ).isInstanceOf(IllegalStateException.class);
-  }
-
-  @Test
-  void throwsWithMoreThanOneCurrency() {
-    market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
-    market.setPrice(
-      category,
-      unpricedSpecies,
-      new Price(Money.of(CurrencyUnit.USD, 3.0), KILOGRAM),
-      now
-    );
-    final Bucket bucket = Bucket.of(
-      Map.of(
-        pricedSpecies,
-        Biomass.ofKg(10.0),
-        unpricedSpecies,
-        Biomass.ofKg(30.0)
-      )
-    );
-    assertThatThrownBy(() ->
-      valuation.inContextOf(vessel).valueOf(new Object(), bucket)
     ).isInstanceOf(IllegalStateException.class);
   }
 

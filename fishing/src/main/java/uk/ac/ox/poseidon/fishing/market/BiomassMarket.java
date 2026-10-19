@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.market;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toMap;
 
 import com.google.common.collect.Maps;
@@ -34,6 +36,7 @@ import java.util.function.Supplier;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.ToString;
+import org.joda.money.CurrencyUnit;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.buckets.BucketBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -46,7 +49,8 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
  * A {@link Market} with prices keyed by (catch category, species), with a
- * fallback lookup via {@link Species#covers}. A market starts with no prices:
+ * fallback lookup via {@link Species#covers}, all in the market's
+ * {@link #currencyUnit}. A market starts with no prices:
  * they are set through {@link #setPrice}, e.g. by {@link MarketPrice#apply}.
  * Selling a catch splits it into what has a price (sold, broadcast as a
  * {@link Sale}) and what doesn't (left in the sale's {@code unsold} catch).
@@ -57,6 +61,8 @@ public class BiomassMarket implements Market {
 
   private final Port port;
   private final String code;
+  /** The currency every price at this market is in. */
+  private final CurrencyUnit currencyUnit;
 
   @Getter(AccessLevel.NONE)
   private final Map<CatchCategory, Map<Species, Price>> prices;
@@ -76,10 +82,12 @@ public class BiomassMarket implements Market {
   BiomassMarket(
     final Port port,
     final String code,
+    final CurrencyUnit currencyUnit,
     final EventManager eventManager
   ) {
     this.port = port;
     this.code = code;
+    this.currencyUnit = checkNotNull(currencyUnit);
     this.prices = new HashMap<>();
     this.saleIdSupplier = new PrefixedIdSupplier(code);
     this.eventManager = eventManager;
@@ -221,6 +229,8 @@ public class BiomassMarket implements Market {
    * {@code catchCategory}.
    *
    * @param dateTime when the price changes
+   * @throws IllegalArgumentException if {@code price} is not in this market's
+   *                                  {@link #currencyUnit}
    */
   public void setPrice(
     final CatchCategory catchCategory,
@@ -228,11 +238,27 @@ public class BiomassMarket implements Market {
     final Price price,
     final LocalDateTime dateTime
   ) {
+    checkCurrencyUnit(price);
     prices
       .computeIfAbsent(catchCategory, k -> new HashMap<>())
       .put(species, price);
     priceCache.remove(catchCategory);
     lastPriceChangeDateTime = dateTime;
+  }
+
+  /**
+   * @throws IllegalArgumentException if {@code price} is not in this market's
+   *                                  {@link #currencyUnit}
+   */
+  void checkCurrencyUnit(final Price price) {
+    final CurrencyUnit priceCurrencyUnit = price.getAmount().getCurrencyUnit();
+    checkArgument(
+      priceCurrencyUnit.equals(currencyUnit),
+      "Market %s trades in %s, not %s.",
+      code,
+      currencyUnit,
+      priceCurrencyUnit
+    );
   }
 
   private Optional<Price> resolvePrice(

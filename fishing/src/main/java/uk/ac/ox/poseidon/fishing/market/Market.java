@@ -29,7 +29,10 @@ import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
-/** A place, at a {@link Port}, where a vessel sells its catch. */
+/**
+ * A place, at a {@link Port}, where a vessel sells its catch. A market trades
+ * in one currency: its prices and sales are all in it.
+ */
 public interface Market {
   /** @return this market's identifying code */
   String getCode();

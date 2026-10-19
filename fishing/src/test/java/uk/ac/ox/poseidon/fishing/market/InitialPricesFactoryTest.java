@@ -116,7 +116,12 @@ class InitialPricesFactoryTest {
   }
 
   private static BiomassMarket market(final String code) {
-    return new BiomassMarket(mock(Port.class), code, mock(EventManager.class));
+    return new BiomassMarket(
+      mock(Port.class),
+      code,
+      CurrencyUnit.EUR,
+      mock(EventManager.class)
+    );
   }
 
   private SimulationScope scope() {

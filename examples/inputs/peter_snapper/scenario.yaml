@@ -143,6 +143,7 @@ components:
         }
   marketGrid: &id007 !!uk.ac.ox.poseidon.fishing.market.MarketGridFactory
     markets: !!uk.ac.ox.poseidon.fishing.market.OneBiomassMarketPerPortFactory
+      currencyCode: IDR
       eventManager: !!uk.ac.ox.poseidon.core.EventManagerFactory {
         }
       portGrid: *id006
@@ -160,7 +161,7 @@ components:
             }
           price: !!uk.ac.ox.poseidon.fishing.market.PriceFactory {
             amount: 40000.0,
-            currencyUnit: IDR,
+            currencyCode: IDR,
             massUnit: kg
           }
           species: *id008
@@ -318,7 +319,7 @@ components:
                 portGrid: *id006
                 pricePerLitres: !!uk.ac.ox.poseidon.fishing.money.MoneyFactory {
                   amount: 10000.0,
-                  currencyUnit: IDR
+                  currencyCode: IDR
                 }
                 pumpRateInLitresPerMinute: 200.0
               portGrid: *id006

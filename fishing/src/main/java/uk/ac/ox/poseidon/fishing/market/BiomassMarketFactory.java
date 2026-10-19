@@ -29,6 +29,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.joda.money.CurrencyUnit;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -38,7 +39,8 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link BiomassMarket}, built
  * via {@link Factories#biomassMarket}. If {@link #marketCode} isn't set, the
- * port's own code is used.
+ * port's own code is used. {@link #currencyCode} is the code of the currency
+ * the market trades in.
  */
 @Getter
 @ToString
@@ -51,6 +53,7 @@ public class BiomassMarketFactory
 
   private final Factory<? super SimulationScope, ? extends Port> port;
   private final String marketCode;
+  private final String currencyCode;
   private final Factory<
     ? super SimulationScope,
     ? extends EventManager
@@ -59,9 +62,15 @@ public class BiomassMarketFactory
   @Override
   protected BiomassMarket newInstance(final SimulationScope scope) {
     checkNotNull(port, "port must not be null");
+    checkNotNull(currencyCode, "currencyCode must not be null");
     final Port port = this.port.get(scope);
     final String marketCode =
       this.marketCode != null ? this.marketCode : port.getCode();
-    return new BiomassMarket(port, marketCode, eventManager.get(scope));
+    return new BiomassMarket(
+      port,
+      marketCode,
+      CurrencyUnit.of(currencyCode),
+      eventManager.get(scope)
+    );
   }
 }

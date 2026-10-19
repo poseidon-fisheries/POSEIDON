@@ -22,12 +22,15 @@
 
 package uk.ac.ox.poseidon.fishing.market;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.joda.money.CurrencyUnit;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
@@ -36,7 +39,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
  * A {@link SimulationScopeFactory} that builds one {@link BiomassMarket} per
- * port in {@link #portGrid}, without prices, built via
+ * port in {@link #portGrid}, without prices, all trading in the currency whose
+ * code is {@link #currencyCode}, built via
  * {@link Factories#oneBiomassMarketPerPort}.
  */
 @Getter
@@ -49,6 +53,7 @@ public class OneBiomassMarketPerPortFactory
 {
 
   private final Factory<? super SimulationScope, ? extends PortGrid> portGrid;
+  private final String currencyCode;
   private final Factory<
     ? super SimulationScope,
     ? extends EventManager
@@ -56,11 +61,15 @@ public class OneBiomassMarketPerPortFactory
 
   @Override
   protected List<BiomassMarket> newInstance(final SimulationScope scope) {
+    checkNotNull(currencyCode, "currencyCode must not be null");
+    final CurrencyUnit currencyUnit = CurrencyUnit.of(currencyCode);
     final EventManager eventManager = this.eventManager.get(scope);
     return portGrid
       .get(scope)
       .getPorts()
-      .map(port -> new BiomassMarket(port, port.getCode(), eventManager))
+      .map(port ->
+        new BiomassMarket(port, port.getCode(), currencyUnit, eventManager)
+      )
       .toList();
   }
 }

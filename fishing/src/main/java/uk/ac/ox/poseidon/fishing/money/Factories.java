@@ -39,9 +39,9 @@ public class Factories {
    */
   public static MoneyFactory money(
     final double amount,
-    final @NonNull String currencyUnit
+    final @NonNull String currencyCode
   ) {
-    return new MoneyFactory(amount, currencyUnit);
+    return new MoneyFactory(amount, currencyCode);
   }
 
   /**

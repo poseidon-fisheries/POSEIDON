@@ -46,17 +46,24 @@ public class Factories {
 
   /**
    * @param port       the market's port
-   * @param marketCode the market's code; the port's own code is used if this is
-   *                   null
+   * @param marketCode   the market's code; the port's own code is used if this
+   *                     is null
+   * @param currencyCode the code of the currency the market trades in
    * @return a {@link SimulationScopeFactory} for a {@link BiomassMarket},
    *         without prices
    * @see BiomassMarket
    */
   public static BiomassMarketFactory biomassMarket(
     final Factory<? super SimulationScope, ? extends Port> port,
-    final String marketCode
+    final String marketCode,
+    final String currencyCode
   ) {
-    return new BiomassMarketFactory(port, marketCode, eventManager());
+    return new BiomassMarketFactory(
+      port,
+      marketCode,
+      currencyCode,
+      eventManager()
+    );
   }
 
   /**
@@ -151,15 +158,21 @@ public class Factories {
   }
 
   /**
-   * @param portGrid the ports to build one market per
+   * @param portGrid     the ports to build one market per
+   * @param currencyCode the code of the currency every market trades in
    * @return a {@link SimulationScopeFactory} for a list of
    *         {@link BiomassMarket}s, one per port, without prices
    * @see OneBiomassMarketPerPortFactory
    */
   public static OneBiomassMarketPerPortFactory oneBiomassMarketPerPort(
-    final Factory<? super SimulationScope, ? extends PortGrid> portGrid
+    final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
+    final String currencyCode
   ) {
-    return new OneBiomassMarketPerPortFactory(portGrid, eventManager());
+    return new OneBiomassMarketPerPortFactory(
+      portGrid,
+      currencyCode,
+      eventManager()
+    );
   }
 
   /**
@@ -221,7 +234,7 @@ public class Factories {
 
   /**
    * @param amount       the amount paid per {@code massUnit}
-   * @param currencyUnit the currency code {@code amount} is in
+   * @param currencyCode the code of the currency {@code amount} is in
    * @param massUnit     the unit of mass {@code amount} is quoted per
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
    *         {@link Price}
@@ -229,9 +242,9 @@ public class Factories {
    */
   public static PriceFactory price(
     final double amount,
-    final String currencyUnit,
+    final String currencyCode,
     final String massUnit
   ) {
-    return new PriceFactory(amount, currencyUnit, massUnit);
+    return new PriceFactory(amount, currencyCode, massUnit);
   }
 }

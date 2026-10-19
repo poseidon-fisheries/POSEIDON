@@ -48,15 +48,15 @@ import uk.ac.ox.poseidon.core.utils.Measurements;
 public class PriceFactory extends GlobalScopeFactory<Price> {
 
   private final double amount;
-  private final String currencyUnit;
+  private final String currencyCode;
   private final String massUnit;
 
   @Override
   protected Price newInstance(final Scope scope) {
-    checkNotNull(currencyUnit, "currencyUnit must not be null");
+    checkNotNull(currencyCode, "currencyCode must not be null");
     checkNotNull(massUnit, "massUnit must not be null");
     return new Price(
-      Money.of(CurrencyUnit.of(currencyUnit), amount, HALF_EVEN),
+      Money.of(CurrencyUnit.of(currencyCode), amount, HALF_EVEN),
       Measurements.parseMassUnit(massUnit)
     );
   }

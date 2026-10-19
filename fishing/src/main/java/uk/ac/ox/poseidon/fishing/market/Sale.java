@@ -111,18 +111,18 @@ public class Sale implements HasAttributes {
     // currency.
     final Map<CurrencyUnit, Double> totals = new HashMap<>();
     for (final Item item : items) {
-      final CurrencyUnit currency = item
+      final CurrencyUnit currencyUnit = item
         .getPrice()
         .getAmount()
         .getCurrencyUnit();
       final double value = item
         .getPrice()
         .valueForKgDouble(item.getContent().asKg());
-      totals.merge(currency, value, Double::sum);
+      totals.merge(currencyUnit, value, Double::sum);
     }
     final Map<CurrencyUnit, Money> result = new HashMap<>();
-    totals.forEach((currency, total) ->
-      result.put(currency, Money.of(currency, total, HALF_EVEN))
+    totals.forEach((currencyUnit, total) ->
+      result.put(currencyUnit, Money.of(currencyUnit, total, HALF_EVEN))
     );
     return result;
   }

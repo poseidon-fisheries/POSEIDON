@@ -283,7 +283,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     final var catchCategory = uncategorisedCatchCategory();
     final var marketGrid = marketGrid(
       portGrid,
-      oneBiomassMarketPerPort(portGrid)
+      oneBiomassMarketPerPort(portGrid, CURRENCY_CODE)
     );
 
     final var initialPrices = initialPrices(

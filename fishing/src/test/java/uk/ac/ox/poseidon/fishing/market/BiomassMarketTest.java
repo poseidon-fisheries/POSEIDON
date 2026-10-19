@@ -102,7 +102,7 @@ class BiomassMarketTest {
       KILOGRAM
     );
     final Price secondPrice = new Price(
-      Money.of(CurrencyUnit.of("USD"), 3.0),
+      Money.of(CurrencyUnit.of("EUR"), 3.0),
       KILOGRAM
     );
 
@@ -114,16 +114,13 @@ class BiomassMarketTest {
 
     final Set<String> seen = new HashSet<>();
     market.forEachPrice((category, species, price) ->
-      seen.add(
-        category.getCode() +
-          ":" +
-          species.getCode() +
-          ":" +
-          price.getAmount().getCurrencyUnit().getCode()
-      )
+      seen.add(category.getCode() + ":" + species.getCode() + ":" + price)
     );
 
-    assertThat(seen).containsExactlyInAnyOrder("C1:S1:EUR", "C2:S2:USD");
+    assertThat(seen).containsExactlyInAnyOrder(
+      "C1:S1:" + firstPrice,
+      "C2:S2:" + secondPrice
+    );
   }
 
   @Test
@@ -181,6 +178,7 @@ class BiomassMarketTest {
     final BiomassMarket market = new BiomassMarket(
       mock(Port.class),
       "M4",
+      CurrencyUnit.EUR,
       eventManager
     );
     market.setPrice(pricedCategory, pricedSpecies, price, DATE_TIME);
@@ -241,6 +239,7 @@ class BiomassMarketTest {
     final BiomassMarket market = new BiomassMarket(
       mock(Port.class),
       "M6",
+      CurrencyUnit.EUR,
       mock(EventManager.class)
     );
 
@@ -253,6 +252,28 @@ class BiomassMarketTest {
     );
   }
 
+  @Test
+  void refusesAPriceInAnotherCurrency() {
+    final BiomassMarket market = marketWithPrices("M7", Map.of());
+    final Price price = new Price(
+      Money.of(CurrencyUnit.of("USD"), 2.0),
+      KILOGRAM
+    );
+
+    assertThatThrownBy(() ->
+      market.setPrice(
+        new CatchCategory("C1"),
+        new Species("S1", null, null),
+        price,
+        DATE_TIME
+      )
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessage("Market M7 trades in EUR, not USD.");
+    assertThat(market.getPrices()).isEmpty();
+    assertThat(market.getLastPriceChangeDateTime()).isEmpty();
+  }
+
   private static BiomassMarket marketWithPrices(
     final String code,
     final Map<CatchCategory, Map<Species, Price>> prices
@@ -260,6 +281,7 @@ class BiomassMarketTest {
     final BiomassMarket market = new BiomassMarket(
       mock(Port.class),
       code,
+      CurrencyUnit.EUR,
       mock(EventManager.class)
     );
     prices.forEach((category, pricesBySpecies) ->

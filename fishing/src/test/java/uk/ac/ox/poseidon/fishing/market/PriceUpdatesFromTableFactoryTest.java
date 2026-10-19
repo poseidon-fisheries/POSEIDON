@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.joda.money.CurrencyUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
@@ -131,6 +132,22 @@ class PriceUpdatesFromTableFactoryTest {
       .hasMessage("Market M2 not found in market grid.");
   }
 
+  @Test
+  void rejectsAPriceInAnotherCurrencyThanItsMarketsWhenBuilt() {
+    final Table priceTable = priceTable("M1", "HKE");
+    priceTable.replaceColumn(StringColumn.create("currency", "USD"));
+    final BiomassMarket market = market("M1");
+    final PriceUpdatesFromTableFactory<SimulationScope> factory = factory(
+      priceTable,
+      marketGrid(market),
+      List.of(new Species("HKE", null, "Hake"))
+    );
+
+    assertThatThrownBy(() -> factory.get(scope()))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessage("Market M1 trades in EUR, not USD.");
+  }
+
   private static PriceUpdatesFromTableFactory<SimulationScope> factory(
     final Table priceTable,
     final MarketGrid marketGrid,
@@ -166,7 +183,12 @@ class PriceUpdatesFromTableFactoryTest {
   }
 
   private static BiomassMarket market(final String code) {
-    return new BiomassMarket(mock(Port.class), code, mock(EventManager.class));
+    return new BiomassMarket(
+      mock(Port.class),
+      code,
+      CurrencyUnit.EUR,
+      mock(EventManager.class)
+    );
   }
 
   private static MarketGrid marketGrid(final BiomassMarket market) {
