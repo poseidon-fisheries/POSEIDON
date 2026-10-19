@@ -71,6 +71,8 @@ Formatting is Prettier's (prettier-plugin-java, options in `.prettierrc`), appli
 
 Prefer lambdas to anonymous classes, and method references to lambdas, wherever they fit. For a `Listener`, which has two abstract methods, use `new SimpleListener<>(EventClass.class, consumer)`. Scenario classes (such as `PeterSnapperScenario`) are the exception: they stay readable for people new to Java, with no method references or other clever tricks.
 
+Prefer streams to loops and to Guava's collection views (`Maps.transformValues`, `Lists.transform`): build an immutable map with `collect(toImmutableMap(...))`, for instance, rather than `ImmutableMap.copyOf(Maps.transformValues(...))`. Where a profile shows a stream's overhead on a hot path, a plain loop is fine; code that runs once, such as a constructor, is not a hot path.
+
 ## Licensing
 
 All source files carry a GNU GPLv3 header (University of Oxford copyright); `./gradlew spotlessApply` adds it to new Java files. Spotless keeps whatever year a header has, so when you modify a file, end its year range at the current year yourself: with `YYYY` the current year, `2024` and `2024-2025` both become `2024-YYYY`, and `YYYY` stays.
