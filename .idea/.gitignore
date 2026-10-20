@@ -9,4 +9,10 @@
 # Generated from Gradle on every sync
 /modules.xml
 /modules/
+/compiler.xml
+/gradle.xml
+/jarRepositories.xml
+/kotlinc.xml
 /*.iml
+# The GUI Designer's default palette; no forms here
+/uiDesigner.xml
