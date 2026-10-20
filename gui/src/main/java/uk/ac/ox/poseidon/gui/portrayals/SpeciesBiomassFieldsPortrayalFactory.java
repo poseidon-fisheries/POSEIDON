@@ -59,11 +59,11 @@ public class SpeciesBiomassFieldsPortrayalFactory
 
   private final Factory<
     ? super SimulationScope,
-    List<? extends BiomassGrid>
+    ? extends List<? extends BiomassGrid>
   > biomassGrids;
   private final Factory<
     ? super SimulationScope,
-    List<? extends CarryingCapacityGrid>
+    ? extends List<? extends CarryingCapacityGrid>
   > carryingCapacityGrids;
   private final boolean visible;
 
