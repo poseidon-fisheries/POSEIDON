@@ -30,7 +30,9 @@ import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 /**
  * Factories for {@link FishingAction}s tested against the regulations engine.
  */
-public class Factories {
+public final class Factories {
+
+  private Factories() {}
 
   /**
    * @param gear the gear the vessel departs with

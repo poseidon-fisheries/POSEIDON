@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -28,7 +28,9 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Argument-validation helpers, on top of Guava's {@code Preconditions}, for
  * common numeric checks.
  */
-public class Preconditions {
+public final class Preconditions {
+
+  private Preconditions() {}
 
   /**
    * @param value the value to check, must be in {@code [0, 1]}

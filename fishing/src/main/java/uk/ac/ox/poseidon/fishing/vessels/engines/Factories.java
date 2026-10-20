@@ -29,7 +29,9 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 
 /** Factories for a vessel's {@link Engine}. */
-public class Factories {
+public final class Factories {
+
+  private Factories() {}
 
   /**
    * @param cruisingSpeed     this engine's cruising speed

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -49,7 +49,9 @@ import sim.util.Double2D;
  * {@link MersenneTwisterFast} RNG, so simulation code doesn't reach for
  * {@code java.util.Random} or hand-roll selection logic.
  */
-public class MasonUtils {
+public final class MasonUtils {
+
+  private MasonUtils() {}
 
   /**
    * @param candidates the candidates to choose from, materialized into a list

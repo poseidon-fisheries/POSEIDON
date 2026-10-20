@@ -31,7 +31,9 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 
 /** Factories for a vessel's {@link FuelTank}. */
-public class Factories {
+public final class Factories {
+
+  private Factories() {}
 
   /**
    * @param capacity    the tank's total capacity

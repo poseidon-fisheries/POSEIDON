@@ -39,7 +39,9 @@ import uk.ac.ox.poseidon.core.SimulationScope;
  * Date-times that move with the simulation are in
  * {@link uk.ac.ox.poseidon.core.providers.temporal.Factories}.
  */
-public class Factories {
+public final class Factories {
+
+  private Factories() {}
 
   /**
    * @return a {@link DurationFactory} for the given days/hours/minutes/seconds
