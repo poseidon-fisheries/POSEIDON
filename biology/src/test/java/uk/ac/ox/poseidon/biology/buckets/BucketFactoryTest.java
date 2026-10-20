@@ -64,12 +64,12 @@ class BucketFactoryTest {
   void ofSpeciesAndContentFiltersEmptyContent() {
     final Content emptyContent = new Content() {
       @Override
-      public Biomass multiply(double value) {
+      public Biomass multiply(final double value) {
         return Biomass.ZERO;
       }
 
       @Override
-      public Biomass divide(double value) {
+      public Biomass divide(final double value) {
         return Biomass.ZERO;
       }
 
