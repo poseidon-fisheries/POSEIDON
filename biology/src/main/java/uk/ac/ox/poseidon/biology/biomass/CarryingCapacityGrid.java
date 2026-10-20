@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -46,6 +46,7 @@ public class CarryingCapacityGrid extends DoubleGridWrapper {
     .filter(cell -> getCarryingCapacity(cell) > 0)
     .toList();
 
+  /** @param grid the carrying capacity of each cell */
   public CarryingCapacityGrid(final DoubleGrid grid) {
     super(grid);
   }

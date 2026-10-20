@@ -45,6 +45,11 @@ public class ImmutableBiomassGrid
   @Getter
   private final Species species;
 
+  /**
+   * @param modelGrid the grid the values are defined over
+   * @param species   the species whose biomass the values are
+   * @param values    the biomass of each cell, indexed {@code [x][y]}
+   */
   public ImmutableBiomassGrid(
     final ModelGrid modelGrid,
     final Species species,

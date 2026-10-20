@@ -30,6 +30,7 @@ import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
  */
 public class FuelStationGrid extends ObjectGrid<FuelStation> {
 
+  /** @param modelGrid the grid this is defined over; starts empty */
   public FuelStationGrid(final ModelGrid modelGrid) {
     super(modelGrid);
   }

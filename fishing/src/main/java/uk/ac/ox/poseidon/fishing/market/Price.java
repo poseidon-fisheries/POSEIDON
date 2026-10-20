@@ -86,7 +86,7 @@ public class Price {
     return amountPerKg * kg;
   }
 
-  @java.lang.Override
+  @Override
   public String toString() {
     return amount + " / " + biomassUnit;
   }

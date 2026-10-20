@@ -33,5 +33,6 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
  * either concrete flavor.
  */
 public interface SpeciesGrid extends DoubleGrid {
+  /** @return the species this grid holds values for */
   Species getSpecies();
 }

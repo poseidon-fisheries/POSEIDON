@@ -30,6 +30,10 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 
+/**
+ * A {@link GlobalScopeFactory} for a {@link MoneyFromRow}. Built via
+ * {@link Factories#moneyFromRow}.
+ */
 @Getter
 @ToString
 @AllArgsConstructor

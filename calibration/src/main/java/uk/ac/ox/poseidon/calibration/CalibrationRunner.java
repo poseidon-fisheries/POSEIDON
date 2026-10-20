@@ -218,6 +218,10 @@ public final class CalibrationRunner {
     double fitness,
     long generations
   ) {
+    /**
+     * Copies {@code parameters}, so that later changes to the caller's map do
+     * not reach the result.
+     */
     public Result {
       parameters = new LinkedHashMap<>(parameters);
     }

@@ -304,6 +304,11 @@ public class BiomassMarket implements Market {
    */
   @FunctionalInterface
   public interface PriceConsumer {
+    /**
+     * @param catchCategory the category the price applies to
+     * @param species       the species the price applies to
+     * @param price         the price
+     */
     void accept(CatchCategory catchCategory, Species species, Price price);
   }
 }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -38,14 +38,29 @@ import java.util.stream.Stream;
  * {@link uk.ac.ox.poseidon.core.aggregators.Factories} for the entry points.
  */
 public interface Aggregator extends Function<DoubleStream, OptionalDouble> {
+  /**
+   * @param numbers the numbers to reduce
+   * @return their summary value, or {@link OptionalDouble#empty()} if there is
+   *         none
+   */
   default OptionalDouble apply(final Stream<? extends Number> numbers) {
     return apply(numbers.mapToDouble(Number::doubleValue));
   }
 
+  /**
+   * @param numbers the numbers to reduce
+   * @return their summary value, or {@link OptionalDouble#empty()} if there is
+   *         none
+   */
   default OptionalDouble apply(final Collection<? extends Number> numbers) {
     return apply(numbers.stream());
   }
 
+  /**
+   * @param numbers the numbers to reduce
+   * @return their summary value, or {@link OptionalDouble#empty()} if there is
+   *         none
+   */
   default OptionalDouble apply(final double[] numbers) {
     return apply(Arrays.stream(numbers));
   }
