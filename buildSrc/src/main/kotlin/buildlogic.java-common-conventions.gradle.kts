@@ -80,7 +80,8 @@ java {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.addAll(listOf("-Werror", "-Xlint:-processing", "-Xlint:unchecked"))
+    // MASON makes steppables and the simulation Serializable, but POSEIDON never serializes them
+    options.compilerArgs.addAll(listOf("-Werror", "-Xlint:all,-serial"))
 }
 
 tasks.named<Test>("test") {
