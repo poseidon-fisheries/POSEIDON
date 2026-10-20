@@ -72,7 +72,10 @@ class AllOfRegulationsTest {
   @Test
   void stopsAtTheFirstRuleThatForbids() {
     final List<String> asked = new ArrayList<>();
-    final Regulations<Action<Object>> first = a -> asked.add("first") && false;
+    final Regulations<Action<Object>> first = a -> {
+      asked.add("first");
+      return false;
+    };
     final Regulations<Action<Object>> second = a -> asked.add("second");
 
     assertThat(
