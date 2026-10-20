@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import sim.display.Console;
 import sim.display.Controller;
 import sim.display.GUIState;
 import sim.engine.Steppable;
@@ -99,6 +100,22 @@ public class SimulationWithUI extends GUIState {
     displayWrappers.forEach(displayWrapper ->
       displayWrapper.setupPortrayals(simulation)
     );
+  }
+
+  /**
+   * Opens MASON's console with its Save and Open menus disabled: they write
+   * and read checkpoints by Java serialization, which a simulation does not
+   * support.
+   *
+   * @return the console
+   */
+  @Override
+  public Controller createController() {
+    final Console console = new Console(this);
+    console.setSaveMenuAllowed(false);
+    console.setOpenMenuAllowed(false);
+    console.setVisible(true);
+    return console;
   }
 
   /**

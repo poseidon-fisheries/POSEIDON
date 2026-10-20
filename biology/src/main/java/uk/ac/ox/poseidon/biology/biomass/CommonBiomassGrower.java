@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import java.io.Serial;
 import java.util.List;
 import lombok.Data;
 import lombok.NonNull;
@@ -35,9 +34,6 @@ import sim.util.Int2D;
  */
 @Data
 public class CommonBiomassGrower implements Steppable {
-
-  @Serial
-  private static final long serialVersionUID = -7273150961650782548L;
 
   @NonNull
   private final BiomassGrid biomassGrid;

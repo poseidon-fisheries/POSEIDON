@@ -27,7 +27,6 @@ import static java.util.stream.Collectors.*;
 
 import com.google.common.collect.Streams;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.Serial;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -112,9 +111,6 @@ public class TemporalSchedule extends Schedule {
   private static final System.Logger logger = System.getLogger(
     TemporalSchedule.class.getName()
   );
-
-  @Serial
-  private static final long serialVersionUID = 4197200009803943439L;
 
   private final LocalDateTime startingDateTime;
   // The last time converted by toDateTime, which is called with the same time
@@ -665,9 +661,6 @@ public class TemporalSchedule extends Schedule {
    * seconds from 0, it fires at 0, 1, 3, 4, 6 seconds, and so on.
    */
   public class TemporalRepeat extends Repeat {
-
-    @Serial
-    private static final long serialVersionUID = -3948718709942805794L;
 
     private final TemporalAmount interval;
     // The anchor of the later firings, set at the first firing.

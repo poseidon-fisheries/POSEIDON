@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.core;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
-import java.io.Serial;
 import java.text.MessageFormat;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
@@ -47,9 +46,6 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
  */
 @Getter
 public class Simulation extends SimState {
-
-  @Serial
-  private static final long serialVersionUID = -8162246985852120341L;
 
   private final EventManager eventManager = new SimpleEventManager();
   private final TemporalSchedule temporalSchedule;

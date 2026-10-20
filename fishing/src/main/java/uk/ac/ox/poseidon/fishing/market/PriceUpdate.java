@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.fishing.market;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.Serial;
 import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -35,9 +34,6 @@ import uk.ac.ox.poseidon.core.Simulation;
  */
 @Value
 public class PriceUpdate implements Steppable {
-
-  @Serial
-  private static final long serialVersionUID = 135321789743469343L;
 
   /** The price to apply. */
   MarketPrice marketPrice;

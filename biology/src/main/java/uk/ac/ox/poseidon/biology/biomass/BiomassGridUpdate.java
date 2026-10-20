@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import java.io.Serial;
 import java.util.List;
 import lombok.Value;
 import sim.engine.SimState;
@@ -36,9 +35,6 @@ import sim.util.Int2D;
  */
 @Value
 public class BiomassGridUpdate implements Steppable {
-
-  @Serial
-  private static final long serialVersionUID = 5460918327904618374L;
 
   List<? extends SpeciesGrid> snapshot;
   FisheableBiomassGrids target;

@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.io.tables;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.Serial;
 import java.util.List;
 import java.util.function.Supplier;
 import sim.engine.SimState;
@@ -40,9 +39,6 @@ import tech.tablesaw.api.Table;
  * in this package.
  */
 public class SteppableTable implements Steppable, Supplier<Table> {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   private final transient Table table;
   private final List<? extends Supplier<?>> valueSuppliers;

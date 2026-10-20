@@ -13,6 +13,13 @@
         <Class name="uk.ac.ox.poseidon.fishing.market.BiomassMarket$Price"/>
     </Match>
     <Match>
+        <!--
+        MASON makes steppables and the simulation Serializable, but POSEIDON never serializes
+        them: the GUI disables MASON's checkpoint menus
+        -->
+        <Bug pattern="SE_NO_SERIALVERSIONID"/>
+    </Match>
+    <Match>
         <!-- Constructor validation throws are a common and safe pattern -->
         <Bug pattern="CT_CONSTRUCTOR_THROW"/>
     </Match>

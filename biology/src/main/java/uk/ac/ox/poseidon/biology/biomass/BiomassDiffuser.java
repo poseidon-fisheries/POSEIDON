@@ -29,7 +29,6 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 import ec.util.MersenneTwisterFast;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.Serial;
 import java.util.*;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -43,9 +42,6 @@ import sim.util.Int2D;
  * cell or pairing is systematically favoured over a run.
  */
 public class BiomassDiffuser implements Steppable {
-
-  @Serial
-  private static final long serialVersionUID = 6904676724631409234L;
 
   private final transient BiomassGrid biomassGrid;
 
