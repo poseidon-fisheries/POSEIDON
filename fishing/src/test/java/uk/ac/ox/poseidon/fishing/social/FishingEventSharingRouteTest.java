@@ -68,7 +68,6 @@ import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.fishing.catches.disposition.Disposition;
-import uk.ac.ox.poseidon.fishing.choices.KeyedMemory;
 import uk.ac.ox.poseidon.fishing.choices.KeyedMemoryFactory;
 import uk.ac.ox.poseidon.fishing.choices.MemoryBasedOptionValuesFactory;
 import uk.ac.ox.poseidon.fishing.choices.OptionValues;

@@ -51,6 +51,7 @@ val isWindows = System.getProperty("os.name").startsWith("Windows")
 spotless {
     java {
         target(subprojects.map { "${it.name}/src/**/*.java" })
+        removeUnusedImports()
         prettier(npmPackages)
             .nodeExecutable(
                 tasks.nodeSetup.get().nodeDir.get()

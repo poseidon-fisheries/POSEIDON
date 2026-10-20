@@ -32,7 +32,6 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
 import sim.util.Int2D;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;

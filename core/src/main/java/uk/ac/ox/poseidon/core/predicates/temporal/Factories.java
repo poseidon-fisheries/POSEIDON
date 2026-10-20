@@ -28,7 +28,6 @@ import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.predicates.comparable.GreaterThanFactory;

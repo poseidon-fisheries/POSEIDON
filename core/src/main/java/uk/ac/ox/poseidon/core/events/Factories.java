@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.core.events;
 import uk.ac.ox.poseidon.core.EventManagerFactory;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.SimulationScope;
 
 /**
  * Factories for the simulation's event manager, and for scheduling

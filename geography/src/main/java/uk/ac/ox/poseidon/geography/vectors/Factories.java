@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.geography.vectors;
 import java.nio.file.Path;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.SimulationScope;
 
 /** Factories for reading vector geometry data. */
 public class Factories {
