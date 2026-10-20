@@ -43,7 +43,7 @@ public class CombinedDuration<C, T> implements BiFunction<C, T, Duration> {
   >[] durations;
 
   /** @param durations the mappings to combine */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public CombinedDuration(
     final List<
       ? extends BiFunction<? super C, ? super T, ? extends Duration>

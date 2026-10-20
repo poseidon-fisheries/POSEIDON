@@ -44,7 +44,7 @@ public class MultiStringKeyFromFunctions<
   private final BiFunction<? super C, ? super T, ?>[] functions;
 
   /** @param functions the mappings to combine */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public MultiStringKeyFromFunctions(
     final List<? extends BiFunction<? super C, ? super T, ?>> functions
   ) {

@@ -42,7 +42,7 @@ class InYearTest {
   void testActionStartYearMatches() {
     // Arrange
     final int targetYear = 2023;
-    final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+    final ExtendedAction<?> extendedAction = Mockito.mock(ExtendedAction.class);
     Mockito.when(extendedAction.getStartDateTime()).thenReturn(
       LocalDateTime.of(2023, 5, 15, 12, 0)
     );
@@ -63,7 +63,7 @@ class InYearTest {
   void testActionSpansOverMultipleYearsIncludingTargetYear() {
     // Arrange
     final int targetYear = 2023;
-    final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+    final ExtendedAction<?> extendedAction = Mockito.mock(ExtendedAction.class);
     Mockito.when(extendedAction.getStartDateTime()).thenReturn(
       LocalDateTime.of(2022, 12, 25, 23, 0)
     );
@@ -84,7 +84,7 @@ class InYearTest {
   void testActionStartsAndEndsBeforeTargetYear() {
     // Arrange
     final int targetYear = 2023;
-    final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+    final ExtendedAction<?> extendedAction = Mockito.mock(ExtendedAction.class);
     Mockito.when(extendedAction.getStartDateTime()).thenReturn(
       LocalDateTime.of(2021, 5, 1, 8, 0)
     );
@@ -105,7 +105,7 @@ class InYearTest {
   void testActionStartsAndEndsAfterTargetYear() {
     // Arrange
     final int targetYear = 2023;
-    final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+    final ExtendedAction<?> extendedAction = Mockito.mock(ExtendedAction.class);
     Mockito.when(extendedAction.getStartDateTime()).thenReturn(
       LocalDateTime.of(2024, 1, 2, 10, 0)
     );
@@ -126,7 +126,7 @@ class InYearTest {
   void testActionEndYearMatches() {
     // Arrange
     final int targetYear = 2023;
-    final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+    final ExtendedAction<?> extendedAction = Mockito.mock(ExtendedAction.class);
     Mockito.when(extendedAction.getStartDateTime()).thenReturn(
       LocalDateTime.of(2022, 5, 15, 12, 0)
     );
@@ -147,7 +147,7 @@ class InYearTest {
   void testBothStartAndEndYearMatch() {
     // Arrange
     final int targetYear = 2023;
-    final ExtendedAction extendedAction = Mockito.mock(ExtendedAction.class);
+    final ExtendedAction<?> extendedAction = Mockito.mock(ExtendedAction.class);
     Mockito.when(extendedAction.getStartDateTime()).thenReturn(
       LocalDateTime.of(2023, 1, 1, 0, 0)
     );

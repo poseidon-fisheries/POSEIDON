@@ -64,7 +64,7 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
    *                                  Java identifier, or has no public getter
    *                                  on the declared type it is read from
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public ObjectProperty(final Class<T> rootClass, final String propertyPath) {
     this.propertyPath = propertyPath;
     this.propertyNames = ImmutableList.copyOf(propertyPath.split("\\.", -1));
