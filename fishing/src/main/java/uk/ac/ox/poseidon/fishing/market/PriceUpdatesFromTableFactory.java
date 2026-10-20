@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.fishing.market;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.stream;
-import static java.lang.System.Logger.Level.WARNING;
 import static java.math.RoundingMode.HALF_EVEN;
 import static java.util.Map.entry;
 import static java.util.function.Function.identity;
@@ -77,10 +76,6 @@ public class PriceUpdatesFromTableFactory<S extends Scope> extends RelativeScope
   S,
   List<Entry<LocalDateTime, PriceUpdate>>
 > {
-
-  private static final System.Logger logger = System.getLogger(
-    PriceUpdatesFromTableFactory.class.getName()
-  );
 
   private final Factory<? super S, ? extends Table> data;
 
@@ -140,16 +135,9 @@ public class PriceUpdatesFromTableFactory<S extends Scope> extends RelativeScope
           // create a new species object for that particular price. The latter
           // case will be common when we have species with life stages in the
           // simulation but the market only deals with generic species.
-          speciesByKey.computeIfAbsent(multiStringKey(speciesCode, null), _ -> {
-            logger.log(
-              WARNING,
-              "No configured species matches price table species " +
-                "code {0}; creating a generic (no life stage) " +
-                "species for it.",
-              speciesCode
-            );
-            return new Species(speciesCode, null, null);
-          });
+          speciesByKey.computeIfAbsent(multiStringKey(speciesCode, null), _ ->
+            new Species(speciesCode, null, null)
+          );
 
         final CatchCategory catchCategory = catchCategories.computeIfAbsent(
           row.getString(categoryCodeColumn),
