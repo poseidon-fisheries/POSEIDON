@@ -24,8 +24,10 @@ package uk.ac.ox.poseidon.geography.distance;
 
 import static java.lang.Math.abs;
 
+import java.util.function.ToDoubleBiFunction;
 import sim.util.Int2D;
 import sim.util.Number2D;
+import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -37,9 +39,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * <p>
  * The length of a step between two neighbouring cells is computed once, when
  * the calculator is built, and looked up afterwards: on a regular lon/lat grid
- * it depends only on the starting row and the direction of the step. Because
- * the formula runs in the constructor, a subclass's formula must not read the
- * subclass's own fields.
+ * it depends only on the starting row and the direction of the step.
  */
 public abstract class CoordinateBasedDistanceCalculator
   extends AbstractDistanceCalculator
@@ -49,10 +49,18 @@ public abstract class CoordinateBasedDistanceCalculator
    * Indexed by {@link #stepIndex}; {@code NaN} for steps leaving the grid.
    */
   private final double[] stepLengthsInKm;
+  private final ToDoubleBiFunction<Coordinate, Coordinate> formula;
 
-  /** @param modelGrid the grid this calculator measures distances over */
-  public CoordinateBasedDistanceCalculator(final ModelGrid modelGrid) {
+  /**
+   * @param modelGrid the grid this calculator measures distances over
+   * @param formula   gives the distance in km between two coordinates
+   */
+  public CoordinateBasedDistanceCalculator(
+    final ModelGrid modelGrid,
+    final ToDoubleBiFunction<Coordinate, Coordinate> formula
+  ) {
     super(modelGrid);
+    this.formula = formula;
     final int gridHeight = modelGrid.getGridHeight();
     stepLengthsInKm = new double[gridHeight * 3 * 2];
     // A westward step is as long as the eastward one, so only steps from
@@ -63,7 +71,7 @@ public abstract class CoordinateBasedDistanceCalculator
         for (int dx = 0; dx <= 1; dx++) {
           final Int2D end = new Int2D(dx, y + dy);
           stepLengthsInKm[stepIndex(y, dx, dy)] = modelGrid.isInGrid(end)
-            ? distanceInKm(
+            ? formula.applyAsDouble(
                 modelGrid.toCoordinate(start),
                 modelGrid.toCoordinate(end)
               )
@@ -75,6 +83,11 @@ public abstract class CoordinateBasedDistanceCalculator
 
   private static int stepIndex(final int startY, final int dx, final int dy) {
     return (startY * 3 + dy + 1) * 2 + abs(dx);
+  }
+
+  @Override
+  public final double distanceInKm(final Coordinate a, final Coordinate b) {
+    return formula.applyAsDouble(a, b);
   }
 
   @Override

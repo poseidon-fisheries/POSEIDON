@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -40,11 +40,13 @@ public class HaversineDistanceCalculator
 
   /** @param modelGrid the grid this calculator measures distances over */
   public HaversineDistanceCalculator(final ModelGrid modelGrid) {
-    super(modelGrid);
+    super(modelGrid, HaversineDistanceCalculator::haversineDistanceInKm);
   }
 
-  @Override
-  public double distanceInKm(final Coordinate a, final Coordinate b) {
+  private static double haversineDistanceInKm(
+    final Coordinate a,
+    final Coordinate b
+  ) {
     final double lat1 = toRadians(a.lat);
     final double lon1 = toRadians(a.lon);
     final double lat2 = toRadians(b.lat);
