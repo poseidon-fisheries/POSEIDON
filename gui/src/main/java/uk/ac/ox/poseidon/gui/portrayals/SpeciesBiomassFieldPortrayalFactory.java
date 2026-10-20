@@ -36,15 +36,15 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 /**
  * A {@link SimulationScopeFactory} that portrays a single species'
  * {@link BiomassGrid} as a {@link NamedPortrayal}, named after the species and
  * coloured relative to {@link #carryingCapacityGrid}'s maximum.
  */
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class SpeciesBiomassFieldPortrayalFactory
   extends SimulationScopeFactory<NamedPortrayal>

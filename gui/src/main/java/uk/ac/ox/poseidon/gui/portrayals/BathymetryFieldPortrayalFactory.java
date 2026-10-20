@@ -32,13 +32,13 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 
-@Getter
-@ToString
-@EqualsAndHashCode(callSuper = true)
 /**
  * A {@link SimpleFieldPortrayalFactory} preset for a {@link BathymetricGrid}:
  * labelled "Bathymetry", diverging colour range around zero elevation.
  */
+@Getter
+@ToString
+@EqualsAndHashCode(callSuper = true)
 // Lombok's static builder() here hides the generic one of the superclass
 @SuppressWarnings("unchecked")
 @SuperBuilder(toBuilder = true)

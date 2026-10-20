@@ -38,14 +38,14 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 /**
  * A {@link SimulationScopeFactory} that portrays a {@link VesselField} as
  * oriented compass markers.
  */
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class VesselFieldPortrayalFactory
   extends SimulationScopeFactory<ContinuousPortrayal2D>

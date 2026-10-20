@@ -42,10 +42,6 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableGrid;
 import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 /**
  * A {@link SimulationScopeFactory} that portrays a {@link DoubleGrid} as a
  * colour-mapped raster, ranged from {@code 0} to the grid's current maximum
@@ -53,6 +49,10 @@ import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
  * {@link NumberGridWithCapacityPortrayalFactory}) override {@link #newColorMap}
  * to change how the colour range is chosen.
  */
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class NumberGridPortrayalFactory
   extends SimulationScopeFactory<FastValueGridPortrayal2D>

@@ -34,14 +34,14 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.geography.ports.MutablePortGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 /**
  * A {@link SimulationScopeFactory} that portrays a {@link PortGrid} with a port
  * icon per cell.
  */
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public final class PortGridPortrayalFactory
   extends SimulationScopeFactory<SparseGridPortrayal2D>

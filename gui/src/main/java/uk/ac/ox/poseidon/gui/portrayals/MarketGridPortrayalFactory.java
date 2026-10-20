@@ -34,14 +34,14 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 /**
  * A {@link SimulationScopeFactory} that portrays a {@link MarketGrid} as ovals,
  * one per market cell.
  */
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public final class MarketGridPortrayalFactory
   extends SimulationScopeFactory<SparseGridPortrayal2D>

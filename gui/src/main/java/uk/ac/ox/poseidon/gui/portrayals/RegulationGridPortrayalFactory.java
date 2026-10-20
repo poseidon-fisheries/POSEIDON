@@ -57,10 +57,6 @@ import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 /**
  * A {@link SimulationScopeFactory} that overlays a checkered texture on cells
  * where fishing is currently forbidden for every active vessel of a fleet, i.e.
@@ -70,6 +66,10 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  * closure, are not marked. If no vessel of the fleet is active, no cell is
  * marked.
  */
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class RegulationGridPortrayalFactory
   extends SimulationScopeFactory<ObjectGridPortrayal2D>

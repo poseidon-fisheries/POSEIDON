@@ -38,15 +38,15 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 /**
  * A {@link SimulationScopeFactory} that shows each cell's lon/lat coordinate as
  * a tooltip, formatted to a fixed number of decimal places, with no visible
  * mark of its own.
  */
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class CoordinatesPortrayalFactory
   extends SimulationScopeFactory<ObjectGridPortrayal2D>

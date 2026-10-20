@@ -36,14 +36,14 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
 
-@Getter
-@ToString
-@EqualsAndHashCode(callSuper = true)
 /**
  * A {@link NumberGridPortrayalFactory} ranged symmetrically around zero (from
  * {@code -max(|min|, |max|)} to {@code +max(|min|, |max|)}), for grids with
  * both positive and negative values (e.g. elevation).
  */
+@Getter
+@ToString
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class DivergingNumberGridPortrayalFactory
   extends NumberGridPortrayalFactory

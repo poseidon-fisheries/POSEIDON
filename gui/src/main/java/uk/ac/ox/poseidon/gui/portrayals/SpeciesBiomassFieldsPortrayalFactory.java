@@ -41,10 +41,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 /**
  * A {@link SimulationScopeFactory} that portrays several species'
  * {@link BiomassGrid}s at once, one {@link NamedPortrayal} per species.
@@ -52,6 +48,10 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
  * either exactly one grid (broadcast to every species) or as many grids as
  * there are species.
  */
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class SpeciesBiomassFieldsPortrayalFactory
   extends SimulationScopeFactory<List<NamedPortrayal>>
