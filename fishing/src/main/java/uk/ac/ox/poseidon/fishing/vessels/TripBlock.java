@@ -47,7 +47,7 @@ import sim.util.Int2D;
  * a trip left open at sea is a model error. Aborting a trip is modelled
  * inside it, by a task that heads home.
  */
-public class TripBlock extends Sequence<Vessel> {
+public final class TripBlock extends Sequence<Vessel> {
 
   private final Function<? super Vessel, Optional<Int2D>> initialDestination;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;

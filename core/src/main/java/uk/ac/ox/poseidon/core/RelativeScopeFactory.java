@@ -82,6 +82,8 @@ public abstract class RelativeScopeFactory<
   // The narrowest level of the inputs that have one, here or in nested
   // relative inputs, or null if none has; and whether an input, here or
   // nested, has no level to read. Transient, so that neither is a property.
+  // Both are computed on first use, never during construction.
+  @SuppressWarnings("this-escape")
   private final transient Supplier<Class<? extends Scope>> inputLevel =
     Suppliers.memoize(() ->
       inputs()
@@ -90,6 +92,8 @@ public abstract class RelativeScopeFactory<
         .reduce(RelativeScopeFactory::narrower)
         .orElse(null)
     );
+
+  @SuppressWarnings("this-escape")
   private final transient Supplier<Boolean> hasUnlevelledInput =
     Suppliers.memoize(() ->
       inputs().anyMatch(input ->

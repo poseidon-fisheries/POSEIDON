@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -41,7 +41,7 @@ import java.util.function.Supplier;
  * @param <E> the type of event accumulated over
  * @param <T> the type of the accumulated value
  */
-public class EphemeralAccumulatingListener<E, T>
+public final class EphemeralAccumulatingListener<E, T>
   extends AbstractListener<E>
   implements Supplier<T>
 {

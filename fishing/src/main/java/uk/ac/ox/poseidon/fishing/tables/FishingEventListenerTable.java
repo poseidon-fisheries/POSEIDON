@@ -86,7 +86,7 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
   /** Creates the table with all ten columns, empty. */
   public FishingEventListenerTable() {
     super(FishingEvent.class);
-    get().addColumns(
+    table.addColumns(
       vesselId,
       startDateTime,
       endDateTime,
