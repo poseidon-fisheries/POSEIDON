@@ -66,7 +66,7 @@ class GreedyPickerFactoryTest {
     return vessel;
   }
 
-  private static class OptionValuesFactory
+  private static final class OptionValuesFactory
     extends GlobalScopeFactory<OptionValues<String>>
   {
 

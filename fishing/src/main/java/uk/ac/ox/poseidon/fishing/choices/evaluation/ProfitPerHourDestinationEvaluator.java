@@ -64,7 +64,7 @@ public class ProfitPerHourDestinationEvaluator implements Evaluator<Int2D> {
     );
   }
 
-  private static class ProfitPerHourEvaluation
+  private static final class ProfitPerHourEvaluation
     implements Evaluation<Int2D>, Listener<TripEndEvent>
   {
 

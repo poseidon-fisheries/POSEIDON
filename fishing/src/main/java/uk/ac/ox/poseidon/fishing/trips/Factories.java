@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.fishing.trips;
 
 /** Factories for predicates about a vessel's trips. */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

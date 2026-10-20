@@ -39,7 +39,7 @@ import uk.ac.ox.poseidon.core.SimulationScope;
  * values.
  */
 @SuppressWarnings("varargs")
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

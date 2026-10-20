@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * (retention/discarding).
  */
 @SuppressWarnings("varargs")
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

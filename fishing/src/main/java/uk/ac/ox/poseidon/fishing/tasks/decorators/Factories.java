@@ -28,7 +28,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 
 /** Factories for behavior-tree decorator nodes wrapping a single child task. */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

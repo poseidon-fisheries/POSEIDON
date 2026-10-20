@@ -29,7 +29,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * Factories for {@link CatchCategory}s and the {@link CatchCategoriser}s that
  * sort into them.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

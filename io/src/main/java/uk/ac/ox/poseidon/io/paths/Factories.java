@@ -34,7 +34,7 @@ import uk.ac.ox.poseidon.core.SimulationScope;
  * from another resolved path (relative segments, per-simulation
  * subdirectories).
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

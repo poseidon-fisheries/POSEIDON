@@ -80,7 +80,7 @@ class VesselEventListenerFactoryTest {
     }
   }
 
-  private static class CountingListenerFactory
+  private static final class CountingListenerFactory
     extends VesselScopeFactory<CountingListener>
   {
 

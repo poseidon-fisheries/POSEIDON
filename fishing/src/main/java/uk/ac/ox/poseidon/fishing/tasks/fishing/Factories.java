@@ -41,7 +41,7 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  * Factories for fishing behavior-tree tasks and their supporting event
  * accumulator.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

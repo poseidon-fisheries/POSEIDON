@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.core.time.MonthDayFactory;
  * {@link uk.ac.ox.poseidon.regulations.TemporalAction}'s date/time span: a
  * fixed date range, a range repeating every calendar year, and a single year.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

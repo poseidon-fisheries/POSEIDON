@@ -53,7 +53,7 @@ import uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCellFactory;
  * growers/diffusers, recruitment allocation, and reading/scheduling
  * time-indexed biomass snapshots from NetCDF data.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

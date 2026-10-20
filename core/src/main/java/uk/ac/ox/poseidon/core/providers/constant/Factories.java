@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.core.Scope;
 /**
  * Factories for values and mappings that are the same whatever they are asked.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {
     throw new IllegalStateException("Utility class");

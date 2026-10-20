@@ -79,7 +79,7 @@ class VesselRegisterFactoryTest {
    * A behaviour that records its vessel's attributes as it starts, then runs
    * for a day.
    */
-  private class RecordingTask extends VesselTask {
+  private final class RecordingTask extends VesselTask {
 
     @Override
     public Status execute() {

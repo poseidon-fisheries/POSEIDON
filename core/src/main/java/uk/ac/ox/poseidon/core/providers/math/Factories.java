@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  * operation (currently max and min). Each keeps {@link Math}'s behaviour, NaN
  * included, so the {@code Double} and {@code Integer} variants stay apart.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

@@ -41,7 +41,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  * a mapping. Both mean the same: the value is the mapping, with nothing to map.
  */
 @SuppressWarnings({ "Convert2Diamond", "overloads", "varargs" })
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

@@ -41,7 +41,7 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * {@link #other} reads such a value off another vessel, in a test relating the
  * two.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

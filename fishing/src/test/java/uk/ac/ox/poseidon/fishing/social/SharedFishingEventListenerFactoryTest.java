@@ -107,7 +107,7 @@ class SharedFishingEventListenerFactoryTest {
     }
   }
 
-  private static class RecordingListenerFactory
+  private static final class RecordingListenerFactory
     extends VesselScopeFactory<RecordingListener>
   {
 

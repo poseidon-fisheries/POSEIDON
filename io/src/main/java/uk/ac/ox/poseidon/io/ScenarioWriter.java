@@ -114,7 +114,7 @@ public class ScenarioWriter {
     yaml.dump(scenario, writer);
   }
 
-  private static class Args {
+  private static final class Args {
 
     @Parameter(
       names = { "-c", "--scenario_class_name" },

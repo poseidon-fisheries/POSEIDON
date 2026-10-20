@@ -39,7 +39,7 @@ import uk.ac.ox.poseidon.geography.utils.ElevationTable;
  * table, a raster grid file, or literal values) or generated synthetically
  * (uniform, or a randomly-shaped coastline).
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

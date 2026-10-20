@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
  * Factories for suppliers of the {@link uk.ac.ox.poseidon.biology.Fisheable} at
  * a vessel's current location.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * species (given literally, or read from a table), filtering a species list by
  * code, and building a {@link SpeciesIndex} over a resolved collection.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

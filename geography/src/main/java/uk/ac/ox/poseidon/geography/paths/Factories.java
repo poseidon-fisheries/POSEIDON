@@ -34,7 +34,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * {@link uk.ac.ox.poseidon.geography.grids.ModelGrid}: path finders, the
  * caches they consult, and what measures the paths they find.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

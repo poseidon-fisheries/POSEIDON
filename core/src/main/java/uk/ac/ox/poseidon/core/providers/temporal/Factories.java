@@ -44,7 +44,7 @@ import uk.ac.ox.poseidon.core.time.PeriodFactory;
  * the temporal arithmetic over such values.
  */
 @SuppressWarnings("varargs")
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

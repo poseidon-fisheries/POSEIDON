@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * Factories for {@link DistanceCalculator}s: geographic (equirectangular,
  * haversine) and grid-native (Cartesian) distance measures.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

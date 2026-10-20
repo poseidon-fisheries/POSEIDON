@@ -26,7 +26,7 @@ package uk.ac.ox.poseidon.geography;
  * Factories for the basic spatial primitives of this package: geographic
  * coordinates and bounding-box envelopes.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

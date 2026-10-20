@@ -39,7 +39,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * Factories for JSR-385 {@link Quantity} values (e.g. mass, volume), and for
  * unwrapping a resolved {@link Mass} into a plain kilogram {@link Double}.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

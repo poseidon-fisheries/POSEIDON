@@ -34,7 +34,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 /**
  * Factories for fuel stations and the grid that locates them.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

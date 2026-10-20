@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * Factories for the simulation's event manager, and for scheduling
  * maintenance steppables over the event subsystem.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

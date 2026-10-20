@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
  * Factories for {@link java.util.function.Supplier}s that aggregate a resolved
  * {@link DoubleGrid}.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

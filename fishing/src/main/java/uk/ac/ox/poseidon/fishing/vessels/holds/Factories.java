@@ -29,7 +29,7 @@ import uk.ac.ox.poseidon.fishing.catches.CatchCategoriser;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 
 /** Factories for a vessel's {@link Hold}, with unlimited or fixed capacity. */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

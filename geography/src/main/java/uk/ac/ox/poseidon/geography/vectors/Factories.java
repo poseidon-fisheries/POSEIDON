@@ -27,7 +27,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
 
 /** Factories for reading vector geometry data. */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

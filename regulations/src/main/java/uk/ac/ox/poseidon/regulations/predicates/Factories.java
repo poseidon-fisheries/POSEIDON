@@ -32,7 +32,7 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  * Factories for predicates over agents built on top of the {@link Regulations}
  * model: converting a rule back into an ordinary predicate.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

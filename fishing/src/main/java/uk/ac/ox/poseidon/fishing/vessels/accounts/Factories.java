@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
  * Factories for {@link sim.engine.Steppable}s that draw on vessels'
  * {@link Account}s.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

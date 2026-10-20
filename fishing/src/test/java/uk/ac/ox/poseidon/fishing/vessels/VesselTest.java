@@ -73,7 +73,7 @@ class VesselTest {
    * A behaviour that records when it is run. Each run alternates between
    * starting a task of {@link #taskDuration} and finishing it.
    */
-  private class RecordingTask extends VesselTask {
+  private final class RecordingTask extends VesselTask {
 
     private final List<LocalDateTime> stepDateTimes = new ArrayList<>();
     private final List<Vessel> vesselsRead = new ArrayList<>();

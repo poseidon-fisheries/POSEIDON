@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  * Factories for {@link uk.ac.ox.poseidon.geography.allocators.Allocator}s over
  * biomass grids.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

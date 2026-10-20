@@ -117,7 +117,9 @@ class TripEvaluatorTest {
   }
 
   /** Records what it observes, and knows no value. */
-  private static class StubOptionValues implements MutableOptionValues<Int2D> {
+  private static final class StubOptionValues
+    implements MutableOptionValues<Int2D>
+  {
 
     private final List<Entry<Int2D, Double>> observations = new ArrayList<>();
 

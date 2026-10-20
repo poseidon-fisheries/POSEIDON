@@ -49,7 +49,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * creates it and states things about it.
  */
 @SuppressWarnings("varargs")
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

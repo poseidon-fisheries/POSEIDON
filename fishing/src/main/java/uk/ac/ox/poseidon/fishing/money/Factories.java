@@ -28,7 +28,7 @@ import lombok.NonNull;
  * Factories for {@link org.joda.money.Money} amounts: a fixed amount, or one
  * read from a table row.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

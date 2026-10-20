@@ -36,7 +36,7 @@ import uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory;
  * mappings testing the thing mapped against values read under the context.
  */
 @SuppressWarnings({ "Convert2Diamond", "overloads" })
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

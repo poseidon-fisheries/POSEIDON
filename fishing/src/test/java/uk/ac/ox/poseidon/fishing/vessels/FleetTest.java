@@ -106,7 +106,7 @@ class FleetTest {
    * A behaviour that records each time it starts, then runs for a second and
    * finishes.
    */
-  private class RecordingTask extends VesselTask {
+  private final class RecordingTask extends VesselTask {
 
     @Override
     public Status execute() {

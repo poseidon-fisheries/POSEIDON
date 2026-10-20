@@ -26,7 +26,7 @@ package uk.ac.ox.poseidon.fishing.tables;
  * Factories for {@link ListenerTable}s that accumulate simulation events into a
  * tablesaw table.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

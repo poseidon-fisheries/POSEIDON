@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * Factories for {@link DataSource}s: sources of readable character data backed
  * by a string literal, a file, or an entry within a zip archive.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

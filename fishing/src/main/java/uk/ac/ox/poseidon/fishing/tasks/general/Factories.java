@@ -36,7 +36,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
  * Factories for general-purpose vessel behavior-tree leaves: checks, waits, and
  * retry glue.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

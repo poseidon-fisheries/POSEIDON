@@ -44,7 +44,7 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
  * constructs (e.g. {@link Sequence}) over a resolved list of steppables.
  */
 @SuppressWarnings("varargs")
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

@@ -32,7 +32,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  * Factories for {@link Allocator}s: weight functions used to place things on a
  * grid.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

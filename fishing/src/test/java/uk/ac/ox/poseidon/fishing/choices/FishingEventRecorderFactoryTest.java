@@ -98,7 +98,7 @@ class FishingEventRecorderFactoryTest {
     return modelGrid;
   }
 
-  private static class PurseSeineKeyFactory
+  private static final class PurseSeineKeyFactory
     extends GlobalScopeFactory<Function<Vessel, String>>
     implements ValueFactory<Scope, Vessel, String>
   {
@@ -109,7 +109,7 @@ class FishingEventRecorderFactoryTest {
     }
   }
 
-  private static class KgOfSpeciesValuationFactory
+  private static final class KgOfSpeciesValuationFactory
     extends GlobalScopeFactory<Valuation<Int2D, Bucket>>
   {
 

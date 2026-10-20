@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
  * Factories for {@link java.util.function.Function}s that extract a value from
  * a resolved {@link DoubleGrid}.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

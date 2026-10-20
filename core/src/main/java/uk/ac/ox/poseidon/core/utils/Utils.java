@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.core.utils;
 
 /** General-purpose string helpers used across the codebase. */
-public class Utils {
+public final class Utils {
 
   private Utils() {}
 

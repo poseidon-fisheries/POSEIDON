@@ -28,7 +28,7 @@ import uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory;
  * Factories for values that draw a fresh random value, from the simulation's
  * shared RNG, on every call, whatever the context they are asked under.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {
     throw new IllegalStateException("Utility class");

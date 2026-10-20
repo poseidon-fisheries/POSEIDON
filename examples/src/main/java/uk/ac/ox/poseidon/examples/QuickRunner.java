@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -127,7 +127,9 @@ public class QuickRunner implements Runnable {
     );
   }
 
-  private static class PeriodConverter implements IStringConverter<Period> {
+  private static final class PeriodConverter
+    implements IStringConverter<Period>
+  {
 
     @Override
     public Period convert(final String value) {

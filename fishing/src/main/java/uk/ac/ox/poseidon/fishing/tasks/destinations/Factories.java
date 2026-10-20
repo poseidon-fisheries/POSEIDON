@@ -29,7 +29,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 
 /** Factories for tasks that pick a destination and redirect the current trip to it. */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

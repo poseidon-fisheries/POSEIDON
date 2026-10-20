@@ -26,7 +26,7 @@ package uk.ac.ox.poseidon.core.aggregators;
  * Factories for {@link Aggregator}s that reduce a stream, collection, or array
  * of numbers to a single summary value.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

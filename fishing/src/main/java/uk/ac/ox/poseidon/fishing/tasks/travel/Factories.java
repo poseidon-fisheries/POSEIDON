@@ -44,7 +44,7 @@ import uk.ac.ox.poseidon.geography.paths.PathFinder;
  * Factories for a vessel's travel-related behavior-tree tasks: refuel, travel,
  * land, end trip.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

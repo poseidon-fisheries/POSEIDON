@@ -40,7 +40,7 @@ import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
  * placed at fixed coordinates (directly or read from a table), and ports placed
  * at random suitable cells.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

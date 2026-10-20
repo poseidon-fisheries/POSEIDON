@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  * Factories for predicates over candidate fishing cells, built on the
  * {@link uk.ac.ox.poseidon.regulations} model.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

@@ -39,7 +39,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  * Factories for a vessel's {@link Gear}: inactive, a fixed proportion, or a
  * per-species one.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

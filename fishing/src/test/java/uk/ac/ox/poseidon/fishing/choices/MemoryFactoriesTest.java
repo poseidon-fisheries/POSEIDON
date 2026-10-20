@@ -73,7 +73,7 @@ class MemoryFactoriesTest {
     return vessel;
   }
 
-  private static class FirstLetterFactory
+  private static final class FirstLetterFactory
     extends GlobalScopeFactory<Function<String, String>>
     implements ValueFactory<Scope, String, String>
   {
@@ -84,7 +84,7 @@ class MemoryFactoriesTest {
     }
   }
 
-  private static class UpperCaseFactory
+  private static final class UpperCaseFactory
     extends GlobalScopeFactory<Function<String, String>>
     implements ValueFactory<Scope, String, String>
   {
@@ -95,7 +95,7 @@ class MemoryFactoriesTest {
     }
   }
 
-  private static class TrawlKeyFactory
+  private static final class TrawlKeyFactory
     extends GlobalScopeFactory<Function<Vessel, String>>
     implements ValueFactory<Scope, Vessel, String>
   {
@@ -106,7 +106,7 @@ class MemoryFactoriesTest {
     }
   }
 
-  private static class RecollectionValuationFactory
+  private static final class RecollectionValuationFactory
     extends GlobalScopeFactory<Valuation<String, Double>>
   {
 

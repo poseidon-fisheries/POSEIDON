@@ -42,7 +42,7 @@ import uk.ac.ox.poseidon.core.predicates.comparable.LessThanFactory;
  * {@link uk.ac.ox.poseidon.core.predicates.comparable.Factories} rather than
  * bespoke implementations.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

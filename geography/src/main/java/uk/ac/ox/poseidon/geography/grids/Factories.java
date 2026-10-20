@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.geography.utils.LonLatTable;
  * grid's active cells; building an allocator-driven double grid (fixed or
  * mutable, normalised or not); and reading raster/NetCDF data files.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

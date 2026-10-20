@@ -51,7 +51,7 @@ import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
  * table's contents.
  */
 @SuppressWarnings({ "overloads", "varargs" })
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

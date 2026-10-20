@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * Factories for {@link LonLatTable}-family wrappers over {@code tablesaw}
  * tables.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

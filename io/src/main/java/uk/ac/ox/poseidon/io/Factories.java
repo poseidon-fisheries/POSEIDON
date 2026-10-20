@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * Factories for filesystem side-effects performed during a simulation run, such
  * as clearing out a target directory.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

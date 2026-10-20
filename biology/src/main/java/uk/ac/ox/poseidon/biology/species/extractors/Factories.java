@@ -28,7 +28,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
  * Factories for {@link java.util.function.Function}s that read a
  * {@link Species}' properties.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

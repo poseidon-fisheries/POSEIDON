@@ -34,7 +34,7 @@ import uk.ac.ox.poseidon.fishing.vessels.holds.Hold;
 /**
  * Factories for tasks that land a vessel's catch at market.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

@@ -47,7 +47,7 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * observations and the rules updating it, and its destination-choice
  * strategies.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 /**
  * Factories for tasks that account for a trip's costs.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

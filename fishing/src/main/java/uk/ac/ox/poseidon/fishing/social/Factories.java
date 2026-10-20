@@ -37,7 +37,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 
 /** Factories for the ties between vessels. */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

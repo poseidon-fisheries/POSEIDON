@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * the action, and the conjunction of rules, {@link AllOfRegulations}.
  */
 @SuppressWarnings("varargs")
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

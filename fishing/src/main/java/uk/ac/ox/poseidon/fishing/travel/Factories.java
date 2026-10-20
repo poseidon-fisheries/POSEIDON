@@ -42,7 +42,7 @@ import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
  * costs.
  */
 @SuppressWarnings({ "overloads", "varargs" })
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

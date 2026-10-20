@@ -29,7 +29,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 /**
  * Factories for tracking vessel locations in continuous space.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

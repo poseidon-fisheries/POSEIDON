@@ -34,7 +34,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * {@link uk.ac.ox.poseidon.regulations.SpatialAction}'s start/end location,
  * either as grid cells or as raw coordinates.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

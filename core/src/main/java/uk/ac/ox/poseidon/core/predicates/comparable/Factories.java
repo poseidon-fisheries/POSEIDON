@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  * Factories for yes/no mappings that compare a tested value against one or two
  * thresholds read under the context.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

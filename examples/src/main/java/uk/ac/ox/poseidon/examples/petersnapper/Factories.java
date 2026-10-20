@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.examples.petersnapper;
 
 /** Factories specific to the Peter Snapper example scenario. */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

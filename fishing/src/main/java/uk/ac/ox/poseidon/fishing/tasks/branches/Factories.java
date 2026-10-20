@@ -30,7 +30,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 
 /** Factories for behavior-tree branch nodes (sequence, selector, parallel). */
 @SuppressWarnings("varargs")
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

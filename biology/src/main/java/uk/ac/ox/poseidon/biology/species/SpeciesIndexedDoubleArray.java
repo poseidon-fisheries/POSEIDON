@@ -30,7 +30,7 @@ import lombok.NonNull;
 /**
  * Lightweight array-backed implementation indexed by {@link SpeciesIndex}.
  */
-public class SpeciesIndexedDoubleArray
+public final class SpeciesIndexedDoubleArray
   implements SpeciesIndexedDoubles<SpeciesIndexedDoubleArray>
 {
 

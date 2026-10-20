@@ -26,7 +26,7 @@ package uk.ac.ox.poseidon.fishing.vessels.values.attributes;
  * Factories for functions reading an attribute by name off anything that has
  * a vessel's attributes.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 

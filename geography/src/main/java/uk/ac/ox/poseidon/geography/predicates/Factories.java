@@ -39,7 +39,7 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
  * Factories for spatial predicates: testing grid cells or coordinates against
  * bathymetry, a bounding box, or a set of geometries.
  */
-public class Factories {
+public final class Factories {
 
   private Factories() {}
 
