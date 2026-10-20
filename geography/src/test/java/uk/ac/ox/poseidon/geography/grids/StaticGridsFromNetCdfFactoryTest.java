@@ -37,8 +37,7 @@ import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
-import ucar.nc2.NetcdfFileWriter;
-import ucar.nc2.Variable;
+import ucar.nc2.write.NetcdfFormatWriter;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 
@@ -112,63 +111,38 @@ class StaticGridsFromNetCdfFactoryTest {
   private Path writeFixture(final double[] longitudes, final double[] latitudes)
     throws IOException {
     final Path file = tempDir.resolve("fixture.nc");
-    try (
-      NetcdfFileWriter writer = NetcdfFileWriter.createNew(
-        NetcdfFileWriter.Version.netcdf3,
-        file.toString()
-      )
-    ) {
-      final Dimension latDim = writer.addDimension(
-        "latitude",
-        latitudes.length
-      );
-      final Dimension lonDim = writer.addDimension(
-        "longitude",
-        longitudes.length
-      );
+    final NetcdfFormatWriter.Builder writerBuilder =
+      NetcdfFormatWriter.createNewNetcdf3(file.toString());
+    final Dimension latDim = writerBuilder.addDimension(
+      "latitude",
+      latitudes.length
+    );
+    final Dimension lonDim = writerBuilder.addDimension(
+      "longitude",
+      longitudes.length
+    );
 
-      final Variable latVar = writer.addVariable(
-        "latitude",
-        DataType.DOUBLE,
-        List.of(latDim)
-      );
-      final Variable lonVar = writer.addVariable(
-        "longitude",
-        DataType.DOUBLE,
-        List.of(lonDim)
-      );
-      final Variable mpa4Var = writer.addVariable(
-        "mpa_4",
-        DataType.FLOAT,
-        List.of(latDim, lonDim)
-      );
-      writer.addVariableAttribute(
-        mpa4Var,
-        new Attribute("_FillValue", FILL_VALUE)
-      );
-      final Variable mpa5Var = writer.addVariable(
-        "mpa_5",
-        DataType.FLOAT,
-        List.of(latDim, lonDim)
-      );
-      writer.addVariableAttribute(
-        mpa5Var,
-        new Attribute("_FillValue", FILL_VALUE)
-      );
+    writerBuilder.addVariable("latitude", DataType.DOUBLE, List.of(latDim));
+    writerBuilder.addVariable("longitude", DataType.DOUBLE, List.of(lonDim));
+    writerBuilder
+      .addVariable("mpa_4", DataType.FLOAT, List.of(latDim, lonDim))
+      .addAttribute(new Attribute("_FillValue", FILL_VALUE));
+    writerBuilder
+      .addVariable("mpa_5", DataType.FLOAT, List.of(latDim, lonDim))
+      .addAttribute(new Attribute("_FillValue", FILL_VALUE));
 
-      writer.create();
-
-      writer.write(latVar, Array.makeFromJavaArray(latitudes));
-      writer.write(lonVar, Array.makeFromJavaArray(longitudes));
+    try (NetcdfFormatWriter writer = writerBuilder.build()) {
+      writer.write("latitude", Array.makeFromJavaArray(latitudes));
+      writer.write("longitude", Array.makeFromJavaArray(longitudes));
       writer.write(
-        mpa4Var,
+        "mpa_4",
         Array.makeFromJavaArray(new float[][] {
           { 0f, 1f, FILL_VALUE },
           { 1f, 0f, 0f }
         })
       );
       writer.write(
-        mpa5Var,
+        "mpa_5",
         Array.makeFromJavaArray(new float[][] {
           { 1f, 1f, 1f },
           { 0f, 0f, 0f }

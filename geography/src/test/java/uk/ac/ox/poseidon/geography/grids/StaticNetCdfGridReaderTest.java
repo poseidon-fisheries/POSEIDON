@@ -34,8 +34,7 @@ import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
-import ucar.nc2.NetcdfFileWriter;
-import ucar.nc2.Variable;
+import ucar.nc2.write.NetcdfFormatWriter;
 
 class StaticNetCdfGridReaderTest {
 
@@ -49,69 +48,43 @@ class StaticNetCdfGridReaderTest {
   @BeforeEach
   void setUp() throws IOException {
     fixture = tempDir.resolve("fixture.nc");
-    try (
-      NetcdfFileWriter writer = NetcdfFileWriter.createNew(
-        NetcdfFileWriter.Version.netcdf3,
-        fixture.toString()
-      )
-    ) {
-      final Dimension latDim = writer.addDimension("latitude", 2);
-      final Dimension lonDim = writer.addDimension("longitude", 3);
+    final NetcdfFormatWriter.Builder writerBuilder =
+      NetcdfFormatWriter.createNewNetcdf3(fixture.toString());
+    final Dimension latDim = writerBuilder.addDimension("latitude", 2);
+    final Dimension lonDim = writerBuilder.addDimension("longitude", 3);
 
-      final Variable latVar = writer.addVariable(
-        "latitude",
-        DataType.DOUBLE,
-        List.of(latDim)
-      );
-      final Variable lonVar = writer.addVariable(
-        "longitude",
-        DataType.DOUBLE,
-        List.of(lonDim)
-      );
-      final Variable crsVar = writer.addVariable(
-        "crs",
-        DataType.INT,
-        List.of()
-      );
-      final Variable mpa4Var = writer.addVariable(
-        "mpa_4",
-        DataType.FLOAT,
-        List.of(latDim, lonDim)
-      );
-      writer.addVariableAttribute(
-        mpa4Var,
-        new Attribute("_FillValue", FILL_VALUE)
-      );
-      final Variable mpa5Var = writer.addVariable(
-        "mpa_5",
-        DataType.FLOAT,
-        List.of(latDim, lonDim)
-      );
-      writer.addVariableAttribute(
-        mpa5Var,
-        new Attribute("_FillValue", FILL_VALUE)
-      );
+    writerBuilder.addVariable("latitude", DataType.DOUBLE, List.of(latDim));
+    writerBuilder.addVariable("longitude", DataType.DOUBLE, List.of(lonDim));
+    writerBuilder.addVariable("crs", DataType.INT, List.of());
+    writerBuilder
+      .addVariable("mpa_4", DataType.FLOAT, List.of(latDim, lonDim))
+      .addAttribute(new Attribute("_FillValue", FILL_VALUE));
+    writerBuilder
+      .addVariable("mpa_5", DataType.FLOAT, List.of(latDim, lonDim))
+      .addAttribute(new Attribute("_FillValue", FILL_VALUE));
 
-      writer.create();
-
-      writer.write(latVar, Array.makeFromJavaArray(new double[] { 5.0, 4.0 }));
+    try (NetcdfFormatWriter writer = writerBuilder.build()) {
       writer.write(
-        lonVar,
+        "latitude",
+        Array.makeFromJavaArray(new double[] { 5.0, 4.0 })
+      );
+      writer.write(
+        "longitude",
         Array.makeFromJavaArray(new double[] { 10.0, 20.0, 30.0 })
       );
       writer.write(
-        crsVar,
+        "crs",
         Array.factory(DataType.INT, new int[0], new int[] { 0 })
       );
       writer.write(
-        mpa4Var,
+        "mpa_4",
         Array.makeFromJavaArray(new float[][] {
           { 0f, 1f, FILL_VALUE },
           { 1f, 0f, 0f }
         })
       );
       writer.write(
-        mpa5Var,
+        "mpa_5",
         Array.makeFromJavaArray(new float[][] {
           { 1f, 1f, 1f },
           { 0f, 0f, 0f }
@@ -158,37 +131,19 @@ class StaticNetCdfGridReaderTest {
   @Test
   void dimensionNamesAreConfigurable() throws IOException {
     final Path renamedFixture = tempDir.resolve("renamed.nc");
-    try (
-      NetcdfFileWriter writer = NetcdfFileWriter.createNew(
-        NetcdfFileWriter.Version.netcdf3,
-        renamedFixture.toString()
-      )
-    ) {
-      final Dimension latDim = writer.addDimension("y", 1);
-      final Dimension lonDim = writer.addDimension("x", 1);
-      final Variable latVar = writer.addVariable(
-        "y",
-        DataType.DOUBLE,
-        List.of(latDim)
-      );
-      final Variable lonVar = writer.addVariable(
-        "x",
-        DataType.DOUBLE,
-        List.of(lonDim)
-      );
-      final Variable dataVar = writer.addVariable(
-        "VAR",
-        DataType.FLOAT,
-        List.of(latDim, lonDim)
-      );
-      writer.addVariableAttribute(
-        dataVar,
-        new Attribute("_FillValue", FILL_VALUE)
-      );
-      writer.create();
-      writer.write(latVar, Array.makeFromJavaArray(new double[] { 1.0 }));
-      writer.write(lonVar, Array.makeFromJavaArray(new double[] { 2.0 }));
-      writer.write(dataVar, Array.makeFromJavaArray(new float[][] { { 42f } }));
+    final NetcdfFormatWriter.Builder writerBuilder =
+      NetcdfFormatWriter.createNewNetcdf3(renamedFixture.toString());
+    final Dimension latDim = writerBuilder.addDimension("y", 1);
+    final Dimension lonDim = writerBuilder.addDimension("x", 1);
+    writerBuilder.addVariable("y", DataType.DOUBLE, List.of(latDim));
+    writerBuilder.addVariable("x", DataType.DOUBLE, List.of(lonDim));
+    writerBuilder
+      .addVariable("VAR", DataType.FLOAT, List.of(latDim, lonDim))
+      .addAttribute(new Attribute("_FillValue", FILL_VALUE));
+    try (NetcdfFormatWriter writer = writerBuilder.build()) {
+      writer.write("y", Array.makeFromJavaArray(new double[] { 1.0 }));
+      writer.write("x", Array.makeFromJavaArray(new double[] { 2.0 }));
+      writer.write("VAR", Array.makeFromJavaArray(new float[][] { { 42f } }));
     } catch (final ucar.ma2.InvalidRangeException e) {
       throw new RuntimeException(e);
     }
@@ -208,29 +163,18 @@ class StaticNetCdfGridReaderTest {
   @Test
   void timeLatLonVariableIsNotConsideredAStaticGrid() throws IOException {
     final Path fileWithTimeVariable = tempDir.resolve("with-time.nc");
-    try (
-      NetcdfFileWriter writer = NetcdfFileWriter.createNew(
-        NetcdfFileWriter.Version.netcdf3,
-        fileWithTimeVariable.toString()
-      )
-    ) {
-      final Dimension timeDim = writer.addDimension("time", 1);
-      final Dimension latDim = writer.addDimension("latitude", 1);
-      final Dimension lonDim = writer.addDimension("longitude", 1);
-      writer.addVariable("time", DataType.DOUBLE, List.of(timeDim));
-      writer.addVariable("latitude", DataType.DOUBLE, List.of(latDim));
-      writer.addVariable("longitude", DataType.DOUBLE, List.of(lonDim));
-      final Variable dataVar = writer.addVariable(
-        "TIMEVAR",
-        DataType.FLOAT,
-        List.of(timeDim, latDim, lonDim)
-      );
-      writer.addVariableAttribute(
-        dataVar,
-        new Attribute("_FillValue", FILL_VALUE)
-      );
-      writer.create();
-    }
+    final NetcdfFormatWriter.Builder writerBuilder =
+      NetcdfFormatWriter.createNewNetcdf3(fileWithTimeVariable.toString());
+    final Dimension timeDim = writerBuilder.addDimension("time", 1);
+    final Dimension latDim = writerBuilder.addDimension("latitude", 1);
+    final Dimension lonDim = writerBuilder.addDimension("longitude", 1);
+    writerBuilder.addVariable("time", DataType.DOUBLE, List.of(timeDim));
+    writerBuilder.addVariable("latitude", DataType.DOUBLE, List.of(latDim));
+    writerBuilder.addVariable("longitude", DataType.DOUBLE, List.of(lonDim));
+    writerBuilder
+      .addVariable("TIMEVAR", DataType.FLOAT, List.of(timeDim, latDim, lonDim))
+      .addAttribute(new Attribute("_FillValue", FILL_VALUE));
+    writerBuilder.build().close();
 
     try (
       StaticNetCdfGridReader reader = new StaticNetCdfGridReader(

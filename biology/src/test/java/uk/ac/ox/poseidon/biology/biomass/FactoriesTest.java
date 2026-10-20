@@ -38,8 +38,7 @@ import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
-import ucar.nc2.NetcdfFileWriter;
-import ucar.nc2.Variable;
+import ucar.nc2.write.NetcdfFormatWriter;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
@@ -82,57 +81,36 @@ class FactoriesTest {
 
   private Path writeFixture() throws IOException {
     final Path file = tempDir.resolve("fixture.nc");
-    try (
-      NetcdfFileWriter writer = NetcdfFileWriter.createNew(
-        NetcdfFileWriter.Version.netcdf3,
-        file.toString()
-      )
-    ) {
-      final Dimension timeDim = writer.addDimension("time", 1);
-      final Dimension latDim = writer.addDimension("latitude", 2);
-      final Dimension lonDim = writer.addDimension("longitude", 3);
-      final Variable timeVar = writer.addVariable(
-        "time",
-        DataType.DOUBLE,
-        List.of(timeDim)
-      );
-      writer.addVariableAttribute(
-        timeVar,
-        new Attribute("units", "days since 1970-01-01")
-      );
-      final Variable latVar = writer.addVariable(
-        "latitude",
-        DataType.DOUBLE,
-        List.of(latDim)
-      );
-      final Variable lonVar = writer.addVariable(
-        "longitude",
-        DataType.DOUBLE,
-        List.of(lonDim)
-      );
-      final Variable dataVar = writer.addVariable(
-        "HKE",
-        DataType.FLOAT,
-        List.of(timeDim, latDim, lonDim)
-      );
-      writer.addVariableAttribute(
-        dataVar,
-        new Attribute("_FillValue", FILL_VALUE)
-      );
-      writer.create();
+    final NetcdfFormatWriter.Builder writerBuilder =
+      NetcdfFormatWriter.createNewNetcdf3(file.toString());
+    final Dimension timeDim = writerBuilder.addDimension("time", 1);
+    final Dimension latDim = writerBuilder.addDimension("latitude", 2);
+    final Dimension lonDim = writerBuilder.addDimension("longitude", 3);
+    writerBuilder
+      .addVariable("time", DataType.DOUBLE, List.of(timeDim))
+      .addAttribute(new Attribute("units", "days since 1970-01-01"));
+    writerBuilder.addVariable("latitude", DataType.DOUBLE, List.of(latDim));
+    writerBuilder.addVariable("longitude", DataType.DOUBLE, List.of(lonDim));
+    writerBuilder
+      .addVariable("HKE", DataType.FLOAT, List.of(timeDim, latDim, lonDim))
+      .addAttribute(new Attribute("_FillValue", FILL_VALUE));
+    try (NetcdfFormatWriter writer = writerBuilder.build()) {
       writer.write(
-        timeVar,
+        "time",
         Array.makeFromJavaArray(new double[] {
           LocalDateTime.of(2020, 1, 1, 0, 0).toLocalDate().toEpochDay()
         })
       );
-      writer.write(latVar, Array.makeFromJavaArray(new double[] { 5.0, 4.0 }));
       writer.write(
-        lonVar,
+        "latitude",
+        Array.makeFromJavaArray(new double[] { 5.0, 4.0 })
+      );
+      writer.write(
+        "longitude",
         Array.makeFromJavaArray(new double[] { 10.0, 20.0, 30.0 })
       );
       writer.write(
-        dataVar,
+        "HKE",
         Array.makeFromJavaArray(new float[][][] {
           { { 1f, 2f, 3f }, { 4f, 5f, 6f } }
         })

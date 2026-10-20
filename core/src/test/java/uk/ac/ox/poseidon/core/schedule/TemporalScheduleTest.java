@@ -124,7 +124,6 @@ class TemporalScheduleTest {
     schedule.scheduleOnce(start.plusHours(1), _ -> {});
     schedule.stepUntil(simState, start.plusDays(1));
     assertThat(schedule.getTime()).isEqualTo(86_400.0);
-    assertThat(schedule.time()).isEqualTo(86_400.0);
     assertThat(schedule.getTimestamp()).isEqualTo("2013-01-02 00:00");
   }
 

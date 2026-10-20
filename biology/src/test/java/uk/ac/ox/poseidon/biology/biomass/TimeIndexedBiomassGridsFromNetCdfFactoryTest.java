@@ -40,8 +40,7 @@ import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
-import ucar.nc2.NetcdfFileWriter;
-import ucar.nc2.Variable;
+import ucar.nc2.write.NetcdfFormatWriter;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
@@ -373,54 +372,30 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
   @Test
   void fractionalTimeValuePreservesTimeOfDay() throws IOException {
     final Path fixture = tempDir.resolve("fractional.nc");
-    try (
-      NetcdfFileWriter writer = NetcdfFileWriter.createNew(
-        NetcdfFileWriter.Version.netcdf3,
-        fixture.toString()
-      )
-    ) {
-      final Dimension timeDim = writer.addDimension("time", 1);
-      final Dimension latDim = writer.addDimension(
-        "latitude",
-        LATITUDES.length
-      );
-      final Dimension lonDim = writer.addDimension(
-        "longitude",
-        LONGITUDES.length
-      );
-      final Variable timeVar = writer.addVariable(
-        "time",
-        DataType.DOUBLE,
-        List.of(timeDim)
-      );
-      writer.addVariableAttribute(
-        timeVar,
-        new Attribute("units", "days since 1970-01-01")
-      );
-      final Variable latVar = writer.addVariable(
-        "latitude",
-        DataType.DOUBLE,
-        List.of(latDim)
-      );
-      final Variable lonVar = writer.addVariable(
-        "longitude",
-        DataType.DOUBLE,
-        List.of(lonDim)
-      );
-      final Variable dataVar = writer.addVariable(
-        "HKE",
-        DataType.FLOAT,
-        List.of(timeDim, latDim, lonDim)
-      );
-      writer.addVariableAttribute(
-        dataVar,
-        new Attribute("_FillValue", FILL_VALUE)
-      );
-      writer.create();
+    final NetcdfFormatWriter.Builder writerBuilder =
+      NetcdfFormatWriter.createNewNetcdf3(fixture.toString());
+    final Dimension timeDim = writerBuilder.addDimension("time", 1);
+    final Dimension latDim = writerBuilder.addDimension(
+      "latitude",
+      LATITUDES.length
+    );
+    final Dimension lonDim = writerBuilder.addDimension(
+      "longitude",
+      LONGITUDES.length
+    );
+    writerBuilder
+      .addVariable("time", DataType.DOUBLE, List.of(timeDim))
+      .addAttribute(new Attribute("units", "days since 1970-01-01"));
+    writerBuilder.addVariable("latitude", DataType.DOUBLE, List.of(latDim));
+    writerBuilder.addVariable("longitude", DataType.DOUBLE, List.of(lonDim));
+    writerBuilder
+      .addVariable("HKE", DataType.FLOAT, List.of(timeDim, latDim, lonDim))
+      .addAttribute(new Attribute("_FillValue", FILL_VALUE));
+    try (NetcdfFormatWriter writer = writerBuilder.build()) {
       // 18262.5 days since 1970-01-01 = noon on 2020-01-01, not midnight.
-      writer.write(timeVar, Array.makeFromJavaArray(new double[] { 18262.5 }));
-      writer.write(latVar, Array.makeFromJavaArray(LATITUDES));
-      writer.write(lonVar, Array.makeFromJavaArray(LONGITUDES));
+      writer.write("time", Array.makeFromJavaArray(new double[] { 18262.5 }));
+      writer.write("latitude", Array.makeFromJavaArray(LATITUDES));
+      writer.write("longitude", Array.makeFromJavaArray(LONGITUDES));
       final float[][][] data =
         new float[1][LATITUDES.length][LONGITUDES.length];
       for (int i = 0; i < LATITUDES.length; i++) {
@@ -428,7 +403,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
           data[0][i][j] = (float) expectedValue(0, 0, i, j);
         }
       }
-      writer.write(dataVar, Array.makeFromJavaArray(data));
+      writer.write("HKE", Array.makeFromJavaArray(data));
     } catch (final InvalidRangeException e) {
       throw new RuntimeException(e);
     }
@@ -470,70 +445,41 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
     final Path file = tempDir.resolve(
       "fixture-" + System.identityHashCode(dates) + ".nc"
     );
-    try (
-      NetcdfFileWriter writer = NetcdfFileWriter.createNew(
-        NetcdfFileWriter.Version.netcdf3,
-        file.toString()
-      )
-    ) {
-      final Dimension timeDim = writer.addDimension("time", dates.size());
-      final Dimension latDim = writer.addDimension(
-        "latitude",
-        latitudes.length
-      );
-      final Dimension lonDim = writer.addDimension(
-        "longitude",
-        longitudes.length
-      );
+    final NetcdfFormatWriter.Builder writerBuilder =
+      NetcdfFormatWriter.createNewNetcdf3(file.toString());
+    final Dimension timeDim = writerBuilder.addDimension("time", dates.size());
+    final Dimension latDim = writerBuilder.addDimension(
+      "latitude",
+      latitudes.length
+    );
+    final Dimension lonDim = writerBuilder.addDimension(
+      "longitude",
+      longitudes.length
+    );
 
-      final Variable timeVar = writer.addVariable(
-        "time",
-        DataType.DOUBLE,
-        List.of(timeDim)
-      );
-      writer.addVariableAttribute(
-        timeVar,
-        new Attribute("units", "days since 1970-01-01")
-      );
-      final Variable latVar = writer.addVariable(
-        "latitude",
-        DataType.DOUBLE,
-        List.of(latDim)
-      );
-      final Variable lonVar = writer.addVariable(
-        "longitude",
-        DataType.DOUBLE,
-        List.of(lonDim)
-      );
+    writerBuilder
+      .addVariable("time", DataType.DOUBLE, List.of(timeDim))
+      .addAttribute(new Attribute("units", "days since 1970-01-01"));
+    writerBuilder.addVariable("latitude", DataType.DOUBLE, List.of(latDim));
+    writerBuilder.addVariable("longitude", DataType.DOUBLE, List.of(lonDim));
 
-      final List<Variable> dataVars = variableNames
-        .stream()
-        .map(name -> {
-          final Variable v = writer.addVariable(
-            name,
-            DataType.FLOAT,
-            List.of(timeDim, latDim, lonDim)
-          );
-          writer.addVariableAttribute(
-            v,
-            new Attribute("_FillValue", FILL_VALUE)
-          );
-          return v;
-        })
-        .toList();
+    variableNames.forEach(name ->
+      writerBuilder
+        .addVariable(name, DataType.FLOAT, List.of(timeDim, latDim, lonDim))
+        .addAttribute(new Attribute("_FillValue", FILL_VALUE))
+    );
 
-      writer.create();
-
+    try (NetcdfFormatWriter writer = writerBuilder.build()) {
       writer.write(
-        timeVar,
+        "time",
         Array.makeFromJavaArray(
           dates.stream().mapToLong(LocalDate::toEpochDay).toArray()
         )
       );
-      writer.write(latVar, Array.makeFromJavaArray(latitudes));
-      writer.write(lonVar, Array.makeFromJavaArray(longitudes));
+      writer.write("latitude", Array.makeFromJavaArray(latitudes));
+      writer.write("longitude", Array.makeFromJavaArray(longitudes));
 
-      for (int v = 0; v < dataVars.size(); v++) {
+      for (int v = 0; v < variableNames.size(); v++) {
         final float[][][] data =
           new float[dates.size()][latitudes.length][longitudes.length];
         for (int t = 0; t < dates.size(); t++) {
@@ -546,7 +492,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
         if (withFillCell && v == 0) {
           data[0][0][2] = FILL_VALUE;
         }
-        writer.write(dataVars.get(v), Array.makeFromJavaArray(data));
+        writer.write(variableNames.get(v), Array.makeFromJavaArray(data));
       }
     } catch (final InvalidRangeException e) {
       throw new RuntimeException(e);

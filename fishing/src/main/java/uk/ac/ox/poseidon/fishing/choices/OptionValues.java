@@ -89,7 +89,7 @@ public interface OptionValues<O> extends Function<Vessel, OptionValues<O>> {
     final ObjectDoubleBiConsumer<? super O> consumer
   ) {
     getBestEntries().forEach(entry ->
-      consumer.accept(entry.getKey(), entry.getValue())
+      consumer.accept(entry.getKey(), entry.getValue().doubleValue())
     );
   }
 }

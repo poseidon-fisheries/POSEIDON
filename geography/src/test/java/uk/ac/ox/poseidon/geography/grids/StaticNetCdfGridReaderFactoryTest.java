@@ -35,8 +35,7 @@ import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
-import ucar.nc2.NetcdfFileWriter;
-import ucar.nc2.Variable;
+import ucar.nc2.write.NetcdfFormatWriter;
 import uk.ac.ox.poseidon.core.Scope;
 
 class StaticNetCdfGridReaderFactoryTest {
@@ -86,37 +85,19 @@ class StaticNetCdfGridReaderFactoryTest {
 
   private Path writeFixture() throws IOException {
     final Path file = tempDir.resolve("fixture.nc");
-    try (
-      NetcdfFileWriter writer = NetcdfFileWriter.createNew(
-        NetcdfFileWriter.Version.netcdf3,
-        file.toString()
-      )
-    ) {
-      final Dimension latDim = writer.addDimension("latitude", 1);
-      final Dimension lonDim = writer.addDimension("longitude", 1);
-      final Variable latVar = writer.addVariable(
-        "latitude",
-        DataType.DOUBLE,
-        List.of(latDim)
-      );
-      final Variable lonVar = writer.addVariable(
-        "longitude",
-        DataType.DOUBLE,
-        List.of(lonDim)
-      );
-      final Variable dataVar = writer.addVariable(
-        "mpa_4",
-        DataType.FLOAT,
-        List.of(latDim, lonDim)
-      );
-      writer.addVariableAttribute(
-        dataVar,
-        new Attribute("_FillValue", FILL_VALUE)
-      );
-      writer.create();
-      writer.write(latVar, Array.makeFromJavaArray(new double[] { 1.0 }));
-      writer.write(lonVar, Array.makeFromJavaArray(new double[] { 2.0 }));
-      writer.write(dataVar, Array.makeFromJavaArray(new float[][] { { 1f } }));
+    final NetcdfFormatWriter.Builder writerBuilder =
+      NetcdfFormatWriter.createNewNetcdf3(file.toString());
+    final Dimension latDim = writerBuilder.addDimension("latitude", 1);
+    final Dimension lonDim = writerBuilder.addDimension("longitude", 1);
+    writerBuilder.addVariable("latitude", DataType.DOUBLE, List.of(latDim));
+    writerBuilder.addVariable("longitude", DataType.DOUBLE, List.of(lonDim));
+    writerBuilder
+      .addVariable("mpa_4", DataType.FLOAT, List.of(latDim, lonDim))
+      .addAttribute(new Attribute("_FillValue", FILL_VALUE));
+    try (NetcdfFormatWriter writer = writerBuilder.build()) {
+      writer.write("latitude", Array.makeFromJavaArray(new double[] { 1.0 }));
+      writer.write("longitude", Array.makeFromJavaArray(new double[] { 2.0 }));
+      writer.write("mpa_4", Array.makeFromJavaArray(new float[][] { { 1f } }));
     } catch (final ucar.ma2.InvalidRangeException e) {
       throw new RuntimeException(e);
     }
