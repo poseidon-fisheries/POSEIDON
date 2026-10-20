@@ -102,6 +102,9 @@ tasks.named("check") {
 allprojects {
     // Missing comments are not reported, and any other Javadoc problem fails the build
     tasks.withType<Javadoc>().configureEach {
+        // Delombok copies every file of the source folders, such as .editorconfig, which Javadoc
+        // would read as packages
+        include("**/*.java")
         (options as StandardJavadocDocletOptions).apply {
             addBooleanOption("Xdoclint:all,-missing", true)
             addBooleanOption("Werror", true)
@@ -120,7 +123,7 @@ tasks.register<Javadoc>("aggregateJavadoc") {
     description = "Generates aggregated Javadoc across all subprojects."
     dependsOn(subprojects.map { it.tasks.named("javadoc") })
     subprojects.forEach { sub ->
-        source(sub.extensions.getByType<SourceSetContainer>()["main"].allJava)
+        source(sub.tasks.named("delombok"))
     }
     classpath = files(subprojects.map { it.configurations.getByName("compileClasspath") })
     setDestinationDir(layout.buildDirectory.dir("docs/javadoc").get().asFile)

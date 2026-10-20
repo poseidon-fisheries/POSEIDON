@@ -21,6 +21,7 @@ joda-money = "2.0.3"
 jqwik = "1.9.3"
 jts = "1.20.0"
 junit = "5.14.3"
+freefair = "9.8.2"
 lombok = "1.18.46"
 mockito = "5.23.0"
 node-gradle = "7.1.0"
@@ -66,7 +67,7 @@ jqwik = { module = "net.jqwik:jqwik", version.ref = "jqwik" }
 jts-core = { module = "org.locationtech.jts:jts-core", version.ref = "jts" }
 junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
-lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+freefair-lombok-gradle-plugin = { module = "io.freefair.gradle:lombok-plugin", version.ref = "freefair" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 si-units = { module = "si.uom:si-units", version.ref = "si-units" }
 slf4j-jdk14 = { module = "org.slf4j:slf4j-jdk14", version.ref = "slf4j" }
@@ -81,6 +82,7 @@ threeten-extra = { module = "org.threeten:threeten-extra", version.ref = "threet
 batik = ["batik-transcoder", "batik-dom", "batik-awt-util"]
 
 [plugins]
+freefair-lombok = { id = "io.freefair.lombok", version.ref = "freefair" }
 node-gradle = { id = "com.github.node-gradle.node", version.ref = "node-gradle" }
 spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugs" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

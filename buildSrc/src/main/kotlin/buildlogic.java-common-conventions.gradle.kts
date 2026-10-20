@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -28,6 +28,13 @@ plugins {
     java
     jacoco
     alias(libs.plugins.spotbugs)
+    // Adds Lombok to every source set, and makes Javadoc read the delomboked sources so it sees
+    // the classes Lombok generates
+    alias(libs.plugins.freefair.lombok)
+}
+
+lombok {
+    version = libs.versions.lombok
 }
 
 val mockitoAgent: Configuration = configurations.create("mockitoAgent")
@@ -49,9 +56,6 @@ val mockitoAgentArgs = objects.newInstance(MockitoAgentArgumentProvider::class).
 dependencies {
     implementation(libs.caffeine)
     implementation(libs.guava)
-    implementation(libs.lombok)
-    annotationProcessor(libs.lombok)
-    testAnnotationProcessor(libs.lombok)
     testImplementation(libs.assertj)
     testImplementation(libs.junit)
     testImplementation(libs.jqwik)
