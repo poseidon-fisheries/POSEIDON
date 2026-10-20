@@ -40,6 +40,7 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /** Factories for markets, prices, and the grid that places markets in space. */
+@SuppressWarnings("varargs")
 public class Factories {
 
   private Factories() {}

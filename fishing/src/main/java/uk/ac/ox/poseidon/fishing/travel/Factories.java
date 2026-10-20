@@ -41,6 +41,7 @@ import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
  * Factories for the routes vessels would travel and what travelling them
  * costs.
  */
+@SuppressWarnings({ "overloads", "varargs" })
 public class Factories {
 
   private Factories() {}

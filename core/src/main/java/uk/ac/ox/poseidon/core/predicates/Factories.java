@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory;
  * Factories for conditions, which are values or mappings, and for yes/no
  * mappings testing the thing mapped against values read under the context.
  */
-@SuppressWarnings("Convert2Diamond")
+@SuppressWarnings({ "Convert2Diamond", "overloads" })
 public class Factories {
 
   private Factories() {}

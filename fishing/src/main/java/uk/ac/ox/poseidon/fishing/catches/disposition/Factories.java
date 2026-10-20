@@ -32,6 +32,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * Factories for the steps of a catch's {@link DispositionProcess}
  * (retention/discarding).
  */
+@SuppressWarnings("varargs")
 public class Factories {
 
   private Factories() {}

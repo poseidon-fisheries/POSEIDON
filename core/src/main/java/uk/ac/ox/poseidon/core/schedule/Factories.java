@@ -43,6 +43,7 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
  * simulation's {@link TemporalSchedule} when built, and for MASON step-grouping
  * constructs (e.g. {@link Sequence}) over a resolved list of steppables.
  */
+@SuppressWarnings("varargs")
 public class Factories {
 
   private Factories() {}

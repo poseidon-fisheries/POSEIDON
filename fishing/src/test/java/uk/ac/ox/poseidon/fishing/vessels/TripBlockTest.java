@@ -96,6 +96,7 @@ class TripBlockTest {
   }
 
   @SafeVarargs
+  @SuppressWarnings("varargs")
   private TripBlock tripTo(
     final Optional<Int2D> initialDestination,
     final Task<Vessel>... children

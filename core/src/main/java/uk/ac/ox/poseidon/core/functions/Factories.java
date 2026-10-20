@@ -40,7 +40,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  * overload per shape: built from values, it gives a value; built from mappings,
  * a mapping. Both mean the same: the value is the mapping, with nothing to map.
  */
-@SuppressWarnings("Convert2Diamond")
+@SuppressWarnings({ "Convert2Diamond", "overloads", "varargs" })
 public class Factories {
 
   private Factories() {}

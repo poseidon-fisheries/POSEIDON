@@ -42,7 +42,7 @@ import uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory;
  * {@link uk.ac.ox.poseidon.core.providers.constant.Factories#always(Object)
  * always(true)} or {@code always(false)}.
  */
-@SuppressWarnings("Convert2Diamond")
+@SuppressWarnings({ "Convert2Diamond", "overloads", "varargs" })
 public class Factories {
 
   private Factories() {}

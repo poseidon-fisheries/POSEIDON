@@ -40,6 +40,7 @@ import uk.ac.ox.poseidon.core.SimulationScope;
  * supplier, and calibration support for cloning a factory with varied property
  * values.
  */
+@SuppressWarnings("varargs")
 public class Factories {
 
   private Factories() {}

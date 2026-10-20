@@ -48,6 +48,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * Factories for a vessel's scope, its fleet, what it is made of, and what
  * creates it and states things about it.
  */
+@SuppressWarnings("varargs")
 public class Factories {
 
   private Factories() {}

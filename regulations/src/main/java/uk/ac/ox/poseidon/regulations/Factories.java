@@ -32,6 +32,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * {@link ForbiddenIf} and {@link PermittedIf}, each built from a predicate over
  * the action, and the conjunction of rules, {@link AllOfRegulations}.
  */
+@SuppressWarnings("varargs")
 public class Factories {
 
   private Factories() {}

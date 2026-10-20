@@ -50,6 +50,7 @@ import uk.ac.ox.poseidon.io.sources.StringDataSourceFactory;
  * incrementally over the course of a simulation, and deriving a lookup from a
  * table's contents.
  */
+@SuppressWarnings({ "overloads", "varargs" })
 public class Factories {
 
   private Factories() {}
