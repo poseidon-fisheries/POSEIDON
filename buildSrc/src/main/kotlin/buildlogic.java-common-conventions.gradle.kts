@@ -27,6 +27,7 @@
 plugins {
     java
     jacoco
+    checkstyle
     alias(libs.plugins.spotbugs)
     // Adds Lombok to every source set, and makes Javadoc read the delomboked sources so it sees
     // the classes Lombok generates
@@ -106,6 +107,12 @@ tasks.jacocoTestCoverageVerification {
             excludes = listOf("lombok.Generated")
         }
     }
+}
+
+checkstyle {
+    toolVersion = libs.versions.checkstyle.get()
+    // Any violation fails the build
+    maxWarnings = 0
 }
 
 spotbugs {

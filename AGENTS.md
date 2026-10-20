@@ -16,19 +16,21 @@ POSEIDON is an agent-based model of fisheries, built on the [MASON](https://cs.g
 ## Build & test commands
 
 ```
-./gradlew build                     # build all modules, run all tests + spotbugs
+./gradlew build                     # build all modules, run all tests + spotbugs + checkstyle
 ./gradlew test                      # run all unit tests
 ./gradlew :core:test                # run tests for a single module (core, io, geography, biology, fishing, regulations, calibration, gui, examples)
 ./gradlew :core:test --tests "uk.ac.ox.poseidon.core.ScenarioTest"          # run a single test class
 ./gradlew :core:test --tests "uk.ac.ox.poseidon.core.ScenarioTest.methodName"  # run a single test method
 ./gradlew jacocoTestReport          # generate coverage reports (build/reports/jacoco/test/…) per module
 ./gradlew spotbugsMain              # run SpotBugs static analysis on a module (Werror is on for javac too)
-./gradlew spotlessApply             # format Java sources with Prettier and add missing license headers
+./gradlew spotlessApply             # format Java sources with Prettier, remove unused imports, add missing license headers
+./gradlew checkstyleMain            # run Checkstyle on main sources (checkstyleTest for tests)
 ```
 
 Notes:
 - `build` runs `spotlessCheck`, which fails on any Java file `spotlessApply` would change: run `./gradlew spotlessApply` after editing Java.
-- Compilation treats warnings as errors (`-Werror`), so unused-import or unchecked warnings fail the build, not just linting.
+- Compilation runs every javac lint category except `serial` and treats warnings as errors (`-Werror -Xlint:all,-serial`), so an unchecked or deprecation warning fails the build, not just linting.
+- Checkstyle (`config/checkstyle/checkstyle.xml`) fails the build on any violation: a public type, method or constructor in main code without Javadoc (getters, setters, overrides and tag-only comments pass), a non-final parameter, local or uninheritable class, a utility class without a private constructor, an unused local, an empty catch whose variable is not named `ignored`, or a boolean expression that can be simplified.
 - Test tasks are auto-configured with a Mockito Java agent (`-javaagent`, `-Xshare:off`) — don't remove this if editing `buildlogic.java-common-conventions.gradle.kts`.
 - Tests use JUnit 5 (`useJUnitPlatform()`), AssertJ, Mockito, and jqwik (property-based testing) — check existing tests in a module before assuming which style applies.
 - `SimulationScope` and `AgentScope` hold their simulation and agent through `WeakReference`s. In tests, keep the mocked `Simulation` or agent in a field: one that only the scope references (`new SimulationScope(mock(Simulation.class))`, or a local variable not used afterwards) can be garbage-collected mid-test, and the test then fails at random with a `NullPointerException`.
@@ -59,7 +61,7 @@ core  →  io  →  geography  →  biology  →  fishing  →  gui
 - `common/` at the repo root is a stray leftover directory (has build artifacts but no `build.gradle.kts` and is not listed in `settings.gradle.kts`) — it is not an active module.
 
 Convention plugins (in `buildSrc/src/main/kotlin/`) centralize shared config:
-- `buildlogic.java-common-conventions` — shared dependencies (Guava, Lombok, Caffeine, fastutil), Java 25 toolchain, `-Werror`, JUnit 5 + Jacoco + SpotBugs wiring.
+- `buildlogic.java-common-conventions` — shared dependencies (Guava, Lombok, Caffeine, fastutil), Java 25 toolchain, `-Werror -Xlint:all,-serial`, JUnit 5 + Jacoco + SpotBugs + Checkstyle wiring.
 - `buildlogic.java-library-conventions` — used by library modules (adds `java-library`).
 - `buildlogic.java-application-conventions` — used by runnable modules (adds `application`, default main class `uk.ac.ox.poseidon.server.Server`).
 
