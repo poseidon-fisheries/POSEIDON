@@ -741,7 +741,7 @@ public class TemporalSchedule extends Schedule {
             sequenceSteps(s).stream(),
             (from, index) -> new K(dateTime, ordering, (int) index, from)
           );
-          case final Object s -> Stream.of(new K(dateTime, ordering, 0, obj));
+          default -> Stream.of(new K(dateTime, ordering, 0, obj));
         };
       })
       .flatMap(x -> x)
