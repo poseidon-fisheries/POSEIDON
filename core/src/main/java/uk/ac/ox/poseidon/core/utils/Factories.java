@@ -24,8 +24,6 @@ package uk.ac.ox.poseidon.core.utils;
 
 import com.google.common.collect.ImmutableList;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RunIdFactory;
@@ -69,14 +67,15 @@ public class Factories {
   }
 
   /**
-   * @param values the literal values to wrap
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always
-   *         resolves to a {@link List} of {@code values}
-   * @see ObjectFactory
+   * @param values the component factories to resolve, in order
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
+   *         {@link List} of the resolved values
+   * @see ListFactory
    */
-  @SafeVarargs
-  public static <T> ObjectFactory<List<T>> listOf(final T... values) {
-    return new ObjectFactory<>(List.of(values));
+  public static <S extends Scope, P> ListFactory<S, P> listOf(
+    final List<? extends Factory<S, ? extends P>> values
+  ) {
+    return new ListFactory<>(ImmutableList.copyOf(values));
   }
 
   /**
@@ -85,8 +84,9 @@ public class Factories {
    *         resolves to a {@link List} of {@code values}
    * @see ObjectFactory
    */
-  public static <T> ObjectFactory<List<T>> listOf(final Stream<T> values) {
-    return new ObjectFactory<>(values.toList());
+  @SafeVarargs
+  public static <T> ObjectFactory<List<T>> listOf(final T... values) {
+    return new ObjectFactory<>(List.of(values));
   }
 
   /**
@@ -100,21 +100,6 @@ public class Factories {
     // using LinkedHashSet to preserve insertion order and be consistent with
     // SnakeYAML
     final LinkedHashSet<T> set = new LinkedHashSet<>(Arrays.asList(values));
-    return new ObjectFactory<>(Collections.unmodifiableSet(set));
-  }
-
-  /**
-   * @param values the literal values to wrap, deduplicated and order-preserved
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} that always
-   *         resolves to a {@link Set} of {@code values}
-   * @see ObjectFactory
-   */
-  public static <T> ObjectFactory<Set<T>> setOf(final Stream<T> values) {
-    // using LinkedHashSet to preserve insertion order and be consistent with
-    // SnakeYAML
-    final LinkedHashSet<T> set = values.collect(
-      Collectors.toCollection(LinkedHashSet::new)
-    );
     return new ObjectFactory<>(Collections.unmodifiableSet(set));
   }
 
