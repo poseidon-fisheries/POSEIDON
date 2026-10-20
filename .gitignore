@@ -18,3 +18,10 @@ buildSrc/.kotlin/
 
 # Prettier, installed by `npm install` for the IDE integration
 node_modules/
+
+# Eclipse project files, written by the jdtls language server
+.project
+.classpath
+.factorypath
+.settings/
+bin/
