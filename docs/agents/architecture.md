@@ -162,6 +162,15 @@ This doesn't apply to the configuration literals of the previous section (a colu
 separator, a file path): they say how to build or read something, not how the model behaves, and
 stay plain fields.
 
+A live parameter is validated when it is read, not when it is built: a precondition the
+constructor used to run moves into the method that reads the value, and runs again on every call.
+There is no build-time equivalent, since a component cannot tell whether the value it was given is
+fixed. This is cheap for a comparison — `EpsilonGreedyChooser` checks that a vessel's epsilon is in
+`[0, 1]` on every destination pick — but not for work such as sorting the times of day or building
+a per-species array, where the cost is real and worth weighing before going live. A bad value then
+fails on first use rather than when the scenario is built: in practice the first step of the run,
+with the same message.
+
 ## Determinism
 
 A simulation's results depend only on its scenario and its seed: the same seed gives the same

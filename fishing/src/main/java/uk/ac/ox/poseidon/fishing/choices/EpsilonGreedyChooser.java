@@ -37,25 +37,25 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
  */
 public class EpsilonGreedyChooser<O> implements Function<Vessel, Optional<O>> {
 
-  private final double epsilon;
+  private final Function<? super Vessel, Double> epsilon;
   private final Function<? super Vessel, ? extends O> explorer;
   private final Function<? super Vessel, ? extends O> exploiter;
   private final MersenneTwisterFast rng;
 
   /**
-   * @param epsilon   probability of exploring instead of exploiting, in
-   *                  {@code [0, 1]}
+   * @param epsilon   gives the probability of exploring instead of exploiting,
+   *                  in {@code [0, 1]}, read for the vessel on each choice
    * @param explorer  gives an exploratory option for a vessel
    * @param exploiter gives the currently-best-known option for a vessel
    * @param rng       the RNG to draw the explore/exploit decision from
    */
   EpsilonGreedyChooser(
-    final double epsilon,
+    final Function<? super Vessel, Double> epsilon,
     final Function<? super Vessel, ? extends O> explorer,
     final Function<? super Vessel, ? extends O> exploiter,
     final MersenneTwisterFast rng
   ) {
-    this.epsilon = checkUnitRange(epsilon, "epsilon");
+    this.epsilon = checkNotNull(epsilon);
     this.explorer = checkNotNull(explorer);
     this.exploiter = checkNotNull(exploiter);
     this.rng = checkNotNull(rng);
@@ -66,9 +66,15 @@ public class EpsilonGreedyChooser<O> implements Function<Vessel, Optional<O>> {
    * @return the exploiter's pick with probability {@code 1 - epsilon} (else the
    *         explorer's), falling back to the explorer if the exploiter returns
    *         {@code null}
+   * @throws IllegalArgumentException if the vessel's epsilon falls outside
+   *                                  {@code [0, 1]}
    */
   @Override
   public Optional<O> apply(final Vessel vessel) {
+    final double epsilon = checkUnitRange(
+      this.epsilon.apply(vessel),
+      "epsilon"
+    );
     final boolean exploit = !rng.nextBoolean(epsilon);
     O result = null;
     if (exploit) {

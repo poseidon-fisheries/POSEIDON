@@ -51,7 +51,11 @@ public class EpsilonGreedyDestinationFactory
   implements ValueFactory<VesselComponentScope, Vessel, Optional<Int2D>>
 {
 
-  private final double epsilon;
+  private final ValueFactory<
+    ? super VesselComponentScope,
+    ? super Vessel,
+    Double
+  > epsilon;
   private final ValueFactory<
     ? super VesselComponentScope,
     ? super Vessel,
@@ -76,7 +80,7 @@ public class EpsilonGreedyDestinationFactory
     final VesselComponentScope scope
   ) {
     return new EpsilonGreedyChooser<>(
-      epsilon,
+      epsilon.get(scope),
       explorer.get(scope),
       exploiter.get(scope),
       randomNumberGenerator.get(scope)

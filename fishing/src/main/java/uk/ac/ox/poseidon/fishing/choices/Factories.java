@@ -115,7 +115,8 @@ public final class Factories {
   }
 
   /**
-   * @param epsilon   probability of exploring instead of exploiting
+   * @param epsilon   gives the probability of exploring instead of exploiting,
+   *                  in {@code [0, 1]}, read for the vessel on each choice
    * @param explorer  gives an exploratory destination for a vessel
    * @param exploiter gives the currently-best-known destination for a vessel
    * @return a
@@ -125,7 +126,11 @@ public final class Factories {
    * @see EpsilonGreedyChooser
    */
   public static EpsilonGreedyDestinationFactory epsilonGreedyDestination(
-    final double epsilon,
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      Double
+    > epsilon,
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
@@ -143,6 +148,33 @@ public final class Factories {
       exploiter,
       randomNumberGenerator()
     );
+  }
+
+  /**
+   * @param epsilon   the probability of exploring instead of exploiting, in
+   *                  {@code [0, 1]}
+   * @param explorer  gives an exploratory destination for a vessel
+   * @param exploiter gives the currently-best-known destination for a vessel
+   * @return a
+   *         {@link uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory}
+   *         for a vessel's destination chosen by an
+   *         {@link EpsilonGreedyChooser}, with a fixed epsilon
+   * @see EpsilonGreedyChooser
+   */
+  public static EpsilonGreedyDestinationFactory epsilonGreedyDestination(
+    final double epsilon,
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      ? extends Int2D
+    > explorer,
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      ? extends Int2D
+    > exploiter
+  ) {
+    return epsilonGreedyDestination(constant(epsilon), explorer, exploiter);
   }
 
   /**
