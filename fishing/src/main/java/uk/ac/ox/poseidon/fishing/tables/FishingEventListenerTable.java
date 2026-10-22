@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.tables;
 
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.google.common.collect.TreeBasedTable;
 import java.util.Map;
 import java.util.Optional;
 import tech.tablesaw.api.DateTimeColumn;
@@ -116,7 +116,9 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
       DISCARDED_DEAD,
       disposition.getDiscardedDead()
     );
-    final Table<Species, String, Double> table = HashBasedTable.create();
+    // Sorted, so that species rows come out in the same order whatever their
+    // hash codes
+    final Table<Species, String, Double> table = TreeBasedTable.create();
     buckets.forEach((columnName, bucket) ->
       bucket.forEachBiomassValue((species, biomass) ->
         table.put(species, columnName, biomass)
