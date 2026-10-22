@@ -22,19 +22,23 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import sim.util.Number2D;
+import sim.util.Double2D;
+import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link GridBasedDistanceCalculator} that measures straight-line
+ * An {@link AbstractDistanceCalculator} that measures straight-line
  * (Pythagorean) distance in grid-cell units, scaled by a fixed cell size,
- * rather than computing geographic distance from lon/lat coordinates. Cheaper
- * than {@link CoordinateBasedDistanceCalculator}'s implementations, at the cost
- * of assuming a uniform cell size across the grid. Built via
+ * rather than computing geographic distance from lon/lat coordinates:
+ * coordinates are converted to grid points first, via
+ * {@link ModelGrid#toPoint}. Cheaper than
+ * {@link CoordinateBasedDistanceCalculator}'s implementations, at the cost of
+ * assuming a uniform cell size across the grid. Built via
  * {@link Factories#cartesianDistanceCalculator(uk.ac.ox.poseidon.core.Factory, double)}
  * in this package.
  */
-public class CartesianDistanceCalculator extends GridBasedDistanceCalculator {
+public class CartesianDistanceCalculator extends AbstractDistanceCalculator {
 
   private final double cellSizeInKm;
 
@@ -51,7 +55,14 @@ public class CartesianDistanceCalculator extends GridBasedDistanceCalculator {
   }
 
   @Override
-  public double distanceInKm(final Number2D start, final Number2D end) {
-    return cellSizeInKm * Math.sqrt(start.getDistanceSq(end));
+  public double distanceInKm(final Coordinate a, final Coordinate b) {
+    final Double2D pointA = modelGrid.toPoint(a);
+    final Double2D pointB = modelGrid.toPoint(b);
+    return cellSizeInKm * Math.hypot(pointB.x - pointA.x, pointB.y - pointA.y);
+  }
+
+  @Override
+  public double distanceInKm(final Int2D start, final Int2D end) {
+    return cellSizeInKm * Math.hypot(end.x - start.x, end.y - start.y);
   }
 }

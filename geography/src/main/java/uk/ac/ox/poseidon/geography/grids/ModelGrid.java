@@ -33,7 +33,6 @@ import java.util.stream.Stream;
 import sim.field.grid.ObjectGrid2D;
 import sim.util.Double2D;
 import sim.util.Int2D;
-import sim.util.Number2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 
@@ -82,23 +81,6 @@ public interface ModelGrid {
 
   /** @return every cell in the grid, active or not */
   Stream<Int2D> getAllCells();
-
-  /**
-   * Dispatches the correct method to convert a Number2D to a coordinate. Note
-   * that, in the case of Int2D, e.g. (3, 2), we assume that we are referring to
-   * the cell itself and return the coordinate at the centre of the cell (3.5,
-   * 2.5) instead of at its corner (3.0, 2.0). There is potential for confusion,
-   * so be careful.
-   */
-  default Coordinate toCoordinate(final Number2D number2D) {
-    return switch (number2D) {
-      case final Int2D cell -> toCoordinate(cell);
-      case final Double2D point -> toCoordinate(point);
-      default -> throw new IllegalStateException(
-        "Unexpected value: " + number2D
-      );
-    };
-  }
 
   /** @return {@code cell}'s coordinate, at the centre of the cell */
   Coordinate toCoordinate(Int2D cell);

@@ -87,9 +87,9 @@ public class CellSetFromGridFileFactory<S extends Scope> extends RelativeScopeFa
     final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
     checkSameCells(gridFile, coverageWrapper, modelGrid.get(scope));
     final ImmutableSet.Builder<Int2D> builder = ImmutableSet.builder();
-    coverageWrapper.processGrid((cell, value) -> {
+    coverageWrapper.processGrid((x, y, value) -> {
       if (value == includedValue) {
-        builder.add(cell);
+        builder.add(new Int2D(x, y));
       }
     });
     return builder.build();

@@ -36,7 +36,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
-import sim.util.Number2D;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -59,7 +58,7 @@ class PathLengthCalculatorTest {
       ModelGrid.create(2, 2, new Envelope(0, 2, 0, 2))
     );
     when(
-      distanceCalculator.distanceInKm(any(Number2D.class), any(Number2D.class))
+      distanceCalculator.distanceInKm(any(Int2D.class), any(Int2D.class))
     ).thenReturn(5.0);
     when(distanceCalculator.distanceInKm(anyList())).thenCallRealMethod();
     when(pathFinder.getPath(start, end)).thenReturn(

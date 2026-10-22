@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025, University of Oxford.
+ * Copyright (c) 2025-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -26,7 +26,6 @@ import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.function.BiConsumer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.geotools.api.geometry.Bounds;
@@ -34,7 +33,6 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridCoverage2DReader;
 import org.geotools.coverage.grid.io.GridFormatFinder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
@@ -76,17 +74,31 @@ public final class CoverageWrapper {
   }
 
   /**
-   * @param action called once per raster cell, with its (x, y) position and its
+   * What {@link #processGrid} does with each raster cell. A raster cell is not
+   * necessarily a cell of the model grid: the raster can be finer.
+   */
+  @FunctionalInterface
+  public interface RasterCellConsumer {
+    /**
+     * @param x     the raster cell's column, from the west
+     * @param y     the raster cell's row, from the north
+     * @param value the raster cell's value in the first band
+     */
+    void accept(int x, int y, double value);
+  }
+
+  /**
+   * @param action called once per raster cell, with its position and its
    *               value (only the first band is read)
    */
-  public void processGrid(final BiConsumer<Int2D, Double> action) {
+  public void processGrid(final RasterCellConsumer action) {
     final RenderedImage image = coverage.getRenderedImage();
     final int width = image.getWidth();
     final int height = image.getHeight();
     final Raster raster = image.getData();
     for (int x = 0; x < width; x++) {
       for (int y = 0; y < height; y++) {
-        action.accept(new Int2D(x, y), raster.getSampleDouble(x, y, 0));
+        action.accept(x, y, raster.getSampleDouble(x, y, 0));
       }
     }
   }

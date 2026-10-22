@@ -27,10 +27,10 @@ import static uk.ac.ox.poseidon.geography.grids.AscFiles.writeFixture;
 
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 class CoverageWrapperTest {
@@ -58,25 +58,25 @@ class CoverageWrapperTest {
 
   @Test
   void processGridGivesEveryValueOnceAtItsColumnAndRowFromTheNorth() {
-    final Map<Int2D, Double> values = new HashMap<>();
-    readFixture().processGrid((cell, value) ->
-      assertThat(values.put(cell, value))
-        .as("value already given for %s", cell)
+    final Map<List<Integer>, Double> values = new HashMap<>();
+    readFixture().processGrid((x, y, value) ->
+      assertThat(values.put(List.of(x, y), value))
+        .as("value already given for (%s, %s)", x, y)
         .isNull()
     );
     assertThat(values).isEqualTo(
       Map.of(
-        new Int2D(0, 0),
+        List.of(0, 0),
         1.0,
-        new Int2D(1, 0),
+        List.of(1, 0),
         2.0,
-        new Int2D(2, 0),
+        List.of(2, 0),
         3.0,
-        new Int2D(0, 1),
+        List.of(0, 1),
         4.0,
-        new Int2D(1, 1),
+        List.of(1, 1),
         5.0,
-        new Int2D(2, 1),
+        List.of(2, 1),
         6.0
       )
     );

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -33,13 +33,13 @@ import java.util.List;
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Speed;
-import sim.util.Number2D;
+import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
 
 /**
- * Measures distance and derived travel duration between two points, given
- * either as {@link Coordinate}s or grid points ({@link Number2D}). Built via
- * {@link uk.ac.ox.poseidon.geography.distance.Factories}.
+ * Measures distance and derived travel duration between two coordinates or
+ * between two cells, from the centre of one cell to the centre of the other.
+ * Built via {@link uk.ac.ox.poseidon.geography.distance.Factories}.
  */
 public interface DistanceCalculator {
   /**
@@ -50,18 +50,19 @@ public interface DistanceCalculator {
   double distanceInKm(Coordinate a, Coordinate b);
 
   /**
-   * @param start one grid point
-   * @param end   the other grid point
-   * @return the distance between {@code start} and {@code end}, in kilometres
+   * @param start one cell
+   * @param end   the other cell
+   * @return the distance between the centres of {@code start} and
+   *         {@code end}, in kilometres
    */
-  double distanceInKm(Number2D start, Number2D end);
+  double distanceInKm(Int2D start, Int2D end);
 
   /**
-   * @param path the waypoints to travel through in order
+   * @param path the cells to travel through in order
    * @return the length of {@code path}, summing the distance of each leg, in
-   *         kilometres; zero for a path of a single waypoint
+   *         kilometres; zero for a path of a single cell
    */
-  default double distanceInKm(final List<? extends Number2D> path) {
+  default double distanceInKm(final List<Int2D> path) {
     double distanceInKm = 0.0;
     for (int i = 0; i < path.size() - 1; i++) {
       distanceInKm += distanceInKm(path.get(i), path.get(i + 1));
@@ -70,10 +71,10 @@ public interface DistanceCalculator {
   }
 
   /**
-   * @return {@link #distanceInKm(Number2D, Number2D)} as a length
+   * @return {@link #distanceInKm(Int2D, Int2D)} as a length
    *         {@link Quantity}
    */
-  default Quantity<Length> distance(final Number2D start, final Number2D end) {
+  default Quantity<Length> distance(final Int2D start, final Int2D end) {
     return getQuantity(distanceInKm(start, end), KILO(METRE));
   }
 
@@ -90,8 +91,8 @@ public interface DistanceCalculator {
    *         {@code cruisingSpeed}
    */
   default Duration travelDuration(
-    final Number2D start,
-    final Number2D end,
+    final Int2D start,
+    final Int2D end,
     final Quantity<Speed> cruisingSpeed
   ) {
     return travelDuration(List.of(start, end), cruisingSpeed);
@@ -102,24 +103,24 @@ public interface DistanceCalculator {
    *         {@code cruisingSpeedInKph}
    */
   default Duration travelDuration(
-    final Number2D start,
-    final Number2D end,
+    final Int2D start,
+    final Int2D end,
     final double cruisingSpeedInKph
   ) {
     return travelDuration(List.of(start, end), cruisingSpeedInKph);
   }
 
   /**
-   * @param path               the waypoints to travel through in order, at
-   *                           least one
+   * @param path               the cells to travel through in order, at least
+   *                           one
    * @param cruisingSpeedInKph the constant travel speed, in km/h
    * @return the time to travel the full path at {@code cruisingSpeedInKph},
    *         summing the distance of each leg; zero for a path of a single
-   *         waypoint
+   *         cell
    * @throws IllegalArgumentException if {@code path} is empty
    */
   default Duration travelDuration(
-    final List<? extends Number2D> path,
+    final List<Int2D> path,
     final double cruisingSpeedInKph
   ) {
     checkArgument(
@@ -151,7 +152,7 @@ public interface DistanceCalculator {
 
   /** @return the time to travel the full path at {@code cruisingSpeed} */
   default Duration travelDuration(
-    final List<? extends Number2D> path,
+    final List<Int2D> path,
     final Quantity<Speed> cruisingSpeed
   ) {
     return travelDuration(

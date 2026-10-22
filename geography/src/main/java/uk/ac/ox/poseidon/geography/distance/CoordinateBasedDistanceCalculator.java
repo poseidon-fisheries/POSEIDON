@@ -26,14 +26,14 @@ import static java.lang.Math.abs;
 
 import java.util.function.ToDoubleBiFunction;
 import sim.util.Int2D;
-import sim.util.Number2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
  * An {@link AbstractDistanceCalculator} that computes geographic distance from
- * lon/lat {@link uk.ac.ox.poseidon.geography.Coordinate}s: grid-point inputs
- * are converted to coordinates first, via {@link ModelGrid#toCoordinate}.
+ * lon/lat {@link uk.ac.ox.poseidon.geography.Coordinate}s: cells are
+ * converted to the coordinates of their centres first, via
+ * {@link ModelGrid#toCoordinate}.
  * Subclassed by {@link EquirectangularDistanceCalculator} and
  * {@link HaversineDistanceCalculator}, which supply the actual formula.
  * <p>
@@ -91,17 +91,12 @@ public abstract class CoordinateBasedDistanceCalculator
   }
 
   @Override
-  public double distanceInKm(final Number2D start, final Number2D end) {
-    if (
-      start instanceof final Int2D startCell &&
-      end instanceof final Int2D endCell &&
-      modelGrid.isInGrid(startCell) &&
-      modelGrid.isInGrid(endCell)
-    ) {
-      final int dx = endCell.x - startCell.x;
-      final int dy = endCell.y - startCell.y;
+  public double distanceInKm(final Int2D start, final Int2D end) {
+    if (modelGrid.isInGrid(start) && modelGrid.isInGrid(end)) {
+      final int dx = end.x - start.x;
+      final int dy = end.y - start.y;
       if (abs(dx) <= 1 && abs(dy) <= 1) {
-        return stepLengthsInKm[stepIndex(startCell.y, dx, dy)];
+        return stepLengthsInKm[stepIndex(start.y, dx, dy)];
       }
     }
     return distanceInKm(

@@ -37,7 +37,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.util.Int2D;
-import sim.util.Number2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
@@ -78,7 +77,7 @@ class RouteViaDestinationTest {
     when(vessel.getCell()).thenReturn(vesselCell);
     when(vessel.getHomePortCell()).thenReturn(portCell);
     when(
-      distanceCalculator.distanceInKm(any(Number2D.class), any(Number2D.class))
+      distanceCalculator.distanceInKm(any(Int2D.class), any(Int2D.class))
     ).thenReturn(5.0);
     when(distanceCalculator.distanceInKm(anyList())).thenCallRealMethod();
     when(pathFinder.getPath(vesselCell, destination)).thenReturn(

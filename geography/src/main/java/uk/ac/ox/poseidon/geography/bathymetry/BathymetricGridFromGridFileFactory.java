@@ -88,9 +88,9 @@ public class BathymetricGridFromGridFileFactory<S extends Scope> extends Bathyme
 
     // worldPos will be mutated while reading
     final Point2D.Double worldPos = new Point2D.Double();
-    coverageWrapper.processGrid((int2D, value) -> {
+    coverageWrapper.processGrid((x, y, value) -> {
       try {
-        gridToCRS2D.transform(new Point2D.Double(int2D.x, int2D.y), worldPos);
+        gridToCRS2D.transform(new Point2D.Double(x, y), worldPos);
         final Int2D cell = modelGrid.toCell(Coordinate.fromPoint2D(worldPos));
         final double elevation = isInverted() ? -value : value;
         elevationValues.put(cell, elevation);
