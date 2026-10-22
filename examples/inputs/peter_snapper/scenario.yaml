@@ -317,17 +317,21 @@ components:
                 eventManager: !!uk.ac.ox.poseidon.core.EventManagerFactory {
                   }
                 portGrid: *id006
-                pricePerLitres: !!uk.ac.ox.poseidon.fishing.money.MoneyFactory {
-                  amount: 10000.0,
-                  currencyCode: IDR
-                }
+                pricePerLitre: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory
+                  object: !!uk.ac.ox.poseidon.fishing.money.MoneyFactory {
+                    amount: 10000.0,
+                    currencyCode: IDR
+                  }
                 pumpRateInLitresPerMinute: 200.0
               portGrid: *id006
             fuelTank: *id011
           currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
             }
           initialDestination: !!uk.ac.ox.poseidon.fishing.choices.EpsilonGreedyDestinationFactory
-            epsilon: 0.2
+            epsilon: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory
+              object: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {
+                value: 0.2
+              }
             exploiter: !!uk.ac.ox.poseidon.fishing.choices.ImitatingPickerFactory
               imitatedOptionValues: !!uk.ac.ox.poseidon.fishing.choices.BestOptionsFromFriendsFactory
                 friends: !!uk.ac.ox.poseidon.fishing.social.FriendshipDynamicsFactory

@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.fuel;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -65,8 +65,10 @@ public class FuelStationGridFactory<S extends Scope> extends RelativeScopeFactor
       fuelStations
         .get(scope)
         .stream()
+        // An ordered map: stations hash by identity, so a HashMap's order would
+        // change from run to run with the same seed
         .collect(
-          toMap(identity(), fuelStation ->
+          toImmutableMap(identity(), fuelStation ->
             portGrid.getCell(fuelStation.getPort())
           )
         )

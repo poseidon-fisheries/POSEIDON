@@ -25,13 +25,13 @@ package uk.ac.ox.poseidon.fishing.fuel;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.math.RoundingMode.CEILING;
-import static lombok.AccessLevel.NONE;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkPositive;
 
 import java.time.Duration;
-import lombok.Data;
+import java.util.function.Function;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
+import lombok.ToString;
 import lombok.Value;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -41,22 +41,22 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 /**
  * A single fuel station at a {@link Port}, selling fuel at a per-litre price
  * and a fixed pump rate; each {@link #refill} broadcasts its resulting
- * {@link Purchase} through the station's {@link EventManager}.
- * {@code pricePerLitre} can be changed after construction (via
- * {@link #setPricePerLitre}); everything else about a station is fixed for its
- * lifetime.
+ * {@link Purchase} through the station's {@link EventManager}. The price per
+ * litre is read for the station on each sale, so it can vary over the run or
+ * between stations; everything else about a station is fixed for its lifetime.
+ * A station is equal only to itself: it is a thing in the model, not a value.
  */
-@Data
+@Getter
+@ToString
 public class FuelStation {
 
   private final @NonNull Port port;
   private final @NonNull String code;
   private final @NonNull EventManager eventManager;
 
-  // suppresses @Data's unchecked setter; setPricePerLitre below enforces
-  // non-negativity instead
-  @Setter(NONE)
-  private @NonNull Money pricePerLitre;
+  // read through getPricePerLitre, which a live value can make throw
+  @ToString.Exclude
+  private final Function<? super FuelStation, Money> pricePerLitre;
 
   private final double pumpRateInLitresPerMinute;
 
@@ -65,14 +65,15 @@ public class FuelStation {
    * @param code                      this station's unique identifier
    * @param eventManager              the event manager this station reports
    *                                  through
-   * @param pricePerLitre             the non-negative initial price per litre
+   * @param pricePerLitre             gives the non-negative price per litre,
+   *                                  read for the station on each sale
    * @param pumpRateInLitresPerMinute the strictly positive pump rate
    */
   public FuelStation(
     final @NonNull Port port,
     final @NonNull String code,
     final @NonNull EventManager eventManager,
-    final @NonNull Money pricePerLitre,
+    final @NonNull Function<? super FuelStation, Money> pricePerLitre,
     final double pumpRateInLitresPerMinute
   ) {
     this.port = checkNotNull(port, "port must not be null");
@@ -81,25 +82,28 @@ public class FuelStation {
       eventManager,
       "eventManager must not be null"
     );
-    this.pricePerLitre = checkPrice(pricePerLitre);
+    this.pricePerLitre = checkNotNull(
+      pricePerLitre,
+      "pricePerLitre must not be null"
+    );
     this.pumpRateInLitresPerMinute = checkPositive(
       pumpRateInLitresPerMinute,
       "pumpRateInLitresPerMinute"
     );
   }
 
-  /** @param pricePerLitre the new, non-negative price per litre */
-  public void setPricePerLitre(final @NonNull Money pricePerLitre) {
-    this.pricePerLitre = checkPrice(pricePerLitre);
-  }
-
-  private static Money checkPrice(final Money pricePerLitre) {
+  /**
+   * @return this station's current price per litre
+   * @throws IllegalArgumentException if the price read is negative
+   */
+  public Money getPricePerLitre() {
+    final Money price = pricePerLitre.apply(this);
     checkArgument(
-      !pricePerLitre.isNegative(),
+      !price.isNegative(),
       "pricePerLitre must not be negative but was %s",
-      pricePerLitre
+      price
     );
-    return pricePerLitre;
+    return price;
   }
 
   /**
@@ -143,8 +147,8 @@ public class FuelStation {
     return Duration.ofSeconds(durationInSeconds);
   }
 
-  /** @return the price of {@code litres}, at {@link #pricePerLitre} */
+  /** @return the price of {@code litres}, at the current price per litre */
   public Money priceFor(final double litres) {
-    return pricePerLitre.multipliedBy(litres, CEILING);
+    return getPricePerLitre().multipliedBy(litres, CEILING);
   }
 }

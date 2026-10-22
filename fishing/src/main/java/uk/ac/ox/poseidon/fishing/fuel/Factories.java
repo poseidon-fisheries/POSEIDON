@@ -23,12 +23,15 @@
 package uk.ac.ox.poseidon.fishing.fuel;
 
 import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import java.util.List;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.fishing.money.MoneyFactory;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
@@ -52,20 +55,49 @@ public final class Factories {
   }
 
   /**
+   * @param portGrid                  the ports to put a station at
+   * @param pricePerLitre             gives the non-negative price per litre,
+   *                                  read for each station on each sale
+   * @param pumpRateInLitresPerMinute the strictly positive pump rate
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for one
    *         {@link FuelStation} per port in {@code portGrid}
    * @see OneFuelStationPerPortFactory
    */
   public static OneFuelStationPerPortFactory oneFuelStationPerPort(
     final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
-    final Factory<? super SimulationScope, ? extends Money> pricePerLitres,
+    final ValueFactory<
+      ? super SimulationScope,
+      ? super FuelStation,
+      Money
+    > pricePerLitre,
     final double pumpRateInLitresPerMinute
   ) {
     return new OneFuelStationPerPortFactory(
       portGrid,
-      pricePerLitres,
+      pricePerLitre,
       pumpRateInLitresPerMinute,
       eventManager()
+    );
+  }
+
+  /**
+   * @param portGrid                  the ports to put a station at
+   * @param pricePerLitre             the non-negative price per litre
+   * @param pumpRateInLitresPerMinute the strictly positive pump rate
+   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for one
+   *         {@link FuelStation} per port in {@code portGrid}, with a fixed
+   *         price per litre
+   * @see OneFuelStationPerPortFactory
+   */
+  public static OneFuelStationPerPortFactory oneFuelStationPerPort(
+    final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
+    final MoneyFactory pricePerLitre,
+    final double pumpRateInLitresPerMinute
+  ) {
+    return oneFuelStationPerPort(
+      portGrid,
+      constant(pricePerLitre),
+      pumpRateInLitresPerMinute
     );
   }
 }

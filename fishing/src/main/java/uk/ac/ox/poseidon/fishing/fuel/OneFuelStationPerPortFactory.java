@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.fuel;
 
 import java.util.List;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,12 +33,14 @@ import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
  * A {@link SimulationScopeFactory} creating one {@link FuelStation} per port in
- * {@code portGrid}, all sharing the same price and pump rate. Built via
+ * {@code portGrid}, all sharing the same price per litre, which each station
+ * reads for itself, and the same pump rate. Built via
  * {@link Factories#oneFuelStationPerPort}.
  */
 @Getter
@@ -50,10 +53,11 @@ public class OneFuelStationPerPortFactory
 {
 
   private final Factory<? super SimulationScope, ? extends PortGrid> portGrid;
-  private final Factory<
+  private final ValueFactory<
     ? super SimulationScope,
-    ? extends Money
-  > pricePerLitres;
+    ? super FuelStation,
+    Money
+  > pricePerLitre;
   private final double pumpRateInLitresPerMinute;
   private final Factory<
     ? super SimulationScope,
@@ -63,6 +67,8 @@ public class OneFuelStationPerPortFactory
   @Override
   protected List<FuelStation> newInstance(final SimulationScope scope) {
     final EventManager eventManager = this.eventManager.get(scope);
+    final Function<? super FuelStation, Money> pricePerLitre =
+      this.pricePerLitre.get(scope);
     return portGrid
       .get(scope)
       .getPorts()
@@ -71,7 +77,7 @@ public class OneFuelStationPerPortFactory
           port,
           port.getCode(),
           eventManager,
-          pricePerLitres.get(scope),
+          pricePerLitre,
           pumpRateInLitresPerMinute
         )
       )

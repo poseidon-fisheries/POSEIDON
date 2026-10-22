@@ -23,12 +23,14 @@
 package uk.ac.ox.poseidon.fishing.fuel;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.concurrent.atomic.AtomicReference;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
@@ -40,27 +42,18 @@ class FuelStationTest {
 
   private static final CurrencyUnit EUR = CurrencyUnit.of("EUR");
 
-  private static FuelStation newStation(final EventManager eventManager) {
+  private final AtomicReference<Money> price = new AtomicReference<>(
+    Money.of(EUR, 2.0)
+  );
+
+  private FuelStation newStation(final EventManager eventManager) {
     return new FuelStation(
       mock(Port.class),
       "F1",
       eventManager,
-      Money.of(EUR, 2.0),
+      ignored -> price.get(),
       60.0
     );
-  }
-
-  @Test
-  void constructorRejectsNegativePrice() {
-    assertThatThrownBy(() ->
-      new FuelStation(
-        mock(Port.class),
-        "F1",
-        mock(EventManager.class),
-        Money.of(EUR, -1.0),
-        60.0
-      )
-    ).isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
@@ -70,18 +63,27 @@ class FuelStationTest {
         mock(Port.class),
         "F1",
         mock(EventManager.class),
-        Money.of(EUR, 2.0),
+        ignored -> Money.of(EUR, 2.0),
         0.0
       )
     ).isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
-  void setPricePerLitreRejectsNegativePrice() {
+  void negativePriceIsRejectedWhenRead() {
     final FuelStation station = newStation(mock(EventManager.class));
-    assertThatThrownBy(() ->
-      station.setPricePerLitre(Money.of(EUR, -1.0))
-    ).isInstanceOf(IllegalArgumentException.class);
+    price.set(Money.of(EUR, -1.0));
+    assertThatIllegalArgumentException().isThrownBy(() ->
+      station.priceFor(1.0)
+    );
+  }
+
+  @Test
+  void priceIsReadOnEachSale() {
+    final FuelStation station = newStation(mock(EventManager.class));
+    assertThat(station.priceFor(10.0)).isEqualTo(Money.of(EUR, 20.0));
+    price.set(Money.of(EUR, 3.0));
+    assertThat(station.priceFor(10.0)).isEqualTo(Money.of(EUR, 30.0));
   }
 
   @Test
