@@ -22,8 +22,6 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import sim.util.Int2D;
-
 /**
  * A {@link DoubleGrid} that delegates every method to a wrapped
  * {@link DoubleGrid}. Meant to be subclassed by decorators that override only
@@ -45,7 +43,7 @@ public class DoubleGridWrapper implements DoubleGrid {
   }
 
   @Override
-  public double getValue(final Int2D cell) {
+  public double getValue(final Cell cell) {
     return grid.getValue(cell);
   }
 

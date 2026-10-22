@@ -34,11 +34,11 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -80,7 +80,7 @@ public class RandomCellsPortGridFactory
   protected PortGrid newInstance(final SimulationScope scope) {
     final BathymetricGrid bathymetricGrid = this.bathymetricGrid.get(scope);
     final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
-    final List<Int2D> suitableTiles = bathymetricGrid
+    final List<Cell> suitableTiles = bathymetricGrid
       .getLandCells()
       .filter(
         cell ->

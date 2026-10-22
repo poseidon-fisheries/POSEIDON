@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.geography.allocators;
 import java.util.function.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * An {@link Allocator} that delegates to another allocator only for cells
@@ -41,10 +41,10 @@ public class FilteredAllocator implements Allocator {
   private final Allocator delegateAllocator;
 
   @NonNull
-  private final Predicate<? super Int2D> predicate;
+  private final Predicate<? super Cell> predicate;
 
   @Override
-  public double applyAsDouble(final Int2D cell) {
+  public double applyAsDouble(final Cell cell) {
     return predicate.test(cell)
       ? delegateAllocator.applyAsDouble(cell)
       : Double.NaN;

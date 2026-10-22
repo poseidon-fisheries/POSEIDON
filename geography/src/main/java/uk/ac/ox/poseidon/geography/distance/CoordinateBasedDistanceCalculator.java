@@ -25,8 +25,8 @@ package uk.ac.ox.poseidon.geography.distance;
 import static java.lang.Math.abs;
 
 import java.util.function.ToDoubleBiFunction;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -66,10 +66,10 @@ public abstract class CoordinateBasedDistanceCalculator
     // A westward step is as long as the eastward one, so only steps from
     // column 0 to columns 0 and 1 are measured.
     for (int y = 0; y < gridHeight; y++) {
-      final Int2D start = new Int2D(0, y);
+      final Cell start = new Cell(0, y);
       for (int dy = -1; dy <= 1; dy++) {
         for (int dx = 0; dx <= 1; dx++) {
-          final Int2D end = new Int2D(dx, y + dy);
+          final Cell end = new Cell(dx, y + dy);
           stepLengthsInKm[stepIndex(y, dx, dy)] = modelGrid.isInGrid(end)
             ? formula.applyAsDouble(
                 modelGrid.toCoordinate(start),
@@ -91,12 +91,12 @@ public abstract class CoordinateBasedDistanceCalculator
   }
 
   @Override
-  public double distanceInKm(final Int2D start, final Int2D end) {
+  public double distanceInKm(final Cell start, final Cell end) {
     if (modelGrid.isInGrid(start) && modelGrid.isInGrid(end)) {
-      final int dx = end.x - start.x;
-      final int dy = end.y - start.y;
+      final int dx = end.x() - start.x();
+      final int dy = end.y() - start.y();
       if (abs(dx) <= 1 && abs(dy) <= 1) {
-        return stepLengthsInKm[stepIndex(start.y, dx, dy)];
+        return stepLengthsInKm[stepIndex(start.y(), dx, dy)];
       }
     }
     return distanceInKm(

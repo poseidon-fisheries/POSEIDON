@@ -29,13 +29,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
@@ -48,8 +48,8 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class NeighbourhoodGridExplorerFactory
-  extends VesselComponentScopeFactory<Function<Vessel, Int2D>>
-  implements ValueFactory<VesselComponentScope, Vessel, Int2D>
+  extends VesselComponentScopeFactory<Function<Vessel, Cell>>
+  implements ValueFactory<VesselComponentScope, Vessel, Cell>
 {
 
   private final Factory<
@@ -59,7 +59,7 @@ public class NeighbourhoodGridExplorerFactory
   private final MappingFactory<
     ? super VesselComponentScope,
     ? super Vessel,
-    ? super Int2D,
+    ? super Cell,
     Boolean
   > cellPredicate;
   private final ValueFactory<
@@ -71,7 +71,7 @@ public class NeighbourhoodGridExplorerFactory
   private final ValueFactory<
     ? super VesselComponentScope,
     ? super Vessel,
-    ? extends Int2D
+    ? extends Cell
   > searchCentre;
   private final Factory<
     ? super VesselComponentScope,
@@ -79,7 +79,7 @@ public class NeighbourhoodGridExplorerFactory
   > randomNumberGenerator;
 
   @Override
-  protected Function<Vessel, Int2D> newInstance(
+  protected Function<Vessel, Cell> newInstance(
     final VesselComponentScope scope
   ) {
     return new NeighbourhoodCellPicker(

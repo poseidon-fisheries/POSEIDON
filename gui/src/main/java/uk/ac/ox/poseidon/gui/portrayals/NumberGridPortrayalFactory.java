@@ -33,11 +33,11 @@ import sim.portrayal.LocationWrapper;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.portrayal.grid.ValueGridPortrayal2D;
 import sim.portrayal.simple.ValuePortrayal2D;
-import sim.util.Int2D;
 import sim.util.gui.ColorMap;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableGrid;
 import uk.ac.ox.poseidon.gui.palettes.PaletteColorMap;
@@ -111,7 +111,7 @@ public class NumberGridPortrayalFactory
     final DoubleGrid2D copy = new DoubleGrid2D(width, height);
     for (int x = 0; x < width; x++) {
       for (int y = 0; y < height; y++) {
-        copy.set(x, y, grid.getValue(new Int2D(x, y)));
+        copy.set(x, y, grid.getValue(new Cell(x, y)));
       }
     }
     return copy;

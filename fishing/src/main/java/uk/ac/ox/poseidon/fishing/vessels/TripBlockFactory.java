@@ -34,10 +34,10 @@ import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A {@link TaskFactory} for a {@link TripBlock}. Built via
@@ -53,7 +53,7 @@ public class TripBlockFactory extends TaskFactory<TripBlock> {
   private final ValueFactory<
     ? super VesselComponentScope,
     ? super Vessel,
-    Optional<Int2D>
+    Optional<Cell>
   > initialDestination;
 
   private final ValueFactory<

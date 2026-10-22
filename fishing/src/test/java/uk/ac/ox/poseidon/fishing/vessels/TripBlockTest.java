@@ -44,17 +44,17 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.tasks.travel.ArriveInPort;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 class TripBlockTest {
 
-  private static final Int2D PORT = new Int2D(0, 0);
-  private static final Int2D DESTINATION = new Int2D(1, 0);
+  private static final Cell PORT = new Cell(0, 0);
+  private static final Cell DESTINATION = new Cell(1, 0);
   private static final LocalDateTime NOW = LocalDateTime.of(2026, 1, 1, 7, 0);
 
   private Vessel vessel;
@@ -98,7 +98,7 @@ class TripBlockTest {
   @SafeVarargs
   @SuppressWarnings("varargs")
   private TripBlock tripTo(
-    final Optional<Int2D> initialDestination,
+    final Optional<Cell> initialDestination,
     final Task<Vessel>... children
   ) {
     return new TripBlock(_ -> initialDestination, _ -> NOW, List.of(children));

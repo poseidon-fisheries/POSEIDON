@@ -34,13 +34,13 @@ import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task.Status;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 class ChooseNextDestinationTest {
 
-  private static final Int2D NEXT = new Int2D(3, 4);
+  private static final Cell NEXT = new Cell(3, 4);
 
   private final Vessel vessel = mock(Vessel.class);
   private final Trip trip = mock(Trip.class);

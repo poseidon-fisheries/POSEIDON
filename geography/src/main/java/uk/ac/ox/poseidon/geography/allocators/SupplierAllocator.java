@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.geography.allocators;
 import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * An {@link Allocator} that ignores the cell entirely and returns the same
@@ -40,7 +40,7 @@ public class SupplierAllocator implements Allocator {
   private final Supplier<Double> supplier;
 
   @Override
-  public double applyAsDouble(final Int2D cell) {
+  public double applyAsDouble(final Cell cell) {
     return supplier.get();
   }
 }

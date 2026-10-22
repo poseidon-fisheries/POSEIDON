@@ -31,11 +31,11 @@ import java.time.Duration;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.accounts.Account;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 class ProfitPerHourDestinationEvaluatorTest {
 
@@ -43,9 +43,9 @@ class ProfitPerHourDestinationEvaluatorTest {
 
   @Test
   void evaluatesNetAccountBalancePerHourAtSea() {
-    final Int2D option = new Int2D(1, 2);
+    final Cell option = new Cell(1, 2);
     final SimpleEventManager eventManager = new SimpleEventManager();
-    final Evaluation<Int2D> evaluation = new ProfitPerHourDestinationEvaluator(
+    final Evaluation<Cell> evaluation = new ProfitPerHourDestinationEvaluator(
       EUR
     ).newEvaluation(option, eventManager);
 
@@ -66,9 +66,9 @@ class ProfitPerHourDestinationEvaluatorTest {
 
   @Test
   void failsIfResultIsRequestedBeforeTripEnds() {
-    final Evaluation<Int2D> evaluation = new ProfitPerHourDestinationEvaluator(
+    final Evaluation<Cell> evaluation = new ProfitPerHourDestinationEvaluator(
       EUR
-    ).newEvaluation(new Int2D(1, 2), new SimpleEventManager());
+    ).newEvaluation(new Cell(1, 2), new SimpleEventManager());
 
     assertThatIllegalStateException()
       .isThrownBy(evaluation::getResult)

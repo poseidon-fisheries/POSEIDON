@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.biology.biomass;
 
 import java.util.List;
 import lombok.Getter;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 import uk.ac.ox.poseidon.geography.grids.DoubleGridWrapper;
 
@@ -40,7 +40,7 @@ public class CarryingCapacityGrid extends DoubleGridWrapper {
    * cached.
    */
   @Getter(lazy = true)
-  private final List<Int2D> habitableCells = getModelGrid()
+  private final List<Cell> habitableCells = getModelGrid()
     .getActiveCells()
     .stream()
     .filter(cell -> getCarryingCapacity(cell) > 0)
@@ -52,7 +52,7 @@ public class CarryingCapacityGrid extends DoubleGridWrapper {
   }
 
   /** @return the carrying capacity at {@code cell} */
-  public double getCarryingCapacity(final Int2D cell) {
+  public double getCarryingCapacity(final Cell cell) {
     return grid.getValue(cell);
   }
 }

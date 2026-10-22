@@ -36,22 +36,22 @@ import java.time.Duration;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 
 class RouteViaDestinationTest {
 
-  private final Int2D vesselCell = new Int2D(0, 0);
-  private final Int2D waypoint = new Int2D(1, 0);
-  private final Int2D destination = new Int2D(1, 1);
-  private final Int2D portCell = new Int2D(2, 2);
+  private final Cell vesselCell = new Cell(0, 0);
+  private final Cell waypoint = new Cell(1, 0);
+  private final Cell destination = new Cell(1, 1);
+  private final Cell portCell = new Cell(2, 2);
   private final Vessel vessel = mock(Vessel.class);
   private final Engine engine = mock(Engine.class);
   private final GridPathFinder pathFinder = mock(GridPathFinder.class);
@@ -77,7 +77,7 @@ class RouteViaDestinationTest {
     when(vessel.getCell()).thenReturn(vesselCell);
     when(vessel.getHomePortCell()).thenReturn(portCell);
     when(
-      distanceCalculator.distanceInKm(any(Int2D.class), any(Int2D.class))
+      distanceCalculator.distanceInKm(any(Cell.class), any(Cell.class))
     ).thenReturn(5.0);
     when(distanceCalculator.distanceInKm(anyList())).thenCallRealMethod();
     when(pathFinder.getPath(vesselCell, destination)).thenReturn(
@@ -100,7 +100,7 @@ class RouteViaDestinationTest {
   void readsTheVesselsCurrentCellHomePortAndSpeedAtEachCall() {
     final Route routeBefore = routeViaDestination.apply(vessel, destination);
 
-    final Int2D otherPortCell = new Int2D(3, 3);
+    final Cell otherPortCell = new Cell(3, 3);
     when(vessel.getCell()).thenReturn(destination);
     when(vessel.getHomePortCell()).thenReturn(otherPortCell);
     when(engine.getCruisingSpeedInKph()).thenReturn(20.0);

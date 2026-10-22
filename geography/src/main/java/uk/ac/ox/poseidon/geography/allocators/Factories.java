@@ -22,11 +22,11 @@
 
 package uk.ac.ox.poseidon.geography.allocators;
 
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Factories for {@link Allocator}s: weight functions used to place things on a
@@ -50,7 +50,7 @@ public final class Factories {
     final MappingFactory<
       ? super S,
       ? super Void,
-      ? super Int2D,
+      ? super Cell,
       Boolean
     > cellPredicate
   ) {

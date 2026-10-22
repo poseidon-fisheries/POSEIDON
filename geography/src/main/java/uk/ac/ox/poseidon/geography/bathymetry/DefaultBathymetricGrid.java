@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -28,8 +28,8 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 import lombok.Getter;
 import sim.field.grid.DoubleGrid2D;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.grids.BaseDoubleGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -45,16 +45,16 @@ public class DefaultBathymetricGrid
 {
 
   @Getter(value = PRIVATE, lazy = true)
-  private final Int2D[] landCellsArray =
-    BathymetricGrid.super.getLandCells().toArray(Int2D[]::new);
+  private final Cell[] landCellsArray =
+    BathymetricGrid.super.getLandCells().toArray(Cell[]::new);
 
   @Getter(value = PRIVATE, lazy = true)
-  private final Int2D[] waterCellsArray =
-    BathymetricGrid.super.getWaterCells().toArray(Int2D[]::new);
+  private final Cell[] waterCellsArray =
+    BathymetricGrid.super.getWaterCells().toArray(Cell[]::new);
 
   @Getter(value = PRIVATE, lazy = true)
-  private final Int2D[] activeWaterCellsArray =
-    BathymetricGrid.super.getActiveWaterCells().toArray(Int2D[]::new);
+  private final Cell[] activeWaterCellsArray =
+    BathymetricGrid.super.getActiveWaterCells().toArray(Cell[]::new);
 
   /**
    * @param modelGrid the grid this bathymetry is defined over; all elevations
@@ -93,24 +93,24 @@ public class DefaultBathymetricGrid
 
   /** Cached: see the class doc. */
   @Override
-  public Stream<Int2D> getActiveWaterCells() {
+  public Stream<Cell> getActiveWaterCells() {
     return Arrays.stream(getActiveWaterCellsArray());
   }
 
   /** Cached: see the class doc. */
   @Override
-  public Stream<Int2D> getWaterCells() {
+  public Stream<Cell> getWaterCells() {
     return Arrays.stream(getWaterCellsArray());
   }
 
   /** Cached: see the class doc. */
   @Override
-  public Stream<Int2D> getLandCells() {
+  public Stream<Cell> getLandCells() {
     return Arrays.stream(getLandCellsArray());
   }
 
   @Override
-  public double getElevation(final Int2D cell) {
+  public double getElevation(final Cell cell) {
     return getValue(cell);
   }
 }

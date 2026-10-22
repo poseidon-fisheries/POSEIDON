@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.fishing.catches.disposition.Disposition;
@@ -37,14 +36,15 @@ import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingOutcome;
 import uk.ac.ox.poseidon.fishing.vessels.values.attributes.StringAttribute;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 class FishingEventRecorderTest {
 
   private final Species species = new Species("A", null, "A");
   private final Coordinate coordinate = new Coordinate(1.5, 41.5);
-  private final Int2D cell = new Int2D(3, 4);
-  private final KeyedMemory<String, Int2D, Bucket> keyedMemory =
+  private final Cell cell = new Cell(3, 4);
+  private final KeyedMemory<String, Cell, Bucket> keyedMemory =
     new KeyedMemory<>();
   private final FishingEventRecorder fishingEventRecorder =
     new FishingEventRecorder(

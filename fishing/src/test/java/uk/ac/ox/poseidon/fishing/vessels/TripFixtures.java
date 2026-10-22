@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.fishing.vessels;
 
 import java.time.LocalDateTime;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Starts trips for tests outside the vessels package, which cannot open one
@@ -39,7 +39,7 @@ public final class TripFixtures {
    */
   public static Trip startTrip(
     final Vessel vessel,
-    final Int2D destination,
+    final Cell destination,
     final LocalDateTime startDateTime
   ) {
     vessel.startTrip(destination, startDateTime);

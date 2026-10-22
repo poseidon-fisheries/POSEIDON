@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.fishing.fuel;
 
 import java.util.Map;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -34,9 +34,11 @@ public class ImmutableFuelStationGrid extends FuelStationGrid {
 
   ImmutableFuelStationGrid(
     final ModelGrid modelGrid,
-    final Map<FuelStation, Int2D> fuelStationCells
+    final Map<FuelStation, Cell> fuelStationCells
   ) {
     super(modelGrid);
-    fuelStationCells.forEach(field::setObjectLocation);
+    fuelStationCells.forEach((fuelStation, cell) ->
+      field.setObjectLocation(fuelStation, cell.x(), cell.y())
+    );
   }
 }

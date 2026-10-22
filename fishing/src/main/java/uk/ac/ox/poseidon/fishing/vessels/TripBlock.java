@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A composite task that opens a trip, runs its children in sequence and
@@ -49,7 +49,7 @@ import sim.util.Int2D;
  */
 public final class TripBlock extends Sequence<Vessel> {
 
-  private final Function<? super Vessel, Optional<Int2D>> initialDestination;
+  private final Function<? super Vessel, Optional<Cell>> initialDestination;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
   private boolean tripOpen;
 
@@ -61,7 +61,7 @@ public final class TripBlock extends Sequence<Vessel> {
    * @throws IllegalArgumentException if {@code children} is empty
    */
   public TripBlock(
-    final Function<? super Vessel, Optional<Int2D>> initialDestination,
+    final Function<? super Vessel, Optional<Cell>> initialDestination,
     final Function<? super Vessel, LocalDateTime> currentDateTime,
     final List<? extends Task<Vessel>> children
   ) {
@@ -84,7 +84,7 @@ public final class TripBlock extends Sequence<Vessel> {
   @Override
   public void run() {
     if (!tripOpen) {
-      final Optional<Int2D> destination = initialDestination.apply(getVessel());
+      final Optional<Cell> destination = initialDestination.apply(getVessel());
       if (destination.isEmpty()) {
         fail();
         return;

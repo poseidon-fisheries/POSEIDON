@@ -243,7 +243,7 @@ public class RegulationGridPortrayalFactory
               )
             )
             .allMatch(regulations::isForbidden);
-        grid.field[cell.x][cell.y] = forbidden ? "FORBIDDEN" : null;
+        grid.field[cell.x()][cell.y()] = forbidden ? "FORBIDDEN" : null;
       });
     }
   }

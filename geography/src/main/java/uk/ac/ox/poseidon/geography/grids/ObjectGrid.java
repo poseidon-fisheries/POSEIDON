@@ -67,23 +67,24 @@ public abstract class ObjectGrid<T>
   }
 
   /** @return the cell {@code object} is placed on */
-  public Int2D getCell(final T object) {
-    return field.getObjectLocation(object);
+  public Cell getCell(final T object) {
+    final Int2D location = field.getObjectLocation(object);
+    return new Cell(location.x, location.y);
   }
 
   /** @return the objects placed on {@code cell} */
-  public Stream<T> getObjectsAt(final Int2D cell) {
-    return bagToStream(field.getObjectsAtLocation(cell.x, cell.y));
+  public Stream<T> getObjectsAt(final Cell cell) {
+    return bagToStream(field.getObjectsAtLocation(cell.x(), cell.y()));
   }
 
   /** @return whether any object is placed on {@code cell} */
-  public boolean anyObjectsAt(final Int2D cell) {
+  public boolean anyObjectsAt(final Cell cell) {
     return numObjectsAt(cell) > 0;
   }
 
   /** @return the number of objects placed on {@code cell} */
-  public int numObjectsAt(final Int2D cell) {
-    return field.numObjectsAtLocation(cell.x, cell.y);
+  public int numObjectsAt(final Cell cell) {
+    return field.numObjectsAtLocation(cell.x(), cell.y());
   }
 
   @Override
@@ -114,7 +115,7 @@ public abstract class ObjectGrid<T>
       modelGrid.getGridHeight()
     );
     portCoordinates.forEach((port, coordinate) -> {
-      final Int2D cell = modelGrid.toCell(coordinate);
+      final Cell cell = modelGrid.toCell(coordinate);
       checkArgument(
         bathymetricGrid.isLand(cell),
         "Port %s at coordinate %s is on water.",
@@ -130,7 +131,7 @@ public abstract class ObjectGrid<T>
         port.getName(),
         coordinate
       );
-      grid.setObjectLocation(port, cell);
+      grid.setObjectLocation(port, cell.x(), cell.y());
     });
     return grid;
   }

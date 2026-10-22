@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
@@ -53,7 +53,7 @@ class MarketGridTest {
 
   /** @return a grid with all {@code markets} on the same cell */
   static MarketGrid marketGrid(final Market... markets) {
-    final Int2D cell = new Int2D(1, 2);
+    final Cell cell = new Cell(1, 2);
     final ModelGrid modelGrid = mock(ModelGrid.class);
     when(modelGrid.getGridWidth()).thenReturn(10);
     when(modelGrid.getGridHeight()).thenReturn(10);

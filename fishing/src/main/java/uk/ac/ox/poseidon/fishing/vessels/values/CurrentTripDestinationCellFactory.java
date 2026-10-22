@@ -25,11 +25,11 @@ package uk.ac.ox.poseidon.fishing.vessels.values;
 import java.util.function.Function;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of
@@ -39,12 +39,12 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class CurrentTripDestinationCellFactory
-  extends GlobalScopeFactory<Function<Vessel, Int2D>>
-  implements ValueFactory<Scope, Vessel, Int2D>
+  extends GlobalScopeFactory<Function<Vessel, Cell>>
+  implements ValueFactory<Scope, Vessel, Cell>
 {
 
   @Override
-  protected Function<Vessel, Int2D> newInstance(final Scope scope) {
+  protected Function<Vessel, Cell> newInstance(final Scope scope) {
     return new CurrentTripDestinationCell();
   }
 }

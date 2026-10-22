@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -35,12 +35,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.bathymetry.DefaultBathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.EquirectangularDistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.AStarPathFinder;
 import uk.ac.ox.poseidon.geography.paths.GridAdaptor;
 import uk.ac.ox.poseidon.geography.ports.MutablePortGrid;
@@ -71,23 +71,23 @@ class GridAdaptorTest {
   @Test
   void getIndex() {
     Map.of(
-      new Int2D(0, 0),
+      new Cell(0, 0),
       0,
-      new Int2D(1, 0),
+      new Cell(1, 0),
       1,
-      new Int2D(2, 0),
+      new Cell(2, 0),
       2,
-      new Int2D(0, 1),
+      new Cell(0, 1),
       3,
-      new Int2D(1, 1),
+      new Cell(1, 1),
       4,
-      new Int2D(2, 1),
+      new Cell(2, 1),
       5,
-      new Int2D(0, 2),
+      new Cell(0, 2),
       6,
-      new Int2D(1, 2),
+      new Cell(1, 2),
       7,
-      new Int2D(2, 2),
+      new Cell(2, 2),
       8
     ).forEach((key, value) -> assertEquals(value, gridAdaptor.getIndex(key)));
   }
@@ -100,31 +100,26 @@ class GridAdaptorTest {
   @Test
   void getConnections() {
     Map.of(
-      new Int2D(0, 0),
-      Set.of(new Int2D(0, 1)),
-      new Int2D(1, 0),
+      new Cell(0, 0),
+      Set.of(new Cell(0, 1)),
+      new Cell(1, 0),
       Set.of(),
-      new Int2D(2, 0),
-      Set.of(new Int2D(2, 1)),
-      new Int2D(0, 1),
-      Set.of(new Int2D(0, 0), new Int2D(0, 2), new Int2D(1, 2)),
-      new Int2D(1, 1),
+      new Cell(2, 0),
+      Set.of(new Cell(2, 1)),
+      new Cell(0, 1),
+      Set.of(new Cell(0, 0), new Cell(0, 2), new Cell(1, 2)),
+      new Cell(1, 1),
       Set.of(),
-      new Int2D(2, 1),
-      Set.of(new Int2D(1, 2), new Int2D(2, 0), new Int2D(2, 2)),
-      new Int2D(0, 2),
-      Set.of(new Int2D(0, 1), new Int2D(1, 2)),
-      new Int2D(1, 2),
-      Set.of(
-        new Int2D(2, 1),
-        new Int2D(0, 1),
-        new Int2D(0, 2),
-        new Int2D(2, 2)
-      ),
-      new Int2D(2, 2),
-      Set.of(new Int2D(2, 1), new Int2D(1, 2))
+      new Cell(2, 1),
+      Set.of(new Cell(1, 2), new Cell(2, 0), new Cell(2, 2)),
+      new Cell(0, 2),
+      Set.of(new Cell(0, 1), new Cell(1, 2)),
+      new Cell(1, 2),
+      Set.of(new Cell(2, 1), new Cell(0, 1), new Cell(0, 2), new Cell(2, 2)),
+      new Cell(2, 2),
+      Set.of(new Cell(2, 1), new Cell(1, 2))
     ).forEach((from, toNodes) -> {
-      final Array<Connection<Int2D>> connections = gridAdaptor.getConnections(
+      final Array<Connection<Cell>> connections = gridAdaptor.getConnections(
         from
       );
       assertTrue(
@@ -149,14 +144,14 @@ class GridAdaptorTest {
     assertEquals(
       Optional.of(
         List.of(
-          new Int2D(0, 0),
-          new Int2D(0, 1),
-          new Int2D(1, 2),
-          new Int2D(2, 1),
-          new Int2D(2, 0)
+          new Cell(0, 0),
+          new Cell(0, 1),
+          new Cell(1, 2),
+          new Cell(2, 1),
+          new Cell(2, 0)
         )
       ),
-      pathFinder.getPath(new Int2D(0, 0), new Int2D(2, 0))
+      pathFinder.getPath(new Cell(0, 0), new Cell(2, 0))
     );
   }
 }

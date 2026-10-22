@@ -31,7 +31,6 @@ import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import sim.util.Int2D;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
@@ -50,7 +49,7 @@ class StaticGridsFromNetCdfFactoryTest {
   @TempDir
   private Path tempDir;
 
-  // Aligned so that modelGrid.toCoordinate(Int2D(x, y)) exactly equals
+  // Aligned so that modelGrid.toCoordinate(Cell(x, y)) exactly equals
   // (LONGITUDES[x], LATITUDES[y]) for this 3x2 grid.
   private final ModelGrid modelGrid = ModelGrid.create(
     3,
@@ -80,12 +79,12 @@ class StaticGridsFromNetCdfFactoryTest {
     assertThat(result.keySet()).containsExactlyInAnyOrder("mpa_4", "mpa_5");
 
     // written as [lat][lon] = {{0,1,FILL},{1,0,0}}; expect [lon][lat] via
-    // Int2D(x=lon, y=lat)
-    assertThat(result.get("mpa_4").getValue(new Int2D(0, 0))).isEqualTo(0.0);
-    assertThat(result.get("mpa_4").getValue(new Int2D(1, 0))).isEqualTo(1.0);
-    assertThat(result.get("mpa_4").getValue(new Int2D(2, 0))).isNaN();
-    assertThat(result.get("mpa_5").getValue(new Int2D(0, 0))).isEqualTo(1.0);
-    assertThat(result.get("mpa_5").getValue(new Int2D(0, 1))).isEqualTo(0.0);
+    // Cell(x=lon, y=lat)
+    assertThat(result.get("mpa_4").getValue(new Cell(0, 0))).isEqualTo(0.0);
+    assertThat(result.get("mpa_4").getValue(new Cell(1, 0))).isEqualTo(1.0);
+    assertThat(result.get("mpa_4").getValue(new Cell(2, 0))).isNaN();
+    assertThat(result.get("mpa_5").getValue(new Cell(0, 0))).isEqualTo(1.0);
+    assertThat(result.get("mpa_5").getValue(new Cell(0, 1))).isEqualTo(0.0);
   }
 
   @Test

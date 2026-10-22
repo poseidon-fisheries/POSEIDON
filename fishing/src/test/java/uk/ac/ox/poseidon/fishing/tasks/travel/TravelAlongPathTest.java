@@ -42,13 +42,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 class TravelAlongPathTest {
@@ -93,7 +93,7 @@ class TravelAlongPathTest {
   @Test
   void travelsOutAndBackAsOneTaskInTwoPlacesOfATree() {
     final Vessel vessel = vesselCruisingAtTenKph();
-    final AtomicReference<Int2D> cell = new AtomicReference<>(ORIGIN);
+    final AtomicReference<Cell> cell = new AtomicReference<>(ORIGIN);
     when(vessel.getCell()).thenAnswer(_ -> cell.get());
     doAnswer(invocation -> {
       cell.set(invocation.getArgument(0));
@@ -101,7 +101,7 @@ class TravelAlongPathTest {
     })
       .when(vessel)
       .setCurrentCell(any());
-    final AtomicReference<Int2D> destination = new AtomicReference<>(
+    final AtomicReference<Cell> destination = new AtomicReference<>(
       DESTINATION
     );
     final Trip trip = vessel.getCurrentTrip();
@@ -116,10 +116,10 @@ class TravelAlongPathTest {
       DistanceCalculator.class
     );
     when(
-      distanceCalculator.distanceInKm(any(Int2D.class), any(Int2D.class))
+      distanceCalculator.distanceInKm(any(Cell.class), any(Cell.class))
     ).thenReturn(5.0);
     @SuppressWarnings("unchecked")
-    final PathFinder<Int2D> pathFinder = mock(PathFinder.class);
+    final PathFinder<Cell> pathFinder = mock(PathFinder.class);
     when(pathFinder.getPath(ORIGIN, DESTINATION)).thenReturn(
       Optional.of(ImmutableList.of(ORIGIN, DESTINATION))
     );
@@ -164,7 +164,7 @@ class TravelAlongPathTest {
     final DistanceCalculator distanceCalculator
   ) {
     @SuppressWarnings("unchecked")
-    final PathFinder<Int2D> pathFinder = mock(PathFinder.class);
+    final PathFinder<Cell> pathFinder = mock(PathFinder.class);
     when(pathFinder.getPath(ORIGIN, DESTINATION)).thenReturn(
       Optional.of(ImmutableList.of(ORIGIN, DESTINATION))
     );

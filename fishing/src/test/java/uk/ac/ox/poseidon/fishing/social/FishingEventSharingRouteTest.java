@@ -61,7 +61,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Scenario;
@@ -88,6 +87,7 @@ import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.fishing.vessels.holds.Hold;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -110,7 +110,7 @@ class FishingEventSharingRouteTest {
 
   private final Species species = new Species("S", null, "S");
   private final Coordinate coordinate = new Coordinate(1.5, 41.5);
-  private final Int2D cell = new Int2D(3, 4);
+  private final Cell cell = new Cell(3, 4);
   private final Port port = mock(Port.class);
   private final PortGrid portGrid = mock(PortGrid.class);
   private final MarketGrid marketGrid = mock(MarketGrid.class);
@@ -122,13 +122,13 @@ class FishingEventSharingRouteTest {
   private final VesselComponent<Gear> gearComponent = vesselComponent(
     object(gear)
   );
-  private final Valuation<Int2D, Bucket> kgOfSpecies = valuedFor ->
+  private final Valuation<Cell, Bucket> kgOfSpecies = valuedFor ->
     (option, bucket) ->
       bucket.getKg(species);
 
-  private final KeyedMemoryFactory<String, Int2D, Bucket> vesselMemory =
+  private final KeyedMemoryFactory<String, Cell, Bucket> vesselMemory =
     keyedMemory();
-  private final MemoryBasedOptionValuesFactory<Int2D, Bucket> optionValues =
+  private final MemoryBasedOptionValuesFactory<Cell, Bucket> optionValues =
     memoryBasedOptionValues(
       keyedMemorySelector(vesselMemory, stringAttribute("gear")),
       object(kgOfSpecies)
@@ -358,7 +358,7 @@ class FishingEventSharingRouteTest {
     );
     final Vessel a = vessel("A");
     final Vessel b = vessel("B");
-    final OptionValues<Int2D> valuesOfB = optionValues.get(scopeOf(b)).apply(b);
+    final OptionValues<Cell> valuesOfB = optionValues.get(scopeOf(b)).apply(b);
     final Trip trip = startTrip(a, cell, now());
     assertThat(socialNetwork.getRecipients(a)).containsExactly(b);
 

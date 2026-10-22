@@ -31,7 +31,6 @@ import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
 import java.util.function.Supplier;
-import sim.util.Int2D;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -41,6 +40,7 @@ import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -296,7 +296,7 @@ public final class Factories {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      Optional<Int2D>
+      Optional<Cell>
     > initialDestination,
     final Factory<
       ? super VesselComponentScope,

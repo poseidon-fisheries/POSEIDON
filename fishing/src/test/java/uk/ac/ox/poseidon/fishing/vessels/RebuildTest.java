@@ -49,12 +49,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -132,7 +132,7 @@ class RebuildTest {
   void stubPorts() {
     final Port port = mock(Port.class);
     Mockito.when(portGrid.getObject("P1")).thenReturn(Optional.of(port));
-    Mockito.when(portGrid.getCell(port)).thenReturn(new Int2D(1, 1));
+    Mockito.when(portGrid.getCell(port)).thenReturn(new Cell(1, 1));
   }
 
   private void startSimulation(

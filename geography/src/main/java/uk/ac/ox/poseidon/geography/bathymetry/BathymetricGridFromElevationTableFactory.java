@@ -30,10 +30,10 @@ import lombok.*;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.utils.ElevationTable;
 
@@ -67,16 +67,16 @@ public class BathymetricGridFromElevationTableFactory<S extends Scope> extends B
   }
 
   @Override
-  protected Map<Int2D, Collection<Double>> readElevationValues(
+  protected Map<Cell, Collection<Double>> readElevationValues(
     final ModelGrid modelGrid,
     final S scope
   ) {
-    final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
+    final Multimap<Cell, Double> elevationValues = ArrayListMultimap.create();
     elevationTable
       .get(scope)
       .entryStream()
       .forEach(entry -> {
-        final Int2D cell = modelGrid.toCell(entry.getCoordinate());
+        final Cell cell = modelGrid.toCell(entry.getCoordinate());
         final double value = entry.getElevation();
         elevationValues.put(cell, isInverted() ? -value : value);
       });

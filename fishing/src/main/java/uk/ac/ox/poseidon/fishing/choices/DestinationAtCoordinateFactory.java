@@ -29,11 +29,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -46,8 +46,8 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class DestinationAtCoordinateFactory<S extends Scope, C>
-  extends RelativeScopeFactory<S, Function<C, Optional<Int2D>>>
-  implements ValueFactory<S, C, Optional<Int2D>>
+  extends RelativeScopeFactory<S, Function<C, Optional<Cell>>>
+  implements ValueFactory<S, C, Optional<Cell>>
 {
 
   private final Factory<? super S, ? extends ModelGrid> modelGrid;
@@ -55,7 +55,7 @@ public class DestinationAtCoordinateFactory<S extends Scope, C>
   private final ValueFactory<? super S, ? super C, ? extends Double> latitude;
 
   @Override
-  protected Function<C, Optional<Int2D>> newInstance(final S scope) {
+  protected Function<C, Optional<Cell>> newInstance(final S scope) {
     return new DestinationAtCoordinate<>(
       modelGrid.get(scope),
       longitude.get(scope),

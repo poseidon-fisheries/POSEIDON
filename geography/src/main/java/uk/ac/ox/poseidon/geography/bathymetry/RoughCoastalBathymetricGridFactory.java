@@ -130,7 +130,7 @@ public class RoughCoastalBathymetricGridFactory
         .toList()
         .forEach(
           cell ->
-            doubleGrid2D.field[cell.x][cell.y] =
+            doubleGrid2D.field[cell.x()][cell.y()] =
               rng.nextDouble() * minimumElevation
         );
     }
@@ -166,7 +166,7 @@ public class RoughCoastalBathymetricGridFactory
         )
         .forEach(
           (cell, newElevation) ->
-            doubleGrid2D.field[cell.x][cell.y] = newElevation
+            doubleGrid2D.field[cell.x()][cell.y()] = newElevation
         );
     }
     return new DefaultBathymetricGrid(modelGrid, doubleGrid2D);

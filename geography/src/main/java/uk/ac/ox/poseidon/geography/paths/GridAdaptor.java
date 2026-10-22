@@ -31,9 +31,9 @@ import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import lombok.Data;
 import lombok.Getter;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -44,9 +44,9 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * since libGDX's search revisits cells and the underlying grid queries aren't
  * free.
  */
-public class GridAdaptor implements IndexedGraph<Int2D> {
+public class GridAdaptor implements IndexedGraph<Cell> {
 
-  private final Interner<Int2D> interner = Interners.newStrongInterner();
+  private final Interner<Cell> interner = Interners.newStrongInterner();
   private final BathymetricGrid bathymetricGrid;
   private final PortGrid portGrid;
   private final ModelGrid modelGrid;
@@ -54,7 +54,7 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
   @Getter
   private final DistanceCalculator distanceCalculator;
 
-  private final Cache<Int2D, Array<Connection<Int2D>>> connectionsCache =
+  private final Cache<Cell, Array<Connection<Cell>>> connectionsCache =
     Caffeine.newBuilder().build();
 
   /**
@@ -75,7 +75,7 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
     this.distanceCalculator = distanceCalculator;
   }
 
-  private boolean isNavigable(final Int2D cell) {
+  private boolean isNavigable(final Cell cell) {
     return bathymetricGrid.isWater(cell) || portGrid.anyObjectsAt(cell);
   }
 
@@ -84,8 +84,8 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
    *         {@link IndexedGraph}
    */
   @Override
-  public int getIndex(final Int2D cell) {
-    return cell.x + cell.y * modelGrid.getGridWidth();
+  public int getIndex(final Cell cell) {
+    return cell.x() + cell.y() * modelGrid.getGridWidth();
   }
 
   /** @return the total number of cells in the grid */
@@ -100,7 +100,7 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
    *         itself isn't navigable
    */
   @Override
-  public Array<Connection<Int2D>> getConnections(final Int2D cell) {
+  public Array<Connection<Cell>> getConnections(final Cell cell) {
     return connectionsCache.get(cell, key ->
       !isNavigable(key)
         ? new Array<>()
@@ -122,22 +122,22 @@ public class GridAdaptor implements IndexedGraph<Int2D> {
   }
 
   /**
-   * We need to intern (i.e., map to a canonical instance) all instances of
-   * Int2D because the AStarPathFinder does all its comparisons by reference,
-   * not equality
+   * We need to intern (i.e., map to a canonical instance) every cell we give
+   * the AStarPathFinder because it does all its comparisons by reference, not
+   * equality
    *
-   * @param cell any Int2D cell instance
+   * @param cell any cell
    * @return the canonical instance for that cell
    */
-  public Int2D intern(final Int2D cell) {
+  public Cell intern(final Cell cell) {
     return interner.intern(cell);
   }
 
   @Data
-  private static final class WeightedConnection implements Connection<Int2D> {
+  private static final class WeightedConnection implements Connection<Cell> {
 
-    private final Int2D fromNode;
-    private final Int2D toNode;
+    private final Cell fromNode;
+    private final Cell toNode;
     private final float cost;
   }
 }

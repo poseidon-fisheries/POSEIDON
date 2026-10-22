@@ -17,7 +17,10 @@
         MASON makes steppables and the simulation Serializable, but POSEIDON never serializes
         them: the GUI disables MASON's checkpoint menus
         -->
-        <Bug pattern="SE_NO_SERIALVERSIONID"/>
+        <Or>
+            <Bug pattern="SE_NO_SERIALVERSIONID"/>
+            <Bug pattern="SE_BAD_FIELD"/>
+        </Or>
     </Match>
     <Match>
         <!-- Constructor validation throws are a common and safe pattern -->

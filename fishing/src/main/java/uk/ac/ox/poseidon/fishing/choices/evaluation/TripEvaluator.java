@@ -23,13 +23,13 @@
 package uk.ac.ox.poseidon.fishing.choices.evaluation;
 
 import java.util.function.Function;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.fishing.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Listens for a vessel's trip start/end events and feeds each completed trip's
@@ -41,10 +41,10 @@ public class TripEvaluator implements Listener<TripEvent> {
 
   private final Function<
     ? super Vessel,
-    ? extends MutableOptionValues<Int2D>
+    ? extends MutableOptionValues<Cell>
   > optionValues;
-  private final Evaluator<Int2D> evaluator;
-  private Evaluation<Int2D> currentEvaluation;
+  private final Evaluator<Cell> evaluator;
+  private Evaluation<Cell> currentEvaluation;
 
   /**
    * @param optionValues gives the option values of a vessel, where each of its
@@ -56,9 +56,9 @@ public class TripEvaluator implements Listener<TripEvent> {
   public TripEvaluator(
     final Function<
       ? super Vessel,
-      ? extends MutableOptionValues<Int2D>
+      ? extends MutableOptionValues<Cell>
     > optionValues,
-    final Evaluator<Int2D> evaluator
+    final Evaluator<Cell> evaluator
   ) {
     this.optionValues = optionValues;
     this.evaluator = evaluator;

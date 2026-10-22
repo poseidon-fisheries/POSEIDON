@@ -33,7 +33,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
@@ -41,6 +40,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 /**
@@ -54,16 +54,16 @@ public class TravelAlongPath extends VesselTask {
 
   private final VesselComponent<? extends Engine> engine;
   private final VesselComponent<? extends FuelTank> fuelTank;
-  private final PathFinder<Int2D> pathFinder;
+  private final PathFinder<Cell> pathFinder;
   private final DistanceCalculator distanceCalculator;
-  private final Function<? super Vessel, Int2D> destinationSource;
+  private final Function<? super Vessel, Cell> destinationSource;
   private final Function<? super Vessel, EventManager> eventManager;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
-  private List<Int2D> currentPath;
+  private List<Cell> currentPath;
 
   private LocalDateTime startDateTime;
-  private Int2D origin;
-  private Int2D destination;
+  private Cell origin;
+  private Cell destination;
   private double cruisingSpeedInKph;
   private double distanceToNextCell;
 
@@ -143,7 +143,7 @@ public class TravelAlongPath extends VesselTask {
         );
       return SUCCEEDED;
     } else {
-      final Int2D nextCell = currentPath.getFirst();
+      final Cell nextCell = currentPath.getFirst();
       distanceToNextCell = distanceCalculator.distanceInKm(
         vessel.getCell(),
         nextCell

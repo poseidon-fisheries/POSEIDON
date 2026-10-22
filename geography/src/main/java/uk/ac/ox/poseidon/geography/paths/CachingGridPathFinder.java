@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.geography.paths;
 
 import com.google.common.collect.ImmutableList;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -36,7 +36,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * {@link DefaultPathFinderFactory}/{@link uk.ac.ox.poseidon.geography.paths.Factories}.
  */
 public class CachingGridPathFinder
-  extends CachingPathFinder<Int2D>
+  extends CachingPathFinder<Cell>
   implements GridPathFinder
 {
 
@@ -45,7 +45,7 @@ public class CachingGridPathFinder
 
   CachingGridPathFinder(
     final GridPathFinder pathFinder,
-    final PathCache<Int2D> cache,
+    final PathCache<Cell> cache,
     final AccessibleWaterCellsCache accessibleWaterCellsCache
   ) {
     super(pathFinder, cache);
@@ -54,9 +54,7 @@ public class CachingGridPathFinder
   }
 
   @Override
-  public ImmutableList<Int2D> getAccessibleWaterCells(
-    final Int2D startingCell
-  ) {
+  public ImmutableList<Cell> getAccessibleWaterCells(final Cell startingCell) {
     return accessibleWaterCellsCache.getAccessibleWaterCells(
       startingCell,
       pathFinder
@@ -64,8 +62,8 @@ public class CachingGridPathFinder
   }
 
   @Override
-  public ImmutableList<Int2D> getAccessibleWaterNeighbours(
-    final Int2D startingCell,
+  public ImmutableList<Cell> getAccessibleWaterNeighbours(
+    final Cell startingCell,
     final int neighbourhoodSize
   ) {
     return accessibleWaterCellsCache.getAccessibleWaterNeighbours(
@@ -81,12 +79,12 @@ public class CachingGridPathFinder
   }
 
   @Override
-  public boolean isWater(final Int2D cell) {
+  public boolean isWater(final Cell cell) {
     return pathFinder.isWater(cell);
   }
 
   @Override
-  public boolean isNavigable(final Int2D cell) {
+  public boolean isNavigable(final Cell cell) {
     return pathFinder.isNavigable(cell);
   }
 }

@@ -25,8 +25,8 @@ package uk.ac.ox.poseidon.fishing.fields;
 import lombok.Getter;
 import sim.field.continuous.Continuous2D;
 import sim.util.Double2D;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -56,7 +56,7 @@ public class VesselField {
    * {@code cell}.
    */
   @SuppressWarnings("UnusedReturnValue")
-  public boolean setCell(final Vessel vessel, final Int2D cell) {
+  public boolean setCell(final Vessel vessel, final Cell cell) {
     return setPoint(vessel, modelGrid.toPoint(cell));
   }
 
@@ -82,7 +82,7 @@ public class VesselField {
    * @return the cell containing {@code vessel}'s recorded location, or
    *         {@code null} if it has none
    */
-  public Int2D getCell(final Vessel vessel) {
+  public Cell getCell(final Vessel vessel) {
     final Double2D point = getPoint(vessel);
     return point != null ? modelGrid.toCell(point) : null;
   }

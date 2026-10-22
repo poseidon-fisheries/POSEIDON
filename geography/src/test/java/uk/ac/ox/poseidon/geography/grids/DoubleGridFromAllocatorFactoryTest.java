@@ -27,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.allocators.FilteredAllocator;
@@ -46,16 +45,16 @@ class DoubleGridFromAllocatorFactoryTest {
         scope -> modelGrid,
         scope ->
           new FilteredAllocator(
-            cell -> cell.x + cell.y,
-            cell -> !(cell.x == 1 && cell.y == 0)
+            cell -> cell.x() + cell.y(),
+            cell -> !(cell.x() == 1 && cell.y() == 0)
           )
       );
 
     final BaseDoubleGrid grid = factory.get(Scope.GLOBAL_SCOPE);
 
-    assertThat(isNaN(grid.getValue(new Int2D(1, 0)))).isTrue();
-    assertThat(grid.getValue(new Int2D(0, 0))).isEqualTo(0.0);
-    assertThat(grid.getValue(new Int2D(1, 1))).isEqualTo(2.0);
+    assertThat(isNaN(grid.getValue(new Cell(1, 0)))).isTrue();
+    assertThat(grid.getValue(new Cell(0, 0))).isEqualTo(0.0);
+    assertThat(grid.getValue(new Cell(1, 1))).isEqualTo(2.0);
   }
 
   @Test
@@ -68,7 +67,7 @@ class DoubleGridFromAllocatorFactoryTest {
     final DoubleGridFromAllocatorFactory<Scope> factory =
       new DoubleGridFromAllocatorFactory<>(
         scope -> modelGrid,
-        scope -> cell -> cell.x == 1 ? -1.0 : 1.0
+        scope -> cell -> cell.x() == 1 ? -1.0 : 1.0
       );
     assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE)).isInstanceOf(
       IllegalArgumentException.class

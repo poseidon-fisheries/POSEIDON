@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -27,9 +27,9 @@ import com.badlogic.gdx.ai.pfa.Heuristic;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
@@ -43,8 +43,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 public class AStarPathFinder extends AbstractGridPathFinder {
 
   private final GridAdaptor gridAdaptor;
-  private final IndexedAStarPathFinder<Int2D> pathFinder;
-  private final Heuristic<Int2D> heuristic;
+  private final IndexedAStarPathFinder<Cell> pathFinder;
+  private final Heuristic<Cell> heuristic;
 
   /**
    * @param bathymetricGrid    the grid to find water/land cells on
@@ -65,17 +65,17 @@ public class AStarPathFinder extends AbstractGridPathFinder {
       distanceCalculator
     );
     this.pathFinder = new IndexedAStarPathFinder<>(gridAdaptor);
-    this.heuristic = (Int2D a, Int2D b) ->
+    this.heuristic = (Cell a, Cell b) ->
       (float) gridAdaptor.getDistanceCalculator().distanceInKm(a, b);
   }
 
   @Override
-  public Optional<ImmutableList<Int2D>> getPath(
-    final Int2D start,
-    final Int2D end
+  public Optional<ImmutableList<Cell>> getPath(
+    final Cell start,
+    final Cell end
   ) {
     if (!(isNavigable(start) && isNavigable(end))) return Optional.empty();
-    final DefaultGraphPath<Int2D> path = new DefaultGraphPath<>();
+    final DefaultGraphPath<Cell> path = new DefaultGraphPath<>();
     final boolean found = pathFinder.searchNodePath(
       gridAdaptor.intern(start),
       gridAdaptor.intern(end),

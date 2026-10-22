@@ -35,7 +35,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import sim.field.continuous.Continuous2D;
 import sim.util.Double2D;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.FactoryComponent;
@@ -44,14 +43,15 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 class RegulationGridPortrayalFactoryTest {
 
-  private static final Int2D CLOSED_TO_FLEET = new Int2D(0, 0);
-  private static final Int2D CLOSED_TO_ONE_VESSEL = new Int2D(1, 0);
-  private static final Int2D OPEN = new Int2D(2, 0);
+  private static final Cell CLOSED_TO_FLEET = new Cell(0, 0);
+  private static final Cell CLOSED_TO_ONE_VESSEL = new Cell(1, 0);
+  private static final Cell OPEN = new Cell(2, 0);
 
   private final ModelGrid modelGrid = ModelGrid.create(
     3,
@@ -95,7 +95,7 @@ class RegulationGridPortrayalFactoryTest {
     final Function<? super Vessel, Boolean> fleet
   ) {
     final Regulations<ExtendedFishingAction> regulations = action -> {
-      final Int2D cell = modelGrid.toCell(action.getStartCoordinate());
+      final Cell cell = modelGrid.toCell(action.getStartCoordinate());
       final Vessel vessel = action.getAgent();
       return !(
         vessel == trawler ||

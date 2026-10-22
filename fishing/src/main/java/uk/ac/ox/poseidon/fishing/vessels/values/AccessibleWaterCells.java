@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
@@ -35,13 +35,13 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * {@code pathFinder}.
  */
 @RequiredArgsConstructor
-public class AccessibleWaterCells implements Function<Vessel, List<Int2D>> {
+public class AccessibleWaterCells implements Function<Vessel, List<Cell>> {
 
   @NonNull
   private final GridPathFinder pathFinder;
 
   @Override
-  public List<Int2D> apply(final Vessel vessel) {
+  public List<Cell> apply(final Vessel vessel) {
     return pathFinder.getAccessibleWaterCells(vessel.getCell());
   }
 }

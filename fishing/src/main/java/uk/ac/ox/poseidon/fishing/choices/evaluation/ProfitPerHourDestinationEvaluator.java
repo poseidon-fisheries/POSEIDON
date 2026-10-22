@@ -28,18 +28,18 @@ import static com.google.common.base.Preconditions.checkState;
 import lombok.Getter;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * An {@link Evaluator} that scores a destination by the vessel's trip profit
  * (in a fixed currency), divided by the trip's time at sea
  * ({@link Trip#getTotalTimeAtSea()}) in hours.
  */
-public class ProfitPerHourDestinationEvaluator implements Evaluator<Int2D> {
+public class ProfitPerHourDestinationEvaluator implements Evaluator<Cell> {
 
   private final String currencyCode;
 
@@ -53,8 +53,8 @@ public class ProfitPerHourDestinationEvaluator implements Evaluator<Int2D> {
    *         ends
    */
   @Override
-  public Evaluation<Int2D> newEvaluation(
-    final Int2D option,
+  public Evaluation<Cell> newEvaluation(
+    final Cell option,
     final EventManager eventManager
   ) {
     return new ProfitPerHourEvaluation(
@@ -65,18 +65,18 @@ public class ProfitPerHourDestinationEvaluator implements Evaluator<Int2D> {
   }
 
   private static final class ProfitPerHourEvaluation
-    implements Evaluation<Int2D>, Listener<TripEndEvent>
+    implements Evaluation<Cell>, Listener<TripEndEvent>
   {
 
     @Getter
-    private final Int2D option;
+    private final Cell option;
 
     private final EventManager eventManager;
     private final CurrencyUnit currencyUnit;
     private Double result;
 
     private ProfitPerHourEvaluation(
-      final Int2D option,
+      final Cell option,
       final EventManager eventManager,
       final CurrencyUnit currencyUnit
     ) {

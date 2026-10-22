@@ -26,8 +26,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -38,8 +38,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * @param <C> the type of the vessel the coordinate is read off
  */
 @RequiredArgsConstructor
-public class DestinationAtCoordinate<C> implements
-  Function<C, Optional<Int2D>> {
+public class DestinationAtCoordinate<C> implements Function<C, Optional<Cell>> {
 
   @NonNull
   private final ModelGrid modelGrid;
@@ -55,7 +54,7 @@ public class DestinationAtCoordinate<C> implements
    *                                  the grid
    */
   @Override
-  public Optional<Int2D> apply(final C vessel) {
+  public Optional<Cell> apply(final C vessel) {
     final Coordinate coordinate = new Coordinate(
       longitude.apply(vessel),
       latitude.apply(vessel)

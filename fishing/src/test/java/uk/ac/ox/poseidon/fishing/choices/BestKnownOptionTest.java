@@ -31,15 +31,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 class BestKnownOptionTest {
 
-  private static final Int2D BEST = new Int2D(4, 2);
-  private static final Int2D WORSE = new Int2D(1, 1);
-  private static final Int2D FALLBACK = new Int2D(2, 2);
-  private static final Function<Vessel, Int2D> NO_FALLBACK = vessel -> {
+  private static final Cell BEST = new Cell(4, 2);
+  private static final Cell WORSE = new Cell(1, 1);
+  private static final Cell FALLBACK = new Cell(2, 2);
+  private static final Function<Vessel, Cell> NO_FALLBACK = vessel -> {
     throw new AssertionError("The fallback should not be asked for an option.");
   };
 
@@ -48,7 +48,7 @@ class BestKnownOptionTest {
 
   @Test
   void givesTheBestKnownOption() {
-    final BestKnownOption<Int2D> bestKnownOption = new BestKnownOption<>(
+    final BestKnownOption<Cell> bestKnownOption = new BestKnownOption<>(
       new ImmutableOptionValues<>(Map.of(BEST, 2.0, WORSE, 1.0)),
       NO_FALLBACK,
       rng
@@ -59,7 +59,7 @@ class BestKnownOptionTest {
 
   @Test
   void givesTheFallbackForTheVesselWhenNoOptionIsKnown() {
-    final BestKnownOption<Int2D> bestKnownOption = new BestKnownOption<>(
+    final BestKnownOption<Cell> bestKnownOption = new BestKnownOption<>(
       new ImmutableOptionValues<>(Map.of()),
       pickedFor -> pickedFor == vessel ? FALLBACK : null,
       rng
@@ -71,13 +71,13 @@ class BestKnownOptionTest {
   @Test
   void readsTheOptionValuesOfTheVesselGiven() {
     final Vessel otherVessel = mock(Vessel.class);
-    final OptionValues<Int2D> bestValues = new ImmutableOptionValues<>(
+    final OptionValues<Cell> bestValues = new ImmutableOptionValues<>(
       Map.of(BEST, 1.0)
     );
-    final OptionValues<Int2D> worseValues = new ImmutableOptionValues<>(
+    final OptionValues<Cell> worseValues = new ImmutableOptionValues<>(
       Map.of(WORSE, 1.0)
     );
-    final BestKnownOption<Int2D> bestKnownOption = new BestKnownOption<>(
+    final BestKnownOption<Cell> bestKnownOption = new BestKnownOption<>(
       pickedFor -> pickedFor == vessel ? bestValues : worseValues,
       NO_FALLBACK,
       rng
@@ -90,11 +90,11 @@ class BestKnownOptionTest {
   @Test
   void readsTheOptionValuesAnewOnEachCall() {
     @SuppressWarnings("unchecked")
-    final OptionValues<Int2D> optionValues = mock(OptionValues.class);
+    final OptionValues<Cell> optionValues = mock(OptionValues.class);
     when(optionValues.getBestOption(rng))
       .thenReturn(Optional.of(BEST))
       .thenReturn(Optional.of(WORSE));
-    final BestKnownOption<Int2D> bestKnownOption = new BestKnownOption<>(
+    final BestKnownOption<Cell> bestKnownOption = new BestKnownOption<>(
       pickedFor -> optionValues,
       NO_FALLBACK,
       rng

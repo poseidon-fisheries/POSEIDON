@@ -23,11 +23,11 @@
 package uk.ac.ox.poseidon.fishing.choices.evaluation;
 
 import java.util.function.Function;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.fishing.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Factories for scoring a vessel's destination choices and feeding the scores
@@ -64,11 +64,11 @@ public final class Factories {
   public static TripEvaluatorFactory tripEvaluator(
     final Factory<
       ? super VesselComponentScope,
-      ? extends Function<? super Vessel, ? extends MutableOptionValues<Int2D>>
+      ? extends Function<? super Vessel, ? extends MutableOptionValues<Cell>>
     > optionValues,
     final Factory<
       ? super VesselComponentScope,
-      ? extends Evaluator<Int2D>
+      ? extends Evaluator<Cell>
     > evaluationProvider
   ) {
     return new TripEvaluatorFactory(optionValues, evaluationProvider);

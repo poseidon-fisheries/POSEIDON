@@ -35,7 +35,6 @@ import java.util.Map.Entry;
 import org.joda.money.CurrencyUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import tech.tablesaw.api.DateColumn;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
@@ -47,6 +46,7 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategory;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
@@ -195,7 +195,7 @@ class PriceUpdatesFromTableFactoryTest {
     final ModelGrid modelGrid = mock(ModelGrid.class);
     when(modelGrid.getGridWidth()).thenReturn(1);
     when(modelGrid.getGridHeight()).thenReturn(1);
-    return new ImmutableMarketGrid(modelGrid, Map.of(market, new Int2D(0, 0)));
+    return new ImmutableMarketGrid(modelGrid, Map.of(market, new Cell(0, 0)));
   }
 
   @Test

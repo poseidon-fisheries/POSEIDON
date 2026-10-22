@@ -30,10 +30,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Redirects the vessel's current trip to whatever destination
@@ -45,7 +45,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 @RequiredArgsConstructor
 public class ChooseNextDestination extends VesselTask {
 
-  private final @NonNull Function<? super Vessel, Optional<Int2D>> destination;
+  private final @NonNull Function<? super Vessel, Optional<Cell>> destination;
 
   /**
    * @return {@link Status#SUCCEEDED} if a destination was found and the trip

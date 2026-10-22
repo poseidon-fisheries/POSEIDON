@@ -28,11 +28,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 /**
@@ -45,14 +45,14 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class CellValueFactory<S extends Scope>
-  extends RelativeScopeFactory<S, BiFunction<Object, Int2D, Double>>
-  implements MappingFactory<S, Object, Int2D, Double>
+  extends RelativeScopeFactory<S, BiFunction<Object, Cell, Double>>
+  implements MappingFactory<S, Object, Cell, Double>
 {
 
   private final Factory<? super S, ? extends DoubleGrid> grid;
 
   @Override
-  protected BiFunction<Object, Int2D, Double> newInstance(final S scope) {
+  protected BiFunction<Object, Cell, Double> newInstance(final S scope) {
     return new CellValue(grid.get(scope));
   }
 }

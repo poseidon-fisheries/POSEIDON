@@ -30,13 +30,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A {@link VesselScopeFactory} counterpart of {@link RandomPicker}, built via
@@ -48,19 +48,19 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class RandomGridExplorerFactory
-  extends VesselScopeFactory<Function<Vessel, Int2D>>
-  implements ValueFactory<VesselScope, Vessel, Int2D>
+  extends VesselScopeFactory<Function<Vessel, Cell>>
+  implements ValueFactory<VesselScope, Vessel, Cell>
 {
 
   private final ValueFactory<
     ? super VesselScope,
     ? super Vessel,
-    ? extends List<? extends Int2D>
+    ? extends List<? extends Cell>
   > cells;
   private final MappingFactory<
     ? super VesselScope,
     ? super Vessel,
-    ? super Int2D,
+    ? super Cell,
     Boolean
   > cellPredicate;
   private final Factory<
@@ -69,7 +69,7 @@ public class RandomGridExplorerFactory
   > randomNumberGenerator;
 
   @Override
-  protected Function<Vessel, Int2D> newInstance(final VesselScope scope) {
+  protected Function<Vessel, Cell> newInstance(final VesselScope scope) {
     return new RandomPicker<>(
       cells.get(scope),
       cellPredicate.get(scope),

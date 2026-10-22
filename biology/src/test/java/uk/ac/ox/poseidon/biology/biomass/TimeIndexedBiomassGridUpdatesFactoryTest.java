@@ -32,17 +32,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 class TimeIndexedBiomassGridUpdatesFactoryTest {
 
-  private static final Int2D CELL = new Int2D(0, 0);
+  private static final Cell CELL = new Cell(0, 0);
   private static final Species HKE = new Species("HKE", null, "Hake");
   private static final Species ANE = new Species("ANE", null, "Anchovy");
 

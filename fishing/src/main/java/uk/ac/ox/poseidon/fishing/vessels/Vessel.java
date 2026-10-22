@@ -29,7 +29,6 @@ import static lombok.AccessLevel.NONE;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.google.common.collect.ImmutableMap;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -44,7 +43,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -55,6 +53,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.Exit;
 import uk.ac.ox.poseidon.fishing.vessels.accounts.Account;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -217,7 +216,7 @@ public class Vessel implements Oriented2D, HasAttributes {
    * on every route to a fishing option.
    */
   @Getter(NONE)
-  private Int2D homePortCell;
+  private Cell homePortCell;
 
   /** This vessel's running balance, which changes at once, from any call. */
   private final Account account = new Account();
@@ -516,7 +515,7 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /** Points the vessel's heading towards {@code destinationCell}'s centre. */
-  public void setHeadingTowards(final Int2D destinationCell) {
+  public void setHeadingTowards(final Cell destinationCell) {
     setHeadingTowards(getVesselField().getModelGrid().toPoint(destinationCell));
   }
 
@@ -538,12 +537,12 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /** @return the grid cell the vessel currently occupies */
-  public Int2D getCell() {
+  public Cell getCell() {
     return vesselField.getCell(this);
   }
 
   /** Moves the vessel to {@code cell}. */
-  public void setCurrentCell(final Int2D cell) {
+  public void setCurrentCell(final Cell cell) {
     vesselField.setCell(this, cell);
   }
 
@@ -588,11 +587,7 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /** @return the home port's grid cell */
-  @SuppressFBWarnings(
-    value = "EI",
-    justification = "A cell is an Int2D, whose coordinates are final."
-  )
-  public Int2D getHomePortCell() {
+  public Cell getHomePortCell() {
     return homePortCell;
   }
 
@@ -633,7 +628,7 @@ public class Vessel implements Oriented2D, HasAttributes {
    * @param startDateTime when the trip starts
    * @throws IllegalStateException if the vessel is already on a trip
    */
-  void startTrip(final Int2D destination, final LocalDateTime startDateTime) {
+  void startTrip(final Cell destination, final LocalDateTime startDateTime) {
     checkState(currentTrip == null, "Vessel %s is already on a trip.", id);
     this.currentTrip = new Trip(this, destination, startDateTime);
   }

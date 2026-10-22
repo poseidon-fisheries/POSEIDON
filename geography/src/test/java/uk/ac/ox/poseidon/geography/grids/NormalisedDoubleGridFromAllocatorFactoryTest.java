@@ -26,7 +26,6 @@ import static java.lang.Double.isNaN;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.allocators.FilteredAllocator;
@@ -46,7 +45,7 @@ class NormalisedDoubleGridFromAllocatorFactoryTest {
         scope ->
           new FilteredAllocator(
             cell -> 1.0,
-            cell -> !(cell.x == 0 && cell.y == 0)
+            cell -> !(cell.x() == 0 && cell.y() == 0)
           ),
         scope -> 12.0
       );
@@ -54,7 +53,7 @@ class NormalisedDoubleGridFromAllocatorFactoryTest {
     final BaseDoubleGrid grid = factory.get(Scope.GLOBAL_SCOPE);
     double sum = 0;
     int nanCount = 0;
-    for (final Int2D cell : modelGrid.getAllCells().toList()) {
+    for (final Cell cell : modelGrid.getAllCells().toList()) {
       final double value = grid.getValue(cell);
       if (isNaN(value)) {
         nanCount++;
@@ -65,7 +64,7 @@ class NormalisedDoubleGridFromAllocatorFactoryTest {
 
     assertThat(sum).isCloseTo(12.0, within(1e-9));
     assertThat(nanCount).isEqualTo(1);
-    assertThat(grid.getValue(new Int2D(1, 1))).isCloseTo(4.0, within(1e-9));
+    assertThat(grid.getValue(new Cell(1, 1))).isCloseTo(4.0, within(1e-9));
   }
 
   @Test
@@ -78,7 +77,7 @@ class NormalisedDoubleGridFromAllocatorFactoryTest {
     final NormalisedDoubleGridFromAllocatorFactory<Scope> factory =
       new NormalisedDoubleGridFromAllocatorFactory<>(
         _ -> modelGrid,
-        _ -> cell -> cell.x == 1 ? -1.0 : 1.0,
+        _ -> cell -> cell.x() == 1 ? -1.0 : 1.0,
         _ -> 4.0
       );
 

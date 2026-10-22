@@ -31,12 +31,12 @@ import static uk.ac.ox.poseidon.geography.grids.Factories.modelGridFromGridFile;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.core.aggregators.MaxAggregator;
 import uk.ac.ox.poseidon.core.aggregators.MeanAggregator;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 class BathymetricGridFromGridFileFactoryTest {
@@ -71,7 +71,9 @@ class BathymetricGridFromGridFileFactoryTest {
       new double[modelGrid.getGridHeight()][modelGrid.getGridWidth()];
     modelGrid
       .getAllCells()
-      .forEach(cell -> rowsFromNorth[cell.y][cell.x] = grid.getElevation(cell));
+      .forEach(
+        cell -> rowsFromNorth[cell.y()][cell.x()] = grid.getElevation(cell)
+      );
     return rowsFromNorth;
   }
 
@@ -90,7 +92,7 @@ class BathymetricGridFromGridFileFactoryTest {
       { -1, -2, -3 },
       { -4, -5, -6 }
     });
-    assertThat(grid.isWater(new Int2D(0, 0))).isTrue();
+    assertThat(grid.isWater(new Cell(0, 0))).isTrue();
   }
 
   @Test
@@ -101,10 +103,10 @@ class BathymetricGridFromGridFileFactoryTest {
       new Envelope(10, 13, 40, 42)
     );
     assertThat(
-      read(oneCell, new MaxAggregator(), false).getElevation(new Int2D(0, 0))
+      read(oneCell, new MaxAggregator(), false).getElevation(new Cell(0, 0))
     ).isEqualTo(6);
     assertThat(
-      read(oneCell, new MeanAggregator(), false).getElevation(new Int2D(0, 0))
+      read(oneCell, new MeanAggregator(), false).getElevation(new Cell(0, 0))
     ).isEqualTo(3.5);
   }
 

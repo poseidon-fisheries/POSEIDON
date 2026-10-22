@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.fishing.tasks.travel;
 
 import java.time.LocalDateTime;
 import lombok.Value;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * An {@link ExtendedEvent} recording one completed leg of travel between two
@@ -42,7 +42,7 @@ public class TravelEvent implements ExtendedEvent {
   /** When travel ended. */
   LocalDateTime endDateTime;
   /** The cell travel started from. */
-  Int2D origin;
+  Cell origin;
   /** The cell travel ended at. */
-  Int2D destination;
+  Cell destination;
 }

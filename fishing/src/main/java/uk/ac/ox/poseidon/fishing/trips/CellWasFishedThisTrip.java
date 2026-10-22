@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.fishing.trips;
 
 import java.util.function.BiFunction;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -35,11 +35,11 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * Never holds when the vessel is not on a trip.
  */
 public class CellWasFishedThisTrip
-  implements BiFunction<Vessel, Int2D, Boolean>
+  implements BiFunction<Vessel, Cell, Boolean>
 {
 
   @Override
-  public Boolean apply(final Vessel vessel, final Int2D cell) {
+  public Boolean apply(final Vessel vessel, final Cell cell) {
     final Trip currentTrip = vessel.getCurrentTrip();
     if (currentTrip == null) {
       return false;

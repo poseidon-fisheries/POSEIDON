@@ -27,8 +27,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 class CoordinateBasedDistanceCalculatorTest {
@@ -46,7 +46,7 @@ class CoordinateBasedDistanceCalculatorTest {
     modelGrid.getAllCells().forEach(start -> {
       for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
-          final Int2D end = new Int2D(start.x + dx, start.y + dy);
+          final Cell end = new Cell(start.x() + dx, start.y() + dy);
           if (modelGrid.isInGrid(end)) {
             assertThat(calculator.distanceInKm(start, end)).isCloseTo(
               calculator.distanceInKm(
@@ -64,10 +64,10 @@ class CoordinateBasedDistanceCalculatorTest {
   @Test
   void stepsOutOfTheGridAreRefused() {
     assertThatThrownBy(() ->
-      calculator.distanceInKm(new Int2D(3, 2), new Int2D(4, 2))
+      calculator.distanceInKm(new Cell(3, 2), new Cell(4, 2))
     ).isInstanceOf(IllegalArgumentException.class);
     assertThatThrownBy(() ->
-      calculator.distanceInKm(new Int2D(-1, 2), new Int2D(0, 2))
+      calculator.distanceInKm(new Cell(-1, 2), new Cell(0, 2))
     ).isInstanceOf(IllegalArgumentException.class);
   }
 }

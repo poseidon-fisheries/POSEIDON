@@ -26,9 +26,9 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.biomass.CarryingCapacityGrid;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * An {@link Allocator} that weighs a cell by a fixed proportion of its carrying
@@ -48,7 +48,7 @@ public class ProportionOfCarryingCapacityAllocator implements Allocator {
    *                                  {@code [0, 1]}
    */
   @Override
-  public double applyAsDouble(final Int2D cell) {
+  public double applyAsDouble(final Cell cell) {
     final double proportion = proportionSupplier.get();
     checkUnitRange(proportion, "proportion of carrying capacity");
     return proportion * carryingCapacityGrid.getCarryingCapacity(cell);

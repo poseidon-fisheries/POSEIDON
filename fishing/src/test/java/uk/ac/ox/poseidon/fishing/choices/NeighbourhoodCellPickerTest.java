@@ -43,9 +43,9 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
@@ -62,18 +62,16 @@ class NeighbourhoodCellPickerTest {
     4,
     new Envelope(0, 6, 0, 4)
   );
-  private static final Int2D CENTRE = new Int2D(4, 2);
-  private static final Int2D VESSEL_CELL = new Int2D(0, 0);
+  private static final Cell CENTRE = new Cell(4, 2);
+  private static final Cell VESSEL_CELL = new Cell(0, 0);
   private static final int BEYOND_THE_GRID = 10;
 
   private final MersenneTwisterFast rng = new MersenneTwisterFast(0);
   private final Vessel vessel = mock(Vessel.class);
   private final GridPathFinder pathFinder = mock(GridPathFinder.class);
-  private final Map<
-    Entry<Int2D, Integer>,
-    ImmutableList<Int2D>
-  > neighbourhoods = new HashMap<>();
-  private final List<Entry<Int2D, Integer>> searched = new ArrayList<>();
+  private final Map<Entry<Cell, Integer>, ImmutableList<Cell>> neighbourhoods =
+    new HashMap<>();
+  private final List<Entry<Cell, Integer>> searched = new ArrayList<>();
 
   @BeforeEach
   void setUp() {
@@ -81,7 +79,7 @@ class NeighbourhoodCellPickerTest {
     when(pathFinder.getModelGrid()).thenReturn(MODEL_GRID);
     when(pathFinder.getAccessibleWaterNeighbours(any(), anyInt())).thenAnswer(
       invocation -> {
-        final Entry<Int2D, Integer> key = entry(
+        final Entry<Cell, Integer> key = entry(
           invocation.getArgument(0),
           invocation.getArgument(1)
         );
@@ -92,16 +90,16 @@ class NeighbourhoodCellPickerTest {
   }
 
   private void neighbourhood(
-    final Int2D centre,
+    final Cell centre,
     final int radius,
-    final Int2D... cells
+    final Cell... cells
   ) {
     neighbourhoods.put(entry(centre, radius), ImmutableList.copyOf(cells));
   }
 
   private NeighbourhoodCellPicker picker(
-    final Supplier<Int2D> searchCentre,
-    final Predicate<? super Int2D> optionPredicate,
+    final Supplier<Cell> searchCentre,
+    final Predicate<? super Cell> optionPredicate,
     final int neighbourhoodSize,
     final int maximumWidening
   ) {
@@ -116,7 +114,7 @@ class NeighbourhoodCellPickerTest {
   }
 
   private NeighbourhoodCellPicker picker(
-    final Predicate<? super Int2D> optionPredicate,
+    final Predicate<? super Cell> optionPredicate,
     final int neighbourhoodSize,
     final int maximumWidening
   ) {
@@ -129,26 +127,26 @@ class NeighbourhoodCellPickerTest {
   }
 
   private NeighbourhoodCellPicker picker(
-    final Predicate<? super Int2D> optionPredicate
+    final Predicate<? super Cell> optionPredicate
   ) {
     return picker(optionPredicate, 1, BEYOND_THE_GRID);
   }
 
   @Test
   void searchesAroundTheSearchCentre() {
-    neighbourhood(CENTRE, 1, new Int2D(5, 2));
-    neighbourhood(VESSEL_CELL, 1, new Int2D(0, 1));
+    neighbourhood(CENTRE, 1, new Cell(5, 2));
+    neighbourhood(VESSEL_CELL, 1, new Cell(0, 1));
 
-    assertThat(picker(cell -> true).apply(vessel)).isEqualTo(new Int2D(5, 2));
+    assertThat(picker(cell -> true).apply(vessel)).isEqualTo(new Cell(5, 2));
     assertThat(searched).containsExactly(entry(CENTRE, 1));
   }
 
   @Test
   void asksForTheSearchCentreAnewOnEachPick() {
-    final Int2D otherCentre = new Int2D(1, 1);
-    neighbourhood(CENTRE, 1, new Int2D(5, 2));
-    neighbourhood(otherCentre, 1, new Int2D(1, 2));
-    final List<Int2D> centres = new ArrayList<>(List.of(CENTRE, otherCentre));
+    final Cell otherCentre = new Cell(1, 1);
+    neighbourhood(CENTRE, 1, new Cell(5, 2));
+    neighbourhood(otherCentre, 1, new Cell(1, 2));
+    final List<Cell> centres = new ArrayList<>(List.of(CENTRE, otherCentre));
     final NeighbourhoodCellPicker picker = picker(
       centres::removeFirst,
       cell -> true,
@@ -156,58 +154,58 @@ class NeighbourhoodCellPickerTest {
       BEYOND_THE_GRID
     );
 
-    assertThat(picker.apply(vessel)).isEqualTo(new Int2D(5, 2));
-    assertThat(picker.apply(vessel)).isEqualTo(new Int2D(1, 2));
+    assertThat(picker.apply(vessel)).isEqualTo(new Cell(5, 2));
+    assertThat(picker.apply(vessel)).isEqualTo(new Cell(1, 2));
   }
 
   @Test
   void picksForTheVesselGivenAroundItsSearchCentreWithItsPredicate() {
     final Vessel otherVessel = mock(Vessel.class);
-    final Int2D otherCell = new Int2D(1, 1);
+    final Cell otherCell = new Cell(1, 1);
     when(otherVessel.getCell()).thenReturn(otherCell);
-    neighbourhood(VESSEL_CELL, 1, new Int2D(1, 0), new Int2D(0, 1));
-    neighbourhood(otherCell, 1, new Int2D(1, 2), new Int2D(2, 1));
+    neighbourhood(VESSEL_CELL, 1, new Cell(1, 0), new Cell(0, 1));
+    neighbourhood(otherCell, 1, new Cell(1, 2), new Cell(2, 1));
     final NeighbourhoodCellPicker picker = new NeighbourhoodCellPicker(
       pathFinder,
       (pickedFor, cell) ->
-        pickedFor == vessel ? cell.y == 0 : cell.equals(new Int2D(2, 1)),
+        pickedFor == vessel ? cell.y() == 0 : cell.equals(new Cell(2, 1)),
       pickedFor -> 1,
       BEYOND_THE_GRID,
       Vessel::getCell,
       rng
     );
 
-    assertThat(picker.apply(vessel)).isEqualTo(new Int2D(1, 0));
-    assertThat(picker.apply(otherVessel)).isEqualTo(new Int2D(2, 1));
+    assertThat(picker.apply(vessel)).isEqualTo(new Cell(1, 0));
+    assertThat(picker.apply(otherVessel)).isEqualTo(new Cell(2, 1));
   }
 
   @Test
   void searchesAroundTheVesselsCellWhenTheSearchCentreGivesNoCell() {
-    neighbourhood(VESSEL_CELL, 1, new Int2D(1, 0));
+    neighbourhood(VESSEL_CELL, 1, new Cell(1, 0));
 
     assertThat(
       picker(() -> null, cell -> true, 1, BEYOND_THE_GRID).apply(vessel)
-    ).isEqualTo(new Int2D(1, 0));
+    ).isEqualTo(new Cell(1, 0));
     assertThat(searched).containsExactly(entry(VESSEL_CELL, 1));
   }
 
   @Test
   void startsTheSearchAtTheSuppliedRadius() {
-    neighbourhood(CENTRE, 1, new Int2D(5, 2));
-    neighbourhood(CENTRE, 3, new Int2D(1, 2));
+    neighbourhood(CENTRE, 1, new Cell(5, 2));
+    neighbourhood(CENTRE, 3, new Cell(1, 2));
 
     assertThat(
       picker(cell -> true, 3, BEYOND_THE_GRID).apply(vessel)
-    ).isEqualTo(new Int2D(1, 2));
+    ).isEqualTo(new Cell(1, 2));
     assertThat(searched).containsExactly(entry(CENTRE, 3));
   }
 
   @Test
   void growsTheRadiusUntilTheNeighbourhoodHasAccessibleWater() {
-    neighbourhood(CENTRE, 3, new Int2D(1, 2));
-    neighbourhood(CENTRE, 4, new Int2D(0, 2));
+    neighbourhood(CENTRE, 3, new Cell(1, 2));
+    neighbourhood(CENTRE, 4, new Cell(0, 2));
 
-    assertThat(picker(cell -> true).apply(vessel)).isEqualTo(new Int2D(1, 2));
+    assertThat(picker(cell -> true).apply(vessel)).isEqualTo(new Cell(1, 2));
     assertThat(searched).containsExactly(
       entry(CENTRE, 1),
       entry(CENTRE, 2),
@@ -230,14 +228,14 @@ class NeighbourhoodCellPickerTest {
 
   @Test
   void picksOnlyACellPassingThePredicate() {
-    final Int2D passing = new Int2D(5, 3);
+    final Cell passing = new Cell(5, 3);
     neighbourhood(
       CENTRE,
       1,
-      new Int2D(3, 2),
-      new Int2D(5, 2),
+      new Cell(3, 2),
+      new Cell(5, 2),
       passing,
-      new Int2D(3, 3)
+      new Cell(3, 3)
     );
     final NeighbourhoodCellPicker picker = picker(passing::equals);
 
@@ -248,8 +246,8 @@ class NeighbourhoodCellPickerTest {
 
   @Test
   void stopsTestingCellsOnceOnePasses() {
-    neighbourhood(CENTRE, 1, new Int2D(3, 2), new Int2D(5, 2), new Int2D(3, 3));
-    final List<Int2D> tested = new ArrayList<>();
+    neighbourhood(CENTRE, 1, new Cell(3, 2), new Cell(5, 2), new Cell(3, 3));
+    final List<Cell> tested = new ArrayList<>();
 
     picker(cell -> tested.add(cell)).apply(vessel);
 
@@ -258,15 +256,15 @@ class NeighbourhoodCellPickerTest {
 
   @Test
   void picksUniformlyAtRandomAmongTheCandidates() {
-    final ImmutableList<Int2D> candidates = ImmutableList.of(
-      new Int2D(3, 2),
-      new Int2D(5, 2),
-      new Int2D(3, 3),
-      new Int2D(5, 3)
+    final ImmutableList<Cell> candidates = ImmutableList.of(
+      new Cell(3, 2),
+      new Cell(5, 2),
+      new Cell(3, 3),
+      new Cell(5, 3)
     );
-    neighbourhood(CENTRE, 1, candidates.toArray(Int2D[]::new));
+    neighbourhood(CENTRE, 1, candidates.toArray(Cell[]::new));
     final NeighbourhoodCellPicker picker = picker(cell -> true);
-    final Map<Int2D, Integer> counts = new HashMap<>();
+    final Map<Cell, Integer> counts = new HashMap<>();
     final int draws = 10_000;
     for (int i = 0; i < draws; i++) {
       counts.merge(picker.apply(vessel), 1, Integer::sum);
@@ -282,11 +280,11 @@ class NeighbourhoodCellPickerTest {
 
   @Test
   void growsTheRadiusUntilACellPassesThePredicate() {
-    final Int2D near = new Int2D(5, 2);
-    final Int2D far = new Int2D(2, 2);
+    final Cell near = new Cell(5, 2);
+    final Cell far = new Cell(2, 2);
     neighbourhood(CENTRE, 1, near);
     neighbourhood(CENTRE, 2, near, far);
-    neighbourhood(CENTRE, 3, near, far, new Int2D(1, 2));
+    neighbourhood(CENTRE, 3, near, far, new Cell(1, 2));
 
     assertThat(picker(far::equals).apply(vessel)).isEqualTo(far);
     assertThat(searched).containsExactly(entry(CENTRE, 1), entry(CENTRE, 2));
@@ -294,11 +292,11 @@ class NeighbourhoodCellPickerTest {
 
   @Test
   void testsOnlyTheCellsAddedByEachLargerNeighbourhood() {
-    final Int2D near = new Int2D(5, 2);
-    final Int2D far = new Int2D(2, 2);
+    final Cell near = new Cell(5, 2);
+    final Cell far = new Cell(2, 2);
     neighbourhood(CENTRE, 1, near);
     neighbourhood(CENTRE, 2, near, far);
-    final List<Int2D> tested = new ArrayList<>();
+    final List<Cell> tested = new ArrayList<>();
 
     picker(cell -> tested.add(cell) && cell.equals(far)).apply(vessel);
 
@@ -307,13 +305,13 @@ class NeighbourhoodCellPickerTest {
 
   @Test
   void picksAtRandomAmongThePassingCellsOfALargerNeighbourhood() {
-    final Int2D near = new Int2D(5, 2);
-    final Int2D farWest = new Int2D(2, 2);
-    final Int2D farNorth = new Int2D(4, 0);
+    final Cell near = new Cell(5, 2);
+    final Cell farWest = new Cell(2, 2);
+    final Cell farNorth = new Cell(4, 0);
     neighbourhood(CENTRE, 1, near);
     neighbourhood(CENTRE, 2, near, farWest, farNorth);
     final NeighbourhoodCellPicker picker = picker(cell -> !cell.equals(near));
-    final Set<Int2D> picked = new HashSet<>();
+    final Set<Cell> picked = new HashSet<>();
     for (int i = 0; i < 100; i++) {
       picked.add(picker.apply(vessel));
     }
@@ -323,8 +321,8 @@ class NeighbourhoodCellPickerTest {
 
   @Test
   void givesNullWhenNoCellPassesThePredicateWithinTheWholeGrid() {
-    neighbourhood(CENTRE, 1, new Int2D(5, 2));
-    neighbourhood(CENTRE, 6, new Int2D(5, 2), new Int2D(0, 0));
+    neighbourhood(CENTRE, 1, new Cell(5, 2));
+    neighbourhood(CENTRE, 6, new Cell(5, 2), new Cell(0, 0));
 
     assertThat(picker(cell -> false).apply(vessel)).isNull();
     assertThat(searched).containsExactly(
@@ -339,20 +337,20 @@ class NeighbourhoodCellPickerTest {
 
   @Test
   void findsACellAtTheMaximumWidening() {
-    neighbourhood(CENTRE, 3, new Int2D(1, 2));
+    neighbourhood(CENTRE, 3, new Cell(1, 2));
 
     assertThat(picker(cell -> true, 1, 2).apply(vessel)).isEqualTo(
-      new Int2D(1, 2)
+      new Cell(1, 2)
     );
   }
 
   @Test
   void stopsWideningAfterTheMaximumWidening() {
-    neighbourhood(CENTRE, 1, new Int2D(5, 2));
-    neighbourhood(CENTRE, 4, new Int2D(0, 2));
+    neighbourhood(CENTRE, 1, new Cell(5, 2));
+    neighbourhood(CENTRE, 4, new Cell(0, 2));
 
     assertThat(picker(cell -> true, 1, 2).apply(vessel)).isEqualTo(
-      new Int2D(5, 2)
+      new Cell(5, 2)
     );
     assertThat(picker(cell -> false, 1, 2).apply(vessel)).isNull();
     assertThat(searched).containsExactly(
@@ -365,7 +363,7 @@ class NeighbourhoodCellPickerTest {
 
   @Test
   void searchesOnlyTheInitialNeighbourhoodWithoutWidening() {
-    neighbourhood(CENTRE, 2, new Int2D(2, 2));
+    neighbourhood(CENTRE, 2, new Cell(2, 2));
 
     assertThat(picker(cell -> true, 1, 0).apply(vessel)).isNull();
     assertThat(searched).containsExactly(entry(CENTRE, 1));
@@ -373,10 +371,10 @@ class NeighbourhoodCellPickerTest {
 
   @Test
   void doesNotOverflowWithAnUnboundedWidening() {
-    neighbourhood(CENTRE, 4, new Int2D(0, 0));
+    neighbourhood(CENTRE, 4, new Cell(0, 0));
 
     assertThat(
       picker(cell -> true, 1, Integer.MAX_VALUE).apply(vessel)
-    ).isEqualTo(new Int2D(0, 0));
+    ).isEqualTo(new Cell(0, 0));
   }
 }

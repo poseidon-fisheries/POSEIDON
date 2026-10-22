@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimaps;
 import java.util.List;
 import java.util.Map;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
@@ -41,10 +41,12 @@ public class ImmutableMarketGrid extends MarketGrid {
 
   ImmutableMarketGrid(
     final ModelGrid modelGrid,
-    final Map<Market, Int2D> marketCells
+    final Map<Market, Cell> marketCells
   ) {
     super(modelGrid);
-    marketCells.forEach(field::setObjectLocation);
+    marketCells.forEach((market, cell) ->
+      field.setObjectLocation(market, cell.x(), cell.y())
+    );
     this.marketsByPort = Multimaps.index(marketCells.keySet(), Market::getPort);
   }
 

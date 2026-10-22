@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -36,13 +36,13 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndex;
 import uk.ac.ox.poseidon.biology.species.SpeciesIndexedObjects;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A whole-community {@link FisheableGrid}: one {@link BiomassGrid} per species,
@@ -103,7 +103,7 @@ public final class FisheableBiomassGrids
   }
 
   @Override
-  public Fisheable getFisheableCell(final Int2D cell) {
+  public Fisheable getFisheableCell(final Cell cell) {
     return new FisheableCell(cell);
   }
 
@@ -115,7 +115,7 @@ public final class FisheableBiomassGrids
   @RequiredArgsConstructor
   class FisheableCell implements Fisheable {
 
-    private final Int2D cell;
+    private final Cell cell;
 
     @Override
     public Bucket extract(final Bucket fishToExtract) {

@@ -26,10 +26,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -48,7 +48,7 @@ public class FishingEventRecorder extends AbstractListener<FishingEvent> {
   private final ModelGrid modelGrid;
   private final Function<
     ? super FishingEvent,
-    ? extends Memory<Int2D, Bucket>
+    ? extends Memory<Cell, Bucket>
   > memorySelector;
   private final BinaryOperator<Bucket> updateRule;
 
@@ -64,7 +64,7 @@ public class FishingEventRecorder extends AbstractListener<FishingEvent> {
     final ModelGrid modelGrid,
     final Function<
       ? super FishingEvent,
-      ? extends Memory<Int2D, Bucket>
+      ? extends Memory<Cell, Bucket>
     > memorySelector,
     final BinaryOperator<Bucket> updateRule
   ) {

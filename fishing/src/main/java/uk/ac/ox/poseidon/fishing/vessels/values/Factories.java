@@ -25,13 +25,13 @@ package uk.ac.ox.poseidon.fishing.vessels.values;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 
 import org.joda.money.Money;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
@@ -164,7 +164,7 @@ public final class Factories {
    * @see VesselIsAt
    */
   public static <S extends Scope> VesselIsAtFactory<S> vesselIsAt(
-    final ValueFactory<? super S, ? super Vessel, Int2D> cell
+    final ValueFactory<? super S, ? super Vessel, Cell> cell
   ) {
     return new VesselIsAtFactory<>(cell);
   }

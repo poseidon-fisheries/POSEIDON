@@ -33,8 +33,8 @@ import java.util.List;
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Speed;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Measures distance and derived travel duration between two coordinates or
@@ -55,14 +55,14 @@ public interface DistanceCalculator {
    * @return the distance between the centres of {@code start} and
    *         {@code end}, in kilometres
    */
-  double distanceInKm(Int2D start, Int2D end);
+  double distanceInKm(Cell start, Cell end);
 
   /**
    * @param path the cells to travel through in order
    * @return the length of {@code path}, summing the distance of each leg, in
    *         kilometres; zero for a path of a single cell
    */
-  default double distanceInKm(final List<Int2D> path) {
+  default double distanceInKm(final List<Cell> path) {
     double distanceInKm = 0.0;
     for (int i = 0; i < path.size() - 1; i++) {
       distanceInKm += distanceInKm(path.get(i), path.get(i + 1));
@@ -71,10 +71,10 @@ public interface DistanceCalculator {
   }
 
   /**
-   * @return {@link #distanceInKm(Int2D, Int2D)} as a length
+   * @return {@link #distanceInKm(Cell, Cell)} as a length
    *         {@link Quantity}
    */
-  default Quantity<Length> distance(final Int2D start, final Int2D end) {
+  default Quantity<Length> distance(final Cell start, final Cell end) {
     return getQuantity(distanceInKm(start, end), KILO(METRE));
   }
 
@@ -91,8 +91,8 @@ public interface DistanceCalculator {
    *         {@code cruisingSpeed}
    */
   default Duration travelDuration(
-    final Int2D start,
-    final Int2D end,
+    final Cell start,
+    final Cell end,
     final Quantity<Speed> cruisingSpeed
   ) {
     return travelDuration(List.of(start, end), cruisingSpeed);
@@ -103,8 +103,8 @@ public interface DistanceCalculator {
    *         {@code cruisingSpeedInKph}
    */
   default Duration travelDuration(
-    final Int2D start,
-    final Int2D end,
+    final Cell start,
+    final Cell end,
     final double cruisingSpeedInKph
   ) {
     return travelDuration(List.of(start, end), cruisingSpeedInKph);
@@ -120,7 +120,7 @@ public interface DistanceCalculator {
    * @throws IllegalArgumentException if {@code path} is empty
    */
   default Duration travelDuration(
-    final List<Int2D> path,
+    final List<Cell> path,
     final double cruisingSpeedInKph
   ) {
     checkArgument(
@@ -152,7 +152,7 @@ public interface DistanceCalculator {
 
   /** @return the time to travel the full path at {@code cruisingSpeed} */
   default Duration travelDuration(
-    final List<Int2D> path,
+    final List<Cell> path,
     final Quantity<Speed> cruisingSpeed
   ) {
     return travelDuration(

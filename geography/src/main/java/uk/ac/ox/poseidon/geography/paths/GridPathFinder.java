@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -25,27 +25,25 @@ package uk.ac.ox.poseidon.geography.paths;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.collect.ImmutableList;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * A {@link PathFinder} specialized to grid cells ({@link Int2D}). Built via
+ * A {@link PathFinder} specialized to grid cells ({@link Cell}). Built via
  * {@link uk.ac.ox.poseidon.geography.paths.Factories}.
  */
-public interface GridPathFinder extends PathFinder<Int2D> {
+public interface GridPathFinder extends PathFinder<Cell> {
   /**
    * @return whether {@code cell} can be part of a path (water, or a port cell)
    */
-  boolean isNavigable(final Int2D cell);
+  boolean isNavigable(final Cell cell);
 
   /**
    * @param startingCell the cell to search from
    * @return every water cell reachable from {@code startingCell} by an existing
    *         path
    */
-  default ImmutableList<Int2D> getAccessibleWaterCells(
-    final Int2D startingCell
-  ) {
+  default ImmutableList<Cell> getAccessibleWaterCells(final Cell startingCell) {
     return getModelGrid()
       .getAllCells()
       .filter(this::isWater)
@@ -57,10 +55,10 @@ public interface GridPathFinder extends PathFinder<Int2D> {
   ModelGrid getModelGrid();
 
   /** @return whether {@code cell} is water */
-  boolean isWater(final Int2D cell);
+  boolean isWater(final Cell cell);
 
   /** @return whether a path exists between {@code start} and {@code end} */
-  default boolean isAccessible(final Int2D start, final Int2D end) {
+  default boolean isAccessible(final Cell start, final Cell end) {
     return getPath(start, end).isPresent();
   }
 
@@ -71,8 +69,8 @@ public interface GridPathFinder extends PathFinder<Int2D> {
    *         {@code neighbourhoodSize}, that are reachable from it by an
    *         existing path
    */
-  default ImmutableList<Int2D> getAccessibleWaterNeighbours(
-    final Int2D startingCell,
+  default ImmutableList<Cell> getAccessibleWaterNeighbours(
+    final Cell startingCell,
     final int neighbourhoodSize
   ) {
     return getModelGrid()

@@ -25,8 +25,8 @@ package uk.ac.ox.poseidon.geography.predicates;
 import java.util.function.BiFunction;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A yes/no mapping of cells, whatever the context, that delegates to a resolved
@@ -35,13 +35,13 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
  * package.
  */
 @RequiredArgsConstructor
-public class IsActiveWaterCell implements BiFunction<Object, Int2D, Boolean> {
+public class IsActiveWaterCell implements BiFunction<Object, Cell, Boolean> {
 
   @NonNull
   private final BathymetricGrid bathymetricGrid;
 
   @Override
-  public Boolean apply(final Object context, final Int2D cell) {
+  public Boolean apply(final Object context, final Cell cell) {
     return bathymetricGrid.isActiveWater(cell);
   }
 }

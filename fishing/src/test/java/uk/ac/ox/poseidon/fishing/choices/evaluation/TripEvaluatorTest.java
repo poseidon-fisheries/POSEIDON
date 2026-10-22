@@ -35,7 +35,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.fishing.choices.MutableOptionValues;
@@ -43,6 +42,7 @@ import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 class TripEvaluatorTest {
 
@@ -52,11 +52,11 @@ class TripEvaluatorTest {
     final SimpleEventManager tripEventManager = new SimpleEventManager();
     final AtomicReference<EventManager> evaluationEventManager =
       new AtomicReference<>();
-    final Evaluator<Int2D> evaluator = (option, eventManager) -> {
+    final Evaluator<Cell> evaluator = (option, eventManager) -> {
       evaluationEventManager.set(eventManager);
       return new Evaluation<>() {
         @Override
-        public Int2D getOption() {
+        public Cell getOption() {
           return option;
         }
 
@@ -67,7 +67,7 @@ class TripEvaluatorTest {
       };
     };
     final Trip trip = mock(Trip.class);
-    final Int2D destination = new Int2D(1, 2);
+    final Cell destination = new Cell(1, 2);
     when(trip.getDestination()).thenReturn(destination);
     when(trip.getEventManager()).thenReturn(tripEventManager);
 
@@ -84,10 +84,10 @@ class TripEvaluatorTest {
     final Vessel vessel = mock(Vessel.class);
     final StubOptionValues vesselsTable = new StubOptionValues();
     final StubOptionValues otherTable = new StubOptionValues();
-    final Evaluator<Int2D> evaluator = (option, eventManager) ->
+    final Evaluator<Cell> evaluator = (option, eventManager) ->
       new Evaluation<>() {
         @Override
-        public Int2D getOption() {
+        public Cell getOption() {
           return option;
         }
 
@@ -97,7 +97,7 @@ class TripEvaluatorTest {
         }
       };
     final Trip trip = mock(Trip.class);
-    final Int2D destination = new Int2D(1, 2);
+    final Cell destination = new Cell(1, 2);
     when(trip.getVessel()).thenReturn(vessel);
     when(trip.getDestination()).thenReturn(destination);
     when(trip.getEventManager()).thenReturn(new SimpleEventManager());
@@ -118,33 +118,33 @@ class TripEvaluatorTest {
 
   /** Records what it observes, and knows no value. */
   private static final class StubOptionValues
-    implements MutableOptionValues<Int2D>
+    implements MutableOptionValues<Cell>
   {
 
-    private final List<Entry<Int2D, Double>> observations = new ArrayList<>();
+    private final List<Entry<Cell, Double>> observations = new ArrayList<>();
 
     @Override
-    public void observe(final Int2D option, final double value) {
+    public void observe(final Cell option, final double value) {
       observations.add(Map.entry(option, value));
     }
 
     @Override
-    public Optional<Double> getValue(final Int2D option) {
+    public Optional<Double> getValue(final Cell option) {
       return Optional.empty();
     }
 
     @Override
     public void forEachEntry(
-      final ObjectDoubleBiConsumer<? super Int2D> consumer
+      final ObjectDoubleBiConsumer<? super Cell> consumer
     ) {}
 
     @Override
-    public List<Int2D> getBestOptions() {
+    public List<Cell> getBestOptions() {
       return List.of();
     }
 
     @Override
-    public Optional<Int2D> getBestOption(final MersenneTwisterFast rng) {
+    public Optional<Cell> getBestOption(final MersenneTwisterFast rng) {
       return Optional.empty();
     }
 
@@ -154,12 +154,12 @@ class TripEvaluatorTest {
     }
 
     @Override
-    public List<Entry<Int2D, Double>> getBestEntries() {
+    public List<Entry<Cell, Double>> getBestEntries() {
       return List.of();
     }
 
     @Override
-    public Optional<Entry<Int2D, Double>> getBestEntry(
+    public Optional<Entry<Cell, Double>> getBestEntry(
       final MersenneTwisterFast rng
     ) {
       return Optional.empty();

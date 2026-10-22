@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.regulations.predicates.spatial;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.regulations.SpatialAction;
 
@@ -39,7 +39,7 @@ public class ActionCellPredicate
 {
 
   private final ModelGrid modelGrid;
-  private final Predicate<Int2D> cellPredicate;
+  private final Predicate<Cell> cellPredicate;
 
   @Override
   public Boolean apply(final Object context, final SpatialAction<?> action) {

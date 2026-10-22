@@ -28,11 +28,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link VesselIsAt}, built via
@@ -48,7 +48,7 @@ public class VesselIsAtFactory<S extends Scope>
   implements ValueFactory<S, Vessel, Boolean>
 {
 
-  private final ValueFactory<? super S, ? super Vessel, Int2D> cell;
+  private final ValueFactory<? super S, ? super Vessel, Cell> cell;
 
   @Override
   protected Function<Vessel, Boolean> newInstance(final S scope) {

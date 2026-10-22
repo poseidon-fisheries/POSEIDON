@@ -28,12 +28,12 @@ import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
 
 import java.util.Collection;
 import org.locationtech.jts.geom.Geometry;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.predicates.ConditionFactory;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Factories for spatial predicates: testing grid cells or coordinates against
@@ -67,7 +67,7 @@ public final class Factories {
   public static <S extends Scope> ConditionFactory<
     S,
     Object,
-    Int2D,
+    Cell,
     Double
   > inDepthRange(
     final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid,

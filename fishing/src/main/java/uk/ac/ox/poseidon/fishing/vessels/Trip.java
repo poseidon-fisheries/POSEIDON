@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
@@ -40,6 +39,7 @@ import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.accounts.Account;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A single fishing trip: the span between a vessel leaving its current cell
@@ -69,7 +69,7 @@ public class Trip {
 
   private final @NonNull Vessel vessel;
   private final @NonNull EventManager eventManager;
-  private final @NonNull Int2D origin;
+  private final @NonNull Cell origin;
   private final @NonNull LocalDateTime startDateTime;
   private final Account account = new Account();
 
@@ -77,7 +77,7 @@ public class Trip {
   @Getter(NONE)
   private final List<FishingEvent> fishingEvents = new ArrayList<>();
 
-  private @NonNull Int2D destination;
+  private @NonNull Cell destination;
   private LocalDateTime portArrivalDateTime;
   private LocalDateTime endDateTime;
 
@@ -89,7 +89,7 @@ public class Trip {
    */
   Trip(
     final @NonNull Vessel vessel,
-    final @NonNull Int2D destination,
+    final @NonNull Cell destination,
     final @NonNull LocalDateTime startDateTime
   ) {
     this.vessel = vessel;
@@ -111,11 +111,11 @@ public class Trip {
    * @throws IllegalArgumentException if {@code destination} is outside the
    *                                  vessel's grid
    */
-  public void setDestination(final @NonNull Int2D destination) {
+  public void setDestination(final @NonNull Cell destination) {
     this.destination = checkInGrid(destination);
   }
 
-  private Int2D checkInGrid(final Int2D cell) {
+  private Cell checkInGrid(final Cell cell) {
     vessel.getVesselField().getModelGrid().checkIsInGrid(cell);
     return cell;
   }

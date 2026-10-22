@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.FactoryComponent;
@@ -48,6 +47,7 @@ import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.distance.CartesianDistanceCalculator;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
@@ -61,11 +61,11 @@ import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenDates;
  */
 class FishingCellLegalityCheckerTest {
 
-  private static final Int2D PORT = new Int2D(0, 0);
-  private static final Int2D CANDIDATE = new Int2D(2, 0);
-  private static final ImmutableList<Int2D> PATH = ImmutableList.of(
+  private static final Cell PORT = new Cell(0, 0);
+  private static final Cell CANDIDATE = new Cell(2, 0);
+  private static final ImmutableList<Cell> PATH = ImmutableList.of(
     PORT,
-    new Int2D(1, 0),
+    new Cell(1, 0),
     CANDIDATE
   );
   private static final double SPEED_IN_KPH = 10;

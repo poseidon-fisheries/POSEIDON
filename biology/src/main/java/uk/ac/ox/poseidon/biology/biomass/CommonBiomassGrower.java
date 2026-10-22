@@ -27,7 +27,7 @@ import lombok.Data;
 import lombok.NonNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A biomass grower that operates on the total biomass of the grid.
@@ -55,10 +55,10 @@ public class CommonBiomassGrower implements Steppable {
    */
   @Override
   public void step(final SimState simState) {
-    final List<Int2D> habitableCells = carryingCapacityGrid.getHabitableCells();
+    final List<Cell> habitableCells = carryingCapacityGrid.getHabitableCells();
     double currentBiomass = 0;
     double totalCarryingCapacity = 0;
-    for (final Int2D cell : habitableCells) {
+    for (final Cell cell : habitableCells) {
       currentBiomass += biomassGrid.getValue(cell);
       totalCarryingCapacity += carryingCapacityGrid.getCarryingCapacity(cell);
     }

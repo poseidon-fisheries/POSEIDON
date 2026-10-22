@@ -29,7 +29,7 @@ import static java.lang.System.Logger.Level.WARNING;
 import ec.util.MersenneTwisterFast;
 import lombok.RequiredArgsConstructor;
 import sim.util.Bag;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Allocates recruited biomass in randomly-ordered, evenly-sized chunks across
@@ -65,7 +65,7 @@ public class RandomBiomassRecruitmentAllocator
     double biomassRemaining = recruitedBiomassInKg;
     while (biomassRemaining > 0 && !cells.isEmpty()) {
       final int i = rng.nextInt(cells.size());
-      final Int2D selectedCell = (Int2D) cells.get(i);
+      final Cell selectedCell = (Cell) cells.get(i);
       final double currentBiomass = biomassGrid.getValue(selectedCell);
       final double availableCapacity =
         carryingCapacityGrid.getCarryingCapacity(selectedCell) - currentBiomass;

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -42,7 +42,6 @@ import sim.field.grid.Grid2D;
 import sim.field.grid.ObjectGrid2D;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Double2D;
-import sim.util.Int2D;
 import sim.util.IntBag;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
@@ -71,14 +70,14 @@ abstract class AbstractModelGrid implements ModelGrid {
    */
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  protected final Int2D[] allCells;
+  protected final Cell[] allCells;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @Getter(AccessLevel.PRIVATE)
   private final LoadingCache<
-    Entry<Int2D, Integer>,
-    List<Int2D>
+    Entry<Cell, Integer>,
+    List<Cell>
   > mooreNeighbourhoods = Caffeine.newBuilder().build(
     this::computeMooreNeighbourhood
   );
@@ -87,8 +86,8 @@ abstract class AbstractModelGrid implements ModelGrid {
   @EqualsAndHashCode.Exclude
   @Getter(AccessLevel.PRIVATE)
   private final LoadingCache<
-    Entry<Int2D, Integer>,
-    List<Int2D>
+    Entry<Cell, Integer>,
+    List<Cell>
   > activeMooreNeighbourhoods = Caffeine.newBuilder().build(
     this::computeActiveMooreNeighbourhood
   );
@@ -106,7 +105,7 @@ abstract class AbstractModelGrid implements ModelGrid {
     final int gridWidth,
     final int gridHeight,
     final Envelope envelope,
-    final Int2D[] allCells
+    final Cell[] allCells
   ) {
     this.gridWidth = gridWidth;
     this.gridHeight = gridHeight;
@@ -123,37 +122,37 @@ abstract class AbstractModelGrid implements ModelGrid {
    * @throws IllegalArgumentException if {@code gridWidth} or {@code gridHeight}
    *                                  isn't positive
    */
-  protected static Int2D[] makeAllCellsArray(
+  protected static Cell[] makeAllCellsArray(
     final int gridWidth,
     final int gridHeight
   ) {
     checkArgument(gridWidth > 0);
     checkArgument(gridHeight > 0);
     return range(0, gridWidth)
-      .mapToObj(x -> range(0, gridHeight).mapToObj(y -> new Int2D(x, y)))
+      .mapToObj(x -> range(0, gridHeight).mapToObj(y -> new Cell(x, y)))
       .flatMap(identity())
-      .toArray(Int2D[]::new);
+      .toArray(Cell[]::new);
   }
 
   private ObjectGrid2D makeCoordinateGrid() {
     final ObjectGrid2D objectGrid2D = new ObjectGrid2D(gridWidth, gridHeight);
     for (int x = 0; x < gridWidth; x++) {
       for (int y = 0; y < gridHeight; y++) {
-        objectGrid2D.set(x, y, toCoordinate(toPoint(new Int2D(x, y))));
+        objectGrid2D.set(x, y, toCoordinate(toPoint(new Cell(x, y))));
       }
     }
     return objectGrid2D;
   }
 
   @Override
-  public Stream<Int2D> getAllCells() {
+  public Stream<Cell> getAllCells() {
     return Arrays.stream(allCells);
   }
 
   @Override
-  public Coordinate toCoordinate(final Int2D cell) {
+  public Coordinate toCoordinate(final Cell cell) {
     checkArgument(isInGrid(cell), "%s outside of grid", cell);
-    return (Coordinate) coordinatesGrid.get(cell.x, cell.y);
+    return (Coordinate) coordinatesGrid.get(cell.x(), cell.y());
   }
 
   /**
@@ -164,10 +163,10 @@ abstract class AbstractModelGrid implements ModelGrid {
    */
   @Override
   public Double2D toPoint(final Coordinate coordinate) {
-    final double pixelWidth = getEnvelope().getWidth() / gridWidth;
-    final double pixelHeight = getEnvelope().getHeight() / gridHeight;
-    final double x = (coordinate.lon - getEnvelope().getMinX()) / pixelWidth;
-    final double y = (getEnvelope().getMaxY() - coordinate.lat) / pixelHeight;
+    final double x =
+      (coordinate.lon - getEnvelope().getMinX()) / getCellWidth();
+    final double y =
+      (getEnvelope().getMaxY() - coordinate.lat) / getCellHeight();
     return new Double2D(x, y);
   }
 
@@ -176,8 +175,8 @@ abstract class AbstractModelGrid implements ModelGrid {
    * thereafter.
    */
   @Override
-  public List<Int2D> getNeighbours(
-    final Int2D cell,
+  public List<Cell> getNeighbours(
+    final Cell cell,
     @SuppressWarnings("SameParameterValue") final int neighbourhoodSize
   ) {
     return mooreNeighbourhoods.get(entry(cell, neighbourhoodSize));
@@ -188,15 +187,15 @@ abstract class AbstractModelGrid implements ModelGrid {
    * thereafter.
    */
   @Override
-  public List<Int2D> getActiveNeighbours(
-    final Int2D cell,
+  public List<Cell> getActiveNeighbours(
+    final Cell cell,
     @SuppressWarnings("SameParameterValue") final int neighbourhoodSize
   ) {
     return activeMooreNeighbourhoods.get(entry(cell, neighbourhoodSize));
   }
 
-  private List<Int2D> computeActiveMooreNeighbourhood(
-    final Entry<Int2D, Integer> entry
+  private List<Cell> computeActiveMooreNeighbourhood(
+    final Entry<Cell, Integer> entry
   ) {
     return mooreNeighbourhoods
       .get(entry)
@@ -206,17 +205,17 @@ abstract class AbstractModelGrid implements ModelGrid {
   }
 
   @SuppressWarnings("UnstableApiUsage")
-  private List<Int2D> computeMooreNeighbourhood(
-    final Entry<Int2D, Integer> entry
+  private List<Cell> computeMooreNeighbourhood(
+    final Entry<Cell, Integer> entry
   ) {
-    final Int2D cell = entry.getKey();
+    final Cell cell = entry.getKey();
     final int neighbourhoodSize = entry.getValue();
     final IntBag xPositions = new IntBag(8);
     final IntBag yPositions = new IntBag(8);
     // `Grid2D::getMooreLocations` fills the provided bags as a side effect
     new SparseGrid2D(gridWidth, gridHeight).getMooreLocations(
-      cell.x,
-      cell.y,
+      cell.x(),
+      cell.y(),
       neighbourhoodSize,
       Grid2D.BOUNDED,
       false,
@@ -226,10 +225,10 @@ abstract class AbstractModelGrid implements ModelGrid {
     return Streams.zip(
       Arrays.stream(xPositions.toArray()).boxed(),
       Arrays.stream(yPositions.toArray()).boxed(),
-      Int2D::new
+      Cell::new
     ).toList();
   }
 
   @Override
-  public abstract boolean isActive(final Int2D cell);
+  public abstract boolean isActive(final Cell cell);
 }

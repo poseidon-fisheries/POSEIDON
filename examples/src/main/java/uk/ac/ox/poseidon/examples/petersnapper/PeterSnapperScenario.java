@@ -102,7 +102,6 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.function.Supplier;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -110,6 +109,7 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.choices.EpsilonGreedyDestinationFactory;
 import uk.ac.ox.poseidon.fishing.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 /**
@@ -336,7 +336,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     // Each vessel's own table of what its destinations are worth, which its
     // friends read too
-    final VesselComponent<MutableOptionValues<Int2D>> optionValues =
+    final VesselComponent<MutableOptionValues<Cell>> optionValues =
       vesselComponent(exponentialMovingAverageOptionValues(LEARNING_ALPHA));
 
     final var fleet = fleet(vesselField, portGrid, marketGrid);

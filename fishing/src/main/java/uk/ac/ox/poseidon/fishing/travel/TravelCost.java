@@ -30,10 +30,10 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.joda.money.Money;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.choices.ContextualisedValuation;
 import uk.ac.ox.poseidon.fishing.choices.Valuation;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Values the cost of a vessel travelling to fish at a cell: computes the
@@ -44,11 +44,11 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
  * with other valuations of the same shape. Route costs in different currencies
  * cannot be summed.
  */
-public class TravelCost implements Valuation<Int2D, Object> {
+public class TravelCost implements Valuation<Cell, Object> {
 
   private final BiFunction<
     ? super Vessel,
-    ? super Int2D,
+    ? super Cell,
     ? extends Route
   > routeFunction;
   private final List<
@@ -63,7 +63,7 @@ public class TravelCost implements Valuation<Int2D, Object> {
   TravelCost(
     final BiFunction<
       ? super Vessel,
-      ? super Int2D,
+      ? super Cell,
       ? extends Route
     > routeFunction,
     final List<
@@ -85,7 +85,7 @@ public class TravelCost implements Valuation<Int2D, Object> {
    *         are in different currencies.
    */
   @Override
-  public ContextualisedValuation<Int2D, Object> inContextOf(
+  public ContextualisedValuation<Cell, Object> inContextOf(
     final Vessel vessel
   ) {
     final List<Function<? super Route, ? extends Money>> vesselRouteCosts =

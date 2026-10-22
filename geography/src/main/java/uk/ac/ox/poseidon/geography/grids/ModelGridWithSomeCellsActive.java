@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.ToString;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
@@ -41,13 +40,13 @@ class ModelGridWithSomeCellsActive extends AbstractModelGrid {
   // Using ImmutableSet here as it should provide fast lookup _and_ iteration
   @ToString.Exclude
   @Getter
-  private final ImmutableSet<Int2D> activeCells;
+  private final ImmutableSet<Cell> activeCells;
 
   ModelGridWithSomeCellsActive(
     final int gridWidth,
     final int gridHeight,
     final Envelope envelope,
-    final Predicate<Int2D> activePredicate
+    final Predicate<Cell> activePredicate
   ) {
     this(
       gridWidth,
@@ -62,8 +61,8 @@ class ModelGridWithSomeCellsActive extends AbstractModelGrid {
     final int gridWidth,
     final int gridHeight,
     final Envelope envelope,
-    final Int2D[] allCells,
-    final Predicate<Int2D> activePredicate
+    final Cell[] allCells,
+    final Predicate<Cell> activePredicate
   ) {
     this(
       gridWidth,
@@ -78,15 +77,15 @@ class ModelGridWithSomeCellsActive extends AbstractModelGrid {
     final int gridWidth,
     final int gridHeight,
     final Envelope envelope,
-    final Int2D[] allCells,
-    final ImmutableSet<Int2D> activeCells
+    final Cell[] allCells,
+    final ImmutableSet<Cell> activeCells
   ) {
     super(gridWidth, gridHeight, envelope, allCells);
     this.activeCells = activeCells;
   }
 
   @Override
-  public boolean isActive(final Int2D cell) {
+  public boolean isActive(final Cell cell) {
     return activeCells.contains(cell);
   }
 }

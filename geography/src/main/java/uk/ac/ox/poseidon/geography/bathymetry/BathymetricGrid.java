@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.geography.bathymetry;
 
 import java.util.stream.Stream;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 /**
@@ -37,7 +37,7 @@ public interface BathymetricGrid extends DoubleGrid {
    * @return every water cell that is also
    *         {@link uk.ac.ox.poseidon.geography.grids.ModelGrid#isActive}
    */
-  default Stream<Int2D> getActiveWaterCells() {
+  default Stream<Cell> getActiveWaterCells() {
     return getWaterCells().filter(getModelGrid()::isActive);
   }
 
@@ -45,7 +45,7 @@ public interface BathymetricGrid extends DoubleGrid {
    * @return {@code cell}'s active water neighbours, within a neighbourhood size
    *         of 1
    */
-  default Stream<Int2D> getActiveWaterNeighbours(final Int2D cell) {
+  default Stream<Cell> getActiveWaterNeighbours(final Cell cell) {
     return getActiveWaterNeighbours(cell, 1);
   }
 
@@ -53,8 +53,8 @@ public interface BathymetricGrid extends DoubleGrid {
    * @return {@code cell}'s active water neighbours, within the given
    *         neighbourhood size
    */
-  default Stream<Int2D> getActiveWaterNeighbours(
-    final Int2D cell,
+  default Stream<Cell> getActiveWaterNeighbours(
+    final Cell cell,
     final int neighbourhoodSize
   ) {
     return getModelGrid()
@@ -66,7 +66,7 @@ public interface BathymetricGrid extends DoubleGrid {
   /**
    * @return {@code cell}'s water neighbours, within a neighbourhood size of 1
    */
-  default Stream<Int2D> getWaterNeighbours(final Int2D cell) {
+  default Stream<Cell> getWaterNeighbours(final Cell cell) {
     return getWaterNeighbours(cell, 1);
   }
 
@@ -74,8 +74,8 @@ public interface BathymetricGrid extends DoubleGrid {
    * @return {@code cell}'s water neighbours, within the given neighbourhood
    *         size
    */
-  default Stream<Int2D> getWaterNeighbours(
-    final Int2D cell,
+  default Stream<Cell> getWaterNeighbours(
+    final Cell cell,
     final int neighbourhoodSize
   ) {
     return getModelGrid()
@@ -87,15 +87,15 @@ public interface BathymetricGrid extends DoubleGrid {
   /**
    * @return {@code cell}'s land neighbours, within a neighbourhood size of 1
    */
-  default Stream<Int2D> getLandNeighbours(final Int2D cell) {
+  default Stream<Cell> getLandNeighbours(final Cell cell) {
     return getLandNeighbours(cell, 1);
   }
 
   /**
    * @return {@code cell}'s land neighbours, within the given neighbourhood size
    */
-  default Stream<Int2D> getLandNeighbours(
-    final Int2D cell,
+  default Stream<Cell> getLandNeighbours(
+    final Cell cell,
     final int neighbourhoodSize
   ) {
     return getModelGrid()
@@ -108,7 +108,7 @@ public interface BathymetricGrid extends DoubleGrid {
    * @return {@code cell}'s land neighbours that are also active, within a
    *         neighbourhood size of 1
    */
-  default Stream<Int2D> getActiveLandNeighbours(final Int2D cell) {
+  default Stream<Cell> getActiveLandNeighbours(final Cell cell) {
     return getActiveLandNeighbours(cell, 1);
   }
 
@@ -116,8 +116,8 @@ public interface BathymetricGrid extends DoubleGrid {
    * @return {@code cell}'s land neighbours that are also active, within the
    *         given neighbourhood size
    */
-  default Stream<Int2D> getActiveLandNeighbours(
-    final Int2D cell,
+  default Stream<Cell> getActiveLandNeighbours(
+    final Cell cell,
     final int neighbourhoodSize
   ) {
     return getModelGrid()
@@ -127,39 +127,39 @@ public interface BathymetricGrid extends DoubleGrid {
   }
 
   /** @return every water cell in the grid */
-  default Stream<Int2D> getWaterCells() {
+  default Stream<Cell> getWaterCells() {
     return getModelGrid().getAllCells().filter(this::isWater);
   }
 
   /** @return every land cell in the grid */
-  default Stream<Int2D> getLandCells() {
+  default Stream<Cell> getLandCells() {
     return getModelGrid().getAllCells().filter(this::isLand);
   }
 
   /** @return every cell in the grid, land and water */
-  default Stream<Int2D> getAllCells() {
+  default Stream<Cell> getAllCells() {
     return getModelGrid().getAllCells();
   }
 
   /** @return whether {@code cell} is land (not water) */
-  default boolean isLand(final Int2D cell) {
+  default boolean isLand(final Cell cell) {
     return !isWater(cell);
   }
 
   /** @return whether {@code cell}'s elevation is negative */
-  default boolean isWater(final Int2D cell) {
+  default boolean isWater(final Cell cell) {
     return getElevation(cell) < 0;
   }
 
   /**
    * @return {@code cell}'s elevation: negative for water, non-negative for land
    */
-  double getElevation(final Int2D cell);
+  double getElevation(final Cell cell);
 
   /**
-   * @return the negation of {@link #getElevation(Int2D)}, positive for water
+   * @return the negation of {@link #getElevation(Cell)}, positive for water
    */
-  default double getDepth(final Int2D cell) {
+  default double getDepth(final Cell cell) {
     return -getElevation(cell);
   }
 
@@ -167,7 +167,7 @@ public interface BathymetricGrid extends DoubleGrid {
    * @return whether {@code cell} is both water and
    *         {@link uk.ac.ox.poseidon.geography.grids.ModelGrid#isActive}
    */
-  default boolean isActiveWater(final Int2D cell) {
+  default boolean isActiveWater(final Cell cell) {
     return isWater(cell) && getModelGrid().isActive(cell);
   }
 }

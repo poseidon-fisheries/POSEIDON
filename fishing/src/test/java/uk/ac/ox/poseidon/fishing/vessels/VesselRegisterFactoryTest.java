@@ -48,12 +48,12 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -63,7 +63,7 @@ class VesselRegisterFactoryTest {
   private static final String COLUMNS = """
   cfr,name_of_vessel,place_of_registration,event,event_start_date,event_end_date,t1,t2
   """;
-  private static final Int2D P1_CELL = new Int2D(1, 1);
+  private static final Cell P1_CELL = new Cell(1, 1);
 
   private final VesselField vesselField = mock(VesselField.class);
   private final PortGrid portGrid = mock(PortGrid.class);
@@ -97,7 +97,7 @@ class VesselRegisterFactoryTest {
     when(portGrid.getObject("P2")).thenReturn(Optional.of(p2));
     when(portGrid.getObject("P3")).thenReturn(Optional.empty());
     when(portGrid.getCell(p1)).thenReturn(P1_CELL);
-    when(portGrid.getCell(p2)).thenReturn(new Int2D(2, 2));
+    when(portGrid.getCell(p2)).thenReturn(new Cell(2, 2));
   }
 
   private void startSimulation(final String rows) {

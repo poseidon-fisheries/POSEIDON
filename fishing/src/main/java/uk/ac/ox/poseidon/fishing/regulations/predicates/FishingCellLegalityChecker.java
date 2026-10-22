@@ -29,13 +29,13 @@ import java.time.LocalDateTime;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
@@ -54,7 +54,7 @@ import uk.ac.ox.poseidon.regulations.Regulations;
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class FishingCellLegalityChecker
-  implements BiFunction<Vessel, Int2D, Boolean>
+  implements BiFunction<Vessel, Cell, Boolean>
 {
 
   private final VesselComponent<? extends Gear> gear;
@@ -71,7 +71,7 @@ public class FishingCellLegalityChecker
    *         permitted for {@code vessel}
    */
   @Override
-  public Boolean apply(final Vessel vessel, final Int2D fishingCell) {
+  public Boolean apply(final Vessel vessel, final Cell fishingCell) {
     return regulations.isPermitted(makeAction(vessel, fishingCell));
   }
 
@@ -85,7 +85,7 @@ public class FishingCellLegalityChecker
    */
   private ExtendedFishingAction makeAction(
     final Vessel vessel,
-    final Int2D fishingCell
+    final Cell fishingCell
   ) {
     final Duration travelDuration = DistanceCalculator.travelDuration(
       pathLengthCalculator.lengthInKm(vessel.getCell(), fishingCell),

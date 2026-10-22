@@ -35,15 +35,15 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 class AccessibleWaterCellsCacheTest {
 
-  private static final Int2D CELL = new Int2D(1, 1);
-  private static final Int2D OTHER_CELL = new Int2D(2, 1);
-  private static final ImmutableList<Int2D> NEIGHBOURS = ImmutableList.of(
-    new Int2D(0, 1),
-    new Int2D(2, 1)
+  private static final Cell CELL = new Cell(1, 1);
+  private static final Cell OTHER_CELL = new Cell(2, 1);
+  private static final ImmutableList<Cell> NEIGHBOURS = ImmutableList.of(
+    new Cell(0, 1),
+    new Cell(2, 1)
   );
 
   private final AccessibleWaterCellsCache cache =
@@ -68,9 +68,9 @@ class AccessibleWaterCellsCacheTest {
 
   @Test
   void keepsNeighbourhoodsOfDifferentSizesApart() {
-    final ImmutableList<Int2D> larger = ImmutableList.<Int2D>builder()
+    final ImmutableList<Cell> larger = ImmutableList.<Cell>builder()
       .addAll(NEIGHBOURS)
-      .add(new Int2D(3, 1))
+      .add(new Cell(3, 1))
       .build();
     when(pathFinder.getAccessibleWaterNeighbours(CELL, 1)).thenReturn(
       NEIGHBOURS
@@ -135,12 +135,12 @@ class AccessibleWaterCellsCacheTest {
       }
     );
 
-    final CompletableFuture<ImmutableList<Int2D>> first =
+    final CompletableFuture<ImmutableList<Cell>> first =
       CompletableFuture.supplyAsync(() ->
         cache.getAccessibleWaterNeighbours(CELL, 1, pathFinder)
       );
     computing.await();
-    final ImmutableList<Int2D> second = cache.getAccessibleWaterNeighbours(
+    final ImmutableList<Cell> second = cache.getAccessibleWaterNeighbours(
       CELL,
       1,
       otherPathFinder

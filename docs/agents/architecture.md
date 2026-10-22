@@ -187,8 +187,11 @@ therefore never iterates a collection whose order depends on identity hash codes
 - `Collectors.toMap`, `toSet` and `groupingBy` build hash collections: use Guava's
   `toImmutableMap`/`toImmutableSet` or pass an ordered supplier when the result is iterated.
 
-Keys with value equality (`String`, `Species`, `Int2D`, records, `@Value` classes, enums) iterate in
-the same order in every run and are fine. Randomness comes only from the simulation's random
+Keys with value equality (`String`, `Species`, `Cell`, records, `@Value` classes, enums) iterate in
+the same order in every run, so they keep runs reproducible. Results should still not depend on that
+order: it follows the keys' hash codes, which change whenever a key type or its fields do, and a
+change that should leave results alone would then alter them. Where the order matters, use the same
+remedies as above. Randomness comes only from the simulation's random
 number generator. Each example scenario has a test that runs the same seed twice in one JVM and
 compares the results (`PeterSnapperScenarioTest.sameSeedGivesSameLandings`; SURIMI-POSEIDON's
 `ScenarioReproducibilityTest`).

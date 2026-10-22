@@ -33,7 +33,7 @@ import java.util.*;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.util.Double2D;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Moves biomass between neighbouring habitable cells of a single-species grid,
@@ -51,9 +51,9 @@ public class BiomassDiffuser implements Steppable {
 
   private final transient BiomassDiffusionRule biomassDiffusionRule;
 
-  private final List<Int2D> habitableCells;
+  private final List<Cell> habitableCells;
 
-  private final Map<Int2D, List<Int2D>> habitableNeighbours;
+  private final Map<Cell, List<Cell>> habitableNeighbours;
 
   /**
    * @param biomassGrid          the grid diffusion reads from and writes into
@@ -79,7 +79,7 @@ public class BiomassDiffuser implements Steppable {
     this.biomassDiffusionRule = biomassDiffusionRule;
     this.rng = rng;
     this.habitableCells = List.copyOf(carryingCapacityGrid.getHabitableCells());
-    final HashSet<Int2D> habitableCellsSet = new HashSet<>(habitableCells);
+    final HashSet<Cell> habitableCellsSet = new HashSet<>(habitableCells);
     this.habitableNeighbours = habitableCells
       .stream()
       .collect(

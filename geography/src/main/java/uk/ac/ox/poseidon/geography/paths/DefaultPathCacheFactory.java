@@ -27,12 +27,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
@@ -56,7 +56,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
 @SuperBuilder(toBuilder = true)
 public class DefaultPathCacheFactory<S extends Scope> extends RelativeScopeFactory<
   S,
-  PathCache<Int2D>
+  PathCache<Cell>
 > {
 
   private final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
@@ -64,7 +64,7 @@ public class DefaultPathCacheFactory<S extends Scope> extends RelativeScopeFacto
   private final Factory<? super S, ? extends DistanceCalculator> distance;
 
   @Override
-  protected PathCache<Int2D> newInstance(final S scope) {
+  protected PathCache<Cell> newInstance(final S scope) {
     return new DefaultPathCache(bathymetricGrid.get(scope).getModelGrid());
   }
 }

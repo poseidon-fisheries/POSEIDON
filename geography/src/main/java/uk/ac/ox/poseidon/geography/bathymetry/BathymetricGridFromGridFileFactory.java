@@ -35,11 +35,11 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.geotools.api.referencing.operation.MathTransform2D;
 import org.geotools.api.referencing.operation.TransformException;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.CoverageWrapper;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -74,13 +74,13 @@ public class BathymetricGridFromGridFileFactory<S extends Scope> extends Bathyme
   }
 
   @Override
-  protected Map<Int2D, Collection<Double>> readElevationValues(
+  protected Map<Cell, Collection<Double>> readElevationValues(
     final ModelGrid modelGrid,
     final S scope
   ) {
     final File gridFile = path.get(scope).toFile();
     final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
-    final Multimap<Int2D, Double> elevationValues = ArrayListMultimap.create();
+    final Multimap<Cell, Double> elevationValues = ArrayListMultimap.create();
     final MathTransform2D gridToCRS2D = coverageWrapper
       .getCoverage()
       .getGridGeometry()
@@ -91,7 +91,7 @@ public class BathymetricGridFromGridFileFactory<S extends Scope> extends Bathyme
     coverageWrapper.processGrid((x, y, value) -> {
       try {
         gridToCRS2D.transform(new Point2D.Double(x, y), worldPos);
-        final Int2D cell = modelGrid.toCell(Coordinate.fromPoint2D(worldPos));
+        final Cell cell = modelGrid.toCell(Coordinate.fromPoint2D(worldPos));
         final double elevation = isInverted() ? -value : value;
         elevationValues.put(cell, elevation);
       } catch (final TransformException e) {

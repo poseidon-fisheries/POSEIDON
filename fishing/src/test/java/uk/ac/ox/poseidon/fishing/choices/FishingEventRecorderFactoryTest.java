@@ -37,7 +37,6 @@ import static uk.ac.ox.poseidon.fishing.vessels.values.attributes.Factories.stri
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
@@ -51,13 +50,14 @@ import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 class FishingEventRecorderFactoryTest {
 
   private static final Species SPECIES = new Species("A", null, "A");
   private static final Coordinate COORDINATE = new Coordinate(1.5, 41.5);
-  private static final Int2D CELL = new Int2D(3, 4);
+  private static final Cell CELL = new Cell(3, 4);
 
   private final Simulation simulation = mock(Simulation.class);
   private final Vessel vesselA = newVessel();
@@ -70,7 +70,7 @@ class FishingEventRecorderFactoryTest {
     new SimulationScope(simulation),
     vesselB
   );
-  private final KeyedMemoryFactory<String, Int2D, Bucket> keyedMemory =
+  private final KeyedMemoryFactory<String, Cell, Bucket> keyedMemory =
     keyedMemory();
   private final FishingEventRecorderFactory<VesselScope> factory =
     fishingEventRecorder(
@@ -110,11 +110,11 @@ class FishingEventRecorderFactoryTest {
   }
 
   private static final class KgOfSpeciesValuationFactory
-    extends GlobalScopeFactory<Valuation<Int2D, Bucket>>
+    extends GlobalScopeFactory<Valuation<Cell, Bucket>>
   {
 
     @Override
-    protected Valuation<Int2D, Bucket> newInstance(final Scope scope) {
+    protected Valuation<Cell, Bucket> newInstance(final Scope scope) {
       return vessel -> (cell, bucket) -> bucket.getKg(SPECIES);
     }
   }
@@ -131,7 +131,7 @@ class FishingEventRecorderFactoryTest {
 
   @Test
   void recordsInTheMemoryTheVesselsOptionValuesRead() {
-    final MemoryBasedOptionValuesFactory<Int2D, Bucket> optionValues =
+    final MemoryBasedOptionValuesFactory<Cell, Bucket> optionValues =
       memoryBasedOptionValues(
         keyedMemorySelector(keyedMemory, new PurseSeineKeyFactory()),
         new KgOfSpeciesValuationFactory()

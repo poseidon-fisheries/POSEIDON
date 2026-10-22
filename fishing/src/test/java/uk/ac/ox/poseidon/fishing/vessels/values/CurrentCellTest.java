@@ -27,8 +27,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 class CurrentCellTest {
 
@@ -36,12 +36,12 @@ class CurrentCellTest {
   void answersForEachVesselItIsGiven() {
     final Vessel first = mock(Vessel.class);
     final Vessel second = mock(Vessel.class);
-    when(first.getCell()).thenReturn(new Int2D(1, 2));
-    when(second.getCell()).thenReturn(new Int2D(3, 4));
+    when(first.getCell()).thenReturn(new Cell(1, 2));
+    when(second.getCell()).thenReturn(new Cell(3, 4));
 
     final CurrentCell currentCell = new CurrentCell();
 
-    assertThat(currentCell.apply(first)).isEqualTo(new Int2D(1, 2));
-    assertThat(currentCell.apply(second)).isEqualTo(new Int2D(3, 4));
+    assertThat(currentCell.apply(first)).isEqualTo(new Cell(1, 2));
+    assertThat(currentCell.apply(second)).isEqualTo(new Cell(3, 4));
   }
 }

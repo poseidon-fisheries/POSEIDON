@@ -29,11 +29,11 @@ import lombok.*;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.aggregators.Aggregator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -69,7 +69,7 @@ public abstract class BathymetricGridFactory<S extends Scope> extends RelativeSc
   protected BathymetricGrid newInstance(final S scope) {
     final ModelGrid modelGrid = this.modelGrid.get(scope);
     final Aggregator aggregator = this.aggregator.get(scope);
-    final Map<Int2D, Collection<Double>> elevationValues = readElevationValues(
+    final Map<Cell, Collection<Double>> elevationValues = readElevationValues(
       modelGrid,
       scope
     );
@@ -77,9 +77,9 @@ public abstract class BathymetricGridFactory<S extends Scope> extends RelativeSc
     modelGrid
       .getAllCells()
       .forEach(
-        int2D ->
-          array[int2D.x][int2D.y] = aggregator
-            .apply(elevationValues.getOrDefault(int2D, List.of()))
+        cell ->
+          array[cell.x()][cell.y()] = aggregator
+            .apply(elevationValues.getOrDefault(cell, List.of()))
             .orElse(0)
       );
     return new DefaultBathymetricGrid(modelGrid, array);
@@ -92,7 +92,7 @@ public abstract class BathymetricGridFactory<S extends Scope> extends RelativeSc
    *         (subclasses are responsible for applying {@code inverted} to their
    *         own values)
    */
-  protected abstract Map<Int2D, Collection<Double>> readElevationValues(
+  protected abstract Map<Cell, Collection<Double>> readElevationValues(
     ModelGrid modelGrid,
     S scope
   );

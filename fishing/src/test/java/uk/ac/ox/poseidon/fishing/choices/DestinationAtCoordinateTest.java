@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 class DestinationAtCoordinateTest {
@@ -55,10 +55,10 @@ class DestinationAtCoordinateTest {
       latitude
     );
     assertThat(destination.apply(Map.of("lon", 0.5, "lat", 0.5))).isEqualTo(
-      Optional.of(new Int2D(0, 0))
+      Optional.of(new Cell(0, 0))
     );
     assertThat(destination.apply(Map.of("lon", 2.5, "lat", 0.5))).isEqualTo(
-      Optional.of(new Int2D(2, 0))
+      Optional.of(new Cell(2, 0))
     );
   }
 

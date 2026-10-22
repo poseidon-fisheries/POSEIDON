@@ -34,7 +34,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import sim.util.Int2D;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
@@ -44,6 +43,7 @@ import ucar.nc2.write.NetcdfFormatWriter;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.TimeIndexedNetCdfGridReaderFactory;
 
@@ -59,7 +59,7 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
   @TempDir
   private Path tempDir;
 
-  // Aligned so that modelGrid.toCoordinate(Int2D(x, y)) exactly equals
+  // Aligned so that modelGrid.toCoordinate(Cell(x, y)) exactly equals
   // (LONGITUDES[x], LATITUDES[y]) for this 3x2 grid.
   private final ModelGrid modelGrid = ModelGrid.create(
     3,
@@ -115,11 +115,11 @@ class TimeIndexedBiomassGridsFromNetCdfFactoryTest {
 
     // The fixture writes a deliberate fill cell for the first variable
     // (ANE_adult) at time index 0, latitude index 0, longitude index 2.
-    assertThat(grids0.get(0).getValue(new Int2D(2, 0))).isNaN();
-    assertThat(grids0.get(0).getValue(new Int2D(0, 0))).isEqualTo(
+    assertThat(grids0.get(0).getValue(new Cell(2, 0))).isNaN();
+    assertThat(grids0.get(0).getValue(new Cell(0, 0))).isEqualTo(
       expectedValue(0, 0, 0, 0)
     );
-    assertThat(grids0.get(1).getValue(new Int2D(1, 1))).isEqualTo(
+    assertThat(grids0.get(1).getValue(new Cell(1, 1))).isEqualTo(
       expectedValue(1, 0, 1, 1)
     );
   }

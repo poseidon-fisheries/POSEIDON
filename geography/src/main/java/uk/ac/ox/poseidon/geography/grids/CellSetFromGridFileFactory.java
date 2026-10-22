@@ -33,7 +33,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
@@ -60,7 +59,7 @@ import uk.ac.ox.poseidon.geography.Envelope;
 @SuperBuilder(toBuilder = true)
 public class CellSetFromGridFileFactory<S extends Scope> extends RelativeScopeFactory<
   S,
-  ImmutableSet<Int2D>
+  ImmutableSet<Cell>
 > {
 
   /**
@@ -79,17 +78,17 @@ public class CellSetFromGridFileFactory<S extends Scope> extends RelativeScopeFa
    *                                  as {@code modelGrid}
    */
   @Override
-  protected ImmutableSet<Int2D> newInstance(final S scope) {
+  protected ImmutableSet<Cell> newInstance(final S scope) {
     final File gridFile = path.get(scope).toFile();
     if (!gridFile.isFile()) {
       throw new RuntimeException(gridFile + " does not point to a file.");
     }
     final CoverageWrapper coverageWrapper = new CoverageWrapper(gridFile);
     checkSameCells(gridFile, coverageWrapper, modelGrid.get(scope));
-    final ImmutableSet.Builder<Int2D> builder = ImmutableSet.builder();
+    final ImmutableSet.Builder<Cell> builder = ImmutableSet.builder();
     coverageWrapper.processGrid((x, y, value) -> {
       if (value == includedValue) {
-        builder.add(new Int2D(x, y));
+        builder.add(new Cell(x, y));
       }
     });
     return builder.build();

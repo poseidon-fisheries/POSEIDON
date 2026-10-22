@@ -28,7 +28,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -37,12 +37,12 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * {@link Factories#pathCache(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory)}
  * in this package.
  */
-public class DefaultPathCache implements PathCache<Int2D> {
+public class DefaultPathCache implements PathCache<Cell> {
 
   private final ModelGrid modelGrid;
   // Keyed by the two cells' ModelGrid.cellPairKey: object keys cost hashing
   // and comparing two cells on every lookup.
-  private final Cache<Long, Optional<ImmutableList<Int2D>>> memory =
+  private final Cache<Long, Optional<ImmutableList<Cell>>> memory =
     Caffeine.newBuilder().build();
 
   /** @param modelGrid the grid whose cells the cached paths go through */
@@ -64,9 +64,9 @@ public class DefaultPathCache implements PathCache<Int2D> {
    * @throws IllegalArgumentException if either cell is outside the grid
    */
   @Override
-  public Optional<ImmutableList<Int2D>> getPath(
-    final Int2D start,
-    final Int2D end
+  public Optional<ImmutableList<Cell>> getPath(
+    final Cell start,
+    final Cell end
   ) {
     return memory.getIfPresent(modelGrid.cellPairKey(start, end));
   }
@@ -74,9 +74,9 @@ public class DefaultPathCache implements PathCache<Int2D> {
   /** @throws IllegalArgumentException if either cell is outside the grid */
   @Override
   public void putPath(
-    final Int2D start,
-    final Int2D end,
-    final Optional<ImmutableList<Int2D>> path
+    final Cell start,
+    final Cell end,
+    final Optional<ImmutableList<Cell>> path
   ) {
     memory.put(modelGrid.cellPairKey(start, end), path);
   }

@@ -30,7 +30,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import java.util.Map.Entry;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Remembers the accessible water cells from a starting cell, and the accessible
@@ -45,17 +45,17 @@ import sim.util.Int2D;
  */
 public class AccessibleWaterCellsCache {
 
-  private final Interner<ImmutableList<Int2D>> cellListInterner =
+  private final Interner<ImmutableList<Cell>> cellListInterner =
     Interners.newStrongInterner();
-  private final Cache<Int2D, ImmutableList<Int2D>> accessibleCells =
+  private final Cache<Cell, ImmutableList<Cell>> accessibleCells =
     Caffeine.newBuilder().build();
   private final Cache<
-    Entry<Int2D, Integer>,
-    ImmutableList<Int2D>
+    Entry<Cell, Integer>,
+    ImmutableList<Cell>
   > accessibleNeighbours = Caffeine.newBuilder().build();
 
-  ImmutableList<Int2D> getAccessibleWaterCells(
-    final Int2D startingCell,
+  ImmutableList<Cell> getAccessibleWaterCells(
+    final Cell startingCell,
     final GridPathFinder pathFinder
   ) {
     return accessibleCells.get(startingCell, cell ->
@@ -63,8 +63,8 @@ public class AccessibleWaterCellsCache {
     );
   }
 
-  ImmutableList<Int2D> getAccessibleWaterNeighbours(
-    final Int2D startingCell,
+  ImmutableList<Cell> getAccessibleWaterNeighbours(
+    final Cell startingCell,
     final int neighbourhoodSize,
     final GridPathFinder pathFinder
   ) {

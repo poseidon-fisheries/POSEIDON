@@ -30,13 +30,13 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * An {@link ExtendedTripTask} that travels straight (as the crow flies) from
@@ -52,8 +52,8 @@ public class TravelDirectly extends ExtendedTripTask {
   private final DistanceCalculator distanceCalculator;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
   private LocalDateTime startDateTime;
-  private Int2D origin;
-  private Int2D destination;
+  private Cell origin;
+  private Cell destination;
   private double distanceInKm;
 
   /**

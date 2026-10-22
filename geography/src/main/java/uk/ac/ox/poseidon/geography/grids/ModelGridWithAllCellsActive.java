@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
@@ -34,7 +33,7 @@ import uk.ac.ox.poseidon.geography.Envelope;
 class ModelGridWithAllCellsActive extends AbstractModelGrid {
 
   @Getter(lazy = true)
-  private final ImmutableSet<Int2D> activeCells = ImmutableSet.copyOf(allCells);
+  private final ImmutableSet<Cell> activeCells = ImmutableSet.copyOf(allCells);
 
   ModelGridWithAllCellsActive(
     final int gridWidth,
@@ -53,13 +52,13 @@ class ModelGridWithAllCellsActive extends AbstractModelGrid {
     final int gridWidth,
     final int gridHeight,
     final Envelope envelope,
-    final Int2D[] allCells
+    final Cell[] allCells
   ) {
     super(gridWidth, gridHeight, envelope, allCells);
   }
 
   @Override
-  public boolean isActive(final Int2D cell) {
+  public boolean isActive(final Cell cell) {
     return true;
   }
 }

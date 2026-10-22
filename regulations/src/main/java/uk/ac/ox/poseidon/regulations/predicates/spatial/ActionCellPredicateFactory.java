@@ -28,12 +28,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.functions.WithoutContext;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.regulations.SpatialAction;
 
@@ -55,7 +55,7 @@ public class ActionCellPredicateFactory<S extends Scope>
   private final MappingFactory<
     ? super S,
     ? super Void,
-    ? super Int2D,
+    ? super Cell,
     Boolean
   > cellPredicate;
 

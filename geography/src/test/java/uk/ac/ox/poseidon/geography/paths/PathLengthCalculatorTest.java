@@ -35,16 +35,16 @@ import com.google.common.collect.ImmutableList;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 class PathLengthCalculatorTest {
 
-  private final Int2D start = new Int2D(0, 0);
-  private final Int2D waypoint = new Int2D(1, 0);
-  private final Int2D end = new Int2D(1, 1);
+  private final Cell start = new Cell(0, 0);
+  private final Cell waypoint = new Cell(1, 0);
+  private final Cell end = new Cell(1, 1);
   private final GridPathFinder pathFinder = mock(GridPathFinder.class);
   private final DistanceCalculator distanceCalculator = mock(
     DistanceCalculator.class
@@ -58,7 +58,7 @@ class PathLengthCalculatorTest {
       ModelGrid.create(2, 2, new Envelope(0, 2, 0, 2))
     );
     when(
-      distanceCalculator.distanceInKm(any(Int2D.class), any(Int2D.class))
+      distanceCalculator.distanceInKm(any(Cell.class), any(Cell.class))
     ).thenReturn(5.0);
     when(distanceCalculator.distanceInKm(anyList())).thenCallRealMethod();
     when(pathFinder.getPath(start, end)).thenReturn(

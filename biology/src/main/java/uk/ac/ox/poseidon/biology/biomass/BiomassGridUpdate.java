@@ -26,7 +26,7 @@ import java.util.List;
 import lombok.Value;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Fully replaces the contents of each species' live {@link BiomassGrid} in
@@ -43,7 +43,7 @@ public class BiomassGridUpdate implements Steppable {
   public void step(final SimState simState) {
     for (final SpeciesGrid speciesGrid : snapshot) {
       final BiomassGrid targetGrid = target.get(speciesGrid.getSpecies());
-      for (final Int2D cell : targetGrid.getModelGrid().getActiveCells()) {
+      for (final Cell cell : targetGrid.getModelGrid().getActiveCells()) {
         targetGrid.setBiomass(cell, speciesGrid.getValue(cell));
       }
     }

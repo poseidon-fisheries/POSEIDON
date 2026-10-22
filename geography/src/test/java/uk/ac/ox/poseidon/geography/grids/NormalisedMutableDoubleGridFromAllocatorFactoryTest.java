@@ -27,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.allocators.FilteredAllocator;
@@ -47,7 +46,7 @@ class NormalisedMutableDoubleGridFromAllocatorFactoryTest {
         scope ->
           new FilteredAllocator(
             cell -> 2.0,
-            cell -> !(cell.x == 0 && cell.y == 1)
+            cell -> !(cell.x() == 0 && cell.y() == 1)
           ),
         scope -> 12.0
       );
@@ -55,7 +54,7 @@ class NormalisedMutableDoubleGridFromAllocatorFactoryTest {
     final MutableDoubleGrid grid = factory.get(Scope.GLOBAL_SCOPE);
     double sum = 0;
     int nanCount = 0;
-    for (final Int2D cell : modelGrid.getAllCells().toList()) {
+    for (final Cell cell : modelGrid.getAllCells().toList()) {
       final double value = grid.getValue(cell);
       if (isNaN(value)) {
         nanCount++;
@@ -66,6 +65,6 @@ class NormalisedMutableDoubleGridFromAllocatorFactoryTest {
 
     assertThat(sum).isCloseTo(12.0, within(1e-9));
     assertThat(nanCount).isEqualTo(1);
-    assertThat(grid.getValue(new Int2D(1, 1))).isCloseTo(4.0, within(1e-9));
+    assertThat(grid.getValue(new Cell(1, 1))).isCloseTo(4.0, within(1e-9));
   }
 }

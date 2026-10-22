@@ -25,9 +25,9 @@ package uk.ac.ox.poseidon.biology.biomass;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.MutableGrid;
 
@@ -61,7 +61,7 @@ class ImmutableBiomassGridTest {
     );
     values[0][0] = 999.0;
 
-    assertThat(grid.getValue(new Int2D(0, 0))).isEqualTo(1.0);
+    assertThat(grid.getValue(new Cell(0, 0))).isEqualTo(1.0);
     assertThat(grid.getSpecies()).isEqualTo(COD);
   }
 }

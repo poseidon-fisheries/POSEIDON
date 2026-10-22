@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.fishing.travel;
 import com.google.common.collect.ImmutableList;
 import java.util.function.Function;
 import org.joda.money.Money;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
@@ -35,6 +34,7 @@ import uk.ac.ox.poseidon.core.functions.ValueAsMappingFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 
 /**
@@ -89,7 +89,7 @@ public final class Factories {
     final MappingFactory<
       ? super S,
       ? super Vessel,
-      ? super Int2D,
+      ? super Cell,
       ? extends Route
     > routeFunction,
     final ValueFactory<

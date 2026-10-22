@@ -29,12 +29,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
@@ -47,14 +47,14 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class AccessibleWaterCellsFactory<S extends Scope>
-  extends RelativeScopeFactory<S, Function<Vessel, List<Int2D>>>
-  implements ValueFactory<S, Vessel, List<Int2D>>
+  extends RelativeScopeFactory<S, Function<Vessel, List<Cell>>>
+  implements ValueFactory<S, Vessel, List<Cell>>
 {
 
   private final Factory<? super S, ? extends GridPathFinder> pathFinder;
 
   @Override
-  protected Function<Vessel, List<Int2D>> newInstance(final S scope) {
+  protected Function<Vessel, List<Cell>> newInstance(final S scope) {
     return new AccessibleWaterCells(pathFinder.get(scope));
   }
 }

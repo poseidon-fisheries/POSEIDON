@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.geography.paths;
 
 import com.google.common.collect.ImmutableList;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * {@link uk.ac.ox.poseidon.geography.paths.Factories}.
  */
 public class FallbackGridPathfinder
-  extends FallbackPathfinder<Int2D>
+  extends FallbackPathfinder<Cell>
   implements GridPathFinder
 {
 
@@ -61,25 +61,23 @@ public class FallbackGridPathfinder
   }
 
   @Override
-  public boolean isWater(final Int2D cell) {
+  public boolean isWater(final Cell cell) {
     return canonicalPathFinder.isWater(cell);
   }
 
   @Override
-  public boolean isNavigable(final Int2D cell) {
+  public boolean isNavigable(final Cell cell) {
     return canonicalPathFinder.isNavigable(cell);
   }
 
   @Override
-  public ImmutableList<Int2D> getAccessibleWaterCells(
-    final Int2D startingCell
-  ) {
+  public ImmutableList<Cell> getAccessibleWaterCells(final Cell startingCell) {
     return canonicalPathFinder.getAccessibleWaterCells(startingCell);
   }
 
   @Override
-  public ImmutableList<Int2D> getAccessibleWaterNeighbours(
-    final Int2D startingCell,
+  public ImmutableList<Cell> getAccessibleWaterNeighbours(
+    final Cell startingCell,
     final int neighbourhoodSize
   ) {
     return canonicalPathFinder.getAccessibleWaterNeighbours(

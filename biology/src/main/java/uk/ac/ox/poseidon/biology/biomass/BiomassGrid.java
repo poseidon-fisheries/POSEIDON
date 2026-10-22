@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,8 +23,8 @@
 package uk.ac.ox.poseidon.biology.biomass;
 
 import sim.field.grid.DoubleGrid2D;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.FisheableGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.MutableGrid;
 
 /**
@@ -36,15 +36,15 @@ public interface BiomassGrid
   extends SpeciesGrid, MutableGrid<DoubleGrid2D>, FisheableGrid
 {
   /** @return the biomass at {@code cell} */
-  default Biomass getBiomass(final Int2D cell) {
+  default Biomass getBiomass(final Cell cell) {
     return Biomass.ofKg(getValue(cell));
   }
 
   /** Sets the biomass at {@code cell} to {@code biomass}. */
-  default void setBiomass(final Int2D cell, final Biomass biomass) {
+  default void setBiomass(final Cell cell, final Biomass biomass) {
     setBiomass(cell, biomass.asKg());
   }
 
   /** Sets the biomass at {@code cell}, in kilograms, to {@code value}. */
-  void setBiomass(final Int2D cell, final double value);
+  void setBiomass(final Cell cell, final double value);
 }

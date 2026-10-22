@@ -23,22 +23,22 @@
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
 import java.util.function.Function;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Provides a vessel's current trip's destination cell, or {@code null} if it
  * has no current trip.
  */
-public class CurrentTripDestinationCell implements Function<Vessel, Int2D> {
+public class CurrentTripDestinationCell implements Function<Vessel, Cell> {
 
   /**
    * @return the current trip's destination, or {@code null} if there is no
    *         current trip
    */
   @Override
-  public Int2D apply(final Vessel vessel) {
+  public Cell apply(final Vessel vessel) {
     final Trip trip = vessel.getCurrentTrip();
     return trip != null ? trip.getDestination() : null;
   }

@@ -29,12 +29,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -57,7 +57,7 @@ public class FishingEventRecorderFactory<S extends Scope> extends RelativeScopeF
   private final Factory<? super S, ? extends ModelGrid> modelGrid;
   private final Factory<
     ? super S,
-    ? extends Function<? super FishingEvent, ? extends Memory<Int2D, Bucket>>
+    ? extends Function<? super FishingEvent, ? extends Memory<Cell, Bucket>>
   > memorySelector;
   private final Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule;
 

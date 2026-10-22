@@ -29,18 +29,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 class DefaultBiomassGridExtractTest {
 
   private static final double EPSILON = 1e-9;
 
-  private static final Int2D CELL = new Int2D(0, 0);
+  private static final Cell CELL = new Cell(0, 0);
   private static final Species SPECIES = new Species("COD", null, "Cod");
   private static final Species OTHER_SPECIES = new Species(
     "HAD",

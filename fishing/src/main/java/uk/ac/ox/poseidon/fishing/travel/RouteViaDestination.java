@@ -25,11 +25,11 @@ package uk.ac.ox.poseidon.fishing.travel;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.function.BiFunction;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 
 /**
@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
  * the round trip). The vessel's cell, home port and cruising speed are read at
  * each call.
  */
-public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
+public class RouteViaDestination implements BiFunction<Vessel, Cell, Route> {
 
   private final VesselComponent<? extends Engine> engine;
   private final PathLengthCalculator pathLengthCalculator;
@@ -64,7 +64,7 @@ public class RouteViaDestination implements BiFunction<Vessel, Int2D, Route> {
    * @throws IllegalArgumentException if either leg has no path
    */
   @Override
-  public Route apply(final Vessel vessel, final Int2D destination) {
+  public Route apply(final Vessel vessel, final Cell destination) {
     final double distanceInKm =
       pathLengthCalculator.lengthInKm(vessel.getCell(), destination) +
       pathLengthCalculator.lengthInKm(destination, vessel.getHomePortCell());

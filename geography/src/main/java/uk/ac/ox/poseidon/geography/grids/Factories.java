@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.geography.grids;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.function.Supplier;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.allocators.Allocator;
@@ -99,7 +98,7 @@ public final class Factories {
    */
   public static <S extends Scope> ModelGridWithActiveCellsFactory<S> modelGridWithActiveCells(
     final Factory<? super S, ? extends ModelGrid> modelGrid,
-    final Factory<? super S, ? extends Collection<Int2D>> activeCells
+    final Factory<? super S, ? extends Collection<Cell>> activeCells
   ) {
     return new ModelGridWithActiveCellsFactory<>(modelGrid, activeCells);
   }

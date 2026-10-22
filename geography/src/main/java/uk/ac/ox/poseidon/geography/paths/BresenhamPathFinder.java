@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -27,8 +27,8 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
@@ -55,20 +55,20 @@ public class BresenhamPathFinder extends AbstractGridPathFinder {
   }
 
   @Override
-  public Optional<ImmutableList<Int2D>> getPath(
-    final Int2D start,
-    final Int2D end
+  public Optional<ImmutableList<Cell>> getPath(
+    final Cell start,
+    final Cell end
   ) {
     if (!(isNavigable(start) && isNavigable(end))) return Optional.empty();
     final Array<GridPoint2> linePoints = new Bresenham2().line(
-      start.x,
-      start.y,
-      end.x,
-      end.y
+      start.x(),
+      start.y(),
+      end.x(),
+      end.y()
     );
-    final ImmutableList.Builder<Int2D> pathBuilder = ImmutableList.builder();
+    final ImmutableList.Builder<Cell> pathBuilder = ImmutableList.builder();
     for (final GridPoint2 point : linePoints) {
-      final Int2D cell = new Int2D(point.x, point.y);
+      final Cell cell = new Cell(point.x, point.y);
       // break early if we bump into land
       if (!isNavigable(cell)) return Optional.empty();
       pathBuilder.add(cell);

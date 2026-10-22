@@ -24,8 +24,8 @@ package uk.ac.ox.poseidon.fishing.vessels.values;
 
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Holds for a vessel currently at the cell {@code cell} returns for it,
@@ -34,11 +34,11 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 @RequiredArgsConstructor
 public class VesselIsAt implements Function<Vessel, Boolean> {
 
-  private final Function<? super Vessel, Int2D> cell;
+  private final Function<? super Vessel, Cell> cell;
 
   @Override
   public Boolean apply(final Vessel vessel) {
-    final Int2D cell = this.cell.apply(vessel);
+    final Cell cell = this.cell.apply(vessel);
     return cell != null && cell.equals(vessel.getCell());
   }
 }

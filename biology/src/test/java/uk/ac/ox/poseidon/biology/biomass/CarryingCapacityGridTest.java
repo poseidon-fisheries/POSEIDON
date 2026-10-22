@@ -28,9 +28,9 @@ import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.grids.BaseDoubleGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFactory;
 
@@ -62,14 +62,14 @@ class CarryingCapacityGridTest {
       .getModelGrid()
       .getAllCells()
       .forEach(cell ->
-        assertEquals(cell.y == 2 ? 1 : 0, grid.getCarryingCapacity(cell))
+        assertEquals(cell.y() == 2 ? 1 : 0, grid.getCarryingCapacity(cell))
       );
   }
 
   @Test
   void getHabitableCells() {
     assertEquals(
-      Set.of(new Int2D(0, 2), new Int2D(1, 2), new Int2D(2, 2)),
+      Set.of(new Cell(0, 2), new Cell(1, 2), new Cell(2, 2)),
       new HashSet<>(grid.getHabitableCells())
     );
   }

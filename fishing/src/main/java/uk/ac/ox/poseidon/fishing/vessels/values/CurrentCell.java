@@ -23,14 +23,14 @@
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
 import java.util.function.Function;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /** Provides a vessel's current cell. */
-public class CurrentCell implements Function<Vessel, Int2D> {
+public class CurrentCell implements Function<Vessel, Cell> {
 
   @Override
-  public Int2D apply(final Vessel vessel) {
+  public Cell apply(final Vessel vessel) {
     return vessel.getCell();
   }
 }

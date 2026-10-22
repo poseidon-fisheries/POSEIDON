@@ -26,8 +26,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import it.unimi.dsi.fastutil.longs.Long2DoubleMap;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * How far apart two cells are by sea: the length of the path its path finder
@@ -76,7 +76,7 @@ public class PathLengthCalculator {
    *                                  {@code end}, or if either cell is
    *                                  outside the path finder's grid
    */
-  public double lengthInKm(final Int2D start, final Int2D end) {
+  public double lengthInKm(final Cell start, final Cell end) {
     return lengthsInKm.computeIfAbsent(
       pathFinder.getModelGrid().cellPairKey(start, end),
       _ ->

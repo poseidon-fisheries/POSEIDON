@@ -30,12 +30,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A {@link VesselComponentScopeFactory} counterpart of {@link EpsilonGreedyChooser},
@@ -47,8 +47,8 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class EpsilonGreedyDestinationFactory
-  extends VesselComponentScopeFactory<Function<Vessel, Optional<Int2D>>>
-  implements ValueFactory<VesselComponentScope, Vessel, Optional<Int2D>>
+  extends VesselComponentScopeFactory<Function<Vessel, Optional<Cell>>>
+  implements ValueFactory<VesselComponentScope, Vessel, Optional<Cell>>
 {
 
   private final ValueFactory<
@@ -59,12 +59,12 @@ public class EpsilonGreedyDestinationFactory
   private final ValueFactory<
     ? super VesselComponentScope,
     ? super Vessel,
-    ? extends Int2D
+    ? extends Cell
   > explorer;
   private final ValueFactory<
     ? super VesselComponentScope,
     ? super Vessel,
-    ? extends Int2D
+    ? extends Cell
   > exploiter;
   private final Factory<
     ? super VesselComponentScope,
@@ -76,7 +76,7 @@ public class EpsilonGreedyDestinationFactory
    *         explorer and exploiter
    */
   @Override
-  protected Function<Vessel, Optional<Int2D>> newInstance(
+  protected Function<Vessel, Optional<Cell>> newInstance(
     final VesselComponentScope scope
   ) {
     return new EpsilonGreedyChooser<>(

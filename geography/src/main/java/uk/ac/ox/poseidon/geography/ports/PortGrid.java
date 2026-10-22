@@ -26,9 +26,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.util.Optional;
 import java.util.stream.Stream;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -43,16 +43,16 @@ public interface PortGrid extends Iterable<Port> {
   Stream<Port> getPorts();
 
   /** @return the cell {@code port} is placed on */
-  Int2D getCell(Port port);
+  Cell getCell(Port port);
 
   /** @return the ports placed on {@code cell}, usually at most one */
-  Stream<Port> getObjectsAt(Int2D cell);
+  Stream<Port> getObjectsAt(Cell cell);
 
   /** @return whether any port is placed on {@code cell} */
-  boolean anyObjectsAt(Int2D cell);
+  boolean anyObjectsAt(Cell cell);
 
   /** @return the number of ports placed on {@code cell} */
-  int numObjectsAt(Int2D cell);
+  int numObjectsAt(Cell cell);
 
   /** @return the port with the given code, if one exists on this grid */
   Optional<Port> getObject(String id);
@@ -61,7 +61,7 @@ public interface PortGrid extends Iterable<Port> {
    * @throws IllegalStateException if {@code cell} isn't land, or has no active
    *                               water cell adjacent to it
    */
-  default void validateCell(final Int2D cell) {
+  default void validateCell(final Cell cell) {
     final Coordinate coordinate = getModelGrid().toCoordinate(cell);
     checkState(
       getBathymetricGrid().isLand(cell),

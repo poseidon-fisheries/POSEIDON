@@ -26,7 +26,6 @@ import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTim
 
 import com.badlogic.gdx.ai.btree.Task;
 import java.util.Optional;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -38,6 +37,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 /**
@@ -79,7 +79,7 @@ public final class Factories {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      Optional<Int2D>
+      Optional<Cell>
     > initialDestination,
     final Factory<
       ? super VesselComponentScope,
@@ -122,7 +122,7 @@ public final class Factories {
     final VesselComponent<? extends FuelTank> fuelTank,
     final Factory<
       ? super VesselComponentScope,
-      ? extends PathFinder<Int2D>
+      ? extends PathFinder<Cell>
     > pathFinder,
     final Factory<
       ? super VesselComponentScope,
@@ -131,7 +131,7 @@ public final class Factories {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      Int2D
+      Cell
     > destination,
     final ValueFactory<
       ? super VesselComponentScope,

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
 
@@ -40,10 +39,10 @@ class BaseDoubleGridTest {
 
   @Test
   void getValue() {
-    assertEquals(1.0, grid.getValue(new Int2D(0, 0)));
-    assertEquals(2.0, grid.getValue(new Int2D(0, 1)));
-    assertEquals(4.0, grid.getValue(new Int2D(1, 0)));
-    assertEquals(9.0, grid.getValue(new Int2D(2, 2)));
+    assertEquals(1.0, grid.getValue(new Cell(0, 0)));
+    assertEquals(2.0, grid.getValue(new Cell(0, 1)));
+    assertEquals(4.0, grid.getValue(new Cell(1, 0)));
+    assertEquals(9.0, grid.getValue(new Cell(2, 2)));
   }
 
   @Test

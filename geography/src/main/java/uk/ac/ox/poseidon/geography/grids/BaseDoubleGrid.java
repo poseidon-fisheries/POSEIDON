@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.geography.grids;
 
 import sim.field.grid.DoubleGrid2D;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
 
 /**
@@ -112,8 +111,8 @@ public class BaseDoubleGrid
   }
 
   @Override
-  public double getValue(final Int2D cell) {
-    return field.get(cell.x, cell.y);
+  public double getValue(final Cell cell) {
+    return field.get(cell.x(), cell.y());
   }
 
   @Override

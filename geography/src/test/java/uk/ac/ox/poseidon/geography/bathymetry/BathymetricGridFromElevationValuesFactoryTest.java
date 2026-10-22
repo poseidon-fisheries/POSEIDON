@@ -29,8 +29,8 @@ import static uk.ac.ox.poseidon.geography.bathymetry.Factories.bathymetricGridFr
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGridFactory;
 
 class BathymetricGridFromElevationValuesFactoryTest {
@@ -67,10 +67,10 @@ class BathymetricGridFromElevationValuesFactoryTest {
     final BathymetricGrid bathymetricGrid = factory(
       List.of(0.0, 1.0, 2.0, 3.0)
     ).get(Scope.GLOBAL_SCOPE);
-    assertEquals(0.0, bathymetricGrid.getElevation(new Int2D(0, 0)));
-    assertEquals(1.0, bathymetricGrid.getElevation(new Int2D(1, 0)));
-    assertEquals(2.0, bathymetricGrid.getElevation(new Int2D(0, 1)));
-    assertEquals(3.0, bathymetricGrid.getElevation(new Int2D(1, 1)));
+    assertEquals(0.0, bathymetricGrid.getElevation(new Cell(0, 0)));
+    assertEquals(1.0, bathymetricGrid.getElevation(new Cell(1, 0)));
+    assertEquals(2.0, bathymetricGrid.getElevation(new Cell(0, 1)));
+    assertEquals(3.0, bathymetricGrid.getElevation(new Cell(1, 1)));
   }
 
   private static BathymetricGridFromElevationValuesFactory<Scope> factory(

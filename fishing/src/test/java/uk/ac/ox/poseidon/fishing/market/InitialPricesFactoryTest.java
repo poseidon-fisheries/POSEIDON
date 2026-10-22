@@ -37,7 +37,6 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -45,6 +44,7 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategory;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
@@ -86,7 +86,7 @@ class InitialPricesFactoryTest {
     when(modelGrid.getGridHeight()).thenReturn(1);
     final MarketGrid marketGrid = new ImmutableMarketGrid(
       modelGrid,
-      Map.of(m1, new Int2D(0, 0), m2, new Int2D(1, 0))
+      Map.of(m1, new Cell(0, 0), m2, new Cell(1, 0))
     );
 
     final List<MarketPrice> applied = initialPrices(

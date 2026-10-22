@@ -30,7 +30,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -41,6 +40,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
@@ -54,8 +54,8 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class FishingCellLegalityCheckerFactory<S extends Scope>
-  extends RelativeScopeFactory<S, BiFunction<Vessel, Int2D, Boolean>>
-  implements MappingFactory<S, Vessel, Int2D, Boolean>
+  extends RelativeScopeFactory<S, BiFunction<Vessel, Cell, Boolean>>
+  implements MappingFactory<S, Vessel, Cell, Boolean>
 {
 
   private final VesselComponent<? extends Gear> gear;
@@ -78,7 +78,7 @@ public class FishingCellLegalityCheckerFactory<S extends Scope>
   > currentDateTime;
 
   @Override
-  protected BiFunction<Vessel, Int2D, Boolean> newInstance(final S scope) {
+  protected BiFunction<Vessel, Cell, Boolean> newInstance(final S scope) {
     return new FishingCellLegalityChecker(
       gear,
       engine,

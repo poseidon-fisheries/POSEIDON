@@ -48,7 +48,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.engine.SimState;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.Sale;
@@ -57,6 +56,7 @@ import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -368,11 +368,11 @@ class VesselTest {
       portGrid,
       behaviour(scope -> behaviour)
     );
-    when(vesselField.getCell(vessel)).thenReturn(new Int2D(0, 0));
-    when(portGrid.anyObjectsAt(new Int2D(0, 0))).thenReturn(true);
+    when(vesselField.getCell(vessel)).thenReturn(new Cell(0, 0));
+    when(portGrid.anyObjectsAt(new Cell(0, 0))).thenReturn(true);
 
     assertNull(vessel.getPreviousTrip());
-    vessel.startTrip(new Int2D(1, 0), START);
+    vessel.startTrip(new Cell(1, 0), START);
     final Trip trip = vessel.getCurrentTrip();
     vessel.arriveInPort(START.plusHours(8));
     vessel.endTrip(START.plusHours(9));

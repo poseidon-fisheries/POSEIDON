@@ -30,7 +30,6 @@ import static uk.ac.ox.poseidon.geography.paths.Factories.pathCache;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -38,6 +37,7 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -60,8 +60,8 @@ class DefaultPathCacheFactoryTest {
       object(mock(DistanceCalculator.class))
     );
 
-    final PathCache<Int2D> first = factory.get(new SimulationScope(simulation));
-    final PathCache<Int2D> second = factory.get(
+    final PathCache<Cell> first = factory.get(new SimulationScope(simulation));
+    final PathCache<Cell> second = factory.get(
       new SimulationScope(otherSimulation)
     );
 
@@ -76,8 +76,8 @@ class DefaultPathCacheFactoryTest {
       object(mock(DistanceCalculator.class))
     );
 
-    final PathCache<Int2D> first = factory.get(new SimulationScope(simulation));
-    final PathCache<Int2D> second = factory.get(
+    final PathCache<Cell> first = factory.get(new SimulationScope(simulation));
+    final PathCache<Cell> second = factory.get(
       new SimulationScope(otherSimulation)
     );
 

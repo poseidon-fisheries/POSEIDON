@@ -40,7 +40,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.engine.SimState;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
@@ -49,12 +48,13 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 class VesselSpecificationTest {
 
-  private static final Int2D PORT_CELL = new Int2D(1, 2);
+  private static final Cell PORT_CELL = new Cell(1, 2);
 
   private final TemporalSchedule schedule = new TemporalSchedule(
     LocalDateTime.of(2000, 1, 1, 0, 0)

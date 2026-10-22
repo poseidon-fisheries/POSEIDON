@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
@@ -47,17 +47,17 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * unbounded search would test every water cell of the grid.
  */
 @RequiredArgsConstructor(access = PACKAGE)
-public class NeighbourhoodCellPicker implements Function<Vessel, Int2D> {
+public class NeighbourhoodCellPicker implements Function<Vessel, Cell> {
 
   private final GridPathFinder pathFinder;
   private final BiFunction<
     ? super Vessel,
-    ? super Int2D,
+    ? super Cell,
     Boolean
   > optionPredicate;
   private final Function<? super Vessel, Integer> neighbourhoodSize;
   private final int maximumWidening;
-  private final Function<? super Vessel, ? extends Int2D> searchCentre;
+  private final Function<? super Vessel, ? extends Cell> searchCentre;
   private final MersenneTwisterFast rng;
 
   /**
@@ -68,7 +68,7 @@ public class NeighbourhoodCellPicker implements Function<Vessel, Int2D> {
    *         searched
    */
   @Override
-  public Int2D apply(final Vessel vessel) {
+  public Cell apply(final Vessel vessel) {
     final int initialNeighbourhoodSize = neighbourhoodSize.apply(vessel);
     final int gridExtent = max(
       pathFinder.getModelGrid().getGridWidth(),
@@ -77,25 +77,25 @@ public class NeighbourhoodCellPicker implements Function<Vessel, Int2D> {
     final int maxNeighbourhoodSize =
       initialNeighbourhoodSize +
       min(maximumWidening, gridExtent - initialNeighbourhoodSize);
-    final Int2D suppliedCentre = searchCentre.apply(vessel);
-    final Int2D centre =
+    final Cell suppliedCentre = searchCentre.apply(vessel);
+    final Cell centre =
       suppliedCentre != null ? suppliedCentre : vessel.getCell();
     for (
       int neighbourhoodSize = initialNeighbourhoodSize;
       neighbourhoodSize <= maxNeighbourhoodSize;
       neighbourhoodSize++
     ) {
-      final List<Int2D> neighbours = pathFinder.getAccessibleWaterNeighbours(
+      final List<Cell> neighbours = pathFinder.getAccessibleWaterNeighbours(
         centre,
         neighbourhoodSize
       );
       // Every cell of the previous neighbourhood has already failed the
       // predicate
-      final List<Int2D> candidates =
+      final List<Cell> candidates =
         neighbourhoodSize == initialNeighbourhoodSize
           ? neighbours
           : ring(neighbours, centre, neighbourhoodSize);
-      final Int2D picked = shuffledStream(candidates, rng)
+      final Cell picked = shuffledStream(candidates, rng)
         .filter(cell -> optionPredicate.apply(vessel, cell))
         .findFirst()
         .orElse(null);
@@ -110,15 +110,16 @@ public class NeighbourhoodCellPicker implements Function<Vessel, Int2D> {
    * @return the cells of {@code neighbours} exactly {@code size} cells away
    *         from the centre
    */
-  private static List<Int2D> ring(
-    final List<Int2D> neighbours,
-    final Int2D centre,
+  private static List<Cell> ring(
+    final List<Cell> neighbours,
+    final Cell centre,
     final int size
   ) {
     return neighbours
       .stream()
       .filter(
-        cell -> max(abs(cell.x - centre.x), abs(cell.y - centre.y)) == size
+        cell ->
+          max(abs(cell.x() - centre.x()), abs(cell.y() - centre.y())) == size
       )
       .toList();
   }

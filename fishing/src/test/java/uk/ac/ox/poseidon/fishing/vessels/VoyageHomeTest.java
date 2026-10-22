@@ -44,7 +44,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.engine.SimState;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
@@ -53,6 +52,7 @@ import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -69,7 +69,7 @@ class VoyageHomeTest {
   private final SimState simState = new SimState(0, schedule) {};
   private final VesselField vesselField = mock(VesselField.class);
   private final PortGrid portGrid = mock(PortGrid.class);
-  private final Map<Vessel, Int2D> cells = new HashMap<>();
+  private final Map<Vessel, Cell> cells = new HashMap<>();
   private final Fleet fleet = new Fleet(
     schedule,
     new SimpleEventManager(),
@@ -132,9 +132,9 @@ class VoyageHomeTest {
 
   @BeforeEach
   void setUp() {
-    port("P1", new Int2D(1, 1));
-    port("P2", new Int2D(2, 2));
-    port("P3", new Int2D(3, 3));
+    port("P1", new Cell(1, 1));
+    port("P2", new Cell(2, 2));
+    port("P3", new Cell(3, 3));
     when(vesselField.setCell(any(), any())).thenAnswer(invocation -> {
       cells.put(invocation.getArgument(0), invocation.getArgument(1));
       return true;
@@ -146,7 +146,7 @@ class VoyageHomeTest {
     schedule.scheduleRepeating(_ -> {}, 0, 1.0);
   }
 
-  private void port(final String code, final Int2D cell) {
+  private void port(final String code, final Cell cell) {
     final Port port = mock(Port.class);
     when(port.getCode()).thenReturn(code);
     when(portGrid.getObject(code)).thenReturn(Optional.of(port));

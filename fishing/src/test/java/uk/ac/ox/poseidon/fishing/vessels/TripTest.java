@@ -34,7 +34,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
@@ -42,18 +41,19 @@ import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingOutcome;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 class TripTest {
 
   private static final LocalDateTime START = LocalDateTime.of(2026, 1, 1, 6, 0);
 
-  private static Vessel newVessel(final Int2D cell, final ModelGrid modelGrid) {
+  private static Vessel newVessel(final Cell cell, final ModelGrid modelGrid) {
     return newVessel(cell, modelGrid, mock(EventManager.class));
   }
 
   private static Vessel newVessel(
-    final Int2D cell,
+    final Cell cell,
     final ModelGrid modelGrid,
     final EventManager vesselEventManager
   ) {
@@ -71,11 +71,11 @@ class TripTest {
     final ModelGrid modelGrid = mock(ModelGrid.class);
     doThrow(new IllegalArgumentException("outside grid"))
       .when(modelGrid)
-      .checkIsInGrid(any(Int2D.class));
-    final Vessel vessel = newVessel(new Int2D(0, 0), modelGrid);
+      .checkIsInGrid(any(Cell.class));
+    final Vessel vessel = newVessel(new Cell(0, 0), modelGrid);
 
     assertThatThrownBy(() ->
-      new Trip(vessel, new Int2D(5, 5), START)
+      new Trip(vessel, new Cell(5, 5), START)
     ).isInstanceOf(IllegalArgumentException.class);
   }
 
@@ -84,14 +84,14 @@ class TripTest {
     // ModelGrid mock's checkIsInGrid no-ops by default, so construction
     // succeeds.
     final ModelGrid modelGrid = mock(ModelGrid.class);
-    final Vessel vessel = newVessel(new Int2D(0, 0), modelGrid);
-    final Trip trip = new Trip(vessel, new Int2D(1, 1), START);
+    final Vessel vessel = newVessel(new Cell(0, 0), modelGrid);
+    final Trip trip = new Trip(vessel, new Cell(1, 1), START);
 
     doThrow(new IllegalArgumentException("outside grid"))
       .when(modelGrid)
-      .checkIsInGrid(any(Int2D.class));
+      .checkIsInGrid(any(Cell.class));
 
-    assertThatThrownBy(() -> trip.setDestination(new Int2D(9, 9))).isInstanceOf(
+    assertThatThrownBy(() -> trip.setDestination(new Cell(9, 9))).isInstanceOf(
       IllegalArgumentException.class
     );
   }
@@ -99,9 +99,9 @@ class TripTest {
   @Test
   void setDestinationToTripOriginResetsToOrigin() {
     final ModelGrid modelGrid = mock(ModelGrid.class);
-    final Int2D origin = new Int2D(2, 2);
+    final Cell origin = new Cell(2, 2);
     final Vessel vessel = newVessel(origin, modelGrid);
-    final Trip trip = new Trip(vessel, new Int2D(3, 3), START);
+    final Trip trip = new Trip(vessel, new Cell(3, 3), START);
 
     trip.setDestinationToTripOrigin();
 
@@ -111,8 +111,8 @@ class TripTest {
   @Test
   void recordsFishingEventsBroadcastOnItsEventManagerInOrder() {
     final Trip trip = new Trip(
-      newVessel(new Int2D(0, 0), mock(ModelGrid.class)),
-      new Int2D(1, 1),
+      newVessel(new Cell(0, 0), mock(ModelGrid.class)),
+      new Cell(1, 1),
       START
     );
     final FishingEvent first = newFishingEvent();
@@ -128,8 +128,8 @@ class TripTest {
   void recordsAFishingEventBeforeVesselListenersReceiveIt() {
     final EventManager vesselEventManager = new SimpleEventManager();
     final Trip trip = new Trip(
-      newVessel(new Int2D(0, 0), mock(ModelGrid.class), vesselEventManager),
-      new Int2D(1, 1),
+      newVessel(new Cell(0, 0), mock(ModelGrid.class), vesselEventManager),
+      new Cell(1, 1),
       START
     );
     final List<List<FishingEvent>> recordedWhenReceived = new ArrayList<>();
@@ -148,8 +148,8 @@ class TripTest {
   @Test
   void fishingEventsCannotBeModifiedFromOutside() {
     final Trip trip = new Trip(
-      newVessel(new Int2D(0, 0), mock(ModelGrid.class)),
-      new Int2D(1, 1),
+      newVessel(new Cell(0, 0), mock(ModelGrid.class)),
+      new Cell(1, 1),
       START
     );
 
@@ -246,9 +246,9 @@ class TripTest {
 
   /** A trip starting in port at {@link #START}. */
   private static Trip newTrip() {
-    final Vessel vessel = newVessel(new Int2D(0, 0), mock(ModelGrid.class));
+    final Vessel vessel = newVessel(new Cell(0, 0), mock(ModelGrid.class));
     when(vessel.isAtPort()).thenReturn(true);
-    return new Trip(vessel, new Int2D(1, 1), START);
+    return new Trip(vessel, new Cell(1, 1), START);
   }
 
   private static FishingEvent newFishingEvent() {

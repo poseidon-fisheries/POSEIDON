@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,8 +23,8 @@
 package uk.ac.ox.poseidon.geography.paths;
 
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -40,12 +40,12 @@ abstract class AbstractGridPathFinder implements GridPathFinder {
   private final PortGrid portGrid;
 
   @Override
-  public boolean isNavigable(final Int2D cell) {
+  public boolean isNavigable(final Cell cell) {
     return isWater(cell) || portGrid.anyObjectsAt(cell);
   }
 
   @Override
-  public boolean isWater(final Int2D cell) {
+  public boolean isWater(final Cell cell) {
     return bathymetricGrid.isWater(cell);
   }
 

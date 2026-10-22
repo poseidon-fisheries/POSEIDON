@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import sim.util.Double2D;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
@@ -49,20 +48,20 @@ class ModelGridTest {
   void getActiveNeighbours() {
     assertEquals(
       Set.of(
-        new Int2D(4, 4),
-        new Int2D(4, 5),
-        new Int2D(4, 6),
-        new Int2D(5, 4),
-        new Int2D(6, 6),
-        new Int2D(5, 6),
-        new Int2D(6, 4),
-        new Int2D(6, 5)
+        new Cell(4, 4),
+        new Cell(4, 5),
+        new Cell(4, 6),
+        new Cell(5, 4),
+        new Cell(6, 6),
+        new Cell(5, 6),
+        new Cell(6, 4),
+        new Cell(6, 5)
       ),
-      Set.copyOf(modelGrid.getActiveNeighbours(new Int2D(5, 5)))
+      Set.copyOf(modelGrid.getActiveNeighbours(new Cell(5, 5)))
     );
     assertEquals(
-      Set.of(new Int2D(0, 1), new Int2D(1, 0), new Int2D(1, 1)),
-      Set.copyOf(modelGrid.getActiveNeighbours(new Int2D(0, 0)))
+      Set.of(new Cell(0, 1), new Cell(1, 0), new Cell(1, 1)),
+      Set.copyOf(modelGrid.getActiveNeighbours(new Cell(0, 0)))
     );
   }
 
@@ -70,11 +69,11 @@ class ModelGridTest {
   void cellToCoordinate() {
     assertEquals(
       new Coordinate(-4.5, 4.5),
-      modelGrid.toCoordinate(new Int2D(0, 0))
+      modelGrid.toCoordinate(new Cell(0, 0))
     );
     assertEquals(
       new Coordinate(4.5, -4.5),
-      modelGrid.toCoordinate(new Int2D(9, 9))
+      modelGrid.toCoordinate(new Cell(9, 9))
     );
   }
 
@@ -102,10 +101,10 @@ class ModelGridTest {
 
   @Test
   void coordinateToCell() {
-    assertEquals(new Int2D(0, 0), modelGrid.toCell(new Coordinate(-5, 5)));
-    assertEquals(new Int2D(0, 0), modelGrid.toCell(new Coordinate(-4.5, 4.5)));
-    assertEquals(new Int2D(9, 9), modelGrid.toCell(new Coordinate(4.5, -4.5)));
-    assertEquals(new Int2D(10, 10), modelGrid.toCell(new Coordinate(5, -5)));
+    assertEquals(new Cell(0, 0), modelGrid.toCell(new Coordinate(-5, 5)));
+    assertEquals(new Cell(0, 0), modelGrid.toCell(new Coordinate(-4.5, 4.5)));
+    assertEquals(new Cell(9, 9), modelGrid.toCell(new Coordinate(4.5, -4.5)));
+    assertEquals(new Cell(10, 10), modelGrid.toCell(new Coordinate(5, -5)));
   }
 
   @Test
@@ -152,7 +151,7 @@ class ModelGridTest {
       final Double2D xy = modelGrid.toPoint(coordinate);
       assertEquals(
         coordinate,
-        modelGrid.toCoordinate(new Int2D((int) xy.x, (int) xy.y)),
+        modelGrid.toCoordinate(new Cell((int) xy.x, (int) xy.y)),
         coordinate.toString()
       );
     });
@@ -161,7 +160,7 @@ class ModelGridTest {
   @Test
   void everyOrderedPairOfCellsHasItsOwnKey() {
     final ModelGrid grid = ModelGrid.create(3, 2, new Envelope(0, 3, 0, 2));
-    final List<Int2D> cells = grid.getAllCells().toList();
+    final List<Cell> cells = grid.getAllCells().toList();
     final Set<Long> keys = cells
       .stream()
       .flatMap(start -> cells.stream().map(end -> grid.cellPairKey(start, end)))
@@ -171,8 +170,8 @@ class ModelGridTest {
 
   @Test
   void aCellOutsideTheGridHasNoPairKey() {
-    final Int2D inside = new Int2D(0, 0);
-    final Int2D outside = new Int2D(10, 0);
+    final Cell inside = new Cell(0, 0);
+    final Cell outside = new Cell(10, 0);
     assertThrows(IllegalArgumentException.class, () ->
       modelGrid.cellPairKey(inside, outside)
     );

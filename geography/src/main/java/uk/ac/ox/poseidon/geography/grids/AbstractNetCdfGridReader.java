@@ -26,7 +26,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import sim.util.Int2D;
 import ucar.ma2.Array;
 import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Attribute;
@@ -126,7 +125,7 @@ public abstract class AbstractNetCdfGridReader implements AutoCloseable {
     for (int lonIndex = 0; lonIndex < longitudes.length; lonIndex++) {
       for (int latIndex = 0; latIndex < latitudes.length; latIndex++) {
         final Coordinate expected = modelGrid.toCoordinate(
-          new Int2D(lonIndex, latIndex)
+          new Cell(lonIndex, latIndex)
         );
         checkState(
           Math.abs(expected.lon - longitudes[lonIndex]) < COORDINATE_EPSILON &&

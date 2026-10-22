@@ -28,13 +28,13 @@ import java.time.Duration;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.fuel.FuelStation;
 import uk.ac.ox.poseidon.fishing.fuel.FuelStationGrid;
 import uk.ac.ox.poseidon.fishing.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * An {@link ExtendedTripTask} that fills the vessel's tank at a fuel station in
@@ -75,7 +75,7 @@ public class Refuel extends ExtendedTripTask {
    * @throws IllegalStateException if there is not exactly one
    */
   private FuelStation fuelStationFor(final Vessel vessel) {
-    final Int2D cell = vessel.getCell();
+    final Cell cell = vessel.getCell();
     final List<FuelStation> fuelStations = fuelStationGrid
       .getObjectsAt(cell)
       .filter(

@@ -91,7 +91,7 @@ public class BiomassGridsFactory
           .getAllCells()
           .forEach(
             cell ->
-              biomassArray[cell.x][cell.y] = biomassAllocator.applyAsDouble(
+              biomassArray[cell.x()][cell.y()] = biomassAllocator.applyAsDouble(
                 cell
               )
           );

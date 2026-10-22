@@ -35,8 +35,8 @@ import org.joda.money.CurrencyMismatchException;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 class TravelCostTest {
 
@@ -44,14 +44,14 @@ class TravelCostTest {
   private static final CurrencyUnit USD = CurrencyUnit.of("USD");
 
   private final Vessel vessel = mock(Vessel.class);
-  private final Int2D cell = new Int2D(3, 2);
+  private final Cell cell = new Cell(3, 2);
   private final AtomicInteger routesComputed = new AtomicInteger();
-  private final BiFunction<Vessel, Int2D, Route> routeFunction = (
+  private final BiFunction<Vessel, Cell, Route> routeFunction = (
     sailedBy,
     destination
   ) -> {
     routesComputed.incrementAndGet();
-    return new Route(destination.x, Duration.ofHours(destination.y));
+    return new Route(destination.x(), Duration.ofHours(destination.y()));
   };
   private final Function<Vessel, Function<Route, Money>> distanceCost =
     chargedTo -> route -> Money.of(EUR, route.getDistanceInKm());
@@ -136,7 +136,7 @@ class TravelCostTest {
 
     final var travelCostForVessel = travelCost.inContextOf(vessel);
     travelCostForVessel.valueOf(cell, null);
-    travelCostForVessel.valueOf(new Int2D(1, 1), null);
+    travelCostForVessel.valueOf(new Cell(1, 1), null);
 
     assertThat(timesGivenTheVessel).hasValue(1);
   }

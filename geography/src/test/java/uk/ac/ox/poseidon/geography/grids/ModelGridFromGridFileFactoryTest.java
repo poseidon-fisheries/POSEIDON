@@ -30,7 +30,6 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
@@ -57,16 +56,16 @@ class ModelGridFromGridFileFactoryTest {
 
   @Test
   void cellsAreCentredOnTheFilesCellsWithRowZeroInTheNorth() {
-    assertThat(modelGrid.toCoordinate(new Int2D(0, 0))).isEqualTo(
+    assertThat(modelGrid.toCoordinate(new Cell(0, 0))).isEqualTo(
       new Coordinate(10.5, 41.5)
     );
-    assertThat(modelGrid.toCoordinate(new Int2D(2, 0))).isEqualTo(
+    assertThat(modelGrid.toCoordinate(new Cell(2, 0))).isEqualTo(
       new Coordinate(12.5, 41.5)
     );
-    assertThat(modelGrid.toCoordinate(new Int2D(0, 1))).isEqualTo(
+    assertThat(modelGrid.toCoordinate(new Cell(0, 1))).isEqualTo(
       new Coordinate(10.5, 40.5)
     );
-    assertThat(modelGrid.toCoordinate(new Int2D(2, 1))).isEqualTo(
+    assertThat(modelGrid.toCoordinate(new Cell(2, 1))).isEqualTo(
       new Coordinate(12.5, 40.5)
     );
   }
@@ -74,13 +73,13 @@ class ModelGridFromGridFileFactoryTest {
   @Test
   void coordinatesAreInTheCellCoveringThem() {
     assertThat(modelGrid.toCell(new Coordinate(10.1, 41.9))).isEqualTo(
-      new Int2D(0, 0)
+      new Cell(0, 0)
     );
     assertThat(modelGrid.toCell(new Coordinate(12.9, 40.1))).isEqualTo(
-      new Int2D(2, 1)
+      new Cell(2, 1)
     );
     assertThat(modelGrid.toCell(new Coordinate(11.5, 40.5))).isEqualTo(
-      new Int2D(1, 1)
+      new Cell(1, 1)
     );
   }
 
@@ -93,10 +92,10 @@ class ModelGridFromGridFileFactoryTest {
   @Test
   void coordinatesJustWestOrNorthOfTheGridAreOutsideIt() {
     assertThat(modelGrid.toCell(new Coordinate(9.9, 41.5))).isEqualTo(
-      new Int2D(-1, 0)
+      new Cell(-1, 0)
     );
     assertThat(modelGrid.toCell(new Coordinate(10.5, 42.1))).isEqualTo(
-      new Int2D(0, -1)
+      new Cell(0, -1)
     );
     assertThat(modelGrid.isInGrid(new Coordinate(9.9, 41.5))).isFalse();
     assertThat(modelGrid.isInGrid(new Coordinate(10.5, 42.1))).isFalse();

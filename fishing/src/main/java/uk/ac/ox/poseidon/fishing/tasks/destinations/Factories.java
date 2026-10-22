@@ -23,10 +23,10 @@
 package uk.ac.ox.poseidon.fishing.tasks.destinations;
 
 import java.util.Optional;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /** Factories for tasks that pick a destination and redirect the current trip to it. */
 public final class Factories {
@@ -43,7 +43,7 @@ public final class Factories {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      Optional<Int2D>
+      Optional<Cell>
     > destination
   ) {
     return new ChooseNextDestinationFactory(destination);

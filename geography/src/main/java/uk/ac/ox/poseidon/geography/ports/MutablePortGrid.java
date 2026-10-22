@@ -29,9 +29,9 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.NonNull;
 import sim.field.grid.SparseGrid2D;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.MutableGrid;
 
 /**
@@ -53,11 +53,10 @@ public class MutablePortGrid
       source.getModelGrid().getGridWidth(),
       source.getModelGrid().getGridHeight()
     );
-    source
-      .getPorts()
-      .forEach(port ->
-        sparseGrid2D.setObjectLocation(port, source.getCell(port))
-      );
+    source.getPorts().forEach(port -> {
+      final Cell cell = source.getCell(port);
+      sparseGrid2D.setObjectLocation(port, cell.x(), cell.y());
+    });
     return new MutablePortGrid(source.getBathymetricGrid(), sparseGrid2D);
   }
 
@@ -96,7 +95,7 @@ public class MutablePortGrid
   Port createPort(
     final String portCode,
     final String portName,
-    final Int2D cell
+    final Cell cell
   ) {
     checkState(
       !getPorts().map(Port::getCode).collect(toSet()).contains(portCode),
@@ -105,7 +104,7 @@ public class MutablePortGrid
     );
     validateCell(cell);
     final Port port = new Port(portCode, portName);
-    field.setObjectLocation(port, cell);
+    field.setObjectLocation(port, cell.x(), cell.y());
     return port;
   }
 

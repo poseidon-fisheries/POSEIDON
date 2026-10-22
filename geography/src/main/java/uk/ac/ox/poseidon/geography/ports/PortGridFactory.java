@@ -33,7 +33,6 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
@@ -41,6 +40,7 @@ import uk.ac.ox.poseidon.core.utils.Pair;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -88,7 +88,7 @@ public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
     ports.get(scope).forEach(pair -> {
       final Port port = pair.getFirst();
       final Coordinate coordinate = pair.getSecond();
-      final Int2D cell = coordinateToCell(
+      final Cell cell = coordinateToCell(
         bathymetricGrid,
         coordinate,
         distanceCalculator
@@ -101,18 +101,18 @@ public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
           )
         )
       );
-      sparseGrid2D.setObjectLocation(port, cell);
+      sparseGrid2D.setObjectLocation(port, cell.x(), cell.y());
     });
     return new ImmutablePortGrid(sparseGrid2D, bathymetricGrid);
   }
 
-  private Optional<Int2D> coordinateToCell(
+  private Optional<Cell> coordinateToCell(
     final BathymetricGrid bathymetricGrid,
     final Coordinate coordinate,
     final DistanceCalculator distanceCalculator
   ) {
     final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
-    final Int2D cell = modelGrid.toCell(coordinate);
+    final Cell cell = modelGrid.toCell(coordinate);
     if (isValidPortCell(bathymetricGrid, cell)) {
       return Optional.of(cell);
     } else {
@@ -131,7 +131,7 @@ public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
 
   private boolean isValidPortCell(
     final BathymetricGrid bathymetricGrid,
-    final Int2D cell
+    final Cell cell
   ) {
     return (
       bathymetricGrid.getModelGrid().isInGrid(cell) &&

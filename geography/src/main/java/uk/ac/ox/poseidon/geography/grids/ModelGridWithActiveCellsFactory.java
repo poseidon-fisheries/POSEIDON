@@ -28,7 +28,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
@@ -49,7 +48,7 @@ public class ModelGridWithActiveCellsFactory<S extends Scope> extends RelativeSc
 > {
 
   private final Factory<? super S, ? extends ModelGrid> modelGrid;
-  private final Factory<? super S, ? extends Collection<Int2D>> activeCells;
+  private final Factory<? super S, ? extends Collection<Cell>> activeCells;
 
   @Override
   protected ModelGrid newInstance(final S scope) {

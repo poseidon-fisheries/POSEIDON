@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.geography.grids.extractors;
 import java.util.function.BiFunction;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 /**
@@ -34,12 +34,12 @@ import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
  * {@link Factories#cellValue(uk.ac.ox.poseidon.core.Factory)} in this package.
  */
 @RequiredArgsConstructor
-public class CellValue implements BiFunction<Object, Int2D, Double> {
+public class CellValue implements BiFunction<Object, Cell, Double> {
 
   private final @NonNull DoubleGrid grid;
 
   @Override
-  public Double apply(final Object context, final Int2D int2D) {
-    return grid.getValue(int2D);
+  public Double apply(final Object context, final Cell cell) {
+    return grid.getValue(cell);
   }
 }

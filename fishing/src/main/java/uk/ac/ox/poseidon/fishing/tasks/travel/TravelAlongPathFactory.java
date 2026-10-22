@@ -28,7 +28,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
@@ -39,6 +38,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 /**
@@ -56,7 +56,7 @@ public class TravelAlongPathFactory extends TaskFactory<TravelAlongPath> {
   private final VesselComponent<? extends FuelTank> fuelTank;
   private final Factory<
     ? super VesselComponentScope,
-    ? extends PathFinder<Int2D>
+    ? extends PathFinder<Cell>
   > pathFinder;
   private final Factory<
     ? super VesselComponentScope,
@@ -65,7 +65,7 @@ public class TravelAlongPathFactory extends TaskFactory<TravelAlongPath> {
   private final ValueFactory<
     ? super VesselComponentScope,
     ? super Vessel,
-    Int2D
+    Cell
   > destination;
   private final ValueFactory<
     ? super VesselComponentScope,

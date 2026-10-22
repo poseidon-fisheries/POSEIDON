@@ -34,7 +34,6 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.ProductStore;
@@ -45,6 +44,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 class TravelCostFactoryTest {
 
@@ -59,23 +59,23 @@ class TravelCostFactoryTest {
     new SimulationScope(simulation),
     vesselB
   );
-  private final MappingFactory<Scope, Object, Int2D, Route> routeFunction =
+  private final MappingFactory<Scope, Object, Cell, Route> routeFunction =
     new GlobalRouteFunctionFactory();
   private final ValueFactory<Scope, Object, Function<Route, Money>> routeCost =
     new GlobalRouteCostFactory();
 
-  private static Route route(final Int2D destination) {
-    return new Route(destination.x, Duration.ofHours(destination.y));
+  private static Route route(final Cell destination) {
+    return new Route(destination.x(), Duration.ofHours(destination.y()));
   }
 
   /** A route function shared by every simulation. */
   private static final class GlobalRouteFunctionFactory
-    extends GlobalScopeFactory<BiFunction<Object, Int2D, Route>>
-    implements MappingFactory<Scope, Object, Int2D, Route>
+    extends GlobalScopeFactory<BiFunction<Object, Cell, Route>>
+    implements MappingFactory<Scope, Object, Cell, Route>
   {
 
     @Override
-    protected BiFunction<Object, Int2D, Route> newInstance(final Scope scope) {
+    protected BiFunction<Object, Cell, Route> newInstance(final Scope scope) {
       return (context, destination) -> route(destination);
     }
   }
@@ -97,12 +97,12 @@ class TravelCostFactoryTest {
 
   /** A route function built once per vessel. */
   private static final class PerVesselRouteFunctionFactory
-    extends VesselScopeFactory<BiFunction<Object, Int2D, Route>>
-    implements MappingFactory<VesselScope, Object, Int2D, Route>
+    extends VesselScopeFactory<BiFunction<Object, Cell, Route>>
+    implements MappingFactory<VesselScope, Object, Cell, Route>
   {
 
     @Override
-    protected BiFunction<Object, Int2D, Route> newInstance(
+    protected BiFunction<Object, Cell, Route> newInstance(
       final VesselScope scope
     ) {
       return (context, destination) -> route(destination);

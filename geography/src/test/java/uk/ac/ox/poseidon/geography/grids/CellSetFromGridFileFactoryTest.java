@@ -32,7 +32,6 @@ import java.nio.file.Path;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.Envelope;
@@ -51,7 +50,7 @@ class CellSetFromGridFileFactoryTest {
     new Envelope(10, 13, 40, 42)
   );
 
-  private static Set<Int2D> cellsWith(
+  private static Set<Cell> cellsWith(
     final Path file,
     final ModelGrid modelGrid,
     final double includedValue
@@ -63,7 +62,7 @@ class CellSetFromGridFileFactoryTest {
     ).get(Scope.GLOBAL_SCOPE);
   }
 
-  private static Set<Int2D> cellsWith(
+  private static Set<Cell> cellsWith(
     final Path file,
     final double includedValue
   ) {
@@ -73,8 +72,8 @@ class CellSetFromGridFileFactoryTest {
   @Test
   void cellsAreTheFilesColumnsAndRowsFromTheNorth() {
     final Path file = writeFixture(tempDir, "fixture.asc");
-    assertThat(cellsWith(file, 2)).containsExactly(new Int2D(1, 0));
-    assertThat(cellsWith(file, 4)).containsExactly(new Int2D(0, 1));
+    assertThat(cellsWith(file, 2)).containsExactly(new Cell(1, 0));
+    assertThat(cellsWith(file, 4)).containsExactly(new Cell(0, 1));
   }
 
   @Test
@@ -87,9 +86,9 @@ class CellSetFromGridFileFactoryTest {
       new double[][] { { 0, 1, 0 }, { 1, 0, 1 } }
     );
     assertThat(cellsWith(file, 0)).containsExactlyInAnyOrder(
-      new Int2D(0, 0),
-      new Int2D(2, 0),
-      new Int2D(1, 1)
+      new Cell(0, 0),
+      new Cell(2, 0),
+      new Cell(1, 1)
     );
   }
 
@@ -107,7 +106,7 @@ class CellSetFromGridFileFactoryTest {
     final ModelGrid modelGrid = modelGridFromGridFile(scope -> file).get(
       Scope.GLOBAL_SCOPE
     );
-    final Int2D cellWithTwo = cellsWith(file, modelGrid, 2).iterator().next();
+    final Cell cellWithTwo = cellsWith(file, modelGrid, 2).iterator().next();
     assertThat(modelGrid.toCoordinate(cellWithTwo)).isEqualTo(
       new Coordinate(11.5, 41.5)
     );
@@ -167,7 +166,7 @@ class CellSetFromGridFileFactoryTest {
       2,
       new Envelope(10.005, 13.005, 39.995, 41.995)
     );
-    assertThat(cellsWith(file, nearly, 2)).containsExactly(new Int2D(1, 0));
+    assertThat(cellsWith(file, nearly, 2)).containsExactly(new Cell(1, 0));
   }
 
   @Test

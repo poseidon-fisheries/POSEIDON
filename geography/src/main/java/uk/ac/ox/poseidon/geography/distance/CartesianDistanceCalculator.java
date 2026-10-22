@@ -23,8 +23,8 @@
 package uk.ac.ox.poseidon.geography.distance;
 
 import sim.util.Double2D;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -62,7 +62,7 @@ public class CartesianDistanceCalculator extends AbstractDistanceCalculator {
   }
 
   @Override
-  public double distanceInKm(final Int2D start, final Int2D end) {
-    return cellSizeInKm * Math.hypot(end.x - start.x, end.y - start.y);
+  public double distanceInKm(final Cell start, final Cell end) {
+    return cellSizeInKm * Math.hypot(end.x() - start.x(), end.y() - start.y());
   }
 }

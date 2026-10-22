@@ -32,12 +32,12 @@ import static uk.ac.ox.poseidon.geography.paths.Factories.pathFinder;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -93,7 +93,7 @@ class DefaultPathFinderFactoryTest {
       object(mock(PortGrid.class)),
       object(mock(DistanceCalculator.class))
     );
-    final Int2D cell = new Int2D(1, 1);
+    final Cell cell = new Cell(1, 1);
 
     factory
       .get(new SimulationScope(simulation))

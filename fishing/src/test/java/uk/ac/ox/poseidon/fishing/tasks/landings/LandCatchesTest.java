@@ -37,7 +37,6 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.market.Market;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.market.Sale;
@@ -45,11 +44,12 @@ import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.accounts.Account;
 import uk.ac.ox.poseidon.fishing.vessels.holds.Hold;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 class LandCatchesTest {
 
-  private final Int2D homePortCell = new Int2D(1, 2);
+  private final Cell homePortCell = new Cell(1, 2);
   private final Port homePort = mock(Port.class);
   private final Port otherPort = mock(Port.class);
   private final Market homePortMarket = mock(Market.class);
@@ -98,7 +98,7 @@ class LandCatchesTest {
 
   @Test
   void throwsWhenTheVesselIsNotAtItsHomePort() {
-    when(vessel.getCell()).thenReturn(new Int2D(3, 4));
+    when(vessel.getCell()).thenReturn(new Cell(3, 4));
     when(marketGrid.getMarket(otherPort)).thenReturn(otherPortMarket);
 
     assertThatThrownBy(landCatches::complete).isInstanceOf(

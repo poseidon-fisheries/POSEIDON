@@ -27,8 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -39,18 +39,18 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  */
 class DefaultPathCacheTest {
 
-  private static final Int2D A = new Int2D(0, 0);
-  private static final Int2D B = new Int2D(0, 1);
-  private static final Int2D C = new Int2D(1, 0);
-  private static final Int2D D = new Int2D(1, 1);
-  private static final Int2D E = new Int2D(2, 0);
-  private static final Int2D F = new Int2D(2, 1);
+  private static final Cell A = new Cell(0, 0);
+  private static final Cell B = new Cell(0, 1);
+  private static final Cell C = new Cell(1, 0);
+  private static final Cell D = new Cell(1, 1);
+  private static final Cell E = new Cell(2, 0);
+  private static final Cell F = new Cell(2, 1);
 
   private final DefaultPathCache cache = new DefaultPathCache(
     ModelGrid.create(3, 2, new Envelope(0, 3, 0, 2))
   );
 
-  private static ImmutableList<Int2D> path(final Int2D... cells) {
+  private static ImmutableList<Cell> path(final Cell... cells) {
     return ImmutableList.copyOf(cells);
   }
 

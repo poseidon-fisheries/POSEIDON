@@ -27,12 +27,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
@@ -66,7 +66,7 @@ public class DefaultPathFinderFactory
   > distance;
   private final Factory<
     ? super SimulationScope,
-    ? extends PathCache<Int2D>
+    ? extends PathCache<Cell>
   > pathCache;
   private final Factory<
     ? super SimulationScope,

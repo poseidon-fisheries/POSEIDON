@@ -28,7 +28,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
@@ -36,6 +35,7 @@ import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 
 /**
@@ -48,8 +48,8 @@ import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class RouteViaDestinationFactory<S extends Scope>
-  extends RelativeScopeFactory<S, BiFunction<Vessel, Int2D, Route>>
-  implements MappingFactory<S, Vessel, Int2D, Route>
+  extends RelativeScopeFactory<S, BiFunction<Vessel, Cell, Route>>
+  implements MappingFactory<S, Vessel, Cell, Route>
 {
 
   private final VesselComponent<? extends Engine> engine;
@@ -59,7 +59,7 @@ public class RouteViaDestinationFactory<S extends Scope>
   > pathLengthCalculator;
 
   @Override
-  protected BiFunction<Vessel, Int2D, Route> newInstance(final S scope) {
+  protected BiFunction<Vessel, Cell, Route> newInstance(final S scope) {
     return new RouteViaDestination(engine, pathLengthCalculator.get(scope));
   }
 }

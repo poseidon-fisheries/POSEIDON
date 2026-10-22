@@ -28,12 +28,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.fishing.choices.MutableOptionValues;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A {@link VesselComponentScopeFactory} counterpart of {@link TripEvaluator}, built via
@@ -50,11 +50,11 @@ public class TripEvaluatorFactory
 
   private final Factory<
     ? super VesselComponentScope,
-    ? extends Function<? super Vessel, ? extends MutableOptionValues<Int2D>>
+    ? extends Function<? super Vessel, ? extends MutableOptionValues<Cell>>
   > optionValues;
   private final Factory<
     ? super VesselComponentScope,
-    ? extends Evaluator<Int2D>
+    ? extends Evaluator<Cell>
   > evaluationProvider;
 
   @Override

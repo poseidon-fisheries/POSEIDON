@@ -30,22 +30,22 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 class CellWasFishedThisTripTest {
 
   private static final Coordinate FIRST_COORDINATE = new Coordinate(1.5, 41.5);
   private static final Coordinate SECOND_COORDINATE = new Coordinate(2.5, 41.5);
-  private static final Int2D FIRST_CELL = new Int2D(1, 1);
-  private static final Int2D SECOND_CELL = new Int2D(2, 1);
-  private static final Int2D UNFISHED_CELL = new Int2D(3, 3);
+  private static final Cell FIRST_CELL = new Cell(1, 1);
+  private static final Cell SECOND_CELL = new Cell(2, 1);
+  private static final Cell UNFISHED_CELL = new Cell(3, 3);
 
   private final Vessel vessel = mock(Vessel.class);
   private final CellWasFishedThisTrip cellWasFishedThisTrip =

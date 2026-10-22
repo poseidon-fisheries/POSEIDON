@@ -28,11 +28,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A {@link TaskFactory} counterpart of {@link ChooseNextDestination},
@@ -50,7 +50,7 @@ public class ChooseNextDestinationFactory
   private final ValueFactory<
     ? super VesselComponentScope,
     ? super Vessel,
-    Optional<Int2D>
+    Optional<Cell>
   > destination;
 
   @Override

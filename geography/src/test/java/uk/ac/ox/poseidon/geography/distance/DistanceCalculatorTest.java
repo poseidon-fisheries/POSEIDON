@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import sim.util.Int2D;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 class DistanceCalculatorTest {
 
@@ -46,7 +46,7 @@ class DistanceCalculatorTest {
       1.0
     );
     assertThat(
-      calculator.travelDuration(List.of(new Int2D(0, 0), new Int2D(3, 4)), 10.0)
+      calculator.travelDuration(List.of(new Cell(0, 0), new Cell(3, 4)), 10.0)
     ).isEqualTo(Duration.ofMinutes(30));
   }
 
@@ -57,7 +57,7 @@ class DistanceCalculatorTest {
       1.0
     );
     assertThat(
-      calculator.travelDuration(List.of(new Int2D(3, 4)), 10.0)
+      calculator.travelDuration(List.of(new Cell(3, 4)), 10.0)
     ).isEqualTo(Duration.ZERO);
   }
 
@@ -80,7 +80,7 @@ class DistanceCalculatorTest {
     );
     assertThat(
       calculator.distanceInKm(
-        List.of(new Int2D(0, 0), new Int2D(3, 4), new Int2D(3, 8))
+        List.of(new Cell(0, 0), new Cell(3, 4), new Cell(3, 8))
       )
     ).isEqualTo(9.0);
   }
@@ -91,8 +91,6 @@ class DistanceCalculatorTest {
       null,
       1.0
     );
-    assertThat(calculator.distanceInKm(List.of(new Int2D(3, 4)))).isEqualTo(
-      0.0
-    );
+    assertThat(calculator.distanceInKm(List.of(new Cell(3, 4)))).isEqualTo(0.0);
   }
 }

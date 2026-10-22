@@ -30,7 +30,6 @@ import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.fishing.vessels.FactoryComponent;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
@@ -38,6 +37,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Shared set-up for the travel task tests: a vessel at {@link #ORIGIN} cruising
@@ -45,8 +45,8 @@ import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
  */
 final class TravelTasks {
 
-  static final Int2D ORIGIN = new Int2D(0, 0);
-  static final Int2D DESTINATION = new Int2D(1, 0);
+  static final Cell ORIGIN = new Cell(0, 0);
+  static final Cell DESTINATION = new Cell(1, 0);
   /** The date the clock of the tasks made here reads. */
   static final LocalDateTime NOW = LocalDateTime.of(2026, 1, 1, 0, 0);
 

@@ -22,11 +22,11 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
@@ -48,7 +48,7 @@ public final class Factories {
     final MappingFactory<
       ? super S,
       ? super Void,
-      ? super Int2D,
+      ? super Cell,
       Boolean
     > cellPredicate
   ) {

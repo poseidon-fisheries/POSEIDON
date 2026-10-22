@@ -28,12 +28,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link IsActiveWaterCell},
@@ -45,14 +45,14 @@ import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class IsActiveWaterCellFactory<S extends Scope>
-  extends RelativeScopeFactory<S, BiFunction<Object, Int2D, Boolean>>
-  implements MappingFactory<S, Object, Int2D, Boolean>
+  extends RelativeScopeFactory<S, BiFunction<Object, Cell, Boolean>>
+  implements MappingFactory<S, Object, Cell, Boolean>
 {
 
   private final Factory<? super S, ? extends BathymetricGrid> bathymetricGrid;
 
   @Override
-  protected BiFunction<Object, Int2D, Boolean> newInstance(final S scope) {
+  protected BiFunction<Object, Cell, Boolean> newInstance(final S scope) {
     return new IsActiveWaterCell(bathymetricGrid.get(scope));
   }
 }

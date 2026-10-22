@@ -30,9 +30,9 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.CurrencyUnit;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A {@link GlobalScopeFactory} counterpart of
@@ -45,13 +45,13 @@ import uk.ac.ox.poseidon.core.Scope;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class ProfitPerHourDestinationEvaluationProviderFactory
-  extends GlobalScopeFactory<Evaluator<Int2D>>
+  extends GlobalScopeFactory<Evaluator<Cell>>
 {
 
   private final String currencyCode;
 
   @Override
-  protected Evaluator<Int2D> newInstance(final Scope scope) {
+  protected Evaluator<Cell> newInstance(final Scope scope) {
     return new ProfitPerHourDestinationEvaluator(
       CurrencyUnit.of(checkNotNull(currencyCode, "currencyCode"))
     );

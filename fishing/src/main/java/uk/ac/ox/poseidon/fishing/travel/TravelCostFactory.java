@@ -31,12 +31,12 @@ import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link TravelCost}, built via
@@ -55,7 +55,7 @@ public class TravelCostFactory<S extends Scope> extends RelativeScopeFactory<
   private final MappingFactory<
     ? super S,
     ? super Vessel,
-    ? super Int2D,
+    ? super Cell,
     ? extends Route
   > routeFunction;
 

@@ -28,7 +28,6 @@ import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGene
 import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
-import sim.util.Int2D;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
@@ -39,6 +38,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
@@ -134,12 +134,12 @@ public final class Factories {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      ? extends Int2D
+      ? extends Cell
     > explorer,
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      ? extends Int2D
+      ? extends Cell
     > exploiter
   ) {
     return new EpsilonGreedyDestinationFactory(
@@ -166,12 +166,12 @@ public final class Factories {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      ? extends Int2D
+      ? extends Cell
     > explorer,
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      ? extends Int2D
+      ? extends Cell
     > exploiter
   ) {
     return epsilonGreedyDestination(constant(epsilon), explorer, exploiter);
@@ -257,7 +257,7 @@ public final class Factories {
     final Factory<? super S, ? extends ModelGrid> modelGrid,
     final Factory<
       ? super S,
-      ? extends Function<? super FishingEvent, ? extends Memory<Int2D, Bucket>>
+      ? extends Function<? super FishingEvent, ? extends Memory<Cell, Bucket>>
     > memorySelector,
     final Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule
   ) {
@@ -387,7 +387,7 @@ public final class Factories {
     final MappingFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      ? super Int2D,
+      ? super Cell,
       Boolean
     > cellPredicate,
     final ValueFactory<
@@ -399,7 +399,7 @@ public final class Factories {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      ? extends Int2D
+      ? extends Cell
     > searchCentre
   ) {
     return new NeighbourhoodGridExplorerFactory(
@@ -476,12 +476,12 @@ public final class Factories {
     final ValueFactory<
       ? super VesselScope,
       ? super Vessel,
-      ? extends List<? extends Int2D>
+      ? extends List<? extends Cell>
     > cells,
     final MappingFactory<
       ? super VesselScope,
       ? super Vessel,
-      ? super Int2D,
+      ? super Cell,
       Boolean
     > cellPredicate
   ) {
