@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.examples.petersnapper;
 
-import static java.util.stream.Collectors.toMap;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPerYearAccumulator;
 
 import com.google.common.collect.ImmutableMap;
@@ -132,7 +132,7 @@ public final class PeterSnapperCatchabilityCalibration {
       .csv(path.toFile())
       .stream()
       .collect(
-        toMap(
+        toImmutableMap(
           row -> row.getInt("year"),
           row -> (double) row.getInt("landings_kg")
         )

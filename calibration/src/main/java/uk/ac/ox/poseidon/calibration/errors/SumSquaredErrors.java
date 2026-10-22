@@ -25,6 +25,8 @@ package uk.ac.ox.poseidon.calibration.errors;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.Sets;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -48,6 +50,12 @@ public class SumSquaredErrors<K> implements ToDoubleFunction<Simulation> {
   private final Function<Simulation, Map<K, Double>> actualValues;
 
   /**
+   * @param targetValues the targets, in the order their differences are added
+   *                     up: with an unordered map, the sum would depend on
+   *                     the keys' hash codes
+   * @param actualValues extracts the actual values from a simulation, in the
+   *                     order the differences of keys with no target are
+   *                     added up
    * @throws IllegalArgumentException if a target value is {@code null},
    *                                  {@code NaN} or infinite
    */
@@ -70,14 +78,18 @@ public class SumSquaredErrors<K> implements ToDoubleFunction<Simulation> {
       targetValues.size(),
       invalidKeys
     );
-    this.targetValues = Map.copyOf(targetValues);
+    this.targetValues = Collections.unmodifiableMap(
+      new LinkedHashMap<>(targetValues)
+    );
     this.actualValues = actualValues;
   }
 
   /**
    * Extracts the actual values from {@code simulation} and returns the sum of
    * squared differences against {@link #targetValues}, over the union of both
-   * maps' keys.
+   * maps' keys. The differences are added up in the order of the targets,
+   * then in that of the actual values for keys with no target, so that the sum
+   * does not depend on the keys' hash codes.
    */
   @Override
   public double applyAsDouble(final Simulation simulation) {
