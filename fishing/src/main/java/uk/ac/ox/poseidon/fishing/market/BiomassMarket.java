@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.fishing.market;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.stream.Collectors.toMap;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 import com.google.common.collect.Maps;
 import java.time.LocalDateTime;
@@ -65,6 +65,8 @@ public class BiomassMarket implements Market {
   /** The currency every price at this market is in. */
   private final CurrencyUnit currencyUnit;
 
+  // Linked, so that prices are listed in the order they were first set,
+  // rather than that of their keys' hash codes
   @Getter(AccessLevel.NONE)
   private final Map<CatchCategory, Map<Species, Price>> prices;
 
@@ -89,7 +91,7 @@ public class BiomassMarket implements Market {
     this.port = port;
     this.code = code;
     this.currencyUnit = checkNotNull(currencyUnit);
-    this.prices = new HashMap<>();
+    this.prices = new LinkedHashMap<>();
     this.saleIdSupplier = new PrefixedIdSupplier(code);
     this.eventManager = eventManager;
   }
@@ -107,7 +109,8 @@ public class BiomassMarket implements Market {
     final LocalDateTime dateTime
   ) {
     final List<Sale.Item> soldItems = new ArrayList<>();
-    final Map<CatchCategory, BucketBuilder> unsoldByCategory = new HashMap<>();
+    final Map<CatchCategory, BucketBuilder> unsoldByCategory =
+      new LinkedHashMap<>();
     split(categorisedCatch, soldItems::add, (catchCategory, bucket) ->
       unsoldByCategory
         .computeIfAbsent(catchCategory, key -> Bucket.newBuilder())
@@ -119,7 +122,9 @@ public class BiomassMarket implements Market {
           unsoldByCategory
             .entrySet()
             .stream()
-            .collect(toMap(Entry::getKey, entry -> entry.getValue().build()))
+            .collect(
+              toImmutableMap(Entry::getKey, entry -> entry.getValue().build())
+            )
         );
     final Sale sale = new Sale(
       dateTime,
@@ -260,7 +265,7 @@ public class BiomassMarket implements Market {
   ) {
     checkCurrencyUnit(price);
     prices
-      .computeIfAbsent(catchCategory, k -> new HashMap<>())
+      .computeIfAbsent(catchCategory, k -> new LinkedHashMap<>())
       .put(species, price);
     priceCache.remove(catchCategory);
     lastPriceChangeDateTime = dateTime;

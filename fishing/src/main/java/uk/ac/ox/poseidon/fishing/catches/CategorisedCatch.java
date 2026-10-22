@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.fishing.catches;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.Value;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
@@ -59,7 +59,9 @@ public class CategorisedCatch {
     if (buckets.isEmpty()) return other;
     if (other.buckets.isEmpty()) return this;
 
-    final Map<CatchCategory, Bucket> merged = new HashMap<>(
+    // Linked, so that categories keep the order they come in, rather than
+    // that of their hash codes
+    final Map<CatchCategory, Bucket> merged = new LinkedHashMap<>(
       buckets.size() + other.buckets.size()
     );
     merged.putAll(buckets);
