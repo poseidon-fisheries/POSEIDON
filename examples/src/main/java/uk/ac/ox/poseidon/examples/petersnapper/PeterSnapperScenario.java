@@ -34,11 +34,14 @@ import static uk.ac.ox.poseidon.core.predicates.Factories.equal;
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.greaterThan;
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
+import static uk.ac.ox.poseidon.core.predicates.temporal.Factories.dateTimeIsBefore;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomInt;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.dateTimeAfter;
+import static uk.ac.ox.poseidon.core.providers.temporal.Factories.durationUntil;
 import static uk.ac.ox.poseidon.core.quantities.Factories.*;
 import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_PER_HOUR;
 import static uk.ac.ox.poseidon.core.schedule.Factories.*;
@@ -59,10 +62,12 @@ import static uk.ac.ox.poseidon.fishing.market.Factories.*;
 import static uk.ac.ox.poseidon.fishing.money.Factories.money;
 import static uk.ac.ox.poseidon.fishing.social.Factories.friendshipDynamics;
 import static uk.ac.ox.poseidon.fishing.social.Factories.socialNetwork;
+import static uk.ac.ox.poseidon.fishing.tasks.branches.Factories.selectorTask;
 import static uk.ac.ox.poseidon.fishing.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.fishing.tasks.decorators.Factories.untilFail;
 import static uk.ac.ox.poseidon.fishing.tasks.fishing.Factories.fishing;
 import static uk.ac.ox.poseidon.fishing.tasks.general.Factories.checkThat;
+import static uk.ac.ox.poseidon.fishing.tasks.general.Factories.succeedOrWait;
 import static uk.ac.ox.poseidon.fishing.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.fishing.tasks.landings.Factories.landCatches;
 import static uk.ac.ox.poseidon.fishing.tasks.travel.Factories.*;
@@ -73,11 +78,14 @@ import static uk.ac.ox.poseidon.fishing.vessels.holds.Factories.standardBiomassH
 import static uk.ac.ox.poseidon.fishing.vessels.tanks.Factories.fullTank;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.accessibleWaterCells;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.componentProperty;
+import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.currentPortStayStartDateTime;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.currentTimeAtSea;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.currentTripDestination;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.currentTripEventManager;
+import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.homePort;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.other;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselIsActive;
+import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselIsDockedAt;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselProperty;
 import static uk.ac.ox.poseidon.geography.Factories.coordinate;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
@@ -386,38 +394,60 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       currentTripEventManager()
     );
 
+    // As in legacy POSEIDON, a vessel departs once it has been at port for 12
+    // hours, counting from its creation for its first trip; if a trip fails
+    // before departing, it tries again an hour later.
+    final var departureDateTime = dateTimeAfter(
+      currentPortStayStartDateTime(),
+      hours(12)
+    );
+
     final var behaviour = behaviour(
       sequenceTask(
-        fishingTrip(
-          destination,
-          travelToTripDestination,
-          untilFail(
-            sequenceTask(
-              fishing(
-                gear,
-                hold,
-                fuelTank,
-                currentCellFisheable(biomassGrid),
-                proportionallyLimitingBiomassToHold()
-              ),
-              checkThat(
-                allOf(
-                  condition(
-                    componentProperty(hold, "availableCapacityInKg"),
-                    greaterThan(1)
-                  ),
-                  condition(currentTimeAtSea(), lessThan(constant(days(10))))
-                )
-              )
-            )
+        checkThat(vesselIsDockedAt(homePort())),
+        selectorTask(
+          sequenceTask(
+            checkThat(
+              condition(currentDateTime(), dateTimeIsBefore(departureDateTime))
+            ),
+            waitFor(durationUntil(departureDateTime))
           ),
-          setDestinationToOrigin(),
-          travelToTripDestination,
-          dockAtDestination(),
-          landCatches(hold, constant(hours(1))),
-          refuel(fuelTank, fuelStationGrid)
-        ),
-        waitFor(constant(hours(12)))
+          succeedOrWait(
+            fishingTrip(
+              destination,
+              travelToTripDestination,
+              untilFail(
+                sequenceTask(
+                  fishing(
+                    gear,
+                    hold,
+                    fuelTank,
+                    currentCellFisheable(biomassGrid),
+                    proportionallyLimitingBiomassToHold()
+                  ),
+                  checkThat(
+                    allOf(
+                      condition(
+                        componentProperty(hold, "availableCapacityInKg"),
+                        greaterThan(1)
+                      ),
+                      condition(
+                        currentTimeAtSea(),
+                        lessThan(constant(days(10)))
+                      )
+                    )
+                  )
+                )
+              ),
+              setDestinationToOrigin(),
+              travelToTripDestination,
+              dockAtDestination(),
+              landCatches(hold, constant(hours(1))),
+              refuel(fuelTank, fuelStationGrid)
+            ),
+            waitFor(constant(hours(1)))
+          )
+        )
       )
     );
 

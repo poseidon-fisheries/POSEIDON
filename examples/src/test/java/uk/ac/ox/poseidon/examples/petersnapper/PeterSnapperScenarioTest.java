@@ -26,7 +26,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPerYearAccumulator;
 import static uk.ac.ox.poseidon.examples.petersnapper.PeterSnapperCatchabilityCalibration.CATCHABILITY_PROPERTY;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,7 +39,10 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
+import uk.ac.ox.poseidon.fishing.vessels.DockingEvent;
+import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
@@ -70,6 +77,64 @@ class PeterSnapperScenarioTest {
     assertThat(tripEnded).isTrue();
   }
 
+  // As in legacy POSEIDON, a vessel created at port stays there for 12 hours
+  // before its first trip.
+  @Test
+  void firstTripsStartTwelveHoursAfterCreation() {
+    final Simulation simulation = new PeterSnapperScenario()
+      .get()
+      .startNewSimulation();
+    final List<LocalDateTime> tripStartDateTimes = new ArrayList<>();
+    simulation
+      .getEventManager()
+      .addListener(
+        new SimpleListener<>(FishingTripStartEvent.class, event ->
+          tripStartDateTimes.add(event.getTrip().getStartDateTime())
+        )
+      );
+    simulation.getTemporalSchedule().stepFor(simulation, Period.ofDays(1));
+    assertThat(tripStartDateTimes)
+      .isNotEmpty()
+      .containsOnly(
+        simulation.getTemporalSchedule().getStartingDateTime().plusHours(12)
+      );
+  }
+
+  // As in legacy POSEIDON, a vessel back from a trip stays at port for 12
+  // hours, counted from its docking, before its next trip.
+  @Test
+  void laterTripsStartTwelveHoursAfterDocking() {
+    final Simulation simulation = new PeterSnapperScenario()
+      .get()
+      .startNewSimulation();
+    final Map<Vessel, LocalDateTime> lastDockingDateTimes = new HashMap<>();
+    final List<Duration> timesAtPort = new ArrayList<>();
+    simulation
+      .getEventManager()
+      .addListener(
+        new SimpleListener<>(DockingEvent.class, event ->
+          lastDockingDateTimes.put(event.getVessel(), event.getDateTime())
+        )
+      );
+    simulation.getEventManager().addListener(
+      new SimpleListener<>(FishingTripStartEvent.class, event -> {
+        final LocalDateTime lastDockingDateTime = lastDockingDateTimes.get(
+          event.getTrip().getVessel()
+        );
+        if (lastDockingDateTime != null) {
+          timesAtPort.add(
+            Duration.between(
+              lastDockingDateTime,
+              event.getTrip().getStartDateTime()
+            )
+          );
+        }
+      })
+    );
+    simulation.getTemporalSchedule().stepFor(simulation, Period.ofDays(60));
+    assertThat(timesAtPort).isNotEmpty().containsOnly(Duration.ofHours(12));
+  }
+
   // Each run hands out identity hash codes, so a result that depended on
   // them (iterating a HashMap keyed by vessels, say) would differ between
   // these runs.
@@ -89,7 +154,7 @@ class PeterSnapperScenarioTest {
   @Test
   void landingsMatchTheBaseline() {
     assertThat(landingsForAYear(new PeterSnapperScenario().get())).isEqualTo(
-      Map.of(1, 2.1606374013265967E7)
+      Map.of(1, 2.047458273295532E7)
     );
   }
 

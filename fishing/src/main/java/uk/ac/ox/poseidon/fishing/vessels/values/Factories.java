@@ -142,6 +142,22 @@ public final class Factories {
   }
 
   /**
+   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for
+   *         a {@link CurrentPortStayStartDateTime}, one per vessel, registered
+   *         on the vessel's event manager as it is built; the current
+   *         date-time when it is built is taken as the start of the vessel's
+   *         first stay at port, so it must first be built for a vessel at the
+   *         vessel's creation, as it is when a component the vessel
+   *         specification lists uses it. A component chosen only after a
+   *         change of attributes is built later, and would date that first
+   *         stay from the change
+   * @see CurrentPortStayStartDateTime
+   */
+  public static CurrentPortStayStartDateTimeFactory currentPortStayStartDateTime() {
+    return new CurrentPortStayStartDateTimeFactory(currentDateTime());
+  }
+
+  /**
    * Reads a value of a vessel off the other vessel, in a test relating the
    * vessel a call is for to another vessel, such as a friendship condition:
    * {@code condition(other(vesselProperty("homePort")),
