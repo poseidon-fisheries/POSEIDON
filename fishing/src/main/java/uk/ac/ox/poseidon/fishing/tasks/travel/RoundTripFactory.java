@@ -35,17 +35,17 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
-import uk.ac.ox.poseidon.fishing.vessels.TripBlock;
+import uk.ac.ox.poseidon.fishing.vessels.FishingTripBlock;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
- * A {@link TaskFactory} for a {@link TripBlock} running a whole fishing trip:
- * travel out, fish, turn back, travel back (reusing the same resolved
- * {@code travelTask} instance for both legs — safe because every task here
- * fully re-initializes its own state in {@code start()}, which gdx-ai calls
- * fresh each time a sequence enters a child, regardless of that child's
+ * A {@link TaskFactory} for a {@link FishingTripBlock} running a whole
+ * fishing trip: travel out, fish, turn back, travel back (reusing the same
+ * resolved {@code travelTask} instance for both legs — safe because every task
+ * here fully re-initializes its own state in {@code start()}, which gdx-ai
+ * calls fresh each time a sequence enters a child, regardless of that child's
  * previous run), dock at the origin port, land the catch. Built via
  * {@link Factories#roundTrip}.
  */
@@ -54,7 +54,7 @@ import uk.ac.ox.poseidon.geography.grids.Cell;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class RoundTripFactory extends TaskFactory<TripBlock> {
+public class RoundTripFactory extends TaskFactory<FishingTripBlock> {
 
   private final ValueFactory<
     ? super VesselComponentScope,
@@ -80,19 +80,19 @@ public class RoundTripFactory extends TaskFactory<TripBlock> {
   > currentDateTime;
 
   /**
-   * @return a {@link TripBlock} to {@code initialDestination} of:
+   * @return a {@link FishingTripBlock} to {@code initialDestination} of:
    *         {@code travelTask} (outbound), {@code fishingTask}, a
    *         {@link SetDestinationToOrigin}, {@code travelTask} again
    *         (inbound), a {@link DockAtDestination} and {@code landingTask}
    */
   @Override
-  protected TripBlock newInstance(final VesselComponentScope scope) {
+  protected FishingTripBlock newInstance(final VesselComponentScope scope) {
     final Task<Vessel> travelTask = this.travelTask.get(scope);
     final Task<Vessel> fishingTask = this.fishingTask.get(scope);
     final Task<Vessel> landingTask = this.landingTask.get(scope);
     final Function<? super Vessel, LocalDateTime> currentDateTime =
       this.currentDateTime.get(scope);
-    return new TripBlock(
+    return new FishingTripBlock(
       initialDestination.get(scope),
       currentDateTime,
       List.of(),

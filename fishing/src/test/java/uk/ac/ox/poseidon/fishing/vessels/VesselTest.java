@@ -27,8 +27,6 @@ import static java.time.Duration.ofSeconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -468,7 +466,7 @@ class VesselTest {
     final Port port = mock(Port.class);
     final Vessel vessel = vesselDockedAt(port);
 
-    vessel.startTrip(new Cell(1, 0), START);
+    startTrip(vessel);
 
     assertThat(vessel.isDocked()).isFalse();
     assertThat(vessel.getCurrentTrip().getOrigin()).isSameAs(port);
@@ -479,7 +477,7 @@ class VesselTest {
     final Vessel vessel = vesselDockedAt(mock(Port.class));
     vessel.undock(START);
 
-    assertThatThrownBy(() -> vessel.startTrip(new Cell(1, 0), START))
+    assertThatThrownBy(() -> startTrip(vessel))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("cannot start a trip at sea");
   }
@@ -488,7 +486,7 @@ class VesselTest {
   void aDockingDuringATripReachesTheTripsListeners() {
     final Port port = mock(Port.class);
     final Vessel vessel = vesselDockedAt(port);
-    vessel.startTrip(new Cell(1, 0), START);
+    startTrip(vessel);
     final List<DockingEvent> events = new ArrayList<>();
     vessel
       .getCurrentTrip()
@@ -506,7 +504,7 @@ class VesselTest {
   void aStopDuringATripBecomesOneOfItsPortCalls() {
     final Port port = mock(Port.class);
     final Vessel vessel = vesselDockedAt(port);
-    vessel.startTrip(new Cell(1, 0), START);
+    startTrip(vessel);
 
     vessel.dockAt(port, START.plusHours(3));
     vessel.undock(START.plusHours(4));
@@ -517,18 +515,46 @@ class VesselTest {
   }
 
   @Test
-  void endTripKeepsTheFinishedTripAsThePreviousTrip() {
+  void endTripEndsTheCurrentTrip() {
+    final Port port = mock(Port.class);
+    final Vessel vessel = vesselDockedAt(port);
+    startTrip(vessel);
+    final Trip trip = vessel.getCurrentTrip();
+    vessel.dockAt(port, START.plusHours(8));
+
+    vessel.endTrip(START.plusHours(9), List.of());
+
+    assertThat(vessel.getCurrentTrip()).isNull();
+    assertThat(trip.getEndDateTime()).isEqualTo(START.plusHours(9));
+  }
+
+  @Test
+  void startTripStartsTheTripGivenForTheOriginWithItsKind() {
     final Port port = mock(Port.class);
     final Vessel vessel = vesselDockedAt(port);
 
-    assertNull(vessel.getPreviousTrip());
-    vessel.startTrip(new Cell(1, 0), START);
-    final Trip trip = vessel.getCurrentTrip();
-    vessel.dockAt(port, START.plusHours(8));
-    vessel.endTrip(START.plusHours(9), List.of());
+    vessel.startTrip(origin ->
+      new FishingTrip(vessel, origin, new Cell(1, 0), START)
+    );
 
-    assertNull(vessel.getCurrentTrip());
-    assertSame(trip, vessel.getPreviousTrip());
+    assertThat(vessel.getCurrentTrip()).isInstanceOf(FishingTrip.class);
+    assertThat(vessel.getCurrentTrip().getOrigin()).isSameAs(port);
+  }
+
+  @Test
+  void aVesselCannotStartTheTripOfAnother() {
+    final Vessel vessel = vesselDockedAt(mock(Port.class));
+    final Vessel otherVessel = vesselDockedAt(mock(Port.class));
+
+    assertThatThrownBy(() ->
+      vessel.startTrip(origin ->
+        new Trip(otherVessel, origin, new Cell(1, 0), START)
+      )
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("cannot start the trip of");
+    assertThat(vessel.getCurrentTrip()).isNull();
+    assertThat(vessel.isDocked()).isTrue();
   }
 
   @Test
@@ -546,5 +572,10 @@ class VesselTest {
     assertThat(fishing.getAttributes()).containsExactly(entry("gear", "PS"));
     assertThat(sale.getAttributes()).containsExactly(entry("gear", "PS"));
     assertThat(vessel.getAttributes()).containsExactly(entry("gear", "OTB"));
+  }
+
+  /** Starts a plain trip for {@code vessel}, at {@link #START}. */
+  private static void startTrip(final Vessel vessel) {
+    vessel.startTrip(origin -> new Trip(vessel, origin, new Cell(1, 0), START));
   }
 }

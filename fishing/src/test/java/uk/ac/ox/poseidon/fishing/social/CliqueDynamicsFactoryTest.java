@@ -41,9 +41,9 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
-import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
+import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet;
-import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 class CliqueDynamicsFactoryTest {
@@ -104,10 +104,10 @@ class CliqueDynamicsFactoryTest {
   void aTripStartBroadcastOnAVesselsEventManagerFormsACliqueThroughForwarding() {
     final SimulationScope scope = new SimulationScope(simulation);
     factory.get(scope);
-    final Trip trip = mock(Trip.class);
+    final FishingTrip trip = mock(FishingTrip.class);
     when(trip.getVessel()).thenReturn(a);
 
-    a.getEventManager().broadcast(new TripStartEvent(trip));
+    a.getEventManager().broadcast(new FishingTripStartEvent(trip));
 
     assertThat(network.get(scope).getRecipients(a)).containsExactly(b);
     assertThat(network.get(scope).getRecipients(b)).containsExactly(a);

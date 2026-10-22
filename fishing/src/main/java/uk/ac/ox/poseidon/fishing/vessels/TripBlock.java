@@ -33,13 +33,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import org.joda.money.Money;
+import uk.ac.ox.poseidon.geography.Destination;
 import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
  * A composite task that opens a trip, runs its children in sequence and
- * closes the trip once they have all succeeded. Only a trip block sets or
- * clears the vessel's current trip, so a behaviour that is not running has
- * no trip open.
+ * closes the trip once they have all succeeded. It opens a plain
+ * {@link Trip}; a {@link FishingTripBlock} opens a {@link FishingTrip}. Only a
+ * trip block sets or clears the vessel's current trip, so a behaviour that is
+ * not running has no trip open.
  *
  * <p>It has trip costs, possibly none, each a function of the finished trip,
  * which it charges as it closes the trip, before the trip's end is broadcast.
@@ -51,7 +54,7 @@ import uk.ac.ox.poseidon.geography.grids.Cell;
  * a trip left open at sea is a model error. Aborting a trip is modelled
  * inside it, by a task that heads home.
  */
-public final class TripBlock extends Sequence<Vessel> {
+public class TripBlock extends Sequence<Vessel> {
 
   private final Function<? super Vessel, Optional<Cell>> initialDestination;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
@@ -69,7 +72,7 @@ public final class TripBlock extends Sequence<Vessel> {
    * @param children           the tasks run in sequence during the trip
    * @throws IllegalArgumentException if {@code children} is empty
    */
-  public TripBlock(
+  TripBlock(
     final Function<? super Vessel, Optional<Cell>> initialDestination,
     final Function<? super Vessel, LocalDateTime> currentDateTime,
     final List<? extends Function<? super Trip, ? extends Money>> tripCosts,
@@ -100,9 +103,10 @@ public final class TripBlock extends Sequence<Vessel> {
         fail();
         return;
       }
-      getVessel().startTrip(
-        destination.get(),
-        currentDateTime.apply(getVessel())
+      final Vessel vessel = getVessel();
+      final LocalDateTime startDateTime = currentDateTime.apply(vessel);
+      vessel.startTrip(origin ->
+        newTrip(vessel, origin, destination.get(), startDateTime)
       );
       tripOpen = true;
     }
@@ -127,6 +131,19 @@ public final class TripBlock extends Sequence<Vessel> {
       getVessel().endTrip(currentDateTime.apply(getVessel()), tripCosts);
       tripOpen = false;
     }
+  }
+
+  /**
+   * @return a new trip of this block's kind, a plain {@link Trip}, for
+   *         {@code vessel} to start
+   */
+  Trip newTrip(
+    final Vessel vessel,
+    final Port origin,
+    final Destination destination,
+    final LocalDateTime startDateTime
+  ) {
+    return new Trip(vessel, origin, destination, startDateTime);
   }
 
   private Vessel getVessel() {

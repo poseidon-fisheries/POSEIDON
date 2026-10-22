@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.trips;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -51,30 +53,38 @@ class CellWasFishedThisTripTest {
   private final CellWasFishedThisTrip cellWasFishedThisTrip =
     new CellWasFishedThisTrip();
 
+  private final ModelGrid modelGrid = mock(ModelGrid.class);
+
   CellWasFishedThisTripTest() {
-    final VesselField vesselField = mock(VesselField.class);
-    final ModelGrid modelGrid = mock(ModelGrid.class);
-    when(vessel.getVesselField()).thenReturn(vesselField);
-    when(vesselField.getModelGrid()).thenReturn(modelGrid);
     when(modelGrid.toCell(FIRST_COORDINATE)).thenReturn(FIRST_CELL);
     when(modelGrid.toCell(SECOND_COORDINATE)).thenReturn(SECOND_CELL);
+    placeInModelGrid(vessel);
+  }
+
+  private void placeInModelGrid(final Vessel vessel) {
+    final VesselField vesselField = mock(VesselField.class);
+    when(vessel.getVesselField()).thenReturn(vesselField);
+    when(vesselField.getModelGrid()).thenReturn(modelGrid);
   }
 
   @Test
   void readsTheTripOfTheVesselGiven() {
     onTripWithFishingEventsAt(FIRST_COORDINATE);
     final Vessel otherVessel = mock(Vessel.class);
-    when(otherVessel.getCurrentTrip()).thenReturn(null);
+    placeInModelGrid(otherVessel);
+    when(otherVessel.getCurrentTrip()).thenReturn(mock(FishingTrip.class));
 
     assertTrue(cellWasFishedThisTrip.apply(vessel, FIRST_CELL));
     assertFalse(cellWasFishedThisTrip.apply(otherVessel, FIRST_CELL));
   }
 
   @Test
-  void neverHoldsWhenTheVesselIsNotOnATrip() {
-    when(vessel.getCurrentTrip()).thenReturn(null);
+  void throwsWhenTheVesselIsNotOnAFishingTrip() {
+    when(vessel.getCurrentTrip()).thenReturn(mock(Trip.class));
 
-    assertFalse(cellWasFishedThisTrip.apply(vessel, FIRST_CELL));
+    assertThatThrownBy(() ->
+      cellWasFishedThisTrip.apply(vessel, FIRST_CELL)
+    ).isInstanceOf(IllegalStateException.class);
   }
 
   @Test
@@ -104,7 +114,7 @@ class CellWasFishedThisTripTest {
     final List<FishingEvent> fishingEvents = Stream.of(coordinates)
       .map(CellWasFishedThisTripTest::fishingEventAt)
       .toList();
-    final Trip trip = mock(Trip.class);
+    final FishingTrip trip = mock(FishingTrip.class);
     when(trip.getFishingEvents()).thenReturn(fishingEvents);
     when(vessel.getCurrentTrip()).thenReturn(trip);
   }

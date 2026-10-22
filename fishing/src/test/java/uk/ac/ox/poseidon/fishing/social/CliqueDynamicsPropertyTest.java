@@ -40,8 +40,8 @@ import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.Provide;
 import net.jqwik.api.constraints.IntRange;
-import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
-import uk.ac.ox.poseidon.fishing.vessels.Trip;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
+import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 class CliqueDynamicsPropertyTest {
@@ -50,9 +50,9 @@ class CliqueDynamicsPropertyTest {
   private static final int MAXIMUM_FLEET_SIZE = 8;
 
   static void startTrip(final CliqueDynamics dynamics, final Vessel vessel) {
-    final Trip trip = mock(Trip.class);
+    final FishingTrip trip = mock(FishingTrip.class);
     when(trip.getVessel()).thenReturn(vessel);
-    dynamics.receive(new TripStartEvent(trip));
+    dynamics.receive(new FishingTripStartEvent(trip));
   }
 
   /**

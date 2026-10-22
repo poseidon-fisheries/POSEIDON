@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.tasks.fishing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 import static uk.ac.ox.poseidon.fishing.vessels.GivenComponents.componentGiving;
 
@@ -167,6 +168,24 @@ class FishingTest {
     verify(hold).addContent(Bucket.empty());
     verify(fisheable).release(Bucket.empty());
     verify(eventManager).broadcast(any(FishingEvent.class));
+  }
+
+  @Test
+  void startingOutsideAFishingTripThrows() throws Exception {
+    final Vessel vessel = mock(Vessel.class);
+    when(vessel.getCurrentTrip()).thenReturn(mock(Trip.class));
+    final ExposedFishing fishing = new ExposedFishing(
+      componentGiving(vessel, mock(Gear.class)),
+      componentGiving(vessel, mock(Hold.class)),
+      componentGiving(vessel, mock(FuelTank.class)),
+      v -> mock(Fisheable.class),
+      mock(DispositionProcess.class)
+    );
+    setTaskObject(fishing, vessel);
+
+    assertThatThrownBy(fishing::start)
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("not on a fishing trip");
   }
 
   private static final class ExposedFishing extends Fishing {

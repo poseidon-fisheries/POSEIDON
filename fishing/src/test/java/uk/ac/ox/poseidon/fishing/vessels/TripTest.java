@@ -40,10 +40,9 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
-import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingOutcome;
 import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
+import uk.ac.ox.poseidon.fishing.trips.TripEvent;
+import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -111,24 +110,7 @@ class TripTest {
   }
 
   @Test
-  void recordsFishingEventsBroadcastOnItsEventManagerInOrder() {
-    final Trip trip = new Trip(
-      newVessel(new Cell(0, 0), mock(ModelGrid.class)),
-      ORIGIN,
-      new Cell(1, 1),
-      START
-    );
-    final FishingEvent first = newFishingEvent();
-    final FishingEvent second = newFishingEvent();
-
-    trip.getEventManager().broadcast(first);
-    trip.getEventManager().broadcast(second);
-
-    assertThat(trip.getFishingEvents()).containsExactly(first, second);
-  }
-
-  @Test
-  void recordsAFishingEventBeforeVesselListenersReceiveIt() {
+  void announcesItsStartAndEndAsATripOfNoParticularKind() {
     final EventManager vesselEventManager = new SimpleEventManager();
     final Trip trip = new Trip(
       newVessel(new Cell(0, 0), mock(ModelGrid.class), vesselEventManager),
@@ -136,31 +118,19 @@ class TripTest {
       new Cell(1, 1),
       START
     );
-    final List<List<FishingEvent>> recordedWhenReceived = new ArrayList<>();
+    final List<Object> events = new ArrayList<>();
     vesselEventManager.addListener(
-      new SimpleListener<>(FishingEvent.class, event ->
-        recordedWhenReceived.add(List.copyOf(trip.getFishingEvents()))
-      )
+      new SimpleListener<>(TripEvent.class, events::add)
     );
-    final FishingEvent fishingEvent = newFishingEvent();
+    dock(trip, START.plusHours(8));
 
-    trip.getEventManager().broadcast(fishingEvent);
+    trip.start();
+    trip.endTrip(START.plusHours(9), List.of());
 
-    assertThat(recordedWhenReceived).containsExactly(List.of(fishingEvent));
-  }
-
-  @Test
-  void fishingEventsCannotBeModifiedFromOutside() {
-    final Trip trip = new Trip(
-      newVessel(new Cell(0, 0), mock(ModelGrid.class)),
-      ORIGIN,
-      new Cell(1, 1),
-      START
+    assertThat(events).containsExactly(
+      new TripStartEvent(trip),
+      new TripEndEvent(trip)
     );
-
-    assertThatThrownBy(() ->
-      trip.getFishingEvents().add(newFishingEvent())
-    ).isInstanceOf(UnsupportedOperationException.class);
   }
 
   @Test
@@ -313,12 +283,5 @@ class TripTest {
     trip
       .getEventManager()
       .broadcast(new UndockingEvent(trip.getVessel(), ORIGIN, dateTime));
-  }
-
-  private static FishingEvent newFishingEvent() {
-    return new FishingEvent(
-      mock(ExtendedFishingAction.class),
-      mock(FishingOutcome.class)
-    );
   }
 }

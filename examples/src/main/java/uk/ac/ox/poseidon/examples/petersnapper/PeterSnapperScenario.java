@@ -379,7 +379,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     final var behaviour = behaviour(
       sequenceTask(
-        trip(
+        fishingTrip(
           destination,
           travelAlongPathTo(
             engine,

@@ -145,14 +145,52 @@ class TripBlockTest {
     assertThat(tripBlock.getStatus()).isEqualTo(SUCCEEDED);
     assertThat(fishing.tripsSeen).containsExactly(trip, trip);
     assertThat(vessel.getCurrentTrip()).isNull();
-    assertThat(vessel.getPreviousTrip()).isSameAs(trip);
     assertThat(vessel.getPortDockedAt()).isEqualTo(port);
     assertThat(trip.getStartDateTime()).isEqualTo(NOW);
     assertThat(trip.getEndDateTime()).isEqualTo(NOW);
   }
 
   @Test
+  void opensAPlainTrip() {
+    final ScriptedTask task = new ScriptedTask(SUCCEEDED);
+
+    treeOver(
+      tripTo(
+        Optional.of(DESTINATION),
+        task,
+        new SetDestinationToOrigin(),
+        new DockAtDestination(_ -> NOW)
+      )
+    ).step();
+
+    assertThat(task.tripsSeen)
+      .singleElement()
+      .isNotInstanceOf(FishingTrip.class);
+  }
+
+  @Test
+  void aFishingTripBlockOpensAFishingTrip() {
+    final ScriptedTask task = new ScriptedTask(SUCCEEDED);
+
+    treeOver(
+      new FishingTripBlock(
+        _ -> Optional.of(DESTINATION),
+        _ -> NOW,
+        List.of(),
+        List.of(
+          task,
+          new SetDestinationToOrigin(),
+          new DockAtDestination(_ -> NOW)
+        )
+      )
+    ).step();
+
+    assertThat(task.tripsSeen).singleElement().isInstanceOf(FishingTrip.class);
+  }
+
+  @Test
   void chargesItsTripCostsInOrderAsItClosesTheTrip() {
+    final ScriptedTask task = new ScriptedTask(SUCCEEDED);
     final TripBlock tripBlock = new TripBlock(
       _ -> Optional.of(DESTINATION),
       _ -> NOW,
@@ -160,13 +198,17 @@ class TripBlockTest {
         _ -> Money.of(CurrencyUnit.EUR, 5),
         _ -> Money.of(CurrencyUnit.EUR, 2)
       ),
-      List.of(new SetDestinationToOrigin(), new DockAtDestination(_ -> NOW))
+      List.of(
+        task,
+        new SetDestinationToOrigin(),
+        new DockAtDestination(_ -> NOW)
+      )
     );
 
     treeOver(tripBlock).step();
 
     assertThat(
-      vessel.getPreviousTrip().getAccount().getBalances()
+      task.tripsSeen.getFirst().getAccount().getBalances()
     ).containsExactly(entry(CurrencyUnit.EUR, Money.of(CurrencyUnit.EUR, -7)));
   }
 
@@ -180,7 +222,6 @@ class TripBlockTest {
     assertThat(tripBlock.getStatus()).isEqualTo(FAILED);
     assertThat(fishing.tripsSeen).isEmpty();
     assertThat(vessel.getCurrentTrip()).isNull();
-    assertThat(vessel.getPreviousTrip()).isNull();
   }
 
   @Test

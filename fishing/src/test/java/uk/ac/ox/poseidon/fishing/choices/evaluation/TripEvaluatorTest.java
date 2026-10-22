@@ -39,8 +39,11 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.fishing.choices.MutableOptionValues;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripEndEvent;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
+import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.Destination;
@@ -68,7 +71,7 @@ class TripEvaluatorTest {
         }
       };
     };
-    final Trip trip = mock(Trip.class);
+    final FishingTrip trip = mock(FishingTrip.class);
     final Cell destination = new Cell(1, 2);
     when(trip.getDestination()).thenReturn(destination);
     when(trip.getEventManager()).thenReturn(tripEventManager);
@@ -76,7 +79,7 @@ class TripEvaluatorTest {
     vesselEventManager.addListener(
       new TripEvaluator(vessel -> new StubOptionValues(), evaluator)
     );
-    vesselEventManager.broadcast(new TripStartEvent(trip));
+    vesselEventManager.broadcast(new FishingTripStartEvent(trip));
 
     assertThat(evaluationEventManager).hasValue(tripEventManager);
   }
@@ -98,7 +101,7 @@ class TripEvaluatorTest {
           return 5;
         }
       };
-    final Trip trip = mock(Trip.class);
+    final FishingTrip trip = mock(FishingTrip.class);
     final Cell destination = new Cell(1, 2);
     when(trip.getVessel()).thenReturn(vessel);
     when(trip.getDestination()).thenReturn(destination);
@@ -108,9 +111,9 @@ class TripEvaluatorTest {
       evaluator
     );
 
-    tripEvaluator.receive(new TripStartEvent(trip));
+    tripEvaluator.receive(new FishingTripStartEvent(trip));
     assertThat(vesselsTable.observations).isEmpty();
-    tripEvaluator.receive(new TripEndEvent(trip));
+    tripEvaluator.receive(new FishingTripEndEvent(trip));
 
     assertThat(vesselsTable.observations).containsExactly(
       Map.entry(destination, 5.0)
@@ -120,7 +123,7 @@ class TripEvaluatorTest {
 
   @Test
   void throwsWhenATripStartsHeadedForADestinationThatIsNotACell() {
-    final Trip trip = mock(Trip.class);
+    final FishingTrip trip = mock(FishingTrip.class);
     final Destination port = portGrid -> new Cell(1, 2);
     when(trip.getVessel()).thenReturn(mock(Vessel.class));
     when(trip.getDestination()).thenReturn(port);
@@ -132,8 +135,28 @@ class TripEvaluatorTest {
     );
 
     assertThatThrownBy(() ->
-      tripEvaluator.receive(new TripStartEvent(trip))
+      tripEvaluator.receive(new FishingTripStartEvent(trip))
     ).isInstanceOf(IllegalStateException.class);
+  }
+
+  @Test
+  void ignoresTripsOfOtherKinds() {
+    final Trip trip = mock(Trip.class);
+    final StubOptionValues table = new StubOptionValues();
+    final TripEvaluator tripEvaluator = new TripEvaluator(
+      vessel -> table,
+      (option, eventManager) -> {
+        throw new AssertionError("No evaluation should start.");
+      }
+    );
+
+    final EventManager vesselEventManager = new SimpleEventManager();
+    vesselEventManager.addListener(tripEvaluator);
+
+    vesselEventManager.broadcast(new TripStartEvent(trip));
+    vesselEventManager.broadcast(new TripEndEvent(trip));
+
+    assertThat(table.observations).isEmpty();
   }
 
   /** Records what it observes, and knows no value. */

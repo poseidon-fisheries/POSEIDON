@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.vessels;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.RUNNING;
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static lombok.AccessLevel.NONE;
@@ -54,7 +55,6 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.Exit;
 import uk.ac.ox.poseidon.fishing.vessels.accounts.Account;
 import uk.ac.ox.poseidon.geography.Coordinate;
-import uk.ac.ox.poseidon.geography.Destination;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -250,11 +250,6 @@ public class Vessel implements Oriented2D, HasAttributes {
   private Port portDockedAt;
   /** The vessel's current trip, or {@code null} if it isn't on one. */
   private Trip currentTrip;
-  /**
-   * The vessel's last finished trip, or {@code null} if it hasn't finished one
-   * yet.
-   */
-  private Trip previousTrip;
 
   /** @return whether this vessel has its behaviour and a home port */
   public boolean isActive() {
@@ -689,29 +684,35 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Undocks the vessel and starts a new {@link Trip} to {@code destination},
-   * from the port it was docked at. Only a {@link TripBlock} opens a trip.
+   * Undocks the vessel and starts the trip {@code newTrip} gives for the port
+   * the vessel is docked at, which is the trip's origin. The trip may be of
+   * any kind: its {@link TripBlock} chooses. Only a trip block opens a trip.
    *
-   * @param destination   where the trip is initially headed
-   * @param startDateTime when the trip starts
-   * @throws IllegalStateException if the vessel is already on a trip, or is
-   *                               not docked
+   * @param newTrip gives the trip to start, for this vessel, from the given
+   *                origin
+   * @throws IllegalStateException    if the vessel is already on a trip, or is
+   *                                  not docked
+   * @throws IllegalArgumentException if the trip given is not this vessel's
    */
-  void startTrip(
-    final Destination destination,
-    final LocalDateTime startDateTime
-  ) {
+  void startTrip(final Function<? super Port, ? extends Trip> newTrip) {
     checkState(currentTrip == null, "Vessel %s is already on a trip.", id);
     checkState(isDocked(), "Vessel %s cannot start a trip at sea.", id);
-    final Port origin = portDockedAt;
-    undock(startDateTime);
-    this.currentTrip = new Trip(this, origin, destination, startDateTime);
+    final Trip trip = newTrip.apply(portDockedAt);
+    checkArgument(
+      trip.getVessel() == this,
+      "Vessel %s cannot start the trip of vessel %s.",
+      id,
+      trip.getVessel().getId()
+    );
+    undock(trip.getStartDateTime());
+    this.currentTrip = trip;
+    trip.start();
   }
 
   /**
    * Ends the current trip, charging {@code tripCosts} to it (see
-   * {@link Trip#endTrip}), folds its account into the vessel's own, and keeps
-   * it as the {@link #previousTrip}. Only a {@link TripBlock} closes a trip.
+   * {@link Trip#endTrip}), and folds its account into the vessel's own. Only
+   * a {@link TripBlock} closes a trip.
    *
    * @param endDateTime when the trip ends
    * @param tripCosts   the costs of the finished trip, possibly none
@@ -722,7 +723,6 @@ public class Vessel implements Oriented2D, HasAttributes {
   ) {
     currentTrip.endTrip(endDateTime, tripCosts);
     this.account.add(currentTrip.getAccount());
-    this.previousTrip = currentTrip;
     this.currentTrip = null;
   }
 }

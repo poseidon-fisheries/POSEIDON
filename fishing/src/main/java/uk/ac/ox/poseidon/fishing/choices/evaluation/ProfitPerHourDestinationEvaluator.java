@@ -30,13 +30,13 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.Listener;
-import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripEndEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
- * An {@link Evaluator} that scores a destination by the vessel's trip profit
- * (in a fixed currency), divided by the trip's time at sea
+ * An {@link Evaluator} that scores a destination by the vessel's fishing trip
+ * profit (in a fixed currency), divided by the trip's time at sea
  * ({@link Trip#getTotalTimeAtSea()}) in hours.
  */
 public class ProfitPerHourDestinationEvaluator implements Evaluator<Cell> {
@@ -65,7 +65,7 @@ public class ProfitPerHourDestinationEvaluator implements Evaluator<Cell> {
   }
 
   private static final class ProfitPerHourEvaluation
-    implements Evaluation<Cell>, Listener<TripEndEvent>
+    implements Evaluation<Cell>, Listener<FishingTripEndEvent>
   {
 
     @Getter
@@ -87,12 +87,12 @@ public class ProfitPerHourDestinationEvaluator implements Evaluator<Cell> {
     }
 
     @Override
-    public Class<? extends TripEndEvent> getEventClass() {
-      return TripEndEvent.class;
+    public Class<? extends FishingTripEndEvent> getEventClass() {
+      return FishingTripEndEvent.class;
     }
 
     @Override
-    public void receive(final TripEndEvent event) {
+    public void receive(final FishingTripEndEvent event) {
       result = profitPerHour(event.getTrip());
       eventManager.removeListener(this);
     }

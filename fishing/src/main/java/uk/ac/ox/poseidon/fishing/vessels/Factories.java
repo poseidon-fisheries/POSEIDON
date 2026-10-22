@@ -349,6 +349,71 @@ public final class Factories {
   }
 
   /**
+   * @param initialDestination gives the trip's first destination for the
+   *                           vessel, or none if it should not leave
+   * @param children           the tasks run in sequence during the trip
+   * @return a {@link TaskFactory} for a {@link FishingTripBlock}, which opens a
+   *         fishing trip, runs {@code children} and closes the trip, charging
+   *         no cost
+   * @see FishingTripBlockFactory
+   */
+  @SafeVarargs
+  public static FishingTripBlockFactory fishingTrip(
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      Optional<Cell>
+    > initialDestination,
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends Task<Vessel>
+    >... children
+  ) {
+    return new FishingTripBlockFactory(
+      initialDestination,
+      currentDateTime(),
+      ImmutableList.of(),
+      ImmutableList.copyOf(children)
+    );
+  }
+
+  /**
+   * @param initialDestination gives the trip's first destination for the
+   *                           vessel, or none if it should not leave
+   * @param tripCost           gives the cost of the finished trip, charged as
+   *                           the block closes it
+   * @param children           the tasks run in sequence during the trip
+   * @return a {@link TaskFactory} for a {@link FishingTripBlock}, which opens a
+   *         fishing trip, runs {@code children} and closes the trip, charging
+   *         {@code tripCost}
+   * @see FishingTripBlockFactory
+   */
+  @SafeVarargs
+  public static FishingTripBlockFactory fishingTrip(
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      Optional<Cell>
+    > initialDestination,
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Trip,
+      ? extends Money
+    > tripCost,
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends Task<Vessel>
+    >... children
+  ) {
+    return new FishingTripBlockFactory(
+      initialDestination,
+      currentDateTime(),
+      ImmutableList.of(tripCost),
+      ImmutableList.copyOf(children)
+    );
+  }
+
+  /**
    * @param listener the factory giving the vessel's listener
    * @return a {@link VesselComponentScopeFactory} that registers the vessel's
    *         listener on the vessel's event manager and gives it; make it one

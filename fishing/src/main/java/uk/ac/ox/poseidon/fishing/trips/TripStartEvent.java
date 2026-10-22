@@ -23,10 +23,12 @@
 package uk.ac.ox.poseidon.fishing.trips;
 
 import lombok.Value;
+import lombok.experimental.NonFinal;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 
 /** Broadcast when a {@link Trip} begins. */
 @Value
+@NonFinal
 public class TripStartEvent implements TripEvent {
 
   Trip trip;

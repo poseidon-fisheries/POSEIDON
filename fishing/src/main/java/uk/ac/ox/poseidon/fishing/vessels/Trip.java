@@ -37,7 +37,6 @@ import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.accounts.Account;
@@ -45,19 +44,20 @@ import uk.ac.ox.poseidon.geography.Destination;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
- * A single fishing trip: the span between a vessel undocking from a port, its
+ * A voyage of any kind: the span between a vessel undocking from a port, its
  * origin, with a destination in mind and {@link #endTrip} being called, with
- * the vessel docked again. Only a
+ * the vessel docked again. A trip of a particular kind, such as a
+ * {@link FishingTrip}, is a subclass adding what that kind records. Only a
  * {@link TripBlock}, through the vessel, starts and ends a trip. Broadcasts a
- * {@link TripStartEvent} at construction and a {@link TripEndEvent} on
- * {@link #endTrip}, through an {@link EventManager} that forwards to the
- * vessel's own, so trip-scoped listeners can be added without affecting
- * vessel-level ones. {@code destination} can be redirected mid-trip via
- * {@link #setDestination}, e.g. to head towards a new destination or, via
- * {@link #setDestinationToTripOrigin()}, to head back to the origin port; every change
- * is validated against the vessel's grid, the way the initial destination is at
- * construction. {@code origin} and {@code startDateTime} are fixed once the
- * trip begins.
+ * {@link TripStartEvent} as it starts and a {@link TripEndEvent} on
+ * {@link #endTrip}, each of its kind's class, through an {@link EventManager}
+ * that forwards to the vessel's own, so trip-scoped listeners can be added
+ * without affecting vessel-level ones. {@code destination} can be redirected
+ * mid-trip via {@link #setDestination}, e.g. to head towards a new destination
+ * or, via {@link #setDestinationToTripOrigin()}, to head back to the origin
+ * port; every change is validated against the vessel's grid, the way the
+ * initial destination is at construction. {@code origin} and
+ * {@code startDateTime} are fixed once the trip begins.
  * <p>
  * A trip holds no clock: it is given the dates it starts and ends, and
  * records the vessel's dockings and undockings from their events. A docking
@@ -79,10 +79,6 @@ public class Trip {
   private final @NonNull Port origin;
   private final @NonNull LocalDateTime startDateTime;
   private final Account account = new Account();
-
-  /** The fishing events of this trip, in the order they happened. */
-  @Getter(NONE)
-  private final List<FishingEvent> fishingEvents = new ArrayList<>();
 
   private @NonNull Destination destination;
 
@@ -121,9 +117,6 @@ public class Trip {
     // listeners before forwarding to the vessel's, so the record is complete
     // before vessel-level listeners react.
     this.eventManager.addListener(
-      new SimpleListener<>(FishingEvent.class, fishingEvents::add)
-    );
-    this.eventManager.addListener(
       new SimpleListener<>(DockingEvent.class, event -> openDocking = event)
     );
     this.eventManager.addListener(
@@ -131,7 +124,24 @@ public class Trip {
     );
     this.origin = origin;
     this.startDateTime = startDateTime;
-    this.eventManager.broadcast(new TripStartEvent(this));
+  }
+
+  /**
+   * Broadcasts the trip's start event. Called by the vessel once the trip is
+   * constructed, so that a subclass is complete before its start is heard.
+   */
+  void start() {
+    eventManager.broadcast(newStartEvent());
+  }
+
+  /** @return the event announcing this trip's start, of its kind's class */
+  TripStartEvent newStartEvent() {
+    return new TripStartEvent(this);
+  }
+
+  /** @return the event announcing this trip's end, of its kind's class */
+  TripEndEvent newEndEvent() {
+    return new TripEndEvent(this);
   }
 
   /**
@@ -239,15 +249,7 @@ public class Trip {
     this.endDateTime = endDateTime;
     this.portArrivalDateTime = openDocking.getDateTime();
     tripCosts.forEach(tripCost -> account.subtract(tripCost.apply(this)));
-    this.eventManager.broadcast(new TripEndEvent(this));
-  }
-
-  /**
-   * @return an unmodifiable view of the fishing events of this trip, in the
-   *         order they happened
-   */
-  public List<FishingEvent> getFishingEvents() {
-    return Collections.unmodifiableList(fishingEvents);
+    this.eventManager.broadcast(newEndEvent());
   }
 
   /** Redirects the trip back towards the port it started from. */

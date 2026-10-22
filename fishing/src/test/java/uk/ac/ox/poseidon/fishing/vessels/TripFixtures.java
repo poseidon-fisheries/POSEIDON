@@ -34,15 +34,21 @@ public final class TripFixtures {
   private TripFixtures() {}
 
   /**
-   * @return the trip started for {@code vessel} towards {@code destination},
-   *         at {@code startDateTime}
+   * @return the fishing trip started for {@code vessel} towards
+   *         {@code destination}, at {@code startDateTime}
    */
-  public static Trip startTrip(
+  public static FishingTrip startFishingTrip(
     final Vessel vessel,
     final Cell destination,
     final LocalDateTime startDateTime
   ) {
-    vessel.startTrip(destination, startDateTime);
-    return vessel.getCurrentTrip();
+    final FishingTrip fishingTrip = new FishingTrip(
+      vessel,
+      vessel.getPortDockedAt(),
+      destination,
+      startDateTime
+    );
+    vessel.startTrip(origin -> fishingTrip);
+    return fishingTrip;
   }
 }

@@ -174,7 +174,7 @@ components:
     behaviour: !!uk.ac.ox.poseidon.fishing.vessels.FactoryComponent
       factory: !!uk.ac.ox.poseidon.fishing.tasks.branches.SequenceTaskFactory
         children:
-        - !!uk.ac.ox.poseidon.fishing.vessels.TripBlockFactory
+        - !!uk.ac.ox.poseidon.fishing.vessels.FishingTripBlockFactory
           children:
           - !!uk.ac.ox.poseidon.fishing.tasks.travel.TravelAlongPathFactory
             currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {

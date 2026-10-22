@@ -23,16 +23,17 @@
 package uk.ac.ox.poseidon.fishing.trips;
 
 import java.util.function.BiFunction;
-import uk.ac.ox.poseidon.fishing.vessels.Trip;
+import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
- * Holds for a cell where the vessel has fished during its current trip: the
- * cell of the start coordinate of one of the trip's
- * {@link Trip#getFishingEvents() fishing events}, in the vessel's model grid.
- * Never holds when the vessel is not on a trip.
+ * Holds for a cell where the vessel has fished during its current fishing
+ * trip: the cell of the start coordinate of one of the trip's
+ * {@link FishingTrip#getFishingEvents() fishing events}, in the vessel's model
+ * grid. Asked of a vessel not on a fishing trip, it throws, as reading it there
+ * is a model error.
  */
 public class CellWasFishedThisTrip
   implements BiFunction<Vessel, Cell, Boolean>
@@ -40,12 +41,13 @@ public class CellWasFishedThisTrip
 
   @Override
   public Boolean apply(final Vessel vessel, final Cell cell) {
-    final Trip currentTrip = vessel.getCurrentTrip();
-    if (currentTrip == null) {
-      return false;
+    if (!(vessel.getCurrentTrip() instanceof final FishingTrip fishingTrip)) {
+      throw new IllegalStateException(
+        "Vessel " + vessel.getId() + " is not on a fishing trip."
+      );
     }
     final ModelGrid modelGrid = vessel.getVesselField().getModelGrid();
-    return currentTrip
+    return fishingTrip
       .getFishingEvents()
       .stream()
       .anyMatch(event ->

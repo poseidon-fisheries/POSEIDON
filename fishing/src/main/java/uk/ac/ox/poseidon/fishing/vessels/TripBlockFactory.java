@@ -27,6 +27,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
@@ -81,7 +82,7 @@ public class TripBlockFactory extends TaskFactory<TripBlock> {
 
   @Override
   protected TripBlock newInstance(final VesselComponentScope scope) {
-    return new TripBlock(
+    return newTripBlock(
       initialDestination.get(scope),
       currentDateTime.get(scope),
       tripCosts
@@ -94,6 +95,24 @@ public class TripBlockFactory extends TaskFactory<TripBlock> {
         .stream()
         .<Task<Vessel>>map(child -> child.get(scope))
         .collect(toImmutableList())
+    );
+  }
+
+  /**
+   * @return a block of this factory's kind, over the resolved parts
+   * @see TripBlock#TripBlock
+   */
+  TripBlock newTripBlock(
+    final Function<? super Vessel, Optional<Cell>> initialDestination,
+    final Function<? super Vessel, LocalDateTime> currentDateTime,
+    final List<? extends Function<? super Trip, ? extends Money>> tripCosts,
+    final List<? extends Task<Vessel>> children
+  ) {
+    return new TripBlock(
+      initialDestination,
+      currentDateTime,
+      tripCosts,
+      children
     );
   }
 }

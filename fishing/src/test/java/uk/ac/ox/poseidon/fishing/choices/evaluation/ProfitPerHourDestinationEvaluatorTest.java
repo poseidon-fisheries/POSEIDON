@@ -32,8 +32,8 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
-import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
-import uk.ac.ox.poseidon.fishing.vessels.Trip;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripEndEvent;
+import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 import uk.ac.ox.poseidon.fishing.vessels.accounts.Account;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 
@@ -53,12 +53,12 @@ class ProfitPerHourDestinationEvaluatorTest {
     account.add(Money.of(EUR, 120));
     account.subtract(Money.of(EUR, 30));
 
-    final Trip trip = mock(Trip.class);
+    final FishingTrip trip = mock(FishingTrip.class);
     when(trip.getAccount()).thenReturn(account);
     when(trip.getTotalTimeAtSea()).thenReturn(Duration.ofHours(3));
     when(trip.getTotalDuration()).thenReturn(Duration.ofHours(4));
 
-    eventManager.broadcast(new TripEndEvent(trip));
+    eventManager.broadcast(new FishingTripEndEvent(trip));
 
     assertThat(evaluation.getOption()).isEqualTo(option);
     assertThat(evaluation.getResult()).isEqualTo(30.0);

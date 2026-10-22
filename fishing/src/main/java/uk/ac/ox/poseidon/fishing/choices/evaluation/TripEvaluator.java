@@ -27,19 +27,19 @@ import static com.google.common.base.Preconditions.checkState;
 import java.util.function.Function;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.fishing.choices.MutableOptionValues;
-import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
-import uk.ac.ox.poseidon.fishing.trips.TripEvent;
-import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripEndEvent;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripEvent;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
- * Listens for a vessel's trip start/end events and feeds each completed trip's
- * destination and score into the option values of the trip's vessel, read
- * when the trip ends, so future destination choices can learn from past
- * outcomes. Its factory registers it on the vessel's event manager.
+ * Listens for a vessel's fishing trip start/end events and feeds each completed
+ * fishing trip's destination and score into the option values of the trip's
+ * vessel, read when the trip ends, so future destination choices can learn from
+ * past outcomes. Its factory registers it on the vessel's event manager.
  */
-public class TripEvaluator implements Listener<TripEvent> {
+public class TripEvaluator implements Listener<FishingTripEvent> {
 
   private final Function<
     ? super Vessel,
@@ -66,24 +66,25 @@ public class TripEvaluator implements Listener<TripEvent> {
     this.evaluator = evaluator;
   }
 
-  /** @return {@link TripEvent}{@code .class} */
+  /** @return {@link FishingTripEvent}{@code .class} */
   @Override
-  public Class<? extends TripEvent> getEventClass() {
-    return TripEvent.class;
+  public Class<? extends FishingTripEvent> getEventClass() {
+    return FishingTripEvent.class;
   }
 
   /**
-   * On a {@link TripStartEvent}, starts a fresh evaluation of the trip's
-   * destination. On a {@link TripEndEvent}, feeds that evaluation's (option,
-   * result) pair into the option values of the trip's vessel.
+   * On a {@link FishingTripStartEvent}, starts a fresh evaluation of the trip's
+   * destination. On a {@link FishingTripEndEvent}, feeds that evaluation's
+   * (option, result) pair into the option values of the trip's vessel. Trips
+   * of other kinds are not learnt from, so it does not hear them.
    *
    * @throws IllegalStateException if a trip starts headed for a destination
    *                               that is not a cell: the options learnt from
    *                               are fishing grounds
    */
   @Override
-  public void receive(final TripEvent event) {
-    if (event instanceof TripStartEvent) {
+  public void receive(final FishingTripEvent event) {
+    if (event instanceof FishingTripStartEvent) {
       checkState(
         event.getTrip().getDestination() instanceof Cell,
         "The trip of vessel %s starts headed for %s, which is not a cell.",
@@ -94,7 +95,7 @@ public class TripEvaluator implements Listener<TripEvent> {
         (Cell) event.getTrip().getDestination(),
         event.getTrip().getEventManager()
       );
-    } else if (event instanceof TripEndEvent) {
+    } else if (event instanceof FishingTripEndEvent) {
       optionValues
         .apply(event.getTrip().getVessel())
         .observe(currentEvaluation.getOption(), currentEvaluation.getResult());

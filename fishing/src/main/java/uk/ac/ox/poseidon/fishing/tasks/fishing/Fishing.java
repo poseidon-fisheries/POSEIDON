@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.tasks.fishing;
 
 import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ import uk.ac.ox.poseidon.fishing.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.fishing.catches.disposition.DispositionProcess;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.tasks.ExtendedTripTask;
+import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
@@ -76,10 +78,19 @@ public class Fishing extends ExtendedTripTask {
   /**
    * Starts a new {@link ExtendedFishingAction} for the current vessel, cell and
    * gear.
+   *
+   * @throws IllegalStateException if the vessel is not on a
+   *                               {@link FishingTrip}, which records the
+   *                               fishing events
    */
   @Override
   public void start() {
     super.start();
+    checkState(
+      getTrip() instanceof FishingTrip,
+      "Vessel %s is fishing while not on a fishing trip.",
+      getVessel().getId()
+    );
     action = new ExtendedFishingAction(
       getVessel(),
       currentDateTime.apply(getVessel()),

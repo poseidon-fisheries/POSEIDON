@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import uk.ac.ox.poseidon.core.events.Listener;
-import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
@@ -42,7 +42,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
  * same home port and gear). Every tie goes both ways, so a vessel's clique is
  * itself and its partners, its recipients in the network.
  */
-public class CliqueDynamics implements Listener<TripStartEvent> {
+public class CliqueDynamics implements Listener<FishingTripStartEvent> {
 
   private final SocialNetwork network;
   private final ImmutableList<Function<? super Vessel, ?>> groupingValues;
@@ -72,8 +72,8 @@ public class CliqueDynamics implements Listener<TripStartEvent> {
    * into cliques of eligible vessels.
    */
   @Override
-  public Class<TripStartEvent> getEventClass() {
-    return TripStartEvent.class;
+  public Class<FishingTripStartEvent> getEventClass() {
+    return FishingTripStartEvent.class;
   }
 
   /**
@@ -82,7 +82,7 @@ public class CliqueDynamics implements Listener<TripStartEvent> {
    * eligible for it whenever there are some.
    */
   @Override
-  public void receive(final TripStartEvent event) {
+  public void receive(final FishingTripStartEvent event) {
     final Vessel vessel = event.getTrip().getVessel();
     settle(vessel);
     join(vessel);

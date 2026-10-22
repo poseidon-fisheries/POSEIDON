@@ -140,12 +140,15 @@ public final class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   *         {@link VesselHasStartedTripToday}
-   * @see VesselHasStartedTripToday
+   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for
+   *         a {@link HasStartedFishingTripToday}, one per vessel, registered
+   *         on the vessel's event manager as it is built; share one between
+   *         the components that read it, so that a component built later
+   *         reads the same record
+   * @see HasStartedFishingTripToday
    */
-  public static VesselHasStartedTripTodayFactory vesselHasStartedTripToday() {
-    return new VesselHasStartedTripTodayFactory(currentDateTime());
+  public static HasStartedFishingTripTodayFactory hasStartedFishingTripToday() {
+    return new HasStartedFishingTripTodayFactory(currentDateTime());
   }
 
   /**
