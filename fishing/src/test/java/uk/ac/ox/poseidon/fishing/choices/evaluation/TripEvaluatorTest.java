@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.choices.evaluation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +43,7 @@ import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.Destination;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 
 class TripEvaluatorTest {
@@ -114,6 +116,24 @@ class TripEvaluatorTest {
       Map.entry(destination, 5.0)
     );
     assertThat(otherTable.observations).isEmpty();
+  }
+
+  @Test
+  void throwsWhenATripStartsHeadedForADestinationThatIsNotACell() {
+    final Trip trip = mock(Trip.class);
+    final Destination port = portGrid -> new Cell(1, 2);
+    when(trip.getVessel()).thenReturn(mock(Vessel.class));
+    when(trip.getDestination()).thenReturn(port);
+    final TripEvaluator tripEvaluator = new TripEvaluator(
+      vessel -> new StubOptionValues(),
+      (option, eventManager) -> {
+        throw new AssertionError("No evaluation should start.");
+      }
+    );
+
+    assertThatThrownBy(() ->
+      tripEvaluator.receive(new TripStartEvent(trip))
+    ).isInstanceOf(IllegalStateException.class);
   }
 
   /** Records what it observes, and knows no value. */

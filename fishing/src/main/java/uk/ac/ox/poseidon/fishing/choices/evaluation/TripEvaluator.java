@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.choices.evaluation;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.function.Function;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.fishing.choices.MutableOptionValues;
@@ -74,12 +76,22 @@ public class TripEvaluator implements Listener<TripEvent> {
    * On a {@link TripStartEvent}, starts a fresh evaluation of the trip's
    * destination. On a {@link TripEndEvent}, feeds that evaluation's (option,
    * result) pair into the option values of the trip's vessel.
+   *
+   * @throws IllegalStateException if a trip starts headed for a destination
+   *                               that is not a cell: the options learnt from
+   *                               are fishing grounds
    */
   @Override
   public void receive(final TripEvent event) {
     if (event instanceof TripStartEvent) {
+      checkState(
+        event.getTrip().getDestination() instanceof Cell,
+        "The trip of vessel %s starts headed for %s, which is not a cell.",
+        event.getTrip().getVessel(),
+        event.getTrip().getDestination()
+      );
       currentEvaluation = evaluator.newEvaluation(
-        event.getTrip().getDestination(),
+        (Cell) event.getTrip().getDestination(),
         event.getTrip().getEventManager()
       );
     } else if (event instanceof TripEndEvent) {

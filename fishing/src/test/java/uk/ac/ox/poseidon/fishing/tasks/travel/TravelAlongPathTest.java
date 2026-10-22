@@ -47,6 +47,7 @@ import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.fishing.vessels.values.CurrentTripDestination;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
@@ -136,7 +137,7 @@ class TravelAlongPathTest {
       FUEL_TANK,
       pathFinder,
       distanceCalculator,
-      v -> v.getCurrentTrip().getDestination(),
+      new CurrentTripDestination(),
       v -> eventManager,
       v -> NOW
     );

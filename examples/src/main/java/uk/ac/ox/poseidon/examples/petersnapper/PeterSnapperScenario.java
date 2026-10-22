@@ -74,7 +74,7 @@ import static uk.ac.ox.poseidon.fishing.vessels.tanks.Factories.fullTank;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.accessibleWaterCells;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.componentProperty;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.currentTimeAtSea;
-import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.currentTripDestinationCell;
+import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.currentTripDestination;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.currentTripEventManager;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.other;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselIsActive;
@@ -394,7 +394,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             fuelTank,
             pathFinder,
             distance,
-            currentTripDestinationCell(),
+            currentTripDestination(),
             currentTripEventManager()
           ),
           untilFail(
@@ -423,7 +423,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             fuelTank,
             pathFinder,
             distance,
-            currentTripDestinationCell(),
+            currentTripDestination(),
             currentTripEventManager()
           ),
           arriveInPort(),

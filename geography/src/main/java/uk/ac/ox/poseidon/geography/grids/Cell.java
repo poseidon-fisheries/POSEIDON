@@ -22,6 +22,9 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
+import uk.ac.ox.poseidon.geography.Destination;
+import uk.ac.ox.poseidon.geography.ports.PortGrid;
+
 /**
  * A cell of the model grid. Two cells are equal when they have the same
  * column and row.
@@ -29,7 +32,13 @@ package uk.ac.ox.poseidon.geography.grids;
  * @param x the cell's column, from the west
  * @param y the cell's row, from the north
  */
-public record Cell(int x, int y) {
+public record Cell(int x, int y) implements Destination {
+  /** @return this cell */
+  @Override
+  public Cell getCell(final PortGrid portGrid) {
+    return this;
+  }
+
   /**
    * The same hash as MASON's {@code Int2D}: the row goes through a bit mix
    * before it is combined with the column. A record's default hash would give

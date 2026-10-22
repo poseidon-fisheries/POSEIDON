@@ -77,11 +77,11 @@ public final class Factories {
 
   /**
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   *         {@link CurrentTripDestinationCell}
-   * @see CurrentTripDestinationCell
+   *         {@link CurrentTripDestination}
+   * @see CurrentTripDestination
    */
-  public static CurrentTripDestinationCellFactory currentTripDestinationCell() {
-    return new CurrentTripDestinationCellFactory();
+  public static CurrentTripDestinationFactory currentTripDestination() {
+    return new CurrentTripDestinationFactory();
   }
 
   /**

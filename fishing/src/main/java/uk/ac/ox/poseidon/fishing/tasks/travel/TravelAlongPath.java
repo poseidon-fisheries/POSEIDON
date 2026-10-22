@@ -39,13 +39,15 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
+import uk.ac.ox.poseidon.geography.Destination;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
 
 /**
  * A leaf {@link VesselTask} that moves the vessel cell by cell along a path from
- * its current cell to a destination, resolved once at {@link #start()},
+ * its current cell to the cell of a destination, resolved once at
+ * {@link #start()},
  * consuming fuel and taking the travel duration for each hop; broadcasts a
  * {@link TravelEvent} on arrival.
  */
@@ -56,7 +58,10 @@ public class TravelAlongPath extends VesselTask {
   private final VesselComponent<? extends FuelTank> fuelTank;
   private final PathFinder<Cell> pathFinder;
   private final DistanceCalculator distanceCalculator;
-  private final Function<? super Vessel, Cell> destinationSource;
+  private final Function<
+    ? super Vessel,
+    ? extends Destination
+  > destinationSource;
   private final Function<? super Vessel, EventManager> eventManager;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
   private List<Cell> currentPath;
@@ -77,14 +82,17 @@ public class TravelAlongPath extends VesselTask {
   }
 
   /**
-   * Resolves the destination and a path to it from the vessel's current cell.
+   * Resolves the destination's cell and a path to it from the vessel's
+   * current cell.
    *
    * @throws IllegalStateException if no path to the destination exists
    */
   @Override
   public void start() {
     final Vessel vessel = getVessel();
-    destination = checkNotNull(destinationSource.apply(vessel));
+    destination = checkNotNull(destinationSource.apply(vessel)).getCell(
+      vessel.getPortGrid()
+    );
     startDateTime = currentDateTime.apply(vessel);
     origin = vessel.getCell();
     currentPath = pathFinder

@@ -39,6 +39,7 @@ import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.accounts.Account;
+import uk.ac.ox.poseidon.geography.Destination;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
@@ -77,19 +78,19 @@ public class Trip {
   @Getter(NONE)
   private final List<FishingEvent> fishingEvents = new ArrayList<>();
 
-  private @NonNull Cell destination;
+  private @NonNull Destination destination;
   private LocalDateTime portArrivalDateTime;
   private LocalDateTime endDateTime;
 
   /**
    * @param vessel        the vessel taking this trip
-   * @param destination   where the trip is initially headed; must be a cell in
-   *                      the vessel's grid
+   * @param destination   where the trip is initially headed; must be on a cell
+   *                      in the vessel's grid
    * @param startDateTime when the trip starts
    */
   Trip(
     final @NonNull Vessel vessel,
-    final @NonNull Cell destination,
+    final @NonNull Destination destination,
     final @NonNull LocalDateTime startDateTime
   ) {
     this.vessel = vessel;
@@ -107,17 +108,21 @@ public class Trip {
   }
 
   /**
-   * @param destination the new destination; must be a cell in the vessel's grid
+   * @param destination the new destination; must be on a cell in the vessel's
+   *                    grid
    * @throws IllegalArgumentException if {@code destination} is outside the
    *                                  vessel's grid
    */
-  public void setDestination(final @NonNull Cell destination) {
+  public void setDestination(final @NonNull Destination destination) {
     this.destination = checkInGrid(destination);
   }
 
-  private Cell checkInGrid(final Cell cell) {
-    vessel.getVesselField().getModelGrid().checkIsInGrid(cell);
-    return cell;
+  private Destination checkInGrid(final Destination destination) {
+    vessel
+      .getVesselField()
+      .getModelGrid()
+      .checkIsInGrid(destination.getCell(vessel.getPortGrid()));
+    return destination;
   }
 
   /**

@@ -179,7 +179,7 @@ components:
           - !!uk.ac.ox.poseidon.fishing.tasks.travel.TravelAlongPathFactory
             currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
               }
-            destination: !!uk.ac.ox.poseidon.fishing.vessels.values.CurrentTripDestinationCellFactory {
+            destination: !!uk.ac.ox.poseidon.fishing.vessels.values.CurrentTripDestinationFactory {
               }
             distance: *id009
             engine: &id015 !!uk.ac.ox.poseidon.fishing.vessels.FactoryComponent
@@ -289,7 +289,7 @@ components:
           - !!uk.ac.ox.poseidon.fishing.tasks.travel.TravelAlongPathFactory
             currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
               }
-            destination: !!uk.ac.ox.poseidon.fishing.vessels.values.CurrentTripDestinationCellFactory {
+            destination: !!uk.ac.ox.poseidon.fishing.vessels.values.CurrentTripDestinationFactory {
               }
             distance: *id009
             engine: *id015

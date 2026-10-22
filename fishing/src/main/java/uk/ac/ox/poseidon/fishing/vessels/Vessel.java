@@ -53,6 +53,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.Exit;
 import uk.ac.ox.poseidon.fishing.vessels.accounts.Account;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.Destination;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -628,7 +629,10 @@ public class Vessel implements Oriented2D, HasAttributes {
    * @param startDateTime when the trip starts
    * @throws IllegalStateException if the vessel is already on a trip
    */
-  void startTrip(final Cell destination, final LocalDateTime startDateTime) {
+  void startTrip(
+    final Destination destination,
+    final LocalDateTime startDateTime
+  ) {
     checkState(currentTrip == null, "Vessel %s is already on a trip.", id);
     this.currentTrip = new Trip(this, destination, startDateTime);
   }

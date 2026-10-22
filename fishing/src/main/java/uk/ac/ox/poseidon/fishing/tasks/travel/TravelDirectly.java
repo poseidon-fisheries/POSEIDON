@@ -57,15 +57,18 @@ public class TravelDirectly extends ExtendedTripTask {
   private double distanceInKm;
 
   /**
-   * Resolves the start date, the origin, the trip's destination, and the
-   * direct distance between them.
+   * Resolves the start date, the origin, the cell of the trip's destination,
+   * and the direct distance between them.
    */
   @Override
   public void start() {
     super.start();
     startDateTime = currentDateTime.apply(getVessel());
     origin = getVessel().getCell();
-    destination = getVessel().getCurrentTrip().getDestination();
+    destination = getVessel()
+      .getCurrentTrip()
+      .getDestination()
+      .getCell(getVessel().getPortGrid());
     distanceInKm = distanceCalculator.distanceInKm(origin, destination);
   }
 
@@ -95,7 +98,7 @@ public class TravelDirectly extends ExtendedTripTask {
       .consumeFuel(
         engine.of(getVessel()).getLitresOfFuelConsumedPerKm() * distanceInKm
       );
-    getVessel().setCurrentCell(getVessel().getCurrentTrip().getDestination());
+    getVessel().setCurrentCell(destination);
     getTrip()
       .getEventManager()
       .broadcast(

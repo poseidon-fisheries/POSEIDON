@@ -26,6 +26,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
+import uk.ac.ox.poseidon.geography.Destination;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * A named port, uniquely identified by its {@code code} within a
@@ -39,7 +41,7 @@ import lombok.Value;
  */
 @Value
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
-public class Port {
+public class Port implements Destination {
 
   // TODO: consider storing location directly in port
 
@@ -48,4 +50,10 @@ public class Port {
 
   @NonNull
   String name;
+
+  /** @return the cell {@code portGrid} places this port on */
+  @Override
+  public Cell getCell(final PortGrid portGrid) {
+    return portGrid.getCell(this);
+  }
 }

@@ -36,6 +36,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.fishing.vessels.engines.Engine;
 import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
+import uk.ac.ox.poseidon.geography.Destination;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.PathFinder;
@@ -109,8 +110,8 @@ public final class Factories {
    * @param pathFinder   finds a path between two cells
    * @param distance     computes the distance, and so the duration, of each
    *                     hop
-   * @param destination  the destination to path to, read for the vessel once,
-   *                     at task start
+   * @param destination  the destination to path to the cell of, read for the
+   *                     vessel once, at task start
    * @param eventManager the event manager to broadcast the arrival
    *                     {@link TravelEvent} on, read for the vessel on arrival
    * @return a {@link uk.ac.ox.poseidon.fishing.tasks.TaskFactory} for a
@@ -131,7 +132,7 @@ public final class Factories {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      Cell
+      ? extends Destination
     > destination,
     final ValueFactory<
       ? super VesselComponentScope,

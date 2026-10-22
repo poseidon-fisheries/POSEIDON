@@ -25,20 +25,20 @@ package uk.ac.ox.poseidon.fishing.vessels.values;
 import java.util.function.Function;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.Destination;
 
 /**
- * Provides a vessel's current trip's destination cell, or {@code null} if it
- * has no current trip.
+ * Provides a vessel's current trip's destination, or {@code null} if it has no
+ * current trip.
  */
-public class CurrentTripDestinationCell implements Function<Vessel, Cell> {
+public class CurrentTripDestination implements Function<Vessel, Destination> {
 
   /**
    * @return the current trip's destination, or {@code null} if there is no
    *         current trip
    */
   @Override
-  public Cell apply(final Vessel vessel) {
+  public Destination apply(final Vessel vessel) {
     final Trip trip = vessel.getCurrentTrip();
     return trip != null ? trip.getDestination() : null;
   }

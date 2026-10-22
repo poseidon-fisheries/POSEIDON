@@ -29,22 +29,21 @@ import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.Destination;
 
 /**
- * A {@link GlobalScopeFactory} counterpart of
- * {@link CurrentTripDestinationCell}, built via
- * {@link Factories#currentTripDestinationCell()}.
+ * A {@link GlobalScopeFactory} counterpart of {@link CurrentTripDestination},
+ * built via {@link Factories#currentTripDestination()}.
  */
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
-public class CurrentTripDestinationCellFactory
-  extends GlobalScopeFactory<Function<Vessel, Cell>>
-  implements ValueFactory<Scope, Vessel, Cell>
+public class CurrentTripDestinationFactory
+  extends GlobalScopeFactory<Function<Vessel, Destination>>
+  implements ValueFactory<Scope, Vessel, Destination>
 {
 
   @Override
-  protected Function<Vessel, Cell> newInstance(final Scope scope) {
-    return new CurrentTripDestinationCell();
+  protected Function<Vessel, Destination> newInstance(final Scope scope) {
+    return new CurrentTripDestination();
   }
 }
