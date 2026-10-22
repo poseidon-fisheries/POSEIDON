@@ -27,14 +27,23 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
+import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link KeyedMemorySelector},
- * built via {@link Factories#keyedMemorySelector(Factory, ValueFactory)}.
+ * A {@link VesselScopeFactory} counterpart of {@link KeyedMemorySelector},
+ * built via {@link Factories#catchMemoryBy(ValueFactory)}. Each selector it
+ * builds selects from a new, empty {@link KeyedMemory}.
+ * <p>
+ * A memory is what its vessel knows across components, so it is
+ * vessel-level: each vessel has its own, and everything given this factory
+ * object, whether it remembers or reads, reaches the same one.
+ *
+ * @param <T> the type of input the key is read from
+ * @param <K> the type of key
+ * @param <O> the type of option observed
+ * @param <M> the type of what is remembered about an option
  */
 @Getter
 @ToString
@@ -42,18 +51,18 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class KeyedMemorySelectorFactory<
-  S extends Scope,
   T,
   K,
   O,
   M
-> extends RelativeScopeFactory<S, KeyedMemorySelector<T, K, O, M>> {
+> extends VesselScopeFactory<KeyedMemorySelector<T, K, O, M>> {
 
-  private final Factory<? super S, ? extends KeyedMemory<K, O, M>> keyedMemory;
-  private final ValueFactory<? super S, ? super T, ? extends K> key;
+  private final ValueFactory<? super VesselScope, ? super T, ? extends K> key;
 
   @Override
-  protected KeyedMemorySelector<T, K, O, M> newInstance(final S scope) {
-    return new KeyedMemorySelector<>(keyedMemory.get(scope), key.get(scope));
+  protected KeyedMemorySelector<T, K, O, M> newInstance(
+    final VesselScope scope
+  ) {
+    return new KeyedMemorySelector<>(new KeyedMemory<>(), key.get(scope));
   }
 }

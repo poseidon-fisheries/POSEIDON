@@ -55,6 +55,11 @@ constructor and a Lombok builder:
 
 Don't add other constructors to a factory class — construct it either via YAML or via the static helper.
 
+A factory is named after its product: `Product` is built by `ProductFactory`, and that is the pair
+to aim for. Depart from it only for a specific reason (e.g. a value factory whose product is a
+plain `Function`), never by leaving a factory's old name in place after its product changes. When
+a factory starts building something else, rename it to match.
+
 When designing a new factory, favor composition over a new bespoke implementation: check whether existing factories (in the same package or in `core`, e.g. constant/random/temporal providers) can be combined or parameterized to produce the desired behavior before writing a new `Factory` class from scratch.
 
 Type parameters keep one meaning throughout: `S` the scope, `P` a factory's product, `C` the

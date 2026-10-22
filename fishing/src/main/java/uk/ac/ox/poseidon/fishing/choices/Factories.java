@@ -303,34 +303,24 @@ public final class Factories {
   }
 
   /**
+   * @param key the key, such as the code of a gear, read from what is
+   *            remembered (a {@link FishingEvent}) and from what reads (a
+   *            {@link Vessel}); each key gets its own memory
    * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for
-   *         an empty {@link KeyedMemory}, one per vessel; give every selector
-   *         of a vessel's memory the same factory object (two make two
-   *         memories)
+   *         an empty memory of the catches made in each cell, one per vessel;
+   *         give everything that remembers in or reads a vessel's memory the
+   *         same factory object (two make two memories)
    * @see KeyedMemory
    */
-  public static <K, O, M> KeyedMemoryFactory<K, O, M> keyedMemory() {
-    return new KeyedMemoryFactory<>();
-  }
-
-  /**
-   * @param keyedMemory  the keyed memory to select from
-   * @param key the key, read from the selector's input
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link KeyedMemorySelector}
-   * @see KeyedMemorySelector
-   */
-  public static <S extends Scope, T, K, O, M> KeyedMemorySelectorFactory<
-    S,
+  public static <T, K> KeyedMemorySelectorFactory<
     T,
     K,
-    O,
-    M
-  > keyedMemorySelector(
-    final Factory<? super S, ? extends KeyedMemory<K, O, M>> keyedMemory,
-    final ValueFactory<? super S, ? super T, ? extends K> key
+    Cell,
+    Bucket
+  > catchMemoryBy(
+    final ValueFactory<? super VesselScope, ? super T, ? extends K> key
   ) {
-    return new KeyedMemorySelectorFactory<>(keyedMemory, key);
+    return new KeyedMemorySelectorFactory<>(key);
   }
 
   /**

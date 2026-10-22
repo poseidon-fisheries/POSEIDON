@@ -31,10 +31,9 @@ import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledByDateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.days;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
+import static uk.ac.ox.poseidon.fishing.choices.Factories.catchMemoryBy;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.exponentialMovingAverageOfBuckets;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.fishingEventRecorder;
-import static uk.ac.ox.poseidon.fishing.choices.Factories.keyedMemory;
-import static uk.ac.ox.poseidon.fishing.choices.Factories.keyedMemorySelector;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.memoryBasedOptionValues;
 import static uk.ac.ox.poseidon.fishing.social.Factories.cliqueDynamics;
 import static uk.ac.ox.poseidon.fishing.social.Factories.fishingEventSharer;
@@ -69,7 +68,7 @@ import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.fishing.catches.disposition.Disposition;
-import uk.ac.ox.poseidon.fishing.choices.KeyedMemoryFactory;
+import uk.ac.ox.poseidon.fishing.choices.KeyedMemorySelectorFactory;
 import uk.ac.ox.poseidon.fishing.choices.MemoryBasedOptionValuesFactory;
 import uk.ac.ox.poseidon.fishing.choices.OptionValues;
 import uk.ac.ox.poseidon.fishing.choices.Valuation;
@@ -81,6 +80,7 @@ import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEventAccumulator;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingOutcome;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet;
 import uk.ac.ox.poseidon.fishing.vessels.FleetFactory;
+import uk.ac.ox.poseidon.fishing.vessels.HasAttributes;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
@@ -128,13 +128,14 @@ class FishingEventSharingRouteTest {
     (option, bucket) ->
       bucket.getKg(species);
 
-  private final KeyedMemoryFactory<String, Cell, Bucket> vesselMemory =
-    keyedMemory();
+  private final KeyedMemorySelectorFactory<
+    HasAttributes,
+    String,
+    Cell,
+    Bucket
+  > vesselMemory = catchMemoryBy(stringAttribute("gear"));
   private final MemoryBasedOptionValuesFactory<Cell, Bucket> optionValues =
-    memoryBasedOptionValues(
-      keyedMemorySelector(vesselMemory, stringAttribute("gear")),
-      object(kgOfSpecies)
-    );
+    memoryBasedOptionValues(vesselMemory, object(kgOfSpecies));
   private final FleetFactory baseFleet = fleet(
     object(vesselField),
     object(portGrid),
@@ -188,7 +189,7 @@ class FishingEventSharingRouteTest {
             vesselEventListener(
               fishingEventRecorder(
                 object(modelGrid),
-                keyedMemorySelector(vesselMemory, stringAttribute("gear")),
+                vesselMemory,
                 exponentialMovingAverageOfBuckets(OWN_ALPHA)
               )
             )
@@ -200,7 +201,7 @@ class FishingEventSharingRouteTest {
             sharedFishingEventListener(
               fishingEventRecorder(
                 object(modelGrid),
-                keyedMemorySelector(vesselMemory, stringAttribute("gear")),
+                vesselMemory,
                 exponentialMovingAverageOfBuckets(SOCIAL_ALPHA)
               ),
               fishingEventSharer
@@ -246,7 +247,7 @@ class FishingEventSharingRouteTest {
   private void remember(final Vessel vessel, final double kg) {
     vesselMemory
       .get(scopeOf(vessel))
-      .get("PS")
+      .apply(vessel)
       .observe(cell, Bucket.of(species, kg), Bucket::add);
   }
 

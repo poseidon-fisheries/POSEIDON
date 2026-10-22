@@ -26,15 +26,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
+import static uk.ac.ox.poseidon.fishing.choices.Factories.catchMemoryBy;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.exponentialMovingAverageOfBuckets;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.fishingEventRecorder;
-import static uk.ac.ox.poseidon.fishing.choices.Factories.keyedMemory;
-import static uk.ac.ox.poseidon.fishing.choices.Factories.keyedMemorySelector;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.memoryBasedOptionValues;
 import static uk.ac.ox.poseidon.fishing.choices.FishingEventRecorderTest.fishingEvent;
 import static uk.ac.ox.poseidon.fishing.vessels.values.attributes.Factories.stringAttribute;
 
-import java.util.function.Function;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
@@ -44,9 +43,9 @@ import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
-import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
+import uk.ac.ox.poseidon.fishing.vessels.HasAttributes;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -70,12 +69,16 @@ class FishingEventRecorderFactoryTest {
     new SimulationScope(simulation),
     vesselB
   );
-  private final KeyedMemoryFactory<String, Cell, Bucket> keyedMemory =
-    keyedMemory();
+  private final KeyedMemorySelectorFactory<
+    HasAttributes,
+    String,
+    Cell,
+    Bucket
+  > catchMemory = catchMemoryBy(stringAttribute("gear"));
   private final FishingEventRecorderFactory<VesselScope> factory =
     fishingEventRecorder(
       object(modelGrid()),
-      keyedMemorySelector(keyedMemory, stringAttribute("gear")),
+      catchMemory,
       exponentialMovingAverageOfBuckets(0.5)
     );
 
@@ -88,6 +91,7 @@ class FishingEventRecorderFactoryTest {
     final EventManager eventManager = new SimpleEventManager();
     final Vessel vessel = mock(Vessel.class);
     when(vessel.getProductStore()).thenReturn(new ProductStore());
+    when(vessel.getAttributes()).thenReturn(Map.of("gear", "PS"));
     when(vessel.getEventManager()).thenReturn(eventManager);
     return vessel;
   }
@@ -96,17 +100,6 @@ class FishingEventRecorderFactoryTest {
     final ModelGrid modelGrid = mock(ModelGrid.class);
     when(modelGrid.toCell(COORDINATE)).thenReturn(CELL);
     return modelGrid;
-  }
-
-  private static final class PurseSeineKeyFactory
-    extends GlobalScopeFactory<Function<Vessel, String>>
-    implements ValueFactory<Scope, Vessel, String>
-  {
-
-    @Override
-    protected Function<Vessel, String> newInstance(final Scope scope) {
-      return vessel -> "PS";
-    }
   }
 
   private static final class KgOfSpeciesValuationFactory
@@ -126,16 +119,13 @@ class FishingEventRecorderFactoryTest {
       .getEventManager()
       .broadcast(fishingEvent("PS", COORDINATE, Bucket.of(SPECIES, 10)));
 
-    assertThat(keyedMemory.get(scopeA).get("PS").get(CELL)).isEmpty();
+    assertThat(catchMemory.get(scopeA).apply(vesselA).get(CELL)).isEmpty();
   }
 
   @Test
   void recordsInTheMemoryTheVesselsOptionValuesRead() {
     final MemoryBasedOptionValuesFactory<Cell, Bucket> optionValues =
-      memoryBasedOptionValues(
-        keyedMemorySelector(keyedMemory, new PurseSeineKeyFactory()),
-        new KgOfSpeciesValuationFactory()
-      );
+      memoryBasedOptionValues(catchMemory, new KgOfSpeciesValuationFactory());
 
     factory
       .get(scopeA)
