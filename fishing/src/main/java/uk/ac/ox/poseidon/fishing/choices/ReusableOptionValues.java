@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.choices;
 
+import it.unimi.dsi.fastutil.objects.Object2DoubleLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -31,8 +31,8 @@ import java.util.Map;
 
 /**
  * A reusable {@link OptionValues} implementation backed by a single
- * {@link Object2DoubleOpenHashMap}. After populating the map and consuming the
- * result, call {@link #clear()} to reset for re-use.
+ * {@link Object2DoubleLinkedOpenHashMap}. After populating the map and
+ * consuming the result, call {@link #clear()} to reset for re-use.
  * <p>
  * This instance must not be accessed concurrently or while another caller holds
  * a reference returned by a prior call (the returned reference IS this
@@ -40,8 +40,10 @@ import java.util.Map;
  */
 class ReusableOptionValues<O> extends MapBasedOptionValues<O> {
 
-  private final Object2DoubleOpenHashMap<O> values =
-    new Object2DoubleOpenHashMap<>();
+  // Linked, so that options come out in the order they were first put, and
+  // a pick among tied options does not depend on their hash codes.
+  private final Object2DoubleLinkedOpenHashMap<O> values =
+    new Object2DoubleLinkedOpenHashMap<>();
 
   // A field rather than a local so its backing array survives across
   // forEachBestEntry() calls (clear() resets size to 0 but keeps the array)

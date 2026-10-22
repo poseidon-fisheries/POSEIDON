@@ -28,8 +28,8 @@ import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 
 import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
+import it.unimi.dsi.fastutil.objects.Object2DoubleLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import java.util.AbstractMap;
@@ -52,8 +52,10 @@ public abstract class HashMapBasedOptionValues<O>
   implements MutableOptionValues<O>
 {
 
-  protected final Object2DoubleOpenHashMap<O> values =
-    new Object2DoubleOpenHashMap<>();
+  // Linked, so that options come out in the order they were first put, and
+  // a pick among tied options does not depend on their hash codes.
+  protected final Object2DoubleLinkedOpenHashMap<O> values =
+    new Object2DoubleLinkedOpenHashMap<>();
   private ImmutableList<O> cachedBestKeys = null;
   private double cachedBestValue = Double.NEGATIVE_INFINITY;
 

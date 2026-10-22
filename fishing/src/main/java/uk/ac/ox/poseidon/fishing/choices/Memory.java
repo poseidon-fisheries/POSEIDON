@@ -25,7 +25,7 @@ package uk.ac.ox.poseidon.fishing.choices;
 import static java.util.Objects.requireNonNull;
 import static lombok.AccessLevel.PACKAGE;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -48,7 +48,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = PACKAGE)
 public class Memory<O, M> {
 
-  private final Map<O, M> contents = new HashMap<>();
+  private final Map<O, M> contents = new LinkedHashMap<>();
 
   /**
    * Remembers {@code observation} for {@code option}: as is if nothing is
@@ -84,7 +84,9 @@ public class Memory<O, M> {
 
   /**
    * Calls {@code action} once per observed option, with what is remembered for
-   * it, in no particular order.
+   * it, in the order the options were first observed. That order does not
+   * depend on the options' hash codes, so neither does a pick among tied
+   * options.
    *
    * @param action the action to call
    */
