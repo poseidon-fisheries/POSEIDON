@@ -47,8 +47,10 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
-import uk.ac.ox.poseidon.fishing.tasks.travel.ArriveInPort;
+import uk.ac.ox.poseidon.fishing.tasks.travel.DockAtDestination;
+import uk.ac.ox.poseidon.fishing.tasks.travel.SetDestinationToOrigin;
 import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 class TripBlockTest {
@@ -57,6 +59,7 @@ class TripBlockTest {
   private static final Cell DESTINATION = new Cell(1, 0);
   private static final LocalDateTime NOW = LocalDateTime.of(2026, 1, 1, 7, 0);
 
+  private final Port port = mock(Port.class);
   private Vessel vessel;
 
   /**
@@ -80,7 +83,10 @@ class TripBlockTest {
     }
   }
 
-  /** A vessel in port, on no trip, with an account to fold trips into. */
+  /**
+   * A vessel docked at {@link #port}, on no trip, with an account to fold
+   * trips into.
+   */
   @BeforeEach
   void setUp() {
     final VesselField vesselField = mock(VesselField.class, RETURNS_DEEP_STUBS);
@@ -92,7 +98,8 @@ class TripBlockTest {
       behaviour(_ -> new ScriptedTask())
     );
     when(vesselField.getCell(vessel)).thenReturn(PORT);
-    when(portGrid.anyObjectsAt(PORT)).thenReturn(true);
+    when(portGrid.getCell(port)).thenReturn(PORT);
+    vessel.dockAt(port, NOW);
   }
 
   @SafeVarargs
@@ -114,7 +121,8 @@ class TripBlockTest {
     final TripBlock tripBlock = tripTo(
       Optional.of(DESTINATION),
       fishing,
-      new ArriveInPort(_ -> NOW)
+      new SetDestinationToOrigin(),
+      new DockAtDestination(_ -> NOW)
     );
     final BehaviorTree<Vessel> tree = treeOver(tripBlock);
 
@@ -122,12 +130,15 @@ class TripBlockTest {
     final Trip trip = vessel.getCurrentTrip();
     assertThat(trip).isNotNull();
     assertThat(trip.getDestination()).isEqualTo(DESTINATION);
+    assertThat(trip.getOrigin()).isEqualTo(port);
+    assertThat(vessel.isDocked()).isFalse();
 
     tree.step();
     assertThat(tripBlock.getStatus()).isEqualTo(SUCCEEDED);
     assertThat(fishing.tripsSeen).containsExactly(trip, trip);
     assertThat(vessel.getCurrentTrip()).isNull();
     assertThat(vessel.getPreviousTrip()).isSameAs(trip);
+    assertThat(vessel.getPortDockedAt()).isEqualTo(port);
     assertThat(trip.getStartDateTime()).isEqualTo(NOW);
     assertThat(trip.getEndDateTime()).isEqualTo(NOW);
   }
@@ -176,7 +187,7 @@ class TripBlockTest {
   void aTripBlockInsideAnotherThrows() {
     final TripBlock tripBlock = tripTo(
       Optional.of(DESTINATION),
-      tripTo(Optional.of(DESTINATION), new ArriveInPort(_ -> NOW))
+      tripTo(Optional.of(DESTINATION), new DockAtDestination(_ -> NOW))
     );
 
     assertThatThrownBy(treeOver(tripBlock)::step)

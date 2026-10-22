@@ -297,7 +297,7 @@ components:
               }
             fuelTank: *id011
             pathFinder: *id016
-          - !!uk.ac.ox.poseidon.fishing.tasks.travel.ArriveInPortFactory
+          - !!uk.ac.ox.poseidon.fishing.tasks.travel.DockAtDestinationFactory
             currentDateTime: !!uk.ac.ox.poseidon.core.CurrentDateTimeFactory {
               }
           - !!uk.ac.ox.poseidon.fishing.tasks.landings.LandCatchesFactory

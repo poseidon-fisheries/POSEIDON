@@ -418,7 +418,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             currentTripDestination(),
             currentTripEventManager()
           ),
-          arriveInPort(),
+          dockAtDestination(),
           landCatches(hold, constant(hours(1))),
           refuel(fuelTank, fuelStationGrid)
         ),

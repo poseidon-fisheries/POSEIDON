@@ -34,15 +34,15 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 
 /**
- * A {@link TaskFactory} counterpart of {@link ArriveInPort}, built via
- * {@link Factories#arriveInPort()}.
+ * A {@link TaskFactory} counterpart of {@link DockAtDestination}, built via
+ * {@link Factories#dockAtDestination()}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class ArriveInPortFactory extends TaskFactory<ArriveInPort> {
+public class DockAtDestinationFactory extends TaskFactory<DockAtDestination> {
 
   private final ValueFactory<
     ? super VesselComponentScope,
@@ -51,7 +51,7 @@ public class ArriveInPortFactory extends TaskFactory<ArriveInPort> {
   > currentDateTime;
 
   @Override
-  protected ArriveInPort newInstance(final VesselComponentScope scope) {
-    return new ArriveInPort(currentDateTime.get(scope));
+  protected DockAtDestination newInstance(final VesselComponentScope scope) {
+    return new DockAtDestination(currentDateTime.get(scope));
   }
 }

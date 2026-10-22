@@ -79,7 +79,14 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * the others, and what the vessel's own store holds, stay. An exit ends the
  * queue: the vessel leaves its fleet with no component left, and so inactive,
  * and nothing after it in the queue applies, nor any rebuild. Its current
- * state (cell, heading, trips) is changed by the behaviour itself, at once.
+ * state (cell, heading, the port it is docked at, trips) is changed by the
+ * behaviour itself, at once.
+ * <p>
+ * A vessel is either docked at a port or at sea. It starts docked at its home
+ * port, where it is created. Docking ({@link #dockAt}) and undocking
+ * ({@link #undock}) are explicit acts, each at a time, and the vessel cannot
+ * move while docked: a cell can hold several ports, so the port a vessel is
+ * docked at is never inferred from its cell.
  * <p>
  * A vessel has at most one step pending on the schedule. It holds no
  * schedule: its fleet gives it a {@link StepScheduler} that schedules its step
@@ -238,6 +245,8 @@ public class Vessel implements Oriented2D, HasAttributes {
   // Current state variables
   /** This vessel's current heading, in radians. */
   private double heading;
+  /** The port this vessel is docked at, or {@code null} if it is at sea. */
+  private Port portDockedAt;
   /** The vessel's current trip, or {@code null} if it isn't on one. */
   private Trip currentTrip;
   /**
@@ -542,14 +551,76 @@ public class Vessel implements Oriented2D, HasAttributes {
     return vesselField.getCell(this);
   }
 
-  /** Moves the vessel to {@code cell}. */
+  /**
+   * Moves the vessel to {@code cell}.
+   *
+   * @throws IllegalStateException if the vessel is docked
+   */
   public void setCurrentCell(final Cell cell) {
+    checkState(
+      !isDocked(),
+      "Vessel %s cannot move while docked at %s.",
+      id,
+      portDockedAt
+    );
     vesselField.setCell(this, cell);
   }
 
-  /** @return {@code true} if the vessel's current cell has a port on it */
-  public boolean isAtPort() {
-    return portGrid.anyObjectsAt(getCell());
+  /** @return whether this vessel is docked at a port */
+  public boolean isDocked() {
+    return portDockedAt != null;
+  }
+
+  /**
+   * Docks this vessel at {@code port} and broadcasts a {@link DockingEvent}.
+   *
+   * @param port     the port to dock at
+   * @param dateTime when the vessel docks
+   * @throws IllegalStateException if the vessel is already docked, or is not in
+   *                               {@code port}'s cell
+   */
+  public void dockAt(final Port port, final LocalDateTime dateTime) {
+    checkState(
+      !isDocked(),
+      "Vessel %s is already docked at %s.",
+      id,
+      portDockedAt
+    );
+    final Cell portCell = portGrid.getCell(port);
+    checkState(
+      getCell().equals(portCell),
+      "Vessel %s cannot dock at %s from %s, which is not the port's cell %s.",
+      id,
+      port,
+      getCell(),
+      portCell
+    );
+    this.portDockedAt = port;
+    currentEventManager().broadcast(new DockingEvent(this, port, dateTime));
+  }
+
+  /**
+   * Undocks this vessel from the port it is docked at and broadcasts an
+   * {@link UndockingEvent}.
+   *
+   * @param dateTime when the vessel undocks
+   * @throws IllegalStateException if the vessel is not docked
+   */
+  public void undock(final LocalDateTime dateTime) {
+    checkState(isDocked(), "Vessel %s is not docked.", id);
+    final Port port = portDockedAt;
+    this.portDockedAt = null;
+    currentEventManager().broadcast(new UndockingEvent(this, port, dateTime));
+  }
+
+  /**
+   * @return the event manager of the current trip, which forwards to this
+   *         vessel's own, or this vessel's own if it is on no trip: event
+   *         managers forward only upwards, so an event broadcast on the
+   *         vessel's would never reach the trip's listeners
+   */
+  private EventManager currentEventManager() {
+    return currentTrip == null ? eventManager : currentTrip.getEventManager();
   }
 
   @Override
@@ -600,7 +671,8 @@ public class Vessel implements Oriented2D, HasAttributes {
 
   /**
    * Puts {@code attributes} in place of this vessel's attributes, and places
-   * the vessel at its home port if it has no position yet.
+   * the vessel docked at its home port if it has no position yet: that is its
+   * initial state, not a docking, so it has no time and broadcasts nothing.
    *
    * @throws NullPointerException if {@code attributes} holds a {@code null}
    *                              name or value
@@ -617,34 +689,29 @@ public class Vessel implements Oriented2D, HasAttributes {
       .orElse(null);
     this.homePortCell = homePort == null ? null : portGrid.getCell(homePort);
     if (homePortCell != null && getCell() == null) {
-      setCurrentCell(homePortCell);
+      vesselField.setCell(this, homePortCell);
+      this.portDockedAt = homePort;
     }
   }
 
   /**
-   * Starts a new {@link Trip} to {@code destination}. Only a
-   * {@link TripBlock} opens a trip.
+   * Undocks the vessel and starts a new {@link Trip} to {@code destination},
+   * from the port it was docked at. Only a {@link TripBlock} opens a trip.
    *
    * @param destination   where the trip is initially headed
    * @param startDateTime when the trip starts
-   * @throws IllegalStateException if the vessel is already on a trip
+   * @throws IllegalStateException if the vessel is already on a trip, or is
+   *                               not docked
    */
   void startTrip(
     final Destination destination,
     final LocalDateTime startDateTime
   ) {
     checkState(currentTrip == null, "Vessel %s is already on a trip.", id);
-    this.currentTrip = new Trip(this, destination, startDateTime);
-  }
-
-  /**
-   * Records the current trip's arrival in port; see
-   * {@link Trip#arriveInPort}.
-   *
-   * @param arrivalDateTime when the vessel arrives
-   */
-  public void arriveInPort(final LocalDateTime arrivalDateTime) {
-    currentTrip.arriveInPort(arrivalDateTime);
+    checkState(isDocked(), "Vessel %s cannot start a trip at sea.", id);
+    final Port origin = portDockedAt;
+    undock(startDateTime);
+    this.currentTrip = new Trip(this, origin, destination, startDateTime);
   }
 
   /**

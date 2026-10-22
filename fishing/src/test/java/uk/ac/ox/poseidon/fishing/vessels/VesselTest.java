@@ -48,6 +48,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.engine.SimState;
+import uk.ac.ox.poseidon.core.events.SimpleListener;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.Sale;
@@ -358,23 +359,158 @@ class VesselTest {
     assertThat(vessel.getAttributes()).containsEntry("gear", "PS");
   }
 
-  @Test
-  void endTripKeepsTheFinishedTripAsThePreviousTrip() {
+  /** The cell {@link #vesselDockedAt} places its vessel and port on. */
+  private static final Cell PORT_CELL = new Cell(0, 0);
+
+  /**
+   * @return a vessel with no home port, docked at {@code port} on
+   *         {@link #PORT_CELL} at {@link #START}, on no trip
+   */
+  private static Vessel vesselDockedAt(final Port port) {
     final VesselField vesselField = mock(VesselField.class, RETURNS_DEEP_STUBS);
     final PortGrid portGrid = mock(PortGrid.class);
     final Vessel vessel = newVessel(
       mock(TemporalSchedule.class),
       vesselField,
       portGrid,
-      behaviour(scope -> behaviour)
+      behaviour(_ -> mock(VesselTask.class))
     );
-    when(vesselField.getCell(vessel)).thenReturn(new Cell(0, 0));
-    when(portGrid.anyObjectsAt(new Cell(0, 0))).thenReturn(true);
+    when(vesselField.getCell(vessel)).thenReturn(PORT_CELL);
+    when(portGrid.getCell(port)).thenReturn(PORT_CELL);
+    vessel.dockAt(port, START);
+    return vessel;
+  }
+
+  @Test
+  void aVesselStartsDockedAtItsHomePort() {
+    final Port homePort = mock(Port.class);
+    final PortGrid portGrid = mock(PortGrid.class);
+    when(portGrid.getObject("P1")).thenReturn(Optional.of(homePort));
+    when(portGrid.getCell(homePort)).thenReturn(PORT_CELL);
+    final Vessel vessel = newVessel(
+      schedule,
+      mock(VesselField.class),
+      portGrid,
+      behaviour(_ -> behaviour)
+    );
+
+    vessel.setAttributes(Map.of(HOME_PORT, "P1"));
+
+    assertThat(vessel.getPortDockedAt()).isSameAs(homePort);
+  }
+
+  @Test
+  void aDockedVesselCannotMove() {
+    final Vessel vessel = vesselDockedAt(mock(Port.class));
+
+    assertThatThrownBy(() -> vessel.setCurrentCell(new Cell(1, 0)))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("cannot move while docked");
+  }
+
+  @Test
+  void aVesselDocksOnlyInThePortsCell() {
+    final Port port = mock(Port.class);
+    final Vessel vessel = vesselDockedAt(port);
+    vessel.undock(START);
+    final Port elsewhere = mock(Port.class);
+    when(vessel.getPortGrid().getCell(elsewhere)).thenReturn(new Cell(1, 0));
+
+    assertThatThrownBy(() -> vessel.dockAt(elsewhere, START))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("not the port's cell");
+    assertThat(vessel.isDocked()).isFalse();
+  }
+
+  @Test
+  void aDockedVesselCannotDockAgain() {
+    final Port port = mock(Port.class);
+    final Vessel vessel = vesselDockedAt(port);
+
+    assertThatThrownBy(() -> vessel.dockAt(port, START))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("already docked");
+  }
+
+  @Test
+  void aVesselAtSeaCannotUndock() {
+    final Vessel vessel = vesselDockedAt(mock(Port.class));
+    vessel.undock(START);
+
+    assertThatThrownBy(() -> vessel.undock(START))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("not docked");
+  }
+
+  @Test
+  void dockingAndUndockingAreBroadcastOnTheVesselsEventManager() {
+    final Port port = mock(Port.class);
+    final Vessel vessel = vesselDockedAt(port);
+    final List<Object> events = new ArrayList<>();
+    vessel
+      .getEventManager()
+      .addListener(new SimpleListener<>(DockingEvent.class, events::add));
+    vessel
+      .getEventManager()
+      .addListener(new SimpleListener<>(UndockingEvent.class, events::add));
+
+    vessel.undock(START.plusHours(1));
+    vessel.dockAt(port, START.plusHours(2));
+
+    assertThat(events).containsExactly(
+      new UndockingEvent(vessel, port, START.plusHours(1)),
+      new DockingEvent(vessel, port, START.plusHours(2))
+    );
+  }
+
+  @Test
+  void startingATripUndocksTheVesselFromTheTripsOrigin() {
+    final Port port = mock(Port.class);
+    final Vessel vessel = vesselDockedAt(port);
+
+    vessel.startTrip(new Cell(1, 0), START);
+
+    assertThat(vessel.isDocked()).isFalse();
+    assertThat(vessel.getCurrentTrip().getOrigin()).isSameAs(port);
+  }
+
+  @Test
+  void aVesselAtSeaCannotStartATrip() {
+    final Vessel vessel = vesselDockedAt(mock(Port.class));
+    vessel.undock(START);
+
+    assertThatThrownBy(() -> vessel.startTrip(new Cell(1, 0), START))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("cannot start a trip at sea");
+  }
+
+  @Test
+  void aDockingDuringATripReachesTheTripsListeners() {
+    final Port port = mock(Port.class);
+    final Vessel vessel = vesselDockedAt(port);
+    vessel.startTrip(new Cell(1, 0), START);
+    final List<DockingEvent> events = new ArrayList<>();
+    vessel
+      .getCurrentTrip()
+      .getEventManager()
+      .addListener(new SimpleListener<>(DockingEvent.class, events::add));
+
+    vessel.dockAt(port, START.plusHours(8));
+
+    assertThat(events).containsExactly(
+      new DockingEvent(vessel, port, START.plusHours(8))
+    );
+  }
+
+  @Test
+  void endTripKeepsTheFinishedTripAsThePreviousTrip() {
+    final Port port = mock(Port.class);
+    final Vessel vessel = vesselDockedAt(port);
 
     assertNull(vessel.getPreviousTrip());
     vessel.startTrip(new Cell(1, 0), START);
     final Trip trip = vessel.getCurrentTrip();
-    vessel.arriveInPort(START.plusHours(8));
+    vessel.dockAt(port, START.plusHours(8));
     vessel.endTrip(START.plusHours(9));
 
     assertNull(vessel.getCurrentTrip());

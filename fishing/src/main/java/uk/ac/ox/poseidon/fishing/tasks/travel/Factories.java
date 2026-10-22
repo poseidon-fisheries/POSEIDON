@@ -185,10 +185,11 @@ public final class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.fishing.tasks.TaskFactory} for an {@link ArriveInPort}
-   * @see ArriveInPort
+   * @return a {@link uk.ac.ox.poseidon.fishing.tasks.TaskFactory} for a
+   *         {@link DockAtDestination}
+   * @see DockAtDestination
    */
-  public static ArriveInPortFactory arriveInPort() {
-    return new ArriveInPortFactory(currentDateTime());
+  public static DockAtDestinationFactory dockAtDestination() {
+    return new DockAtDestinationFactory(currentDateTime());
   }
 }

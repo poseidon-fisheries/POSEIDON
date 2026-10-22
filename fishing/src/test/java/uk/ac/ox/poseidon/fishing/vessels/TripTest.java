@@ -43,10 +43,12 @@ import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingOutcome;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 class TripTest {
 
   private static final LocalDateTime START = LocalDateTime.of(2026, 1, 1, 6, 0);
+  private static final Port ORIGIN = mock(Port.class);
 
   private static Vessel newVessel(final Cell cell, final ModelGrid modelGrid) {
     return newVessel(cell, modelGrid, mock(EventManager.class));
@@ -75,7 +77,7 @@ class TripTest {
     final Vessel vessel = newVessel(new Cell(0, 0), modelGrid);
 
     assertThatThrownBy(() ->
-      new Trip(vessel, new Cell(5, 5), START)
+      new Trip(vessel, ORIGIN, new Cell(5, 5), START)
     ).isInstanceOf(IllegalArgumentException.class);
   }
 
@@ -85,7 +87,7 @@ class TripTest {
     // succeeds.
     final ModelGrid modelGrid = mock(ModelGrid.class);
     final Vessel vessel = newVessel(new Cell(0, 0), modelGrid);
-    final Trip trip = new Trip(vessel, new Cell(1, 1), START);
+    final Trip trip = new Trip(vessel, ORIGIN, new Cell(1, 1), START);
 
     doThrow(new IllegalArgumentException("outside grid"))
       .when(modelGrid)
@@ -97,21 +99,19 @@ class TripTest {
   }
 
   @Test
-  void setDestinationToTripOriginResetsToOrigin() {
-    final ModelGrid modelGrid = mock(ModelGrid.class);
-    final Cell origin = new Cell(2, 2);
-    final Vessel vessel = newVessel(origin, modelGrid);
-    final Trip trip = new Trip(vessel, new Cell(3, 3), START);
+  void setDestinationToTripOriginHeadsForTheOriginPort() {
+    final Trip trip = newTrip();
 
     trip.setDestinationToTripOrigin();
 
-    assertThat(trip.getDestination()).isEqualTo(origin);
+    assertThat(trip.getDestination()).isEqualTo(ORIGIN);
   }
 
   @Test
   void recordsFishingEventsBroadcastOnItsEventManagerInOrder() {
     final Trip trip = new Trip(
       newVessel(new Cell(0, 0), mock(ModelGrid.class)),
+      ORIGIN,
       new Cell(1, 1),
       START
     );
@@ -129,6 +129,7 @@ class TripTest {
     final EventManager vesselEventManager = new SimpleEventManager();
     final Trip trip = new Trip(
       newVessel(new Cell(0, 0), mock(ModelGrid.class), vesselEventManager),
+      ORIGIN,
       new Cell(1, 1),
       START
     );
@@ -149,6 +150,7 @@ class TripTest {
   void fishingEventsCannotBeModifiedFromOutside() {
     final Trip trip = new Trip(
       newVessel(new Cell(0, 0), mock(ModelGrid.class)),
+      ORIGIN,
       new Cell(1, 1),
       START
     );
@@ -159,51 +161,37 @@ class TripTest {
   }
 
   @Test
-  void recordsWhenItArrivedInPort() {
+  void recordsWhenTheVesselDockedAsItsArrivalInPort() {
     final Trip trip = newTrip();
 
-    trip.arriveInPort(START.plusHours(8));
+    dock(trip, START.plusHours(8));
 
     assertThat(trip.getPortArrivalDateTime()).isEqualTo(START.plusHours(8));
   }
 
   @Test
-  void cannotArriveInPortAwayFromAPort() {
-    final Trip trip = newTrip();
-    when(trip.getVessel().isAtPort()).thenReturn(false);
-
-    assertThatThrownBy(() -> trip.arriveInPort(START)).isInstanceOf(
-      IllegalStateException.class
-    );
-  }
-
-  @Test
-  void cannotArriveInPortTwice() {
-    final Trip trip = newTrip();
-    trip.arriveInPort(START);
-
-    assertThatThrownBy(() -> trip.arriveInPort(START)).isInstanceOf(
-      IllegalStateException.class
-    );
-  }
-
-  @Test
-  void hasArrivedInPortOnlyOnceItArrives() {
+  void hasArrivedInPortOnlyWhileTheVesselIsDocked() {
     final Trip trip = newTrip();
     assertThat(trip.hasArrivedInPort()).isFalse();
 
-    trip.arriveInPort(START);
-
+    dock(trip, START.plusHours(8));
     assertThat(trip.hasArrivedInPort()).isTrue();
+
+    trip
+      .getEventManager()
+      .broadcast(
+        new UndockingEvent(trip.getVessel(), ORIGIN, START.plusHours(9))
+      );
+    assertThat(trip.hasArrivedInPort()).isFalse();
   }
 
   @Test
-  void cannotEndBeforeArrivingInPort() {
+  void cannotEndAtSea() {
     final Trip trip = newTrip();
 
-    assertThatThrownBy(() -> trip.endTrip(START)).isInstanceOf(
-      IllegalStateException.class
-    );
+    assertThatThrownBy(() -> trip.endTrip(START))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("cannot end at sea");
   }
 
   @Test
@@ -219,7 +207,7 @@ class TripTest {
   void timeAtSeaRunsFromTheStartToTheArrivalInPort() {
     final Trip trip = newTrip();
 
-    trip.arriveInPort(START.plusHours(8));
+    dock(trip, START.plusHours(8));
 
     assertThat(trip.getTotalTimeAtSea()).isEqualTo(Duration.ofHours(8));
   }
@@ -227,7 +215,7 @@ class TripTest {
   @Test
   void hasNoTotalDurationBeforeItEnds() {
     final Trip trip = newTrip();
-    trip.arriveInPort(START.plusHours(8));
+    dock(trip, START.plusHours(8));
 
     assertThatThrownBy(trip::getTotalDuration).isInstanceOf(
       IllegalStateException.class
@@ -237,18 +225,28 @@ class TripTest {
   @Test
   void totalDurationRunsFromTheStartToTheEnd() {
     final Trip trip = newTrip();
-    trip.arriveInPort(START.plusHours(8));
+    dock(trip, START.plusHours(8));
 
     trip.endTrip(START.plusHours(9));
 
     assertThat(trip.getTotalDuration()).isEqualTo(Duration.ofHours(9));
   }
 
-  /** A trip starting in port at {@link #START}. */
+  /** A trip starting from {@link #ORIGIN} at {@link #START}. */
   private static Trip newTrip() {
     final Vessel vessel = newVessel(new Cell(0, 0), mock(ModelGrid.class));
-    when(vessel.isAtPort()).thenReturn(true);
-    return new Trip(vessel, new Cell(1, 1), START);
+    return new Trip(vessel, ORIGIN, new Cell(1, 1), START);
+  }
+
+  /**
+   * Broadcasts {@code trip}'s vessel docking at {@link #ORIGIN}, as the vessel
+   * does, and has the vessel report itself docked.
+   */
+  private static void dock(final Trip trip, final LocalDateTime dateTime) {
+    when(trip.getVessel().isDocked()).thenReturn(true);
+    trip
+      .getEventManager()
+      .broadcast(new DockingEvent(trip.getVessel(), ORIGIN, dateTime));
   }
 
   private static FishingEvent newFishingEvent() {

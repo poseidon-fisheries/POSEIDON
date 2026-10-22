@@ -46,7 +46,7 @@ import uk.ac.ox.poseidon.geography.grids.Cell;
  * {@code travelTask} instance for both legs — safe because every task here
  * fully re-initializes its own state in {@code start()}, which gdx-ai calls
  * fresh each time a sequence enters a child, regardless of that child's
- * previous run), arrive in port, land the catch. Built via
+ * previous run), dock at the origin port, land the catch. Built via
  * {@link Factories#roundTrip}.
  */
 @Getter
@@ -83,7 +83,7 @@ public class RoundTripFactory extends TaskFactory<TripBlock> {
    * @return a {@link TripBlock} to {@code initialDestination} of:
    *         {@code travelTask} (outbound), {@code fishingTask}, a
    *         {@link SetDestinationToOrigin}, {@code travelTask} again
-   *         (inbound), an {@link ArriveInPort} and {@code landingTask}
+   *         (inbound), a {@link DockAtDestination} and {@code landingTask}
    */
   @Override
   protected TripBlock newInstance(final VesselComponentScope scope) {
@@ -100,7 +100,7 @@ public class RoundTripFactory extends TaskFactory<TripBlock> {
         fishingTask,
         new SetDestinationToOrigin(),
         travelTask,
-        new ArriveInPort(currentDateTime),
+        new DockAtDestination(currentDateTime),
         landingTask
       )
     );

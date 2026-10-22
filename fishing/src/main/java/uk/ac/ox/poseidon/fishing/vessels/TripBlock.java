@@ -109,8 +109,8 @@ public final class TripBlock extends Sequence<Vessel> {
     if (tripOpen) {
       checkState(
         getStatus() == SUCCEEDED,
-        "A trip block ended as %s with its trip open: a trip ends only by " +
-          "travelling home.",
+        "A trip block ended as %s with its trip open: a trip ends only " +
+          "docked in port.",
         getStatus()
       );
       getVessel().endTrip(currentDateTime.apply(getVessel()));

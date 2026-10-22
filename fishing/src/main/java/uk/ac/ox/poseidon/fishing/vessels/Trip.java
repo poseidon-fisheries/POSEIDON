@@ -40,26 +40,28 @@ import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
 import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.accounts.Account;
 import uk.ac.ox.poseidon.geography.Destination;
-import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
- * A single fishing trip: the span between a vessel leaving its current cell
- * with a destination in mind and {@link #endTrip} being called. Only a
+ * A single fishing trip: the span between a vessel undocking from a port, its
+ * origin, with a destination in mind and {@link #endTrip} being called, with
+ * the vessel docked again. Only a
  * {@link TripBlock}, through the vessel, starts and ends a trip. Broadcasts a
  * {@link TripStartEvent} at construction and a {@link TripEndEvent} on
  * {@link #endTrip}, through an {@link EventManager} that forwards to the
  * vessel's own, so trip-scoped listeners can be added without affecting
  * vessel-level ones. {@code destination} can be redirected mid-trip via
  * {@link #setDestination}, e.g. to head towards a new destination or, via
- * {@link #setDestinationToTripOrigin()}, to abort and return home; every change
+ * {@link #setDestinationToTripOrigin()}, to head back to the origin port; every change
  * is validated against the vessel's grid, the way the initial destination is at
  * construction. {@code origin} and {@code startDateTime} are fixed once the
  * trip begins.
  * <p>
- * A trip holds no clock: it is given the dates it starts, arrives in port and
- * ends. It has two totals, each known once its leg is over: its
+ * A trip holds no clock: it is given the dates it starts and ends, and takes
+ * the date of its arrival in port from the vessel's {@link DockingEvent}. It
+ * has two totals, each known once its leg is over: its
  * {@linkplain #getTotalTimeAtSea() total time at sea}, from its start to its
- * arrival in port ({@link #arriveInPort}), and its
+ * arrival in port, and its
  * {@linkplain #getTotalDuration() total duration}, from its start to its end.
  * The difference is the time spent in port before the trip ends, e.g. landing
  * the catch. The time at sea or duration so far is its reader's to work out,
@@ -70,7 +72,7 @@ public class Trip {
 
   private final @NonNull Vessel vessel;
   private final @NonNull EventManager eventManager;
-  private final @NonNull Cell origin;
+  private final @NonNull Port origin;
   private final @NonNull LocalDateTime startDateTime;
   private final Account account = new Account();
 
@@ -79,17 +81,24 @@ public class Trip {
   private final List<FishingEvent> fishingEvents = new ArrayList<>();
 
   private @NonNull Destination destination;
+
+  /**
+   * When the vessel docked, if it is docked; cleared when it undocks, so a
+   * stop before the end of the trip is not its arrival.
+   */
   private LocalDateTime portArrivalDateTime;
   private LocalDateTime endDateTime;
 
   /**
    * @param vessel        the vessel taking this trip
+   * @param origin        the port the vessel undocked from to start the trip
    * @param destination   where the trip is initially headed; must be on a cell
    *                      in the vessel's grid
    * @param startDateTime when the trip starts
    */
   Trip(
     final @NonNull Vessel vessel,
+    final @NonNull Port origin,
     final @NonNull Destination destination,
     final @NonNull LocalDateTime startDateTime
   ) {
@@ -102,7 +111,19 @@ public class Trip {
     this.eventManager.addListener(
       new SimpleListener<>(FishingEvent.class, fishingEvents::add)
     );
-    this.origin = vessel.getCell();
+    this.eventManager.addListener(
+      new SimpleListener<>(
+        DockingEvent.class,
+        event -> portArrivalDateTime = event.getDateTime()
+      )
+    );
+    this.eventManager.addListener(
+      new SimpleListener<>(
+        UndockingEvent.class,
+        _ -> portArrivalDateTime = null
+      )
+    );
+    this.origin = origin;
     this.startDateTime = startDateTime;
     this.eventManager.broadcast(new TripStartEvent(this));
   }
@@ -125,30 +146,7 @@ public class Trip {
     return destination;
   }
 
-  /**
-   * Records the vessel's arrival in port, which ends its time at sea.
-   *
-   * @param arrivalDateTime when the vessel arrives
-   * @throws IllegalStateException if the vessel is not at a port, or the trip
-   *                               has already arrived in port
-   */
-  public void arriveInPort(final @NonNull LocalDateTime arrivalDateTime) {
-    checkState(
-      !hasArrivedInPort(),
-      "The trip of vessel %s has already arrived in port.",
-      vessel.getId()
-    );
-    checkState(
-      vessel.isAtPort(),
-      "Vessel %s is not at a port.",
-      vessel.getId()
-    );
-    this.portArrivalDateTime = arrivalDateTime;
-  }
-
-  /**
-   * @return whether the trip has arrived in port; see {@link #arriveInPort}
-   */
+  /** @return whether the vessel is docked, which is the trip's arrival */
   public boolean hasArrivedInPort() {
     return portArrivalDateTime != null;
   }
@@ -183,12 +181,12 @@ public class Trip {
    * Marks the trip as ended and broadcasts a {@link TripEndEvent}.
    *
    * @param endDateTime when the trip ends
-   * @throws IllegalStateException if the trip has not arrived in port
+   * @throws IllegalStateException if the vessel is not docked
    */
   void endTrip(final @NonNull LocalDateTime endDateTime) {
     checkState(
-      hasArrivedInPort(),
-      "The trip of vessel %s cannot end before arriving in port.",
+      vessel.isDocked(),
+      "The trip of vessel %s cannot end at sea.",
       vessel.getId()
     );
     this.endDateTime = endDateTime;
@@ -203,7 +201,7 @@ public class Trip {
     return Collections.unmodifiableList(fishingEvents);
   }
 
-  /** Redirects the trip back towards where it started. */
+  /** Redirects the trip back towards the port it started from. */
   public void setDestinationToTripOrigin() {
     setDestination(origin);
   }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2025-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -20,32 +20,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.fishing.tasks.travel;
-
-import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+package uk.ac.ox.poseidon.fishing.vessels;
 
 import java.time.LocalDateTime;
-import java.util.function.Function;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
-import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import lombok.Value;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
- * A leaf {@link VesselTask} that records the vessel's arrival in port, ending
- * its current trip's time at sea, and always succeeds.
+ * Broadcast when a {@link Vessel} undocks from a port. It goes on the event
+ * manager of the vessel's current trip, which forwards it to the vessel's
+ * own, or straight on the vessel's own if it is on no trip, as when the
+ * undocking starts a trip.
  */
-@RequiredArgsConstructor
-public class ArriveInPort extends VesselTask {
+@Value
+public class UndockingEvent {
 
-  /** The clock, which dates the arrival. */
-  @NonNull
-  private final Function<? super Vessel, LocalDateTime> currentDateTime;
-
-  /** Records the vessel's arrival in port. */
-  @Override
-  public Status execute() {
-    getVessel().arriveInPort(currentDateTime.apply(getVessel()));
-    return SUCCEEDED;
-  }
+  /** The vessel that undocked. */
+  Vessel vessel;
+  /** The port it undocked from. */
+  Port port;
+  /** When it undocked. */
+  LocalDateTime dateTime;
 }

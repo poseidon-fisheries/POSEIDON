@@ -112,7 +112,10 @@ class VoyageHomeTest {
     }
   }
 
-  /** Travels three hours to the home port it has as it sets off. */
+  /**
+   * Undocks and travels three hours to the home port it has as it sets off,
+   * where it docks.
+   */
   private final class VoyageHome extends VesselTask {
 
     private Port destination;
@@ -121,10 +124,12 @@ class VoyageHomeTest {
     public Status execute() {
       if (getStatus() == Status.RUNNING) {
         getVessel().setCurrentCell(portGrid.getCell(destination));
+        getVessel().dockAt(destination, schedule.getDateTime());
         log.add("arrive at " + destination.getCode());
         return Status.SUCCEEDED;
       }
       destination = getVessel().getHomePort();
+      getVessel().undock(schedule.getDateTime());
       log.add("travel home to " + destination.getCode());
       return runFor(ofHours(3));
     }

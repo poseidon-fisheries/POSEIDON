@@ -56,7 +56,9 @@ import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -152,7 +154,17 @@ class FishingEventSharingRouteTest {
     when(portGrid.getObject("P1")).thenReturn(Optional.of(port));
     when(modelGrid.toCell(coordinate)).thenReturn(cell);
     when(vesselField.getModelGrid()).thenReturn(modelGrid);
-    when(vesselField.getCell(any())).thenReturn(cell);
+    when(portGrid.getCell(port)).thenReturn(cell);
+    // Places each vessel where it is set, so that it starts docked at its
+    // home port, on the cell.
+    final Map<Vessel, Cell> cells = new HashMap<>();
+    when(vesselField.setCell(any(), any())).thenAnswer(invocation -> {
+      cells.put(invocation.getArgument(0), invocation.getArgument(1));
+      return true;
+    });
+    when(vesselField.getCell(any())).thenAnswer(invocation ->
+      cells.get(invocation.<Vessel>getArgument(0))
+    );
   }
 
   private void startSimulation(
