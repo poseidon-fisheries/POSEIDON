@@ -22,40 +22,30 @@
 
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
-import java.util.function.Function;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.Duration;
+import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.ValueFactory;
+import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
-/**
- * A {@link RelativeScopeFactory} for a {@link TripCostFromHourlyCosts}. Built
- * via {@link Factories#tripCostFromHourlyCosts}.
- */
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder(toBuilder = true)
-public class TripCostFromHourlyCostsFactory<S extends Scope>
-  extends RelativeScopeFactory<S, Function<Vessel, Money>>
-  implements ValueFactory<S, Vessel, Money>
-{
+class TimeAtSeaCostTest {
 
-  private final ValueFactory<
-    ? super S,
-    ? super Vessel,
-    ? extends Money
-  > hourlyCosts;
+  @Test
+  void appliesHourlyRateToHoursAtSea() {
+    final CurrencyUnit eur = CurrencyUnit.of("EUR");
+    final Money hourlyCost = Money.of(eur, 10.0);
 
-  @Override
-  protected Function<Vessel, Money> newInstance(final S scope) {
-    return new TripCostFromHourlyCosts(hourlyCosts.get(scope));
+    final Trip trip = mock(Trip.class);
+    when(trip.getVessel()).thenReturn(mock(Vessel.class));
+    when(trip.getTotalTimeAtSea()).thenReturn(Duration.ofHours(3));
+
+    final TimeAtSeaCost timeAtSeaCost = new TimeAtSeaCost(v -> hourlyCost);
+
+    assertThat(timeAtSeaCost.apply(trip)).isEqualTo(Money.of(eur, 30.0));
   }
 }

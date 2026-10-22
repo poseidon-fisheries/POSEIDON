@@ -33,10 +33,10 @@ import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * Provides the time at sea of a vessel's current trip so far: from its start to
- * now while the vessel is at sea, and its
- * {@linkplain Trip#getTotalTimeAtSea() total time at sea} once it has arrived
- * in port. Only checks made during a trip read it.
+ * Provides the time at sea of a vessel's current trip so far: from its start
+ * to now, less the time it has spent docked, including a stop still in
+ * progress (see {@link Trip#getTimeAtSeaUntil}). Only checks made during a
+ * trip read it.
  */
 @RequiredArgsConstructor
 public class CurrentTimeAtSea implements Function<Vessel, Duration> {
@@ -57,11 +57,6 @@ public class CurrentTimeAtSea implements Function<Vessel, Duration> {
       "Vessel %s is not on a trip.",
       vessel.getId()
     );
-    return currentTrip.hasArrivedInPort()
-      ? currentTrip.getTotalTimeAtSea()
-      : Duration.between(
-          currentTrip.getStartDateTime(),
-          currentDateTime.apply(vessel)
-        );
+    return currentTrip.getTimeAtSeaUntil(currentDateTime.apply(vessel));
   }
 }

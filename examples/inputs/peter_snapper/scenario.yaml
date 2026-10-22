@@ -401,6 +401,8 @@ components:
                   }
             randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
               }
+          tripCosts: [
+            ]
         - !!uk.ac.ox.poseidon.fishing.tasks.general.WaitForFactory
           duration: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory
             object: !!uk.ac.ox.poseidon.core.time.DurationFactory {

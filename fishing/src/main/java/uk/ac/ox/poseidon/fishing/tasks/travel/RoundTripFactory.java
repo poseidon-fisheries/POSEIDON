@@ -95,6 +95,7 @@ public class RoundTripFactory extends TaskFactory<TripBlock> {
     return new TripBlock(
       initialDestination.get(scope),
       currentDateTime,
+      List.of(),
       List.of(
         travelTask,
         fishingTask,

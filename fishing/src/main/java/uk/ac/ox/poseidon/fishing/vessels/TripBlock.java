@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import org.joda.money.Money;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
@@ -39,6 +40,9 @@ import uk.ac.ox.poseidon.geography.grids.Cell;
  * closes the trip once they have all succeeded. Only a trip block sets or
  * clears the vessel's current trip, so a behaviour that is not running has
  * no trip open.
+ *
+ * <p>It has trip costs, possibly none, each a function of the finished trip,
+ * which it charges as it closes the trip, before the trip's end is broadcast.
  *
  * <p>When it starts running, it asks {@code initialDestination} for the
  * trip's first destination and fails, without opening a trip, if there is
@@ -51,23 +55,30 @@ public final class TripBlock extends Sequence<Vessel> {
 
   private final Function<? super Vessel, Optional<Cell>> initialDestination;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final List<
+    ? extends Function<? super Trip, ? extends Money>
+  > tripCosts;
   private boolean tripOpen;
 
   /**
    * @param initialDestination gives the trip's first destination for the
    *                           vessel, or none if it should not leave
    * @param currentDateTime    the clock, which dates the trip's start and end
+   * @param tripCosts          the costs of the finished trip, charged in
+   *                           order; possibly none
    * @param children           the tasks run in sequence during the trip
    * @throws IllegalArgumentException if {@code children} is empty
    */
   public TripBlock(
     final Function<? super Vessel, Optional<Cell>> initialDestination,
     final Function<? super Vessel, LocalDateTime> currentDateTime,
+    final List<? extends Function<? super Trip, ? extends Money>> tripCosts,
     final List<? extends Task<Vessel>> children
   ) {
     checkArgument(!children.isEmpty(), "A trip needs at least one task.");
     this.initialDestination = initialDestination;
     this.currentDateTime = currentDateTime;
+    this.tripCosts = List.copyOf(tripCosts);
     children.forEach(this::addChild);
   }
 
@@ -99,7 +110,7 @@ public final class TripBlock extends Sequence<Vessel> {
   }
 
   /**
-   * Closes the trip if the block succeeded.
+   * Closes the trip, charging its cost, if the block succeeded.
    *
    * @throws IllegalStateException if the block failed or was cancelled with
    *                               its trip open
@@ -113,7 +124,7 @@ public final class TripBlock extends Sequence<Vessel> {
           "docked in port.",
         getStatus()
       );
-      getVessel().endTrip(currentDateTime.apply(getVessel()));
+      getVessel().endTrip(currentDateTime.apply(getVessel()), tripCosts);
       tripOpen = false;
     }
   }

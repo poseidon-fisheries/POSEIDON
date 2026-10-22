@@ -28,12 +28,14 @@ import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
@@ -62,6 +64,16 @@ public class TripBlockFactory extends TaskFactory<TripBlock> {
     LocalDateTime
   > currentDateTime;
 
+  /** Give the costs of the finished trip, charged in order; possibly none. */
+  @Singular
+  private final ImmutableList<
+    ? extends ValueFactory<
+      ? super VesselComponentScope,
+      ? super Trip,
+      ? extends Money
+    >
+  > tripCosts;
+
   @Singular
   private final ImmutableList<
     ? extends Factory<? super VesselComponentScope, ? extends Task<Vessel>>
@@ -72,6 +84,12 @@ public class TripBlockFactory extends TaskFactory<TripBlock> {
     return new TripBlock(
       initialDestination.get(scope),
       currentDateTime.get(scope),
+      tripCosts
+        .stream()
+        .<Function<? super Trip, ? extends Money>>map(tripCost ->
+          tripCost.get(scope)
+        )
+        .collect(toImmutableList()),
       children
         .stream()
         .<Task<Vessel>>map(child -> child.get(scope))

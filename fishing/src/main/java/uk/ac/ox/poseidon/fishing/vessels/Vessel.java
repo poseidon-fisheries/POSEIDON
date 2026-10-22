@@ -41,6 +41,7 @@ import java.util.Queue;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.NonNull;
+import org.joda.money.Money;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
 import uk.ac.ox.poseidon.core.Factory;
@@ -715,13 +716,18 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Ends the current trip, folding its account into the vessel's own, and keeps
+   * Ends the current trip, charging {@code tripCosts} to it (see
+   * {@link Trip#endTrip}), folds its account into the vessel's own, and keeps
    * it as the {@link #previousTrip}. Only a {@link TripBlock} closes a trip.
    *
    * @param endDateTime when the trip ends
+   * @param tripCosts   the costs of the finished trip, possibly none
    */
-  void endTrip(final LocalDateTime endDateTime) {
-    currentTrip.endTrip(endDateTime);
+  void endTrip(
+    final LocalDateTime endDateTime,
+    final List<? extends Function<? super Trip, ? extends Money>> tripCosts
+  ) {
+    currentTrip.endTrip(endDateTime, tripCosts);
     this.account.add(currentTrip.getAccount());
     this.previousTrip = currentTrip;
     this.currentTrip = null;

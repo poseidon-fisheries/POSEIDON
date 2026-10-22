@@ -20,35 +20,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.fishing.vessels.values;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+package uk.ac.ox.poseidon.fishing.vessels;
 
 import java.time.Duration;
-import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
-import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.fishing.vessels.Trip;
-import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import java.time.LocalDateTime;
+import lombok.NonNull;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
-class TripCostFromHourlyCostsTest {
-
-  @Test
-  void appliesHourlyRateToHoursAtSea() {
-    final CurrencyUnit eur = CurrencyUnit.of("EUR");
-    final Money hourlyCost = Money.of(eur, 10.0);
-
-    final Vessel vessel = mock(Vessel.class);
-    final Trip trip = mock(Trip.class);
-    when(vessel.getCurrentTrip()).thenReturn(trip);
-    when(trip.getTotalTimeAtSea()).thenReturn(Duration.ofHours(3));
-
-    final TripCostFromHourlyCosts tripCost = new TripCostFromHourlyCosts(
-      v -> hourlyCost
-    );
-
-    assertThat(tripCost.apply(vessel)).isEqualTo(Money.of(eur, 30.0));
+/**
+ * A stop of a {@link Trip} before its end: the vessel docked at {@code port}
+ * and undocked again. The docking that ends a trip is its arrival, not a port
+ * call.
+ *
+ * @param port              the port the vessel docked at
+ * @param arrivalDateTime   when it docked
+ * @param departureDateTime when it undocked
+ */
+public record PortCall(
+  @NonNull Port port,
+  @NonNull LocalDateTime arrivalDateTime,
+  @NonNull LocalDateTime departureDateTime
+) {
+  /** @return the time from the arrival to the departure */
+  public Duration duration() {
+    return Duration.between(arrivalDateTime, departureDateTime);
   }
 }

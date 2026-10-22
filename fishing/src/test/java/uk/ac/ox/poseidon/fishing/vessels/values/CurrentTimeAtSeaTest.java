@@ -52,22 +52,13 @@ class CurrentTimeAtSeaTest {
   }
 
   @Test
-  void runsFromTheTripsStartToNowWhileAtSea() {
+  void isTheTripsTimeAtSeaUntilNow() {
     final Vessel vessel = mock(Vessel.class);
     final Trip trip = mock(Trip.class);
     when(vessel.getCurrentTrip()).thenReturn(trip);
-    when(trip.getStartDateTime()).thenReturn(START);
-
-    assertEquals(Duration.ofHours(5), currentTimeAtSea.apply(vessel));
-  }
-
-  @Test
-  void isTheTripsTimeAtSeaOnceItHasArrivedInPort() {
-    final Vessel vessel = mock(Vessel.class);
-    final Trip trip = mock(Trip.class);
-    when(vessel.getCurrentTrip()).thenReturn(trip);
-    when(trip.hasArrivedInPort()).thenReturn(true);
-    when(trip.getTotalTimeAtSea()).thenReturn(Duration.ofHours(3));
+    when(trip.getTimeAtSeaUntil(START.plusHours(5))).thenReturn(
+      Duration.ofHours(3)
+    );
 
     assertEquals(Duration.ofHours(3), currentTimeAtSea.apply(vessel));
   }

@@ -20,28 +20,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.fishing.tasks.accounting;
+package uk.ac.ox.poseidon.fishing.tasks.travel;
 
-import org.joda.money.Money;
-import uk.ac.ox.poseidon.core.Scope;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 
 /**
- * Factories for tasks that account for a trip's costs.
+ * A {@link TaskFactory} counterpart of {@link Undock}, built via
+ * {@link Factories#undock()}.
  */
-public final class Factories {
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
+public class UndockFactory extends TaskFactory<Undock> {
 
-  private Factories() {}
+  private final ValueFactory<
+    ? super VesselComponentScope,
+    ? super Vessel,
+    LocalDateTime
+  > currentDateTime;
 
-  /**
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link PayTripCost}
-   * @see PayTripCostFactory
-   */
-  public static <S extends Scope> PayTripCostFactory<S> payTripCost(
-    final ValueFactory<? super S, ? super Vessel, ? extends Money> tripCost
-  ) {
-    return new PayTripCostFactory<>(tripCost);
+  @Override
+  protected Undock newInstance(final VesselComponentScope scope) {
+    return new Undock(currentDateTime.get(scope));
   }
 }

@@ -20,41 +20,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.fishing.tasks.accounting;
+package uk.ac.ox.poseidon.fishing.vessels.values;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import java.math.RoundingMode;
+import java.time.Duration;
+import java.util.function.Function;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.joda.money.Money;
-import uk.ac.ox.poseidon.core.RelativeScopeFactory;
-import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * A {@link RelativeScopeFactory} for a {@link PayTripCost}. Built via
- * {@link Factories#payTripCost}.
+ * The cost of a finished trip's time at sea: its
+ * {@linkplain Trip#getTotalTimeAtSea() total time at sea} times its vessel's
+ * hourly rate from {@code hourlyCosts}.
  */
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder(toBuilder = true)
-public class PayTripCostFactory<S extends Scope> extends RelativeScopeFactory<
-  S,
-  PayTripCost
-> {
+@RequiredArgsConstructor
+public class TimeAtSeaCost implements Function<Trip, Money> {
 
-  private final ValueFactory<
-    ? super S,
-    ? super Vessel,
-    ? extends Money
-  > tripCost;
+  @NonNull
+  private final Function<? super Vessel, ? extends Money> hourlyCosts;
 
+  /**
+   * @return {@code hourlyCosts}'s rate for {@code trip}'s vessel, times the
+   *         trip's hours at sea
+   * @throws IllegalStateException if the trip has not ended
+   */
   @Override
-  protected PayTripCost newInstance(final S scope) {
-    return new PayTripCost(tripCost.get(scope));
+  public Money apply(final Trip trip) {
+    final Duration timeAtSea = trip.getTotalTimeAtSea();
+    return hourlyCosts
+      .apply(trip.getVessel())
+      .multipliedBy(timeAtSea.toSeconds() / 3600.0, RoundingMode.HALF_EVEN);
   }
 }

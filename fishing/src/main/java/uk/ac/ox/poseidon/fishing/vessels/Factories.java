@@ -31,6 +31,7 @@ import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
 import java.util.function.Supplier;
+import org.joda.money.Money;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
@@ -48,7 +49,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * Factories for a vessel's scope, its fleet, what it is made of, and what
  * creates it and states things about it.
  */
-@SuppressWarnings("varargs")
+@SuppressWarnings({ "overloads", "varargs" })
 public final class Factories {
 
   private Factories() {}
@@ -288,7 +289,7 @@ public final class Factories {
    *                           vessel, or none if it should not leave
    * @param children           the tasks run in sequence during the trip
    * @return a {@link TaskFactory} for a {@link TripBlock}, which opens a trip,
-   *         runs {@code children} and closes the trip
+   *         runs {@code children} and closes the trip, charging no cost
    * @see TripBlockFactory
    */
   @SafeVarargs
@@ -306,6 +307,43 @@ public final class Factories {
     return new TripBlockFactory(
       initialDestination,
       currentDateTime(),
+      ImmutableList.of(),
+      ImmutableList.copyOf(children)
+    );
+  }
+
+  /**
+   * @param initialDestination gives the trip's first destination for the
+   *                           vessel, or none if it should not leave
+   * @param tripCost           gives the cost of the finished trip, charged as
+   *                           the block closes it
+   * @param children           the tasks run in sequence during the trip
+   * @return a {@link TaskFactory} for a {@link TripBlock}, which opens a trip,
+   *         runs {@code children} and closes the trip, charging
+   *         {@code tripCost}
+   * @see TripBlockFactory
+   */
+  @SafeVarargs
+  public static TripBlockFactory trip(
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      Optional<Cell>
+    > initialDestination,
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Trip,
+      ? extends Money
+    > tripCost,
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends Task<Vessel>
+    >... children
+  ) {
+    return new TripBlockFactory(
+      initialDestination,
+      currentDateTime(),
+      ImmutableList.of(tripCost),
       ImmutableList.copyOf(children)
     );
   }

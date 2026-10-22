@@ -33,6 +33,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
@@ -41,6 +43,7 @@ import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingOutcome;
+import uk.ac.ox.poseidon.fishing.trips.TripEndEvent;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -161,55 +164,78 @@ class TripTest {
   }
 
   @Test
-  void recordsWhenTheVesselDockedAsItsArrivalInPort() {
+  void endingMakesTheOpenDockingItsArrivalInPort() {
     final Trip trip = newTrip();
-
     dock(trip, START.plusHours(8));
 
+    trip.endTrip(START.plusHours(9), List.of());
+
     assertThat(trip.getPortArrivalDateTime()).isEqualTo(START.plusHours(8));
+    assertThat(trip.getPortCalls()).isEmpty();
   }
 
   @Test
-  void hasArrivedInPortOnlyWhileTheVesselIsDocked() {
+  void anUndockingMakesTheOpenDockingAPortCall() {
     final Trip trip = newTrip();
-    assertThat(trip.hasArrivedInPort()).isFalse();
+    dock(trip, START.plusHours(3));
 
-    dock(trip, START.plusHours(8));
-    assertThat(trip.hasArrivedInPort()).isTrue();
+    undock(trip, START.plusHours(4));
 
-    trip
-      .getEventManager()
-      .broadcast(
-        new UndockingEvent(trip.getVessel(), ORIGIN, START.plusHours(9))
-      );
-    assertThat(trip.hasArrivedInPort()).isFalse();
+    assertThat(trip.getPortCalls()).containsExactly(
+      new PortCall(ORIGIN, START.plusHours(3), START.plusHours(4))
+    );
   }
 
   @Test
   void cannotEndAtSea() {
     final Trip trip = newTrip();
 
-    assertThatThrownBy(() -> trip.endTrip(START))
+    assertThatThrownBy(() -> trip.endTrip(START, List.of()))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("cannot end at sea");
   }
 
   @Test
-  void hasNoTimeAtSeaBeforeArrivingInPort() {
+  void hasNoTotalTimeAtSeaBeforeItEnds() {
+    final Trip trip = newTrip();
+    dock(trip, START.plusHours(8));
+
+    assertThatThrownBy(trip::getTotalTimeAtSea)
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("has not ended");
+  }
+
+  @Test
+  void totalTimeAtSeaRunsFromTheStartToTheArrivalLessItsPortCalls() {
+    final Trip trip = newTrip();
+    dock(trip, START.plusHours(3));
+    undock(trip, START.plusHours(4));
+    dock(trip, START.plusHours(8));
+
+    trip.endTrip(START.plusHours(9), List.of());
+
+    assertThat(trip.getTotalTimeAtSea()).isEqualTo(Duration.ofHours(7));
+  }
+
+  @Test
+  void timeAtSeaSoFarRunsToTheDateAtSea() {
     final Trip trip = newTrip();
 
-    assertThatThrownBy(trip::getTotalTimeAtSea).isInstanceOf(
-      IllegalStateException.class
+    assertThat(trip.getTimeAtSeaUntil(START.plusHours(5))).isEqualTo(
+      Duration.ofHours(5)
     );
   }
 
   @Test
-  void timeAtSeaRunsFromTheStartToTheArrivalInPort() {
+  void timeAtSeaSoFarLeavesOutPortCallsAndAStopInProgress() {
     final Trip trip = newTrip();
+    dock(trip, START.plusHours(3));
+    undock(trip, START.plusHours(4));
+    dock(trip, START.plusHours(6));
 
-    dock(trip, START.plusHours(8));
-
-    assertThat(trip.getTotalTimeAtSea()).isEqualTo(Duration.ofHours(8));
+    assertThat(trip.getTimeAtSeaUntil(START.plusHours(7))).isEqualTo(
+      Duration.ofHours(5)
+    );
   }
 
   @Test
@@ -227,9 +253,38 @@ class TripTest {
     final Trip trip = newTrip();
     dock(trip, START.plusHours(8));
 
-    trip.endTrip(START.plusHours(9));
+    trip.endTrip(START.plusHours(9), List.of());
 
     assertThat(trip.getTotalDuration()).isEqualTo(Duration.ofHours(9));
+  }
+
+  @Test
+  void chargesItsCostOnFinalTotalsBeforeBroadcastingItsEnd() {
+    final EventManager vesselEventManager = new SimpleEventManager();
+    final Trip trip = new Trip(
+      newVessel(new Cell(0, 0), mock(ModelGrid.class), vesselEventManager),
+      ORIGIN,
+      new Cell(1, 1),
+      START
+    );
+    final List<Money> balancesAtEnd = new ArrayList<>();
+    vesselEventManager.addListener(
+      new SimpleListener<>(TripEndEvent.class, event ->
+        balancesAtEnd.add(
+          event.getTrip().getAccount().getBalances().get(CurrencyUnit.EUR)
+        )
+      )
+    );
+    dock(trip, START.plusHours(8));
+
+    trip.endTrip(
+      START.plusHours(9),
+      List.of(finished ->
+        Money.of(CurrencyUnit.EUR, finished.getTotalTimeAtSea().toHours())
+      )
+    );
+
+    assertThat(balancesAtEnd).containsExactly(Money.of(CurrencyUnit.EUR, -8));
   }
 
   /** A trip starting from {@link #ORIGIN} at {@link #START}. */
@@ -247,6 +302,17 @@ class TripTest {
     trip
       .getEventManager()
       .broadcast(new DockingEvent(trip.getVessel(), ORIGIN, dateTime));
+  }
+
+  /**
+   * Broadcasts {@code trip}'s vessel undocking from {@link #ORIGIN}, as the
+   * vessel does, and has the vessel report itself at sea.
+   */
+  private static void undock(final Trip trip, final LocalDateTime dateTime) {
+    when(trip.getVessel().isDocked()).thenReturn(false);
+    trip
+      .getEventManager()
+      .broadcast(new UndockingEvent(trip.getVessel(), ORIGIN, dateTime));
   }
 
   private static FishingEvent newFishingEvent() {

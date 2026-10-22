@@ -192,4 +192,13 @@ public final class Factories {
   public static DockAtDestinationFactory dockAtDestination() {
     return new DockAtDestinationFactory(currentDateTime());
   }
+
+  /**
+   * @return a {@link uk.ac.ox.poseidon.fishing.tasks.TaskFactory} for an
+   *         {@link Undock}, ending a stop mid-trip
+   * @see Undock
+   */
+  public static UndockFactory undock() {
+    return new UndockFactory(currentDateTime());
+  }
 }

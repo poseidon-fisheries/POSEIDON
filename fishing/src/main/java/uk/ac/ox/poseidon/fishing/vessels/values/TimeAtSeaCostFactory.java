@@ -22,36 +22,41 @@
 
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
-import java.math.RoundingMode;
-import java.time.Duration;
 import java.util.function.Function;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import org.joda.money.Money;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * Extracts the cost of a vessel's current trip once it has arrived in port, as
- * its total time at sea ({@link Trip#getTotalTimeAtSea()}) times an hourly rate from
- * {@code hourlyCosts}.
+ * A {@link RelativeScopeFactory} for a {@link TimeAtSeaCost}. Built via
+ * {@link Factories#timeAtSeaCost}.
  */
-@RequiredArgsConstructor
-public class TripCostFromHourlyCosts implements Function<Vessel, Money> {
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
+public class TimeAtSeaCostFactory<S extends Scope>
+  extends RelativeScopeFactory<S, Function<Trip, Money>>
+  implements ValueFactory<S, Trip, Money>
+{
 
-  @NonNull
-  private final Function<? super Vessel, ? extends Money> hourlyCosts;
+  private final ValueFactory<
+    ? super S,
+    ? super Vessel,
+    ? extends Money
+  > hourlyCosts;
 
-  /**
-   * @return {@code hourlyCosts}'s rate for {@code vessel}, times its
-   *         current trip's hours at sea
-   * @throws IllegalStateException if the current trip has not arrived in port
-   */
   @Override
-  public Money apply(final Vessel vessel) {
-    final Duration timeAtSea = vessel.getCurrentTrip().getTotalTimeAtSea();
-    return hourlyCosts
-      .apply(vessel)
-      .multipliedBy(timeAtSea.toSeconds() / 3600.0, RoundingMode.HALF_EVEN);
+  protected Function<Trip, Money> newInstance(final S scope) {
+    return new TimeAtSeaCost(hourlyCosts.get(scope));
   }
 }

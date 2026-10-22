@@ -170,14 +170,15 @@ public final class Factories {
   }
 
   /**
+   * @param hourlyCosts gives the hourly cost of a vessel at sea
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link TripCostFromHourlyCosts}
-   * @see TripCostFromHourlyCostsFactory
+   *         {@link TimeAtSeaCost}, the cost of a finished trip's time at sea
+   * @see TimeAtSeaCostFactory
    */
-  public static <S extends Scope> TripCostFromHourlyCostsFactory<S> tripCostFromHourlyCosts(
+  public static <S extends Scope> TimeAtSeaCostFactory<S> timeAtSeaCost(
     final ValueFactory<? super S, ? super Vessel, ? extends Money> hourlyCosts
   ) {
-    return new TripCostFromHourlyCostsFactory<>(hourlyCosts);
+    return new TimeAtSeaCostFactory<>(hourlyCosts);
   }
 
   /**

@@ -20,39 +20,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ox.poseidon.fishing.tasks.accounting;
+package uk.ac.ox.poseidon.fishing.tasks.travel;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
+import static com.google.common.base.Preconditions.checkState;
 
+import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.joda.money.Money;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * Deducts a vessel's trip cost from its current trip's account, then succeeds.
+ * A leaf {@link VesselTask} that undocks the vessel, ending a stop of its
+ * current trip, and always succeeds. A trip's start undocks by itself, so this
+ * task runs only within a trip.
  */
 @RequiredArgsConstructor
-public class PayTripCost extends VesselTask {
+public class Undock extends VesselTask {
 
+  /** The clock, which dates the undocking. */
   @NonNull
-  private final Function<? super Vessel, ? extends Money> tripCost;
+  private final Function<? super Vessel, LocalDateTime> currentDateTime;
 
   /**
-   * @return {@link Status#SUCCEEDED}
-   * @throws NullPointerException if {@code tripCost} yields no cost
-   *                              for the vessel
+   * Undocks the vessel.
+   *
+   * @throws IllegalStateException if the vessel is on no trip, or is not
+   *                               docked
    */
   @Override
   public Status execute() {
     final Vessel vessel = getVessel();
-    final Money tripCost = checkNotNull(
-      this.tripCost.apply(vessel),
-      "Unable to extract trip cost for Vessel %s.".formatted(vessel)
+    checkState(
+      vessel.getCurrentTrip() != null,
+      "Vessel %s cannot undock outside a trip: a trip's start undocks it.",
+      vessel.getId()
     );
-    vessel.getCurrentTrip().getAccount().subtract(tripCost);
-    return Status.SUCCEEDED;
+    vessel.undock(currentDateTime.apply(vessel));
+    return SUCCEEDED;
   }
 }

@@ -28,6 +28,7 @@ import static com.badlogic.gdx.ai.btree.Task.Status.SUCCEEDED;
 import static java.time.Duration.ofHours;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,6 +43,8 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -108,7 +111,12 @@ class TripBlockTest {
     final Optional<Cell> initialDestination,
     final Task<Vessel>... children
   ) {
-    return new TripBlock(_ -> initialDestination, _ -> NOW, List.of(children));
+    return new TripBlock(
+      _ -> initialDestination,
+      _ -> NOW,
+      List.of(),
+      List.of(children)
+    );
   }
 
   private BehaviorTree<Vessel> treeOver(final TripBlock tripBlock) {
@@ -141,6 +149,25 @@ class TripBlockTest {
     assertThat(vessel.getPortDockedAt()).isEqualTo(port);
     assertThat(trip.getStartDateTime()).isEqualTo(NOW);
     assertThat(trip.getEndDateTime()).isEqualTo(NOW);
+  }
+
+  @Test
+  void chargesItsTripCostsInOrderAsItClosesTheTrip() {
+    final TripBlock tripBlock = new TripBlock(
+      _ -> Optional.of(DESTINATION),
+      _ -> NOW,
+      List.of(
+        _ -> Money.of(CurrencyUnit.EUR, 5),
+        _ -> Money.of(CurrencyUnit.EUR, 2)
+      ),
+      List.of(new SetDestinationToOrigin(), new DockAtDestination(_ -> NOW))
+    );
+
+    treeOver(tripBlock).step();
+
+    assertThat(
+      vessel.getPreviousTrip().getAccount().getBalances()
+    ).containsExactly(entry(CurrencyUnit.EUR, Money.of(CurrencyUnit.EUR, -7)));
   }
 
   @Test

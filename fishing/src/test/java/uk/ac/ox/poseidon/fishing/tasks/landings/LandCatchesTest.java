@@ -78,7 +78,7 @@ class LandCatchesTest {
     when(vessel.getCell()).thenReturn(homePortCell);
     when(vessel.getMarketGrid()).thenReturn(marketGrid);
     when(trip.getAccount()).thenReturn(mock(Account.class));
-    when(trip.hasArrivedInPort()).thenReturn(true);
+    when(vessel.isDocked()).thenReturn(true);
     setTaskObject(landCatches, vessel);
     final Field tripField = LandCatches.class
       .getSuperclass()
@@ -108,8 +108,8 @@ class LandCatchesTest {
   }
 
   @Test
-  void throwsWhenTheTripHasNotArrivedInPort() {
-    when(trip.hasArrivedInPort()).thenReturn(false);
+  void throwsWhenTheVesselIsNotDocked() {
+    when(vessel.isDocked()).thenReturn(false);
     when(marketGrid.getMarket(homePort)).thenReturn(homePortMarket);
 
     assertThatThrownBy(landCatches::complete).isInstanceOf(

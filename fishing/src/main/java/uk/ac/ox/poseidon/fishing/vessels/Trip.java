@@ -30,8 +30,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import lombok.Getter;
 import lombok.NonNull;
+import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
@@ -57,15 +59,17 @@ import uk.ac.ox.poseidon.geography.ports.Port;
  * construction. {@code origin} and {@code startDateTime} are fixed once the
  * trip begins.
  * <p>
- * A trip holds no clock: it is given the dates it starts and ends, and takes
- * the date of its arrival in port from the vessel's {@link DockingEvent}. It
- * has two totals, each known once its leg is over: its
- * {@linkplain #getTotalTimeAtSea() total time at sea}, from its start to its
- * arrival in port, and its
- * {@linkplain #getTotalDuration() total duration}, from its start to its end.
- * The difference is the time spent in port before the trip ends, e.g. landing
- * the catch. The time at sea or duration so far is its reader's to work out,
- * from the trip's start and the clock.
+ * A trip holds no clock: it is given the dates it starts and ends, and
+ * records the vessel's dockings and undockings from their events. A docking
+ * stays open until the vessel undocks, which makes it one of the trip's
+ * {@linkplain #getPortCalls() port calls}, or the trip ends, which makes it
+ * the trip's arrival in port. Its time at sea is the time it was not docked:
+ * {@linkplain #getTimeAtSeaUntil so far}, given the date, and in
+ * {@linkplain #getTotalTimeAtSea() total} once it has ended, which is from its
+ * start to its arrival less its port calls. Its
+ * {@linkplain #getTotalDuration() total duration} runs from its start to its
+ * end, so it also counts the time spent in port at the end, e.g. landing the
+ * catch.
  */
 @Getter
 public class Trip {
@@ -82,10 +86,18 @@ public class Trip {
 
   private @NonNull Destination destination;
 
+  /** The stops of this trip before its end, in the order they happened. */
+  @Getter(NONE)
+  private final List<PortCall> portCalls = new ArrayList<>();
+
   /**
-   * When the vessel docked, if it is docked; cleared when it undocks, so a
-   * stop before the end of the trip is not its arrival.
+   * The vessel's docking during this trip that is not followed by an
+   * undocking, if it is docked; the arrival once the trip has ended.
    */
+  @Getter(NONE)
+  private DockingEvent openDocking;
+
+  /** When the trip arrived in port, set as it ends. */
   private LocalDateTime portArrivalDateTime;
   private LocalDateTime endDateTime;
 
@@ -112,16 +124,10 @@ public class Trip {
       new SimpleListener<>(FishingEvent.class, fishingEvents::add)
     );
     this.eventManager.addListener(
-      new SimpleListener<>(
-        DockingEvent.class,
-        event -> portArrivalDateTime = event.getDateTime()
-      )
+      new SimpleListener<>(DockingEvent.class, event -> openDocking = event)
     );
     this.eventManager.addListener(
-      new SimpleListener<>(
-        UndockingEvent.class,
-        _ -> portArrivalDateTime = null
-      )
+      new SimpleListener<>(UndockingEvent.class, this::closeDocking)
     );
     this.origin = origin;
     this.startDateTime = startDateTime;
@@ -146,9 +152,43 @@ public class Trip {
     return destination;
   }
 
-  /** @return whether the vessel is docked, which is the trip's arrival */
-  public boolean hasArrivedInPort() {
-    return portArrivalDateTime != null;
+  /** Records the open docking, which {@code undocking} ends, as a port call. */
+  private void closeDocking(final UndockingEvent undocking) {
+    portCalls.add(
+      new PortCall(
+        openDocking.getPort(),
+        openDocking.getDateTime(),
+        undocking.getDateTime()
+      )
+    );
+    openDocking = null;
+  }
+
+  /**
+   * @return an unmodifiable view of this trip's port calls, its stops before
+   *         its end, in the order they happened
+   */
+  public List<PortCall> getPortCalls() {
+    return Collections.unmodifiableList(portCalls);
+  }
+
+  /**
+   * @param dateTime the date to count to, no earlier than the trip's last
+   *                 docking or undocking
+   * @return the time from the trip's start to {@code dateTime} during which the
+   *         vessel was not docked
+   */
+  public Duration getTimeAtSeaUntil(final @NonNull LocalDateTime dateTime) {
+    final Duration timeDocked = portCalls
+      .stream()
+      .map(PortCall::duration)
+      .reduce(
+        openDocking == null
+          ? Duration.ZERO
+          : Duration.between(openDocking.getDateTime(), dateTime),
+        Duration::plus
+      );
+    return Duration.between(startDateTime, dateTime).minus(timeDocked);
   }
 
   /**
@@ -165,31 +205,40 @@ public class Trip {
   }
 
   /**
-   * @return the time from the trip's start to its arrival in port
-   * @throws IllegalStateException if the trip has not arrived in port
+   * @return the time from the trip's start to its arrival in port, less its
+   *         port calls
+   * @throws IllegalStateException if the trip has not ended
    */
   public Duration getTotalTimeAtSea() {
     checkState(
-      hasArrivedInPort(),
-      "The trip of vessel %s has not arrived in port.",
+      endDateTime != null,
+      "The trip of vessel %s has not ended.",
       vessel.getId()
     );
-    return Duration.between(startDateTime, portArrivalDateTime);
+    return getTimeAtSeaUntil(endDateTime);
   }
 
   /**
-   * Marks the trip as ended and broadcasts a {@link TripEndEvent}.
+   * Ends the trip, making the vessel's open docking its arrival in port,
+   * charges each of {@code tripCosts} to its account, then broadcasts a
+   * {@link TripEndEvent}, so that the event's readers see the final account.
    *
    * @param endDateTime when the trip ends
+   * @param tripCosts   the costs of the finished trip, possibly none
    * @throws IllegalStateException if the vessel is not docked
    */
-  void endTrip(final @NonNull LocalDateTime endDateTime) {
+  void endTrip(
+    final @NonNull LocalDateTime endDateTime,
+    final List<? extends Function<? super Trip, ? extends Money>> tripCosts
+  ) {
     checkState(
       vessel.isDocked(),
       "The trip of vessel %s cannot end at sea.",
       vessel.getId()
     );
     this.endDateTime = endDateTime;
+    this.portArrivalDateTime = openDocking.getDateTime();
+    tripCosts.forEach(tripCost -> account.subtract(tripCost.apply(this)));
     this.eventManager.broadcast(new TripEndEvent(this));
   }
 

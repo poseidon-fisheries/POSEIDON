@@ -57,8 +57,8 @@ public class LandCatches extends ExtendedTripTask {
    * sale's proceeds (by currency) to the trip's account.
    *
    * @return {@link Status#SUCCEEDED}
-   * @throws IllegalStateException if the trip has not arrived in port, the
-   *                               vessel has no home port or is not at it, or
+   * @throws IllegalStateException if the vessel is not docked, has no home
+   *                               port or is not at it, or
    *                               its home port does not have exactly one
    *                               market
    */
@@ -66,8 +66,8 @@ public class LandCatches extends ExtendedTripTask {
   protected Status complete() {
     final Vessel vessel = getVessel();
     checkState(
-      getTrip().hasArrivedInPort(),
-      "Vessel %s is landing before its trip arrived in port.",
+      vessel.isDocked(),
+      "Vessel %s is landing while not docked.",
       vessel.getId()
     );
     checkState(

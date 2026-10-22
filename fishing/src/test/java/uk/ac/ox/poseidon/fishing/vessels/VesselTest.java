@@ -503,6 +503,20 @@ class VesselTest {
   }
 
   @Test
+  void aStopDuringATripBecomesOneOfItsPortCalls() {
+    final Port port = mock(Port.class);
+    final Vessel vessel = vesselDockedAt(port);
+    vessel.startTrip(new Cell(1, 0), START);
+
+    vessel.dockAt(port, START.plusHours(3));
+    vessel.undock(START.plusHours(4));
+
+    assertThat(vessel.getCurrentTrip().getPortCalls()).containsExactly(
+      new PortCall(port, START.plusHours(3), START.plusHours(4))
+    );
+  }
+
+  @Test
   void endTripKeepsTheFinishedTripAsThePreviousTrip() {
     final Port port = mock(Port.class);
     final Vessel vessel = vesselDockedAt(port);
@@ -511,7 +525,7 @@ class VesselTest {
     vessel.startTrip(new Cell(1, 0), START);
     final Trip trip = vessel.getCurrentTrip();
     vessel.dockAt(port, START.plusHours(8));
-    vessel.endTrip(START.plusHours(9));
+    vessel.endTrip(START.plusHours(9), List.of());
 
     assertNull(vessel.getCurrentTrip());
     assertSame(trip, vessel.getPreviousTrip());
