@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.gui.portrayals;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -37,12 +39,21 @@ import org.w3c.dom.svg.SVGDocument;
 
 /**
  * Rasterises a parsed SVG document, via Apache Batik, to a given pixel size on
- * demand.
+ * demand. Drawing keeps the image rasterised at each size, so the document is
+ * rasterised once per size rather than once per draw.
  */
 @RequiredArgsConstructor
 public class SvgRenderer {
 
+  /**
+   * How many sizes to keep an image for. Sizes change only when the display is
+   * zoomed, so a handful covers it.
+   */
+  private static final int MAXIMUM_CACHED_SIZES = 16;
+
   private final SVGDocument svgDocument;
+  private final Cache<ImageSize, BufferedImage> images =
+    Caffeine.newBuilder().maximumSize(MAXIMUM_CACHED_SIZES).build();
 
   /**
    * @param svgInputStream the SVG document to parse
@@ -75,8 +86,8 @@ public class SvgRenderer {
   }
 
   /**
-   * Rasterises the SVG at {@code width x height} and draws it at
-   * {@code (x, y)}.
+   * Draws the SVG, rasterised at {@code width x height}, at {@code (x, y)},
+   * rasterising it only if it hasn't been drawn at that size yet.
    *
    * @throws RuntimeException if rasterising fails
    */
@@ -87,13 +98,20 @@ public class SvgRenderer {
     final int width,
     final int height
   ) {
-    try {
-      final BufferedImage image = render(width, height);
-      g.drawImage(image, x, y, null);
-    } catch (final Exception e) {
-      throw new RuntimeException("Failed to draw SVG document", e);
-    }
+    final BufferedImage image = images.get(
+      new ImageSize(width, height),
+      size -> {
+        try {
+          return render(size.width(), size.height());
+        } catch (final Exception e) {
+          throw new RuntimeException("Failed to draw SVG document", e);
+        }
+      }
+    );
+    g.drawImage(image, x, y, null);
   }
+
+  private record ImageSize(int width, int height) {}
 
   // Inner class for handling the image transcoding
   private static class CustomImageTranscoder extends ImageTranscoder {
