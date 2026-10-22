@@ -22,9 +22,10 @@
 
 package uk.ac.ox.poseidon.biology.buckets;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
+import static java.util.Comparator.naturalOrder;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,21 +38,22 @@ import uk.ac.ox.poseidon.biology.species.Species;
 
 /**
  * The general-purpose {@link Bucket}, holding arbitrary {@link Content} per
- * species in a plain map. Used only when the content isn't all {@link Biomass},
- * which no scenario produces yet since {@code Biomass} is currently the only
- * {@code Content} implementation — but this is the shape the whole abstraction
- * is built for: an age- or length-structured abundance is just another
- * {@code Content}, so adding one doesn't require duplicating any of the
- * machinery that moves fish around. Keep it that way when touching this
- * package.
+ * species in a map sorted by species, so that it iterates in the same order
+ * however it was built, whatever the species' hash codes. Used only when the
+ * content isn't all {@link Biomass}, which no scenario produces yet since
+ * {@code Biomass} is currently the only {@code Content} implementation — but
+ * this is the shape the whole abstraction is built for: an age- or
+ * length-structured abundance is just another {@code Content}, so adding one
+ * doesn't require duplicating any of the machinery that moves fish around.
+ * Keep it that way when touching this package.
  */
 @Getter
 @ToString
 final class ContentBucket implements Bucket {
 
-  private final ImmutableMap<Species, Content> map;
+  private final ImmutableSortedMap<Species, Content> map;
 
-  private ContentBucket(final ImmutableMap<Species, Content> map) {
+  private ContentBucket(final ImmutableSortedMap<Species, Content> map) {
     this.map = map;
   }
 
@@ -75,7 +77,9 @@ final class ContentBucket implements Bucket {
         .entrySet()
         .stream()
         .filter(e -> e.getValue() != null && e.getValue().asKg() > 0.0)
-        .collect(toImmutableMap(Entry::getKey, Entry::getValue))
+        .collect(
+          toImmutableSortedMap(naturalOrder(), Entry::getKey, Entry::getValue)
+        )
     );
   }
 
@@ -91,7 +95,11 @@ final class ContentBucket implements Bucket {
         .entrySet()
         .stream()
         .filter(e -> e.getValue() != null && e.getValue() > 0.0)
-        .collect(toImmutableMap(Entry::getKey, e -> Biomass.ofKg(e.getValue())))
+        .collect(
+          toImmutableSortedMap(naturalOrder(), Entry::getKey, e ->
+            Biomass.ofKg(e.getValue())
+          )
+        )
     );
   }
 

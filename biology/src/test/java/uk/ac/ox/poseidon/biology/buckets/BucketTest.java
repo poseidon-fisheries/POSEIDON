@@ -249,9 +249,9 @@ abstract class BucketTest {
     final Bucket b1 = newBucket(
       Map.of(a, 100.0, bA, 200.0, bJ, 300.0, c, 400.0)
     );
-    assertThat(b1.getSpecies()).isEqualTo(Set.of(a, bA, bJ, c));
+    assertThat(b1.getSpecies()).containsExactlyInAnyOrder(a, bA, bJ, c);
     final Bucket b2 = newBucket(Map.of(a, 100.0, c, 400.0));
-    assertThat(b2.getSpecies()).isEqualTo(Set.of(a, c));
+    assertThat(b2.getSpecies()).containsExactlyInAnyOrder(a, c);
   }
 
   @Test
