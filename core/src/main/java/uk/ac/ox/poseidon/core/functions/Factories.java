@@ -243,6 +243,19 @@ public final class Factories {
   }
 
   /**
+   * @param delegate the value that always exists
+   * @return a {@link ValueFactory} for a {@link Some} of the resolved delegate:
+   *         its value, always present, where a value that may be missing is
+   *         expected
+   * @see Some
+   */
+  public static <S extends Scope, C, T> SomeFactory<S, C, T> some(
+    final ValueFactory<? super S, ? super C, ? extends T> delegate
+  ) {
+    return new SomeFactory<S, C, T>(delegate);
+  }
+
+  /**
    * @param functions the mappings to apply to the same thing and join into one
    *                  key
    * @return a {@link MappingFactory} for a {@link MultiStringKeyFromFunctions}

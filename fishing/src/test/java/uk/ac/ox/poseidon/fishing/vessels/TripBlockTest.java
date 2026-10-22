@@ -47,6 +47,7 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.functions.Some;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
@@ -210,6 +211,21 @@ class TripBlockTest {
     assertThat(
       task.tripsSeen.getFirst().getAccount().getBalances()
     ).containsExactly(entry(CurrencyUnit.EUR, Money.of(CurrencyUnit.EUR, -7)));
+  }
+
+  @Test
+  void opensATripToADestinationThatAlwaysExists() {
+    final Port otherPort = mock(Port.class);
+    final TripBlock tripBlock = new TripBlock(
+      new Some<>(_ -> otherPort),
+      _ -> NOW,
+      List.of(),
+      List.of(new ScriptedTask(RUNNING))
+    );
+
+    treeOver(tripBlock).step();
+
+    assertThat(vessel.getCurrentTrip().getDestination()).isEqualTo(otherPort);
   }
 
   @Test

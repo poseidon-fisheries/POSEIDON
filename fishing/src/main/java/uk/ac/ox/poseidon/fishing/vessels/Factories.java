@@ -41,7 +41,7 @@ import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
-import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.Destination;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -286,7 +286,11 @@ public final class Factories {
 
   /**
    * @param initialDestination gives the trip's first destination for the
-   *                           vessel, or none if it should not leave
+   *                           vessel, or none if it should not leave; for a
+   *                           destination that always exists, such as the
+   *                           vessel's home port, wrap it in
+   *                           {@link uk.ac.ox.poseidon.core.functions.Factories#some
+   *                           some(...)}
    * @param children           the tasks run in sequence during the trip
    * @return a {@link TaskFactory} for a {@link TripBlock}, which opens a trip,
    *         runs {@code children} and closes the trip, charging no cost
@@ -297,7 +301,7 @@ public final class Factories {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      Optional<Cell>
+      ? extends Optional<? extends Destination>
     > initialDestination,
     final Factory<
       ? super VesselComponentScope,
@@ -314,7 +318,11 @@ public final class Factories {
 
   /**
    * @param initialDestination gives the trip's first destination for the
-   *                           vessel, or none if it should not leave
+   *                           vessel, or none if it should not leave; for a
+   *                           destination that always exists, such as the
+   *                           vessel's home port, wrap it in
+   *                           {@link uk.ac.ox.poseidon.core.functions.Factories#some
+   *                           some(...)}
    * @param tripCost           gives the cost of the finished trip, charged as
    *                           the block closes it
    * @param children           the tasks run in sequence during the trip
@@ -328,7 +336,7 @@ public final class Factories {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      Optional<Cell>
+      ? extends Optional<? extends Destination>
     > initialDestination,
     final ValueFactory<
       ? super VesselComponentScope,
@@ -350,7 +358,11 @@ public final class Factories {
 
   /**
    * @param initialDestination gives the trip's first destination for the
-   *                           vessel, or none if it should not leave
+   *                           vessel, or none if it should not leave; for a
+   *                           destination that always exists, such as the
+   *                           vessel's home port, wrap it in
+   *                           {@link uk.ac.ox.poseidon.core.functions.Factories#some
+   *                           some(...)}
    * @param children           the tasks run in sequence during the trip
    * @return a {@link TaskFactory} for a {@link FishingTripBlock}, which opens a
    *         fishing trip, runs {@code children} and closes the trip, charging
@@ -362,7 +374,7 @@ public final class Factories {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      Optional<Cell>
+      ? extends Optional<? extends Destination>
     > initialDestination,
     final Factory<
       ? super VesselComponentScope,
@@ -379,7 +391,11 @@ public final class Factories {
 
   /**
    * @param initialDestination gives the trip's first destination for the
-   *                           vessel, or none if it should not leave
+   *                           vessel, or none if it should not leave; for a
+   *                           destination that always exists, such as the
+   *                           vessel's home port, wrap it in
+   *                           {@link uk.ac.ox.poseidon.core.functions.Factories#some
+   *                           some(...)}
    * @param tripCost           gives the cost of the finished trip, charged as
    *                           the block closes it
    * @param children           the tasks run in sequence during the trip
@@ -393,7 +409,7 @@ public final class Factories {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      Optional<Cell>
+      ? extends Optional<? extends Destination>
     > initialDestination,
     final ValueFactory<
       ? super VesselComponentScope,

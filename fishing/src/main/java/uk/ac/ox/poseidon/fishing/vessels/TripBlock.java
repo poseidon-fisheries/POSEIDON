@@ -34,7 +34,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.geography.Destination;
-import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
@@ -56,7 +55,10 @@ import uk.ac.ox.poseidon.geography.ports.Port;
  */
 public class TripBlock extends Sequence<Vessel> {
 
-  private final Function<? super Vessel, Optional<Cell>> initialDestination;
+  private final Function<
+    ? super Vessel,
+    ? extends Optional<? extends Destination>
+  > initialDestination;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
   private final List<
     ? extends Function<? super Trip, ? extends Money>
@@ -73,7 +75,10 @@ public class TripBlock extends Sequence<Vessel> {
    * @throws IllegalArgumentException if {@code children} is empty
    */
   TripBlock(
-    final Function<? super Vessel, Optional<Cell>> initialDestination,
+    final Function<
+      ? super Vessel,
+      ? extends Optional<? extends Destination>
+    > initialDestination,
     final Function<? super Vessel, LocalDateTime> currentDateTime,
     final List<? extends Function<? super Trip, ? extends Money>> tripCosts,
     final List<? extends Task<Vessel>> children
@@ -98,7 +103,8 @@ public class TripBlock extends Sequence<Vessel> {
   @Override
   public void run() {
     if (!tripOpen) {
-      final Optional<Cell> destination = initialDestination.apply(getVessel());
+      final Optional<? extends Destination> destination =
+        initialDestination.apply(getVessel());
       if (destination.isEmpty()) {
         fail();
         return;

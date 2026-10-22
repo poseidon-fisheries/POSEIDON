@@ -29,7 +29,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.geography.Destination;
-import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
@@ -49,7 +48,10 @@ public final class FishingTripBlock extends TripBlock {
    * @throws IllegalArgumentException if {@code children} is empty
    */
   public FishingTripBlock(
-    final Function<? super Vessel, Optional<Cell>> initialDestination,
+    final Function<
+      ? super Vessel,
+      ? extends Optional<? extends Destination>
+    > initialDestination,
     final Function<? super Vessel, LocalDateTime> currentDateTime,
     final List<? extends Function<? super Trip, ? extends Money>> tripCosts,
     final List<? extends Task<Vessel>> children

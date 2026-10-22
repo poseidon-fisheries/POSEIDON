@@ -36,7 +36,7 @@ import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
-import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.Destination;
 
 /**
  * A {@link TaskFactory} for a {@link FishingTripBlock}. Built via
@@ -60,7 +60,7 @@ public class FishingTripBlockFactory extends TripBlockFactory {
     final ValueFactory<
       ? super VesselComponentScope,
       ? super Vessel,
-      Optional<Cell>
+      ? extends Optional<? extends Destination>
     > initialDestination,
     final ValueFactory<
       ? super VesselComponentScope,
@@ -83,7 +83,10 @@ public class FishingTripBlockFactory extends TripBlockFactory {
 
   @Override
   FishingTripBlock newTripBlock(
-    final Function<? super Vessel, Optional<Cell>> initialDestination,
+    final Function<
+      ? super Vessel,
+      ? extends Optional<? extends Destination>
+    > initialDestination,
     final Function<? super Vessel, LocalDateTime> currentDateTime,
     final List<? extends Function<? super Trip, ? extends Money>> tripCosts,
     final List<? extends Task<Vessel>> children
