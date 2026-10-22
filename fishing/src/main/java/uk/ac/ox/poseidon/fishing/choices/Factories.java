@@ -206,10 +206,11 @@ public final class Factories {
   /**
    * @param alpha the smoothing factor, in {@code [0, 1]}
    * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for
-   *         an {@link ExponentialMovingAverageOptionValues}
+   *         an {@link ExponentialMovingAverageOptionValues} of cells; it names
+   *         its option type so that a scenario can hold it in a {@code var}
    * @see ExponentialMovingAverageOptionValues
    */
-  public static <O> ExponentialMovingAverageOptionValuesFactory<O> exponentialMovingAverageOptionValues(
+  public static ExponentialMovingAverageOptionValuesFactory<Cell> exponentialMovingAverageCellValues(
     final double alpha
   ) {
     return new ExponentialMovingAverageOptionValuesFactory<>(alpha);

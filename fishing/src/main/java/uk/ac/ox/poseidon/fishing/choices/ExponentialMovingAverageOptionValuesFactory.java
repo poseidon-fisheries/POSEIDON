@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
 /**
  * A {@link VesselScopeFactory} counterpart of
  * {@link ExponentialMovingAverageOptionValues}, built via
- * {@link Factories#exponentialMovingAverageOptionValues}.
+ * {@link Factories#exponentialMovingAverageCellValues}.
  */
 @Getter
 @ToString

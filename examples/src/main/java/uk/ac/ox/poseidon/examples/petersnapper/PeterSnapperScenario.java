@@ -102,14 +102,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.function.Supplier;
-import uk.ac.ox.poseidon.biology.species.SpeciesFactory;
 import uk.ac.ox.poseidon.core.Scenario;
-import uk.ac.ox.poseidon.core.Simulation;
-import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
-import uk.ac.ox.poseidon.fishing.choices.EpsilonGreedyDestinationFactory;
-import uk.ac.ox.poseidon.fishing.choices.MutableOptionValues;
-import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
-import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 /**
@@ -136,12 +129,12 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     // petersnapper scenario. It does; so the calibration mismatch is from
     // fisher behaviour, not biology.
 
-    final Scenario scenario = new PeterSnapperScenario().get();
+    final var scenario = new PeterSnapperScenario().get();
 
-    final Path outputPath = Path.of("outputs", "peter_snapper");
+    final var outputPath = Path.of("outputs", "peter_snapper");
     new ScenarioWriter().write(scenario, outputPath.resolve("scenario.yaml"));
 
-    final Simulation simulation = scenario
+    final var simulation = scenario
       .withComponent(
         "totalLandingsPerYear",
         finalProcess(
@@ -182,8 +175,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       )
       .startNewSimulation(0);
     try {
-      final TemporalSchedule temporalSchedule =
-        simulation.getTemporalSchedule();
+      final var temporalSchedule = simulation.getTemporalSchedule();
       for (int i = 0; i < 10; i++) {
         temporalSchedule.stepFor(simulation, Period.ofYears(1));
       }
@@ -235,7 +227,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       )
     );
 
-    final SpeciesFactory species = species("PS", "Peter Snapper", null);
+    final var species = species("PS", "Peter Snapper", null);
     final var biomassGrid = biomassGrid(
       modelGrid,
       species,
@@ -336,8 +328,9 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     // Each vessel's own table of what its destinations are worth, which its
     // friends read too
-    final VesselComponent<MutableOptionValues<Cell>> optionValues =
-      vesselComponent(exponentialMovingAverageOptionValues(LEARNING_ALPHA));
+    final var optionValues = vesselComponent(
+      exponentialMovingAverageCellValues(LEARNING_ALPHA)
+    );
 
     final var fleet = fleet(vesselField, portGrid, marketGrid);
 
@@ -345,41 +338,40 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       cellValue(carryingCapacityGrid),
       greaterThan(0)
     );
-    final EpsilonGreedyDestinationFactory destination =
-      epsilonGreedyDestination(
-        EXPLORATION_PROBABILITY,
-        neighbourhoodGridExplorer(
-          pathFinder,
-          validCellPredicate,
-          oneValueFrom(randomInt(1, 10)),
-          MAXIMUM_EXPLORATION_WIDENING,
-          bestKnownOption(
-            optionValues,
-            randomGridExplorer(
-              accessibleWaterCells(pathFinder),
-              validCellPredicate
-            )
-          )
-        ),
-        imitatingPicker(
+    final var destination = epsilonGreedyDestination(
+      EXPLORATION_PROBABILITY,
+      neighbourhoodGridExplorer(
+        pathFinder,
+        validCellPredicate,
+        oneValueFrom(randomInt(1, 10)),
+        MAXIMUM_EXPLORATION_WIDENING,
+        bestKnownOption(
           optionValues,
-          always(true),
-          bestOptionsFromFriends(
-            optionValues,
-            friendshipDynamics(
-              socialNetwork(fleet),
-              2,
-              allOf(
-                other(vesselIsActive()),
-                condition(
-                  other(vesselProperty("homePort")),
-                  equal(vesselProperty("homePort"))
-                )
+          randomGridExplorer(
+            accessibleWaterCells(pathFinder),
+            validCellPredicate
+          )
+        )
+      ),
+      imitatingPicker(
+        optionValues,
+        always(true),
+        bestOptionsFromFriends(
+          optionValues,
+          friendshipDynamics(
+            socialNetwork(fleet),
+            2,
+            allOf(
+              other(vesselIsActive()),
+              condition(
+                other(vesselProperty("homePort")),
+                equal(vesselProperty("homePort"))
               )
             )
           )
         )
-      );
+      )
+    );
 
     final var tripEvaluator = vesselComponent(
       tripEvaluator(optionValues, profitPerHour(CURRENCY_CODE))
