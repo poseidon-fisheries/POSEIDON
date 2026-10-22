@@ -377,18 +377,20 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       tripEvaluator(optionValues, profitPerHour(CURRENCY_CODE))
     );
 
+    final var travelToTripDestination = travelAlongPathTo(
+      engine,
+      fuelTank,
+      pathFinder,
+      distance,
+      currentTripDestination(),
+      currentTripEventManager()
+    );
+
     final var behaviour = behaviour(
       sequenceTask(
         fishingTrip(
           destination,
-          travelAlongPathTo(
-            engine,
-            fuelTank,
-            pathFinder,
-            distance,
-            currentTripDestination(),
-            currentTripEventManager()
-          ),
+          travelToTripDestination,
           untilFail(
             sequenceTask(
               fishing(
@@ -410,14 +412,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
             )
           ),
           setDestinationToOrigin(),
-          travelAlongPathTo(
-            engine,
-            fuelTank,
-            pathFinder,
-            distance,
-            currentTripDestination(),
-            currentTripEventManager()
-          ),
+          travelToTripDestination,
           dockAtDestination(),
           landCatches(hold, constant(hours(1))),
           refuel(fuelTank, fuelStationGrid)

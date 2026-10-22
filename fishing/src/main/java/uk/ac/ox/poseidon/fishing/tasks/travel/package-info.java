@@ -21,12 +21,10 @@
  */
 
 /**
- * Behavior-tree tasks for moving a vessel and running its trips end to end:
- * travelling along a path or directly to a destination, refuelling, turning
- * back, arriving in port, and
- * {@link uk.ac.ox.poseidon.fishing.tasks.travel.RoundTripFactory} for stringing
- * a whole trip together out of these and the fishing/landing tasks from sibling
- * packages. See {@link uk.ac.ox.poseidon.fishing.tasks.travel.Factories} for the
- * entry points.
+ * Behavior-tree tasks for moving a vessel during its trips: travelling along a
+ * path or directly to a destination, refuelling, turning back, and docking and
+ * undocking at a port. See
+ * {@link uk.ac.ox.poseidon.fishing.tasks.travel.Factories} for the entry
+ * points.
  */
 package uk.ac.ox.poseidon.fishing.tasks.travel;

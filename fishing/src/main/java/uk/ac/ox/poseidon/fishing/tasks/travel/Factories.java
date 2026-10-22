@@ -24,13 +24,10 @@ package uk.ac.ox.poseidon.fishing.tasks.travel;
 
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 
-import com.badlogic.gdx.ai.btree.Task;
-import java.util.Optional;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.fishing.fuel.FuelStationGrid;
-import uk.ac.ox.poseidon.fishing.vessels.FishingTripBlock;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
@@ -63,45 +60,6 @@ public final class Factories {
     > fuelStationGrid
   ) {
     return new RefuelFactory(fuelTank, fuelStationGrid);
-  }
-
-  /**
-   * @param initialDestination gives the trip's first destination for the
-   *                           vessel, or none if it should not leave
-   * @param travelTask         the task that travels between origin and fishing
-   *                           grounds, resolved once and reused for both legs
-   * @param fishingTask        the task that fishes once at the destination
-   * @param landingTask        the task that lands the catch after returning
-   * @return a {@link uk.ac.ox.poseidon.fishing.tasks.TaskFactory} for a
-   *         {@link FishingTripBlock} running a whole fishing trip
-   * @see RoundTripFactory
-   */
-  public static RoundTripFactory roundTrip(
-    final ValueFactory<
-      ? super VesselComponentScope,
-      ? super Vessel,
-      Optional<Cell>
-    > initialDestination,
-    final Factory<
-      ? super VesselComponentScope,
-      ? extends Task<Vessel>
-    > travelTask,
-    final Factory<
-      ? super VesselComponentScope,
-      ? extends Task<Vessel>
-    > fishingTask,
-    final Factory<
-      ? super VesselComponentScope,
-      ? extends Task<Vessel>
-    > landingTask
-  ) {
-    return new RoundTripFactory(
-      initialDestination,
-      travelTask,
-      fishingTask,
-      landingTask,
-      currentDateTime()
-    );
   }
 
   /**

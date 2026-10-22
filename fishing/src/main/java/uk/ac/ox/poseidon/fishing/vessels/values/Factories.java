@@ -31,7 +31,6 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
-import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
@@ -65,15 +64,6 @@ public final class Factories {
     final Factory<? super S, ? extends GridPathFinder> pathFinder
   ) {
     return new AccessibleWaterCellsFactory<>(pathFinder);
-  }
-
-  /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   *         {@link HomePortCell}
-   * @see HomePortCell
-   */
-  public static HomePortCellFactory homePortCell() {
-    return new HomePortCellFactory();
   }
 
   /**
@@ -168,18 +158,6 @@ public final class Factories {
     final ValueFactory<? super S, ? super Vessel, ? extends R> value
   ) {
     return new OtherFactory<>(value);
-  }
-
-  /**
-   * @param cell the cell, read for the vessel tested, to test its
-   *                     location against
-   * @return a {@link VesselScope}-relative factory for a {@link VesselIsAt}
-   * @see VesselIsAt
-   */
-  public static <S extends Scope> VesselIsAtFactory<S> vesselIsAt(
-    final ValueFactory<? super S, ? super Vessel, Cell> cell
-  ) {
-    return new VesselIsAtFactory<>(cell);
   }
 
   /**
