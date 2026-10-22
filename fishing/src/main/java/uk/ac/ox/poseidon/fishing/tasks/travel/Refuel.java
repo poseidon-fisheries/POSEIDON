@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.fishing.tasks.travel;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.time.Duration;
-import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.fishing.fuel.FuelStation;
@@ -34,12 +33,11 @@ import uk.ac.ox.poseidon.fishing.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
-import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
- * An {@link ExtendedTripTask} that fills the vessel's tank at a fuel station in
- * its current cell, running for that purchase's duration and charging its price
- * to the trip account.
+ * An {@link ExtendedTripTask} that fills the vessel's tank at the fuel station
+ * of the port it is docked at, running for that purchase's duration and
+ * charging its price to the trip account.
  */
 @RequiredArgsConstructor
 public class Refuel extends ExtendedTripTask {
@@ -49,11 +47,11 @@ public class Refuel extends ExtendedTripTask {
   private Duration duration;
 
   /**
-   * Buys fuel from the vessel's fuel station, charging its price to the trip
-   * account and recording its duration.
+   * Buys fuel from the station of the port the vessel is docked at, charging
+   * its price to the trip account and recording its duration.
    *
-   * @throws IllegalStateException if the vessel has no fuel station to buy from,
-   *                               or several
+   * @throws IllegalStateException if the vessel is not docked, or its port
+   *                               does not have exactly one station
    */
   @Override
   public void start() {
@@ -66,32 +64,17 @@ public class Refuel extends ExtendedTripTask {
   }
 
   /**
-   * Several ports can share a cell, each with its own station. A vessel in its
-   * home port's cell is taken to be docked at its home port, so it buys from
-   * that port's station; anywhere else, nothing says which port it is at, so
-   * the cell must hold exactly one station.
-   *
-   * @return the one fuel station the vessel can buy from in its current cell
-   * @throws IllegalStateException if there is not exactly one
+   * @return the one fuel station of the port the vessel is docked at
+   * @throws IllegalStateException if the vessel is not docked, or its port
+   *                               does not have exactly one station
    */
   private FuelStation fuelStationFor(final Vessel vessel) {
-    final Cell cell = vessel.getCell();
-    final List<FuelStation> fuelStations = fuelStationGrid
-      .getObjectsAt(cell)
-      .filter(
-        fuelStation ->
-          !vessel.isAtHomePort() ||
-          fuelStation.getPort().equals(vessel.getHomePort())
-      )
-      .toList();
     checkState(
-      fuelStations.size() == 1,
-      "Expected one fuel station for %s in cell %s, found %s.",
-      vessel,
-      cell,
-      fuelStations.size()
+      vessel.isDocked(),
+      "Vessel %s is refuelling while not docked.",
+      vessel.getId()
     );
-    return fuelStations.getFirst();
+    return fuelStationGrid.getFuelStation(vessel.getPortDockedAt());
   }
 
   /** @return the purchase's duration, computed at {@link #start()} */

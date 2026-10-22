@@ -22,15 +22,23 @@
 
 package uk.ac.ox.poseidon.fishing.fuel;
 
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Multimaps;
+import java.util.List;
 import java.util.Map;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
  * A {@link FuelStationGrid} whose station cells are fixed at construction,
- * from a station-to-cell map, rather than mutated afterwards.
+ * from a station-to-cell map, rather than mutated afterwards. Since its
+ * stations never change, it indexes them by port, so finding the station of a
+ * port does not scan every station.
  */
 public class ImmutableFuelStationGrid extends FuelStationGrid {
+
+  private final ImmutableListMultimap<Port, FuelStation> fuelStationsByPort;
 
   ImmutableFuelStationGrid(
     final ModelGrid modelGrid,
@@ -40,5 +48,14 @@ public class ImmutableFuelStationGrid extends FuelStationGrid {
     fuelStationCells.forEach((fuelStation, cell) ->
       field.setObjectLocation(fuelStation, cell.x(), cell.y())
     );
+    this.fuelStationsByPort = Multimaps.index(
+      fuelStationCells.keySet(),
+      FuelStation::getPort
+    );
+  }
+
+  @Override
+  protected List<FuelStation> fuelStationsOf(final Port port) {
+    return fuelStationsByPort.get(port);
   }
 }

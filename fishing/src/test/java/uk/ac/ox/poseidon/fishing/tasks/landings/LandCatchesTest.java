@@ -44,12 +44,10 @@ import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.accounts.Account;
 import uk.ac.ox.poseidon.fishing.vessels.holds.Hold;
-import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 class LandCatchesTest {
 
-  private final Cell homePortCell = new Cell(1, 2);
   private final Port homePort = mock(Port.class);
   private final Port otherPort = mock(Port.class);
   private final Market homePortMarket = mock(Market.class);
@@ -74,11 +72,10 @@ class LandCatchesTest {
     when(homePortMarket.sell(any(), any(), any())).thenReturn(sale);
     when(otherPortMarket.sell(any(), any(), any())).thenReturn(sale);
     when(vessel.getHomePort()).thenReturn(homePort);
-    when(vessel.getHomePortCell()).thenReturn(homePortCell);
-    when(vessel.getCell()).thenReturn(homePortCell);
     when(vessel.getMarketGrid()).thenReturn(marketGrid);
     when(trip.getAccount()).thenReturn(mock(Account.class));
     when(vessel.isDocked()).thenReturn(true);
+    when(vessel.getPortDockedAt()).thenReturn(homePort);
     setTaskObject(landCatches, vessel);
     final Field tripField = LandCatches.class
       .getSuperclass()
@@ -88,7 +85,7 @@ class LandCatchesTest {
   }
 
   @Test
-  void sellsAtTheMarketOfItsHomePort() {
+  void sellsAtTheMarketOfThePortItIsDockedAt() {
     when(marketGrid.getMarket(homePort)).thenReturn(homePortMarket);
 
     landCatches.complete();
@@ -97,30 +94,22 @@ class LandCatchesTest {
   }
 
   @Test
-  void throwsWhenTheVesselIsNotAtItsHomePort() {
-    when(vessel.getCell()).thenReturn(new Cell(3, 4));
+  void sellsAwayFromItsHomePortAtThePortItIsDockedAt() {
+    when(vessel.getPortDockedAt()).thenReturn(otherPort);
+    when(marketGrid.getMarket(homePort)).thenReturn(homePortMarket);
     when(marketGrid.getMarket(otherPort)).thenReturn(otherPortMarket);
 
-    assertThatThrownBy(landCatches::complete).isInstanceOf(
-      IllegalStateException.class
-    );
-    verify(otherPortMarket, never()).sell(any(), any(), any());
+    landCatches.complete();
+
+    verify(otherPortMarket).sell(eq(vessel), any(), any());
+    verify(homePortMarket, never()).sell(any(), any(), any());
   }
 
   @Test
   void throwsWhenTheVesselIsNotDocked() {
     when(vessel.isDocked()).thenReturn(false);
+    when(vessel.getPortDockedAt()).thenReturn(null);
     when(marketGrid.getMarket(homePort)).thenReturn(homePortMarket);
-
-    assertThatThrownBy(landCatches::complete).isInstanceOf(
-      IllegalStateException.class
-    );
-    verify(homePortMarket, never()).sell(any(), any(), any());
-  }
-
-  @Test
-  void throwsWithoutAHomePort() {
-    when(vessel.getHomePort()).thenReturn(null);
 
     assertThatThrownBy(landCatches::complete).isInstanceOf(
       IllegalStateException.class

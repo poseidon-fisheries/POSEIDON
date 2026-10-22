@@ -52,6 +52,8 @@ import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
+import uk.ac.ox.poseidon.fishing.vessels.values.HomePort;
+import uk.ac.ox.poseidon.fishing.vessels.values.VesselIsDockedAt;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -84,7 +86,10 @@ class VoyageHomeTest {
     fleet,
     behaviour(
       selectorTask(
-        sequenceTask(scope -> new IsAtHomePort(), scope -> new Departure()),
+        sequenceTask(
+          scope -> new IsDockedAtHomePort(),
+          scope -> new Departure()
+        ),
         scope -> new VoyageHome()
       )
     ),
@@ -93,11 +98,17 @@ class VoyageHomeTest {
     null
   );
 
-  private static final class IsAtHomePort extends VesselTask {
+  private static final class IsDockedAtHomePort extends VesselTask {
+
+    private final VesselIsDockedAt dockedAtHomePort = new VesselIsDockedAt(
+      new HomePort()
+    );
 
     @Override
     public Status execute() {
-      return getVessel().isAtHomePort() ? Status.SUCCEEDED : Status.FAILED;
+      return dockedAtHomePort.apply(getVessel())
+        ? Status.SUCCEEDED
+        : Status.FAILED;
     }
   }
 

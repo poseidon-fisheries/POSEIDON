@@ -22,8 +22,12 @@
 
 package uk.ac.ox.poseidon.fishing.fuel;
 
+import static com.google.common.base.Preconditions.checkState;
+
+import java.util.List;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.grids.ObjectGrid;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
  * A grid of {@link FuelStation}s, keyed by each station's {@code getCode()}.
@@ -38,5 +42,36 @@ public class FuelStationGrid extends ObjectGrid<FuelStation> {
   @Override
   protected String getObjectId(final FuelStation object) {
     return object.getCode();
+  }
+
+  /**
+   * Finds a fuel station by the port it belongs to, not by its cell: ports can
+   * share a cell.
+   *
+   * @param port the port whose fuel station to find
+   * @return the one fuel station of {@code port}
+   * @throws IllegalStateException if {@code port} does not have exactly one
+   *                               fuel station
+   */
+  public FuelStation getFuelStation(final Port port) {
+    final List<FuelStation> fuelStations = fuelStationsOf(port);
+    checkState(
+      fuelStations.size() == 1,
+      "Expected one fuel station at port %s, found %s.",
+      port,
+      fuelStations.size()
+    );
+    return fuelStations.getFirst();
+  }
+
+  /**
+   * @param port the port whose fuel stations to find
+   * @return the fuel stations of {@code port}, by scanning every station; a
+   *         grid whose stations never change can index them instead
+   */
+  protected List<FuelStation> fuelStationsOf(final Port port) {
+    return stream()
+      .filter(fuelStation -> fuelStation.getPort().equals(port))
+      .toList();
   }
 }

@@ -652,13 +652,6 @@ public class Vessel implements Oriented2D, HasAttributes {
     return homePort;
   }
 
-  /**
-   * @return {@code true} if the vessel's current cell is its home port's cell
-   */
-  public boolean isAtHomePort() {
-    return getCell().equals(getHomePortCell());
-  }
-
   /** @return the home port's grid cell */
   public Cell getHomePortCell() {
     return homePortCell;

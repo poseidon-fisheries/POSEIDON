@@ -35,9 +35,10 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.holds.Hold;
 
 /**
- * Sells the vessel's hold contents to the market of its home port, where it
- * must be, and credits the trip's account with the proceeds. The market is
- * found by port, not by cell, because ports can share a cell.
+ * Sells the vessel's hold contents to the market of the port it is docked at,
+ * which need not be its home port, and credits the trip's account with the
+ * proceeds. The market is found by port, not by cell, because ports can share
+ * a cell.
  */
 @RequiredArgsConstructor
 public class LandCatches extends ExtendedTripTask {
@@ -53,14 +54,12 @@ public class LandCatches extends ExtendedTripTask {
   }
 
   /**
-   * Sells the vessel's entire hold to the market of its home port, adding the
-   * sale's proceeds (by currency) to the trip's account.
+   * Sells the vessel's entire hold to the market of the port it is docked at,
+   * adding the sale's proceeds (by currency) to the trip's account.
    *
    * @return {@link Status#SUCCEEDED}
-   * @throws IllegalStateException if the vessel is not docked, has no home
-   *                               port or is not at it, or
-   *                               its home port does not have exactly one
-   *                               market
+   * @throws IllegalStateException if the vessel is not docked, or its port
+   *                               does not have exactly one market
    */
   @Override
   protected Status complete() {
@@ -70,21 +69,9 @@ public class LandCatches extends ExtendedTripTask {
       "Vessel %s is landing while not docked.",
       vessel.getId()
     );
-    checkState(
-      vessel.getHomePort() != null,
-      "Vessel %s has no home port.",
-      vessel.getId()
-    );
-    checkState(
-      vessel.getCell().equals(vessel.getHomePortCell()),
-      "Vessel %s is landing at %s, not at its home port %s.",
-      vessel.getId(),
-      vessel.getCell(),
-      vessel.getHomePort()
-    );
     vessel
       .getMarketGrid()
-      .getMarket(vessel.getHomePort())
+      .getMarket(vessel.getPortDockedAt())
       .sell(
         vessel,
         hold.of(vessel).extractContent(),

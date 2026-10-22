@@ -33,6 +33,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
  * Factories for values of a vessel: functions given the vessel to read. They
@@ -73,6 +74,15 @@ public final class Factories {
    */
   public static HomePortCellFactory homePortCell() {
     return new HomePortCellFactory();
+  }
+
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
+   *         {@link HomePort}
+   * @see HomePort
+   */
+  public static HomePortFactory homePort() {
+    return new HomePortFactory();
   }
 
   /**
@@ -167,6 +177,19 @@ public final class Factories {
     final ValueFactory<? super S, ? super Vessel, Cell> cell
   ) {
     return new VesselIsAtFactory<>(cell);
+  }
+
+  /**
+   * @param port the port, read for the vessel tested, to test its docking
+   *             against
+   * @return a {@link VesselScope}-relative factory for a
+   *         {@link VesselIsDockedAt}
+   * @see VesselIsDockedAt
+   */
+  public static <S extends Scope> VesselIsDockedAtFactory<S> vesselIsDockedAt(
+    final ValueFactory<? super S, ? super Vessel, Port> port
+  ) {
+    return new VesselIsDockedAtFactory<>(port);
   }
 
   /**

@@ -29,11 +29,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.fishing.tasks.travel.TravelTasks.FUEL_TANK;
-import static uk.ac.ox.poseidon.fishing.tasks.travel.TravelTasks.ORIGIN;
 import static uk.ac.ox.poseidon.fishing.tasks.travel.TravelTasks.setTaskObject;
 import static uk.ac.ox.poseidon.fishing.tasks.travel.TravelTasks.vesselCruisingAtTenKph;
 
-import java.util.stream.Stream;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
@@ -62,70 +60,44 @@ class RefuelTest {
     );
   }
 
-  private static Refuel refuelAmong(
+  private static Refuel refuelAt(
     final Vessel vessel,
-    final FuelStation... fuelStations
+    final FuelStationGrid fuelStationGrid
   ) throws Exception {
-    final FuelStationGrid fuelStationGrid = mock(FuelStationGrid.class);
-    when(fuelStationGrid.getObjectsAt(ORIGIN)).thenAnswer(invocation ->
-      Stream.of(fuelStations)
-    );
     final Refuel refuel = new Refuel(FUEL_TANK, fuelStationGrid);
     setTaskObject(refuel, vessel);
     return refuel;
   }
 
-  private static Vessel vesselWithAnAccount() {
+  private static Vessel vesselDockedAt(final Port port) {
     final Vessel vessel = vesselCruisingAtTenKph();
     final Trip trip = vessel.getCurrentTrip();
     when(trip.getAccount()).thenReturn(mock(Account.class));
+    when(vessel.isDocked()).thenReturn(true);
+    when(vessel.getPortDockedAt()).thenReturn(port);
     return vessel;
   }
 
   @Test
-  void awayFromHomeBuysFromTheStationInItsCell() throws Exception {
-    final Vessel vessel = vesselWithAnAccount();
+  void buysFromTheStationOfThePortItIsDockedAt() throws Exception {
+    final Port port = mock(Port.class);
     final EventManager eventManager = mock(EventManager.class);
+    final FuelStationGrid fuelStationGrid = mock(FuelStationGrid.class);
+    when(fuelStationGrid.getFuelStation(port)).thenReturn(
+      station(port, eventManager)
+    );
 
-    refuelAmong(vessel, station(mock(Port.class), eventManager)).start();
+    refuelAt(vesselDockedAt(port), fuelStationGrid).start();
 
     verify(eventManager).broadcast(any(FuelStation.Purchase.class));
   }
 
   @Test
-  void atHomeBuysFromTheHomePortStationAmongSeveral() throws Exception {
-    final Vessel vessel = vesselWithAnAccount();
-    final Port homePort = mock(Port.class);
-    when(vessel.isAtHomePort()).thenReturn(true);
-    when(vessel.getHomePort()).thenReturn(homePort);
-    final EventManager home = mock(EventManager.class);
-    final EventManager neighbour = mock(EventManager.class);
-
-    refuelAmong(
-      vessel,
-      station(mock(Port.class), neighbour),
-      station(homePort, home)
-    ).start();
-
-    verify(home).broadcast(any(FuelStation.Purchase.class));
-    verify(neighbour, never()).broadcast(any());
-  }
-
-  @Test
-  void awayFromHomeSeveralStationsInACellAreRejected() throws Exception {
-    final Refuel refuel = refuelAmong(
-      vesselCruisingAtTenKph(),
-      station(mock(Port.class), mock(EventManager.class)),
-      station(mock(Port.class), mock(EventManager.class))
-    );
+  void aVesselNotDockedIsRejected() throws Exception {
+    final FuelStationGrid fuelStationGrid = mock(FuelStationGrid.class);
+    final Refuel refuel = refuelAt(vesselCruisingAtTenKph(), fuelStationGrid);
 
     assertThatIllegalStateException().isThrownBy(refuel::start);
-  }
-
-  @Test
-  void aCellWithoutAStationIsRejected() throws Exception {
-    final Refuel refuel = refuelAmong(vesselCruisingAtTenKph());
-
-    assertThatIllegalStateException().isThrownBy(refuel::start);
+    verify(fuelStationGrid, never()).getFuelStation(any());
   }
 }
