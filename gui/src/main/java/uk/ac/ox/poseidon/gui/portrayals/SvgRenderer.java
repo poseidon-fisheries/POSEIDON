@@ -52,8 +52,9 @@ public class SvgRenderer {
   private static final int MAXIMUM_CACHED_SIZES = 16;
 
   private final SVGDocument svgDocument;
-  private final Cache<ImageSize, BufferedImage> images =
-    Caffeine.newBuilder().maximumSize(MAXIMUM_CACHED_SIZES).build();
+  private final Cache<ImageSize, BufferedImage> images = Caffeine.newBuilder()
+    .maximumSize(MAXIMUM_CACHED_SIZES)
+    .build();
 
   /**
    * @param svgInputStream the SVG document to parse
