@@ -33,6 +33,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  * Factories for {@link uk.ac.ox.poseidon.geography.allocators.Allocator}s over
  * biomass grids.
  */
+@SuppressWarnings("overloads")
 public final class Factories {
 
   private Factories() {}
@@ -55,6 +56,27 @@ public final class Factories {
     return new ProportionOfCarryingCapacityAllocatorFactory<>(
       carryingCapacityGrid,
       proportion
+    );
+  }
+
+  /**
+   * @param carryingCapacityGrid the grid whose carrying capacities are
+   *                             allocated a proportion of
+   * @param proportion           the proportion of each cell's carrying
+   *                             capacity
+   * @return the same as the overload taking a {@link ValueFactory}
+   *         proportion, with a constant {@code proportion}
+   */
+  public static <S extends Scope> ProportionOfCarryingCapacityAllocatorFactory<S> proportionOfCarryingCapacityAllocator(
+    final Factory<
+      ? super S,
+      ? extends CarryingCapacityGrid
+    > carryingCapacityGrid,
+    final double proportion
+  ) {
+    return proportionOfCarryingCapacityAllocator(
+      carryingCapacityGrid,
+      constant(proportion)
     );
   }
 

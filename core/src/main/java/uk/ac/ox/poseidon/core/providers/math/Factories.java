@@ -54,6 +54,19 @@ public final class Factories {
   /**
    * @param a one of the two values to compare
    * @param b the other value to compare
+   * @return the same as {@link #maxDouble(ValueFactory, ValueFactory)}, with a
+   *         constant {@code b}
+   */
+  public static <S extends Scope, C> MaxDoubleFactory<S, C> maxDouble(
+    final ValueFactory<? super S, ? super C, Double> a,
+    final double b
+  ) {
+    return maxDouble(a, constant(b));
+  }
+
+  /**
+   * @param a one of the two values to compare
+   * @param b the other value to compare
    * @return a {@link uk.ac.ox.poseidon.core.ValueFactory} for a
    *         {@link MaxInt}
    * @see MaxInt
@@ -77,6 +90,19 @@ public final class Factories {
     final ValueFactory<? super S, ? super C, Double> b
   ) {
     return new MinDoubleFactory<>(a, b);
+  }
+
+  /**
+   * @param a one of the two values to compare
+   * @param b the other value to compare
+   * @return the same as {@link #minDouble(ValueFactory, ValueFactory)}, with a
+   *         constant {@code b}
+   */
+  public static <S extends Scope, C> MinDoubleFactory<S, C> minDouble(
+    final ValueFactory<? super S, ? super C, Double> a,
+    final double b
+  ) {
+    return minDouble(a, constant(b));
   }
 
   /**

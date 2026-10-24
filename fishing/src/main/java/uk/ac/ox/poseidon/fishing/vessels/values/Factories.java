@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 
 import org.joda.money.Money;
@@ -41,6 +42,7 @@ import uk.ac.ox.poseidon.geography.ports.Port;
  * {@link #other} reads such a value off another vessel, in a test relating the
  * two.
  */
+@SuppressWarnings("overloads")
 public final class Factories {
 
   private Factories() {}
@@ -199,6 +201,17 @@ public final class Factories {
     final ValueFactory<? super S, ? super Vessel, ? extends Money> hourlyCosts
   ) {
     return new TimeAtSeaCostFactory<>(hourlyCosts);
+  }
+
+  /**
+   * @param hourlyCosts the cost of an hour at sea, the same for every vessel
+   * @return the same as {@link #timeAtSeaCost(ValueFactory)}, over a constant
+   *         {@code hourlyCosts}
+   */
+  public static <S extends Scope> TimeAtSeaCostFactory<S> timeAtSeaCost(
+    final Factory<? super S, ? extends Money> hourlyCosts
+  ) {
+    return timeAtSeaCost(constant(hourlyCosts));
   }
 
   /**

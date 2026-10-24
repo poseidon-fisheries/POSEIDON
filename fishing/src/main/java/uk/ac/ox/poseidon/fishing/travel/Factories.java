@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.travel;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
+
 import com.google.common.collect.ImmutableList;
 import java.util.function.Function;
 import org.joda.money.Money;
@@ -74,6 +76,17 @@ public final class Factories {
     final ValueFactory<? super S, ? super Vessel, ? extends Money> hourlyCost
   ) {
     return new TimeCostFactory<>(hourlyCost);
+  }
+
+  /**
+   * @param hourlyCost the cost of an hour, the same for every vessel
+   * @return the same as {@link #timeCost(ValueFactory)}, over a constant
+   *         {@code hourlyCost}
+   */
+  public static <S extends Scope> TimeCostFactory<S> timeCost(
+    final Factory<? super S, ? extends Money> hourlyCost
+  ) {
+    return timeCost(constant(hourlyCost));
   }
 
   /**

@@ -34,7 +34,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * Factories for the steps of a catch's {@link DispositionProcess}
  * (retention/discarding).
  */
-@SuppressWarnings("varargs")
+@SuppressWarnings({ "varargs", "overloads" })
 public final class Factories {
 
   private Factories() {}
@@ -60,6 +60,19 @@ public final class Factories {
   }
 
   /**
+   * @param species the species to index rates over
+   * @param rate    the rate, the same for every species
+   * @return the same as {@link #discardRates(Factory, MappingFactory)}, with a
+   *         constant {@code rate}
+   */
+  public static <S extends Scope> IndexedDiscardRatesFactory<S> discardRates(
+    final Factory<? super S, ? extends Collection<? extends Species>> species,
+    final double rate
+  ) {
+    return discardRates(species, always(rate));
+  }
+
+  /**
    * @param species      the species to index rates over
    * @param rateFunction the discard mortality rate, per species
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for an
@@ -76,6 +89,19 @@ public final class Factories {
     > rateFunction
   ) {
     return new IndexedDiscardMortalityFactory<S>(species, rateFunction);
+  }
+
+  /**
+   * @param species the species to index rates over
+   * @param rate    the rate, the same for every species
+   * @return the same as {@link #indexedDiscardMortality(Factory, MappingFactory)}, with a
+   *         constant {@code rate}
+   */
+  public static <S extends Scope> IndexedDiscardMortalityFactory<S> indexedDiscardMortality(
+    final Factory<? super S, ? extends Collection<? extends Species>> species,
+    final double rate
+  ) {
+    return indexedDiscardMortality(species, always(rate));
   }
 
   /**

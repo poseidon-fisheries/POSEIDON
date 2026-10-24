@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.vessels.accounts;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
+
 import org.joda.money.Money;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
@@ -33,6 +35,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
  * Factories for {@link sim.engine.Steppable}s that draw on vessels'
  * {@link Account}s.
  */
+@SuppressWarnings("overloads")
 public final class Factories {
 
   private Factories() {}
@@ -50,5 +53,18 @@ public final class Factories {
     final ValueFactory<? super S, ? super Vessel, ? extends Money> cost
   ) {
     return new FixedCostCollectorFactory<>(fleet, cost);
+  }
+
+  /**
+   * @param fleet the fleet whose vessels pay the cost
+   * @param cost  the cost, the same for every vessel
+   * @return the same as {@link #fixedCostCollector(Factory, ValueFactory)},
+   *         over a constant {@code cost}
+   */
+  public static <S extends Scope> FixedCostCollectorFactory<S> fixedCostCollector(
+    final Factory<? super S, ? extends Fleet> fleet,
+    final Factory<? super S, ? extends Money> cost
+  ) {
+    return fixedCostCollector(fleet, constant(cost));
   }
 }

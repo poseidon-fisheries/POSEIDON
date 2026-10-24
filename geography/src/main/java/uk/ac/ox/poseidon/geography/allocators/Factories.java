@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.allocators;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
+
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
@@ -32,6 +34,7 @@ import uk.ac.ox.poseidon.geography.grids.Cell;
  * Factories for {@link Allocator}s: weight functions used to place things on a
  * grid.
  */
+@SuppressWarnings("overloads")
 public final class Factories {
 
   private Factories() {}
@@ -67,5 +70,16 @@ public final class Factories {
     final ValueFactory<? super S, ? super Void, Double> value
   ) {
     return new SupplierAllocatorFactory<>(value);
+  }
+
+  /**
+   * @param value the value allocated to every cell
+   * @return the same as {@link #supplierAllocator(ValueFactory)}, with a
+   *         constant {@code value}
+   */
+  public static <S extends Scope> SupplierAllocatorFactory<S> supplierAllocator(
+    final double value
+  ) {
+    return supplierAllocator(constant(value));
   }
 }

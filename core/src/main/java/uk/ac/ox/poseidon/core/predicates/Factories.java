@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core.predicates;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import java.util.Collection;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
@@ -122,5 +123,16 @@ public final class Factories {
     > values
   ) {
     return new InSetFactory<>(values);
+  }
+
+  /**
+   * @param values factory for the values the tested value must be among
+   * @return the same as {@link #in(ValueFactory)}, over a constant
+   *         {@code values}
+   */
+  public static <S extends Scope, T> InSetFactory<S, Object, T> in(
+    final Factory<? super S, ? extends Collection<? extends T>> values
+  ) {
+    return in(constant(values));
   }
 }

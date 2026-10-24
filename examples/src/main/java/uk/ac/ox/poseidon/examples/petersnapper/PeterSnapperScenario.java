@@ -36,7 +36,6 @@ import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
 import static uk.ac.ox.poseidon.core.predicates.temporal.Factories.dateTimeIsBefore;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomInt;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
@@ -225,7 +224,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       normalisedDoubleGridFromAllocator(
         modelGrid,
         filteredAllocator(
-          supplierAllocator(constant(1.0)),
+          supplierAllocator(1.0),
           allOf(
             isActiveWaterCell(bathymetricGrid),
             inDepthRange(bathymetricGrid, 30, 800)
@@ -431,10 +430,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
                         componentProperty(hold, "availableCapacityInKg"),
                         greaterThan(1)
                       ),
-                      condition(
-                        currentTimeAtSea(),
-                        lessThan(constant(days(10)))
-                      )
+                      condition(currentTimeAtSea(), lessThan(days(10)))
                     )
                   )
                 )
