@@ -442,10 +442,10 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
               setDestinationToOrigin(),
               travelToTripDestination,
               dockAtDestination(),
-              landCatches(hold, constant(hours(1))),
+              landCatches(hold, hours(1)),
               refuel(fuelTank, fuelStationGrid)
             ),
-            waitFor(constant(hours(1)))
+            waitFor(hours(1))
           )
         )
       )

@@ -24,10 +24,12 @@ package uk.ac.ox.poseidon.core.predicates.temporal;
 
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.greaterThan;
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.predicates.comparable.GreaterThanFactory;
@@ -42,9 +44,23 @@ import uk.ac.ox.poseidon.core.predicates.comparable.LessThanFactory;
  * {@link uk.ac.ox.poseidon.core.predicates.comparable.Factories} rather than
  * bespoke implementations.
  */
+@SuppressWarnings("overloads")
 public final class Factories {
 
   private Factories() {}
+
+  /**
+   * @param referenceTime the time the resulting predicate tests against
+   * @return the same as {@link #afterTime(ValueFactory)}, over a constant
+   *         {@code referenceTime}
+   */
+  public static <S extends Scope> GreaterThanFactory<
+    S,
+    Object,
+    LocalTime
+  > afterTime(final Factory<? super S, ? extends LocalTime> referenceTime) {
+    return afterTime(constant(referenceTime));
+  }
 
   /**
    * @param referenceTime factory for the time the resulting predicate tests
@@ -65,6 +81,17 @@ public final class Factories {
   }
 
   /**
+   * @param referenceDate the date the resulting predicate tests against
+   * @return the same as {@link #afterDate(ValueFactory)}, over a constant
+   *         {@code referenceDate}
+   */
+  public static <S extends Scope> AfterDateFactory<S, Object> afterDate(
+    final Factory<? super S, ? extends LocalDate> referenceDate
+  ) {
+    return afterDate(constant(referenceDate));
+  }
+
+  /**
    * @param referenceDate factory for the date the resulting predicate tests
    *                      against
    * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for an
@@ -75,6 +102,17 @@ public final class Factories {
     final ValueFactory<? super S, ? super C, ? extends LocalDate> referenceDate
   ) {
     return new AfterDateFactory<>(referenceDate);
+  }
+
+  /**
+   * @param referenceDateTime the date-time the resulting predicate tests against
+   * @return the same as {@link #afterDateTime(ValueFactory)}, over a constant
+   *         {@code referenceDateTime}
+   */
+  public static <S extends Scope> AfterDateTimeFactory<S, Object> afterDateTime(
+    final Factory<? super S, ? extends LocalDateTime> referenceDateTime
+  ) {
+    return afterDateTime(constant(referenceDateTime));
   }
 
   /**
@@ -96,6 +134,19 @@ public final class Factories {
   }
 
   /**
+   * @param referenceTime the time the resulting predicate tests against
+   * @return the same as {@link #timeIsBefore(ValueFactory)}, over a constant
+   *         {@code referenceTime}
+   */
+  public static <S extends Scope> LessThanFactory<
+    S,
+    Object,
+    LocalTime
+  > timeIsBefore(final Factory<? super S, ? extends LocalTime> referenceTime) {
+    return timeIsBefore(constant(referenceTime));
+  }
+
+  /**
    * @param referenceTime factory for the time the resulting predicate tests
    *                      against
    * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
@@ -114,6 +165,17 @@ public final class Factories {
   }
 
   /**
+   * @param referenceDate the date the resulting predicate tests against
+   * @return the same as {@link #dateIsBefore(ValueFactory)}, over a constant
+   *         {@code referenceDate}
+   */
+  public static <S extends Scope> DateIsBeforeFactory<S, Object> dateIsBefore(
+    final Factory<? super S, ? extends LocalDate> referenceDate
+  ) {
+    return dateIsBefore(constant(referenceDate));
+  }
+
+  /**
    * @param referenceDate factory for the date the resulting predicate tests
    *                      against
    * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
@@ -124,6 +186,20 @@ public final class Factories {
     final ValueFactory<? super S, ? super C, ? extends LocalDate> referenceDate
   ) {
     return new DateIsBeforeFactory<>(referenceDate);
+  }
+
+  /**
+   * @param referenceDateTime the date-time the resulting predicate tests against
+   * @return the same as {@link #dateTimeIsBefore(ValueFactory)}, over a constant
+   *         {@code referenceDateTime}
+   */
+  public static <S extends Scope> DateTimeIsBeforeFactory<
+    S,
+    Object
+  > dateTimeIsBefore(
+    final Factory<? super S, ? extends LocalDateTime> referenceDateTime
+  ) {
+    return dateTimeIsBefore(constant(referenceDateTime));
   }
 
   /**

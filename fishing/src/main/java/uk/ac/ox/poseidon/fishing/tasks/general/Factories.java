@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.tasks.general;
 
 import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import com.badlogic.gdx.ai.btree.Task;
 import java.time.Duration;
@@ -36,6 +37,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
  * Factories for general-purpose vessel behavior-tree leaves: checks, waits, and
  * retry glue.
  */
+@SuppressWarnings("overloads")
 public final class Factories {
 
   private Factories() {}
@@ -91,6 +93,17 @@ public final class Factories {
     > duration
   ) {
     return new WaitForFactory(duration);
+  }
+
+  /**
+   * @param duration the duration to wait
+   * @return the same as {@link #waitFor(ValueFactory)}, over a constant
+   *         {@code duration}
+   */
+  public static WaitForFactory waitFor(
+    final Factory<? super VesselComponentScope, ? extends Duration> duration
+  ) {
+    return waitFor(constant(duration));
   }
 
   /**

@@ -22,9 +22,11 @@
 
 package uk.ac.ox.poseidon.fishing.tasks.landings;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 
 import java.time.Duration;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
@@ -34,6 +36,7 @@ import uk.ac.ox.poseidon.fishing.vessels.holds.Hold;
 /**
  * Factories for tasks that land a vessel's catch at market.
  */
+@SuppressWarnings("overloads")
 public final class Factories {
 
   private Factories() {}
@@ -54,5 +57,18 @@ public final class Factories {
     > duration
   ) {
     return new LandCatchesFactory(hold, duration, currentDateTime());
+  }
+
+  /**
+   * @param hold     the hold whose catch is landed
+   * @param duration how long landing takes
+   * @return the same as {@link #landCatches(VesselComponent, ValueFactory)},
+   *         over a constant {@code duration}
+   */
+  public static LandCatchesFactory landCatches(
+    final VesselComponent<? extends Hold> hold,
+    final Factory<? super VesselComponentScope, ? extends Duration> duration
+  ) {
+    return landCatches(hold, constant(duration));
   }
 }
