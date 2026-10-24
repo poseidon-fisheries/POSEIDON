@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.core.providers.math;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
+
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
@@ -30,6 +32,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  * operation (currently max and min). Each keeps {@link Math}'s behaviour, NaN
  * included, so the {@code Double} and {@code Integer} variants stay apart.
  */
+@SuppressWarnings("overloads")
 public final class Factories {
 
   private Factories() {}
@@ -88,5 +91,31 @@ public final class Factories {
     final ValueFactory<? super S, ? super C, Integer> b
   ) {
     return new MinIntFactory<>(a, b);
+  }
+
+  /**
+   * @param a one of the two values to compare
+   * @param b the other value to compare
+   * @return the same as {@link #maxInt(ValueFactory, ValueFactory)}, with a
+   *         constant {@code b}
+   */
+  public static <S extends Scope, C> MaxIntFactory<S, C> maxInt(
+    final ValueFactory<? super S, ? super C, Integer> a,
+    final int b
+  ) {
+    return maxInt(a, constant(b));
+  }
+
+  /**
+   * @param a one of the two values to compare
+   * @param b the other value to compare
+   * @return the same as {@link #minInt(ValueFactory, ValueFactory)}, with a
+   *         constant {@code b}
+   */
+  public static <S extends Scope, C> MinIntFactory<S, C> minInt(
+    final ValueFactory<? super S, ? super C, Integer> a,
+    final int b
+  ) {
+    return minInt(a, constant(b));
   }
 }

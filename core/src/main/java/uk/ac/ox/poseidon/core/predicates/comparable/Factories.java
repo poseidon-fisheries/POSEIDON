@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.core.predicates.comparable;
 
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
@@ -31,6 +32,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  * Factories for yes/no mappings that compare a tested value against one or two
  * thresholds read under the context.
  */
+@SuppressWarnings("overloads")
 public final class Factories {
 
   private Factories() {}
@@ -45,6 +47,20 @@ public final class Factories {
     final double threshold
   ) {
     return lessThan(constant(threshold));
+  }
+
+  /**
+   * @param value factory for the value the resulting predicate tests against
+   * @return the same as {@link #lessThan(ValueFactory)}, over a constant
+   *         {@code value}
+   */
+  public static <
+    S extends Scope,
+    T extends Comparable<? super T>
+  > LessThanFactory<S, Object, T> lessThan(
+    final Factory<? super S, ? extends T> value
+  ) {
+    return lessThan(constant(value));
   }
 
   /**
@@ -71,6 +87,20 @@ public final class Factories {
     Double
   > greaterThan(final double threshold) {
     return greaterThan(constant(threshold));
+  }
+
+  /**
+   * @param value factory for the value the resulting predicate tests against
+   * @return the same as {@link #greaterThan(ValueFactory)}, over a constant
+   *         {@code value}
+   */
+  public static <
+    S extends Scope,
+    T extends Comparable<? super T>
+  > GreaterThanFactory<S, Object, T> greaterThan(
+    final Factory<? super S, ? extends T> value
+  ) {
+    return greaterThan(constant(value));
   }
 
   /**

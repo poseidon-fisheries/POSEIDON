@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.catches.disposition;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
+
 import java.util.Collection;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.Factory;
@@ -105,6 +107,17 @@ public final class Factories {
     > selectedSpecies
   ) {
     return new SelectedSpeciesRetentionFactory<>(selectedSpecies);
+  }
+
+  /**
+   * @param mortalityRate the discard mortality rate, the same for every species
+   * @return the same as {@link #discardMortality(MappingFactory)}, with a
+   *         constant {@code mortalityRate}
+   */
+  public static <S extends Scope> DiscardMortalityFactory<S> discardMortality(
+    final double mortalityRate
+  ) {
+    return discardMortality(always(mortalityRate));
   }
 
   /**

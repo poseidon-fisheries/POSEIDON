@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.vessels.gears;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.time.Duration;
@@ -39,6 +40,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  * Factories for a vessel's {@link Gear}: inactive, a fixed proportion, or a
  * per-species one.
  */
+@SuppressWarnings("overloads")
 public final class Factories {
 
   private Factories() {}
@@ -126,6 +128,89 @@ public final class Factories {
   ) {
     return new IndexedBiomassCatchabilityGearFactory<S>(
       duration,
+      species,
+      proportionFunction,
+      minimumCatchThreshold
+    );
+  }
+
+  /**
+   * @param proportion            factory for the fraction of available
+   *                              biomass caught per species
+   * @param minimumCatchThreshold per-species catch below this is discarded down
+   *                              to zero
+   * @param duration              how long every fishing event takes
+   * @param fuelConsumptionRate   fuel burned per hour of fishing
+   * @return the same as the overload taking a {@link ValueFactory} duration,
+   *         with a constant {@code duration}
+   */
+  public static <S extends Scope> FixedBiomassProportionGearFactory<S> fixedBiomassProportionGear(
+    final Factory<? super S, ? extends Double> proportion,
+    final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold,
+    final Factory<? super S, ? extends Duration> duration,
+    final Factory<
+      ? super S,
+      ? extends Quantity<VolumetricFlowRate>
+    > fuelConsumptionRate
+  ) {
+    return fixedBiomassProportionGear(
+      proportion,
+      minimumCatchThreshold,
+      constant(duration),
+      fuelConsumptionRate
+    );
+  }
+
+  /**
+   * @param proportion            the fraction of available biomass caught per
+   *                              species
+   * @param minimumCatchThreshold per-species catch below this is discarded down
+   *                              to zero
+   * @param duration              how long every fishing event takes
+   * @param fuelConsumptionRate   fuel burned per hour of fishing
+   * @return the same as the overload taking a {@link ValueFactory} duration,
+   *         with a constant {@code duration}
+   */
+  public static <S extends Scope> FixedBiomassProportionGearFactory<S> fixedBiomassProportionGear(
+    final double proportion,
+    final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold,
+    final Factory<? super S, ? extends Duration> duration,
+    final Factory<
+      ? super S,
+      ? extends Quantity<VolumetricFlowRate>
+    > fuelConsumptionRate
+  ) {
+    return fixedBiomassProportionGear(
+      proportion,
+      minimumCatchThreshold,
+      constant(duration),
+      fuelConsumptionRate
+    );
+  }
+
+  /**
+   * @param duration              how long every fishing event takes
+   * @param species               the species to index proportions over
+   * @param proportionFunction    the fraction of available biomass caught, per
+   *                              species
+   * @param minimumCatchThreshold per-species catch below this is discarded down
+   *                              to zero
+   * @return the same as the overload taking a {@link ValueFactory} duration,
+   *         with a constant {@code duration}
+   */
+  public static <S extends Scope> IndexedBiomassCatchabilityGearFactory<S> indexedBiomassCatchabilityGear(
+    final Factory<? super S, ? extends Duration> duration,
+    final Factory<? super S, ? extends Collection<? extends Species>> species,
+    final MappingFactory<
+      ? super S,
+      ? super Void,
+      ? super Species,
+      Double
+    > proportionFunction,
+    final Factory<? super S, ? extends Quantity<Mass>> minimumCatchThreshold
+  ) {
+    return indexedBiomassCatchabilityGear(
+      constant(duration),
       species,
       proportionFunction,
       minimumCatchThreshold

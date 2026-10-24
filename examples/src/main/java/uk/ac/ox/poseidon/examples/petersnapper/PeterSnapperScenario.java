@@ -315,7 +315,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       fixedBiomassProportionGear(
         gearProportion,
         massOf(1, KILOGRAM),
-        constant(hours(1)),
+        hours(1),
         volumetricFlowRateOf(70.0, LITRE_PER_HOUR)
       )
     );
