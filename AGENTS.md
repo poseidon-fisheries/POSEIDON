@@ -28,7 +28,7 @@ POSEIDON is an agent-based model of fisheries, built on the [MASON](https://cs.g
 ```
 
 Notes:
-- `build` runs `spotlessCheck`, which fails on any Java file `spotlessApply` would change: run `./gradlew spotlessApply` after editing Java.
+- `build` runs `spotlessCheck`, which fails on any Java file `spotlessApply` would change: run `./gradlew spotlessApply` after editing Java. It never touches the year in a license header: end the year range of every file you modify at the current year yourself (see "Licensing").
 - Compilation runs every javac lint category except `serial` and treats warnings as errors (`-Werror -Xlint:all,-serial`), so an unchecked or deprecation warning fails the build, not just linting.
 - Checkstyle (`config/checkstyle/checkstyle.xml`) fails the build on any violation: a public type, method or constructor in main code without Javadoc (getters, setters, overrides and tag-only comments pass), a non-final parameter, local or uninheritable class, a utility class without a private constructor, an unused local, an empty catch whose variable is not named `ignored`, or a boolean expression that can be simplified.
 - Test tasks are auto-configured with a Mockito Java agent (`-javaagent`, `-Xshare:off`) — don't remove this if editing `buildlogic.java-common-conventions.gradle.kts`.
