@@ -22,7 +22,8 @@
 
 package uk.ac.ox.poseidon.core.events;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +55,8 @@ class EventManagerTest {
     eventManager.broadcast(event);
 
     // Verify the event was received
-    assertEquals(1, receivedEvents.size());
-    assertEquals(event, receivedEvents.getFirst());
+    assertThat(receivedEvents).hasSize(1);
+    assertThat(receivedEvents.getFirst()).isEqualTo(event);
   }
 
   @Test
@@ -76,7 +77,7 @@ class EventManagerTest {
     eventManager.broadcast(event);
 
     // Verify the event was NOT received
-    assertTrue(receivedEvents.isEmpty());
+    assertThat(receivedEvents).isEmpty();
   }
 
   @Test
@@ -98,20 +99,19 @@ class EventManagerTest {
     eventManager.broadcast(event);
 
     // Verify both listeners received the event
-    assertEquals(1, receivedEvents1.size());
-    assertEquals(event, receivedEvents1.getFirst());
-    assertEquals(1, receivedEvents2.size());
-    assertEquals(event, receivedEvents2.getFirst());
+    assertThat(receivedEvents1).hasSize(1);
+    assertThat(receivedEvents1.getFirst()).isEqualTo(event);
+    assertThat(receivedEvents2).hasSize(1);
+    assertThat(receivedEvents2.getFirst()).isEqualTo(event);
   }
 
   @Test
   void testNoListenersForEventType() {
     // Broadcast an event when no listeners are registered
     final String event = "Test Event";
-    assertDoesNotThrow(
-      () -> eventManager.broadcast(event),
-      "Broadcasting with no listeners should not throw exceptions"
-    );
+    assertThatCode(() ->
+      eventManager.broadcast(event)
+    ).doesNotThrowAnyException();
   }
 
   @Test
@@ -129,8 +129,8 @@ class EventManagerTest {
     eventManager.broadcast(event);
 
     // Verify that the Number listener receives the Integer event
-    assertEquals(1, receivedEvents.size());
-    assertEquals(event, receivedEvents.getFirst());
+    assertThat(receivedEvents).hasSize(1);
+    assertThat(receivedEvents.getFirst()).isEqualTo(event);
   }
 
   @Test
@@ -148,8 +148,8 @@ class EventManagerTest {
     eventManager.broadcast(event);
 
     // Verify that the CharSequence listener receives the String event
-    assertEquals(1, receivedEvents.size());
-    assertEquals(event, receivedEvents.getFirst());
+    assertThat(receivedEvents).hasSize(1);
+    assertThat(receivedEvents.getFirst()).isEqualTo(event);
   }
 
   @Test
@@ -168,8 +168,8 @@ class EventManagerTest {
     eventManager.broadcast(event);
 
     // Verify that the CharSequence listener receives the StringBuilder event
-    assertEquals(1, receivedEvents.size());
-    assertEquals(event, receivedEvents.getFirst());
+    assertThat(receivedEvents).hasSize(1);
+    assertThat(receivedEvents.getFirst()).isEqualTo(event);
   }
 
   @Test
@@ -195,21 +195,20 @@ class EventManagerTest {
     eventManager.broadcast(event);
 
     // Verify all relevant listeners received the event
-    assertEquals(1, objectEvents.size());
-    assertEquals(event, objectEvents.getFirst());
-    assertEquals(1, numberEvents.size());
-    assertEquals(event, numberEvents.getFirst());
-    assertEquals(1, integerEvents.size());
-    assertEquals(event, integerEvents.getFirst());
+    assertThat(objectEvents).hasSize(1);
+    assertThat(objectEvents.getFirst()).isEqualTo(event);
+    assertThat(numberEvents).hasSize(1);
+    assertThat(numberEvents.getFirst()).isEqualTo(event);
+    assertThat(integerEvents).hasSize(1);
+    assertThat(integerEvents.getFirst()).isEqualTo(event);
   }
 
   @Test
   void testBroadcastNullEvent() {
     // Ensure that broadcasting a null event does not throw exceptions
-    assertDoesNotThrow(
-      () -> eventManager.broadcast(null),
-      "Broadcasting a null event should not throw exceptions"
-    );
+    assertThatCode(() ->
+      eventManager.broadcast(null)
+    ).doesNotThrowAnyException();
   }
 
   @Test
@@ -222,8 +221,8 @@ class EventManagerTest {
     final DiamondEvent event = new DiamondEvent();
     eventManager.broadcast(event);
 
-    assertEquals(1, receivedEvents.size());
-    assertEquals(event, receivedEvents.getFirst());
+    assertThat(receivedEvents).hasSize(1);
+    assertThat(receivedEvents.getFirst()).isEqualTo(event);
   }
 
   @Test
@@ -237,11 +236,11 @@ class EventManagerTest {
     eventManager.addListener(listener);
 
     eventManager.broadcast("first");
-    assertEquals(2, receivedEvents.size());
+    assertThat(receivedEvents).hasSize(2);
 
     eventManager.removeListener(listener);
     eventManager.broadcast("second");
-    assertEquals(2, receivedEvents.size());
+    assertThat(receivedEvents).hasSize(2);
   }
 
   @Test
@@ -266,7 +265,9 @@ class EventManagerTest {
     eventManager.addListener(listener1);
     eventManager.addListener(listener2);
 
-    assertDoesNotThrow(() -> eventManager.broadcast("event"));
+    assertThatCode(() ->
+      eventManager.broadcast("event")
+    ).doesNotThrowAnyException();
   }
 
   interface BaseEvent {}

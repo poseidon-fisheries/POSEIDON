@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.core.predicates.comparable;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,11 +37,11 @@ class BetweenTest {
       true
     );
 
-    assertTrue(between.apply(null, 0.0));
-    assertTrue(between.apply(null, 5.0));
-    assertTrue(between.apply(null, 10.0));
-    assertFalse(between.apply(null, -0.1));
-    assertFalse(between.apply(null, 10.1));
+    assertThat(between.apply(null, 0.0)).isTrue();
+    assertThat(between.apply(null, 5.0)).isTrue();
+    assertThat(between.apply(null, 10.0)).isTrue();
+    assertThat(between.apply(null, -0.1)).isFalse();
+    assertThat(between.apply(null, 10.1)).isFalse();
   }
 
   @Test
@@ -53,9 +53,9 @@ class BetweenTest {
       true
     );
 
-    assertFalse(between.apply(null, 0.0));
-    assertTrue(between.apply(null, 5.0));
-    assertTrue(between.apply(null, 10.0));
+    assertThat(between.apply(null, 0.0)).isFalse();
+    assertThat(between.apply(null, 5.0)).isTrue();
+    assertThat(between.apply(null, 10.0)).isTrue();
   }
 
   @Test
@@ -67,9 +67,9 @@ class BetweenTest {
       false
     );
 
-    assertTrue(between.apply(null, 0.0));
-    assertTrue(between.apply(null, 5.0));
-    assertFalse(between.apply(null, 10.0));
+    assertThat(between.apply(null, 0.0)).isTrue();
+    assertThat(between.apply(null, 5.0)).isTrue();
+    assertThat(between.apply(null, 10.0)).isFalse();
   }
 
   @Test
@@ -81,8 +81,8 @@ class BetweenTest {
       false
     );
 
-    assertFalse(between.apply(null, 0.0));
-    assertTrue(between.apply(null, 5.0));
-    assertFalse(between.apply(null, 10.0));
+    assertThat(between.apply(null, 0.0)).isFalse();
+    assertThat(between.apply(null, 5.0)).isTrue();
+    assertThat(between.apply(null, 10.0)).isFalse();
   }
 }

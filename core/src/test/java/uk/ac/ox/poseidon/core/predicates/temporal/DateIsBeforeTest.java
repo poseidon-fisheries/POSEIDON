@@ -22,8 +22,7 @@
 
 package uk.ac.ox.poseidon.core.predicates.temporal;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
@@ -36,11 +35,11 @@ class DateIsBeforeTest {
 
   @Test
   void testEarlierDateIsBefore() {
-    assertTrue(predicate.apply(null, LocalDate.of(2025, 6, 14)));
+    assertThat(predicate.apply(null, LocalDate.of(2025, 6, 14))).isTrue();
   }
 
   @Test
   void testLaterDateIsNotBefore() {
-    assertFalse(predicate.apply(null, LocalDate.of(2025, 6, 16)));
+    assertThat(predicate.apply(null, LocalDate.of(2025, 6, 16))).isFalse();
   }
 }

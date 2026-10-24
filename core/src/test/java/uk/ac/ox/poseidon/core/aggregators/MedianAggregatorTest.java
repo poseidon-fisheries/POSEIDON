@@ -22,8 +22,7 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.OptionalDouble;
 import java.util.stream.DoubleStream;
@@ -47,10 +46,7 @@ class MedianAggregatorTest {
     final OptionalDouble result = median.apply(numbers);
 
     // Then
-    assertTrue(
-      result.isEmpty(),
-      "Expected result to be empty for an empty array."
-    );
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -62,15 +58,7 @@ class MedianAggregatorTest {
     final OptionalDouble result = median.apply(numbers);
 
     // Then
-    assertTrue(
-      result.isPresent(),
-      "Expected result to be present for a single-element array."
-    );
-    assertEquals(
-      5.0,
-      result.getAsDouble(),
-      "Expected median to be 5.0 for a single-element array."
-    );
+    assertThat(result).hasValue(5.0);
   }
 
   @Test
@@ -82,15 +70,7 @@ class MedianAggregatorTest {
     final OptionalDouble result = median.apply(numbers);
 
     // Then
-    assertTrue(
-      result.isPresent(),
-      "Expected result to be present for an array with odd number of elements."
-    );
-    assertEquals(
-      2.0,
-      result.getAsDouble(),
-      "Expected median to be 2.0 for the input array [3.0, 1.0, 2.0]."
-    );
+    assertThat(result).hasValue(2.0);
   }
 
   @Test
@@ -102,15 +82,7 @@ class MedianAggregatorTest {
     final OptionalDouble result = median.apply(numbers);
 
     // Then
-    assertTrue(
-      result.isPresent(),
-      "Expected result to be present for an array with even number of elements."
-    );
-    assertEquals(
-      2.5,
-      result.getAsDouble(),
-      "Expected median to be 2.5 for the input array [4.0, 1.0, 3.0, 2.0]."
-    );
+    assertThat(result).hasValue(2.5);
   }
 
   @Test
@@ -122,15 +94,7 @@ class MedianAggregatorTest {
     final OptionalDouble result = median.apply(numbers);
 
     // Then
-    assertTrue(
-      result.isPresent(),
-      "Expected result to be present for an array with negative numbers."
-    );
-    assertEquals(
-      -2.0,
-      result.getAsDouble(),
-      "Expected median to be -2.0 for the input array [-1.0, -3.0, -2.0]."
-    );
+    assertThat(result).hasValue(-2.0);
   }
 
   @Test
@@ -142,15 +106,7 @@ class MedianAggregatorTest {
     final OptionalDouble result = median.apply(numbers);
 
     // Then
-    assertTrue(
-      result.isPresent(),
-      "Expected result to be present for an already sorted array."
-    );
-    assertEquals(
-      2.5,
-      result.getAsDouble(),
-      "Expected median to be 2.5 for the input array [1.0, 2.0, 3.0, 4.0]."
-    );
+    assertThat(result).hasValue(2.5);
   }
 
   @Test
@@ -162,15 +118,7 @@ class MedianAggregatorTest {
     final OptionalDouble result = median.apply(doubleStream);
 
     // Then
-    assertTrue(
-      result.isPresent(),
-      "Expected result to be present for a DoubleStream."
-    );
-    assertEquals(
-      3.0,
-      result.getAsDouble(),
-      "Expected median to be 3.0 for the input DoubleStream [5.0, 3.0, 4.0, 1.0, 2.0]."
-    );
+    assertThat(result).hasValue(3.0);
   }
 
   @Test
@@ -182,9 +130,6 @@ class MedianAggregatorTest {
     final OptionalDouble result = median.apply(doubleStream);
 
     // Then
-    assertTrue(
-      result.isEmpty(),
-      "Expected result to be empty for an empty DoubleStream."
-    );
+    assertThat(result).isEmpty();
   }
 }

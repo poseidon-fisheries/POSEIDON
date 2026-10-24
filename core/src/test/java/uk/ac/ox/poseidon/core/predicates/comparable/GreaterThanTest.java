@@ -22,7 +22,9 @@
 
 package uk.ac.ox.poseidon.core.predicates.comparable;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,10 +37,7 @@ class GreaterThanTest {
       context -> threshold
     );
 
-    assertTrue(
-      greaterThan.apply(null, 15.0),
-      "Expected the test to return true when the value is above the threshold"
-    );
+    assertThat(greaterThan.apply(null, 15.0)).isTrue();
   }
 
   @Test
@@ -48,10 +47,7 @@ class GreaterThanTest {
       context -> threshold
     );
 
-    assertFalse(
-      greaterThan.apply(null, 5.0),
-      "Expected the test to return false when the value is below the threshold"
-    );
+    assertThat(greaterThan.apply(null, 5.0)).isFalse();
   }
 
   @Test
@@ -61,10 +57,7 @@ class GreaterThanTest {
       context -> threshold
     );
 
-    assertFalse(
-      greaterThan.apply(null, 10.0),
-      "Expected the test to return false when the value is equal to the threshold"
-    );
+    assertThat(greaterThan.apply(null, 10.0)).isFalse();
   }
 
   @Test
@@ -74,11 +67,9 @@ class GreaterThanTest {
       context -> threshold
     );
 
-    assertDoesNotThrow(
-      () -> greaterThan.apply(null, 12.0),
-      "Expected the test to execute without throwing a NullPointerException when the value " +
-        "is not null"
-    );
+    assertThatCode(() ->
+      greaterThan.apply(null, 12.0)
+    ).doesNotThrowAnyException();
   }
 
   @Test
@@ -88,10 +79,8 @@ class GreaterThanTest {
       context -> threshold
     );
 
-    assertThrows(
-      NullPointerException.class,
-      () -> greaterThan.apply(null, null),
-      "Expected the test to throw NullPointerException when the value is null"
+    assertThatNullPointerException().isThrownBy(() ->
+      greaterThan.apply(null, null)
     );
   }
 }

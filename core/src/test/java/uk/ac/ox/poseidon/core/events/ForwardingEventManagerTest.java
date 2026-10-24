@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core.events;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -43,8 +44,8 @@ class ForwardingEventManagerTest {
     forwarding.broadcast("event");
 
     verify(secondary).broadcast("event");
-    org.junit.jupiter.api.Assertions.assertEquals(1, received.size());
-    org.junit.jupiter.api.Assertions.assertEquals("event", received.getFirst());
+    assertThat(received).hasSize(1);
+    assertThat(received.getFirst()).isEqualTo("event");
   }
 
   @Test
@@ -65,7 +66,7 @@ class ForwardingEventManagerTest {
     forwarding.broadcast("event");
 
     verify(secondary).broadcast("event");
-    org.junit.jupiter.api.Assertions.assertTrue(received.isEmpty());
+    assertThat(received).isEmpty();
     verifyNoMoreInteractions(secondary);
   }
 }

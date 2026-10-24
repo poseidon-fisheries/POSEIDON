@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.core.events;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.*;
 
 import java.util.function.BiFunction;
@@ -58,7 +58,7 @@ class EphemeralAccumulatingListenerTest {
     listener.receive(10);
 
     // Retrieve the accumulated value
-    assertEquals(15, listener.get());
+    assertThat(listener.get()).isEqualTo(15);
   }
 
   @Test
@@ -101,8 +101,8 @@ class EphemeralAccumulatingListenerTest {
     listener.receive(4);
 
     // Retrieve the accumulated value multiple times
-    assertEquals(24, listener.get());
-    assertEquals(24, listener.get());
+    assertThat(listener.get()).isEqualTo(24);
+    assertThat(listener.get()).isEqualTo(24);
 
     // Verify that removeListener was only called once
     verify(eventManager, times(1)).removeListener(listener);
@@ -112,13 +112,13 @@ class EphemeralAccumulatingListenerTest {
   void testNullSafetyInConstructor() {
     // Verify that passing null to any constructor argument throws
     // NullPointerException
-    assertThrows(NullPointerException.class, () ->
+    assertThatNullPointerException().isThrownBy(() ->
       new EphemeralAccumulatingListener<>(Integer.class, null, 0, Integer::sum)
     );
-    assertThrows(NullPointerException.class, () ->
+    assertThatNullPointerException().isThrownBy(() ->
       new EphemeralAccumulatingListener<>(null, eventManager, 0, Integer::sum)
     );
-    assertThrows(NullPointerException.class, () ->
+    assertThatNullPointerException().isThrownBy(() ->
       new EphemeralAccumulatingListener<>(Integer.class, eventManager, 0, null)
     );
   }
@@ -142,6 +142,6 @@ class EphemeralAccumulatingListenerTest {
     listener.receive(20);
 
     // Retrieve the accumulated value
-    assertEquals(130, listener.get());
+    assertThat(listener.get()).isEqualTo(130);
   }
 }

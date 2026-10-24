@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.util.OptionalDouble;
 import java.util.stream.DoubleStream;
@@ -53,16 +53,7 @@ class SumTest {
     final OptionalDouble result = sumAggregator.apply(doubleStream);
 
     // Assert
-    assertTrue(
-      result.isPresent(),
-      "The result should be present for a non-empty stream."
-    );
-    assertEquals(
-      11.4,
-      result.getAsDouble(),
-      1e-9,
-      "The sum of the elements was not computed correctly."
-    );
+    assertThat(result).hasValueCloseTo(11.4, within(1e-9));
   }
 
   @Test
@@ -75,16 +66,7 @@ class SumTest {
     final OptionalDouble result = sumAggregator.apply(doubleStream);
 
     // Assert
-    assertTrue(
-      result.isPresent(),
-      "The result should be present even for an empty stream."
-    );
-    assertEquals(
-      0.0,
-      result.getAsDouble(),
-      1e-9,
-      "The sum of an empty stream should be 0.0."
-    );
+    assertThat(result).hasValueCloseTo(0.0, within(1e-9));
   }
 
   @Test
@@ -97,16 +79,7 @@ class SumTest {
     final OptionalDouble result = sumAggregator.apply(doubleStream);
 
     // Assert
-    assertTrue(
-      result.isPresent(),
-      "The result should be present for a single-element stream."
-    );
-    assertEquals(
-      5.0,
-      result.getAsDouble(),
-      1e-9,
-      "The sum of a single-element stream was not computed correctly."
-    );
+    assertThat(result).hasValueCloseTo(5.0, within(1e-9));
   }
 
   @Test
@@ -119,16 +92,7 @@ class SumTest {
     final OptionalDouble result = sumAggregator.apply(doubleStream);
 
     // Assert
-    assertTrue(
-      result.isPresent(),
-      "The result should be present for a stream with negative numbers."
-    );
-    assertEquals(
-      -7.0,
-      result.getAsDouble(),
-      1e-9,
-      "The sum of the negative numbers was not computed correctly."
-    );
+    assertThat(result).hasValueCloseTo(-7.0, within(1e-9));
   }
 
   @Test
@@ -141,15 +105,6 @@ class SumTest {
     final OptionalDouble result = sumAggregator.apply(doubleStream);
 
     // Assert
-    assertTrue(
-      result.isPresent(),
-      "The result should be present for a stream with mixed numbers."
-    );
-    assertEquals(
-      2.2,
-      result.getAsDouble(),
-      1e-9,
-      "The sum of the mixed numbers was not computed correctly."
-    );
+    assertThat(result).hasValueCloseTo(2.2, within(1e-9));
   }
 }

@@ -22,7 +22,8 @@
 
 package uk.ac.ox.poseidon.core.predicates.comparable;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,10 +36,7 @@ class LessThanTest {
       context -> threshold
     );
 
-    assertTrue(
-      lessThan.apply(null, 5.0),
-      "The value 5.0 should be less than the threshold 10.0"
-    );
+    assertThat(lessThan.apply(null, 5.0)).isTrue();
   }
 
   @Test
@@ -48,10 +46,7 @@ class LessThanTest {
       context -> threshold
     );
 
-    assertFalse(
-      lessThan.apply(null, 10.0),
-      "The value 10.0 should not be less than the threshold 10.0"
-    );
+    assertThat(lessThan.apply(null, 10.0)).isFalse();
   }
 
   @Test
@@ -61,10 +56,7 @@ class LessThanTest {
       context -> threshold
     );
 
-    assertFalse(
-      lessThan.apply(null, 15.0),
-      "The value 15.0 should not be less than the threshold 10.0"
-    );
+    assertThat(lessThan.apply(null, 15.0)).isFalse();
   }
 
   @Test
@@ -74,10 +66,7 @@ class LessThanTest {
       context -> threshold
     );
 
-    assertTrue(
-      lessThan.apply(null, -10.0),
-      "The value -10.0 should be less than the threshold -5.0"
-    );
+    assertThat(lessThan.apply(null, -10.0)).isTrue();
   }
 
   @Test
@@ -87,10 +76,7 @@ class LessThanTest {
       context -> threshold
     );
 
-    assertFalse(
-      lessThan.apply(null, -5.0),
-      "The value -5.0 should not be less than the threshold -5.0"
-    );
+    assertThat(lessThan.apply(null, -5.0)).isFalse();
   }
 
   @Test
@@ -100,10 +86,7 @@ class LessThanTest {
       context -> threshold
     );
 
-    assertFalse(
-      lessThan.apply(null, -5.0),
-      "The value -5.0 should not be less than the threshold -10.0"
-    );
+    assertThat(lessThan.apply(null, -5.0)).isFalse();
   }
 
   @Test
@@ -113,10 +96,7 @@ class LessThanTest {
       context -> threshold
     );
 
-    assertTrue(
-      lessThan.apply(null, -1.0),
-      "The value -1.0 should be less than the threshold 0.0"
-    );
+    assertThat(lessThan.apply(null, -1.0)).isTrue();
   }
 
   @Test
@@ -126,10 +106,8 @@ class LessThanTest {
       context -> threshold
     );
 
-    assertThrows(
-      NullPointerException.class,
-      () -> lessThan.apply(null, null),
-      "Passing null should throw NullPointerException"
+    assertThatNullPointerException().isThrownBy(() ->
+      lessThan.apply(null, null)
     );
   }
 }

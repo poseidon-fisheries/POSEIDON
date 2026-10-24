@@ -22,8 +22,7 @@
 
 package uk.ac.ox.poseidon.core.predicates;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,19 +32,13 @@ class EqualTest {
   void testEqualValueShouldReturnTrue() {
     final Equal<Object, String> equal = new Equal<>(context -> "foo");
 
-    assertTrue(
-      equal.apply(null, "foo"),
-      "Expected the test to return true for an equal value"
-    );
+    assertThat(equal.apply(null, "foo")).isTrue();
   }
 
   @Test
   void testDifferentValueShouldReturnFalse() {
     final Equal<Object, String> equal = new Equal<>(context -> "foo");
 
-    assertFalse(
-      equal.apply(null, "bar"),
-      "Expected the test to return false for a different value"
-    );
+    assertThat(equal.apply(null, "bar")).isFalse();
   }
 }

@@ -22,7 +22,8 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.util.OptionalDouble;
 import java.util.stream.DoubleStream;
@@ -47,13 +48,7 @@ class MinAggregatorTest {
     final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
     // Assert
-    assertTrue(result.isPresent(), "Expected result to be present");
-    assertEquals(
-      1.2,
-      result.getAsDouble(),
-      0.001,
-      "Minimum value is incorrect"
-    );
+    assertThat(result).hasValueCloseTo(1.2, within(0.001));
   }
 
   @Test
@@ -65,7 +60,7 @@ class MinAggregatorTest {
     final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
     // Assert
-    assertFalse(result.isPresent(), "Expected result to be empty");
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -77,13 +72,7 @@ class MinAggregatorTest {
     final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
     // Assert
-    assertTrue(result.isPresent(), "Expected result to be present");
-    assertEquals(
-      7.9,
-      result.getAsDouble(),
-      0.001,
-      "Minimum value for single element stream is incorrect"
-    );
+    assertThat(result).hasValueCloseTo(7.9, within(0.001));
   }
 
   @Test
@@ -95,13 +84,7 @@ class MinAggregatorTest {
     final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
     // Assert
-    assertTrue(result.isPresent(), "Expected result to be present");
-    assertEquals(
-      -7.8,
-      result.getAsDouble(),
-      0.001,
-      "Minimum value with negative numbers is incorrect"
-    );
+    assertThat(result).hasValueCloseTo(-7.8, within(0.001));
   }
 
   @Test
@@ -119,12 +102,6 @@ class MinAggregatorTest {
     final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
     // Assert
-    assertTrue(result.isPresent(), "Expected result to be present");
-    assertEquals(
-      -5.9,
-      result.getAsDouble(),
-      0.001,
-      "Minimum value for mixed sign values is incorrect"
-    );
+    assertThat(result).hasValueCloseTo(-5.9, within(0.001));
   }
 }

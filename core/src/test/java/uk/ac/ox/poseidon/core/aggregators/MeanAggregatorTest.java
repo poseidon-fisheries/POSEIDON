@@ -22,7 +22,8 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.util.OptionalDouble;
 import java.util.stream.DoubleStream;
@@ -45,16 +46,7 @@ class MeanAggregatorTest {
 
     final OptionalDouble result = meanAggreagator.apply(stream);
 
-    assertTrue(
-      result.isPresent(),
-      "Result should be present for a non-empty stream"
-    );
-    assertEquals(
-      3.0,
-      result.getAsDouble(),
-      0.0001,
-      "The calculated mean should be correct"
-    );
+    assertThat(result).hasValueCloseTo(3.0, within(0.0001));
   }
 
   @Test
@@ -64,10 +56,7 @@ class MeanAggregatorTest {
 
     final OptionalDouble result = meanAggreagator.apply(stream);
 
-    assertFalse(
-      result.isPresent(),
-      "Result should be empty for an empty stream"
-    );
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -77,16 +66,7 @@ class MeanAggregatorTest {
 
     final OptionalDouble result = meanAggreagator.apply(stream);
 
-    assertTrue(
-      result.isPresent(),
-      "Result should be present for a single-element stream"
-    );
-    assertEquals(
-      42.0,
-      result.getAsDouble(),
-      0.0001,
-      "The calculated mean should match the single element"
-    );
+    assertThat(result).hasValueCloseTo(42.0, within(0.0001));
   }
 
   @Test
@@ -96,16 +76,7 @@ class MeanAggregatorTest {
 
     final OptionalDouble result = meanAggreagator.apply(stream);
 
-    assertTrue(
-      result.isPresent(),
-      "Result should be present for a non-empty stream with negative numbers"
-    );
-    assertEquals(
-      -20.0,
-      result.getAsDouble(),
-      0.0001,
-      "The mean of negative numbers should be calculated correctly"
-    );
+    assertThat(result).hasValueCloseTo(-20.0, within(0.0001));
   }
 
   @Test
@@ -115,15 +86,6 @@ class MeanAggregatorTest {
 
     final OptionalDouble result = meanAggreagator.apply(stream);
 
-    assertTrue(
-      result.isPresent(),
-      "Result should be present for a mixed stream of numbers"
-    );
-    assertEquals(
-      0.0,
-      result.getAsDouble(),
-      0.0001,
-      "The calculated mean for mixed numbers should be correct"
-    );
+    assertThat(result).hasValueCloseTo(0.0, within(0.0001));
   }
 }

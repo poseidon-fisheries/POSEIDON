@@ -22,7 +22,8 @@
 
 package uk.ac.ox.poseidon.core.aggregators;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.util.OptionalDouble;
 import java.util.stream.DoubleStream;
@@ -48,10 +49,7 @@ class MaxAggregatorTest {
     final OptionalDouble result = maxAggregator.apply(emptyStream);
 
     // Assert
-    assertFalse(
-      result.isPresent(),
-      "Expected the result to be an empty OptionalDouble for an empty stream."
-    );
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -64,16 +62,7 @@ class MaxAggregatorTest {
     final OptionalDouble result = maxAggregator.apply(singleElementStream);
 
     // Assert
-    assertTrue(
-      result.isPresent(),
-      "Expected the result to contain a value for a stream with a single element."
-    );
-    assertEquals(
-      42.0,
-      result.getAsDouble(),
-      0.0001,
-      "The max value should be equal to the single element in the stream."
-    );
+    assertThat(result).hasValueCloseTo(42.0, within(0.0001));
   }
 
   @Test
@@ -92,16 +81,7 @@ class MaxAggregatorTest {
     final OptionalDouble result = maxAggregator.apply(multipleElementsStream);
 
     // Assert
-    assertTrue(
-      result.isPresent(),
-      "Expected the result to contain a value for a stream with multiple elements."
-    );
-    assertEquals(
-      42.0,
-      result.getAsDouble(),
-      0.0001,
-      "The max value should be the largest element in the stream."
-    );
+    assertThat(result).hasValueCloseTo(42.0, within(0.0001));
   }
 
   @Test
@@ -119,16 +99,7 @@ class MaxAggregatorTest {
     final OptionalDouble result = maxAggregator.apply(negativeNumbersStream);
 
     // Assert
-    assertTrue(
-      result.isPresent(),
-      "Expected the result to contain a value for a stream with negative numbers."
-    );
-    assertEquals(
-      -3.0,
-      result.getAsDouble(),
-      0.0001,
-      "The max value should be the least negative (largest) element in the stream."
-    );
+    assertThat(result).hasValueCloseTo(-3.0, within(0.0001));
   }
 
   @Test
@@ -147,16 +118,6 @@ class MaxAggregatorTest {
     final OptionalDouble result = maxAggregator.apply(mixedNumbersStream);
 
     // Assert
-    assertTrue(
-      result.isPresent(),
-      "Expected the result to contain a value for a stream with mixed positive and negative" +
-        " numbers."
-    );
-    assertEquals(
-      10.0,
-      result.getAsDouble(),
-      0.0001,
-      "The max value should be the largest element in the stream."
-    );
+    assertThat(result).hasValueCloseTo(10.0, within(0.0001));
   }
 }
