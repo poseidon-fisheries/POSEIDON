@@ -43,12 +43,10 @@ public class EnvelopeTest {
     @ForAll final double x,
     @ForAll final double y
   ) {
-    // Arrange
     final Coordinate p1 = new Coordinate(Math.min(x1, x2), Math.min(y1, y2));
     final Coordinate p2 = new Coordinate(Math.max(x1, x2), Math.max(y1, y2));
     final Coordinate q = new Coordinate(x, y);
 
-    // Act & Assert
     if (x >= p1.lon && x <= p2.lon && y >= p1.lat && y <= p2.lat) {
       // Point is inside the rectangle
       assertThat(Envelope.intersects(p1, p2, q)).isTrue();
@@ -67,12 +65,10 @@ public class EnvelopeTest {
     @ForAll final double x,
     @ForAll final double y
   ) {
-    // Arrange
     final Coordinate p1 = new Coordinate(Math.min(x1, x2), Math.min(y1, y2));
     final Coordinate p2 = new Coordinate(Math.max(x1, x2), Math.max(y1, y2));
     final Coordinate q = new Coordinate(x, y);
 
-    // Act & Assert
     if (x < p1.lon || x > p2.lon || y < p1.lat || y > p2.lat) {
       assertThat(Envelope.intersects(p1, p2, q)).isFalse();
     } else {
@@ -82,23 +78,19 @@ public class EnvelopeTest {
 
   @Test
   public void testIntersects_PointAtCorner() {
-    // Arrange
     final Coordinate p1 = new Coordinate(0.0, 0.0);
     final Coordinate p2 = new Coordinate(10.0, 10.0);
     final Coordinate q = new Coordinate(10.0, 10.0);
 
-    // Act & Assert
     assertThat(Envelope.intersects(p1, p2, q)).isTrue();
   }
 
   @Test
   public void testIntersects_PointInvertedRectangle() {
-    // Arrange
     final Coordinate p1 = new Coordinate(10.0, 10.0);
     final Coordinate p2 = new Coordinate(0.0, 0.0);
     final Coordinate q = new Coordinate(5.0, 5.0);
 
-    // Act & Assert
     assertThat(Envelope.intersects(p1, p2, q)).isTrue();
   }
 
@@ -117,7 +109,6 @@ public class EnvelopeTest {
     @ForAll final double x4,
     @ForAll final double y4
   ) {
-    // Arrange
     final Coordinate p1 = new Coordinate(Math.min(x1, x2), Math.min(y1, y2));
     final Coordinate p2 = new Coordinate(Math.max(x1, x2), Math.max(y1, y2));
     final Coordinate q1 = new Coordinate(Math.min(x3, x4), Math.min(y3, y4));
@@ -126,7 +117,6 @@ public class EnvelopeTest {
     final Envelope envelope1 = new Envelope(p1, p2);
     final Envelope envelope2 = new Envelope(q1, q2);
 
-    // Act & Assert
     final boolean intersects = envelope1.intersects(envelope2);
     final boolean expected = !(
       q2.lon < p1.lon ||
@@ -140,49 +130,41 @@ public class EnvelopeTest {
 
   @Test
   public void testIntersects_OneRectangleFullyInsideAnother() {
-    // Arrange
     final Coordinate p1 = new Coordinate(0.0, 0.0);
     final Coordinate p2 = new Coordinate(10.0, 10.0);
     final Coordinate q1 = new Coordinate(2.0, 2.0);
     final Coordinate q2 = new Coordinate(8.0, 8.0);
 
-    // Act & Assert
     assertThat(Envelope.intersects(p1, p2, q1, q2)).isTrue();
   }
 
   @Test
   public void testIntersects_RectanglesTouchAtEdge() {
-    // Arrange
     final Coordinate p1 = new Coordinate(0.0, 0.0);
     final Coordinate p2 = new Coordinate(10.0, 10.0);
     final Coordinate q1 = new Coordinate(10.0, 5.0);
     final Coordinate q2 = new Coordinate(15.0, 5.0);
 
-    // Act & Assert
     assertThat(Envelope.intersects(p1, p2, q1, q2)).isTrue();
   }
 
   @Test
   public void testIntersects_RectanglesTouchAtCorner() {
-    // Arrange
     final Coordinate p1 = new Coordinate(0.0, 0.0);
     final Coordinate p2 = new Coordinate(10.0, 10.0);
     final Coordinate q1 = new Coordinate(10.0, 10.0);
     final Coordinate q2 = new Coordinate(15.0, 15.0);
 
-    // Act & Assert
     assertThat(Envelope.intersects(p1, p2, q1, q2)).isTrue();
   }
 
   @Test
   public void testIntersects_InvertedRectanglesOverlap() {
-    // Arrange
     final Coordinate p1 = new Coordinate(10.0, 10.0);
     final Coordinate p2 = new Coordinate(0.0, 0.0);
     final Coordinate q1 = new Coordinate(15.0, 15.0);
     final Coordinate q2 = new Coordinate(5.0, 5.0);
 
-    // Act & Assert
     assertThat(Envelope.intersects(p1, p2, q1, q2)).isTrue();
   }
 }

@@ -31,16 +31,13 @@ class CoordinateTest {
 
   @Test
   void testFromJTSWithValidInput() {
-    // Arrange
     final double x = 1.23;
     final double y = 4.56;
     final org.locationtech.jts.geom.Coordinate jtsCoordinate =
       new org.locationtech.jts.geom.Coordinate(x, y);
 
-    // Act
     final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
 
-    // Assert
     assertThat(result).isNotNull();
     assertThat(result.getLon()).isEqualTo(x);
     assertThat(result.getLat()).isEqualTo(y);
@@ -48,16 +45,13 @@ class CoordinateTest {
 
   @Test
   void testFromJTSWithExtremelyLargeValues() {
-    // Arrange
     final double x = Double.MAX_VALUE;
     final double y = -Double.MAX_VALUE;
     final org.locationtech.jts.geom.Coordinate jtsCoordinate =
       new org.locationtech.jts.geom.Coordinate(x, y);
 
-    // Act
     final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
 
-    // Assert
     assertThat(result).isNotNull();
     assertThat(result.getLon()).isEqualTo(x);
     assertThat(result.getLat()).isEqualTo(y);
@@ -65,16 +59,13 @@ class CoordinateTest {
 
   @Test
   void testFromJTSWithZeroCoordinates() {
-    // Arrange
     final double x = 0.0;
     final double y = 0.0;
     final org.locationtech.jts.geom.Coordinate jtsCoordinate =
       new org.locationtech.jts.geom.Coordinate(x, y);
 
-    // Act
     final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
 
-    // Assert
     assertThat(result).isNotNull();
     assertThat(result.getLon()).isEqualTo(x);
     assertThat(result.getLat()).isEqualTo(y);
@@ -82,16 +73,13 @@ class CoordinateTest {
 
   @Test
   void testFromJTSWithNegativeCoordinates() {
-    // Arrange
     final double x = -12.34;
     final double y = -56.78;
     final org.locationtech.jts.geom.Coordinate jtsCoordinate =
       new org.locationtech.jts.geom.Coordinate(x, y);
 
-    // Act
     final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
 
-    // Assert
     assertThat(result).isNotNull();
     assertThat(result.getLon()).isEqualTo(x);
     assertThat(result.getLat()).isEqualTo(y);
@@ -99,7 +87,6 @@ class CoordinateTest {
 
   @Test
   void testFromJTSWithNullInput() {
-    // Act & Assert
     // noinspection DataFlowIssue
     assertThatNullPointerException().isThrownBy(() -> Coordinate.fromJTS(null));
   }

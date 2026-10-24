@@ -41,55 +41,42 @@ class MinAggregatorTest {
 
   @Test
   void testApplyWithNonEmptyStream() {
-    // Arrange
     final DoubleStream doubleStream = DoubleStream.of(3.5, 2.1, 4.8, 1.2, 5.6);
 
-    // Act
     final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(1.2, within(0.001));
   }
 
   @Test
   void testApplyWithEmptyStream() {
-    // Arrange
     final DoubleStream doubleStream = DoubleStream.empty();
 
-    // Act
     final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
-    // Assert
     assertThat(result).isEmpty();
   }
 
   @Test
   void testApplyWithSingleElementStream() {
-    // Arrange
     final DoubleStream doubleStream = DoubleStream.of(7.9);
 
-    // Act
     final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(7.9, within(0.001));
   }
 
   @Test
   void testApplyWithNegativeValues() {
-    // Arrange
     final DoubleStream doubleStream = DoubleStream.of(-3.4, -1.2, -7.8, -0.5);
 
-    // Act
     final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(-7.8, within(0.001));
   }
 
   @Test
   void testApplyWithMixedSignValues() {
-    // Arrange
     final DoubleStream doubleStream = DoubleStream.of(
       4.5,
       -2.3,
@@ -98,10 +85,8 @@ class MinAggregatorTest {
       -5.9
     );
 
-    // Act
     final OptionalDouble result = minAggregatorAggregator.apply(doubleStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(-5.9, within(0.001));
   }
 }

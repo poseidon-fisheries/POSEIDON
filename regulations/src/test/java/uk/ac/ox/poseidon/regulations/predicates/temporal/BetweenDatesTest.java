@@ -43,11 +43,9 @@ class BetweenDatesTest {
 
   @Test
   void testStartDateAfterEndDateThrowsException() {
-    // Arrange
     final LocalDate startDate = LocalDate.of(2023, 12, 31);
     final LocalDate endDate = LocalDate.of(2023, 1, 1);
 
-    // Act & Assert
     assertThatThrownBy(() -> new BetweenDates(startDate, endDate)).isInstanceOf(
       IllegalArgumentException.class
     );
@@ -55,7 +53,6 @@ class BetweenDatesTest {
 
   @Test
   void testActionWithinDateRangeStartOnly() {
-    // Arrange
     final LocalDate startDate = LocalDate.of(2023, 1, 1);
     final LocalDate endDate = LocalDate.of(2023, 12, 31);
     final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
@@ -65,13 +62,11 @@ class BetweenDatesTest {
       LocalDateTime.of(2024, 1, 1, 12, 0)
     );
 
-    // Act & Assert
     assertThat(betweenDates.apply(null, action)).isTrue();
   }
 
   @Test
   void testActionWithinDateRangeEndOnly() {
-    // Arrange
     final LocalDate startDate = LocalDate.of(2023, 1, 1);
     final LocalDate endDate = LocalDate.of(2023, 12, 31);
     final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
@@ -81,13 +76,11 @@ class BetweenDatesTest {
       LocalDateTime.of(2023, 6, 15, 12, 0)
     );
 
-    // Act & Assert
     assertThat(betweenDates.apply(null, action)).isTrue();
   }
 
   @Test
   void testActionExactlyOnStartDate() {
-    // Arrange
     final LocalDate startDate = LocalDate.of(2023, 1, 1);
     final LocalDate endDate = LocalDate.of(2023, 12, 31);
     final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
@@ -97,13 +90,11 @@ class BetweenDatesTest {
       LocalDateTime.of(2023, 12, 31, 23, 59)
     );
 
-    // Act & Assert
     assertThat(betweenDates.apply(null, action)).isTrue();
   }
 
   @Test
   void testActionExactlyOnEndDate() {
-    // Arrange
     final LocalDate startDate = LocalDate.of(2023, 1, 1);
     final LocalDate endDate = LocalDate.of(2023, 12, 31);
     final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
@@ -113,13 +104,11 @@ class BetweenDatesTest {
       LocalDateTime.of(2023, 12, 31, 0, 0)
     );
 
-    // Act & Assert
     assertThat(betweenDates.apply(null, action)).isTrue();
   }
 
   @Test
   void testActionBeforeDateRange() {
-    // Arrange
     final LocalDate startDate = LocalDate.of(2023, 1, 1);
     final LocalDate endDate = LocalDate.of(2023, 12, 31);
     final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
@@ -129,13 +118,11 @@ class BetweenDatesTest {
       LocalDateTime.of(2022, 12, 31, 23, 59)
     );
 
-    // Act & Assert
     assertThat(betweenDates.apply(null, action)).isFalse();
   }
 
   @Test
   void testActionAfterDateRange() {
-    // Arrange
     final LocalDate startDate = LocalDate.of(2023, 1, 1);
     final LocalDate endDate = LocalDate.of(2023, 12, 31);
     final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
@@ -145,13 +132,11 @@ class BetweenDatesTest {
       LocalDateTime.of(2024, 1, 2, 12, 0)
     );
 
-    // Act & Assert
     assertThat(betweenDates.apply(null, action)).isFalse();
   }
 
   @Test
   void testActionStartAndEndDatesWithinRange() {
-    // Arrange
     final LocalDate startDate = LocalDate.of(2023, 1, 1);
     final LocalDate endDate = LocalDate.of(2023, 12, 31);
     final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
@@ -161,13 +146,11 @@ class BetweenDatesTest {
       LocalDateTime.of(2023, 6, 30, 23, 59)
     );
 
-    // Act & Assert
     assertThat(betweenDates.apply(null, action)).isTrue();
   }
 
   @Test
   void testActionStartAndEndSpanningDateRange() {
-    // Arrange
     final LocalDate startDate = LocalDate.of(2023, 1, 1);
     final LocalDate endDate = LocalDate.of(2023, 12, 31);
     final BetweenDates betweenDates = new BetweenDates(startDate, endDate);
@@ -177,7 +160,6 @@ class BetweenDatesTest {
       LocalDateTime.of(2024, 1, 1, 12, 0)
     );
 
-    // Act & Assert
     assertThat(betweenDates.apply(null, action)).isTrue();
   }
 

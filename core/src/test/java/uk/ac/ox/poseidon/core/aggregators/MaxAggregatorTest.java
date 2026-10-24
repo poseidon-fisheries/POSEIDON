@@ -41,33 +41,26 @@ class MaxAggregatorTest {
 
   @Test
   void apply_emptyStream_returnsEmptyOptional() {
-    // Arrange
     final MaxAggregator maxAggregator = new MaxAggregator();
     final DoubleStream emptyStream = DoubleStream.empty();
 
-    // Act
     final OptionalDouble result = maxAggregator.apply(emptyStream);
 
-    // Assert
     assertThat(result).isEmpty();
   }
 
   @Test
   void apply_singleElementStream_returnsElementAsMax() {
-    // Arrange
     final MaxAggregator maxAggregator = new MaxAggregator();
     final DoubleStream singleElementStream = DoubleStream.of(42.0);
 
-    // Act
     final OptionalDouble result = maxAggregator.apply(singleElementStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(42.0, within(0.0001));
   }
 
   @Test
   void apply_multipleElements_returnsMaximumValue() {
-    // Arrange
     final MaxAggregator maxAggregator = new MaxAggregator();
     final DoubleStream multipleElementsStream = DoubleStream.of(
       1.0,
@@ -77,16 +70,13 @@ class MaxAggregatorTest {
       5.0
     );
 
-    // Act
     final OptionalDouble result = maxAggregator.apply(multipleElementsStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(42.0, within(0.0001));
   }
 
   @Test
   void apply_negativeNumbers_returnsMaximumValue() {
-    // Arrange
     final MaxAggregator maxAggregator = new MaxAggregator();
     final DoubleStream negativeNumbersStream = DoubleStream.of(
       -10.0,
@@ -95,16 +85,13 @@ class MaxAggregatorTest {
       -3.0
     );
 
-    // Act
     final OptionalDouble result = maxAggregator.apply(negativeNumbersStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(-3.0, within(0.0001));
   }
 
   @Test
   void apply_mixedPositiveAndNegativeNumbers_returnsMaximumValue() {
-    // Arrange
     final MaxAggregator maxAggregator = new MaxAggregator();
     final DoubleStream mixedNumbersStream = DoubleStream.of(
       -1.0,
@@ -114,10 +101,8 @@ class MaxAggregatorTest {
       -3.0
     );
 
-    // Act
     final OptionalDouble result = maxAggregator.apply(mixedNumbersStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(10.0, within(0.0001));
   }
 }

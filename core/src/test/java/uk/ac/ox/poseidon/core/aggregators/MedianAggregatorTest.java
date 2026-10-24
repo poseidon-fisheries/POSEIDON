@@ -39,97 +39,73 @@ class MedianAggregatorTest {
 
   @Test
   void testApplyWithEmptyArray() {
-    // Given
     final double[] numbers = new double[] {};
 
-    // When
     final OptionalDouble result = median.apply(numbers);
 
-    // Then
     assertThat(result).isEmpty();
   }
 
   @Test
   void testApplyWithSingleElement() {
-    // Given
     final double[] numbers = new double[] { 5.0 };
 
-    // When
     final OptionalDouble result = median.apply(numbers);
 
-    // Then
     assertThat(result).hasValue(5.0);
   }
 
   @Test
   void testApplyWithOddNumberOfElements() {
-    // Given
     final double[] numbers = new double[] { 3.0, 1.0, 2.0 };
 
-    // When
     final OptionalDouble result = median.apply(numbers);
 
-    // Then
     assertThat(result).hasValue(2.0);
   }
 
   @Test
   void testApplyWithEvenNumberOfElements() {
-    // Given
     final double[] numbers = new double[] { 4.0, 1.0, 3.0, 2.0 };
 
-    // When
     final OptionalDouble result = median.apply(numbers);
 
-    // Then
     assertThat(result).hasValue(2.5);
   }
 
   @Test
   void testApplyWithNegativeNumbers() {
-    // Given
     final double[] numbers = new double[] { -1.0, -3.0, -2.0 };
 
-    // When
     final OptionalDouble result = median.apply(numbers);
 
-    // Then
     assertThat(result).hasValue(-2.0);
   }
 
   @Test
   void testApplyWithAlreadySortedArray() {
-    // Given
     final double[] numbers = new double[] { 1.0, 2.0, 3.0, 4.0 };
 
-    // When
     final OptionalDouble result = median.apply(numbers);
 
-    // Then
     assertThat(result).hasValue(2.5);
   }
 
   @Test
   void testApplyWithDoubleStream() {
-    // Given
     final DoubleStream doubleStream = DoubleStream.of(5.0, 3.0, 4.0, 1.0, 2.0);
 
-    // When
     final OptionalDouble result = median.apply(doubleStream);
 
-    // Then
     assertThat(result).hasValue(3.0);
   }
 
   @Test
   void testApplyWithEmptyDoubleStream() {
-    // Given
     final DoubleStream doubleStream = DoubleStream.empty();
 
-    // When
     final OptionalDouble result = median.apply(doubleStream);
 
-    // Then
     assertThat(result).isEmpty();
   }
 }

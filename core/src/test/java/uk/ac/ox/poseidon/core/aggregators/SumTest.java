@@ -45,66 +45,51 @@ class SumTest {
 
   @Test
   void testApplyWithNonEmptyStream() {
-    // Arrange
     final SumAggregator sumAggregator = new SumAggregator();
     final DoubleStream doubleStream = DoubleStream.of(1.2, 2.3, 3.4, 4.5);
 
-    // Act
     final OptionalDouble result = sumAggregator.apply(doubleStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(11.4, within(1e-9));
   }
 
   @Test
   void testApplyWithEmptyStream() {
-    // Arrange
     final SumAggregator sumAggregator = new SumAggregator();
     final DoubleStream doubleStream = DoubleStream.empty();
 
-    // Act
     final OptionalDouble result = sumAggregator.apply(doubleStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(0.0, within(1e-9));
   }
 
   @Test
   void testApplyWithSingleElementStream() {
-    // Arrange
     final SumAggregator sumAggregator = new SumAggregator();
     final DoubleStream doubleStream = DoubleStream.of(5.0);
 
-    // Act
     final OptionalDouble result = sumAggregator.apply(doubleStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(5.0, within(1e-9));
   }
 
   @Test
   void testApplyWithNegativeNumbers() {
-    // Arrange
     final SumAggregator sumAggregator = new SumAggregator();
     final DoubleStream doubleStream = DoubleStream.of(-1.0, -2.5, -3.5);
 
-    // Act
     final OptionalDouble result = sumAggregator.apply(doubleStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(-7.0, within(1e-9));
   }
 
   @Test
   void testApplyWithMixedNumbers() {
-    // Arrange
     final SumAggregator sumAggregator = new SumAggregator();
     final DoubleStream doubleStream = DoubleStream.of(-1.2, 2.3, -3.4, 4.5);
 
-    // Act
     final OptionalDouble result = sumAggregator.apply(doubleStream);
 
-    // Assert
     assertThat(result).hasValueCloseTo(2.2, within(1e-9));
   }
 }
