@@ -22,8 +22,7 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.temporal;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -36,7 +35,6 @@ class BetweenYearlyDatesTest {
 
   @Test
   void testActionStartsAndEndsOnExactStartDate() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.JUNE, 1);
     final MonthDay end = MonthDay.of(Month.JULY, 31);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -49,13 +47,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2023, 6, 1, 23, 59)
     );
 
-    // Act & Assert
-    assertTrue(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isTrue();
   }
 
   @Test
   void testActionSpansMoreThanAYear() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.JANUARY, 1);
     final MonthDay end = MonthDay.of(Month.DECEMBER, 31);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -68,13 +64,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2024, 7, 15, 10, 0)
     );
 
-    // Act & Assert
-    assertTrue(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isTrue();
   }
 
   @Test
   void testActionStartsAndEndsOnExactEndDate() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.JUNE, 1);
     final MonthDay end = MonthDay.of(Month.JULY, 31);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -87,13 +81,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2023, 7, 31, 23, 59)
     );
 
-    // Act & Assert
-    assertTrue(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isTrue();
   }
 
   @Test
   void testActionSpansEntireYear() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.NOVEMBER, 1);
     final MonthDay end = MonthDay.of(Month.MARCH, 1);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -106,13 +98,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2022, 12, 31, 23, 59)
     );
 
-    // Act & Assert
-    assertTrue(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isTrue();
   }
 
   @Test
   void testActionFullyOverlapsRange() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.APRIL, 1);
     final MonthDay end = MonthDay.of(Month.JUNE, 30);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -125,13 +115,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2023, 7, 2, 23, 59)
     );
 
-    // Act & Assert
-    assertTrue(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isTrue();
   }
 
   @Test
   void testActionStartsAtYearBoundaryForYearSpanningRange() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.NOVEMBER, 1);
     final MonthDay end = MonthDay.of(Month.FEBRUARY, 28);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -144,13 +132,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2024, 1, 1, 0, 0)
     );
 
-    // Act & Assert
-    assertTrue(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isTrue();
   }
 
   @Test
   void testActionStartsAndEndsSameDayInsideRange() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.MARCH, 15);
     final MonthDay end = MonthDay.of(Month.APRIL, 10);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -163,13 +149,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2023, 3, 20, 20, 0)
     );
 
-    // Act & Assert
-    assertTrue(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isTrue();
   }
 
   @Test
   void testActionWithinNonYearSpanningRange() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.JUNE, 1);
     final MonthDay end = MonthDay.of(Month.JULY, 31);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -182,13 +166,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2023, 7, 15, 10, 0)
     );
 
-    // Act & Assert
-    assertTrue(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isTrue();
   }
 
   @Test
   void testActionOutsideNonYearSpanningRange() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.JUNE, 1);
     final MonthDay end = MonthDay.of(Month.JULY, 31);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -201,13 +183,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2023, 5, 20, 10, 0)
     );
 
-    // Act & Assert
-    assertFalse(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isFalse();
   }
 
   @Test
   void testActionWithinYearSpanningRange() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.NOVEMBER, 1);
     final MonthDay end = MonthDay.of(Month.FEBRUARY, 28);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -220,13 +200,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2023, 12, 15, 10, 0)
     );
 
-    // Act & Assert
-    assertTrue(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isTrue();
   }
 
   @Test
   void testActionOutsideYearSpanningRange() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.NOVEMBER, 1);
     final MonthDay end = MonthDay.of(Month.FEBRUARY, 28);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -239,13 +217,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2023, 8, 15, 10, 0)
     );
 
-    // Act & Assert
-    assertFalse(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isFalse();
   }
 
   @Test
   void testActionSpanningAcrossYearBoundaryWithinRange() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.NOVEMBER, 1);
     final MonthDay end = MonthDay.of(Month.FEBRUARY, 28);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -258,13 +234,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2024, 1, 15, 10, 0)
     );
 
-    // Act & Assert
-    assertTrue(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isTrue();
   }
 
   @Test
   void testZeroDurationActionInsideRangeMatches() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.JUNE, 1);
     final MonthDay end = MonthDay.of(Month.JULY, 31);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -277,13 +251,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2023, 6, 15, 12, 0)
     );
 
-    // Act & Assert
-    assertTrue(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isTrue();
   }
 
   @Test
   void testZeroDurationActionOutsideRangeDoesNotMatch() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.JUNE, 1);
     final MonthDay end = MonthDay.of(Month.JULY, 31);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -296,13 +268,11 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2023, 5, 15, 12, 0)
     );
 
-    // Act & Assert
-    assertFalse(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isFalse();
   }
 
   @Test
   void testActionSpanningAcrossYearBoundaryOutsideRange() {
-    // Arrange
     final MonthDay beginning = MonthDay.of(Month.NOVEMBER, 1);
     final MonthDay end = MonthDay.of(Month.FEBRUARY, 28);
     final BetweenYearlyDates predicate = new BetweenYearlyDates(beginning, end);
@@ -315,7 +285,6 @@ class BetweenYearlyDatesTest {
       LocalDateTime.of(2023, 9, 15, 10, 0)
     );
 
-    // Act & Assert
-    assertFalse(predicate.apply(null, extendedAction));
+    assertThat(predicate.apply(null, extendedAction)).isFalse();
   }
 }

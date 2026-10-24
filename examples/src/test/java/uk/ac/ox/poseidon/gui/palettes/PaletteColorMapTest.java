@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.gui.palettes;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.OLERON;
 
 import java.awt.*;
@@ -58,11 +58,7 @@ class PaletteColorMapTest {
     ).forEach((value, index) -> {
       final Color expected = palette[index];
       final Color actual = colorMap.getColor(value);
-      assertEquals(
-        expected,
-        actual,
-        () -> "Expected " + value + " but got " + actual + " for value " + value
-      );
+      assertThat(actual).as("colour for value %s", value).isEqualTo(expected);
     });
   }
 }

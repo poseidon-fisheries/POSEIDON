@@ -22,9 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.trips;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -74,8 +73,8 @@ class CellWasFishedThisTripTest {
     placeInModelGrid(otherVessel);
     when(otherVessel.getCurrentTrip()).thenReturn(mock(FishingTrip.class));
 
-    assertTrue(cellWasFishedThisTrip.apply(vessel, FIRST_CELL));
-    assertFalse(cellWasFishedThisTrip.apply(otherVessel, FIRST_CELL));
+    assertThat(cellWasFishedThisTrip.apply(vessel, FIRST_CELL)).isTrue();
+    assertThat(cellWasFishedThisTrip.apply(otherVessel, FIRST_CELL)).isFalse();
   }
 
   @Test
@@ -91,23 +90,23 @@ class CellWasFishedThisTripTest {
   void holdsForTheCellOfAFishingEventOfTheCurrentTrip() {
     onTripWithFishingEventsAt(FIRST_COORDINATE);
 
-    assertTrue(cellWasFishedThisTrip.apply(vessel, FIRST_CELL));
+    assertThat(cellWasFishedThisTrip.apply(vessel, FIRST_CELL)).isTrue();
   }
 
   @Test
   void doesNotHoldForACellNotFishedThisTrip() {
     onTripWithFishingEventsAt(FIRST_COORDINATE);
 
-    assertFalse(cellWasFishedThisTrip.apply(vessel, UNFISHED_CELL));
+    assertThat(cellWasFishedThisTrip.apply(vessel, UNFISHED_CELL)).isFalse();
   }
 
   @Test
   void holdsForTheCellsOfEveryFishingEventOfTheCurrentTrip() {
     onTripWithFishingEventsAt(FIRST_COORDINATE, SECOND_COORDINATE);
 
-    assertTrue(cellWasFishedThisTrip.apply(vessel, FIRST_CELL));
-    assertTrue(cellWasFishedThisTrip.apply(vessel, SECOND_CELL));
-    assertFalse(cellWasFishedThisTrip.apply(vessel, UNFISHED_CELL));
+    assertThat(cellWasFishedThisTrip.apply(vessel, FIRST_CELL)).isTrue();
+    assertThat(cellWasFishedThisTrip.apply(vessel, SECOND_CELL)).isTrue();
+    assertThat(cellWasFishedThisTrip.apply(vessel, UNFISHED_CELL)).isFalse();
   }
 
   private void onTripWithFishingEventsAt(final Coordinate... coordinates) {

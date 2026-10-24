@@ -23,8 +23,6 @@
 package uk.ac.ox.poseidon.fishing.catches.disposition;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -45,11 +43,10 @@ class FullDiscardMortalityTest {
       0.0
     );
 
-    assertEquals(retained, result.getRetained());
-    assertTrue(result.getDiscardedAlive().isEmpty());
-    assertEquals(
-      Bucket.of(DummySpecies.A, Biomass.ofKg(70.0)),
-      result.getDiscardedDead()
+    assertThat(result.getRetained()).isEqualTo(retained);
+    assertThat(result.getDiscardedAlive().isEmpty()).isTrue();
+    assertThat(result.getDiscardedDead()).isEqualTo(
+      Bucket.of(DummySpecies.A, Biomass.ofKg(70.0))
     );
   }
 
@@ -63,9 +60,9 @@ class FullDiscardMortalityTest {
       0.0
     );
 
-    assertEquals(retained, result.getRetained());
-    assertTrue(result.getDiscardedAlive().isEmpty());
-    assertEquals(discardedDead, result.getDiscardedDead());
+    assertThat(result.getRetained()).isEqualTo(retained);
+    assertThat(result.getDiscardedAlive().isEmpty()).isTrue();
+    assertThat(result.getDiscardedDead()).isEqualTo(discardedDead);
   }
 
   @Test
@@ -79,11 +76,10 @@ class FullDiscardMortalityTest {
       0.0
     );
 
-    assertEquals(retained, result.getRetained());
-    assertTrue(result.getDiscardedAlive().isEmpty());
-    assertEquals(
-      Bucket.of(DummySpecies.A, Biomass.ofKg(50.0)),
-      result.getDiscardedDead()
+    assertThat(result.getRetained()).isEqualTo(retained);
+    assertThat(result.getDiscardedAlive().isEmpty()).isTrue();
+    assertThat(result.getDiscardedDead()).isEqualTo(
+      Bucket.of(DummySpecies.A, Biomass.ofKg(50.0))
     );
   }
 
@@ -97,7 +93,7 @@ class FullDiscardMortalityTest {
       0.0
     );
 
-    assertEquals(retained, result.getRetained());
+    assertThat(result.getRetained()).isEqualTo(retained);
   }
 
   @Test
@@ -124,8 +120,8 @@ class FullDiscardMortalityTest {
       0.0
     );
 
-    assertEquals(retained, result.getRetained());
-    assertTrue(result.getDiscardedAlive().isEmpty());
+    assertThat(result.getRetained()).isEqualTo(retained);
+    assertThat(result.getDiscardedAlive().isEmpty()).isTrue();
     assertThat(result.getDiscardedDead().getKg(DummySpecies.A)).isEqualTo(50.0);
     assertThat(result.getDiscardedDead().getKg(DummySpecies.B)).isEqualTo(25.0);
   }

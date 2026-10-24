@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +46,7 @@ class CurrentTimeAtSeaTest {
     final Vessel vessel = mock(Vessel.class);
     when(vessel.getCurrentTrip()).thenReturn(null);
 
-    assertThrows(IllegalStateException.class, () ->
+    assertThatIllegalStateException().isThrownBy(() ->
       currentTimeAtSea.apply(vessel)
     );
   }
@@ -60,6 +60,6 @@ class CurrentTimeAtSeaTest {
       Duration.ofHours(3)
     );
 
-    assertEquals(Duration.ofHours(3), currentTimeAtSea.apply(vessel));
+    assertThat(currentTimeAtSea.apply(vessel)).isEqualTo(Duration.ofHours(3));
   }
 }

@@ -22,8 +22,7 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,57 +41,39 @@ class InRectangularAreaTest {
 
   @Test
   void test_GivenCoordinateInsideEnvelope_ShouldReturnTrue() {
-    // Arrange
     final Envelope envelope = mock(Envelope.class);
     final Coordinate coordinate = new Coordinate(1.0, 1.0);
     when(envelope.contains(coordinate)).thenReturn(true);
 
     final InRectangularArea predicate = new InRectangularArea(envelope);
 
-    // Act
     final boolean result = predicate.apply(null, coordinate);
 
-    // Assert
-    assertTrue(
-      result,
-      "Expected coordinate to be inside the envelope, but it was not."
-    );
+    assertThat(result).isTrue();
   }
 
   @Test
   void test_GivenCoordinateOutsideEnvelope_ShouldReturnFalse() {
-    // Arrange
     final Envelope envelope = mock(Envelope.class);
     final Coordinate coordinate = new Coordinate(2.0, 2.0);
     when(envelope.contains(coordinate)).thenReturn(false);
 
     final InRectangularArea predicate = new InRectangularArea(envelope);
 
-    // Act
     final boolean result = predicate.apply(null, coordinate);
 
-    // Assert
-    assertFalse(
-      result,
-      "Expected coordinate to be outside the envelope, but it was inside."
-    );
+    assertThat(result).isFalse();
   }
 
   @Test
   void test_GivenNullCoordinate_ShouldReturnFalse() {
-    // Arrange
     final Envelope envelope = mock(Envelope.class);
     final Coordinate coordinate = null;
 
     final InRectangularArea predicate = new InRectangularArea(envelope);
 
-    // Act
     final boolean result = predicate.apply(null, coordinate);
 
-    // Assert
-    assertFalse(
-      result,
-      "Expected null coordinate to be outside the envelope, but it was not."
-    );
+    assertThat(result).isFalse();
   }
 }

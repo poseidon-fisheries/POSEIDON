@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.fishing.catches.disposition;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -63,14 +62,12 @@ class DiscardMortalityTest {
       0.0
     );
 
-    assertEquals(retained, result.getRetained());
-    assertEquals(
-      Bucket.of(DummySpecies.A, Biomass.ofKg(25.0)),
-      result.getDiscardedAlive()
+    assertThat(result.getRetained()).isEqualTo(retained);
+    assertThat(result.getDiscardedAlive()).isEqualTo(
+      Bucket.of(DummySpecies.A, Biomass.ofKg(25.0))
     );
-    assertEquals(
-      Bucket.of(DummySpecies.A, Biomass.ofKg(45.0)),
-      result.getDiscardedDead()
+    assertThat(result.getDiscardedDead()).isEqualTo(
+      Bucket.of(DummySpecies.A, Biomass.ofKg(45.0))
     );
   }
 
@@ -99,14 +96,12 @@ class DiscardMortalityTest {
       0.0
     );
 
-    assertEquals(retained, result.getRetained());
-    assertEquals(
-      Bucket.of(DummySpecies.B, Biomass.ofKg(0.0)),
-      result.getDiscardedAlive()
+    assertThat(result.getRetained()).isEqualTo(retained);
+    assertThat(result.getDiscardedAlive()).isEqualTo(
+      Bucket.of(DummySpecies.B, Biomass.ofKg(0.0))
     );
-    assertEquals(
-      Bucket.of(DummySpecies.B, Biomass.ofKg(20.0)),
-      result.getDiscardedDead()
+    assertThat(result.getDiscardedDead()).isEqualTo(
+      Bucket.of(DummySpecies.B, Biomass.ofKg(20.0))
     );
   }
 
@@ -135,14 +130,12 @@ class DiscardMortalityTest {
       0.0
     );
 
-    assertEquals(retained, result.getRetained());
-    assertEquals(
-      Bucket.of(DummySpecies.C, Biomass.ofKg(50.0)),
-      result.getDiscardedAlive()
+    assertThat(result.getRetained()).isEqualTo(retained);
+    assertThat(result.getDiscardedAlive()).isEqualTo(
+      Bucket.of(DummySpecies.C, Biomass.ofKg(50.0))
     );
-    assertEquals(
-      Bucket.of(DummySpecies.C, Biomass.ofKg(20.0)),
-      result.getDiscardedDead()
+    assertThat(result.getDiscardedDead()).isEqualTo(
+      Bucket.of(DummySpecies.C, Biomass.ofKg(20.0))
     );
   }
 
@@ -173,14 +166,12 @@ class DiscardMortalityTest {
       0.0
     );
 
-    assertEquals(retained, result.getRetained());
-    assertEquals(
-      Bucket.of(species, Biomass.ofKg(0.0)),
-      result.getDiscardedAlive()
+    assertThat(result.getRetained()).isEqualTo(retained);
+    assertThat(result.getDiscardedAlive()).isEqualTo(
+      Bucket.of(species, Biomass.ofKg(0.0))
     );
-    assertEquals(
-      Bucket.of(species, Biomass.ofKg(100.0)),
-      result.getDiscardedDead()
+    assertThat(result.getDiscardedDead()).isEqualTo(
+      Bucket.of(species, Biomass.ofKg(100.0))
     );
   }
 

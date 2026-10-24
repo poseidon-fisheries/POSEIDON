@@ -22,8 +22,7 @@
 
 package uk.ac.ox.poseidon.regulations;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
 import java.util.function.Predicate;
@@ -54,8 +53,7 @@ class PermittedIfTest {
       predicate
     );
 
-    // Assert the method isPermitted returns true
-    assertTrue(permittedIf.isPermitted(mockExtendedAction));
+    assertThat(permittedIf.isPermitted(mockExtendedAction)).isTrue();
   }
 
   @Test
@@ -73,8 +71,7 @@ class PermittedIfTest {
       predicate
     );
 
-    // Assert the method isPermitted returns false
-    assertFalse(permittedIf.isPermitted(mockExtendedAction));
+    assertThat(permittedIf.isPermitted(mockExtendedAction)).isFalse();
   }
 
   @Test
@@ -97,8 +94,7 @@ class PermittedIfTest {
       predicate
     );
 
-    // Assert the method isPermitted returns true for the mockAction
-    assertTrue(permittedIf.isPermitted(mockExtendedAction));
+    assertThat(permittedIf.isPermitted(mockExtendedAction)).isTrue();
   }
 
   @Test
@@ -121,7 +117,6 @@ class PermittedIfTest {
       predicate
     );
 
-    // Assert the method isPermitted returns false for the mockAction
-    assertFalse(permittedIf.isPermitted(mockExtendedAction));
+    assertThat(permittedIf.isPermitted(mockExtendedAction)).isFalse();
   }
 }

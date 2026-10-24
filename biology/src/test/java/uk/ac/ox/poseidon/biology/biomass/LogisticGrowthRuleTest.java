@@ -22,7 +22,8 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.util.stream.DoubleStream;
 import org.junit.jupiter.api.Test;
@@ -38,16 +39,14 @@ class LogisticGrowthRuleTest {
     final BiomassGrowthRule logisticGrowthRule = new LogisticGrowthRule(
       growthRate
     );
-    assertArrayEquals(
-      expectedValues,
+    assertThat(
       DoubleStream.iterate(initialBiomass, currentBiomass ->
         logisticGrowthRule.newBiomass(currentBiomass, carryingCapacity)
       )
         .skip(1)
         .limit(expectedValues.length)
-        .toArray(),
-      0.001
-    );
+        .toArray()
+    ).containsExactly(expectedValues, within(0.001));
   }
 
   @Test

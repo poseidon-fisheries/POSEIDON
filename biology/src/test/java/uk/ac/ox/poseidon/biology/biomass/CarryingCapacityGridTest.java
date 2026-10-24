@@ -22,10 +22,8 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashSet;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Scope;
@@ -62,15 +60,18 @@ class CarryingCapacityGridTest {
       .getModelGrid()
       .getAllCells()
       .forEach(cell ->
-        assertEquals(cell.y() == 2 ? 1 : 0, grid.getCarryingCapacity(cell))
+        assertThat(grid.getCarryingCapacity(cell)).isEqualTo(
+          cell.y() == 2 ? 1 : 0
+        )
       );
   }
 
   @Test
   void getHabitableCells() {
-    assertEquals(
-      Set.of(new Cell(0, 2), new Cell(1, 2), new Cell(2, 2)),
-      new HashSet<>(grid.getHabitableCells())
+    assertThat(grid.getHabitableCells()).containsExactlyInAnyOrder(
+      new Cell(0, 2),
+      new Cell(1, 2),
+      new Cell(2, 2)
     );
   }
 }

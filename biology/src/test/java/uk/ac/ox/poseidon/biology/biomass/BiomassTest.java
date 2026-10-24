@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.biology.biomass;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static tech.units.indriya.unit.Units.GRAM;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
@@ -43,148 +43,113 @@ class BiomassTest {
 
   @Test
   void testConstructor_WithNumericValueAndUnit() {
-    // Arrange & Act
     final Biomass biomass = new Biomass(500, GRAM);
 
-    // Assert
-    assertEquals(0.5, biomass.asKg());
+    assertThat(biomass.asKg()).isEqualTo(0.5);
   }
 
   @Test
   void testOfKg_StaticFactoryMethod() {
-    // Arrange & Act
     final Biomass biomass = Biomass.ofKg(12.5);
 
-    // Assert
-    assertEquals(12.5, biomass.asKg());
+    assertThat(biomass.asKg()).isEqualTo(12.5);
   }
 
   @Test
   void testAdd_WithPositiveValues() {
-    // Arrange
     final Biomass biomass1 = Biomass.ofKg(10.0);
     final Biomass biomass2 = Biomass.ofKg(5.0);
 
-    // Act
     final Biomass result = biomass1.add(biomass2);
 
-    // Assert
-    assertEquals(15.0, result.asKg());
+    assertThat(result.asKg()).isEqualTo(15.0);
   }
 
   @Test
   void testSubtract_WithPositiveValues() {
-    // Arrange
     final Biomass biomass1 = Biomass.ofKg(10.0);
     final Biomass biomass2 = Biomass.ofKg(3.0);
 
-    // Act
     final Biomass result = biomass1.subtract(biomass2);
 
-    // Assert
-    assertEquals(7.0, result.asKg());
+    assertThat(result.asKg()).isEqualTo(7.0);
   }
 
   @Test
   void testMultiply_WithPositiveValue() {
-    // Arrange
     final Biomass biomass = Biomass.ofKg(2.0);
 
-    // Act
     final Biomass result = biomass.multiply(3.5);
 
-    // Assert
-    assertEquals(7.0, result.asKg());
+    assertThat(result.asKg()).isEqualTo(7.0);
   }
 
   @Test
   void testMultiply_WithZero() {
-    // Arrange
     final Biomass biomass = Biomass.ofKg(5.0);
 
-    // Act
     final Biomass result = biomass.multiply(0.0);
 
-    // Assert
-    assertEquals(0.0, result.asKg());
+    assertThat(result.asKg()).isEqualTo(0.0);
   }
 
   @Test
   void testDivide_WithPositiveValue() {
-    // Arrange
     final Biomass biomass = Biomass.ofKg(10.0);
 
-    // Act
     final Biomass result = biomass.divide(2.0);
 
-    // Assert
-    assertEquals(5.0, result.asKg());
+    assertThat(result.asKg()).isEqualTo(5.0);
   }
 
   @Test
   void testDivide_ByValueGreaterThanBiomass() {
-    // Arrange
     final Biomass biomass = Biomass.ofKg(2.0);
 
-    // Act
     final Biomass result = biomass.divide(4.0);
 
-    // Assert
-    assertEquals(0.5, result.asKg());
+    assertThat(result.asKg()).isEqualTo(0.5);
   }
 
   @Test
   void testIsEmpty_WithZeroBiomass() {
-    // Arrange
     final Biomass biomass = Biomass.ofKg(0.0);
 
-    // Act & Assert
-    assertTrue(biomass.isEmpty());
+    assertThat(biomass.isEmpty()).isTrue();
   }
 
   @Test
   void testIsEmpty_WithNonZeroBiomass() {
-    // Arrange
     final Biomass biomass = Biomass.ofKg(1.0);
 
-    // Act & Assert
-    assertFalse(biomass.isEmpty());
+    assertThat(biomass.isEmpty()).isFalse();
   }
 
   @Test
   void testAsBiomass_ReturnsSelf() {
-    // Arrange
     final Biomass biomass = Biomass.ofKg(5.0);
 
-    // Act
     final Biomass result = biomass.asBiomass();
 
-    // Assert
-    assertEquals(biomass, result);
+    assertThat(result).isEqualTo(biomass);
   }
 
   @Test
   void testAsQuantity_ReturnsCorrectQuantity() {
-    // Arrange
     final Biomass biomass = Biomass.ofKg(4.0);
 
-    // Act
     final Quantity<Mass> quantity = biomass.asQuantity();
 
-    // Assert
-    assertEquals(4, quantity.getValue());
-    assertEquals(KILOGRAM, quantity.getUnit());
+    assertThat(quantity.getValue()).isEqualTo(4);
+    assertThat(quantity.getUnit()).isEqualTo(KILOGRAM);
   }
 
   @Test
   void testToString_ReturnsExpectedFormat() {
-    // Arrange
     final Biomass biomass = Biomass.ofKg(3.5);
 
-    // Act
     final String result = biomass.toString();
 
-    // Assert
-    assertEquals("Biomass(3.5 kg)", result);
+    assertThat(result).isEqualTo("Biomass(3.5 kg)");
   }
 }
