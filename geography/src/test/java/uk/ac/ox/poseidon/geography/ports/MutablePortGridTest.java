@@ -22,13 +22,10 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.DefaultBathymetricGrid;
@@ -49,13 +46,12 @@ class MutablePortGridTest {
 
     final MutablePortGrid copy = MutablePortGrid.copyOf(source);
 
-    assertNotSame(source, copy);
-    assertEquals(
-      source.getPorts().collect(Collectors.toSet()),
-      copy.getPorts().collect(Collectors.toSet())
+    assertThat(copy).isNotSameAs(source);
+    assertThat(copy.getPorts()).containsExactlyInAnyOrderElementsOf(
+      source.getPorts().toList()
     );
     Set.of(portA, portB).forEach(port ->
-      assertEquals(source.getCell(port), copy.getCell(port))
+      assertThat(copy.getCell(port)).isEqualTo(source.getCell(port))
     );
   }
 
@@ -71,7 +67,7 @@ class MutablePortGridTest {
       Map.of(portA, new Coordinate(0.5, 2.5), portB, new Coordinate(1.5, 1.5))
     );
 
-    assertEquals(Optional.of(portB), portGrid.getObject("PB"));
-    assertEquals(Optional.empty(), portGrid.getObject("PC"));
+    assertThat(portGrid.getObject("PB")).contains(portB);
+    assertThat(portGrid.getObject("PC")).isEmpty();
   }
 }

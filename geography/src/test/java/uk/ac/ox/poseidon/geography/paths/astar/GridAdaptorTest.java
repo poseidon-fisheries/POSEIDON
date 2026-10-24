@@ -22,8 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.paths.astar;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.badlogic.gdx.ai.pfa.Connection;
@@ -33,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
@@ -89,17 +87,19 @@ class GridAdaptorTest {
       7,
       new Cell(2, 2),
       8
-    ).forEach((key, value) -> assertEquals(value, gridAdaptor.getIndex(key)));
+    ).forEach((key, value) ->
+      assertThat(gridAdaptor.getIndex(key)).isEqualTo(value)
+    );
   }
 
   @Test
   void getNodeCount() {
-    assertEquals(9, gridAdaptor.getNodeCount());
+    assertThat(gridAdaptor.getNodeCount()).isEqualTo(9);
   }
 
   @Test
   void getConnections() {
-    Map.of(
+    Map.<Cell, Set<Cell>>of(
       new Cell(0, 0),
       Set.of(new Cell(0, 1)),
       new Cell(1, 0),
@@ -122,15 +122,12 @@ class GridAdaptorTest {
       final Array<Connection<Cell>> connections = gridAdaptor.getConnections(
         from
       );
-      assertTrue(
-        Streams.stream(connections).allMatch(c -> c.getFromNode().equals(from))
+      assertThat(Streams.stream(connections)).allMatch(c ->
+        c.getFromNode().equals(from)
       );
-      assertEquals(
-        toNodes,
-        Streams.stream(connections)
-          .map(Connection::getToNode)
-          .collect(Collectors.toSet())
-      );
+      assertThat(
+        Streams.stream(connections).map(Connection::getToNode)
+      ).containsExactlyInAnyOrderElementsOf(toNodes);
     });
   }
 
@@ -141,7 +138,7 @@ class GridAdaptorTest {
       portGrid,
       distanceCalculator
     );
-    assertEquals(
+    assertThat(pathFinder.getPath(new Cell(0, 0), new Cell(2, 0))).isEqualTo(
       Optional.of(
         List.of(
           new Cell(0, 0),
@@ -150,8 +147,7 @@ class GridAdaptorTest {
           new Cell(2, 1),
           new Cell(2, 0)
         )
-      ),
-      pathFinder.getPath(new Cell(0, 0), new Cell(2, 0))
+      )
     );
   }
 }

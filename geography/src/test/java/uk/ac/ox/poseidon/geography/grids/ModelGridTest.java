@@ -24,9 +24,9 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.IntStream.range;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 import java.util.List;
 import java.util.Set;
@@ -46,75 +46,75 @@ class ModelGridTest {
 
   @Test
   void getActiveNeighbours() {
-    assertEquals(
-      Set.of(
-        new Cell(4, 4),
-        new Cell(4, 5),
-        new Cell(4, 6),
-        new Cell(5, 4),
-        new Cell(6, 6),
-        new Cell(5, 6),
-        new Cell(6, 4),
-        new Cell(6, 5)
-      ),
-      Set.copyOf(modelGrid.getActiveNeighbours(new Cell(5, 5)))
+    assertThat(
+      modelGrid.getActiveNeighbours(new Cell(5, 5))
+    ).containsExactlyInAnyOrder(
+      new Cell(4, 4),
+      new Cell(4, 5),
+      new Cell(4, 6),
+      new Cell(5, 4),
+      new Cell(6, 6),
+      new Cell(5, 6),
+      new Cell(6, 4),
+      new Cell(6, 5)
     );
-    assertEquals(
-      Set.of(new Cell(0, 1), new Cell(1, 0), new Cell(1, 1)),
-      Set.copyOf(modelGrid.getActiveNeighbours(new Cell(0, 0)))
-    );
+    assertThat(
+      modelGrid.getActiveNeighbours(new Cell(0, 0))
+    ).containsExactlyInAnyOrder(new Cell(0, 1), new Cell(1, 0), new Cell(1, 1));
   }
 
   @Test
   void cellToCoordinate() {
-    assertEquals(
-      new Coordinate(-4.5, 4.5),
-      modelGrid.toCoordinate(new Cell(0, 0))
+    assertThat(modelGrid.toCoordinate(new Cell(0, 0))).isEqualTo(
+      new Coordinate(-4.5, 4.5)
     );
-    assertEquals(
-      new Coordinate(4.5, -4.5),
-      modelGrid.toCoordinate(new Cell(9, 9))
+    assertThat(modelGrid.toCoordinate(new Cell(9, 9))).isEqualTo(
+      new Coordinate(4.5, -4.5)
     );
   }
 
   @Test
   void pointToCoordinate() {
-    assertEquals(
-      new Coordinate(-5, 5),
-      modelGrid.toCoordinate(new Double2D(0, 0))
+    assertThat(modelGrid.toCoordinate(new Double2D(0, 0))).isEqualTo(
+      new Coordinate(-5, 5)
     );
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> modelGrid.toCoordinate(new Double2D(10, 10)),
-      "Double2D[10.0,10.0] outside of grid"
-    );
+    assertThatIllegalArgumentException()
+      .isThrownBy(() -> modelGrid.toCoordinate(new Double2D(10, 10)))
+      .withMessage("Double2D[10.0,10.0] outside of grid");
   }
 
   @Test
   void coordinateToPoint() {
-    assertEquals(new Double2D(0, 0), modelGrid.toPoint(new Coordinate(-5, 5)));
-    assertEquals(
-      new Double2D(10, 10),
-      modelGrid.toPoint(new Coordinate(5, -5))
+    assertThat(modelGrid.toPoint(new Coordinate(-5, 5))).isEqualTo(
+      new Double2D(0, 0)
+    );
+    assertThat(modelGrid.toPoint(new Coordinate(5, -5))).isEqualTo(
+      new Double2D(10, 10)
     );
   }
 
   @Test
   void coordinateToCell() {
-    assertEquals(new Cell(0, 0), modelGrid.toCell(new Coordinate(-5, 5)));
-    assertEquals(new Cell(0, 0), modelGrid.toCell(new Coordinate(-4.5, 4.5)));
-    assertEquals(new Cell(9, 9), modelGrid.toCell(new Coordinate(4.5, -4.5)));
-    assertEquals(new Cell(10, 10), modelGrid.toCell(new Coordinate(5, -5)));
+    assertThat(modelGrid.toCell(new Coordinate(-5, 5))).isEqualTo(
+      new Cell(0, 0)
+    );
+    assertThat(modelGrid.toCell(new Coordinate(-4.5, 4.5))).isEqualTo(
+      new Cell(0, 0)
+    );
+    assertThat(modelGrid.toCell(new Coordinate(4.5, -4.5))).isEqualTo(
+      new Cell(9, 9)
+    );
+    assertThat(modelGrid.toCell(new Coordinate(5, -5))).isEqualTo(
+      new Cell(10, 10)
+    );
   }
 
   @Test
   void rejectsAWestLongitudeEastOfTheEastLongitude() {
     final ModelGridFactory factory = new ModelGridFactory(1.0, 170, -170, 0, 1);
-    final IllegalStateException exception = assertThrows(
-      IllegalStateException.class,
-      () -> factory.get(Scope.GLOBAL_SCOPE)
-    );
-    assertTrue(exception.getMessage().contains("antimeridian"));
+    assertThatIllegalStateException()
+      .isThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
+      .withMessageContaining("antimeridian");
   }
 
   @Test
@@ -122,7 +122,7 @@ class ModelGridTest {
     final ModelGrid modelGrid = new ModelGridFactory(1.0, 170, 190, 0, 1).get(
       Scope.GLOBAL_SCOPE
     );
-    assertEquals(20, modelGrid.getGridWidth());
+    assertThat(modelGrid.getGridWidth()).isEqualTo(20);
   }
 
   @Test
@@ -149,11 +149,9 @@ class ModelGridTest {
 
     coordinates.forEach(coordinate -> {
       final Double2D xy = modelGrid.toPoint(coordinate);
-      assertEquals(
-        coordinate,
-        modelGrid.toCoordinate(new Cell((int) xy.x, (int) xy.y)),
-        coordinate.toString()
-      );
+      assertThat(
+        modelGrid.toCoordinate(new Cell((int) xy.x, (int) xy.y))
+      ).isEqualTo(coordinate);
     });
   }
 
@@ -165,17 +163,17 @@ class ModelGridTest {
       .stream()
       .flatMap(start -> cells.stream().map(end -> grid.cellPairKey(start, end)))
       .collect(toSet());
-    assertEquals(cells.size() * cells.size(), keys.size());
+    assertThat(keys).hasSize(cells.size() * cells.size());
   }
 
   @Test
   void aCellOutsideTheGridHasNoPairKey() {
     final Cell inside = new Cell(0, 0);
     final Cell outside = new Cell(10, 0);
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThatIllegalArgumentException().isThrownBy(() ->
       modelGrid.cellPairKey(inside, outside)
     );
-    assertThrows(IllegalArgumentException.class, () ->
+    assertThatIllegalArgumentException().isThrownBy(() ->
       modelGrid.cellPairKey(outside, inside)
     );
   }

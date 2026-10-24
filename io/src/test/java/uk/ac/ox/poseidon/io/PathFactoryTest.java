@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.io.paths.Factories.path;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,24 +40,24 @@ class PathFactoryTest {
   @Test
   void newInstanceSimpleFile() {
     final PathFactory<Scope> pathFactory = path(FILENAME);
-    assertEquals(Path.of(FILENAME), pathFactory.get(Scope.GLOBAL_SCOPE));
+    assertThat(pathFactory.get(Scope.GLOBAL_SCOPE)).isEqualTo(
+      Path.of(FILENAME)
+    );
   }
 
   @Test
   void newInstanceFileInFolder() {
     final PathFactory<Scope> pathFactory = path(FOLDERS + FILENAME);
-    assertEquals(
-      Path.of(FOLDERS + FILENAME),
-      pathFactory.get(Scope.GLOBAL_SCOPE)
+    assertThat(pathFactory.get(Scope.GLOBAL_SCOPE)).isEqualTo(
+      Path.of(FOLDERS + FILENAME)
     );
   }
 
   @Test
   void newInstanceWithParent() {
     final PathFactory<Scope> pathFactory = path(FOLDERS).plus(FILENAME);
-    assertEquals(
-      Path.of(FOLDERS + FILENAME),
-      pathFactory.get(Scope.GLOBAL_SCOPE)
+    assertThat(pathFactory.get(Scope.GLOBAL_SCOPE)).isEqualTo(
+      Path.of(FOLDERS + FILENAME)
     );
   }
 }

@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.ac.ox.poseidon.geography.bathymetry.Factories.bathymetricGridFromElevationValues;
 
 import java.util.List;
@@ -67,10 +67,10 @@ class BathymetricGridFromElevationValuesFactoryTest {
     final BathymetricGrid bathymetricGrid = factory(
       List.of(0.0, 1.0, 2.0, 3.0)
     ).get(Scope.GLOBAL_SCOPE);
-    assertEquals(0.0, bathymetricGrid.getElevation(new Cell(0, 0)));
-    assertEquals(1.0, bathymetricGrid.getElevation(new Cell(1, 0)));
-    assertEquals(2.0, bathymetricGrid.getElevation(new Cell(0, 1)));
-    assertEquals(3.0, bathymetricGrid.getElevation(new Cell(1, 1)));
+    assertThat(bathymetricGrid.getElevation(new Cell(0, 0))).isEqualTo(0.0);
+    assertThat(bathymetricGrid.getElevation(new Cell(1, 0))).isEqualTo(1.0);
+    assertThat(bathymetricGrid.getElevation(new Cell(0, 1))).isEqualTo(2.0);
+    assertThat(bathymetricGrid.getElevation(new Cell(1, 1))).isEqualTo(3.0);
   }
 
   private static BathymetricGridFromElevationValuesFactory<Scope> factory(

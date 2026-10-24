@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.geography;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
@@ -51,10 +51,10 @@ public class EnvelopeTest {
     // Act & Assert
     if (x >= p1.lon && x <= p2.lon && y >= p1.lat && y <= p2.lat) {
       // Point is inside the rectangle
-      assertTrue(Envelope.intersects(p1, p2, q));
+      assertThat(Envelope.intersects(p1, p2, q)).isTrue();
     } else {
       // Point is outside the rectangle
-      assertFalse(Envelope.intersects(p1, p2, q));
+      assertThat(Envelope.intersects(p1, p2, q)).isFalse();
     }
   }
 
@@ -74,9 +74,9 @@ public class EnvelopeTest {
 
     // Act & Assert
     if (x < p1.lon || x > p2.lon || y < p1.lat || y > p2.lat) {
-      assertFalse(Envelope.intersects(p1, p2, q));
+      assertThat(Envelope.intersects(p1, p2, q)).isFalse();
     } else {
-      assertTrue(Envelope.intersects(p1, p2, q));
+      assertThat(Envelope.intersects(p1, p2, q)).isTrue();
     }
   }
 
@@ -88,7 +88,7 @@ public class EnvelopeTest {
     final Coordinate q = new Coordinate(10.0, 10.0);
 
     // Act & Assert
-    assertTrue(Envelope.intersects(p1, p2, q));
+    assertThat(Envelope.intersects(p1, p2, q)).isTrue();
   }
 
   @Test
@@ -99,7 +99,7 @@ public class EnvelopeTest {
     final Coordinate q = new Coordinate(5.0, 5.0);
 
     // Act & Assert
-    assertTrue(Envelope.intersects(p1, p2, q));
+    assertThat(Envelope.intersects(p1, p2, q)).isTrue();
   }
 
   /**
@@ -135,7 +135,7 @@ public class EnvelopeTest {
       q1.lat > p2.lat
     );
 
-    assertEquals(intersects, expected);
+    assertThat(intersects).isEqualTo(expected);
   }
 
   @Test
@@ -147,7 +147,7 @@ public class EnvelopeTest {
     final Coordinate q2 = new Coordinate(8.0, 8.0);
 
     // Act & Assert
-    assertTrue(Envelope.intersects(p1, p2, q1, q2));
+    assertThat(Envelope.intersects(p1, p2, q1, q2)).isTrue();
   }
 
   @Test
@@ -159,7 +159,7 @@ public class EnvelopeTest {
     final Coordinate q2 = new Coordinate(15.0, 5.0);
 
     // Act & Assert
-    assertTrue(Envelope.intersects(p1, p2, q1, q2));
+    assertThat(Envelope.intersects(p1, p2, q1, q2)).isTrue();
   }
 
   @Test
@@ -171,7 +171,7 @@ public class EnvelopeTest {
     final Coordinate q2 = new Coordinate(15.0, 15.0);
 
     // Act & Assert
-    assertTrue(Envelope.intersects(p1, p2, q1, q2));
+    assertThat(Envelope.intersects(p1, p2, q1, q2)).isTrue();
   }
 
   @Test
@@ -183,6 +183,6 @@ public class EnvelopeTest {
     final Coordinate q2 = new Coordinate(5.0, 5.0);
 
     // Act & Assert
-    assertTrue(Envelope.intersects(p1, p2, q1, q2));
+    assertThat(Envelope.intersects(p1, p2, q1, q2)).isTrue();
   }
 }

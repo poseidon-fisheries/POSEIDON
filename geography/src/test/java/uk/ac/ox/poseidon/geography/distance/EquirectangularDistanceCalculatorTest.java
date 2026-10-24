@@ -23,7 +23,8 @@
 package uk.ac.ox.poseidon.geography.distance;
 
 import static javax.measure.MetricPrefix.KILO;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.Mockito.mock;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.METRE;
@@ -34,7 +35,6 @@ import javax.measure.Quantity;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.constraints.DoubleRange;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -48,7 +48,7 @@ class EquirectangularDistanceCalculatorTest {
   void testDistanceDifferentPoints() {
     final Coordinate oxford = new Coordinate(-1.254, 51.751);
     final Coordinate london = new Coordinate(-0.1278, 51.5074);
-    assertEquals(
+    assertCloseTo(
       getQuantity(82, KILO(METRE)),
       equirectangularDistance.distance(oxford, london),
       getQuantity(350, METRE)
@@ -60,29 +60,29 @@ class EquirectangularDistanceCalculatorTest {
     final Coordinate pointA = new Coordinate(0, 1);
     final Coordinate pointB = new Coordinate(0, -1);
 
-    assertEquals(
+    assertCloseTo(
       getQuantity(222, KILO(METRE)),
       equirectangularDistance.distance(pointA, pointB),
       getQuantity(500, METRE)
     );
   }
 
-  private <Q extends Quantity<Q>> void assertEquals(
+  private <Q extends Quantity<Q>> void assertCloseTo(
     final Quantity<Q> expected,
     final Quantity<Q> actual,
     final Quantity<Q> delta
   ) {
-    Assertions.assertEquals(
-      expected.toSystemUnit().getValue().doubleValue(),
-      actual.toSystemUnit().getValue().doubleValue(),
-      delta.toSystemUnit().getValue().doubleValue(),
-      () -> actual + " is not within " + delta + " of " + expected
-    );
+    assertThat(actual.toSystemUnit().getValue().doubleValue())
+      .as("%s within %s of %s", actual, delta, expected)
+      .isCloseTo(
+        expected.toSystemUnit().getValue().doubleValue(),
+        within(delta.toSystemUnit().getValue().doubleValue())
+      );
   }
 
   @Test
   void otherCoordinates() {
-    assertEquals(
+    assertCloseTo(
       getQuantity(106, KILO(METRE)),
       equirectangularDistance.distance(
         new Coordinate(-1.256, 51.7522), // Oxford
@@ -98,11 +98,11 @@ class EquirectangularDistanceCalculatorTest {
     @ForAll @DoubleRange(min = -90, max = 90) final double lat
   ) {
     final Coordinate point = new Coordinate(lon, lat);
-    assertTrue(
+    assertThat(
       equirectangularDistance
         .distance(point, point)
         .isEquivalentTo(getQuantity(0, METRE))
-    );
+    ).isTrue();
   }
 
   @Property
@@ -129,11 +129,11 @@ class EquirectangularDistanceCalculatorTest {
         java.util.logging.Level.WARNING.intValue()
     );
 
-    assertTrue(
+    assertThat(
       equirectangularDistance
         .distance(pointA, pointB)
         .isEquivalentTo(equirectangularDistance.distance(pointB, pointA))
-    );
+    ).isTrue();
     // Restore the original filter after the test
     julLogger.setFilter(originalFilter);
   }

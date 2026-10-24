@@ -22,7 +22,8 @@
 
 package uk.ac.ox.poseidon.geography;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,9 +41,9 @@ class CoordinateTest {
     final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
 
     // Assert
-    assertNotNull(result, "The result should not be null");
-    assertEquals(x, result.getLon(), "Longitude was not set correctly");
-    assertEquals(y, result.getLat(), "Latitude was not set correctly");
+    assertThat(result).isNotNull();
+    assertThat(result.getLon()).isEqualTo(x);
+    assertThat(result.getLat()).isEqualTo(y);
   }
 
   @Test
@@ -57,17 +58,9 @@ class CoordinateTest {
     final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
 
     // Assert
-    assertNotNull(result, "The result should not be null");
-    assertEquals(
-      x,
-      result.getLon(),
-      "Longitude was not set correctly with large values"
-    );
-    assertEquals(
-      y,
-      result.getLat(),
-      "Latitude was not set correctly with large values"
-    );
+    assertThat(result).isNotNull();
+    assertThat(result.getLon()).isEqualTo(x);
+    assertThat(result.getLat()).isEqualTo(y);
   }
 
   @Test
@@ -82,9 +75,9 @@ class CoordinateTest {
     final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
 
     // Assert
-    assertNotNull(result, "The result should not be null");
-    assertEquals(x, result.getLon(), "Longitude was not set correctly");
-    assertEquals(y, result.getLat(), "Latitude was not set correctly");
+    assertThat(result).isNotNull();
+    assertThat(result.getLon()).isEqualTo(x);
+    assertThat(result.getLat()).isEqualTo(y);
   }
 
   @Test
@@ -99,19 +92,15 @@ class CoordinateTest {
     final Coordinate result = Coordinate.fromJTS(jtsCoordinate);
 
     // Assert
-    assertNotNull(result, "The result should not be null");
-    assertEquals(x, result.getLon(), "Longitude was not set correctly");
-    assertEquals(y, result.getLat(), "Latitude was not set correctly");
+    assertThat(result).isNotNull();
+    assertThat(result.getLon()).isEqualTo(x);
+    assertThat(result.getLat()).isEqualTo(y);
   }
 
   @Test
   void testFromJTSWithNullInput() {
     // Act & Assert
     // noinspection DataFlowIssue
-    assertThrows(
-      NullPointerException.class,
-      () -> Coordinate.fromJTS(null),
-      "Passing a null JTSCoordinate should throw NullPointerException"
-    );
+    assertThatNullPointerException().isThrownBy(() -> Coordinate.fromJTS(null));
   }
 }

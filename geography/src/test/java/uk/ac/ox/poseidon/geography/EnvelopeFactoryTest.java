@@ -22,8 +22,7 @@
 
 package uk.ac.ox.poseidon.geography;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Scope;
@@ -49,27 +48,11 @@ class EnvelopeFactoryTest {
     final Envelope envelope = factory.get(Scope.GLOBAL_SCOPE);
 
     // Verify results
-    assertNotNull(envelope, "Expected an instance of Envelope to be created.");
-    assertEquals(
-      minX,
-      envelope.getMinX(),
-      "Envelope minX does not match the value set in EnvelopeFactory."
-    );
-    assertEquals(
-      maxX,
-      envelope.getMaxX(),
-      "Envelope maxX does not match the value set in EnvelopeFactory."
-    );
-    assertEquals(
-      minY,
-      envelope.getMinY(),
-      "Envelope minY does not match the value set in EnvelopeFactory."
-    );
-    assertEquals(
-      maxY,
-      envelope.getMaxY(),
-      "Envelope maxY does not match the value set in EnvelopeFactory."
-    );
+    assertThat(envelope).isNotNull();
+    assertThat(envelope.getMinX()).isEqualTo(minX);
+    assertThat(envelope.getMaxX()).isEqualTo(maxX);
+    assertThat(envelope.getMinY()).isEqualTo(minY);
+    assertThat(envelope.getMaxY()).isEqualTo(maxY);
   }
 
   @Test
@@ -85,27 +68,11 @@ class EnvelopeFactoryTest {
     final Envelope envelope = factory.get(Scope.GLOBAL_SCOPE);
 
     // Verify results
-    assertNotNull(envelope, "Expected an instance of Envelope to be created.");
-    assertEquals(
-      1.0,
-      envelope.getMinX(),
-      "Envelope minX should be normalized to the smaller value."
-    );
-    assertEquals(
-      5.0,
-      envelope.getMaxX(),
-      "Envelope maxX should be normalized to the larger value."
-    );
-    assertEquals(
-      2.0,
-      envelope.getMinY(),
-      "Envelope minY should be normalized to the smaller value."
-    );
-    assertEquals(
-      6.0,
-      envelope.getMaxY(),
-      "Envelope maxY should be normalized to the larger value."
-    );
+    assertThat(envelope).isNotNull();
+    assertThat(envelope.getMinX()).isEqualTo(1.0);
+    assertThat(envelope.getMaxX()).isEqualTo(5.0);
+    assertThat(envelope.getMinY()).isEqualTo(2.0);
+    assertThat(envelope.getMaxY()).isEqualTo(6.0);
   }
 
   @Test
@@ -117,26 +84,10 @@ class EnvelopeFactoryTest {
     final Envelope envelope = factory.get(Scope.GLOBAL_SCOPE);
 
     // Verify results
-    assertNotNull(envelope, "Expected an instance of Envelope to be created.");
-    assertEquals(
-      0.0,
-      envelope.getMinX(),
-      "Envelope minX should default to 0.0."
-    );
-    assertEquals(
-      0.0,
-      envelope.getMaxX(),
-      "Envelope maxX should default to 0.0."
-    );
-    assertEquals(
-      0.0,
-      envelope.getMinY(),
-      "Envelope minY should default to 0.0."
-    );
-    assertEquals(
-      0.0,
-      envelope.getMaxY(),
-      "Envelope maxY should default to 0.0."
-    );
+    assertThat(envelope).isNotNull();
+    assertThat(envelope.getMinX()).isEqualTo(0.0);
+    assertThat(envelope.getMaxX()).isEqualTo(0.0);
+    assertThat(envelope.getMinY()).isEqualTo(0.0);
+    assertThat(envelope.getMaxY()).isEqualTo(0.0);
   }
 }

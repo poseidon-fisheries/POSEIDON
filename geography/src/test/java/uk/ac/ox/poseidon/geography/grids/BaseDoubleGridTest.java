@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.grids;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -39,28 +39,30 @@ class BaseDoubleGridTest {
 
   @Test
   void getValue() {
-    assertEquals(1.0, grid.getValue(new Cell(0, 0)));
-    assertEquals(2.0, grid.getValue(new Cell(0, 1)));
-    assertEquals(4.0, grid.getValue(new Cell(1, 0)));
-    assertEquals(9.0, grid.getValue(new Cell(2, 2)));
+    assertThat(grid.getValue(new Cell(0, 0))).isEqualTo(1.0);
+    assertThat(grid.getValue(new Cell(0, 1))).isEqualTo(2.0);
+    assertThat(grid.getValue(new Cell(1, 0))).isEqualTo(4.0);
+    assertThat(grid.getValue(new Cell(2, 2))).isEqualTo(9.0);
   }
 
   @Test
   void getMinimumValue() {
-    assertEquals(1.0, grid.getMinimumValue());
+    assertThat(grid.getMinimumValue()).isEqualTo(1.0);
   }
 
   @Test
   void getMaximumValue() {
-    assertEquals(9.0, grid.getMaximumValue());
+    assertThat(grid.getMaximumValue()).isEqualTo(9.0);
   }
 
   @Test
   void testModelGrid() {
     final ModelGrid modelGrid = grid.getModelGrid();
-    assertEquals(3, modelGrid.getGridWidth());
-    assertEquals(3, modelGrid.getGridHeight());
-    assertEquals(
+    assertThat(modelGrid.getGridWidth()).isEqualTo(3);
+    assertThat(modelGrid.getGridHeight()).isEqualTo(3);
+    assertThat(
+      modelGrid.getAllCells().map(modelGrid::toCoordinate).toList()
+    ).isEqualTo(
       List.of(
         new Coordinate(0.5, 2.5),
         new Coordinate(0.5, 1.5),
@@ -71,15 +73,14 @@ class BaseDoubleGridTest {
         new Coordinate(2.5, 2.5),
         new Coordinate(2.5, 1.5),
         new Coordinate(2.5, 0.5)
-      ),
-      modelGrid.getAllCells().map(modelGrid::toCoordinate).toList()
+      )
     );
   }
 
   @Test
   void testEnvelope() {
     final Envelope envelope = grid.getModelGrid().getEnvelope();
-    assertEquals(3, envelope.getWidth());
-    assertEquals(3, envelope.getHeight());
+    assertThat(envelope.getWidth()).isEqualTo(3);
+    assertThat(envelope.getHeight()).isEqualTo(3);
   }
 }

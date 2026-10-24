@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.geography.grids.Cell;
@@ -36,26 +36,27 @@ class CartesianDistanceCalculatorTest {
   @Test
   void threeFourFiveTriangle() {
     // 3-4-5 triangle scaled by cellSizeInKm=2 should give a 6-8-10 result.
-    assertEquals(
-      10.0,
-      calculator.distanceInKm(new Cell(0, 0), new Cell(3, 4)),
-      1e-9
-    );
+    assertThat(
+      calculator.distanceInKm(new Cell(0, 0), new Cell(3, 4))
+    ).isCloseTo(10.0, within(1e-9));
   }
 
   @Test
   void samePointIsZero() {
     final Cell cell = new Cell(5, 5);
-    assertEquals(0.0, calculator.distanceInKm(cell, cell), 1e-9);
+    assertThat(calculator.distanceInKm(cell, cell)).isCloseTo(
+      0.0,
+      within(1e-9)
+    );
   }
 
   @Test
   void isSymmetric() {
     final Cell a = new Cell(1, 2);
     final Cell b = new Cell(7, -3);
-    assertTrue(
-      Math.abs(calculator.distanceInKm(a, b) - calculator.distanceInKm(b, a)) <
-        1e-9
+    assertThat(calculator.distanceInKm(a, b)).isCloseTo(
+      calculator.distanceInKm(b, a),
+      within(1e-9)
     );
   }
 }

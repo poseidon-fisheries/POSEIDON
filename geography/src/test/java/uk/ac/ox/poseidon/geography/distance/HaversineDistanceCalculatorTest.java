@@ -22,8 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.distance;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.Mockito.mock;
 
 import net.jqwik.api.ForAll;
@@ -45,12 +45,7 @@ class HaversineDistanceCalculatorTest {
     final Coordinate point = new Coordinate(-0.1278, 51.5074);
     final double result = calculator.distanceInKm(point, point);
 
-    assertEquals(
-      0.0,
-      result,
-      0.0001,
-      "Distance between the same points should be zero."
-    );
+    assertThat(result).isCloseTo(0.0, within(0.0001));
   }
 
   @Test
@@ -67,12 +62,7 @@ class HaversineDistanceCalculatorTest {
     final double result = calculator.distanceInKm(london, paris);
     final double expectedDistance = 343.9; // Approximate distance in kilometers
 
-    assertEquals(
-      expectedDistance,
-      result,
-      1.0,
-      "Distance between London and Paris should be approximately 343.9 km."
-    );
+    assertThat(result).isCloseTo(expectedDistance, within(1.0));
   }
 
   @Test
@@ -88,12 +78,7 @@ class HaversineDistanceCalculatorTest {
     final double result = calculator.distanceInKm(pointNorth, pointSouth);
     final double expectedDistance = 222.4;
 
-    assertEquals(
-      expectedDistance,
-      result,
-      1.0,
-      "Distance across the equator should be approximately 222.4 km."
-    );
+    assertThat(result).isCloseTo(expectedDistance, within(1.0));
   }
 
   @Test
@@ -111,12 +96,7 @@ class HaversineDistanceCalculatorTest {
     // Approximate distance in kilometers
     final double expectedDistance = 15988.8;
 
-    assertEquals(
-      expectedDistance,
-      result,
-      50.0,
-      "Distance between New York and Sydney should be approximately 15,988.8 km."
-    );
+    assertThat(result).isCloseTo(expectedDistance, within(50.0));
   }
 
   @Test
@@ -134,12 +114,7 @@ class HaversineDistanceCalculatorTest {
     // Half Earth's approximate circumference
     final double expectedDistance = 20015.1;
 
-    assertEquals(
-      expectedDistance,
-      result,
-      100.0,
-      "Distance between North Pole and South Pole should be approximately 20,015.1 km."
-    );
+    assertThat(result).isCloseTo(expectedDistance, within(100.0));
   }
 
   @Property
@@ -154,10 +129,10 @@ class HaversineDistanceCalculatorTest {
       new HaversineDistanceCalculator(mockModelGrid);
     final Coordinate pointA = new Coordinate(lon1, lat1);
     final Coordinate pointB = new Coordinate(lon2, lat2);
-    assertTrue(
+    assertThat(
       calculator
         .distance(pointA, pointB)
         .isEquivalentTo(calculator.distance(pointB, pointA))
-    );
+    ).isTrue();
   }
 }
