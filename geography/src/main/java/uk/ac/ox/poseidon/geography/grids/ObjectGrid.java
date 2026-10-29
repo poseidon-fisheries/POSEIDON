@@ -140,7 +140,7 @@ public abstract class ObjectGrid<T>
   protected abstract String getObjectId(T object);
 
   /** @return the object with the given id, if one exists on this grid */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "checkstyle:ReturnCount" })
   public Optional<T> getObject(final String id) {
     // A plain scan of the field, which allocates nothing: vessels look up their
     // home port by code every time they read it, and a grid holds few objects.

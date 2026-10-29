@@ -22,10 +22,13 @@
 
 package uk.ac.ox.poseidon.geography.paths;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 import com.badlogic.gdx.math.Bresenham2;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Streams;
 import java.util.Optional;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.Cell;
@@ -59,20 +62,22 @@ public class BresenhamPathFinder extends AbstractGridPathFinder {
     final Cell start,
     final Cell end
   ) {
-    if (!(isNavigable(start) && isNavigable(end))) return Optional.empty();
+    return isNavigable(start) && isNavigable(end)
+      ? Optional.of(line(start, end)).filter(cells ->
+          cells.stream().allMatch(this::isNavigable)
+        )
+      : Optional.empty();
+  }
+
+  private static ImmutableList<Cell> line(final Cell start, final Cell end) {
     final Array<GridPoint2> linePoints = new Bresenham2().line(
       start.x(),
       start.y(),
       end.x(),
       end.y()
     );
-    final ImmutableList.Builder<Cell> pathBuilder = ImmutableList.builder();
-    for (final GridPoint2 point : linePoints) {
-      final Cell cell = new Cell(point.x, point.y);
-      // break early if we bump into land
-      if (!isNavigable(cell)) return Optional.empty();
-      pathBuilder.add(cell);
-    }
-    return Optional.of(pathBuilder.build());
+    return Streams.stream(linePoints)
+      .map(point -> new Cell(point.x, point.y))
+      .collect(toImmutableList());
   }
 }

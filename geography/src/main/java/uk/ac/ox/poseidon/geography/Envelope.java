@@ -127,20 +127,26 @@ public final class Envelope {
     final Coordinate q1,
     final Coordinate q2
   ) {
-    double minQ = Math.min(q1.lon, q2.lon);
-    double maxQ = Math.max(q1.lon, q2.lon);
-    double minP = Math.min(p1.lon, p2.lon);
-    double maxP = Math.max(p1.lon, p2.lon);
-    if (minP > maxQ) return false;
-    if (maxP < minQ) return false;
+    return (
+      overlap(p1.lon, p2.lon, q1.lon, q2.lon) &&
+      overlap(p1.lat, p2.lat, q1.lat, q2.lat)
+    );
+  }
 
-    minQ = Math.min(q1.lat, q2.lat);
-    maxQ = Math.max(q1.lat, q2.lat);
-    minP = Math.min(p1.lat, p2.lat);
-    maxP = Math.max(p1.lat, p2.lat);
-
-    if (minP > maxQ) return false;
-    return maxP >= minQ;
+  /**
+   * @return whether the interval between {@code p1} and {@code p2} overlaps
+   *         the one between {@code q1} and {@code q2}
+   */
+  private static boolean overlap(
+    final double p1,
+    final double p2,
+    final double q1,
+    final double q2
+  ) {
+    return (
+      Math.min(p1, p2) <= Math.max(q1, q2) &&
+      Math.max(p1, p2) >= Math.min(q1, q2)
+    );
   }
 
   /**
@@ -149,15 +155,14 @@ public final class Envelope {
   public static Envelope fromJTS(
     final org.locationtech.jts.geom.Envelope jtsEnv
   ) {
-    if (jtsEnv == null) {
-      return new Envelope(); // null envelope
-    }
-    return new Envelope(
-      jtsEnv.getMinX(),
-      jtsEnv.getMaxX(),
-      jtsEnv.getMinY(),
-      jtsEnv.getMaxY()
-    );
+    return jtsEnv == null
+      ? new Envelope() // null envelope
+      : new Envelope(
+          jtsEnv.getMinX(),
+          jtsEnv.getMaxX(),
+          jtsEnv.getMinY(),
+          jtsEnv.getMaxY()
+        );
   }
 
   /**
@@ -194,7 +199,6 @@ public final class Envelope {
    *         {@code 0} if this envelope is {@link #isNull() null}
    */
   public double minExtent() {
-    if (isNull()) return 0.0;
     return Math.min(getWidth(), getHeight());
   }
 
@@ -203,7 +207,6 @@ public final class Envelope {
    *         {@code 0} if this envelope is {@link #isNull() null}
    */
   public double maxExtent() {
-    if (isNull()) return 0.0;
     return Math.max(getWidth(), getHeight());
   }
 
@@ -219,32 +222,34 @@ public final class Envelope {
    * direction.
    */
   public Envelope expandBy(final double deltaX, final double deltaY) {
-    if (isNull()) {
-      return this;
-    }
     final double newMinX = minX - deltaX;
     final double newMaxX = maxX + deltaX;
     final double newMinY = minY - deltaY;
     final double newMaxY = maxY + deltaY;
-    if (newMinX > newMaxX || newMinY > newMaxY) {
+    final Envelope expanded;
+    if (isNull()) {
+      expanded = this;
+    } else if (newMinX > newMaxX || newMinY > newMaxY) {
       // This yields a null envelope
-      return new Envelope();
+      expanded = new Envelope();
+    } else {
+      expanded = new Envelope(newMinX, newMaxX, newMinY, newMaxY);
     }
-    return new Envelope(newMinX, newMaxX, newMinY, newMaxY);
+    return expanded;
   }
 
   /**
    * Returns a new Envelope expanded to include (x, y).
    */
   public Envelope expandToInclude(final double x, final double y) {
-    if (isNull()) {
-      return new Envelope(x, x, y, y);
-    }
-    final double newMinX = Math.min(minX, x);
-    final double newMaxX = Math.max(maxX, x);
-    final double newMinY = Math.min(minY, y);
-    final double newMaxY = Math.max(maxY, y);
-    return new Envelope(newMinX, newMaxX, newMinY, newMaxY);
+    return isNull()
+      ? new Envelope(x, x, y, y)
+      : new Envelope(
+          Math.min(minX, x),
+          Math.max(maxX, x),
+          Math.min(minY, y),
+          Math.max(maxY, y)
+        );
   }
 
   /**
@@ -258,32 +263,34 @@ public final class Envelope {
    * Returns a new Envelope expanded to include another Envelope.
    */
   public Envelope expandToInclude(final Envelope other) {
+    final Envelope expanded;
     if (other.isNull()) {
-      return this;
+      expanded = this;
+    } else if (this.isNull()) {
+      expanded = new Envelope(other);
+    } else {
+      expanded = new Envelope(
+        Math.min(this.minX, other.minX),
+        Math.max(this.maxX, other.maxX),
+        Math.min(this.minY, other.minY),
+        Math.max(this.maxY, other.maxY)
+      );
     }
-    if (this.isNull()) {
-      return new Envelope(other);
-    }
-    final double newMinX = Math.min(this.minX, other.minX);
-    final double newMaxX = Math.max(this.maxX, other.maxX);
-    final double newMinY = Math.min(this.minY, other.minY);
-    final double newMaxY = Math.max(this.maxY, other.maxY);
-    return new Envelope(newMinX, newMaxX, newMinY, newMaxY);
+    return expanded;
   }
 
   /**
    * Returns a new Envelope translated by transX, transY.
    */
   public Envelope translate(final double transX, final double transY) {
-    if (isNull()) {
-      return this;
-    }
-    return new Envelope(
-      minX + transX,
-      maxX + transX,
-      minY + transY,
-      maxY + transY
-    );
+    return isNull()
+      ? this
+      : new Envelope(
+          minX + transX,
+          maxX + transX,
+          minY + transY,
+          maxY + transY
+        );
   }
 
   /**
@@ -291,10 +298,9 @@ public final class Envelope {
    *         {@link #isNull() null}
    */
   public Coordinate centre() {
-    if (isNull()) {
-      return null;
-    }
-    return new Coordinate((minX + maxX) / 2.0, (minY + maxY) / 2.0);
+    return isNull()
+      ? null
+      : new Coordinate((minX + maxX) / 2.0, (minY + maxY) / 2.0);
   }
 
   /**
@@ -302,14 +308,15 @@ public final class Envelope {
    *         {@link #isNull() null} envelope if they don't overlap
    */
   public Envelope intersection(final Envelope env) {
-    if (this.isNull() || env.isNull() || !this.intersects(env)) {
-      return new Envelope();
-    }
-    final double intMinX = Math.max(this.minX, env.minX);
-    final double intMaxX = Math.min(this.maxX, env.maxX);
-    final double intMinY = Math.max(this.minY, env.minY);
-    final double intMaxY = Math.min(this.maxY, env.maxY);
-    return new Envelope(intMinX, intMaxX, intMinY, intMaxY);
+    // Two null envelopes don't intersect
+    return this.intersects(env)
+      ? new Envelope(
+          Math.max(this.minX, env.minX),
+          Math.min(this.maxX, env.maxX),
+          Math.max(this.minY, env.minY),
+          Math.min(this.maxY, env.maxY)
+        )
+      : new Envelope();
   }
 
   /**
@@ -317,11 +324,14 @@ public final class Envelope {
    *         overlapping)
    */
   public boolean intersects(final Envelope other) {
-    if (this.isNull() || other.isNull()) return false;
-    if (other.minX > this.maxX) return false;
-    if (other.maxX < this.minX) return false;
-    if (other.minY > this.maxY) return false;
-    return !(other.maxY < this.minY);
+    return (
+      !this.isNull() &&
+      !other.isNull() &&
+      other.minX <= this.maxX &&
+      other.maxX >= this.minX &&
+      other.minY <= this.maxY &&
+      other.maxY >= this.minY
+    );
   }
 
   /** @deprecated use {@link #intersects(Envelope)} */
@@ -345,11 +355,7 @@ public final class Envelope {
    * @return whether this envelope contains or touches the point {@code (x, y)}
    */
   public boolean intersects(final double x, final double y) {
-    if (isNull()) return false;
-    if (x > maxX) return false;
-    if (x < minX) return false;
-    if (y > maxY) return false;
-    return !(y < minY);
+    return !isNull() && x <= maxX && x >= minX && y <= maxY && y >= minY;
   }
 
   /** @deprecated use {@link #intersects(double, double)} */
@@ -388,8 +394,7 @@ public final class Envelope {
    *         envelope covers nothing
    */
   public boolean covers(final double x, final double y) {
-    if (isNull()) return false;
-    return x >= minX && x <= maxX && y >= minY && y <= maxY;
+    return !isNull() && x >= minX && x <= maxX && y >= minY && y <= maxY;
   }
 
   /** @return whether this envelope covers the point {@code p} */
@@ -399,8 +404,9 @@ public final class Envelope {
 
   /** @return whether this envelope fully covers {@code other} */
   public boolean covers(final Envelope other) {
-    if (this.isNull() || other.isNull()) return false;
     return (
+      !this.isNull() &&
+      !other.isNull() &&
       other.minX >= this.minX &&
       other.maxX <= this.maxX &&
       other.minY >= this.minY &&
@@ -413,24 +419,24 @@ public final class Envelope {
    *         {@code 0} if they overlap
    */
   public double distance(final Envelope env) {
-    if (this.intersects(env)) {
-      return 0.0;
-    }
-    double dx = 0.0;
-    if (this.maxX < env.minX) {
-      dx = env.minX - this.maxX;
-    } else if (this.minX > env.maxX) {
-      dx = this.minX - env.maxX;
-    }
-    double dy = 0.0;
-    if (this.maxY < env.minY) {
-      dy = env.minY - this.maxY;
-    } else if (this.minY > env.maxY) {
-      dy = this.minY - env.maxY;
-    }
-    if (dx == 0.0) return dy;
-    if (dy == 0.0) return dx;
-    return Math.sqrt(dx * dx + dy * dy);
+    final double dx = gap(this.minX, this.maxX, env.minX, env.maxX);
+    final double dy = gap(this.minY, this.maxY, env.minY, env.maxY);
+    // Along one axis, the distance is the gap itself, without rounding
+    return dx == 0.0 || dy == 0.0 ? dx + dy : Math.sqrt(dx * dx + dy * dy);
+  }
+
+  /**
+   * @return the gap between the interval from {@code minA} to {@code maxA}
+   *         and the one from {@code minB} to {@code maxB}, or {@code 0} if
+   *         they overlap
+   */
+  private static double gap(
+    final double minA,
+    final double maxA,
+    final double minB,
+    final double maxB
+  ) {
+    return Math.max(0.0, Math.max(minB - maxA, minA - maxB));
   }
 
   /**

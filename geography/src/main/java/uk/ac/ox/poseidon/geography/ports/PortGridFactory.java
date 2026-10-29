@@ -113,20 +113,18 @@ public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
   ) {
     final ModelGrid modelGrid = bathymetricGrid.getModelGrid();
     final Cell cell = modelGrid.toCell(coordinate);
-    if (isValidPortCell(bathymetricGrid, cell)) {
-      return Optional.of(cell);
-    } else {
-      return bathymetricGrid
-        .getActiveLandNeighbours(cell)
-        .min(
-          comparingDouble(landNeighbour ->
-            distanceCalculator.distanceInKm(
-              coordinate,
-              modelGrid.toCoordinate(landNeighbour)
+    return isValidPortCell(bathymetricGrid, cell)
+      ? Optional.of(cell)
+      : bathymetricGrid
+          .getActiveLandNeighbours(cell)
+          .min(
+            comparingDouble(landNeighbour ->
+              distanceCalculator.distanceInKm(
+                coordinate,
+                modelGrid.toCoordinate(landNeighbour)
+              )
             )
-          )
-        );
-    }
+          );
   }
 
   private boolean isValidPortCell(

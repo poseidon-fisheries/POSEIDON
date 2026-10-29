@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.predicates;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.BiFunction;
 import lombok.NonNull;
@@ -52,12 +53,9 @@ public class InGeometries implements BiFunction<Object, Coordinate, Boolean> {
    */
   @Override
   public Boolean apply(final Object context, final Coordinate coordinate) {
-    for (final Geometry geometry : geometries) {
+    return Arrays.stream(geometries).anyMatch(geometry -> {
       final Point point = geometry.getFactory().createPoint(coordinate.toJTS());
-      if (geometry.contains(point)) {
-        return true;
-      }
-    }
-    return false;
+      return geometry.contains(point);
+    });
   }
 }

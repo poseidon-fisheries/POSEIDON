@@ -74,7 +74,15 @@ public class AStarPathFinder extends AbstractGridPathFinder {
     final Cell start,
     final Cell end
   ) {
-    if (!(isNavigable(start) && isNavigable(end))) return Optional.empty();
+    return isNavigable(start) && isNavigable(end)
+      ? search(start, end)
+      : Optional.empty();
+  }
+
+  private Optional<ImmutableList<Cell>> search(
+    final Cell start,
+    final Cell end
+  ) {
     final DefaultGraphPath<Cell> path = new DefaultGraphPath<>();
     final boolean found = pathFinder.searchNodePath(
       gridAdaptor.intern(start),
