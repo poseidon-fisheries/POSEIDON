@@ -47,7 +47,10 @@ public class AllOfRegulations<A extends Action<?>> implements Regulations<A> {
     this.regulations = regulations.toArray(Regulations[]::new);
   }
 
+  // A loop, not a stream: this runs for every option the legality check
+  // tests, and the stream's overhead showed in profiles.
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public boolean isPermitted(final A action) {
     for (final Regulations<? super A> regulation : regulations) {
       if (!regulation.isPermitted(action)) {
