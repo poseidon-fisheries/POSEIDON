@@ -68,6 +68,7 @@ public class IntervalLabel<C, T, R> implements BiFunction<C, T, R> {
    * @throws NullPointerException if the number is {@code null}
    */
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public R apply(final C context, final T t) {
     final double value = number.apply(context, t);
     // A loop, not a stream: this runs for every cell valued, and the stream's

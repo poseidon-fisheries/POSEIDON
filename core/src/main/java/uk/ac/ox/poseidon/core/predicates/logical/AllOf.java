@@ -51,7 +51,10 @@ public class AllOf<C, T> implements BiFunction<C, T, Boolean> {
     this.predicates = predicates.toArray(BiFunction[]::new);
   }
 
+  // A loop, not a stream: this runs for every option the legality check
+  // tests, and the stream's overhead showed in profiles.
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public Boolean apply(final C context, final T t) {
     for (final BiFunction<
       ? super C,

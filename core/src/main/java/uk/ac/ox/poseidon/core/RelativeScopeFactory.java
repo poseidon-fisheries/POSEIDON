@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.core;
 
+import static com.google.common.base.Preconditions.checkState;
 import static java.beans.Introspector.getBeanInfo;
 
 import com.google.common.base.Supplier;
@@ -187,19 +188,13 @@ public abstract class RelativeScopeFactory<
     final Class<? extends Scope> a,
     final Class<? extends Scope> b
   ) {
-    if (a.isAssignableFrom(b)) {
-      return b;
-    }
-    if (b.isAssignableFrom(a)) {
-      return a;
-    }
-    throw new IllegalStateException(
-      "Inputs at levels " +
-        a.getSimpleName() +
-        " and " +
-        b.getSimpleName() +
-        ", neither of which is narrower than the other"
+    checkState(
+      a.isAssignableFrom(b) || b.isAssignableFrom(a),
+      "Inputs at levels %s and %s, neither of which is narrower than the other",
+      a.getSimpleName(),
+      b.getSimpleName()
     );
+    return a.isAssignableFrom(b) ? b : a;
   }
 
   private static List<Method> findInputReadMethods(
@@ -247,24 +242,21 @@ public abstract class RelativeScopeFactory<
   // bridge method with an erased return type; the declared type is the
   // bridged method's.
   private static Type genericReturnType(final Method readMethod) {
-    if (!readMethod.isBridge()) {
-      return readMethod.getGenericReturnType();
-    }
-    for (
-      Class<?> c = readMethod.getDeclaringClass().getSuperclass();
-      c != null;
-      c = c.getSuperclass()
-    ) {
-      try {
-        final Method declared = c.getDeclaredMethod(readMethod.getName());
-        if (!declared.isBridge()) {
-          return declared.getGenericReturnType();
-        }
-      } catch (final NoSuchMethodException e) {
-        // not declared here: look further up
-      }
-    }
-    return readMethod.getGenericReturnType();
+    return Stream.<Class<?>>iterate(
+      readMethod.getDeclaringClass(),
+      Objects::nonNull,
+      Class::getSuperclass
+    )
+      .flatMap(c -> Arrays.stream(c.getDeclaredMethods()))
+      .filter(
+        method ->
+          method.getName().equals(readMethod.getName()) &&
+          method.getParameterCount() == 0 &&
+          !method.isBridge()
+      )
+      .findFirst()
+      .orElse(readMethod)
+      .getGenericReturnType();
   }
 
   private enum Kind {
@@ -278,19 +270,20 @@ public abstract class RelativeScopeFactory<
   private static Kind kindOf(final Type type, final Type scopeVariable) {
     final TypeToken token = TypeToken.of(type);
     final Class<?> rawType = token.getRawType();
+    final Kind kind;
     if (Factory.class.isAssignableFrom(rawType)) {
-      return scopeArgumentKind(
+      kind = scopeArgumentKind(
         token.getSupertype(Factory.class).getType(),
         scopeVariable
       );
+    } else if (Map.class.isAssignableFrom(rawType)) {
+      kind = elementKind(token, Map.class, 1, scopeVariable);
+    } else if (Collection.class.isAssignableFrom(rawType)) {
+      kind = elementKind(token, Collection.class, 0, scopeVariable);
+    } else {
+      kind = Kind.NOT_A_FACTORY;
     }
-    if (Map.class.isAssignableFrom(rawType)) {
-      return elementKind(token, Map.class, 1, scopeVariable);
-    }
-    if (Collection.class.isAssignableFrom(rawType)) {
-      return elementKind(token, Collection.class, 0, scopeVariable);
-    }
-    return Kind.NOT_A_FACTORY;
+    return kind;
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -301,38 +294,60 @@ public abstract class RelativeScopeFactory<
     final Type scopeVariable
   ) {
     final Type containerType = token.getSupertype(container).getType();
-    if (!(containerType instanceof final ParameterizedType parameterized)) {
-      return Kind.NOT_A_FACTORY;
-    }
-    final Type element = parameterized.getActualTypeArguments()[index];
-    return element instanceof final WildcardType wildcard
-      ? kindOf(wildcard.getUpperBounds()[0], scopeVariable)
-      : kindOf(element, scopeVariable);
+    return containerType instanceof final ParameterizedType parameterized
+      ? kindOf(
+          upperBound(parameterized.getActualTypeArguments()[index]),
+          scopeVariable
+        )
+      : Kind.NOT_A_FACTORY;
+  }
+
+  private static Type upperBound(final Type type) {
+    return type instanceof final WildcardType wildcard
+      ? wildcard.getUpperBounds()[0]
+      : type;
   }
 
   private static Kind scopeArgumentKind(
     final Type factoryType,
     final Type scopeVariable
   ) {
-    if (!(factoryType instanceof final ParameterizedType parameterized)) {
-      return Kind.UNTYPED;
-    }
-    final Type scopeArgument = parameterized.getActualTypeArguments()[0];
-    final Type scope =
-      scopeArgument instanceof final WildcardType wildcard
-        ? wildcard.getLowerBounds().length == 1
-          ? wildcard.getLowerBounds()[0]
-          : null
-        : scopeArgument;
+    final Type scope = scopeIn(factoryType);
+    final Kind kind;
     if (scope == null) {
-      return Kind.UNTYPED;
-    }
-    if (scope.equals(scopeVariable)) {
-      return Kind.INPUT;
-    }
-    return scope instanceof final Class<?> scopeClass &&
+      kind = Kind.UNTYPED;
+    } else if (scope.equals(scopeVariable)) {
+      kind = Kind.INPUT;
+    } else if (
+      scope instanceof final Class<?> scopeClass &&
       Scope.class.isAssignableFrom(scopeClass)
-      ? Kind.HELD
-      : Kind.UNTYPED;
+    ) {
+      kind = Kind.HELD;
+    } else {
+      kind = Kind.UNTYPED;
+    }
+    return kind;
+  }
+
+  /**
+   * @return the scope argument of a factory type, or {@code null} if it has
+   *         none, or has a wildcard without a single lower bound
+   */
+  private static Type scopeIn(final Type factoryType) {
+    final Type scope;
+    if (!(factoryType instanceof final ParameterizedType parameterized)) {
+      scope = null;
+    } else if (
+      parameterized.getActualTypeArguments()[0] instanceof
+        final WildcardType wildcard
+    ) {
+      scope =
+        wildcard.getLowerBounds().length == 1
+          ? wildcard.getLowerBounds()[0]
+          : null;
+    } else {
+      scope = parameterized.getActualTypeArguments()[0];
+    }
+    return scope;
   }
 }

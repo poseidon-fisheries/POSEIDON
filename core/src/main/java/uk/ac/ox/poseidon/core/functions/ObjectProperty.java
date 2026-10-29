@@ -28,6 +28,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -123,19 +125,30 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
   ) {
     final String suffix =
       Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
-    try {
-      return type.getMethod("get" + suffix);
-    } catch (final NoSuchMethodException e) {
-      try {
-        final Method getter = type.getMethod("is" + suffix);
-        if (getter.getReturnType() == boolean.class) return getter;
-      } catch (final NoSuchMethodException ignored) {
-        // reported below
-      }
-    }
-    throw new IllegalArgumentException(
-      "No getter for property %s on %s.".formatted(propertyName, type.getName())
-    );
+    final String getterName = "get" + suffix;
+    final String booleanGetterName = "is" + suffix;
+    return Arrays.stream(type.getMethods())
+      .filter(method -> method.getParameterCount() == 0)
+      .filter(
+        method ->
+          method.getName().equals(getterName) ||
+          (method.getName().equals(booleanGetterName) &&
+            method.getReturnType() == boolean.class)
+      )
+      // A get method wins over an is method
+      .min(
+        Comparator.comparing(method ->
+          method.getName().equals(booleanGetterName)
+        )
+      )
+      .orElseThrow(() ->
+        new IllegalArgumentException(
+          "No getter for property %s on %s.".formatted(
+            propertyName,
+            type.getName()
+          )
+        )
+      );
   }
 
   /**

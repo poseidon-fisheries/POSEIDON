@@ -212,9 +212,17 @@ public final class MasonUtils {
     final MersenneTwisterFast rng
   ) {
     checkNonNegative(n, "n");
-    if (n == 0 || candidates.isEmpty()) return ImmutableList.of();
+    return n >= candidates.size()
+      ? ImmutableList.copyOf(candidates)
+      : sampled(n, candidates, rng);
+  }
+
+  private static <T> ImmutableList<T> sampled(
+    final int n,
+    final List<T> candidates,
+    final MersenneTwisterFast rng
+  ) {
     final int size = candidates.size();
-    if (n >= size) return ImmutableList.copyOf(candidates);
     final ImmutableList.Builder<T> builder = ImmutableList.builder();
     int i = 0;
     int j = 0;
@@ -283,10 +291,12 @@ public final class MasonUtils {
     final Collection<T> candidates,
     final MersenneTwisterFast rng
   ) {
-    if (candidates instanceof RandomAccess && candidates instanceof List) {
-      return shuffledStream((List<T>) candidates, rng);
-    }
-    return shuffledStream(new ArrayList<>(candidates), rng);
+    return shuffledStream(
+      candidates instanceof RandomAccess && candidates instanceof List
+        ? (List<T>) candidates
+        : new ArrayList<>(candidates),
+      rng
+    );
   }
 
   /**
@@ -301,7 +311,6 @@ public final class MasonUtils {
     final List<T> candidates,
     final MersenneTwisterFast rng
   ) {
-    if (candidates.isEmpty()) return Stream.empty();
     final int[] indices = new int[candidates.size()];
     Arrays.setAll(indices, i -> i);
 
@@ -313,15 +322,17 @@ public final class MasonUtils {
 
       @Override
       public boolean tryAdvance(final Consumer<? super T> action) {
-        if (remaining == 0) return false;
-        final int i = candidates.size() - remaining;
-        final int j = i + rng.nextInt(remaining);
-        final int tmp = indices[i];
-        indices[i] = indices[j];
-        indices[j] = tmp;
-        action.accept(candidates.get(indices[i]));
-        remaining--;
-        return true;
+        final boolean advances = remaining > 0;
+        if (advances) {
+          final int i = candidates.size() - remaining;
+          final int j = i + rng.nextInt(remaining);
+          final int tmp = indices[i];
+          indices[i] = indices[j];
+          indices[j] = tmp;
+          action.accept(candidates.get(indices[i]));
+          remaining--;
+        }
+        return advances;
       }
     };
     return StreamSupport.stream(spliterator, false);

@@ -43,14 +43,10 @@ public final class Utils {
     final Object value,
     final boolean nullIfNa
   ) {
-    if (value == null) {
-      return null;
-    }
-    final String trimmed = value.toString().trim();
-    if (nullIfNa && (trimmed.isEmpty() || trimmed.equalsIgnoreCase("NA"))) {
-      return null;
-    }
-    return trimmed;
+    final String trimmed = value == null ? null : value.toString().trim();
+    final boolean isNa =
+      trimmed != null && (trimmed.isEmpty() || trimmed.equalsIgnoreCase("NA"));
+    return nullIfNa && isNa ? null : trimmed;
   }
 
   /**

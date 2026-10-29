@@ -61,7 +61,9 @@ public class NextOccurrenceOfTimeOfDay<C> implements
     Arrays.sort(this.times);
   }
 
+  // A loop, not a stream: the stream's overhead showed in profiles.
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public LocalDateTime apply(final C context) {
     final LocalDateTime reference = referenceDateTime.apply(context);
     final LocalDate day = reference.toLocalDate();

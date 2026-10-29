@@ -88,23 +88,24 @@ public abstract class AbstractFactory<
     );
     @SuppressWarnings("unchecked")
     final S widened = (S) scope.widenedTo(level);
+    final P product;
     if (level == Scope.class) {
       synchronized (this) {
-        return getFrom(globalStore, widened);
+        product = getFrom(globalStore, widened);
       }
+    } else {
+      product = getFrom(((SimulationScope) widened).getProductStore(), widened);
     }
-    return getFrom(((SimulationScope) widened).getProductStore(), widened);
+    return product;
   }
 
   // Looked up, built and then stored, not filled in one call: the build asks
   // for its inputs, which may be stored in the same store.
   private P getFrom(final ProductStore store, final S scope) {
-    if (store.contains(this)) {
-      return store.get(this);
+    if (!store.contains(this)) {
+      store.put(this, newInstance(scope));
     }
-    final P product = newInstance(scope);
-    store.put(this, product);
-    return product;
+    return store.get(this);
   }
 
   /**

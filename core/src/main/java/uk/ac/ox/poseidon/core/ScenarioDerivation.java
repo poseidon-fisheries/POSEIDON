@@ -145,10 +145,14 @@ final class ScenarioDerivation {
   }
 
   private Object rebuilt(final Object node) {
-    if (copies.containsKey(node)) {
-      return copies.get(node);
+    if (!copies.containsKey(node)) {
+      copies.put(node, copyOf(node));
     }
-    final Object copy = switch (node) {
+    return copies.get(node);
+  }
+
+  private Object copyOf(final Object node) {
+    return switch (node) {
       case final Map<?, ?> map -> rebuiltMap(map);
       case final List<?> list -> rebuiltList(list);
       case final Collection<?> collection -> checkedUnchanged(collection);
@@ -156,8 +160,6 @@ final class ScenarioDerivation {
       case final Scenario scenario -> rebuiltBean(scenario);
       case null, default -> node;
     };
-    copies.put(node, copy);
-    return copy;
   }
 
   private Object rebuiltMap(final Map<?, ?> map) {

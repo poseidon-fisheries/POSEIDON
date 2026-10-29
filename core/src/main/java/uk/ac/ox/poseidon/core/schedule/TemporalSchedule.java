@@ -182,18 +182,19 @@ public class TemporalSchedule extends Schedule {
     final String beforeSimulationString,
     final String afterSimulationString
   ) {
+    final String timestamp;
     if (time < EPOCH) {
-      return beforeSimulationString;
+      timestamp = beforeSimulationString;
     } else if (time >= Double.POSITIVE_INFINITY) {
-      return afterSimulationString;
+      timestamp = afterSimulationString;
     } else {
       final LocalDateTime dateTime = toDateTime(time);
-      return (
+      timestamp =
         dateTime.toLocalDate().toString() +
         ' ' +
-        dateTime.toLocalTime().toString()
-      );
+        dateTime.toLocalTime().toString();
     }
+    return timestamp;
   }
 
   /**
@@ -273,11 +274,13 @@ public class TemporalSchedule extends Schedule {
   public LocalDateTime toDateTime(final double time) {
     final long seconds = (long) Math.floor(time);
     final Conversion conversion = lastConversion;
-    if (
-      conversion != null && conversion.seconds() == seconds
-    ) return conversion.dateTime();
-    final LocalDateTime dateTime = startingDateTime.plusSeconds(seconds);
-    lastConversion = new Conversion(seconds, dateTime);
+    final LocalDateTime dateTime;
+    if (conversion != null && conversion.seconds() == seconds) {
+      dateTime = conversion.dateTime();
+    } else {
+      dateTime = startingDateTime.plusSeconds(seconds);
+      lastConversion = new Conversion(seconds, dateTime);
+    }
     return dateTime;
   }
 
@@ -479,20 +482,30 @@ public class TemporalSchedule extends Schedule {
         );
       }
     }
-    while (true) {
-      // The last look at the queue and the boundary update are one locked
-      // block, so that no event can be queued before the target in between.
-      synchronized (lock) {
-        if (sealed) {
-          throw new IllegalStateException("The schedule is finished.");
-        }
-        if (queue.isEmpty() || ((Key) queue.getMinKey()).getTime() >= target) {
-          boundary = target;
-          return;
-        }
-      }
+    while (hasEventBefore(target)) {
       checkpoint();
       step(simState);
+    }
+  }
+
+  /**
+   * @return whether an event is queued before {@code target}; when none is,
+   *         the boundary moves to {@code target}, in the same locked block as
+   *         the look at the queue, so that no event can be queued before the
+   *         target in between
+   * @throws IllegalStateException if the schedule is finished
+   */
+  private boolean hasEventBefore(final double target) {
+    synchronized (lock) {
+      if (sealed) {
+        throw new IllegalStateException("The schedule is finished.");
+      }
+      final boolean hasEvent =
+        !queue.isEmpty() && ((Key) queue.getMinKey()).getTime() < target;
+      if (!hasEvent) {
+        boundary = target;
+      }
+      return hasEvent;
     }
   }
 
@@ -513,11 +526,14 @@ public class TemporalSchedule extends Schedule {
   @Override
   public synchronized boolean step(final SimState simState) {
     checkNotRunningEvents();
+    final boolean isSealed;
     synchronized (lock) {
-      if (sealed) {
-        return false;
-      }
+      isSealed = sealed;
     }
+    return !isSealed && runningStep(simState);
+  }
+
+  private boolean runningStep(final SimState simState) {
     running = true;
     try {
       return super.step(simState);
@@ -755,16 +771,16 @@ public class TemporalSchedule extends Schedule {
   }
 
   private static List<Object> sequenceSteps(final Sequence sequence) {
+    Object steps;
     try {
       final var field = Sequence.class.getDeclaredField("steps");
       field.setAccessible(true);
-      final Object raw = field.get(sequence);
-      if (raw instanceof final Object[] array) {
-        return Arrays.stream(array).toList();
-      }
-      return List.of(raw);
+      steps = field.get(sequence);
     } catch (final ReflectiveOperationException | SecurityException e) {
-      return List.of(sequence);
+      steps = sequence;
     }
+    return steps instanceof final Object[] array
+      ? Arrays.stream(array).toList()
+      : List.of(steps);
   }
 }

@@ -58,13 +58,14 @@ public class SimpleEventManager implements EventManager {
 
   @Override
   public <E> void broadcast(final E event) {
-    if (event == null) return;
-    final Class<?>[] dispatchClasses = dispatchClassCache.computeIfAbsent(
-      event.getClass(),
-      this::computeDispatchClasses
-    );
-    for (final Class<?> dispatchClass : dispatchClasses) {
-      notifyListenersForClass(dispatchClass, event);
+    if (event != null) {
+      final Class<?>[] dispatchClasses = dispatchClassCache.computeIfAbsent(
+        event.getClass(),
+        this::computeDispatchClasses
+      );
+      for (final Class<?> dispatchClass : dispatchClasses) {
+        notifyListenersForClass(dispatchClass, event);
+      }
     }
   }
 
@@ -84,9 +85,10 @@ public class SimpleEventManager implements EventManager {
     final Set<Class<?>> visitedClasses,
     final List<Class<?>> dispatchClasses
   ) {
-    if (!visitedClasses.add(clazz)) return;
-    dispatchClasses.add(clazz);
-    collectInterfaces(clazz, visitedClasses, dispatchClasses);
+    if (visitedClasses.add(clazz)) {
+      dispatchClasses.add(clazz);
+      collectInterfaces(clazz, visitedClasses, dispatchClasses);
+    }
   }
 
   private void collectInterfaces(
