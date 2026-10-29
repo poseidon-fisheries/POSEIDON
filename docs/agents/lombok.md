@@ -12,7 +12,9 @@ almost every case — match the shape to the class's role:
   `@NonNull` when the constructor should null-check them.
 - **Immutable value objects** (small data carriers with no setters): `@Value` — final fields,
   generated getters/`equals`/`hashCode`/`toString`. Add hand-written constructors alongside it only
-  when a field needs derived/defaulted state.
+  when a field needs derived/defaulted state. Use `@Value` rather than a Java `record`: MASON's
+  GUI inspectors find properties through JavaBean getters (`getX()`), which a record's accessors
+  (`x()`) aren't.
 - **`Factory` YAML beans** (`*Factory` classes per the Factory/Scenario pattern — see
   `docs/agents/architecture.md`): immutable, always the same five — `@Getter @ToString
   @AllArgsConstructor @EqualsAndHashCode(callSuper = true) @SuperBuilder(toBuilder = true)`, with
