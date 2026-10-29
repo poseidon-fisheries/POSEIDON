@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.ToString;
@@ -42,7 +42,8 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.buckets.BucketBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.events.EventManager;
-import uk.ac.ox.poseidon.core.utils.PrefixedIdSupplier;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
+import uk.ac.ox.poseidon.core.utils.PrefixedId;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategory;
 import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
@@ -79,7 +80,7 @@ public class BiomassMarket implements Market {
   @Getter(AccessLevel.NONE)
   private LocalDateTime lastPriceChangeDateTime;
 
-  private final Supplier<String> saleIdSupplier;
+  private final Function<Vessel, String> saleIds;
   private final EventManager eventManager;
 
   BiomassMarket(
@@ -92,7 +93,7 @@ public class BiomassMarket implements Market {
     this.code = code;
     this.currencyUnit = checkNotNull(currencyUnit);
     this.prices = new LinkedHashMap<>();
-    this.saleIdSupplier = new PrefixedIdSupplier(code);
+    this.saleIds = WithoutContext.function(new PrefixedId(code));
     this.eventManager = eventManager;
   }
 
@@ -128,7 +129,7 @@ public class BiomassMarket implements Market {
         );
     final Sale sale = new Sale(
       dateTime,
-      saleIdSupplier.get(),
+      saleIds.apply(vessel),
       this,
       vessel,
       soldItems,

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -23,34 +23,40 @@
 package uk.ac.ox.poseidon.core.utils;
 
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
- * A {@link Supplier} of unique string ids, each the given prefix followed by an
- * incrementing counter (starting at 0). Built via
- * {@link Factories#prefixedIdSupplier(String)} in this package.
+ * A mapping that gives a new id each time it is called: the given prefix
+ * followed by a counter starting at 0, whatever the context and whatever it
+ * maps. An id is always the id of something, and what the mapping maps is
+ * what the caller names: the cell a port is placed on, the port vessels are
+ * created at. It is the counterpart of
+ * {@link uk.ac.ox.poseidon.core.providers.constant.ConstantMapping} for ids
+ * that must differ.
+ *
+ * <p>
+ * Unlike most mappings, it is not pure: every call moves the counter on, so a
+ * consumer calls it exactly once per thing it names. Built via
+ * {@link Factories#prefixedId(String)}.
  */
-@RequiredArgsConstructor
-public class PrefixedIdSupplier implements Supplier<String> {
+public class PrefixedId implements BiFunction<Object, Object, String> {
 
   @Getter
   private final String prefix;
 
-  private final AtomicLong counter;
+  private final AtomicLong counter = new AtomicLong();
 
   /**
-   * @param prefix the prefix prepended to every generated id, with a fresh
-   *               counter starting at 0
+   * @param prefix the prefix prepended to every id, with a fresh counter
+   *               starting at 0
    */
-  public PrefixedIdSupplier(final String prefix) {
+  public PrefixedId(final String prefix) {
     this.prefix = prefix;
-    this.counter = new AtomicLong();
   }
 
   @Override
-  public String get() {
+  public String apply(final Object context, final Object named) {
     return prefix + counter.getAndIncrement();
   }
 }

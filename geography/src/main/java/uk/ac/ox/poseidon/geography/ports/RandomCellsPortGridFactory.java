@@ -27,7 +27,7 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 import ec.util.MersenneTwisterFast;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,8 +35,10 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -49,7 +51,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * class here: the produced {@link PortGrid} is returned as-is, with no wrapper
  * type to carry documentation, so this factory carries the behavior doc
  * directly. Built via
- * {@link Factories#randomCellsPortGrid(uk.ac.ox.poseidon.core.Factory, uk.ac.ox.poseidon.core.Factory, int, int)}
+ * {@link Factories#randomCellsPortGrid(Factory, MappingFactory, int, int)}
  * in this package.
  */
 @Getter
@@ -65,10 +67,12 @@ public class RandomCellsPortGridFactory
     ? super SimulationScope,
     ? extends BathymetricGrid
   > bathymetricGrid;
-  private final Factory<
+  private final MappingFactory<
     ? super SimulationScope,
-    ? extends Supplier<String>
-  > idSupplier;
+    ? super Void,
+    ? super Cell,
+    ? extends String
+  > code;
   private final int numberOfPorts;
   private final int minimumAdjacentWaterTiles;
   private final Factory<
@@ -105,11 +109,13 @@ public class RandomCellsPortGridFactory
       bathymetricGrid,
       sparseGrid2D
     );
-    final Supplier<String> idSupplier = this.idSupplier.get(scope);
+    final Function<Cell, String> code = WithoutContext.function(
+      this.code.get(scope)
+    );
     shuffledStream(suitableTiles, randomNumberGenerator.get(scope))
       .limit(numberOfPorts)
       .forEach(cell -> {
-        final String portCode = idSupplier.get();
+        final String portCode = code.apply(cell);
         portGrid.createPort(portCode, "Port " + portCode, cell);
       });
     return portGrid;

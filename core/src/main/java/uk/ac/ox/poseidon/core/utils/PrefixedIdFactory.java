@@ -22,32 +22,39 @@
 
 package uk.ac.ox.poseidon.core.utils;
 
-import java.util.concurrent.atomic.AtomicLong;
-import lombok.*;
+import java.util.function.BiFunction;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 
 /**
- * A {@link SimulationScopeFactory} counterpart of {@link PrefixedIdSupplier},
- * built via {@link Factories#prefixedIdSupplier(String)}.
+ * A {@link SimulationScopeFactory} counterpart of {@link PrefixedId}, built via
+ * {@link Factories#prefixedId(String)}. Its counter is the simulation's: every
+ * consumer given the same factory draws from the same sequence.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class PrefixedIdSupplierFactory
-  extends SimulationScopeFactory<PrefixedIdSupplier>
+public class PrefixedIdFactory
+  extends SimulationScopeFactory<BiFunction<Object, Object, String>>
+  implements MappingFactory<SimulationScope, Object, Object, String>
 {
 
   @NonNull
   private final String prefix;
 
   @Override
-  protected PrefixedIdSupplier newInstance(final SimulationScope scope) {
-    return new PrefixedIdSupplier(prefix, new AtomicLong());
+  protected BiFunction<Object, Object, String> newInstance(
+    final SimulationScope scope
+  ) {
+    return new PrefixedId(prefix);
   }
 }

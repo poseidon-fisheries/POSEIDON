@@ -22,15 +22,16 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
-import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
+import uk.ac.ox.poseidon.core.functions.WithoutContext;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
@@ -51,9 +52,11 @@ public class CreateVesselsAtPortFactory
     ? super SimulationScope,
     ? extends VesselSpecification
   > vesselSpecification;
-  private final Factory<
+  private final MappingFactory<
     ? super SimulationScope,
-    ? extends Supplier<String>
+    ? super Void,
+    ? super Port,
+    ? extends String
   > vesselIds;
   private final Factory<? super SimulationScope, ? extends Port> port;
   private final int numberOfVessels;
@@ -62,7 +65,7 @@ public class CreateVesselsAtPortFactory
   protected CreateVesselsAtPort newInstance(final SimulationScope scope) {
     return new CreateVesselsAtPort(
       vesselSpecification.get(scope),
-      vesselIds.get(scope),
+      WithoutContext.function(vesselIds.get(scope)),
       port.get(scope),
       numberOfVessels
     );

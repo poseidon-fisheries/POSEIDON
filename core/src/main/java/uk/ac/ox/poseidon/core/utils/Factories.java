@@ -35,7 +35,7 @@ import uk.ac.ox.poseidon.core.SimulationScope;
  * package: literal and collection pass-throughs (e.g. {@link ObjectFactory}),
  * simple combinations of other resolved components (e.g. {@link PairFactory}),
  * scope-changing wrappers, small standalone utilities like a unique-id
- * supplier, and calibration support for cloning a factory with varied property
+ * mapping, and calibration support for cloning a factory with varied property
  * values.
  */
 @SuppressWarnings("varargs")
@@ -127,15 +127,13 @@ public final class Factories {
   }
 
   /**
-   * @param prefix the prefix prepended to every generated id
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
-   *         {@link PrefixedIdSupplier} with that prefix
-   * @see PrefixedIdSupplier
+   * @param prefix the prefix prepended to every id
+   * @return a {@link uk.ac.ox.poseidon.core.MappingFactory} for a
+   *         {@link PrefixedId} with that prefix, one per simulation
+   * @see PrefixedId
    */
-  public static PrefixedIdSupplierFactory prefixedIdSupplier(
-    final String prefix
-  ) {
-    return new PrefixedIdSupplierFactory(prefix);
+  public static PrefixedIdFactory prefixedId(final String prefix) {
+    return new PrefixedIdFactory(prefix);
   }
 
   /**

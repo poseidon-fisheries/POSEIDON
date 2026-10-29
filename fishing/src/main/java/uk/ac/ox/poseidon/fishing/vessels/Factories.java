@@ -30,10 +30,10 @@ import static uk.ac.ox.poseidon.core.providers.temporal.Factories.startingDateTi
 import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
-import java.util.function.Supplier;
 import org.joda.money.Money;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
@@ -113,7 +113,8 @@ public final class Factories {
 
   /**
    * @param vesselSpecification what the vessels are made of
-   * @param vesselIds           supplies each new vessel's id
+   * @param vesselIds           gives each new vessel's id, from the port it
+   *                            is created at; called once per vessel
    * @param port                the vessels' home port
    * @param numberOfVessels     how many vessels to create
    * @return a {@link SimulationScopeFactory} for a
@@ -126,9 +127,11 @@ public final class Factories {
       ? super SimulationScope,
       ? extends VesselSpecification
     > vesselSpecification,
-    final Factory<
+    final MappingFactory<
       ? super SimulationScope,
-      ? extends Supplier<String>
+      ? super Void,
+      ? super Port,
+      ? extends String
     > vesselIds,
     final Factory<? super SimulationScope, ? extends Port> port,
     final int numberOfVessels

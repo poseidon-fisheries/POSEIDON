@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.fishing.vessels;
 
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -32,13 +32,14 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 /**
  * A scheduled {@link Steppable} that, when run, creates
  * {@link #numberOfVessels} vessels from a {@link VesselSpecification}, each
- * with a new id and with {@link #port} as its home port.
+ * with a new id, given by {@link #vesselIds} for {@link #port}, and with
+ * {@link #port} as its home port.
  */
 @RequiredArgsConstructor
 public class CreateVesselsAtPort implements Steppable {
 
   private final VesselSpecification specification;
-  private final Supplier<String> vesselIds;
+  private final Function<Port, String> vesselIds;
   private final Port port;
   private final int numberOfVessels;
 
@@ -46,7 +47,7 @@ public class CreateVesselsAtPort implements Steppable {
   public void step(final SimState simState) {
     for (int i = 0; i < numberOfVessels; i++) {
       specification.create(
-        vesselIds.get(),
+        vesselIds.apply(port),
         Map.of(specification.getHomePortAttribute(), port.getCode())
       );
     }

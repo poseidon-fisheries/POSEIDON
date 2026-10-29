@@ -458,7 +458,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       .build();
 
     // Benoa's vessels are created first, then Kupang's
-    final var vesselIds = prefixedIdSupplier("V");
+    final var vesselIds = prefixedId("V");
     final var vesselCreation = scheduledOnceAtStart(
       steppableSequence(
         createVesselsAtPort(vesselSpecification, vesselIds, benoa, 25),

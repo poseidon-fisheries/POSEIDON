@@ -25,15 +25,16 @@ package uk.ac.ox.poseidon.geography.ports;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
 
 import java.util.List;
-import java.util.function.Supplier;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
+import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.utils.Pair;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Factories for {@link Port}s and {@link PortGrid}s: standalone ports, ports
@@ -103,8 +104,8 @@ public final class Factories {
   /**
    * @param bathymetricGrid           factory for the bathymetric grid ports are
    *                                  placed on
-   * @param idSupplier                factory for the supplier of each new
-   *                                  port's code
+   * @param code                      factory for the code of the port
+   *                                  placed on a cell, called once per port
    * @param numberOfPorts             how many ports to place
    * @param minimumAdjacentWaterTiles the minimum number of active water
    *                                  neighbours a land cell must have to be a
@@ -118,16 +119,18 @@ public final class Factories {
       ? super SimulationScope,
       ? extends BathymetricGrid
     > bathymetricGrid,
-    final Factory<
+    final MappingFactory<
       ? super SimulationScope,
-      ? extends Supplier<String>
-    > idSupplier,
+      ? super Void,
+      ? super Cell,
+      ? extends String
+    > code,
     final int numberOfPorts,
     final int minimumAdjacentWaterTiles
   ) {
     return new RandomCellsPortGridFactory(
       bathymetricGrid,
-      idSupplier,
+      code,
       numberOfPorts,
       minimumAdjacentWaterTiles,
       randomNumberGenerator()

@@ -455,7 +455,7 @@ components:
       - !!uk.ac.ox.poseidon.fishing.vessels.CreateVesselsAtPortFactory
         numberOfVessels: 25
         port: *id024
-        vesselIds: &id027 !!uk.ac.ox.poseidon.core.utils.PrefixedIdSupplierFactory {
+        vesselIds: &id027 !!uk.ac.ox.poseidon.core.utils.PrefixedIdFactory {
           prefix: V
         }
         vesselSpecification: *id025
