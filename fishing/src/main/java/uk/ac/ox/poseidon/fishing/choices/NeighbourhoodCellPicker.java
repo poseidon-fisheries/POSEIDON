@@ -30,8 +30,10 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 import ec.util.MersenneTwisterFast;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.grids.Cell;
@@ -80,30 +82,43 @@ public class NeighbourhoodCellPicker implements Function<Vessel, Cell> {
     final Cell suppliedCentre = searchCentre.apply(vessel);
     final Cell centre =
       suppliedCentre != null ? suppliedCentre : vessel.getCell();
-    for (
-      int neighbourhoodSize = initialNeighbourhoodSize;
-      neighbourhoodSize <= maxNeighbourhoodSize;
-      neighbourhoodSize++
-    ) {
-      final List<Cell> neighbours = pathFinder.getAccessibleWaterNeighbours(
-        centre,
-        neighbourhoodSize
-      );
-      // Every cell of the previous neighbourhood has already failed the
-      // predicate
-      final List<Cell> candidates =
-        neighbourhoodSize == initialNeighbourhoodSize
-          ? neighbours
-          : ring(neighbours, centre, neighbourhoodSize);
-      final Cell picked = shuffledStream(candidates, rng)
-        .filter(cell -> optionPredicate.apply(vessel, cell))
-        .findFirst()
-        .orElse(null);
-      if (picked != null) {
-        return picked;
-      }
-    }
-    return null;
+    return IntStream.rangeClosed(initialNeighbourhoodSize, maxNeighbourhoodSize)
+      .mapToObj(neighbourhoodSize ->
+        pickWithin(
+          vessel,
+          centre,
+          neighbourhoodSize,
+          neighbourhoodSize == initialNeighbourhoodSize
+        )
+      )
+      .flatMap(Optional::stream)
+      .findFirst()
+      .orElse(null);
+  }
+
+  /**
+   * @return a uniformly random accessible water cell satisfying the option
+   *         predicate, among those {@code neighbourhoodSize} cells away from
+   *         {@code centre}, or closer if {@code isInitial}
+   */
+  private Optional<Cell> pickWithin(
+    final Vessel vessel,
+    final Cell centre,
+    final int neighbourhoodSize,
+    final boolean isInitial
+  ) {
+    final List<Cell> neighbours = pathFinder.getAccessibleWaterNeighbours(
+      centre,
+      neighbourhoodSize
+    );
+    // Every cell of the previous neighbourhood has already failed the
+    // predicate
+    final List<Cell> candidates = isInitial
+      ? neighbours
+      : ring(neighbours, centre, neighbourhoodSize);
+    return shuffledStream(candidates, rng)
+      .filter(cell -> optionPredicate.apply(vessel, cell))
+      .findFirst();
   }
 
   /**

@@ -83,7 +83,10 @@ class VesselRegisterFactoryTest {
 
     @Override
     public Status execute() {
-      if (getStatus() == Status.RUNNING) return Status.SUCCEEDED;
+      return getStatus() == Status.RUNNING ? Status.SUCCEEDED : recordStart();
+    }
+
+    private Status recordStart() {
       attributesSeen
         .computeIfAbsent(getVessel().getId(), _ -> new ArrayList<>())
         .add(getVessel().getAttributes());

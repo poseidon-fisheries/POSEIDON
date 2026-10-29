@@ -137,27 +137,31 @@ public class TravelAlongPath extends VesselTask {
       );
 
     currentPath = currentPath.subList(1, currentPath.size());
-    if (currentPath.isEmpty()) {
-      eventManager
-        .apply(vessel)
-        .broadcast(
-          new TravelEvent(
-            getVessel(),
-            startDateTime,
-            currentDateTime.apply(vessel),
-            origin,
-            destination
-          )
-        );
-      return SUCCEEDED;
-    } else {
-      final Cell nextCell = currentPath.getFirst();
-      distanceToNextCell = distanceCalculator.distanceInKm(
-        vessel.getCell(),
-        nextCell
+    return currentPath.isEmpty() ? arrive(vessel) : headForNextCell(vessel);
+  }
+
+  private Status arrive(final Vessel vessel) {
+    eventManager
+      .apply(vessel)
+      .broadcast(
+        new TravelEvent(
+          getVessel(),
+          startDateTime,
+          currentDateTime.apply(vessel),
+          origin,
+          destination
+        )
       );
-      vessel.setHeadingTowards(nextCell);
-      return runFor(travelDuration(distanceToNextCell, cruisingSpeedInKph));
-    }
+    return SUCCEEDED;
+  }
+
+  private Status headForNextCell(final Vessel vessel) {
+    final Cell nextCell = currentPath.getFirst();
+    distanceToNextCell = distanceCalculator.distanceInKm(
+      vessel.getCell(),
+      nextCell
+    );
+    vessel.setHeadingTowards(nextCell);
+    return runFor(travelDuration(distanceToNextCell, cruisingSpeedInKph));
   }
 }

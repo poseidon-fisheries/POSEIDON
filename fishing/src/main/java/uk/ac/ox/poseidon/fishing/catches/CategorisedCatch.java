@@ -56,9 +56,18 @@ public class CategorisedCatch {
    *         share a category
    */
   public CategorisedCatch add(final CategorisedCatch other) {
-    if (buckets.isEmpty()) return other;
-    if (other.buckets.isEmpty()) return this;
+    final CategorisedCatch sum;
+    if (buckets.isEmpty()) {
+      sum = other;
+    } else if (other.buckets.isEmpty()) {
+      sum = this;
+    } else {
+      sum = merged(other);
+    }
+    return sum;
+  }
 
+  private CategorisedCatch merged(final CategorisedCatch other) {
     // Linked, so that categories keep the order they come in, rather than
     // that of their hash codes
     final Map<CatchCategory, Bucket> merged = new LinkedHashMap<>(
@@ -76,11 +85,7 @@ public class CategorisedCatch {
    *         empty
    */
   public boolean isEmpty() {
-    if (buckets.isEmpty()) return true;
-    for (final Bucket bucket : buckets.values()) {
-      if (!bucket.isEmpty()) return false;
-    }
-    return true;
+    return buckets.values().stream().allMatch(Bucket::isEmpty);
   }
 
   /** @return the total biomass across every bucket, in kilograms */

@@ -58,22 +58,32 @@ public class ProportionallyLimitingBiomassToHold implements DispositionProcess {
       .getRetained()
       .getTotalBiomass()
       .asKg();
-    if (currentlyRetainedInKg <= availableCapacityInKg) {
-      return currentDisposition;
-    } else {
-      final double proportionToKeep =
-        availableCapacityInKg / currentlyRetainedInKg;
-      final Bucket updatedRetained = currentDisposition
-        .getRetained()
-        .mapContent((species, biomass) -> biomass.multiply(proportionToKeep));
-      final Bucket newlyDiscarded = currentDisposition
-        .getRetained()
-        .subtract(updatedRetained);
-      return new Disposition(
-        updatedRetained,
-        currentDisposition.getDiscardedAlive().add(newlyDiscarded),
-        currentDisposition.getDiscardedDead()
-      );
-    }
+    return currentlyRetainedInKg <= availableCapacityInKg
+      ? currentDisposition
+      : scaledDown(
+          currentDisposition,
+          availableCapacityInKg / currentlyRetainedInKg
+        );
+  }
+
+  /**
+   * @return {@code currentDisposition} with its retained biomass scaled by
+   *         {@code proportionToKeep}, the rest moved to discarded-alive
+   */
+  private static Disposition scaledDown(
+    final Disposition currentDisposition,
+    final double proportionToKeep
+  ) {
+    final Bucket updatedRetained = currentDisposition
+      .getRetained()
+      .mapContent((species, biomass) -> biomass.multiply(proportionToKeep));
+    final Bucket newlyDiscarded = currentDisposition
+      .getRetained()
+      .subtract(updatedRetained);
+    return new Disposition(
+      updatedRetained,
+      currentDisposition.getDiscardedAlive().add(newlyDiscarded),
+      currentDisposition.getDiscardedDead()
+    );
   }
 }

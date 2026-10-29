@@ -72,25 +72,27 @@ public abstract class HashMapBasedOptionValues<O>
   }
 
   private void updateBestCache(final O option, final double newValue) {
-    if (cachedBestKeys == null) return;
-    if (newValue > cachedBestValue) {
-      cachedBestKeys = ImmutableList.of(option);
-      cachedBestValue = newValue;
-    } else if (newValue == cachedBestValue) {
-      if (!cachedBestKeys.contains(option)) {
-        cachedBestKeys = ImmutableList.<O>builder()
-          .addAll(cachedBestKeys)
-          .add(option)
-          .build();
-      }
-    } else if (cachedBestKeys.contains(option)) {
-      if (cachedBestKeys.size() == 1) {
-        cachedBestKeys = null;
-      } else {
-        cachedBestKeys = cachedBestKeys
-          .stream()
-          .filter(k -> !k.equals(option))
-          .collect(toImmutableList());
+    // Nothing to update when nothing is cached
+    if (cachedBestKeys != null) {
+      if (newValue > cachedBestValue) {
+        cachedBestKeys = ImmutableList.of(option);
+        cachedBestValue = newValue;
+      } else if (newValue == cachedBestValue) {
+        if (!cachedBestKeys.contains(option)) {
+          cachedBestKeys = ImmutableList.<O>builder()
+            .addAll(cachedBestKeys)
+            .add(option)
+            .build();
+        }
+      } else if (cachedBestKeys.contains(option)) {
+        if (cachedBestKeys.size() == 1) {
+          cachedBestKeys = null;
+        } else {
+          cachedBestKeys = cachedBestKeys
+            .stream()
+            .filter(k -> !k.equals(option))
+            .collect(toImmutableList());
+        }
       }
     }
   }
@@ -148,8 +150,9 @@ public abstract class HashMapBasedOptionValues<O>
   @Override
   public Optional<Double> getBestValue() {
     if (cachedBestKeys == null) computeBestCache();
-    if (cachedBestKeys.isEmpty()) return Optional.empty();
-    return Optional.of(cachedBestValue);
+    return cachedBestKeys.isEmpty()
+      ? Optional.empty()
+      : Optional.of(cachedBestValue);
   }
 
   @Override
@@ -157,9 +160,14 @@ public abstract class HashMapBasedOptionValues<O>
     final MersenneTwisterFast rng
   ) {
     if (cachedBestKeys == null) computeBestCache();
-    if (cachedBestKeys.isEmpty()) return Optional.empty();
-    final O key = oneOf(cachedBestKeys, rng);
-    return Optional.of(new AbstractMap.SimpleEntry<>(key, cachedBestValue));
+    return cachedBestKeys.isEmpty()
+      ? Optional.empty()
+      : Optional.of(
+          new AbstractMap.SimpleEntry<>(
+            oneOf(cachedBestKeys, rng),
+            cachedBestValue
+          )
+        );
   }
 
   /**

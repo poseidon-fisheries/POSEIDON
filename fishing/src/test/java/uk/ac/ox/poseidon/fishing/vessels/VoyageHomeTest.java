@@ -117,7 +117,10 @@ class VoyageHomeTest {
 
     @Override
     public Status execute() {
-      if (getStatus() == Status.RUNNING) return Status.SUCCEEDED;
+      return getStatus() == Status.RUNNING ? Status.SUCCEEDED : depart();
+    }
+
+    private Status depart() {
       log.add("depart from " + getVessel().getHomePort().getCode());
       return runFor(ofHours(1));
     }
@@ -133,16 +136,21 @@ class VoyageHomeTest {
 
     @Override
     public Status execute() {
-      if (getStatus() == Status.RUNNING) {
-        getVessel().setCurrentCell(portGrid.getCell(destination));
-        getVessel().dockAt(destination, schedule.getDateTime());
-        log.add("arrive at " + destination.getCode());
-        return Status.SUCCEEDED;
-      }
+      return getStatus() == Status.RUNNING ? arrive() : setOff();
+    }
+
+    private Status setOff() {
       destination = getVessel().getHomePort();
       getVessel().undock(schedule.getDateTime());
       log.add("travel home to " + destination.getCode());
       return runFor(ofHours(3));
+    }
+
+    private Status arrive() {
+      getVessel().setCurrentCell(portGrid.getCell(destination));
+      getVessel().dockAt(destination, schedule.getDateTime());
+      log.add("arrive at " + destination.getCode());
+      return Status.SUCCEEDED;
     }
   }
 

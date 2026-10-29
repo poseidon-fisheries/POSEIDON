@@ -43,8 +43,7 @@ public abstract class ExtendedTask extends VesselTask {
    */
   @Override
   public Status execute() {
-    if (getStatus() == RUNNING) return complete();
-    else return runFor(getDuration());
+    return getStatus() == RUNNING ? complete() : runFor(getDuration());
   }
 
   /**

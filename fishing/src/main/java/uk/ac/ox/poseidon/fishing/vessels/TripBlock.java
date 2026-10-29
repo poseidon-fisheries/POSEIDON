@@ -103,20 +103,22 @@ public class TripBlock extends Sequence<Vessel> {
   @Override
   public void run() {
     if (!tripOpen) {
-      final Optional<? extends Destination> destination =
-        initialDestination.apply(getVessel());
-      if (destination.isEmpty()) {
-        fail();
-        return;
-      }
-      final Vessel vessel = getVessel();
-      final LocalDateTime startDateTime = currentDateTime.apply(vessel);
-      vessel.startTrip(origin ->
-        newTrip(vessel, origin, destination.get(), startDateTime)
-      );
-      tripOpen = true;
+      initialDestination
+        .apply(getVessel())
+        .ifPresentOrElse(this::openTrip, this::fail);
     }
-    super.run();
+    if (tripOpen) {
+      super.run();
+    }
+  }
+
+  private void openTrip(final Destination destination) {
+    final Vessel vessel = getVessel();
+    final LocalDateTime startDateTime = currentDateTime.apply(vessel);
+    vessel.startTrip(origin ->
+      newTrip(vessel, origin, destination, startDateTime)
+    );
+    tripOpen = true;
   }
 
   /**

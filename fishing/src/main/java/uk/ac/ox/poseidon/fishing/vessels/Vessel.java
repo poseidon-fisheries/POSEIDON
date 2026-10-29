@@ -303,19 +303,20 @@ public class Vessel implements Oriented2D, HasAttributes {
    * never applied.
    */
   private void applyStatements() {
-    final Map<String, Object> previousAttributes = attributes;
-    while (!statements.isEmpty()) {
-      switch (statements.poll()) {
-        case final AttributeChange change -> setAttributes(
-          change.applyTo(attributes)
-        );
-        case final Exit _ -> {
-          exit();
-          return;
-        }
+    applyStatementsSince(attributes);
+  }
+
+  private void applyStatementsSince(
+    final Map<String, Object> previousAttributes
+  ) {
+    switch (statements.poll()) {
+      case null -> rebuildChosenAnew(previousAttributes);
+      case final AttributeChange change -> {
+        setAttributes(change.applyTo(attributes));
+        applyStatementsSince(previousAttributes);
       }
+      case final Exit _ -> exit();
     }
-    rebuildChosenAnew(previousAttributes);
   }
 
   /**

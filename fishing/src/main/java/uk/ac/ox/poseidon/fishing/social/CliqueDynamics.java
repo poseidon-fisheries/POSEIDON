@@ -97,25 +97,24 @@ public class CliqueDynamics implements Listener<FishingTripStartEvent> {
    * same seed and candidates in the same order make the same cliques.
    */
   void join(final Vessel vessel) {
-    if (!network.getRecipients(vessel).isEmpty()) {
-      return;
+    if (network.getRecipients(vessel).isEmpty()) {
+      final List<Vessel> eligibleVesselsWithRoomInTheirClique = network
+        .getCandidates()
+        .stream()
+        .filter(candidate -> candidate != vessel)
+        .filter(candidate -> areEligible(vessel, candidate))
+        .filter(
+          candidate ->
+            network.getRecipients(candidate).size() + 1 < maximumCliqueSize
+        )
+        .toList();
+      upToOneOf(eligibleVesselsWithRoomInTheirClique, rng).ifPresent(
+        chosenVessel -> {
+          settle(chosenVessel);
+          cliqueOf(chosenVessel).forEach(member -> tie(vessel, member));
+        }
+      );
     }
-    final List<Vessel> eligibleVesselsWithRoomInTheirClique = network
-      .getCandidates()
-      .stream()
-      .filter(candidate -> candidate != vessel)
-      .filter(candidate -> areEligible(vessel, candidate))
-      .filter(
-        candidate ->
-          network.getRecipients(candidate).size() + 1 < maximumCliqueSize
-      )
-      .toList();
-    upToOneOf(eligibleVesselsWithRoomInTheirClique, rng).ifPresent(
-      chosenVessel -> {
-        settle(chosenVessel);
-        cliqueOf(chosenVessel).forEach(member -> tie(vessel, member));
-      }
-    );
   }
 
   void settle(final Vessel vessel) {

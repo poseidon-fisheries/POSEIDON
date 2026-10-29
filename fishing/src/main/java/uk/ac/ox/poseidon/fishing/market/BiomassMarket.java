@@ -150,18 +150,19 @@ public class BiomassMarket implements Market {
     final double[] total = { 0.0 };
     categorisedCatch.getBuckets().forEach((catchCategory, bucket) -> {
       final Map<Species, Price> pricePerSpecies = prices.get(catchCategory);
-      if (pricePerSpecies == null) return;
-      final Map<Species, Optional<Price>> priceCacheBySpecies =
-        priceCache.computeIfAbsent(catchCategory, key -> new HashMap<>());
-      bucket.forEachBiomassValue((species, biomass) -> {
-        final Optional<Price> price = priceCacheBySpecies.computeIfAbsent(
-          species,
-          key -> resolvePrice(pricePerSpecies, key)
-        );
-        if (price.isPresent()) {
-          total[0] += price.get().valueForKgDouble(biomass);
-        }
-      });
+      if (pricePerSpecies != null) {
+        final Map<Species, Optional<Price>> priceCacheBySpecies =
+          priceCache.computeIfAbsent(catchCategory, key -> new HashMap<>());
+        bucket.forEachBiomassValue((species, biomass) -> {
+          final Optional<Price> price = priceCacheBySpecies.computeIfAbsent(
+            species,
+            key -> resolvePrice(pricePerSpecies, key)
+          );
+          if (price.isPresent()) {
+            total[0] += price.get().valueForKgDouble(biomass);
+          }
+        });
+      }
     });
     return Money.ofMinor(
       currencyUnit,
@@ -186,18 +187,19 @@ public class BiomassMarket implements Market {
         unpricedCatchConsumer.accept(catchCategory, bucket);
       } else {
         bucket.forEach((species, biomass) -> {
-          if (biomass.asKg() <= 0.0) return;
-          getPrice(catchCategory, species).ifPresentOrElse(
-            price ->
-              pricedItemConsumer.accept(
-                new Sale.Item(catchCategory, species, biomass, price)
-              ),
-            () ->
-              unpricedCatchConsumer.accept(
-                catchCategory,
-                Bucket.of(species, biomass)
-              )
-          );
+          if (biomass.asKg() > 0.0) {
+            getPrice(catchCategory, species).ifPresentOrElse(
+              price ->
+                pricedItemConsumer.accept(
+                  new Sale.Item(catchCategory, species, biomass, price)
+                ),
+              () ->
+                unpricedCatchConsumer.accept(
+                  catchCategory,
+                  Bucket.of(species, biomass)
+                )
+            );
+          }
         });
       }
     });
@@ -235,14 +237,11 @@ public class BiomassMarket implements Market {
     final Species species
   ) {
     final Map<Species, Price> pricePerSpecies = prices.get(catchCategory);
-    if (pricePerSpecies == null) {
-      return Optional.empty();
-    }
-    final Map<Species, Optional<Price>> priceCacheBySpecies =
-      priceCache.computeIfAbsent(catchCategory, key -> new HashMap<>());
-    return priceCacheBySpecies.computeIfAbsent(species, key ->
-      resolvePrice(pricePerSpecies, key)
-    );
+    return pricePerSpecies == null
+      ? Optional.empty()
+      : priceCache
+          .computeIfAbsent(catchCategory, key -> new HashMap<>())
+          .computeIfAbsent(species, key -> resolvePrice(pricePerSpecies, key));
   }
 
   @Override
@@ -292,16 +291,14 @@ public class BiomassMarket implements Market {
     final Species species
   ) {
     // Try direct match first, then fall back to a covers() scan.
-    final Price directMatch = pricePerSpecies.get(species);
-    if (directMatch != null) {
-      return Optional.of(directMatch);
-    }
-    for (final Entry<Species, Price> entry : pricePerSpecies.entrySet()) {
-      if (entry.getKey().covers(species)) {
-        return Optional.of(entry.getValue());
-      }
-    }
-    return Optional.empty();
+    return Optional.ofNullable(pricePerSpecies.get(species)).or(() ->
+      pricePerSpecies
+        .entrySet()
+        .stream()
+        .filter(entry -> entry.getKey().covers(species))
+        .map(Entry::getValue)
+        .findFirst()
+    );
   }
 
   /**

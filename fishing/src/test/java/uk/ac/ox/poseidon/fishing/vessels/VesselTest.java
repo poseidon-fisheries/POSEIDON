@@ -267,9 +267,10 @@ class VesselTest {
 
       @Override
       public Status execute() {
-        if (getStatus() == Status.RUNNING) {
-          return Status.SUCCEEDED;
-        }
+        return getStatus() == Status.RUNNING ? Status.SUCCEEDED : stateGear();
+      }
+
+      private Status stateGear() {
         getVessel().queue(setting("gear", "PS"));
         return runFor(ofSeconds(1));
       }

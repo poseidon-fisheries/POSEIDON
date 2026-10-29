@@ -96,6 +96,14 @@ public class GreedyPicker<O> implements Function<Vessel, O> {
 
     // Most picks take an option at the best value, so the options are sorted
     // only when none of those passes.
+    final List<O> best = best(entries);
+    return pickAmongTied(vessel, best)
+      .or(() -> pickInValueOrder(vessel, entries, best.size()))
+      .orElse(null);
+  }
+
+  /** @return the options of {@code entries} at the best value, in order */
+  private static <O> List<O> best(final List<Entry<O, Double>> entries) {
     double bestValue = Double.NEGATIVE_INFINITY;
     final List<O> best = new ArrayList<>();
     for (final Entry<O, Double> entry : entries) {
@@ -106,26 +114,45 @@ public class GreedyPicker<O> implements Function<Vessel, O> {
       }
       if (value == bestValue) best.add(entry.getKey());
     }
-    final Optional<O> bestPicked = pickAmongTied(vessel, best);
-    if (bestPicked.isPresent()) return bestPicked.get();
+    return best;
+  }
 
+  /**
+   * Picks among the options tied at each value in turn, from the best down,
+   * skipping the {@code skipped} best ones, already tried.
+   */
+  private Optional<O> pickInValueOrder(
+    final Vessel vessel,
+    final List<Entry<O, Double>> entries,
+    final int skipped
+  ) {
     entries.sort(
       comparingDouble((Entry<O, Double> entry) -> entry.getValue()).reversed()
     );
-    int start = best.size();
-    while (start < entries.size()) {
-      final double value = entries.get(start).getValue();
-      final List<O> tied = new ArrayList<>();
-      int end = start;
-      while (end < entries.size() && entries.get(end).getValue() == value) {
-        tied.add(entries.get(end).getKey());
-        end++;
+    return tiedGroups(entries.subList(skipped, entries.size()))
+      .stream()
+      .map(tied -> pickAmongTied(vessel, tied))
+      .flatMap(Optional::stream)
+      .findFirst();
+  }
+
+  /**
+   * @return the options of {@code sortedEntries}, in groups of equal value, in
+   *         order
+   */
+  private static <O> List<List<O>> tiedGroups(
+    final List<Entry<O, Double>> sortedEntries
+  ) {
+    final List<List<O>> groups = new ArrayList<>();
+    double groupValue = Double.NaN;
+    for (final Entry<O, Double> entry : sortedEntries) {
+      if (groups.isEmpty() || entry.getValue() != groupValue) {
+        groups.add(new ArrayList<>());
+        groupValue = entry.getValue();
       }
-      final Optional<O> picked = pickAmongTied(vessel, tied);
-      if (picked.isPresent()) return picked.get();
-      start = end;
+      groups.getLast().add(entry.getKey());
     }
-    return null;
+    return groups;
   }
 
   /**

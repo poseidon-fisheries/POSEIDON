@@ -161,26 +161,32 @@ public class VesselRegisterFactory
             checkNotExited(vesselId, exitDatesAtStart);
             attributesAtStart.put(vesselId, attributes);
           }
-          return;
-        }
-        final VesselStatement statement = statement(row, eventCode);
-        if (dueAfterTheStart) {
-          laterStatements.add(
-            entry(date, _ -> fleet.queue(vesselId, statement))
-          );
-          return;
-        }
-        checkNotExited(vesselId, exitDatesAtStart);
-        final Map<String, Object> attributes = attributesAtStart.get(vesselId);
-        checkState(attributes != null, "Vessel %s does not exist", vesselId);
-        switch (statement) {
-          case final AttributeChange change -> attributesAtStart.put(
-            vesselId,
-            change.applyTo(attributes)
-          );
-          case final Exit _ -> {
-            attributesAtStart.remove(vesselId);
-            exitDatesAtStart.put(vesselId, date);
+        } else {
+          final VesselStatement statement = statement(row, eventCode);
+          if (dueAfterTheStart) {
+            laterStatements.add(
+              entry(date, _ -> fleet.queue(vesselId, statement))
+            );
+          } else {
+            checkNotExited(vesselId, exitDatesAtStart);
+            final Map<String, Object> attributes = attributesAtStart.get(
+              vesselId
+            );
+            checkState(
+              attributes != null,
+              "Vessel %s does not exist",
+              vesselId
+            );
+            switch (statement) {
+              case final AttributeChange change -> attributesAtStart.put(
+                vesselId,
+                change.applyTo(attributes)
+              );
+              case final Exit _ -> {
+                attributesAtStart.remove(vesselId);
+                exitDatesAtStart.put(vesselId, date);
+              }
+            }
           }
         }
       });
@@ -204,9 +210,15 @@ public class VesselRegisterFactory
    *                                  configured ones
    */
   private VesselStatement statement(final Row row, final String eventCode) {
-    if (changeEventCodes.contains(eventCode)) return attributeChange(row);
-    if (exitEventCodes.contains(eventCode)) return new Exit();
-    throw new IllegalArgumentException("Unknown event code: " + eventCode);
+    final VesselStatement statement;
+    if (changeEventCodes.contains(eventCode)) {
+      statement = attributeChange(row);
+    } else if (exitEventCodes.contains(eventCode)) {
+      statement = new Exit();
+    } else {
+      throw new IllegalArgumentException("Unknown event code: " + eventCode);
+    }
+    return statement;
   }
 
   /**

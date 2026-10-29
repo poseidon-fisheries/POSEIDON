@@ -110,9 +110,10 @@ class FleetTest {
 
     @Override
     public Status execute() {
-      if (getStatus() == Status.RUNNING) {
-        return Status.SUCCEEDED;
-      }
+      return getStatus() == Status.RUNNING ? Status.SUCCEEDED : recordStart();
+    }
+
+    private Status recordStart() {
       events.add("step " + getVessel().getId());
       return runFor(ofSeconds(1));
     }
