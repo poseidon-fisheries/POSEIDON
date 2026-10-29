@@ -102,10 +102,14 @@ public class NumberGridPortrayalFactory
   }
 
   private static Grid2D toField(final DoubleGrid grid) {
-    if (grid instanceof final MutableGrid<?> mutableGrid) {
-      final Grid2D field = mutableGrid.getField();
-      if (field instanceof DoubleGrid2D) return field;
-    }
+    final Grid2D field =
+      grid instanceof final MutableGrid<?> mutableGrid
+        ? mutableGrid.getField()
+        : null;
+    return field instanceof DoubleGrid2D ? field : copyOf(grid);
+  }
+
+  private static DoubleGrid2D copyOf(final DoubleGrid grid) {
     final int width = grid.getModelGrid().getGridWidth();
     final int height = grid.getModelGrid().getGridHeight();
     final DoubleGrid2D copy = new DoubleGrid2D(width, height);

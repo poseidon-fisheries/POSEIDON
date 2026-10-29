@@ -135,14 +135,13 @@ public class PaletteColorMap extends AbstractColorMap {
    */
   @Override
   public Color getColor(final double v) {
-    if (Double.isNaN(v)) {
-      return TRANSPARENT;
-    } else {
-      final double boundedValue = min(max(v, minimum), maximum);
-      final double interpolation =
-        (boundedValue - minimum) / (maximum - minimum);
-      final long index = Math.round(interpolation * (colors.length - 1));
-      return colors[(int) index];
-    }
+    return Double.isNaN(v) ? TRANSPARENT : paletteColor(v);
+  }
+
+  private Color paletteColor(final double v) {
+    final double boundedValue = min(max(v, minimum), maximum);
+    final double interpolation = (boundedValue - minimum) / (maximum - minimum);
+    final long index = Math.round(interpolation * (colors.length - 1));
+    return colors[(int) index];
   }
 }
