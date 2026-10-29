@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.geography.ports;
 
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
 
+import java.util.Collection;
 import java.util.List;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.core.Factory;
@@ -35,11 +36,12 @@ import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
  * Factories for {@link Port}s and {@link PortGrid}s: standalone ports, ports
- * placed at fixed coordinates (directly or read from a table), and ports placed
- * at random suitable cells.
+ * placed at fixed coordinates (directly or read from a table) or on given
+ * cells, and ports placed at random suitable cells.
  */
 public final class Factories {
 
@@ -99,6 +101,28 @@ public final class Factories {
       longitudeColumnName,
       latitudeColumnName
     );
+  }
+
+  /**
+   * @param cells     factory for the cells ports are on, one port per cell
+   * @param modelGrid factory for the model grid the cells belong to
+   * @param code      factory for the code of the port on a cell, called once
+   *                  per cell
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the list
+   *         of (port, coordinate) pairs, one per cell, at the cell's centre
+   * @see PortsFromCellsFactory
+   */
+  public static <S extends Scope> PortsFromCellsFactory<S> portsFromCells(
+    final Factory<? super S, ? extends Collection<Cell>> cells,
+    final Factory<? super S, ? extends ModelGrid> modelGrid,
+    final MappingFactory<
+      ? super S,
+      ? super Void,
+      ? super Cell,
+      ? extends String
+    > code
+  ) {
+    return new PortsFromCellsFactory<>(cells, modelGrid, code);
   }
 
   /**
