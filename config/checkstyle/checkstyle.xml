@@ -11,7 +11,12 @@
     <property name="files" value="[\\/]src[\\/]test[\\/]"/>
   </module>
 
+  <!-- @SuppressWarnings("checkstyle:ReturnCount") marks a deliberate exception -->
+  <module name="SuppressWarningsFilter"/>
+
   <module name="TreeWalker">
+    <module name="SuppressWarningsHolder"/>
+
     <!-- Getters and setters, overrides, and comments made only of tags pass -->
     <module name="MissingJavadocType"/>
     <module name="MissingJavadocMethod">
@@ -37,5 +42,15 @@
     </module>
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
+
+    <!-- One return per method or lambda, at the end; guard clauses throw -->
+    <module name="ReturnCount">
+      <property name="max" value="1"/>
+      <property name="maxForVoid" value="0"/>
+    </module>
+    <module name="MatchXpath">
+      <property name="query" value="//QUESTION[ancestor::QUESTION]"/>
+      <message key="matchxpath.match" value="Nested ternaries are not allowed."/>
+    </module>
   </module>
 </module>
