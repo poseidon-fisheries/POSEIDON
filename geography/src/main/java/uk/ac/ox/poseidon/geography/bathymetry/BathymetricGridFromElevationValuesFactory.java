@@ -74,7 +74,7 @@ public class BathymetricGridFromElevationValuesFactory<S extends Scope> extends 
       expectedCells,
       elevationValues.size()
     );
-    final double[][] elevationGrid = new double[height][width];
+    final double[][] elevationGrid = new double[width][height];
     for (int x = 0; x < width; x++) {
       for (int y = 0; y < height; y++) {
         elevationGrid[x][y] = elevationValues.get(x + y * width).doubleValue();

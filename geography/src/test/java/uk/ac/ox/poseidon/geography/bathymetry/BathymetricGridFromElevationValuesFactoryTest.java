@@ -73,6 +73,19 @@ class BathymetricGridFromElevationValuesFactoryTest {
     assertThat(bathymetricGrid.getElevation(new Cell(1, 1))).isEqualTo(3.0);
   }
 
+  @Test
+  void valuesAreMappedOnANonSquareGrid() {
+    // Three cells wide and two high
+    final BathymetricGrid bathymetricGrid = bathymetricGridFromElevationValues(
+      new ModelGridFactory(1, -1, 2, -1, 1),
+      List.<Number>of(0.0, 1.0, 2.0, 3.0, 4.0, 5.0)
+    ).get(Scope.GLOBAL_SCOPE);
+    assertThat(bathymetricGrid.getElevation(new Cell(0, 0))).isEqualTo(0.0);
+    assertThat(bathymetricGrid.getElevation(new Cell(2, 0))).isEqualTo(2.0);
+    assertThat(bathymetricGrid.getElevation(new Cell(0, 1))).isEqualTo(3.0);
+    assertThat(bathymetricGrid.getElevation(new Cell(2, 1))).isEqualTo(5.0);
+  }
+
   private static BathymetricGridFromElevationValuesFactory<Scope> factory(
     final List<Number> elevationValues
   ) {
