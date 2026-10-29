@@ -52,22 +52,22 @@ public class DirectoryRemover implements Steppable {
    */
   @Override
   public void step(final SimState simState) {
-    if (!target.toFile().exists()) {
-      if (ignoreIfAbsent) return;
-      else throw new IllegalStateException(target + " does not exist");
-    }
-    if (!target.toFile().isDirectory()) {
-      throw new IllegalStateException(target + " is not a directory");
-    }
-    try {
-      FileUtils.deleteDirectory(target.toFile());
-      logger.log(
-        System.Logger.Level.INFO,
-        "Deleted {0}",
-        target.toAbsolutePath()
-      );
-    } catch (final IOException e) {
-      throw new RuntimeException(e);
+    if (target.toFile().exists()) {
+      if (!target.toFile().isDirectory()) {
+        throw new IllegalStateException(target + " is not a directory");
+      }
+      try {
+        FileUtils.deleteDirectory(target.toFile());
+        logger.log(
+          System.Logger.Level.INFO,
+          "Deleted {0}",
+          target.toAbsolutePath()
+        );
+      } catch (final IOException e) {
+        throw new RuntimeException(e);
+      }
+    } else if (!ignoreIfAbsent) {
+      throw new IllegalStateException(target + " does not exist");
     }
   }
 }

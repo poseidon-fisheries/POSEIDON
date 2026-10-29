@@ -87,13 +87,11 @@ class BuilderConstructor extends Constructor {
     if (
       // The superclass registers a plain description for the root type
       !(typeDefinitions.get(clazz) instanceof BuilderTypeDescription) &&
-      builtClassPrefixes.stream().anyMatch(clazz.getName()::startsWith)
+      builtClassPrefixes.stream().anyMatch(clazz.getName()::startsWith) &&
+      // Only a concrete class appears in a tag; an abstract one is only
+      // ever a property's declared type, whose values carry their tags.
+      !Modifier.isAbstract(clazz.getModifiers())
     ) {
-      if (Modifier.isAbstract(clazz.getModifiers())) {
-        // Only a concrete class appears in a tag; an abstract one is only
-        // ever a property's declared type, whose values carry their tags.
-        return;
-      }
       if (findBuilderMethod(clazz) == null) {
         throw new YAMLException(
           "Class " + clazz.getName() + " has no static builder() method"
@@ -104,12 +102,15 @@ class BuilderConstructor extends Constructor {
   }
 
   private static Method findBuilderMethod(final Class<?> clazz) {
-    try {
-      final Method method = clazz.getMethod("builder");
-      return Modifier.isStatic(method.getModifiers()) ? method : null;
-    } catch (final NoSuchMethodException e) {
-      return null;
-    }
+    return Arrays.stream(clazz.getMethods())
+      .filter(
+        method ->
+          method.getName().equals("builder") &&
+          method.getParameterCount() == 0 &&
+          Modifier.isStatic(method.getModifiers())
+      )
+      .findFirst()
+      .orElse(null);
   }
 
   /**
