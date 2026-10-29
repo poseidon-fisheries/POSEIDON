@@ -293,22 +293,19 @@ public final class CalibrationRunner {
     }
 
     private void report(final EvolutionResult<DoubleGene, Double> result) {
-      if (
-        everyGenerations <= 0 || result.generation() % everyGenerations != 0
-      ) {
-        return;
+      if (everyGenerations > 0 && result.generation() % everyGenerations == 0) {
+        final long now = System.nanoTime();
+        System.out.println(
+          formatReport(
+            result.generation(),
+            result.bestFitness(),
+            Duration.ofNanos(now - previousNanos),
+            problem.takeSimulationTimes(),
+            processors
+          )
+        );
+        previousNanos = now;
       }
-      final long now = System.nanoTime();
-      System.out.println(
-        formatReport(
-          result.generation(),
-          result.bestFitness(),
-          Duration.ofNanos(now - previousNanos),
-          problem.takeSimulationTimes(),
-          processors
-        )
-      );
-      previousNanos = now;
     }
   }
 }
