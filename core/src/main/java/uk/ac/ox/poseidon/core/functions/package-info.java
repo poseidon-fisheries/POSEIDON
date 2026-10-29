@@ -23,7 +23,7 @@
 /**
  * Values and mappings that transform, combine, or look up other values and
  * mappings, and the conversion of those asked with no context
- * ({@link uk.ac.ox.poseidon.core.functions.WithoutContext}). See
+ * ({@link uk.ac.ox.poseidon.core.functions.VoidContextConversions}). See
  * {@link uk.ac.ox.poseidon.core.functions.Factories} for the entry points.
  */
 package uk.ac.ox.poseidon.core.functions;

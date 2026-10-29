@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.regulations;
 
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toPredicate;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,7 +32,6 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} for a {@link ForbiddenIf}. Built via
@@ -55,8 +56,6 @@ public class ForbiddenIfFactory<
 
   @Override
   protected ForbiddenIf<A> newInstance(final S scope) {
-    return new ForbiddenIf<>(
-      WithoutContext.predicate(actionPredicate.get(scope))
-    );
+    return new ForbiddenIf<>(toPredicate(actionPredicate.get(scope)));
   }
 }

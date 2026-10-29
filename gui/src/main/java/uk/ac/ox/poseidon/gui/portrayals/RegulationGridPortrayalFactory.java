@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.gui.portrayals;
 
 import static java.time.temporal.ChronoField.*;
 import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toSupplier;
 import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_DAY;
 
 import java.awt.*;
@@ -48,7 +49,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
@@ -114,8 +114,8 @@ public class RegulationGridPortrayalFactory
   protected ObjectGridPortrayal2D newInstance(final SimulationScope scope) {
     return new Portrayal(
       gear,
-      WithoutContext.supplier(currentDateTime.get(scope)),
-      WithoutContext.supplier(hasDateTime.get(scope)),
+      toSupplier(currentDateTime.get(scope)),
+      toSupplier(hasDateTime.get(scope)),
       regulations.get(scope),
       vesselField.get(scope),
       fleet.get(scope),

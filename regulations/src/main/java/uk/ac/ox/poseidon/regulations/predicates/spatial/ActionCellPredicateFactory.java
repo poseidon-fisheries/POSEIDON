@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toPredicate;
+
 import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -32,7 +34,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.regulations.SpatialAction;
@@ -65,7 +66,7 @@ public class ActionCellPredicateFactory<S extends Scope>
   ) {
     return new ActionCellPredicate(
       modelGrid.get(scope),
-      WithoutContext.predicate(cellPredicate.get(scope))
+      toPredicate(cellPredicate.get(scope))
     );
   }
 }

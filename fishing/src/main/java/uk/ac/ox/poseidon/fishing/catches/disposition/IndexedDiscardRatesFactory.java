@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.catches.disposition;
 
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toFunction;
+
 import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -34,7 +36,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link IndexedDiscardRates},
@@ -66,7 +67,7 @@ public class IndexedDiscardRatesFactory<S extends Scope> extends RelativeScopeFa
   protected IndexedDiscardRates newInstance(final S scope) {
     return new IndexedDiscardRates(
       SpeciesIndex.of(species.get(scope)).mapToDoubleArray(
-        WithoutContext.function(rateFunction.get(scope))
+        toFunction(rateFunction.get(scope))
       )
     );
   }

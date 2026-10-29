@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.vessels.gears;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toSupplier;
 import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_PER_HOUR;
 
 import java.time.Duration;
@@ -38,7 +39,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of
@@ -76,7 +76,7 @@ public class FixedBiomassProportionGearFactory<S extends Scope> extends Relative
     return new FixedBiomassProportionGear(
       proportion.get(scope),
       minimumCatchThreshold.get(scope).to(KILOGRAM).getValue().doubleValue(),
-      WithoutContext.supplier(duration.get(scope)),
+      toSupplier(duration.get(scope)),
       fuelPerHour
     );
   }

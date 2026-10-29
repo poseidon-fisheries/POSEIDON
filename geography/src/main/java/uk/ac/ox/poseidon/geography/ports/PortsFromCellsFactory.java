@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.geography.ports;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toFunction;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
@@ -38,7 +39,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 import uk.ac.ox.poseidon.core.utils.Pair;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.Cell;
@@ -79,9 +79,7 @@ public class PortsFromCellsFactory<S extends Scope> extends RelativeScopeFactory
   @Override
   protected List<Pair<Port, Coordinate>> newInstance(final S scope) {
     final ModelGrid modelGrid = this.modelGrid.get(scope);
-    final Function<Cell, String> code = WithoutContext.function(
-      this.code.get(scope)
-    );
+    final Function<Cell, String> code = toFunction(this.code.get(scope));
     final ImmutableMap<String, Cell> cellsByCode = cells
       .get(scope)
       .stream()

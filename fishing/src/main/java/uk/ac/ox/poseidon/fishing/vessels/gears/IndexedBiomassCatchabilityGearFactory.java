@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.fishing.vessels.gears;
 
 import static tech.units.indriya.unit.Units.KILOGRAM;
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toFunction;
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toSupplier;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
 import java.time.Duration;
@@ -41,7 +43,6 @@ import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of
@@ -77,13 +78,13 @@ public class IndexedBiomassCatchabilityGearFactory<S extends Scope> extends Rela
 
   @Override
   protected IndexedBiomassCatchabilityGear newInstance(final S scope) {
-    final var function = WithoutContext.function(proportionFunction.get(scope));
+    final var function = toFunction(proportionFunction.get(scope));
     return new IndexedBiomassCatchabilityGear(
       SpeciesIndex.of(species.get(scope)).mapToDoubleArray(s ->
         checkUnitRange(function.apply(s), "proportion")
       ),
       minimumCatchThreshold.get(scope).to(KILOGRAM).getValue().doubleValue(),
-      WithoutContext.supplier(duration.get(scope))
+      toSupplier(duration.get(scope))
     );
   }
 }

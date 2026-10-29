@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.biology.allocators;
 
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toSupplier;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,7 +34,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of
@@ -60,7 +61,7 @@ public class ProportionOfCarryingCapacityAllocatorFactory<S extends Scope> exten
   protected ProportionOfCarryingCapacityAllocator newInstance(final S scope) {
     return new ProportionOfCarryingCapacityAllocator(
       carryingCapacityGrid.get(scope),
-      WithoutContext.supplier(proportion.get(scope))
+      toSupplier(proportion.get(scope))
     );
   }
 }

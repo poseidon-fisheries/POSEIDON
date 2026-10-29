@@ -36,15 +36,15 @@ import java.util.function.Supplier;
  * the scenario is compiled, and converts it once, when it builds. Each call
  * passes {@code null}, the only value of {@code Void}.
  */
-public final class WithoutContext {
+public final class VoidContextConversions {
 
-  private WithoutContext() {}
+  private VoidContextConversions() {}
 
   /**
    * @param value a value whose context is {@code Void}
    * @return a supplier of that value
    */
-  public static <R> Supplier<R> supplier(
+  public static <R> Supplier<R> toSupplier(
     final Function<? super Void, ? extends R> value
   ) {
     return () -> value.apply(null);
@@ -54,7 +54,7 @@ public final class WithoutContext {
    * @param mapping a yes/no mapping whose context is {@code Void}
    * @return a predicate testing what the mapping tests
    */
-  public static <T> Predicate<T> predicate(
+  public static <T> Predicate<T> toPredicate(
     final BiFunction<? super Void, ? super T, Boolean> mapping
   ) {
     return t -> mapping.apply(null, t);
@@ -64,7 +64,7 @@ public final class WithoutContext {
    * @param mapping a mapping whose context is {@code Void}
    * @return a function mapping what the mapping maps
    */
-  public static <T, R> Function<T, R> function(
+  public static <T, R> Function<T, R> toFunction(
     final BiFunction<? super Void, ? super T, ? extends R> mapping
   ) {
     return t -> mapping.apply(null, t);

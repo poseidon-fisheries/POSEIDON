@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.allocators;
 
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toPredicate;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,7 +33,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
@@ -60,7 +61,7 @@ public class FilteredAllocatorFactory<S extends Scope> extends RelativeScopeFact
   protected FilteredAllocator newInstance(final S scope) {
     return new FilteredAllocator(
       delegateAllocator.get(scope),
-      WithoutContext.predicate(cellPredicate.get(scope))
+      toPredicate(cellPredicate.get(scope))
     );
   }
 }

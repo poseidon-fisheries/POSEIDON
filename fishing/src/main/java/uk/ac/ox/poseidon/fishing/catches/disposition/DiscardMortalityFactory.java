@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.fishing.catches.disposition;
 
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toFunction;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,7 +33,6 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link DiscardMortality}, built
@@ -56,8 +57,6 @@ public class DiscardMortalityFactory<S extends Scope> extends RelativeScopeFacto
 
   @Override
   protected DiscardMortality newInstance(final S scope) {
-    return new DiscardMortality(
-      WithoutContext.function(mortalityRate.get(scope))
-    );
+    return new DiscardMortality(toFunction(mortalityRate.get(scope)));
   }
 }

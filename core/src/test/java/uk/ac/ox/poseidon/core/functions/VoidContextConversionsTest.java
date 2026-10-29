@@ -23,6 +23,9 @@
 package uk.ac.ox.poseidon.core.functions;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toFunction;
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toPredicate;
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toSupplier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +33,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
-class WithoutContextTest {
+class VoidContextConversionsTest {
 
   private final List<Object> contexts = new ArrayList<>();
 
@@ -40,7 +43,7 @@ class WithoutContextTest {
       contexts.add(context);
       return "value";
     };
-    assertThat(WithoutContext.supplier(value).get()).isEqualTo("value");
+    assertThat(toSupplier(value).get()).isEqualTo("value");
     assertThat(contexts).containsExactly((Object) null);
   }
 
@@ -50,8 +53,8 @@ class WithoutContextTest {
       contexts.add(context);
       return i > 0;
     };
-    assertThat(WithoutContext.predicate(positive).test(1)).isTrue();
-    assertThat(WithoutContext.predicate(positive).test(-1)).isFalse();
+    assertThat(toPredicate(positive).test(1)).isTrue();
+    assertThat(toPredicate(positive).test(-1)).isFalse();
     assertThat(contexts).containsExactly(null, null);
   }
 
@@ -61,7 +64,7 @@ class WithoutContextTest {
       contexts.add(context);
       return 2 * i;
     };
-    assertThat(WithoutContext.function(doubled).apply(3)).isEqualTo(6);
+    assertThat(toFunction(doubled).apply(3)).isEqualTo(6);
     assertThat(contexts).containsExactly((Object) null);
   }
 }

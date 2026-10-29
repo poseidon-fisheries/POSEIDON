@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.geography.ports;
 
 import static com.google.common.base.Preconditions.checkState;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toFunction;
 
 import ec.util.MersenneTwisterFast;
 import java.util.List;
@@ -38,7 +39,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -109,9 +109,7 @@ public class RandomCellsPortGridFactory
       bathymetricGrid,
       sparseGrid2D
     );
-    final Function<Cell, String> code = WithoutContext.function(
-      this.code.get(scope)
-    );
+    final Function<Cell, String> code = toFunction(this.code.get(scope));
     shuffledStream(suitableTiles, randomNumberGenerator.get(scope))
       .limit(numberOfPorts)
       .forEach(cell -> {

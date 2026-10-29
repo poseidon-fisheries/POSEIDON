@@ -137,8 +137,8 @@ for. A component that has none (a grid
 built cell by cell, a regulation judging an action, a gear fishing, a table's columns) has its
 factory take the value with `Void` as its context, so that a value reading a vessel is refused when
 the scenario is compiled, and convert it once, when it builds, into the plain `Supplier`,
-`Predicate` or `Function` the component holds (`WithoutContext`). Numbers are boxed: there are no
-primitive shapes.
+`Predicate` or `Function` the component holds (`VoidContextConversions`). Numbers are boxed: there
+are no primitive shapes.
 
 The package's `Factories` class offers the live version plus an overload taking a plain value
 that it wraps in `constant(...)`:

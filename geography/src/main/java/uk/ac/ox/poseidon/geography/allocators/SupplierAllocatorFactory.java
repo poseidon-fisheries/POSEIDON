@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.geography.allocators;
 
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toSupplier;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,7 +32,6 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link SupplierAllocator},
@@ -50,6 +51,6 @@ public class SupplierAllocatorFactory<S extends Scope> extends RelativeScopeFact
 
   @Override
   protected SupplierAllocator newInstance(final S scope) {
-    return new SupplierAllocator(WithoutContext.supplier(value.get(scope)));
+    return new SupplierAllocator(toSupplier(value.get(scope)));
   }
 }

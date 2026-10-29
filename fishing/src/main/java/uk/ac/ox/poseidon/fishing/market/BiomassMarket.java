@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.fishing.market;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toFunction;
 
 import com.google.common.collect.Maps;
 import java.time.LocalDateTime;
@@ -42,7 +43,6 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.buckets.BucketBuilder;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.core.events.EventManager;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 import uk.ac.ox.poseidon.core.utils.PrefixedId;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategory;
 import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
@@ -93,7 +93,7 @@ public class BiomassMarket implements Market {
     this.code = code;
     this.currencyUnit = checkNotNull(currencyUnit);
     this.prices = new LinkedHashMap<>();
-    this.saleIds = WithoutContext.function(new PrefixedId(code));
+    this.saleIds = toFunction(new PrefixedId(code));
     this.eventManager = eventManager;
   }
 

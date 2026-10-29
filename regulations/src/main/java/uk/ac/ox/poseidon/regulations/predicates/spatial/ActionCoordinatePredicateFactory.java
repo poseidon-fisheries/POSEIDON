@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.regulations.predicates.spatial;
 
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toPredicate;
+
 import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -31,7 +33,6 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.regulations.SpatialAction;
 
@@ -61,7 +62,7 @@ public class ActionCoordinatePredicateFactory<S extends Scope>
     final S scope
   ) {
     return new ActionCoordinatePredicate(
-      WithoutContext.predicate(coordinatePredicate.get(scope))
+      toPredicate(coordinatePredicate.get(scope))
     );
   }
 }

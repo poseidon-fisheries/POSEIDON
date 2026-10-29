@@ -22,6 +22,8 @@
 
 package uk.ac.ox.poseidon.io.tables;
 
+import static uk.ac.ox.poseidon.core.functions.VoidContextConversions.toSupplier;
+
 import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -33,7 +35,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
-import uk.ac.ox.poseidon.core.functions.WithoutContext;
 
 /**
  * A {@link SimulationScopeFactory} counterpart of {@link SteppableTable}, built
@@ -65,7 +66,7 @@ public class SteppableTableFactory
       tableDefinition.get(scope),
       values
         .stream()
-        .map(value -> WithoutContext.supplier(value.get(scope)))
+        .map(value -> toSupplier(value.get(scope)))
         .toList()
     );
   }
