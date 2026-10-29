@@ -119,6 +119,7 @@ final class AdaptiveBucketBuilder implements BucketBuilder {
   }
 
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public Bucket build() {
     // Performance note:
     // This method is intentionally implemented as a single-pass loop (instead

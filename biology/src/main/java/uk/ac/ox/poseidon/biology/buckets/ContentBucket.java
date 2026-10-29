@@ -109,6 +109,7 @@ final class ContentBucket implements Bucket {
   }
 
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public Bucket add(final Bucket other) {
     final Map<Species, Content> results = new HashMap<>(getMap());
     for (final Entry<Species, Content> entry : other.getMap().entrySet()) {

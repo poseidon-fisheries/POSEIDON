@@ -136,6 +136,7 @@ class SingleSpeciesBiomassBucket implements Bucket {
   }
 
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public Bucket replaceContent(
     final Species species,
     final Content newContent
@@ -150,6 +151,7 @@ class SingleSpeciesBiomassBucket implements Bucket {
   }
 
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public Bucket mapContent(final BiFunction<Species, Content, Content> mapper) {
     final Content mapped = mapper.apply(species, getContent());
     if (mapped instanceof Biomass) {

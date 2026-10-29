@@ -145,13 +145,19 @@ class DefaultBiomassGrid
 
     @Override
     public Bucket extract(final Bucket fishToExtract) {
-      final double biomassToExtract = fishToExtract.getKg(species);
-      if (biomassToExtract <= 0) return Bucket.empty();
       final double gridBiomass = getValue(cell);
-      if (gridBiomass <= 0) return Bucket.empty();
-      final double biomassExtracted = Math.min(biomassToExtract, gridBiomass);
-      setValue(cell, gridBiomass - biomassExtracted);
-      return Bucket.of(species, biomassExtracted);
+      final double biomassExtracted = Math.min(
+        fishToExtract.getKg(species),
+        gridBiomass
+      );
+      final Bucket extracted;
+      if (biomassExtracted > 0) {
+        setValue(cell, gridBiomass - biomassExtracted);
+        extracted = Bucket.of(species, biomassExtracted);
+      } else {
+        extracted = Bucket.empty();
+      }
+      return extracted;
     }
   }
 }

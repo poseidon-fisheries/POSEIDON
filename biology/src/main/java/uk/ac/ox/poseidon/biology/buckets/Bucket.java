@@ -80,6 +80,7 @@ public interface Bucket {
    * @return whether {@code other} is a {@link Bucket} holding the same content
    *         as {@code bucket}
    */
+  @SuppressWarnings("checkstyle:ReturnCount")
   static boolean contentEquals(final Bucket bucket, final Object other) {
     if (bucket == other) return true;
     if (!(other instanceof final Bucket otherBucket)) return false;
@@ -113,6 +114,7 @@ public interface Bucket {
    *         {@link #empty()} if that amount is zero or {@link Double#NaN}
    * @throws IllegalArgumentException if {@code biomassInKg} is negative
    */
+  @SuppressWarnings("checkstyle:ReturnCount")
   static Bucket of(final Species species, final double biomassInKg) {
     if (Double.isNaN(biomassInKg) || biomassInKg == 0.0) return Bucket.empty();
     checkArgument(biomassInKg > 0, "biomassInKg must be positive");

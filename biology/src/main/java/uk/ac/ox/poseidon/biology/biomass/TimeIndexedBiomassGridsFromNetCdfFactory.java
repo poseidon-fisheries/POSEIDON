@@ -222,13 +222,11 @@ public class TimeIndexedBiomassGridsFromNetCdfFactory<S extends Scope> extends R
     final String separator
   ) {
     final int separatorIndex = variableName.lastIndexOf(separator);
-    if (separatorIndex < 0) {
-      return multiStringKey(variableName, null);
-    }
-    final String code = variableName.substring(0, separatorIndex);
-    final String lifeStage = variableName.substring(
-      separatorIndex + separator.length()
-    );
-    return multiStringKey(code, lifeStage);
+    return separatorIndex < 0
+      ? multiStringKey(variableName, null)
+      : multiStringKey(
+          variableName.substring(0, separatorIndex),
+          variableName.substring(separatorIndex + separator.length())
+        );
   }
 }

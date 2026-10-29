@@ -150,6 +150,7 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
   }
 
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public Optional<Content> getContent(final Species species) {
     final int i = speciesIndex.indexOf(species);
     if (i == -1) return Optional.empty();
@@ -195,6 +196,7 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
       : Bucket.empty();
   }
 
+  @SuppressWarnings("checkstyle:ReturnCount")
   private SpeciesIndex commonIndex(final Bucket other) {
     if (containsAll(speciesIndex, other.getSpecies())) return speciesIndex;
     if (
@@ -206,6 +208,7 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
     return SpeciesIndex.of(Sets.union(this.getSpecies(), other.getSpecies()));
   }
 
+  @SuppressWarnings("checkstyle:ReturnCount")
   private static boolean containsAll(
     final SpeciesIndex index,
     final Set<Species> species
@@ -277,6 +280,7 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
   }
 
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public Bucket replaceContent(
     final Species species,
     final Content newContent
@@ -308,6 +312,7 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
    *                                  biomass
    */
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public Bucket mapBiomassValue(
     final ObjDoubleToDoubleFunction<Species> mapper
   ) {
@@ -340,6 +345,7 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
    *                                  biomass
    */
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public Bucket mapWithIndex(
     final SpeciesIndexed other,
     final DoubleIntToDoubleFunction mapper
@@ -413,6 +419,7 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
   }
 
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public void forEachWithIndex(
     final SpeciesIndexed other,
     final DoubleIntConsumer action,
@@ -429,6 +436,7 @@ class BiomassBucket implements Bucket, SpeciesIndexedDoubles<BiomassBucket> {
   }
 
   @Override
+  @SuppressWarnings("checkstyle:ReturnCount")
   public boolean isEmpty() {
     for (final double b : biomasses) {
       if (isPresent(b)) return false;

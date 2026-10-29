@@ -55,22 +55,18 @@ public class SmoothBiomassDiffusionRule implements BiomassDiffusionRule {
     final double currentBiomassY,
     final double carryingCapacityY
   ) {
-    final double delta = currentBiomassX - currentBiomassY;
-    if (delta > 0) {
-      final double differential = Math.min(
-        delta,
-        carryingCapacityY - currentBiomassY
-      );
-      if (differential > 0) {
-        final double movement = Math.min(
-          differentialPercentageToMove * differential,
-          percentageLimitOnDailyMovement * currentBiomassX
-        );
-        return new Double2D(
-          currentBiomassX - movement,
-          currentBiomassY + movement
-        );
-      } else return new Double2D(currentBiomassX, currentBiomassY);
-    } else return new Double2D(currentBiomassX, currentBiomassY);
+    // Biomass moves only from more to less, and only into spare capacity
+    final double differential = Math.min(
+      currentBiomassX - currentBiomassY,
+      carryingCapacityY - currentBiomassY
+    );
+    final double movement =
+      differential > 0
+        ? Math.min(
+            differentialPercentageToMove * differential,
+            percentageLimitOnDailyMovement * currentBiomassX
+          )
+        : 0;
+    return new Double2D(currentBiomassX - movement, currentBiomassY + movement);
   }
 }
