@@ -17,6 +17,21 @@ Formatting is Prettier's (prettier-plugin-java, options in `.prettierrc`), appli
   block in `build.gradle.kts` that pins node-gradle's Jackson 2 with the `jackson2` version. The
   `checkstyle` version in `libs.versions.toml` is duplicated too. Change both repos together.
 
+### Optional local setup
+
+Gradle downloads Node.js itself, so formatting needs no local install. Beyond that:
+
+- Format on save in IntelliJ: run `npm install` once, then enable Settings → Languages &
+  Frameworks → JavaScript → Prettier with "Run on save" and `**/*.java` in "Run for files".
+- Check formatting before each push: `./gradlew spotlessInstallGitPrePushHook`. Spotless can't
+  install it when POSEIDON is checked out as a submodule; there, write an executable
+  `$(git rev-parse --git-path hooks)/pre-push` containing `#!/bin/sh` and
+  `exec ./gradlew spotlessCheck`.
+- Skip reformatting commits in `git blame`:
+  `git config blame.ignoreRevsFile .git-blame-ignore-revs`. Git then refuses to blame on
+  checkouts without that file (commits from before it was added); there, pass
+  `--ignore-revs-file .git-blame-ignore-revs` to `git blame` instead.
+
 ## Lambdas and scenario classes
 
 Prefer lambdas to anonymous classes, and method references to lambdas, wherever they fit. For a
