@@ -177,6 +177,15 @@ a per-species array, where the cost is real and worth weighing before going live
 fails on first use rather than when the scenario is built: in practice the first step of the run,
 with the same message.
 
+## Read mutable state at the point of use
+
+A component that reads a field off a mutable object (a vessel, a trip, market state) resolves it
+inside the method that needs it (`receive(event)`), not at construction or registration. A value
+that can legitimately be absent when the component is built, or corrected later in the object's
+life (`Vessel.getHomePort()` is null until a later `FleetEvent` modification sets it), would
+otherwise be cached too early, and the bug surfaces far from where the value was captured. Failing
+loudly and early is no reason to resolve early.
+
 ## Determinism
 
 A simulation's results depend only on its scenario and its seed: the same seed gives the same

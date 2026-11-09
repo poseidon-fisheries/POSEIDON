@@ -119,3 +119,9 @@ The pattern itself — why the triplet exists, why scenario code never calls `.g
 already covered in `docs/agents/architecture.md`; don't restate it in per-package Javadoc. Package
 `package-info.java` files should stick to that short blurb + `{@link Factories}` pointer, and
 `@link` back to `Factory`/`Scenario` rather than re-explaining the general pattern.
+
+## Javadoc stands alone
+
+Javadoc and comments never point to a design document, an invariant number or a section number:
+design notes are not part of POSEIDON and may not survive, while code outlives them. State the rule
+and its reason in the comment itself. The same goes for commit messages.
