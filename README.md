@@ -40,7 +40,14 @@ is downloaded by Gradle.
 ```
 
 The `examples` module holds a complete scenario, the Peter Snapper fishery, with its input data.
-Run it for three simulated months, without a window:
+Open it in a window:
+
+```
+./gradlew :examples:run \
+  -PmainClass=uk.ac.ox.poseidon.examples.petersnapper.PeterSnapperScenarioWithUI
+```
+
+To run it without a window instead, for three simulated months:
 
 ```
 ./gradlew :examples:run \
@@ -48,9 +55,7 @@ Run it for three simulated months, without a window:
   --args="-s inputs/peter_snapper/scenario.yaml -p P3M"
 ```
 
-`-p` takes an ISO-8601 period (`P3M` is three months, `P2Y` two years). To open the same scenario in
-a window instead, use `-PmainClass=uk.ac.ox.poseidon.examples.petersnapper.PeterSnapperScenarioWithUI`
-and no `--args`.
+`-p` takes an ISO-8601 period (`P3M` is three months, `P2Y` two years).
 
 `PeterSnapperScenario` in the same module shows how a scenario is written, and
 `./gradlew :examples:writePeterSnapperScenario` regenerates its YAML file.
