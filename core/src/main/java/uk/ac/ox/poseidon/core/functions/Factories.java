@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableList;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.NavigableMap;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
@@ -137,6 +138,53 @@ public final class Factories {
         new ValueAsMappingFactory<S, C, K>(key),
         map,
         defaultValue
+      )
+    );
+  }
+
+  /**
+   * @param key factory for the mapping that reads the key from the thing
+   *            mapped
+   * @param map factory for the sorted map to look the key up in
+   * @return a {@link MappingFactory} for a {@link FloorMapLookup} of the key
+   *         in the resolved map, which gives the entry with the nearest
+   *         earlier key and throws if the key is below every entry
+   * @see FloorMapLookup
+   */
+  public static <S extends Scope, C, T, K, V> FloorMapLookupFactory<
+    S,
+    C,
+    T,
+    K,
+    V
+  > floorMapLookup(
+    final MappingFactory<? super S, ? super C, ? super T, ? extends K> key,
+    final Factory<? super S, ? extends NavigableMap<? super K, ? extends V>> map
+  ) {
+    return new FloorMapLookupFactory<S, C, T, K, V>(key, map);
+  }
+
+  /**
+   * @param key factory for the value that is the key
+   * @param map factory for the sorted map to look the key up in
+   * @return a {@link ValueFactory} for a {@link FloorMapLookup} of the key in
+   *         the resolved map, made a value by {@link MappingAsValue}, which
+   *         gives the entry with the nearest earlier key and throws if the key
+   *         is below every entry
+   * @see FloorMapLookup
+   */
+  public static <S extends Scope, C, K, V> MappingAsValueFactory<
+    S,
+    C,
+    V
+  > floorMapLookup(
+    final ValueFactory<? super S, ? super C, ? extends K> key,
+    final Factory<? super S, ? extends NavigableMap<? super K, ? extends V>> map
+  ) {
+    return new MappingAsValueFactory<S, C, V>(
+      new FloorMapLookupFactory<S, C, Void, K, V>(
+        new ValueAsMappingFactory<S, C, K>(key),
+        map
       )
     );
   }

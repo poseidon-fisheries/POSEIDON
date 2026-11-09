@@ -132,9 +132,10 @@ value overload builds the mapping over its value arguments, each made a mapping 
 ignores what it maps (`ValueAsMapping`), and makes the result a value by giving it `null` as the
 thing mapped (`MappingAsValue`). Neither appears in scenario code. A block that transforms what it
 is given takes it as its first argument, so a call reads in the order data flows, with one overload
-per shape of that input: `mapLookup(key, map)`, `routeProperty(route, path)`, `intervalLabel(number,
-intervals…)`, `tableLookup(key, table, …)`, and `condition(subject, predicate)`, which states the
-predicate of its subject. There is no generic composition: a mapping of one's own becomes a block
+per shape of that input: `mapLookup(key, map)`, `floorMapLookup(key, map)`,
+`routeProperty(route, path)`, `intervalLabel(number, intervals…)`, `tableLookup(key, table, …)`,
+and `condition(subject, predicate)`, which states the predicate of its subject. There is no generic
+composition: a mapping of one's own becomes a block
 that takes its input, so the YAML says what it is.
 
 A component passes the context it has: a task passes its vessel, and a picker the vessel it picks

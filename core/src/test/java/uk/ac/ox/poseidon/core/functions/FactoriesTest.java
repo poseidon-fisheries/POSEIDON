@@ -26,15 +26,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.functions.Factories.combinedDuration;
+import static uk.ac.ox.poseidon.core.functions.Factories.floorMapLookup;
 import static uk.ac.ox.poseidon.core.functions.Factories.mapEntry;
 import static uk.ac.ox.poseidon.core.functions.Factories.mapLookup;
 import static uk.ac.ox.poseidon.core.functions.Factories.multiStringKeyFromFunctions;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.NoSuchElementException;
+import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
@@ -105,6 +109,76 @@ class FactoriesTest {
     ).get(GLOBAL_SCOPE);
     assertThat(mapping.apply("ab", 3)).isEqualTo("five");
     assertThat(mapping.apply("ab", 2)).isEqualTo("none");
+  }
+
+  /** A series of names, from 3 and from 5 on. */
+  private final Factory<Scope, NavigableMap<Integer, String>> series = scope ->
+    new TreeMap<>(Map.of(3, "three", 5, "five"));
+
+  @Test
+  void aFloorLookupOfAValueFindsTheNearestEarlierEntry() {
+    final Function<String, String> value = floorMapLookup(
+      contextLength,
+      series
+    ).get(GLOBAL_SCOPE);
+    assertThat(value.apply("abc")).isEqualTo("three");
+    assertThat(value.apply("abcd")).isEqualTo("three");
+    assertThat(value.apply("abcde")).isEqualTo("five");
+    assertThat(value.apply("abcdefgh")).isEqualTo("five");
+    assertThatThrownBy(() -> value.apply("ab"))
+      .isInstanceOf(NoSuchElementException.class)
+      .hasMessageContaining("2");
+  }
+
+  @Test
+  void aFloorLookupOfAMappingFindsTheNearestEarlierEntry() {
+    final BiFunction<String, Integer, String> mapping = floorMapLookup(
+      plusLength,
+      series
+    ).get(GLOBAL_SCOPE);
+    assertThat(mapping.apply("ab", 1)).isEqualTo("three");
+    assertThat(mapping.apply("ab", 3)).isEqualTo("five");
+    assertThat(mapping.apply("ab", 10)).isEqualTo("five");
+    assertThatThrownBy(() -> mapping.apply("ab", 0))
+      .isInstanceOf(NoSuchElementException.class)
+      .hasMessageContaining("2");
+  }
+
+  @Test
+  void aFloorLookupReturnsAnEntrysNullValue() {
+    final Function<String, String> value = floorMapLookup(
+      contextLength,
+      (Factory<Scope, NavigableMap<Integer, String>>) scope -> {
+        final NavigableMap<Integer, String> map = new TreeMap<>();
+        map.put(2, null);
+        return map;
+      }
+    ).get(GLOBAL_SCOPE);
+    assertThat(value.apply("abc")).isNull();
+  }
+
+  @Test
+  void aFloorLookupWorksOnDates() {
+    final Factory<Scope, NavigableMap<LocalDate, String>> prices = scope ->
+      new TreeMap<>(
+        Map.of(
+          LocalDate.of(2026, 1, 1),
+          "low",
+          LocalDate.of(2026, 7, 1),
+          "high"
+        )
+      );
+    final BiFunction<String, LocalDate, String> mapping = floorMapLookup(
+      (MappingFactory<Scope, String, LocalDate, LocalDate>) scope ->
+        (context, date) ->
+          date,
+      prices
+    ).get(GLOBAL_SCOPE);
+    assertThat(mapping.apply("", LocalDate.of(2026, 3, 15))).isEqualTo("low");
+    assertThat(mapping.apply("", LocalDate.of(2026, 7, 1))).isEqualTo("high");
+    assertThatThrownBy(() -> mapping.apply("", LocalDate.of(2025, 12, 31)))
+      .isInstanceOf(NoSuchElementException.class)
+      .hasMessageContaining("2025-12-31");
   }
 
   /** A map with an entry whose value is null. */
