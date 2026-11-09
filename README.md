@@ -2,7 +2,7 @@
 [![codecov](https://codecov.io/gh/poseidon-fisheries/POSEIDON/branch/main/graph/badge.svg)](https://codecov.io/gh/poseidon-fisheries/POSEIDON)
 [![Javadoc](https://github.com/poseidon-fisheries/POSEIDON/actions/workflows/javadoc.yml/badge.svg)](https://poseidon-fisheries.github.io/POSEIDON/)
 
-<h1 align="center"><img src="docs/images/Poseidon-integrated-horizontal-RGB.png" alt="POSEIDON" width="480"></h1>
+<h1><img src="docs/images/Poseidon-horizontal-RGB.png" alt="POSEIDON" width="480"></h1>
 
 POSEIDON is an agent-based model of fisheries, built on the
 [MASON](https://cs.gmu.edu/~eclab/projects/mason/) discrete-event simulation toolkit. It is
