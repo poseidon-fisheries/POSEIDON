@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledOnceAtStart;
 
+import lombok.Value;
 import org.junit.jupiter.api.Test;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -55,11 +56,17 @@ class SchedulingFactoryTest {
 
     scheduledOnceAtStart(step).get(scope);
 
-    assertThat(step.get(scope).scopeClass()).isEqualTo(SimulationScope.class);
+    assertThat(step.get(scope).getScopeClass()).isEqualTo(
+      SimulationScope.class
+    );
   }
 
   /** A step that does nothing, built knowing the class of its build's scope. */
-  record Step(Class<? extends Scope> scopeClass) implements Steppable {
+  @Value
+  static final class Step implements Steppable {
+
+    Class<? extends Scope> scopeClass;
+
     @Override
     public void step(final SimState simState) {}
   }

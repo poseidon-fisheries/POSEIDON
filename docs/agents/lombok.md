@@ -14,7 +14,8 @@ almost every case — match the shape to the class's role:
   generated getters/`equals`/`hashCode`/`toString`. Add hand-written constructors alongside it only
   when a field needs derived/defaulted state. Use `@Value` rather than a Java `record`: MASON's
   GUI inspectors find properties through JavaBean getters (`getX()`), which a record's accessors
-  (`x()`) aren't.
+  (`x()`) aren't. This holds for every value object, not only those the GUI
+  reaches; a record is used only where a deconstruction pattern needs one.
 - **`Factory` YAML beans** (`*Factory` classes per the Factory/Scenario pattern — see
   `docs/agents/architecture.md`): immutable, always the same five — `@Getter @ToString
   @AllArgsConstructor @EqualsAndHashCode(callSuper = true) @SuperBuilder(toBuilder = true)`, with

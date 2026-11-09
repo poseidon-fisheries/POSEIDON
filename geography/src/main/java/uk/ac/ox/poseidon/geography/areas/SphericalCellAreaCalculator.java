@@ -76,6 +76,6 @@ public class SphericalCellAreaCalculator implements CellAreaCalculator {
   @Override
   public double areaInSquareKm(final Cell cell) {
     modelGrid.checkIsInGrid(cell);
-    return rowAreasInSquareKm[cell.y()];
+    return rowAreasInSquareKm[cell.getY()];
   }
 }

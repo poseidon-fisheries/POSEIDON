@@ -101,7 +101,7 @@ public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
           )
         )
       );
-      sparseGrid2D.setObjectLocation(port, cell.x(), cell.y());
+      sparseGrid2D.setObjectLocation(port, cell.getX(), cell.getY());
     });
     return new ImmutablePortGrid(sparseGrid2D, bathymetricGrid);
   }

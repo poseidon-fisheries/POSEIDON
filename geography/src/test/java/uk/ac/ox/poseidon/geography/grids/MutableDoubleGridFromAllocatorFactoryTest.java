@@ -44,8 +44,8 @@ class MutableDoubleGridFromAllocatorFactoryTest {
         scope -> modelGrid,
         scope ->
           new FilteredAllocator(
-            cell -> cell.x() + cell.y(),
-            cell -> !(cell.x() == 1 && cell.y() == 0)
+            cell -> cell.getX() + cell.getY(),
+            cell -> !(cell.getX() == 1 && cell.getY() == 0)
           )
       );
 

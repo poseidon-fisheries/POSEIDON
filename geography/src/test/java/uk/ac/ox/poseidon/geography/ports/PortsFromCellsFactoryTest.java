@@ -45,7 +45,7 @@ class PortsFromCellsFactoryTest {
 
   private final MappingFactory<Scope, Object, Cell, String> cellCode = scope ->
     (context, cell) ->
-      cell.x() + "_" + cell.y();
+      cell.getX() + "_" + cell.getY();
 
   @Test
   void givesOnePortPerCellInOrderAtTheCellsCentre() {
@@ -74,7 +74,7 @@ class PortsFromCellsFactoryTest {
 
     assertThatThrownBy(() -> ports.get(GLOBAL_SCOPE))
       .isInstanceOf(NullPointerException.class)
-      .hasMessage("No port code for Cell[x=2, y=1].");
+      .hasMessage("No port code for Cell(x=2, y=1).");
   }
 
   @Test
@@ -87,7 +87,7 @@ class PortsFromCellsFactoryTest {
 
     assertThatThrownBy(() -> ports.get(GLOBAL_SCOPE))
       .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("P=Cell[x=2, y=1]")
-      .hasMessageContaining("P=Cell[x=0, y=0]");
+      .hasMessageContaining("P=Cell(x=2, y=1)")
+      .hasMessageContaining("P=Cell(x=0, y=0)");
   }
 }

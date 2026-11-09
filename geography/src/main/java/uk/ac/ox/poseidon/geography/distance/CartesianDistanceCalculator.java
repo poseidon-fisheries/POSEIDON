@@ -63,6 +63,9 @@ public class CartesianDistanceCalculator extends AbstractDistanceCalculator {
 
   @Override
   public double distanceInKm(final Cell start, final Cell end) {
-    return cellSizeInKm * Math.hypot(end.x() - start.x(), end.y() - start.y());
+    return (
+      cellSizeInKm *
+      Math.hypot(end.getX() - start.getX(), end.getY() - start.getY())
+    );
   }
 }

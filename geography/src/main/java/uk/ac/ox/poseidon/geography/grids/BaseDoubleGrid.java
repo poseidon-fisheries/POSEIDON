@@ -112,7 +112,7 @@ public class BaseDoubleGrid
 
   @Override
   public double getValue(final Cell cell) {
-    return field.get(cell.x(), cell.y());
+    return field.get(cell.getX(), cell.getY());
   }
 
   @Override

@@ -147,7 +147,9 @@ public class VesselRegisterFactory
         final String eventCode = row.getString(eventCodeColumn);
         final boolean dueAfterTheStart = date.isAfter(start);
         if (creationEventCodes.contains(eventCode)) {
-          final Map<String, Object> attributes = attributeChange(row).values();
+          final Map<String, Object> attributes = attributeChange(
+            row
+          ).getValues();
           if (dueAfterTheStart) {
             laterStatements.add(
               entry(date, _ -> specification.create(vesselId, attributes))

@@ -90,21 +90,21 @@ public class VesselSpecificationFactory
     );
     nodes
       .stream()
-      .map(ReachedNode::node)
+      .map(ReachedNode::getNode)
       .filter(VesselSpecificationFactory.class::isInstance)
       .flatMap(node -> ((VesselSpecificationFactory) node).listedComponents())
       .forEach(listed::add);
     nodes
       .stream()
-      .filter(reached -> reached.node() instanceof VesselComponent<?>)
-      .filter(reached -> !listed.contains(reached.node()))
+      .filter(reached -> reached.getNode() instanceof VesselComponent<?>)
+      .filter(reached -> !listed.contains(reached.getNode()))
       .findFirst()
       .ifPresent(reached -> {
         throw new IllegalStateException(
           "A vessel component used by " +
-            (reached.parent() == null
+            (reached.getParent() == null
               ? "the scenario"
-              : reached.parent().getClass().getName()) +
+              : reached.getParent().getClass().getName()) +
             " is not in the vessel specification"
         );
       });

@@ -152,7 +152,7 @@ abstract class AbstractModelGrid implements ModelGrid {
   @Override
   public Coordinate toCoordinate(final Cell cell) {
     checkArgument(isInGrid(cell), "%s outside of grid", cell);
-    return (Coordinate) coordinatesGrid.get(cell.x(), cell.y());
+    return (Coordinate) coordinatesGrid.get(cell.getX(), cell.getY());
   }
 
   /**
@@ -214,8 +214,8 @@ abstract class AbstractModelGrid implements ModelGrid {
     final IntBag yPositions = new IntBag(8);
     // `Grid2D::getMooreLocations` fills the provided bags as a side effect
     new SparseGrid2D(gridWidth, gridHeight).getMooreLocations(
-      cell.x(),
-      cell.y(),
+      cell.getX(),
+      cell.getY(),
       neighbourhoodSize,
       Grid2D.BOUNDED,
       false,

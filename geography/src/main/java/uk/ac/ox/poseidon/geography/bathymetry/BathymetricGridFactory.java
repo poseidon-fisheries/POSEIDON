@@ -78,7 +78,7 @@ public abstract class BathymetricGridFactory<S extends Scope> extends RelativeSc
       .getAllCells()
       .forEach(
         cell ->
-          array[cell.x()][cell.y()] = aggregator
+          array[cell.getX()][cell.getY()] = aggregator
             .apply(elevationValues.getOrDefault(cell, List.of()))
             .orElse(0)
       );

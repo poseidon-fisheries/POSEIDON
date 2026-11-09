@@ -76,7 +76,7 @@ public class MutableDoubleGrid
    * @param value the new value
    */
   protected void setValue(final Cell cell, final double value) {
-    this.field.set(cell.x(), cell.y(), value);
+    this.field.set(cell.getX(), cell.getY(), value);
   }
 
   @Override

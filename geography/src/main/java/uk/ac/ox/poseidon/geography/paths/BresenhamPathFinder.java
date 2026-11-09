@@ -71,10 +71,10 @@ public class BresenhamPathFinder extends AbstractGridPathFinder {
 
   private static ImmutableList<Cell> line(final Cell start, final Cell end) {
     final Array<GridPoint2> linePoints = new Bresenham2().line(
-      start.x(),
-      start.y(),
-      end.x(),
-      end.y()
+      start.getX(),
+      start.getY(),
+      end.getX(),
+      end.getY()
     );
     return Streams.stream(linePoints)
       .map(point -> new Cell(point.x, point.y))

@@ -35,6 +35,8 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.SequencedMap;
 import java.util.concurrent.ForkJoinTask;
+import lombok.AllArgsConstructor;
+import lombok.Value;
 import uk.ac.ox.poseidon.calibration.CalibrationProblem.SimulationTimes;
 
 /**
@@ -70,7 +72,7 @@ public final class CalibrationRunner {
   ) {
     final Engine<DoubleGene, Double> engine = Engine.builder(problem)
       .minimizing()
-      .populationSize(options.populationSize())
+      .populationSize(options.getPopulationSize())
       .survivorsSelector(
         new EliteSelector<>(1, new TournamentSelector<DoubleGene, Double>(3))
       )
@@ -78,27 +80,27 @@ public final class CalibrationRunner {
       .fitnessExecutor(CalibrationRunner::evaluateSeparately)
       .alterers(
         new GaussianMutator<>(
-          options.mutationProbability(),
+          options.getMutationProbability(),
           new GaussianMutator.Shape(
-            options.mutatorShapeShift(),
-            options.mutatorShapeSigma()
+            options.getMutatorShapeShift(),
+            options.getMutatorShapeSigma()
           )
         ),
-        new MeanAlterer<>(options.recombinationProbability())
+        new MeanAlterer<>(options.getRecombinationProbability())
       )
       .build();
 
     final Reporter reporter = new Reporter(
       problem,
-      options.reportEveryGenerations(),
+      options.getReportEveryGenerations(),
       Runtime.getRuntime().availableProcessors()
     );
     EvolutionStream<DoubleGene, Double> stream = engine
       .stream()
-      .limit(byFixedGeneration(options.generations()));
+      .limit(byFixedGeneration(options.getGenerations()));
 
-    if (options.steadyGenerations() > 0) {
-      stream = stream.limit(bySteadyFitness(options.steadyGenerations()));
+    if (options.getSteadyGenerations() > 0) {
+      stream = stream.limit(bySteadyFitness(options.getSteadyGenerations()));
     }
 
     final EvolutionResult<DoubleGene, Double> result = stream
@@ -115,38 +117,44 @@ public final class CalibrationRunner {
   /**
    * The genetic-algorithm parameters
    * {@link #minimize(CalibrationProblem, Options)} runs with.
-   *
-   * @param populationSize           number of individuals per generation
-   * @param generations              hard cap on the number of generations to
-   *                                 run
-   * @param mutationProbability      per-allele probability of Gaussian mutation
-   * @param recombinationProbability probability of mean-value recombination
-   *                                 between parents
-   * @param steadyGenerations        if greater than {@code 0}, stop early once
-   *                                 the best fitness hasn't improved for this
-   *                                 many consecutive generations; {@code 0}
-   *                                 disables early stopping
-   * @param reportEveryGenerations   if greater than {@code 0}, print a progress
-   *                                 line every this many generations: the best
-   *                                 fitness and, since the previous line, the
-   *                                 wall time, the simulations run, their time
-   *                                 and the share of the processors they used;
-   *                                 {@code 0} disables reporting
-   * @param mutatorShapeShift        shift parameter of the Gaussian mutator's
-   *                                 shape
-   * @param mutatorShapeSigma        sigma (spread) parameter of the Gaussian
-   *                                 mutator's shape
    */
-  public record Options(
-    int populationSize,
-    long generations,
-    double mutationProbability,
-    double recombinationProbability,
-    int steadyGenerations,
-    int reportEveryGenerations,
-    double mutatorShapeShift,
-    double mutatorShapeSigma
-  ) {
+  @Value
+  @AllArgsConstructor
+  public static final class Options {
+
+    /** Number of individuals per generation. */
+    int populationSize;
+
+    /** Hard cap on the number of generations to run. */
+    long generations;
+
+    /** Per-allele probability of Gaussian mutation. */
+    double mutationProbability;
+
+    /** Probability of mean-value recombination between parents. */
+    double recombinationProbability;
+
+    /**
+     * If greater than {@code 0}, stop early once the best fitness hasn't
+     * improved for this many consecutive generations; {@code 0} disables early
+     * stopping.
+     */
+    int steadyGenerations;
+
+    /**
+     * If greater than {@code 0}, print a progress line every this many
+     * generations: the best fitness and, since the previous line, the wall
+     * time, the simulations run, their time and the share of the processors
+     * they used; {@code 0} disables reporting.
+     */
+    int reportEveryGenerations;
+
+    /** Shift parameter of the Gaussian mutator's shape. */
+    double mutatorShapeShift;
+
+    /** Sigma (spread) parameter of the Gaussian mutator's shape. */
+    double mutatorShapeSigma;
+
     /**
      * Shorthand for the full constructor with early stopping, reporting and
      * mutator shaping disabled/left at their neutral defaults.
@@ -207,27 +215,38 @@ public final class CalibrationRunner {
   /**
    * The outcome of a {@link #minimize(CalibrationProblem, Options)} run.
    *
-   * @param parameters  the best solution found, as a map of property name to
-   *                    value; defensively copied on construction and on every
-   *                    {@link #parameters()} call
-   * @param fitness     the best solution's fitness score
-   * @param generations the number of generations actually run
    */
-  public record Result(
-    SequencedMap<String, Double> parameters,
-    double fitness,
-    long generations
-  ) {
+  @Value
+  public static final class Result {
+
+    /**
+     * The best solution found, as a map of property name to value; defensively
+     * copied on construction and on every {@link #getParameters()} call.
+     */
+    SequencedMap<String, Double> parameters;
+
+    /** The best solution's fitness score. */
+    double fitness;
+
+    /** The number of generations actually run. */
+    long generations;
+
     /**
      * Copies {@code parameters}, so that later changes to the caller's map do
      * not reach the result.
      */
-    public Result {
-      parameters = new LinkedHashMap<>(parameters);
+    public Result(
+      final SequencedMap<String, Double> parameters,
+      final double fitness,
+      final long generations
+    ) {
+      this.parameters = new LinkedHashMap<>(parameters);
+      this.fitness = fitness;
+      this.generations = generations;
     }
 
-    @Override
-    public SequencedMap<String, Double> parameters() {
+    /** @return a copy of the best solution found */
+    public SequencedMap<String, Double> getParameters() {
       return new LinkedHashMap<>(parameters);
     }
   }

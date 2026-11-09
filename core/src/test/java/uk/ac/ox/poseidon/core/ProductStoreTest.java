@@ -30,6 +30,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Value;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 
@@ -129,7 +130,11 @@ class ProductStoreTest {
   }
 
   /** Holds its simulation, which goes only with the store keeping it. */
-  record Product(Simulation simulation) {}
+  @Value
+  static final class Product {
+
+    Simulation simulation;
+  }
 
   static final class ProductFactory extends SimulationScopeFactory<Product> {
 

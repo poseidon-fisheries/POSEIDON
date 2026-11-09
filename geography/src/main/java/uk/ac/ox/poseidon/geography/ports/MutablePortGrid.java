@@ -55,7 +55,7 @@ public class MutablePortGrid
     );
     source.getPorts().forEach(port -> {
       final Cell cell = source.getCell(port);
-      sparseGrid2D.setObjectLocation(port, cell.x(), cell.y());
+      sparseGrid2D.setObjectLocation(port, cell.getX(), cell.getY());
     });
     return new MutablePortGrid(source.getBathymetricGrid(), sparseGrid2D);
   }
@@ -104,7 +104,7 @@ public class MutablePortGrid
     );
     validateCell(cell);
     final Port port = new Port(portCode, portName);
-    field.setObjectLocation(port, cell.x(), cell.y());
+    field.setObjectLocation(port, cell.getX(), cell.getY());
     return port;
   }
 

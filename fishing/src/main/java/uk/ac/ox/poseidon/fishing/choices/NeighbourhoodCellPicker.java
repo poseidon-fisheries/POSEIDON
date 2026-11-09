@@ -134,7 +134,10 @@ public class NeighbourhoodCellPicker implements Function<Vessel, Cell> {
       .stream()
       .filter(
         cell ->
-          max(abs(cell.x() - centre.x()), abs(cell.y() - centre.y())) == size
+          max(
+            abs(cell.getX() - centre.getX()),
+            abs(cell.getY() - centre.getY())
+          ) == size
       )
       .toList();
   }

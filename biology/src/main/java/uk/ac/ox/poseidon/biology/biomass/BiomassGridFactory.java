@@ -62,9 +62,8 @@ public class BiomassGridFactory extends SimulationScopeFactory<BiomassGrid> {
       .getAllCells()
       .forEach(
         cell ->
-          biomassArray[cell.x()][cell.y()] = biomassAllocator.applyAsDouble(
-            cell
-          )
+          biomassArray[cell.getX()][cell.getY()] =
+            biomassAllocator.applyAsDouble(cell)
       );
     return new DefaultBiomassGrid(modelGrid, species.get(scope), biomassArray);
   }

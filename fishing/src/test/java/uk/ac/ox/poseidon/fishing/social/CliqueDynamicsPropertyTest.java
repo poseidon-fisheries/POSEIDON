@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lombok.Value;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Combinators;
@@ -113,8 +114,8 @@ class CliqueDynamicsPropertyTest {
       new MersenneTwisterFast(seed)
     );
     for (final Step step : steps) {
-      final Vessel vessel = fleet.get(step.vesselIndex() % fleetSize);
-      switch (step.kind()) {
+      final Vessel vessel = fleet.get(step.getVesselIndex() % fleetSize);
+      switch (step.getKind()) {
         case TRIP_START -> {
           startTrip(dynamics, vessel);
           assertThat(network.getRecipients(vessel)).allMatch(
@@ -124,7 +125,7 @@ class CliqueDynamicsPropertyTest {
               keys.get(partner).equals(keys.get(vessel))
           );
         }
-        case KEY_CHANGE -> keys.put(vessel, KEYS.get(step.keyIndex()));
+        case KEY_CHANGE -> keys.put(vessel, KEYS.get(step.getKeyIndex()));
         case ACTIVITY_CHANGE -> activity.put(vessel, !activity.get(vessel));
       }
       assertCliqueInvariants(network, fleet, maximumCliqueSize);
@@ -149,5 +150,11 @@ class CliqueDynamicsPropertyTest {
     ACTIVITY_CHANGE
   }
 
-  record Step(StepKind kind, int vesselIndex, int keyIndex) {}
+  @Value
+  static final class Step {
+
+    StepKind kind;
+    int vesselIndex;
+    int keyIndex;
+  }
 }

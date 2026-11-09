@@ -46,7 +46,7 @@ class NormalisedMutableDoubleGridFromAllocatorFactoryTest {
         scope ->
           new FilteredAllocator(
             cell -> 2.0,
-            cell -> !(cell.x() == 0 && cell.y() == 1)
+            cell -> !(cell.getX() == 0 && cell.getY() == 1)
           ),
         scope -> 12.0
       );

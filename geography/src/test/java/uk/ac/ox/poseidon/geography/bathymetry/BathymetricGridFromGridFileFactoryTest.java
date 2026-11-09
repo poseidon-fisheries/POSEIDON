@@ -72,7 +72,8 @@ class BathymetricGridFromGridFileFactoryTest {
     modelGrid
       .getAllCells()
       .forEach(
-        cell -> rowsFromNorth[cell.y()][cell.x()] = grid.getElevation(cell)
+        cell ->
+          rowsFromNorth[cell.getY()][cell.getX()] = grid.getElevation(cell)
       );
     return rowsFromNorth;
   }

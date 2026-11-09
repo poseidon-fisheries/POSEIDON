@@ -168,7 +168,7 @@ class NeighbourhoodCellPickerTest {
     final NeighbourhoodCellPicker picker = new NeighbourhoodCellPicker(
       pathFinder,
       (pickedFor, cell) ->
-        pickedFor == vessel ? cell.y() == 0 : cell.equals(new Cell(2, 1)),
+        pickedFor == vessel ? cell.getY() == 0 : cell.equals(new Cell(2, 1)),
       pickedFor -> 1,
       BEYOND_THE_GRID,
       Vessel::getCell,

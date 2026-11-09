@@ -45,10 +45,10 @@ class ScenarioCheckTest {
     scenarioWith(check).startNewSimulation(0).finish();
 
     assertThat(check.seen)
-      .extracting(ReachedNode::node)
+      .extracting(ReachedNode::getNode)
       .containsExactly(check, shared);
     assertThat(check.seen)
-      .extracting(ReachedNode::parent)
+      .extracting(ReachedNode::getParent)
       .containsExactly(null, check);
   }
 

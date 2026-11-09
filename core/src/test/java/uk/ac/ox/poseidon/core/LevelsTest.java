@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 
+import lombok.Value;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
@@ -131,7 +132,11 @@ class LevelsTest {
   }
 
   /** Says the class of the scope its build received. */
-  record Product(Class<? extends Scope> scopeClass) {}
+  @Value
+  static final class Product {
+
+    Class<? extends Scope> scopeClass;
+  }
 
   static final class GlobalProductFactory extends GlobalScopeFactory<Product> {
 

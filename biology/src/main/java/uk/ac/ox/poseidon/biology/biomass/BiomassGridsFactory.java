@@ -91,9 +91,8 @@ public class BiomassGridsFactory
           .getAllCells()
           .forEach(
             cell ->
-              biomassArray[cell.x()][cell.y()] = biomassAllocator.applyAsDouble(
-                cell
-              )
+              biomassArray[cell.getX()][cell.getY()] =
+                biomassAllocator.applyAsDouble(cell)
           );
         return (BiomassGrid) new DefaultBiomassGrid(
           modelGrid,

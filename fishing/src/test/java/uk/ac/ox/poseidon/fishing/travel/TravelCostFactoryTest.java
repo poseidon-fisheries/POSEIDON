@@ -65,7 +65,7 @@ class TravelCostFactoryTest {
     new GlobalRouteCostFactory();
 
   private static Route route(final Cell destination) {
-    return new Route(destination.x(), Duration.ofHours(destination.y()));
+    return new Route(destination.getX(), Duration.ofHours(destination.getY()));
   }
 
   /** A route function shared by every simulation. */

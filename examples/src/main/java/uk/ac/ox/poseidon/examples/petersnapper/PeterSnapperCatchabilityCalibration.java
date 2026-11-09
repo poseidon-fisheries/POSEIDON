@@ -112,12 +112,12 @@ public final class PeterSnapperCatchabilityCalibration {
       )
     );
 
-    System.out.println("Best parameters: " + result.parameters());
-    System.out.println("Best fitness: " + result.fitness());
-    System.out.println("Generations: " + result.generations());
+    System.out.println("Best parameters: " + result.getParameters());
+    System.out.println("Best fitness: " + result.getFitness());
+    System.out.println("Generations: " + result.getGenerations());
     System.out.printf(
       "Tutorial catchability error: %.6g%n",
-      result.parameters().get(CATCHABILITY_PROPERTY) - TUTORIAL_CATCHABILITY
+      result.getParameters().get(CATCHABILITY_PROPERTY) - TUTORIAL_CATCHABILITY
     );
   }
 

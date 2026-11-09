@@ -51,7 +51,7 @@ class TravelCostTest {
     destination
   ) -> {
     routesComputed.incrementAndGet();
-    return new Route(destination.x(), Duration.ofHours(destination.y()));
+    return new Route(destination.getX(), Duration.ofHours(destination.getY()));
   };
   private final Function<Vessel, Function<Route, Money>> distanceCost =
     chargedTo -> route -> Money.of(EUR, route.getDistanceInKm());

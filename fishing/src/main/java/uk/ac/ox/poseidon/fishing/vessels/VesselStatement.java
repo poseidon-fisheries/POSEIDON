@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import lombok.Value;
 
 /**
  * What a source states about a vessel that exists: that some of its
@@ -41,23 +42,33 @@ sealed interface VesselStatement {
    * Some of a vessel's attributes take new values, others become absent, and
    * those it does not name are untouched.
    *
-   * @param values           the attributes set, with their new values
-   * @param absentAttributes the attributes that become absent
    */
-  record AttributeChange(
-    ImmutableMap<String, Object> values,
-    ImmutableSet<String> absentAttributes
-  ) implements VesselStatement {
+  @Value
+  final class AttributeChange implements VesselStatement {
+
+    /** The attributes set, with their new values. */
+    ImmutableMap<String, Object> values;
+
+    /** The attributes that become absent. */
+    ImmutableSet<String> absentAttributes;
+
     /**
+     * @param values           the attributes set, with their new values
+     * @param absentAttributes the attributes that become absent
      * @throws IllegalArgumentException if an attribute is both set and made
      *                                  absent
      */
-    public AttributeChange {
+    public AttributeChange(
+      final ImmutableMap<String, Object> values,
+      final ImmutableSet<String> absentAttributes
+    ) {
       checkArgument(
         Sets.intersection(values.keySet(), absentAttributes).isEmpty(),
         "Attributes both set and made absent: %s",
         Sets.intersection(values.keySet(), absentAttributes)
       );
+      this.values = values;
+      this.absentAttributes = absentAttributes;
     }
 
     /**
@@ -78,5 +89,6 @@ sealed interface VesselStatement {
    * The vessel exits: it leaves its fleet for good, and no later statement
    * about it may be made.
    */
-  record Exit() implements VesselStatement {}
+  @Value
+  final class Exit implements VesselStatement {}
 }

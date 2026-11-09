@@ -22,13 +22,17 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
+import lombok.Value;
+
 /**
  * The default of a choice as a scenario writes it: what a combination that no
  * row lists gives. Built via {@link Factories#otherwise}.
  *
- * @param outcome what such a combination gives
- * @param <T>     the type of the component
+ * @param <T> the type of the component
  */
-public record ChoiceDefault<T>(
-  ChoiceOutcome<T> outcome
-) implements ChoiceEntry<T> {}
+@Value
+public final class ChoiceDefault<T> implements ChoiceEntry<T> {
+
+  /** What such a combination gives. */
+  ChoiceOutcome<T> outcome;
+}

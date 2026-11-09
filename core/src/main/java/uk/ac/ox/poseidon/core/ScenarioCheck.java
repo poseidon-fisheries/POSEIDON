@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core;
 
 import java.util.List;
+import lombok.Value;
 
 /**
  * A part of a scenario's description that checks the whole description it
@@ -40,10 +41,17 @@ public interface ScenarioCheck {
    */
   void check(List<ReachedNode> nodes);
 
-  /**
-   * @param node   a node of the description
-   * @param parent the node {@code node} was first reached from, or
-   *               {@code null} for a scenario component
-   */
-  record ReachedNode(Object node, Object parent) {}
+  /** A node of a scenario's description, with where it was reached from. */
+  @Value
+  static final class ReachedNode {
+
+    /** A node of the description. */
+    Object node;
+
+    /**
+     * The node {@code node} was first reached from, or {@code null} for a
+     * scenario component.
+     */
+    Object parent;
+  }
 }

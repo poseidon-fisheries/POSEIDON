@@ -61,7 +61,7 @@ class CarryingCapacityGridTest {
       .getAllCells()
       .forEach(cell ->
         assertThat(grid.getCarryingCapacity(cell)).isEqualTo(
-          cell.y() == 2 ? 1 : 0
+          cell.getY() == 2 ? 1 : 0
         )
       );
   }

@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -30,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -103,7 +104,7 @@ public class SvgRenderer {
       new ImageSize(width, height),
       size -> {
         try {
-          return render(size.width(), size.height());
+          return render(size.getWidth(), size.getHeight());
         } catch (final Exception e) {
           throw new RuntimeException("Failed to draw SVG document", e);
         }
@@ -112,7 +113,12 @@ public class SvgRenderer {
     g.drawImage(image, x, y, null);
   }
 
-  private record ImageSize(int width, int height) {}
+  @Value
+  private static final class ImageSize {
+
+    int width;
+    int height;
+  }
 
   // Inner class for handling the image transcoding
   private static class CustomImageTranscoder extends ImageTranscoder {

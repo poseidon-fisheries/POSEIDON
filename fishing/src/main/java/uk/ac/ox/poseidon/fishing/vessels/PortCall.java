@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.fishing.vessels;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.NonNull;
+import lombok.Value;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
@@ -32,15 +33,22 @@ import uk.ac.ox.poseidon.geography.ports.Port;
  * and undocked again. The docking that ends a trip is its arrival, not a port
  * call.
  *
- * @param port              the port the vessel docked at
- * @param arrivalDateTime   when it docked
- * @param departureDateTime when it undocked
  */
-public record PortCall(
-  @NonNull Port port,
-  @NonNull LocalDateTime arrivalDateTime,
-  @NonNull LocalDateTime departureDateTime
-) {
+@Value
+public final class PortCall {
+
+  /** The port the vessel docked at. */
+  @NonNull
+  Port port;
+
+  /** When it docked. */
+  @NonNull
+  LocalDateTime arrivalDateTime;
+
+  /** When it undocked. */
+  @NonNull
+  LocalDateTime departureDateTime;
+
   /** @return the time from the arrival to the departure */
   public Duration duration() {
     return Duration.between(arrivalDateTime, departureDateTime);

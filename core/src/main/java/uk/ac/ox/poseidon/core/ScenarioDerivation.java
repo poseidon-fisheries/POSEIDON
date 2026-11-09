@@ -36,6 +36,7 @@ import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.Value;
 import org.apache.commons.beanutils.expression.DefaultResolver;
 import org.apache.commons.beanutils.expression.Resolver;
 import uk.ac.ox.poseidon.core.utils.Builders;
@@ -247,7 +248,11 @@ final class ScenarioDerivation {
     Object write(Object container, Object value);
   }
 
-  private record Property(String name) implements Step {
+  @Value
+  private static final class Property implements Step {
+
+    String name;
+
     @Override
     public Object read(final Object container, final String address) {
       if (!(container instanceof ScenarioNode)) {
@@ -280,7 +285,11 @@ final class ScenarioDerivation {
     }
   }
 
-  private record Key(String key) implements Step {
+  @Value
+  private static final class Key implements Step {
+
+    String key;
+
     @Override
     public Object read(final Object container, final String address) {
       if (!(container instanceof Map<?, ?> map)) {
@@ -311,7 +320,11 @@ final class ScenarioDerivation {
     }
   }
 
-  private record Index(int index) implements Step {
+  @Value
+  private static final class Index implements Step {
+
+    int index;
+
     @Override
     public Object read(final Object container, final String address) {
       if (

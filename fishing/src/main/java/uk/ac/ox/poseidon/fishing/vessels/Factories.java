@@ -218,7 +218,7 @@ public final class Factories {
             "The choice by %s has two defaults",
             attributes
           );
-          defaultOutcome = choiceDefault.outcome();
+          defaultOutcome = choiceDefault.getOutcome();
         }
       }
     }

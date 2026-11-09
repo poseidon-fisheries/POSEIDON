@@ -80,7 +80,7 @@ final class ScenarioWalk {
     final List<ReachedNode> nodes = List.copyOf(walk.nodes);
     nodes
       .stream()
-      .map(ReachedNode::node)
+      .map(ReachedNode::getNode)
       .filter(ScenarioCheck.class::isInstance)
       .forEach(node -> ((ScenarioCheck) node).check(nodes));
   }

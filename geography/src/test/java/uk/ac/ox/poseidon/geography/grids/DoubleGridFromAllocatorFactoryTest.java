@@ -45,8 +45,8 @@ class DoubleGridFromAllocatorFactoryTest {
         scope -> modelGrid,
         scope ->
           new FilteredAllocator(
-            cell -> cell.x() + cell.y(),
-            cell -> !(cell.x() == 1 && cell.y() == 0)
+            cell -> cell.getX() + cell.getY(),
+            cell -> !(cell.getX() == 1 && cell.getY() == 0)
           )
       );
 
@@ -67,7 +67,7 @@ class DoubleGridFromAllocatorFactoryTest {
     final DoubleGridFromAllocatorFactory<Scope> factory =
       new DoubleGridFromAllocatorFactory<>(
         scope -> modelGrid,
-        scope -> cell -> cell.x() == 1 ? -1.0 : 1.0
+        scope -> cell -> cell.getX() == 1 ? -1.0 : 1.0
       );
     assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE)).isInstanceOf(
       IllegalArgumentException.class

@@ -99,7 +99,7 @@ public interface ModelGrid {
   /** @return the continuous grid point at the centre of {@code cell} */
   @SuppressWarnings("MagicNumber")
   default Double2D toPoint(final Cell cell) {
-    return new Double2D(cell.x() + 0.5, cell.y() + 0.5);
+    return new Double2D(cell.getX() + 0.5, cell.getY() + 0.5);
   }
 
   /** @return the discrete cell containing {@code coordinate} */
@@ -183,7 +183,7 @@ public interface ModelGrid {
   }
 
   private long cellIndex(final Cell cell) {
-    return (long) cell.x() * getGridHeight() + cell.y();
+    return (long) cell.getX() * getGridHeight() + cell.getY();
   }
 
   /**
@@ -225,10 +225,10 @@ public interface ModelGrid {
    */
   default boolean isInGrid(final Cell cell) {
     return (
-      cell.x() >= 0 &&
-      cell.y() >= 0 &&
-      cell.x() < getGridWidth() &&
-      cell.y() < getGridHeight()
+      cell.getX() >= 0 &&
+      cell.getY() >= 0 &&
+      cell.getX() < getGridWidth() &&
+      cell.getY() < getGridHeight()
     );
   }
 

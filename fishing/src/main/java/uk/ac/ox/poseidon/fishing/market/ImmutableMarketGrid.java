@@ -45,7 +45,7 @@ public class ImmutableMarketGrid extends MarketGrid {
   ) {
     super(modelGrid);
     marketCells.forEach((market, cell) ->
-      field.setObjectLocation(market, cell.x(), cell.y())
+      field.setObjectLocation(market, cell.getX(), cell.getY())
     );
     this.marketsByPort = Multimaps.index(marketCells.keySet(), Market::getPort);
   }

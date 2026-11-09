@@ -79,7 +79,7 @@ abstract class AbstractDoubleGridFromAllocatorFactory<
         );
         sum.addAndGet(value);
       }
-      values[cell.x()][cell.y()] = value;
+      values[cell.getX()][cell.getY()] = value;
     });
     return makeGrid(modelGrid, postProcess(scope, values, sum.doubleValue()));
   }

@@ -74,7 +74,7 @@ public abstract class ObjectGrid<T>
 
   /** @return the objects placed on {@code cell} */
   public Stream<T> getObjectsAt(final Cell cell) {
-    return bagToStream(field.getObjectsAtLocation(cell.x(), cell.y()));
+    return bagToStream(field.getObjectsAtLocation(cell.getX(), cell.getY()));
   }
 
   /** @return whether any object is placed on {@code cell} */
@@ -84,7 +84,7 @@ public abstract class ObjectGrid<T>
 
   /** @return the number of objects placed on {@code cell} */
   public int numObjectsAt(final Cell cell) {
-    return field.numObjectsAtLocation(cell.x(), cell.y());
+    return field.numObjectsAtLocation(cell.getX(), cell.getY());
   }
 
   @Override
@@ -131,7 +131,7 @@ public abstract class ObjectGrid<T>
         port.getName(),
         coordinate
       );
-      grid.setObjectLocation(port, cell.x(), cell.y());
+      grid.setObjectLocation(port, cell.getX(), cell.getY());
     });
     return grid;
   }

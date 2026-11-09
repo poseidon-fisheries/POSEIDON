@@ -44,6 +44,7 @@ import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.experimental.Accessors;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
@@ -175,13 +176,17 @@ public class CalibrationProblem
   /**
    * Simulations run over some period, with their total time.
    *
-   * @param simulations the number of simulations run
-   * @param total       their total time, from building each one to finishing it
-   * @param building    the part of {@code total} spent building them
    */
-  public record SimulationTimes(
-    long simulations,
-    Duration total,
-    Duration building
-  ) {}
+  @Value
+  public static final class SimulationTimes {
+
+    /** The number of simulations run. */
+    long simulations;
+
+    /** Their total time, from building each one to finishing it. */
+    Duration total;
+
+    /** The part of {@code total} spent building them. */
+    Duration building;
+  }
 }

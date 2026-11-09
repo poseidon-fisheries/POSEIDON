@@ -46,7 +46,7 @@ public class ImmutableFuelStationGrid extends FuelStationGrid {
   ) {
     super(modelGrid);
     fuelStationCells.forEach((fuelStation, cell) ->
-      field.setObjectLocation(fuelStation, cell.x(), cell.y())
+      field.setObjectLocation(fuelStation, cell.getX(), cell.getY())
     );
     this.fuelStationsByPort = Multimaps.index(
       fuelStationCells.keySet(),

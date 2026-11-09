@@ -41,6 +41,7 @@ import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import sim.engine.*;
 
 /**
@@ -275,8 +276,8 @@ public class TemporalSchedule extends Schedule {
     final long seconds = (long) Math.floor(time);
     final Conversion conversion = lastConversion;
     final LocalDateTime dateTime;
-    if (conversion != null && conversion.seconds() == seconds) {
-      dateTime = conversion.dateTime();
+    if (conversion != null && conversion.getSeconds() == seconds) {
+      dateTime = conversion.getDateTime();
     } else {
       dateTime = startingDateTime.plusSeconds(seconds);
       lastConversion = new Conversion(seconds, dateTime);
@@ -284,7 +285,12 @@ public class TemporalSchedule extends Schedule {
     return dateTime;
   }
 
-  private record Conversion(long seconds, LocalDateTime dateTime) {}
+  @Value
+  private static final class Conversion {
+
+    long seconds;
+    LocalDateTime dateTime;
+  }
 
   /**
    * @param dateTime the date-time to schedule the event at
@@ -738,12 +744,14 @@ public class TemporalSchedule extends Schedule {
    * circumstances be used in actual simulation code. -- NP 2026-02-03.
    */
   private List<?> asMap() {
-    record K(
-      LocalDateTime dateTime,
-      int ordering,
-      int sequence,
-      Object steppable
-    ) {}
+    @Value
+    final class K {
+
+      LocalDateTime dateTime;
+      int ordering;
+      int sequence;
+      Object steppable;
+    }
     final Comparable[] keys = queue.getKeys();
     final Object[] objects = queue.getObjects();
     return IntStream.range(0, this.queue.size())
@@ -762,9 +770,9 @@ public class TemporalSchedule extends Schedule {
       })
       .flatMap(x -> x)
       .sorted((o1, o2) ->
-        Comparator.comparing(K::dateTime)
-          .thenComparingInt(K::ordering)
-          .thenComparingInt(K::sequence)
+        Comparator.comparing(K::getDateTime)
+          .thenComparingInt(K::getOrdering)
+          .thenComparingInt(K::getSequence)
           .compare(o1, o2)
       )
       .toList();

@@ -85,7 +85,7 @@ public class GridAdaptor implements IndexedGraph<Cell> {
    */
   @Override
   public int getIndex(final Cell cell) {
-    return cell.x() + cell.y() * modelGrid.getGridWidth();
+    return cell.getX() + cell.getY() * modelGrid.getGridWidth();
   }
 
   /** @return the total number of cells in the grid */

@@ -92,13 +92,13 @@ public abstract class CoordinateBasedDistanceCalculator
 
   @Override
   public double distanceInKm(final Cell start, final Cell end) {
-    final int dx = end.x() - start.x();
-    final int dy = end.y() - start.y();
+    final int dx = end.getX() - start.getX();
+    final int dy = end.getY() - start.getY();
     return modelGrid.isInGrid(start) &&
       modelGrid.isInGrid(end) &&
       abs(dx) <= 1 &&
       abs(dy) <= 1
-      ? stepLengthsInKm[stepIndex(start.y(), dx, dy)]
+      ? stepLengthsInKm[stepIndex(start.getY(), dx, dy)]
       : distanceInKm(
           modelGrid.toCoordinate(start),
           modelGrid.toCoordinate(end)

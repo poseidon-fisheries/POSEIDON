@@ -45,7 +45,7 @@ class NormalisedDoubleGridFromAllocatorFactoryTest {
         scope ->
           new FilteredAllocator(
             cell -> 1.0,
-            cell -> !(cell.x() == 0 && cell.y() == 0)
+            cell -> !(cell.getX() == 0 && cell.getY() == 0)
           ),
         scope -> 12.0
       );
@@ -77,7 +77,7 @@ class NormalisedDoubleGridFromAllocatorFactoryTest {
     final NormalisedDoubleGridFromAllocatorFactory<Scope> factory =
       new NormalisedDoubleGridFromAllocatorFactory<>(
         _ -> modelGrid,
-        _ -> cell -> cell.x() == 1 ? -1.0 : 1.0,
+        _ -> cell -> cell.getX() == 1 ? -1.0 : 1.0,
         _ -> 4.0
       );
 

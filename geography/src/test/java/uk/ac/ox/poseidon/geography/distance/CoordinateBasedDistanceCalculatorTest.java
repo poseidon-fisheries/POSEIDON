@@ -46,7 +46,7 @@ class CoordinateBasedDistanceCalculatorTest {
     modelGrid.getAllCells().forEach(start -> {
       for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
-          final Cell end = new Cell(start.x() + dx, start.y() + dy);
+          final Cell end = new Cell(start.getX() + dx, start.getY() + dy);
           if (modelGrid.isInGrid(end)) {
             assertThat(calculator.distanceInKm(start, end)).isCloseTo(
               calculator.distanceInKm(
