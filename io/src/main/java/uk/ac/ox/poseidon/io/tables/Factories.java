@@ -265,7 +265,8 @@ public final class Factories {
    *                        map value
    * @return a {@link MappingFactory} for a
    *         {@link uk.ac.ox.poseidon.core.functions.MapLookup} of the key in
-   *         the map built from the resolved table
+   *         the map built from the resolved table, which throws if the key has no
+   *         entry
    * @see uk.ac.ox.poseidon.core.functions.MapLookup
    */
   public static <S extends Scope, C, T, K, V> MapLookupFactory<
@@ -299,7 +300,8 @@ public final class Factories {
    * @return a {@link ValueFactory} for a
    *         {@link uk.ac.ox.poseidon.core.functions.MapLookup} of the key in
    *         the map built from the resolved table, made a value by
-   *         {@link uk.ac.ox.poseidon.core.functions.MappingAsValue}
+   *         {@link uk.ac.ox.poseidon.core.functions.MappingAsValue}, which
+   *         throws if the key has no entry
    * @see uk.ac.ox.poseidon.core.functions.MapLookup
    */
   public static <S extends Scope, C, K, V> MappingAsValueFactory<
@@ -319,5 +321,85 @@ public final class Factories {
     > rowValueBuilder
   ) {
     return mapLookup(key, mapFromTable(table, rowKeyBuilder, rowValueBuilder));
+  }
+
+  /**
+   * @param key             factory for the mapping that reads the lookup key
+   *                        from the thing mapped
+   * @param table           factory for the table to look values up in
+   * @param rowKeyBuilder   factory for the function deriving each table row's
+   *                        map key
+   * @param rowValueBuilder factory for the function deriving each table row's
+   *                        map value
+   * @param defaultValue    the value to return for a key with no entry
+   * @return a {@link MappingFactory} for a
+   *         {@link uk.ac.ox.poseidon.core.functions.MapLookup} of the key in
+   *         the map built from the resolved table, which returns
+   *         {@code defaultValue} if the key has no entry
+   * @see uk.ac.ox.poseidon.core.functions.MapLookup
+   */
+  public static <S extends Scope, C, T, K, V> MapLookupFactory<
+    S,
+    C,
+    T,
+    K,
+    V
+  > tableLookup(
+    final MappingFactory<? super S, ? super C, ? super T, ? extends K> key,
+    final Factory<? super S, Table> table,
+    final Factory<
+      ? super S,
+      ? extends Function<? super Row, ? extends K>
+    > rowKeyBuilder,
+    final Factory<
+      ? super S,
+      ? extends Function<? super Row, ? extends V>
+    > rowValueBuilder,
+    final V defaultValue
+  ) {
+    return mapLookup(
+      key,
+      mapFromTable(table, rowKeyBuilder, rowValueBuilder),
+      defaultValue
+    );
+  }
+
+  /**
+   * @param key             factory for the value that is the lookup key
+   * @param table           factory for the table to look values up in
+   * @param rowKeyBuilder   factory for the function deriving each table row's
+   *                        map key
+   * @param rowValueBuilder factory for the function deriving each table row's
+   *                        map value
+   * @param defaultValue    the value to return for a key with no entry
+   * @return a {@link ValueFactory} for a
+   *         {@link uk.ac.ox.poseidon.core.functions.MapLookup} of the key in
+   *         the map built from the resolved table, made a value by
+   *         {@link uk.ac.ox.poseidon.core.functions.MappingAsValue}, which
+   *         returns {@code defaultValue} if the key has no entry
+   * @see uk.ac.ox.poseidon.core.functions.MapLookup
+   */
+  public static <S extends Scope, C, K, V> MappingAsValueFactory<
+    S,
+    C,
+    V
+  > tableLookup(
+    final ValueFactory<? super S, ? super C, ? extends K> key,
+    final Factory<? super S, Table> table,
+    final Factory<
+      ? super S,
+      ? extends Function<? super Row, ? extends K>
+    > rowKeyBuilder,
+    final Factory<
+      ? super S,
+      ? extends Function<? super Row, ? extends V>
+    > rowValueBuilder,
+    final V defaultValue
+  ) {
+    return mapLookup(
+      key,
+      mapFromTable(table, rowKeyBuilder, rowValueBuilder),
+      defaultValue
+    );
   }
 }

@@ -23,7 +23,6 @@
 package uk.ac.ox.poseidon.core.functions;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import com.google.common.collect.ImmutableList;
 import java.time.Duration;
@@ -50,7 +49,7 @@ public final class Factories {
    *            mapped
    * @param map factory for the map to look the key up in
    * @return a {@link MappingFactory} for a {@link MapLookup} of the key in the
-   *         resolved map
+   *         resolved map, which throws if the key has no entry
    * @see MapLookup
    */
   public static <S extends Scope, C, T, K, V> MapLookupFactory<
@@ -63,14 +62,15 @@ public final class Factories {
     final MappingFactory<? super S, ? super C, ? super T, ? extends K> key,
     final Factory<? super S, ? extends Map<? super K, ? extends V>> map
   ) {
-    return new MapLookupFactory<S, C, T, K, V>(key, map);
+    return new MapLookupFactory<S, C, T, K, V>(key, map, null);
   }
 
   /**
    * @param key factory for the value that is the key
    * @param map factory for the map to look the key up in
    * @return a {@link ValueFactory} for a {@link MapLookup} of the key in the
-   *         resolved map, made a value by {@link MappingAsValue}
+   *         resolved map, made a value by {@link MappingAsValue}, which throws
+   *         if the key has no entry
    * @see MapLookup
    */
   public static <S extends Scope, C, K, V> MappingAsValueFactory<
@@ -84,7 +84,59 @@ public final class Factories {
     return new MappingAsValueFactory<S, C, V>(
       new MapLookupFactory<S, C, Void, K, V>(
         new ValueAsMappingFactory<S, C, K>(key),
-        map
+        map,
+        null
+      )
+    );
+  }
+
+  /**
+   * @param key          factory for the mapping that reads the key from the
+   *                     thing mapped
+   * @param map          factory for the map to look the key up in
+   * @param defaultValue the value to return for a key with no entry
+   * @return a {@link MappingFactory} for a {@link MapLookup} of the key in the
+   *         resolved map, which returns {@code defaultValue} if the key has no
+   *         entry
+   * @see MapLookup
+   */
+  public static <S extends Scope, C, T, K, V> MapLookupFactory<
+    S,
+    C,
+    T,
+    K,
+    V
+  > mapLookup(
+    final MappingFactory<? super S, ? super C, ? super T, ? extends K> key,
+    final Factory<? super S, ? extends Map<? super K, ? extends V>> map,
+    final V defaultValue
+  ) {
+    return new MapLookupFactory<S, C, T, K, V>(key, map, defaultValue);
+  }
+
+  /**
+   * @param key          factory for the value that is the key
+   * @param map          factory for the map to look the key up in
+   * @param defaultValue the value to return for a key with no entry
+   * @return a {@link ValueFactory} for a {@link MapLookup} of the key in the
+   *         resolved map, made a value by {@link MappingAsValue}, which returns
+   *         {@code defaultValue} if the key has no entry
+   * @see MapLookup
+   */
+  public static <S extends Scope, C, K, V> MappingAsValueFactory<
+    S,
+    C,
+    V
+  > mapLookup(
+    final ValueFactory<? super S, ? super C, ? extends K> key,
+    final Factory<? super S, ? extends Map<? super K, ? extends V>> map,
+    final V defaultValue
+  ) {
+    return new MappingAsValueFactory<S, C, V>(
+      new MapLookupFactory<S, C, Void, K, V>(
+        new ValueAsMappingFactory<S, C, K>(key),
+        map,
+        defaultValue
       )
     );
   }
@@ -93,7 +145,8 @@ public final class Factories {
    * @param map factory for the map to look the value up in
    * @param key the fixed key to look up
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for the value
-   *         found under {@code key} in the resolved map
+   *         found under {@code key} in the resolved map, which throws when
+   *         resolved if there is no such entry
    * @see MapEntryFactory
    */
   public static <S extends Scope, K, V> MapEntryFactory<S, K, V> mapEntry(
@@ -155,91 +208,6 @@ public final class Factories {
           .collect(toImmutableList())
       )
     );
-  }
-
-  /**
-   * @param delegate     the mapping to delegate to
-   * @param defaultValue factory for the value substituted when {@code delegate}
-   *                     returns {@code null}
-   * @return a {@link MappingFactory} for a {@link DefaultIfNull} wrapping the
-   *         resolved delegate and default
-   * @see DefaultIfNull
-   */
-  public static <S extends Scope, C, T, R> DefaultIfNullFactory<
-    S,
-    C,
-    T,
-    R
-  > defaultIfNull(
-    final MappingFactory<? super S, ? super C, ? super T, ? extends R> delegate,
-    final Factory<? super S, ? extends R> defaultValue
-  ) {
-    return new DefaultIfNullFactory<S, C, T, R>(delegate, defaultValue);
-  }
-
-  /**
-   * @param delegate     the mapping to delegate to
-   * @param defaultValue the literal value substituted when {@code delegate}
-   *                     returns {@code null}
-   * @return a {@link MappingFactory} for a {@link DefaultIfNull} wrapping the
-   *         resolved delegate and the given default
-   * @see DefaultIfNull
-   */
-  public static <S extends Scope, C, T, R> DefaultIfNullFactory<
-    S,
-    C,
-    T,
-    R
-  > defaultIfNull(
-    final MappingFactory<? super S, ? super C, ? super T, ? extends R> delegate,
-    final R defaultValue
-  ) {
-    return defaultIfNull(delegate, object(defaultValue));
-  }
-
-  /**
-   * @param delegate     the value to read
-   * @param defaultValue factory for the value substituted when {@code delegate}
-   *                     is {@code null}
-   * @return a {@link ValueFactory} for a {@link DefaultIfNull} wrapping the
-   *         resolved delegate and default, made a value by
-   *         {@link MappingAsValue}
-   * @see DefaultIfNull
-   */
-  public static <S extends Scope, C, R> MappingAsValueFactory<
-    S,
-    C,
-    R
-  > defaultIfNull(
-    final ValueFactory<? super S, ? super C, ? extends R> delegate,
-    final Factory<? super S, ? extends R> defaultValue
-  ) {
-    return new MappingAsValueFactory<S, C, R>(
-      new DefaultIfNullFactory<S, C, Void, R>(
-        new ValueAsMappingFactory<S, C, R>(delegate),
-        defaultValue
-      )
-    );
-  }
-
-  /**
-   * @param delegate     the value to read
-   * @param defaultValue the literal value substituted when {@code delegate} is
-   *                     {@code null}
-   * @return a {@link ValueFactory} for a {@link DefaultIfNull} wrapping the
-   *         resolved delegate and the given default, made a value by
-   *         {@link MappingAsValue}
-   * @see DefaultIfNull
-   */
-  public static <S extends Scope, C, R> MappingAsValueFactory<
-    S,
-    C,
-    R
-  > defaultIfNull(
-    final ValueFactory<? super S, ? super C, ? extends R> delegate,
-    final R defaultValue
-  ) {
-    return defaultIfNull(delegate, object(defaultValue));
   }
 
   /**

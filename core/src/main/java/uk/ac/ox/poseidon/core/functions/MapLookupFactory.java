@@ -36,7 +36,8 @@ import uk.ac.ox.poseidon.core.Scope;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link MapLookup}, built via
- * {@link Factories Factories.mapLookup(...)}.
+ * {@link Factories Factories.mapLookup(...)}. The lookup throws on a key with no
+ * entry, unless a default value is given, which it returns instead.
  */
 @Getter
 @ToString
@@ -56,8 +57,11 @@ public class MapLookupFactory<S extends Scope, C, T, K, V>
   > key;
   private final Factory<? super S, ? extends Map<? super K, ? extends V>> map;
 
+  /** The value for a key with no entry, or {@code null} to throw instead. */
+  private final V defaultValue;
+
   @Override
   protected BiFunction<C, T, V> newInstance(final S scope) {
-    return new MapLookup<>(key.get(scope), map.get(scope));
+    return new MapLookup<>(key.get(scope), map.get(scope), defaultValue);
   }
 }

@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.functions;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -39,7 +40,9 @@ import uk.ac.ox.poseidon.core.Scope;
  * once but look up the key on every call. There's no separate
  * plain component class here: the produced value {@code V} is returned as-is,
  * with no wrapper type to carry documentation, so this factory carries the
- * behavior doc directly. Built via {@link Factories#mapEntry(Factory, Object)}.
+ * behavior doc directly. A key with no entry throws a
+ * {@link NoSuchElementException} naming the key when the factory is resolved;
+ * there is no default. Built via {@link Factories#mapEntry(Factory, Object)}.
  */
 @Getter
 @ToString
@@ -57,6 +60,13 @@ public class MapEntryFactory<
 
   @Override
   protected V newInstance(final S scope) {
-    return map.get(scope).get(key);
+    final Map<? super K, ? extends V> resolved = map.get(scope);
+    final V value = resolved.get(key);
+    if (value == null && !resolved.containsKey(key)) {
+      throw new NoSuchElementException(
+        String.format("No entry for key %s.", key)
+      );
+    }
+    return value;
   }
 }

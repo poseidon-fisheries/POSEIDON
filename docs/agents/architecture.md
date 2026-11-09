@@ -124,7 +124,7 @@ from its context has `Object` as its context, so it fits wherever any context is
 value is `constant(x)` where a value is expected and `always(x)` where a mapping is (a filter, a
 part of a key, a term of a sum over routes); the compiler refuses the wrong one. A
 combinator that makes sense in both shapes (`condition`, `allOf`, `anyOf`, `not`,
-`defaultIfNull`, `combinedDuration`…) has one overload per shape; a helper method returning a live
+`combinedDuration`…) has one overload per shape; a helper method returning a live
 value must therefore declare its shape type, or it matches no overload.
 
 Such a combinator has one implementation, its mapping, so it means the same in both shapes. Its

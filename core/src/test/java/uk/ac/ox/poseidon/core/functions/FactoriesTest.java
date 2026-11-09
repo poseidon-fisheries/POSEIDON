@@ -23,15 +23,18 @@
 package uk.ac.ox.poseidon.core.functions;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.core.functions.Factories.combinedDuration;
-import static uk.ac.ox.poseidon.core.functions.Factories.defaultIfNull;
+import static uk.ac.ox.poseidon.core.functions.Factories.mapEntry;
 import static uk.ac.ox.poseidon.core.functions.Factories.mapLookup;
 import static uk.ac.ox.poseidon.core.functions.Factories.multiStringKeyFromFunctions;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
@@ -55,11 +58,6 @@ class FactoriesTest {
   private final MappingFactory<Scope, String, Integer, Integer> plusLength =
     scope -> (context, i) -> i + context.length();
 
-  /** Null for an empty context, else the context itself. */
-  private final ValueFactory<Scope, String, String> nullIfEmpty = scope ->
-    context ->
-      context.isEmpty() ? null : context;
-
   /** Names of a few numbers. */
   private final Factory<Scope, Map<Integer, String>> names = scope ->
     Map.of(3, "three", 5, "five");
@@ -70,7 +68,9 @@ class FactoriesTest {
       GLOBAL_SCOPE
     );
     assertThat(value.apply("abc")).isEqualTo("three");
-    assertThat(value.apply("ab")).isNull();
+    assertThatThrownBy(() -> value.apply("ab"))
+      .isInstanceOf(NoSuchElementException.class)
+      .hasMessageContaining("2");
   }
 
   @Test
@@ -80,29 +80,76 @@ class FactoriesTest {
       names
     ).get(GLOBAL_SCOPE);
     assertThat(mapping.apply("ab", 3)).isEqualTo("five");
-    assertThat(mapping.apply("ab", 2)).isNull();
+    assertThatThrownBy(() -> mapping.apply("ab", 2)).isInstanceOf(
+      NoSuchElementException.class
+    );
   }
 
   @Test
-  void aDefaultReplacesANullValue() {
-    final Function<String, String> value = defaultIfNull(
-      nullIfEmpty,
+  void aValueLookupFallsBackOnItsDefault() {
+    final Function<String, String> value = mapLookup(
+      contextLength,
+      names,
       "none"
     ).get(GLOBAL_SCOPE);
-    assertThat(value.apply("")).isEqualTo("none");
-    assertThat(value.apply("a")).isEqualTo("a");
+    assertThat(value.apply("abc")).isEqualTo("three");
+    assertThat(value.apply("ab")).isEqualTo("none");
   }
 
   @Test
-  void aDefaultReplacesANullMapping() {
-    final MappingFactory<Scope, Object, String, String> nullIfEmptyMapping =
-      scope -> (context, s) -> s.isEmpty() ? null : s;
-    final BiFunction<Object, String, String> mapping = defaultIfNull(
-      nullIfEmptyMapping,
+  void aMappingLookupFallsBackOnItsDefault() {
+    final BiFunction<String, Integer, String> mapping = mapLookup(
+      plusLength,
+      names,
       "none"
     ).get(GLOBAL_SCOPE);
-    assertThat(mapping.apply(null, "")).isEqualTo("none");
-    assertThat(mapping.apply(null, "a")).isEqualTo("a");
+    assertThat(mapping.apply("ab", 3)).isEqualTo("five");
+    assertThat(mapping.apply("ab", 2)).isEqualTo("none");
+  }
+
+  /** A map with an entry whose value is null. */
+  private final Factory<Scope, Map<Integer, String>> withNullValue = scope -> {
+    final Map<Integer, String> map = new HashMap<>();
+    map.put(2, null);
+    return map;
+  };
+
+  @Test
+  void aLookupReturnsAnEntrysNullValueRatherThanItsDefault() {
+    final Function<String, String> value = mapLookup(
+      contextLength,
+      withNullValue,
+      "none"
+    ).get(GLOBAL_SCOPE);
+    assertThat(value.apply("ab")).isNull();
+    assertThat(value.apply("abc")).isEqualTo("none");
+  }
+
+  @Test
+  void aLookupWithoutDefaultReturnsAnEntrysNullValue() {
+    final Function<String, String> value = mapLookup(
+      contextLength,
+      withNullValue
+    ).get(GLOBAL_SCOPE);
+    assertThat(value.apply("ab")).isNull();
+  }
+
+  @Test
+  void anEntryWithANullValueIsFoundWhenResolved() {
+    assertThat(mapEntry(withNullValue, 2).get(GLOBAL_SCOPE)).isNull();
+  }
+
+  @Test
+  void anEntryIsFoundWhenResolved() {
+    assertThat(mapEntry(names, 3).get(GLOBAL_SCOPE)).isEqualTo("three");
+  }
+
+  @Test
+  void aMissingEntryThrowsWhenResolved() {
+    final var entry = mapEntry(names, 4);
+    assertThatThrownBy(() -> entry.get(GLOBAL_SCOPE))
+      .isInstanceOf(NoSuchElementException.class)
+      .hasMessageContaining("4");
   }
 
   @Test
