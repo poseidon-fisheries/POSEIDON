@@ -62,6 +62,11 @@ a factory starts building something else, rename it to match.
 
 When designing a new factory, favor composition over a new bespoke implementation: check whether existing factories (in the same package or in `core`, e.g. constant/random/temporal providers) can be combined or parameterized to produce the desired behavior before writing a new `Factory` class from scratch.
 
+Compose at the level of the parts a scenario wires: each piece of a composition should mean
+something on its own to a reader of scenario code, and be used, or plausibly usable, in more than
+one composition. Don't split a part into internal pieces that only one class uses, or that only
+forward; keep such a piece inside the part, as a field or a private method.
+
 Type parameters keep one meaning throughout: `S` the scope, `P` a factory's product, `C` the
 context of a live value, `T` the thing a mapping maps (or, outside the two shapes, the main type a
 class is about), `R` a result.
