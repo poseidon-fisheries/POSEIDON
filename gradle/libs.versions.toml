@@ -1,42 +1,41 @@
 [versions]
 assertj = "3.27.7"
-batik = "1.19"
+batik = "1.20"
 commons-beanutils = "1.11.0"
-commons-collections = "4.5.0"
+commons-collections = "4.6.0"
 commons-io = "2.22.0"
-caffeine = "3.2.3"
-checkstyle = "14.3.0"
+caffeine = "3.3.1"
+checkstyle = "14.4.0"
 classgraph = "4.8.180"
-cdm-core = "5.10.0"
-fastutil = "8.5.18"
-flatlaf = "3.7.1"
+cdm-core = "5.11.0"
+fastutil = "8.5.19"
+flatlaf = "3.8"
 gdxai = "50d94f4847303dc18ba8077f8a3424d1be5e0692"
-geotools = "35.1"
+geotools = "35.2"
 guava = "33.6.0-jre"
-indriya = "2.2.3"
+indriya = "2.2.4"
 jackson2 = "2.18.11" # build classpath only, via node-gradle
-jackson-core = "3.2.3" # transitive via GeoTools; drop once a GeoTools release brings 3.2.3 or later
 jcommander = "2.0"
-jenetics = "9.0.0"
+jenetics = "9.1.0"
 joda-money = "2.0.3"
 jqwik = "1.9.3"
 jts = "1.20.0"
 junit = "5.14.3"
 freefair = "9.8.2"
-lombok = "1.18.46"
+lombok = "1.18.48"
 mason = "8c42c10ae5"
-mockito = "5.23.0"
+mockito = "5.24.0"
 node-gradle = "7.1.0"
 nodejs = "24.14.0"
-si-units = "2.1" # do not bump without checking compatibility with the pinned GeoTools version (previously broke with GeoTools 32.2; tests pass with GeoTools 35.1)
-slf4j = "2.0.17"
-snakeyaml = "2.6"
-streamex = "0.8.4"
+si-units = "2.1" # do not bump without checking compatibility with the pinned GeoTools version (previously broke with GeoTools 32.2; tests pass with GeoTools 35.2)
+slf4j = "2.0.20"
+snakeyaml = "2.7"
+streamex = "0.9.0"
 tablesaw = "0.44.4"
 spotbugs = "6.5.12"
 spotless = "8.10.4"
 annotation-api = "1.3.2"
-threeten-extra = "1.8.0"
+threeten-extra = "1.11.0"
 
 [libraries]
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
@@ -61,7 +60,6 @@ gt-shapefile = { module = "org.geotools:gt-shapefile", version.ref = "geotools" 
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 indriya = { module = "tech.units:indriya", version.ref = "indriya" }
 jackson2-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson2" }
-jackson-core = { module = "tools.jackson.core:jackson-core", version.ref = "jackson-core" }
 jcommander = { module = "org.jcommander:jcommander", version.ref = "jcommander" }
 jenetics = { module = "io.jenetics:jenetics", version.ref = "jenetics" }
 joda-money = { module = "org.joda:joda-money", version.ref = "joda-money" }
