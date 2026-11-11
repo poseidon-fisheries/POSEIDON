@@ -24,6 +24,7 @@ jts = "1.20.0"
 junit = "5.14.3"
 freefair = "9.8.2"
 lombok = "1.18.46"
+mason = "8c42c10ae5"
 mockito = "5.23.0"
 node-gradle = "7.1.0"
 nodejs = "24.14.0"
@@ -69,6 +70,7 @@ jts-core = { module = "org.locationtech.jts:jts-core", version.ref = "jts" }
 junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 freefair-lombok-gradle-plugin = { module = "io.freefair.gradle:lombok-plugin", version.ref = "freefair" }
+mason = { module = "com.github.eclab.MASON:mason", version.ref = "mason" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 si-units = { module = "si.uom:si-units", version.ref = "si-units" }
 slf4j-jdk14 = { module = "org.slf4j:slf4j-jdk14", version.ref = "slf4j" }
