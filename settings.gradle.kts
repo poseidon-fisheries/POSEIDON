@@ -46,19 +46,17 @@ include("regulations")
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        // This repository list (including comments and order) is intentionally mirrored in the
+        // This repository list is intentionally mirrored in the
         // parent SURIMI-POSEIDON/settings.gradle.kts. Keep both in sync.
-        maven {
-            // needs to come before Maven Central, otherwise we fail to find javax.media:jai_core:1.1.3
-            url = uri("https://repo.osgeo.org/repository/geotools-releases/")
-        }
         mavenCentral()
+        maven("https://repo.osgeo.org/repository/geotools-releases/")
         maven("https://jitpack.io")
-        maven { url = uri("https://maven.geo-solutions.it/") }
+        maven("https://maven.geo-solutions.it/")
         maven {
-            // needs to come after mavenCentral otherwise we fail to find the FlatLaf native
-            // macOS artifacts (flatlaf-<version>-macos-arm64.dylib / -macos-x86_64.dylib)
             url = uri("https://nexus.geomatys.com/repository/maven-public/")
+            // Only for cdm-core: left unfiltered, this repository would also answer for FlatLaf, but it
+            // lacks the macOS native artifacts (flatlaf-<version>-macos-arm64.dylib / -macos-x86_64.dylib)
+            content { includeGroup("edu.ucar") }
         }
         ivy {
             // Node.js distributions, downloaded by the node-gradle plugin to run Prettier. Declared
