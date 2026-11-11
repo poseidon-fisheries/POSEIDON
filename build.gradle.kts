@@ -107,6 +107,11 @@ allprojects {
         // would read as packages
         include("**/*.java")
         (options as StandardJavadocDocletOptions).apply {
+            // MASON's jar contains .java files as well as .class files. Without a source path,
+            // Javadoc finds those sources on the classpath and runs doclint on them, which fails
+            // on the <tt> tags in MASON's comments. Pointing the source path at an empty
+            // directory makes it use only the .class files.
+            addStringOption("sourcepath", temporaryDir.path)
             addBooleanOption("Xdoclint:all,-missing", true)
             addBooleanOption("Werror", true)
         }
