@@ -133,4 +133,13 @@ tasks.register<Javadoc>("aggregateJavadoc") {
     }
     classpath = files(subprojects.map { it.configurations.getByName("compileClasspath") })
     setDestinationDir(layout.buildDirectory.dir("docs/javadoc").get().asFile)
+    // Javadoc fetches each link's element-list at build time, so a host that is down fails this
+    // task. javadoc.io serves the files of every released version; each version comes from the
+    // catalog so that the links follow the libraries
+    (options as StandardJavadocDocletOptions).links(
+        "https://javadoc.io/static/com.google.guava/guava/${libs.versions.guava.get()}/",
+        "https://javadoc.io/static/javax.measure/unit-api/${libs.versions.unit.api.get()}/",
+        "https://javadoc.io/static/tech.tablesaw/tablesaw-core/${libs.versions.tablesaw.get()}/",
+        "https://javadoc.jitpack.io/com/github/Dgzt/gdx-ai/${libs.versions.gdxai.get()}/javadoc/"
+    )
 }
