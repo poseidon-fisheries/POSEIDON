@@ -34,8 +34,10 @@ Gradle downloads Node.js itself, so formatting needs no local install. Beyond th
 
 ## Lambdas and scenario classes
 
-Prefer lambdas to anonymous classes, and method references to lambdas, wherever they fit. For a
-`Listener`, which has two abstract methods, use `new SimpleListener<>(EventClass.class, consumer)`.
+For local callbacks, prefer lambdas to anonymous classes and method references to lambdas.
+Factory products follow the concrete-product rule in
+[architecture.md](architecture.md#factory-class-shape). For a `Listener` used as a local callback,
+which has two abstract methods, use `new SimpleListener<>(EventClass.class, consumer)`.
 
 Scenario classes (such as `PeterSnapperScenario`, or `NorthwesternMedScenario` in SURIMI-POSEIDON)
 are the exception: they stay readable for people new to Java, with no method references or other

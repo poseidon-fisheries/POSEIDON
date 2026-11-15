@@ -72,7 +72,7 @@ import uk.ac.ox.poseidon.geography.ports.Port;
  * catch.
  */
 @Getter
-public class Trip {
+public class Trip implements HasVessel {
 
   private final @NonNull Vessel vessel;
   private final @NonNull EventManager eventManager;
@@ -81,6 +81,9 @@ public class Trip {
   private final Account account = new Account();
 
   private @NonNull Destination destination;
+
+  @Getter(NONE)
+  private final List<Destination> destinations = new ArrayList<>();
 
   /** The stops of this trip before its end, in the order they happened. */
   @Getter(NONE)
@@ -112,6 +115,7 @@ public class Trip {
   ) {
     this.vessel = vessel;
     this.destination = checkInGrid(destination);
+    destinations.add(destination);
     this.eventManager = new ForwardingEventManager(vessel.getEventManager());
     // Registered on the trip's own event manager, which delivers to its
     // listeners before forwarding to the vessel's, so the record is complete
@@ -152,6 +156,15 @@ public class Trip {
    */
   public void setDestination(final @NonNull Destination destination) {
     this.destination = checkInGrid(destination);
+    destinations.add(destination);
+  }
+
+  /**
+   * @return an unmodifiable view of every destination assigned to this trip,
+   *         including the initial and current destinations, in assignment order
+   */
+  public List<Destination> getDestinations() {
+    return Collections.unmodifiableList(destinations);
   }
 
   private Destination checkInGrid(final Destination destination) {

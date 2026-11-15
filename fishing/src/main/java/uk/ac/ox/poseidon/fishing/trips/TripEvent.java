@@ -22,13 +22,20 @@
 
 package uk.ac.ox.poseidon.fishing.trips;
 
+import uk.ac.ox.poseidon.fishing.vessels.HasVessel;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
+import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
  * An event broadcast by a {@link Trip}, e.g. {@link TripStartEvent} or
  * {@link TripEndEvent}.
  */
-public interface TripEvent {
+public interface TripEvent extends HasVessel {
+  @Override
+  default Vessel getVessel() {
+    return getTrip().getVessel();
+  }
+
   /** @return the trip this event was broadcast by */
   Trip getTrip();
 }

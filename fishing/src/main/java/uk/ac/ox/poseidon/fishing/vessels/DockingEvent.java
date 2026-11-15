@@ -32,7 +32,7 @@ import uk.ac.ox.poseidon.geography.ports.Port;
  * straight on the vessel's own if it is on no trip.
  */
 @Value
-public class DockingEvent {
+public class DockingEvent implements HasVessel {
 
   /** The vessel that docked. */
   Vessel vessel;

@@ -26,20 +26,36 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.Value;
 import uk.ac.ox.poseidon.core.events.ExtendedEvent;
+import uk.ac.ox.poseidon.core.events.HasDateTime;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.HasAttributes;
+import uk.ac.ox.poseidon.fishing.vessels.HasVessel;
+import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
  * An {@link ExtendedEvent} recording one completed fishing action and what it
  * caught.
  */
 @Value
-public class FishingActionEvent implements ExtendedEvent, HasAttributes {
+public class FishingActionEvent
+  implements ExtendedEvent, HasAttributes, HasVessel, HasDateTime
+{
 
   /** The fishing action taken. */
   ExtendedFishingAction action;
   /** What the action caught, and how it was disposed of. */
   FishingOutcome outcome;
+
+  /** @return the acting vessel, also given by the action's getAgent() */
+  @Override
+  public Vessel getVessel() {
+    return action.getAgent();
+  }
+
+  @Override
+  public LocalDateTime getDateTime() {
+    return getEndDateTime();
+  }
 
   /** @return the vessel's attributes when it took {@link #action} */
   @Override

@@ -39,6 +39,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategory;
 import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.fishing.vessels.HasAttributes;
+import uk.ac.ox.poseidon.fishing.vessels.HasVessel;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
@@ -46,7 +47,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
  * and what didn't.
  */
 @Data
-public class Sale implements HasAttributes {
+public class Sale implements HasAttributes, HasVessel {
 
   /** When the sale happened. */
   private final LocalDateTime dateTime;

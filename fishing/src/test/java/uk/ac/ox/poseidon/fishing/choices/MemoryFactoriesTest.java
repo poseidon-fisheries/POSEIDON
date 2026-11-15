@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.fishing.choices;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.fishing.choices.Factories.memory;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.memoryBasedOptionValues;
 
 import java.util.function.Function;
@@ -105,7 +104,7 @@ class MemoryFactoriesTest {
 
   @Test
   void memoryIsOnePerVessel() {
-    final MemoryFactory<String, Double> factory = memory();
+    final MemoryFactory<String, Double> factory = new MemoryFactory<>();
 
     assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
     assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));

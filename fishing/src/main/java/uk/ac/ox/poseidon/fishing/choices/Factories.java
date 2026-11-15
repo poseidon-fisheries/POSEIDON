@@ -26,6 +26,7 @@ import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
@@ -34,6 +35,7 @@ import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripEndEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
@@ -327,15 +329,6 @@ public final class Factories {
   }
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for
-   *         an empty {@link Memory}, one per vessel
-   * @see Memory
-   */
-  public static <O, M> MemoryFactory<O, M> memory() {
-    return new MemoryFactory<>();
-  }
-
-  /**
    * @param memorySelector selects the memory to read for a vessel
    * @param valuation      values an option for a vessel, given what is
    *                       remembered about it
@@ -483,6 +476,174 @@ public final class Factories {
       cells,
       cellPredicate,
       randomNumberGenerator()
+    );
+  }
+
+  /**
+   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for a
+   *         plain memory of numbers by cell
+   * @see MemoryFactory
+   */
+  public static MemoryFactory<Cell, Double> numbersByCell() {
+    return new MemoryFactory<>();
+  }
+
+  /**
+   * @param partitionKey selects the partition from an event or vessel
+   * @param <T> the input type
+   * @param <P> the partition key type
+   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for
+   *         separate catch entries by cell for each partition
+   * @see PartitionedMemory
+   */
+  public static <T, P> PartitionedMemoryFactory<
+    T,
+    P,
+    Cell,
+    Bucket
+  > catchesByCellPartitionedBy(
+    final ValueFactory<? super VesselScope, ? super T, ? extends P> partitionKey
+  ) {
+    return new PartitionedMemoryFactory<>(partitionKey);
+  }
+
+  /**
+   * @param <T> the observed and remembered type
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the
+   *         keep-last-received rule
+   * @see KeepLastReceived
+   */
+  public static <T> KeepLastReceivedFactory<T> keepLastReceived() {
+    return new KeepLastReceivedFactory<>();
+  }
+
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the
+   *         {@link FishingCell}
+   * @see FishingCell
+   */
+  public static FishingCellFactory fishingCell() {
+    return new FishingCellFactory();
+  }
+
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the
+   *         {@link RetainedCatch}
+   * @see RetainedCatch
+   */
+  public static RetainedCatchFactory retainedCatch() {
+    return new RetainedCatchFactory();
+  }
+
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the
+   *         {@link DestinationCell}
+   * @see DestinationCell
+   */
+  public static DestinationCellFactory destinationCell() {
+    return new DestinationCellFactory();
+  }
+
+  /**
+   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for the
+   *         {@link ProfitPerHour}
+   * @see ProfitPerHour
+   */
+  public static ProfitPerHourFactory profitPerHour() {
+    return new ProfitPerHourFactory();
+  }
+
+  /**
+   * @param key extracts the key, or no key to skip an event
+   * @param observation extracts the observation
+   * @param memory selects the entries from the event
+   * @param updateRule folds the observation into the entries
+   * @param <S> the scope type
+   * @param <K> the entry key type
+   * @param <T> the observation type
+   * @param <M> the remembered type
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a recorder
+   * @see EventRecorder
+   */
+  public static <S extends Scope, K, T, M> EventRecorderFactory<
+    S,
+    FishingActionEvent,
+    K,
+    T,
+    M
+  > fishingActionRecorder(
+    final ValueFactory<
+      ? super S,
+      ? super FishingActionEvent,
+      ? extends Optional<K>
+    > key,
+    final ValueFactory<
+      ? super S,
+      ? super FishingActionEvent,
+      ? extends T
+    > observation,
+    final Factory<
+      ? super S,
+      ? extends Function<
+        ? super FishingActionEvent,
+        ? extends MutableMemoryEntries<K, M>
+      >
+    > memory,
+    final Factory<? super S, ? extends UpdateRule<? super T, M>> updateRule
+  ) {
+    return new EventRecorderFactory<>(
+      FishingActionEvent.class.getName(),
+      key,
+      observation,
+      memory,
+      updateRule
+    );
+  }
+
+  /**
+   * @param key extracts the key, or no key to skip an event
+   * @param observation extracts the observation
+   * @param memory selects the entries from the event
+   * @param updateRule folds the observation into the entries
+   * @param <S> the scope type
+   * @param <K> the entry key type
+   * @param <T> the observation type
+   * @param <M> the remembered type
+   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a recorder
+   * @see EventRecorder
+   */
+  public static <S extends Scope, K, T, M> EventRecorderFactory<
+    S,
+    FishingTripEndEvent,
+    K,
+    T,
+    M
+  > fishingTripEndRecorder(
+    final ValueFactory<
+      ? super S,
+      ? super FishingTripEndEvent,
+      ? extends Optional<K>
+    > key,
+    final ValueFactory<
+      ? super S,
+      ? super FishingTripEndEvent,
+      ? extends T
+    > observation,
+    final Factory<
+      ? super S,
+      ? extends Function<
+        ? super FishingTripEndEvent,
+        ? extends MutableMemoryEntries<K, M>
+      >
+    > memory,
+    final Factory<? super S, ? extends UpdateRule<? super T, M>> updateRule
+  ) {
+    return new EventRecorderFactory<>(
+      FishingTripEndEvent.class.getName(),
+      key,
+      observation,
+      memory,
+      updateRule
     );
   }
 }

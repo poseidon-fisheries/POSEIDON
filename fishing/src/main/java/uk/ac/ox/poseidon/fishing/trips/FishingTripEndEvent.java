@@ -22,8 +22,10 @@
 
 package uk.ac.ox.poseidon.fishing.trips;
 
+import java.time.LocalDateTime;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import uk.ac.ox.poseidon.core.events.HasDateTime;
 import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 
 /**
@@ -34,8 +36,13 @@ import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 @EqualsAndHashCode(callSuper = true)
 public class FishingTripEndEvent
   extends TripEndEvent
-  implements FishingTripEvent
+  implements FishingTripEvent, HasDateTime
 {
+
+  @Override
+  public LocalDateTime getDateTime() {
+    return getTrip().getEndDateTime();
+  }
 
   /** @param trip the fishing trip that ends */
   public FishingTripEndEvent(final FishingTrip trip) {

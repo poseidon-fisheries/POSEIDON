@@ -55,10 +55,17 @@ constructor and a Lombok builder:
 
 Don't add other constructors to a factory class — construct it either via YAML or via the static helper.
 
-A factory is named after its product: `Product` is built by `ProductFactory`, and that is the pair
-to aim for. Depart from it only for a specific reason (e.g. a value factory whose product is a
-plain `Function`), never by leaving a factory's old name in place after its product changes. When
-a factory starts building something else, rename it to match.
+A factory resolves dependencies and constructs its product. Named runtime calculations and
+extractors have concrete product classes, including when they implement `Function` or another
+functional interface. Their behaviour and behavioural documentation belong on the product;
+the factory carries the construction and its pointer documentation. This applies to one-line
+extractors too. Returned lambdas and method references are appropriate for forwarding to
+behaviour already defined elsewhere, or for explicitly agreed plain-function products: for
+example, `MemoryFactory` returns a function that always gives the same memory entries.
+
+A factory is named after its product: `Product` is built by `ProductFactory`. An explicitly
+agreed plain-function product may use the name of its role. When a factory starts building
+something else, rename it to match.
 
 When designing a new factory, favor composition over a new bespoke implementation: check whether existing factories (in the same package or in `core`, e.g. constant/random/temporal providers) can be combined or parameterized to produce the desired behavior before writing a new `Factory` class from scratch.
 

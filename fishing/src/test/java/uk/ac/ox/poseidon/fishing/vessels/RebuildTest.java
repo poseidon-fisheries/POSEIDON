@@ -49,6 +49,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.fishing.choices.Factories;
+import uk.ac.ox.poseidon.fishing.choices.MemoryFactory;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
@@ -75,12 +77,7 @@ class RebuildTest {
   /** The behaviours built, in order. */
   private final List<Object> behavioursBuilt = new ArrayList<>();
   /** A vessel-level product, which outlives the vessel's components. */
-  private final VesselScopeFactory<Object> memory = new VesselScopeFactory<>() {
-    @Override
-    protected Object newInstance(final VesselScope scope) {
-      return new Object();
-    }
-  };
+  private final MemoryFactory<Cell, Double> memory = Factories.numbersByCell();
   private Simulation simulation;
   private Fleet fleet;
 
@@ -97,7 +94,7 @@ class RebuildTest {
       protected Task<Vessel> newInstance(final VesselComponentScope scope) {
         events.add("build behaviour " + label);
         scope.addTeardown(_ -> events.add("end behaviour " + label));
-        memoriesFound.add(memory.get(scope));
+        memoriesFound.add(memory.get(scope).apply(scope.getVessel()));
         final Task<Vessel> task = new VesselTask() {
           @Override
           public Status execute() {

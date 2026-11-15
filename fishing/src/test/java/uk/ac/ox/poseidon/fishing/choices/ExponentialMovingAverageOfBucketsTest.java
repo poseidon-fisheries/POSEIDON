@@ -26,6 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.within;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
@@ -38,17 +40,34 @@ class ExponentialMovingAverageOfBucketsTest {
     new ExponentialMovingAverageOfBuckets(0.25);
 
   @Test
+  void firstObservationIsRememberedUnchanged() {
+    final Bucket observation = Bucket.of(a, 10);
+    assertThat(
+      rule.update(
+        Optional.empty(),
+        observation,
+        LocalDateTime.of(2026, 1, 1, 12, 0)
+      )
+    ).isSameAs(observation);
+  }
+
+  @Test
   void speciesInBothBucketsIsAveraged() {
-    final Bucket result = rule.apply(Bucket.of(a, 10), Bucket.of(a, 4));
+    final Bucket result = rule.update(
+      Optional.of(Bucket.of(a, 10)),
+      Bucket.of(a, 4),
+      LocalDateTime.of(2026, 1, 1, 12, 0)
+    );
 
     assertThat(result.getKg(a)).isCloseTo(10 * 0.75 + 4 * 0.25, within(1e-12));
   }
 
   @Test
   void speciesOnlyRememberedDecays() {
-    final Bucket result = rule.apply(
-      Bucket.of(a, 10).add(Bucket.of(b, 8)),
-      Bucket.of(a, 4)
+    final Bucket result = rule.update(
+      Optional.of(Bucket.of(a, 10).add(Bucket.of(b, 8))),
+      Bucket.of(a, 4),
+      LocalDateTime.of(2026, 1, 1, 12, 0)
     );
 
     assertThat(result.getKg(b)).isCloseTo(8 * 0.75, within(1e-12));
@@ -56,7 +75,11 @@ class ExponentialMovingAverageOfBucketsTest {
 
   @Test
   void speciesOnlyObservedEntersWeightedByAlpha() {
-    final Bucket result = rule.apply(Bucket.of(a, 10), Bucket.of(b, 8));
+    final Bucket result = rule.update(
+      Optional.of(Bucket.of(a, 10)),
+      Bucket.of(b, 8),
+      LocalDateTime.of(2026, 1, 1, 12, 0)
+    );
 
     assertThat(result.getKg(a)).isCloseTo(10 * 0.75, within(1e-12));
     assertThat(result.getKg(b)).isCloseTo(8 * 0.25, within(1e-12));
@@ -64,7 +87,15 @@ class ExponentialMovingAverageOfBucketsTest {
 
   @Test
   void emptyBucketsGiveAnEmptyBucket() {
-    assertThat(rule.apply(Bucket.empty(), Bucket.empty()).isEmpty()).isTrue();
+    assertThat(
+      rule
+        .update(
+          Optional.of(Bucket.empty()),
+          Bucket.empty(),
+          LocalDateTime.of(2026, 1, 1, 12, 0)
+        )
+        .isEmpty()
+    ).isTrue();
   }
 
   @Test

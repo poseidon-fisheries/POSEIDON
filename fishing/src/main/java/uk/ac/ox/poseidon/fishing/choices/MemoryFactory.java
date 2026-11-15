@@ -22,31 +22,39 @@
 
 package uk.ac.ox.poseidon.fishing.choices;
 
+import java.util.function.Function;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link Memory}, built via
- * {@link Factories#memory()}.
- * <p>
- * A memory is what its vessel knows across components, so it is
- * vessel-level: each vessel has its own, and every selector of a vessel's
- * memory reached through this factory object reads the same one.
+ * A {@link VesselScopeFactory} of a plain memory: a function always giving
+ * the same entries. Each vessel owns separate entries for each factory
+ * object, shared by all its readers and recorders across component rebuilds.
+ * Built via {@link Factories#numbersByCell()}.
+ * @param <K> the entry key type
+ * @param <M> the remembered type
  */
 @Getter
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class MemoryFactory<O, M> extends VesselScopeFactory<Memory<O, M>> {
+public class MemoryFactory<K, M>
+  extends VesselScopeFactory<Function<Object, MutableMemoryEntries<K, M>>>
+  implements ValueFactory<VesselScope, Object, MutableMemoryEntries<K, M>>
+{
 
   @Override
-  protected Memory<O, M> newInstance(final VesselScope scope) {
-    return new Memory<>();
+  protected Function<Object, MutableMemoryEntries<K, M>> newInstance(
+    final VesselScope scope
+  ) {
+    final MutableMemoryEntries<K, M> contents = new MutableMemoryEntries<>();
+    return _ -> contents;
   }
 }

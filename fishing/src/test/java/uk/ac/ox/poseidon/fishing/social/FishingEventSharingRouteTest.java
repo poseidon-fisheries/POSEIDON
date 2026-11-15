@@ -31,10 +31,11 @@ import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledByDateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.days;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
-import static uk.ac.ox.poseidon.fishing.choices.Factories.catchMemoryBy;
+import static uk.ac.ox.poseidon.fishing.choices.Factories.catchesByCellPartitionedBy;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.exponentialMovingAverageOfBuckets;
-import static uk.ac.ox.poseidon.fishing.choices.Factories.fishingEventRecorder;
-import static uk.ac.ox.poseidon.fishing.choices.Factories.memoryBasedOptionValues;
+import static uk.ac.ox.poseidon.fishing.choices.Factories.fishingActionRecorder;
+import static uk.ac.ox.poseidon.fishing.choices.Factories.fishingCell;
+import static uk.ac.ox.poseidon.fishing.choices.Factories.retainedCatch;
 import static uk.ac.ox.poseidon.fishing.social.Factories.cliqueDynamics;
 import static uk.ac.ox.poseidon.fishing.social.Factories.fishingEventSharer;
 import static uk.ac.ox.poseidon.fishing.social.Factories.sharedFishingEventListener;
@@ -68,10 +69,8 @@ import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.fishing.catches.disposition.Disposition;
-import uk.ac.ox.poseidon.fishing.choices.KeyedMemorySelectorFactory;
-import uk.ac.ox.poseidon.fishing.choices.MemoryBasedOptionValuesFactory;
-import uk.ac.ox.poseidon.fishing.choices.OptionValues;
-import uk.ac.ox.poseidon.fishing.choices.Valuation;
+import uk.ac.ox.poseidon.fishing.choices.MemoryEntries;
+import uk.ac.ox.poseidon.fishing.choices.PartitionedMemoryFactory;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
@@ -124,18 +123,12 @@ class FishingEventSharingRouteTest {
   private final VesselComponent<Gear> gearComponent = vesselComponent(
     object(gear)
   );
-  private final Valuation<Cell, Bucket> kgOfSpecies = valuedFor ->
-    (option, bucket) ->
-      bucket.getKg(species);
-
-  private final KeyedMemorySelectorFactory<
+  private final PartitionedMemoryFactory<
     HasAttributes,
     String,
     Cell,
     Bucket
-  > vesselMemory = catchMemoryBy(stringAttribute("gear"));
-  private final MemoryBasedOptionValuesFactory<Cell, Bucket> optionValues =
-    memoryBasedOptionValues(vesselMemory, object(kgOfSpecies));
+  > vesselMemory = catchesByCellPartitionedBy(stringAttribute("gear"));
   private final FleetFactory baseFleet = fleet(
     object(vesselField),
     object(portGrid),
@@ -187,8 +180,9 @@ class FishingEventSharingRouteTest {
           "ownCatchRecorder",
           vesselComponent(
             vesselEventListener(
-              fishingEventRecorder(
-                object(modelGrid),
+              fishingActionRecorder(
+                fishingCell(),
+                retainedCatch(),
                 vesselMemory,
                 exponentialMovingAverageOfBuckets(OWN_ALPHA)
               )
@@ -199,8 +193,9 @@ class FishingEventSharingRouteTest {
           "friendsCatchRecorder",
           vesselComponent(
             sharedFishingEventListener(
-              fishingEventRecorder(
-                object(modelGrid),
+              fishingActionRecorder(
+                fishingCell(),
+                retainedCatch(),
                 vesselMemory,
                 exponentialMovingAverageOfBuckets(SOCIAL_ALPHA)
               ),
@@ -248,11 +243,27 @@ class FishingEventSharingRouteTest {
     vesselMemory
       .get(scopeOf(vessel))
       .apply(vessel)
-      .observe(cell, Bucket.of(species, kg), Bucket::add);
+      .record(
+        cell,
+        Bucket.of(species, kg),
+        now(),
+        (remembered, observation, _) ->
+          remembered.map(bucket -> bucket.add(observation)).orElse(observation)
+      );
   }
 
   private Optional<Double> valueOfTheCellFor(final Vessel vessel) {
-    return optionValues.get(scopeOf(vessel)).apply(vessel).getValue(cell);
+    return valueOfTheCell(vesselMemory.get(scopeOf(vessel)).apply(vessel));
+  }
+
+  private Optional<Double> valueOfTheCell(
+    final MemoryEntries<Cell, Bucket> entries
+  ) {
+    final Map<Cell, Bucket> contents = new HashMap<>();
+    entries.forEachEntry(contents::put);
+    return Optional.ofNullable(contents.get(cell)).map(bucket ->
+      bucket.getKg(species)
+    );
   }
 
   private LocalDateTime now() {
@@ -371,7 +382,9 @@ class FishingEventSharingRouteTest {
     );
     final Vessel a = vessel("A");
     final Vessel b = vessel("B");
-    final OptionValues<Cell> valuesOfB = optionValues.get(scopeOf(b)).apply(b);
+    final MemoryEntries<Cell, Bucket> valuesOfB = vesselMemory
+      .get(scopeOf(b))
+      .apply(b);
     final Trip trip = startFishingTrip(a, cell, now());
     assertThat(socialNetwork.getRecipients(a)).containsExactly(b);
 
@@ -386,7 +399,7 @@ class FishingEventSharingRouteTest {
     socialNetwork.addTie(a, b);
     fishingEvent(trip, 20);
 
-    assertThat(valuesOfB.getValue(cell)).isEmpty();
+    assertThat(valueOfTheCell(valuesOfB)).isEmpty();
   }
 
   @AfterEach

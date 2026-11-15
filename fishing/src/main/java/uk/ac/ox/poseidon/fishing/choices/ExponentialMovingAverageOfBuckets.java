@@ -24,23 +24,25 @@ package uk.ac.ox.poseidon.fishing.choices;
 
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 
-import java.util.function.BinaryOperator;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
 /**
- * A {@link Memory} update rule for {@link Bucket}s: an exponential moving
+ * An {@link UpdateRule} for {@link Bucket}s: an exponential moving
  * average taken species by species, which remembers
  * {@code recollection × (1 − alpha) + observation × alpha} of each species'
- * biomass. A species missing from either bucket counts as zero there, so a
- * species that is remembered but not observed decays, and one observed for the
- * first time enters at {@code alpha} of its observed biomass.
+ * biomass. The first observation is remembered unchanged. Thereafter, a
+ * species missing from either bucket counts as zero there, so a species that
+ * is remembered but not observed decays, and one newly observed enters at
+ * {@code alpha} of its observed biomass.
  * <p>
  * Every species' content is averaged as
  * {@link uk.ac.ox.poseidon.biology.biomass.Biomass}, so any structure a content
  * has beyond its weight in kilograms is lost.
  */
 public class ExponentialMovingAverageOfBuckets
-  implements BinaryOperator<Bucket>
+  implements UpdateRule<Bucket, Bucket>
 {
 
   private final double alpha;
@@ -51,9 +53,17 @@ public class ExponentialMovingAverageOfBuckets
   }
 
   @Override
-  public Bucket apply(final Bucket recollection, final Bucket observation) {
-    return recollection
-      .mapBiomassValue((species, kg) -> kg * (1 - alpha))
-      .add(observation.mapBiomassValue((species, kg) -> kg * alpha));
+  public Bucket update(
+    final Optional<Bucket> remembered,
+    final Bucket observation,
+    final LocalDateTime observationDateTime
+  ) {
+    return remembered
+      .map(recollection ->
+        recollection
+          .mapBiomassValue((species, kg) -> kg * (1 - alpha))
+          .add(observation.mapBiomassValue((species, kg) -> kg * alpha))
+      )
+      .orElse(observation);
   }
 }
