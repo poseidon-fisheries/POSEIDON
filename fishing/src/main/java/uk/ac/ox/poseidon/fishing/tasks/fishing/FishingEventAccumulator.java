@@ -24,11 +24,13 @@ package uk.ac.ox.poseidon.fishing.tasks.fishing;
 
 import uk.ac.ox.poseidon.core.events.EventAccumulator;
 
-/** An {@link EventAccumulator} of {@link FishingEvent}s. */
-public class FishingEventAccumulator extends EventAccumulator<FishingEvent> {
+/** An {@link EventAccumulator} of {@link FishingActionEvent}s. */
+public class FishingEventAccumulator
+  extends EventAccumulator<FishingActionEvent>
+{
 
   /** Starts with no events. */
   public FishingEventAccumulator() {
-    super(FishingEvent.class);
+    super(FishingActionEvent.class);
   }
 }

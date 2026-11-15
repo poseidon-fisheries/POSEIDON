@@ -34,7 +34,7 @@ import uk.ac.ox.poseidon.fishing.vessels.HasAttributes;
  * caught.
  */
 @Value
-public class FishingEvent implements ExtendedEvent, HasAttributes {
+public class FishingActionEvent implements ExtendedEvent, HasAttributes {
 
   /** The fishing action taken. */
   ExtendedFishingAction action;

@@ -114,8 +114,9 @@ class FishingTest {
       Object.class
     );
     verify(eventManager).broadcast(eventCaptor.capture());
-    assertThat(eventCaptor.getValue()).isInstanceOf(FishingEvent.class);
-    final FishingEvent event = (FishingEvent) eventCaptor.getValue();
+    assertThat(eventCaptor.getValue()).isInstanceOf(FishingActionEvent.class);
+    final FishingActionEvent event =
+      (FishingActionEvent) eventCaptor.getValue();
     assertThat(event.getOutcome().getGrossCatch()).isEqualTo(grossCatch);
     assertThat(event.getOutcome().getDisposition()).isEqualTo(disposition);
   }
@@ -167,7 +168,7 @@ class FishingTest {
     verify(dispositionProcess).partition(grossCatch, 0.0);
     verify(hold).addContent(Bucket.empty());
     verify(fisheable).release(Bucket.empty());
-    verify(eventManager).broadcast(any(FishingEvent.class));
+    verify(eventManager).broadcast(any(FishingActionEvent.class));
   }
 
   @Test

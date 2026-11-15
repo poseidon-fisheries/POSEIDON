@@ -61,7 +61,7 @@ import static uk.ac.ox.poseidon.fishing.market.Factories.*;
 import static uk.ac.ox.poseidon.fishing.money.Factories.money;
 import static uk.ac.ox.poseidon.fishing.social.Factories.friendshipDynamics;
 import static uk.ac.ox.poseidon.fishing.social.Factories.socialNetwork;
-import static uk.ac.ox.poseidon.fishing.tasks.branches.Factories.selectorTask;
+import static uk.ac.ox.poseidon.fishing.tasks.branches.Factories.fallbackTask;
 import static uk.ac.ox.poseidon.fishing.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.fishing.tasks.decorators.Factories.untilFail;
 import static uk.ac.ox.poseidon.fishing.tasks.fishing.Factories.fishing;
@@ -93,7 +93,7 @@ import static uk.ac.ox.poseidon.geography.bathymetry.Factories.bathymetricGridFr
 import static uk.ac.ox.poseidon.geography.distance.Factories.haversineDistanceCalculator;
 import static uk.ac.ox.poseidon.geography.grids.Factories.modelGridFromLonLatTable;
 import static uk.ac.ox.poseidon.geography.grids.Factories.normalisedDoubleGridFromAllocator;
-import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
+import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.gridReading;
 import static uk.ac.ox.poseidon.geography.grids.suppliers.Factories.gridSum;
 import static uk.ac.ox.poseidon.geography.paths.Factories.pathFinder;
 import static uk.ac.ox.poseidon.geography.ports.Factories.port;
@@ -342,7 +342,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     final var fleet = fleet(vesselField, portGrid, marketGrid);
 
     final var validCellPredicate = condition(
-      cellValue(carryingCapacityGrid),
+      gridReading(carryingCapacityGrid),
       greaterThan(0)
     );
     final var destination = epsilonGreedyDestination(
@@ -404,7 +404,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
     final var behaviour = behaviour(
       sequenceTask(
         checkThat(vesselIsDockedAt(homePort())),
-        selectorTask(
+        fallbackTask(
           sequenceTask(
             checkThat(
               condition(currentDateTime(), dateTimeIsBefore(departureDateTime))

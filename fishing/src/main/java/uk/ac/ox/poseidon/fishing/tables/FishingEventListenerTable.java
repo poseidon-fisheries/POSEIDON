@@ -32,16 +32,18 @@ import tech.tablesaw.api.StringColumn;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.fishing.catches.disposition.Disposition;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 
 /**
  * A {@link ListenerTable} that records one row per species per
- * {@link FishingEvent}: the catching vessel, the event's start/end times and
+ * {@link FishingActionEvent}: the catching vessel, the event's start/end times and
  * end location, and the species' gross catch broken down by {@link Disposition}
  * (retained, discarded alive, discarded dead).
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
+public class FishingEventListenerTable
+  extends ListenerTable<FishingActionEvent>
+{
 
   /** Name of the vessel-ID column. */
   public static final String VESSEL_ID = "vessel_id";
@@ -85,7 +87,7 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
 
   /** Creates the table with all ten columns, empty. */
   public FishingEventListenerTable() {
-    super(FishingEvent.class);
+    super(FishingActionEvent.class);
     table.addColumns(
       vesselId,
       startDateTime,
@@ -104,7 +106,7 @@ public class FishingEventListenerTable extends ListenerTable<FishingEvent> {
    * Appends one row per species involved in {@code event} to {@link #table}.
    */
   @Override
-  public void receive(final FishingEvent event) {
+  public void receive(final FishingActionEvent event) {
     final Disposition disposition = event.getOutcome().getDisposition();
     final Map<String, Bucket> buckets = Map.of(
       GROSS_CATCH,

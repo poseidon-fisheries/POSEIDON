@@ -25,7 +25,7 @@
  * {@link uk.ac.ox.poseidon.fishing.tasks.fishing.Fishing} (the task that
  * actually fishes and sorts the catch), a legality precheck
  * ({@link uk.ac.ox.poseidon.fishing.tasks.fishing.CheckIfFishingHereAndNowIsLegal}),
- * and the {@link uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent}/
+ * and the {@link uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent}/
  * {@link uk.ac.ox.poseidon.fishing.tasks.fishing.FishingOutcome} records it
  * broadcasts. See {@link uk.ac.ox.poseidon.fishing.tasks.fishing.Factories} for
  * the entry points.

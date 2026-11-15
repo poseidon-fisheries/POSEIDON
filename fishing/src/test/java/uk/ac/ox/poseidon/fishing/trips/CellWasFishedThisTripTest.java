@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
@@ -110,7 +110,7 @@ class CellWasFishedThisTripTest {
   }
 
   private void onTripWithFishingEventsAt(final Coordinate... coordinates) {
-    final List<FishingEvent> fishingEvents = Stream.of(coordinates)
+    final List<FishingActionEvent> fishingEvents = Stream.of(coordinates)
       .map(CellWasFishedThisTripTest::fishingEventAt)
       .toList();
     final FishingTrip trip = mock(FishingTrip.class);
@@ -118,9 +118,11 @@ class CellWasFishedThisTripTest {
     when(vessel.getCurrentTrip()).thenReturn(trip);
   }
 
-  private static FishingEvent fishingEventAt(final Coordinate coordinate) {
+  private static FishingActionEvent fishingEventAt(
+    final Coordinate coordinate
+  ) {
     final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
     when(action.getStartCoordinate()).thenReturn(coordinate);
-    return new FishingEvent(action, null);
+    return new FishingActionEvent(action, null);
   }
 }

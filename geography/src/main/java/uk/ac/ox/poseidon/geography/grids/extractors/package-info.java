@@ -21,8 +21,8 @@
  */
 
 /**
- * {@link java.util.function.Function}s that extract a value from a resolved
- * {@link uk.ac.ox.poseidon.geography.grids.DoubleGrid}. See
+ * Mappings that read a resolved
+ * {@link uk.ac.ox.poseidon.geography.grids.DoubleGrid} at a cell. See
  * {@link uk.ac.ox.poseidon.geography.grids.extractors.Factories} for the entry
  * points.
  */

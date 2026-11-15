@@ -36,15 +36,15 @@ import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 /**
- * A {@link RelativeScopeFactory} counterpart of {@link CellValue}, built via
- * {@link Factories#cellValue(Factory)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link GridReading}, built via
+ * {@link Factories#gridReading(Factory)}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class CellValueFactory<S extends Scope>
+public class GridReadingFactory<S extends Scope>
   extends RelativeScopeFactory<S, BiFunction<Object, Cell, Double>>
   implements MappingFactory<S, Object, Cell, Double>
 {
@@ -53,6 +53,6 @@ public class CellValueFactory<S extends Scope>
 
   @Override
   protected BiFunction<Object, Cell, Double> newInstance(final S scope) {
-    return new CellValue(grid.get(scope));
+    return new GridReading(grid.get(scope));
   }
 }

@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.Listener;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
@@ -135,7 +135,7 @@ public final class Factories {
    *         make it one of the vessel's components
    * @see SharedFishingEventListenerFactory
    */
-  public static <L extends Listener<? super FishingEvent>> SharedFishingEventListenerFactory<L> sharedFishingEventListener(
+  public static <L extends Listener<? super FishingActionEvent>> SharedFishingEventListenerFactory<L> sharedFishingEventListener(
     final Factory<? super VesselComponentScope, ? extends L> listener,
     final Factory<
       ? super SimulationScope,

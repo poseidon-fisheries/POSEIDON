@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.RelativeScopeFactory;
 import uk.ac.ox.poseidon.core.Scope;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -57,7 +57,10 @@ public class FishingEventRecorderFactory<S extends Scope> extends RelativeScopeF
   private final Factory<? super S, ? extends ModelGrid> modelGrid;
   private final Factory<
     ? super S,
-    ? extends Function<? super FishingEvent, ? extends Memory<Cell, Bucket>>
+    ? extends Function<
+      ? super FishingActionEvent,
+      ? extends Memory<Cell, Bucket>
+    >
   > memorySelector;
   private final Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule;
 

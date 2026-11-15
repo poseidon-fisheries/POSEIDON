@@ -41,7 +41,7 @@ import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
@@ -93,17 +93,17 @@ class FishingEventSharerFactoryTest {
   @Test
   void aFishingEventBroadcastOnAVesselsEventManagerReachesItsRecipientThroughForwarding() {
     final SimulationScope scope = new SimulationScope(simulation);
-    final List<FishingEvent> heardByB = new ArrayList<>();
+    final List<FishingActionEvent> heardByB = new ArrayList<>();
     factory.get(scope).register(
       b,
-      new Listener<FishingEvent>() {
+      new Listener<FishingActionEvent>() {
         @Override
-        public Class<FishingEvent> getEventClass() {
-          return FishingEvent.class;
+        public Class<FishingActionEvent> getEventClass() {
+          return FishingActionEvent.class;
         }
 
         @Override
-        public void receive(final FishingEvent event) {
+        public void receive(final FishingActionEvent event) {
           heardByB.add(event);
         }
       }
@@ -111,7 +111,10 @@ class FishingEventSharerFactoryTest {
     network.get(scope).addTie(a, b);
     final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
     when(action.getAgent()).thenReturn(a);
-    final FishingEvent fishingEventByA = new FishingEvent(action, null);
+    final FishingActionEvent fishingEventByA = new FishingActionEvent(
+      action,
+      null
+    );
 
     a.getEventManager().broadcast(fishingEventByA);
 

@@ -42,7 +42,7 @@ class FishingEventPropertyFactoryTest {
     assertThat(
       fishingEventProperty("action.gear")
         .get(Scope.GLOBAL_SCOPE)
-        .apply(new FishingEvent(action, null))
+        .apply(new FishingActionEvent(action, null))
     ).isSameAs(gear);
   }
 }

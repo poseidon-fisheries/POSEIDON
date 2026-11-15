@@ -32,7 +32,7 @@ import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.fishing.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingOutcome;
 import uk.ac.ox.poseidon.fishing.vessels.values.attributes.StringAttribute;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -59,7 +59,7 @@ class FishingEventRecorderTest {
     return modelGrid;
   }
 
-  static FishingEvent fishingEvent(
+  static FishingActionEvent fishingEvent(
     final String gearCode,
     final Coordinate coordinate,
     final Bucket retained
@@ -67,7 +67,7 @@ class FishingEventRecorderTest {
     final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
     when(action.getAttributes()).thenReturn(Map.of("gear", gearCode));
     when(action.getStartCoordinate()).thenReturn(coordinate);
-    return new FishingEvent(
+    return new FishingActionEvent(
       action,
       new FishingOutcome(
         retained,

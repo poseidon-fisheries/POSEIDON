@@ -29,14 +29,14 @@ import uk.ac.ox.poseidon.core.functions.ObjectPropertyValueFactory;
 
 /**
  * An {@link ObjectPropertyValueFactory} for an {@link ObjectPropertyValue} of a
- * {@link FishingEvent}, built via {@link Factories#fishingEventProperty}.
+ * {@link FishingActionEvent}, built via {@link Factories#fishingEventProperty}.
  *
  * @param <R> the type of the property; not checked
  */
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class FishingEventPropertyFactory<R> extends ObjectPropertyValueFactory<
-  FishingEvent,
+  FishingActionEvent,
   R
 > {
 
@@ -49,7 +49,7 @@ public class FishingEventPropertyFactory<R> extends ObjectPropertyValueFactory<
   }
 
   @Override
-  protected Class<FishingEvent> rootClass() {
-    return FishingEvent.class;
+  protected Class<FishingActionEvent> rootClass() {
+    return FishingActionEvent.class;
   }
 }

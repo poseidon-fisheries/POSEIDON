@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.fishing.tasks.branches.Factories.selectorTask;
+import static uk.ac.ox.poseidon.fishing.tasks.branches.Factories.fallbackTask;
 import static uk.ac.ox.poseidon.fishing.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 
@@ -85,7 +85,7 @@ class VoyageHomeTest {
     new SimulationScope(mock(Simulation.class)),
     fleet,
     behaviour(
-      selectorTask(
+      fallbackTask(
         sequenceTask(
           scope -> new IsDockedAtHomePort(),
           scope -> new Departure()

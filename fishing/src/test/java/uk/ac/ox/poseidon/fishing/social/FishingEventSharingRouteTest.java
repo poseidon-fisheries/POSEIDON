@@ -75,7 +75,7 @@ import uk.ac.ox.poseidon.fishing.choices.Valuation;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEventAccumulator;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingOutcome;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet;
@@ -276,7 +276,7 @@ class FishingEventSharingRouteTest {
     trip
       .getEventManager()
       .broadcast(
-        new FishingEvent(
+        new FishingActionEvent(
           action,
           new FishingOutcome(
             retained,

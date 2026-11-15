@@ -37,19 +37,19 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 /**
  * A {@link BranchTaskFactory} for a gdx-ai {@link Selector}: runs its children
  * in order, succeeding (and stopping) as soon as one succeeds, failing once all
- * of them have. Built via {@link Factories#selectorTask}.
+ * of them have. Built via {@link Factories#fallbackTask}.
  */
 @Getter
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class SelectorTaskFactory extends BranchTaskFactory<Selector<Vessel>> {
+public class FallbackTaskFactory extends BranchTaskFactory<Selector<Vessel>> {
 
   /**
    * @param children factories for the selector's child tasks, resolved and
    *                 attached in order
    */
-  public SelectorTaskFactory(
+  public FallbackTaskFactory(
     final List<
       ? extends Factory<? super VesselComponentScope, ? extends Task<Vessel>>
     > children

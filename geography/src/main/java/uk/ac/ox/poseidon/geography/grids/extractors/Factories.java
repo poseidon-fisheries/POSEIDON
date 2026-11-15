@@ -28,8 +28,7 @@ import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
 /**
- * Factories for {@link java.util.function.Function}s that extract a value from
- * a resolved {@link DoubleGrid}.
+ * Factories for mappings that read a resolved {@link DoubleGrid} at a cell.
  */
 public final class Factories {
 
@@ -38,12 +37,12 @@ public final class Factories {
   /**
    * @param grid factory for the grid to read from
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link CellValue} over the resolved grid
-   * @see CellValue
+   *         {@link GridReading} over the resolved grid
+   * @see GridReading
    */
-  public static <S extends Scope> CellValueFactory<S> cellValue(
+  public static <S extends Scope> GridReadingFactory<S> gridReading(
     @NonNull final Factory<S, ? extends DoubleGrid> grid
   ) {
-    return new CellValueFactory<>(grid);
+    return new GridReadingFactory<>(grid);
   }
 }

@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Selects, from a {@link KeyedMemory}, the {@link Memory} for the key extracted
- * from its input, such as the code of the gear used in a {@code FishingEvent}
+ * from its input, such as the code of the gear used in a {@code FishingActionEvent}
  * when remembering it, or of the gear a vessel currently uses when reading.
  *
  * @param <T> the type of input the key is extracted from

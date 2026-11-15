@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.NonNull;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.trips.FishingTripEndEvent;
 import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
 import uk.ac.ox.poseidon.geography.Destination;
@@ -43,7 +43,7 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 public class FishingTrip extends Trip {
 
   /** The fishing events of this trip, in the order they happened. */
-  private final List<FishingEvent> fishingEvents = new ArrayList<>();
+  private final List<FishingActionEvent> fishingEvents = new ArrayList<>();
 
   /**
    * @param vessel        the vessel taking this trip
@@ -63,7 +63,7 @@ public class FishingTrip extends Trip {
     // listeners before forwarding to the vessel's, so the record is complete
     // before vessel-level listeners react.
     getEventManager().addListener(
-      new SimpleListener<>(FishingEvent.class, fishingEvents::add)
+      new SimpleListener<>(FishingActionEvent.class, fishingEvents::add)
     );
   }
 
@@ -81,7 +81,7 @@ public class FishingTrip extends Trip {
    * @return an unmodifiable view of the fishing events of this trip, in the
    *         order they happened
    */
-  public List<FishingEvent> getFishingEvents() {
+  public List<FishingActionEvent> getFishingEvents() {
     return Collections.unmodifiableList(fishingEvents);
   }
 }

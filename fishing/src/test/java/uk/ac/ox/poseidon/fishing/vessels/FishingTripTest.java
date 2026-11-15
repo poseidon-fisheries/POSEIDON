@@ -36,7 +36,7 @@ import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingOutcome;
 import uk.ac.ox.poseidon.fishing.trips.FishingTripEndEvent;
 import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
@@ -108,8 +108,8 @@ class FishingTripTest {
       new Cell(1, 1),
       START
     );
-    final FishingEvent first = newFishingEvent();
-    final FishingEvent second = newFishingEvent();
+    final FishingActionEvent first = newFishingEvent();
+    final FishingActionEvent second = newFishingEvent();
 
     trip.getEventManager().broadcast(first);
     trip.getEventManager().broadcast(second);
@@ -126,13 +126,14 @@ class FishingTripTest {
       new Cell(1, 1),
       START
     );
-    final List<List<FishingEvent>> recordedWhenReceived = new ArrayList<>();
+    final List<List<FishingActionEvent>> recordedWhenReceived =
+      new ArrayList<>();
     vesselEventManager.addListener(
-      new SimpleListener<>(FishingEvent.class, event ->
+      new SimpleListener<>(FishingActionEvent.class, event ->
         recordedWhenReceived.add(List.copyOf(trip.getFishingEvents()))
       )
     );
-    final FishingEvent fishingEvent = newFishingEvent();
+    final FishingActionEvent fishingEvent = newFishingEvent();
 
     trip.getEventManager().broadcast(fishingEvent);
 
@@ -153,8 +154,8 @@ class FishingTripTest {
     ).isInstanceOf(UnsupportedOperationException.class);
   }
 
-  private static FishingEvent newFishingEvent() {
-    return new FishingEvent(
+  private static FishingActionEvent newFishingEvent() {
+    return new FishingActionEvent(
       mock(ExtendedFishingAction.class),
       mock(FishingOutcome.class)
     );

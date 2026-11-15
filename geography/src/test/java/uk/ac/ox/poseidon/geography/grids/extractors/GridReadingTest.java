@@ -22,24 +22,23 @@
 
 package uk.ac.ox.poseidon.geography.grids.extractors;
 
-import java.util.function.BiFunction;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
+import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.DoubleGrid;
 
-/**
- * A mapping that reads a fixed, resolved {@link DoubleGrid}'s value at the cell
- * mapped, whatever the context. Built via
- * {@link Factories#cellValue(uk.ac.ox.poseidon.core.Factory)} in this package.
- */
-@RequiredArgsConstructor
-public class CellValue implements BiFunction<Object, Cell, Double> {
+class GridReadingTest {
 
-  private final @NonNull DoubleGrid grid;
-
-  @Override
-  public Double apply(final Object context, final Cell cell) {
-    return grid.getValue(cell);
+  @Test
+  void readsTheCurrentGridAtTheSuppliedCellWhateverTheContext() {
+    final DoubleGrid grid = mock(DoubleGrid.class);
+    final Cell cell = new Cell(2, 3);
+    when(grid.getValue(cell)).thenReturn(-12.5, 7.0);
+    final GridReading reading = new GridReading(grid);
+    assertThat(reading.apply(new Object(), cell)).isEqualTo(-12.5);
+    assertThat(reading.apply(new Object(), cell)).isEqualTo(7.0);
+    verify(grid, times(2)).getValue(cell);
   }
 }

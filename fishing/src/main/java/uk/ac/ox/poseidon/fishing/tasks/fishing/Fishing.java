@@ -48,7 +48,7 @@ import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
  * vessel's gear: runs for the gear's own duration, then sorts the catch via
  * {@code dispositionProcess}, adds the retained portion to the hold, releases
  * what's discarded alive back to the fisheable, broadcasts a
- * {@link FishingEvent}, and takes the fuel the gear burns per hour of fishing
+ * {@link FishingActionEvent}, and takes the fuel the gear burns per hour of fishing
  * from the tank.
  */
 @RequiredArgsConstructor
@@ -110,7 +110,7 @@ public class Fishing extends ExtendedTripTask {
   /**
    * Fishes the fisheable {@link #fisheable} supplies, sorts the catch
    * via {@link #dispositionProcess}, retains what fits in the hold, releases
-   * the rest alive back to the fisheable, broadcasts a {@link FishingEvent},
+   * the rest alive back to the fisheable, broadcasts a {@link FishingActionEvent},
    * and consumes fuel for the elapsed duration.
    *
    * @return always {@code SUCCEEDED}
@@ -130,7 +130,10 @@ public class Fishing extends ExtendedTripTask {
     getTrip()
       .getEventManager()
       .broadcast(
-        new FishingEvent(action, new FishingOutcome(grossCatch, disposition))
+        new FishingActionEvent(
+          action,
+          new FishingOutcome(grossCatch, disposition)
+        )
       );
     final double fuelPerHour = gear.getLitresOfFuelConsumedPerHourOfFishing();
     if (fuelPerHour > 0) {

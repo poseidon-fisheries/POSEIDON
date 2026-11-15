@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
  * A {@link TaskFactory} for a gdx-ai {@link BranchTask}: builds the
  * branch node via {@link #newTask()} and attaches one child, resolved against
  * the current {@link VesselComponentScope}, per entry in {@code children}. See
- * {@link SequenceTaskFactory} and {@link SelectorTaskFactory} for the concrete
+ * {@link SequenceTaskFactory} and {@link FallbackTaskFactory} for the concrete
  * branch types.
  *
  * @param <T> the concrete {@link BranchTask} type built

@@ -32,7 +32,7 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.Listener;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory;
 
@@ -52,7 +52,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class SharedFishingEventListenerFactory<L extends Listener<? super FishingEvent>> extends VesselComponentScopeFactory<L> {
+public class SharedFishingEventListenerFactory<L extends Listener<? super FishingActionEvent>> extends VesselComponentScopeFactory<L> {
 
   private final Factory<? super VesselComponentScope, ? extends L> listener;
   private final Factory<

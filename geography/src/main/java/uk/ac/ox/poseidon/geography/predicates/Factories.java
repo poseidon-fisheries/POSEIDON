@@ -24,7 +24,7 @@ package uk.ac.ox.poseidon.geography.predicates;
 
 import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.between;
-import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.cellValue;
+import static uk.ac.ox.poseidon.geography.grids.extractors.Factories.gridReading;
 
 import java.util.Collection;
 import org.locationtech.jts.geom.Geometry;
@@ -75,7 +75,7 @@ public final class Factories {
     final double maximumDepth
   ) {
     return condition(
-      cellValue(bathymetricGrid),
+      gridReading(bathymetricGrid),
       between(-maximumDepth, -minimumDepth)
     );
   }

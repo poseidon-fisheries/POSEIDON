@@ -41,7 +41,7 @@ components:
                 object: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {
                   value: -800.0
                 }
-            subject: !!uk.ac.ox.poseidon.geography.grids.extractors.CellValueFactory
+            subject: !!uk.ac.ox.poseidon.geography.grids.extractors.GridReadingFactory
               grid: *id003
         delegateAllocator: !!uk.ac.ox.poseidon.geography.allocators.SupplierAllocatorFactory
           value: !!uk.ac.ox.poseidon.core.providers.constant.ConstantFactory
@@ -178,7 +178,7 @@ components:
           predicate: !!uk.ac.ox.poseidon.fishing.vessels.values.VesselIsDockedAtFactory
             port: !!uk.ac.ox.poseidon.fishing.vessels.values.HomePortFactory {
               }
-        - !!uk.ac.ox.poseidon.fishing.tasks.branches.SelectorTaskFactory
+        - !!uk.ac.ox.poseidon.fishing.tasks.branches.FallbackTaskFactory
           children:
           - !!uk.ac.ox.poseidon.fishing.tasks.branches.SequenceTaskFactory
             children:
@@ -399,7 +399,7 @@ components:
                         object: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {
                           value: 0.0
                         }
-                    subject: !!uk.ac.ox.poseidon.geography.grids.extractors.CellValueFactory
+                    subject: !!uk.ac.ox.poseidon.geography.grids.extractors.GridReadingFactory
                       grid: *id004
                   maximumWidening: 3
                   neighbourhoodSize: !!uk.ac.ox.poseidon.fishing.vessels.OneValueFromFactory

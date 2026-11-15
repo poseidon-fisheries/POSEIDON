@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
@@ -258,7 +258,10 @@ public final class Factories {
     final Factory<? super S, ? extends ModelGrid> modelGrid,
     final Factory<
       ? super S,
-      ? extends Function<? super FishingEvent, ? extends Memory<Cell, Bucket>>
+      ? extends Function<
+        ? super FishingActionEvent,
+        ? extends Memory<Cell, Bucket>
+      >
     > memorySelector,
     final Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule
   ) {
@@ -304,7 +307,7 @@ public final class Factories {
 
   /**
    * @param key the key, such as the code of a gear, read from what is
-   *            remembered (a {@link FishingEvent}) and from what reads (a
+   *            remembered (a {@link FishingActionEvent}) and from what reads (a
    *            {@link Vessel}); each key gets its own memory
    * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for
    *         an empty memory of the catches made in each cell, one per vessel;

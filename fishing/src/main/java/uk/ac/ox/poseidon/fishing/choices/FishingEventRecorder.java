@@ -28,7 +28,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
@@ -43,11 +43,11 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  * same memory, with different update rules, such as one for its own fishing
  * events and one for fishing events it is told about.
  */
-public class FishingEventRecorder extends AbstractListener<FishingEvent> {
+public class FishingEventRecorder extends AbstractListener<FishingActionEvent> {
 
   private final ModelGrid modelGrid;
   private final Function<
-    ? super FishingEvent,
+    ? super FishingActionEvent,
     ? extends Memory<Cell, Bucket>
   > memorySelector;
   private final BinaryOperator<Bucket> updateRule;
@@ -63,19 +63,19 @@ public class FishingEventRecorder extends AbstractListener<FishingEvent> {
   FishingEventRecorder(
     final ModelGrid modelGrid,
     final Function<
-      ? super FishingEvent,
+      ? super FishingActionEvent,
       ? extends Memory<Cell, Bucket>
     > memorySelector,
     final BinaryOperator<Bucket> updateRule
   ) {
-    super(FishingEvent.class);
+    super(FishingActionEvent.class);
     this.modelGrid = checkNotNull(modelGrid);
     this.memorySelector = checkNotNull(memorySelector);
     this.updateRule = checkNotNull(updateRule);
   }
 
   @Override
-  public void receive(final FishingEvent event) {
+  public void receive(final FishingActionEvent event) {
     memorySelector
       .apply(event)
       .observe(

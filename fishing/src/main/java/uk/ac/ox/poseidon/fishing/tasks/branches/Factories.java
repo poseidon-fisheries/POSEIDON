@@ -54,15 +54,15 @@ public final class Factories {
    * @param children factories for the selector's child tasks
    * @return a {@link uk.ac.ox.poseidon.fishing.tasks.TaskFactory} for a
    *         {@link com.badlogic.gdx.ai.btree.branch.Selector}
-   * @see SelectorTaskFactory
+   * @see FallbackTaskFactory
    */
   @SafeVarargs
-  public static SelectorTaskFactory selectorTask(
+  public static FallbackTaskFactory fallbackTask(
     final Factory<
       ? super VesselComponentScope,
       ? extends Task<Vessel>
     >... children
   ) {
-    return new SelectorTaskFactory(List.of(children));
+    return new FallbackTaskFactory(List.of(children));
   }
 }

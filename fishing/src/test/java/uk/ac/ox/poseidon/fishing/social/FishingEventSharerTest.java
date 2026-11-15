@@ -32,7 +32,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 class FishingEventSharerTest {
@@ -43,26 +43,26 @@ class FishingEventSharerTest {
   private final FishingEventSharer fishingEventSharer = new FishingEventSharer(
     network
   );
-  private final List<FishingEvent> heardByA = new ArrayList<>();
-  private final List<FishingEvent> heardByB = new ArrayList<>();
+  private final List<FishingActionEvent> heardByA = new ArrayList<>();
+  private final List<FishingActionEvent> heardByB = new ArrayList<>();
 
-  private static FishingEvent fishingEventBy(final Vessel vessel) {
+  private static FishingActionEvent fishingEventBy(final Vessel vessel) {
     final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
     when(action.getAgent()).thenReturn(vessel);
-    return new FishingEvent(action, null);
+    return new FishingActionEvent(action, null);
   }
 
-  private static Listener<FishingEvent> listener(
-    final List<FishingEvent> heard
+  private static Listener<FishingActionEvent> listener(
+    final List<FishingActionEvent> heard
   ) {
     return new Listener<>() {
       @Override
-      public Class<FishingEvent> getEventClass() {
-        return FishingEvent.class;
+      public Class<FishingActionEvent> getEventClass() {
+        return FishingActionEvent.class;
       }
 
       @Override
-      public void receive(final FishingEvent event) {
+      public void receive(final FishingActionEvent event) {
         heard.add(event);
       }
     };
@@ -73,7 +73,7 @@ class FishingEventSharerTest {
     fishingEventSharer.register(a, listener(heardByA));
     fishingEventSharer.register(b, listener(heardByB));
     network.addTie(a, b);
-    final FishingEvent fishingEventByA = fishingEventBy(a);
+    final FishingActionEvent fishingEventByA = fishingEventBy(a);
 
     fishingEventSharer.receive(fishingEventByA);
     fishingEventSharer.receive(fishingEventBy(b));

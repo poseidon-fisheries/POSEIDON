@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import uk.ac.ox.poseidon.core.events.AbstractListener;
 import uk.ac.ox.poseidon.core.events.Listener;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEvent;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselRegistry;
 
@@ -43,18 +43,18 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselRegistry;
  * {@link uk.ac.ox.poseidon.fishing.vessels.VesselScope}.
  */
 public class FishingEventSharer
-  extends AbstractListener<FishingEvent>
-  implements VesselRegistry<Listener<? super FishingEvent>>
+  extends AbstractListener<FishingActionEvent>
+  implements VesselRegistry<Listener<? super FishingActionEvent>>
 {
 
   private final SocialNetwork network;
   private final Map<
     Vessel,
-    Listener<? super FishingEvent>
+    Listener<? super FishingActionEvent>
   > sharedFishingEventListeners = new HashMap<>();
 
   FishingEventSharer(final SocialNetwork network) {
-    super(FishingEvent.class);
+    super(FishingActionEvent.class);
     this.network = checkNotNull(network);
   }
 
@@ -70,7 +70,7 @@ public class FishingEventSharer
   @Override
   public Runnable register(
     final Vessel vessel,
-    final Listener<? super FishingEvent> sharedFishingEventListener
+    final Listener<? super FishingActionEvent> sharedFishingEventListener
   ) {
     checkState(
       !sharedFishingEventListeners.containsKey(vessel),
@@ -85,11 +85,11 @@ public class FishingEventSharer
   }
 
   @Override
-  public void receive(final FishingEvent event) {
+  public void receive(final FishingActionEvent event) {
     for (final Vessel recipient : network.getRecipients(
       event.getAction().getAgent()
     )) {
-      final Listener<? super FishingEvent> sharedFishingEventListener =
+      final Listener<? super FishingActionEvent> sharedFishingEventListener =
         sharedFishingEventListeners.get(recipient);
       if (sharedFishingEventListener != null) {
         sharedFishingEventListener.receive(event);
