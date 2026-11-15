@@ -54,6 +54,13 @@ strings and simple values (`vesselProperty("gear.code")`) beat method references
 even when the clever version buys compile-time safety, and a call site that needs type witnesses is
 not simple. Put the safety net in a test that builds the scenario.
 
+## Yes/no inputs
+
+A component's yes/no input is a `Function` or `BiFunction` with a `Boolean` result, the shape the
+predicate combinators (`condition`, `allOf`, `anyOf`, `not`) build, as
+[architecture.md](architecture.md) says. Only a component built without a context converts its
+input to a plain `Predicate`, once, through `VoidContextConversions`.
+
 ## `Factories` helper names
 
 Name a `Factories` helper after the class its factory builds, in lowerCamelCase (`GreedyPicker` →
@@ -70,8 +77,8 @@ than `ImmutableMap.copyOf(Maps.transformValues(...))`, and build a value rather 
 into a mutable one. This is a preference, not a rule. A loop is fine where it reads better: filling
 or transposing an array by index, a state machine such as a character scanner, or a cursor API like
 StAX. If a stream needs nested `IntStream`s or index arithmetic to do what a plain loop says
-directly, keep the loop. A loop is also fine on a hot path where a profile shows a stream's
-overhead; code that runs once, such as a constructor, is not a hot path.
+directly, keep the loop. A loop is also fine on a [hot path](#hot-paths) where a profile shows a
+stream's overhead.
 
 ## Single exit
 
@@ -88,7 +95,18 @@ Checkstyle's `ReturnCount` check enforces this.
 - A loop that runs a fixed, small number of times is written out as its steps.
 - When a change alters what a method does, rewrite the method as the new sequence of steps rather
   than wrapping the old body.
-- On a hot path, such as the buckets, market quotes, catch valuation or the legality check's
-  predicate combinators (anything run once per option the legality check tests), keep a loop with
-  early returns where a stream would cost measurably, and mark the method
-  `@SuppressWarnings("checkstyle:ReturnCount")`, so the exception is stated where it is made.
+- On a [hot path](#hot-paths), keep a loop with early returns where a stream would cost
+  measurably, and mark the method `@SuppressWarnings("checkstyle:ReturnCount")`, so the exception
+  is stated where it is made.
+
+## Hot paths
+
+Before restructuring code, ask how often it runs. Code that runs once per option on each pick,
+once per cell, or once per vessel on each step is a hot path: the buckets, market quotes, catch
+valuation, the legality check's predicate combinators and a picker's visit of option values are
+examples, not the whole set. Code that runs once per build or per run, such as a constructor or
+scenario wiring, is not.
+
+On a hot path, a style rule never justifies an extra pass over the data or an extra allocation per
+element: keep the work to a single pass where it was one, even if that keeps a mutable accumulator
+or an early return.

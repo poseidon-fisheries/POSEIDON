@@ -31,12 +31,9 @@ The model is built around a declarative configuration → runtime object pattern
   patch the `.yaml` file directly, and don't reach for a scripted find-and-replace (sed, a
   hand-rolled rename script, etc.) even when you've confirmed via a regenerated copy that it
   produces the identical text. Renaming a `*Factory` class is a Java rename that gets reflected in
-  YAML by rerunning the writer task, not a text substitution performed on the checked-in file. If
-  running the writer task turns up a diff broader than the change you set out to make — i.e. the
-  committed YAML had already drifted from what the current Java produces, for reasons unrelated to
-  your change — don't hand-patch around the unrelated part and don't silently drop it either.
-  Surface the drift to the user and let them decide whether to accept the full regenerated file
-  (folding the unrelated fix in) or handle it as a separate change.
+  YAML by rerunning the writer task, not a text substitution performed on the checked-in file.
+  Commit whatever the writer task produces, with the Java change: the YAML needs no review, and
+  any drift from earlier changes goes into the same commit.
 - **When building a `Scenario`, use the module's static `Factories` helper methods, not `new SomeFactory(...)` directly.** Modules expose a `Factories` class (e.g. `core/.../time/Factories.java`, and similarly in `io`, `geography`, `regulations`, and per-example packages) with static factory methods (`Factories.days(3)`, `Factories.dateTime(...)`, etc.) that scenario-building code should call instead of instantiating `*Factory` classes directly.
 - **In scenario-building code, write a factory inline where it is used, and give it a local variable only when:**
   - **it is used more than once.** This is about identity, not tidiness: products are stored by factory identity, so two inline copies of the same expression build two different objects. When an object must be shared (e.g. one per-vessel memory that both a learner and the view read), a single named instance is what makes it shared, and inlining it would silently duplicate it;
