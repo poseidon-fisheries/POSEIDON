@@ -419,10 +419,7 @@ components:
                     - !!uk.ac.ox.poseidon.fishing.choices.RandomPickerFactory
                       candidates: !!uk.ac.ox.poseidon.fishing.vessels.values.AccessibleWaterCellsFactory
                         pathFinder: *id020
-                      optionEligibilityCriteria: !!uk.ac.ox.poseidon.core.providers.constant.ConstantMappingFactory
-                        result: !!uk.ac.ox.poseidon.core.utils.ObjectFactory {
-                          value: true
-                        }
+                      optionEligibilityCriteria: *id019
                       rng: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                         }
                   searchRadius: !!uk.ac.ox.poseidon.fishing.vessels.OneValueFromFactory
