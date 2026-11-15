@@ -150,11 +150,14 @@ class PeterSnapperScenarioTest {
 
   // Stored from a run, so that a change that was meant to keep behaviour
   // and does not fails here. A change meant to alter the draws replaces
-  // these values and says why.
+  // these values and says why. These values changed when vessels began to
+  // learn from their own and their friends' trip outcomes through one memory
+  // of the last received profit per hour, which draws differently from the
+  // earlier tables, evaluator and imitation.
   @Test
   void landingsMatchTheBaseline() {
     assertThat(landingsForAYear(new PeterSnapperScenario().get())).isEqualTo(
-      Map.of(1, 2.047458273295532E7)
+      Map.of(1, 2.208188231290395E7)
     );
   }
 

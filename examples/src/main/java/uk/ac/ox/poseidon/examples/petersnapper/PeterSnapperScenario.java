@@ -35,7 +35,6 @@ import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.greaterThan
 import static uk.ac.ox.poseidon.core.predicates.comparable.Factories.lessThan;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
 import static uk.ac.ox.poseidon.core.predicates.temporal.Factories.dateTimeIsBefore;
-import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomDouble;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.randomInt;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
@@ -51,15 +50,15 @@ import static uk.ac.ox.poseidon.fishing.catches.Factories.uncategorisedCatchCate
 import static uk.ac.ox.poseidon.fishing.catches.Factories.uniformCatchCategoriser;
 import static uk.ac.ox.poseidon.fishing.catches.disposition.Factories.proportionallyLimitingBiomassToHold;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.*;
-import static uk.ac.ox.poseidon.fishing.choices.evaluation.Factories.profitPerHour;
-import static uk.ac.ox.poseidon.fishing.choices.evaluation.Factories.tripEvaluator;
 import static uk.ac.ox.poseidon.fishing.fields.Factories.vesselField;
 import static uk.ac.ox.poseidon.fishing.fisheables.Factories.currentCellFisheable;
 import static uk.ac.ox.poseidon.fishing.fuel.Factories.fuelStationGrid;
 import static uk.ac.ox.poseidon.fishing.fuel.Factories.oneFuelStationPerPort;
 import static uk.ac.ox.poseidon.fishing.market.Factories.*;
 import static uk.ac.ox.poseidon.fishing.money.Factories.money;
+import static uk.ac.ox.poseidon.fishing.social.Factories.fishingTripEndSharer;
 import static uk.ac.ox.poseidon.fishing.social.Factories.friendshipDynamics;
+import static uk.ac.ox.poseidon.fishing.social.Factories.sharedFishingTripEndListener;
 import static uk.ac.ox.poseidon.fishing.social.Factories.socialNetwork;
 import static uk.ac.ox.poseidon.fishing.tasks.branches.Factories.fallbackTask;
 import static uk.ac.ox.poseidon.fishing.tasks.branches.Factories.sequenceTask;
@@ -125,7 +124,6 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
   // configurations to the module's working directory.
   private static final Path INPUT_PATH = Path.of("inputs", "peter_snapper");
 
-  private static final double LEARNING_ALPHA = 1;
   private static final double EXPLORATION_PROBABILITY = 0.2;
   private static final int MAXIMUM_EXPLORATION_WIDENING = 3;
   private static final int TOTAL_CARRYING_CAPACITY = 110_749_315;
@@ -333,55 +331,57 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     final var fuelTank = vesselComponent(fullTank(volumeOf(100000, LITRE)));
 
-    // Each vessel's own table of what its destinations are worth, which its
-    // friends read too
-    final var optionValues = vesselComponent(
-      exponentialMovingAverageCellValues(LEARNING_ALPHA)
-    );
-
     final var fleet = fleet(vesselField, portGrid, marketGrid);
 
-    final var validCellPredicate = condition(
-      gridReading(carryingCapacityGrid),
-      greaterThan(0)
-    );
-    final var destination = epsilonGreedyDestination(
-      EXPLORATION_PROBABILITY,
-      neighbourhoodGridExplorer(
-        pathFinder,
-        validCellPredicate,
-        oneValueFrom(randomInt(1, 10)),
-        MAXIMUM_EXPLORATION_WIDENING,
-        bestKnownOption(
-          optionValues,
-          randomGridExplorer(
-            accessibleWaterCells(pathFinder),
-            validCellPredicate
-          )
-        )
-      ),
-      imitatingPicker(
-        optionValues,
-        always(true),
-        bestOptionsFromFriends(
-          optionValues,
-          friendshipDynamics(
-            socialNetwork(fleet),
-            2,
-            allOf(
-              other(vesselIsActive()),
-              condition(
-                other(vesselProperty("homePort")),
-                equal(vesselProperty("homePort"))
-              )
-            )
-          )
+    final var socialNetwork = socialNetwork(fleet);
+    final var friendshipDynamics = friendshipDynamics(
+      socialNetwork,
+      2,
+      allOf(
+        other(vesselIsActive()),
+        condition(
+          other(vesselProperty("homePort")),
+          equal(vesselProperty("homePort"))
         )
       )
     );
+    final var tripSharer = fishingTripEndSharer(socialNetwork);
 
-    final var tripEvaluator = vesselComponent(
-      tripEvaluator(optionValues, profitPerHour(CURRENCY_CODE))
+    // Realised profit per hour of the vessel's own trips and its friends'
+    // trips: the last received figure stands, whoever made the trip
+    final var profitPerHourByCell = numbersByCell();
+    final var tripRecorder = fishingTripEndRecorder(
+      destinationCell(),
+      profitPerHour(),
+      profitPerHourByCell,
+      keepLastReceived()
+    );
+    final var ownTripRecorder = vesselComponent(
+      vesselEventListener(tripRecorder)
+    );
+    final var friendTripRecorder = vesselComponent(
+      sharedFishingTripEndListener(tripRecorder, tripSharer)
+    );
+
+    final var cellValues = memoryBasedOptionValues(profitPerHourByCell);
+
+    final var cellEligibilityCriteria = condition(
+      gridReading(carryingCapacityGrid),
+      greaterThan(0)
+    );
+    final var destination = epsilonGreedyPicker(
+      EXPLORATION_PROBABILITY,
+      nearbyCellPicker(
+        pathFinder,
+        cellEligibilityCriteria,
+        oneValueFrom(randomInt(1, 10)),
+        MAXIMUM_EXPLORATION_WIDENING,
+        fallbackPicker(
+          greedyPicker(cellValues),
+          randomPicker(accessibleWaterCells(pathFinder))
+        )
+      ),
+      greedyPicker(cellValues, cellEligibilityCriteria)
     );
 
     final var travelToTripDestination = travelAlongPathTo(
@@ -453,8 +453,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       .component("engine", engine)
       .component("fuelTank", fuelTank)
       .component("hold", hold)
-      .component("optionValues", optionValues)
-      .component("tripEvaluator", tripEvaluator)
+      .component("ownTripRecorder", ownTripRecorder)
+      .component("friendTripRecorder", friendTripRecorder)
       .build();
 
     // Benoa's vessels are created first, then Kupang's
@@ -480,6 +480,8 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       .component("initialPrices", initialPrices)
       .component("gearProportion", gearProportion)
       .component("vesselField", vesselField)
+      .component("friendshipDynamics", friendshipDynamics)
+      .component("tripSharer", tripSharer)
       .component("vesselSpecification", vesselSpecification)
       .component("vesselCreation", vesselCreation)
       .build();

@@ -31,41 +31,49 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
-import uk.ac.ox.poseidon.core.events.Listener;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
-import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
-import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory;
+import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
+import uk.ac.ox.poseidon.fishing.vessels.HasVessel;
 
 /**
- * Registers the vessel's {@link #listener} with the {@link FishingEventSharer},
- * once per vessel, and gives that listener: it then hears the fishing events of
- * the vessel's sources. Built via {@link Factories#sharedFishingEventListener}.
- * <p>
- * A listener nothing else reads would never be built for a vessel, since
- * factories only build when asked: make this factory one of the vessel's
- * components, which are built when the vessel is created.
+ * A {@link SimulationEventListenerFactory} for {@link EventSharer}, built via
+ * {@link Factories#fishingActionSharer} or
+ * {@link Factories#fishingTripEndSharer}. Registered with the simulation's
+ * event manager, the sharer hears the events every vessel's event manager
+ * forwards there.
  *
- * @param <L> the type of listener
+ * @param <E> the type of event shared
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class SharedFishingEventListenerFactory<L extends Listener<? super FishingActionEvent>> extends VesselComponentScopeFactory<L> {
+public class EventSharerFactory<E extends HasVessel> extends SimulationEventListenerFactory<
+  EventSharer<E>
+> {
 
-  private final Factory<? super VesselComponentScope, ? extends L> listener;
+  private final String eventClass;
   private final Factory<
     ? super SimulationScope,
-    ? extends FishingEventSharer
-  > fishingEventSharer;
+    ? extends SocialNetwork
+  > network;
 
   @Override
-  protected L newInstance(final VesselComponentScope scope) {
-    checkNotNull(listener, "listener must not be null");
-    checkNotNull(fishingEventSharer, "fishingEventSharer must not be null");
-    final L listener = this.listener.get(scope);
-    scope.register(fishingEventSharer.get(scope), listener);
-    return listener;
+  @SuppressWarnings("unchecked")
+  protected EventSharer<E> newListener(final SimulationScope scope) {
+    checkNotNull(eventClass, "eventClass must not be null");
+    checkNotNull(network, "network must not be null");
+    final Class<E> eventClass;
+    try {
+      eventClass = (Class<E>) Class.forName(this.eventClass).asSubclass(
+        HasVessel.class
+      );
+    } catch (final ClassNotFoundException e) {
+      throw new IllegalArgumentException(
+        "Unknown event class: " + this.eventClass,
+        e
+      );
+    }
+    return new EventSharer<>(eventClass, network.get(scope));
   }
 }

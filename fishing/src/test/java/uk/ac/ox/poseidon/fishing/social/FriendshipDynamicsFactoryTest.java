@@ -25,27 +25,27 @@ package uk.ac.ox.poseidon.fishing.social;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
-import static uk.ac.ox.poseidon.fishing.social.Factories.fishingEventSharer;
+import static uk.ac.ox.poseidon.fishing.social.Factories.friendshipDynamics;
 import static uk.ac.ox.poseidon.fishing.social.Factories.socialNetwork;
 
 import com.google.common.collect.ImmutableSet;
-import java.util.ArrayList;
-import java.util.List;
+import ec.util.MersenneTwisterFast;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
-import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
-import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
-import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
+import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
-class FishingEventSharerFactoryTest {
+class FriendshipDynamicsFactoryTest {
 
   private final EventManager simulationEventManager = new SimpleEventManager();
   private final Simulation simulation = simulation(simulationEventManager);
@@ -56,11 +56,16 @@ class FishingEventSharerFactoryTest {
   private final Vessel b = vessel(simulationEventManager);
   private final Fleet fleet = fleetOf(a, b);
   private final SocialNetworkFactory network = socialNetwork(object(fleet));
-  private final FishingEventSharerFactory factory = fishingEventSharer(network);
+  private final FriendshipDynamicsFactory factory = friendshipDynamics(
+    network,
+    1,
+    always(true)
+  );
 
   private static Simulation simulation(final EventManager eventManager) {
     final Simulation simulation = mock(Simulation.class);
     when(simulation.getProductStore()).thenReturn(new ProductStore());
+    simulation.random = new MersenneTwisterFast(0);
     when(simulation.getEventManager()).thenReturn(eventManager);
     return simulation;
   }
@@ -68,6 +73,7 @@ class FishingEventSharerFactoryTest {
   private static Vessel vessel(final EventManager simulationEventManager) {
     final Vessel vessel = mock(Vessel.class);
     when(vessel.getProductStore()).thenReturn(new ProductStore());
+    when(vessel.isActive()).thenReturn(true);
     when(vessel.getEventManager()).thenReturn(
       new ForwardingEventManager(simulationEventManager)
     );
@@ -81,8 +87,14 @@ class FishingEventSharerFactoryTest {
     return fleet;
   }
 
+  private static void startTrip(final Vessel vessel) {
+    final FishingTrip trip = mock(FishingTrip.class);
+    when(trip.getVessel()).thenReturn(vessel);
+    vessel.getEventManager().broadcast(new FishingTripStartEvent(trip));
+  }
+
   @Test
-  void givesOneSharerPerSimulation() {
+  void givesOneDynamicsPerSimulation() {
     final SimulationScope scope = new SimulationScope(simulation);
     final SimulationScope otherScope = new SimulationScope(otherSimulation);
 
@@ -91,33 +103,23 @@ class FishingEventSharerFactoryTest {
   }
 
   @Test
-  void aFishingEventBroadcastOnAVesselsEventManagerReachesItsRecipientThroughForwarding() {
+  void aTripStartBroadcastOnAVesselsEventManagerRecruitsItsFriendsThroughForwarding() {
     final SimulationScope scope = new SimulationScope(simulation);
-    final List<FishingActionEvent> heardByB = new ArrayList<>();
-    factory.get(scope).register(
-      b,
-      new Listener<FishingActionEvent>() {
-        @Override
-        public Class<FishingActionEvent> getEventClass() {
-          return FishingActionEvent.class;
-        }
+    factory.get(scope);
 
-        @Override
-        public void receive(final FishingActionEvent event) {
-          heardByB.add(event);
-        }
-      }
-    );
-    network.get(scope).addTie(a, b);
-    final ExtendedFishingAction action = mock(ExtendedFishingAction.class);
-    when(action.getAgent()).thenReturn(a);
-    final FishingActionEvent fishingEventByA = new FishingActionEvent(
-      action,
-      null
-    );
+    startTrip(a);
 
-    a.getEventManager().broadcast(fishingEventByA);
+    assertThat(network.get(scope).getSources(a)).containsExactly(b);
+    assertThat(network.get(scope).getRecipients(a)).isEmpty();
+  }
 
-    assertThat(heardByB).containsExactly(fishingEventByA);
+  @Test
+  void aTargetGivenAsAValueOfTheVesselIsUsed() {
+    final SimulationScope scope = new SimulationScope(simulation);
+    friendshipDynamics(network, constant(0), always(true)).get(scope);
+
+    startTrip(a);
+
+    assertThat(network.get(scope).getSources(a)).isEmpty();
   }
 }

@@ -31,31 +31,43 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
-import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
+import uk.ac.ox.poseidon.core.events.Listener;
+import uk.ac.ox.poseidon.fishing.vessels.HasVessel;
+import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory;
 
 /**
- * A {@link SimulationEventListenerFactory} for a {@link FishingEventSharer},
- * built via {@link Factories#fishingEventSharer}. Registered with the
- * simulation's event manager, the sharer hears the fishing events every
- * vessel's event manager forwards there.
+ * Gives a vessel's listener for the events shared with it and registers it
+ * with an {@link EventSharer}, built via
+ * {@link Factories#sharedFishingActionListener} or
+ * {@link Factories#sharedFishingTripEndListener}. The registration ends with
+ * the vessel's component.
+ *
+ * @param <E> the type of event shared
+ * @param <L> the type of the vessel's listener
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class FishingEventSharerFactory
-  extends SimulationEventListenerFactory<FishingEventSharer>
-{
+public class SharedEventListenerFactory<
+  E extends HasVessel,
+  L extends Listener<? super E>
+> extends VesselComponentScopeFactory<L> {
 
+  private final Factory<? super VesselComponentScope, ? extends L> listener;
   private final Factory<
     ? super SimulationScope,
-    ? extends SocialNetwork
-  > network;
+    ? extends EventSharer<E>
+  > eventSharer;
 
   @Override
-  protected FishingEventSharer newListener(final SimulationScope scope) {
-    checkNotNull(network, "network must not be null");
-    return new FishingEventSharer(network.get(scope));
+  protected L newInstance(final VesselComponentScope scope) {
+    checkNotNull(listener, "listener must not be null");
+    checkNotNull(eventSharer, "eventSharer must not be null");
+    final L listener = this.listener.get(scope);
+    scope.register(eventSharer.get(scope), listener);
+    return listener;
   }
 }

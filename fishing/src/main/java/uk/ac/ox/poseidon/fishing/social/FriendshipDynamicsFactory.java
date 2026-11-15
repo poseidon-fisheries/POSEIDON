@@ -25,8 +25,6 @@ package uk.ac.ox.poseidon.fishing.social;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import ec.util.MersenneTwisterFast;
-import java.util.Set;
-import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,14 +33,16 @@ import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.SimulationScope;
-import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * A {@link SimulationScopeFactory} for {@link FriendshipDynamics}, built via
- * {@link Factories#friendshipDynamics}: a value of a vessel, its friends. The
- * dynamics use the simulation's random number generator.
+ * A {@link SimulationEventListenerFactory} for {@link FriendshipDynamics},
+ * built via {@link Factories#friendshipDynamics}. Registered with the
+ * simulation's event manager, the dynamics hear the fishing trip starts every
+ * vessel's event manager forwards there. They use the simulation's random
+ * number generator.
  */
 @Getter
 @ToString
@@ -50,15 +50,18 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class FriendshipDynamicsFactory
-  extends SimulationScopeFactory<Function<Vessel, Set<Vessel>>>
-  implements ValueFactory<SimulationScope, Vessel, Set<Vessel>>
+  extends SimulationEventListenerFactory<FriendshipDynamics>
 {
 
   private final Factory<
     ? super SimulationScope,
     ? extends SocialNetwork
   > network;
-  private final int targetNumberOfFriends;
+  private final ValueFactory<
+    ? super SimulationScope,
+    ? super Vessel,
+    ? extends Number
+  > targetNumberOfFriends;
   private final MappingFactory<
     ? super SimulationScope,
     ? super Vessel,
@@ -71,14 +74,16 @@ public class FriendshipDynamicsFactory
   > rng;
 
   @Override
-  protected Function<Vessel, Set<Vessel>> newInstance(
-    final SimulationScope scope
-  ) {
+  protected FriendshipDynamics newListener(final SimulationScope scope) {
     checkNotNull(network, "network must not be null");
+    checkNotNull(
+      targetNumberOfFriends,
+      "targetNumberOfFriends must not be null"
+    );
     checkNotNull(friendshipCondition, "friendshipCondition must not be null");
     return new FriendshipDynamics(
       network.get(scope),
-      targetNumberOfFriends,
+      targetNumberOfFriends.get(scope),
       friendshipCondition.get(scope),
       rng.get(scope)
     );

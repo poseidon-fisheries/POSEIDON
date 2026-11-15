@@ -27,29 +27,28 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static uk.ac.ox.poseidon.core.MasonUtils.reservoirSample;
 
 import ec.util.MersenneTwisterFast;
-import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import uk.ac.ox.poseidon.core.events.AbstractListener;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * Network dynamics that give each vessel friends: a friend of a vessel is a
- * vessel that tells it, through a tie from the friend to the vessel, and that
- * the friendship condition relates to the vessel when its friends are read.
- * Reading a vessel's friends through these dynamics first draws new ties, from
- * the network's candidates the condition relates to the vessel, until it has
- * the target number of friends, if there are enough candidates. A tie to a
- * vessel that fails the condition is kept, but not read, so that a vessel
- * that passes the condition again, such as one that moves away and back, is a
- * friend again. Only reading friends through these dynamics draws: reading the
- * network itself never does.
+ * Forms and drops the friends of a vessel, the sources of its incoming ties,
+ * when it starts a fishing trip. It edits no other tie: a trip home starts
+ * nothing, and the ties out of the vessel are left to those it tells.
  */
-public class FriendshipDynamics implements Function<Vessel, Set<Vessel>> {
+public class FriendshipDynamics
+  extends AbstractListener<FishingTripStartEvent>
+{
 
   private final SocialNetwork network;
-  private final int targetNumberOfFriends;
+  private final Function<
+    ? super Vessel,
+    ? extends Number
+  > targetNumberOfFriends;
   private final BiFunction<
     ? super Vessel,
     ? super Vessel,
@@ -59,7 +58,7 @@ public class FriendshipDynamics implements Function<Vessel, Set<Vessel>> {
 
   FriendshipDynamics(
     final SocialNetwork network,
-    final int targetNumberOfFriends,
+    final Function<? super Vessel, ? extends Number> targetNumberOfFriends,
     final BiFunction<
       ? super Vessel,
       ? super Vessel,
@@ -67,49 +66,47 @@ public class FriendshipDynamics implements Function<Vessel, Set<Vessel>> {
     > friendshipCondition,
     final MersenneTwisterFast rng
   ) {
-    checkArgument(
-      targetNumberOfFriends >= 0,
-      "The target number of friends must not be negative, not %s.",
-      targetNumberOfFriends
-    );
+    super(FishingTripStartEvent.class);
     this.network = checkNotNull(network);
-    this.targetNumberOfFriends = targetNumberOfFriends;
+    this.targetNumberOfFriends = checkNotNull(targetNumberOfFriends);
     this.friendshipCondition = checkNotNull(friendshipCondition);
     this.rng = checkNotNull(rng);
   }
 
   /**
-   * Draws new ties to {@code vessel} if it has fewer friends than the target,
-   * sampling uniformly, without replacement, among the candidates the
-   * condition relates to it that do not already tell it.
-   *
-   * @param vessel the vessel whose friends to read
-   * @return the vessels that tell {@code vessel} and that the condition
-   *         relates to it, in the order their ties were made, unmodifiable
+   * Drops the ties from sources the condition no longer relates to the
+   * starting vessel. If it then has fewer friends than its target, read once
+   * here, draws new ties to it, uniformly and without replacement, among the
+   * candidates the condition relates to it. Friends beyond the target are
+   * kept: the target governs recruitment, not a maximum.
    */
   @Override
-  public Set<Vessel> apply(final Vessel vessel) {
-    final Set<Vessel> sources = network.getSources(vessel);
-    final Set<Vessel> friends = new LinkedHashSet<>();
-    for (final Vessel source : sources) {
+  public void receive(final FishingTripStartEvent event) {
+    final Vessel vessel = event.getVessel();
+    final int target = targetNumberOfFriends.apply(vessel).intValue();
+    checkArgument(
+      target >= 0,
+      "The target number of friends must not be negative, not %s.",
+      target
+    );
+    final Set<Vessel> friends = new HashSet<>();
+    for (final Vessel source : network.getSources(vessel)) {
       if (friendshipCondition.apply(vessel, source)) {
         friends.add(source);
+      } else {
+        network.removeTie(source, vessel);
       }
     }
-    if (friends.size() < targetNumberOfFriends) {
+    if (friends.size() < target) {
       reservoirSample(
         network.getCandidates(),
-        targetNumberOfFriends - friends.size(),
+        target - friends.size(),
         candidate ->
           candidate != vessel &&
-          !sources.contains(candidate) &&
+          !friends.contains(candidate) &&
           friendshipCondition.apply(vessel, candidate),
         rng
-      ).forEach(friend -> {
-        network.addTie(friend, vessel);
-        friends.add(friend);
-      });
+      ).forEach(friend -> network.addTie(friend, vessel));
     }
-    return Collections.unmodifiableSet(friends);
   }
 }

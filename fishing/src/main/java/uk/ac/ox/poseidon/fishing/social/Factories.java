@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.social;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.rng;
 
 import com.google.common.collect.ImmutableList;
@@ -32,6 +33,7 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripEndEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
@@ -56,19 +58,26 @@ public final class Factories {
 
   /**
    * @param network               the network whose ties are the friendships
-   * @param targetNumberOfFriends how many friends each vessel is drawn
+   * @param targetNumberOfFriends how many friends a vessel recruits, a value
+   *                              of the vessel read once at each of its
+   *                              fishing trip starts
    * @param friendshipCondition   which other vessels count as friends of a
-   *                              vessel when its friends are read: a mapping
-   *                              of the other vessel, read with
-   *                              {@code other(...)} (see
+   *                              vessel: a mapping of the other vessel, read
+   *                              with {@code other(...)} (see
    *                              {@link uk.ac.ox.poseidon.fishing.vessels.values.Factories#other})
-   * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a
-   *         {@link FriendshipDynamics}, a value of a vessel: its friends
+   * @return a
+   *         {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory}
+   *         for a {@link FriendshipDynamics} registered with the simulation's
+   *         event manager, so that it hears every vessel's fishing trip starts
    * @see FriendshipDynamics
    */
   public static FriendshipDynamicsFactory friendshipDynamics(
     final Factory<? super SimulationScope, ? extends SocialNetwork> network,
-    final int targetNumberOfFriends,
+    final ValueFactory<
+      ? super SimulationScope,
+      ? super Vessel,
+      ? extends Number
+    > targetNumberOfFriends,
     final MappingFactory<
       ? super SimulationScope,
       ? super Vessel,
@@ -81,6 +90,32 @@ public final class Factories {
       targetNumberOfFriends,
       friendshipCondition,
       rng()
+    );
+  }
+
+  /**
+   * @param network               the network whose ties are the friendships
+   * @param targetNumberOfFriends how many friends every vessel recruits
+   * @param friendshipCondition   which other vessels count as friends of a
+   *                              vessel: a mapping of the other vessel, read
+   *                              with {@code other(...)}
+   * @return the same as {@link #friendshipDynamics(Factory, ValueFactory,
+   *         MappingFactory)}, with the target a constant
+   */
+  public static FriendshipDynamicsFactory friendshipDynamics(
+    final Factory<? super SimulationScope, ? extends SocialNetwork> network,
+    final int targetNumberOfFriends,
+    final MappingFactory<
+      ? super SimulationScope,
+      ? super Vessel,
+      ? super Vessel,
+      Boolean
+    > friendshipCondition
+  ) {
+    return friendshipDynamics(
+      network,
+      constant(targetNumberOfFriends),
+      friendshipCondition
     );
   }
 
@@ -113,38 +148,79 @@ public final class Factories {
   }
 
   /**
-   * @param network the network whose ties decide who hears each fishing event
+   * @param network the network whose ties decide who hears each fishing action
    * @return a
    *         {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory}
-   *         for a {@link FishingEventSharer} registered with the simulation's
-   *         event manager, so that it hears every vessel's fishing events
-   * @see FishingEventSharer
+   *         for an {@link EventSharer} of {@link FishingActionEvent}s
+   *         registered with the simulation's event manager
+   * @see EventSharer
    */
-  public static FishingEventSharerFactory fishingEventSharer(
+  public static EventSharerFactory<FishingActionEvent> fishingActionSharer(
     final Factory<? super SimulationScope, ? extends SocialNetwork> network
   ) {
-    return new FishingEventSharerFactory(network);
+    return new EventSharerFactory<>(
+      FishingActionEvent.class.getName(),
+      network
+    );
   }
 
   /**
-   * @param listener           the factory giving the vessel's shared fishing
-   *                           event listener
-   * @param fishingEventSharer the sharer to register the listener with
+   * @param network the network whose ties decide who hears each fishing trip
+   *                end
+   * @return a
+   *         {@link uk.ac.ox.poseidon.core.events.SimulationEventListenerFactory}
+   *         for an {@link EventSharer} of {@link FishingTripEndEvent}s
+   *         registered with the simulation's event manager
+   * @see EventSharer
+   */
+  public static EventSharerFactory<FishingTripEndEvent> fishingTripEndSharer(
+    final Factory<? super SimulationScope, ? extends SocialNetwork> network
+  ) {
+    return new EventSharerFactory<>(
+      FishingTripEndEvent.class.getName(),
+      network
+    );
+  }
+
+  /**
+   * @param listener            the factory giving the vessel's shared listener
+   * @param fishingActionSharer the sharer to register the listener with
    * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory}
    *         that registers the vessel's listener with the sharer and gives it;
    *         make it one of the vessel's components
-   * @see SharedFishingEventListenerFactory
+   * @see SharedEventListenerFactory
    */
-  public static <L extends Listener<? super FishingActionEvent>> SharedFishingEventListenerFactory<L> sharedFishingEventListener(
+  public static <L extends Listener<? super FishingActionEvent>> SharedEventListenerFactory<
+    FishingActionEvent,
+    L
+  > sharedFishingActionListener(
     final Factory<? super VesselComponentScope, ? extends L> listener,
     final Factory<
       ? super SimulationScope,
-      ? extends FishingEventSharer
-    > fishingEventSharer
+      ? extends EventSharer<FishingActionEvent>
+    > fishingActionSharer
   ) {
-    return new SharedFishingEventListenerFactory<>(
-      listener,
-      fishingEventSharer
-    );
+    return new SharedEventListenerFactory<>(listener, fishingActionSharer);
+  }
+
+  /**
+   * @param listener             the factory giving the vessel's shared listener
+   * @param fishingTripEndSharer the sharer to register the listener with
+   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory}
+   *         that registers the vessel's listener with the sharer and gives it;
+   *         make it one of the vessel's components
+   * @see SharedEventListenerFactory
+   */
+  public static <L extends Listener<? super FishingTripEndEvent>> SharedEventListenerFactory<
+    FishingTripEndEvent,
+    L
+  > sharedFishingTripEndListener(
+    final Factory<? super VesselComponentScope, ? extends L> listener,
+    final Factory<
+      ? super SimulationScope,
+      ? extends EventSharer<FishingTripEndEvent>
+    > fishingTripEndSharer
+  ) {
+    return new SharedEventListenerFactory<>(listener, fishingTripEndSharer);
   }
 }

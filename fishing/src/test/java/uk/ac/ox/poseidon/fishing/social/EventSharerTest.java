@@ -30,19 +30,21 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.events.AbstractListener;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripEndEvent;
+import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
-class FishingEventSharerTest {
+class EventSharerTest {
 
   private final Vessel a = mock(Vessel.class);
   private final Vessel b = mock(Vessel.class);
   private final SocialNetwork network = new SocialNetwork(() -> List.of(a, b));
-  private final FishingEventSharer fishingEventSharer = new FishingEventSharer(
-    network
-  );
+  private final EventSharer<FishingActionEvent> fishingActionSharer =
+    new EventSharer<>(FishingActionEvent.class, network);
   private final List<FishingActionEvent> heardByA = new ArrayList<>();
   private final List<FishingActionEvent> heardByB = new ArrayList<>();
 
@@ -70,13 +72,13 @@ class FishingEventSharerTest {
 
   @Test
   void aFishingEventReachesTheSendersRecipientsOnly() {
-    fishingEventSharer.register(a, listener(heardByA));
-    fishingEventSharer.register(b, listener(heardByB));
+    fishingActionSharer.register(a, listener(heardByA));
+    fishingActionSharer.register(b, listener(heardByB));
     network.addTie(a, b);
     final FishingActionEvent fishingEventByA = fishingEventBy(a);
 
-    fishingEventSharer.receive(fishingEventByA);
-    fishingEventSharer.receive(fishingEventBy(b));
+    fishingActionSharer.receive(fishingEventByA);
+    fishingActionSharer.receive(fishingEventBy(b));
 
     assertThat(heardByB).containsExactly(fishingEventByA);
     assertThat(heardByA).isEmpty();
@@ -84,12 +86,12 @@ class FishingEventSharerTest {
 
   @Test
   void aFishingEventIsNotDeliveredBackToItsSender() {
-    fishingEventSharer.register(a, listener(heardByA));
-    fishingEventSharer.register(b, listener(heardByB));
+    fishingActionSharer.register(a, listener(heardByA));
+    fishingActionSharer.register(b, listener(heardByB));
     network.addTie(a, b);
     network.addTie(b, a);
 
-    fishingEventSharer.receive(fishingEventBy(a));
+    fishingActionSharer.receive(fishingEventBy(a));
 
     assertThat(heardByA).isEmpty();
     assertThat(heardByB).hasSize(1);
@@ -99,15 +101,15 @@ class FishingEventSharerTest {
   void skipsARecipientWithNoSharedFishingEventListener() {
     network.addTie(a, b);
 
-    fishingEventSharer.receive(fishingEventBy(a));
+    fishingActionSharer.receive(fishingEventBy(a));
   }
 
   @Test
   void deliversNothingWithoutTies() {
-    fishingEventSharer.register(a, listener(heardByA));
-    fishingEventSharer.register(b, listener(heardByB));
+    fishingActionSharer.register(a, listener(heardByA));
+    fishingActionSharer.register(b, listener(heardByB));
 
-    fishingEventSharer.receive(fishingEventBy(a));
+    fishingActionSharer.receive(fishingEventBy(a));
 
     assertThat(heardByA).isEmpty();
     assertThat(heardByB).isEmpty();
@@ -115,10 +117,58 @@ class FishingEventSharerTest {
 
   @Test
   void rejectsASecondSharedFishingEventListenerForTheSameVessel() {
-    fishingEventSharer.register(a, listener(heardByA));
+    fishingActionSharer.register(a, listener(heardByA));
 
     assertThatThrownBy(() ->
-      fishingEventSharer.register(a, listener(heardByB))
+      fishingActionSharer.register(a, listener(heardByB))
     ).isInstanceOf(IllegalStateException.class);
+  }
+
+  @Test
+  void aFishingTripEndReachesTheSendersRecipientsIntact() {
+    final EventSharer<FishingTripEndEvent> tripEndSharer = new EventSharer<>(
+      FishingTripEndEvent.class,
+      network
+    );
+    final List<FishingTripEndEvent> heardByB = new ArrayList<>();
+    tripEndSharer.register(
+      b,
+      new AbstractListener<>(FishingTripEndEvent.class) {
+        @Override
+        public void receive(final FishingTripEndEvent event) {
+          heardByB.add(event);
+        }
+      }
+    );
+    network.addTie(a, b);
+    final FishingTrip trip = mock(FishingTrip.class);
+    when(trip.getVessel()).thenReturn(a);
+    final FishingTripEndEvent event = new FishingTripEndEvent(trip);
+
+    tripEndSharer.receive(event);
+
+    assertThat(heardByB).containsExactly(event);
+  }
+
+  @Test
+  void aTieMadeAfterAnEventGivesNoHistory() {
+    fishingActionSharer.register(b, listener(heardByB));
+    fishingActionSharer.receive(fishingEventBy(a));
+
+    network.addTie(a, b);
+
+    assertThat(heardByB).isEmpty();
+  }
+
+  @Test
+  void aDroppedTieStopsFurtherDeliveryAndTakesNothingBack() {
+    fishingActionSharer.register(b, listener(heardByB));
+    network.addTie(a, b);
+    fishingActionSharer.receive(fishingEventBy(a));
+
+    network.removeTie(a, b);
+    fishingActionSharer.receive(fishingEventBy(a));
+
+    assertThat(heardByB).hasSize(1);
   }
 }

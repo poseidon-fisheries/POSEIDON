@@ -26,8 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
-import static uk.ac.ox.poseidon.fishing.social.Factories.fishingEventSharer;
-import static uk.ac.ox.poseidon.fishing.social.Factories.sharedFishingEventListener;
+import static uk.ac.ox.poseidon.fishing.social.Factories.fishingActionSharer;
+import static uk.ac.ox.poseidon.fishing.social.Factories.sharedFishingActionListener;
 import static uk.ac.ox.poseidon.fishing.social.Factories.socialNetwork;
 import static uk.ac.ox.poseidon.fishing.vessels.GivenComponents.componentScopeOf;
 
@@ -49,7 +49,7 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
 
-class SharedFishingEventListenerFactoryTest {
+class SharedEventListenerFactoryTest {
 
   private final Simulation simulation = simulation();
   private final Vessel a = mock(Vessel.class);
@@ -64,12 +64,14 @@ class SharedFishingEventListenerFactoryTest {
     componentStoreB
   );
   private final SocialNetworkFactory network = socialNetwork(object(fleet));
-  private final FishingEventSharerFactory fishingEventSharer =
-    fishingEventSharer(network);
+  private final EventSharerFactory<FishingActionEvent> fishingActionSharer =
+    fishingActionSharer(network);
   private final RecordingListenerFactory listener =
     new RecordingListenerFactory();
-  private final SharedFishingEventListenerFactory<RecordingListener> factory =
-    sharedFishingEventListener(listener, fishingEventSharer);
+  private final SharedEventListenerFactory<
+    FishingActionEvent,
+    RecordingListener
+  > factory = sharedFishingActionListener(listener, fishingActionSharer);
 
   /** @return a mocked fleet of {@code vessels}, in that order */
   private static Fleet fleetOf(final Vessel... vessels) {
@@ -129,7 +131,7 @@ class SharedFishingEventListenerFactoryTest {
     network.get(simulationScope).addTie(a, b);
     final FishingActionEvent fishingEventByA = fishingEventBy(a);
 
-    fishingEventSharer.get(simulationScope).receive(fishingEventByA);
+    fishingActionSharer.get(simulationScope).receive(fishingEventByA);
 
     assertThat(listener.get(scopeB).heard).containsExactly(fishingEventByA);
   }
@@ -140,7 +142,7 @@ class SharedFishingEventListenerFactoryTest {
     network.get(simulationScope).addTie(a, b);
     componentStoreB.end();
 
-    fishingEventSharer.get(simulationScope).receive(fishingEventBy(a));
+    fishingActionSharer.get(simulationScope).receive(fishingEventBy(a));
 
     assertThat(listenerOfB.heard).isEmpty();
   }
@@ -156,7 +158,7 @@ class SharedFishingEventListenerFactoryTest {
     factory.get(scopeB);
     network.get(simulationScope).addTie(a, b);
 
-    fishingEventSharer.get(simulationScope).receive(fishingEventBy(a));
+    fishingActionSharer.get(simulationScope).receive(fishingEventBy(a));
 
     assertThat(listener.get(scopeB).heard).hasSize(1);
   }

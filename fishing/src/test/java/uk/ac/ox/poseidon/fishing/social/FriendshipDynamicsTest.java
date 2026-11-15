@@ -30,9 +30,14 @@ import static org.mockito.Mockito.when;
 import ec.util.MersenneTwisterFast;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.events.SimpleEventManager;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripEndEvent;
+import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
+import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 class FriendshipDynamicsTest {
@@ -58,29 +63,43 @@ class FriendshipDynamicsTest {
   }
 
   private FriendshipDynamics dynamics(
-    final int targetNumberOfFriends,
+    final Function<? super Vessel, ? extends Number> target,
     final BiFunction<? super Vessel, ? super Vessel, Boolean> condition
   ) {
-    return new FriendshipDynamics(
-      network,
-      targetNumberOfFriends,
-      condition,
-      rng
-    );
+    return new FriendshipDynamics(network, target, condition, rng);
   }
 
   private FriendshipDynamics dynamicsOfActiveFriends(final int target) {
-    return dynamics(target, (vessel, other) -> other.isActive());
+    return dynamics(vessel -> target, (vessel, other) -> other.isActive());
+  }
+
+  private static FishingTrip tripOf(final Vessel vessel) {
+    final FishingTrip trip = mock(FishingTrip.class);
+    when(trip.getVessel()).thenReturn(vessel);
+    return trip;
+  }
+
+  private static void startTrip(
+    final FriendshipDynamics dynamics,
+    final Vessel vessel
+  ) {
+    dynamics.receive(new FishingTripStartEvent(tripOf(vessel)));
   }
 
   @Test
-  void drawsTiesFromTheCandidatesToTheVesselUpToTheTarget() {
+  void listensForFishingTripStarts() {
+    assertThat(dynamicsOfActiveFriends(1).getEventClass()).isEqualTo(
+      FishingTripStartEvent.class
+    );
+  }
+
+  @Test
+  void drawsTiesFromTheCandidatesToTheStartingVesselUpToTheTarget() {
     addCandidates(5);
 
-    final Set<Vessel> friends = dynamicsOfActiveFriends(3).apply(self);
+    startTrip(dynamicsOfActiveFriends(3), self);
 
-    assertThat(friends).hasSize(3).doesNotContain(self);
-    assertThat(network.getSources(self)).isEqualTo(friends);
+    assertThat(network.getSources(self)).hasSize(3).doesNotContain(self);
     assertThat(network.getRecipients(self)).isEmpty();
   }
 
@@ -88,9 +107,9 @@ class FriendshipDynamicsTest {
   void drawsEveryCandidateWhenThereAreFewerThanTheTarget() {
     final List<Vessel> others = addCandidates(2);
 
-    assertThat(
-      dynamicsOfActiveFriends(3).apply(self)
-    ).containsExactlyElementsOf(others);
+    startTrip(dynamicsOfActiveFriends(3), self);
+
+    assertThat(network.getSources(self)).containsExactlyElementsOf(others);
   }
 
   @Test
@@ -99,24 +118,28 @@ class FriendshipDynamicsTest {
     final Vessel otherGroup = activeVessel();
     candidates.addAll(List.of(sameGroup, otherGroup));
 
-    final Set<Vessel> friends = dynamics(
-      3,
-      (vessel, other) ->
-        (vessel == self && other == sameGroup) ||
-        (vessel != self && other == otherGroup)
-    ).apply(self);
+    startTrip(
+      dynamics(
+        vessel -> 3,
+        (vessel, other) ->
+          (vessel == self && other == sameGroup) ||
+          (vessel != self && other == otherGroup)
+      ),
+      self
+    );
 
-    assertThat(friends).containsExactly(sameGroup);
+    assertThat(network.getSources(self)).containsExactly(sameGroup);
   }
 
   @Test
-  void keepsTheVesselsFriendsFromOneReadToTheNext() {
+  void leavesTheTiesAloneBetweenTripStartsOfAVesselWithEnoughFriends() {
     addCandidates(5);
     final FriendshipDynamics dynamics = dynamicsOfActiveFriends(3);
+    startTrip(dynamics, self);
+    final var first = network.getSources(self);
 
-    final Set<Vessel> first = dynamics.apply(self);
+    startTrip(dynamics, self);
 
-    assertThat(dynamics.apply(self)).isEqualTo(first);
     assertThat(network.getSources(self)).isEqualTo(first);
   }
 
@@ -126,62 +149,132 @@ class FriendshipDynamicsTest {
     addCandidates(3);
     network.addTie(friend, self);
 
-    final Set<Vessel> friends = dynamicsOfActiveFriends(2).apply(self);
+    startTrip(dynamicsOfActiveFriends(2), self);
 
-    assertThat(friends).hasSize(2).contains(friend);
+    assertThat(network.getSources(self)).hasSize(2).contains(friend);
   }
 
   @Test
-  void aFriendFailingTheConditionIsNotReadButKeepsItsTie() {
+  void dropsASourceFailingTheCondition() {
     final Vessel friend = addCandidates(1).getFirst();
     final FriendshipDynamics dynamics = dynamicsOfActiveFriends(1);
-    dynamics.apply(self);
-
+    startTrip(dynamics, self);
     when(friend.isActive()).thenReturn(false);
 
-    assertThat(dynamics.apply(self)).isEmpty();
-    assertThat(network.getSources(self)).containsExactly(friend);
-  }
-
-  @Test
-  void aFriendPassingTheConditionAgainIsAFriendAgain() {
-    final Vessel friend = addCandidates(1).getFirst();
-    final FriendshipDynamics dynamics = dynamicsOfActiveFriends(1);
-    dynamics.apply(self);
-    when(friend.isActive()).thenReturn(false);
-    dynamics.apply(self);
-
-    when(friend.isActive()).thenReturn(true);
-
-    assertThat(dynamics.apply(self)).containsExactly(friend);
-  }
-
-  @Test
-  void replacesAFriendFailingTheConditionWithANewTie() {
-    final Vessel friend = addCandidates(1).getFirst();
-    final FriendshipDynamics dynamics = dynamicsOfActiveFriends(1);
-    dynamics.apply(self);
-    when(friend.isActive()).thenReturn(false);
-    final Vessel newcomer = addCandidates(1).getFirst();
-
-    assertThat(dynamics.apply(self)).containsExactly(newcomer);
-    assertThat(network.getSources(self)).containsExactly(friend, newcomer);
-  }
-
-  @Test
-  void readingTheNetworkDrawsNothing() {
-    addCandidates(5);
-    dynamicsOfActiveFriends(3);
+    startTrip(dynamics, self);
 
     assertThat(network.getSources(self)).isEmpty();
   }
 
   @Test
-  void givesAnUnmodifiableSet() {
-    addCandidates(3);
+  void replacesASourceFailingTheConditionWithANewTie() {
+    final Vessel friend = addCandidates(1).getFirst();
+    final FriendshipDynamics dynamics = dynamicsOfActiveFriends(1);
+    startTrip(dynamics, self);
+    when(friend.isActive()).thenReturn(false);
+    final Vessel newcomer = addCandidates(1).getFirst();
 
-    assertThatThrownBy(() ->
-      dynamicsOfActiveFriends(2).apply(self).add(activeVessel())
-    ).isInstanceOf(UnsupportedOperationException.class);
+    startTrip(dynamics, self);
+
+    assertThat(network.getSources(self)).containsExactly(newcomer);
+  }
+
+  @Test
+  void keepsExcessEligibleSourcesWhenTheTargetFalls() {
+    addCandidates(5);
+    final int[] target = { 4 };
+    final FriendshipDynamics dynamics = dynamics(
+      vessel -> target[0],
+      (vessel, other) -> other.isActive()
+    );
+    startTrip(dynamics, self);
+    final var four = network.getSources(self);
+
+    target[0] = 1;
+    startTrip(dynamics, self);
+
+    assertThat(network.getSources(self)).isEqualTo(four);
+  }
+
+  @Test
+  void recruitsAgainWhenTheTargetRisesAgain() {
+    addCandidates(5);
+    final int[] target = { 2 };
+    final FriendshipDynamics dynamics = dynamics(
+      vessel -> target[0],
+      (vessel, other) -> other.isActive()
+    );
+    startTrip(dynamics, self);
+
+    target[0] = 4;
+    startTrip(dynamics, self);
+
+    assertThat(network.getSources(self)).hasSize(4);
+  }
+
+  @Test
+  void readsTheTargetOnceForTheStartingVesselOnly() {
+    addCandidates(5);
+    final List<Vessel> asked = new ArrayList<>();
+    final AtomicInteger reads = new AtomicInteger();
+
+    startTrip(
+      dynamics(
+        vessel -> {
+          asked.add(vessel);
+          reads.incrementAndGet();
+          return 2;
+        },
+        (vessel, other) -> other.isActive()
+      ),
+      self
+    );
+
+    assertThat(reads).hasValue(1);
+    assertThat(asked).containsExactly(self);
+  }
+
+  @Test
+  void editsOnlyTheStartingVesselsIncomingTies() {
+    final Vessel friend = addCandidates(1).getFirst();
+    final Vessel other = addCandidates(1).getFirst();
+    final Vessel another = addCandidates(1).getFirst();
+    network.addTie(self, other);
+    network.addTie(another, other);
+    network.addTie(self, friend);
+
+    startTrip(dynamicsOfActiveFriends(0), self);
+
+    assertThat(network.getRecipients(self)).containsExactlyInAnyOrder(
+      other,
+      friend
+    );
+    assertThat(network.getSources(other)).containsExactlyInAnyOrder(
+      self,
+      another
+    );
+  }
+
+  @Test
+  void onlyAFishingTripStartTriggersRecruitment() {
+    addCandidates(3);
+    final SimpleEventManager eventManager = new SimpleEventManager();
+    eventManager.addListener(dynamicsOfActiveFriends(2));
+    final FishingTrip trip = tripOf(self);
+
+    eventManager.broadcast(new FishingTripEndEvent(trip));
+    assertThat(network.getSources(self)).isEmpty();
+
+    eventManager.broadcast(new FishingTripStartEvent(trip));
+    assertThat(network.getSources(self)).hasSize(2);
+  }
+
+  @Test
+  void rejectsANegativeTarget() {
+    addCandidates(1);
+
+    assertThatThrownBy(() -> startTrip(dynamicsOfActiveFriends(-1), self))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("-1");
   }
 }

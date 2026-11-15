@@ -37,8 +37,8 @@ import static uk.ac.ox.poseidon.fishing.choices.Factories.fishingActionRecorder;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.fishingCell;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.retainedCatch;
 import static uk.ac.ox.poseidon.fishing.social.Factories.cliqueDynamics;
-import static uk.ac.ox.poseidon.fishing.social.Factories.fishingEventSharer;
-import static uk.ac.ox.poseidon.fishing.social.Factories.sharedFishingEventListener;
+import static uk.ac.ox.poseidon.fishing.social.Factories.fishingActionSharer;
+import static uk.ac.ox.poseidon.fishing.social.Factories.sharedFishingActionListener;
 import static uk.ac.ox.poseidon.fishing.social.Factories.socialNetwork;
 import static uk.ac.ox.poseidon.fishing.tasks.fishing.Factories.fishingEventAccumulator;
 import static uk.ac.ox.poseidon.fishing.tasks.general.Factories.waitFor;
@@ -135,8 +135,8 @@ class FishingEventSharingRouteTest {
     object(marketGrid)
   );
   private final SocialNetworkFactory network = socialNetwork(baseFleet);
-  private final FishingEventSharerFactory fishingEventSharer =
-    fishingEventSharer(network);
+  private final EventSharerFactory<FishingActionEvent> fishingActionSharer =
+    fishingActionSharer(network);
 
   private Simulation simulation;
   private SimulationScope simulationScope;
@@ -192,14 +192,14 @@ class FishingEventSharingRouteTest {
         .component(
           "friendsCatchRecorder",
           vesselComponent(
-            sharedFishingEventListener(
+            sharedFishingActionListener(
               fishingActionRecorder(
                 fishingCell(),
                 retainedCatch(),
                 vesselMemory,
                 exponentialMovingAverageOfBuckets(SOCIAL_ALPHA)
               ),
-              fishingEventSharer
+              fishingActionSharer
             )
           )
         );
@@ -223,7 +223,7 @@ class FishingEventSharingRouteTest {
       )
       .component("fishingEventAccumulator", fishingEventAccumulator());
     if (withSharing) {
-      scenario.component("fishingEventSharer", fishingEventSharer);
+      scenario.component("fishingActionSharer", fishingActionSharer);
     }
     simulation = scenario.build().startNewSimulation();
     simulationScope = new SimulationScope(simulation);
