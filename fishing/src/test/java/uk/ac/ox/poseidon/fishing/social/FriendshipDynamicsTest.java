@@ -37,7 +37,9 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.fishing.trips.FishingTripEndEvent;
 import uk.ac.ox.poseidon.fishing.trips.FishingTripStartEvent;
+import uk.ac.ox.poseidon.fishing.trips.TripStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.FishingTrip;
+import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 class FriendshipDynamicsTest {
@@ -267,6 +269,19 @@ class FriendshipDynamicsTest {
 
     eventManager.broadcast(new FishingTripStartEvent(trip));
     assertThat(network.getSources(self)).hasSize(2);
+  }
+
+  @Test
+  void aTripHomeTriggersNoRecruitment() {
+    addCandidates(3);
+    final SimpleEventManager eventManager = new SimpleEventManager();
+    eventManager.addListener(dynamicsOfActiveFriends(2));
+    final Trip tripHome = mock(Trip.class);
+    when(tripHome.getVessel()).thenReturn(self);
+
+    eventManager.broadcast(new TripStartEvent(tripHome));
+
+    assertThat(network.getSources(self)).isEmpty();
   }
 
   @Test

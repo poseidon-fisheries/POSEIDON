@@ -65,8 +65,9 @@ class SharedTripLearningTest {
   private final Vessel a = mock(Vessel.class);
   private final Vessel b = mock(Vessel.class);
   private final Cell cell = mock(Cell.class);
+  private final Simulation simulation = simulation();
   private final SimulationScope simulationScope = new SimulationScope(
-    simulation()
+    simulation
   );
   private final SocialNetworkFactory network = socialNetwork(
     object(fleetOf(a, b))
@@ -146,5 +147,18 @@ class SharedTripLearningTest {
 
     b.getEventManager().broadcast(tripEnd(b, 5, noon.plusHours(1)));
     assertThat(remembered()).containsEntry(cell, 5.0);
+  }
+
+  @Test
+  void aDroppedTieKeepsWhatWasRememberedAndANewTieGivesNoHistory() {
+    final LocalDateTime noon = LocalDateTime.of(2026, 1, 1, 12, 0);
+    friendReports(tripEnd(a, 7, noon));
+
+    network.get(simulationScope).removeTie(a, b);
+    assertThat(remembered()).containsEntry(cell, 7.0);
+
+    friendReports(tripEnd(a, 9, noon.plusHours(1)));
+    network.get(simulationScope).addTie(a, b);
+    assertThat(remembered()).containsEntry(cell, 7.0);
   }
 }
