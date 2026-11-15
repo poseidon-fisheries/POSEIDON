@@ -275,9 +275,7 @@ class NearbyCellPickerTest {
     neighbourhood(CENTRE, 1, new Cell(3, 2), new Cell(5, 2), new Cell(3, 3));
     final List<Cell> tested = new ArrayList<>();
 
-    picker(cell -> tested.add(cell))
-      .apply(vessel)
-      .orElse(null);
+    picker(cell -> tested.add(cell)).apply(vessel);
 
     assertThat(tested).hasSize(1);
   }
@@ -326,9 +324,7 @@ class NearbyCellPickerTest {
     neighbourhood(CENTRE, 2, near, far);
     final List<Cell> tested = new ArrayList<>();
 
-    picker(cell -> tested.add(cell) && cell.equals(far))
-      .apply(vessel)
-      .orElse(null);
+    picker(cell -> tested.add(cell) && cell.equals(far)).apply(vessel);
 
     assertThat(tested).containsExactly(near, far);
   }

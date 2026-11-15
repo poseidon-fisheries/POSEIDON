@@ -168,7 +168,7 @@ class GreedyPickerTest {
       }
     );
 
-    picker.apply(vessel).orElse(null);
+    picker.apply(vessel);
 
     assertThat(tested).hasSize(1);
   }
@@ -181,7 +181,7 @@ class GreedyPickerTest {
       option -> true
     );
 
-    assertThatThrownBy(() -> picker.apply(vessel).orElse(null))
+    assertThatThrownBy(() -> picker.apply(vessel))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("A")
       .hasMessageContaining("NaN");
@@ -195,7 +195,7 @@ class GreedyPickerTest {
       option -> true
     );
 
-    assertThatThrownBy(() -> picker.apply(vessel).orElse(null))
+    assertThatThrownBy(() -> picker.apply(vessel))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("B")
       .hasMessageContaining("NaN");
