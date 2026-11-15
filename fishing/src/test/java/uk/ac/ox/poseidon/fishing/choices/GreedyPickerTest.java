@@ -48,7 +48,10 @@ class GreedyPickerTest {
     final Predicate<? super String> optionPredicate
   ) {
     return new GreedyPicker<>(
-      new ImmutableOptionValues<>(values),
+      (receiver, consumer) ->
+        values.forEach((option, value) ->
+          consumer.accept(option, value.doubleValue())
+        ),
       (pickedFor, option) -> optionPredicate.test(option),
       rng
     );
@@ -57,20 +60,23 @@ class GreedyPickerTest {
   @Test
   void picksAmongTheOptionValuesOfTheVesselGivenWithItsPredicate() {
     final Vessel otherVessel = mock(Vessel.class);
-    final OptionValues<String> values = new ImmutableOptionValues<>(
-      Map.of("A", 1.0, "B", 3.0)
-    );
-    final OptionValues<String> otherValues = new ImmutableOptionValues<>(
-      Map.of("C", 2.0, "D", 1.0)
-    );
+    final OptionValues<String> values = (receiver, consumer) -> {
+      if (receiver == vessel) {
+        consumer.accept("A", 1.0);
+        consumer.accept("B", 3.0);
+      } else {
+        consumer.accept("C", 2.0);
+        consumer.accept("D", 1.0);
+      }
+    };
     final GreedyPicker<String> picker = new GreedyPicker<>(
-      pickedFor -> pickedFor == vessel ? values : otherValues,
+      values,
       (pickedFor, option) -> pickedFor == vessel || !option.equals("C"),
       rng
     );
 
-    assertThat(picker.apply(vessel)).isEqualTo("B");
-    assertThat(picker.apply(otherVessel)).isEqualTo("D");
+    assertThat(picker.apply(vessel).orElse(null)).isEqualTo("B");
+    assertThat(picker.apply(otherVessel).orElse(null)).isEqualTo("D");
   }
 
   @Test
@@ -80,7 +86,7 @@ class GreedyPickerTest {
       option -> true
     );
 
-    assertThat(picker.apply(vessel)).isEqualTo("B");
+    assertThat(picker.apply(vessel).orElse(null)).isEqualTo("B");
   }
 
   @Test
@@ -90,22 +96,26 @@ class GreedyPickerTest {
       option -> !option.equals("B")
     );
 
-    assertThat(picker.apply(vessel)).isEqualTo("C");
+    assertThat(picker.apply(vessel).orElse(null)).isEqualTo("C");
   }
 
   @Test
-  void givesNullWhenNoOptionPassesThePredicate() {
+  void givesNoOptionWhenNoOptionPassesThePredicate() {
     final GreedyPicker<String> picker = picker(
       Map.of("A", 1.0, "B", 3.0),
       option -> false
     );
 
-    assertThat(picker.apply(vessel)).isNull();
+    assertThat(picker.apply(vessel).orElse(null)).isNull();
   }
 
   @Test
-  void givesNullWhenThereAreNoOptions() {
-    assertThat(picker(Map.of(), option -> true).apply(vessel)).isNull();
+  void givesNoOptionWhenThereAreNoOptions() {
+    assertThat(
+      picker(Map.of(), option -> true)
+        .apply(vessel)
+        .orElse(null)
+    ).isNull();
   }
 
   @Test
@@ -115,7 +125,7 @@ class GreedyPickerTest {
       option -> true
     );
 
-    assertThat(picker.apply(vessel)).isEqualTo("B");
+    assertThat(picker.apply(vessel).orElse(null)).isEqualTo("B");
   }
 
   @Test
@@ -126,7 +136,7 @@ class GreedyPickerTest {
     );
     final Set<String> picked = new HashSet<>();
     for (int i = 0; i < 100; i++) {
-      picked.add(picker.apply(vessel));
+      picked.add(picker.apply(vessel).orElse(null));
     }
 
     assertThat(picked).containsExactlyInAnyOrder("A", "B");
@@ -143,7 +153,7 @@ class GreedyPickerTest {
       }
     );
 
-    assertThat(picker.apply(vessel)).isEqualTo("D");
+    assertThat(picker.apply(vessel).orElse(null)).isEqualTo("D");
     assertThat(tested).doesNotContain("A", "C");
   }
 
@@ -158,7 +168,7 @@ class GreedyPickerTest {
       }
     );
 
-    picker.apply(vessel);
+    picker.apply(vessel).orElse(null);
 
     assertThat(tested).hasSize(1);
   }
@@ -171,7 +181,7 @@ class GreedyPickerTest {
       option -> true
     );
 
-    assertThatThrownBy(() -> picker.apply(vessel))
+    assertThatThrownBy(() -> picker.apply(vessel).orElse(null))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("A")
       .hasMessageContaining("NaN");
@@ -185,7 +195,7 @@ class GreedyPickerTest {
       option -> true
     );
 
-    assertThatThrownBy(() -> picker.apply(vessel))
+    assertThatThrownBy(() -> picker.apply(vessel).orElse(null))
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("B")
       .hasMessageContaining("NaN");
@@ -202,9 +212,46 @@ class GreedyPickerTest {
       Double.NEGATIVE_INFINITY
     );
 
-    assertThat(picker(values, option -> true).apply(vessel)).isEqualTo("A");
     assertThat(
-      picker(values, option -> option.equals("C")).apply(vessel)
+      picker(values, option -> true)
+        .apply(vessel)
+        .orElse(null)
+    ).isEqualTo("A");
+    assertThat(
+      picker(values, option -> option.equals("C"))
+        .apply(vessel)
+        .orElse(null)
     ).isEqualTo("C");
+  }
+
+  @Test
+  void visitsOptionValuesOnceEvenWhenEveryBestOptionFails() {
+    final java.util.concurrent.atomic.AtomicInteger visits =
+      new java.util.concurrent.atomic.AtomicInteger();
+    final GreedyPicker<String> picker = new GreedyPicker<>(
+      (receiver, consumer) -> {
+        visits.incrementAndGet();
+        consumer.accept("best", 10);
+        consumer.accept("eligible", 5);
+        consumer.accept("lowest", 0);
+      },
+      (receiver, option) -> option.equals("eligible"),
+      rng
+    );
+    assertThat(picker.apply(vessel)).contains("eligible");
+    assertThat(visits).hasValue(1);
+  }
+
+  @Test
+  void treatsBothSignedZerosAsTied() {
+    final GreedyPicker<String> picker = picker(
+      Map.of("A", -0.0, "B", 0.0),
+      option -> true
+    );
+    final Set<String> selected = new HashSet<>();
+    for (int i = 0; i < 100; i++) selected.add(
+      picker.apply(vessel).orElseThrow()
+    );
+    assertThat(selected).containsExactlyInAnyOrder("A", "B");
   }
 }

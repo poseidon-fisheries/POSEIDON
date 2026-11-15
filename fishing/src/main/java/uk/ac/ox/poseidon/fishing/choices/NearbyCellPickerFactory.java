@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.choices;
 
 import ec.util.MersenneTwisterFast;
+import java.util.Optional;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -39,17 +40,17 @@ import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
- * A {@link VesselComponentScopeFactory} counterpart of {@link NeighbourhoodCellPicker},
- * built via {@link Factories#neighbourhoodGridExplorer}.
+ * A {@link VesselComponentScopeFactory} counterpart of {@link NearbyCellPicker},
+ * built via {@link Factories#nearbyCellPicker}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class NeighbourhoodGridExplorerFactory
-  extends VesselComponentScopeFactory<Function<Vessel, Cell>>
-  implements ValueFactory<VesselComponentScope, Vessel, Cell>
+public class NearbyCellPickerFactory
+  extends VesselComponentScopeFactory<Function<Vessel, Optional<Cell>>>
+  implements ValueFactory<VesselComponentScope, Vessel, Optional<Cell>>
 {
 
   private final Factory<
@@ -61,17 +62,17 @@ public class NeighbourhoodGridExplorerFactory
     ? super Vessel,
     ? super Cell,
     Boolean
-  > cellPredicate;
+  > cellEligibilityCriteria;
   private final ValueFactory<
     ? super VesselComponentScope,
     ? super Vessel,
     Integer
-  > neighbourhoodSize;
+  > searchRadius;
   private final int maximumWidening;
   private final ValueFactory<
     ? super VesselComponentScope,
     ? super Vessel,
-    ? extends Cell
+    ? extends Optional<Cell>
   > searchCentre;
   private final Factory<
     ? super VesselComponentScope,
@@ -79,13 +80,13 @@ public class NeighbourhoodGridExplorerFactory
   > rng;
 
   @Override
-  protected Function<Vessel, Cell> newInstance(
+  protected Function<Vessel, Optional<Cell>> newInstance(
     final VesselComponentScope scope
   ) {
-    return new NeighbourhoodCellPicker(
+    return new NearbyCellPicker(
       pathFinder.get(scope),
-      cellPredicate.get(scope),
-      neighbourhoodSize.get(scope),
+      cellEligibilityCriteria.get(scope),
+      searchRadius.get(scope),
       maximumWidening,
       searchCentre.get(scope),
       rng.get(scope)

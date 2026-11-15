@@ -29,41 +29,44 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.core.RelativeScopeFactory;
+import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
-import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
-import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link MemoryBasedOptionValues},
- * built via {@link Factories#memoryBasedOptionValues(Factory, Factory)}.
+ * A {@link RelativeScopeFactory} counterpart of {@link MemoryBasedOptionValues},
+ * built via {@link Factories#memoryBasedOptionValues(Factory, Factory)} or
+ * {@link Factories#memoryBasedOptionValues(Factory)} for remembered returns.
+ * @param <S> the scope type
+ * @param <O> the option type
+ * @param <M> the remembered outcome type
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class MemoryBasedOptionValuesFactory<O, M>
-  extends VesselScopeFactory<Function<Vessel, OptionValues<O>>>
-  implements ValueFactory<VesselScope, Vessel, OptionValues<O>>
-{
+public class MemoryBasedOptionValuesFactory<
+  S extends Scope,
+  O,
+  M
+> extends RelativeScopeFactory<S, MemoryBasedOptionValues<O, M>> {
 
   private final Factory<
-    ? super VesselScope,
-    ? extends Function<? super Vessel, ? extends Memory<O, M>>
+    ? super S,
+    ? extends Function<? super Vessel, ? extends MemoryEntries<O, M>>
   > memorySelector;
-  private final Factory<
-    ? super VesselScope,
-    ? extends Valuation<? super O, ? super M>
-  > valuation;
+  // Deliberate absence selects direct reading of remembered Double returns.
+  private final Factory<? super S, ? extends Valuation<? super M>> valuation;
 
   @Override
-  protected Function<Vessel, OptionValues<O>> newInstance(
-    final VesselScope scope
-  ) {
+  protected MemoryBasedOptionValues<O, M> newInstance(final S scope) {
     return new MemoryBasedOptionValues<>(
       memorySelector.get(scope),
-      valuation.get(scope)
+      valuation == null
+        ? vessel -> recollection ->
+            Double.class.cast(recollection).doubleValue()
+        : valuation.get(scope)
     );
   }
 }

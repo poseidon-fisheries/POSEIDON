@@ -25,194 +25,116 @@ package uk.ac.ox.poseidon.fishing.choices;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import ec.util.MersenneTwisterFast;
-import java.util.HashMap;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BinaryOperator;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 class MemoryBasedOptionValuesTest {
 
-  private static final BinaryOperator<Double> SUM = Double::sum;
-
-  private final KeyedMemory<String, String, Double> keyedMemory =
-    new KeyedMemory<>();
-  private final AtomicReference<String> contextKey = new AtomicReference<>(
-    "trawl"
-  );
-  private final AtomicReference<Valuation<String, Double>> valuation =
-    new AtomicReference<>(valuedFor -> (option, recollection) -> recollection);
-  private final AtomicInteger timesPutInContext = new AtomicInteger();
   private final Vessel vessel = mock(Vessel.class);
-  private final MemoryBasedOptionValues<
-    String,
-    Double
-  > memoryBasedOptionValues = new MemoryBasedOptionValues<>(
-    new KeyedMemorySelector<>(keyedMemory, valuedFor -> contextKey.get()),
-    valuedFor -> {
-      timesPutInContext.incrementAndGet();
-      return valuation.get().inContextOf(valuedFor);
-    }
-  );
-
-  /** The option values of the vessel, asked for anew, as each pick does. */
-  private OptionValues<String> optionValues() {
-    return memoryBasedOptionValues.apply(vessel);
-  }
-
-  @Test
-  void bestOptionChangesWhenTheValuationChangesWithoutNewObservations() {
-    keyedMemory.get("trawl").observe("A", 1.0, SUM);
-    keyedMemory.get("trawl").observe("B", 2.0, SUM);
-    assertThat(optionValues().getBestOptions()).containsExactly("B");
-
-    valuation.set(valuedFor -> (option, recollection) -> -recollection);
-
-    assertThat(optionValues().getBestOptions()).containsExactly("A");
-    assertThat(optionValues().getBestValue()).contains(-1.0);
-  }
-
-  @Test
-  void bestOptionChangesWhenTheContextKeyChanges() {
-    keyedMemory.get("trawl").observe("A", 1.0, SUM);
-    keyedMemory.get("seine").observe("B", 5.0, SUM);
-    assertThat(optionValues().getBestOptions()).containsExactly("A");
-
-    contextKey.set("seine");
-
-    assertThat(optionValues().getBestOptions()).containsExactly("B");
-  }
-
-  @Test
-  void tiesGiveEveryTiedOption() {
-    keyedMemory.get("trawl").observe("A", 2.0, SUM);
-    keyedMemory.get("trawl").observe("B", 2.0, SUM);
-    keyedMemory.get("trawl").observe("C", 1.0, SUM);
-
-    assertThat(optionValues().getBestOptions()).containsExactlyInAnyOrder(
-      "A",
-      "B"
+  private final MutableMemoryEntries<String, Double> memory =
+    new MutableMemoryEntries<>();
+  private final AtomicReference<Double> scale = new AtomicReference<>(2.0);
+  private final AtomicInteger snapshots = new AtomicInteger();
+  private final AtomicInteger memoryReads = new AtomicInteger();
+  private final MemoryBasedOptionValues<String, Double> values =
+    new MemoryBasedOptionValues<>(
+      pickedFor -> {
+        memoryReads.incrementAndGet();
+        return memory;
+      },
+      pickedFor -> {
+        snapshots.incrementAndGet();
+        final double multiplier = scale.get();
+        return outcome -> outcome * multiplier;
+      }
     );
-    assertThat(optionValues().getBestEntries()).containsExactlyInAnyOrder(
-      Map.entry("A", 2.0),
-      Map.entry("B", 2.0)
-    );
-    assertThat(optionValues().getBestValue()).contains(2.0);
-    final MersenneTwisterFast rng = new MersenneTwisterFast(42);
-    assertThat(optionValues().getBestOption(rng)).hasValueSatisfying(option ->
-      assertThat(option).isIn("A", "B")
-    );
-    assertThat(optionValues().getBestEntry(rng)).hasValueSatisfying(entry ->
-      assertThat(entry).isIn(Map.entry("A", 2.0), Map.entry("B", 2.0))
+
+  private void remember(final String option, final double value) {
+    memory.record(
+      option,
+      value,
+      LocalDateTime.of(2026, 1, 1, 0, 0),
+      new KeepLastReceived<>()
     );
   }
 
-  @Test
-  void emptyMemoryHasNoBestOption() {
-    final MersenneTwisterFast rng = new MersenneTwisterFast(42);
-
-    assertThat(optionValues().getBestOptions()).isEmpty();
-    assertThat(optionValues().getBestEntries()).isEmpty();
-    assertThat(optionValues().getBestValue()).isEmpty();
-    assertThat(optionValues().getBestOption(rng)).isEmpty();
-    assertThat(optionValues().getBestEntry(rng)).isEmpty();
+  private Map<String, Double> visit() {
+    final Map<String, Double> result = new LinkedHashMap<>();
+    values.forEachEntry(vessel, result::put);
+    return result;
   }
 
   @Test
-  void valuesGoThroughTheValuation() {
-    keyedMemory.get("trawl").observe("A", 1.0, SUM);
-    keyedMemory.get("trawl").observe("B", 2.0, SUM);
-    valuation.set(valuedFor -> (option, recollection) -> recollection * 10);
+  void readsMemoryAndCircumstancesOncePerVisit() {
+    remember("A", 3);
+    remember("B", 4);
+    assertThat(visit()).containsExactly(
+      Map.entry("A", 6.0),
+      Map.entry("B", 8.0)
+    );
+    assertThat(memoryReads).hasValue(1);
+    assertThat(snapshots).hasValue(1);
+    scale.set(10.0);
+    assertThat(visit()).containsExactly(
+      Map.entry("A", 30.0),
+      Map.entry("B", 40.0)
+    );
+    assertThat(snapshots).hasValue(2);
+  }
 
-    assertThat(optionValues().getValue("A")).contains(10.0);
-    assertThat(optionValues().getValue("C")).isEmpty();
-    final Map<String, Double> entries = new HashMap<>();
-    optionValues().forEachEntry(entries::put);
-    assertThat(entries).containsOnly(
-      Map.entry("A", 10.0),
-      Map.entry("B", 20.0)
+  @Test
+  void readsCircumstancesAtTheStartOfTheVisit() {
+    remember("A", 3);
+    remember("B", 4);
+    final Map<String, Double> result = new LinkedHashMap<>();
+    values.forEachEntry(vessel, (option, value) -> {
+      result.put(option, value);
+      scale.set(100.0);
+    });
+    assertThat(result).containsExactly(
+      Map.entry("A", 6.0),
+      Map.entry("B", 8.0)
     );
   }
 
   @Test
-  void valuationCanDependOnTheOption() {
-    keyedMemory.get("trawl").observe("near", 1.0, SUM);
-    keyedMemory.get("trawl").observe("far", 2.0, SUM);
-    valuation.set(
-      valuedFor -> (option, recollection) ->
-        recollection - (option.equals("far") ? 5 : 0)
-    );
-
-    assertThat(optionValues().getValue("far")).contains(-3.0);
-    assertThat(optionValues().getBestOptions()).containsExactly("near");
+  void emptyMemoryVisitsNoOption() {
+    assertThat(visit()).isEmpty();
+    assertThat(snapshots).hasValue(1);
   }
 
   @Test
-  void readsTheMemoryOfTheVesselGivenAndValuesForIt() {
+  void selectsTheReceivingVesselsPartitionOnEachVisit() {
     final Vessel otherVessel = mock(Vessel.class);
-    final MemoryBasedOptionValues<String, Double> perVesselOptionValues =
-      new MemoryBasedOptionValues<>(
-        new KeyedMemorySelector<>(keyedMemory, valuedFor ->
-          valuedFor == vessel ? "trawl" : "seine"
-        ),
-        valuedFor -> (option, recollection) ->
-          valuedFor == vessel ? recollection : recollection * 10
+    final AtomicReference<String> gear = new AtomicReference<>("trawl");
+    final PartitionedMemory<Vessel, String, String, Double> partitions =
+      new PartitionedMemory<>(pickedFor ->
+        pickedFor == vessel ? gear.get() : "seine"
       );
-    keyedMemory.get("trawl").observe("A", 1.0, SUM);
-    keyedMemory.get("seine").observe("B", 2.0, SUM);
-
-    assertThat(
-      perVesselOptionValues.apply(vessel).getBestEntries()
-    ).containsExactly(Map.entry("A", 1.0));
-    assertThat(
-      perVesselOptionValues.apply(otherVessel).getBestEntries()
-    ).containsExactly(Map.entry("B", 20.0));
-  }
-
-  @Test
-  void theOptionValuesGivenKeepTheMemorySelectedWhenTheyWereGiven() {
-    keyedMemory.get("trawl").observe("A", 1.0, SUM);
-    keyedMemory.get("seine").observe("B", 5.0, SUM);
-    final OptionValues<String> forOnePick = optionValues();
-
-    contextKey.set("seine");
-
-    assertThat(forOnePick.getBestOptions()).containsExactly("A");
-    assertThat(optionValues().getBestOptions()).containsExactly("B");
-  }
-
-  @Test
-  void putsTheValuationInContextOnceForAllTheOptionsOfOnePick() {
-    keyedMemory.get("trawl").observe("A", 1.0, SUM);
-    keyedMemory.get("trawl").observe("B", 2.0, SUM);
-    final OptionValues<String> forOnePick = optionValues();
-
-    forOnePick.getBestEntries();
-    forOnePick.getValue("A");
-
-    assertThat(timesPutInContext).hasValue(1);
-  }
-
-  @Test
-  void putsTheValuationInContextAgainForEachPick() {
-    keyedMemory.get("trawl").observe("A", 1.0, SUM);
-
-    optionValues().getBestEntries();
-    optionValues().getBestEntries();
-
-    assertThat(timesPutInContext).hasValue(2);
-  }
-
-  @Test
-  void doesNotPutTheValuationInContextWithNothingRemembered() {
-    final OptionValues<String> forOnePick = optionValues();
-
-    forOnePick.getBestEntries();
-    forOnePick.getValue("A");
-
-    assertThat(timesPutInContext).hasValue(0);
+    final LocalDateTime time = LocalDateTime.of(2026, 1, 1, 0, 0);
+    partitions.apply(vessel).record("A", 1.0, time, new KeepLastReceived<>());
+    partitions
+      .apply(otherVessel)
+      .record("B", 2.0, time, new KeepLastReceived<>());
+    final MemoryBasedOptionValues<String, Double> partitionedValues =
+      new MemoryBasedOptionValues<>(
+        partitions,
+        pickedFor -> outcome -> pickedFor == vessel ? outcome : outcome * 10
+      );
+    final Map<String, Double> result = new LinkedHashMap<>();
+    partitionedValues.forEachEntry(vessel, result::put);
+    assertThat(result).containsExactly(Map.entry("A", 1.0));
+    result.clear();
+    partitionedValues.forEachEntry(otherVessel, result::put);
+    assertThat(result).containsExactly(Map.entry("B", 20.0));
+    result.clear();
+    gear.set("seine");
+    partitionedValues.forEachEntry(vessel, result::put);
+    assertThat(result).containsExactly(Map.entry("B", 2.0));
   }
 }

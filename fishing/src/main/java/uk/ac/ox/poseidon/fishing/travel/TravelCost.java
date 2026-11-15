@@ -29,22 +29,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 import org.joda.money.Money;
-import uk.ac.ox.poseidon.fishing.choices.ContextualisedValuation;
-import uk.ac.ox.poseidon.fishing.choices.Valuation;
+import uk.ac.ox.poseidon.fishing.choices.Cost;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 
 /**
  * Values the cost of a vessel travelling to fish at a cell: computes the
  * {@link Route} via the cell once, then sums what each route cost charges the
- * vessel for it. Each route cost is given the vessel once, when the valuation
- * is put in its context, and then costs every route valued for it. The
- * recollection the cell is valued for is ignored, so that this can be combined
- * with other valuations of the same shape. Route costs in different currencies
- * cannot be summed.
+ * vessel for it. Each route cost reads the vessel once at the start of a visit,
+ * then costs every route considered during that visit. The returned function
+ * must not be retained; model state must not change during its visit. Route
+ * costs in different currencies cannot be summed.
  */
-public class TravelCost implements Valuation<Cell, Object> {
+public class TravelCost implements Cost<Cell> {
 
   private final BiFunction<
     ? super Vessel,
@@ -85,15 +84,13 @@ public class TravelCost implements Valuation<Cell, Object> {
    *         are in different currencies.
    */
   @Override
-  public ContextualisedValuation<Cell, Object> inContextOf(
-    final Vessel vessel
-  ) {
+  public ToDoubleFunction<Cell> forVessel(final Vessel vessel) {
     final List<Function<? super Route, ? extends Money>> vesselRouteCosts =
       new ArrayList<>(routeCosts.size());
     for (final var routeCost : routeCosts) {
       vesselRouteCosts.add(routeCost.apply(vessel));
     }
-    return (cell, recollection) -> {
+    return cell -> {
       final Route route = routeFunction.apply(vessel, cell);
       Money sum = null;
       for (final var routeCost : vesselRouteCosts) {

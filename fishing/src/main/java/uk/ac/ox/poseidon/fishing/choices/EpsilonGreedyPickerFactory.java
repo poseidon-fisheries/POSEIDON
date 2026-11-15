@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.fishing.choices;
 
 import ec.util.MersenneTwisterFast;
-import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -31,45 +31,57 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import uk.ac.ox.poseidon.core.Factory;
-import uk.ac.ox.poseidon.core.MappingFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
-import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
-import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
-import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
+import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory;
 
 /**
- * A {@link VesselScopeFactory} counterpart of {@link RandomPicker}, built via
- * {@link Factories#randomGridExplorer}.
+ * A {@link VesselComponentScopeFactory} counterpart of {@link EpsilonGreedyPicker},
+ * built via {@link Factories#epsilonGreedyPicker}.
  */
 @Getter
 @ToString
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
-public class RandomGridExplorerFactory
-  extends VesselScopeFactory<Function<Vessel, Cell>>
-  implements ValueFactory<VesselScope, Vessel, Cell>
+public class EpsilonGreedyPickerFactory<O>
+  extends VesselComponentScopeFactory<Function<Vessel, Optional<O>>>
+  implements ValueFactory<VesselComponentScope, Vessel, Optional<O>>
 {
 
   private final ValueFactory<
-    ? super VesselScope,
+    ? super VesselComponentScope,
     ? super Vessel,
-    ? extends List<? extends Cell>
-  > cells;
-  private final MappingFactory<
-    ? super VesselScope,
+    Double
+  > epsilon;
+  private final ValueFactory<
+    ? super VesselComponentScope,
     ? super Vessel,
-    ? super Cell,
-    Boolean
-  > cellPredicate;
-  private final Factory<? super VesselScope, ? extends MersenneTwisterFast> rng;
+    ? extends Optional<O>
+  > explorer;
+  private final ValueFactory<
+    ? super VesselComponentScope,
+    ? super Vessel,
+    ? extends Optional<O>
+  > exploiter;
+  private final Factory<
+    ? super VesselComponentScope,
+    ? extends MersenneTwisterFast
+  > rng;
 
+  /**
+   * @return an {@link EpsilonGreedyPicker} of destinations over the resolved
+   *         explorer and exploiter
+   */
   @Override
-  protected Function<Vessel, Cell> newInstance(final VesselScope scope) {
-    return new RandomPicker<>(
-      cells.get(scope),
-      cellPredicate.get(scope),
+  protected Function<Vessel, Optional<O>> newInstance(
+    final VesselComponentScope scope
+  ) {
+    return new EpsilonGreedyPicker<>(
+      epsilon.get(scope),
+      explorer.get(scope),
+      exploiter.get(scope),
       rng.get(scope)
     );
   }

@@ -22,146 +22,78 @@
 
 package uk.ac.ox.poseidon.fishing.choices;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static java.util.Comparator.comparingDouble;
-import static java.util.Map.entry;
-import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
+import static lombok.AccessLevel.PACKAGE;
 
 import ec.util.MersenneTwisterFast;
-import java.util.ArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleArrays;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.IntStream;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * Picks, for a vessel, the option with the highest value among its option
- * values that passes a predicate for that vessel, breaking ties at random, or
- * gives {@code null} when no option passes (so that an
- * {@link EpsilonGreedyChooser} falls back to exploring).
- * <p>
- * Options are tested from the highest value down, one value at a time, and
- * testing stops at the first value with an option that passes: the predicate
- * can be costly (such as a check that computes a path), and is not called for
- * options that could not be picked anyway. Options tied at a value are tested
- * in a random order, stopping at the first that passes, which breaks the tie at
- * random among the passing options without testing all of them.
- * <p>
- * Infinite values are ordinary values, but a {@code NaN} value is an error: it
- * has no place in the order of values, so it would hide a broken valuation
- * behind an arbitrary pick.
- *
- * @param <O> the type of option
+ * Visits a vessel's option values once, then picks the highest-valued eligible
+ * option. Ties are tested in random order, stopping at the first eligible
+ * option. Lower values are considered only when every better option fails.
+ * Values use primitive storage and sorting is deferred until the best options
+ * all fail eligibility. Infinite values are allowed; NaN is an error.
+ * @param <O> the option type
  */
-public class GreedyPicker<O> implements Function<Vessel, O> {
+@RequiredArgsConstructor(access = PACKAGE)
+public class GreedyPicker<O> implements Function<Vessel, Optional<O>> {
 
-  private final Function<
+  private final @NonNull OptionValues<O> optionValues;
+  private final @NonNull BiFunction<
     ? super Vessel,
-    ? extends OptionValues<O>
-  > optionValues;
-  private final BiFunction<? super Vessel, ? super O, Boolean> optionPredicate;
-  private final MersenneTwisterFast rng;
+    ? super O,
+    Boolean
+  > optionEligibilityCriteria;
+  private final @NonNull MersenneTwisterFast rng;
 
-  /**
-   * @param optionValues    gives a vessel's values of the options to pick from
-   * @param optionPredicate which options can be picked for a vessel
-   * @param rng             breaks ties between options with the same value
-   */
-  GreedyPicker(
-    final Function<? super Vessel, ? extends OptionValues<O>> optionValues,
-    final BiFunction<? super Vessel, ? super O, Boolean> optionPredicate,
-    final MersenneTwisterFast rng
-  ) {
-    this.optionValues = checkNotNull(optionValues);
-    this.optionPredicate = checkNotNull(optionPredicate);
-    this.rng = checkNotNull(rng);
-  }
-
-  /**
-   * @param vessel the vessel to pick for
-   * @return the picked option, or {@code null} if no option passes the
-   *         predicate
-   * @throws IllegalStateException if the value of any option is {@code NaN}
-   */
   @Override
-  public O apply(final Vessel vessel) {
-    final List<Entry<O, Double>> entries = new ArrayList<>();
-    optionValues.apply(vessel).forEachEntry((option, value) -> {
+  public Optional<O> apply(final Vessel vessel) {
+    final ObjectArrayList<O> entries = new ObjectArrayList<>();
+    final DoubleArrayList values = new DoubleArrayList();
+    final ObjectArrayList<O> best = new ObjectArrayList<>();
+    final double[] bestValue = { Double.NEGATIVE_INFINITY };
+    optionValues.forEachEntry(vessel, (option, value) -> {
       checkState(!Double.isNaN(value), "Value of option %s is NaN.", option);
-      entries.add(entry(option, value));
-    });
-
-    // Most picks take an option at the best value, so the options are sorted
-    // only when none of those passes.
-    final List<O> best = best(entries);
-    return pickAmongTied(vessel, best)
-      .or(() -> pickInValueOrder(vessel, entries, best.size()))
-      .orElse(null);
-  }
-
-  /** @return the options of {@code entries} at the best value, in order */
-  private static <O> List<O> best(final List<Entry<O, Double>> entries) {
-    double bestValue = Double.NEGATIVE_INFINITY;
-    final List<O> best = new ArrayList<>();
-    for (final Entry<O, Double> entry : entries) {
-      final double value = entry.getValue();
-      if (value > bestValue) {
-        bestValue = value;
+      entries.add(option);
+      values.add(value);
+      if (value > bestValue[0]) {
+        bestValue[0] = value;
         best.clear();
       }
-      if (value == bestValue) best.add(entry.getKey());
-    }
-    return best;
-  }
-
-  /**
-   * Picks among the options tied at each value in turn, from the best down,
-   * skipping the {@code skipped} best ones, already tried.
-   */
-  private Optional<O> pickInValueOrder(
-    final Vessel vessel,
-    final List<Entry<O, Double>> entries,
-    final int skipped
-  ) {
-    entries.sort(
-      comparingDouble((Entry<O, Double> entry) -> entry.getValue()).reversed()
-    );
-    return tiedGroups(entries.subList(skipped, entries.size()))
-      .stream()
-      .map(tied -> pickAmongTied(vessel, tied))
-      .flatMap(Optional::stream)
-      .findFirst();
-  }
-
-  /**
-   * @return the options of {@code sortedEntries}, in groups of equal value, in
-   *         order
-   */
-  private static <O> List<List<O>> tiedGroups(
-    final List<Entry<O, Double>> sortedEntries
-  ) {
-    final List<List<O>> groups = new ArrayList<>();
-    double groupValue = Double.NaN;
-    for (final Entry<O, Double> entry : sortedEntries) {
-      if (groups.isEmpty() || entry.getValue() != groupValue) {
-        groups.add(new ArrayList<>());
-        groupValue = entry.getValue();
+      if (value == bestValue[0]) {
+        best.add(option);
       }
-      groups.getLast().add(entry.getKey());
+    });
+    Optional<O> result = pickAmongTied(vessel, best);
+    if (result.isEmpty() && best.size() < entries.size()) {
+      final int[] order = IntStream.range(0, entries.size()).toArray();
+      DoubleArrays.quickSortIndirect(order, values.elements(), 0, order.length);
+      int end = entries.size() - best.size();
+      while (result.isEmpty() && end > 0) {
+        final double groupValue = values.getDouble(order[end - 1]);
+        final ObjectArrayList<O> tied = new ObjectArrayList<>();
+        do {
+          end--;
+          tied.add(entries.get(order[end]));
+        } while (end > 0 && values.getDouble(order[end - 1]) == groupValue);
+        result = pickAmongTied(vessel, tied);
+      }
     }
-    return groups;
+    return result;
   }
 
-  /**
-   * The first option to pass, in a random order, is a uniformly random pick
-   * among the passing ones, without testing the others.
-   */
   private Optional<O> pickAmongTied(final Vessel vessel, final List<O> tied) {
-    return shuffledStream(tied, rng)
-      .filter(option -> optionPredicate.apply(vessel, option))
-      .findFirst();
+    return RandomPicker.pickFrom(vessel, tied, optionEligibilityCriteria, rng);
   }
 }

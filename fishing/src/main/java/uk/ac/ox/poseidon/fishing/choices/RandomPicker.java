@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2026, University of Oxford.
+ * Copyright (c) 2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -26,6 +26,7 @@ import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 
 import ec.util.MersenneTwisterFast;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import lombok.NonNull;
@@ -33,27 +34,49 @@ import lombok.RequiredArgsConstructor;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * Picks, for a vessel, a uniformly random option from the vessel's list of
- * options, subject to a predicate for the vessel, or {@code null} if none
- * qualify.
+ * Picks uniformly among a vessel's eligible candidates, or gives no option.
+ * The candidate list is read once per pick, must have a stable order and must
+ * contain distinct options. These requirements are documented, not checked.
+ * @param <O> the option type
  */
 @RequiredArgsConstructor
-public class RandomPicker<O> implements Function<Vessel, O> {
+public class RandomPicker<O> implements Function<Vessel, Optional<O>> {
 
-  @NonNull
-  private final Function<? super Vessel, ? extends List<? extends O>> options;
-
-  @NonNull
-  private final BiFunction<? super Vessel, ? super O, Boolean> optionPredicate;
-
-  @NonNull
-  private final MersenneTwisterFast rng;
+  private final @NonNull Function<
+    ? super Vessel,
+    ? extends List<? extends O>
+  > candidates;
+  private final @NonNull BiFunction<
+    ? super Vessel,
+    ? super O,
+    Boolean
+  > optionEligibilityCriteria;
+  private final @NonNull MersenneTwisterFast rng;
 
   @Override
-  public O apply(final Vessel vessel) {
-    return shuffledStream(options.apply(vessel), rng)
-      .filter(option -> optionPredicate.apply(vessel, option))
+  public Optional<O> apply(final Vessel vessel) {
+    return pickFrom(
+      vessel,
+      candidates.apply(vessel),
+      optionEligibilityCriteria,
+      rng
+    );
+  }
+
+  /** Uniform eligible draw; eligibility is tested lazily in random order. */
+  static <O> Optional<O> pickFrom(
+    final Vessel vessel,
+    final List<? extends O> candidates,
+    final BiFunction<
+      ? super Vessel,
+      ? super O,
+      Boolean
+    > optionEligibilityCriteria,
+    final MersenneTwisterFast rng
+  ) {
+    return shuffledStream(candidates, rng)
+      .filter(option -> optionEligibilityCriteria.apply(vessel, option))
       .findFirst()
-      .orElse(null);
+      .map(option -> option);
   }
 }

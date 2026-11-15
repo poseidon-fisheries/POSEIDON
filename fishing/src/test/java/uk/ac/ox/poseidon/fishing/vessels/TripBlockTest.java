@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -277,5 +278,46 @@ class TripBlockTest {
     assertThatThrownBy(treeOver(tripBlock)::step)
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("already on a trip");
+  }
+
+  @Test
+  void invokesItsDestinationPickerOnceAcrossRunningChildren() {
+    final AtomicInteger picks = new AtomicInteger();
+    final TripBlock block = new TripBlock(
+      receiver -> {
+        picks.incrementAndGet();
+        return Optional.of(DESTINATION);
+      },
+      receiver -> NOW,
+      List.of(),
+      List.of(
+        new ScriptedTask(RUNNING, SUCCEEDED),
+        new SetDestinationToOrigin(),
+        new DockAtDestination(receiver -> NOW)
+      )
+    );
+    final BehaviorTree<Vessel> tree = treeOver(block);
+    tree.step();
+    tree.step();
+    assertThat(picks).hasValue(1);
+    assertThat(block.getStatus()).isEqualTo(SUCCEEDED);
+  }
+
+  @Test
+  void invokesItsDestinationPickerOnceWhenThereIsNoAnswer() {
+    final AtomicInteger picks = new AtomicInteger();
+    final TripBlock block = new TripBlock(
+      receiver -> {
+        picks.incrementAndGet();
+        return Optional.empty();
+      },
+      receiver -> NOW,
+      List.of(),
+      List.of(new ScriptedTask(SUCCEEDED))
+    );
+    treeOver(block).step();
+    assertThat(picks).hasValue(1);
+    assertThat(vessel.getCurrentTrip()).isNull();
+    assertThat(block.getStatus()).isEqualTo(FAILED);
   }
 }

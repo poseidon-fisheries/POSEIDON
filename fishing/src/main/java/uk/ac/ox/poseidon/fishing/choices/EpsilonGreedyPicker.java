@@ -31,15 +31,15 @@ import java.util.function.Function;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * Chooses for a vessel: with probability {@code epsilon}, explores (asks the
+ * Picks for a vessel: with probability {@code epsilon}, explores (asks the
  * explorer); otherwise exploits (asks the exploiter), falling back to exploring
  * if the exploiter has nothing to offer.
  */
-public class EpsilonGreedyChooser<O> implements Function<Vessel, Optional<O>> {
+public class EpsilonGreedyPicker<O> implements Function<Vessel, Optional<O>> {
 
   private final Function<? super Vessel, Double> epsilon;
-  private final Function<? super Vessel, ? extends O> explorer;
-  private final Function<? super Vessel, ? extends O> exploiter;
+  private final Function<? super Vessel, ? extends Optional<O>> explorer;
+  private final Function<? super Vessel, ? extends Optional<O>> exploiter;
   private final MersenneTwisterFast rng;
 
   /**
@@ -49,10 +49,10 @@ public class EpsilonGreedyChooser<O> implements Function<Vessel, Optional<O>> {
    * @param exploiter gives the currently-best-known option for a vessel
    * @param rng       the RNG to draw the explore/exploit decision from
    */
-  EpsilonGreedyChooser(
+  EpsilonGreedyPicker(
     final Function<? super Vessel, Double> epsilon,
-    final Function<? super Vessel, ? extends O> explorer,
-    final Function<? super Vessel, ? extends O> exploiter,
+    final Function<? super Vessel, ? extends Optional<O>> explorer,
+    final Function<? super Vessel, ? extends Optional<O>> exploiter,
     final MersenneTwisterFast rng
   ) {
     this.epsilon = checkNotNull(epsilon);
@@ -65,7 +65,7 @@ public class EpsilonGreedyChooser<O> implements Function<Vessel, Optional<O>> {
    * @param vessel the vessel to choose for
    * @return the exploiter's pick with probability {@code 1 - epsilon} (else the
    *         explorer's), falling back to the explorer if the exploiter returns
-   *         {@code null}
+   *         an empty {@code Optional}
    * @throws IllegalArgumentException if the vessel's epsilon falls outside
    *                                  {@code [0, 1]}
    */
@@ -76,13 +76,13 @@ public class EpsilonGreedyChooser<O> implements Function<Vessel, Optional<O>> {
       "epsilon"
     );
     final boolean exploit = !rng.nextBoolean(epsilon);
-    O result = null;
+    Optional<O> result = Optional.empty();
     if (exploit) {
       result = this.exploiter.apply(vessel);
     }
-    if (result == null) {
+    if (result.isEmpty()) {
       result = this.explorer.apply(vessel);
     }
-    return Optional.ofNullable(result);
+    return result;
   }
 }

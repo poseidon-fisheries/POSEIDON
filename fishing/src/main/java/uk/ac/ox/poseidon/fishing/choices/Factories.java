@@ -22,9 +22,11 @@
 
 package uk.ac.ox.poseidon.fishing.choices;
 
+import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 import static uk.ac.ox.poseidon.core.providers.random.Factories.rng;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
@@ -37,7 +39,6 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.trips.FishingTripEndEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
-import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
 import uk.ac.ox.poseidon.fishing.vessels.VesselScope;
 import uk.ac.ox.poseidon.geography.grids.Cell;
@@ -52,26 +53,6 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 public final class Factories {
 
   private Factories() {}
-
-  /**
-   * @param optionValues the component holding each vessel's own option values
-   * @param friends      gives a vessel's current friends
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for
-   *         a vessel's friends' best options
-   * @see BestOptionsFromFriends
-   */
-  public static <O> BestOptionsFromFriendsFactory<O> bestOptionsFromFriends(
-    final VesselComponent<
-      ? extends Function<? super Vessel, ? extends OptionValues<O>>
-    > optionValues,
-    final ValueFactory<
-      ? super VesselScope,
-      ? super Vessel,
-      ? extends Iterable<? extends Vessel>
-    > friends
-  ) {
-    return new BestOptionsFromFriendsFactory<>(optionValues, friends);
-  }
 
   /**
    * @param modelGrid the grid the coordinate is placed in
@@ -117,69 +98,6 @@ public final class Factories {
   }
 
   /**
-   * @param epsilon   gives the probability of exploring instead of exploiting,
-   *                  in {@code [0, 1]}, read for the vessel on each choice
-   * @param explorer  gives an exploratory destination for a vessel
-   * @param exploiter gives the currently-best-known destination for a vessel
-   * @return a
-   *         {@link uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory}
-   *         for a vessel's destination chosen by an
-   *         {@link EpsilonGreedyChooser}
-   * @see EpsilonGreedyChooser
-   */
-  public static EpsilonGreedyDestinationFactory epsilonGreedyDestination(
-    final ValueFactory<
-      ? super VesselComponentScope,
-      ? super Vessel,
-      Double
-    > epsilon,
-    final ValueFactory<
-      ? super VesselComponentScope,
-      ? super Vessel,
-      ? extends Cell
-    > explorer,
-    final ValueFactory<
-      ? super VesselComponentScope,
-      ? super Vessel,
-      ? extends Cell
-    > exploiter
-  ) {
-    return new EpsilonGreedyDestinationFactory(
-      epsilon,
-      explorer,
-      exploiter,
-      rng()
-    );
-  }
-
-  /**
-   * @param epsilon   the probability of exploring instead of exploiting, in
-   *                  {@code [0, 1]}
-   * @param explorer  gives an exploratory destination for a vessel
-   * @param exploiter gives the currently-best-known destination for a vessel
-   * @return a
-   *         {@link uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory}
-   *         for a vessel's destination chosen by an
-   *         {@link EpsilonGreedyChooser}, with a fixed epsilon
-   * @see EpsilonGreedyChooser
-   */
-  public static EpsilonGreedyDestinationFactory epsilonGreedyDestination(
-    final double epsilon,
-    final ValueFactory<
-      ? super VesselComponentScope,
-      ? super Vessel,
-      ? extends Cell
-    > explorer,
-    final ValueFactory<
-      ? super VesselComponentScope,
-      ? super Vessel,
-      ? extends Cell
-    > exploiter
-  ) {
-    return epsilonGreedyDestination(constant(epsilon), explorer, exploiter);
-  }
-
-  /**
    * @param alpha the weight of a new observation, between 0 and 1
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
    *         {@link Memory} update rule that is a species-by-species exponential
@@ -203,41 +121,6 @@ public final class Factories {
     final double alpha
   ) {
     return new ExponentialMovingAverageOfDoublesFactory(alpha);
-  }
-
-  /**
-   * @param alpha the smoothing factor, in {@code [0, 1]}
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for
-   *         an {@link ExponentialMovingAverageOptionValues} of cells; it names
-   *         its option type so that a scenario can hold it in a {@code var}
-   * @see ExponentialMovingAverageOptionValues
-   */
-  public static ExponentialMovingAverageOptionValuesFactory<Cell> exponentialMovingAverageCellValues(
-    final double alpha
-  ) {
-    return new ExponentialMovingAverageOptionValuesFactory<>(alpha);
-  }
-
-  /**
-   * @param optionValues    gives a vessel's values of the options to pick from
-   * @param optionPredicate which options can be picked for a vessel
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for a
-   *         {@link GreedyPicker}
-   * @see GreedyPicker
-   */
-  public static <O> GreedyPickerFactory<O> greedyPicker(
-    final Factory<
-      ? super VesselScope,
-      ? extends Function<? super Vessel, ? extends OptionValues<O>>
-    > optionValues,
-    final MappingFactory<
-      ? super VesselScope,
-      ? super Vessel,
-      ? super O,
-      Boolean
-    > optionPredicate
-  ) {
-    return new GreedyPickerFactory<>(optionValues, optionPredicate, rng());
   }
 
   /**
@@ -271,39 +154,6 @@ public final class Factories {
   }
 
   /**
-   * @param optionValues         gives a vessel's own learned option values
-   * @param optionPredicate      filters which candidate options are eligible
-   *                             for a vessel
-   * @param imitatedOptionValues gives the option values a vessel imitates
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for
-   *         an {@link ImitatingPicker}
-   * @see ImitatingPicker
-   */
-  public static <O> ImitatingPickerFactory<O> imitatingPicker(
-    final Factory<
-      ? super VesselScope,
-      ? extends Function<? super Vessel, ? extends OptionValues<O>>
-    > optionValues,
-    final MappingFactory<
-      ? super VesselScope,
-      ? super Vessel,
-      ? super O,
-      Boolean
-    > optionPredicate,
-    final Factory<
-      ? super VesselScope,
-      ? extends Function<? super Vessel, ? extends OptionValues<O>>
-    > imitatedOptionValues
-  ) {
-    return new ImitatingPickerFactory<>(
-      optionValues,
-      optionPredicate,
-      imitatedOptionValues,
-      rng()
-    );
-  }
-
-  /**
    * @param key the key, such as the code of a gear, read from what is
    *            remembered (a {@link FishingActionEvent}) and from what reads (a
    *            {@link Vessel}); each key gets its own memory
@@ -322,149 +172,6 @@ public final class Factories {
     final ValueFactory<? super VesselScope, ? super T, ? extends K> key
   ) {
     return new KeyedMemorySelectorFactory<>(key);
-  }
-
-  /**
-   * @param memorySelector selects the memory to read for a vessel
-   * @param valuation      values an option for a vessel, given what is
-   *                       remembered about it
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for a
-   *         vessel's option values read from its memory
-   * @see MemoryBasedOptionValues
-   */
-  public static <O, M> MemoryBasedOptionValuesFactory<
-    O,
-    M
-  > memoryBasedOptionValues(
-    final Factory<
-      ? super VesselScope,
-      ? extends Function<? super Vessel, ? extends Memory<O, M>>
-    > memorySelector,
-    final Factory<
-      ? super VesselScope,
-      ? extends Valuation<? super O, ? super M>
-    > valuation
-  ) {
-    return new MemoryBasedOptionValuesFactory<>(memorySelector, valuation);
-  }
-
-  /**
-   * @param pathFinder                finds accessible water neighbours
-   * @param cellPredicate             filters which candidate cells are eligible
-   * @param neighbourhoodSize the initial search radius
-   * @param maximumWidening           how many cells the radius may grow beyond
-   *                                  the initial one while no cell satisfies
-   *                                  {@code cellPredicate}
-   * @param searchCentre              gives the cell to search around for a
-   *                                  vessel, asked for anew on each pick
-   * @return a
-   *         {@link uk.ac.ox.poseidon.fishing.vessels.VesselComponentScopeFactory}
-   *         for a {@link NeighbourhoodCellPicker}
-   * @see NeighbourhoodCellPicker
-   */
-  public static NeighbourhoodGridExplorerFactory neighbourhoodGridExplorer(
-    final Factory<
-      ? super VesselComponentScope,
-      ? extends GridPathFinder
-    > pathFinder,
-    final MappingFactory<
-      ? super VesselComponentScope,
-      ? super Vessel,
-      ? super Cell,
-      Boolean
-    > cellPredicate,
-    final ValueFactory<
-      ? super VesselComponentScope,
-      ? super Vessel,
-      Integer
-    > neighbourhoodSize,
-    final int maximumWidening,
-    final ValueFactory<
-      ? super VesselComponentScope,
-      ? super Vessel,
-      ? extends Cell
-    > searchCentre
-  ) {
-    return new NeighbourhoodGridExplorerFactory(
-      pathFinder,
-      cellPredicate,
-      neighbourhoodSize,
-      maximumWidening,
-      searchCentre,
-      rng()
-    );
-  }
-
-  /**
-   * @param optionValues gives a vessel's values of the options
-   * @param fallback     gives an option for a vessel when none is known
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for a
-   *         {@link BestKnownOption}
-   * @see BestKnownOption
-   */
-  public static <O> BestKnownOptionFactory<O> bestKnownOption(
-    final Factory<
-      ? super VesselScope,
-      ? extends Function<? super Vessel, ? extends OptionValues<O>>
-    > optionValues,
-    final ValueFactory<
-      ? super VesselScope,
-      ? super Vessel,
-      ? extends O
-    > fallback
-  ) {
-    return new BestKnownOptionFactory<>(optionValues, fallback, rng());
-  }
-
-  /**
-   * @param revenueValuation values an option for a vessel, given what is
-   *                         remembered about it
-   * @param costValuation    values the cost of an option for a vessel, given
-   *                         what is remembered about it
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link NetValuation}
-   * @see NetValuation
-   */
-  public static <S extends Scope, O, M> NetValuationFactory<
-    S,
-    O,
-    M
-  > netValuation(
-    final Factory<
-      ? super S,
-      ? extends Valuation<? super O, ? super M>
-    > revenueValuation,
-    final Factory<
-      ? super S,
-      ? extends Valuation<? super O, ? super M>
-    > costValuation
-  ) {
-    return new NetValuationFactory<>(revenueValuation, costValuation);
-  }
-
-  /**
-   * @param cells         the candidate cells to pick from, read for the vessel
-   *                      picked for
-   * @param cellPredicate filters which candidate cells are eligible for a
-   *                      vessel
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for a
-   *         {@link RandomPicker}
-   * @see RandomPicker
-   */
-  public static RandomGridExplorerFactory randomGridExplorer(
-    final ValueFactory<
-      ? super VesselScope,
-      ? super Vessel,
-      ? extends List<? extends Cell>
-    > cells,
-    final MappingFactory<
-      ? super VesselScope,
-      ? super Vessel,
-      ? super Cell,
-      Boolean
-    > cellPredicate
-  ) {
-    return new RandomGridExplorerFactory(cells, cellPredicate, rng());
   }
 
   /**
@@ -633,5 +340,249 @@ public final class Factories {
       memory,
       updateRule
     );
+  }
+
+  /**
+   * @param optionValues the values to compare for a vessel
+   * @param optionEligibilityCriteria which options may be selected
+   * @return a vessel-level factory for a greedy picker
+   * @see GreedyPicker
+   */
+  public static <O> GreedyPickerFactory<O> greedyPicker(
+    final Factory<? super VesselScope, ? extends OptionValues<O>> optionValues,
+    final MappingFactory<
+      ? super VesselScope,
+      ? super Vessel,
+      ? super O,
+      Boolean
+    > optionEligibilityCriteria
+  ) {
+    return new GreedyPickerFactory<>(
+      optionValues,
+      optionEligibilityCriteria,
+      rng()
+    );
+  }
+
+  /**
+   * @param optionValues the values to compare without an eligibility filter
+   * @return a vessel-level factory for an unfiltered greedy picker
+   * @see GreedyPicker
+   */
+  public static <O> GreedyPickerFactory<O> greedyPicker(
+    final Factory<? super VesselScope, ? extends OptionValues<O>> optionValues
+  ) {
+    return greedyPicker(optionValues, always(true));
+  }
+
+  /**
+   * @param memorySelector selects the vessel's remembered outcomes
+   * @param valuation values an outcome in the receiver's circumstances
+   * @return a relative-scope factory for memory-based option values
+   * @see MemoryBasedOptionValues
+   */
+  public static <S extends Scope, O, M> MemoryBasedOptionValuesFactory<
+    S,
+    O,
+    M
+  > memoryBasedOptionValues(
+    final Factory<
+      ? super S,
+      ? extends Function<? super Vessel, ? extends MemoryEntries<O, M>>
+    > memorySelector,
+    final Factory<? super S, ? extends Valuation<? super M>> valuation
+  ) {
+    return new MemoryBasedOptionValuesFactory<>(memorySelector, valuation);
+  }
+
+  /**
+   * Reads remembered numbers that already express the preference and unit
+   * being compared; no identity valuation is exposed to scenario code.
+   * @param memorySelector selects the vessel's remembered returns
+   * @return a relative-scope factory for direct reading of remembered worth
+   * @see MemoryBasedOptionValues
+   */
+  public static <S extends Scope, O> MemoryBasedOptionValuesFactory<
+    S,
+    O,
+    Double
+  > memoryBasedOptionValues(
+    final Factory<
+      ? super S,
+      ? extends Function<? super Vessel, ? extends MemoryEntries<O, Double>>
+    > memorySelector
+  ) {
+    return new MemoryBasedOptionValuesFactory<>(memorySelector, null);
+  }
+
+  /**
+   * @param optionValues the values before cost subtraction
+   * @param cost the cost in the same unit, subtracted once per visited option
+   * @return a relative-scope factory for net option values
+   * @see NetOptionValues
+   */
+  public static <S extends Scope, O> NetOptionValuesFactory<
+    S,
+    O
+  > netOptionValues(
+    final Factory<? super S, ? extends OptionValues<O>> optionValues,
+    final Factory<? super S, ? extends Cost<? super O>> cost
+  ) {
+    return new NetOptionValuesFactory<>(optionValues, cost);
+  }
+
+  /**
+   * @param candidates the stable, distinct candidates, read once per pick
+   * @param optionEligibilityCriteria which options may be selected
+   * @return a vessel-level factory for a random picker
+   * @see RandomPicker
+   */
+  public static <O> RandomPickerFactory<O> randomPicker(
+    final ValueFactory<
+      ? super VesselScope,
+      ? super Vessel,
+      ? extends List<? extends O>
+    > candidates,
+    final MappingFactory<
+      ? super VesselScope,
+      ? super Vessel,
+      ? super O,
+      Boolean
+    > optionEligibilityCriteria
+  ) {
+    return new RandomPickerFactory<>(
+      candidates,
+      optionEligibilityCriteria,
+      rng()
+    );
+  }
+
+  /**
+   * @param candidates the stable, distinct candidates, read once per pick
+   * @return a vessel-level factory for an unfiltered random picker
+   * @see RandomPicker
+   */
+  public static <O> RandomPickerFactory<O> randomPicker(
+    final ValueFactory<
+      ? super VesselScope,
+      ? super Vessel,
+      ? extends List<? extends O>
+    > candidates
+  ) {
+    return randomPicker(candidates, always(true));
+  }
+
+  /**
+   * @param pathFinder supplies accessible water neighbours
+   * @param cellEligibilityCriteria which cells may be selected
+   * @param searchRadius the live radius in cells, read once per pick
+   * @param maximumWidening the maximum additional radius in cells
+   * @param searchCentre gives the centre once; absence means no exploration
+   * @return a component-level factory for nearby-cell exploration
+   * @see NearbyCellPicker
+   */
+  public static NearbyCellPickerFactory nearbyCellPicker(
+    final Factory<
+      ? super VesselComponentScope,
+      ? extends GridPathFinder
+    > pathFinder,
+    final MappingFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      ? super Cell,
+      Boolean
+    > cellEligibilityCriteria,
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      Integer
+    > searchRadius,
+    final int maximumWidening,
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      ? extends Optional<Cell>
+    > searchCentre
+  ) {
+    return new NearbyCellPickerFactory(
+      pathFinder,
+      cellEligibilityCriteria,
+      searchRadius,
+      maximumWidening,
+      searchCentre,
+      rng()
+    );
+  }
+
+  /**
+   * @param epsilon the live exploration probability, in [0, 1]
+   * @param explorer the exploration picker
+   * @param exploiter the exploitation picker
+   * @return a component-level factory for epsilon-greedy picking
+   * @see EpsilonGreedyPicker
+   */
+  public static <O> EpsilonGreedyPickerFactory<O> epsilonGreedyPicker(
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      Double
+    > epsilon,
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      ? extends Optional<O>
+    > explorer,
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      ? extends Optional<O>
+    > exploiter
+  ) {
+    return new EpsilonGreedyPickerFactory<>(
+      epsilon,
+      explorer,
+      exploiter,
+      rng()
+    );
+  }
+
+  /**
+   * @param epsilon the exploration probability, in [0, 1]
+   * @param explorer the exploration picker
+   * @param exploiter the exploitation picker
+   * @return a component-level factory for epsilon-greedy picking
+   * @see EpsilonGreedyPicker
+   */
+  public static <O> EpsilonGreedyPickerFactory<O> epsilonGreedyPicker(
+    final double epsilon,
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      ? extends Optional<O>
+    > explorer,
+    final ValueFactory<
+      ? super VesselComponentScope,
+      ? super Vessel,
+      ? extends Optional<O>
+    > exploiter
+  ) {
+    return epsilonGreedyPicker(constant(epsilon), explorer, exploiter);
+  }
+
+  /**
+   * @param pickers the pickers to try in order
+   * @return a relative-scope factory for picking with explicit fallback
+   * @see FallbackPicker
+   */
+  @SafeVarargs
+  @SuppressWarnings("varargs")
+  public static <S extends Scope, O> FallbackPickerFactory<S, O> fallbackPicker(
+    final ValueFactory<
+      ? super S,
+      ? super Vessel,
+      ? extends Optional<O>
+    >... pickers
+  ) {
+    return new FallbackPickerFactory<S, O>(ImmutableList.copyOf(pickers));
   }
 }

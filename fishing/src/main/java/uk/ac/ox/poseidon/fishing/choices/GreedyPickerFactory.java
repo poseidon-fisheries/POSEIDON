@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.choices;
 
 import ec.util.MersenneTwisterFast;
+import java.util.Optional;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -46,27 +47,27 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class GreedyPickerFactory<O>
-  extends VesselScopeFactory<Function<Vessel, O>>
-  implements ValueFactory<VesselScope, Vessel, O>
+  extends VesselScopeFactory<Function<Vessel, Optional<O>>>
+  implements ValueFactory<VesselScope, Vessel, Optional<O>>
 {
 
   private final Factory<
     ? super VesselScope,
-    ? extends Function<? super Vessel, ? extends OptionValues<O>>
+    ? extends OptionValues<O>
   > optionValues;
   private final MappingFactory<
     ? super VesselScope,
     ? super Vessel,
     ? super O,
     Boolean
-  > optionPredicate;
+  > optionEligibilityCriteria;
   private final Factory<? super VesselScope, ? extends MersenneTwisterFast> rng;
 
   @Override
-  protected Function<Vessel, O> newInstance(final VesselScope scope) {
+  protected Function<Vessel, Optional<O>> newInstance(final VesselScope scope) {
     return new GreedyPicker<>(
       optionValues.get(scope),
-      optionPredicate.get(scope),
+      optionEligibilityCriteria.get(scope),
       rng.get(scope)
     );
   }

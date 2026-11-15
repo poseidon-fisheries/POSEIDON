@@ -38,7 +38,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +57,7 @@ import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
  * cells, so the search never goes beyond a radius of 6. Unless a test says
  * otherwise, the maximum widening is larger than that.
  */
-class NeighbourhoodCellPickerTest {
+class NearbyCellPickerTest {
 
   private static final ModelGrid MODEL_GRID = ModelGrid.create(
     6,
@@ -97,23 +99,23 @@ class NeighbourhoodCellPickerTest {
     neighbourhoods.put(entry(centre, radius), ImmutableList.copyOf(cells));
   }
 
-  private NeighbourhoodCellPicker picker(
+  private NearbyCellPicker picker(
     final Supplier<Cell> searchCentre,
     final Predicate<? super Cell> optionPredicate,
     final int neighbourhoodSize,
     final int maximumWidening
   ) {
-    return new NeighbourhoodCellPicker(
+    return new NearbyCellPicker(
       pathFinder,
       (v, cell) -> optionPredicate.test(cell),
       v -> neighbourhoodSize,
       maximumWidening,
-      v -> searchCentre.get(),
+      v -> Optional.ofNullable(searchCentre.get()),
       rng
     );
   }
 
-  private NeighbourhoodCellPicker picker(
+  private NearbyCellPicker picker(
     final Predicate<? super Cell> optionPredicate,
     final int neighbourhoodSize,
     final int maximumWidening
@@ -126,7 +128,7 @@ class NeighbourhoodCellPickerTest {
     );
   }
 
-  private NeighbourhoodCellPicker picker(
+  private NearbyCellPicker picker(
     final Predicate<? super Cell> optionPredicate
   ) {
     return picker(optionPredicate, 1, BEYOND_THE_GRID);
@@ -137,7 +139,11 @@ class NeighbourhoodCellPickerTest {
     neighbourhood(CENTRE, 1, new Cell(5, 2));
     neighbourhood(VESSEL_CELL, 1, new Cell(0, 1));
 
-    assertThat(picker(cell -> true).apply(vessel)).isEqualTo(new Cell(5, 2));
+    assertThat(
+      picker(cell -> true)
+        .apply(vessel)
+        .orElse(null)
+    ).isEqualTo(new Cell(5, 2));
     assertThat(searched).containsExactly(entry(CENTRE, 1));
   }
 
@@ -147,15 +153,15 @@ class NeighbourhoodCellPickerTest {
     neighbourhood(CENTRE, 1, new Cell(5, 2));
     neighbourhood(otherCentre, 1, new Cell(1, 2));
     final List<Cell> centres = new ArrayList<>(List.of(CENTRE, otherCentre));
-    final NeighbourhoodCellPicker picker = picker(
+    final NearbyCellPicker picker = picker(
       centres::removeFirst,
       cell -> true,
       1,
       BEYOND_THE_GRID
     );
 
-    assertThat(picker.apply(vessel)).isEqualTo(new Cell(5, 2));
-    assertThat(picker.apply(vessel)).isEqualTo(new Cell(1, 2));
+    assertThat(picker.apply(vessel).orElse(null)).isEqualTo(new Cell(5, 2));
+    assertThat(picker.apply(vessel).orElse(null)).isEqualTo(new Cell(1, 2));
   }
 
   @Test
@@ -165,28 +171,38 @@ class NeighbourhoodCellPickerTest {
     when(otherVessel.getCell()).thenReturn(otherCell);
     neighbourhood(VESSEL_CELL, 1, new Cell(1, 0), new Cell(0, 1));
     neighbourhood(otherCell, 1, new Cell(1, 2), new Cell(2, 1));
-    final NeighbourhoodCellPicker picker = new NeighbourhoodCellPicker(
+    final NearbyCellPicker picker = new NearbyCellPicker(
       pathFinder,
       (pickedFor, cell) ->
         pickedFor == vessel ? cell.getY() == 0 : cell.equals(new Cell(2, 1)),
       pickedFor -> 1,
       BEYOND_THE_GRID,
-      Vessel::getCell,
+      pickedFor -> Optional.of(pickedFor.getCell()),
       rng
     );
 
-    assertThat(picker.apply(vessel)).isEqualTo(new Cell(1, 0));
-    assertThat(picker.apply(otherVessel)).isEqualTo(new Cell(2, 1));
+    assertThat(picker.apply(vessel).orElse(null)).isEqualTo(new Cell(1, 0));
+    assertThat(picker.apply(otherVessel).orElse(null)).isEqualTo(
+      new Cell(2, 1)
+    );
   }
 
   @Test
-  void searchesAroundTheVesselsCellWhenTheSearchCentreGivesNoCell() {
-    neighbourhood(VESSEL_CELL, 1, new Cell(1, 0));
-
-    assertThat(
-      picker(() -> null, cell -> true, 1, BEYOND_THE_GRID).apply(vessel)
-    ).isEqualTo(new Cell(1, 0));
-    assertThat(searched).containsExactly(entry(VESSEL_CELL, 1));
+  void givesNoOptionWithoutACentre() {
+    final NearbyCellPicker picker = new NearbyCellPicker(
+      pathFinder,
+      (receiver, cell) -> {
+        throw new AssertionError("tested eligibility");
+      },
+      receiver -> {
+        throw new AssertionError("read radius");
+      },
+      2,
+      receiver -> Optional.empty(),
+      rng
+    );
+    assertThat(picker.apply(vessel)).isEmpty();
+    assertThat(searched).isEmpty();
   }
 
   @Test
@@ -195,7 +211,9 @@ class NeighbourhoodCellPickerTest {
     neighbourhood(CENTRE, 3, new Cell(1, 2));
 
     assertThat(
-      picker(cell -> true, 3, BEYOND_THE_GRID).apply(vessel)
+      picker(cell -> true, 3, BEYOND_THE_GRID)
+        .apply(vessel)
+        .orElse(null)
     ).isEqualTo(new Cell(1, 2));
     assertThat(searched).containsExactly(entry(CENTRE, 3));
   }
@@ -205,7 +223,11 @@ class NeighbourhoodCellPickerTest {
     neighbourhood(CENTRE, 3, new Cell(1, 2));
     neighbourhood(CENTRE, 4, new Cell(0, 2));
 
-    assertThat(picker(cell -> true).apply(vessel)).isEqualTo(new Cell(1, 2));
+    assertThat(
+      picker(cell -> true)
+        .apply(vessel)
+        .orElse(null)
+    ).isEqualTo(new Cell(1, 2));
     assertThat(searched).containsExactly(
       entry(CENTRE, 1),
       entry(CENTRE, 2),
@@ -214,8 +236,12 @@ class NeighbourhoodCellPickerTest {
   }
 
   @Test
-  void givesNullWhenNoWaterIsAccessibleWithinTheWholeGrid() {
-    assertThat(picker(cell -> true).apply(vessel)).isNull();
+  void givesNoOptionWhenNoWaterIsAccessibleWithinTheWholeGrid() {
+    assertThat(
+      picker(cell -> true)
+        .apply(vessel)
+        .orElse(null)
+    ).isNull();
     assertThat(searched).containsExactly(
       entry(CENTRE, 1),
       entry(CENTRE, 2),
@@ -237,10 +263,10 @@ class NeighbourhoodCellPickerTest {
       passing,
       new Cell(3, 3)
     );
-    final NeighbourhoodCellPicker picker = picker(passing::equals);
+    final NearbyCellPicker picker = picker(passing::equals);
 
     for (int i = 0; i < 100; i++) {
-      assertThat(picker.apply(vessel)).isEqualTo(passing);
+      assertThat(picker.apply(vessel).orElse(null)).isEqualTo(passing);
     }
   }
 
@@ -249,7 +275,9 @@ class NeighbourhoodCellPickerTest {
     neighbourhood(CENTRE, 1, new Cell(3, 2), new Cell(5, 2), new Cell(3, 3));
     final List<Cell> tested = new ArrayList<>();
 
-    picker(cell -> tested.add(cell)).apply(vessel);
+    picker(cell -> tested.add(cell))
+      .apply(vessel)
+      .orElse(null);
 
     assertThat(tested).hasSize(1);
   }
@@ -263,11 +291,11 @@ class NeighbourhoodCellPickerTest {
       new Cell(5, 3)
     );
     neighbourhood(CENTRE, 1, candidates.toArray(Cell[]::new));
-    final NeighbourhoodCellPicker picker = picker(cell -> true);
+    final NearbyCellPicker picker = picker(cell -> true);
     final Map<Cell, Integer> counts = new HashMap<>();
     final int draws = 10_000;
     for (int i = 0; i < draws; i++) {
-      counts.merge(picker.apply(vessel), 1, Integer::sum);
+      counts.merge(picker.apply(vessel).orElse(null), 1, Integer::sum);
     }
 
     assertThat(counts).containsOnlyKeys(candidates);
@@ -286,7 +314,7 @@ class NeighbourhoodCellPickerTest {
     neighbourhood(CENTRE, 2, near, far);
     neighbourhood(CENTRE, 3, near, far, new Cell(1, 2));
 
-    assertThat(picker(far::equals).apply(vessel)).isEqualTo(far);
+    assertThat(picker(far::equals).apply(vessel).orElse(null)).isEqualTo(far);
     assertThat(searched).containsExactly(entry(CENTRE, 1), entry(CENTRE, 2));
   }
 
@@ -298,7 +326,9 @@ class NeighbourhoodCellPickerTest {
     neighbourhood(CENTRE, 2, near, far);
     final List<Cell> tested = new ArrayList<>();
 
-    picker(cell -> tested.add(cell) && cell.equals(far)).apply(vessel);
+    picker(cell -> tested.add(cell) && cell.equals(far))
+      .apply(vessel)
+      .orElse(null);
 
     assertThat(tested).containsExactly(near, far);
   }
@@ -310,21 +340,25 @@ class NeighbourhoodCellPickerTest {
     final Cell farNorth = new Cell(4, 0);
     neighbourhood(CENTRE, 1, near);
     neighbourhood(CENTRE, 2, near, farWest, farNorth);
-    final NeighbourhoodCellPicker picker = picker(cell -> !cell.equals(near));
+    final NearbyCellPicker picker = picker(cell -> !cell.equals(near));
     final Set<Cell> picked = new HashSet<>();
     for (int i = 0; i < 100; i++) {
-      picked.add(picker.apply(vessel));
+      picked.add(picker.apply(vessel).orElse(null));
     }
 
     assertThat(picked).containsExactlyInAnyOrder(farWest, farNorth);
   }
 
   @Test
-  void givesNullWhenNoCellPassesThePredicateWithinTheWholeGrid() {
+  void givesNoOptionWhenNoCellPassesThePredicateWithinTheWholeGrid() {
     neighbourhood(CENTRE, 1, new Cell(5, 2));
     neighbourhood(CENTRE, 6, new Cell(5, 2), new Cell(0, 0));
 
-    assertThat(picker(cell -> false).apply(vessel)).isNull();
+    assertThat(
+      picker(cell -> false)
+        .apply(vessel)
+        .orElse(null)
+    ).isNull();
     assertThat(searched).containsExactly(
       entry(CENTRE, 1),
       entry(CENTRE, 2),
@@ -339,9 +373,11 @@ class NeighbourhoodCellPickerTest {
   void findsACellAtTheMaximumWidening() {
     neighbourhood(CENTRE, 3, new Cell(1, 2));
 
-    assertThat(picker(cell -> true, 1, 2).apply(vessel)).isEqualTo(
-      new Cell(1, 2)
-    );
+    assertThat(
+      picker(cell -> true, 1, 2)
+        .apply(vessel)
+        .orElse(null)
+    ).isEqualTo(new Cell(1, 2));
   }
 
   @Test
@@ -349,10 +385,16 @@ class NeighbourhoodCellPickerTest {
     neighbourhood(CENTRE, 1, new Cell(5, 2));
     neighbourhood(CENTRE, 4, new Cell(0, 2));
 
-    assertThat(picker(cell -> true, 1, 2).apply(vessel)).isEqualTo(
-      new Cell(5, 2)
-    );
-    assertThat(picker(cell -> false, 1, 2).apply(vessel)).isNull();
+    assertThat(
+      picker(cell -> true, 1, 2)
+        .apply(vessel)
+        .orElse(null)
+    ).isEqualTo(new Cell(5, 2));
+    assertThat(
+      picker(cell -> false, 1, 2)
+        .apply(vessel)
+        .orElse(null)
+    ).isNull();
     assertThat(searched).containsExactly(
       entry(CENTRE, 1),
       entry(CENTRE, 1),
@@ -365,7 +407,11 @@ class NeighbourhoodCellPickerTest {
   void searchesOnlyTheInitialNeighbourhoodWithoutWidening() {
     neighbourhood(CENTRE, 2, new Cell(2, 2));
 
-    assertThat(picker(cell -> true, 1, 0).apply(vessel)).isNull();
+    assertThat(
+      picker(cell -> true, 1, 0)
+        .apply(vessel)
+        .orElse(null)
+    ).isNull();
     assertThat(searched).containsExactly(entry(CENTRE, 1));
   }
 
@@ -374,7 +420,44 @@ class NeighbourhoodCellPickerTest {
     neighbourhood(CENTRE, 4, new Cell(0, 0));
 
     assertThat(
-      picker(cell -> true, 1, Integer.MAX_VALUE).apply(vessel)
+      picker(cell -> true, 1, Integer.MAX_VALUE)
+        .apply(vessel)
+        .orElse(null)
     ).isEqualTo(new Cell(0, 0));
+  }
+
+  @Test
+  void readsCentreOnceWhileWideningAndRadiusAfreshForEachPick() {
+    final AtomicInteger centres = new AtomicInteger();
+    final AtomicInteger radius = new AtomicInteger(1);
+    neighbourhood(CENTRE, 2, new Cell(2, 2));
+    final NearbyCellPicker picker = new NearbyCellPicker(
+      pathFinder,
+      (receiver, cell) -> true,
+      receiver -> radius.get(),
+      1,
+      receiver -> {
+        centres.incrementAndGet();
+        return Optional.of(CENTRE);
+      },
+      rng
+    );
+    assertThat(picker.apply(vessel)).contains(new Cell(2, 2));
+    assertThat(centres).hasValue(1);
+    assertThat(searched).containsExactly(entry(CENTRE, 1), entry(CENTRE, 2));
+    searched.clear();
+    radius.set(2);
+    assertThat(picker.apply(vessel)).contains(new Cell(2, 2));
+    assertThat(centres).hasValue(2);
+    assertThat(searched).containsExactly(entry(CENTRE, 2));
+  }
+
+  @Test
+  void aRadiusBeyondTheGridStillSearchesItsInitialNeighbourhood() {
+    neighbourhood(CENTRE, 10, new Cell(0, 0));
+    assertThat(
+      picker(cell -> true, 10, Integer.MAX_VALUE).apply(vessel)
+    ).contains(new Cell(0, 0));
+    assertThat(searched).containsExactly(entry(CENTRE, 10));
   }
 }

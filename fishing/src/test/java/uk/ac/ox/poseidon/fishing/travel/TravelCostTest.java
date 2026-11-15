@@ -29,6 +29,7 @@ import static org.mockito.Mockito.mock;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.joda.money.CurrencyMismatchException;
@@ -65,9 +66,7 @@ class TravelCostTest {
       List.of(distanceCost, durationCost)
     );
 
-    assertThat(travelCost.inContextOf(vessel).valueOf(cell, null)).isEqualTo(
-      5.0
-    );
+    assertThat(travelCost.forVessel(vessel).applyAsDouble(cell)).isEqualTo(5.0);
   }
 
   @Test
@@ -77,7 +76,7 @@ class TravelCostTest {
       List.of(distanceCost, durationCost)
     );
 
-    travelCost.inContextOf(vessel).valueOf(cell, null);
+    travelCost.forVessel(vessel).applyAsDouble(cell);
 
     assertThat(routesComputed).hasValue(1);
   }
@@ -90,7 +89,7 @@ class TravelCostTest {
     );
 
     assertThatThrownBy(() ->
-      travelCost.inContextOf(vessel).valueOf(cell, null)
+      travelCost.forVessel(vessel).applyAsDouble(cell)
     ).isInstanceOf(CurrencyMismatchException.class);
   }
 
@@ -106,21 +105,17 @@ class TravelCostTest {
       )
     );
 
-    assertThat(travelCost.inContextOf(vessel).valueOf(cell, null)).isEqualTo(
-      1.0
+    assertThat(travelCost.forVessel(vessel).applyAsDouble(cell)).isEqualTo(1.0);
+    assertThat(travelCost.forVessel(otherVessel).applyAsDouble(cell)).isEqualTo(
+      110.0
     );
-    assertThat(
-      travelCost.inContextOf(otherVessel).valueOf(cell, null)
-    ).isEqualTo(110.0);
   }
 
   @Test
   void isZeroWithoutCosts() {
     final TravelCost travelCost = new TravelCost(routeFunction, List.of());
 
-    assertThat(travelCost.inContextOf(vessel).valueOf(cell, null)).isEqualTo(
-      0.0
-    );
+    assertThat(travelCost.forVessel(vessel).applyAsDouble(cell)).isEqualTo(0.0);
   }
 
   @Test
@@ -134,10 +129,26 @@ class TravelCostTest {
       })
     );
 
-    final var travelCostForVessel = travelCost.inContextOf(vessel);
-    travelCostForVessel.valueOf(cell, null);
-    travelCostForVessel.valueOf(new Cell(1, 1), null);
+    final var travelCostForVessel = travelCost.forVessel(vessel);
+    travelCostForVessel.applyAsDouble(cell);
+    travelCostForVessel.applyAsDouble(new Cell(1, 1));
 
     assertThat(timesGivenTheVessel).hasValue(1);
+  }
+
+  @Test
+  void snapshotsTheHourlyRateAndReadsItAfreshForTheNextVisit() {
+    final AtomicReference<Money> hourlyCost = new AtomicReference<>(
+      Money.of(EUR, 2)
+    );
+    final TravelCost cost = new TravelCost(
+      routeFunction,
+      List.of(new TimeCost(receiver -> hourlyCost.get()))
+    );
+    final var firstVisit = cost.forVessel(vessel);
+    assertThat(firstVisit.applyAsDouble(cell)).isEqualTo(4.0);
+    hourlyCost.set(Money.of(EUR, 3));
+    assertThat(firstVisit.applyAsDouble(new Cell(1, 1))).isEqualTo(2.0);
+    assertThat(cost.forVessel(vessel).applyAsDouble(cell)).isEqualTo(6.0);
   }
 }

@@ -29,7 +29,6 @@ import static uk.ac.ox.poseidon.core.providers.constant.Factories.always;
 import static uk.ac.ox.poseidon.fishing.choices.Factories.greedyPicker;
 
 import ec.util.MersenneTwisterFast;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.GlobalScopeFactory;
 import uk.ac.ox.poseidon.core.ProductStore;
@@ -72,7 +71,10 @@ class GreedyPickerFactoryTest {
 
     @Override
     protected OptionValues<String> newInstance(final Scope scope) {
-      return new ImmutableOptionValues<>(Map.of("A", 1.0, "B", 3.0));
+      return (vessel, consumer) -> {
+        consumer.accept("A", 1.0);
+        consumer.accept("B", 3.0);
+      };
     }
   }
 
@@ -85,6 +87,6 @@ class GreedyPickerFactoryTest {
 
     assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
     assertThat(factory.get(scopeA)).isNotSameAs(factory.get(scopeB));
-    assertThat(factory.get(scopeA).apply(vesselA)).isEqualTo("B");
+    assertThat(factory.get(scopeA).apply(vesselA)).contains("B");
   }
 }

@@ -37,7 +37,7 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
  * without touching the RNG: an epsilon of 0 always exploits and an epsilon of
  * 1 always explores, whatever the seed.
  */
-class EpsilonGreedyChooserTest {
+class EpsilonGreedyPickerTest {
 
   private static final String EXPLORED = "explored";
   private static final String EXPLOITED = "exploited";
@@ -46,11 +46,11 @@ class EpsilonGreedyChooserTest {
   private final MersenneTwisterFast rng = new MersenneTwisterFast(0);
   private final AtomicReference<Double> epsilon = new AtomicReference<>(0.0);
 
-  private EpsilonGreedyChooser<String> chooser() {
-    return new EpsilonGreedyChooser<>(
+  private EpsilonGreedyPicker<String> chooser() {
+    return new EpsilonGreedyPicker<>(
       ignored -> epsilon.get(),
-      ignored -> EXPLORED,
-      ignored -> EXPLOITED,
+      ignored -> Optional.of(EXPLORED),
+      ignored -> Optional.of(EXPLOITED),
       rng
     );
   }
@@ -68,7 +68,7 @@ class EpsilonGreedyChooserTest {
 
   @Test
   void epsilonIsReadOnEachChoice() {
-    final EpsilonGreedyChooser<String> chooser = chooser();
+    final EpsilonGreedyPicker<String> chooser = chooser();
     assertThat(chooser.apply(vessel)).contains(EXPLOITED);
     epsilon.set(1.0);
     assertThat(chooser.apply(vessel)).contains(EXPLORED);
@@ -76,7 +76,7 @@ class EpsilonGreedyChooserTest {
 
   @Test
   void epsilonOutsideTheUnitRangeIsRejectedOnChoice() {
-    final EpsilonGreedyChooser<String> chooser = chooser();
+    final EpsilonGreedyPicker<String> chooser = chooser();
     epsilon.set(1.5);
     assertThatIllegalArgumentException().isThrownBy(() ->
       chooser.apply(vessel)
@@ -85,10 +85,10 @@ class EpsilonGreedyChooserTest {
 
   @Test
   void exploiterWithNothingToOfferFallsBackToExploring() {
-    final EpsilonGreedyChooser<String> chooser = new EpsilonGreedyChooser<>(
+    final EpsilonGreedyPicker<String> chooser = new EpsilonGreedyPicker<>(
       ignored -> 0.0,
-      ignored -> EXPLORED,
-      ignored -> null,
+      ignored -> Optional.of(EXPLORED),
+      ignored -> Optional.empty(),
       rng
     );
     assertThat(chooser.apply(vessel)).contains(EXPLORED);
@@ -96,12 +96,43 @@ class EpsilonGreedyChooserTest {
 
   @Test
   void chooserWithNothingToOfferPicksNothing() {
-    final EpsilonGreedyChooser<String> chooser = new EpsilonGreedyChooser<>(
+    final EpsilonGreedyPicker<String> chooser = new EpsilonGreedyPicker<>(
       ignored -> 0.0,
-      ignored -> null,
-      ignored -> null,
+      ignored -> Optional.empty(),
+      ignored -> Optional.empty(),
       rng
     );
     assertThat(chooser.apply(vessel)).isEqualTo(Optional.empty());
+  }
+
+  @Test
+  void exploringDoesNotVisitOptionValues() {
+    final GreedyPicker<String> exploiter = new GreedyPicker<>(
+      (receiver, consumer) -> {
+        throw new AssertionError("visited values while exploring");
+      },
+      (receiver, option) -> true,
+      rng
+    );
+    final EpsilonGreedyPicker<String> picker = new EpsilonGreedyPicker<>(
+      receiver -> 1.0,
+      receiver -> Optional.of(EXPLORED),
+      exploiter,
+      rng
+    );
+    assertThat(picker.apply(vessel)).contains(EXPLORED);
+  }
+
+  @Test
+  void explorationReturningNothingDoesNotInvokeTheExploiter() {
+    final EpsilonGreedyPicker<String> picker = new EpsilonGreedyPicker<>(
+      receiver -> 1.0,
+      receiver -> Optional.empty(),
+      receiver -> {
+        throw new AssertionError("exploited after exploration");
+      },
+      rng
+    );
+    assertThat(picker.apply(vessel)).isEmpty();
   }
 }

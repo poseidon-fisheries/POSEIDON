@@ -33,6 +33,7 @@ import static org.mockito.Mockito.when;
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task.Status;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
@@ -86,5 +87,21 @@ class ChooseNextDestinationTest {
     assertThatThrownBy(() ->
       run(new ChooseNextDestination(chosenFor -> Optional.of(NEXT)))
     ).isInstanceOf(IllegalStateException.class);
+  }
+
+  @Test
+  void invokesThePickerOnceBeforeApplyingItsAnswer() {
+    when(vessel.getCurrentTrip()).thenReturn(trip);
+    final AtomicInteger picks = new AtomicInteger();
+    assertThat(
+      run(
+        new ChooseNextDestination(receiver -> {
+          picks.incrementAndGet();
+          return Optional.of(NEXT);
+        })
+      )
+    ).isEqualTo(Status.SUCCEEDED);
+    assertThat(picks).hasValue(1);
+    verify(trip).setDestination(NEXT);
   }
 }

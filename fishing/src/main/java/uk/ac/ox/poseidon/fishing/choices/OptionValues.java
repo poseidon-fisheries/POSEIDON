@@ -22,74 +22,23 @@
 
 package uk.ac.ox.poseidon.fishing.choices;
 
-import ec.util.MersenneTwisterFast;
 import it.unimi.dsi.fastutil.objects.ObjectDoubleBiConsumer;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.function.Function;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
- * A learned value per option (e.g. per destination cell), supporting lookup of
- * the current best option(s) — the highest-valued one(s), possibly tied.
- * <p>
- * A picker takes the option values of the vessel it picks for, as a function of
- * that vessel, since some (those worked out from a memory) are valued for a
- * vessel. Option values that are the same for every vessel, such as a learned
- * table, are such a function themselves: they give themselves, whatever the
- * vessel.
+ * Visits the options a vessel can value, each at most once, without filtering
+ * eligibility. Values are doubles; absence means an option is not visited.
+ * A visit reads the vessel's circumstances once and retains no snapshot beyond
+ * the visit. Implementations must preserve a stable option order and allocate
+ * nothing per option. Finding the best eligible option belongs to a picker.
  *
- * @param <O> the type of option valued
+ * @param <O> the option type
  */
-public interface OptionValues<O> extends Function<Vessel, OptionValues<O>> {
+@FunctionalInterface
+public interface OptionValues<O> {
   /**
-   * @param vessel ignored
-   * @return these option values, the same for every vessel
+   * @param vessel the vessel whose circumstances determine the values
+   * @param consumer receives each option and its value during this visit
    */
-  @Override
-  default OptionValues<O> apply(final Vessel vessel) {
-    return this;
-  }
-
-  /** @return {@code option}'s current value, if it has been observed */
-  Optional<Double> getValue(O option);
-
-  /** @return every option currently tied for the highest value */
-  List<O> getBestOptions();
-
-  /**
-   * @param rng the RNG to break ties with; @return one option uniformly picked
-   *            among the best, if any
-   */
-  Optional<O> getBestOption(MersenneTwisterFast rng);
-
-  /** @return the current highest value, if any options have been observed */
-  Optional<Double> getBestValue();
-
-  /** @return every (option, value) pair currently tied for the highest value */
-  List<Entry<O, Double>> getBestEntries();
-
-  /**
-   * @param rng the RNG to break ties with; @return one (option, value) pair
-   *            uniformly picked among the best, if any
-   */
-  Optional<Entry<O, Double>> getBestEntry(MersenneTwisterFast rng);
-
-  /**
-   * Calls {@code consumer} once per observed option, with its value, in no
-   * particular order.
-   *
-   * @param consumer the consumer to call
-   */
-  void forEachEntry(ObjectDoubleBiConsumer<? super O> consumer);
-
-  /** Calls {@code consumer} once per {@link #getBestEntries()} entry. */
-  default void forEachBestEntry(
-    final ObjectDoubleBiConsumer<? super O> consumer
-  ) {
-    getBestEntries().forEach(entry ->
-      consumer.accept(entry.getKey(), entry.getValue().doubleValue())
-    );
-  }
+  void forEachEntry(Vessel vessel, ObjectDoubleBiConsumer<? super O> consumer);
 }
