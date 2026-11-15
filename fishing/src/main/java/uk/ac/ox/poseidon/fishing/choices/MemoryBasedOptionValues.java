@@ -34,7 +34,9 @@ import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 /**
  * Reads remembered outcomes as option values, valuing each outcome for the
  * receiving vessel. Each visit selects the vessel's entries anew and reads
- * valuation circumstances once. Options without evidence are not visited.
+ * valuation circumstances once, even when the entries are empty, so a vessel
+ * whose circumstances cannot be read fails on every visit. Options without
+ * evidence are not visited.
  * @param <O> the option type
  * @param <M> the remembered outcome type
  */

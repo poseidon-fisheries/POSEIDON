@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.choices;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 import java.time.LocalDateTime;
@@ -106,6 +107,20 @@ class MemoryBasedOptionValuesTest {
   void emptyMemoryVisitsNoOption() {
     assertThat(visit()).isEmpty();
     assertThat(snapshots).hasValue(1);
+  }
+
+  @Test
+  void emptyMemoryStillThrowsWhenCircumstancesCannotBeRead() {
+    final MemoryBasedOptionValues<String, Double> unvaluable =
+      new MemoryBasedOptionValues<>(
+        pickedFor -> memory,
+        pickedFor -> {
+          throw new IllegalStateException("no home port");
+        }
+      );
+    assertThatThrownBy(() ->
+      unvaluable.forEachEntry(vessel, (option, value) -> {})
+    ).isInstanceOf(IllegalStateException.class);
   }
 
   @Test
