@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.fishing.choices;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.poseidon.fishing.choices.Factories.memoryBasedOptionValues;
 
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
@@ -81,27 +80,6 @@ class MemoryFactoriesTest {
     }
   }
 
-  private static final class TrawlKeyFactory
-    extends GlobalScopeFactory<Function<Vessel, String>>
-    implements ValueFactory<Scope, Vessel, String>
-  {
-
-    @Override
-    protected Function<Vessel, String> newInstance(final Scope scope) {
-      return vessel -> "trawl";
-    }
-  }
-
-  private static final class RecollectionValuationFactory
-    extends GlobalScopeFactory<Valuation<String, Double>>
-  {
-
-    @Override
-    protected Valuation<String, Double> newInstance(final Scope scope) {
-      return vessel -> (option, recollection) -> recollection;
-    }
-  }
-
   @Test
   void memoryIsOnePerVessel() {
     final MemoryFactory<String, Double> factory = new MemoryFactory<>();
@@ -114,9 +92,9 @@ class MemoryFactoriesTest {
   }
 
   @Test
-  void keyedMemoryIsOnePerVessel() {
-    final KeyedMemorySelectorFactory<String, String, String, Double> factory =
-      new KeyedMemorySelectorFactory<>(new FirstLetterFactory());
+  void partitionedMemoryIsOnePerVessel() {
+    final PartitionedMemoryFactory<String, String, String, Double> factory =
+      new PartitionedMemoryFactory<>(new FirstLetterFactory());
 
     assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
     assertThat(factory.get(scopeA).apply("Trawl")).isNotSameAs(
@@ -129,30 +107,13 @@ class MemoryFactoriesTest {
 
   @Test
   void separateMemoryFactoriesGiveSeparateMemories() {
-    final KeyedMemorySelectorFactory<String, String, String, Double> writer =
-      new KeyedMemorySelectorFactory<>(new FirstLetterFactory());
-    final KeyedMemorySelectorFactory<String, String, String, Double> reader =
-      new KeyedMemorySelectorFactory<>(new FirstLetterFactory());
+    final PartitionedMemoryFactory<String, String, String, Double> writer =
+      new PartitionedMemoryFactory<>(new FirstLetterFactory());
+    final PartitionedMemoryFactory<String, String, String, Double> reader =
+      new PartitionedMemoryFactory<>(new FirstLetterFactory());
 
     assertThat(writer.get(scopeA).apply("Trawl")).isNotSameAs(
       reader.get(scopeA).apply("Trawl")
     );
-  }
-
-  @Test
-  void optionValuesReadTheMemoryTheVesselsSelectorGives() {
-    final KeyedMemorySelectorFactory<
-      Vessel,
-      String,
-      String,
-      Double
-    > keyedMemory = new KeyedMemorySelectorFactory<>(new TrawlKeyFactory());
-    final MemoryBasedOptionValuesFactory<String, Double> factory =
-      memoryBasedOptionValues(keyedMemory, new RecollectionValuationFactory());
-    keyedMemory.get(scopeA).apply(vesselA).observe("X", 3.0, Double::sum);
-
-    assertThat(factory.get(scopeA)).isNotNull().isSameAs(factory.get(scopeA));
-    assertThat(factory.get(scopeA).apply(vesselA).getValue("X")).contains(3.0);
-    assertThat(factory.get(scopeB).apply(vesselB).getValue("X")).isEmpty();
   }
 }

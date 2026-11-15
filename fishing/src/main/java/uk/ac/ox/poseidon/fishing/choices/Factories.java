@@ -29,7 +29,6 @@ import static uk.ac.ox.poseidon.core.providers.random.Factories.rng;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 import uk.ac.ox.poseidon.core.Factory;
@@ -46,7 +45,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 
 /**
- * Factories for a vessel's learned {@link OptionValues}, its {@link Memory} of
+ * Factories for a vessel's learned {@link OptionValues}, its {@link MemoryEntries} of
  * observations and the rules updating it, and its destination-choice
  * strategies.
  */
@@ -100,7 +99,7 @@ public final class Factories {
   /**
    * @param alpha the weight of a new observation, between 0 and 1
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   *         {@link Memory} update rule that is a species-by-species exponential
+   *         {@link UpdateRule} that is a species-by-species exponential
    *         moving average of {@link uk.ac.ox.poseidon.biology.buckets.Bucket}s
    * @see ExponentialMovingAverageOfBuckets
    */
@@ -108,70 +107,6 @@ public final class Factories {
     final double alpha
   ) {
     return new ExponentialMovingAverageOfBucketsFactory(alpha);
-  }
-
-  /**
-   * @param alpha the weight of a new observation, between 0 and 1
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a
-   *         {@link Memory} update rule that is an exponential moving average of
-   *         {@code Double}s
-   * @see ExponentialMovingAverageOfDoubles
-   */
-  public static ExponentialMovingAverageOfDoublesFactory exponentialMovingAverageOfDoubles(
-    final double alpha
-  ) {
-    return new ExponentialMovingAverageOfDoublesFactory(alpha);
-  }
-
-  /**
-   * @param modelGrid      the grid giving the cell of a fishing event's
-   *                       coordinate
-   * @param memorySelector selects, from a fishing event, the memory to record
-   *                       it in
-   * @param updateRule     revises what is remembered of a cell with a new
-   *                       observation of it
-   * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
-   *         {@link FishingEventRecorder}, which it does not register with
-   *         anything
-   * @see FishingEventRecorder
-   */
-  public static <S extends Scope> FishingEventRecorderFactory<S> fishingEventRecorder(
-    final Factory<? super S, ? extends ModelGrid> modelGrid,
-    final Factory<
-      ? super S,
-      ? extends Function<
-        ? super FishingActionEvent,
-        ? extends Memory<Cell, Bucket>
-      >
-    > memorySelector,
-    final Factory<? super S, ? extends BinaryOperator<Bucket>> updateRule
-  ) {
-    return new FishingEventRecorderFactory<>(
-      modelGrid,
-      memorySelector,
-      updateRule
-    );
-  }
-
-  /**
-   * @param key the key, such as the code of a gear, read from what is
-   *            remembered (a {@link FishingActionEvent}) and from what reads (a
-   *            {@link Vessel}); each key gets its own memory
-   * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for
-   *         an empty memory of the catches made in each cell, one per vessel;
-   *         give everything that remembers in or reads a vessel's memory the
-   *         same factory object (two make two memories)
-   * @see KeyedMemory
-   */
-  public static <T, K> KeyedMemorySelectorFactory<
-    T,
-    K,
-    Cell,
-    Bucket
-  > catchMemoryBy(
-    final ValueFactory<? super VesselScope, ? super T, ? extends K> key
-  ) {
-    return new KeyedMemorySelectorFactory<>(key);
   }
 
   /**
