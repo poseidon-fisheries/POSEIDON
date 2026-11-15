@@ -60,7 +60,7 @@ public class BiomassDiffuserFactory
   private final Factory<
     ? super SimulationScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   @Override
   protected BiomassDiffuser newInstance(final SimulationScope scope) {
@@ -68,7 +68,7 @@ public class BiomassDiffuserFactory
       biomassGrid.get(scope),
       carryingCapacityGrid.get(scope),
       biomassDiffusionRule.get(scope),
-      randomNumberGenerator.get(scope)
+      rng.get(scope)
     );
   }
 }

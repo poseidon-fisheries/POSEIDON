@@ -60,17 +60,14 @@ public class GreedyPickerFactory<O>
     ? super O,
     Boolean
   > optionPredicate;
-  private final Factory<
-    ? super VesselScope,
-    ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  private final Factory<? super VesselScope, ? extends MersenneTwisterFast> rng;
 
   @Override
   protected Function<Vessel, O> newInstance(final VesselScope scope) {
     return new GreedyPicker<>(
       optionValues.get(scope),
       optionPredicate.get(scope),
-      randomNumberGenerator.get(scope)
+      rng.get(scope)
     );
   }
 }

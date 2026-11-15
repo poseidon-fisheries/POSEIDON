@@ -64,10 +64,7 @@ public class ImitatingPickerFactory<O>
     ? super VesselScope,
     ? extends Function<? super Vessel, ? extends OptionValues<O>>
   > imitatedOptionValues;
-  private final Factory<
-    ? super VesselScope,
-    ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  private final Factory<? super VesselScope, ? extends MersenneTwisterFast> rng;
 
   @Override
   protected Function<Vessel, O> newInstance(final VesselScope scope) {
@@ -75,7 +72,7 @@ public class ImitatingPickerFactory<O>
       optionValues.get(scope),
       optionPredicate.get(scope),
       imitatedOptionValues.get(scope),
-      randomNumberGenerator.get(scope)
+      rng.get(scope)
     );
   }
 }

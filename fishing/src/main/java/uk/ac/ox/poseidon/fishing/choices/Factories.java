@@ -23,7 +23,7 @@
 package uk.ac.ox.poseidon.fishing.choices;
 
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
-import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
+import static uk.ac.ox.poseidon.core.providers.random.Factories.rng;
 
 import java.util.List;
 import java.util.Optional;
@@ -148,7 +148,7 @@ public final class Factories {
       epsilon,
       explorer,
       exploiter,
-      randomNumberGenerator()
+      rng()
     );
   }
 
@@ -237,11 +237,7 @@ public final class Factories {
       Boolean
     > optionPredicate
   ) {
-    return new GreedyPickerFactory<>(
-      optionValues,
-      optionPredicate,
-      randomNumberGenerator()
-    );
+    return new GreedyPickerFactory<>(optionValues, optionPredicate, rng());
   }
 
   /**
@@ -303,7 +299,7 @@ public final class Factories {
       optionValues,
       optionPredicate,
       imitatedOptionValues,
-      randomNumberGenerator()
+      rng()
     );
   }
 
@@ -395,7 +391,7 @@ public final class Factories {
       neighbourhoodSize,
       maximumWidening,
       searchCentre,
-      randomNumberGenerator()
+      rng()
     );
   }
 
@@ -417,11 +413,7 @@ public final class Factories {
       ? extends O
     > fallback
   ) {
-    return new BestKnownOptionFactory<>(
-      optionValues,
-      fallback,
-      randomNumberGenerator()
-    );
+    return new BestKnownOptionFactory<>(optionValues, fallback, rng());
   }
 
   /**
@@ -472,11 +464,7 @@ public final class Factories {
       Boolean
     > cellPredicate
   ) {
-    return new RandomGridExplorerFactory(
-      cells,
-      cellPredicate,
-      randomNumberGenerator()
-    );
+    return new RandomGridExplorerFactory(cells, cellPredicate, rng());
   }
 
   /**

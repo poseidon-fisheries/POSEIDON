@@ -60,7 +60,7 @@ components:
       proportion: !!uk.ac.ox.poseidon.core.providers.random.RandomDoubleFactory
         maximum: 0.8
         minimum: 0.7
-        randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
+        rng: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
           }
     modelGrid: *id002
     species: &id008 !!uk.ac.ox.poseidon.biology.species.SpeciesFactory {
@@ -91,7 +91,7 @@ components:
       }
       biomassGrid: *id005
       carryingCapacityGrid: *id004
-      randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
+      rng: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
         }
   biomassGrower: !!uk.ac.ox.poseidon.core.schedule.ScheduledRepeatingFactory
     interval: !!uk.ac.ox.poseidon.core.time.PeriodFactory {
@@ -114,7 +114,7 @@ components:
         growthRate: 0.372
       }
       biomassRecruitmentAllocator: !!uk.ac.ox.poseidon.biology.biomass.RandomBiomassRecruitmentAllocatorFactory
-        randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
+        rng: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
           }
       carryingCapacityGrid: *id004
   portGrid: &id006 !!uk.ac.ox.poseidon.geography.ports.PortGridFactory
@@ -378,7 +378,7 @@ components:
                           marketGrid: *id007
                           portGrid: *id006
                           vesselField: *id017
-                      randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
+                      rng: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                         }
                       targetNumberOfFriends: 2
                     optionValues: &id018 !!uk.ac.ox.poseidon.fishing.vessels.FactoryComponent
@@ -390,7 +390,7 @@ components:
                       value: true
                     }
                   optionValues: *id018
-                  randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
+                  rng: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                     }
                 explorer: !!uk.ac.ox.poseidon.fishing.choices.NeighbourhoodGridExplorerFactory
                   cellPredicate: &id020 !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
@@ -406,22 +406,22 @@ components:
                     delegate: !!uk.ac.ox.poseidon.core.providers.random.RandomIntFactory
                       maximum: 10
                       minimum: 1
-                      randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
+                      rng: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                         }
                   pathFinder: *id019
-                  randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
+                  rng: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                     }
                   searchCentre: !!uk.ac.ox.poseidon.fishing.choices.BestKnownOptionFactory
                     fallback: !!uk.ac.ox.poseidon.fishing.choices.RandomGridExplorerFactory
                       cellPredicate: *id020
                       cells: !!uk.ac.ox.poseidon.fishing.vessels.values.AccessibleWaterCellsFactory
                         pathFinder: *id019
-                      randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
+                      rng: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                         }
                     optionValues: *id018
-                    randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
+                    rng: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                       }
-                randomNumberGenerator: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
+                rng: !!uk.ac.ox.poseidon.core.RandomNumberGeneratorFactory {
                   }
               tripCosts: [
                 ]

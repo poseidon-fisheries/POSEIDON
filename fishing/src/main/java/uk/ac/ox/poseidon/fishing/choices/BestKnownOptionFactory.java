@@ -58,17 +58,14 @@ public class BestKnownOptionFactory<O>
     ? super Vessel,
     ? extends O
   > fallback;
-  private final Factory<
-    ? super VesselScope,
-    ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  private final Factory<? super VesselScope, ? extends MersenneTwisterFast> rng;
 
   @Override
   protected Function<Vessel, O> newInstance(final VesselScope scope) {
     return new BestKnownOption<>(
       optionValues.get(scope),
       fallback.get(scope),
-      randomNumberGenerator.get(scope)
+      rng.get(scope)
     );
   }
 }

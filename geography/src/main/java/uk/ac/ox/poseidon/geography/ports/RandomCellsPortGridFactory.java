@@ -78,7 +78,7 @@ public class RandomCellsPortGridFactory
   private final Factory<
     ? super SimulationScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   @Override
   protected PortGrid newInstance(final SimulationScope scope) {
@@ -110,7 +110,7 @@ public class RandomCellsPortGridFactory
       sparseGrid2D
     );
     final Function<Cell, String> code = toFunction(this.code.get(scope));
-    shuffledStream(suitableTiles, randomNumberGenerator.get(scope))
+    shuffledStream(suitableTiles, rng.get(scope))
       .limit(numberOfPorts)
       .forEach(cell -> {
         final String portCode = code.apply(cell);

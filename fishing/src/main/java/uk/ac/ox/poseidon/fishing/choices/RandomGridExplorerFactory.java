@@ -63,17 +63,14 @@ public class RandomGridExplorerFactory
     ? super Cell,
     Boolean
   > cellPredicate;
-  private final Factory<
-    ? super VesselScope,
-    ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  private final Factory<? super VesselScope, ? extends MersenneTwisterFast> rng;
 
   @Override
   protected Function<Vessel, Cell> newInstance(final VesselScope scope) {
     return new RandomPicker<>(
       cells.get(scope),
       cellPredicate.get(scope),
-      randomNumberGenerator.get(scope)
+      rng.get(scope)
     );
   }
 }

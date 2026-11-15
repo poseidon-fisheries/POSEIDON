@@ -54,7 +54,7 @@ public class ExponentiallyDistributedDurationSupplierFactory
   private final Factory<
     ? super SimulationScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   @Override
   protected ExponentiallyDistributedDuration newInstance(
@@ -62,7 +62,7 @@ public class ExponentiallyDistributedDurationSupplierFactory
   ) {
     return new ExponentiallyDistributedDuration(
       meanDuration.get(scope),
-      randomNumberGenerator.get(scope)
+      rng.get(scope)
     );
   }
 }

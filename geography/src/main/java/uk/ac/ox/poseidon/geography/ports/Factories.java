@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.ports;
 
-import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
+import static uk.ac.ox.poseidon.core.providers.random.Factories.rng;
 
 import java.util.Collection;
 import java.util.List;
@@ -157,7 +157,7 @@ public final class Factories {
       code,
       numberOfPorts,
       minimumAdjacentWaterTiles,
-      randomNumberGenerator()
+      rng()
     );
   }
 }

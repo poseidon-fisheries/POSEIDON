@@ -49,14 +49,12 @@ public class RandomBiomassRecruitmentAllocatorFactory
   private final Factory<
     ? super SimulationScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   @Override
   protected BiomassRecruitmentAllocator newInstance(
     final SimulationScope scope
   ) {
-    return new RandomBiomassRecruitmentAllocator(
-      randomNumberGenerator.get(scope)
-    );
+    return new RandomBiomassRecruitmentAllocator(rng.get(scope));
   }
 }

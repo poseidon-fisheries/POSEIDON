@@ -33,7 +33,7 @@ import lombok.experimental.SuperBuilder;
  * generator: the one every draw of a run makes, so that a seed gives the same
  * run. A factory that draws takes this as an input rather than reading the
  * simulation. Built via
- * {@link uk.ac.ox.poseidon.core.providers.random.Factories#randomNumberGenerator()}.
+ * {@link uk.ac.ox.poseidon.core.providers.random.Factories#rng()}.
  */
 @ToString
 @NoArgsConstructor

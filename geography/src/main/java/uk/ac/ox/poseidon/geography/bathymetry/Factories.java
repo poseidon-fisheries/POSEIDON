@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.geography.bathymetry;
 
-import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
+import static uk.ac.ox.poseidon.core.providers.random.Factories.rng;
 
 import com.google.common.collect.ImmutableList;
 import java.nio.file.Path;
@@ -149,7 +149,7 @@ public final class Factories {
       minimumElevation,
       maximumElevation,
       probabilityOfFlippingLandToWater,
-      randomNumberGenerator()
+      rng()
     );
   }
 

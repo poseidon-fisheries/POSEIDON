@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.core.time;
 
-import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
+import static uk.ac.ox.poseidon.core.providers.random.Factories.rng;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.startingDateTime;
 
 import java.time.Duration;
@@ -212,7 +212,7 @@ public final class Factories {
   ) {
     return new ExponentiallyDistributedDurationSupplierFactory(
       meanDuration,
-      randomNumberGenerator()
+      rng()
     );
   }
 }

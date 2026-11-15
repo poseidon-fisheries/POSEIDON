@@ -53,12 +53,10 @@ public class RandomPoissonFactory
   private final Factory<
     ? super SimulationScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   @Override
   protected Function<Object, Integer> newInstance(final SimulationScope scope) {
-    return new RandomPoisson(
-      new Poisson(mean, randomNumberGenerator.get(scope))
-    );
+    return new RandomPoisson(new Poisson(mean, rng.get(scope)));
   }
 }

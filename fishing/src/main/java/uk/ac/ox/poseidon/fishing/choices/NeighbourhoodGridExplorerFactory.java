@@ -76,7 +76,7 @@ public class NeighbourhoodGridExplorerFactory
   private final Factory<
     ? super VesselComponentScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   @Override
   protected Function<Vessel, Cell> newInstance(
@@ -88,7 +88,7 @@ public class NeighbourhoodGridExplorerFactory
       neighbourhoodSize.get(scope),
       maximumWidening,
       searchCentre.get(scope),
-      randomNumberGenerator.get(scope)
+      rng.get(scope)
     );
   }
 }

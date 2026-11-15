@@ -76,7 +76,7 @@ public class RoughCoastalBathymetricGridFactory
   private final Factory<
     ? super SimulationScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   /**
    * @throws IllegalStateException if {@code minimumElevation >= 0} or
@@ -88,7 +88,7 @@ public class RoughCoastalBathymetricGridFactory
     checkState(maximumElevation > 0);
 
     final ModelGrid modelGrid = this.modelGrid.get(scope);
-    final MersenneTwisterFast rng = randomNumberGenerator.get(scope);
+    final MersenneTwisterFast rng = this.rng.get(scope);
     final DoubleGrid2D doubleGrid2D = new DoubleGrid2D(
       modelGrid.getGridWidth(),
       modelGrid.getGridHeight()

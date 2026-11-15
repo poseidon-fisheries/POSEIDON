@@ -68,7 +68,7 @@ public class FriendshipDynamicsFactory
   private final Factory<
     ? super SimulationScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   @Override
   protected Function<Vessel, Set<Vessel>> newInstance(
@@ -80,7 +80,7 @@ public class FriendshipDynamicsFactory
       network.get(scope),
       targetNumberOfFriends,
       friendshipCondition.get(scope),
-      randomNumberGenerator.get(scope)
+      rng.get(scope)
     );
   }
 }

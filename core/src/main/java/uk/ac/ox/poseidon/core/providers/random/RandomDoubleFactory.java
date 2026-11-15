@@ -53,10 +53,10 @@ public class RandomDoubleFactory
   private final Factory<
     ? super SimulationScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   @Override
   protected Function<Object, Double> newInstance(final SimulationScope scope) {
-    return new RandomDouble(randomNumberGenerator.get(scope), minimum, maximum);
+    return new RandomDouble(rng.get(scope), minimum, maximum);
   }
 }

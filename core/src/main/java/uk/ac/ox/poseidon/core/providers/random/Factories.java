@@ -39,7 +39,7 @@ public final class Factories {
    *         simulation's random number generator
    * @see RandomNumberGeneratorFactory
    */
-  public static RandomNumberGeneratorFactory randomNumberGenerator() {
+  public static RandomNumberGeneratorFactory rng() {
     return new RandomNumberGeneratorFactory();
   }
 
@@ -50,7 +50,7 @@ public final class Factories {
    * @see RandomBoolean
    */
   public static RandomBooleanFactory randomBoolean() {
-    return new RandomBooleanFactory(0.5, randomNumberGenerator());
+    return new RandomBooleanFactory(0.5, rng());
   }
 
   /**
@@ -61,7 +61,7 @@ public final class Factories {
    * @see RandomBoolean
    */
   public static RandomBooleanFactory randomBoolean(final double probability) {
-    return new RandomBooleanFactory(probability, randomNumberGenerator());
+    return new RandomBooleanFactory(probability, rng());
   }
 
   /**
@@ -75,7 +75,7 @@ public final class Factories {
     final double minimum,
     final double maximum
   ) {
-    return new RandomDoubleFactory(minimum, maximum, randomNumberGenerator());
+    return new RandomDoubleFactory(minimum, maximum, rng());
   }
 
   /**
@@ -89,7 +89,7 @@ public final class Factories {
     final int minimum,
     final int maximum
   ) {
-    return new RandomIntFactory(minimum, maximum, randomNumberGenerator());
+    return new RandomIntFactory(minimum, maximum, rng());
   }
 
   /**
@@ -100,6 +100,6 @@ public final class Factories {
    * @see RandomPoisson
    */
   public static RandomPoissonFactory randomPoisson(final double mean) {
-    return new RandomPoissonFactory(mean, randomNumberGenerator());
+    return new RandomPoissonFactory(mean, rng());
   }
 }

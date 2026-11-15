@@ -67,7 +67,7 @@ public class CliqueDynamicsFactory
   private final Factory<
     ? super SimulationScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   @Override
   protected CliqueDynamics newListener(final SimulationScope scope) {
@@ -80,7 +80,7 @@ public class CliqueDynamicsFactory
         .map(value -> value.get(scope))
         .toList(),
       maximumCliqueSize,
-      randomNumberGenerator.get(scope)
+      rng.get(scope)
     );
   }
 }

@@ -22,7 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.social;
 
-import static uk.ac.ox.poseidon.core.providers.random.Factories.randomNumberGenerator;
+import static uk.ac.ox.poseidon.core.providers.random.Factories.rng;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -80,7 +80,7 @@ public final class Factories {
       network,
       targetNumberOfFriends,
       friendshipCondition,
-      randomNumberGenerator()
+      rng()
     );
   }
 
@@ -108,7 +108,7 @@ public final class Factories {
       network,
       ImmutableList.copyOf(groupingValues),
       maximumCliqueSize,
-      randomNumberGenerator()
+      rng()
     );
   }
 

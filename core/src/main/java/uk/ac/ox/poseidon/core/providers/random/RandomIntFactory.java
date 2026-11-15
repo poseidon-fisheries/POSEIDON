@@ -53,10 +53,10 @@ public class RandomIntFactory
   private final Factory<
     ? super SimulationScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   @Override
   protected Function<Object, Integer> newInstance(final SimulationScope scope) {
-    return new RandomInt(randomNumberGenerator.get(scope), minimum, maximum);
+    return new RandomInt(rng.get(scope), minimum, maximum);
   }
 }

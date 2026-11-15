@@ -52,10 +52,10 @@ public class RandomBooleanFactory
   private final Factory<
     ? super SimulationScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   @Override
   protected Function<Object, Boolean> newInstance(final SimulationScope scope) {
-    return new RandomBoolean(probability, randomNumberGenerator.get(scope));
+    return new RandomBoolean(probability, rng.get(scope));
   }
 }

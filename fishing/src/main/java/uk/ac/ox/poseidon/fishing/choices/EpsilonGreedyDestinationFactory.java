@@ -69,7 +69,7 @@ public class EpsilonGreedyDestinationFactory
   private final Factory<
     ? super VesselComponentScope,
     ? extends MersenneTwisterFast
-  > randomNumberGenerator;
+  > rng;
 
   /**
    * @return an {@link EpsilonGreedyChooser} of destinations over the resolved
@@ -83,7 +83,7 @@ public class EpsilonGreedyDestinationFactory
       epsilon.get(scope),
       explorer.get(scope),
       exploiter.get(scope),
-      randomNumberGenerator.get(scope)
+      rng.get(scope)
     );
   }
 }
