@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
  * A {@link RelativeScopeFactory} counterpart of {@link DestinationAtCoordinate},
- * built via {@link Factories#destinationAt}.
+ * built via {@link Factories#destinationAtCoordinate}.
  */
 @Getter
 @ToString

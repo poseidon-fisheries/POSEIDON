@@ -64,7 +64,7 @@ public final class Factories {
   public static <S extends Scope, C> DestinationAtCoordinateFactory<
     S,
     C
-  > destinationAt(
+  > destinationAtCoordinate(
     final Factory<? super S, ? extends ModelGrid> modelGrid,
     final ValueFactory<? super S, ? super C, ? extends Double> longitude,
     final ValueFactory<? super S, ? super C, ? extends Double> latitude
@@ -84,7 +84,7 @@ public final class Factories {
   public static <S extends Scope> DestinationAtCoordinateFactory<
     S,
     Object
-  > destinationAt(
+  > destinationAtCoordinate(
     final Factory<? super S, ? extends ModelGrid> modelGrid,
     final double longitude,
     final double latitude
