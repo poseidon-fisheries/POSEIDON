@@ -71,38 +71,44 @@ public class NearbyCellPicker implements Function<Vessel, Optional<Cell>> {
    */
   @Override
   public Optional<Cell> apply(final Vessel vessel) {
-    final Optional<Cell> suppliedCentre = searchCentre.apply(vessel);
-    Optional<Cell> result = Optional.empty();
-    if (suppliedCentre.isPresent()) {
-      final int initialSearchRadius = searchRadius.apply(vessel);
-      checkArgument(
-        initialSearchRadius >= 0,
-        "searchRadius must not be negative."
-      );
-      checkArgument(
-        maximumWidening >= 0,
-        "maximumWidening must not be negative."
-      );
-      final int gridExtent = max(
-        pathFinder.getModelGrid().getGridWidth(),
-        pathFinder.getModelGrid().getGridHeight()
-      );
-      final int maximumSearchRadius =
-        initialSearchRadius +
-        min(maximumWidening, max(0, gridExtent - initialSearchRadius));
-      result = IntStream.rangeClosed(initialSearchRadius, maximumSearchRadius)
-        .mapToObj(searchRadius ->
-          pickWithin(
-            vessel,
-            suppliedCentre.orElseThrow(),
-            searchRadius,
-            searchRadius == initialSearchRadius
-          )
+    return searchCentre
+      .apply(vessel)
+      .flatMap(centre -> pickAround(vessel, centre));
+  }
+
+  /**
+   * @return a uniformly random accessible water cell satisfying the option
+   *         predicate, within the smallest neighbourhood of {@code centre}
+   *         that has any
+   */
+  private Optional<Cell> pickAround(final Vessel vessel, final Cell centre) {
+    final int initialSearchRadius = searchRadius.apply(vessel);
+    checkArgument(
+      initialSearchRadius >= 0,
+      "searchRadius must not be negative."
+    );
+    checkArgument(
+      maximumWidening >= 0,
+      "maximumWidening must not be negative."
+    );
+    final int gridExtent = max(
+      pathFinder.getModelGrid().getGridWidth(),
+      pathFinder.getModelGrid().getGridHeight()
+    );
+    final int maximumSearchRadius =
+      initialSearchRadius +
+      min(maximumWidening, max(0, gridExtent - initialSearchRadius));
+    return IntStream.rangeClosed(initialSearchRadius, maximumSearchRadius)
+      .mapToObj(searchRadius ->
+        pickWithin(
+          vessel,
+          centre,
+          searchRadius,
+          searchRadius == initialSearchRadius
         )
-        .flatMap(Optional::stream)
-        .findFirst();
-    }
-    return result;
+      )
+      .flatMap(Optional::stream)
+      .findFirst();
   }
 
   /**

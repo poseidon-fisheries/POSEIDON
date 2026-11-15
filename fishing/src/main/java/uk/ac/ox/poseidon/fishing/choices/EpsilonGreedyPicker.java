@@ -75,14 +75,10 @@ public class EpsilonGreedyPicker<O> implements Function<Vessel, Optional<O>> {
       this.epsilon.apply(vessel),
       "epsilon"
     );
-    final boolean exploit = !rng.nextBoolean(epsilon);
-    Optional<O> result = Optional.empty();
-    if (exploit) {
-      result = this.exploiter.apply(vessel);
-    }
-    if (result.isEmpty()) {
-      result = this.explorer.apply(vessel);
-    }
-    return result;
+    final boolean explore = rng.nextBoolean(epsilon);
+    final Optional<O> exploited = explore
+      ? Optional.empty()
+      : exploiter.apply(vessel);
+    return exploited.or(() -> explorer.apply(vessel));
   }
 }

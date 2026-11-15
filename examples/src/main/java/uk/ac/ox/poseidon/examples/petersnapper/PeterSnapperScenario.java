@@ -378,7 +378,10 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
         MAXIMUM_EXPLORATION_WIDENING,
         fallbackPicker(
           greedyPicker(cellValues),
-          randomPicker(accessibleWaterCells(pathFinder))
+          randomPicker(
+            accessibleWaterCells(pathFinder),
+            cellEligibilityCriteria
+          )
         )
       ),
       greedyPicker(cellValues, cellEligibilityCriteria)

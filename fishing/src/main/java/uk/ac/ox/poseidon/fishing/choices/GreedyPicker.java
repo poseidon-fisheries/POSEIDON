@@ -62,6 +62,8 @@ public class GreedyPicker<O> implements Function<Vessel, Optional<O>> {
     final ObjectArrayList<O> entries = new ObjectArrayList<>();
     final DoubleArrayList values = new DoubleArrayList();
     final ObjectArrayList<O> best = new ObjectArrayList<>();
+    // Tracked during the single visit, which runs for every option on each
+    // pick, so the common case needs no further pass
     final double[] bestValue = { Double.NEGATIVE_INFINITY };
     optionValues.forEachEntry(vessel, (option, value) -> {
       checkState(!Double.isNaN(value), "Value of option %s is NaN.", option);
@@ -75,22 +77,75 @@ public class GreedyPicker<O> implements Function<Vessel, Optional<O>> {
         best.add(option);
       }
     });
-    Optional<O> result = pickAmongTied(vessel, best);
-    if (result.isEmpty() && best.size() < entries.size()) {
-      final int[] order = IntStream.range(0, entries.size()).toArray();
-      DoubleArrays.quickSortIndirect(order, values.elements(), 0, order.length);
-      int end = entries.size() - best.size();
-      while (result.isEmpty() && end > 0) {
-        final double groupValue = values.getDouble(order[end - 1]);
-        final ObjectArrayList<O> tied = new ObjectArrayList<>();
-        do {
-          end--;
-          tied.add(entries.get(order[end]));
-        } while (end > 0 && values.getDouble(order[end - 1]) == groupValue);
-        result = pickAmongTied(vessel, tied);
-      }
-    }
-    return result;
+    final int belowBest = entries.size() - best.size();
+    return pickAmongTied(vessel, best).or(() ->
+      belowBest > 0
+        ? pickBelowBest(vessel, entries, values, belowBest)
+        : Optional.empty()
+    );
+  }
+
+  /**
+   * Tests the groups of tied values below the best one, from the highest down,
+   * stopping at the first group with an eligible option.
+   *
+   * @param belowBest the number of entries valued below the best value
+   */
+  private Optional<O> pickBelowBest(
+    final Vessel vessel,
+    final List<O> entries,
+    final DoubleArrayList values,
+    final int belowBest
+  ) {
+    final int[] order = IntStream.range(0, entries.size()).toArray();
+    DoubleArrays.quickSortIndirect(order, values.elements(), 0, order.length);
+    // Each element is the end, exclusive, of a group in ascending order
+    return IntStream.iterate(
+      belowBest,
+      end -> end > 0,
+      end -> groupStart(values, order, end)
+    )
+      .mapToObj(end -> pickInGroup(vessel, entries, values, order, end))
+      .flatMap(Optional::stream)
+      .findFirst();
+  }
+
+  /**
+   * Tests the group ending just before {@code end} in {@code order}, taking its
+   * entries from the highest index down.
+   */
+  private Optional<O> pickInGroup(
+    final Vessel vessel,
+    final List<O> entries,
+    final DoubleArrayList values,
+    final int[] order,
+    final int end
+  ) {
+    final int start = groupStart(values, order, end);
+    return pickAmongTied(
+      vessel,
+      IntStream.iterate(end - 1, i -> i >= start, i -> i - 1)
+        .mapToObj(i -> entries.get(order[i]))
+        .toList()
+    );
+  }
+
+  /**
+   * @return the start of the group of entries tied with the entry just before
+   *         {@code end} in {@code order}
+   */
+  private static int groupStart(
+    final DoubleArrayList values,
+    final int[] order,
+    final int end
+  ) {
+    final double groupValue = values.getDouble(order[end - 1]);
+    return (
+      IntStream.iterate(end - 2, i -> i >= 0, i -> i - 1)
+        .filter(i -> values.getDouble(order[i]) != groupValue)
+        .findFirst()
+        .orElse(-1) + 1
+    );
   }
 
   private Optional<O> pickAmongTied(final Vessel vessel, final List<O> tied) {

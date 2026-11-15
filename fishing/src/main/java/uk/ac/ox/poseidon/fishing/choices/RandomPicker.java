@@ -74,9 +74,12 @@ public class RandomPicker<O> implements Function<Vessel, Optional<O>> {
     > optionEligibilityCriteria,
     final MersenneTwisterFast rng
   ) {
-    return shuffledStream(candidates, rng)
-      .filter(option -> optionEligibilityCriteria.apply(vessel, option))
-      .findFirst()
-      .map(option -> option);
+    return (
+      shuffledStream(candidates, rng)
+        .filter(option -> optionEligibilityCriteria.apply(vessel, option))
+        .findFirst()
+        // Widens Optional<? extends O> to Optional<O>
+        .map(option -> option)
+    );
   }
 }
