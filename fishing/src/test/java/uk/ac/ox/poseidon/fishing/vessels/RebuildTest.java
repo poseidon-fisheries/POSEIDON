@@ -29,11 +29,9 @@ import static uk.ac.ox.poseidon.core.schedule.Factories.scheduledByDateTime;
 import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.by;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.choice;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.none;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.otherwise;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegister;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
@@ -174,22 +172,22 @@ class RebuildTest {
   }
 
   private VesselComponent<Task<Vessel>> behaviourByGear(final int psDays) {
-    return choice(
-      by("gear"),
-      when("PS").then(behaviourBuilder("PS", psDays)),
-      when("OTB").then(behaviourBuilder("OTB", 1)),
-      when("LLS").then(behaviourBuilder("LLS", 1))
+    return varyingBy(
+      "gear",
+      when("PS", behaviourBuilder("PS", psDays)),
+      when("OTB", behaviourBuilder("OTB", 1)),
+      when("LLS", behaviourBuilder("LLS", 1))
     );
   }
 
   /** The gear chosen by gear, for PS, OTB and LLS, and none for the rest. */
   private VesselComponent<Object> gearByGear() {
-    return choice(
-      by("gear"),
-      when("PS").then(componentBuilder("gear PS")),
-      when("OTB").then(componentBuilder("gear OTB")),
-      when("LLS").then(componentBuilder("gear LLS")),
-      otherwise(none())
+    return varyingBy(
+      "gear",
+      none(),
+      when("PS", componentBuilder("gear PS")),
+      when("OTB", componentBuilder("gear OTB")),
+      when("LLS", componentBuilder("gear LLS"))
     );
   }
 
@@ -297,11 +295,7 @@ class RebuildTest {
   @Test
   void aChoiceOfNoBehaviourLeavesTheVesselInactiveUntilAChangeGivesItOne() {
     startSimulation(
-      choice(
-        by("gear"),
-        when("PS").then(behaviourBuilder("PS", 1)),
-        otherwise(none())
-      ),
+      varyingBy("gear", none(), when("PS", behaviourBuilder("PS", 1))),
       gearByGear(),
       """
       V1,CEN,2000-01-01,,P1,GNS,1

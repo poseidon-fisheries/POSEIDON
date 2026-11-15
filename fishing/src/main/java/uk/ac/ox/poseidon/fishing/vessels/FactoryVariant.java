@@ -22,32 +22,25 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
-import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Singular;
-import uk.ac.ox.poseidon.core.ScenarioNode;
+import uk.ac.ox.poseidon.core.Factory;
 
 /**
- * A row of a {@link ChosenComponent}: a combination of exact values of the
- * attributes the choice reads, in their order, and what it gives. Built via
- * {@link Factories#when}.
+ * A variant that builds a component with a factory, under a fresh store each
+ * time the vessel is given it. Built via {@link Factories
+ * Factories.when(...)/Factories.varyingBy(...)}.
  *
  * @param <T> the type of the component
  */
 @Getter
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public final class ChoiceRow<T> implements ScenarioNode, ChoiceEntry<T> {
+public final class FactoryVariant<T> implements Variant<T> {
 
-  /** The values of the attributes the choice reads, in their order. */
+  /** Builds the component; its own level decides where its product lives. */
   @NonNull
-  @Singular
-  private final ImmutableList<Object> values;
-
-  /** What a vessel with these values is given. */
-  @NonNull
-  private final ChoiceOutcome<T> outcome;
+  private final Factory<? super VesselComponentScope, ? extends T> factory;
 }

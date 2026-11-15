@@ -22,13 +22,15 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static uk.ac.ox.poseidon.core.events.Factories.eventManager;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.startingDateTime;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 import org.joda.money.Money;
 import tech.tablesaw.api.Table;
@@ -191,82 +193,92 @@ public final class Factories {
   }
 
   /**
-   * @param attributes the attributes the choice reads, in the order each row
-   *                   gives their values; from {@link #by}
-   * @param entries    the rows, from {@link #when}, and at most one default,
-   *                   from {@link #otherwise}
-   * @return a vessel component chosen by {@code attributes}
-   * @throws IllegalArgumentException if there are two defaults, a row does not
-   *                                  give one value for each attribute, or two
-   *                                  rows give the same values
-   * @see ChosenComponent
+   * @param attribute the vessel attribute that determines the variant
+   * @param rows the listed values and their variants, from {@link #when}
+   * @return a component varying by {@code attribute}, without a default
+   * @see VaryingComponent
    */
   @SafeVarargs
-  public static <T> ChosenComponent<T> choice(
-    final ImmutableList<String> attributes,
-    final ChoiceEntry<? extends T>... entries
+  public static <T> VaryingComponent<T> varyingBy(
+    final String attribute,
+    final Map.Entry<Object, ? extends Variant<? extends T>>... rows
   ) {
-    final ChosenComponent.ChosenComponentBuilder<T> choice =
-      ChosenComponent.<T>builder().attributes(attributes);
-    ChoiceOutcome<? extends T> defaultOutcome = null;
-    for (final ChoiceEntry<? extends T> entry : entries) {
-      switch (entry) {
-        case final ChoiceRow<? extends T> row -> choice.row(row);
-        case final ChoiceDefault<? extends T> choiceDefault -> {
-          checkArgument(
-            defaultOutcome == null,
-            "The choice by %s has two defaults",
-            attributes
-          );
-          defaultOutcome = choiceDefault.getOutcome();
-        }
-      }
-    }
-    return choice.defaultOutcome(defaultOutcome).build();
+    return VaryingComponent.<T>builder()
+      .attribute(attribute)
+      .variants(
+        ImmutableMap.<Object, Variant<? extends T>>builder()
+          .putAll(Arrays.asList(rows))
+          .buildOrThrow()
+      )
+      .build();
   }
 
   /**
-   * @param attributes the attributes a choice reads
-   * @return {@code attributes}, in their order, for {@link #choice}
+   * @param attribute the vessel attribute that determines the variant
+   * @param factory builds the component for unlisted values
+   * @param rows the listed values and their variants, from {@link #when}
+   * @return a component varying by {@code attribute}, with a factory default
+   * @see VaryingComponent
    */
-  public static ImmutableList<String> by(final String... attributes) {
-    return ImmutableList.copyOf(attributes);
+  @SafeVarargs
+  public static <T> VaryingComponent<T> varyingBy(
+    final String attribute,
+    final Factory<? super VesselComponentScope, ? extends T> factory,
+    final Map.Entry<Object, ? extends Variant<? extends T>>... rows
+  ) {
+    return varyingBy(attribute, rows)
+      .toBuilder()
+      .defaultVariant(new FactoryVariant<>(factory))
+      .build();
   }
 
   /**
-   * @param values exact values of the attributes a choice reads, in their
-   *               order
-   * @return the start of a row of the choice for these values, to which
-   *         {@link ChoiceCondition#then} gives what they give
+   * @param attribute the vessel attribute that determines the variant
+   * @param noComponent {@link #none}
+   * @param rows the listed values and their variants, from {@link #when}
+   * @return a component varying by {@code attribute}, absent for unlisted values
+   * @see VaryingComponent
    */
-  public static ChoiceCondition when(final Object... values) {
-    return new ChoiceCondition(ImmutableList.copyOf(values));
+  @SafeVarargs
+  public static <T> VaryingComponent<T> varyingBy(
+    final String attribute,
+    final NoComponent<T> noComponent,
+    final Map.Entry<Object, ? extends Variant<? extends T>>... rows
+  ) {
+    return varyingBy(attribute, rows)
+      .toBuilder()
+      .defaultVariant(noComponent)
+      .build();
   }
 
   /**
-   * @param factory builds the component for a vessel whose values no row
-   *                lists
-   * @return the default of a choice, giving what {@code factory} builds
+   * @param value the attribute value
+   * @param factory builds the component for this value
+   * @return the value paired with its factory variant
+   * @see VaryingComponent
    */
-  public static <T> ChoiceDefault<T> otherwise(
+  public static <T> Map.Entry<Object, FactoryVariant<T>> when(
+    final Object value,
     final Factory<? super VesselComponentScope, ? extends T> factory
   ) {
-    return new ChoiceDefault<>(new BuildOutcome<>(factory));
+    return Map.entry(value, new FactoryVariant<>(factory));
   }
 
   /**
+   * @param value the attribute value
    * @param noComponent {@link #none}
-   * @return the default of a choice, giving a vessel whose values no row
-   *         lists no component
+   * @return the value paired with deliberate absence
+   * @see VaryingComponent
    */
-  public static <T> ChoiceDefault<T> otherwise(
+  public static <T> Map.Entry<Object, NoComponent<T>> when(
+    final Object value,
     final NoComponent<T> noComponent
   ) {
-    return new ChoiceDefault<>(noComponent);
+    return Map.entry(value, noComponent);
   }
 
   /**
-   * @return the outcome of a choice that gives no component, for what the
+   * @return a variant that gives no component, for what the
    *         scenario does not model
    */
   public static <T> NoComponent<T> none() {

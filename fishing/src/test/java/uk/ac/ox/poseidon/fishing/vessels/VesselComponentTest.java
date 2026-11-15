@@ -27,10 +27,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.by;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.choice;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.none;
-import static uk.ac.ox.poseidon.fishing.vessels.Factories.otherwise;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.when;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.newVessel;
@@ -120,10 +118,10 @@ class VesselComponentTest {
 
   @Test
   void aChoiceOfNoComponentLeavesTheComponentAbsent() {
-    final VesselComponent<Object> chosen = choice(
-      by("gear"),
-      when("PS").then(new NewObjectFactory()),
-      otherwise(none())
+    final VesselComponent<Object> chosen = varyingBy(
+      "gear",
+      none(),
+      when("PS", new NewObjectFactory())
     );
     final Vessel vessel = newVessel(
       mock(TemporalSchedule.class),

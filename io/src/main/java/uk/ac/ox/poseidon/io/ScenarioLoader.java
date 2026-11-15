@@ -80,6 +80,7 @@ public class ScenarioLoader {
         .anyMatch(prefix -> tag.getClassName().startsWith(prefix))
     );
     options.setMaxAliasesForCollections(MAX_ALIASES_FOR_COLLECTIONS);
+    options.setAllowDuplicateKeys(false);
     return options;
   }
 

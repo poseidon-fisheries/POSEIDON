@@ -28,11 +28,11 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 
 /**
  * One of a vessel's components, such as its gear: what builds it, a single
- * factory ({@link FactoryComponent}) or a choice by the vessel's attributes
- * ({@link ChosenComponent}), and the key under which each vessel keeps what
+ * factory ({@link FactoryComponent}) or a variant by one vessel attribute
+ * ({@link VaryingComponent}), and the key under which each vessel keeps what
  * was built, with a store of its own, so with a lifetime of its own. The
  * vessel builds it, when it is created and again when a change of attributes
- * makes a choice pick anew. Readers get a vessel's current component when
+ * selects a variant anew. Readers get a vessel's current component when
  * they use it, through {@link #of} or {@link #findIn}, or by taking this as a
  * value of the vessel: its product is a function from a vessel to that
  * vessel's component, and building it never builds the component. It is
@@ -42,7 +42,7 @@ import uk.ac.ox.poseidon.core.ValueFactory;
  */
 public sealed interface VesselComponent<T>
   extends ValueFactory<Scope, Vessel, T>
-  permits FactoryComponent, ChosenComponent
+  permits FactoryComponent, VaryingComponent
 {
   /**
    * @param vessel the vessel whose component to read

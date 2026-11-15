@@ -310,7 +310,7 @@ public class Vessel implements Oriented2D, HasAttributes {
     final Map<String, Object> previousAttributes
   ) {
     switch (statements.poll()) {
-      case null -> rebuildChosenAnew(previousAttributes);
+      case null -> rebuildVaryingAnew(previousAttributes);
       case final AttributeChange change -> {
         setAttributes(change.applyTo(attributes));
         applyStatementsSince(previousAttributes);
@@ -436,7 +436,7 @@ public class Vessel implements Oriented2D, HasAttributes {
 
   /**
    * @return what builds {@code component} for this vessel: its single
-   *         factory, or what its choice gives for this vessel's attributes;
+   *         factory, or the variant selected by this vessel's attribute;
    *         nothing if that is no component
    */
   private <T> Optional<
@@ -444,8 +444,10 @@ public class Vessel implements Oriented2D, HasAttributes {
   > factoryFor(final VesselComponent<T> component) {
     return switch (component) {
       case final FactoryComponent<T> single -> Optional.of(single.getFactory());
-      case final ChosenComponent<T> chosen -> switch (chosen.outcomeFor(this)) {
-        case final BuildOutcome<? extends T> build -> Optional.of(
+      case final VaryingComponent<T> chosen -> switch (
+        chosen.variantFor(this)
+      ) {
+        case final FactoryVariant<? extends T> build -> Optional.of(
           build.getFactory()
         );
         case final NoComponent<? extends T> _ -> Optional.empty();
@@ -454,27 +456,23 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Gives this vessel anew every component whose choice reads an attribute
-   * whose value differs from {@code previousAttributes}, even if the same row
-   * is picked: ends their stores in the reverse of the order its
+   * Gives this vessel anew every component that varies by an attribute
+   * whose value differs from {@code previousAttributes}, even if the same
+   * variant is picked: ends their stores in the reverse of the order its
    * specification builds them, then builds them in that order.
    */
-  private void rebuildChosenAnew(final Map<String, Object> previousAttributes) {
+  private void rebuildVaryingAnew(
+    final Map<String, Object> previousAttributes
+  ) {
     final List<VesselComponent<?>> componentsToRebuild = specification
       .listedComponents()
       .filter(
         component ->
-          component instanceof final ChosenComponent<?> chosen &&
-          chosen
-            .getAttributes()
-            .stream()
-            .anyMatch(
-              attribute ->
-                !Objects.equals(
-                  previousAttributes.get(attribute),
-                  attributes.get(attribute)
-                )
-            )
+          component instanceof final VaryingComponent<?> chosen &&
+          !Objects.equals(
+            previousAttributes.get(chosen.getAttribute()),
+            attributes.get(chosen.getAttribute())
+          )
       )
       .toList();
     componentsToRebuild.reversed().forEach(this::dropComponent);

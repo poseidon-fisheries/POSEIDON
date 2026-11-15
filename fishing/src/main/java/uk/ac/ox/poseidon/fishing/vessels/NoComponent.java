@@ -25,10 +25,10 @@ package uk.ac.ox.poseidon.fishing.vessels;
 import lombok.Builder;
 
 /**
- * The outcome of a choice that gives no component: the vessel has none, and
+ * A variant that deliberately gives no component: the vessel has none, and
  * no store is opened for it. Built via {@link Factories#none}.
  *
  * @param <T> the type of the component
  */
 @Builder(toBuilder = true)
-public final class NoComponent<T> implements ChoiceOutcome<T> {}
+public final class NoComponent<T> implements Variant<T> {}

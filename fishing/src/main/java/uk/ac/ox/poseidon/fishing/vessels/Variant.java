@@ -25,12 +25,11 @@ package uk.ac.ox.poseidon.fishing.vessels;
 import uk.ac.ox.poseidon.core.ScenarioNode;
 
 /**
- * What a row of a {@link ChosenComponent}, or its default, gives: a factory
- * that builds the component ({@link BuildOutcome}), or no component at all
- * ({@link NoComponent}), said on purpose for what the scenario does not model.
+ * One form of a {@link VaryingComponent}: a factory that builds the component
+ * ({@link FactoryVariant}), or deliberately no component ({@link NoComponent}).
  *
  * @param <T> the type of the component
  */
-public sealed interface ChoiceOutcome<T>
+public sealed interface Variant<T>
   extends ScenarioNode
-  permits BuildOutcome, NoComponent {}
+  permits FactoryVariant, NoComponent {}
