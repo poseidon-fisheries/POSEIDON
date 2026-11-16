@@ -28,6 +28,7 @@ import static uk.ac.ox.poseidon.core.utils.Preconditions.checkUnitRange;
 import java.time.Duration;
 import java.util.function.Supplier;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import uk.ac.ox.poseidon.biology.Fisheable;
@@ -45,6 +46,7 @@ public class FixedBiomassProportionGear implements Gear {
   private final double proportion;
   private final double minimumCatchThresholdInKg;
   private final Supplier<Duration> durationSupplier;
+  private final Duration expectedDuration;
   private final double litresOfFuelConsumedPerHourOfFishing;
 
   @Setter
@@ -59,13 +61,16 @@ public class FixedBiomassProportionGear implements Gear {
    *                                             to zero
    * @param durationSupplier                     supplies how long one fishing
    *                                             event takes
+   * @param expectedDuration                     how long one fishing event is
+   *                                             expected to take
    * @param litresOfFuelConsumedPerHourOfFishing fuel burned per hour of
    *                                             fishing, in litres
    */
   FixedBiomassProportionGear(
     final double proportion,
     final double minimumCatchThresholdInKg,
-    final Supplier<Duration> durationSupplier,
+    @NonNull final Supplier<Duration> durationSupplier,
+    @NonNull final Duration expectedDuration,
     final double litresOfFuelConsumedPerHourOfFishing
   ) {
     this.proportion = checkUnitRange(proportion, "proportion");
@@ -74,6 +79,7 @@ public class FixedBiomassProportionGear implements Gear {
       "minimumCatchThresholdInKg"
     );
     this.durationSupplier = durationSupplier;
+    this.expectedDuration = expectedDuration;
     this.litresOfFuelConsumedPerHourOfFishing =
       litresOfFuelConsumedPerHourOfFishing;
   }

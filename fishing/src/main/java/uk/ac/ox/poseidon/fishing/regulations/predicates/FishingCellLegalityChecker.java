@@ -41,16 +41,16 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 
 /**
  * Predicate matching cells the vessel it is given could legally fish at:
- * builds a hypothetical {@link ExtendedFishingAction} for arriving at the
- * candidate cell (travel time included, via {@code pathLengthCalculator}) and
- * lasting {@code fishingDuration}, and checks it against {@code regulations}.
- * Used to filter fishing-cell candidates before committing to a trip
- * there.
+ * builds the {@linkplain ExtendedFishingAction#expected expected fishing
+ * action} at the candidate cell, starting on arrival there (travel time
+ * included, via {@code pathLengthCalculator}), and checks it against
+ * {@code regulations}. Used to filter fishing-cell candidates before committing
+ * to a trip there.
  * <p>
- * {@code fishingDuration} is the typical duration of a fishing action: fishers
- * don't know how long a given set or haul will take, so they plan with a
- * typical one. A fishing action expected to run into a closure is refused here;
- * one that actually runs longer than planned is not this checker's concern.
+ * The action lasts the vessel's gear's expected duration: fishers don't know
+ * how long a given set or haul will take, so they plan with the expected one.
+ * A fishing action expected to run into a closure is refused here; one that
+ * actually runs longer than expected is not this checker's concern.
  */
 @RequiredArgsConstructor(access = PACKAGE)
 public class FishingCellLegalityChecker
@@ -61,7 +61,6 @@ public class FishingCellLegalityChecker
   private final VesselComponent<? extends Engine> engine;
   private final Regulations<? super ExtendedFishingAction> regulations;
   private final PathLengthCalculator pathLengthCalculator;
-  private final Duration fishingDuration;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
 
   /**
@@ -76,9 +75,9 @@ public class FishingCellLegalityChecker
   }
 
   /**
-   * Builds the {@link ExtendedFishingAction} the vessel would plan at
+   * Builds the {@link ExtendedFishingAction} the vessel would expect to take at
    * {@code fishingCell}: starting whenever it would arrive there from its
-   * current cell, and lasting {@code fishingDuration}.
+   * current cell, and lasting its gear's expected duration.
    *
    * @throws IllegalArgumentException if no path exists from the vessel's
    *                                  current cell to {@code fishingCell}
@@ -92,11 +91,10 @@ public class FishingCellLegalityChecker
       engine.of(vessel).getCruisingSpeedInKph()
     );
 
-    return new ExtendedFishingAction(
+    return ExtendedFishingAction.expected(
       vessel,
       currentDateTime.apply(vessel).plus(travelDuration),
-      fishingDuration,
-      vessel.getVesselField().getModelGrid().toCoordinate(fishingCell),
+      fishingCell,
       gear.of(vessel)
     );
   }

@@ -39,7 +39,9 @@ import uk.ac.ox.poseidon.regulations.Regulations;
 /**
  * A leaf {@link VesselTask} that succeeds if a fishing action started now, at
  * the vessel's current cell and with its current gear, would be permitted by
- * {@code regulations}.
+ * {@code regulations}. The action checked lasts the gear's expected duration
+ * (see {@link ExtendedFishingAction#expected}): the vessel cannot know yet how
+ * long it will actually fish.
  */
 @RequiredArgsConstructor
 public class CheckIfFishingHereAndNowIsLegal extends VesselTask {
@@ -55,14 +57,15 @@ public class CheckIfFishingHereAndNowIsLegal extends VesselTask {
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
 
   /**
-   * @return {@code SUCCEEDED} if a fishing action started now, here, would be
-   *         permitted, {@code FAILED} otherwise
+   * @return {@code SUCCEEDED} if the fishing action the vessel expects to take
+   *         now, here, would be permitted, {@code FAILED} otherwise
    */
   @Override
   public Status execute() {
-    final ExtendedFishingAction action = new ExtendedFishingAction(
+    final ExtendedFishingAction action = ExtendedFishingAction.expected(
       getVessel(),
       currentDateTime.apply(getVessel()),
+      getVessel().getCell(),
       gear.of(getVessel())
     );
     return regulations.isPermitted(action) ? SUCCEEDED : FAILED;

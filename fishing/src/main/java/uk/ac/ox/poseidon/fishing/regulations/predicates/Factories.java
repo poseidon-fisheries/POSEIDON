@@ -24,7 +24,6 @@ package uk.ac.ox.poseidon.fishing.regulations.predicates;
 
 import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTime;
 
-import java.time.Duration;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
@@ -50,9 +49,6 @@ public final class Factories {
    *                             be permitted by
    * @param pathLengthCalculator measures the path from the vessel's current
    *                             cell to the candidate
-   * @param fishingDuration      the typical duration of a fishing action,
-   *                             which the candidate action lasts (see
-   *                             {@link FishingCellLegalityChecker})
    * @return a {@link uk.ac.ox.poseidon.core.RelativeScopeFactory} for a
    *         {@link FishingCellLegalityChecker}
    * @see FishingCellLegalityCheckerFactory
@@ -67,15 +63,13 @@ public final class Factories {
     final Factory<
       ? super S,
       ? extends PathLengthCalculator
-    > pathLengthCalculator,
-    final Factory<? super S, ? extends Duration> fishingDuration
+    > pathLengthCalculator
   ) {
     return new FishingCellLegalityCheckerFactory<>(
       gear,
       engine,
       regulations,
       pathLengthCalculator,
-      fishingDuration,
       currentDateTime()
     );
   }

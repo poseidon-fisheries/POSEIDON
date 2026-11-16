@@ -340,6 +340,11 @@ class VaryingComponentTest {
     }
 
     @Override
+    public Duration getExpectedDuration() {
+      return Duration.ZERO;
+    }
+
+    @Override
     public Bucket fish(final Fisheable fisheable) {
       return Bucket.empty();
     }

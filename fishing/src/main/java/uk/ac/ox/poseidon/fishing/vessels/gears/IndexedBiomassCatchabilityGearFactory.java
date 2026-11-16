@@ -60,6 +60,7 @@ public class IndexedBiomassCatchabilityGearFactory<S extends Scope> extends Rela
 > {
 
   private final ValueFactory<? super S, ? super Void, Duration> duration;
+  private final Factory<? super S, ? extends Duration> expectedDuration;
   private final Factory<
     ? super S,
     ? extends Collection<? extends Species>
@@ -84,7 +85,8 @@ public class IndexedBiomassCatchabilityGearFactory<S extends Scope> extends Rela
         checkUnitRange(function.apply(s), "proportion")
       ),
       minimumCatchThreshold.get(scope).to(KILOGRAM).getValue().doubleValue(),
-      toSupplier(duration.get(scope))
+      toSupplier(duration.get(scope)),
+      expectedDuration.get(scope)
     );
   }
 }

@@ -45,11 +45,12 @@ import uk.ac.ox.poseidon.fishing.vessels.tanks.FuelTank;
 
 /**
  * An {@link ExtendedTripTask} that fishes a single {@link Fisheable} using the
- * vessel's gear: runs for the gear's own duration, then sorts the catch via
- * {@code dispositionProcess}, adds the retained portion to the hold, releases
- * what's discarded alive back to the fisheable, broadcasts a
- * {@link FishingActionEvent}, and takes the fuel the gear burns per hour of fishing
- * from the tank.
+ * vessel's gear: runs for a duration drawn from the gear's duration supplier
+ * (the actual duration, which may differ from the gear's expected one), then
+ * sorts the catch via {@code dispositionProcess}, adds the retained portion to
+ * the hold, releases what's discarded alive back to the fisheable, broadcasts a
+ * {@link FishingActionEvent}, and takes the fuel the gear burns per hour of
+ * fishing from the tank.
  */
 @RequiredArgsConstructor
 public class Fishing extends ExtendedTripTask {
@@ -77,7 +78,7 @@ public class Fishing extends ExtendedTripTask {
 
   /**
    * Starts a new {@link ExtendedFishingAction} for the current vessel, cell and
-   * gear.
+   * gear, lasting a duration drawn from the gear's duration supplier.
    *
    * @throws IllegalStateException if the vessel is not on a
    *                               {@link FishingTrip}, which records the
@@ -91,10 +92,16 @@ public class Fishing extends ExtendedTripTask {
       "Vessel %s is fishing while not on a fishing trip.",
       getVessel().getId()
     );
+    final Gear gear = this.gear.of(getVessel());
     action = new ExtendedFishingAction(
       getVessel(),
       currentDateTime.apply(getVessel()),
-      gear.of(getVessel())
+      gear.getDurationSupplier().get(),
+      getVessel()
+        .getVesselField()
+        .getModelGrid()
+        .toCoordinate(getVessel().getCell()),
+      gear
     );
   }
 

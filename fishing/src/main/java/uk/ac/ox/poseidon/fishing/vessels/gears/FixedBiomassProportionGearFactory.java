@@ -61,6 +61,7 @@ public class FixedBiomassProportionGearFactory<S extends Scope> extends Relative
     ? extends Quantity<Mass>
   > minimumCatchThreshold;
   private final ValueFactory<? super S, ? super Void, Duration> duration;
+  private final Factory<? super S, ? extends Duration> expectedDuration;
   private final Factory<
     ? super S,
     ? extends Quantity<VolumetricFlowRate>
@@ -77,6 +78,7 @@ public class FixedBiomassProportionGearFactory<S extends Scope> extends Relative
       proportion.get(scope),
       minimumCatchThreshold.get(scope).to(KILOGRAM).getValue().doubleValue(),
       toSupplier(duration.get(scope)),
+      expectedDuration.get(scope),
       fuelPerHour
     );
   }

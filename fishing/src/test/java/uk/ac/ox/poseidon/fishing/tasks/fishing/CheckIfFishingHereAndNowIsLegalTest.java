@@ -71,12 +71,12 @@ class CheckIfFishingHereAndNowIsLegalTest {
     when(vessel.getVesselField()).thenReturn(vesselField);
     when(vessel.getCell()).thenReturn(new Cell(0, 0));
     when(vessel.getAttributes()).thenReturn(Map.of("main_fishing_gear", "OTB"));
-    when(gear.getDurationSupplier()).thenReturn(() -> Duration.ofHours(2));
+    when(gear.getExpectedDuration()).thenReturn(Duration.ofHours(2));
   }
 
   @ParameterizedTest
   @ValueSource(booleans = { true, false })
-  void submitsTheProspectiveActionAndReportsTheLegalityDecision(
+  void submitsTheExpectedActionAndReportsTheLegalityDecision(
     final boolean permitted
   ) {
     final List<ExtendedFishingAction> checked = new ArrayList<>();
@@ -114,6 +114,7 @@ class CheckIfFishingHereAndNowIsLegalTest {
         );
       });
     verify(gear, never()).fish(any());
+    verify(gear, never()).getDurationSupplier();
   }
 
   @Test
@@ -131,9 +132,7 @@ class CheckIfFishingHereAndNowIsLegalTest {
     tree.step();
 
     final Gear otherGear = mock(Gear.class);
-    when(otherGear.getDurationSupplier()).thenReturn(() ->
-      Duration.ofMinutes(30)
-    );
+    when(otherGear.getExpectedDuration()).thenReturn(Duration.ofMinutes(30));
     giveComponent(vessel, gearComponent, otherGear);
     when(vessel.getCell()).thenReturn(new Cell(1, 0));
     when(vessel.getAttributes()).thenReturn(Map.of("main_fishing_gear", "PS"));

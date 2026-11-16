@@ -31,6 +31,7 @@ import lombok.NonNull;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Coordinate;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.regulations.ExtendedAction;
 
 /**
@@ -70,23 +71,28 @@ public class ExtendedFishingAction
   }
 
   /**
-   * Starts at {@code startDateTime}, at the vessel's current cell, for the
-   * gear's own duration, fishing with {@code gear}.
+   * The action a vessel expects to take: before it fishes, a vessel can only
+   * know how long fishing with {@code gear} is expected to take, not how long
+   * it will take, so the action lasts the gear's expected duration.
    *
-   * @param vessel        the vessel taking the action
-   * @param startDateTime when the action starts
-   * @param gear          the vessel's current gear
+   * @param vessel        the vessel that would take the action
+   * @param startDateTime when the action would start
+   * @param cell          where the action would take place
+   * @param gear          the gear the vessel would fish with
+   * @return an action lasting {@code gear}'s
+   *         {@linkplain Gear#getExpectedDuration() expected duration}
    */
-  public ExtendedFishingAction(
+  public static ExtendedFishingAction expected(
     final Vessel vessel,
     final LocalDateTime startDateTime,
+    final Cell cell,
     final Gear gear
   ) {
-    this(
+    return new ExtendedFishingAction(
       vessel,
       startDateTime,
-      gear.getDurationSupplier().get(),
-      vessel.getVesselField().getModelGrid().toCoordinate(vessel.getCell()),
+      gear.getExpectedDuration(),
+      vessel.getVesselField().getModelGrid().toCoordinate(cell),
       gear
     );
   }

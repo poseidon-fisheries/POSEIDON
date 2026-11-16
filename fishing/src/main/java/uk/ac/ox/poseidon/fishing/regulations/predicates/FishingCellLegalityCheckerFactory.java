@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.fishing.regulations.predicates;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.function.BiFunction;
 import lombok.AllArgsConstructor;
@@ -70,7 +69,6 @@ public class FishingCellLegalityCheckerFactory<S extends Scope>
     ? super S,
     ? extends PathLengthCalculator
   > pathLengthCalculator;
-  private final Factory<? super S, ? extends Duration> fishingDuration;
   private final ValueFactory<
     ? super S,
     ? super Vessel,
@@ -84,7 +82,6 @@ public class FishingCellLegalityCheckerFactory<S extends Scope>
       engine,
       regulations.get(scope),
       pathLengthCalculator.get(scope),
-      fishingDuration.get(scope),
       currentDateTime.get(scope)
     );
   }

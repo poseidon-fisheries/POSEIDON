@@ -54,7 +54,8 @@ class IndexedBiomassCatchabilityGearTest {
       new IndexedBiomassCatchabilityGear(
         SpeciesIndexedDoubleArray.of(new double[] { 0.2, 0.6 }, speciesIndex),
         MINIMUM_CATCH_THRESHOLD,
-        DURATION
+        DURATION,
+        Duration.ofHours(1)
       );
     final Bucket availableFish = Bucket.of(
       new double[] { 10.0, 5.0 },
@@ -75,7 +76,8 @@ class IndexedBiomassCatchabilityGearTest {
       new IndexedBiomassCatchabilityGear(
         SpeciesIndexedDoubleArray.of(new double[] { 0.1, 0.5 }, gearIndex),
         MINIMUM_CATCH_THRESHOLD,
-        DURATION
+        DURATION,
+        Duration.ofHours(1)
       );
     final Bucket availableFish = Bucket.of(
       Map.of(SPECIES_B, Biomass.ofKg(8.0), SPECIES_C, Biomass.ofKg(4.0))
@@ -96,7 +98,8 @@ class IndexedBiomassCatchabilityGearTest {
       new IndexedBiomassCatchabilityGear(
         SpeciesIndexedDoubleArray.of(new double[] { 0.3, 1.2 }, speciesIndex),
         MINIMUM_CATCH_THRESHOLD,
-        DURATION
+        DURATION,
+        Duration.ofHours(1)
       )
     ).isInstanceOf(IllegalArgumentException.class);
   }
@@ -108,7 +111,8 @@ class IndexedBiomassCatchabilityGearTest {
       new IndexedBiomassCatchabilityGear(
         SpeciesIndexedDoubleArray.of(new double[] { 0.5 }, speciesIndex),
         MINIMUM_CATCH_THRESHOLD,
-        DURATION
+        DURATION,
+        Duration.ofHours(1)
       );
     final Bucket availableFish = Bucket.of(new double[] { 1.0 }, speciesIndex);
     final Fisheable fisheable = new StubFisheable(availableFish);
@@ -125,7 +129,8 @@ class IndexedBiomassCatchabilityGearTest {
       new IndexedBiomassCatchabilityGear(
         SpeciesIndexedDoubleArray.of(new double[] { 0.3, 0.5 }, speciesIndex),
         -1.0,
-        DURATION
+        DURATION,
+        Duration.ofHours(1)
       )
     ).isInstanceOf(IllegalArgumentException.class);
   }
@@ -137,7 +142,8 @@ class IndexedBiomassCatchabilityGearTest {
       new IndexedBiomassCatchabilityGear(
         null,
         MINIMUM_CATCH_THRESHOLD,
-        DURATION
+        DURATION,
+        Duration.ofHours(1)
       )
     ).isInstanceOf(NullPointerException.class);
   }

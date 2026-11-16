@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.quantities.Factories.massOf;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -40,6 +41,44 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 class IndexedBiomassCatchabilityGearFactoryTest {
 
   @Test
+  void expectsTheDurationItIsGivenBesideAVaryingOne() {
+    final ValueFactory<Scope, Object, Duration> duration = scope -> context ->
+      Duration.ofHours(1);
+    final Factory<Scope, Collection<? extends Species>> species = scope ->
+      List.of(new Species("COD", "adult", "Cod"));
+    final var factory = Factories.indexedBiomassCatchabilityGear(
+      duration,
+      object(Duration.ofHours(2)),
+      species,
+      (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->
+        0.5,
+      massOf(1, KILOGRAM)
+    );
+
+    final var gear = factory.get(Scope.GLOBAL_SCOPE);
+
+    assertThat(gear.getExpectedDuration()).isEqualTo(Duration.ofHours(2));
+  }
+
+  @Test
+  void expectsItsConstantDuration() {
+    final Factory<Scope, Collection<? extends Species>> species = scope ->
+      List.of(new Species("COD", "adult", "Cod"));
+    final var factory = Factories.indexedBiomassCatchabilityGear(
+      object(Duration.ofHours(3)),
+      species,
+      (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->
+        0.5,
+      massOf(1, KILOGRAM)
+    );
+
+    final var gear = factory.get(Scope.GLOBAL_SCOPE);
+
+    assertThat(gear.getExpectedDuration()).isEqualTo(Duration.ofHours(3));
+    assertThat(gear.getDurationSupplier().get()).isEqualTo(Duration.ofHours(3));
+  }
+
+  @Test
   void appliesFunctionPerSpecies() {
     final ValueFactory<Scope, Object, Duration> duration = scope -> context ->
       Duration.ofHours(1);
@@ -47,6 +86,7 @@ class IndexedBiomassCatchabilityGearFactoryTest {
       List.of(new Species("COD", "adult", "Cod"));
     final var factory = Factories.indexedBiomassCatchabilityGear(
       duration,
+      object(Duration.ofHours(1)),
       species,
       (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->
         0.5,
@@ -64,6 +104,7 @@ class IndexedBiomassCatchabilityGearFactoryTest {
       List.of(new Species("COD", "adult", "Cod"));
     final var factory = Factories.indexedBiomassCatchabilityGear(
       duration,
+      object(Duration.ofHours(1)),
       species,
       (MappingFactory<Scope, Object, Species, Double>) scope -> (context, s) ->
         1.5,

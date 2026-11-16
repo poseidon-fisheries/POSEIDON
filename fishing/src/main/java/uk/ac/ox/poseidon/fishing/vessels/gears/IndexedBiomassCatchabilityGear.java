@@ -51,6 +51,9 @@ public class IndexedBiomassCatchabilityGear implements Gear {
   @NonNull
   private final Supplier<Duration> durationSupplier;
 
+  @NonNull
+  private final Duration expectedDuration;
+
   @Setter
   private boolean active = true;
 
@@ -60,11 +63,14 @@ public class IndexedBiomassCatchabilityGear implements Gear {
    * @param minimumCatchThresholdInKg per-species catch below this, in
    *                                  kilograms, is discarded down to zero
    * @param durationSupplier          supplies how long one fishing event takes
+   * @param expectedDuration          how long one fishing event is expected to
+   *                                  take
    */
   public IndexedBiomassCatchabilityGear(
     @NonNull final SpeciesIndexedDoubleArray proportions,
     final double minimumCatchThresholdInKg,
-    @NonNull final Supplier<Duration> durationSupplier
+    @NonNull final Supplier<Duration> durationSupplier,
+    @NonNull final Duration expectedDuration
   ) {
     proportions.forEachValue(value -> checkUnitRange(value, "proportion"));
     this.proportions = proportions;
@@ -73,6 +79,7 @@ public class IndexedBiomassCatchabilityGear implements Gear {
       "minimumCatchThresholdInKg"
     );
     this.durationSupplier = durationSupplier;
+    this.expectedDuration = expectedDuration;
   }
 
   /**

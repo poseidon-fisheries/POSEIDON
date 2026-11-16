@@ -44,6 +44,14 @@ public interface Gear {
   Supplier<Duration> getDurationSupplier();
 
   /**
+   * @return how long one fishing event with this gear is expected to take:
+   *         what a vessel can know before fishing, when the duration
+   *         {@link #getDurationSupplier()} supplies may vary from one event to
+   *         the next
+   */
+  Duration getExpectedDuration();
+
+  /**
    * @return what this gear catches from {@code fisheable}, removed from it in
    *         the process
    */

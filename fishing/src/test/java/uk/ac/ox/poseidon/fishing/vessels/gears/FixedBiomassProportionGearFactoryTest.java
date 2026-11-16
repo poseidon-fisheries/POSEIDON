@@ -29,6 +29,7 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.quantities.Factories.massOf;
 import static uk.ac.ox.poseidon.core.quantities.Factories.volumetricFlowRateOf;
 import static uk.ac.ox.poseidon.core.quantities.VolumetricFlowRateFactory.LITRE_PER_HOUR;
+import static uk.ac.ox.poseidon.core.utils.Factories.object;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,38 @@ import uk.ac.ox.poseidon.core.ValueFactory;
 class FixedBiomassProportionGearFactoryTest {
 
   @Test
+  void expectsTheDurationItIsGivenBesideAVaryingOne() {
+    final ValueFactory<Scope, Object, Duration> duration = scope -> context ->
+      Duration.ofHours(1);
+    final var factory = Factories.fixedBiomassProportionGear(
+      0.25,
+      massOf(2, KILOGRAM),
+      duration,
+      object(Duration.ofHours(2)),
+      volumetricFlowRateOf(0.0, LITRE_PER_HOUR)
+    );
+
+    final var gear = factory.get(Scope.GLOBAL_SCOPE);
+
+    assertThat(gear.getExpectedDuration()).isEqualTo(Duration.ofHours(2));
+  }
+
+  @Test
+  void expectsItsConstantDuration() {
+    final var factory = Factories.fixedBiomassProportionGear(
+      0.25,
+      massOf(2, KILOGRAM),
+      object(Duration.ofHours(3)),
+      volumetricFlowRateOf(0.0, LITRE_PER_HOUR)
+    );
+
+    final var gear = factory.get(Scope.GLOBAL_SCOPE);
+
+    assertThat(gear.getExpectedDuration()).isEqualTo(Duration.ofHours(3));
+    assertThat(gear.getDurationSupplier().get()).isEqualTo(Duration.ofHours(3));
+  }
+
+  @Test
   void resolvesMinimumCatchThreshold() {
     final ValueFactory<Scope, Object, Duration> duration = scope -> context ->
       Duration.ofHours(1);
@@ -45,6 +78,7 @@ class FixedBiomassProportionGearFactoryTest {
       0.25,
       massOf(2, KILOGRAM),
       duration,
+      object(Duration.ofHours(1)),
       volumetricFlowRateOf(0.0, LITRE_PER_HOUR)
     );
     final var gear = factory.get(Scope.GLOBAL_SCOPE);
@@ -62,6 +96,7 @@ class FixedBiomassProportionGearFactoryTest {
       0.25,
       massOf(-1, KILOGRAM),
       duration,
+      object(Duration.ofHours(1)),
       volumetricFlowRateOf(0.0, LITRE_PER_HOUR)
     );
     assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE)).isInstanceOf(
