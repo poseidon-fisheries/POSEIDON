@@ -43,7 +43,6 @@ import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.ForwardingEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
-import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
@@ -70,9 +69,6 @@ public class Fleet implements VesselsGetter {
 
   @Getter
   private final PortGrid portGrid;
-
-  @Getter
-  private final MarketGrid marketGrid;
 
   /** @return the vessel registered under {@code vesselId}, if any */
   public Optional<Vessel> getVessel(final String vesselId) {
@@ -113,7 +109,6 @@ public class Fleet implements VesselsGetter {
       vesselId,
       vesselField,
       portGrid,
-      marketGrid,
       specification
     );
     vesselsById.put(vesselId, vessel);

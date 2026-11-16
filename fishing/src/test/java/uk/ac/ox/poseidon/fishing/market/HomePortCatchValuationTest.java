@@ -68,15 +68,12 @@ class HomePortCatchValuationTest {
     CurrencyUnit.EUR,
     mock(EventManager.class)
   );
-  private final HomePortCatchValuation valuation = new HomePortCatchValuation(
-    catchCategoriser,
-    _ -> now
-  );
+  private HomePortCatchValuation valuation;
 
   @BeforeEach
   void setUp() {
     when(vessel.getHomePort()).thenReturn(homePort);
-    givenMarkets(market);
+    valuation = valuationOver(market);
   }
 
   @Test
@@ -93,7 +90,7 @@ class HomePortCatchValuationTest {
     when(otherMarket.quote(any())).thenThrow(
       new AssertionError("quoted the wrong port")
     );
-    givenMarkets(market, otherMarket);
+    valuation = valuationOver(market, otherMarket);
     market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
     assertThat(
       valuation.by(vessel).applyAsDouble(Bucket.of(pricedSpecies, 10.0))
@@ -149,10 +146,6 @@ class HomePortCatchValuationTest {
 
   @Test
   void aChangeOfHomePortShows() {
-    market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
-    final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
-    now = now.plusHours(1);
-    assertThat(valuation.by(vessel).applyAsDouble(bucket)).isEqualTo(20.0);
     final Port otherPort = mock(Port.class);
     final BiomassMarket otherMarket = new BiomassMarket(
       otherPort,
@@ -160,13 +153,12 @@ class HomePortCatchValuationTest {
       CurrencyUnit.EUR,
       mock(EventManager.class)
     );
-    otherMarket.setPrice(
-      category,
-      pricedSpecies,
-      eurosPerKg(3.0),
-      now.minusHours(1)
-    );
-    givenMarkets(market, otherMarket);
+    valuation = valuationOver(market, otherMarket);
+    market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
+    otherMarket.setPrice(category, pricedSpecies, eurosPerKg(3.0), now);
+    final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
+    now = now.plusHours(1);
+    assertThat(valuation.by(vessel).applyAsDouble(bucket)).isEqualTo(20.0);
     when(vessel.getHomePort()).thenReturn(otherPort);
     assertThat(valuation.by(vessel).applyAsDouble(bucket)).isEqualTo(30.0);
   }
@@ -182,11 +174,9 @@ class HomePortCatchValuationTest {
     );
     market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
     otherMarket.setPrice(category, pricedSpecies, eurosPerKg(3.0), now);
-    givenMarkets(market, otherMarket);
+    valuation = valuationOver(market, otherMarket);
     final Vessel otherVessel = mock(Vessel.class);
     when(otherVessel.getHomePort()).thenReturn(otherPort);
-    final MarketGrid marketGrid = vessel.getMarketGrid();
-    when(otherVessel.getMarketGrid()).thenReturn(marketGrid);
     final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
     now = now.plusHours(1);
     assertThat(valuation.by(vessel).applyAsDouble(bucket)).isEqualTo(20.0);
@@ -203,7 +193,7 @@ class HomePortCatchValuationTest {
 
   @Test
   void throwsWithoutAMarketForTheHomePort() {
-    givenMarkets(market(mock(Port.class)));
+    valuation = valuationOver(market(mock(Port.class)));
     assertThatThrownBy(() ->
       valuation.by(vessel).applyAsDouble(Bucket.of(pricedSpecies, 10.0))
     ).isInstanceOf(IllegalStateException.class);
@@ -217,7 +207,7 @@ class HomePortCatchValuationTest {
       CurrencyUnit.EUR,
       mock(EventManager.class)
     );
-    givenMarkets(market, otherMarket);
+    valuation = valuationOver(market, otherMarket);
     assertThatThrownBy(() ->
       valuation.by(vessel).applyAsDouble(Bucket.of(pricedSpecies, 10.0))
     ).isInstanceOf(IllegalStateException.class);
@@ -251,9 +241,12 @@ class HomePortCatchValuationTest {
     assertThat(catchesCategorised).hasValue(1);
   }
 
-  private void givenMarkets(final Market... markets) {
-    final MarketGrid marketGrid = marketGrid(markets);
-    when(vessel.getMarketGrid()).thenReturn(marketGrid);
+  private HomePortCatchValuation valuationOver(final Market... markets) {
+    return new HomePortCatchValuation(
+      catchCategoriser,
+      _ -> now,
+      marketGrid(markets)
+    );
   }
 
   private static Price eurosPerKg(final double amount) {

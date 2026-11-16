@@ -60,6 +60,7 @@ public class HomePortCatchValuation implements Valuation<Bucket> {
 
   private final CatchCategoriser catchCategoriser;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final MarketGrid marketGrid;
   // By identity: cheaper than comparing catches, and a catch never changes.
   private final Map<Bucket, Double> values = new IdentityHashMap<>();
   // The market and the time from which the values above hold.
@@ -80,9 +81,7 @@ public class HomePortCatchValuation implements Valuation<Bucket> {
       "Vessel %s has no home port.",
       vessel.getId()
     );
-    final Market market = vessel
-      .getMarketGrid()
-      .getMarket(vessel.getHomePort());
+    final Market market = marketGrid.getMarket(vessel.getHomePort());
     final boolean valuesHold =
       market == valuedMarket &&
       !pricesChangedSince(market, valuedSince) &&

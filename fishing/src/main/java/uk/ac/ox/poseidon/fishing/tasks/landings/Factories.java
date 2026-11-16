@@ -28,6 +28,7 @@ import static uk.ac.ox.poseidon.core.providers.temporal.Factories.currentDateTim
 import java.time.Duration;
 import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
@@ -42,8 +43,9 @@ public final class Factories {
   private Factories() {}
 
   /**
-   * @param hold     the hold whose catch is landed
-   * @param duration how long landing takes, read for the vessel
+   * @param hold       the hold whose catch is landed
+   * @param duration   how long landing takes, read for the vessel
+   * @param marketGrid the markets the catch is sold to, by port
    * @return a {@link uk.ac.ox.poseidon.fishing.tasks.TaskFactory} for a
    *         {@link LandCatches}
    * @see LandCatchesFactory
@@ -54,21 +56,30 @@ public final class Factories {
       ? super VesselComponentScope,
       ? super Vessel,
       Duration
-    > duration
+    > duration,
+    final Factory<? super VesselComponentScope, ? extends MarketGrid> marketGrid
   ) {
-    return new LandCatchesFactory(hold, duration, currentDateTime());
+    return new LandCatchesFactory(
+      hold,
+      duration,
+      currentDateTime(),
+      marketGrid
+    );
   }
 
   /**
-   * @param hold     the hold whose catch is landed
-   * @param duration how long landing takes
-   * @return the same as {@link #landCatches(VesselComponent, ValueFactory)},
-   *         over a constant {@code duration}
+   * @param hold       the hold whose catch is landed
+   * @param duration   how long landing takes
+   * @param marketGrid the markets the catch is sold to, by port
+   * @return the same as
+   *         {@link #landCatches(VesselComponent, ValueFactory, Factory)}, over
+   *         a constant {@code duration}
    */
   public static LandCatchesFactory landCatches(
     final VesselComponent<? extends Hold> hold,
-    final Factory<? super VesselComponentScope, ? extends Duration> duration
+    final Factory<? super VesselComponentScope, ? extends Duration> duration,
+    final Factory<? super VesselComponentScope, ? extends MarketGrid> marketGrid
   ) {
-    return landCatches(hold, constant(duration));
+    return landCatches(hold, constant(duration), marketGrid);
   }
 }

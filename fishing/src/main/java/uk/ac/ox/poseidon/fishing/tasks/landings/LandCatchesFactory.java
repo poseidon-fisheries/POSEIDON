@@ -29,7 +29,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ValueFactory;
+import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
@@ -58,13 +60,18 @@ public class LandCatchesFactory extends TaskFactory<LandCatches> {
     ? super Vessel,
     LocalDateTime
   > currentDateTime;
+  private final Factory<
+    ? super VesselComponentScope,
+    ? extends MarketGrid
+  > marketGrid;
 
   @Override
   protected LandCatches newInstance(final VesselComponentScope scope) {
     return new LandCatches(
       hold,
       duration.get(scope),
-      currentDateTime.get(scope)
+      currentDateTime.get(scope),
+      marketGrid.get(scope)
     );
   }
 }

@@ -52,7 +52,6 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.fishing.choices.Factories;
 import uk.ac.ox.poseidon.fishing.choices.MemoryFactory;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
-import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -135,11 +134,7 @@ class RebuildTest {
     final VesselComponent<?> gear,
     final String rows
   ) {
-    final var fleet = fleet(
-      object(mock(VesselField.class)),
-      object(portGrid),
-      object(mock(MarketGrid.class))
-    );
+    final var fleet = fleet(object(mock(VesselField.class)), object(portGrid));
     final var vesselSpecification = vesselSpecification(fleet, behaviour)
       .component("gear", gear)
       .component("hold", vesselComponent(componentBuilder("hold")))

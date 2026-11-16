@@ -72,7 +72,6 @@ import uk.ac.ox.poseidon.fishing.catches.disposition.Disposition;
 import uk.ac.ox.poseidon.fishing.choices.MemoryEntries;
 import uk.ac.ox.poseidon.fishing.choices.PartitionedMemoryFactory;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
-import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEventAccumulator;
@@ -114,7 +113,6 @@ class FishingEventSharingRouteTest {
   private final Cell cell = new Cell(3, 4);
   private final Port port = mock(Port.class);
   private final PortGrid portGrid = mock(PortGrid.class);
-  private final MarketGrid marketGrid = mock(MarketGrid.class);
   private final ModelGrid modelGrid = mock(ModelGrid.class);
   private final VesselField vesselField = mock(VesselField.class);
   private final Gear gear = mock(Gear.class);
@@ -131,8 +129,7 @@ class FishingEventSharingRouteTest {
   > vesselMemory = catchesByCellPartitionedBy(stringAttribute("gear"));
   private final FleetFactory baseFleet = fleet(
     object(vesselField),
-    object(portGrid),
-    object(marketGrid)
+    object(portGrid)
   );
   private final SocialNetworkFactory network = socialNetwork(baseFleet);
   private final EventSharerFactory<FishingActionEvent> fishingActionSharer =

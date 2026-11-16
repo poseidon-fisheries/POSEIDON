@@ -48,7 +48,6 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
-import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.Exit;
@@ -67,8 +66,7 @@ class FleetTest {
     schedule,
     new SimpleEventManager(),
     vesselField,
-    portGrid,
-    mock(MarketGrid.class)
+    portGrid
   );
   /** What happened, in order. */
   private final List<String> events = new ArrayList<>();

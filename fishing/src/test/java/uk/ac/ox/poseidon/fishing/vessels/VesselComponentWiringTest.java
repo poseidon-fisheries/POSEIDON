@@ -78,12 +78,14 @@ class VesselComponentWiringTest {
       .component(
         "vesselSpecification",
         vesselSpecification(
-          fleet(
-            object(mock(VesselField.class)),
-            object(mock(PortGrid.class)),
-            object(mock(MarketGrid.class))
-          ),
-          behaviour(landCatches(hold, constant(Duration.ZERO)))
+          fleet(object(mock(VesselField.class)), object(mock(PortGrid.class))),
+          behaviour(
+            landCatches(
+              hold,
+              constant(Duration.ZERO),
+              object(mock(MarketGrid.class))
+            )
+          )
         )
           .homePortAttribute("home_port")
           .component("hold", listedHold)

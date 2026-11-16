@@ -33,7 +33,6 @@ import uk.ac.ox.poseidon.core.SchedulingScope;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
-import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
 /**
@@ -54,10 +53,6 @@ public class FleetFactory extends SchedulingFactory<Fleet> {
   private final Factory<? super SimulationScope, ? extends PortGrid> portGrid;
   private final Factory<
     ? super SimulationScope,
-    ? extends MarketGrid
-  > marketGrid;
-  private final Factory<
-    ? super SimulationScope,
     ? extends EventManager
   > eventManager;
 
@@ -67,8 +62,7 @@ public class FleetFactory extends SchedulingFactory<Fleet> {
       scope.getSchedule(),
       eventManager.get(scope),
       vesselField.get(scope),
-      portGrid.get(scope),
-      marketGrid.get(scope)
+      portGrid.get(scope)
     );
   }
 }

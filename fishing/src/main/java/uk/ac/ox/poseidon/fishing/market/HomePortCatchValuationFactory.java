@@ -57,12 +57,14 @@ public class HomePortCatchValuationFactory
     ? super Vessel,
     LocalDateTime
   > currentDateTime;
+  private final Factory<? super VesselScope, ? extends MarketGrid> marketGrid;
 
   @Override
   protected HomePortCatchValuation newInstance(final VesselScope scope) {
     return new HomePortCatchValuation(
       catchCategoriser.get(scope),
-      currentDateTime.get(scope)
+      currentDateTime.get(scope),
+      marketGrid.get(scope)
     );
   }
 }

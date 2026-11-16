@@ -51,7 +51,6 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
-import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -104,11 +103,7 @@ class VesselRegisterFactoryTest {
   }
 
   private void startSimulation(final String rows) {
-    final var fleet = fleet(
-      object(vesselField),
-      object(portGrid),
-      object(mock(MarketGrid.class))
-    );
+    final var fleet = fleet(object(vesselField), object(portGrid));
     final var vesselSpecification = vesselSpecification(
       fleet,
       behaviour(scope -> new RecordingTask())

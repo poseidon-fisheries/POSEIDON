@@ -40,7 +40,6 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
-import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -53,8 +52,7 @@ class SocialNetworkFactoryTest {
     mock(TemporalSchedule.class),
     mock(EventManager.class),
     mock(VesselField.class),
-    mock(PortGrid.class),
-    mock(MarketGrid.class)
+    mock(PortGrid.class)
   );
   private final SocialNetworkFactory factory = socialNetwork(fleetFactory());
 

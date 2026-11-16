@@ -41,7 +41,6 @@ import uk.ac.ox.poseidon.core.SimulationScopeFactory;
 import uk.ac.ox.poseidon.core.ValueFactory;
 import uk.ac.ox.poseidon.core.events.Listener;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
-import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.TaskFactory;
 import uk.ac.ox.poseidon.geography.Destination;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -76,16 +75,14 @@ public final class Factories {
   /**
    * @param vesselField the field vessels move within
    * @param portGrid    the fleet's ports
-   * @param marketGrid  the fleet's markets
    * @return a {@link SimulationScopeFactory} for a {@link Fleet}
    * @see Fleet
    */
   public static FleetFactory fleet(
     final Factory<? super SimulationScope, ? extends VesselField> vesselField,
-    final Factory<? super SimulationScope, ? extends PortGrid> portGrid,
-    final Factory<? super SimulationScope, ? extends MarketGrid> marketGrid
+    final Factory<? super SimulationScope, ? extends PortGrid> portGrid
   ) {
-    return new FleetFactory(vesselField, portGrid, marketGrid, eventManager());
+    return new FleetFactory(vesselField, portGrid, eventManager());
   }
 
   /**

@@ -80,6 +80,7 @@ public final class Factories {
    * @param catchCategoriser sorts the catch before pricing; give it the same
    *                         factory as the vessel's hold, so that both sort the
    *                         catch the same way
+   * @param marketGrid       the markets whose prices value the catch, by port
    * @return a {@link uk.ac.ox.poseidon.fishing.vessels.VesselScopeFactory} for a
    *         {@link HomePortCatchValuation}
    * @see HomePortCatchValuation
@@ -88,11 +89,13 @@ public final class Factories {
     final Factory<
       ? super VesselScope,
       ? extends CatchCategoriser
-    > catchCategoriser
+    > catchCategoriser,
+    final Factory<? super VesselScope, ? extends MarketGrid> marketGrid
   ) {
     return new HomePortCatchValuationFactory(
       catchCategoriser,
-      currentDateTime()
+      currentDateTime(),
+      marketGrid
     );
   }
 

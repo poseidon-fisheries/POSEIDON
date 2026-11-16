@@ -70,6 +70,7 @@ import uk.ac.ox.poseidon.fishing.catches.CatchCategory;
 import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.fishing.fuel.FuelStation;
 import uk.ac.ox.poseidon.fishing.fuel.FuelStationGrid;
+import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.market.Price;
 import uk.ac.ox.poseidon.fishing.market.Sale;
 import uk.ac.ox.poseidon.fishing.tasks.fishing.Fishing;
@@ -175,7 +176,8 @@ class TripBalanceTest {
       new Price(Money.of(CurrencyUnit.EUR, 5), KILOGRAM),
       START
     );
-    when(vessel.getMarketGrid().getMarket(port)).thenReturn(market);
+    final MarketGrid markets = mock(MarketGrid.class);
+    when(markets.getMarket(port)).thenReturn(market);
     final var station = new FuelStation(
       port,
       "fuel",
@@ -222,7 +224,8 @@ class TripBalanceTest {
         new LandCatches(
           holdComponent,
           _ -> Duration.ofMinutes(30),
-          _ -> now.get()
+          _ -> now.get(),
+          markets
         ),
         new Refuel(tankComponent, stations)
       )

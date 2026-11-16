@@ -331,7 +331,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
 
     final var fuelTank = vesselComponent(fullTank(volumeOf(100000, LITRE)));
 
-    final var fleet = fleet(vesselField, portGrid, marketGrid);
+    final var fleet = fleet(vesselField, portGrid);
 
     final var socialNetwork = socialNetwork(fleet);
     final var friendshipDynamics = friendshipDynamics(
@@ -441,7 +441,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
               setDestinationToOrigin(),
               travelToTripDestination,
               dockAtDestination(),
-              landCatches(hold, hours(1)),
+              landCatches(hold, hours(1), marketGrid),
               refuel(fuelTank, fuelStationGrid)
             ),
             waitFor(hours(1))

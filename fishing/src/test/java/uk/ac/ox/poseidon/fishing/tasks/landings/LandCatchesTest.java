@@ -58,7 +58,8 @@ class LandCatchesTest {
   private final LandCatches landCatches = new LandCatches(
     componentGiving(vessel, mock(Hold.class)),
     vessel -> Duration.ZERO,
-    vessel -> LocalDateTime.of(2026, 1, 1, 0, 0)
+    vessel -> LocalDateTime.of(2026, 1, 1, 0, 0),
+    marketGrid
   );
 
   @BeforeEach
@@ -72,7 +73,6 @@ class LandCatchesTest {
     when(homePortMarket.sell(any(), any(), any())).thenReturn(sale);
     when(otherPortMarket.sell(any(), any(), any())).thenReturn(sale);
     when(vessel.getHomePort()).thenReturn(homePort);
-    when(vessel.getMarketGrid()).thenReturn(marketGrid);
     when(trip.getAccount()).thenReturn(mock(Account.class));
     when(vessel.isDocked()).thenReturn(true);
     when(vessel.getPortDockedAt()).thenReturn(homePort);

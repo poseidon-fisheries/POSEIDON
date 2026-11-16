@@ -29,6 +29,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.tasks.ExtendedTripTask;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
@@ -46,6 +47,7 @@ public class LandCatches extends ExtendedTripTask {
   private final VesselComponent<? extends Hold> hold;
   private final Function<? super Vessel, Duration> duration;
   private final Function<? super Vessel, LocalDateTime> currentDateTime;
+  private final MarketGrid marketGrid;
 
   /** @return how long landing takes */
   @Override
@@ -69,8 +71,7 @@ public class LandCatches extends ExtendedTripTask {
       "Vessel %s is landing while not docked.",
       vessel.getId()
     );
-    vessel
-      .getMarketGrid()
+    marketGrid
       .getMarket(vessel.getPortDockedAt())
       .sell(
         vessel,

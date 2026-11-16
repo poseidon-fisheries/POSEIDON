@@ -49,7 +49,6 @@ import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
-import uk.ac.ox.poseidon.fishing.market.MarketGrid;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet.StepScheduler;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.Exit;
@@ -164,10 +163,6 @@ public class Vessel implements Oriented2D, HasAttributes {
   /** The grid of ports this vessel can dock at. */
   private final @NonNull PortGrid portGrid;
 
-  // TODO: consider if the vessel really needs a reference to the market grid
-  /** The grid of markets this vessel can sell into. */
-  private final @NonNull MarketGrid marketGrid;
-
   /**
    * Creates an inactive vessel, with no behaviour built yet. It starts stepping
    * once its first step is scheduled ({@link #scheduleFirstStep}).
@@ -180,7 +175,6 @@ public class Vessel implements Oriented2D, HasAttributes {
    * @param id               the vessel's identifying id
    * @param vesselField      the field the vessel moves within
    * @param portGrid         the grid of ports the vessel can dock at
-   * @param marketGrid       the grid of markets the vessel can sell into
    * @param specification    what the vessel is made of
    */
   Vessel(
@@ -190,7 +184,6 @@ public class Vessel implements Oriented2D, HasAttributes {
     @NonNull final String id,
     @NonNull final VesselField vesselField,
     @NonNull final PortGrid portGrid,
-    @NonNull final MarketGrid marketGrid,
     @NonNull final VesselSpecification specification
   ) {
     this.stepScheduler = newStepScheduler.apply(this::step);
@@ -199,7 +192,6 @@ public class Vessel implements Oriented2D, HasAttributes {
     this.id = id;
     this.vesselField = vesselField;
     this.portGrid = portGrid;
-    this.marketGrid = marketGrid;
     this.specification = specification;
   }
 
