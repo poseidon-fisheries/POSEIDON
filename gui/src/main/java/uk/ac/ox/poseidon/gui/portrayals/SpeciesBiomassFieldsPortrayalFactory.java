@@ -27,7 +27,6 @@ import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.gui.palettes.PaletteColorMap.LAJOLLA;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.IntStream;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -83,8 +82,10 @@ public class SpeciesBiomassFieldsPortrayalFactory
 
     final int n = Math.max(biomassGrids.size(), carryingCapacityGrids.size());
 
-    checkState(Set.of(1, n).contains(biomassGrids.size()));
-    checkState(Set.of(1, n).contains(carryingCapacityGrids.size()));
+    checkState(biomassGrids.size() == 1 || biomassGrids.size() == n);
+    checkState(
+      carryingCapacityGrids.size() == 1 || carryingCapacityGrids.size() == n
+    );
 
     return IntStream.range(0, n)
       .mapToObj(i -> {
