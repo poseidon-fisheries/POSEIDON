@@ -22,13 +22,8 @@
 
 package uk.ac.ox.poseidon.core;
 
-import static java.beans.Introspector.getBeanInfo;
-
-import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -43,22 +38,6 @@ import uk.ac.ox.poseidon.core.ScenarioCheck.ReachedNode;
  * meets over every node.
  */
 final class ScenarioWalk {
-
-  private static final ClassValue<List<PropertyDescriptor>> PROPERTIES =
-    new ClassValue<>() {
-      @Override
-      protected List<PropertyDescriptor> computeValue(final Class<?> type) {
-        try {
-          return Arrays.stream(
-            getBeanInfo(type, Object.class).getPropertyDescriptors()
-          )
-            .filter(property -> property.getReadMethod() != null)
-            .toList();
-        } catch (final IntrospectionException e) {
-          throw new IllegalStateException(e);
-        }
-      }
-    };
 
   private final List<ReachedNode> nodes = new ArrayList<>();
   private final Set<Object> met = Collections.newSetFromMap(
@@ -102,25 +81,11 @@ final class ScenarioWalk {
   private void visitNode(final Object node, final Object parent) {
     if (met.add(node)) {
       nodes.add(new ReachedNode(node, parent));
-      for (final PropertyDescriptor property : PROPERTIES.get(
+      for (final PropertyDescriptor property : ReadableProperties.of(
         node.getClass()
       )) {
-        visit(read(node, property), node);
+        visit(ReadableProperties.read(node, property), node);
       }
-    }
-  }
-
-  private static Object read(
-    final Object node,
-    final PropertyDescriptor property
-  ) {
-    try {
-      return property.getReadMethod().invoke(node);
-    } catch (final IllegalAccessException | InvocationTargetException e) {
-      throw new IllegalStateException(
-        "Cannot read " + property.getName() + " on " + node.getClass(),
-        e
-      );
     }
   }
 }

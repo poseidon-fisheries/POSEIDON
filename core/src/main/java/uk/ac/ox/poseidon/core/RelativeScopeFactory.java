@@ -23,12 +23,10 @@
 package uk.ac.ox.poseidon.core;
 
 import static com.google.common.base.Preconditions.checkState;
-import static java.beans.Introspector.getBeanInfo;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.reflect.TypeToken;
-import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -204,17 +202,8 @@ public abstract class RelativeScopeFactory<
     final Type scopeVariable = classType
       .resolveType(RelativeScopeFactory.class.getTypeParameters()[0])
       .getType();
-    final PropertyDescriptor[] properties;
-    try {
-      properties = getBeanInfo(
-        factoryClass,
-        Object.class
-      ).getPropertyDescriptors();
-    } catch (final IntrospectionException e) {
-      throw new IllegalStateException(e);
-    }
-    return Arrays.stream(properties)
-      .filter(property -> property.getReadMethod() != null)
+    return ReadableProperties.of(factoryClass)
+      .stream()
       .filter(property -> {
         final Type type = classType
           .resolveType(genericReturnType(property.getReadMethod()))

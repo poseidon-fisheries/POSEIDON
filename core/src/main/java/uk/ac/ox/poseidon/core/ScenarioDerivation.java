@@ -22,13 +22,9 @@
 
 package uk.ac.ox.poseidon.core;
 
-import static java.beans.Introspector.getBeanInfo;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -63,22 +59,6 @@ import uk.ac.ox.poseidon.core.utils.Builders;
 final class ScenarioDerivation {
 
   private static final Resolver RESOLVER = new DefaultResolver();
-
-  private static final ClassValue<List<PropertyDescriptor>> PROPERTIES =
-    new ClassValue<>() {
-      @Override
-      protected List<PropertyDescriptor> computeValue(final Class<?> type) {
-        try {
-          return Arrays.stream(
-            getBeanInfo(type, Object.class).getPropertyDescriptors()
-          )
-            .filter(property -> property.getReadMethod() != null)
-            .toList();
-        } catch (final IntrospectionException e) {
-          throw new IllegalStateException(e);
-        }
-      }
-    };
 
   /** Each node met so far, with what replaces it, itself if unchanged. */
   private final Map<Object, Object> copies = new IdentityHashMap<>();
@@ -195,28 +175,16 @@ final class ScenarioDerivation {
 
   private Object rebuiltBean(final Object bean) {
     final Map<String, Object> changes = new LinkedHashMap<>();
-    for (final PropertyDescriptor property : PROPERTIES.get(bean.getClass())) {
-      final Object child = read(bean, property);
+    for (final PropertyDescriptor property : ReadableProperties.of(
+      bean.getClass()
+    )) {
+      final Object child = ReadableProperties.read(bean, property);
       final Object copy = rebuilt(child);
       if (copy != child) {
         changes.put(property.getName(), copy);
       }
     }
     return changes.isEmpty() ? bean : copy(bean, changes);
-  }
-
-  private static Object read(
-    final Object bean,
-    final PropertyDescriptor property
-  ) {
-    try {
-      return property.getReadMethod().invoke(bean);
-    } catch (final IllegalAccessException | InvocationTargetException e) {
-      throw new IllegalStateException(
-        "Cannot read " + property.getName() + " on " + bean.getClass(),
-        e
-      );
-    }
   }
 
   private static Object copy(
@@ -260,11 +228,11 @@ final class ScenarioDerivation {
           "No property " + name + " to follow in " + address
         );
       }
-      return PROPERTIES.get(container.getClass())
+      return ReadableProperties.of(container.getClass())
         .stream()
         .filter(property -> property.getName().equals(name))
         .findFirst()
-        .map(property -> ScenarioDerivation.read(container, property))
+        .map(property -> ReadableProperties.read(container, property))
         .orElseThrow(() ->
           new IllegalArgumentException(
             "No property " +
