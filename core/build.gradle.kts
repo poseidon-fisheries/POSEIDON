@@ -37,3 +37,10 @@ dependencies {
     implementation(libs.commons.beanutils)
     api(libs.fastutil.core)
 }
+
+pitest {
+    // Measured 2026-11-17 at 67%; the surviving mutants are all either provably
+    // equivalent or unobservable under PIT's forked JVMs (ClassValue memoization).
+    // Bump this floor up, never down.
+    mutationThreshold.set(67)
+}
