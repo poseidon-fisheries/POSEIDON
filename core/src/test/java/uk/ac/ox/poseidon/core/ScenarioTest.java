@@ -137,6 +137,7 @@ class ScenarioTest {
 
     final Scenario derived = scenario
       .with("table.value(DBO;adult)", 2.0)
+      .with("list.factories[0].value", 4.0)
       .with("list.factories[1].value", 5.0);
 
     assertThat(
@@ -145,7 +146,38 @@ class ScenarioTest {
     final ListFactory<?, ?> list = derived.component("list", ListFactory.class);
     assertThat(list.getFactories())
       .extracting(factory -> ((NumberFactory) factory).getValue())
-      .containsExactly(1.0, 5.0);
+      .containsExactly(4.0, 5.0);
+  }
+
+  @Test
+  void aContainerTheChangeDoesNotReachIsKeptAsIs() {
+    final Factory<? super SimulationScope, ?> table = new ObjectFactory<>(
+      Map.of("key", 1.0)
+    );
+    final Factory<? super SimulationScope, ?> list = new ListFactory<>(
+      ImmutableList.of(number(1))
+    );
+    final Scenario scenario = scenario(
+      Map.of("number", number(1), "table", table, "list", list)
+    );
+
+    final Scenario derived = scenario.with("number.value", 2.0);
+
+    assertThat(derived.component("table")).isSameAs(table);
+    assertThat(derived.component("list")).isSameAs(list);
+  }
+
+  @Test
+  void aPropertyChangeKeepsTheBeansOtherProperties() {
+    final NumberFactory number = number(1);
+    final PairFactory pair = pair(number, number(3));
+    final Scenario scenario = scenario(Map.of("pair", pair));
+
+    final Scenario derived = scenario.with("pair.second.value", 4.0);
+
+    final PairFactory copy = derived.component("pair", PairFactory.class);
+    assertThat(copy.getSecond()).isNotSameAs(pair.getSecond());
+    assertThat(copy.getFirst()).isSameAs(number);
   }
 
   @ParameterizedTest
@@ -155,7 +187,9 @@ class ScenarioTest {
       "number.missing",
       "number.value.further",
       "table.value(missing)",
-      "list.factories[2]"
+      "list.factories[1]",
+      "list.factories[2]",
+      "list.factories[-1]"
     }
   )
   void refusesAnAddressThatLeadsNowhere(final String address) {
