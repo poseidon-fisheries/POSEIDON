@@ -53,6 +53,9 @@ class EphemeralAccumulatingListenerTest {
         accumulator
       );
 
+    // The constructor subscribes itself to the event manager
+    verify(eventManager).addListener(listener);
+
     // Simulate events being received
     listener.receive(5);
     listener.receive(10);

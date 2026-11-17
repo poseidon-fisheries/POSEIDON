@@ -57,6 +57,22 @@ public class ObjectPropertyTest {
   }
 
   @Test
+  void ignoresAnOverloadedGetterWithParameters() {
+    assertThat(
+      new ObjectProperty<Outer, String>(Outer.class, "label").read(new Outer())
+    ).isEqualTo("label");
+  }
+
+  @Test
+  void treatsAPropertyWithOnlyAParameterizedGetterAsUnknown() {
+    assertThatThrownBy(() ->
+      new ObjectProperty<Outer, String>(Outer.class, "sized")
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("No getter for property sized");
+  }
+
+  @Test
   void followsANestedPath() {
     assertThat(
       new ObjectProperty<Outer, String>(Outer.class, "inner.code").read(
@@ -180,6 +196,20 @@ public class ObjectPropertyTest {
 
     public boolean isActive() {
       return true;
+    }
+
+    public String getLabel() {
+      return "label";
+    }
+
+    @SuppressWarnings("unused")
+    public String getLabel(final String ignored) {
+      return "overloaded";
+    }
+
+    @SuppressWarnings("unused")
+    public String getSized(final int index) {
+      return "sized" + index;
     }
 
     public String isWeird() {
