@@ -344,6 +344,113 @@ class TemporalScheduleTest {
     assertThat(firings).containsExactly(until.plusSeconds(10));
   }
 
+  // --- Return values of scheduling calls ---
+
+  @Test
+  void returnsTrueWhenSchedulingOnceInDurations() {
+    assertThat(
+      schedule.scheduleOnceIn(Duration.ofMinutes(30), recordFiring)
+    ).isTrue();
+    assertThat(
+      schedule.scheduleOnceIn(Duration.ofMinutes(30), recordFiring, 1)
+    ).isTrue();
+  }
+
+  @Test
+  void returnsTrueWhenSchedulingOnceAtADateTime() {
+    assertThat(schedule.scheduleOnce(start.plusDays(1), recordFiring)).isTrue();
+    assertThat(
+      schedule.scheduleOnce(start.plusDays(1), 1, recordFiring)
+    ).isTrue();
+  }
+
+  @Test
+  void returnsTrueWhenSchedulingOnceOnTheOverriddenMasonMethods() {
+    assertThat(schedule.scheduleOnce(recordFiring)).isTrue();
+    assertThat(schedule.scheduleOnce(recordFiring, 1)).isTrue();
+    assertThat(schedule.scheduleOnceIn(10.0, recordFiring)).isTrue();
+    assertThat(schedule.scheduleOnceIn(10.0, recordFiring, 1)).isTrue();
+  }
+
+  @Test
+  void returnsTrueFromTheStepThatRunsAnEvent() {
+    schedule.scheduleOnce(start.plusSeconds(1), recordFiring);
+    assertThat(schedule.step(simState)).isTrue();
+  }
+
+  @Test
+  void returnsFalseFromTheStepOfAnEmptySchedule() {
+    assertThat(schedule.step(simState)).isFalse();
+  }
+
+  @Test
+  void refusesToStepUntilFromInsideAnEventWithoutRunningTheNextEvent() {
+    schedule.scheduleOnce(start.plusSeconds(1), _ ->
+      schedule.stepUntil(simState, start.plusSeconds(10))
+    );
+    schedule.scheduleOnce(start.plusSeconds(5), recordFiring);
+    assertThatThrownBy(() -> schedule.step(simState)).isInstanceOf(
+      IllegalStateException.class
+    );
+    assertThat(firings).isEmpty();
+  }
+
+  @Test
+  void returnsFalseWhenSchedulingOnceTheSimulationIsFinished() {
+    simState.finish();
+    assertThat(
+      schedule.scheduleOnce(start.plusDays(1), recordFiring)
+    ).isFalse();
+    assertThat(
+      schedule.scheduleOnce(start.plusDays(1), 1, recordFiring)
+    ).isFalse();
+    assertThat(schedule.scheduleOnce(recordFiring)).isFalse();
+    assertThat(schedule.scheduleOnce(recordFiring, 1)).isFalse();
+    assertThat(schedule.scheduleOnceIn(10.0, recordFiring)).isFalse();
+    assertThat(schedule.scheduleOnceIn(10.0, recordFiring, 1)).isFalse();
+    assertThat(
+      schedule.scheduleOnceIn(Duration.ofMinutes(30), recordFiring)
+    ).isFalse();
+    assertThat(
+      schedule.scheduleOnceIn(Duration.ofMinutes(30), recordFiring, 1)
+    ).isFalse();
+  }
+
+  @Test
+  void returnsNullWhenSchedulingRepeatingOnAFinishedSimulation() {
+    simState.finish();
+    assertThat(
+      schedule.scheduleRepeating(recordFiring, Duration.ofDays(1))
+    ).isNull();
+  }
+
+  @Test
+  void returnsTheRepeatHandleFromTheRepeatingOverloads() {
+    assertThat(
+      schedule.scheduleRepeating(
+        start.plusHours(1),
+        recordFiring,
+        Duration.ofDays(1)
+      )
+    ).isNotNull();
+    assertThat(
+      schedule.scheduleRepeating(
+        start.plusHours(1),
+        1,
+        recordFiring,
+        Duration.ofDays(1)
+      )
+    ).isNotNull();
+    assertThat(schedule.scheduleRepeating(recordFiring)).isNotNull();
+    assertThat(
+      schedule.scheduleRepeating(recordFiring, Duration.ofDays(1))
+    ).isNotNull();
+    assertThat(schedule.scheduleRepeating(recordFiring, 3_600.0)).isNotNull();
+    assertThat(
+      schedule.scheduleRepeating(recordFiring, 1, 3_600.0)
+    ).isNotNull();
+  }
+
   @Test
   void countsRelativeTimesFromTheStartBeforeTheFirstStep() {
     schedule.scheduleOnceIn(Duration.ofHours(1), recordFiring);
@@ -732,6 +839,14 @@ class TemporalScheduleTest {
     assertThat(firings).containsExactly(start);
   }
 
+  @Test
+  void clearsTheQueuedEventsOnReset() {
+    schedule.scheduleOnce(start.plusHours(1), recordFiring);
+    schedule.reset();
+    schedule.stepUntil(simState, start.plusDays(1));
+    assertThat(firings).isEmpty();
+  }
+
   // --- One advance at a time ---
 
   @Test
@@ -753,6 +868,9 @@ class TemporalScheduleTest {
     schedule.scheduleOnce(start.plusSeconds(5), recordFiring);
     schedule.stepUntil(simState, start.plusSeconds(2));
     assertThat(refused).hasSize(2);
+    assertThat(refused).allSatisfy(e ->
+      assertThat(e).hasMessageContaining("from inside an event")
+    );
     assertThat(firings).containsExactly(start.plusSeconds(1));
     assertThat(schedule.getDateTime()).isEqualTo(start.plusSeconds(2));
     schedule.stepUntil(simState, start.plusSeconds(10));
