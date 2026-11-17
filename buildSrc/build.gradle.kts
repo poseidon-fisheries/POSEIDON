@@ -36,6 +36,7 @@ repositories {
 
 dependencies {
     implementation(libs.freefair.lombok.gradle.plugin)
+    implementation(libs.pitest.gradle.plugin)
     implementation(libs.spotbugs.gradle.plugin)
 }
 

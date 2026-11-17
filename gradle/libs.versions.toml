@@ -27,6 +27,8 @@ mason = "8c42c10ae5"
 mockito = "5.24.0"
 node-gradle = "7.1.0"
 nodejs = "24.14.0"
+pitest = "1.19.0"
+pitest-junit5 = "1.2.3"
 si-units = "2.1" # do not bump without checking compatibility with the pinned GeoTools version (previously broke with GeoTools 32.2; tests pass with GeoTools 35.2)
 slf4j = "2.0.20"
 snakeyaml = "2.7"
@@ -71,6 +73,7 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 freefair-lombok-gradle-plugin = { module = "io.freefair.gradle:lombok-plugin", version.ref = "freefair" }
 mason = { module = "com.github.eclab.MASON:mason", version.ref = "mason" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+pitest-gradle-plugin = { module = "info.solidsoft.gradle.pitest:gradle-pitest-plugin", version.ref = "pitest" }
 si-units = { module = "si.uom:si-units", version.ref = "si-units" }
 slf4j-jdk14 = { module = "org.slf4j:slf4j-jdk14", version.ref = "slf4j" }
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
@@ -86,5 +89,6 @@ batik = ["batik-transcoder", "batik-dom", "batik-awt-util"]
 [plugins]
 freefair-lombok = { id = "io.freefair.lombok", version.ref = "freefair" }
 node-gradle = { id = "com.github.node-gradle.node", version.ref = "node-gradle" }
+pitest = { id = "info.solidsoft.pitest", version.ref = "pitest" }
 spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugs" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

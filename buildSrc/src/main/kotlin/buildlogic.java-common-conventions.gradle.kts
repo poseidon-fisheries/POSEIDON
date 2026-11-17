@@ -32,6 +32,8 @@ plugins {
     // Adds Lombok to every source set, and makes Javadoc read the delomboked sources so it sees
     // the classes Lombok generates
     alias(libs.plugins.freefair.lombok)
+    // Mutation testing with PIT; run per module with e.g. `./gradlew :core:pitest`
+    alias(libs.plugins.pitest)
 }
 
 lombok {
@@ -112,4 +114,23 @@ checkstyle {
 
 spotbugs {
     excludeFilter.set(file("${rootProject.projectDir}/spotbugs_exclude.xml"))
+}
+
+pitest {
+    junit5PluginVersion.set(libs.versions.pitest.junit5)
+    targetClasses.set(setOf("uk.ac.ox.poseidon.${project.name}.*"))
+    threads.set(Runtime.getRuntime().availableProcessors())
+    outputFormats.set(setOf("XML", "HTML"))
+    // Stable report path so CI can pick it up without globbing
+    timestampedReports.set(false)
+    // Lombok-generated code is bytecode-mutated like everything else; lombok.config already
+    // annotates it with @lombok.Generated, which PIT skips, and this keeps calls to the Lombok
+    // runtime itself out of scope
+    avoidCallsTo.set(setOf("lombok"))
+    // These are Lombok- or IDE-generated all over the codebase and produce only junk mutants
+    excludedMethods.set(setOf("toString", "equals", "hashCode"))
+    // PIT forks its own JVMs and doesn't inherit the test task's JVM argument providers, so the
+    // Mockito agent isn't on board; mirror the -Xshare:off it comes with so inline mock-making
+    // still works if the agent has to self-attach
+    jvmArgs.add("-Xshare:off")
 }
