@@ -169,6 +169,50 @@ class MasonUtilsTest {
   }
 
   @Test
+  void upToNOfPreservesOriginalRelativeOrder() {
+    final List<Integer> candidates = IntStream.range(0, 100).boxed().toList();
+
+    for (long seed = 0; seed < 50; seed++) {
+      final MersenneTwisterFast rng = new MersenneTwisterFast(seed);
+      final List<Integer> result = upToNOf(7, candidates, rng);
+      assertThat(result).isSorted();
+    }
+  }
+
+  @Test
+  void upToNOfSamplesUniformlyAcrossSeeds() {
+    final List<Integer> candidates = IntStream.range(0, 10).boxed().toList();
+    final int[] selectionCounts = new int[candidates.size()];
+
+    final int runs = 10_000;
+    for (long seed = 0; seed < runs; seed++) {
+      final MersenneTwisterFast rng = new MersenneTwisterFast(seed);
+      upToNOf(3, candidates, rng).forEach(i -> selectionCounts[i]++);
+    }
+
+    final double expected = (runs * 3.0) / candidates.size();
+    for (final int count : selectionCounts) {
+      assertThat((double) count).isCloseTo(expected, within(expected * 0.15));
+    }
+  }
+
+  @Test
+  void upToNOfSamplesWhenNIsOneLessThanSize() {
+    final List<Integer> candidates = List.of(10, 20, 30, 40, 50);
+
+    for (long seed = 0; seed < 50; seed++) {
+      final MersenneTwisterFast rng = new MersenneTwisterFast(seed);
+      final List<Integer> result = upToNOf(
+        candidates.size() - 1,
+        candidates,
+        rng
+      );
+      assertThat(result).hasSize(candidates.size() - 1);
+      assertThat(candidates).containsAll(result);
+    }
+  }
+
+  @Test
   void reservoirSampleReturnsAllWhenPoolSmallerThanSampleSize() {
     final List<Integer> pool = List.of(10, 20, 30);
     final MersenneTwisterFast rng = new MersenneTwisterFast();

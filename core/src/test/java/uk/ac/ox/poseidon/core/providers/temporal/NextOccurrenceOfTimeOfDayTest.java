@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.providers.temporal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -43,6 +44,15 @@ class NextOccurrenceOfTimeOfDayTest {
       context -> referenceDateTime,
       times
     ).apply(null);
+  }
+
+  @Test
+  void refusesNoTimesOfDay() {
+    assertThatThrownBy(() ->
+      new NextOccurrenceOfTimeOfDay<>(context -> null, new LocalTime[0])
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("At least one time of day");
   }
 
   @Test

@@ -87,8 +87,22 @@ class MultiStringKeyTest {
   }
 
   @Test
+  void rejectsSeparatorAtStartOfValue() {
+    assertThatThrownBy(() -> Utils.multiStringKey(";a"))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining(";");
+  }
+
+  @Test
   void rejectsClosingParenInValue() {
     assertThatThrownBy(() -> Utils.multiStringKey("a)b"))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining(")");
+  }
+
+  @Test
+  void rejectsClosingParenAtStartOfValue() {
+    assertThatThrownBy(() -> Utils.multiStringKey(")a"))
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining(")");
   }

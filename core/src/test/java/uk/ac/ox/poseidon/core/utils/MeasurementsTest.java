@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.core.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.poseidon.core.utils.Measurements.parseMassUnit;
 
@@ -37,5 +38,12 @@ class MeasurementsTest {
     assertThat(
       parseMassUnit("t").getConverterTo(KILOGRAM).convert(1.0)
     ).isEqualTo(1000.0);
+  }
+
+  @Test
+  void refusesAnEmptyUnitString() {
+    assertThatThrownBy(() -> parseMassUnit(""))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("empty");
   }
 }

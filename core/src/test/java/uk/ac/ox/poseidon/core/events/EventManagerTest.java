@@ -81,6 +81,25 @@ class EventManagerTest {
   }
 
   @Test
+  void removingOneOfTwoListenersLeavesTheOther() {
+    final List<String> removed = new ArrayList<>();
+    final List<String> kept = new ArrayList<>();
+
+    final Listener<String> removedListener = new SimpleListener<>(
+      String.class,
+      removed::add
+    );
+    eventManager.addListener(removedListener);
+    eventManager.addListener(new SimpleListener<>(String.class, kept::add));
+
+    eventManager.removeListener(removedListener);
+    eventManager.broadcast("event");
+
+    assertThat(removed).isEmpty();
+    assertThat(kept).containsExactly("event");
+  }
+
+  @Test
   void testMultipleListenersForSameEventType() {
     // Create lists to hold received events for each listener
     final List<String> receivedEvents1 = new ArrayList<>();
