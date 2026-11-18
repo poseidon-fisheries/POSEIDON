@@ -39,8 +39,12 @@ dependencies {
 }
 
 pitest {
-    // Measured 2026-11-17 at 67%; the surviving mutants are all either provably
-    // equivalent or unobservable under PIT's forked JVMs (ClassValue memoization).
+    // Measured 2026-11-18 at 86%. The survivors are of four kinds: equivalent
+    // (bounds on saturated ranges, the terminal ProductStore.end, shuffles that
+    // each return a permutation); masked by redundancy (TemporalSchedule.step
+    // re-checks what stepUntil does, so removing the latter call is invisible);
+    // unobservable under PIT's forked JVMs because ClassValue memoization skips
+    // the discovery code after its first run; or diagnostic logging only.
     // Bump this floor up, never down.
-    mutationThreshold.set(67)
+    mutationThreshold.set(84)
 }

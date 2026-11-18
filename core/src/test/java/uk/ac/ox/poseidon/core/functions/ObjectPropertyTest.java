@@ -118,6 +118,17 @@ public class ObjectPropertyTest {
   }
 
   @Test
+  void throwsWhenTheObjectReadIsNull() {
+    final ObjectProperty<Outer, String> property = new ObjectProperty<>(
+      Outer.class,
+      "inner.code"
+    );
+    assertThatThrownBy(() -> property.read(null))
+      .isInstanceOf(NullPointerException.class)
+      .hasMessageContaining("The object read");
+  }
+
+  @Test
   void throwsWhenBuiltWithAnUnknownProperty() {
     assertThatThrownBy(() ->
       new ObjectProperty<Outer, String>(Outer.class, "inner.colour")
