@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.core.predicates;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
+import static uk.ac.ox.poseidon.core.predicates.Factories.equal;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,5 +42,10 @@ class EqualTest {
     final Equal<Object, String> equal = new Equal<>(context -> "foo");
 
     assertThat(equal.apply(null, "bar")).isFalse();
+  }
+
+  @Test
+  void factoryBuildsTheSamePredicateOverALiteralValue() {
+    assertThat(equal("foo").get(GLOBAL_SCOPE).apply(null, "foo")).isTrue();
   }
 }
