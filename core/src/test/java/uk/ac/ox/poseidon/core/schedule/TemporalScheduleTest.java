@@ -42,6 +42,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 import sim.engine.Schedule;
+import sim.engine.Sequence;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 
@@ -448,6 +449,9 @@ class TemporalScheduleTest {
     assertThat(schedule.scheduleRepeating(recordFiring, 3_600.0)).isNotNull();
     assertThat(
       schedule.scheduleRepeating(recordFiring, 1, 3_600.0)
+    ).isNotNull();
+    assertThat(
+      schedule.scheduleRepeating(recordFiring, 1, Duration.ofDays(1))
     ).isNotNull();
   }
 
@@ -982,5 +986,48 @@ class TemporalScheduleTest {
     release.countDown();
     first.join();
     second.join();
+  }
+
+  @Test
+  void theDebugSnapshotListsPendingEntriesSortedByDateTime() {
+    schedule.scheduleOnce(start.plusDays(3), 0, recordFiring);
+    schedule.scheduleOnce(start.plusDays(1), 0, recordFiring);
+    schedule.scheduleOnce(start.plusDays(2), 0, recordFiring);
+
+    assertThat(schedule.asMap())
+      .extracting(TemporalSchedule.ScheduledEntry::getDateTime)
+      .containsExactly(start.plusDays(1), start.plusDays(2), start.plusDays(3));
+  }
+
+  @Test
+  void theDebugSnapshotOrdersEntriesAtTheSameTimeByOrderingThenSequence() {
+    schedule.scheduleOnce(start.plusDays(1), 2, recordFiring);
+    schedule.scheduleOnce(start.plusDays(1), 1, recordFiring);
+
+    assertThat(schedule.asMap())
+      .extracting(TemporalSchedule.ScheduledEntry::getOrdering)
+      .containsExactly(1, 2);
+  }
+
+  @Test
+  void theDebugSnapshotExpandsASequenceIntoOneEntryPerStep() {
+    final Steppable first = _ -> {};
+    final Steppable second = _ -> {};
+    schedule.scheduleOnce(
+      start.plusDays(1),
+      new Sequence(new Steppable[] { first, second })
+    );
+
+    assertThat(schedule.asMap())
+      .extracting(TemporalSchedule.ScheduledEntry::getSequence)
+      .containsExactly(0, 1);
+    assertThat(schedule.asMap())
+      .extracting(TemporalSchedule.ScheduledEntry::getSteppable)
+      .containsExactly(first, second);
+  }
+
+  @Test
+  void theDebugSnapshotIsEmptyWhenNothingIsScheduled() {
+    assertThat(schedule.asMap()).isEmpty();
   }
 }

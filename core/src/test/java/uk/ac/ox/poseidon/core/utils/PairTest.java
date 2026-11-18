@@ -58,8 +58,11 @@ class PairTest {
 
   @Test
   void factoryPairsTheValuesOfItsInputs() {
-    final PairFactory<Scope, String, Integer> factory = PairFactory
-      .<Scope, String, Integer>builder()
+    final PairFactory<Scope, String, Integer> factory = PairFactory.<
+      Scope,
+      String,
+      Integer
+    >builder()
       .first(new Value<>("a"))
       .second(new Value<>(1))
       .build();
@@ -70,7 +73,7 @@ class PairTest {
   @Getter
   @AllArgsConstructor
   @SuperBuilder(toBuilder = true)
-  private static class Value<R> extends GlobalScopeFactory<R> {
+  private static final class Value<R> extends GlobalScopeFactory<R> {
 
     private final R value;
 

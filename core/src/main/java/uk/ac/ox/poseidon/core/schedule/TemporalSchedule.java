@@ -739,19 +739,25 @@ public class TemporalSchedule extends Schedule {
   }
 
   /**
+   * A single pending entry of {@link #asMap()}: the event it runs, the date-time
+   * and ordering the schedule holds it at, and — for a step of a
+   * {@link Sequence} — its position within that sequence.
+   */
+  @Value
+  static class ScheduledEntry {
+
+    LocalDateTime dateTime;
+    int ordering;
+    int sequence;
+    Object steppable;
+  }
+
+  /**
    * This is a very ugly method meant to package the schedule in a slightly more
    * easily interpretable way for human _debugging_ and should not under any
    * circumstances be used in actual simulation code. -- NP 2026-02-03.
    */
-  private List<?> asMap() {
-    @Value
-    final class K {
-
-      LocalDateTime dateTime;
-      int ordering;
-      int sequence;
-      Object steppable;
-    }
+  List<ScheduledEntry> asMap() {
     final Comparable[] keys = queue.getKeys();
     final Object[] objects = queue.getObjects();
     return IntStream.range(0, this.queue.size())
@@ -763,22 +769,23 @@ public class TemporalSchedule extends Schedule {
         return switch (obj) {
           case final Sequence s -> Streams.mapWithIndex(
             sequenceSteps(s).stream(),
-            (from, index) -> new K(dateTime, ordering, (int) index, from)
+            (from, index) ->
+              new ScheduledEntry(dateTime, ordering, (int) index, from)
           );
-          default -> Stream.of(new K(dateTime, ordering, 0, obj));
+          default -> Stream.of(new ScheduledEntry(dateTime, ordering, 0, obj));
         };
       })
       .flatMap(x -> x)
       .sorted((o1, o2) ->
-        Comparator.comparing(K::getDateTime)
-          .thenComparingInt(K::getOrdering)
-          .thenComparingInt(K::getSequence)
+        Comparator.comparing(ScheduledEntry::getDateTime)
+          .thenComparingInt(ScheduledEntry::getOrdering)
+          .thenComparingInt(ScheduledEntry::getSequence)
           .compare(o1, o2)
       )
       .toList();
   }
 
-  private static List<Object> sequenceSteps(final Sequence sequence) {
+  static List<Object> sequenceSteps(final Sequence sequence) {
     Object steps;
     try {
       final var field = Sequence.class.getDeclaredField("steps");

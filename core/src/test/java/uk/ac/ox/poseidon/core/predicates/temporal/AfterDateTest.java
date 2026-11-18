@@ -39,8 +39,8 @@ class AfterDateTest {
     context ->
       REFERENCE;
 
-  private final AfterDate<Object> predicate = new AfterDate<>(context ->
-    REFERENCE
+  private final AfterDate<Object> predicate = new AfterDate<>(
+    context -> REFERENCE
   );
 
   @Test

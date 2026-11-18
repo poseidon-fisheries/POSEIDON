@@ -53,8 +53,7 @@ class EventClearerTest {
       String.class
     );
     accumulator.receive("a");
-    final EventClearer clearer = EventClearerFactory
-      .<Scope>builder()
+    final EventClearer clearer = EventClearerFactory.<Scope>builder()
       .eventAccumulator(new HeldAccumulator<>(accumulator))
       .build()
       .get(GLOBAL_SCOPE);
@@ -64,8 +63,9 @@ class EventClearerTest {
     assertThat(accumulator.getEvents()).isEmpty();
   }
 
-  private static class HeldAccumulator<E>
-    extends GlobalScopeFactory<EventAccumulator<E>> {
+  private static final class HeldAccumulator<E> extends GlobalScopeFactory<
+    EventAccumulator<E>
+  > {
 
     private final EventAccumulator<E> accumulator;
 

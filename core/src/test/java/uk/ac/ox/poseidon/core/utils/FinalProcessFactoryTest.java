@@ -47,7 +47,10 @@ class FinalProcessFactoryTest {
   void theBuiltProcessIsRegisteredToRunAtFinish() {
     final List<String> ran = new ArrayList<>();
     final Factory<SimulationScope, Steppable> process = scope ->
-      (final SimState simState) -> ran.add("ran");
+      (
+        final SimState simState
+      ) ->
+        ran.add("ran");
 
     finalProcess(process).get(new SimulationScope(simulation));
 
@@ -61,7 +64,8 @@ class FinalProcessFactoryTest {
     final Steppable steppable = simState -> {};
     final Factory<SimulationScope, Steppable> process = scope -> steppable;
 
-    assertThat(finalProcess(process).get(new SimulationScope(simulation)))
-      .isSameAs(steppable);
+    assertThat(
+      finalProcess(process).get(new SimulationScope(simulation))
+    ).isSameAs(steppable);
   }
 }
