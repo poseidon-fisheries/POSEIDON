@@ -23,18 +23,35 @@
 package uk.ac.ox.poseidon.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
+import static uk.ac.ox.poseidon.core.MasonUtils.bagToSet;
+import static uk.ac.ox.poseidon.core.MasonUtils.bagToStream;
+import static uk.ac.ox.poseidon.core.MasonUtils.inBounds;
+import static uk.ac.ox.poseidon.core.MasonUtils.oneOf;
 import static uk.ac.ox.poseidon.core.MasonUtils.reservoirSample;
 import static uk.ac.ox.poseidon.core.MasonUtils.shuffledStream;
 import static uk.ac.ox.poseidon.core.MasonUtils.upToNOf;
+import static uk.ac.ox.poseidon.core.MasonUtils.upToOneOf;
 
 import ec.util.MersenneTwisterFast;
+import java.util.AbstractCollection;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.RandomAccess;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
+import sim.field.continuous.Continuous2D;
+import sim.field.grid.DenseGrid2D;
+import sim.util.Bag;
+import sim.util.Double2D;
 
 class MasonUtilsTest {
 
@@ -261,6 +278,263 @@ class MasonUtilsTest {
       rng
     );
     assertThat(result).allMatch(x -> x % 2 == 0);
+  }
+
+  @Test
+  void bagToSetCollectsEveryElement() {
+    final Bag bag = new Bag(List.of("a", "b"));
+
+    assertThat(bagToSet(bag)).containsExactlyInAnyOrder("a", "b");
+  }
+
+  @Test
+  void bagToSetOfANullBagIsEmpty() {
+    assertThat(MasonUtils.<String>bagToSet(null)).isEmpty();
+  }
+
+  @Test
+  void bagToStreamReadsEveryElement() {
+    final Bag bag = new Bag(List.of("a", "b"));
+
+    assertThat(bagToStream(bag).toList()).containsExactly("a", "b");
+  }
+
+  @Test
+  void bagToStreamOfANullBagIsEmpty() {
+    assertThat(MasonUtils.<String>bagToStream(null).toList()).isEmpty();
+  }
+
+  @Test
+  void bagToStreamCastsEveryElementToTheGivenClass() {
+    final Bag bag = new Bag(List.of("a", "b"));
+
+    assertThat(bagToStream(bag, String.class).toList()).containsExactly(
+      "a",
+      "b"
+    );
+  }
+
+  @Test
+  void bagToStreamRefusesAnElementOfAnotherClass() {
+    final Bag bag = new Bag(List.of("a", 1));
+
+    assertThatThrownBy(() ->
+      bagToStream(bag, String.class).toList()
+    ).isInstanceOf(ClassCastException.class);
+  }
+
+  @Test
+  void oneOfAnIteratorPicksItsOnlyElement() {
+    assertThat(
+      oneOf(List.of("only").iterator(), new MersenneTwisterFast(42))
+    ).isEqualTo("only");
+  }
+
+  @Test
+  void oneOfAnIterablePicksItsOnlyElement() {
+    final Iterable<String> candidates = Set.of("only");
+
+    assertThat(oneOf(candidates, new MersenneTwisterFast(42))).isEqualTo(
+      "only"
+    );
+  }
+
+  @Test
+  void oneOfAnArrayPicksItsOnlyElement() {
+    assertThat(
+      oneOf(new String[] { "only" }, new MersenneTwisterFast(42))
+    ).isEqualTo("only");
+  }
+
+  @Test
+  void oneOfAListPicksItsOnlyElement() {
+    assertThat(oneOf(List.of("only"), new MersenneTwisterFast(42))).isEqualTo(
+      "only"
+    );
+  }
+
+  @Test
+  void oneOfAListDrawsTheIndexTheRngPicks() {
+    final List<String> candidates = List.of("a", "b", "c");
+
+    for (long seed = 0; seed < 10; seed++) {
+      final int expectedIndex = new MersenneTwisterFast(seed).nextInt(3);
+      assertThat(oneOf(candidates, new MersenneTwisterFast(seed))).isEqualTo(
+        candidates.get(expectedIndex)
+      );
+    }
+  }
+
+  @Test
+  void oneOfAnArrayDrawsTheIndexTheRngPicks() {
+    final String[] candidates = { "a", "b", "c" };
+
+    for (long seed = 0; seed < 10; seed++) {
+      final int expectedIndex = new MersenneTwisterFast(seed).nextInt(3);
+      assertThat(oneOf(candidates, new MersenneTwisterFast(seed))).isEqualTo(
+        candidates[expectedIndex]
+      );
+    }
+  }
+
+  @Test
+  void oneOfRefusesAnEmptyList() {
+    assertThatThrownBy(() ->
+      oneOf(List.<String>of(), new MersenneTwisterFast(42))
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("must not be empty");
+  }
+
+  @Test
+  void oneOfRefusesAnEmptyIterable() {
+    final Iterable<String> empty = Set.of();
+
+    assertThatThrownBy(() -> oneOf(empty, new MersenneTwisterFast(42)))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("must not be empty");
+  }
+
+  @Test
+  void oneOfRefusesAnEmptyArray() {
+    assertThatThrownBy(() -> oneOf(new String[0], new MersenneTwisterFast(42)))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("must not be empty");
+  }
+
+  @Test
+  void upToOneOfIsPresentForANonEmptyList() {
+    assertThat(
+      upToOneOf(List.of("only"), new MersenneTwisterFast(42))
+    ).contains("only");
+  }
+
+  @Test
+  void upToOneOfIsEmptyForAnEmptyList() {
+    assertThat(
+      upToOneOf(List.<String>of(), new MersenneTwisterFast(42))
+    ).isEmpty();
+  }
+
+  @Test
+  void upToOneOfIsEmptyForANullList() {
+    assertThat(
+      MasonUtils.<String>upToOneOf(null, new MersenneTwisterFast(42))
+    ).isEmpty();
+  }
+
+  @Test
+  void shuffledStreamOfACollectionReturnsEveryElement() {
+    final Collection<String> candidates = Set.of("apple", "banana", "cherry");
+
+    assertThat(
+      shuffledStream(candidates, new MersenneTwisterFast(42)).toList()
+    ).containsExactlyInAnyOrderElementsOf(candidates);
+  }
+
+  @Test
+  void shuffledStreamOfAListCollectionReturnsEveryElement() {
+    final Collection<String> candidates = new ArrayList<>(
+      List.of("apple", "banana", "cherry")
+    );
+
+    assertThat(
+      shuffledStream(candidates, new MersenneTwisterFast(42)).toList()
+    ).containsExactlyInAnyOrderElementsOf(candidates);
+  }
+
+  @Test
+  void shuffledStreamOfANonRandomAccessListReturnsEveryElement() {
+    final Collection<String> candidates = new LinkedList<>(
+      List.of("apple", "banana", "cherry")
+    );
+
+    assertThat(
+      shuffledStream(candidates, new MersenneTwisterFast(42)).toList()
+    ).containsExactlyInAnyOrderElementsOf(candidates);
+  }
+
+  @Test
+  void shuffledStreamOfARandomAccessCollectionReturnsEveryElement() {
+    final Collection<String> candidates = new RandomAccessCollection<>(
+      List.of("apple", "banana", "cherry")
+    );
+
+    assertThat(
+      shuffledStream(candidates, new MersenneTwisterFast(42)).toList()
+    ).containsExactlyInAnyOrderElementsOf(candidates);
+  }
+
+  @Test
+  void inBoundsAcceptsALocationInsideAContinuousField() {
+    assertThat(inBounds(new Double2D(5, 10), continuousField())).isTrue();
+  }
+
+  @Test
+  void inBoundsRefusesALocationOutsideAContinuousField() {
+    assertThat(inBounds(new Double2D(15, 10), continuousField())).isFalse();
+  }
+
+  @Test
+  void inBoundsAcceptsALocationInsideAGrid() {
+    assertThat(inBounds(new Double2D(5, 10), grid())).isTrue();
+  }
+
+  @Test
+  void inBoundsRefusesALocationOutsideAGrid() {
+    assertThat(inBounds(new Double2D(15, 10), grid())).isFalse();
+  }
+
+  @Test
+  void inBoundsIncludesTheOriginButExcludesTheFarEdges() {
+    final Continuous2D field = continuousField();
+
+    assertThat(inBounds(new Double2D(0, 0), field)).isTrue();
+    assertThat(inBounds(new Double2D(0, 10), field)).isTrue();
+    assertThat(inBounds(new Double2D(5, 0), field)).isTrue();
+    assertThat(inBounds(new Double2D(10, 10), field)).isFalse();
+    assertThat(inBounds(new Double2D(5, 20), field)).isFalse();
+  }
+
+  @Test
+  void inBoundsOnAGridIncludesTheOriginButExcludesTheFarEdges() {
+    final DenseGrid2D grid = grid();
+
+    assertThat(inBounds(new Double2D(0, 0), grid)).isTrue();
+    assertThat(inBounds(new Double2D(0, 10), grid)).isTrue();
+    assertThat(inBounds(new Double2D(5, 0), grid)).isTrue();
+    assertThat(inBounds(new Double2D(10, 10), grid)).isFalse();
+    assertThat(inBounds(new Double2D(5, 20), grid)).isFalse();
+  }
+
+  private static Continuous2D continuousField() {
+    return new Continuous2D(1.0, 10, 20);
+  }
+
+  private static DenseGrid2D grid() {
+    return new DenseGrid2D(10, 20);
+  }
+
+  private static final class RandomAccessCollection<E>
+    extends AbstractCollection<E>
+    implements RandomAccess
+  {
+
+    private final List<E> elements;
+
+    private RandomAccessCollection(final List<E> elements) {
+      this.elements = elements;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+      return elements.iterator();
+    }
+
+    @Override
+    public int size() {
+      return elements.size();
+    }
   }
 
   @Test
