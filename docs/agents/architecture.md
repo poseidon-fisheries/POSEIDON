@@ -19,42 +19,24 @@ The model is built around a declarative configuration → runtime object pattern
   itself.
 - When creating a new factory, extend `AbstractFactory`
   (`core/.../AbstractFactory.java`) rather than implementing `Factory` directly
-  unless you have a specific reason not to. It builds a factory's product once
-  per owner, keyed by factory identity: sharing is declared only by the
-  factory's level and by referencing the same factory object from several
-  places, so two distinct factory objects never share a product, however equal
-  their values.
-- A factory's **level** says which owner its product belongs to: global
-  (`Scope`), a simulation (`SimulationScope`) or a vessel (`VesselScope`). A
-  level base class declares it (`GlobalScopeFactory`, `SimulationScopeFactory`,
-  `VesselScopeFactory`); a `RelativeScopeFactory` derives it.
-- Prefer `RelativeScopeFactory` over `GlobalScopeFactory` for any factory with
-  `Factory`-typed input fields: `GlobalScopeFactory` hard-codes global scope
-  regardless of what its inputs resolve to, whereas `RelativeScopeFactory` takes
-  the narrowest level of its inputs (global if it has none) — so it still ends
-  up at global scope when its inputs do, but safely demotes to per-simulation
-  scope instead of silently sharing stale state if an input ever isn't global.
-  Which properties count as its inputs is in `RelativeScopeFactory`'s Javadoc.
-  No existing `GlobalScopeFactory` subclass has a `Factory`-typed field; that's
-  a signal you want `RelativeScopeFactory` instead.
-- The same goes for `SimulationScopeFactory` and `VesselScopeFactory`:
-  **`RelativeScopeFactory` is the default, and a fixed scope needs a reason
-  tying the product to it.** There are three:
+  unless you have a specific reason not to.
+- **`RelativeScopeFactory` is the default level for every factory, and a fixed
+  level (`GlobalScopeFactory`, `SimulationScopeFactory`, `VesselScopeFactory`)
+  needs a reason tying the product to it.** There are three:
   - **the product holds mutable state** of its own (a memory, a network, an
     accumulator). A relative factory whose inputs are all global would be global
     too, and would share that state across simulations. A product that only
     holds a reference to a mutable object it was given isn't stateful on that
     account: the state belongs to whatever built that object. A cache is not
-    state of a run either: values worked out only from the factory's inputs are
-    the same whichever simulation asks for them, so a relative factory is right,
-    and gives the cache the level of its inputs (`DefaultPathCacheFactory`). Two
-    conditions come with it: everything the cached values depend on must be an
-    input of the factory, even one it never reads, so that a derived scenario
-    gets a new cache; and the cache must be safe to use from several threads,
-    since the simulations sharing it may run in parallel. A shared cache also
-    lives as long as its factory, across every simulation that shares it. A
-    cache that is only fast from one thread, such as a fastutil map, keeps a
-    fixed simulation level (`PathLengthCalculatorFactory`);
+    state of a run: its values depend only on the factory's inputs, so a
+    relative factory is right and gives the cache the level of its inputs
+    (`DefaultPathCacheFactory`). Everything the cached values depend on must
+    then be an input of the factory, even one it never reads, so that a derived
+    scenario gets a new cache, and the cache must be safe to use from several
+    threads, since the simulations sharing it may run in parallel. A shared
+    cache lives as long as its factory. A cache that is only fast from one
+    thread, such as a fastutil map, keeps a fixed simulation level
+    (`PathLengthCalculatorFactory`);
   - **`newInstance` uses the scope itself**: it registers its product through
     the scope (`scope.addListener`, `scope.register`, `scope.addFinalProcess`).
     A relative factory with global inputs would build it once, from the first
@@ -65,10 +47,9 @@ The model is built around a declarative configuration → runtime object pattern
     how many times the side effect runs, so it shouldn't depend on what the
     inputs happen to resolve at.
 
-  A stateless product built only from what its inputs give it (`TravelCost`,
-  `EventRecorder`, `NetOptionValues`) gets a relative factory, typed
-  `<S extends Scope>` like `NetOptionValuesFactory`: it is then per vessel when
-  an input is, and shared when none is.
+  A relative factory takes the narrowest level of its inputs, global if it has
+  none; which properties count as its inputs is in `RelativeScopeFactory`'s
+  Javadoc. Type it `<S extends Scope>`, like `NetOptionValuesFactory`.
 
 - `Scenario` is an immutable (Lombok `@Builder`) bag of named component
   `Factory` instances plus a starting date/time. A scenario that differs in some
@@ -80,15 +61,11 @@ The model is built around a declarative configuration → runtime object pattern
   `withStartingDateTime(start)` moves the start. Calibration derives one
   scenario per candidate. A run is started with its seed and, optionally, its
   id: `startNewSimulation(seed[, simulationId])`.
-- Consumers take a **vessel component** (made once with
-  `vesselComponent(factory)`, or varying by one vessel attribute with
-  `varyingBy`), not what it builds: `fishing(gear, hold, fuelTank, ...)`,
-  `refuel(fuelTank, ...)`, `componentProperty(hold, "availableCapacityInKg")`. A
-  consumer reads what the component built for the vessel when it uses it, with
-  `gear.of(vessel)` (or `findIn` where absence is normal). What holds the
-  working state of one component (tasks, the behaviour, holds, learners,
-  listener wrappers) extends `VesselComponentScopeFactory`; what a vessel knows
-  across components (memories, option values) is vessel-level.
+- Consumers take a **vessel component** (`vesselComponent(factory)` or
+  `varyingBy`), not what it builds, and read what it built for the vessel when
+  they use it, with `gear.of(vessel)`. What holds the working state of one
+  component extends `VesselComponentScopeFactory`; what a vessel knows across
+  components is vessel-level.
 - **Nothing goes on `Vessel` unless every possible model needs it.** State or
   queries that only some models need (a chosen destination, the current fishing
   trip, whether a fishing trip started today) live in vessel components, or in
@@ -111,25 +88,15 @@ The model is built around a declarative configuration → runtime object pattern
 - **Every `Scenario` must remain serializable to YAML.** Anything hung off a
   `Scenario` (components, factories, nested config) has to survive a SnakeYAML
   round-trip — don't introduce fields/types that can't be represented that way.
-- **YAML scenario files are generated output, never hand-edited — with no
-  exceptions for edits that look small, mechanical, or "verified."** They're
-  produced from Java code via `ScenarioWriter`/`Factories`-style helpers (see
-  the `writePeterSnapperScenario` Gradle task). If a scenario needs to change,
-  change the Java that generates it and regenerate the YAML — don't patch the
-  `.yaml` file directly, and don't reach for a scripted find-and-replace (sed, a
-  hand-rolled rename script, etc.) even when you've confirmed via a regenerated
-  copy that it produces the identical text. Renaming a `*Factory` class is a
-  Java rename that gets reflected in YAML by rerunning the writer task, not a
-  text substitution performed on the checked-in file. Commit whatever the writer
-  task produces, with the Java change: the YAML needs no review, and any drift
-  from earlier changes goes into the same commit.
-- **When building a `Scenario`, use the module's static `Factories` helper
-  methods, not `new SomeFactory(...)` directly.** Modules expose a `Factories`
-  class (e.g. `core/.../time/Factories.java`, and similarly in `io`,
-  `geography`, `regulations`, and per-example packages) with static factory
-  methods (`Factories.days(3)`, `Factories.dateTime(...)`, etc.) that
-  scenario-building code should call instead of instantiating `*Factory` classes
-  directly.
+- **YAML scenario files are output of their writer task**
+  (`writePeterSnapperScenario`). To change one, change the Java that generates
+  it and rerun the writer; a rename is a Java rename, then a rerun. Commit
+  whatever the writer produces with the Java change: the YAML needs no review,
+  and drift from earlier changes goes in the same commit. Never edit the
+  checked-in file, by hand or by script, even when the result would be
+  identical.
+- **When building a `Scenario`, use the static helper methods of each package's
+  `Factories` class, not `new SomeFactory(...)` directly.**
 - **In scenario-building code, write a factory inline where it is used, and give
   it a local variable only when:**
   - **it is used more than once.** This is about identity, not tidiness:
@@ -145,9 +112,9 @@ The model is built around a declarative configuration → runtime object pattern
 
 When adding a new simulation component (a new kind of provider, allocator,
 regulation, etc.), follow the existing pattern in the relevant package: a plain
-class implementing the domain interface, plus a `*Factory` (typically extending
-`AbstractFactory`) that YAML scenarios instantiate, and a static helper method
-added to that package's `Factories` class for programmatic construction.
+class implementing the domain interface, plus a `*Factory` that YAML scenarios
+instantiate, and a static helper method added to that package's `Factories`
+class for programmatic construction.
 
 ## Factory class shape
 
@@ -159,8 +126,7 @@ setters. Each has one constructor and a Lombok builder:
 - `@SuperBuilder(toBuilder = true)`: `ScenarioLoader` builds factories through
   it, and `toBuilder()` makes a changed copy.
 
-Don't add other constructors to a factory class — construct it either via YAML
-or via the static helper.
+Don't add other constructors to a factory class.
 
 A factory resolves dependencies and constructs its product. Named runtime
 calculations and extractors have concrete product classes, including when they
@@ -207,9 +173,8 @@ It then works the same whether the value is fixed, depends on the date, the
 vessel or the state of the simulation, or is changed mid-run, and any value in
 `core/providers` can feed it.
 
-A live parameter is a function of a _context_: what the caller has at hand when
-it asks, usually the vessel it acts for. It comes in two shapes, each with its
-factory type in `core`:
+A live parameter is a function of a _context_. It comes in two shapes, each with
+its factory type in `core`:
 
 - a _value_ of the context, `Function<C, R>`, built by a `ValueFactory<S, C, R>`
   (a constant, the current date-time, a property of the vessel);
@@ -217,22 +182,22 @@ factory type in `core`:
   `MappingFactory<S, C, T, R>` (a comparison with a threshold, a cell's value, a
   property of a route).
 
-A reader of a vessel's state (`currentCell()`, `currentTripStartDateTime()`,
-`vesselProperty(...)`) is a value of the vessel: it reads the vessel it is given
-and holds none, so one serves every vessel and answers for whichever it is
-given. Every other object that reads a vessel takes it on each call too, from
-its caller, and holds none: a route, a cell checker, a time cost, a valuation, a
-picker. A picker takes the option values of the vessel it picks for as a
-function of that vessel: values worked out from a memory are valued for it,
-while a learned table ignores the vessel and gives itself.
-
-The context is always the vessel the call is for. A test relating it to another
-vessel, such as a friendship condition, is a mapping of that other vessel, and
-reads values off it with `other(...)`:
+The context is always the vessel the call is for. Whatever reads a vessel (a
+reader of its state such as `currentCell()` or `vesselProperty(...)`, a route, a
+cell checker, a time cost, a valuation, a picker) takes it on each call and
+holds none, so one serves every vessel. A test relating it to another vessel,
+such as a friendship condition, is a mapping of that other vessel, and reads
+values off it with `other(...)`:
 `condition(other(vesselProperty("homePort")), equal(vesselProperty("homePort")))`
 holds when the other vessel's home port is the vessel's. A value without
 `other(...)` reads the vessel the call is for, and leaving it out where a
-mapping is expected does not compile.
+mapping is expected does not compile. A component without a vessel (a grid built
+cell by cell, a regulation judging an action, a gear fishing, a table's columns)
+has its factory take the value with `Void` as its context, so that a value
+reading a vessel is refused when the scenario is compiled, and convert it once,
+when it builds, into the plain `Supplier`, `Predicate` or `Function` the
+component holds (`VoidContextConversions`). Numbers are boxed: there are no
+primitive shapes.
 
 A yes/no is a value or a mapping with a `Boolean` result. A value or mapping
 that reads nothing from its context has `Object` as its context, so it fits
@@ -242,27 +207,17 @@ of a sum over routes); the compiler refuses the wrong one. A combinator that
 makes sense in both shapes (`condition`, `allOf`, `anyOf`, `not`,
 `combinedDuration`…) has one overload per shape; a helper method returning a
 live value must therefore declare its shape type, or it matches no overload.
-
 Such a combinator has one implementation, its mapping, so it means the same in
-both shapes. Its value overload builds the mapping over its value arguments,
+both shapes: its value overload builds the mapping over its value arguments,
 each made a mapping of `Void` that ignores what it maps (`ValueAsMapping`), and
 makes the result a value by giving it `null` as the thing mapped
-(`MappingAsValue`). Neither appears in scenario code. A block that transforms
-what it is given takes it as its first argument, so a call reads in the order
-data flows, with one overload per shape of that input: `mapLookup(key, map)`,
-`floorMapLookup(key, map)`, `routeProperty(route, path)`,
-`intervalLabel(number, intervals…)`, `tableLookup(key, table, …)`, and
-`condition(subject, predicate)`, which states the predicate of its subject.
-There is no generic composition: a mapping of one's own becomes a block that
-takes its input, so the YAML says what it is.
+(`MappingAsValue`).
 
-A component passes the context it has: a task passes its vessel, and a picker
-the vessel it picks for. A component that has none (a grid built cell by cell, a
-regulation judging an action, a gear fishing, a table's columns) has its factory
-take the value with `Void` as its context, so that a value reading a vessel is
-refused when the scenario is compiled, and convert it once, when it builds, into
-the plain `Supplier`, `Predicate` or `Function` the component holds
-(`VoidContextConversions`). Numbers are boxed: there are no primitive shapes.
+A block that transforms what it is given takes it as its first argument, so a
+call reads in the order data flows, with one overload per shape of that input:
+`mapLookup(key, map)`, or `condition(subject, predicate)`, which states the
+predicate of its subject. There is no generic composition: a mapping of one's
+own becomes a block that takes its input, so the YAML says what it is.
 
 The package's `Factories` class offers the live version plus an overload taking
 a plain value that it wraps in `constant(...)`:
@@ -273,8 +228,7 @@ a plain value that it wraps in `constant(...)`:
   `dateTimeAfter(referenceDateTime, ValueFactory)` in `core/providers/temporal`.
 
 Use this shape for new building blocks even when no caller needs a varying value
-yet. Reading a `Constant` costs a call that the JIT inlines; it doesn't show
-next to the work around it.
+yet: reading a `Constant` costs a call that the JIT inlines.
 
 What counts as a plain value depends on the YAML:
 
@@ -296,16 +250,13 @@ This doesn't apply to the configuration literals of the previous section (a
 column name, a separator, a file path): they say how to build or read something,
 not how the model behaves, and stay plain fields.
 
-A live parameter is validated when it is read, not when it is built: a
-precondition the constructor used to run moves into the method that reads the
-value, and runs again on every call. There is no build-time equivalent, since a
-component cannot tell whether the value it was given is fixed. This is cheap for
-a comparison — `EpsilonGreedyChooser` checks that a vessel's epsilon is in
-`[0, 1]` on every destination pick — but not for work such as sorting the times
-of day or building a per-species array, where the cost is real and worth
-weighing before going live. A bad value then fails on first use rather than when
-the scenario is built: in practice the first step of the run, with the same
-message.
+A live parameter is validated where it is read, on every call: a component
+cannot validate it when built, since it cannot tell whether the value it was
+given is fixed. This is cheap for a comparison — `EpsilonGreedyChooser` checks
+that a vessel's epsilon is in `[0, 1]` on every destination pick — but not for
+work such as sorting the times of day or building a per-species array, where the
+cost is real and worth weighing before going live. A bad value then fails on
+first use rather than when the scenario is built.
 
 ## Read mutable state at the point of use
 
