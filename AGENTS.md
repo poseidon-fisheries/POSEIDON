@@ -41,15 +41,15 @@ of the original POSEIDON model.
 ./gradlew :core:test --tests "uk.ac.ox.poseidon.core.ScenarioTest.methodName"  # run a single test method
 ./gradlew jacocoTestReport          # generate coverage reports (build/reports/jacoco/test/…) per module
 ./gradlew spotbugsMain              # run SpotBugs static analysis on a module (Werror is on for javac too)
-./gradlew spotlessApply             # format Java sources with Prettier, remove unused imports, add missing license headers
+./gradlew spotlessApply             # format Java and Markdown with Prettier, remove unused imports, add missing license headers
 ./gradlew checkstyleMain            # run Checkstyle on main sources (checkstyleTest for tests)
 ```
 
 Notes:
 
-- `build` runs `spotlessCheck`, which fails on any Java file `spotlessApply`
-  would change: run `./gradlew spotlessApply` after editing Java. For
-  license-header years, see "Licensing".
+- `build` runs `spotlessCheck`, which fails on any Java or Markdown file
+  `spotlessApply` would change: run `./gradlew spotlessApply` after editing
+  either. For license-header years, see "Licensing".
 - Compilation runs every javac lint category except `serial` and treats warnings
   as errors (`-Werror -Xlint:all,-serial`), so an unchecked or deprecation
   warning fails the build, not just linting.
@@ -114,11 +114,10 @@ common exception is a traditional counting `for` loop's own loop variable
 (`for (int i = 0; ...; i++)`), which must stay mutable by definition.
 
 Formatting is Prettier's, applied by `./gradlew spotlessApply`; wrap comments by
-hand within 80 columns. Hard-wrap Markdown at 80 columns too, except headings,
-URLs, code blocks and tables. A method or lambda has at most one `return`, as
-its last statement. Scenario classes (such as `PeterSnapperScenario`) stay
-readable for people new to Java: locals declared `final var`, no method
-references or other clever tricks.
+hand within 80 columns. A method or lambda has at most one `return`, as its last
+statement. Scenario classes (such as `PeterSnapperScenario`) stay readable for
+people new to Java: locals declared `final var`, no method references or other
+clever tricks.
 
 ## Merging
 

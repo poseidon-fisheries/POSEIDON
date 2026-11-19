@@ -6,8 +6,9 @@ reaches.
 
 ## Formatting
 
-Formatting is Prettier's (prettier-plugin-java, options in `.prettierrc`),
-applied by `./gradlew spotlessApply`.
+Formatting is Prettier's, applied by `./gradlew spotlessApply`: Java with
+prettier-plugin-java (options in `.prettierrc`), Markdown wrapped at 80 columns
+(options in the Spotless `markdown` block).
 
 - Prettier leaves comments as they are: wrap them by hand within 80 columns.
 - It moves a comment placed at the start of a lambda body down the method chain,

@@ -90,10 +90,25 @@ spotless {
             """.trimIndent() + "\n\n"
         )
     }
+    format("markdown") {
+        target("**/*.md")
+        targetExclude("**/.*/**", "**/build/**", "**/bin/**", "**/out/**", "**/node_modules/**")
+        prettier(npmPackages)
+            .nodeExecutable(
+                tasks.nodeSetup.get().nodeDir.get()
+                    .file(if (isWindows) "node.exe" else "bin/node").asFile
+            )
+            .npmExecutable(
+                tasks.npmSetup.get().npmDir.get()
+                    .file(if (isWindows) "npm.cmd" else "bin/npm").asFile
+            )
+            .config(mapOf("parser" to "markdown", "proseWrap" to "always", "printWidth" to 80))
+            .npmInstallCache()
+    }
 }
 
-tasks.named("spotlessJava") {
-    dependsOn(tasks.nodeSetup, tasks.npmSetup)
+listOf("spotlessJava", "spotlessMarkdown").forEach {
+    tasks.named(it) { dependsOn(tasks.nodeSetup, tasks.npmSetup) }
 }
 
 tasks.named("check") {
