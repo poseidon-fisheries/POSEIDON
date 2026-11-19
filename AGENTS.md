@@ -59,6 +59,8 @@ Notes:
 - Test tasks are auto-configured with a Mockito Java agent (`-javaagent`,
   `-Xshare:off`): keep it when editing
   `buildlogic.java-common-conventions.gradle.kts`.
+- jdtls (the LSP tool) can report type-inference errors that javac accepts;
+  `./gradlew compileJava` is authoritative.
 - SpotBugs exclusions live in `spotbugs_exclude.xml` at the repo root; consult
   it before assuming a finding is a false positive.
 - To run one of the example scenarios directly: `./gradlew :examples:run` (see
