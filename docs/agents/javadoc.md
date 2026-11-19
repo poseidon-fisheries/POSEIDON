@@ -20,105 +20,60 @@ Prettier leaves Javadoc as written, so lay it out by hand:
 
 ## The component/`Factory`/`Factories` triplet
 
-See `docs/agents/architecture.md` for the component/`Factory`/`Factories`-helper triplet pattern
-this section documents.
+The pattern itself is in `architecture.md`. Each part of the triplet is documented in one place,
+and every doc comment except the component's and the `*ScopeFactory` base classes' is a pointer,
+not prose:
 
-The triplet gets documented in four different places, once each, not duplicated across them:
-
-- **Component class** (the plain value/config class actually doing the work, e.g.
-  `Constant`) carries the real behavior doc: what it does, semantics, edge cases. This is
-  the one source of truth — put depth here, nowhere else.
-- **`Factory` subclass** (the YAML bean) gets a one-line pointer only: `A
-  {@link GlobalScopeFactory} counterpart of {@link Component}, built via
-  {@link Factories#method(Factory)}.` — naming whichever `*ScopeFactory` the leaf class's ancestry
-  is rooted in (`GlobalScopeFactory`, `SimulationScopeFactory`, `RelativeScopeFactory` in `core`;
-  domain-specific ones like `VesselScopeFactory` in `fishing`) in place of the generic `Factory`.
-  When the leaf extends a `*ScopeFactory` directly, that's the one to name. When it instead
-  extends an intermediate abstract template base that isn't itself a `*ScopeFactory` (e.g.
-  `RelativeDateTimeFactory`, `AbstractQuantityFactory`), walk up to the `*ScopeFactory` that base
-  is ultimately rooted in and name that instead — naming the template base defeats the point of
-  the pointer, since the base carries no scope-semantics prose of its own to link to. The `built
-  via` half is a real `{@link}`, clickable, not `{@code}`. How it's written depends on how many
-  `Factories` methods build this component:
-  - **Exactly one method builds this component, however many overloads that method has:** link
-    straight to it — `{@link Factories#method(Factory)}` if it's overloaded (name the erasure of
-    one overload's params to disambiguate; Javadoc renders the label from the signature, no custom
-    label needed), or plain `{@link Factories#method()}` if it isn't. There's nothing to hide
-    behind a class-level link when only one method reaches this component — link it directly. This
-    is the common case; check it first before reaching for the fallbacks below.
-  - **More than one overload of the same method name independently builds this exact component**
-    (e.g. `between(double, double)` and `between(Factory, Factory)` both ultimately return a
-    `BetweenFactory`): link the class with a custom label instead of picking one overload to stand
-    for all of them: `{@link Factories Factories.method(...)}`.
-  - **More than one distinct method *name* builds this component** (not overloads, e.g.
-    `nextOccurrenceOf(...)`/`nextOccurrenceAfter(...)` both returning
-    `NextOccurrenceOfTimeOfDayFactory`): combine them in one class-level link's label:
+- **The component class** (the class doing the work, e.g. `Constant`) carries the behaviour: what
+  it does, its semantics, its edge cases. Put depth here, nowhere else.
+- **The `Factory` subclass** (the YAML bean) gets a one-line pointer and no behaviour:
+  `A {@link GlobalScopeFactory} counterpart of {@link Component}, built via
+  {@link Factories#method(Factory)}.` Name the `*ScopeFactory` the class's ancestry is rooted in
+  (`GlobalScopeFactory`, `SimulationScopeFactory`, `RelativeScopeFactory` in `core`;
+  `VesselScopeFactory` in `fishing`), walking past any intermediate template base that is not
+  itself one (`RelativeDateTimeFactory`, `AbstractQuantityFactory`). The "built via" half is a
+  real `{@link}`, not `{@code}`, and depends on what builds the component:
+  - **One method, however many overloads** (the common case, so check it first): link straight to
+    it. Name one overload's erased parameters if it is overloaded (`{@link
+    Factories#method(Factory)}`); Javadoc renders the label.
+  - **Several overloads of one name each build it**: link the class with a label,
+    `{@link Factories Factories.method(...)}`.
+  - **Several method names build it**: combine them in one label,
     `{@link Factories Factories.nextOccurrenceOf(...)/Factories.nextOccurrenceAfter(...)}`.
 
-  Don't assume same-name overloads share a target or a distinct name doesn't — check what each
-  overload actually returns (e.g. `allOf(MappingFactory...)` returns an `AllOfFactory` and
-  `allOf(ValueFactory...)` a `MappingAsValueFactory` holding one: both build an `AllOf`, so `AllOf`
-  and `AllOfFactory` get a class-level link, while `MappingAsValueFactory`, built by the value
-  overload of every combinator, names that category rather than a method; `constant(T)` and
-  `constant(Factory)` both return the same `ConstantFactory`, so that one stays a class-level
-  link). No behavior explanation on the `Factory` subclass — scenario-building code
-  never touches these directly (per `docs/agents/architecture.md`), so a reader here just needs to
-  be routed to the component and to the helper that builds it.
-- **Scope semantics are documented once, not per factory.** Each `*ScopeFactory` base class
-  carries the real explanation of what that scope means and when to reach for it, on the class
-  itself. Never restate that explanation in free text on a leaf `Factory` subclass — copies drift.
-  The `{@link GlobalScopeFactory}` in the one-liner above is the pointer; no separate "Scope:" line
-  is needed. Do the same on the corresponding `Factories` helper method's `@return`: `@return a
-  {@link GlobalScopeFactory} for a {@link Component} that always returns {@code true}`.
-- **Static `Factories` helper method** is the discoverability layer: this is what scenario-building
-  code actually calls and what autocomplete surfaces. Document `@param`/`@return` for what the
-  method takes and produces (the scope link folded into `@return` per above), plus `@see Component`
-  for the full behavior — not a re-explanation.
-- **`Factories` class itself** gets a short class-level Javadoc: one or two sentences naming what
-  the grouped static methods produce (e.g. "Factories for `Provider`s that always return a fixed
-  value.") — the entry point a reader lands on before drilling into individual methods.
-- **Package `package-info.java`** (for any package containing a `Factories` class): a short
-  blurb — one or two sentences on what the package's components do — plus a `{@link Factories}`
-  pointer, so a reader landing on the package summary gets routed straight to the discoverability
-  entry point instead of having to guess which class to open.
+  Check what each overload actually returns. `allOf(MappingFactory...)` returns an `AllOfFactory`
+  and `allOf(ValueFactory...)` a `MappingAsValueFactory` holding one: both build an `AllOf`, so
+  `AllOf` and `AllOfFactory` get a class-level link, while `MappingAsValueFactory`, built by the
+  value overload of every combinator, names that category rather than a method. `constant(T)` and
+  `constant(Factory)` both return the same `ConstantFactory`, so it gets a class-level link too.
+- **Scope semantics** are explained once, on each `*ScopeFactory` base class, never restated on a
+  leaf factory: the `{@link GlobalScopeFactory}` in the pointer is enough, with no separate
+  "Scope:" line. The helper's `@return` links the same way: `@return a {@link GlobalScopeFactory}
+  for a {@link Component} that always returns {@code true}`.
+- **The static `Factories` helper method** is what scenario code calls and autocomplete surfaces.
+  Document `@param` and `@return`, plus `@see Component` for the behaviour.
+- **The `Factories` class** gets one or two sentences naming what its methods produce ("Factories
+  for `Provider`s that always return a fixed value.").
+- **`package-info.java`**, in any package with a `Factories` class: one or two sentences on what
+  the package's components do, a `{@link Factories}` pointer, and links back to `Factory` or
+  `Scenario` rather than an explanation of the pattern.
 
-**Describe the category, don't enumerate the members**, on both the `Factories` class doc and
-`package-info.java`. A package or `Factories` class is expected to grow new components over time;
-a doc that lists today's classes by name (`{@link ObjectFactory}`, `{@link ListFactory}`, ...) goes
-stale the moment a new one is added and nobody remembers to update the list. Say what *kind* of
-thing the package holds ("factories for pass-through/collection literals, resolved components, and
-scope-changing wrappers") rather than naming every current class. Naming one or two classes as
-*examples* of the category is fine when it aids concreteness; naming all of them as an exhaustive
-list is not — if the sentence would need editing every time a sibling class is added, it's
-enumerating, not describing.
+On the `Factories` class and in `package-info.java`, describe the category rather than list the
+members: a list of today's classes goes stale when the next one is added. Naming one or two as
+examples is fine; if the sentence would need editing whenever a sibling class is added, it is a
+list.
 
-Don't write the same behavioral explanation twice across the triplet; every doc comment except the
-component's and the `*ScopeFactory` base classes' should be a pointer, not prose.
+## Every public and protected member
 
-**Every public and protected member of a class you touch needs to be documented** — not just the
-triplet skeleton described above, and not just the public ones. Constants, constructors, fields,
-and methods all get a real (if short) Javadoc comment as soon as they're `public` or `protected`,
-including `protected` fields/methods on an abstract base meant for subclassing (e.g. a
-`*ScopeFactory` base class's protected constructor or protected helper field) — subclass authors
-read those same as any public API. Package-private and private members stay undocumented unless
-their behavior is genuinely non-obvious. The one exception: a *trivial* `@Override`
-method whose superclass/interface method is already documented doesn't need its own comment —
-Java's standard doc-inheritance applies (the javadoc tool shows "Description copied from..."), so
-`newInstance(scope)` overrides of `AbstractFactory`'s hook, and `get()`/`test()`/`apply()`-style
-overrides of `Supplier`/`Predicate`/`Provider` etc., are already covered as long as the method
-they override carries a doc comment somewhere up the hierarchy and the override itself does
-nothing but implement the plain contract. If the override has genuinely special behavior worth
-calling out — an edge case the inherited doc doesn't cover, a surprising choice, a deviation from
-what a reader would assume from the interface alone — give it its own comment rather than leaning
-on inheritance; the bar is "would a reader be misled by only reading the inherited doc," not
-"is this technically an override." When auditing a package already marked done, check for this
-too — it's easy to document the triplet shape and miss a public constant or constructor sitting
-alongside it.
+Every public or protected member of a class you touch gets a short Javadoc comment: constants,
+constructors, fields and methods, including the protected constructor or helper field of an
+abstract base meant for subclassing. Package-private and private members stay undocumented unless
+their behaviour is not obvious.
 
-The pattern itself — why the triplet exists, why scenario code never calls `.get()` directly — is
-already covered in `docs/agents/architecture.md`; don't restate it in per-package Javadoc. Package
-`package-info.java` files should stick to that short blurb + `{@link Factories}` pointer, and
-`@link` back to `Factory`/`Scenario` rather than re-explaining the general pattern.
+The exception is a trivial override of a documented method, such as `newInstance(scope)` or a
+plain `get()`, `test()` or `apply()`: Javadoc inherits the comment. An override with an edge case,
+a surprising choice or a deviation from its interface gets its own comment. The bar is whether a
+reader of the inherited doc alone would be misled.
 
 ## Javadoc stands alone
 

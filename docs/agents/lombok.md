@@ -40,11 +40,3 @@ almost every case — match the shape to the class's role:
 
 Use `@Getter(AccessLevel.NONE)` on individual fields to suppress just that one accessor rather
 than dropping `@Getter` for a hand-written class.
-
-## Sharing data across simulations
-
-A type meant to be read-only and shared globally (e.g. across every simulation run from one loaded scenario) must not implement a mutable-by-contract interface like `MutableGrid` — even if its own methods never mutate, `MutableGrid.getField()` (or any analogous accessor) hands out a live mutable handle to the backing structure, so the object is never actually immutable. Follow the existing pattern instead: a small read-only sibling type that wraps the mutable implementation without implementing its mutable interface (e.g. `CarryingCapacityGrid` / `ImmutableBiomassGrid`, both `extends DoubleGridWrapper` rather than implementing `BiomassGrid`).
-
-## Collections
-
-Prefer Guava's immutable collection types (`ImmutableMap`, `ImmutableList`, `ImmutableSet`, etc.) over mutable JDK collections (`HashMap`, `ArrayList`, `HashSet`) for factory-produced results and other data that shouldn't change after construction — this is already the convention for data shared across simulations or handed out from a resolved `Factory` (e.g. `FisheableBiomassGrids`'s use of `ImmutableMap`). Reach for mutable collections only for genuinely local, mutable working state inside a method body.

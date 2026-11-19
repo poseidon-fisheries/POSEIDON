@@ -38,7 +38,17 @@ APIs keep their own names (MASON's `setObjectLocation`).
 - Keep similar concepts visibly distinct (the trip cost paid, the travel cost in the valuation, the
   route cost).
 
-## Steppables and tasks
+## Factories and their products
 
-A name for a product called only for its side effects is in `architecture.md`, under "Factory class
-shape".
+A factory is named after its product: `Product` is built by `ProductFactory`. An explicitly
+agreed plain-function product may use the name of its role. When a factory starts building
+something else, rename it to match.
+
+A name says what its product is used for, as a guideline rather than a rule. A product used for
+what it gives back (a grid, a price, a vessel function) takes a noun naming that thing. A product
+called only for its side effects, such as a `Steppable` or a task, should not take a plain noun
+(`vesselsAtPort`), which reads as if it gave back the things it names. It takes a verb when it is
+a one-off action (`createVesselsAtPort`, `landCatches`), and the name of the role that acts when
+it is an ongoing process (`fixedCostCollector`, `biomassDiffuser`). A noun can still fit a
+wrapper that arranges other steppables or tasks (`steppableSequence`), or a product that steps
+and also gives something back (a table it fills).

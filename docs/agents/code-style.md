@@ -32,6 +32,20 @@ Gradle downloads Node.js itself, so formatting needs no local install. Beyond th
   checkouts without that file (commits from before it was added); there, pass
   `--ignore-revs-file .git-blame-ignore-revs` to `git blame` instead.
 
+## Checkstyle
+
+Checkstyle (`config/checkstyle/checkstyle.xml`) fails the build on any violation. The checks code
+most often trips:
+
+- a public type, method or constructor in main code without Javadoc (getters, setters, overrides
+  and tag-only comments pass);
+- a non-final parameter, local or uninheritable class;
+- a utility class without a private constructor;
+- an unused local;
+- an empty catch whose variable is not named `ignored`;
+- a boolean expression that can be simplified;
+- more than one `return` (see [Single exit](#single-exit)).
+
 ## Lambdas and scenario classes
 
 For local callbacks, prefer lambdas to anonymous classes and method references to lambdas.

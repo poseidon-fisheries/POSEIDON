@@ -1,0 +1,53 @@
+# Runtime model
+
+How the framework turns a scenario into a running simulation. The rules for writing factories and scenarios are in `architecture.md`.
+
+## Product stores
+
+`AbstractFactory` (`core/.../AbstractFactory.java`) builds a factory's product once per owner and keeps it in a `ProductStore` keyed by factory identity: the simulation's store for a simulation-level factory, the vessel's for a vessel-level one, and the factory's own store for a global one. Sharing is declared by two things only: the factory's scope, and referencing the same factory object from several places. Two distinct factory objects never share a product, however equal their values, so a copy made by derivation builds its own. A simulation's store ends when the simulation finishes, and refuses any later build. Ending a store first runs the teardowns of the registrations made for its products, the last made first.
+
+## Levels and scopes
+
+A factory's **level** says which owner its product belongs to: global (`Scope`), a simulation (`SimulationScope`) or a vessel (`VesselScope`). A level base class declares it (`GlobalScopeFactory`, `SimulationScopeFactory`, `VesselScopeFactory`); a `RelativeScopeFactory` derives it. `get` refuses a scope wider than the factory's level, and widens a narrower one by constructing a scope of exactly that level over the same owners, so a build receives nothing a narrower scope offers, and its registrations go to the store that holds its product.
+
+## Simulations
+
+`Scenario.startNewSimulation(...)` builds a `Simulation` by resolving every component factory against a fresh `SimulationScope`. `Simulation` extends MASON's `SimState` and owns the `TemporalSchedule`, an `EventManager`, and the list of resolved components; `finalProcesses` run at `finish()`.
+
+## Vessel components
+
+A **vessel component** (its gear, engine, fuel tank, hold, behaviour, option values, learners, recorders) is made once, with `vesselComponent(factory)`, or varying by one vessel attribute, and the component is what consumers take: `fishing(gear, hold, fuelTank, ...)`, `refuel(fuelTank, ...)`, `componentProperty(hold, "availableCapacityInKg")`. A consumer reads what the component built for the vessel when it uses it, with `gear.of(vessel)` (or `findIn` where absence is normal). A component is also a value of a vessel (a global `ValueFactory` whose product reads the vessel's component), so it goes wherever a vessel value is expected: a picker takes the option values' component as the option values of the vessel it picks for.
+
+The vessel builds the components its vessel specification lists, each under a `VesselComponentScope` carrying a store of its own, so each has a lifetime of its own, and keeps what each built under it. Components are compared by identity, as the keys they are. What holds the working state of one component (tasks, the behaviour, holds, learners, listener wrappers) extends `VesselComponentScopeFactory`; what a vessel knows across components (memories, option values) is vessel-level.
+
+A varying component (`varyingBy("main_fishing_gear", none(), when("PS", purseSeine), when("OTB", bottomTrawl))`) maps values of one required vessel attribute to variants: a factory or deliberate absence, with an optional default. Duplicate keys and mixed key types fail when the component is constructed. Missing attributes, wrong attribute types on a miss, and unlisted values without a default fail when the vessel is given the component. With no listed values, there is no key type to check, but the attribute is still required. `Variant` is sealed to `FactoryVariant` and `NoComponent`; absence is not a factory. A varying component reads an attribute only, never another component, and a component property drawn by `oneValueFrom` is drawn when its component is built.
+
+Only the vessel builds what a component's factory or variants build: building the component itself builds only its reader. Before a simulation starts, the description's `ScenarioCheck`s run over every node: a component some consumer uses but no vessel specification lists fails then, naming the consumer.
+
+## Vessel creation
+
+The **vessel specification** (`vesselSpecification(fleet, behaviour)`, given the other components by name with `component(name, component)`) is what a vessel of the scenario is made of, and the only thing that creates vessels: a creation source (`createVesselsAtPort`, the vessel register) asks it to create each vessel from an id and attributes. It names the attributes that give a vessel's home port (`homePortAttribute`) and its name (`nameAttribute`, if vessels have names); the home port is the port of that code in the port grid, looked up whenever it is read, and a code naming no port leaves the vessel without a home port, and so inactive.
+
+Creation runs in a fixed order: the vessel joins the fleet with an account, takes its attributes (which place it at its home port), and builds its components, the behaviour first, then the others as listed; only then does the fleet announce its entry to its entry listeners (`addEntryListener`), so a listener only ever sees a complete vessel, before its first step.
+
+## Statements, rebuilds and exits
+
+A source states things about an existing vessel through the fleet: a change of attributes, or its exit. A statement joins the vessel's queue and takes effect at the start of the vessel's next step in which its behaviour is not running, never inside the call that made it; one queued on a vessel with no step pending schedules one at once. Scheduling wrappers, and so statements and creations, run at ordering 0, and vessel steps at ordering 1: every statement due at an instant is queued before any vessel steps then, and a vessel takes its first step at the instant it is created. A vessel's account changes at once, from any call.
+
+Once the queue is applied, the vessel rebuilds every component that varies by an attribute whose value changed, even if the same variant is picked: their stores end in the reverse of the build order, then they are built in that order, each under a fresh store; every other component, the vessel's own store (its memories) and its account stay. A hold that still holds catch refuses to have its store ended, so a rebuild only ever drops an empty hold.
+
+An exit ends the queue: the vessel's component stores end in the reverse of the build order, then its own store; it leaves the vessel field, then the fleet, which announces the exit to its exit listeners (`addExitListener`) and keeps the id with its exit date, so that a later statement about it is an error and ids are never reused.
+
+The vessel register (`scheduledByDateTime(vesselRegister(table, vesselSpecification))`) turns each row into a dated statement; it folds each vessel's rows dated at or before the start into one creation at the start, and a vessel that exited by then is never created, its exit recorded with the fleet.
+
+## Registration
+
+A build registers through its scope, never directly. In a vessel scope, `addListener` registers on the vessel's event manager and `register(registry, item)` registers in a `VesselRegistry` (the fishing event sharer), which takes the vessel from the scope and returns its own teardown; the scope gives each teardown to the vessel's store. In a simulation scope, `addListener` registers on the simulation's event manager with no teardown: the simulation's store ends only at the finish, which takes nothing back. The global scope offers no way to register.
+
+## Simulation services
+
+The simulation's services are inputs: its random number generator (`rng()`), its clock (`currentDateTime()`, `hasDateTime()`, `startingDateTime()`), its event manager (`eventManager()`) and the run's id (`runId()`). A scope does not offer the simulation to a build: `SimulationScope`'s accessor is package-private, and the only readers, all in `core`, are the services' own factories, the store routing (`SimulationScopeFactory`, `PerSimulationFactory`), the scope's registration methods and the `SchedulingScope`. A service is simulation-level, so a relative factory that takes one is at least simulation-level.
+
+## Scheduling
+
+Scheduling is not something a scope offers. Only scheduling factories schedule: core's scheduling wrappers (`scheduledOnce`, `scheduledRepeating`, `scheduledByDateTime` and the rest, in `core/.../schedule/Factories.java`) and the fleet factories. They extend `SchedulingFactory`, whose build receives a `SchedulingScope` offering the simulation's schedule. A `SimulationScopeFactory`'s build always receives a plain `SimulationScope`, and a wrapper's input is typed `Factory<? super SimulationScope, ...>`, which no factory typed in `SchedulingScope` is, so the steppable a wrapper schedules cannot schedule anything itself.
