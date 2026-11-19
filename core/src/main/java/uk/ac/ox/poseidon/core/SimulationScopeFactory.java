@@ -28,9 +28,14 @@ import lombok.experimental.SuperBuilder;
 /**
  * A {@link Factory} whose produced object is kept in its {@link Simulation}'s
  * store — one instance per simulation run, shared by every resolution within
- * that run, but never shared across different runs. Use for components that
- * depend on a live simulation's state (its RNG, its
- * {@link uk.ac.ox.poseidon.core.schedule.TemporalSchedule}, etc.).
+ * that run, but never shared across different runs.
+ * <p>
+ * Declare this level only when the product needs it: it holds mutable state of
+ * its own, its build registers through the scope, or its build has side effects
+ * on what its inputs give it. A product that only uses the simulation's
+ * services (its random number generator, its clock, its event manager) takes
+ * them as inputs of a {@link RelativeScopeFactory}, which is then
+ * simulation-level anyway.
  */
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor

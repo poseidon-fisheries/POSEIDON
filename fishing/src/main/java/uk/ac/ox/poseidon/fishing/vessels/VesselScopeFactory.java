@@ -34,8 +34,13 @@ import uk.ac.ox.poseidon.core.Factory;
  * A {@link Factory} whose produced object is cached per {@link Vessel} — one
  * instance per vessel agent, shared by every resolution against that vessel for
  * the life of the simulation, but never shared between different vessels or
- * across simulation runs. Use for components that depend on a single vessel's
- * own state.
+ * across simulation runs.
+ * <p>
+ * Declare this level only when the product needs one instance per vessel: it
+ * holds mutable state of its own, its build registers through the vessel's
+ * scope, or its build has side effects on what its inputs give it. A stateless
+ * product that only reads a vessel's state is a {@link
+ * uk.ac.ox.poseidon.core.RelativeScopeFactory}, per vessel when an input is.
  */
 @Getter
 @ToString

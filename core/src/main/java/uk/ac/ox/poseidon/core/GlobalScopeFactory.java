@@ -28,8 +28,11 @@ import lombok.experimental.SuperBuilder;
 /**
  * A {@link Factory} whose produced object is kept in the factory's own store,
  * regardless of the scope it's resolved against — so one instance is shared
- * across every simulation that reaches this factory object. Use for components
- * with no per-simulation state.
+ * across every simulation that reaches this factory object.
+ * <p>
+ * Use it for a product built from plain values only, with no state of its own.
+ * A factory with {@link Factory}-typed inputs is a {@link RelativeScopeFactory}
+ * instead, which is global when its inputs are and narrower when one is not.
  */
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
