@@ -162,10 +162,8 @@ class RelativeScopeFactoryTest {
     extends RelativeScopeFactory<Scope, Object>
   {
 
-    private final String name = "plain";
-
     public String getName() {
-      return name;
+      return "plain";
     }
 
     @Override

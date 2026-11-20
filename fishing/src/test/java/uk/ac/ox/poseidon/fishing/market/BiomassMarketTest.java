@@ -352,9 +352,9 @@ class BiomassMarketTest {
     assertThat(sale.getUnsold().getBuckets()).containsOnlyKeys(
       unpricedCategory
     );
-    assertThat(
-      sale.getUnsold().getBuckets().get(unpricedCategory).getKg(species)
-    ).isEqualTo(30.0);
+    assertThat(sale.getUnsold().getBuckets())
+      .extractingByKey(unpricedCategory)
+      .satisfies(bucket -> assertThat(bucket.getKg(species)).isEqualTo(30.0));
   }
 
   @Test
@@ -381,12 +381,12 @@ class BiomassMarketTest {
     assertThat(sale.getItems())
       .extracting(Sale.Item::getSpecies)
       .containsExactly(priced);
-    assertThat(
-      sale.getUnsold().getBuckets().get(category).getKg(unpriced)
-    ).isEqualTo(4.0);
-    assertThat(
-      sale.getUnsold().getBuckets().get(category).getKg(priced)
-    ).isZero();
+    assertThat(sale.getUnsold().getBuckets())
+      .extractingByKey(category)
+      .satisfies(bucket -> {
+        assertThat(bucket.getKg(unpriced)).isEqualTo(4.0);
+        assertThat(bucket.getKg(priced)).isZero();
+      });
   }
 
   @Test

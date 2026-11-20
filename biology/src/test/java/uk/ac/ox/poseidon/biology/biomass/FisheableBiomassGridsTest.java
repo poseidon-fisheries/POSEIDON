@@ -28,6 +28,7 @@ import static uk.ac.ox.poseidon.biology.biomass.Factories.fisheableBiomassGrids;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.Fisheable;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
@@ -118,7 +119,9 @@ final class FisheableBiomassGridsTest {
   @Test
   void newInstanceRejectsAnArrayWithTheWrongSpeciesCount() {
     assertThatIllegalArgumentException()
-      .isThrownBy(() -> grids.newInstance(new BiomassGrid[] { codGrid }))
+      .isThrownBy(() ->
+        Objects.requireNonNull(grids.newInstance(new BiomassGrid[] { codGrid }))
+      )
       .withMessage("Grid array length must match species index size");
   }
 
