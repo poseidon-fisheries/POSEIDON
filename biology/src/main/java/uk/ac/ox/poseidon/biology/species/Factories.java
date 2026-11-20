@@ -38,14 +38,6 @@ public final class Factories {
   private Factories() {}
 
   /**
-   * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an unnamed,
-   *         uncoded species
-   */
-  public static SpeciesFactory species() {
-    return SpeciesFactory.builder().build();
-  }
-
-  /**
    * @param code the species' code; name defaults to {@code "Species <code>"},
    *             no life stage
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for a

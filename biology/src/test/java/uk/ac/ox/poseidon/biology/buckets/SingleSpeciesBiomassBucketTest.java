@@ -200,6 +200,32 @@ class SingleSpeciesBiomassBucketTest {
     assertThat(partitions.get(false)).isSameAs(Bucket.empty());
   }
 
+  @Test
+  void mapContentReturningPositiveBiomassKeepsTheSpeciesAndMappedValue() {
+    final Bucket bucket = Bucket.of(a, 10);
+
+    final Bucket mapped = bucket.mapContent((species, content) -> {
+      assertThat(species).isEqualTo(a);
+      assertThat(content.asKg()).isEqualTo(10);
+      return Biomass.ofKg(4);
+    });
+
+    assertThat(mapped.getKg(a)).isEqualTo(4);
+    assertThat(mapped.getSpecies()).containsExactly(a);
+    assertThat(bucket.getKg(a)).isEqualTo(10);
+  }
+
+  @Test
+  void mapContentReturningZeroBiomassReturnsTheCanonicalEmptyBucket() {
+    final Bucket bucket = Bucket.of(a, 10);
+
+    final Bucket mapped = bucket.mapContent((species, content) ->
+      Biomass.ofKg(0)
+    );
+
+    assertThat(mapped).isSameAs(Bucket.empty());
+  }
+
   private static final class NonBiomassContent implements Content {
 
     private final double kg;

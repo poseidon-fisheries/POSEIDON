@@ -38,7 +38,7 @@ import uk.ac.ox.poseidon.core.Scope;
  * {@link Species}'s own constructor order ({@code code}, {@code lifeStage},
  * {@code name}) — {@link #newInstance} maps between them by name, but take care
  * when constructing either directly. Built via
- * {@link Factories#species()}/{@link Factories#species(String)}/
+ * {@link Factories#species(String)}/
  * {@link Factories#species(String, String, String)}.
  */
 @Getter
