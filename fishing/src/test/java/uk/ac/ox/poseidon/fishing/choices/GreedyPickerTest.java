@@ -254,4 +254,32 @@ class GreedyPickerTest {
     );
     assertThat(selected).containsExactlyInAnyOrder("A", "B");
   }
+
+  @Test
+  void picksAtRandomAmongTheTiedOptionsOfTheBestGroupWithAPassingOption() {
+    final GreedyPicker<String> picker = picker(
+      Map.of("T", 5.0, "A", 3.0, "B", 3.0, "C", 2.0, "D", 2.0, "E", 1.0),
+      option -> Set.of("C", "D", "E").contains(option)
+    );
+    final Set<String> picked = new HashSet<>();
+    for (int i = 0; i < 100; i++) {
+      picked.add(picker.apply(vessel).orElse(null));
+    }
+
+    assertThat(picked).containsExactlyInAnyOrder("C", "D");
+  }
+
+  @Test
+  void picksAtRandomAmongTheTiedOptionsBelowTheBestValue() {
+    final GreedyPicker<String> picker = picker(
+      Map.of("T", 5.0, "A", 3.0, "B", 3.0, "C", 1.0),
+      option -> !option.equals("T")
+    );
+    final Set<String> picked = new HashSet<>();
+    for (int i = 0; i < 100; i++) {
+      picked.add(picker.apply(vessel).orElse(null));
+    }
+
+    assertThat(picked).containsExactlyInAnyOrder("A", "B");
+  }
 }

@@ -32,9 +32,11 @@ import static uk.ac.ox.poseidon.fishing.market.MarketGridTest.market;
 import static uk.ac.ox.poseidon.fishing.market.MarketGridTest.marketGrid;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.ToDoubleFunction;
+import java.util.stream.IntStream;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -188,7 +190,29 @@ class HomePortCatchValuationTest {
     when(vessel.getHomePort()).thenReturn(null);
     assertThatThrownBy(() ->
       valuation.by(vessel).applyAsDouble(Bucket.of(pricedSpecies, 10.0))
-    ).isInstanceOf(IllegalStateException.class);
+    )
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("has no home port");
+  }
+
+  @Test
+  void keepsTenThousandValuesButNotMore() {
+    market.setPrice(category, pricedSpecies, eurosPerKg(2.0), now);
+    final List<Bucket> buckets = IntStream.range(0, 10_001)
+      .mapToObj(_ -> Bucket.of(pricedSpecies, 1.0))
+      .toList();
+    now = now.plusHours(1);
+    final ToDoubleFunction<Bucket> first = valuation.by(vessel);
+    buckets.subList(0, 10_000).forEach(first::applyAsDouble);
+    catchesCategorised.set(0);
+
+    valuation.by(vessel).applyAsDouble(buckets.getFirst());
+    assertThat(catchesCategorised).hasValue(0);
+
+    first.applyAsDouble(buckets.getLast());
+    catchesCategorised.set(0);
+    valuation.by(vessel).applyAsDouble(buckets.getFirst());
+    assertThat(catchesCategorised).hasValue(1);
   }
 
   @Test
