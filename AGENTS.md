@@ -4,24 +4,28 @@ This file provides guidance to coding agents (Claude Code and others) when
 working with code in this repository. Longer topic-specific sections live in
 `docs/agents/` — read the relevant one before touching code it covers:
 
-- `docs/agents/architecture.md` — the Factory + Scenario pattern, `*Factory`
-  class shape, live parameters with plain-value overloads, data shared across
-  simulations, immutable collections, determinism.
+- `docs/agents/architecture.md` — before writing or changing a factory, a
+  `Factories` helper or scenario code: the Factory + Scenario pattern,
+  `*Factory` class shape, live parameters, data shared across simulations,
+  determinism.
 - `docs/agents/runtime-model.md` — before changing `core` or `fishing`
   internals: product stores, levels and scopes, vessel components, vessel
   creation and statements, registration, services, scheduling.
-- `docs/agents/javadoc.md` — Javadoc layout, and conventions for the
+- `docs/agents/javadoc.md` — before writing or editing Javadoc: layout, and the
   component/`Factory`/`Factories` triplet.
-- `docs/agents/lombok.md` — which Lombok annotation shape to use per class role.
-- `docs/agents/code-style.md` — Checkstyle's checks, scenario class conventions,
-  `Factories` helper names, streams versus loops, the single-exit rule in
-  detail, and the Prettier/Spotless setup SURIMI-POSEIDON duplicates.
+- `docs/agents/lombok.md` — before writing a class or changing its Lombok
+  annotations: which annotation shape fits each class role.
+- `docs/agents/code-style.md` — before writing Java: Checkstyle's checks,
+  scenario classes, `Factories` helper names, streams versus loops, single exit,
+  hot paths, and the Prettier/Spotless setup SURIMI-POSEIDON duplicates.
 - `docs/agents/testing.md` — before writing or editing a test: AssertJ, test
   layout, and mocks that scopes hold weakly.
-- `docs/agents/naming.md` — how to name factories, steppables, tasks,
-  predicates, cells and function-valued fields, and what reads as English.
-- `docs/agents/conceptual-correctness.md` — don't collapse distinct concepts for
-  a smaller diff; absence is not a default.
+- `docs/agents/naming.md` — before naming a class, method, field or variable:
+  factories, steppables, tasks, predicates, cells, fields and function-valued
+  fields, and what reads as English.
+- `docs/agents/conceptual-correctness.md` — before fixing a design problem or
+  giving missing state a default: don't collapse distinct concepts for a smaller
+  diff; absence is not a default.
 
 ## What this is
 
@@ -47,6 +51,9 @@ of the original POSEIDON model.
 
 Notes:
 
+- Shared build configuration (dependencies, toolchain, compiler flags, test and
+  analysis wiring) lives in the convention plugins in
+  `buildSrc/src/main/kotlin/`, not in the modules' build files.
 - `build` runs `spotlessCheck`, which fails on any Java or Markdown file
   `spotlessApply` would change: run `./gradlew spotlessApply` after editing
   either. For license-header years, see "Licensing".
@@ -102,10 +109,7 @@ core  →  io  →  geography  →  biology  →  fishing  →  gui
   built on MASON's UI facilities (`ScenarioWithUI`, portrayals, palettes).
 - **examples** — Runnable example scenarios (e.g. `petersnapper`) that wire the
   other modules together into an application; also contains
-  scenario-writing/calibration entry points with `main` methods. Shared build
-  configuration (dependencies, toolchain, compiler flags, test and analysis
-  wiring) lives in the convention plugins in `buildSrc/src/main/kotlin/`, not in
-  the modules' build files.
+  scenario-writing/calibration entry points with `main` methods.
 
 ## Code style
 
@@ -118,8 +122,7 @@ common exception is a traditional counting `for` loop's own loop variable
 Formatting is Prettier's, applied by `./gradlew spotlessApply`; wrap comments by
 hand within 80 columns. A method or lambda has at most one `return`, as its last
 statement. Scenario classes (such as `PeterSnapperScenario`) stay readable for
-people new to Java: locals declared `final var`, no method references or other
-clever tricks.
+people new to Java, as `docs/agents/code-style.md` details.
 
 ## Merging
 

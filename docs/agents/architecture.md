@@ -62,24 +62,20 @@ The model is built around a declarative configuration → runtime object pattern
   scenario per candidate. A run is started with its seed and, optionally, its
   id: `startNewSimulation(seed[, simulationId])`.
 - Consumers take a **vessel component** (`vesselComponent(factory)` or
-  `varyingBy`), not what it builds, and read what it built for the vessel when
-  they use it, with `gear.of(vessel)`. What holds the working state of one
-  component extends `VesselComponentScopeFactory`; what a vessel knows across
-  components is vessel-level.
+  `varyingBy`), not what it builds: see "Vessel components" in
+  `runtime-model.md`.
 - **Nothing goes on `Vessel` unless every possible model needs it.** State or
   queries that only some models need (a chosen destination, the current fishing
   trip, whether a fishing trip started today) live in vessel components, or in
   other objects built for the models that need them, never as fields or methods
   of the vessel.
-- A build registers through its scope (`scope.addListener`, `scope.register`),
-  never directly.
 - A factory that draws random numbers, reads the date, publishes events or needs
   the run's id takes the simulation service's factory (`rng()`,
   `currentDateTime()`, `eventManager()`, `runId()`) as an input, which its
   helper passes, so scenario code never names it.
-- Only scheduling factories schedule. What runs when is said in the scenario, by
-  wrapping a steppable in one of core's scheduling wrappers (`scheduledOnce`,
-  `scheduledRepeating`, `scheduledByDateTime` and the rest).
+- What runs when is said in the scenario, by wrapping a steppable in one of
+  core's scheduling wrappers (`scheduledOnce`, `scheduledRepeating`,
+  `scheduledByDateTime` and the rest); see "Scheduling" in `runtime-model.md`.
 - Scenarios are serialized to/from YAML via SnakeYAML (`io/.../ScenarioLoader`,
   `ScenarioWriter`); `ScenarioLoader` restricts deserializable classes to
   configured prefixes (`uk.ac.ox.poseidon`, `java`, plus caller-supplied extras)

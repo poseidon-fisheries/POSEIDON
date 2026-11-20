@@ -26,6 +26,13 @@ Name anything that is a grid cell (`Int2D`) with "cell" (`getHomePortCell`,
 continuous coordinate or a cell. Third-party APIs keep their own names (MASON's
 `setObjectLocation`).
 
+## Fields
+
+Name a field after its full domain type in lower camel case (`OptionValues` →
+`optionValues`, `CatchCategoriser` → `catchCategoriser`), with a role qualifier
+when two fields of a class have the same type. A random number generator is
+`rng` everywhere: fields, parameters, local variables and factory helpers.
+
 ## Function-valued fields
 
 - A bare noun of the value is fine when the function reads a value off its
