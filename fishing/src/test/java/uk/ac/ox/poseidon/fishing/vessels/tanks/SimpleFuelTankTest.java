@@ -80,4 +80,91 @@ class SimpleFuelTankTest {
       IllegalArgumentException.class
     );
   }
+
+  @Test
+  void constructorRejectsNegativeCapacity() {
+    assertThatThrownBy(() -> new SimpleFuelTank(-1.0, 0.0)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+  }
+
+  @Test
+  void constructorRejectsNegativeCurrentFuel() {
+    assertThatThrownBy(() -> new SimpleFuelTank(100.0, -1.0)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+  }
+
+  @Test
+  void constructorAcceptsAnEmptyZeroCapacityTank() {
+    final SimpleFuelTank tank = new SimpleFuelTank(0.0, 0.0);
+
+    assertThat(tank.getCapacityInLitres()).isZero();
+    assertThat(tank.getCurrentFuelInLitres()).isZero();
+  }
+
+  @Test
+  void addFuelIncreasesCurrentFuel() {
+    final SimpleFuelTank tank = new SimpleFuelTank(100.0, 70.0);
+
+    tank.addFuel(20.0);
+
+    assertThat(tank.getCurrentFuelInLitres()).isEqualTo(90.0);
+  }
+
+  @Test
+  void addFuelAcceptsZeroLitres() {
+    final SimpleFuelTank tank = new SimpleFuelTank(100.0, 70.0);
+
+    tank.addFuel(0.0);
+
+    assertThat(tank.getCurrentFuelInLitres()).isEqualTo(70.0);
+  }
+
+  @Test
+  void addFuelRejectsNegativeVolume() {
+    final SimpleFuelTank tank = new SimpleFuelTank(100.0, 70.0);
+
+    assertThatThrownBy(() -> tank.addFuel(-1.0)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+    assertThat(tank.getCurrentFuelInLitres()).isEqualTo(70.0);
+  }
+
+  @Test
+  void addFuelRejectsVolumeAboveCapacity() {
+    final SimpleFuelTank tank = new SimpleFuelTank(100.0, 70.0);
+
+    assertThatThrownBy(() -> tank.addFuel(31.0)).isInstanceOf(
+      IllegalArgumentException.class
+    );
+    assertThat(tank.getCurrentFuelInLitres()).isEqualTo(70.0);
+  }
+
+  @Test
+  void addFuelAcceptsAnOverageOfExactlyTheTolerance() {
+    final SimpleFuelTank tank = new SimpleFuelTank(0.0, 0.0);
+
+    tank.addFuel(1e-6);
+
+    assertThat(tank.getCurrentFuelInLitres()).isZero();
+  }
+
+  @Test
+  void consumeFuelAcceptsZeroLitres() {
+    final SimpleFuelTank tank = new SimpleFuelTank(100.0, 70.0);
+
+    tank.consumeFuel(0.0);
+
+    assertThat(tank.getCurrentFuelInLitres()).isEqualTo(70.0);
+  }
+
+  @Test
+  void consumeFuelAcceptsAnUnderageOfExactlyTheTolerance() {
+    final SimpleFuelTank tank = new SimpleFuelTank(100.0, 0.0);
+
+    tank.consumeFuel(1e-6);
+
+    assertThat(tank.getCurrentFuelInLitres()).isZero();
+  }
 }
