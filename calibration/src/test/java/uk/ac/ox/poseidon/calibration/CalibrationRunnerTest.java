@@ -28,8 +28,13 @@ import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 import static uk.ac.ox.poseidon.calibration.CalibrationRunner.evaluateSeparately;
 import static uk.ac.ox.poseidon.calibration.CalibrationRunner.formatReport;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.ImmutableLongArray;
 import io.jenetics.util.ISeq;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeoutException;
@@ -37,8 +42,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import uk.ac.ox.poseidon.calibration.CalibrationProblem.SimulationTimes;
+import uk.ac.ox.poseidon.core.Scenario;
+import uk.ac.ox.poseidon.core.time.PeriodFactory;
 
 class CalibrationRunnerTest {
+
+  @Test
+  void optimizationReturnsAnIntegerThatCanBeReappliedToTheScenario() {
+    final var scenario = new Scenario(
+      LocalDate.of(2020, 1, 1),
+      Map.of("period", new PeriodFactory(0, 0, 1))
+    );
+    final var problem = new CalibrationProblem(
+      scenario,
+      Period.ofDays(1),
+      ImmutableMap.of("period.days", new IntegerParameterRange(2, 2)),
+      simulation -> simulation.getComponent(Period.class).getDays(),
+      ImmutableLongArray.of(1)
+    );
+
+    final var result = CalibrationRunner.minimize(
+      problem,
+      new CalibrationRunner.Options(4, 1, 0, 0)
+    );
+
+    assertThat(result.getParameters()).containsEntry("period.days", 2);
+    assertThat(problem.fitness().apply(result.getParameters())).isEqualTo(2.0);
+  }
 
   @Test
   void reportsTheShareOfTheProcessorsTheSimulationsUsed() {

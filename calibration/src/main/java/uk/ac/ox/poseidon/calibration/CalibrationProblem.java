@@ -31,7 +31,6 @@ import io.jenetics.DoubleGene;
 import io.jenetics.Genotype;
 import io.jenetics.engine.Codec;
 import io.jenetics.engine.Problem;
-import io.jenetics.util.DoubleRange;
 import java.time.Duration;
 import java.time.temporal.TemporalAmount;
 import java.util.Arrays;
@@ -55,7 +54,7 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
  * values by running it forward for a fixed duration, once per seed, and
  * scoring the outcome with an {@code evaluator}. A candidate solution is a map
  * of address to value, each value encoded as an allele in {@code [0.0, 1.0]}
- * that {@link #codec()} rescales to that address's {@code parameterRanges}
+ * that {@link #codec()} decodes through that address's {@code parameterRanges}
  * entry; {@link #fitness()} derives a scenario with those values (see
  * {@link Scenario#with}), runs it for every seed in {@code seeds} and returns
  * the average evaluator score. The seeds of one evaluation run in parallel, on the
@@ -67,7 +66,7 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 @RequiredArgsConstructor
 @Accessors(fluent = true)
 public class CalibrationProblem
-  implements Problem<SequencedMap<String, Double>, DoubleGene, Double>
+  implements Problem<SequencedMap<String, Number>, DoubleGene, Double>
 {
 
   /**
@@ -75,7 +74,7 @@ public class CalibrationProblem
    */
   protected final @NonNull Scenario scenario;
   private final @NonNull TemporalAmount duration;
-  private final @NonNull ImmutableMap<String, DoubleRange> parameterRanges;
+  private final @NonNull ImmutableMap<String, ParameterRange> parameterRanges;
   private final @NonNull ToDoubleFunction<Simulation> evaluator;
   private final @NonNull ImmutableLongArray seeds;
   private final LongAdder simulations = new LongAdder();
@@ -84,12 +83,12 @@ public class CalibrationProblem
 
   /**
    * Encodes/decodes a genotype of {@code parameterRanges.size()} alleles in
-   * {@code [0.0, 1.0]} to/from a map of address to value, by linearly
-   * rescaling each allele to its corresponding entry in
+   * {@code [0.0, 1.0]} to/from a map of address to value, by decoding
+   * each allele through its corresponding entry in
    * {@code parameterRanges}. Computed lazily, once, on first access.
    */
   @Getter(lazy = true)
-  private final Codec<SequencedMap<String, Double>, DoubleGene> codec =
+  private final Codec<SequencedMap<String, Number>, DoubleGene> codec =
     Codec.of(
       Genotype.of(DoubleChromosome.of(0.0, 1.0, this.parameterRanges.size())),
       genotype -> {
@@ -98,12 +97,9 @@ public class CalibrationProblem
         return IntStream.range(0, this.parameterRanges.size())
           .mapToObj(i -> {
             final var entry = entries.get(i);
-            final DoubleRange range = entry.getValue();
+            final ParameterRange range = entry.getValue();
             final double allele = chromosome.get(i).allele();
-            return java.util.Map.entry(
-              entry.getKey(),
-              range.min() + allele * (range.max() - range.min())
-            );
+            return java.util.Map.entry(entry.getKey(), range.decode(allele));
           })
           .collect(
             toMap(
@@ -121,7 +117,7 @@ public class CalibrationProblem
    *         the given values, runs it once per seed in {@code seeds}, and
    *         returns the average of {@code evaluator}'s score across seeds
    */
-  public Function<SequencedMap<String, Double>, Double> fitness() {
+  public Function<SequencedMap<String, Number>, Double> fitness() {
     return this::evaluate;
   }
 
@@ -138,7 +134,7 @@ public class CalibrationProblem
     );
   }
 
-  private double evaluate(final SequencedMap<String, Double> parameters) {
+  private double evaluate(final SequencedMap<String, Number> parameters) {
     Scenario candidate = scenario;
     for (final var parameter : parameters.entrySet()) {
       candidate = candidate.with(parameter.getKey(), parameter.getValue());

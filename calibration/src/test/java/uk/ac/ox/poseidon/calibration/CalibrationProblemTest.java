@@ -24,11 +24,14 @@ package uk.ac.ox.poseidon.calibration;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.ImmutableLongArray;
-import io.jenetics.util.DoubleRange;
+import io.jenetics.DoubleChromosome;
+import io.jenetics.DoubleGene;
+import io.jenetics.Genotype;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
@@ -44,6 +47,7 @@ import org.junit.jupiter.api.Timeout;
 import uk.ac.ox.poseidon.calibration.CalibrationProblem.SimulationTimes;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.time.PeriodFactory;
 import uk.ac.ox.poseidon.core.utils.ObjectFactory;
 
 /**
@@ -115,12 +119,72 @@ class CalibrationProblemTest {
         Map.of("number", new ObjectFactory<>(1.0))
       ),
       Period.ofDays(1),
-      ImmutableMap.of("number.value", new DoubleRange(0, 10)),
+      ImmutableMap.of("number.value", new LinearParameterRange(0, 10)),
       simulation -> simulation.getComponent(Double.class),
       ImmutableLongArray.of(1)
     );
-    final SequencedMap<String, Double> parameters = new LinkedHashMap<>();
+    final SequencedMap<String, Number> parameters = new LinkedHashMap<>();
     parameters.put("number.value", 2.0);
+
+    assertThat(problem.fitness().apply(parameters)).isEqualTo(2.0);
+  }
+
+  @Test
+  void codecDecodesMixedRangesInAddressOrderAndKeepsIntegers() {
+    final var problem = new CalibrationProblem(
+      new Scenario(LocalDate.of(2020, 1, 1), Map.of()),
+      Period.ofDays(1),
+      ImmutableMap.of(
+        "linear",
+        new LinearParameterRange(0, 10),
+        "logarithmic",
+        new LogarithmicParameterRange(0.01, 1),
+        "integer",
+        new IntegerParameterRange(0, 4)
+      ),
+      Simulation::seed,
+      ImmutableLongArray.of(1)
+    );
+    final var parameters = problem
+      .codec()
+      .decode(
+        Genotype.of(
+          DoubleChromosome.of(
+            DoubleGene.of(0.5, 0, 1),
+            DoubleGene.of(0.5, 0, 1),
+            DoubleGene.of(0.5, 0, 1)
+          )
+        )
+      );
+
+    assertThat(parameters.sequencedKeySet()).containsExactly(
+      "linear",
+      "logarithmic",
+      "integer"
+    );
+    assertThat(parameters.get("linear")).isEqualTo(5.0);
+    assertThat(parameters.get("logarithmic").doubleValue()).isCloseTo(
+      0.1,
+      within(1e-15)
+    );
+    assertThat(parameters.get("integer")).isEqualTo(2);
+  }
+
+  @Test
+  void decodedIntegerCanBeAppliedToAnIntScenarioField() {
+    final var problem = new CalibrationProblem(
+      new Scenario(
+        LocalDate.of(2020, 1, 1),
+        Map.of("number", new PeriodFactory(0, 0, 1))
+      ),
+      Period.ofDays(1),
+      ImmutableMap.of("number.days", new IntegerParameterRange(0, 4)),
+      simulation -> simulation.getComponent(Period.class).getDays(),
+      ImmutableLongArray.of(1)
+    );
+    final var parameters = problem
+      .codec()
+      .decode(Genotype.of(DoubleChromosome.of(DoubleGene.of(0.5, 0, 1))));
 
     assertThat(problem.fitness().apply(parameters)).isEqualTo(2.0);
   }

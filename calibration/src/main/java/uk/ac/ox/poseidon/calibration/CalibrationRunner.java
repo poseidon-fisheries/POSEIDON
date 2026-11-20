@@ -223,7 +223,7 @@ public final class CalibrationRunner {
      * The best solution found, as a map of property name to value; defensively
      * copied on construction and on every {@link #getParameters()} call.
      */
-    SequencedMap<String, Double> parameters;
+    SequencedMap<String, Number> parameters;
 
     /** The best solution's fitness score. */
     double fitness;
@@ -236,7 +236,7 @@ public final class CalibrationRunner {
      * not reach the result.
      */
     public Result(
-      final SequencedMap<String, Double> parameters,
+      final SequencedMap<String, Number> parameters,
       final double fitness,
       final long generations
     ) {
@@ -246,7 +246,7 @@ public final class CalibrationRunner {
     }
 
     /** @return a copy of the best solution found */
-    public SequencedMap<String, Double> getParameters() {
+    public SequencedMap<String, Number> getParameters() {
       return new LinkedHashMap<>(parameters);
     }
   }
