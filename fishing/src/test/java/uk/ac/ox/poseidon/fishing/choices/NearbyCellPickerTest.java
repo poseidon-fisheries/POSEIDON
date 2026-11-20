@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.fishing.choices;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -506,5 +507,29 @@ class NearbyCellPickerTest {
       picker(cell -> true, 10, Integer.MAX_VALUE).apply(vessel)
     ).contains(new Cell(0, 0));
     assertThat(searched).containsExactly(entry(CENTRE, 10));
+  }
+
+  @Test
+  void rejectsANegativeSearchRadius() {
+    final NearbyCellPicker picker = picker(_ -> true, -1, 0);
+
+    assertThatIllegalArgumentException().isThrownBy(() -> picker.apply(vessel));
+  }
+
+  @Test
+  void rejectsANegativeMaximumWidening() {
+    final NearbyCellPicker picker = picker(_ -> true, 1, -1);
+
+    assertThatIllegalArgumentException().isThrownBy(() -> picker.apply(vessel));
+  }
+
+  @Test
+  void acceptsAZeroSearchRadiusAndZeroWidening() {
+    final Cell cell = new Cell(3, 2);
+    neighbourhood(CENTRE, 0, cell);
+
+    final Optional<Cell> picked = picker(_ -> true, 0, 0).apply(vessel);
+
+    assertThat(picked).contains(cell);
   }
 }
