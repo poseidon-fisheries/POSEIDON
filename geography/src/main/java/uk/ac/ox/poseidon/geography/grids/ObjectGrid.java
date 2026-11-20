@@ -103,7 +103,7 @@ public abstract class ObjectGrid<T>
    * @param portCoordinates the ports to place, each at its given coordinate
    * @return a fresh field with one entry per {@code portCoordinates} entry
    * @throws IllegalArgumentException if any port's coordinate isn't on land, or
-   *                                  isn't adjacent to an active water cell
+   *                                  isn't adjacent to a water cell
    */
   protected static SparseGrid2D makeField(
     final BathymetricGrid bathymetricGrid,
@@ -124,10 +124,10 @@ public abstract class ObjectGrid<T>
       );
       checkArgument(
         modelGrid
-          .getActiveNeighbours(cell)
+          .getNeighbours(cell)
           .stream()
           .anyMatch(bathymetricGrid::isWater),
-        "Port %s at coordinate %s is not adjacent to an active water cell.",
+        "Port %s at coordinate %s is not adjacent to a water cell.",
         port.getName(),
         coordinate
       );

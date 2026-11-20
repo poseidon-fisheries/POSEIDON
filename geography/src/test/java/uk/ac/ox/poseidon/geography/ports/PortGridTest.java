@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.poseidon.geography.Envelope;
@@ -87,5 +88,59 @@ final class PortGridTest {
     assertThatThrownBy(() -> portGrid.validateCell(new Cell(0, 0)))
       .isExactlyInstanceOf(IllegalStateException.class)
       .hasMessageContaining("is not on land");
+  }
+
+  @Test
+  void coordinateMapConstructorAcceptsInactiveLandBesideInactiveWater() {
+    final var modelGrid = ModelGrid.create(
+      2,
+      1,
+      new Envelope(0, 2, 0, 1)
+    ).withActiveCells(List.of());
+    final var bathymetricGrid = new DefaultBathymetricGrid(
+      modelGrid,
+      new double[][] { { 0 }, { -2 } }
+    );
+    final var port = new Port("P", "Port P");
+
+    final var portGrid = new MutablePortGrid(
+      bathymetricGrid,
+      Map.of(port, modelGrid.toCoordinate(new Cell(0, 0)))
+    );
+
+    assertThat(portGrid.getCell(port)).isEqualTo(new Cell(0, 0));
+    assertThat(portGrid.getPorts()).containsExactly(port);
+  }
+
+  @Test
+  void coordinateMapConstructorRejectsLandWithoutWaterNeighbours() {
+    final var bathymetricGrid = new DefaultBathymetricGrid(new double[][] {
+      { 0 },
+      { 1 }
+    });
+    final var coordinates = Map.of(
+      new Port("P", "Port P"),
+      bathymetricGrid.getModelGrid().toCoordinate(new Cell(0, 0))
+    );
+
+    assertThatThrownBy(() -> new MutablePortGrid(bathymetricGrid, coordinates))
+      .isExactlyInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("not adjacent to a water cell");
+  }
+
+  @Test
+  void coordinateMapConstructorRejectsWaterEvenBesideOtherWater() {
+    final var bathymetricGrid = new DefaultBathymetricGrid(new double[][] {
+      { -1 },
+      { -2 }
+    });
+    final var coordinates = Map.of(
+      new Port("P", "Port P"),
+      bathymetricGrid.getModelGrid().toCoordinate(new Cell(0, 0))
+    );
+
+    assertThatThrownBy(() -> new MutablePortGrid(bathymetricGrid, coordinates))
+      .isExactlyInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("is on water");
   }
 }
