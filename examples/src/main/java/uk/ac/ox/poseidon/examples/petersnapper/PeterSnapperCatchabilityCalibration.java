@@ -27,7 +27,6 @@ import static uk.ac.ox.poseidon.examples.petersnapper.Factories.totalLandingsPer
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.ImmutableLongArray;
-import io.jenetics.util.DoubleRange;
 import java.nio.file.Path;
 import java.time.Period;
 import java.util.Arrays;
@@ -37,6 +36,7 @@ import java.util.SequencedMap;
 import tech.tablesaw.api.Table;
 import uk.ac.ox.poseidon.calibration.CalibrationProblem;
 import uk.ac.ox.poseidon.calibration.CalibrationRunner;
+import uk.ac.ox.poseidon.calibration.LinearParameterRange;
 import uk.ac.ox.poseidon.calibration.errors.SumSquaredErrors;
 
 /**
@@ -81,7 +81,7 @@ public final class PeterSnapperCatchabilityCalibration {
       Period.ofYears(observedLandings.size()),
       ImmutableMap.of(
         CATCHABILITY_PROPERTY,
-        new DoubleRange(MIN_CATCHABILITY, MAX_CATCHABILITY)
+        new LinearParameterRange(MIN_CATCHABILITY, MAX_CATCHABILITY)
       ),
       new SumSquaredErrors<>(observedLandings, sim ->
         sim.getComponent(TotalLandingsPerYearAccumulator.class).get()
@@ -94,7 +94,7 @@ public final class PeterSnapperCatchabilityCalibration {
     System.out.println("steady_generations=" + STEADY_GENERATIONS);
     System.out.println("seeds=" + Arrays.toString(seeds));
     System.out.println("tutorial_catchability=" + TUTORIAL_CATCHABILITY);
-    final SequencedMap<String, Double> tutorialParams = new LinkedHashMap<>();
+    final SequencedMap<String, Number> tutorialParams = new LinkedHashMap<>();
     tutorialParams.put(CATCHABILITY_PROPERTY, TUTORIAL_CATCHABILITY);
     System.out.println(
       "tutorial_fitness=" + problem.fitness().apply(tutorialParams)
@@ -117,7 +117,8 @@ public final class PeterSnapperCatchabilityCalibration {
     System.out.println("Generations: " + result.getGenerations());
     System.out.printf(
       "Tutorial catchability error: %.6g%n",
-      result.getParameters().get(CATCHABILITY_PROPERTY) - TUTORIAL_CATCHABILITY
+      result.getParameters().get(CATCHABILITY_PROPERTY).doubleValue() -
+        TUTORIAL_CATCHABILITY
     );
   }
 
