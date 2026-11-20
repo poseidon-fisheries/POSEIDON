@@ -67,10 +67,6 @@ dependencies {
     mockitoAgent(libs.mockito) { isTransitive = false }
     testRuntimeOnly(libs.junit.platform.launcher)
     compileOnly("${libs.spotbugs.annotations.get()}:${spotbugs.toolVersion.get()}")
-    // Core's own tests see its test fixtures without asking
-    if (project.name != "core") {
-        testImplementation(testFixtures(project(":core")))
-    }
 }
 
 

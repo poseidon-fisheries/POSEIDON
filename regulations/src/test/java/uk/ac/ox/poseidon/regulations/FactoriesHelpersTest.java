@@ -42,8 +42,9 @@ final class FactoriesHelpersTest {
 
   /** @return whether {@code method} parses a date from one of its arguments */
   private static boolean parsesItsArguments(final Method method) {
-    return Arrays.asList(method.getParameterTypes()).contains(
-      CharSequence.class
+    return (
+      method.getName().equals("betweenYearlyDates") &&
+      Arrays.asList(method.getParameterTypes()).contains(CharSequence.class)
     );
   }
 }

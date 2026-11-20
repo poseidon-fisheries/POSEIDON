@@ -25,6 +25,7 @@ plugins {
 }
 
 dependencies {
+    testImplementation(testFixtures(project(":core")))
     api(project(":regulations"))
     api(project(":biology"))
     api(project(":geography"))

@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -60,6 +61,7 @@ final class CreateVesselsAtPortTest {
 
     verify(specification).create("P1-1", Map.of("home_port", "P1"));
     verify(specification).create("P1-2", Map.of("home_port", "P1"));
+    verify(specification, times(2)).create(any(), anyMap());
   }
 
   @Test

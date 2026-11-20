@@ -37,15 +37,17 @@ import java.lang.reflect.Modifier;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DynamicTest;
 
 /**
  * Checks that every public static helper in the {@code Factories} classes of a
- * package returns an object of its declared type. The helpers only construct a
- * factory, so this is all they can get wrong on their own; it also runs each of
- * them, so that PIT can tell a helper whose result was replaced by null.
+ * package returns an object rather than null. It runs each helper, so that PIT
+ * can tell a helper whose result was replaced by null; it does not check that a
+ * helper passes its arguments on in the right places, which a test of the
+ * helper has to do.
  */
 public final class FactoriesHelpers {
 
@@ -71,12 +73,16 @@ public final class FactoriesHelpers {
    *                      suits them: a test of their own has to cover them
    * @return one test per public static helper not excluded, which calls it
    *         with mocks and default values for its arguments
+   * @throws AssertionError if there is no helper to check, as when
+   *                        {@code packagePrefix} names no package
    */
   public static Stream<DynamicTest> everyHelperBuildsItsResult(
     final String packagePrefix,
     final Predicate<? super Method> excluded
   ) throws IOException {
-    return ClassPath.from(FactoriesHelpers.class.getClassLoader())
+    final List<Method> helpers = ClassPath.from(
+      FactoriesHelpers.class.getClassLoader()
+    )
       .getTopLevelClassesRecursive(packagePrefix)
       .stream()
       .filter(info -> info.getSimpleName().equals("Factories"))
@@ -90,6 +96,12 @@ public final class FactoriesHelpers {
           method.getDeclaringClass().getName()
         ).thenComparing(Method::toGenericString)
       )
+      .toList();
+    assertThat(helpers)
+      .as("Factories helpers under %s", packagePrefix)
+      .isNotEmpty();
+    return helpers
+      .stream()
       .map(method ->
         dynamicTest(method.toGenericString(), () -> check(method))
       );
@@ -103,7 +115,7 @@ public final class FactoriesHelpers {
         .toArray()
     );
 
-    assertThat(result).isInstanceOf(boxed(method.getReturnType()));
+    assertThat(result).isNotNull();
   }
 
   private static Object argumentOf(final Class<?> type) {
@@ -145,19 +157,15 @@ public final class FactoriesHelpers {
   }
 
   private static Object emptyCollection(final Class<?> type) {
-    return Stream.<Object>of(
-      ImmutableList.of(),
-      ImmutableSet.of(),
-      ImmutableMap.of()
-    )
-      .filter(type::isInstance)
-      .findFirst()
-      .orElse(null);
-  }
-
-  private static Class<?> boxed(final Class<?> type) {
-    return type.isPrimitive()
-      ? Array.get(Array.newInstance(type, 1), 0).getClass()
-      : type;
+    return type == Object.class
+      ? null
+      : Stream.<Object>of(
+          ImmutableList.of(),
+          ImmutableSet.of(),
+          ImmutableMap.of()
+        )
+          .filter(type::isInstance)
+          .findFirst()
+          .orElse(null);
   }
 }

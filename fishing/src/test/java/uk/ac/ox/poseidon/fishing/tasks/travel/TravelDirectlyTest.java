@@ -30,6 +30,9 @@ import static uk.ac.ox.poseidon.fishing.tasks.travel.TravelTasks.*;
 
 import com.badlogic.gdx.ai.btree.Task.Status;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
@@ -86,11 +89,15 @@ class TravelDirectlyTest {
     );
     when(distanceCalculator.distanceInKm(ORIGIN, DESTINATION)).thenReturn(5.0);
     final Vessel vessel = vesselCruisingAtTenKph();
+    final Iterator<LocalDateTime> clock = List.of(
+      NOW,
+      NOW.plusMinutes(30)
+    ).iterator();
     final TravelDirectly travelDirectly = new TravelDirectly(
       ENGINE,
       FUEL_TANK,
       distanceCalculator,
-      v -> NOW
+      v -> clock.next()
     );
     setTaskObject(travelDirectly, vessel);
 
@@ -108,6 +115,8 @@ class TravelDirectlyTest {
     assertThat(event.getValue().getOrigin()).isEqualTo(ORIGIN);
     assertThat(event.getValue().getDestination()).isEqualTo(DESTINATION);
     assertThat(event.getValue().getStartDateTime()).isEqualTo(NOW);
-    assertThat(event.getValue().getEndDateTime()).isEqualTo(NOW);
+    assertThat(event.getValue().getEndDateTime()).isEqualTo(
+      NOW.plusMinutes(30)
+    );
   }
 }

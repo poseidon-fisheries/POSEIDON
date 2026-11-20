@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.core;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.stream.Stream;
 import javax.measure.Quantity;
 import org.junit.jupiter.api.DynamicTest;
@@ -32,6 +33,15 @@ import org.junit.jupiter.api.TestFactory;
 import uk.ac.ox.poseidon.core.testing.FactoriesHelpers;
 
 final class FactoriesHelpersTest {
+
+  private static final Set<String> PARSING_HELPERS = Set.of(
+    "massOf",
+    "speedOf",
+    "volumeOf",
+    "volumetricFlowRateOf",
+    "duration",
+    "period"
+  );
 
   @TestFactory
   Stream<DynamicTest> everyHelperBuildsItsResult() throws IOException {
@@ -42,12 +52,16 @@ final class FactoriesHelpersTest {
   }
 
   /**
-   * @return whether {@code method} parses or reads an argument that a mock or
-   *         a default value cannot stand in for, such as a quantity string
+   * @return whether {@code method} parses a quantity or a duration from its
+   *         argument, or reads a quantity, which none of the default argument
+   *         values suits: tests of their own cover them
    */
   private static boolean readsItsArguments(final Method method) {
-    return Arrays.stream(method.getParameterTypes()).anyMatch(
-      type -> type == String.class || Quantity.class.isAssignableFrom(type)
+    return (
+      PARSING_HELPERS.contains(method.getName()) &&
+      Arrays.stream(method.getParameterTypes()).anyMatch(
+        type -> type == String.class || Quantity.class.isAssignableFrom(type)
+      )
     );
   }
 }

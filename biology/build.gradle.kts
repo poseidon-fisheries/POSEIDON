@@ -25,6 +25,7 @@ plugins {
 }
 
 dependencies {
+    testImplementation(testFixtures(project(":core")))
     api(project(":geography"))
     implementation(libs.tablesaw.core)
     implementation(libs.fastutil.core)
