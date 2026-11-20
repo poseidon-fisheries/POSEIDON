@@ -134,6 +134,9 @@ class VesselComponentTest {
     vessel.buildComponents();
 
     assertThat(chosen.findIn(vessel)).isEmpty();
+    assertThatThrownBy(() -> chosen.of(vessel))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("Vessel vessel");
   }
 
   private static final class NewObjectFactory

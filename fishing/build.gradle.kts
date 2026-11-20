@@ -38,11 +38,10 @@ dependencies {
 }
 
 pitest {
-    // Measured 2026-11-20 at approximately 93% (971 killed or timed out of
-    // 1,046 mutants); the floor sits two points below. Most of the 60
-    // uncovered mutants are null returns from the newInstance methods of
-    // simple factories, which only run when a factory is built in a scope.
-    // The 15 survivors are equivalent paths, tolerance boundaries and
-    // redundant calls. Bump this floor up, never down.
-    mutationThreshold.set(90)
+    // Measured 2026-11-20 at approximately 98.6% (1,031 killed or timed out of
+    // 1,046 mutants); the floor sits two points below. No mutant is uncovered:
+    // the newInstance methods of simple factories run through the shared
+    // FactoryProductsTest. The 15 survivors are equivalent paths, tolerance
+    // boundaries and redundant calls. Bump this floor up, never down.
+    mutationThreshold.set(96)
 }

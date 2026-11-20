@@ -118,7 +118,7 @@ public final class FactoriesHelpers {
     assertThat(result).isNotNull();
   }
 
-  private static Object argumentOf(final Class<?> type) {
+  static Object argumentOf(final Class<?> type) {
     final Object argument;
     if (type == boolean.class) {
       argument = false;

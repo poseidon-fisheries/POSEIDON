@@ -92,6 +92,20 @@ class TravelAlongPathTest {
   }
 
   @Test
+  void resettingForgetsTheTreeTheTaskRanIn() throws Exception {
+    final TravelAlongPath travelAlongPath = travelingFromOriginToDestination(
+      mock(DistanceCalculator.class)
+    );
+    setTaskObject(travelAlongPath, vesselCruisingAtTenKph());
+
+    travelAlongPath.resetTask();
+
+    assertThatThrownBy(travelAlongPath::getObject).isInstanceOf(
+      IllegalStateException.class
+    );
+  }
+
+  @Test
   void travelsOutAndBackAsOneTaskInTwoPlacesOfATree() {
     final Vessel vessel = vesselCruisingAtTenKph();
     final AtomicReference<Cell> cell = new AtomicReference<>(ORIGIN);
