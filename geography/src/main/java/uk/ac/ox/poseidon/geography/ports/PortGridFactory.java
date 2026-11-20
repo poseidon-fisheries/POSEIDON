@@ -116,7 +116,7 @@ public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
     return isValidPortCell(bathymetricGrid, cell)
       ? Optional.of(cell)
       : bathymetricGrid
-          .getActiveLandNeighbours(cell)
+          .getLandNeighbours(cell)
           .filter(landNeighbour ->
             isValidPortCell(bathymetricGrid, landNeighbour)
           )
@@ -137,7 +137,7 @@ public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
     return (
       bathymetricGrid.getModelGrid().isInGrid(cell) &&
       bathymetricGrid.isLand(cell) &&
-      bathymetricGrid.getActiveWaterNeighbours(cell).findAny().isPresent()
+      bathymetricGrid.getWaterNeighbours(cell).findAny().isPresent()
     );
   }
 }

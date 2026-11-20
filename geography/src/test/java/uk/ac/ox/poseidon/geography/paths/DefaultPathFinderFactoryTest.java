@@ -102,7 +102,7 @@ class DefaultPathFinderFactoryTest {
       .get(new SimulationScope(otherSimulation))
       .getAccessibleWaterNeighbours(cell, 1);
 
-    verify(modelGrid, times(1)).getActiveNeighbours(cell, 1);
+    verify(modelGrid, times(1)).getNeighbours(cell, 1);
   }
 
   private static BathymetricGrid bathymetricGrid() {

@@ -33,7 +33,7 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 /**
  * A grid of {@link Port}s placed on land cells, each adjacent to at least one
- * active water cell. Built via
+ * water cell, regardless of biological activity. Built via
  * {@link uk.ac.ox.poseidon.geography.ports.Factories}; implemented by
  * {@link ImmutablePortGrid} (fixed at build time) and {@link MutablePortGrid}
  * (ports can be added afterward).
@@ -58,7 +58,7 @@ public interface PortGrid extends Iterable<Port> {
   Optional<Port> getObject(String id);
 
   /**
-   * @throws IllegalStateException if {@code cell} isn't land, or has no active
+   * @throws IllegalStateException if {@code cell} isn't land, or has no
    *                               water cell adjacent to it
    */
   default void validateCell(final Cell cell) {
@@ -70,9 +70,8 @@ public interface PortGrid extends Iterable<Port> {
       coordinate
     );
     checkState(
-      getBathymetricGrid().getActiveWaterNeighbours(cell).findAny().isPresent(),
-      "Invalid port cell: cell %s (centred on %s) has no active water " +
-        "neighbour.",
+      getBathymetricGrid().getWaterNeighbours(cell).findAny().isPresent(),
+      "Invalid port cell: cell %s (centred on %s) has no water neighbour.",
       cell,
       coordinate
     );

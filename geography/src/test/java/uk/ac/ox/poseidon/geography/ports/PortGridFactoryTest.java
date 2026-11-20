@@ -114,7 +114,7 @@ final class PortGridFactoryTest {
   }
 
   @Test
-  void originalLandWithOnlyInactiveWaterNeighboursIsRejected() {
+  void originalLandWithOnlyInactiveWaterNeighboursIsAccepted() {
     final var modelGrid = ModelGrid.create(
       3,
       1,
@@ -125,13 +125,13 @@ final class PortGridFactoryTest {
       new double[][] { { -2 }, { 0 }, { 0 } }
     );
 
-    assertThatThrownBy(() -> create(bathymetricGrid, new Coordinate(1.5, 0.5)))
-      .isExactlyInstanceOf(RuntimeException.class)
-      .hasMessageContaining("No suitable land cell found");
+    final var portGrid = create(bathymetricGrid, new Coordinate(1.5, 0.5));
+
+    assertThat(portGrid.getCell(port)).isEqualTo(new Cell(1, 0));
   }
 
   @Test
-  void replacementLandWithOnlyInactiveWaterNeighboursIsRejected() {
+  void replacementLandWithOnlyInactiveWaterNeighboursIsAccepted() {
     final var modelGrid = ModelGrid.create(
       5,
       1,
@@ -146,11 +146,11 @@ final class PortGridFactoryTest {
 
     final var portGrid = create(bathymetricGrid, new Coordinate(2.1, 0.5));
 
-    assertThat(portGrid.getCell(port)).isEqualTo(new Cell(3, 0));
+    assertThat(portGrid.getCell(port)).isEqualTo(new Cell(1, 0));
   }
 
   @Test
-  void inactiveLandIsExcludedFromReplacementCandidates() {
+  void inactiveLandCanBeAReplacementCandidate() {
     final var modelGrid = ModelGrid.create(
       3,
       1,
@@ -163,7 +163,7 @@ final class PortGridFactoryTest {
 
     final var portGrid = create(bathymetricGrid, new Coordinate(1.1, 0.5));
 
-    assertThat(portGrid.getCell(port)).isEqualTo(new Cell(2, 0));
+    assertThat(portGrid.getCell(port)).isEqualTo(new Cell(0, 0));
   }
 
   @Test

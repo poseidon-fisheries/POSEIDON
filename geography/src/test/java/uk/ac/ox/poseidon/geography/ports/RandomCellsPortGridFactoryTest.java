@@ -79,7 +79,7 @@ final class RandomCellsPortGridFactoryTest {
   }
 
   @Test
-  void diagonallyAdjacentActiveWaterCountsTowardsTheMinimum() {
+  void diagonallyAdjacentWaterCountsTowardsTheMinimum() {
     final BathymetricGrid bathymetricGrid = new DefaultBathymetricGrid(
       new double[][] { { -1, -1, -1 }, { -1, 0, -1 }, { -1, -1, -1 } }
     );
@@ -92,7 +92,7 @@ final class RandomCellsPortGridFactoryTest {
   }
 
   @Test
-  void inactiveWaterDoesNotCountTowardsTheMinimum() {
+  void inactiveWaterCountsTowardsTheMinimum() {
     final var modelGrid = ModelGrid.create(
       3,
       1,
@@ -103,9 +103,11 @@ final class RandomCellsPortGridFactoryTest {
       new double[][] { { -1 }, { 0 }, { -1 } }
     );
 
-    assertThatThrownBy(() -> factory(bathymetricGrid, 1, 2).get(scope))
-      .isExactlyInstanceOf(IllegalStateException.class)
-      .hasMessage("Only 0 suitable land tiles for 1 ports.");
+    final var portGrid = factory(bathymetricGrid, 1, 2).get(scope);
+
+    assertThat(portGrid.getPorts().map(portGrid::getCell)).containsExactly(
+      new Cell(1, 0)
+    );
   }
 
   @Test

@@ -131,7 +131,7 @@ public final class Factories {
    * @param code                      factory for the code of the port
    *                                  placed on a cell, called once per port
    * @param numberOfPorts             how many ports to place
-   * @param minimumAdjacentWaterTiles the minimum number of active water
+   * @param minimumAdjacentWaterTiles the minimum number of water
    *                                  neighbours a land cell must have to be a
    *                                  candidate port cell
    * @return a {@link uk.ac.ox.poseidon.core.SimulationScopeFactory} for a

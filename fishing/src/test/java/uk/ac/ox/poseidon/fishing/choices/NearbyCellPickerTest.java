@@ -45,11 +45,17 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.Envelope;
+import uk.ac.ox.poseidon.geography.bathymetry.DefaultBathymetricGrid;
+import uk.ac.ox.poseidon.geography.distance.CartesianDistanceCalculator;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.paths.AStarPathFinder;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
+import uk.ac.ox.poseidon.geography.ports.MutablePortGrid;
+import uk.ac.ox.poseidon.geography.predicates.IsActiveWaterCell;
 
 /**
  * The pathfinder is a mock whose accessible water neighbourhoods are stubbed
@@ -132,6 +138,51 @@ class NearbyCellPickerTest {
     final Predicate<? super Cell> optionPredicate
   ) {
     return picker(optionPredicate, 1, BEYOND_THE_GRID);
+  }
+
+  @Test
+  void biologicalEligibilityRestrictsDestinationsWithoutBlockingTravel() {
+    final var modelGrid = ModelGrid.create(
+      4,
+      1,
+      new Envelope(0, 4, 0, 1)
+    ).withActiveCells(List.of(new Cell(0, 0), new Cell(3, 0)));
+    final var bathymetricGrid = new DefaultBathymetricGrid(
+      modelGrid,
+      new double[][] { { -1 }, { -1 }, { -1 }, { -1 } }
+    );
+    final var portGrid = new MutablePortGrid(
+      bathymetricGrid,
+      new SparseGrid2D(4, 1)
+    );
+    final var realPathFinder = new AStarPathFinder(
+      bathymetricGrid,
+      portGrid,
+      new CartesianDistanceCalculator(modelGrid, 1)
+    );
+    final var picker = new NearbyCellPicker(
+      realPathFinder,
+      new IsActiveWaterCell(bathymetricGrid),
+      ignored -> 3,
+      0,
+      ignored -> Optional.of(new Cell(0, 0)),
+      rng
+    );
+
+    assertThat(
+      realPathFinder.getAccessibleWaterNeighbours(new Cell(0, 0), 3)
+    ).containsExactlyInAnyOrder(new Cell(1, 0), new Cell(2, 0), new Cell(3, 0));
+    assertThat(picker.apply(vessel)).contains(new Cell(3, 0));
+    assertThat(
+      realPathFinder.getPath(new Cell(0, 0), new Cell(3, 0))
+    ).hasValueSatisfying(path ->
+      assertThat(path).containsExactly(
+        new Cell(0, 0),
+        new Cell(1, 0),
+        new Cell(2, 0),
+        new Cell(3, 0)
+      )
+    );
   }
 
   @Test

@@ -34,14 +34,15 @@ import uk.ac.ox.poseidon.geography.grids.ModelGrid;
  */
 public interface GridPathFinder extends PathFinder<Cell> {
   /**
-   * @return whether {@code cell} can be part of a path (water, or a port cell)
+   * @return whether {@code cell} can be part of a path (water, or a port cell),
+   *         regardless of biological activity
    */
   boolean isNavigable(final Cell cell);
 
   /**
    * @param startingCell the cell to search from
    * @return every water cell reachable from {@code startingCell} by an existing
-   *         path
+   *         path, regardless of biological activity
    */
   default ImmutableList<Cell> getAccessibleWaterCells(final Cell startingCell) {
     return getModelGrid()
@@ -67,14 +68,14 @@ public interface GridPathFinder extends PathFinder<Cell> {
    * @param neighbourhoodSize how far out to look for neighbours
    * @return {@code startingCell}'s water neighbours, within
    *         {@code neighbourhoodSize}, that are reachable from it by an
-   *         existing path
+   *         existing path, regardless of biological activity
    */
   default ImmutableList<Cell> getAccessibleWaterNeighbours(
     final Cell startingCell,
     final int neighbourhoodSize
   ) {
     return getModelGrid()
-      .getActiveNeighbours(startingCell, neighbourhoodSize)
+      .getNeighbours(startingCell, neighbourhoodSize)
       .stream()
       .filter(this::isWater)
       .filter(cell -> isAccessible(startingCell, cell))
