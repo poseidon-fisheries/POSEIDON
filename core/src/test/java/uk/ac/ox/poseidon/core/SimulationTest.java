@@ -24,12 +24,18 @@ package uk.ac.ox.poseidon.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
 
@@ -93,5 +99,40 @@ class SimulationTest {
     fresh.start();
 
     assertThat(fresh.schedule.isSealed()).isFalse();
+  }
+
+  @Test
+  void stepForAdvancesTheScheduleByTheAmountGiven() {
+    simulation.stepFor(Period.ofDays(3));
+
+    assertThat(simulation.getTemporalSchedule().getDateTime()).isEqualTo(
+      LocalDateTime.of(2000, 1, 4, 0, 0)
+    );
+  }
+
+  @Test
+  void logPrefixesTheMessageWithTheSimulationIdAndTimestamp() {
+    final System.Logger logger = mock(System.Logger.class);
+
+    Simulation.log(
+      logger,
+      System.Logger.Level.INFO,
+      simulation,
+      "{0} fish in {1}",
+      "three",
+      "the sea"
+    );
+
+    @SuppressWarnings("unchecked")
+    final ArgumentCaptor<Supplier<String>> message = ArgumentCaptor.forClass(
+      Supplier.class
+    );
+    verify(logger).log(eq(System.Logger.Level.INFO), message.capture());
+    assertThat(message.getValue().get()).isEqualTo(
+      simulation.getId() +
+        " [" +
+        simulation.getTemporalSchedule().getTimestamp() +
+        "] three fish in the sea"
+    );
   }
 }

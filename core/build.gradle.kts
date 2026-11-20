@@ -46,13 +46,14 @@ dependencies {
 }
 
 pitest {
-    // Measured 2026-11-20 at approximately 96% (823 killed or timed out of 861
-    // mutants); the floor sits two points below. The survivors are of four
-    // kinds: equivalent (bounds on saturated ranges, the terminal
+    // Measured 2026-11-20 at approximately 97% (837 killed or timed out of 861
+    // mutants); the floor sits two points below. The one uncovered mutant is
+    // MasonUtils.oneOf(Bag), which no Java caller can reach. The survivors are
+    // of four kinds: equivalent (bounds on saturated ranges, the terminal
     // ProductStore.end, shuffles that each return a permutation); masked by
     // redundancy (TemporalSchedule.step re-checks what stepUntil does, so
     // removing the latter call is invisible); unobservable under PIT's forked
     // JVMs because ClassValue memoization skips the discovery code after its
     // first run; or diagnostic logging only. Bump this floor up, never down.
-    mutationThreshold.set(94)
+    mutationThreshold.set(95)
 }

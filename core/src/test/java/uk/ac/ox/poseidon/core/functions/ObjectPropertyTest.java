@@ -24,8 +24,10 @@ package uk.ac.ox.poseidon.core.functions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 
 import java.util.List;
+import lombok.experimental.SuperBuilder;
 import org.junit.jupiter.api.Test;
 
 public class ObjectPropertyTest {
@@ -88,6 +90,33 @@ public class ObjectPropertyTest {
         new Outer()
       )
     ).isTrue();
+  }
+
+  @Test
+  void aGetMethodWinsOverAnIsMethodForTheSameProperty() {
+    assertThat(
+      new ObjectProperty<Outer, Boolean>(Outer.class, "flag").read(new Outer())
+    ).isFalse();
+  }
+
+  @Test
+  void asAFactoryBuildsAMappingFromItsPath() {
+    final OuterProperty factory = OuterProperty.builder()
+      .propertyPath("inner.code")
+      .build();
+
+    assertThat(factory.get(GLOBAL_SCOPE).apply("any", new Outer())).isEqualTo(
+      "code"
+    );
+  }
+
+  @Test
+  void asAValueFactoryBuildsAValueFromItsPath() {
+    final OuterValue factory = OuterValue.builder()
+      .propertyPath("name")
+      .build();
+
+    assertThat(factory.get(GLOBAL_SCOPE).apply(new Outer())).isEqualTo("outer");
   }
 
   @Test
@@ -205,6 +234,14 @@ public class ObjectPropertyTest {
       return null;
     }
 
+    public boolean getFlag() {
+      return false;
+    }
+
+    public boolean isFlag() {
+      return true;
+    }
+
     public boolean isActive() {
       return true;
     }
@@ -229,6 +266,28 @@ public class ObjectPropertyTest {
 
     public String getBroken() {
       throw new UnsupportedOperationException();
+    }
+  }
+
+  @SuperBuilder
+  public static class OuterProperty
+    extends ObjectPropertyFactory<Outer, String>
+  {
+
+    @Override
+    protected Class<Outer> rootClass() {
+      return Outer.class;
+    }
+  }
+
+  @SuperBuilder
+  public static class OuterValue
+    extends ObjectPropertyValueFactory<Outer, String>
+  {
+
+    @Override
+    protected Class<Outer> rootClass() {
+      return Outer.class;
     }
   }
 }

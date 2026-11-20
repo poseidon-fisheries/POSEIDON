@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableList;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -180,6 +181,42 @@ class ScenarioTest {
     assertThat(copy.getFirst()).isSameAs(number);
   }
 
+  @Test
+  void aValueIsReplacedInAListOfValues() {
+    final Scenario scenario = scenario(
+      Map.of("numbers", NumbersFactory.of(1.0, 2.0, 3.0))
+    );
+
+    final Scenario derived = scenario.with("numbers.values[1]", 9.0);
+
+    assertThat(
+      derived.component("numbers", NumbersFactory.class).getValues()
+    ).containsExactly(1.0, 9.0, 3.0);
+  }
+
+  @Test
+  void aCollectionTheChangeDoesNotReachIsKeptAsIs() {
+    final Set<Object> members = Set.of("a", "b");
+    final SetFactory set = SetFactory.builder().members(members).build();
+    final Scenario scenario = scenario(Map.of("number", number(1), "set", set));
+
+    final Scenario derived = scenario.with("number.value", 2.0);
+
+    assertThat(derived.component("set")).isSameAs(set);
+    assertThat(set.getMembers()).isSameAs(members);
+  }
+
+  @Test
+  void refusesToCopyACollectionHoldingAChangedNode() {
+    final NumberFactory number = number(1);
+    final SetFactory set = SetFactory.builder().members(Set.of(number)).build();
+    final Scenario scenario = scenario(Map.of("number", number, "set", set));
+
+    assertThatThrownBy(() -> scenario.with("number.value", 2.0))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageStartingWith("Cannot copy a ");
+  }
+
   @ParameterizedTest
   @ValueSource(
     strings = {
@@ -326,6 +363,36 @@ class ScenarioTest {
     @Override
     protected List<Object> newInstance(final Scope scope) {
       return List.of(first.get(scope), second.get(scope));
+    }
+  }
+
+  @Getter
+  @SuperBuilder(toBuilder = true)
+  static class NumbersFactory extends GlobalScopeFactory<List<Double>> {
+
+    private final List<Double> values;
+
+    static NumbersFactory of(final Double... values) {
+      return NumbersFactory.builder()
+        .values(ImmutableList.copyOf(values))
+        .build();
+    }
+
+    @Override
+    protected List<Double> newInstance(final Scope scope) {
+      return values;
+    }
+  }
+
+  @Getter
+  @SuperBuilder(toBuilder = true)
+  static class SetFactory extends GlobalScopeFactory<Set<Object>> {
+
+    private final Set<Object> members;
+
+    @Override
+    protected Set<Object> newInstance(final Scope scope) {
+      return members;
     }
   }
 

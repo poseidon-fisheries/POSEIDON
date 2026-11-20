@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.ScenarioCheck.ReachedNode;
 import uk.ac.ox.poseidon.core.time.DateTimeFactory;
@@ -50,6 +51,17 @@ class ScenarioCheckTest {
     assertThat(check.seen)
       .extracting(ReachedNode::getParent)
       .containsExactly(null, check);
+  }
+
+  @Test
+  void aCheckSeesTheNodesHeldInAMap() {
+    final Leaf leaf = new Leaf();
+    final MapHolder holder = new MapHolder(Map.of("leaf", leaf));
+    scenarioWith(holder).startNewSimulation(0).finish();
+
+    assertThat(holder.seen)
+      .extracting(ReachedNode::getNode)
+      .containsExactly(holder, leaf);
   }
 
   @Test
@@ -82,6 +94,34 @@ class ScenarioCheckTest {
     @Override
     protected Object newInstance(final Scope scope) {
       built = true;
+      return new Object();
+    }
+  }
+
+  /** Holds its children in a map, and records what it sees. */
+  static final class MapHolder
+    extends GlobalScopeFactory<Object>
+    implements ScenarioCheck
+  {
+
+    private final Map<String, Leaf> children;
+    private final List<ReachedNode> seen = new ArrayList<>();
+
+    MapHolder(final Map<String, Leaf> children) {
+      this.children = children;
+    }
+
+    public Map<String, Leaf> getChildren() {
+      return children;
+    }
+
+    @Override
+    public void check(final List<ReachedNode> nodes) {
+      seen.addAll(nodes);
+    }
+
+    @Override
+    protected Object newInstance(final Scope scope) {
       return new Object();
     }
   }
