@@ -124,6 +124,58 @@ class ModelGridTest {
   }
 
   @Test
+  void rejectsAnEmptyLongitudeRange() {
+    final ModelGridFactory factory = new ModelGridFactory(1.0, 10, 10, 0, 1);
+
+    assertThatIllegalStateException()
+      .isThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
+      .withMessageContaining("antimeridian");
+  }
+
+  @Test
+  void gridSizeIsTheExtentOverTheResolution() {
+    final ModelGrid grid = new ModelGridFactory(0.5, 0, 2, 0, 1).get(
+      Scope.GLOBAL_SCOPE
+    );
+
+    assertThat(grid.getGridWidth()).isEqualTo(4);
+    assertThat(grid.getGridHeight()).isEqualTo(2);
+  }
+
+  @Test
+  void rejectsAnExtentThatIsNotAMultipleOfTheResolution() {
+    final ModelGridFactory wide = new ModelGridFactory(0.5, 0, 1.3, 0, 1);
+    final ModelGridFactory high = new ModelGridFactory(0.5, 0, 1, 0, 1.3);
+
+    assertThatIllegalStateException()
+      .isThrownBy(() -> wide.get(Scope.GLOBAL_SCOPE))
+      .withMessageContaining("Width");
+    assertThatIllegalStateException()
+      .isThrownBy(() -> high.get(Scope.GLOBAL_SCOPE))
+      .withMessageContaining("Height");
+  }
+
+  @Test
+  void aCellOutsideTheGridIsReportedWithTheLargestValidCoordinates() {
+    assertThatIllegalArgumentException()
+      .isThrownBy(() -> modelGrid.checkIsInGrid(new Cell(10, 0)))
+      .withMessageContaining("max x: 9, max y: 9");
+  }
+
+  @Test
+  void allCellsOfAGridNeedAPositiveWidthAndHeight() {
+    assertThatIllegalArgumentException().isThrownBy(() ->
+      AbstractModelGrid.makeAllCellsArray(0, 2)
+    );
+    assertThatIllegalArgumentException().isThrownBy(() ->
+      AbstractModelGrid.makeAllCellsArray(2, 0)
+    );
+    assertThat(AbstractModelGrid.makeAllCellsArray(1, 1)).containsExactly(
+      new Cell(0, 0)
+    );
+  }
+
+  @Test
   void crossesTheAntimeridianWithLongitudesPast180() {
     final ModelGrid modelGrid = new ModelGridFactory(1.0, 170, 190, 0, 1).get(
       Scope.GLOBAL_SCOPE

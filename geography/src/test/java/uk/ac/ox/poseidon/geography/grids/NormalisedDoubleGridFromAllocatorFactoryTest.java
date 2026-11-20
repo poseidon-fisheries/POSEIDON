@@ -85,4 +85,42 @@ class NormalisedDoubleGridFromAllocatorFactoryTest {
       IllegalArgumentException.class
     );
   }
+
+  @Test
+  void rejectsATotalValueThatIsNotPositive() {
+    final ModelGrid modelGrid = ModelGrid.create(
+      2,
+      2,
+      new Envelope(0, 2, 0, 2)
+    );
+    final NormalisedDoubleGridFromAllocatorFactory<Scope> factory =
+      new NormalisedDoubleGridFromAllocatorFactory<>(
+        _ -> modelGrid,
+        _ -> cell -> 1.0,
+        _ -> 0.0
+      );
+
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("Total value");
+  }
+
+  @Test
+  void rejectsAllocatedValuesThatDoNotSumToAPositiveNumber() {
+    final ModelGrid modelGrid = ModelGrid.create(
+      2,
+      2,
+      new Envelope(0, 2, 0, 2)
+    );
+    final NormalisedDoubleGridFromAllocatorFactory<Scope> factory =
+      new NormalisedDoubleGridFromAllocatorFactory<>(
+        _ -> modelGrid,
+        _ -> cell -> 0.0,
+        _ -> 4.0
+      );
+
+    assertThatThrownBy(() -> factory.get(Scope.GLOBAL_SCOPE))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("Sum of values");
+  }
 }

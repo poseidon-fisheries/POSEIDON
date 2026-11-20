@@ -23,6 +23,8 @@
 package uk.ac.ox.poseidon.geography.grids;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -35,6 +37,7 @@ import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.write.NetcdfFormatWriter;
+import uk.ac.ox.poseidon.geography.Envelope;
 
 class StaticNetCdfGridReaderTest {
 
@@ -184,6 +187,67 @@ class StaticNetCdfGridReaderTest {
       )
     ) {
       assertThat(reader.getDataVariableNames()).isEmpty();
+    }
+  }
+
+  @Test
+  void aModelGridWithTheSameCellCentresIsAligned() {
+    final ModelGrid modelGrid = ModelGrid.create(
+      3,
+      2,
+      new Envelope(5, 35, 3.5, 5.5)
+    );
+
+    try (StaticNetCdfGridReader reader = openReader()) {
+      assertThatCode(() ->
+        reader.checkAlignmentWith(modelGrid)
+      ).doesNotThrowAnyException();
+    }
+  }
+
+  @Test
+  void aModelGridOfAnotherSizeIsNotAligned() {
+    final ModelGrid wider = ModelGrid.create(
+      4,
+      2,
+      new Envelope(5, 45, 3.5, 5.5)
+    );
+    final ModelGrid higher = ModelGrid.create(
+      3,
+      3,
+      new Envelope(5, 35, 2.5, 5.5)
+    );
+
+    try (StaticNetCdfGridReader reader = openReader()) {
+      assertThatIllegalStateException()
+        .isThrownBy(() -> reader.checkAlignmentWith(wider))
+        .withMessageContaining("3x2 but ModelGrid is 4x2");
+      assertThatIllegalStateException()
+        .isThrownBy(() -> reader.checkAlignmentWith(higher))
+        .withMessageContaining("3x2 but ModelGrid is 3x3");
+    }
+  }
+
+  @Test
+  void aModelGridWhoseCellCentresAreOffsetIsNotAligned() {
+    final ModelGrid eastish = ModelGrid.create(
+      3,
+      2,
+      new Envelope(5.001, 35.001, 3.5, 5.5)
+    );
+    final ModelGrid northish = ModelGrid.create(
+      3,
+      2,
+      new Envelope(5, 35, 3.501, 5.501)
+    );
+
+    try (StaticNetCdfGridReader reader = openReader()) {
+      assertThatIllegalStateException()
+        .isThrownBy(() -> reader.checkAlignmentWith(eastish))
+        .withMessageContaining("does not align");
+      assertThatIllegalStateException()
+        .isThrownBy(() -> reader.checkAlignmentWith(northish))
+        .withMessageContaining("does not align");
     }
   }
 }
