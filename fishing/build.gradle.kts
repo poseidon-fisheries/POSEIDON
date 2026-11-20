@@ -35,3 +35,13 @@ dependencies {
     implementation(libs.commons.beanutils)
     implementation(libs.fastutil.core)
 }
+
+pitest {
+    // Measured 2026-11-20 at approximately 85% (892 killed or timed out of
+    // 1,046 mutants); the floor sits two points below. Almost all of the 138
+    // uncovered mutants are null-returning construction wrappers in the
+    // Factories helper classes and the factories they build. The 16 survivors
+    // are equivalent paths, tolerance boundaries and redundant calls.
+    // Bump this floor up, never down.
+    mutationThreshold.set(83)
+}
