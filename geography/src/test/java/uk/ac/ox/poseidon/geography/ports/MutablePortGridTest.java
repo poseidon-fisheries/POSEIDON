@@ -23,14 +23,82 @@
 package uk.ac.ox.poseidon.geography.ports;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.bathymetry.DefaultBathymetricGrid;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 
 class MutablePortGridTest {
+
+  private final DefaultBathymetricGrid bathymetricGrid =
+    new DefaultBathymetricGrid(new double[][] {
+      { +1d, -1d, -1d },
+      { +1d, +1d, -1d },
+      { -1d, -1d, -1d }
+    });
+  private final SparseGrid2D field = new SparseGrid2D(3, 3);
+  private final MutablePortGrid portGrid = new MutablePortGrid(
+    bathymetricGrid,
+    field
+  );
+
+  @Test
+  void createsAPortAtACoordinate() {
+    final Port port = portGrid.createPort(
+      "PA",
+      "Port A",
+      new Coordinate(0.5, 2.5)
+    );
+
+    assertThat(port).isEqualTo(new Port("PA", "Port A"));
+    assertThat(portGrid.getCell(port)).isEqualTo(new Cell(0, 0));
+    assertThat(portGrid.getPorts()).containsExactly(port);
+  }
+
+  @Test
+  void refusesAPortWhoseCodeAlreadyExists() {
+    portGrid.createPort("PA", "Port A", new Cell(0, 0));
+
+    assertThatThrownBy(() ->
+      portGrid.createPort("PA", "Another port", new Cell(1, 1))
+    )
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("PA");
+    assertThat(portGrid.getPorts()).hasSize(1);
+  }
+
+  @Test
+  void refusesAPortOnACellThatIsNotValid() {
+    assertThatThrownBy(() ->
+      portGrid.createPort("PW", "Port W", new Cell(2, 2))
+    ).isInstanceOf(IllegalStateException.class);
+    assertThat(portGrid.getPorts()).isEmpty();
+  }
+
+  @Test
+  void exposesTheFieldItWasGiven() {
+    assertThat(portGrid.getField()).isSameAs(field);
+  }
+
+  @Test
+  void portsAndCellsKnowTheirCell() {
+    final Port port = portGrid.createPort("PA", "Port A", new Cell(1, 1));
+
+    assertThat(port.getCell(portGrid)).isEqualTo(new Cell(1, 1));
+    assertThat(new Cell(2, 0).getCell(portGrid)).isEqualTo(new Cell(2, 0));
+  }
+
+  @Test
+  void usesTheModelGridOfItsBathymetricGrid() {
+    assertThat(portGrid.getModelGrid()).isSameAs(
+      bathymetricGrid.getModelGrid()
+    );
+  }
 
   @Test
   void copyOfKeepsCells() {
