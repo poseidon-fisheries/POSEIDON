@@ -26,6 +26,9 @@
 
 plugins {
     id("buildlogic.java-library-conventions")
+    // Test code the other modules share, such as the check that every Factories helper builds
+    // its factory
+    `java-test-fixtures`
 }
 
 dependencies {
@@ -36,6 +39,10 @@ dependencies {
     implementation(libs.jcommander)
     implementation(libs.commons.beanutils)
     api(libs.fastutil.core)
+    testFixturesApi(libs.junit)
+    testFixturesImplementation(libs.guava)
+    testFixturesImplementation(libs.mockito)
+    testFixturesImplementation(libs.assertj)
 }
 
 pitest {
