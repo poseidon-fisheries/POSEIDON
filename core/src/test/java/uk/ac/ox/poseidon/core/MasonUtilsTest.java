@@ -331,12 +331,10 @@ class MasonUtilsTest {
   }
 
   @Test
-  void oneOfAnIterablePicksItsOnlyElement() {
-    final Iterable<String> candidates = Set.of("only");
-
-    assertThat(oneOf(candidates, new MersenneTwisterFast(42))).isEqualTo(
-      "only"
-    );
+  void oneOfABagPicksItsOnlyElement() {
+    assertThat(
+      oneOf(new Bag(List.of("only")), new MersenneTwisterFast(42))
+    ).isEqualTo("only");
   }
 
   @Test
@@ -356,6 +354,18 @@ class MasonUtilsTest {
   @Test
   void oneOfAListDrawsTheIndexTheRngPicks() {
     final List<String> candidates = List.of("a", "b", "c");
+
+    for (long seed = 0; seed < 10; seed++) {
+      final int expectedIndex = new MersenneTwisterFast(seed).nextInt(3);
+      assertThat(oneOf(candidates, new MersenneTwisterFast(seed))).isEqualTo(
+        candidates.get(expectedIndex)
+      );
+    }
+  }
+
+  @Test
+  void oneOfABagDrawsTheIndexTheRngPicks() {
+    final Bag candidates = new Bag(List.of("a", "b", "c"));
 
     for (long seed = 0; seed < 10; seed++) {
       final int expectedIndex = new MersenneTwisterFast(seed).nextInt(3);
@@ -387,8 +397,8 @@ class MasonUtilsTest {
   }
 
   @Test
-  void oneOfRefusesAnEmptyIterable() {
-    final Iterable<String> empty = Set.of();
+  void oneOfRefusesAnEmptyBag() {
+    final Bag empty = new Bag();
 
     assertThatThrownBy(() -> oneOf(empty, new MersenneTwisterFast(42)))
       .isInstanceOf(IllegalArgumentException.class)

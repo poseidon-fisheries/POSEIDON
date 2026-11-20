@@ -68,20 +68,6 @@ public final class MasonUtils {
   }
 
   /**
-   * @param candidates the candidates to choose from, materialized into a list
-   *                   first
-   * @param random     the RNG to draw from
-   * @return a uniformly random element of {@code candidates}
-   */
-  public static <T> T oneOf(
-    final Iterable<T> candidates,
-    final MersenneTwisterFast random
-  ) {
-    final ArrayList<T> candidatesList = newArrayList(candidates);
-    return candidatesList.get(oneOfIndices(candidatesList, random));
-  }
-
-  /**
    * @param bag the bag to convert, may be null (treated as empty)
    * @return the bag's elements as an {@link ImmutableSet}, unchecked-cast to
    *         {@code T}
