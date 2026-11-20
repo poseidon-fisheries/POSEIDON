@@ -34,8 +34,10 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DynamicTest;
 
@@ -58,6 +60,22 @@ public final class FactoriesHelpers {
   public static Stream<DynamicTest> everyHelperBuildsItsResult(
     final String packagePrefix
   ) throws IOException {
+    return everyHelperBuildsItsResult(packagePrefix, method -> false);
+  }
+
+  /**
+   * @param packagePrefix the package, and its subpackages, whose
+   *                      {@code Factories} classes to check
+   * @param excluded      the helpers to leave out, because they read or parse
+   *                      their arguments, so that none of the default values
+   *                      suits them: a test of their own has to cover them
+   * @return one test per public static helper not excluded, which calls it
+   *         with mocks and default values for its arguments
+   */
+  public static Stream<DynamicTest> everyHelperBuildsItsResult(
+    final String packagePrefix,
+    final Predicate<? super Method> excluded
+  ) throws IOException {
     return ClassPath.from(FactoriesHelpers.class.getClassLoader())
       .getTopLevelClassesRecursive(packagePrefix)
       .stream()
@@ -66,6 +84,7 @@ public final class FactoriesHelpers {
       .flatMap(clazz -> Arrays.stream(clazz.getDeclaredMethods()))
       .filter(method -> Modifier.isPublic(method.getModifiers()))
       .filter(method -> Modifier.isStatic(method.getModifiers()))
+      .filter(method -> !excluded.test(method))
       .sorted(
         Comparator.comparing((Method method) ->
           method.getDeclaringClass().getName()
@@ -107,6 +126,8 @@ public final class FactoriesHelpers {
       argument = 1.0;
     } else if (type == String.class) {
       argument = "x";
+    } else if (type == LocalDate.class) {
+      argument = LocalDate.of(2026, 1, 1);
     } else if (type.isArray()) {
       argument = Array.newInstance(type.getComponentType(), 0);
     } else if (type.isEnum()) {
