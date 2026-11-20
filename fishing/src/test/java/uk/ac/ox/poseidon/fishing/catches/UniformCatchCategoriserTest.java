@@ -23,9 +23,9 @@
 package uk.ac.ox.poseidon.fishing.catches;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.mock;
 
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
 
@@ -40,6 +40,8 @@ final class UniformCatchCategoriserTest {
       category
     ).apply(bucket);
 
-    assertThat(categorised.getBuckets()).isEqualTo(Map.of(category, bucket));
+    assertThat(categorised.getBuckets()).containsExactly(
+      entry(category, bucket)
+    );
   }
 }

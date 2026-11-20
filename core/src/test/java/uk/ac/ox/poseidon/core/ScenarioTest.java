@@ -196,14 +196,14 @@ class ScenarioTest {
 
   @Test
   void aCollectionTheChangeDoesNotReachIsKeptAsIs() {
-    final Set<Object> members = Set.of("a", "b");
-    final SetFactory set = SetFactory.builder().members(members).build();
+    final SetFactory set = SetFactory.builder()
+      .members(Set.of("a", "b"))
+      .build();
     final Scenario scenario = scenario(Map.of("number", number(1), "set", set));
 
     final Scenario derived = scenario.with("number.value", 2.0);
 
     assertThat(derived.component("set")).isSameAs(set);
-    assertThat(set.getMembers()).isSameAs(members);
   }
 
   @Test

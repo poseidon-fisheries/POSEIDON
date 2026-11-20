@@ -46,9 +46,9 @@ dependencies {
 }
 
 pitest {
-    // Measured 2026-11-20 at approximately 97% (837 killed or timed out of 861
-    // mutants); the floor sits two points below. The one uncovered mutant is
-    // MasonUtils.oneOf(Bag), which no Java caller can reach. The survivors are
+    // Measured 2026-11-20 at approximately 97% (837 killed or timed out of 860
+    // mutants); the floor sits two points below. No mutant is uncovered. The
+    // survivors are
     // of four kinds: equivalent (bounds on saturated ranges, the terminal
     // ProductStore.end, shuffles that each return a permutation); masked by
     // redundancy (TemporalSchedule.step re-checks what stepUntil does, so

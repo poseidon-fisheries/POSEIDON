@@ -93,10 +93,12 @@ public class ObjectPropertyTest {
   }
 
   @Test
-  void aGetMethodWinsOverAnIsMethodForTheSameProperty() {
-    assertThat(
-      new ObjectProperty<Outer, Boolean>(Outer.class, "flag").read(new Outer())
-    ).isFalse();
+  void refusesAPropertyWithBothAGetAndAnIsMethod() {
+    assertThatThrownBy(() ->
+      new ObjectProperty<Outer, Boolean>(Outer.class, "flag")
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("Both get and is getters for property flag");
   }
 
   @Test

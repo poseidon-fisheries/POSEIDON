@@ -36,29 +36,52 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.testing.FactoryProducts;
+import uk.ac.ox.poseidon.fishing.choices.EventRecorderFactory;
+import uk.ac.ox.poseidon.fishing.fuel.FuelStationGridFactory;
+import uk.ac.ox.poseidon.fishing.market.BiomassMarketFactory;
+import uk.ac.ox.poseidon.fishing.market.MarketGridFactory;
+import uk.ac.ox.poseidon.fishing.market.OneBiomassMarketPerPortFactory;
+import uk.ac.ox.poseidon.fishing.market.PriceFactory;
+import uk.ac.ox.poseidon.fishing.market.PriceUpdatesFromTableFactory;
+import uk.ac.ox.poseidon.fishing.market.UniformMarketPricesFactory;
+import uk.ac.ox.poseidon.fishing.money.MoneyFactory;
+import uk.ac.ox.poseidon.fishing.social.EventSharerFactory;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingEventPropertyFactory;
+import uk.ac.ox.poseidon.fishing.travel.RoutePropertyFactory;
+import uk.ac.ox.poseidon.fishing.vessels.gears.FixedBiomassProportionGearFactory;
+import uk.ac.ox.poseidon.fishing.vessels.gears.IndexedBiomassCatchabilityGearFactory;
+import uk.ac.ox.poseidon.fishing.vessels.values.CurrentPortStayStartDateTimeFactory;
+import uk.ac.ox.poseidon.fishing.vessels.values.VesselPropertyFactory;
 
+// In this package, not the module's root, because the test builds a
+// VesselComponentScope, whose constructor is package-private on purpose.
 final class FactoryProductsTest {
 
-  // Factories whose inputs must be real, not mocks: a currency, an event
-  // class or a property path that is parsed, a positive threshold, a model
-  // grid that has cells, or a result that is legitimately null.
-  private static final Set<String> EXCLUDED = Set.of(
-    "BiomassMarketFactory",
-    "CurrentPortStayStartDateTimeFactory",
-    "EventRecorderFactory",
-    "EventSharerFactory",
-    "FishingEventPropertyFactory",
-    "FixedBiomassProportionGearFactory",
-    "FuelStationGridFactory",
-    "IndexedBiomassCatchabilityGearFactory",
-    "MarketGridFactory",
-    "MoneyFactory",
-    "OneBiomassMarketPerPortFactory",
-    "PriceFactory",
-    "PriceUpdatesFromTableFactory",
-    "RoutePropertyFactory",
-    "UniformMarketPricesFactory",
-    "VesselPropertyFactory"
+  private static final Set<Class<?>> EXCLUDED = Set.of(
+    // The currency code is parsed: a mock's "x" is not a currency.
+    BiomassMarketFactory.class,
+    MoneyFactory.class,
+    OneBiomassMarketPerPortFactory.class,
+    PriceFactory.class,
+    // The event class is looked up by name: "x" is not an event class.
+    EventRecorderFactory.class,
+    EventSharerFactory.class,
+    // The property path is resolved on a real class: it has no getter x.
+    FishingEventPropertyFactory.class,
+    RoutePropertyFactory.class,
+    VesselPropertyFactory.class,
+    // The minimum catch threshold must be positive, not a mock's 0.
+    FixedBiomassProportionGearFactory.class,
+    IndexedBiomassCatchabilityGearFactory.class,
+    // The grid is rejected for a mocked field with no width or height.
+    FuelStationGridFactory.class,
+    MarketGridFactory.class,
+    // A mocked currentDateTime returns null into a non-null field.
+    CurrentPortStayStartDateTimeFactory.class,
+    // The list is collected from a mocked grid's stream, which collects to
+    // null.
+    PriceUpdatesFromTableFactory.class,
+    UniformMarketPricesFactory.class
   );
 
   private final Simulation simulation = mock(Simulation.class);
@@ -80,7 +103,7 @@ final class FactoryProductsTest {
         new VesselScope(new SimulationScope(simulation), vessel),
         new ProductStore()
       ),
-      clazz -> EXCLUDED.contains(clazz.getSimpleName())
+      clazz -> EXCLUDED.contains(clazz)
     );
   }
 }

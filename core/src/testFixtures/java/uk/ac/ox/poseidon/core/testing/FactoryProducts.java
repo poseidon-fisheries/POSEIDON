@@ -38,8 +38,11 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DynamicTest;
@@ -106,10 +109,7 @@ public final class FactoryProducts {
     for (final Method method : builder.getClass().getMethods()) {
       if (
         method.getParameterCount() == 1 &&
-        method.getDeclaringClass() != Object.class &&
-        !method.getName().equals("self") &&
-        !method.getName().equals("equals") &&
-        !method.getName().startsWith("$fillValuesFrom")
+        method.getDeclaringClass() != Object.class
       ) {
         method.setAccessible(true);
         method.invoke(
@@ -146,9 +146,10 @@ public final class FactoryProducts {
       );
     } else if (
       raw.isArray() ||
-      raw.isAssignableFrom(java.util.List.class) ||
-      raw.isAssignableFrom(java.util.Set.class) ||
-      raw.isAssignableFrom(java.util.Map.class)
+      raw == Collection.class ||
+      raw == List.class ||
+      raw == Set.class ||
+      raw == Map.class
     ) {
       argument = FactoriesHelpers.argumentOf(raw);
     } else {

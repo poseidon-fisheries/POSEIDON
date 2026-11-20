@@ -41,7 +41,9 @@ pitest {
     // Measured 2026-11-20 at approximately 98.6% (1,031 killed or timed out of
     // 1,046 mutants); the floor sits two points below. No mutant is uncovered:
     // the newInstance methods of simple factories run through the shared
-    // FactoryProductsTest. The 15 survivors are equivalent paths, tolerance
+    // FactoryProductsTest. That non-null sweep, not tests of how each factory
+    // wires its inputs, kills the null-return mutants of the newInstance
+    // methods. The 15 survivors are equivalent paths, tolerance
     // boundaries and redundant calls. Bump this floor up, never down.
     mutationThreshold.set(96)
 }

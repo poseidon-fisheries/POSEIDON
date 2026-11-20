@@ -24,6 +24,7 @@ package uk.ac.ox.poseidon.fishing.market;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
 import static uk.ac.ox.poseidon.core.Scope.GLOBAL_SCOPE;
 
 import org.joda.money.CurrencyUnit;
@@ -37,12 +38,12 @@ final class PriceFactoryTest {
     final Price price = PriceFactory.builder()
       .amount(2.5)
       .currencyCode("EUR")
-      .massUnit("kg")
+      .massUnit("t")
       .build()
       .get(GLOBAL_SCOPE);
 
     assertThat(price.getAmount()).isEqualTo(Money.of(CurrencyUnit.EUR, 2.5));
-    assertThat(price.valueForKgDouble(3)).isEqualTo(7.5);
+    assertThat(price.valueForKgDouble(3)).isCloseTo(0.0075, within(1e-12));
   }
 
   @Test

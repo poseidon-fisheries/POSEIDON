@@ -34,13 +34,21 @@ final class MoneyFactoryTest {
 
   @Test
   void buildsAnAmountInTheCurrencyRoundedHalfToEven() {
-    final Money money = MoneyFactory.builder()
+    final MoneyFactory down = MoneyFactory.builder()
       .amount(12.345)
       .currencyCode("USD")
-      .build()
-      .get(GLOBAL_SCOPE);
+      .build();
+    final MoneyFactory up = MoneyFactory.builder()
+      .amount(12.355)
+      .currencyCode("USD")
+      .build();
 
-    assertThat(money).isEqualTo(Money.of(CurrencyUnit.USD, 12.34));
+    assertThat(down.get(GLOBAL_SCOPE)).isEqualTo(
+      Money.of(CurrencyUnit.USD, 12.34)
+    );
+    assertThat(up.get(GLOBAL_SCOPE)).isEqualTo(
+      Money.of(CurrencyUnit.USD, 12.36)
+    );
   }
 
   @Test

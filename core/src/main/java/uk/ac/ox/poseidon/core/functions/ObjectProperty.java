@@ -29,7 +29,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -41,7 +40,8 @@ import javax.lang.model.SourceVersion;
  * {@code getMarket().getCode()}, and {@code "active"} reads {@code isActive()} if
  * it returns a {@code boolean}. The getters are looked up once, when this is
  * built, from the declared return types along the path, so a wrong path fails
- * when the scenario is built rather than when first read. The last property may
+ * when the scenario is built rather than when first read; so does a property
+ * with both a {@code get} and an {@code is} getter. The last property may
  * be {@code null}; a {@code null} part way along the path throws. Built via a
  * subclass of {@link ObjectPropertyFactory}, which fixes the class the path
  * starts from, or held by a block that reads a property of its input, such as
@@ -63,8 +63,9 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
    * @param rootClass    the class the path starts from
    * @param propertyPath the dotted path of properties to follow
    * @throws IllegalArgumentException if a property name along the path is not a
-   *                                  Java identifier, or has no public getter
-   *                                  on the declared type it is read from
+   *                                  Java identifier, has no public getter on
+   *                                  the declared type it is read from, or has
+   *                                  both a get and an is getter there
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public ObjectProperty(final Class<T> rootClass, final String propertyPath) {
@@ -127,7 +128,7 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
       Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
     final String getterName = "get" + suffix;
     final String booleanGetterName = "is" + suffix;
-    return Arrays.stream(type.getMethods())
+    final List<Method> getters = Arrays.stream(type.getMethods())
       .filter(method -> method.getParameterCount() == 0)
       .filter(
         method ->
@@ -135,12 +136,18 @@ public class ObjectProperty<T, R> implements BiFunction<Object, T, R> {
           (method.getName().equals(booleanGetterName) &&
             method.getReturnType() == boolean.class)
       )
-      // A get method wins over an is method
-      .min(
-        Comparator.comparing(method ->
-          method.getName().equals(booleanGetterName)
+      .toList();
+    if (getters.size() > 1) {
+      throw new IllegalArgumentException(
+        "Both get and is getters for property %s on %s.".formatted(
+          propertyName,
+          type.getName()
         )
-      )
+      );
+    }
+    return getters
+      .stream()
+      .findFirst()
       .orElseThrow(() ->
         new IllegalArgumentException(
           "No getter for property %s on %s.".formatted(
