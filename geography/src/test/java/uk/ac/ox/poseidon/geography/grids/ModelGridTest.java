@@ -25,12 +25,18 @@ package uk.ac.ox.poseidon.geography.grids;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.IntStream.range;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import ec.util.MersenneTwisterFast;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import sim.util.Double2D;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.geography.Coordinate;
@@ -175,6 +181,92 @@ class ModelGridTest {
     );
     assertThatIllegalArgumentException().isThrownBy(() ->
       modelGrid.cellPairKey(outside, inside)
+    );
+  }
+
+  @Test
+  void coordinateValidationAcceptsInteriorAndEnvelopeBoundaries() {
+    assertThatCode(() -> {
+      modelGrid.checkIsInGrid(new Coordinate(0, 0));
+      modelGrid.checkIsInGrid(new Coordinate(-5, 5));
+      modelGrid.checkIsInGrid(new Coordinate(5, -5));
+    }).doesNotThrowAnyException();
+  }
+
+  @ParameterizedTest
+  @CsvSource({ "-5.1, 0", "5.1, 0", "0, -5.1", "0, 5.1" })
+  void coordinateValidationRejectsCoordinatesBeyondEachEdge(
+    final double lon,
+    final double lat
+  ) {
+    final Coordinate coordinate = new Coordinate(lon, lat);
+
+    assertThat(modelGrid.isInGrid(coordinate)).isFalse();
+    assertThatIllegalArgumentException()
+      .isThrownBy(() -> modelGrid.checkIsInGrid(coordinate))
+      .withMessageContaining("outside of grid");
+  }
+
+  @Test
+  void coordinateActivityUsesTheContainingCell() {
+    final ModelGrid partiallyActiveGrid = modelGrid.withActiveCells(
+      List.of(new Cell(0, 0))
+    );
+
+    assertThat(
+      partiallyActiveGrid.isActive(new Coordinate(-4.75, 4.25))
+    ).isTrue();
+    assertThat(
+      partiallyActiveGrid.isActive(new Coordinate(-3.75, 4.25))
+    ).isFalse();
+  }
+
+  @Test
+  void pointActivityUsesTheContainingCell() {
+    final ModelGrid partiallyActiveGrid = modelGrid.withActiveCells(
+      List.of(new Cell(0, 0))
+    );
+
+    assertThat(partiallyActiveGrid.isActive(new Double2D(0.25, 0.75))).isTrue();
+    assertThat(
+      partiallyActiveGrid.isActive(new Double2D(1.25, 0.75))
+    ).isFalse();
+  }
+
+  @ParameterizedTest
+  @CsvSource({ "0, 0", "2, 1" })
+  void randomCellUsesBothGridDimensionsAndCanSelectInactiveCells(
+    final int x,
+    final int y
+  ) {
+    final ModelGrid partiallyActiveGrid = ModelGrid.create(
+      3,
+      2,
+      new Envelope(0, 3, 0, 2)
+    ).withActiveCells(List.of(new Cell(0, 1)));
+    final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
+    when(rng.nextInt(3)).thenReturn(x);
+    when(rng.nextInt(2)).thenReturn(y);
+
+    final Cell selectedCell = partiallyActiveGrid.randomCell(rng);
+
+    assertThat(selectedCell).isEqualTo(new Cell(x, y));
+    assertThat(partiallyActiveGrid.isActive(selectedCell)).isFalse();
+  }
+
+  @Test
+  void continuousPointConversionScalesBothAxesAndInvertsTheVerticalAxis() {
+    final ModelGrid scaledGrid = ModelGrid.create(
+      4,
+      3,
+      new Envelope(10, 18, -6, 3)
+    );
+
+    assertThat(scaledGrid.toCoordinate(new Double2D(1.25, 2.5))).isEqualTo(
+      new Coordinate(12.5, -4.5)
+    );
+    assertThat(scaledGrid.toPoint(new Coordinate(12.5, -4.5))).isEqualTo(
+      new Double2D(1.25, 2.5)
     );
   }
 }
