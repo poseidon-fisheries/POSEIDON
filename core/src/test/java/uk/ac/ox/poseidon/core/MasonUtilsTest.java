@@ -397,6 +397,15 @@ class MasonUtilsTest {
   }
 
   @Test
+  void oneOfRefusesAnEmptyIterator() {
+    assertThatThrownBy(() ->
+      oneOf(List.<String>of().iterator(), new MersenneTwisterFast(42))
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("must not be empty");
+  }
+
+  @Test
   void oneOfRefusesAnEmptyBag() {
     final Bag empty = new Bag();
 

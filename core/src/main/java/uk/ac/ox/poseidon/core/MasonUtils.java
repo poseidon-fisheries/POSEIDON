@@ -25,7 +25,6 @@ package uk.ac.ox.poseidon.core;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static com.google.common.collect.Lists.newArrayList;
 import static uk.ac.ox.poseidon.core.utils.Preconditions.checkNonNegative;
 
 import com.google.common.collect.ImmutableList;
@@ -54,8 +53,8 @@ public final class MasonUtils {
   private MasonUtils() {}
 
   /**
-   * @param candidates the candidates to choose from, materialized into a list
-   *                   first
+   * @param candidates the candidates to choose from, must not be null or
+   *                   empty; traversed once
    * @param random     the RNG to draw from
    * @return a uniformly random element of {@code candidates}
    */
@@ -63,8 +62,18 @@ public final class MasonUtils {
     final Iterator<T> candidates,
     final MersenneTwisterFast random
   ) {
-    final ArrayList<T> candidatesList = newArrayList(candidates);
-    return candidatesList.get(oneOfIndices(candidatesList, random));
+    checkNotNull(candidates, "collection of candidates must not be null");
+    final List<T> drawn = reservoirSample(
+      () -> candidates,
+      1,
+      x -> true,
+      random
+    );
+    checkArgument(
+      !drawn.isEmpty(),
+      "collection of candidates must not be empty"
+    );
+    return drawn.get(0);
   }
 
   /**
