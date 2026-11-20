@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.catches.disposition;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.ac.ox.poseidon.fishing.catches.disposition.Factories.discardRates;
 
 import java.util.Set;
@@ -87,5 +88,18 @@ class IndexedDiscardRatesTest {
 
     assertThat(updated.getDiscardedAlive().getKg(adult)).isEqualTo(2.0);
     assertThat(updated.getDiscardedAlive().getKg(juvenile)).isEqualTo(1.0);
+  }
+
+  @Test
+  void rejectsARateOutsideTheUnitRange() {
+    final SpeciesIndex index = SpeciesIndex.of(new Species("A", null, null));
+
+    assertThatThrownBy(() ->
+      new IndexedDiscardRates(
+        SpeciesIndexedDoubleArray.of(new double[] { 1.5 }, index)
+      )
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("discard rate");
   }
 }

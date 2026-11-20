@@ -268,4 +268,13 @@ class FleetTest {
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("V1");
   }
+
+  @Test
+  void anExitCannotBeRecordedTwice() {
+    fleet.recordExit("V1", START.minusYears(1));
+
+    assertThatThrownBy(() -> fleet.recordExit("V1", START.minusMonths(1)))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining(START.minusYears(1).toString());
+  }
 }

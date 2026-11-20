@@ -43,4 +43,27 @@ class HoldTest {
     assertThat(hold.getAvailableCapacityInKg()).isZero();
     assertThat(hold.isFull()).isTrue();
   }
+
+  @Test
+  void aHoldWithRoomLeftIsNotFull() {
+    final CategorisedCatch content = mock(CategorisedCatch.class);
+    when(content.getTotalBiomassInKg()).thenReturn(4.0);
+    final Hold hold = mock(Hold.class, CALLS_REAL_METHODS);
+    when(hold.getTotalCapacityInKg()).thenReturn(10.0);
+    when(hold.getContent()).thenReturn(content);
+
+    assertThat(hold.getAvailableCapacityInKg()).isEqualTo(6.0);
+    assertThat(hold.isFull()).isFalse();
+  }
+
+  @Test
+  void aHoldAtItsCapacityIsFull() {
+    final CategorisedCatch content = mock(CategorisedCatch.class);
+    when(content.getTotalBiomassInKg()).thenReturn(10.0);
+    final Hold hold = mock(Hold.class, CALLS_REAL_METHODS);
+    when(hold.getTotalCapacityInKg()).thenReturn(10.0);
+    when(hold.getContent()).thenReturn(content);
+
+    assertThat(hold.isFull()).isTrue();
+  }
 }

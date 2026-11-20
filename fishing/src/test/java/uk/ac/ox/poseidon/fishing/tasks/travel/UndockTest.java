@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.tasks.travel;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -31,6 +32,7 @@ import static uk.ac.ox.poseidon.fishing.tasks.travel.TravelTasks.NOW;
 import static uk.ac.ox.poseidon.fishing.tasks.travel.TravelTasks.setTaskObject;
 import static uk.ac.ox.poseidon.fishing.tasks.travel.TravelTasks.vesselCruisingAtTenKph;
 
+import com.badlogic.gdx.ai.btree.Task.Status;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
@@ -42,8 +44,9 @@ class UndockTest {
     final Undock undock = new Undock(_ -> NOW);
     setTaskObject(undock, vessel);
 
-    undock.execute();
+    final Status status = undock.execute();
 
+    assertThat(status).isEqualTo(Status.SUCCEEDED);
     verify(vessel).undock(NOW);
   }
 

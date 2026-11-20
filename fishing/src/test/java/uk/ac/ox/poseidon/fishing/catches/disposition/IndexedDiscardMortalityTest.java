@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing.catches.disposition;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
@@ -55,5 +56,18 @@ class IndexedDiscardMortalityTest {
     assertThat(updated.getDiscardedAlive().getKg(b)).isEqualTo(20.0);
     assertThat(updated.getDiscardedDead().getKg(a)).isEqualTo(1.0);
     assertThat(updated.getDiscardedDead().getKg(b)).isEqualTo(0.0);
+  }
+
+  @Test
+  void rejectsARateOutsideTheUnitRange() {
+    final SpeciesIndex index = SpeciesIndex.of(new Species("A", null, null));
+
+    assertThatThrownBy(() ->
+      new IndexedDiscardMortality(
+        SpeciesIndexedDoubleArray.of(new double[] { -0.5 }, index)
+      )
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("mortality rate");
   }
 }

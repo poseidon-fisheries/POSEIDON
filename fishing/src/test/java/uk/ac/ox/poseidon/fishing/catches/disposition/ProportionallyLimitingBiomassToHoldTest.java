@@ -97,9 +97,9 @@ class ProportionallyLimitingBiomassToHoldTest {
   @ParameterizedTest
   @ValueSource(doubles = { -1.0, Double.NaN })
   void partition_throwsOnNegativeOrNaNCapacity(final double capacity) {
-    assertThatThrownBy(() ->
-      process.partition(disposition, capacity)
-    ).isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> process.partition(disposition, capacity))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("must be a non-negative value");
   }
 
   private static double totalKg(final Disposition disposition) {
