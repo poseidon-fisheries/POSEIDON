@@ -24,6 +24,8 @@ package uk.ac.ox.poseidon.geography.grids;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static uk.ac.ox.poseidon.geography.grids.AscFiles.rowsFromNorth;
+import static uk.ac.ox.poseidon.geography.grids.AscFiles.write;
 import static uk.ac.ox.poseidon.geography.grids.AscFiles.writeFixture;
 import static uk.ac.ox.poseidon.geography.grids.Factories.cellSetFromGridFile;
 import static uk.ac.ox.poseidon.geography.grids.Factories.modelGridFromGridFile;
@@ -175,5 +177,30 @@ class CellSetFromGridFileFactoryTest {
     assertThatThrownBy(() -> cellsWith(missing, 0))
       .isInstanceOf(RuntimeException.class)
       .hasMessageContaining("does not point to a file");
+  }
+
+  @Test
+  void theToleranceScalesWithTheSizeOfTheCells() {
+    // Four-degree cells: a hundredth of a cell is 0.04°, so 0.03° is the same
+    final Path file = write(
+      tempDir.resolve("large.asc"),
+      10,
+      40,
+      4,
+      rowsFromNorth()
+    );
+    final ModelGrid eastish = ModelGrid.create(
+      3,
+      2,
+      new Envelope(10.03, 22.03, 40, 48)
+    );
+    final ModelGrid northish = ModelGrid.create(
+      3,
+      2,
+      new Envelope(10, 22, 40.03, 48.03)
+    );
+
+    assertThat(cellsWith(file, eastish, 2)).containsExactly(new Cell(1, 0));
+    assertThat(cellsWith(file, northish, 2)).containsExactly(new Cell(1, 0));
   }
 }

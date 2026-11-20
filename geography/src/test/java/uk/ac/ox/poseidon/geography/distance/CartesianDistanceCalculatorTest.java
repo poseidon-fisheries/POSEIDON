@@ -24,9 +24,14 @@ package uk.ac.ox.poseidon.geography.distance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import sim.util.Double2D;
+import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 
 class CartesianDistanceCalculatorTest {
 
@@ -58,5 +63,25 @@ class CartesianDistanceCalculatorTest {
       calculator.distanceInKm(b, a),
       within(1e-9)
     );
+  }
+
+  @Test
+  void distanceBetweenCellsDoesNotDependOnTheirPosition() {
+    assertThat(
+      calculator.distanceInKm(new Cell(1, 1), new Cell(4, 5))
+    ).isCloseTo(10.0, within(1e-9));
+  }
+
+  @Test
+  void distanceBetweenCoordinatesIsMeasuredBetweenTheirGridPoints() {
+    final ModelGrid modelGrid = mock(ModelGrid.class);
+    final Coordinate a = new Coordinate(1, 1);
+    final Coordinate b = new Coordinate(2, 2);
+    when(modelGrid.toPoint(a)).thenReturn(new Double2D(1, 1));
+    when(modelGrid.toPoint(b)).thenReturn(new Double2D(4, 5));
+
+    assertThat(
+      new CartesianDistanceCalculator(modelGrid, 2.0).distanceInKm(a, b)
+    ).isCloseTo(10.0, within(1e-9));
   }
 }
