@@ -152,8 +152,19 @@ public abstract class ObjectGrid<T>
     return Optional.empty();
   }
 
-  /** @return an independent copy of the underlying field */
+  /**
+   * @return an independent copy of the underlying field: changing either field
+   *         leaves the other as it was (the placed objects themselves are
+   *         shared)
+   */
   public SparseGrid2D copyOfField() {
-    return new SparseGrid2D(field);
+    final SparseGrid2D copy = new SparseGrid2D(
+      field.getWidth(),
+      field.getHeight()
+    );
+    forEach(object ->
+      copy.setObjectLocation(object, field.getObjectLocation(object))
+    );
+    return copy;
   }
 }

@@ -93,6 +93,51 @@ final class ObjectGridTest {
     assertThat(grid.anyObjectsAt(new Cell(1, 1))).isFalse();
   }
 
+  @Test
+  void movingAnObjectInTheCopyOfTheFieldLeavesTheGridUnchanged() {
+    final var grid = gridWith("a", new Cell(0, 0), "b", new Cell(2, 1));
+
+    final var copy = grid.copyOfField();
+    copy.setObjectLocation("a", 1, 1);
+
+    assertThat(grid.getCell("a")).isEqualTo(new Cell(0, 0));
+    assertThat(grid.getObjectsAt(new Cell(0, 0))).containsExactly("a");
+    assertThat(grid.anyObjectsAt(new Cell(1, 1))).isFalse();
+  }
+
+  @Test
+  void addingToAnOccupiedCellInTheCopyOfTheFieldLeavesTheGridUnchanged() {
+    final var grid = gridWith("a", new Cell(0, 0), "b", new Cell(2, 1));
+
+    final var copy = grid.copyOfField();
+    copy.setObjectLocation("c", 2, 1);
+
+    assertThat(grid.numObjectsAt(new Cell(2, 1))).isEqualTo(1);
+    assertThat(grid.getObjectsAt(new Cell(2, 1))).containsExactly("b");
+  }
+
+  @Test
+  void removingAnObjectFromTheCopyOfTheFieldLeavesTheGridUnchanged() {
+    final var grid = gridWith("a", new Cell(0, 0), "b", new Cell(2, 1));
+
+    final var copy = grid.copyOfField();
+    copy.remove("a");
+
+    assertThat(grid.stream()).containsExactlyInAnyOrder("a", "b");
+    assertThat(grid.getObjectsAt(new Cell(0, 0))).containsExactly("a");
+    assertThat(grid.field.getObjectIndex("b")).isEqualTo(1);
+  }
+
+  @Test
+  void changingTheGridLeavesTheCopyOfTheFieldUnchanged() {
+    final var grid = gridWith("a", new Cell(0, 0), "b", new Cell(2, 1));
+
+    final var copy = grid.copyOfField();
+    grid.field.setObjectLocation("a", 1, 1);
+
+    assertThat(copy.getObjectLocation("a")).isEqualTo(new Int2D(0, 0));
+  }
+
   private StringGrid gridWith(
     final String first,
     final Cell firstCell,
