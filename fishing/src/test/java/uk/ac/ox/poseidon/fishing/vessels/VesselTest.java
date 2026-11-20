@@ -46,6 +46,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.engine.SimState;
+import sim.util.Double2D;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
@@ -573,6 +574,49 @@ class VesselTest {
     assertThat(fishing.getAttributes()).containsExactly(entry("gear", "PS"));
     assertThat(sale.getAttributes()).containsExactly(entry("gear", "PS"));
     assertThat(vessel.getAttributes()).containsExactly(entry("gear", "OTB"));
+  }
+
+  @Test
+  void aVesselHeadsTowardsTheCentreOfACellFromItsPoint() {
+    final VesselField vesselField = mock(VesselField.class, RETURNS_DEEP_STUBS);
+    final Vessel vessel = newVessel(
+      schedule,
+      vesselField,
+      mock(PortGrid.class),
+      behaviour(_ -> behaviour)
+    );
+    final Cell destination = new Cell(4, 3);
+    when(vesselField.getPoint(vessel)).thenReturn(new Double2D(1, 2));
+    when(vesselField.getModelGrid().toPoint(destination)).thenReturn(
+      new Double2D(4, 3)
+    );
+
+    vessel.setHeadingTowards(destination);
+
+    assertThat(vessel.orientation2D()).isEqualTo(Math.atan2(1, 3));
+  }
+
+  @Test
+  void aVesselReportsItsPointAsACoordinateAndItsHomePortsCell() {
+    final VesselField vesselField = mock(VesselField.class, RETURNS_DEEP_STUBS);
+    final Port homePort = mock(Port.class);
+    final PortGrid portGrid = mock(PortGrid.class);
+    when(portGrid.getObject("P1")).thenReturn(Optional.of(homePort));
+    when(portGrid.getCell(homePort)).thenReturn(PORT_CELL);
+    final Vessel vessel = newVessel(
+      schedule,
+      vesselField,
+      portGrid,
+      behaviour(_ -> behaviour)
+    );
+    vessel.setAttributes(Map.of(HOME_PORT, "P1"));
+    final Double2D point = new Double2D(1, 2);
+    final Coordinate coordinate = new Coordinate(3.5, 40.5);
+    when(vesselField.getPoint(vessel)).thenReturn(point);
+    when(vesselField.getModelGrid().toCoordinate(point)).thenReturn(coordinate);
+
+    assertThat(vessel.getCoordinate()).isEqualTo(coordinate);
+    assertThat(vessel.getHomePortCell()).isEqualTo(PORT_CELL);
   }
 
   /** Starts a plain trip for {@code vessel}, at {@link #START}. */
