@@ -327,6 +327,35 @@ class VesselRegisterFactoryTest {
   }
 
   @Test
+  void aSecondCreationByTheStartIsAnError() {
+    assertThatThrownBy(() ->
+      startSimulation(
+        """
+        V1,Vee One,P1,CEN,2000-01-01,,1,a
+        V1,Vee One,P1,CHA,2000-06-01,,1,a
+        """
+      )
+    )
+      .hasStackTraceContaining("V1")
+      .hasStackTraceContaining("already exists");
+  }
+
+  @Test
+  void aChangeAfterAnExitByTheStartIsAnError() {
+    assertThatThrownBy(() ->
+      startSimulation(
+        """
+        V1,Vee One,P1,CEN,2000-01-01,,1,a
+        V1,Vee One,P1,EXP,2000-03-01,,1,a
+        V1,Vee One,P1,MOD,2000-06-01,,2,a
+        """
+      )
+    )
+      .hasStackTraceContaining("V1")
+      .hasStackTraceContaining("exited on 2000-03-01");
+  }
+
+  @Test
   void anUnknownEventCodeIsAnError() {
     assertThatThrownBy(() ->
       startSimulation(
