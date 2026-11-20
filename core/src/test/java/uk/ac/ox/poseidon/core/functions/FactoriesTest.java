@@ -30,6 +30,7 @@ import static uk.ac.ox.poseidon.core.functions.Factories.floorMapLookup;
 import static uk.ac.ox.poseidon.core.functions.Factories.mapEntry;
 import static uk.ac.ox.poseidon.core.functions.Factories.mapLookup;
 import static uk.ac.ox.poseidon.core.functions.Factories.multiStringKeyFromFunctions;
+import static uk.ac.ox.poseidon.core.functions.Factories.some;
 import static uk.ac.ox.poseidon.core.providers.constant.Factories.constant;
 
 import java.time.Duration;
@@ -38,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -248,6 +250,15 @@ class FactoriesTest {
       hours
     ).get(GLOBAL_SCOPE);
     assertThat(mapping.apply("a", 1)).isEqualTo(Duration.ofHours(4));
+  }
+
+  @Test
+  void someAlwaysHoldsTheResolvedValue() {
+    final Function<String, Optional<Integer>> value = some(contextLength).get(
+      GLOBAL_SCOPE
+    );
+
+    assertThat(value.apply("abc")).contains(3);
   }
 
   @Test

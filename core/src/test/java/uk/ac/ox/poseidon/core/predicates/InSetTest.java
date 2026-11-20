@@ -29,6 +29,7 @@ import static uk.ac.ox.poseidon.core.predicates.Factories.in;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.core.ValueFactory;
 
@@ -62,5 +63,13 @@ class InSetTest {
         List.of("a", "b", "c");
 
     assertThat(in(values).get(GLOBAL_SCOPE).apply(null, "a")).isTrue();
+  }
+
+  @Test
+  void factoryBuildsTheSamePredicateOverAConstantFactory() {
+    final Factory<Scope, Collection<String>> values = scope ->
+      List.of("a", "b", "c");
+
+    assertThat(in(values).get(GLOBAL_SCOPE).apply(null, "b")).isTrue();
   }
 }
