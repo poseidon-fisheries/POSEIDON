@@ -230,6 +230,44 @@ class TripBlockTest {
   }
 
   @Test
+  void rejectsHavingNoTasks() {
+    assertThatThrownBy(() -> tripTo(Optional.of(DESTINATION)))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("at least one task");
+  }
+
+  @Test
+  void refusesToReadItsVesselOutsideAStep() {
+    final TripBlock tripBlock = tripTo(
+      Optional.of(DESTINATION),
+      new ScriptedTask(SUCCEEDED)
+    );
+
+    assertThatThrownBy(new BehaviorTree<>(tripBlock)::step)
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("read its vessel outside a step");
+  }
+
+  @Test
+  void runsItsTasksFromTheStartAgainOnTheNextTrip() {
+    final ScriptedTask fishing = new ScriptedTask(SUCCEEDED, SUCCEEDED);
+    final TripBlock tripBlock = tripTo(
+      Optional.of(DESTINATION),
+      fishing,
+      new SetDestinationToOrigin(),
+      new DockAtDestination(_ -> NOW)
+    );
+    final BehaviorTree<Vessel> tree = treeOver(tripBlock);
+
+    tree.step();
+    tree.step();
+
+    assertThat(tripBlock.getStatus()).isEqualTo(SUCCEEDED);
+    assertThat(fishing.tripsSeen).hasSize(2);
+    assertThat(fishing.tripsSeen.get(1)).isNotSameAs(fishing.tripsSeen.get(0));
+  }
+
+  @Test
   void failsWithoutOpeningATripWhenThereIsNoDestination() {
     final ScriptedTask fishing = new ScriptedTask(SUCCEEDED);
     final TripBlock tripBlock = tripTo(Optional.empty(), fishing);

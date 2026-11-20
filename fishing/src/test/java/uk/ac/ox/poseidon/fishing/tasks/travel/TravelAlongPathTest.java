@@ -161,6 +161,70 @@ class TravelAlongPathTest {
       .hasMessageContaining("read its vessel outside a step");
   }
 
+  @Test
+  void headsTowardsTheNextCellOnThePath() throws Exception {
+    final DistanceCalculator distanceCalculator = mock(
+      DistanceCalculator.class
+    );
+    when(distanceCalculator.distanceInKm(ORIGIN, DESTINATION)).thenReturn(5.0);
+    final Vessel vessel = vesselCruisingAtTenKph();
+    final TravelAlongPath travelAlongPath = travelingFromOriginToDestination(
+      distanceCalculator
+    );
+    setTaskObject(travelAlongPath, vessel);
+
+    travelAlongPath.start();
+    travelAlongPath.execute();
+
+    verify(vessel).setHeadingTowards(DESTINATION);
+  }
+
+  @Test
+  void failsToStartWithoutAPathToTheDestination() throws Exception {
+    @SuppressWarnings("unchecked")
+    final PathFinder<Cell> pathFinder = mock(PathFinder.class);
+    when(pathFinder.getPath(ORIGIN, DESTINATION)).thenReturn(Optional.empty());
+    final TravelAlongPath travelAlongPath = new TravelAlongPath(
+      ENGINE,
+      FUEL_TANK,
+      pathFinder,
+      mock(DistanceCalculator.class),
+      v -> DESTINATION,
+      v -> mock(EventManager.class),
+      v -> NOW
+    );
+    setTaskObject(travelAlongPath, vesselCruisingAtTenKph());
+
+    assertThatThrownBy(travelAlongPath::start)
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("No path found");
+  }
+
+  @Test
+  void refusesAPathThatDoesNotEndAtTheDestination() throws Exception {
+    @SuppressWarnings("unchecked")
+    final PathFinder<Cell> pathFinder = mock(PathFinder.class);
+    when(pathFinder.getPath(ORIGIN, DESTINATION)).thenReturn(
+      Optional.of(ImmutableList.of(ORIGIN))
+    );
+    final TravelAlongPath travelAlongPath = new TravelAlongPath(
+      ENGINE,
+      FUEL_TANK,
+      pathFinder,
+      mock(DistanceCalculator.class),
+      v -> DESTINATION,
+      v -> mock(EventManager.class),
+      v -> NOW
+    );
+    setTaskObject(travelAlongPath, vesselCruisingAtTenKph());
+
+    travelAlongPath.start();
+
+    assertThatThrownBy(travelAlongPath::execute)
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("does not match current destination");
+  }
+
   private static TravelAlongPath travelingFromOriginToDestination(
     final DistanceCalculator distanceCalculator
   ) {

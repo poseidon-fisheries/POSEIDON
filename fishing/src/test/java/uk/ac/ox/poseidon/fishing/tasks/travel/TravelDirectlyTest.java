@@ -22,13 +22,16 @@
 
 package uk.ac.ox.poseidon.fishing.tasks.travel;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.fishing.tasks.travel.TravelTasks.*;
 
+import com.badlogic.gdx.ai.btree.Task.Status;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.distance.DistanceCalculator;
 
@@ -74,5 +77,37 @@ class TravelDirectlyTest {
     travelDirectly.complete();
 
     verify(FUEL_TANK.of(vessel)).consumeFuel(15.0);
+  }
+
+  @Test
+  void movesTheVesselToTheDestinationAndBroadcastsTheTravel() throws Exception {
+    final DistanceCalculator distanceCalculator = mock(
+      DistanceCalculator.class
+    );
+    when(distanceCalculator.distanceInKm(ORIGIN, DESTINATION)).thenReturn(5.0);
+    final Vessel vessel = vesselCruisingAtTenKph();
+    final TravelDirectly travelDirectly = new TravelDirectly(
+      ENGINE,
+      FUEL_TANK,
+      distanceCalculator,
+      v -> NOW
+    );
+    setTaskObject(travelDirectly, vessel);
+
+    travelDirectly.start();
+    final Status status = travelDirectly.complete();
+
+    assertThat(status).isEqualTo(Status.SUCCEEDED);
+    verify(vessel).setCurrentCell(DESTINATION);
+    final ArgumentCaptor<TravelEvent> event = ArgumentCaptor.forClass(
+      TravelEvent.class
+    );
+    verify(vessel.getCurrentTrip().getEventManager()).broadcast(
+      event.capture()
+    );
+    assertThat(event.getValue().getOrigin()).isEqualTo(ORIGIN);
+    assertThat(event.getValue().getDestination()).isEqualTo(DESTINATION);
+    assertThat(event.getValue().getStartDateTime()).isEqualTo(NOW);
+    assertThat(event.getValue().getEndDateTime()).isEqualTo(NOW);
   }
 }
