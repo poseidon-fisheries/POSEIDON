@@ -117,6 +117,9 @@ public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
       ? Optional.of(cell)
       : bathymetricGrid
           .getActiveLandNeighbours(cell)
+          .filter(landNeighbour ->
+            isValidPortCell(bathymetricGrid, landNeighbour)
+          )
           .min(
             comparingDouble(landNeighbour ->
               distanceCalculator.distanceInKm(
@@ -134,7 +137,7 @@ public class PortGridFactory<S extends Scope> extends RelativeScopeFactory<
     return (
       bathymetricGrid.getModelGrid().isInGrid(cell) &&
       bathymetricGrid.isLand(cell) &&
-      bathymetricGrid.getWaterNeighbours(cell).findAny().isPresent()
+      bathymetricGrid.getActiveWaterNeighbours(cell).findAny().isPresent()
     );
   }
 }
