@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -39,12 +39,13 @@ dependencies {
 }
 
 pitest {
-    // Measured 2026-11-18 at 86%. The survivors are of four kinds: equivalent
-    // (bounds on saturated ranges, the terminal ProductStore.end, shuffles that
-    // each return a permutation); masked by redundancy (TemporalSchedule.step
-    // re-checks what stepUntil does, so removing the latter call is invisible);
-    // unobservable under PIT's forked JVMs because ClassValue memoization skips
-    // the discovery code after its first run; or diagnostic logging only.
-    // Bump this floor up, never down.
-    mutationThreshold.set(84)
+    // Measured 2026-11-20 at approximately 96% (823 killed or timed out of 861
+    // mutants); the floor sits two points below. The survivors are of four
+    // kinds: equivalent (bounds on saturated ranges, the terminal
+    // ProductStore.end, shuffles that each return a permutation); masked by
+    // redundancy (TemporalSchedule.step re-checks what stepUntil does, so
+    // removing the latter call is invisible); unobservable under PIT's forked
+    // JVMs because ClassValue memoization skips the discovery code after its
+    // first run; or diagnostic logging only. Bump this floor up, never down.
+    mutationThreshold.set(94)
 }
