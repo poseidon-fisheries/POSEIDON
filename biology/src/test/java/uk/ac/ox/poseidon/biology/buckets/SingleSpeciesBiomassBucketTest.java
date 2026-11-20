@@ -226,6 +226,45 @@ class SingleSpeciesBiomassBucketTest {
     assertThat(mapped).isSameAs(Bucket.empty());
   }
 
+  @Test
+  void replacingAnotherSpeciesKeepsTheOriginalSpeciesBiomass() {
+    final Bucket bucket = Bucket.of(a, 10);
+
+    final Bucket replaced = bucket.replaceContent(b, Biomass.ofKg(6));
+
+    assertThat(replaced.getSpecies()).containsExactlyInAnyOrder(a, b);
+    assertThat(replaced.getKg(a)).isEqualTo(10);
+    assertThat(replaced.getKg(b)).isEqualTo(6);
+  }
+
+  @Test
+  void replacementPreservesNonBiomassContent() {
+    final Bucket bucket = Bucket.of(a, 10);
+    final Content replacement = new NonBiomassContent(6);
+
+    final Bucket replaced = bucket.replaceContent(a, replacement);
+
+    assertThat(replaced.getContent(a)).hasValueSatisfying(content ->
+      assertThat(content).isSameAs(replacement)
+    );
+    assertThat(replaced.getKg(a)).isEqualTo(6);
+  }
+
+  @Test
+  void mappingPreservesNonBiomassContent() {
+    final Bucket bucket = Bucket.of(a, 10);
+    final Content mappedContent = new NonBiomassContent(6);
+
+    final Bucket mapped = bucket.mapContent(
+      (species, content) -> mappedContent
+    );
+
+    assertThat(mapped.getContent(a)).hasValueSatisfying(content ->
+      assertThat(content).isSameAs(mappedContent)
+    );
+    assertThat(mapped.getKg(a)).isEqualTo(6);
+  }
+
   private static final class NonBiomassContent implements Content {
 
     private final double kg;

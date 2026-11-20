@@ -109,6 +109,30 @@ class AdaptiveBucketBuilderTest {
     assertThat(bucket).isInstanceOf(ContentBucket.class);
   }
 
+  @Test
+  void addingSpeciesContentCanBeChainedAndAccumulatesExistingBiomass() {
+    final Bucket bucket = Bucket.newBuilder()
+      .put(a, Biomass.ofKg(10))
+      .add(a, Biomass.ofKg(3))
+      .add(b, Biomass.ofKg(5))
+      .build();
+
+    assertThat(bucket.getKg(a)).isEqualTo(13);
+    assertThat(bucket.getKg(b)).isEqualTo(5);
+  }
+
+  @Test
+  void subtractingSpeciesContentCanBeChainedAndKeepsTheRemainder() {
+    final Bucket bucket = Bucket.newBuilder()
+      .put(a, Biomass.ofKg(10))
+      .put(b, Biomass.ofKg(5))
+      .subtract(a, Biomass.ofKg(4))
+      .build();
+
+    assertThat(bucket.getKg(a)).isEqualTo(6);
+    assertThat(bucket.getKg(b)).isEqualTo(5);
+  }
+
   private static final class TestContent implements Content {
 
     private final double kg;

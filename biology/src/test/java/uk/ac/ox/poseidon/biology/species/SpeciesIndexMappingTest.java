@@ -84,4 +84,23 @@ final class SpeciesIndexMappingTest {
       index.mapToDoubleArray(values::get)
     );
   }
+
+  @Test
+  void sharedIndexRecognitionDistinguishesEqualAndDifferentSpeciesSets() {
+    final SpeciesIndexedDoubleArray first = SpeciesIndexedDoubleArray.of(
+      new double[] { 3, 8 },
+      SpeciesIndex.of(COD, HAD)
+    );
+    final SpeciesIndexedDoubleArray same = SpeciesIndexedDoubleArray.of(
+      new double[] { 1, 2 },
+      SpeciesIndex.of(HAD, COD)
+    );
+    final SpeciesIndexedDoubleArray different = SpeciesIndexedDoubleArray.of(
+      new double[] { 3 },
+      SpeciesIndex.of(COD)
+    );
+
+    assertThat(first.sameIndex(same)).isTrue();
+    assertThat(first.sameIndex(different)).isFalse();
+  }
 }

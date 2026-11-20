@@ -171,4 +171,68 @@ final class BiomassBucketIndexedTest {
     assertThat(visited).containsOnly(Map.entry(0, 20.0), Map.entry(1, 30.0));
     assertThat(missing).containsOnly(Map.entry(a, 10.0));
   }
+
+  @Test
+  void indexedAccessReturnsStoredBiomassIncludingAbsentSlots() {
+    final BiomassBucket bucket = BiomassBucket.create(
+      new double[] { 10, 0, 30 },
+      speciesIndex
+    );
+
+    assertThat(bucket.getDouble(0)).isEqualTo(10);
+    assertThat(bucket.getDouble(1)).isZero();
+    assertThat(bucket.getDouble(c)).isEqualTo(30);
+  }
+
+  @Test
+  void creationRejectsArraysShorterOrLongerThanTheSpeciesIndex() {
+    assertThatIllegalArgumentException().isThrownBy(() ->
+      BiomassBucket.create(new double[] { 10, 20 }, speciesIndex)
+    );
+    assertThatIllegalArgumentException().isThrownBy(() ->
+      BiomassBucket.create(new double[] { 10, 20, 30, 40 }, speciesIndex)
+    );
+  }
+
+  @Test
+  void subtractionOnASharedIndexKeepsRemaindersAndDropsExhaustedSpecies() {
+    final BiomassBucket bucket = BiomassBucket.create(
+      new double[] { 10, 20, 0 },
+      speciesIndex
+    );
+    final BiomassBucket removed = BiomassBucket.create(
+      new double[] { 3, 20, 0 },
+      speciesIndex
+    );
+
+    final Bucket remainder = bucket.subtract(removed);
+
+    assertThat(remainder.getKg(a)).isEqualTo(7);
+    assertThat(remainder.getSpecies()).containsExactly(a);
+    assertThat(bucket.getKg(a)).isEqualTo(10);
+    assertThat(bucket.getKg(b)).isEqualTo(20);
+  }
+
+  @Test
+  void subtractingAllBiomassOnASharedIndexReturnsTheEmptyBucket() {
+    final BiomassBucket bucket = BiomassBucket.create(
+      new double[] { 10, 20, 0 },
+      speciesIndex
+    );
+
+    assertThat(bucket.subtract(bucket)).isSameAs(Bucket.empty());
+  }
+
+  @Test
+  void subtractionRejectsOverdrawingContentFromAnotherBucketRepresentation() {
+    final BiomassBucket bucket = BiomassBucket.create(
+      new double[] { 10, 20, 0 },
+      speciesIndex
+    );
+    final Bucket removed = Bucket.of(a, 11);
+
+    assertThatIllegalArgumentException().isThrownBy(() ->
+      bucket.subtract(removed)
+    );
+  }
 }

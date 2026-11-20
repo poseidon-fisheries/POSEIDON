@@ -23,9 +23,11 @@
 package uk.ac.ox.poseidon.biology.buckets;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import uk.ac.ox.poseidon.biology.biomass.Biomass;
 import uk.ac.ox.poseidon.biology.species.Species;
 
 final class BucketValueTest {
@@ -48,5 +50,21 @@ final class BucketValueTest {
 
     assertThat(Bucket.contentEquals(bucket, null)).isFalse();
     assertThat(Bucket.contentEquals(bucket, "COD")).isFalse();
+  }
+
+  @Test
+  void singleSpeciesFactoryRejectsNegativeBiomass() {
+    assertThatIllegalArgumentException().isThrownBy(() -> Bucket.of(COD, -1));
+  }
+
+  @Test
+  void contentBucketDropsZeroMassEntries() {
+    final Bucket bucket = ContentBucket.ofContentMap(
+      Map.of(COD, Biomass.ZERO, HAD, Biomass.ofKg(8))
+    );
+
+    assertThat(bucket.getSpecies()).containsExactly(HAD);
+    assertThat(bucket.getContent(COD)).isEmpty();
+    assertThat(bucket.getTotalBiomassInKg()).isEqualTo(8);
   }
 }

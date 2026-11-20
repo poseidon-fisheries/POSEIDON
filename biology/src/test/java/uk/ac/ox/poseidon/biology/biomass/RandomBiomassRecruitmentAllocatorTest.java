@@ -25,6 +25,9 @@ package uk.ac.ox.poseidon.biology.biomass;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.data.Offset.offset;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.jupiter.api.Test;
@@ -126,6 +129,101 @@ class RandomBiomassRecruitmentAllocatorTest {
     assertThatThrownBy(() -> allocator.allocate(1.0, biomassGrid, capacityGrid))
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining("No habitable cells");
+  }
+
+  @Test
+  void allocationRejectsNegativeRecruitment() {
+    final ModelGrid modelGrid = newGrid(1, 1);
+    final DefaultBiomassGrid biomassGrid = newBiomassGrid(
+      modelGrid,
+      new double[][] { { 2 } }
+    );
+    final CarryingCapacityGrid capacityGrid = newCapacityGrid(
+      modelGrid,
+      new double[][] { { 10 } }
+    );
+    final RandomBiomassRecruitmentAllocator allocator =
+      new RandomBiomassRecruitmentAllocator(new MersenneTwisterFast(123));
+
+    assertThatThrownBy(() -> allocator.allocate(-1, biomassGrid, capacityGrid))
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessageContaining("non-negative");
+    assertThat(biomassGrid.getSum()).isEqualTo(2);
+  }
+
+  @Test
+  void zeroRecruitmentLeavesBiomassAndRandomStreamUnchanged() {
+    final ModelGrid modelGrid = newGrid(1, 1);
+    final DefaultBiomassGrid biomassGrid = newBiomassGrid(
+      modelGrid,
+      new double[][] { { 2 } }
+    );
+    final CarryingCapacityGrid capacityGrid = newCapacityGrid(
+      modelGrid,
+      new double[][] { { 10 } }
+    );
+    final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
+    when(rng.nextInt(anyInt())).thenThrow(
+      new AssertionError("Zero recruitment must not sample cells")
+    );
+    final RandomBiomassRecruitmentAllocator allocator =
+      new RandomBiomassRecruitmentAllocator(rng);
+
+    allocator.allocate(0, biomassGrid, capacityGrid);
+
+    assertThat(biomassGrid.getSum()).isEqualTo(2);
+  }
+
+  @Test
+  void allocationUsesEqualChunksAcrossSuccessivelySelectedCells() {
+    final ModelGrid modelGrid = newGrid(2, 1);
+    final DefaultBiomassGrid biomassGrid = newBiomassGrid(
+      modelGrid,
+      new double[][] { { 0 }, { 0 } }
+    );
+    final CarryingCapacityGrid capacityGrid = newCapacityGrid(
+      modelGrid,
+      new double[][] { { 100 }, { 100 } }
+    );
+    final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
+    when(rng.nextInt(anyInt())).thenReturn(0, 1);
+    final RandomBiomassRecruitmentAllocator allocator =
+      new RandomBiomassRecruitmentAllocator(rng);
+
+    allocator.allocate(8, biomassGrid, capacityGrid);
+
+    assertThat(
+      biomassGrid.getValue(capacityGrid.getHabitableCells().get(0))
+    ).isEqualTo(4);
+    assertThat(
+      biomassGrid.getValue(capacityGrid.getHabitableCells().get(1))
+    ).isEqualTo(4);
+  }
+
+  @Test
+  void allocationRemovesSaturatedCellsFromSubsequentRandomSelections() {
+    final ModelGrid modelGrid = newGrid(3, 1);
+    final DefaultBiomassGrid biomassGrid = newBiomassGrid(
+      modelGrid,
+      new double[][] { { 0 }, { 0 }, { 0 } }
+    );
+    final var cells = modelGrid.getActiveCells().stream().toList();
+    final double[][] capacities = { { 100 }, { 100 }, { 100 } };
+    capacities[cells.get(0).getX()][cells.get(0).getY()] = 4;
+    final CarryingCapacityGrid capacityGrid = newCapacityGrid(
+      modelGrid,
+      capacities
+    );
+    final MersenneTwisterFast rng = mock(MersenneTwisterFast.class);
+    when(rng.nextInt(anyInt())).thenReturn(0, 0, 1);
+    final RandomBiomassRecruitmentAllocator allocator =
+      new RandomBiomassRecruitmentAllocator(rng);
+
+    allocator.allocate(12, biomassGrid, capacityGrid);
+
+    assertThat(biomassGrid.getValue(cells.get(0))).isEqualTo(4);
+    assertThat(biomassGrid.getValue(cells.get(1))).isEqualTo(4);
+    assertThat(biomassGrid.getValue(cells.get(2))).isEqualTo(4);
   }
 
   private static ModelGrid newGrid(final int width, final int height) {
