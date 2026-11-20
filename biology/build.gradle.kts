@@ -1,6 +1,6 @@
 /*
  * POSEIDON: an agent-based model of fisheries
- * Copyright (c) 2024-2025, University of Oxford.
+ * Copyright (c) 2024-2026, University of Oxford.
  *
  * University of Oxford means the Chancellor, Masters and Scholars of the
  * University of Oxford, having an administrative office at Wellington
@@ -36,4 +36,13 @@ dependencies {
             because("classgraph 4.8.180 avoids JDK 24+ sun.misc.Unsafe::invokeCleaner warnings")
         }
     }
+}
+
+pitest {
+    // Measured 2026-11-20 at approximately 96% (498 killed and one timeout
+    // out of 521 mutants). Survivors cover equivalent paths, boundary changes
+    // and diagnostic logging. Uncovered mutants are trivial factory/wrapper
+    // null returns and duplicate-species diagnostics pre-empted by Guava.
+    // Bump this floor up, never down.
+    mutationThreshold.set(94)
 }
