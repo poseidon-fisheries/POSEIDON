@@ -36,3 +36,11 @@ dependencies {
     runtimeOnly(libs.gt.arcgrid)
     implementation(libs.cdm.core)
 }
+
+pitest {
+    // Measured 2026-11-20 at approximately 97% (745 killed and two timeouts
+    // out of 771 mutants). Survivors cover equivalent paths (cell-key and step
+    // encodings, the A* heuristic, envelope tie-breaks), tolerance boundaries,
+    // diagnostic logging and resource disposal. Bump this floor up, never down.
+    mutationThreshold.set(94)
+}
