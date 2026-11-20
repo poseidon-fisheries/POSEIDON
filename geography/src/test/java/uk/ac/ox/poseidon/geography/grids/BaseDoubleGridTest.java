@@ -46,6 +46,40 @@ class BaseDoubleGridTest {
   }
 
   @Test
+  void sumsEveryCellOfARectangularGrid() {
+    final BaseDoubleGrid rectangularGrid = new BaseDoubleGrid(new double[][] {
+      { 1.5, -2.0, 4.25 },
+      { -0.5, 3.0, 8.0 }
+    });
+
+    assertThat(rectangularGrid.getSum()).isEqualTo(14.25);
+  }
+
+  @Test
+  void sumIncludesInactiveCells() {
+    final ModelGrid modelGrid = ModelGrid.create(
+      2,
+      1,
+      new Envelope(0, 2, 0, 1)
+    ).withActiveCells(List.of(new Cell(0, 0)));
+    final BaseDoubleGrid partiallyActiveGrid = new BaseDoubleGrid(
+      modelGrid,
+      new double[][] { { 2.5 }, { 7.0 } }
+    );
+
+    assertThat(partiallyActiveGrid.getSum()).isEqualTo(9.5);
+  }
+
+  @Test
+  void defaultValuesSumToZero() {
+    final BaseDoubleGrid zeroGrid = new BaseDoubleGrid(
+      ModelGrid.create(1, 1, new Envelope(0, 1, 0, 1))
+    );
+
+    assertThat(zeroGrid.getSum()).isZero();
+  }
+
+  @Test
   void getMinimumValue() {
     assertThat(grid.getMinimumValue()).isEqualTo(1.0);
   }
