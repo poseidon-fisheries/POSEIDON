@@ -25,6 +25,7 @@ package uk.ac.ox.poseidon.fishing.market;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
@@ -333,5 +334,108 @@ class BiomassMarketTest {
       )
     );
     return market;
+  }
+
+  @Test
+  void sellLeavesACategoryWithoutPricesUnsold() {
+    final CatchCategory unpricedCategory = new CatchCategory("C2");
+    final Species species = new Species("S1", null, null);
+    final BiomassMarket market = newMarket(mock(EventManager.class));
+
+    final Sale sale = market.sell(
+      mock(Vessel.class),
+      new CategorisedCatch(Map.of(unpricedCategory, Bucket.of(species, 30.0))),
+      DATE_TIME
+    );
+
+    assertThat(sale.getItems()).isEmpty();
+    assertThat(sale.getUnsold().getBuckets()).containsOnlyKeys(
+      unpricedCategory
+    );
+    assertThat(
+      sale.getUnsold().getBuckets().get(unpricedCategory).getKg(species)
+    ).isEqualTo(30.0);
+  }
+
+  @Test
+  void sellLeavesASpeciesWithoutAPriceUnsoldAndSellsTheRest() {
+    final CatchCategory category = new CatchCategory("C1");
+    final Species priced = new Species("S1", null, null);
+    final Species unpriced = new Species("S2", null, null);
+    final BiomassMarket market = newMarket(mock(EventManager.class));
+    market.setPrice(category, priced, eurosPerKg(2.0), DATE_TIME);
+
+    final Sale sale = market.sell(
+      mock(Vessel.class),
+      new CategorisedCatch(
+        Map.of(
+          category,
+          Bucket.of(
+            Map.of(priced, Biomass.ofKg(10.0), unpriced, Biomass.ofKg(4.0))
+          )
+        )
+      ),
+      DATE_TIME
+    );
+
+    assertThat(sale.getItems())
+      .extracting(Sale.Item::getSpecies)
+      .containsExactly(priced);
+    assertThat(
+      sale.getUnsold().getBuckets().get(category).getKg(unpriced)
+    ).isEqualTo(4.0);
+    assertThat(
+      sale.getUnsold().getBuckets().get(category).getKg(priced)
+    ).isZero();
+  }
+
+  @Test
+  void sellIgnoresASpeciesWithoutBiomassInAPricedCategory() {
+    final CatchCategory category = new CatchCategory("C1");
+    final Species priced = new Species("S1", null, null);
+    final Species empty = new Species("S2", null, null);
+    final BiomassMarket market = newMarket(mock(EventManager.class));
+    market.setPrice(category, priced, eurosPerKg(2.0), DATE_TIME);
+
+    final Sale sale = market.sell(
+      mock(Vessel.class),
+      new CategorisedCatch(
+        Map.of(
+          category,
+          Bucket.of(
+            Map.of(priced, Biomass.ofKg(10.0), empty, Biomass.ofKg(0.0))
+          )
+        )
+      ),
+      DATE_TIME
+    );
+
+    assertThat(sale.getItems())
+      .extracting(Sale.Item::getSpecies)
+      .containsExactly(priced);
+    assertThat(sale.getUnsold().isEmpty()).isTrue();
+  }
+
+  @Test
+  void sellBroadcastsTheSale() {
+    final EventManager eventManager = mock(EventManager.class);
+    final BiomassMarket market = newMarket(eventManager);
+
+    final Sale sale = market.sell(
+      mock(Vessel.class),
+      CategorisedCatch.empty(),
+      DATE_TIME
+    );
+
+    verify(eventManager).broadcast(sale);
+  }
+
+  private static BiomassMarket newMarket(final EventManager eventManager) {
+    return new BiomassMarket(
+      mock(Port.class),
+      "M5",
+      CurrencyUnit.EUR,
+      eventManager
+    );
   }
 }
