@@ -33,6 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -97,5 +98,45 @@ class MarketGridTest {
     assertThatThrownBy(() -> marketGrid.getMarket(portA)).isInstanceOf(
       IllegalStateException.class
     );
+  }
+
+  private static MarketGrid scanningGrid(final Market... markets) {
+    final ModelGrid modelGrid = mock(ModelGrid.class);
+    when(modelGrid.getGridWidth()).thenReturn(10);
+    when(modelGrid.getGridHeight()).thenReturn(10);
+    return new MarketGrid(modelGrid) {
+      {
+        Arrays.stream(markets).forEach(market ->
+          field.setObjectLocation(market, 1, 2)
+        );
+      }
+    };
+  }
+
+  @Test
+  void scansForTheMarketOfEachPortWhenNotIndexed() {
+    final MarketGrid marketGrid = scanningGrid(marketA, marketB);
+
+    assertThat(marketGrid.getMarket(portA)).isSameAs(marketA);
+    assertThat(marketGrid.getMarket(portB)).isSameAs(marketB);
+  }
+
+  @Test
+  void throwsWhenScanningFindsNoMarketForThePort() {
+    final MarketGrid marketGrid = scanningGrid(marketB);
+
+    assertThatThrownBy(() -> marketGrid.getMarket(portA)).isInstanceOf(
+      IllegalStateException.class
+    );
+  }
+
+  @Test
+  void looksMarketsUpByCode() {
+    when(marketA.getCode()).thenReturn("A");
+    when(marketB.getCode()).thenReturn("B");
+    final MarketGrid marketGrid = scanningGrid(marketA, marketB);
+
+    assertThat(marketGrid.getObject("B")).isEqualTo(Optional.of(marketB));
+    assertThat(marketGrid.getObject("C")).isEmpty();
   }
 }

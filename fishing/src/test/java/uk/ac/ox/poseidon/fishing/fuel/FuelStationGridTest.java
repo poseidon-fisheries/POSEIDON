@@ -33,6 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
@@ -110,5 +111,55 @@ class FuelStationGridTest {
     assertThatIllegalStateException().isThrownBy(() ->
       fuelStationGrid.getFuelStation(portA)
     );
+  }
+
+  private static FuelStationGrid scanningGrid(
+    final FuelStation... fuelStations
+  ) {
+    final ModelGrid modelGrid = mock(ModelGrid.class);
+    when(modelGrid.getGridWidth()).thenReturn(10);
+    when(modelGrid.getGridHeight()).thenReturn(10);
+    return new FuelStationGrid(modelGrid) {
+      {
+        Arrays.stream(fuelStations).forEach(fuelStation ->
+          field.setObjectLocation(fuelStation, 1, 2)
+        );
+      }
+    };
+  }
+
+  @Test
+  void scansForTheStationOfEachPortWhenNotIndexed() {
+    final FuelStationGrid fuelStationGrid = scanningGrid(
+      fuelStationA,
+      fuelStationB
+    );
+
+    assertThat(fuelStationGrid.getFuelStation(portA)).isSameAs(fuelStationA);
+    assertThat(fuelStationGrid.getFuelStation(portB)).isSameAs(fuelStationB);
+  }
+
+  @Test
+  void throwsWhenScanningFindsNoStationForThePort() {
+    final FuelStationGrid fuelStationGrid = scanningGrid(fuelStationB);
+
+    assertThatIllegalStateException().isThrownBy(() ->
+      fuelStationGrid.getFuelStation(portA)
+    );
+  }
+
+  @Test
+  void looksStationsUpByCode() {
+    when(fuelStationA.getCode()).thenReturn("A");
+    when(fuelStationB.getCode()).thenReturn("B");
+    final FuelStationGrid fuelStationGrid = scanningGrid(
+      fuelStationA,
+      fuelStationB
+    );
+
+    assertThat(fuelStationGrid.getObject("B")).isEqualTo(
+      Optional.of(fuelStationB)
+    );
+    assertThat(fuelStationGrid.getObject("C")).isEmpty();
   }
 }
