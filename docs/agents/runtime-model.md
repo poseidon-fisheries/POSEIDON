@@ -168,18 +168,22 @@ after that, including the exit of a docked vessel, whose `BecameAbsentEvent`
 reaches fleet-level listeners before the fleet's exit announcement.
 
 The vessel register
-(`scheduledByDateTime(vesselRegister(table, vesselSpecification))`) turns each
-row into dated statements. It reads the home-port code from a column and states
-it as the home port; the column is an attribute too, unless it is among the
-ignored columns. Creation supplies the row's attributes and code. Each later
-change row is compared with that vessel's previous register row, not with the
-vessel's live state: changed attributes yield an `AttributeUpdate`, a changed
-code a `HomePortUpdate`, unchanged parts nothing, and becoming missing is a
-change. So a row changing only the length cannot undo a home port another source
-set. The register folds each vessel's rows dated at or before the start into one
-creation at the start, home port included, and a vessel that exited by then is
-never created, its exit recorded with the fleet. A code matching no port in the
-grid, or a missing one, leaves the vessel absent.
+(`scheduledByDateTime(vesselRegister(table, vesselSpecification, columns, eventCodes))`)
+turns each row into dated statements. `columns` (`vesselRegisterColumns(...)`)
+names the vessel id, event code, event date and home-port columns and lists the
+attribute columns; `eventCodes` (`vesselRegisterEventCodes(...)`) lists the
+creation, change and exit codes. The register reads the home-port code from its
+column and states it as the home port; only listed columns become attributes, so
+the home-port column is one only if listed. Creation supplies the row's
+attributes and code. Each later change row is compared with that vessel's
+previous register row, not with the vessel's live state: changed attributes
+yield an `AttributeUpdate`, a changed code a `HomePortUpdate`, unchanged parts
+nothing, and becoming missing is a change. So a row changing only the length
+cannot undo a home port another source set. The register folds each vessel's
+rows dated at or before the start into one creation at the start, home port
+included, and a vessel that exited by then is never created, its exit recorded
+with the fleet. A code matching no port in the grid, or a missing one, leaves
+the vessel absent.
 
 ## Registration
 

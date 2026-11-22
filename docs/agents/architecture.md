@@ -164,6 +164,26 @@ enum — stays a plain field, exactly like `separator` on
 a layer of indirection nothing resolves differently through, and every call site
 has to write `scope -> "value"` for no gain.
 
+## Plain scenario nodes
+
+A part of a scenario that builds nothing itself, such as `VesselRegisterColumns`
+or a `Variant`, is a plain node: an immutable class implementing `ScenarioNode`,
+held by the factory or node above it and written nested under it in the scenario
+file. To take part in YAML writing and loading, addressing, derivation and
+validation it needs:
+
+- a static `builder()` and a `toBuilder()` (`@Builder(toBuilder = true)`): the
+  loader builds it through the builder and derivation copies it through
+  `toBuilder()`;
+- a getter for every property its builder sets, and no other getter, which
+  `FactoryBuildersTest` checks;
+- `@Value`-style equality, so a loaded copy equals the original;
+- any validation in its constructor, which the builder calls, so that
+  construction and YAML loading reject the same inputs.
+
+A static helper in `Factories` returns it like any other scenario part. When a
+part should be a factory and when a plain node is left to the general rule.
+
 ## Live parameters, with a plain-value overload
 
 A building block reads its model parameters (a threshold, a duration, an amount

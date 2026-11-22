@@ -48,6 +48,8 @@ import static uk.ac.ox.poseidon.fishing.vessels.Factories.namedComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselEventListener;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegister;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegisterColumns;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegisterEventCodes;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
 import static uk.ac.ox.poseidon.fishing.vessels.TripFixtures.startFishingTrip;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.homePort;
@@ -218,7 +220,19 @@ class FishingEventSharingRouteTest {
         scheduledByDateTime(
           vesselRegister(
             tableFromCsvString(vesselRegister),
-            vesselSpecification
+            vesselSpecification,
+            vesselRegisterColumns(
+              "cfr",
+              "event",
+              "event_start_date",
+              "place_of_registration",
+              List.of("name_of_vessel", "place_of_registration", "gear")
+            ),
+            vesselRegisterEventCodes(
+              List.of("CEN", "CST", "IMP", "CHA"),
+              List.of("MOD"),
+              List.of("DES", "EXP", "RET")
+            )
           )
         )
       )

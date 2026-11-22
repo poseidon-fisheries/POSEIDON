@@ -22,31 +22,27 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparing;
 import static java.util.Map.entry;
-import static java.util.function.Predicate.not;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.IntStream;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Singular;
 import lombok.ToString;
 import lombok.Value;
 import lombok.experimental.SuperBuilder;
@@ -67,10 +63,12 @@ import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.HomePortUpdate;
  * attributes and home-port code; a change code gives the vessel what differs
  * from its previous row, an attribute update for changed attributes and a
  * home-port update for a changed code, and nothing for what is unchanged; an
- * exit code makes the vessel exit. A row's attributes are its values in every
- * column but the vessel id, event code and event date columns and the ignored
- * columns, so the home-port column is one too unless it is ignored; a missing
- * value is an absent attribute, and a missing home-port code no home port.
+ * exit code makes the vessel exit. A row's attributes are its values in the
+ * listed attribute columns only; a role column is an attribute only if listed,
+ * a missing value is an absent attribute, and a missing home-port code no home
+ * port. The home port comes from the home-port column alone, so a listed
+ * home-port attribute is the register's value as source data, and can differ
+ * from the vessel's actual home port.
  * <p>
  * Each vessel's rows dated at or before the start describe its state at the
  * start, so they are folded into one creation at the start, with their
@@ -101,43 +99,18 @@ public class VesselRegisterFactory
     ? super SimulationScope,
     ? extends LocalDateTime
   > startingDateTime;
-  /** Column giving each row's vessel id. */
-  private final String vesselIdColumn;
-  /** Column giving each row's event code. */
-  private final String eventCodeColumn;
-  /** Column giving each row's event date. */
-  private final String eventDateColumn;
-  /**
-   * Column giving each row's home-port code. It is stated as the vessel's home
-   * port; it is also an attribute unless it is among the ignored columns.
-   */
-  private final String homePortColumn;
-
-  /**
-   * Columns left out of a row's attributes, on top of the vessel id, event
-   * code and event date columns.
-   */
-  @Singular
-  private final ImmutableList<String> ignoredColumns;
-
-  /** Event codes whose rows create a vessel. */
-  @Singular
-  private final ImmutableList<String> creationEventCodes;
-
-  /** Event codes whose rows change a vessel's attributes. */
-  @Singular
-  private final ImmutableList<String> changeEventCodes;
-
-  /** Event codes whose rows make a vessel exit. */
-  @Singular
-  private final ImmutableList<String> exitEventCodes;
+  /** What the table's columns mean. */
+  private final VesselRegisterColumns columns;
+  /** The codes of the rows that create, change and exit vessels. */
+  private final VesselRegisterEventCodes eventCodes;
 
   /**
    * @throws IllegalStateException    if a vessel's rows dated at or before the
    *                                  start do not begin with its creation, or
    *                                  go on after its exit
    * @throws IllegalArgumentException if a row's event code is none of the
-   *                                  configured ones
+   *                                  configured ones, or a column the register
+   *                                  names is not in the table
    */
   @Override
   protected List<Entry<LocalDateTime, Steppable>> newInstance(
@@ -147,6 +120,16 @@ public class VesselRegisterFactory
     final Fleet fleet = specification.getFleet();
     final LocalDateTime start = startingDateTime.get(scope);
     final Table table = data.get(scope);
+    columns
+      .namedColumns()
+      .forEach(column ->
+        checkArgument(
+          table.containsColumn(column),
+          "The vessel register table has no column %s",
+          column
+        )
+      );
+    final String eventDateColumn = columns.getEventDateColumn();
     final Map<String, RegisterRow> previousRows = new HashMap<>();
     final Map<String, StartingState> statesAtStart = new LinkedHashMap<>();
     final Map<String, LocalDateTime> exitDatesAtStart = new LinkedHashMap<>();
@@ -156,11 +139,11 @@ public class VesselRegisterFactory
       .mapToObj(table::row)
       .sorted(comparing(row -> row.getDate(eventDateColumn)))
       .forEach(row -> {
-        final String vesselId = row.getString(vesselIdColumn);
+        final String vesselId = row.getString(columns.getVesselIdColumn());
         final LocalDateTime date = row.getDate(eventDateColumn).atStartOfDay();
-        final String eventCode = row.getString(eventCodeColumn);
+        final String eventCode = row.getString(columns.getEventCodeColumn());
         final boolean dueAfterTheStart = date.isAfter(start);
-        if (creationEventCodes.contains(eventCode)) {
+        if (eventCodes.getCreationCodes().contains(eventCode)) {
           final RegisterRow creationRow = registerRow(row);
           previousRows.put(vesselId, creationRow);
           if (dueAfterTheStart) {
@@ -188,7 +171,7 @@ public class VesselRegisterFactory
               )
             );
           }
-        } else if (changeEventCodes.contains(eventCode)) {
+        } else if (eventCodes.getChangeCodes().contains(eventCode)) {
           final RegisterRow changeRow = registerRow(row);
           final RegisterRow previousRow = previousRows.getOrDefault(
             vesselId,
@@ -208,7 +191,7 @@ public class VesselRegisterFactory
             checkState(state != null, "Vessel %s does not exist", vesselId);
             statesAtStart.put(vesselId, state.after(statements));
           }
-        } else if (exitEventCodes.contains(eventCode)) {
+        } else if (eventCodes.getExitCodes().contains(eventCode)) {
           if (dueAfterTheStart) {
             laterStatements.add(
               entry(date, _ -> fleet.queue(vesselId, new Exit()))
@@ -253,25 +236,17 @@ public class VesselRegisterFactory
    *         the attribute absent
    */
   private RegisterRow registerRow(final Row row) {
-    final Set<String> leftOutColumns = new HashSet<>(ignoredColumns);
-    leftOutColumns.addAll(
-      List.of(vesselIdColumn, eventCodeColumn, eventDateColumn)
-    );
     final ImmutableMap.Builder<String, Object> values = ImmutableMap.builder();
     final ImmutableSet.Builder<String> absentAttributes =
       ImmutableSet.builder();
-    row
-      .columnNames()
-      .stream()
-      .filter(not(leftOutColumns::contains))
-      .forEach(column -> {
-        if (row.isMissing(column)) absentAttributes.add(column);
-        else values.put(column, row.getObject(column));
-      });
+    columns.getAttributeColumns().forEach(column -> {
+      if (row.isMissing(column)) absentAttributes.add(column);
+      else values.put(column, row.getObject(column));
+    });
     return new RegisterRow(
-      row.isMissing(homePortColumn)
+      row.isMissing(columns.getHomePortColumn())
         ? Optional.empty()
-        : Optional.of(row.getString(homePortColumn)),
+        : Optional.of(row.getString(columns.getHomePortColumn())),
       values.build(),
       absentAttributes.build()
     );

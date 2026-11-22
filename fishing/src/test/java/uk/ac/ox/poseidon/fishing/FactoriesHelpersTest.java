@@ -23,6 +23,7 @@
 package uk.ac.ox.poseidon.fishing;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -33,7 +34,16 @@ final class FactoriesHelpersTest {
   @TestFactory
   Stream<DynamicTest> everyHelperBuildsItsResult() throws IOException {
     return FactoriesHelpers.everyHelperBuildsItsResult(
-      "uk.ac.ox.poseidon.fishing"
+      "uk.ac.ox.poseidon.fishing",
+      FactoriesHelpersTest::rejectsDefaultArguments
     );
+  }
+
+  /**
+   * @return whether {@code method} rejects empty lists, as the default
+   *         arguments are: its own tests cover it
+   */
+  private static boolean rejectsDefaultArguments(final Method method) {
+    return method.getName().equals("vesselRegisterEventCodes");
   }
 }

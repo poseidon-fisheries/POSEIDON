@@ -36,6 +36,8 @@ import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegister;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegisterColumns;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegisterEventCodes;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
 import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 
@@ -61,6 +63,8 @@ import uk.ac.ox.poseidon.fishing.vessels.Whereabouts.Docked;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
+import uk.ac.ox.poseidon.io.ScenarioLoader;
+import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 class VesselRegisterFactoryTest {
 
@@ -108,7 +112,35 @@ class VesselRegisterFactoryTest {
     when(portGrid.getCell(p2)).thenReturn(new Cell(2, 2));
   }
 
+  private static VesselRegisterColumns columns(final String... attributes) {
+    return vesselRegisterColumns(
+      "cfr",
+      "event",
+      "event_start_date",
+      "place_of_registration",
+      List.of(attributes)
+    );
+  }
+
+  private static VesselRegisterEventCodes eventCodes() {
+    return vesselRegisterEventCodes(
+      List.of("CEN", "CST", "IMP", "CHA"),
+      List.of("MOD"),
+      List.of("DES", "EXP", "RET")
+    );
+  }
+
   private void startSimulation(final String rows) {
+    startSimulation(
+      columns("name_of_vessel", "place_of_registration", "t1", "t2"),
+      rows
+    );
+  }
+
+  private void startSimulation(
+    final VesselRegisterColumns columns,
+    final String rows
+  ) {
     final var fleet = fleet(object(vesselField), object(portGrid));
     final var vesselSpecification = vesselSpecification(
       fleet,
@@ -123,7 +155,9 @@ class VesselRegisterFactoryTest {
         scheduledByDateTime(
           vesselRegister(
             tableFromCsvString(COLUMNS + rows),
-            vesselSpecification
+            vesselSpecification,
+            columns,
+            eventCodes()
           )
         )
       )
@@ -480,6 +514,151 @@ class VesselRegisterFactoryTest {
         """
       )
     ).hasStackTraceContaining("XYZ");
+  }
+
+  @Test
+  void onlyListedColumnsBecomeAttributes() {
+    startSimulation(
+      columns("t1"),
+      """
+      V1,Vee One,P1,CEN,2001-01-01,,1,a
+      """
+    );
+    stepUntil(START.plusSeconds(1));
+
+    assertThat(vessel("V1").getAttributes()).containsExactly(entry("t1", 1));
+    assertThat(vessel("V1").getHomePort()).containsSame(p1);
+  }
+
+  @Test
+  void aRoleColumnIsAnAttributeOnlyIfListed() {
+    startSimulation(
+      columns("place_of_registration", "event"),
+      """
+      V1,Vee One,P1,CEN,2001-01-01,,1,a
+      """
+    );
+    stepUntil(START.plusSeconds(1));
+
+    assertThat(vessel("V1").getAttributes()).containsExactly(
+      entry("place_of_registration", "P1"),
+      entry("event", "CEN")
+    );
+  }
+
+  @Test
+  void anEmptyAttributeListGivesVesselsNoAttributes() {
+    startSimulation(
+      columns(),
+      """
+      V1,Vee One,P1,CEN,2001-01-01,,1,a
+      V1,Vee Uno,P2,MOD,2001-01-03,,2,b
+      """
+    );
+    stepUntil(START.plusDays(4));
+
+    assertThat(vessel("V1").getAttributes()).isEmpty();
+    assertThat(vessel("V1").getHomePort()).containsSame(p2);
+  }
+
+  @Test
+  void aListedHomePortAttributeKeepsAnOutsideCodeAsSourceData() {
+    startSimulation(
+      columns("place_of_registration"),
+      """
+      V1,Vee One,P3,CEN,2001-01-01,,1,a
+      """
+    );
+    stepUntil(START.plusSeconds(1));
+
+    assertThat(vessel("V1").getAttributes()).containsExactly(
+      entry("place_of_registration", "P3")
+    );
+    assertThat(vessel("V1").getHomePort()).isEmpty();
+  }
+
+  @Test
+  void aMissingRoleColumnIsAnErrorNamingIt() {
+    assertThatThrownBy(() ->
+      startSimulation(
+        vesselRegisterColumns(
+          "cfr",
+          "event",
+          "start_date",
+          "place_of_registration",
+          List.of("t1")
+        ),
+        "V1,Vee One,P1,CEN,2001-01-01,,1,a\n"
+      )
+    ).hasStackTraceContaining("start_date");
+  }
+
+  @Test
+  void aMissingAttributeColumnIsAnErrorNamingIt() {
+    assertThatThrownBy(() ->
+      startSimulation(
+        columns("t1", "wingspan"),
+        "V1,Vee One,P1,CEN,2001-01-01,,1,a\n"
+      )
+    ).hasStackTraceContaining("wingspan");
+  }
+
+  /** Only the columns and event codes matter here, so there is no specification. */
+  private String writtenRegister(final VesselRegisterEventCodes eventCodes) {
+    return new ScenarioWriter().write(
+      Scenario.builder()
+        .component(
+          "vesselRegister",
+          vesselRegister(
+            tableFromCsvString(COLUMNS),
+            null,
+            columns("name_of_vessel", "t1"),
+            eventCodes
+          )
+        )
+        .build()
+    );
+  }
+
+  @Test
+  void theRegisterAndItsNodesSurviveAYamlRoundTrip() {
+    final String written = writtenRegister(eventCodes());
+
+    final var loaded = (VesselRegisterFactory) new ScenarioLoader()
+      .load(written)
+      .getComponents()
+      .get("vesselRegister");
+    assertThat(loaded.getColumns()).isEqualTo(columns("name_of_vessel", "t1"));
+    assertThat(loaded.getEventCodes()).isEqualTo(eventCodes());
+  }
+
+  @Test
+  void yamlLoadingRejectsACodeInTwoLists() {
+    final String written = writtenRegister(
+      vesselRegisterEventCodes(List.of("CEN"), List.of("MOD"), List.of("DES"))
+    );
+    final String clashing = written.replace("DES", "MOD");
+    assertThat(clashing).isNotEqualTo(written);
+
+    assertThatThrownBy(() -> new ScenarioLoader().load(clashing))
+      .hasStackTraceContaining("MOD")
+      .hasStackTraceContaining("more than one list");
+  }
+
+  @Test
+  void yamlLoadingRejectsAnEmptyCreationList() {
+    final String written = writtenRegister(
+      vesselRegisterEventCodes(List.of("CEN"), List.of("MOD"), List.of("DES"))
+    );
+    final String noCreation = written.replaceAll(
+      "creationCodes: \\[\\s*CEN\\s*\\]",
+      "creationCodes: []"
+    );
+    assertThat(noCreation).isNotEqualTo(written);
+
+    assertThatThrownBy(() ->
+      new ScenarioLoader().load(noCreation)
+    ).hasStackTraceContaining("at least one creation code");
   }
 
   @AfterEach
