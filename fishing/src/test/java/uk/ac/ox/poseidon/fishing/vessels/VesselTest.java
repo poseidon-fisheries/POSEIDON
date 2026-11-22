@@ -577,6 +577,7 @@ class VesselTest {
       behaviour(_ -> behaviour)
     );
     vessel.setStartingState(Optional.of("P1"), Map.of("gear", "PS"));
+    vessel.buildComponents();
     final ExtendedFishingAction fishing = new ExtendedFishingAction(
       vessel,
       START,
@@ -594,7 +595,8 @@ class VesselTest {
     final FishingActionEvent event = new FishingActionEvent(fishing, null);
 
     vessel.queue(new HomePortUpdate(Optional.of("P2")));
-    vessel.setStartingState(Optional.of("P2"), Map.of("gear", "OTB"));
+    vessel.queue(setting("gear", "OTB"));
+    stepFor(ofSeconds(1));
 
     assertThat(fishing.getAttributes()).containsExactly(entry("gear", "PS"));
     assertThat(sale.getAttributes()).containsExactly(entry("gear", "PS"));
