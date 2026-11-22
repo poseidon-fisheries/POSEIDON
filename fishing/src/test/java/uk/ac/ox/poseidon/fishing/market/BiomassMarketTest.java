@@ -27,12 +27,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -145,7 +147,7 @@ class BiomassMarketTest {
       market.getPrices().get(category).keySet()
     );
     final Sale sale = market.sell(
-      mock(Vessel.class),
+      vesselWithAHomePort(),
       new CategorisedCatch(Map.of(category, Bucket.of(stagedSpecies, 10.0))),
       LocalDateTime.of(2026, 1, 1, 0, 0)
     );
@@ -308,12 +310,18 @@ class BiomassMarketTest {
     return new Price(Money.of(CurrencyUnit.EUR, amount), KILOGRAM);
   }
 
+  private static Vessel vesselWithAHomePort() {
+    final Vessel vessel = mock(Vessel.class);
+    when(vessel.getHomePort()).thenReturn(Optional.of(mock(Port.class)));
+    return vessel;
+  }
+
   private static Money saleTotal(
     final BiomassMarket market,
     final CategorisedCatch categorisedCatch
   ) {
     return market
-      .sell(mock(Vessel.class), categorisedCatch, DATE_TIME)
+      .sell(vesselWithAHomePort(), categorisedCatch, DATE_TIME)
       .summary()
       .getOrDefault(CurrencyUnit.EUR, Money.zero(CurrencyUnit.EUR));
   }
@@ -343,7 +351,7 @@ class BiomassMarketTest {
     final BiomassMarket market = newMarket(mock(EventManager.class));
 
     final Sale sale = market.sell(
-      mock(Vessel.class),
+      vesselWithAHomePort(),
       new CategorisedCatch(Map.of(unpricedCategory, Bucket.of(species, 30.0))),
       DATE_TIME
     );
@@ -366,7 +374,7 @@ class BiomassMarketTest {
     market.setPrice(category, priced, eurosPerKg(2.0), DATE_TIME);
 
     final Sale sale = market.sell(
-      mock(Vessel.class),
+      vesselWithAHomePort(),
       new CategorisedCatch(
         Map.of(
           category,
@@ -398,7 +406,7 @@ class BiomassMarketTest {
     market.setPrice(category, priced, eurosPerKg(2.0), DATE_TIME);
 
     final Sale sale = market.sell(
-      mock(Vessel.class),
+      vesselWithAHomePort(),
       new CategorisedCatch(
         Map.of(
           category,
@@ -422,7 +430,7 @@ class BiomassMarketTest {
     final BiomassMarket market = newMarket(eventManager);
 
     final Sale sale = market.sell(
-      mock(Vessel.class),
+      vesselWithAHomePort(),
       CategorisedCatch.empty(),
       DATE_TIME
     );

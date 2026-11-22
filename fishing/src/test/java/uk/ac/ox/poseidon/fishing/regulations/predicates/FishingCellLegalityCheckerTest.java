@@ -53,6 +53,7 @@ import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
 import uk.ac.ox.poseidon.geography.paths.GridPathFinder;
 import uk.ac.ox.poseidon.geography.paths.PathLengthCalculator;
+import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.regulations.Regulations;
 import uk.ac.ox.poseidon.regulations.predicates.temporal.BetweenDates;
 
@@ -101,6 +102,7 @@ class FishingCellLegalityCheckerTest {
     when(engine.getCruisingSpeedInKph()).thenReturn(SPEED_IN_KPH);
     final VesselField vesselField = mock(VesselField.class);
     when(vesselField.getModelGrid()).thenReturn(MODEL_GRID);
+    when(vessel.getHomePort()).thenReturn(Optional.of(mock(Port.class)));
     when(vessel.getCell()).thenReturn(PORT);
     giveComponent(vessel, engineComponent, engine);
     when(vessel.getVesselField()).thenReturn(vesselField);
@@ -155,12 +157,14 @@ class FishingCellLegalityCheckerTest {
   @Test
   void checksTheActionOfTheVesselGiven() {
     final Vessel otherVessel = mock(Vessel.class);
+    when(otherVessel.getHomePort()).thenReturn(Optional.of(mock(Port.class)));
     final Gear otherGear = mock(Gear.class);
     when(otherGear.getExpectedDuration()).thenReturn(Duration.ofHours(3));
     final Engine otherEngine = mock(Engine.class);
     when(otherEngine.getCruisingSpeedInKph()).thenReturn(SPEED_IN_KPH);
     final VesselField vesselField = mock(VesselField.class);
     when(vesselField.getModelGrid()).thenReturn(MODEL_GRID);
+    when(vessel.getHomePort()).thenReturn(Optional.of(mock(Port.class)));
     when(otherVessel.getCell()).thenReturn(PORT);
     giveComponent(otherVessel, engineComponent, otherEngine);
     when(otherVessel.getVesselField()).thenReturn(vesselField);

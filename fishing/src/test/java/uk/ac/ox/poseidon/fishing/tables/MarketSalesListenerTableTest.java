@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,7 @@ import uk.ac.ox.poseidon.fishing.market.Market;
 import uk.ac.ox.poseidon.fishing.market.Price;
 import uk.ac.ox.poseidon.fishing.market.Sale;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 final class MarketSalesListenerTableTest {
 
@@ -51,6 +53,7 @@ final class MarketSalesListenerTableTest {
   private static Sale sale() {
     final Vessel vessel = mock(Vessel.class);
     when(vessel.getId()).thenReturn("V1");
+    when(vessel.getHomePort()).thenReturn(Optional.of(mock(Port.class)));
     final Market market = mock(Market.class);
     when(market.getCode()).thenReturn("M1");
     final Price price = new Price(

@@ -30,8 +30,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
+import uk.ac.ox.poseidon.fishing.vessels.values.HomePort;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.Cell;
+import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.regulations.ExtendedAction;
 
 /**
@@ -51,6 +53,10 @@ public class ExtendedFishingAction
   /** The vessel's attributes when it took the action. */
   private final Map<String, Object> attributes;
 
+  /** The vessel's home port when it took the action. */
+  @NonNull
+  private final Port homePort;
+
   /**
    * @param vessel        the vessel taking the action
    * @param startDateTime when the action starts
@@ -67,6 +73,7 @@ public class ExtendedFishingAction
   ) {
     super(vessel, startDateTime, duration, coordinate);
     this.attributes = ImmutableMap.copyOf(vessel.getAttributes());
+    this.homePort = new HomePort().apply(vessel);
     this.gear = gear;
   }
 

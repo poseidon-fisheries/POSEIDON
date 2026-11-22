@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,7 @@ import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 class CheckIfFishingHereAndNowIsLegalTest {
 
@@ -70,6 +72,7 @@ class CheckIfFishingHereAndNowIsLegalTest {
     when(vesselField.getModelGrid()).thenReturn(MODEL_GRID);
     when(vessel.getVesselField()).thenReturn(vesselField);
     when(vessel.getCell()).thenReturn(new Cell(0, 0));
+    when(vessel.getHomePort()).thenReturn(Optional.of(mock(Port.class)));
     when(vessel.getAttributes()).thenReturn(Map.of("main_fishing_gear", "OTB"));
     when(gear.getExpectedDuration()).thenReturn(Duration.ofHours(2));
   }

@@ -25,11 +25,13 @@ package uk.ac.ox.poseidon.fishing.market;
 import static java.math.RoundingMode.HALF_EVEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
@@ -38,6 +40,7 @@ import uk.ac.ox.poseidon.biology.species.Species;
 import uk.ac.ox.poseidon.fishing.catches.CatchCategory;
 import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 class SaleTest {
 
@@ -56,11 +59,13 @@ class SaleTest {
       new Sale.Item(category, species, Biomass.ofKg(3.0), usdPrice)
     );
 
+    final Vessel vessel = mock(Vessel.class);
+    when(vessel.getHomePort()).thenReturn(Optional.of(mock(Port.class)));
     final Sale sale = new Sale(
       LocalDateTime.now(),
       "sale-1",
       null,
-      mock(Vessel.class),
+      vessel,
       items,
       CategorisedCatch.empty()
     );

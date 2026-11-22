@@ -30,11 +30,13 @@ import static uk.ac.ox.poseidon.fishing.vessels.GivenComponents.giveComponent;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.fishing.vessels.FactoryComponent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 final class DepartNowActionFunctionTest {
 
@@ -44,6 +46,7 @@ final class DepartNowActionFunctionTest {
   void buildsADepartureOfTheVesselNowWithItsCurrentGear() {
     final Vessel vessel = mock(Vessel.class, RETURNS_DEEP_STUBS);
     when(vessel.getAttributes()).thenReturn(Map.of());
+    when(vessel.getHomePort()).thenReturn(Optional.of(mock(Port.class)));
     final Gear gear = mock(Gear.class);
     final VesselComponent<Gear> gearComponent = new FactoryComponent<>(
       scope -> gear

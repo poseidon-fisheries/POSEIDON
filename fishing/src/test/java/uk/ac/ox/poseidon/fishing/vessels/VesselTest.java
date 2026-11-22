@@ -52,7 +52,9 @@ import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.Sale;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
+import uk.ac.ox.poseidon.fishing.regulations.actions.InstantFishingAction;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
+import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingActionEvent;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeUpdate;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.HomePortUpdate;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
@@ -562,8 +564,19 @@ class VesselTest {
   }
 
   @Test
-  void anActionKeepsTheAttributesTheVesselHadWhenItWasMade() {
-    vessel.setStartingState(Optional.empty(), Map.of("gear", "PS"));
+  void aRecordKeepsTheAttributesAndHomePortTheVesselHadWhenItWasMade() {
+    final Port firstPort = mock(Port.class);
+    final Port secondPort = mock(Port.class);
+    final PortGrid portGrid = mock(PortGrid.class);
+    when(portGrid.getObject("P1")).thenReturn(Optional.of(firstPort));
+    when(portGrid.getObject("P2")).thenReturn(Optional.of(secondPort));
+    final Vessel vessel = newVessel(
+      schedule,
+      mock(VesselField.class),
+      portGrid,
+      behaviour(_ -> behaviour)
+    );
+    vessel.setStartingState(Optional.of("P1"), Map.of("gear", "PS"));
     final ExtendedFishingAction fishing = new ExtendedFishingAction(
       vessel,
       START,
@@ -571,11 +584,59 @@ class VesselTest {
       new Coordinate(0, 0),
       mock(Gear.class)
     );
+    final InstantFishingAction instant = new InstantFishingAction(
+      vessel,
+      START,
+      new Coordinate(0, 0),
+      mock(Gear.class)
+    );
     final Sale sale = new Sale(START, "sale", null, vessel, List.of(), null);
-    vessel.setStartingState(Optional.empty(), Map.of("gear", "OTB"));
+    final FishingActionEvent event = new FishingActionEvent(fishing, null);
+
+    vessel.queue(new HomePortUpdate(Optional.of("P2")));
+    vessel.setStartingState(Optional.of("P2"), Map.of("gear", "OTB"));
+
     assertThat(fishing.getAttributes()).containsExactly(entry("gear", "PS"));
     assertThat(sale.getAttributes()).containsExactly(entry("gear", "PS"));
     assertThat(vessel.getAttributes()).containsExactly(entry("gear", "OTB"));
+    assertThat(fishing.getHomePort()).isSameAs(firstPort);
+    assertThat(instant.getHomePort()).isSameAs(firstPort);
+    assertThat(sale.getHomePort()).isSameAs(firstPort);
+    assertThat(event.getHomePort()).isSameAs(firstPort);
+    assertThat(vessel.getHomePort()).containsSame(secondPort);
+  }
+
+  @Test
+  void aRecordOfAVesselWithoutAModelledHomePortFailsNamingTheVessel() {
+    final Vessel vessel = vesselWithAHomePort(behaviour(_ -> behaviour));
+    vessel.setStartingState(Optional.empty(), Map.of());
+
+    assertThatThrownBy(() ->
+      new ExtendedFishingAction(
+        vessel,
+        START,
+        ofHours(1),
+        new Coordinate(0, 0),
+        mock(Gear.class)
+      )
+    )
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining(vessel.getId());
+    assertThatThrownBy(() ->
+      new InstantFishingAction(
+        vessel,
+        START,
+        new Coordinate(0, 0),
+        mock(Gear.class)
+      )
+    )
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining(vessel.getId());
+    assertThatThrownBy(() ->
+      new Sale(START, "sale", null, vessel, List.of(), null)
+    )
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining(vessel.getId());
   }
 
   @Test

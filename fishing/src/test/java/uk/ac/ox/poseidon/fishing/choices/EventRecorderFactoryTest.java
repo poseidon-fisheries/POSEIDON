@@ -34,6 +34,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.biology.buckets.Bucket;
@@ -58,6 +59,7 @@ import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
@@ -106,6 +108,7 @@ class EventRecorderFactoryTest {
     final Vessel vessel = mock(Vessel.class);
     when(vessel.getProductStore()).thenReturn(new ProductStore());
     when(vessel.getAttributes()).thenReturn(Map.of("gear", "PS"));
+    when(vessel.getHomePort()).thenReturn(Optional.of(mock(Port.class)));
     when(vessel.getEventManager()).thenReturn(new SimpleEventManager());
     final VesselField field = mock(VesselField.class);
     final ModelGrid grid = mock(ModelGrid.class);
@@ -153,6 +156,7 @@ class EventRecorderFactoryTest {
       contents(memory.get(scope).apply(vessel)).get(CELL).getKg(SPECIES)
     ).isEqualTo(4);
     when(vessel.getAttributes()).thenReturn(Map.of("gear", "PS"));
+    when(vessel.getHomePort()).thenReturn(Optional.of(mock(Port.class)));
     assertThat(memory.get(scope).apply(vessel)).isSameAs(ps);
     assertThat(contents(ps).get(CELL).getKg(SPECIES)).isEqualTo(10);
   }

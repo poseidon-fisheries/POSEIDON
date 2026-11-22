@@ -41,6 +41,8 @@ import uk.ac.ox.poseidon.fishing.catches.CategorisedCatch;
 import uk.ac.ox.poseidon.fishing.vessels.HasAttributes;
 import uk.ac.ox.poseidon.fishing.vessels.HasVessel;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.fishing.vessels.values.HomePort;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
  * The record of one vessel's completed sale: what sold (as line {@link Item}s)
@@ -63,9 +65,11 @@ public class Sale implements HasAttributes, HasVessel {
   private final CategorisedCatch unsold;
   /** The selling vessel's attributes when it sold. */
   private final Map<String, Object> attributes;
+  /** The selling vessel's home port when it sold. */
+  private final Port homePort;
 
   /**
-   * Records {@code vessel}'s attributes as they are now.
+   * Records {@code vessel}'s attributes and home port as they are now.
    *
    * @param dateTime when the sale happened
    * @param id       the sale's identifying ID
@@ -93,6 +97,7 @@ public class Sale implements HasAttributes, HasVessel {
     this.items = items;
     this.unsold = unsold;
     this.attributes = ImmutableMap.copyOf(vessel.getAttributes());
+    this.homePort = new HomePort().apply(vessel);
   }
 
   /**

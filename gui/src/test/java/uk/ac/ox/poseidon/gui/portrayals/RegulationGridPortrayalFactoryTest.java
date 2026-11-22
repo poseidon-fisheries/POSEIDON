@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.gui.portrayals.RegulationGridPortrayalFactory.UpdateFrequency.EVERY_DAY;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -45,6 +46,7 @@ import uk.ac.ox.poseidon.geography.Envelope;
 import uk.ac.ox.poseidon.geography.bathymetry.BathymetricGrid;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.grids.ModelGrid;
+import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.regulations.Regulations;
 
 class RegulationGridPortrayalFactoryTest {
@@ -131,6 +133,7 @@ class RegulationGridPortrayalFactoryTest {
   private static Vessel vessel() {
     final Vessel vessel = mock(Vessel.class);
     when(vessel.isActive()).thenReturn(true);
+    when(vessel.getHomePort()).thenReturn(Optional.of(mock(Port.class)));
     return vessel;
   }
 

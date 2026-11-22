@@ -31,6 +31,7 @@ import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.vessels.HasAttributes;
 import uk.ac.ox.poseidon.fishing.vessels.HasVessel;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
+import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
  * An {@link ExtendedEvent} recording one completed fishing action and what it
@@ -61,6 +62,11 @@ public class FishingActionEvent
   @Override
   public Map<String, Object> getAttributes() {
     return action.getAttributes();
+  }
+
+  /** @return the vessel's home port when it took {@link #action} */
+  public Port getHomePort() {
+    return action.getHomePort();
   }
 
   /** @return {@link #action}'s start time */
