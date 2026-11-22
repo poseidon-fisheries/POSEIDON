@@ -145,10 +145,11 @@ class RelativeScopeFactoryTest {
     extends RelativeScopeFactory<Scope, Object>
   {
 
-    private final List<Factory<? super SimulationScope, ?>> held = List.of();
+    private final List<Factory<? super SimulationScope, ?>> childFactories =
+      List.of();
 
-    public List<Factory<? super SimulationScope, ?>> getHeld() {
-      return held;
+    public List<Factory<? super SimulationScope, ?>> getChildFactories() {
+      return childFactories;
     }
 
     @Override
@@ -194,11 +195,11 @@ class RelativeScopeFactoryTest {
     extends RelativeScopeFactory<Scope, Object>
   {
 
-    private final Factory<? super SimulationScope, ?> held = scope ->
+    private final Factory<? super SimulationScope, ?> childFactory = scope ->
       new Object();
 
-    public Factory<? super SimulationScope, ?> getHeld() {
-      return held;
+    public Factory<? super SimulationScope, ?> getChildFactory() {
+      return childFactory;
     }
 
     @Override

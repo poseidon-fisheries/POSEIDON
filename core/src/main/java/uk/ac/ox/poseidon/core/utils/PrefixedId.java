@@ -56,7 +56,7 @@ public class PrefixedId implements BiFunction<Object, Object, String> {
   }
 
   @Override
-  public String apply(final Object context, final Object named) {
+  public String apply(final Object context, final Object subject) {
     return prefix + counter.getAndIncrement();
   }
 }

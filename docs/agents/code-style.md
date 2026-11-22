@@ -80,6 +80,16 @@ when the clever version buys compile-time safety, and a call site that needs
 type witnesses is not simple. Put the safety net in a test that builds the
 scenario.
 
+## Expression readability
+
+When writing or reviewing Java, read each changed expression as an explanation
+of the operation. Ask whether it mixes distinct steps. When an argument contains
+a separate lookup, validation or failure path that interrupts that explanation,
+consider resolving it into a named local first. Extract it when the name and
+separation make the operation easier to follow; assess the meaning rather than
+counting nesting levels. Scenario composition retains its nested-helper rule in
+`architecture.md`.
+
 ## Yes/no inputs
 
 A component's yes/no input is a `Function` or `BiFunction` with a `Boolean`

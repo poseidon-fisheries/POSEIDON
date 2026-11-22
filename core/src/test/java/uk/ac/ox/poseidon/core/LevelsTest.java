@@ -163,22 +163,22 @@ class LevelsTest {
   > {
 
     private final Factory<? super S, ?> input;
-    private final Factory<? super SimulationScope, ?> held;
+    private final Factory<? super SimulationScope, ?> childFactory;
 
     RelativeProductFactory(
       final Factory<? super S, ?> input,
-      final Factory<? super SimulationScope, ?> held
+      final Factory<? super SimulationScope, ?> childFactory
     ) {
       this.input = input;
-      this.held = held;
+      this.childFactory = childFactory;
     }
 
     public Factory<? super S, ?> getInput() {
       return input;
     }
 
-    public Factory<? super SimulationScope, ?> getHeld() {
-      return held;
+    public Factory<? super SimulationScope, ?> getChildFactory() {
+      return childFactory;
     }
 
     @Override

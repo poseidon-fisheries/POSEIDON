@@ -36,10 +36,17 @@
     </module>
     <module name="UnusedLocalVariable"/>
 
-    <!-- A bare participle or adjective is not a name; see docs/agents/naming.md -->
+    <!-- Known dangling names; contextual judgements are in docs/agents/naming.md -->
     <module name="IllegalIdentifierName">
       <property name="format"
                 value="^(?!(given|keyed|shared|filtered)$).+$"/>
+    </module>
+    <!-- These words can be verbs in method names, but need nouns for values -->
+    <module name="IllegalIdentifierName">
+      <property name="tokens"
+                value="VARIABLE_DEF, PARAMETER_DEF, PATTERN_VARIABLE_DEF, RECORD_COMPONENT_DEF, LAMBDA"/>
+      <property name="format"
+                value="^(?!(held|named|created|changed|built)$).+$"/>
     </module>
 
     <!-- An empty catch block is allowed when its variable says it is ignored -->

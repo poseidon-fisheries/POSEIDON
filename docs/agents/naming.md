@@ -15,11 +15,32 @@ reads naturally, for example `not(cellWasFishedThisTrip())`.
 
 ## Name the thing, not an adjective
 
-Don't use a dangling adjective or participle as a noun (`keyed`, `shared`,
-`filtered`). Name the thing itself (`keyedMemory`, `memory`, `sharedEvent`),
-even for a short-lived local variable or a lambda parameter. Checkstyle rejects
-the four bare words above (`given` too) as names of anything; a word that is
-part of a longer name passes.
+Name the thing itself (`keyedMemory`, `memory`, `sharedEvent`) rather than
+leaving an adjective or participle dangling (`keyed`, `shared`, `filtered`),
+even for a short-lived local variable or a lambda parameter. An adjective can
+stand alone when the immediate context supplies an unmistakable noun: for
+example, `previous` and `current` in an interval comparison. Judge related names
+together and preserve their balance when renaming one. Checkstyle catches known
+cases in `config/checkstyle/checkstyle.xml`; the prose rule applies to every
+name, including those outside that list.
+
+## Naming audit and Checkstyle upkeep
+
+Before finishing an implementation or review, inventory every new or renamed
+identifier and check each against all the naming rules. Include lambda
+parameters, pattern variables and test helpers. A naming audit is complete only
+when every identifier in that inventory has been checked. Skip manual checks
+only for the exact cases tooling enforces, rather than the wider rule.
+
+For each naming violation found while writing or reviewing code, check whether
+Checkstyle catches it. If a missed case is a reusable naming failure likely to
+recur, search its identifier uses in POSEIDON and SURIMI-POSEIDON and assess
+false positives. Add an exact-name restriction where it fits, rename affected
+identifiers in the same change, and run the relevant Checkstyle checks. Scope
+the restriction to the kinds of identifier where the word is unsuitable: a word
+used as a verb can still fit a method name. Keep unusual or contextual cases in
+the manual audit; explain when a proposed ban would reject valid names. Use the
+published Checkstyle checks and their options.
 
 ## Cell and location
 

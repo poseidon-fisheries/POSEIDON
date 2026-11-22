@@ -41,14 +41,14 @@ class MutableMemoryEntriesTest {
   void everyObservationReachesTheRuleWithItsTimeIncludingTheFirst() {
     final MutableMemoryEntries<String, Integer> entries =
       new MutableMemoryEntries<>();
-    final List<Optional<Integer>> previous = new ArrayList<>();
+    final List<Optional<Integer>> previousValues = new ArrayList<>();
     final List<LocalDateTime> times = new ArrayList<>();
     final UpdateRule<String, Integer> rule = (
       remembered,
       observation,
       time
     ) -> {
-      previous.add(remembered);
+      previousValues.add(remembered);
       times.add(time);
       return remembered.orElse(0) + observation.length();
     };
@@ -56,7 +56,10 @@ class MutableMemoryEntriesTest {
     entries.record("A", "fish", TIME, rule);
     entries.record("A", "cod", TIME.minusDays(1), rule);
 
-    assertThat(previous).containsExactly(Optional.empty(), Optional.of(4));
+    assertThat(previousValues).containsExactly(
+      Optional.empty(),
+      Optional.of(4)
+    );
     assertThat(times).containsExactly(TIME, TIME.minusDays(1));
     assertThat(contents(entries)).containsExactly(Map.entry("A", 7));
   }

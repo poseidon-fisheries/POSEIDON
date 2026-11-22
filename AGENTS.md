@@ -15,12 +15,13 @@ working with code in this repository. Longer topic-specific sections live in
   component/`Factory`/`Factories` triplet.
 - `docs/agents/lombok.md` — before writing a class or changing its Lombok
   annotations: which annotation shape fits each class role.
-- `docs/agents/code-style.md` — before writing Java: Checkstyle's checks,
-  scenario classes, `Factories` helper names, streams versus loops, single exit,
-  hot paths, and the Prettier/Spotless setup SURIMI-POSEIDON duplicates.
+- `docs/agents/code-style.md` — before writing or reviewing Java: readability,
+  Checkstyle's checks, scenario classes, `Factories` helper names, streams
+  versus loops, single exit, hot paths, and the Prettier/Spotless setup
+  SURIMI-POSEIDON duplicates.
 - `docs/agents/testing.md` — before writing or editing a test: AssertJ, test
   layout, and mocks that scopes hold weakly.
-- `docs/agents/naming.md` — before naming a class, method, field or variable:
+- `docs/agents/naming.md` — before naming or reviewing any identifier:
   factories, steppables, tasks, predicates, cells, fields and function-valued
   fields, and what reads as English.
 - `docs/agents/conceptual-correctness.md` — before fixing a design problem or

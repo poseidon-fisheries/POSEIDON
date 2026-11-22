@@ -79,7 +79,7 @@ class ScenarioCheckTest {
     assertThatThrownBy(() -> scenarioWith(failing).startNewSimulation(0))
       .isInstanceOf(IllegalStateException.class)
       .hasMessage("wrong wiring");
-    assertThat(leaf.built).isFalse();
+    assertThat(leaf.wasBuilt).isFalse();
   }
 
   private static Scenario scenarioWith(final Factory<Scope, ?> component) {
@@ -91,11 +91,11 @@ class ScenarioCheckTest {
 
   static final class Leaf extends GlobalScopeFactory<Object> {
 
-    private boolean built;
+    private boolean wasBuilt;
 
     @Override
     protected Object newInstance(final Scope scope) {
-      built = true;
+      wasBuilt = true;
       return new Object();
     }
   }

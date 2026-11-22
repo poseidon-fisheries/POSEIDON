@@ -60,7 +60,7 @@ public class CreateVesselsAtPort implements Steppable {
         .getFleet()
         .getPortGrid()
         .getObject(port.getCode())
-        .filter(held -> held == port)
+        .filter(portInGrid -> portInGrid == port)
         .isPresent(),
       "Port %s is not in the port grid of the vessels' fleet.",
       port.getCode()

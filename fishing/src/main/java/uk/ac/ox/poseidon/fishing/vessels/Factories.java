@@ -103,8 +103,11 @@ public final class Factories {
     final var specification = VesselSpecificationFactory.builder()
       .fleet(fleet)
       .behaviour(behaviour);
-    for (final NamedComponent named : namedComponents) {
-      specification.component(named.getName(), named.getComponent());
+    for (final NamedComponent namedComponent : namedComponents) {
+      specification.component(
+        namedComponent.getName(),
+        namedComponent.getComponent()
+      );
     }
     return specification.build();
   }
