@@ -146,12 +146,26 @@ public class Fleet implements VesselsGetter {
    *                               if it did
    */
   void queue(final String vesselId, final VesselStatement statement) {
+    queue(vesselId, List.of(statement));
+  }
+
+  /**
+   * Queues {@code statements} in order on the vessel registered under
+   * {@code vesselId}, validating the vessel even when the list is empty.
+   *
+   * @throws IllegalStateException if no vessel is registered under
+   *                               {@code vesselId}, naming the date it exited
+   *                               if it did
+   */
+  void queue(
+    final String vesselId,
+    final List<? extends VesselStatement> statements
+  ) {
     checkNotExited(vesselId);
-    getVessel(vesselId)
-      .orElseThrow(() ->
-        new IllegalStateException("Vessel " + vesselId + " does not exist")
-      )
-      .queue(statement);
+    final Vessel vessel = getVessel(vesselId).orElseThrow(() ->
+      new IllegalStateException("Vessel " + vesselId + " does not exist")
+    );
+    statements.forEach(vessel::queue);
   }
 
   /**

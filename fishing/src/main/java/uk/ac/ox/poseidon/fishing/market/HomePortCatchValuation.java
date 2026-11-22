@@ -70,8 +70,9 @@ public class HomePortCatchValuation implements Valuation<Bucket> {
    * @param vessel the vessel that would sell the catches
    * @return what a catch would sell for at {@code vessel}'s home port now, for
    *         one visit only; model state must not change during that visit
-   * @throws IllegalStateException if the vessel has no modelled home port, or its home
-   *                               port does not have exactly one market
+   * @throws IllegalStateException if the vessel has no modelled home port, or
+   *                               its home port does not have exactly one
+   *                               market
    */
   @Override
   public ToDoubleFunction<Bucket> by(final Vessel vessel) {

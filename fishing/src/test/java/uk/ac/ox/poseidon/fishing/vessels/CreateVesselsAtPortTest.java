@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -30,13 +31,23 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 
+import com.google.common.collect.ImmutableMap;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sim.engine.SimState;
+import uk.ac.ox.poseidon.core.Simulation;
+import uk.ac.ox.poseidon.core.SimulationScope;
+import uk.ac.ox.poseidon.core.events.SimpleEventManager;
+import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
+import uk.ac.ox.poseidon.fishing.fields.VesselField;
+import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
+import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
 
@@ -49,6 +60,7 @@ final class CreateVesselsAtPortTest {
   private final PortGrid portGrid = mock(PortGrid.class);
   private final Port port = mock(Port.class);
   private final AtomicInteger counter = new AtomicInteger();
+  private final Simulation simulation = mock(Simulation.class);
 
   @BeforeEach
   void setUp() {
@@ -74,6 +86,41 @@ final class CreateVesselsAtPortTest {
     verify(specification).create("P1-1", Optional.of("P1"), Map.of());
     verify(specification).create("P1-2", Optional.of("P1"), Map.of());
     verify(specification, times(2)).create(any(), any(), anyMap());
+  }
+
+  @Test
+  void createdVesselsAreDockedAtTheirHomePortWithNoAttributes() {
+    final Cell portCell = new Cell(1, 2);
+    when(portGrid.getCell(port)).thenReturn(portCell);
+    final VesselField vesselField = mock(VesselField.class);
+    final Fleet fleet = new Fleet(
+      new TemporalSchedule(LocalDateTime.of(2001, 1, 1, 0, 0)),
+      new SimpleEventManager(),
+      vesselField,
+      portGrid
+    );
+    final VesselSpecification specification = new VesselSpecification(
+      new SimulationScope(simulation),
+      fleet,
+      behaviour(_ -> mock(VesselTask.class)),
+      ImmutableMap.of()
+    );
+
+    new CreateVesselsAtPort(
+      specification,
+      p -> p.getCode() + "-" + counter.incrementAndGet(),
+      port,
+      2
+    ).step(mock(SimState.class));
+
+    assertThat(fleet.getVessels()).hasSize(2);
+    for (final Vessel vessel : fleet.getVessels()) {
+      assertThat(vessel.getHomePort()).containsSame(port);
+      assertThat(vessel.getHomePortCell()).contains(portCell);
+      assertThat(vessel.isDockedAt(port)).isTrue();
+      assertThat(vessel.getAttributes()).isEmpty();
+      verify(vesselField).setCell(vessel, portCell);
+    }
   }
 
   @Test

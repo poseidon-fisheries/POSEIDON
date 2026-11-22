@@ -65,18 +65,16 @@ public class RouteViaDestination implements BiFunction<Vessel, Cell, Route> {
    */
   @Override
   public Route apply(final Vessel vessel, final Cell destination) {
+    final Cell homePortCell = vessel
+      .getHomePortCell()
+      .orElseThrow(() ->
+        new IllegalStateException(
+          "Vessel %s has no modelled home port.".formatted(vessel.getId())
+        )
+      );
     final double distanceInKm =
       pathLengthCalculator.lengthInKm(vessel.getCell(), destination) +
-      pathLengthCalculator.lengthInKm(
-        destination,
-        vessel
-          .getHomePortCell()
-          .orElseThrow(() ->
-            new IllegalStateException(
-              "Vessel %s has no modelled home port.".formatted(vessel.getId())
-            )
-          )
-      );
+      pathLengthCalculator.lengthInKm(destination, homePortCell);
     return new Route(
       distanceInKm,
       DistanceCalculator.travelDuration(

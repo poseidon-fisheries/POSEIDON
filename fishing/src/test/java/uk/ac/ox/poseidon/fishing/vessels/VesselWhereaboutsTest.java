@@ -113,7 +113,7 @@ class VesselWhereaboutsTest {
   }
 
   /** @return a vessel created as a source creates one, then first-stepped */
-  private Vessel created(
+  private Vessel createVessel(
     final Optional<String> homePortCode,
     final Map<String, ?> attributes,
     final VesselComponent<?>... components
@@ -129,7 +129,7 @@ class VesselWhereaboutsTest {
   }
 
   private Vessel createdAtHomePort() {
-    return created(Optional.of(HOME_PORT_CODE), Map.of());
+    return createVessel(Optional.of(HOME_PORT_CODE), Map.of());
   }
 
   private void step() {
@@ -163,7 +163,7 @@ class VesselWhereaboutsTest {
 
   @Test
   void aVesselWithNoMatchingHomePortIsCreatedAbsent() {
-    final Vessel vessel = created(Optional.of("nowhere"), Map.of());
+    final Vessel vessel = createVessel(Optional.of("nowhere"), Map.of());
 
     assertThat(vessel.getWhereabouts()).isEqualTo(new Absent());
     assertThat(vessel.isAbsent()).isTrue();
@@ -176,7 +176,7 @@ class VesselWhereaboutsTest {
 
   @Test
   void anAbsentVesselCannotBeMovedOrLocatedOrDockedOrUndocked() {
-    final Vessel vessel = created(Optional.empty(), Map.of());
+    final Vessel vessel = createVessel(Optional.empty(), Map.of());
 
     assertThatThrownBy(() -> vessel.setCurrentCell(PORT_CELL)).isInstanceOf(
       IllegalStateException.class
@@ -313,17 +313,17 @@ class VesselWhereaboutsTest {
 
   @Test
   void anUpdateEqualToTheCurrentStateRebuildsNothing() {
-    final List<Object> built = new ArrayList<>();
-    final Vessel vessel = created(
+    final List<Object> builtComponents = new ArrayList<>();
+    final Vessel vessel = createVessel(
       Optional.of(HOME_PORT_CODE),
       Map.of("generation", "old"),
       varyingBy(
         "generation",
-        when("old", scope -> built.add(new Object())),
-        when("new", scope -> built.add(new Object()))
+        when("old", scope -> builtComponents.add(new Object())),
+        when("new", scope -> builtComponents.add(new Object()))
       )
     );
-    assertThat(built).hasSize(1);
+    assertThat(builtComponents).hasSize(1);
 
     vessel.queue(setting(HOME_PORT_CODE));
     vessel.queue(
@@ -334,7 +334,7 @@ class VesselWhereaboutsTest {
     );
     stepToTheNextBoundary();
 
-    assertThat(built).hasSize(1);
+    assertThat(builtComponents).hasSize(1);
     assertThat(vessel.getHomePort()).containsSame(homePort);
   }
 
@@ -345,7 +345,7 @@ class VesselWhereaboutsTest {
   ) {
     final List<HasVessel> oldEvents = new ArrayList<>();
     final List<HasVessel> newEvents = new ArrayList<>();
-    final Vessel vessel = created(
+    final Vessel vessel = createVessel(
       Optional.of(initiallyPresent ? HOME_PORT_CODE : "nowhere"),
       Map.of("generation", "old"),
       varyingBy(
@@ -414,7 +414,7 @@ class VesselWhereaboutsTest {
 
   @Test
   void anExitWhileAbsentAnnouncesNothingButTheFleetsExit() {
-    final Vessel vessel = created(Optional.empty(), Map.of());
+    final Vessel vessel = createVessel(Optional.empty(), Map.of());
 
     vessel.queue(new Exit());
     step();

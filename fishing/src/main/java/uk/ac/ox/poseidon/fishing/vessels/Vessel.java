@@ -74,7 +74,8 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * tick (once it isn't). It steps its behaviour only while {@link #isActive()}
  * holds.
  * <p>
- * What a source states about it, an update of its attributes or home port, or its exit, joins
+ * What a source states about it, an update of its attributes or home port, or
+ * its exit, joins
  * its queue of statements and takes effect at the start of its next step in
  * which the behaviour is not running, never during a run of the behaviour and
  * never inside the call that made the statement: so a vessel doesn't exit at

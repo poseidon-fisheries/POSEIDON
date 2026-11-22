@@ -37,13 +37,14 @@ import uk.ac.ox.poseidon.core.SimulationScope;
 
 /**
  * What a vessel of a scenario is made of: the component that is the behaviour
- * it steps, its other components, by name, and the attributes that give its
- * home port and its name. It creates vessels, and receives
- * nothing about a vessel that already exists.
+ * it steps and its other components, by name. Creation sources supply each
+ * vessel's home-port code and attributes separately; the specification holds
+ * no attribute names and receives nothing about a vessel that already exists.
  * <p>
  * A vessel is created in a fixed order: it is constructed and joins the
- * fleet, with an account; it takes its attributes, which place it at its home
- * port; its components are built, the behaviour first, then the others in the
+ * fleet, with an account; it takes its home-port code and attributes, and is
+ * placed docked at that port if it is modelled, or left absent otherwise;
+ * its components are built, the behaviour first, then the others in the
  * order they are listed; the fleet announces its entry, so that a listener
  * only ever sees a complete vessel; and its first step is scheduled, at that
  * instant.

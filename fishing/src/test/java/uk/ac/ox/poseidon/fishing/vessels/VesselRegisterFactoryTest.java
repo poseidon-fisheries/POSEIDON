@@ -429,6 +429,49 @@ class VesselRegisterFactoryTest {
   }
 
   @Test
+  void anUnchangedRowAfterAnExitBeforeTheStartIsAnError() {
+    startSimulation(
+      """
+      V1,Vee One,P1,CEN,2000-01-01,,1,a
+      V1,Vee One,P1,DES,2000-06-01,,1,a
+      V1,Vee One,P1,MOD,2001-01-02,,1,a
+      """
+    );
+
+    assertThatThrownBy(() -> stepUntil(START.plusDays(2)))
+      .hasStackTraceContaining("V1")
+      .hasStackTraceContaining("exited on 2000-06-01");
+  }
+
+  @Test
+  void anUnchangedRowAfterAnExitDuringTheRunIsAnError() {
+    startSimulation(
+      """
+      V1,Vee One,P1,CEN,2000-01-01,,1,a
+      V1,Vee One,P1,DES,2001-01-02,,1,a
+      V1,Vee One,P1,MOD,2001-01-03,,1,a
+      """
+    );
+
+    assertThatThrownBy(() -> stepUntil(START.plusDays(3)))
+      .hasStackTraceContaining("V1")
+      .hasStackTraceContaining("exited on 2001-01-02");
+  }
+
+  @Test
+  void aRowWithNoValuesAboutAVesselNeverCreatedIsAnError() {
+    startSimulation(
+      """
+      V9,NA,NA,MOD,2001-01-02,,NA,NA
+      """
+    );
+
+    assertThatThrownBy(() -> stepUntil(START.plusDays(2)))
+      .hasStackTraceContaining("V9")
+      .hasStackTraceContaining("does not exist");
+  }
+
+  @Test
   void anUnknownEventCodeIsAnError() {
     assertThatThrownBy(() ->
       startSimulation(

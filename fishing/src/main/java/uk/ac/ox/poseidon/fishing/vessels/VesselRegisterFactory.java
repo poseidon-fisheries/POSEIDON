@@ -161,15 +161,15 @@ public class VesselRegisterFactory
         final String eventCode = row.getString(eventCodeColumn);
         final boolean dueAfterTheStart = date.isAfter(start);
         if (creationEventCodes.contains(eventCode)) {
-          final RegisterRow created = registerRow(row);
-          previousRows.put(vesselId, created);
+          final RegisterRow creationRow = registerRow(row);
+          previousRows.put(vesselId, creationRow);
           if (dueAfterTheStart) {
             laterStatements.add(
               entry(date, _ ->
                 specification.create(
                   vesselId,
-                  created.getHomePortCode(),
-                  created.getValues()
+                  creationRow.getHomePortCode(),
+                  creationRow.getValues()
                 )
               )
             );
@@ -182,24 +182,25 @@ public class VesselRegisterFactory
             checkNotExited(vesselId, exitDatesAtStart);
             statesAtStart.put(
               vesselId,
-              new StartingState(created.getHomePortCode(), created.getValues())
+              new StartingState(
+                creationRow.getHomePortCode(),
+                creationRow.getValues()
+              )
             );
           }
         } else if (changeEventCodes.contains(eventCode)) {
-          final RegisterRow changed = registerRow(row);
-          final RegisterRow previous = previousRows.getOrDefault(
+          final RegisterRow changeRow = registerRow(row);
+          final RegisterRow previousRow = previousRows.getOrDefault(
             vesselId,
             RegisterRow.NOTHING
           );
-          previousRows.put(vesselId, changed);
-          final List<VesselStatement> statements = changed.differencesFrom(
-            previous
+          previousRows.put(vesselId, changeRow);
+          final List<VesselStatement> statements = changeRow.differencesFrom(
+            previousRow
           );
           if (dueAfterTheStart) {
-            statements.forEach(statement ->
-              laterStatements.add(
-                entry(date, _ -> fleet.queue(vesselId, statement))
-              )
+            laterStatements.add(
+              entry(date, _ -> fleet.queue(vesselId, statements))
             );
           } else {
             checkNotExited(vesselId, exitDatesAtStart);
@@ -297,29 +298,32 @@ public class VesselRegisterFactory
     ImmutableSet<String> absentAttributes;
 
     /**
-     * @param previous the vessel's previous row
+     * @param previousRow the vessel's previous row
      * @return the statements this row makes: an attribute update for the
-     *         attributes whose value differs from {@code previous}, a missing
-     *         value counting as a difference, and a home-port update if the
-     *         code differs; nothing for what is unchanged
+     *         attributes whose value differs from {@code previousRow}, a
+     *         missing value counting as a difference, and a home-port update
+     *         if the code differs; nothing for what is unchanged
      */
-    List<VesselStatement> differencesFrom(final RegisterRow previous) {
+    List<VesselStatement> differencesFrom(final RegisterRow previousRow) {
       final ImmutableMap<String, Object> changedValues = values
         .entrySet()
         .stream()
         .filter(
-          entry -> !entry.getValue().equals(previous.values.get(entry.getKey()))
+          entry ->
+            !entry.getValue().equals(previousRow.values.get(entry.getKey()))
         )
         .collect(toImmutableMap(Entry::getKey, Entry::getValue));
-      final ImmutableSet<String> newlyAbsent = absentAttributes
+      final ImmutableSet<String> newlyAbsentAttributes = absentAttributes
         .stream()
-        .filter(previous.values::containsKey)
+        .filter(previousRow.values::containsKey)
         .collect(toImmutableSet());
       final List<VesselStatement> statements = new ArrayList<>();
-      if (!changedValues.isEmpty() || !newlyAbsent.isEmpty()) {
-        statements.add(new AttributeUpdate(changedValues, newlyAbsent));
+      if (!changedValues.isEmpty() || !newlyAbsentAttributes.isEmpty()) {
+        statements.add(
+          new AttributeUpdate(changedValues, newlyAbsentAttributes)
+        );
       }
-      if (!homePortCode.equals(previous.homePortCode)) {
+      if (!homePortCode.equals(previousRow.homePortCode)) {
         statements.add(new HomePortUpdate(homePortCode));
       }
       return statements;
