@@ -22,6 +22,7 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
+import lombok.Value;
 import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
@@ -31,15 +32,20 @@ import uk.ac.ox.poseidon.geography.ports.Port;
  */
 public sealed interface Whereabouts {
   /** The vessel is not in the simulated area, so it is not on the field. */
-  record Absent() implements Whereabouts {}
+  @Value
+  class Absent implements Whereabouts {}
 
   /**
    * The vessel is docked at {@code port}, which it holds.
-   *
-   * @param port the port the vessel is docked at
    */
-  record Docked(Port port) implements Whereabouts {}
+  @Value
+  class Docked implements Whereabouts {
+
+    /** The port the vessel is docked at. */
+    Port port;
+  }
 
   /** The vessel is in the simulated area, away from any port. */
-  record AtSea() implements Whereabouts {}
+  @Value
+  class AtSea implements Whereabouts {}
 }

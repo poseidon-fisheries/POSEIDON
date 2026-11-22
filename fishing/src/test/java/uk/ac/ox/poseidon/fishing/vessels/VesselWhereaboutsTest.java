@@ -32,6 +32,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.when;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT_CODE;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.specificationOf;
@@ -45,7 +47,10 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import sim.engine.SimState;
+import uk.ac.ox.poseidon.core.Factory;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.events.SimpleListener;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -108,10 +113,13 @@ class VesselWhereaboutsTest {
   }
 
   /** @return a vessel created as a source creates one, then first-stepped */
-  private Vessel created(final Map<String, ?> attributes) {
+  private Vessel created(
+    final Map<String, ?> attributes,
+    final VesselComponent<?>... components
+  ) {
     final Vessel vessel = fleet.createVessel(
       "vessel",
-      specificationOf(behaviour(_ -> new HourTask()))
+      specificationOf(behaviour(_ -> new HourTask()), components)
     );
     vessel.setAttributes(attributes);
     vessel.buildComponents();
@@ -275,8 +283,91 @@ class VesselWhereaboutsTest {
   }
 
   @Test
+  void anAtSeaQueueMovingItsHomePortOutAndBackChecksOnlyTheNetResult() {
+    final Vessel vessel = createdAtHomePort();
+    vessel.undock(START);
+    heard.clear();
+
+    vessel.queue(removingTheHomePort());
+    vessel.queue(setting(OTHER_PORT_CODE));
+    stepToTheNextBoundary();
+
+    assertThat(vessel.getWhereabouts()).isEqualTo(new AtSea());
+    assertThat(vessel.getHomePort()).isSameAs(otherPort);
+    assertThat(heard).isEmpty();
+    verify(vesselField, never()).remove(vessel);
+    verify(vesselField, never()).setCell(vessel, new Cell(1, 0));
+  }
+
+  private static Factory<
+    VesselComponentScope,
+    SimpleListener<HasVessel>
+  > recordingEventsIn(final List<HasVessel> events) {
+    return scope -> {
+      final SimpleListener<HasVessel> listener = new SimpleListener<>(
+        HasVessel.class,
+        events::add
+      );
+      scope.addListener(listener);
+      return listener;
+    };
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = { true, false })
+  void whereaboutsEventsReachTheReplacementComponentAfterRebuild(
+    final boolean initiallyPresent
+  ) {
+    final List<HasVessel> oldEvents = new ArrayList<>();
+    final List<HasVessel> newEvents = new ArrayList<>();
+    final Vessel vessel = created(
+      Map.of(
+        HOME_PORT,
+        initiallyPresent ? HOME_PORT_CODE : "nowhere",
+        "generation",
+        "old"
+      ),
+      varyingBy(
+        "generation",
+        when("old", recordingEventsIn(oldEvents)),
+        when("new", recordingEventsIn(newEvents))
+      )
+    );
+
+    vessel.queue(
+      new AttributeChange(
+        ImmutableMap.of(
+          HOME_PORT,
+          initiallyPresent ? "nowhere" : HOME_PORT_CODE,
+          "generation",
+          "new"
+        ),
+        ImmutableSet.of()
+      )
+    );
+    stepToTheNextBoundary();
+
+    assertThat(oldEvents).isEmpty();
+    assertThat(newEvents).containsExactly(
+      initiallyPresent
+        ? new BecameAbsentEvent(vessel, homePort, START)
+        : new BecamePresentEvent(vessel, homePort, START)
+    );
+  }
+
+  @Test
   void anExitFromDockedAnnouncesBecomingAbsentBeforeTheFleetsExit() {
     final Vessel vessel = createdAtHomePort();
+    final List<Vessel> absentWhileStillInFleet = new ArrayList<>();
+    fleetEvents.addListener(
+      new SimpleListener<>(BecameAbsentEvent.class, event -> {
+        assertThat(event.getVessel()).isSameAs(vessel);
+        assertThat(vessel.isAbsent()).isTrue();
+        verify(vesselField).remove(vessel);
+        assertThat(fleet.getVessel(vessel.getId())).contains(vessel);
+        absentWhileStillInFleet.add(vessel);
+      })
+    );
 
     vessel.queue(new Exit());
     stepToTheNextBoundary();
@@ -286,6 +377,8 @@ class VesselWhereaboutsTest {
       "exit"
     );
     assertThat(vessel.isAbsent()).isTrue();
+    assertThat(absentWhileStillInFleet).containsExactly(vessel);
+    assertThat(fleet.getVessel(vessel.getId())).isEmpty();
     verify(vesselField).remove(vessel);
   }
 

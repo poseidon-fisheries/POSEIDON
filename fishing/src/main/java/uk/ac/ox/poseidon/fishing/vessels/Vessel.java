@@ -386,7 +386,7 @@ public class Vessel implements Oriented2D, HasAttributes {
         case final Absent _ -> vesselField.remove(this);
         case final Docked docked -> vesselField.setCell(
           this,
-          portGrid.getCell(docked.port())
+          portGrid.getCell(docked.getPort())
         );
         case final AtSea _ -> throw new IllegalStateException(
           "Vessel %s has no way to be put at sea.".formatted(id)
@@ -408,13 +408,13 @@ public class Vessel implements Oriented2D, HasAttributes {
   ) {
     if (before instanceof final Docked docked && after instanceof Absent) {
       eventManager.broadcast(
-        new BecameAbsentEvent(this, docked.port(), dateTime)
+        new BecameAbsentEvent(this, docked.getPort(), dateTime)
       );
     } else if (
       before instanceof Absent && after instanceof final Docked docked
     ) {
       eventManager.broadcast(
-        new BecamePresentEvent(this, docked.port(), dateTime)
+        new BecamePresentEvent(this, docked.getPort(), dateTime)
       );
     }
   }
@@ -693,7 +693,7 @@ public class Vessel implements Oriented2D, HasAttributes {
    */
   public Port getPortDockedAt() {
     checkState(isDocked(), "Vessel %s is not docked.", id);
-    return ((Docked) whereabouts).port();
+    return ((Docked) whereabouts).getPort();
   }
 
   /** @return whether this vessel is docked at {@code port} */
