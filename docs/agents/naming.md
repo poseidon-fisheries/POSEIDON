@@ -17,7 +17,9 @@ reads naturally, for example `not(cellWasFishedThisTrip())`.
 
 Don't use a dangling adjective or participle as a noun (`keyed`, `shared`,
 `filtered`). Name the thing itself (`keyedMemory`, `memory`, `sharedEvent`),
-even for a short-lived local variable or a lambda parameter.
+even for a short-lived local variable or a lambda parameter. Checkstyle rejects
+the four bare words above (`given` too) as names of anything; a word that is
+part of a longer name passes.
 
 ## Cell and location
 

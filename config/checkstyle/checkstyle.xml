@@ -36,6 +36,12 @@
     </module>
     <module name="UnusedLocalVariable"/>
 
+    <!-- A bare participle or adjective is not a name; see docs/agents/naming.md -->
+    <module name="IllegalIdentifierName">
+      <property name="format"
+                value="^(?!(given|keyed|shared|filtered)$).+$"/>
+    </module>
+
     <!-- An empty catch block is allowed when its variable says it is ignored -->
     <module name="EmptyCatchBlock">
       <property name="exceptionVariableName" value="ignored"/>

@@ -117,11 +117,11 @@ class ScenarioWriterTest {
   }
 
   private static Scenario scenario() {
-    final var shared = object("L'été à Oxford — 漁");
+    final var sharedObject = object("L'été à Oxford — 漁");
     return Scenario.builder()
       .startingDateTime(dateTime(LocalDateTime.of(2026, 11, 16, 1, 2, 3)))
-      .component("first", shared)
-      .component("second", shared)
+      .component("first", sharedObject)
+      .component("second", sharedObject)
       .component("bounded", maxDouble(constant(-3.5), 2.5))
       .build();
   }

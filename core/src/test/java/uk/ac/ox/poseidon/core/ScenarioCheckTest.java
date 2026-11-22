@@ -41,13 +41,15 @@ class ScenarioCheckTest {
 
   @Test
   void aCheckSeesEveryNodeOnceWithWhereItWasFirstReachedFrom() {
-    final Leaf shared = new Leaf();
-    final RecordingCheck check = new RecordingCheck(List.of(shared, shared));
+    final Leaf sharedLeaf = new Leaf();
+    final RecordingCheck check = new RecordingCheck(
+      List.of(sharedLeaf, sharedLeaf)
+    );
     scenarioWith(check).startNewSimulation(0).finish();
 
     assertThat(check.seen)
       .extracting(ReachedNode::getNode)
-      .containsExactly(check, shared);
+      .containsExactly(check, sharedLeaf);
     assertThat(check.seen)
       .extracting(ReachedNode::getParent)
       .containsExactly(null, check);

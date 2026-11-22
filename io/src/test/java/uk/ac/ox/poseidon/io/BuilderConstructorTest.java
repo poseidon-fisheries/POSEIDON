@@ -45,13 +45,15 @@ class BuilderConstructorTest {
 
   @Test
   void loadsObjectsThroughTheirBuilders() {
-    final NumberFactory shared = NumberFactory.builder().value(1.5).build();
+    final NumberFactory sharedNumberFactory = NumberFactory.builder()
+      .value(1.5)
+      .build();
     final PairFactory<Double> pair = PairFactory.<Double>builder()
-      .first(shared)
-      .second(shared)
+      .first(sharedNumberFactory)
+      .second(sharedNumberFactory)
       .number(NumberFactory.builder().value(2.5).build())
       .item(NumberFactory.builder().value(3.5).build())
-      .item(shared)
+      .item(sharedNumberFactory)
       .label("a pair")
       .build();
 
