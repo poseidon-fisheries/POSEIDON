@@ -33,6 +33,8 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
+import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT;
+import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT_CODE;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.newVessel;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
@@ -42,6 +44,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.joda.money.CurrencyUnit;
@@ -103,8 +106,9 @@ class TripBlockTest {
       behaviour(_ -> new ScriptedTask())
     );
     when(vesselField.getCell(vessel)).thenReturn(PORT);
+    when(portGrid.getObject(HOME_PORT_CODE)).thenReturn(Optional.of(port));
     when(portGrid.getCell(port)).thenReturn(PORT);
-    vessel.dockAt(port, NOW);
+    vessel.setAttributes(Map.of(HOME_PORT, HOME_PORT_CODE));
   }
 
   @SafeVarargs

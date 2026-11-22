@@ -108,7 +108,6 @@ class LandCatchesTest {
   @Test
   void throwsWhenTheVesselIsNotDocked() {
     when(vessel.isDocked()).thenReturn(false);
-    when(vessel.getPortDockedAt()).thenReturn(null);
     when(marketGrid.getMarket(homePort)).thenReturn(homePortMarket);
 
     assertThatThrownBy(landCatches::complete).isInstanceOf(

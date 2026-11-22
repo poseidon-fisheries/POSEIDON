@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
+import uk.ac.ox.poseidon.fishing.vessels.BecamePresentEvent;
 import uk.ac.ox.poseidon.fishing.vessels.DockingEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -66,6 +67,17 @@ class CurrentPortStayStartDateTimeTest {
     dock(CREATION.plusDays(3));
     assertThat(currentPortStayStartDateTime.apply(vessel)).isEqualTo(
       CREATION.plusDays(3)
+    );
+  }
+
+  @Test
+  void isWhenTheVesselLastBecamePresent() {
+    dock(CREATION.plusDays(1));
+    eventManager.broadcast(
+      new BecamePresentEvent(vessel, mock(Port.class), CREATION.plusDays(2))
+    );
+    assertThat(currentPortStayStartDateTime.apply(vessel)).isEqualTo(
+      CREATION.plusDays(2)
     );
   }
 

@@ -6,8 +6,10 @@ where these apply, not just the shapes below — a plain class with
 `private final` dependency fields should get `@RequiredArgsConstructor` rather
 than a hand-written constructor, and a class that needs
 `equals`/`hashCode`/`toString` should get `@Value`/`@Data`/`@EqualsAndHashCode`
-rather than hand-rolled ones. Four recurring shapes cover almost every case —
-match the shape to the class's role:
+rather than hand-rolled ones. Prefer Lombok wherever it can generate the code:
+write a constructor, accessor or `equals`/`hashCode`/`toString` by hand only
+when it does something Lombok's wouldn't. Four recurring shapes cover almost
+every case — match the shape to the class's role:
 
 - **Injected dependencies / no mutation** (most non-factory classes: services,
   handlers, predicates, action functions): `@RequiredArgsConstructor` on the
@@ -47,4 +49,6 @@ match the shape to the class's role:
   constructor is hand-written, to check component names.
 
 Use `@Getter(AccessLevel.NONE)` on individual fields to suppress just that one
-accessor rather than dropping `@Getter` for a hand-written class.
+accessor rather than dropping `@Getter` for a hand-written class. Suppress an
+accessor to hide it or to replace it with one that does more; a hand-written
+replacement identical to Lombok's is left to Lombok.

@@ -41,20 +41,15 @@ class VesselIsDockedAtTest {
 
   @Test
   void holdsForAVesselDockedAtThePort() {
-    when(vessel.getPortDockedAt()).thenReturn(port);
+    when(vessel.isDockedAt(port)).thenReturn(true);
 
     assertThat(vesselIsDockedAtPort.apply(vessel)).isTrue();
   }
 
   @Test
-  void doesNotHoldForAVesselDockedAtAnotherPortInTheSameCell() {
-    when(vessel.getPortDockedAt()).thenReturn(mock(Port.class));
+  void doesNotHoldForAVesselNotDockedAtThePort() {
+    when(vessel.isDockedAt(port)).thenReturn(false);
 
-    assertThat(vesselIsDockedAtPort.apply(vessel)).isFalse();
-  }
-
-  @Test
-  void doesNotHoldForAVesselAtSea() {
     assertThat(vesselIsDockedAtPort.apply(vessel)).isFalse();
   }
 

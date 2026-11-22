@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.NonNull;
@@ -52,6 +53,9 @@ import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet.StepScheduler;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.Exit;
+import uk.ac.ox.poseidon.fishing.vessels.Whereabouts.Absent;
+import uk.ac.ox.poseidon.fishing.vessels.Whereabouts.AtSea;
+import uk.ac.ox.poseidon.fishing.vessels.Whereabouts.Docked;
 import uk.ac.ox.poseidon.fishing.vessels.accounts.Account;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.Cell;
@@ -77,16 +81,23 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * no step pending schedules one, at once. Once the queue is applied, every
  * component whose choice reads an attribute that changed is rebuilt, once;
  * the others, and what the vessel's own store holds, stay. An exit ends the
- * queue: the vessel leaves its fleet with no component left, and so inactive,
+ * queue: the vessel leaves its fleet absent and with no component left,
  * and nothing after it in the queue applies, nor any rebuild. Its current
- * state (cell, heading, the port it is docked at, trips) is changed by the
+ * state (cell, heading, whereabouts, trips) is changed by the
  * behaviour itself, at once.
  * <p>
- * A vessel is either docked at a port or at sea. It starts docked at its home
- * port, where it is created. Docking ({@link #dockAt}) and undocking
- * ({@link #undock}) are explicit acts, each at a time, and the vessel cannot
- * move while docked: a cell can hold several ports, so the port a vessel is
- * docked at is never inferred from its cell.
+ * A vessel's {@link Whereabouts} are exactly one of absent, docked at a port or
+ * at sea, and the vessel field agrees: an absent vessel is off it. A vessel is
+ * created absent and placed, silently, docked at its home port if it has one.
+ * Docking ({@link #dockAt}) and undocking ({@link #undock}) are explicit acts,
+ * each at a time, and the vessel cannot move while docked: a cell can hold
+ * several ports, so the port a vessel is docked at is never inferred from its
+ * cell. A vessel is absent exactly when it has no modelled home port, once its
+ * statements are applied: one whose home port stops being modelled while it is
+ * docked becomes absent, and one whose home port is modelled again becomes
+ * present, docked there. Each change announces itself, once, as a
+ * {@link BecameAbsentEvent} or {@link BecamePresentEvent}, after the rebuild.
+ * A vessel at sea cannot become absent, or exit.
  * <p>
  * A vessel has at most one step pending on the schedule. It holds no
  * schedule: its fleet gives it a {@link StepScheduler} that schedules its step
@@ -167,8 +178,9 @@ public class Vessel implements Oriented2D, HasAttributes {
    * Creates an inactive vessel, with no behaviour built yet. It starts stepping
    * once its first step is scheduled ({@link #scheduleFirstStep}).
    *
-   * @param newStepScheduler makes, from this vessel's step, what schedules
-   *                         that step and nothing else
+   * @param newStepScheduler makes, from this vessel's step (which is given
+   *                         the date-time it runs at), what schedules that
+   *                         step and nothing else
    * @param newFleetExit     makes, from this vessel, what takes it out of its
    *                         fleet and nothing else
    * @param eventManager     the event manager this vessel broadcasts on
@@ -178,7 +190,10 @@ public class Vessel implements Oriented2D, HasAttributes {
    * @param specification    what the vessel is made of
    */
   Vessel(
-    @NonNull final Function<Runnable, StepScheduler> newStepScheduler,
+    @NonNull final Function<
+      Consumer<LocalDateTime>,
+      StepScheduler
+    > newStepScheduler,
     @NonNull final Function<Vessel, Runnable> newFleetExit,
     @NonNull final EventManager eventManager,
     @NonNull final String id,
@@ -238,14 +253,30 @@ public class Vessel implements Oriented2D, HasAttributes {
   // Current state variables
   /** This vessel's current heading, in radians. */
   private double heading;
-  /** The port this vessel is docked at, or {@code null} if it is at sea. */
-  private Port portDockedAt;
+
+  /**
+   * Where this vessel is: absent, docked at a port, or at sea. It is absent
+   * until it is placed at its home port, and agrees with the vessel field,
+   * where an absent vessel is not.
+   */
+  private Whereabouts whereabouts = new Absent();
+
   /** The vessel's current trip, or {@code null} if it isn't on one. */
   private Trip currentTrip;
 
-  /** @return whether this vessel has its behaviour and a home port */
+  /** @return whether this vessel is present and has its behaviour */
   public boolean isActive() {
-    return tree != null && getHomePort() != null;
+    return !isAbsent() && tree != null;
+  }
+
+  /** @return whether this vessel is absent from the simulated area */
+  public boolean isAbsent() {
+    return whereabouts instanceof Absent;
+  }
+
+  /** @return whether this vessel is at sea */
+  public boolean isAtSea() {
+    return whereabouts instanceof AtSea;
   }
 
   /** @return whether this vessel's behaviour tree is running */
@@ -259,16 +290,18 @@ public class Vessel implements Oriented2D, HasAttributes {
    * exited and is active, starts the tree afresh, in this same step. Then, if
    * the vessel is active, schedules the next step after {@link #taskDuration}.
    *
+   * @param dateTime the date-time of the step, which goes only in the events
+   *                 this vessel broadcasts
    * @throws IllegalStateException if the tree, started afresh, finishes
    *                               without starting a task: restarting it would
    *                               never move time on
    */
-  private void step() {
+  private void step(final LocalDateTime dateTime) {
     if (isBehaviourRunning()) {
       stepBehaviour();
     }
     if (!isBehaviourRunning()) {
-      applyStatements();
+      applyStatements(dateTime);
       if (isActive()) {
         stepBehaviour();
         checkState(
@@ -292,22 +325,97 @@ public class Vessel implements Oriented2D, HasAttributes {
   /**
    * Applies the queued statements in order and rebuilds what their changes
    * choose anew; an exit ends this vessel, and the statements after it are
-   * never applied.
+   * never applied. Once they are applied, the vessel is absent exactly when it
+   * has no home port, and announces the one net change in its whereabouts, if
+   * there is one, after the rebuild.
+   *
+   * @throws IllegalStateException if the vessel is at sea and has no home port
+   *                               once the statements are applied, or exits at
+   *                               sea
    */
-  private void applyStatements() {
-    applyStatementsSince(attributes);
+  private void applyStatements(final LocalDateTime dateTime) {
+    applyStatementsSince(attributes, whereabouts, dateTime);
   }
 
   private void applyStatementsSince(
-    final Map<String, Object> previousAttributes
+    final Map<String, Object> previousAttributes,
+    final Whereabouts previousWhereabouts,
+    final LocalDateTime dateTime
   ) {
     switch (statements.poll()) {
-      case null -> rebuildVaryingAnew(previousAttributes);
-      case final AttributeChange change -> {
-        setAttributes(change.applyTo(attributes));
-        applyStatementsSince(previousAttributes);
+      case null -> {
+        placeToAgreeWithHomePort();
+        rebuildVaryingAnew(previousAttributes);
+        announceWhereaboutsChange(previousWhereabouts, whereabouts, dateTime);
       }
-      case final Exit _ -> exit();
+      case final AttributeChange change -> {
+        replaceAttributes(change.applyTo(attributes));
+        applyStatementsSince(previousAttributes, previousWhereabouts, dateTime);
+      }
+      case final Exit _ -> exit(previousWhereabouts, dateTime);
+    }
+  }
+
+  /**
+   * Places this vessel to agree with its home port: absent if it has none,
+   * docked at it if the vessel was absent, and where it is otherwise.
+   *
+   * @throws IllegalStateException if the vessel is at sea and has no home port
+   */
+  private void placeToAgreeWithHomePort() {
+    if (homePort == null) {
+      checkState(
+        !isAtSea(),
+        "Vessel %s has no modelled home port, so cannot be absent at sea.",
+        id
+      );
+      placeAt(new Absent());
+    } else if (isAbsent()) {
+      placeAt(new Docked(homePort));
+    }
+  }
+
+  /**
+   * Makes {@code newWhereabouts} this vessel's whereabouts, keeping the vessel
+   * field in step: an absent vessel is off it, a vessel that becomes docked is
+   * placed on its port's cell.
+   */
+  private void placeAt(final Whereabouts newWhereabouts) {
+    if (!newWhereabouts.equals(whereabouts)) {
+      switch (newWhereabouts) {
+        case final Absent _ -> vesselField.remove(this);
+        case final Docked docked -> vesselField.setCell(
+          this,
+          portGrid.getCell(docked.port())
+        );
+        case final AtSea _ -> throw new IllegalStateException(
+          "Vessel %s has no way to be put at sea.".formatted(id)
+        );
+      }
+      this.whereabouts = newWhereabouts;
+    }
+  }
+
+  /**
+   * Broadcasts the change in whereabouts from {@code before} to
+   * {@code after} on this vessel's own event manager, if it is one between
+   * docked and absent.
+   */
+  private void announceWhereaboutsChange(
+    final Whereabouts before,
+    final Whereabouts after,
+    final LocalDateTime dateTime
+  ) {
+    if (before instanceof final Docked docked && after instanceof Absent) {
+      eventManager.broadcast(
+        new BecameAbsentEvent(this, docked.port(), dateTime)
+      );
+    } else if (
+      before instanceof Absent && after instanceof final Docked docked
+    ) {
+      eventManager.broadcast(
+        new BecamePresentEvent(this, docked.port(), dateTime)
+      );
     }
   }
 
@@ -374,13 +482,23 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Ends this vessel's component stores, in the reverse of the order its
-   * specification builds them, and drops the components, which are no longer
-   * its own, so that it has no behaviour and is inactive; ends its own store;
-   * takes it off the vessel field; and takes it out of its fleet, which
-   * announces the exit.
+   * Checks this vessel is not at sea; ends its component stores, in the reverse
+   * of the order its specification builds them, and drops the components,
+   * which are no longer its own, so that it has no behaviour and is inactive;
+   * ends its own store; takes it off the vessel field and makes it absent;
+   * broadcasts a {@link BecameAbsentEvent} if it was docked when the statements
+   * began; and takes it out of its fleet, which announces the exit. Exiting
+   * while absent is valid, and announces nothing.
+   *
+   * @param previousWhereabouts where this vessel was when the statements began
+   * @param dateTime            when the vessel exits
+   * @throws IllegalStateException if the vessel is at sea
    */
-  private void exit() {
+  private void exit(
+    final Whereabouts previousWhereabouts,
+    final LocalDateTime dateTime
+  ) {
+    checkState(!isAtSea(), "Vessel %s cannot exit at sea.", id);
     specification
       .listedComponents()
       .toList()
@@ -388,7 +506,8 @@ public class Vessel implements Oriented2D, HasAttributes {
       .forEach(this::dropComponent);
     tree = null;
     productStore.end();
-    vesselField.remove(this);
+    placeAt(new Absent());
+    announceWhereaboutsChange(previousWhereabouts, whereabouts, dateTime);
     fleetExit.run();
   }
 
@@ -523,39 +642,63 @@ public class Vessel implements Oriented2D, HasAttributes {
     this.heading = Math.atan2(dy, dx);
   }
 
-  /** @return the vessel's continuous-space position */
+  /**
+   * @return the vessel's continuous-space position
+   * @throws IllegalStateException if the vessel is absent
+   */
   public Double2D getPoint() {
+    checkPresent();
     return vesselField.getPoint(this);
   }
 
-  /** @return the vessel's position, converted to a geographic coordinate */
+  /**
+   * @return the vessel's position, converted to a geographic coordinate
+   * @throws IllegalStateException if the vessel is absent
+   */
   public Coordinate getCoordinate() {
     return vesselField.getModelGrid().toCoordinate(getPoint());
   }
 
-  /** @return the grid cell the vessel currently occupies */
+  /**
+   * @return the grid cell the vessel currently occupies
+   * @throws IllegalStateException if the vessel is absent
+   */
   public Cell getCell() {
+    checkPresent();
     return vesselField.getCell(this);
+  }
+
+  private void checkPresent() {
+    checkState(!isAbsent(), "Vessel %s is absent, so has no position.", id);
   }
 
   /**
    * Moves the vessel to {@code cell}.
    *
-   * @throws IllegalStateException if the vessel is docked
+   * @throws IllegalStateException if the vessel is not at sea
    */
   public void setCurrentCell(final Cell cell) {
-    checkState(
-      !isDocked(),
-      "Vessel %s cannot move while docked at %s.",
-      id,
-      portDockedAt
-    );
+    checkState(isAtSea(), "Vessel %s cannot move while %s.", id, whereabouts);
     vesselField.setCell(this, cell);
   }
 
   /** @return whether this vessel is docked at a port */
   public boolean isDocked() {
-    return portDockedAt != null;
+    return whereabouts instanceof Docked;
+  }
+
+  /**
+   * @return the port this vessel is docked at
+   * @throws IllegalStateException if the vessel is not docked
+   */
+  public Port getPortDockedAt() {
+    checkState(isDocked(), "Vessel %s is not docked.", id);
+    return ((Docked) whereabouts).port();
+  }
+
+  /** @return whether this vessel is docked at {@code port} */
+  public boolean isDockedAt(final Port port) {
+    return whereabouts.equals(new Docked(port));
   }
 
   /**
@@ -563,15 +706,16 @@ public class Vessel implements Oriented2D, HasAttributes {
    *
    * @param port     the port to dock at
    * @param dateTime when the vessel docks
-   * @throws IllegalStateException if the vessel is already docked, or is not in
+   * @throws IllegalStateException if the vessel is not at sea, or is not in
    *                               {@code port}'s cell
    */
   public void dockAt(final Port port, final LocalDateTime dateTime) {
     checkState(
-      !isDocked(),
-      "Vessel %s is already docked at %s.",
+      isAtSea(),
+      "Vessel %s cannot dock at %s while %s.",
       id,
-      portDockedAt
+      port,
+      whereabouts
     );
     final Cell portCell = portGrid.getCell(port);
     checkState(
@@ -582,7 +726,7 @@ public class Vessel implements Oriented2D, HasAttributes {
       getCell(),
       portCell
     );
-    this.portDockedAt = port;
+    this.whereabouts = new Docked(port);
     currentEventManager().broadcast(new DockingEvent(this, port, dateTime));
   }
 
@@ -594,9 +738,8 @@ public class Vessel implements Oriented2D, HasAttributes {
    * @throws IllegalStateException if the vessel is not docked
    */
   public void undock(final LocalDateTime dateTime) {
-    checkState(isDocked(), "Vessel %s is not docked.", id);
-    final Port port = portDockedAt;
-    this.portDockedAt = null;
+    final Port port = getPortDockedAt();
+    this.whereabouts = new AtSea();
     currentEventManager().broadcast(new UndockingEvent(this, port, dateTime));
   }
 
@@ -651,13 +794,25 @@ public class Vessel implements Oriented2D, HasAttributes {
 
   /**
    * Puts {@code attributes} in place of this vessel's attributes, and places
-   * the vessel docked at its home port if it has no position yet: that is its
-   * initial state, not a docking, so it has no time and broadcasts nothing.
+   * the vessel to agree with its home port: docked at it if the vessel was
+   * absent, absent if there is none. That is the vessel's initial state, not a
+   * docking, so it has no time and broadcasts nothing; the statements a vessel
+   * applies later announce their changes in whereabouts instead.
    *
-   * @throws NullPointerException if {@code attributes} holds a {@code null}
-   *                              name or value
+   * @throws NullPointerException  if {@code attributes} holds a {@code null}
+   *                               name or value
+   * @throws IllegalStateException if the vessel is at sea and has no home port
    */
   void setAttributes(final Map<String, ?> attributes) {
+    replaceAttributes(attributes);
+    placeToAgreeWithHomePort();
+  }
+
+  /**
+   * Puts {@code attributes} in place of this vessel's attributes and looks up
+   * the home port they give, leaving the vessel where it is.
+   */
+  private void replaceAttributes(final Map<String, ?> attributes) {
     final ImmutableMap<String, Object> newAttributes = ImmutableMap.copyOf(
       attributes
     );
@@ -668,10 +823,6 @@ public class Vessel implements Oriented2D, HasAttributes {
       .flatMap(code -> portGrid.getObject(code.toString()))
       .orElse(null);
     this.homePortCell = homePort == null ? null : portGrid.getCell(homePort);
-    if (homePortCell != null && getCell() == null) {
-      vesselField.setCell(this, homePortCell);
-      this.portDockedAt = homePort;
-    }
   }
 
   /**
@@ -688,7 +839,7 @@ public class Vessel implements Oriented2D, HasAttributes {
   void startTrip(final Function<? super Port, ? extends Trip> newTrip) {
     checkState(currentTrip == null, "Vessel %s is already on a trip.", id);
     checkState(isDocked(), "Vessel %s cannot start a trip at sea.", id);
-    final Trip trip = newTrip.apply(portDockedAt);
+    final Trip trip = newTrip.apply(getPortDockedAt());
     checkArgument(
       trip.getVessel() == this,
       "Vessel %s cannot start the trip of vessel %s.",

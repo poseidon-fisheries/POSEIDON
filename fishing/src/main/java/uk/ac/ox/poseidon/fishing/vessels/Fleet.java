@@ -212,16 +212,17 @@ public class Fleet implements VesselsGetter {
 
     /**
      * @param schedule   the schedule the vessel's step goes on
-     * @param vesselStep the vessel's step, the only one this schedules
+     * @param vesselStep the vessel's step, the only one this schedules, given
+     *                   the schedule's date-time when it runs
      */
     private StepScheduler(
       final TemporalSchedule schedule,
-      final Runnable vesselStep
+      final Consumer<LocalDateTime> vesselStep
     ) {
       this.schedule = schedule;
       this.step = _ -> {
         stepPending = false;
-        vesselStep.run();
+        vesselStep.accept(schedule.getDateTime());
       };
     }
 

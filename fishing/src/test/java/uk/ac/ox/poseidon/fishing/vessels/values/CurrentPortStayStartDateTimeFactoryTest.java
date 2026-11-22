@@ -36,6 +36,7 @@ import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.core.SimulationScope;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.core.events.SimpleEventManager;
+import uk.ac.ox.poseidon.fishing.vessels.BecamePresentEvent;
 import uk.ac.ox.poseidon.fishing.vessels.DockingEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponentScope;
@@ -88,6 +89,16 @@ class CurrentPortStayStartDateTimeFactoryTest {
     );
     assertThat(currentPortStayStartDateTime.apply(vessel)).isEqualTo(
       BUILD.plusDays(2)
+    );
+  }
+
+  @Test
+  void aVesselBecomingPresentStartsAFreshStay() {
+    vesselEventManager.broadcast(
+      new BecamePresentEvent(vessel, mock(Port.class), BUILD.plusDays(3))
+    );
+    assertThat(currentPortStayStartDateTime.apply(vessel)).isEqualTo(
+      BUILD.plusDays(3)
     );
   }
 

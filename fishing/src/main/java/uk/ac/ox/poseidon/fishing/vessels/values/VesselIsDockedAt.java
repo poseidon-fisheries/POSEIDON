@@ -31,7 +31,7 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 
 /**
  * Holds for a vessel docked at the port {@code port} returns for it, read
- * fresh on each call; does not hold for a vessel at sea.
+ * fresh on each call; does not hold for a vessel at sea or absent.
  */
 @RequiredArgsConstructor
 public class VesselIsDockedAt implements Function<Vessel, Boolean> {
@@ -48,6 +48,6 @@ public class VesselIsDockedAt implements Function<Vessel, Boolean> {
       "No port to test vessel %s against.",
       vessel.getId()
     );
-    return port.equals(vessel.getPortDockedAt());
+    return vessel.isDockedAt(port);
   }
 }

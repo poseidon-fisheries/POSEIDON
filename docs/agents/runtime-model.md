@@ -82,13 +82,13 @@ vessel from an id and attributes. It names the attributes that give a vessel's
 home port (`homePortAttribute`) and its name (`nameAttribute`, if vessels have
 names); the home port is the port of that code in the port grid, looked up
 whenever it is read, and a code naming no port leaves the vessel without a home
-port, and so inactive.
+port, and so absent.
 
 Creation runs in a fixed order: the vessel joins the fleet with an account,
-takes its attributes (which place it at its home port), and builds its
-components, the behaviour first, then the others as listed; only then does the
-fleet announce its entry to its entry listeners (`addEntryListener`), so a
-listener only ever sees a complete vessel, before its first step.
+takes its attributes (which place it at its home port, if it has one), and
+builds its components, the behaviour first, then the others as listed; only then
+does the fleet announce its entry to its entry listeners (`addEntryListener`),
+so a listener only ever sees a complete vessel, before its first step.
 
 ## Statements, rebuilds and exits
 
@@ -108,11 +108,47 @@ under a fresh store; every other component, the vessel's own store (its
 memories) and its account stay. A hold that still holds catch refuses to have
 its store ended, so a rebuild only ever drops an empty hold.
 
-An exit ends the queue: the vessel's component stores end in the reverse of the
-build order, then its own store; it leaves the vessel field, then the fleet,
-which announces the exit to its exit listeners (`addExitListener`) and keeps the
-id with its exit date, so that a later statement about it is an error and ids
-are never reused.
+Once the queue is applied, a vessel is absent exactly when it has no modelled
+home port; see "Whereabouts". An exit ends the queue: the vessel checks it is
+not at sea, ends its component stores in the reverse of the build order, then
+its own store; it leaves the vessel field and becomes absent, announcing
+`BecameAbsentEvent` if it was docked when the queue started; then it leaves the
+fleet, which announces the exit to its exit listeners (`addExitListener`) and
+keeps the id with its exit date, so that a later statement about it is an error
+and ids are never reused.
+
+## Whereabouts
+
+A vessel's `Whereabouts` are exactly one of `Absent`, `Docked` (holding the
+port) or `AtSea`; the vessel field agrees, and an absent vessel is off it.
+Absent is neither docked nor at sea: it has no position, so `getCell`,
+`getPoint` and `getCoordinate` fail on it, `setCurrentCell` requires at sea, and
+`isActive()` means present and having a behaviour. Every transition is checked
+against the current whereabouts: undock (docked to at sea, `UndockingEvent`),
+dock (at sea to docked, `DockingEvent`), docked to absent (`BecameAbsentEvent`)
+and absent to docked (`BecamePresentEvent`). At sea to absent is an error, and
+absent to at sea has no path. `isDocked()`, `isDockedAt(port)` and
+`getPortDockedAt()` read the whereabouts; the last fails unless docked.
+
+A vessel is created absent, and placed docked at its home port, silently, if its
+home-port code names a port in the port grid. Becoming absent and becoming
+present follow from the statements: a vessel whose code matches no port, or
+whose home port is cleared, is absent; one whose home port becomes a modelled
+port again becomes present, docked there. A move between modelled home ports
+leaves the vessel where it is and announces nothing. The vessel compares its
+whereabouts before and after its whole queue, announces at most one net change
+after the rebuild, and checks the at-sea error on the net result. Both events
+carry the vessel, the date and the port, go on the vessel's own event manager
+(which forwards to the fleet's), and are distinct from docking events, so trip
+and effort listeners never read them as departures or arrivals. The date is the
+step's, which `StepScheduler` passes to the vessel; the vessel holds no clock.
+Both `DockingEvent` and `BecamePresentEvent` are a `PortStayStartEvent`, which
+`CurrentPortStayStartDateTime` listens for to restart the port stay.
+
+A fleet-wide listener (`addEntryListener`) sees a vessel's whereabouts at entry
+as its starting state: creation announces nothing. The events give every change
+after that, including the exit of a docked vessel, whose `BecameAbsentEvent`
+reaches fleet-level listeners before the fleet's exit announcement.
 
 The vessel register
 (`scheduledByDateTime(vesselRegister(table, vesselSpecification))`) turns each

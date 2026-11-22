@@ -42,6 +42,9 @@ final class SpecificationFixtures {
   /** The attribute giving a vessel's home port, in these specifications. */
   static final String HOME_PORT = "home_port";
 
+  /** The code of the home port the vessels of tests are given. */
+  static final String HOME_PORT_CODE = "P1";
+
   private SpecificationFixtures() {}
 
   /**

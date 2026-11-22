@@ -29,20 +29,20 @@ import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import uk.ac.ox.poseidon.core.events.Listener;
-import uk.ac.ox.poseidon.fishing.vessels.DockingEvent;
+import uk.ac.ox.poseidon.fishing.vessels.PortStayStartEvent;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 
 /**
  * Provides when a docked vessel's current stay at port started: when it last
- * docked, or, if it has not docked since it was created, when it was created,
- * as a vessel starts docked at its home port. It listens to the vessel's
- * dockings, so it must be registered on the event manager of the vessel it is
- * asked about, and be given the date-time it is created at as the start of the
- * vessel's first stay.
+ * docked or became present, or, if it has done neither since it was created,
+ * when it was created, as a vessel starts docked at its home port if it has
+ * one. It listens to the vessel's {@link PortStayStartEvent}s, so it must be
+ * registered on the event manager of the vessel it is asked about, and be given
+ * the date-time it is created at as the start of the vessel's first stay.
  */
 @AllArgsConstructor
 public class CurrentPortStayStartDateTime
-  implements Function<Vessel, LocalDateTime>, Listener<DockingEvent>
+  implements Function<Vessel, LocalDateTime>, Listener<PortStayStartEvent>
 {
 
   /** When the vessel's current, or last, stay at port started. */
@@ -50,12 +50,12 @@ public class CurrentPortStayStartDateTime
   private LocalDateTime portStayStartDateTime;
 
   @Override
-  public Class<DockingEvent> getEventClass() {
-    return DockingEvent.class;
+  public Class<PortStayStartEvent> getEventClass() {
+    return PortStayStartEvent.class;
   }
 
   @Override
-  public void receive(final DockingEvent event) {
+  public void receive(final PortStayStartEvent event) {
     portStayStartDateTime = event.getDateTime();
   }
 

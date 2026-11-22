@@ -40,6 +40,8 @@ import static uk.ac.ox.poseidon.fishing.catches.disposition.Factories.*;
 import static uk.ac.ox.poseidon.fishing.fields.Factories.vesselField;
 import static uk.ac.ox.poseidon.fishing.market.Factories.biomassMarket;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
+import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT;
+import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT_CODE;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.newVessel;
 import static uk.ac.ox.poseidon.fishing.vessels.gears.Factories.fixedBiomassProportionGear;
 
@@ -124,6 +126,7 @@ class TripBalanceTest {
     final var field = vesselField(_ -> grid).get(scope);
     final Port port = mock(Port.class);
     final PortGrid ports = mock(PortGrid.class);
+    when(ports.getObject(HOME_PORT_CODE)).thenReturn(Optional.of(port));
     when(ports.getCell(port)).thenReturn(PORT_CELL);
     when(port.getCell(ports)).thenReturn(PORT_CELL);
     final Engine engine = mock(Engine.class);
@@ -166,8 +169,7 @@ class TripBalanceTest {
       .when(vessel)
       .setTaskDuration(any());
     vessel.buildComponents();
-    field.setCell(vessel, PORT_CELL);
-    vessel.dockAt(port, START);
+    vessel.setAttributes(Map.of(HOME_PORT, HOME_PORT_CODE));
     vessel.getAccount().add(Money.of(CurrencyUnit.EUR, 1000));
     final var market = biomassMarket(_ -> port, "market", "EUR").get(scope);
     market.setPrice(

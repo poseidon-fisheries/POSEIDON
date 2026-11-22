@@ -32,6 +32,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT;
+import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT_CODE;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.newVessel;
 
 import com.badlogic.gdx.ai.btree.Task;
@@ -363,8 +364,8 @@ class VesselTest {
   private static final Cell PORT_CELL = new Cell(0, 0);
 
   /**
-   * @return a vessel with no home port, docked at {@code port} on
-   *         {@link #PORT_CELL} at {@link #START}, on no trip
+   * @return a vessel whose home port is {@code port}, docked there on
+   *         {@link #PORT_CELL}, on no trip
    */
   private static Vessel vesselDockedAt(final Port port) {
     final VesselField vesselField = mock(VesselField.class, RETURNS_DEEP_STUBS);
@@ -376,8 +377,9 @@ class VesselTest {
       behaviour(_ -> mock(VesselTask.class))
     );
     when(vesselField.getCell(vessel)).thenReturn(PORT_CELL);
+    when(portGrid.getObject(HOME_PORT_CODE)).thenReturn(Optional.of(port));
     when(portGrid.getCell(port)).thenReturn(PORT_CELL);
-    vessel.dockAt(port, START);
+    vessel.setAttributes(Map.of(HOME_PORT, HOME_PORT_CODE));
     return vessel;
   }
 
@@ -405,7 +407,7 @@ class VesselTest {
 
     assertThatThrownBy(() -> vessel.setCurrentCell(new Cell(1, 0)))
       .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("cannot move while docked");
+      .hasMessageContaining("cannot move while");
   }
 
   @Test
@@ -429,7 +431,7 @@ class VesselTest {
 
     assertThatThrownBy(() -> vessel.dockAt(port, START))
       .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("already docked");
+      .hasMessageContaining("cannot dock at");
   }
 
   @Test
@@ -579,12 +581,17 @@ class VesselTest {
   @Test
   void aVesselHeadsTowardsTheCentreOfACellFromItsPoint() {
     final VesselField vesselField = mock(VesselField.class, RETURNS_DEEP_STUBS);
+    final PortGrid portGrid = mock(PortGrid.class);
+    when(portGrid.getObject(HOME_PORT_CODE)).thenReturn(
+      Optional.of(mock(Port.class))
+    );
     final Vessel vessel = newVessel(
       schedule,
       vesselField,
-      mock(PortGrid.class),
+      portGrid,
       behaviour(_ -> behaviour)
     );
+    vessel.setAttributes(Map.of(HOME_PORT, HOME_PORT_CODE));
     final Cell destination = new Cell(4, 3);
     when(vesselField.getPoint(vessel)).thenReturn(new Double2D(1, 2));
     when(vesselField.getModelGrid().toPoint(destination)).thenReturn(
