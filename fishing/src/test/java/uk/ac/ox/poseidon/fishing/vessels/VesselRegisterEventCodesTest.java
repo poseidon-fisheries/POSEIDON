@@ -54,6 +54,7 @@ class VesselRegisterEventCodesTest {
       List.of(),
       List.of()
     );
+
     assertThat(codes.getCreationCodes()).containsExactly("CEN");
     assertThat(codes.getChangeCodes()).isEmpty();
     assertThat(codes.getExitCodes()).isEmpty();

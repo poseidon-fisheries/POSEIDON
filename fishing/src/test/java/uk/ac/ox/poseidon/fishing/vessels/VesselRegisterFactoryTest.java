@@ -628,6 +628,7 @@ class VesselRegisterFactoryTest {
       .load(written)
       .getComponents()
       .get("vesselRegister");
+
     assertThat(loaded.getColumns()).isEqualTo(columns("name_of_vessel", "t1"));
     assertThat(loaded.getEventCodes()).isEqualTo(eventCodes());
   }
