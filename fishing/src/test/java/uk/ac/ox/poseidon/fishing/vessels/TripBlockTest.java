@@ -33,7 +33,6 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
-import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT_CODE;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.newVessel;
 
@@ -108,7 +107,7 @@ class TripBlockTest {
     when(vesselField.getCell(vessel)).thenReturn(PORT);
     when(portGrid.getObject(HOME_PORT_CODE)).thenReturn(Optional.of(port));
     when(portGrid.getCell(port)).thenReturn(PORT);
-    vessel.setAttributes(Map.of(HOME_PORT, HOME_PORT_CODE));
+    vessel.setStartingState(Optional.of(HOME_PORT_CODE), Map.of());
   }
 
   @SafeVarargs

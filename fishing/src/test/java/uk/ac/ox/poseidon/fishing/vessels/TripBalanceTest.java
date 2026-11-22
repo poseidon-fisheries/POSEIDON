@@ -40,7 +40,6 @@ import static uk.ac.ox.poseidon.fishing.catches.disposition.Factories.*;
 import static uk.ac.ox.poseidon.fishing.fields.Factories.vesselField;
 import static uk.ac.ox.poseidon.fishing.market.Factories.biomassMarket;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
-import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT_CODE;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.newVessel;
 import static uk.ac.ox.poseidon.fishing.vessels.gears.Factories.fixedBiomassProportionGear;
@@ -169,7 +168,7 @@ class TripBalanceTest {
       .when(vessel)
       .setTaskDuration(any());
     vessel.buildComponents();
-    vessel.setAttributes(Map.of(HOME_PORT, HOME_PORT_CODE));
+    vessel.setStartingState(Optional.of(HOME_PORT_CODE), Map.of());
     vessel.getAccount().add(Money.of(CurrencyUnit.EUR, 1000));
     final var market = biomassMarket(_ -> port, "market", "EUR").get(scope);
     market.setPrice(

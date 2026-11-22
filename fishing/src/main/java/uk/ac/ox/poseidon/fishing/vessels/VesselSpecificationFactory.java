@@ -67,9 +67,6 @@ public class VesselSpecificationFactory
   @Singular
   private final ImmutableMap<String, VesselComponent<?>> components;
 
-  private final String homePortAttribute;
-  private final String nameAttribute;
-
   /**
    * @return the behaviour, then the other components, in the order they are
    *         built
@@ -116,9 +113,7 @@ public class VesselSpecificationFactory
       scope,
       fleet.get(scope),
       checkNotNull(behaviour),
-      components,
-      checkNotNull(homePortAttribute),
-      nameAttribute
+      components
     );
   }
 }

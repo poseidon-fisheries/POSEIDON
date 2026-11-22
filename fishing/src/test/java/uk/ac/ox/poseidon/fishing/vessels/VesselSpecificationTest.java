@@ -82,9 +82,7 @@ class VesselSpecificationTest {
       recordedComponent("gear"),
       "hold",
       recordedComponent("hold")
-    ),
-    "home_port",
-    "name"
+    )
   );
 
   /**
@@ -121,7 +119,7 @@ class VesselSpecificationTest {
   }
 
   private Vessel create(final String id) {
-    return specification.create(id, Map.of("home_port", "P1"));
+    return specification.create(id, Optional.of("P1"), Map.of());
   }
 
   @Test
@@ -152,21 +150,19 @@ class VesselSpecificationTest {
       fleet,
       behaviour(scope -> {
         final Vessel vessel = scope.getVessel();
-        assertThat(vessel.getAttributes()).containsEntry("home_port", "P1");
-        assertThat(vessel.getHomePort()).isSameAs(port);
-        assertThat(vessel.getName()).contains("Vee One");
+        assertThat(vessel.getAttributes()).containsEntry("gear", "PS");
+        assertThat(vessel.getHomePort()).containsSame(port);
         assertThat(vessel.getAccount()).isNotNull();
         vesselsBuilt.add(vessel);
         return new RecordingTask();
       }),
-      ImmutableMap.of(),
-      "home_port",
-      "name"
+      ImmutableMap.of()
     );
 
     final Vessel vessel = specification.create(
       "V1",
-      Map.of("home_port", "P1", "name", "Vee One")
+      Optional.of("P1"),
+      Map.of("gear", "PS")
     );
 
     assertThat(vesselsBuilt).containsExactly(vessel);
@@ -180,25 +176,22 @@ class VesselSpecificationTest {
   }
 
   @Test
-  void aVesselIsKnownByItsNameAndIdOrByItsIdAlone() {
-    final Vessel named = specification.create(
-      "V1",
-      Map.of("home_port", "P1", "name", "Vee One")
-    );
-    final Vessel unnamed = create("V2");
-
-    assertThat(named).hasToString("Vee One (V1)");
-    assertThat(unnamed.getName()).isEmpty();
-    assertThat(unnamed).hasToString("V2");
+  void aVesselIsLabelledByItsId() {
+    assertThat(create("V1")).hasToString("V1");
   }
 
   @Test
   void aHomePortCodeNamingNoPortGivesNoHomePortAndAnInactiveVessel() {
     when(portGrid.getObject("P9")).thenReturn(Optional.empty());
 
-    final Vessel vessel = specification.create("V1", Map.of("home_port", "P9"));
+    final Vessel vessel = specification.create(
+      "V1",
+      Optional.of("P9"),
+      Map.of()
+    );
 
-    assertThat(vessel.getHomePort()).isNull();
+    assertThat(vessel.getHomePort()).isEmpty();
+    assertThat(vessel.getHomePortCell()).isEmpty();
     assertThat(vessel.isActive()).isFalse();
   }
 

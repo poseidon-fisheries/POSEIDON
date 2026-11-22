@@ -30,6 +30,7 @@ import static uk.ac.ox.poseidon.core.time.Factories.dateTime;
 import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.namedComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.none;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
@@ -135,11 +136,12 @@ class RebuildTest {
     final String rows
   ) {
     final var fleet = fleet(object(mock(VesselField.class)), object(portGrid));
-    final var vesselSpecification = vesselSpecification(fleet, behaviour)
-      .component("gear", gear)
-      .component("hold", vesselComponent(componentBuilder("hold")))
-      .homePortAttribute("place_of_registration")
-      .build();
+    final var vesselSpecification = vesselSpecification(
+      fleet,
+      behaviour,
+      namedComponent("gear", gear),
+      namedComponent("hold", vesselComponent(componentBuilder("hold")))
+    );
     simulation = Scenario.builder()
       .startingDateTime(dateTime(START))
       .component("fleet", fleet)

@@ -39,9 +39,6 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  */
 final class SpecificationFixtures {
 
-  /** The attribute giving a vessel's home port, in these specifications. */
-  static final String HOME_PORT = "home_port";
-
   /** The code of the home port the vessels of tests are given. */
   static final String HOME_PORT_CODE = "P1";
 
@@ -49,7 +46,7 @@ final class SpecificationFixtures {
 
   /**
    * @return a specification of vessels with {@code behaviour} and the other
-   *         {@code components}, whose home port is given by {@link #HOME_PORT},
+   *         {@code components},
    *         building over a simulation scope of a mocked simulation; it has no
    *         fleet, so it creates no vessel
    */
@@ -66,9 +63,7 @@ final class SpecificationFixtures {
       new SimulationScope(mock(Simulation.class)),
       null,
       behaviour,
-      componentsByName.build(),
-      HOME_PORT,
-      null
+      componentsByName.build()
     );
   }
 

@@ -39,6 +39,8 @@ import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegister;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
 import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -52,6 +54,10 @@ import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Simulation;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
+import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeUpdate;
+import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.HomePortUpdate;
+import uk.ac.ox.poseidon.fishing.vessels.Whereabouts.Absent;
+import uk.ac.ox.poseidon.fishing.vessels.Whereabouts.Docked;
 import uk.ac.ox.poseidon.geography.grids.Cell;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -107,10 +113,7 @@ class VesselRegisterFactoryTest {
     final var vesselSpecification = vesselSpecification(
       fleet,
       behaviour(scope -> new RecordingTask())
-    )
-      .homePortAttribute("place_of_registration")
-      .nameAttribute("name_of_vessel")
-      .build();
+    );
     simulation = Scenario.builder()
       .startingDateTime(dateTime(START))
       .component("fleet", fleet)
@@ -155,7 +158,7 @@ class VesselRegisterFactoryTest {
       entry("place_of_registration", "P2"),
       entry("t1", 3)
     );
-    assertThat(vessel("V1").getHomePort()).isSameAs(p2);
+    assertThat(vessel("V1").getHomePort()).containsSame(p2);
     assertThat(attributesSeen.get("V1")).hasSize(1);
   }
 
@@ -249,7 +252,7 @@ class VesselRegisterFactoryTest {
     );
     stepUntil(START.plusDays(2));
     final Vessel vessel = vessel("V1");
-    assertThat(vessel.getHomePort()).isNull();
+    assertThat(vessel.getHomePort()).isEmpty();
     assertThat(vessel.isActive()).isFalse();
     assertThat(attributesSeen).isEmpty();
     verify(vesselField, never()).setCell(vessel, P1_CELL);
@@ -258,6 +261,76 @@ class VesselRegisterFactoryTest {
     assertThat(vessel.isActive()).isTrue();
     verify(vesselField).setCell(vessel, P1_CELL);
     assertThat(attributesSeen.get("V1")).hasSize(1);
+  }
+
+  @Test
+  void aRowChangingOnlyAnAttributeLeavesAHomePortMovedByAnotherSourceAlone() {
+    startSimulation(
+      """
+      V1,Vee One,P1,CEN,2000-01-01,,1,a
+      V1,Vee One,P1,MOD,2001-01-03,,5,a
+      """
+    );
+    stepUntil(START.plusDays(1));
+    fleet.queue("V1", new HomePortUpdate(Optional.of("P2")));
+    stepUntil(START.plusDays(4));
+
+    assertThat(vessel("V1").getHomePort()).containsSame(p2);
+    assertThat(vessel("V1").getAttributes()).containsEntry("t1", 5);
+  }
+
+  @Test
+  void aRowLeavingAnAttributeUnchangedLeavesAnotherSourcesValueAlone() {
+    startSimulation(
+      """
+      V1,Vee One,P1,CEN,2000-01-01,,1,a
+      V1,Vee One,P1,MOD,2001-01-03,,5,a
+      """
+    );
+    stepUntil(START.plusDays(1));
+    fleet.queue(
+      "V1",
+      new AttributeUpdate(
+        ImmutableMap.of("name_of_vessel", "Other"),
+        ImmutableSet.of()
+      )
+    );
+    stepUntil(START.plusDays(4));
+
+    assertThat(vessel("V1").getAttributes())
+      .containsEntry("name_of_vessel", "Other")
+      .containsEntry("t1", 5);
+  }
+
+  @Test
+  void aVesselMovedOutOfTheModelAndBackIsAbsentThenPresentAtItsNewHomePort() {
+    startSimulation(
+      """
+      V1,Vee One,P1,CEN,2000-01-01,,1,a
+      V1,Vee One,P3,MOD,2001-01-03,,1,a
+      V1,Vee One,P2,MOD,2001-01-06,,1,a
+      """
+    );
+    stepUntil(START.plusDays(4));
+    assertThat(vessel("V1").getWhereabouts()).isEqualTo(new Absent());
+    assertThat(vessel("V1").getHomePort()).isEmpty();
+
+    stepUntil(START.plusDays(7));
+    assertThat(vessel("V1").getWhereabouts()).isEqualTo(new Docked(p2));
+    assertThat(vessel("V1").getHomePort()).containsSame(p2);
+  }
+
+  @Test
+  void aMissingHomePortCodeLeavesTheVesselWithoutOne() {
+    startSimulation(
+      """
+      V1,Vee One,NA,CEN,2000-01-01,,1,a
+      """
+    );
+    stepUntil(START.plusSeconds(1));
+
+    assertThat(vessel("V1").getHomePort()).isEmpty();
+    assertThat(vessel("V1").isActive()).isFalse();
   }
 
   @Test

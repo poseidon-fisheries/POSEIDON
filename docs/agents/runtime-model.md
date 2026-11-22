@@ -74,39 +74,55 @@ uses but no vessel specification lists fails then, naming the consumer.
 
 ## Vessel creation
 
-The **vessel specification** (`vesselSpecification(fleet, behaviour)`, given the
-other components by name with `component(name, component)`) is what a vessel of
+The **vessel specification**
+(`vesselSpecification(fleet, behaviour, namedComponent(...)...)`, one call whose
+trailing named components keep the order they are built in) is what a vessel of
 the scenario is made of, and the only thing that creates vessels: a creation
 source (`createVesselsAtPort`, the vessel register) asks it to create each
-vessel from an id and attributes. It names the attributes that give a vessel's
-home port (`homePortAttribute`) and its name (`nameAttribute`, if vessels have
-names); the home port is the port of that code in the port grid, looked up
-whenever it is read, and a code naming no port leaves the vessel without a home
-port, and so absent.
+vessel from an id, an `Optional<String>` home-port code and attributes. The
+specification holds no attribute names: each source states the home port itself,
+and a vessel's label is its id. The vessel resolves the code against its port
+grid once, when it is given, and keeps a non-null `Optional<Port>` and
+`Optional<Cell>`, present only for a modelled port; no code, or a code naming no
+port, leaves them empty and the vessel absent. A creation source supplies the
+code and never a `Port`, so the port grid is the only route to a home port.
+`createVesselsAtPort` rejects, when it is built, a port its vessels' port grid
+does not hold (that very port, not one with the same code), then supplies the
+port's code. The `homePort()` value gives a plain `Port` and fails, naming the
+vessel, if there is none, as do `HomePortCatchValuation` and
+`RouteViaDestination`: they run inside a present vessel's behaviour.
 
 Creation runs in a fixed order: the vessel joins the fleet with an account,
-takes its attributes (which place it at its home port, if it has one), and
-builds its components, the behaviour first, then the others as listed; only then
-does the fleet announce its entry to its entry listeners (`addEntryListener`),
-so a listener only ever sees a complete vessel, before its first step.
+takes its home port and attributes (which place it at its home port, if it has
+one), and builds its components, the behaviour first, then the others as listed;
+only then does the fleet announce its entry to its entry listeners
+(`addEntryListener`), so a listener only ever sees a complete vessel, before its
+first step.
 
 ## Statements, rebuilds and exits
 
-A source states things about an existing vessel through the fleet: a change of
-attributes, or its exit. A statement joins the vessel's queue and takes effect
-at the start of the vessel's next step in which its behaviour is not running,
-never inside the call that made it; one queued on a vessel with no step pending
-schedules one at once. Scheduling wrappers, and so statements and creations, run
-at ordering 0, and vessel steps at ordering 1: every statement due at an instant
-is queued before any vessel steps then, and a vessel takes its first step at the
-instant it is created. A vessel's account changes at once, from any call.
+A source states things about an existing vessel through the fleet: an
+`AttributeUpdate` (values for the attributes it names; a missing value removes
+one; unnamed attributes are untouched), a `HomePortUpdate` (an optional code; an
+empty one clears the home port, and no statement leaves it unchanged), or its
+exit. The two updates are separate, so a source can state either alone;
+statements and fleet submission are package-private. A statement joins the
+vessel's queue and takes effect at the start of the vessel's next step in which
+its behaviour is not running, never inside the call that made it; one queued on
+a vessel with no step pending schedules one at once. Scheduling wrappers, and so
+statements and creations, run at ordering 0, and vessel steps at ordering 1:
+every statement due at an instant is queued before any vessel steps then, and a
+vessel takes its first step at the instant it is created. A vessel's account
+changes at once, from any call.
 
-Once the queue is applied, the vessel rebuilds every component that varies by an
-attribute whose value changed, even if the same variant is picked: their stores
-end in the reverse of the build order, then they are built in that order, each
-under a fresh store; every other component, the vessel's own store (its
-memories) and its account stay. A hold that still holds catch refuses to have
-its store ended, so a rebuild only ever drops an empty hold.
+The vessel compares what a source states with its current state, since another
+source may already have applied it: once the queue is applied, it rebuilds every
+component that varies by an attribute whose value actually changed, even if the
+same variant is picked: their stores end in the reverse of the build order, then
+they are built in that order, each under a fresh store; every other component,
+the vessel's own store (its memories) and its account stay. A hold that still
+holds catch refuses to have its store ended, so a rebuild only ever drops an
+empty hold.
 
 Once the queue is applied, a vessel is absent exactly when it has no modelled
 home port; see "Whereabouts". An exit ends the queue: the vessel checks it is
@@ -135,7 +151,8 @@ home-port code names a port in the port grid. Becoming absent and becoming
 present follow from the statements: a vessel whose code matches no port, or
 whose home port is cleared, is absent; one whose home port becomes a modelled
 port again becomes present, docked there. A move between modelled home ports
-leaves the vessel where it is and announces nothing. The vessel compares its
+leaves the vessel where it is and announces nothing: whether and when it travels
+to its new home port is up to the scenario's behaviour. The vessel compares its
 whereabouts before and after its whole queue, announces at most one net change
 after the rebuild, and checks the at-sea error on the net result. Both events
 carry the vessel, the date and the port, go on the vessel's own event manager
@@ -152,9 +169,17 @@ reaches fleet-level listeners before the fleet's exit announcement.
 
 The vessel register
 (`scheduledByDateTime(vesselRegister(table, vesselSpecification))`) turns each
-row into a dated statement; it folds each vessel's rows dated at or before the
-start into one creation at the start, and a vessel that exited by then is never
-created, its exit recorded with the fleet.
+row into dated statements. It reads the home-port code from a column and states
+it as the home port; the column is an attribute too, unless it is among the
+ignored columns. Creation supplies the row's attributes and code. Each later
+change row is compared with that vessel's previous register row, not with the
+vessel's live state: changed attributes yield an `AttributeUpdate`, a changed
+code a `HomePortUpdate`, unchanged parts nothing, and becoming missing is a
+change. So a row changing only the length cannot undo a home port another source
+set. The register folds each vessel's rows dated at or before the start into one
+creation at the start, home port included, and a vessel that exited by then is
+never created, its exit recorded with the fleet. A code matching no port in the
+grid, or a missing one, leaves the vessel absent.
 
 ## Registration
 

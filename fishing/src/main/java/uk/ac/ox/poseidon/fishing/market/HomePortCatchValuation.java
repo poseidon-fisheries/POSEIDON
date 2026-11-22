@@ -22,7 +22,6 @@
 
 package uk.ac.ox.poseidon.fishing.market;
 
-import static com.google.common.base.Preconditions.checkState;
 import static lombok.AccessLevel.PACKAGE;
 
 import java.time.LocalDateTime;
@@ -71,17 +70,20 @@ public class HomePortCatchValuation implements Valuation<Bucket> {
    * @param vessel the vessel that would sell the catches
    * @return what a catch would sell for at {@code vessel}'s home port now, for
    *         one visit only; model state must not change during that visit
-   * @throws IllegalStateException if the vessel has no home port, or its home
+   * @throws IllegalStateException if the vessel has no modelled home port, or its home
    *                               port does not have exactly one market
    */
   @Override
   public ToDoubleFunction<Bucket> by(final Vessel vessel) {
-    checkState(
-      vessel.getHomePort() != null,
-      "Vessel %s has no home port.",
-      vessel.getId()
+    final Market market = marketGrid.getMarket(
+      vessel
+        .getHomePort()
+        .orElseThrow(() ->
+          new IllegalStateException(
+            "Vessel %s has no modelled home port.".formatted(vessel.getId())
+          )
+        )
     );
-    final Market market = marketGrid.getMarket(vessel.getHomePort());
     final boolean valuesHold =
       market == valuedMarket &&
       !pricesChangedSince(market, valuedSince) &&

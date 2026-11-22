@@ -70,6 +70,8 @@ final class FactoryProductsTest {
     FishingEventPropertyFactory.class,
     RoutePropertyFactory.class,
     VesselPropertyFactory.class,
+    // The port must be the one a mocked grid holds: it holds none.
+    CreateVesselsAtPortFactory.class,
     // The minimum catch threshold must be positive, not a mock's 0.
     FixedBiomassProportionGearFactory.class,
     IndexedBiomassCatchabilityGearFactory.class,

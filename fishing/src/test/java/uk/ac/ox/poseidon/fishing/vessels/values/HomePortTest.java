@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -39,7 +40,7 @@ class HomePortTest {
   @Test
   void givesTheVesselsHomePort() {
     final Port port = mock(Port.class);
-    when(vessel.getHomePort()).thenReturn(port);
+    when(vessel.getHomePort()).thenReturn(Optional.of(port));
 
     assertThat(homePort.apply(vessel)).isSameAs(port);
   }

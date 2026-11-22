@@ -28,10 +28,11 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.core.predicates.Factories.condition;
 import static uk.ac.ox.poseidon.core.predicates.Factories.equal;
 import static uk.ac.ox.poseidon.core.predicates.logical.Factories.allOf;
+import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.homePort;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.other;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselIsActive;
-import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselProperty;
 
+import java.util.Optional;
 import java.util.function.BiFunction;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Scope;
@@ -45,7 +46,7 @@ class OtherTest {
 
   private static Vessel vessel(final Port homePort, final boolean active) {
     final Vessel vessel = mock(Vessel.class);
-    when(vessel.getHomePort()).thenReturn(homePort);
+    when(vessel.getHomePort()).thenReturn(Optional.of(homePort));
     when(vessel.isActive()).thenReturn(active);
     return vessel;
   }
@@ -65,10 +66,7 @@ class OtherTest {
     final BiFunction<? super Vessel, ? super Vessel, Boolean> friendship =
       allOf(
         other(vesselIsActive()),
-        condition(
-          other(vesselProperty("homePort")),
-          equal(vesselProperty("homePort"))
-        )
+        condition(other(homePort()), equal(homePort()))
       ).get(Scope.GLOBAL_SCOPE);
     final Vessel vessel = vessel(home, false);
 

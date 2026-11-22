@@ -30,6 +30,7 @@ import static uk.ac.ox.poseidon.core.utils.Factories.object;
 import static uk.ac.ox.poseidon.fishing.tasks.landings.Factories.landCatches;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.namedComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
 
@@ -85,11 +86,9 @@ class VesselComponentWiringTest {
               constant(Duration.ZERO),
               object(mock(MarketGrid.class))
             )
-          )
+          ),
+          namedComponent("hold", listedHold)
         )
-          .homePortAttribute("home_port")
-          .component("hold", listedHold)
-          .build()
       )
       .build();
   }

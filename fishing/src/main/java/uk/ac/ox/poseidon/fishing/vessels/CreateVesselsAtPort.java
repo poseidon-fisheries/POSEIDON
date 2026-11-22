@@ -22,9 +22,11 @@
 
 package uk.ac.ox.poseidon.fishing.vessels;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
-import lombok.RequiredArgsConstructor;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -35,7 +37,6 @@ import uk.ac.ox.poseidon.geography.ports.Port;
  * with a new id, given by {@link #vesselIds} for {@link #port}, and with
  * {@link #port} as its home port.
  */
-@RequiredArgsConstructor
 public class CreateVesselsAtPort implements Steppable {
 
   private final VesselSpecification specification;
@@ -43,12 +44,40 @@ public class CreateVesselsAtPort implements Steppable {
   private final Port port;
   private final int numberOfVessels;
 
+  /**
+   * @throws IllegalArgumentException if the port grid of the vessels'
+   *                                  fleet does not hold {@code port}, that
+   *                                  very port and not one with its code
+   */
+  public CreateVesselsAtPort(
+    final VesselSpecification specification,
+    final Function<Port, String> vesselIds,
+    final Port port,
+    final int numberOfVessels
+  ) {
+    checkArgument(
+      specification
+        .getFleet()
+        .getPortGrid()
+        .getObject(port.getCode())
+        .filter(held -> held == port)
+        .isPresent(),
+      "Port %s is not in the port grid of the vessels' fleet.",
+      port.getCode()
+    );
+    this.specification = specification;
+    this.vesselIds = vesselIds;
+    this.port = port;
+    this.numberOfVessels = numberOfVessels;
+  }
+
   @Override
   public void step(final SimState simState) {
     for (int i = 0; i < numberOfVessels; i++) {
       specification.create(
         vesselIds.apply(port),
-        Map.of(specification.getHomePortAttribute(), port.getCode())
+        Optional.of(port.getCode()),
+        Map.of()
       );
     }
   }

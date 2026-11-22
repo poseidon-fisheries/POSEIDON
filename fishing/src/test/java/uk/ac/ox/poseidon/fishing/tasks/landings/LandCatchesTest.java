@@ -33,6 +33,7 @@ import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,7 +73,7 @@ class LandCatchesTest {
     );
     when(homePortMarket.sell(any(), any(), any())).thenReturn(sale);
     when(otherPortMarket.sell(any(), any(), any())).thenReturn(sale);
-    when(vessel.getHomePort()).thenReturn(homePort);
+    when(vessel.getHomePort()).thenReturn(Optional.of(homePort));
     when(trip.getAccount()).thenReturn(mock(Account.class));
     when(vessel.isDocked()).thenReturn(true);
     when(vessel.getPortDockedAt()).thenReturn(homePort);

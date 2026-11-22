@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import lombok.Value;
 
 /**
@@ -39,12 +40,11 @@ import lombok.Value;
  */
 sealed interface VesselStatement {
   /**
-   * Some of a vessel's attributes take new values, others become absent, and
-   * those it does not name are untouched.
-   *
+   * A source states values for the attributes it names: some take new values,
+   * others become absent, and those it does not name are untouched.
    */
   @Value
-  final class AttributeChange implements VesselStatement {
+  final class AttributeUpdate implements VesselStatement {
 
     /** The attributes set, with their new values. */
     ImmutableMap<String, Object> values;
@@ -58,7 +58,7 @@ sealed interface VesselStatement {
      * @throws IllegalArgumentException if an attribute is both set and made
      *                                  absent
      */
-    public AttributeChange(
+    public AttributeUpdate(
       final ImmutableMap<String, Object> values,
       final ImmutableSet<String> absentAttributes
     ) {
@@ -72,7 +72,7 @@ sealed interface VesselStatement {
     }
 
     /**
-     * @return {@code attributes} with this change applied, in their order, the
+     * @return {@code attributes} with this update applied, in their order, the
      *         new ones last
      */
     Map<String, Object> applyTo(final Map<String, ?> attributes) {
@@ -83,6 +83,18 @@ sealed interface VesselStatement {
       changedAttributes.keySet().removeAll(absentAttributes);
       return changedAttributes;
     }
+  }
+
+  /**
+   * A source states a vessel's home port by its code in the vessel's port
+   * grid. An empty code clears the home port; a code matching no port leaves
+   * the vessel without a modelled one, as no code does.
+   */
+  @Value
+  final class HomePortUpdate implements VesselStatement {
+
+    /** The code of the home port, or nothing to clear it. */
+    Optional<String> code;
   }
 
   /**

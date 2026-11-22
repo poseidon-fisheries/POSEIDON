@@ -22,8 +22,6 @@
 
 package uk.ac.ox.poseidon.fishing.vessels.values;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import java.util.function.Function;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.geography.ports.Port;
@@ -32,12 +30,16 @@ import uk.ac.ox.poseidon.geography.ports.Port;
 public class HomePort implements Function<Vessel, Port> {
 
   /**
-   * @throws IllegalStateException if the vessel has no home port
+   * @throws IllegalStateException if the vessel has no modelled home port
    */
   @Override
   public Port apply(final Vessel vessel) {
-    final Port homePort = vessel.getHomePort();
-    checkState(homePort != null, "Vessel %s has no home port.", vessel.getId());
-    return homePort;
+    return vessel
+      .getHomePort()
+      .orElseThrow(() ->
+        new IllegalStateException(
+          "Vessel %s has no modelled home port.".formatted(vessel.getId())
+        )
+      );
   }
 }

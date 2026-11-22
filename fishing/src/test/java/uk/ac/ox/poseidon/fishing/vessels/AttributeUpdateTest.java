@@ -28,14 +28,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.junit.jupiter.api.Test;
-import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
+import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeUpdate;
 
-final class AttributeChangeTest {
+final class AttributeUpdateTest {
 
   @Test
   void rejectsAnAttributeBothSetAndMadeAbsent() {
     assertThatThrownBy(() ->
-      new AttributeChange(
+      new AttributeUpdate(
         ImmutableMap.of("gear", "PS"),
         ImmutableSet.of("gear")
       )
@@ -46,7 +46,7 @@ final class AttributeChangeTest {
 
   @Test
   void acceptsDistinctAttributesSetAndMadeAbsent() {
-    final AttributeChange change = new AttributeChange(
+    final AttributeUpdate change = new AttributeUpdate(
       ImmutableMap.of("gear", "PS"),
       ImmutableSet.of("length")
     );

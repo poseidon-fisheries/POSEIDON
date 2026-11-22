@@ -49,7 +49,7 @@ import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
-import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
+import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeUpdate;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.Exit;
 import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.geography.ports.PortGrid;
@@ -95,9 +95,7 @@ class FleetTest {
       componentEndingWith("gear"),
       "hold",
       componentEndingWith("hold")
-    ),
-    "home_port",
-    null
+    )
   );
 
   /**
@@ -142,18 +140,18 @@ class FleetTest {
   }
 
   private Vessel create(final String id) {
-    return specification.create(id, Map.of("home_port", "P1"));
+    return specification.create(id, Optional.of("P1"), Map.of());
   }
 
   private void stepFor(final Duration duration) {
     schedule.stepFor(simState, duration);
   }
 
-  private static AttributeChange setting(
+  private static AttributeUpdate setting(
     final String attribute,
     final Object value
   ) {
-    return new AttributeChange(
+    return new AttributeUpdate(
       ImmutableMap.of(attribute, value),
       ImmutableSet.of()
     );

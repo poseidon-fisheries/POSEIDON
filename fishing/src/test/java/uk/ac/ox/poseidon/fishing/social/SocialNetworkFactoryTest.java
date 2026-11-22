@@ -31,6 +31,7 @@ import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
 
 import com.badlogic.gdx.ai.btree.leaf.Success;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Factory;
@@ -83,10 +84,8 @@ class SocialNetworkFactoryTest {
       fleetFactory(),
       behaviour(scope -> new Success<>())
     )
-      .homePortAttribute("home_port")
-      .build()
       .get(new SimulationScope(simulation))
-      .create("A", Map.of());
+      .create("A", Optional.empty(), Map.of());
 
     assertThat(network.getCandidates()).containsExactly(vessel);
   }

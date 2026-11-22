@@ -44,18 +44,20 @@ import static uk.ac.ox.poseidon.fishing.tasks.fishing.Factories.fishingEventAccu
 import static uk.ac.ox.poseidon.fishing.tasks.general.Factories.waitFor;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.fleet;
+import static uk.ac.ox.poseidon.fishing.vessels.Factories.namedComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselComponent;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselEventListener;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselRegister;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.vesselSpecification;
 import static uk.ac.ox.poseidon.fishing.vessels.TripFixtures.startFishingTrip;
-import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselProperty;
+import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.homePort;
 import static uk.ac.ox.poseidon.fishing.vessels.values.attributes.Factories.stringAttribute;
 import static uk.ac.ox.poseidon.io.tables.Factories.tableFromCsvString;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +81,7 @@ import uk.ac.ox.poseidon.fishing.tasks.fishing.FishingOutcome;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet;
 import uk.ac.ox.poseidon.fishing.vessels.FleetFactory;
 import uk.ac.ox.poseidon.fishing.vessels.HasAttributes;
+import uk.ac.ox.poseidon.fishing.vessels.NamedComponent;
 import uk.ac.ox.poseidon.fishing.vessels.Trip;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
 import uk.ac.ox.poseidon.fishing.vessels.VesselComponent;
@@ -162,18 +165,16 @@ class FishingEventSharingRouteTest {
     final String vesselRegister,
     final boolean withSharing
   ) {
-    final var vesselSpecification = vesselSpecification(
-      baseFleet,
-      behaviour(waitFor(constant(days(1))))
-    )
-      .homePortAttribute("place_of_registration")
-      .nameAttribute("name_of_vessel")
-      .component("hold", vesselComponent(object(hold)))
-      .component("gear", gearComponent)
-      .component("engine", vesselComponent(object(engine)));
+    final List<NamedComponent> components = new ArrayList<>(
+      List.of(
+        namedComponent("hold", vesselComponent(object(hold))),
+        namedComponent("gear", gearComponent),
+        namedComponent("engine", vesselComponent(object(engine)))
+      )
+    );
     if (withSharing) {
-      vesselSpecification
-        .component(
+      components.add(
+        namedComponent(
           "ownCatchRecorder",
           vesselComponent(
             vesselEventListener(
@@ -186,7 +187,9 @@ class FishingEventSharingRouteTest {
             )
           )
         )
-        .component(
+      );
+      components.add(
+        namedComponent(
           "friendsCatchRecorder",
           vesselComponent(
             sharedFishingActionListener(
@@ -199,8 +202,14 @@ class FishingEventSharingRouteTest {
               fishingActionSharer
             )
           )
-        );
+        )
+      );
     }
+    final var vesselSpecification = vesselSpecification(
+      baseFleet,
+      behaviour(waitFor(constant(days(1)))),
+      components.toArray(NamedComponent[]::new)
+    );
     final var scenario = Scenario.builder()
       .startingDateTime(dateTime(LocalDate.of(2000, 1, 1).atStartOfDay()))
       .component("fleet", baseFleet)
@@ -209,14 +218,14 @@ class FishingEventSharingRouteTest {
         scheduledByDateTime(
           vesselRegister(
             tableFromCsvString(vesselRegister),
-            vesselSpecification.build()
+            vesselSpecification
           )
         )
       )
       .component("socialNetwork", network)
       .component(
         "cliqueDynamics",
-        cliqueDynamics(network, List.of(vesselProperty("homePort.code")), 5)
+        cliqueDynamics(network, List.of(homePort()), 5)
       )
       .component("fishingEventAccumulator", fishingEventAccumulator());
     if (withSharing) {

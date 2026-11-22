@@ -34,7 +34,6 @@ import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.varyingBy;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.when;
-import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT_CODE;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.specificationOf;
 
@@ -56,8 +55,9 @@ import uk.ac.ox.poseidon.core.events.SimpleListener;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
-import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
+import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeUpdate;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.Exit;
+import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.HomePortUpdate;
 import uk.ac.ox.poseidon.fishing.vessels.Whereabouts.Absent;
 import uk.ac.ox.poseidon.fishing.vessels.Whereabouts.AtSea;
 import uk.ac.ox.poseidon.fishing.vessels.Whereabouts.Docked;
@@ -114,6 +114,7 @@ class VesselWhereaboutsTest {
 
   /** @return a vessel created as a source creates one, then first-stepped */
   private Vessel created(
+    final Optional<String> homePortCode,
     final Map<String, ?> attributes,
     final VesselComponent<?>... components
   ) {
@@ -121,14 +122,14 @@ class VesselWhereaboutsTest {
       "vessel",
       specificationOf(behaviour(_ -> new HourTask()), components)
     );
-    vessel.setAttributes(attributes);
+    vessel.setStartingState(homePortCode, attributes);
     vessel.buildComponents();
     vessel.scheduleFirstStep();
     return vessel;
   }
 
   private Vessel createdAtHomePort() {
-    return created(Map.of(HOME_PORT, HOME_PORT_CODE));
+    return created(Optional.of(HOME_PORT_CODE), Map.of());
   }
 
   private void step() {
@@ -140,15 +141,12 @@ class VesselWhereaboutsTest {
     schedule.stepFor(simState, ofHours(1));
   }
 
-  private static AttributeChange setting(final String code) {
-    return new AttributeChange(
-      ImmutableMap.of(HOME_PORT, code),
-      ImmutableSet.of()
-    );
+  private static HomePortUpdate setting(final String code) {
+    return new HomePortUpdate(Optional.of(code));
   }
 
-  private static AttributeChange removingTheHomePort() {
-    return new AttributeChange(ImmutableMap.of(), ImmutableSet.of(HOME_PORT));
+  private static HomePortUpdate removingTheHomePort() {
+    return new HomePortUpdate(Optional.empty());
   }
 
   @Test
@@ -165,7 +163,7 @@ class VesselWhereaboutsTest {
 
   @Test
   void aVesselWithNoMatchingHomePortIsCreatedAbsent() {
-    final Vessel vessel = created(Map.of(HOME_PORT, "nowhere"));
+    final Vessel vessel = created(Optional.of("nowhere"), Map.of());
 
     assertThat(vessel.getWhereabouts()).isEqualTo(new Absent());
     assertThat(vessel.isAbsent()).isTrue();
@@ -178,7 +176,7 @@ class VesselWhereaboutsTest {
 
   @Test
   void anAbsentVesselCannotBeMovedOrLocatedOrDockedOrUndocked() {
-    final Vessel vessel = created(Map.of());
+    final Vessel vessel = created(Optional.empty(), Map.of());
 
     assertThatThrownBy(() -> vessel.setCurrentCell(PORT_CELL)).isInstanceOf(
       IllegalStateException.class
@@ -248,7 +246,7 @@ class VesselWhereaboutsTest {
     vessel.queue(setting(OTHER_PORT_CODE));
     stepToTheNextBoundary();
 
-    assertThat(vessel.getHomePort()).isSameAs(otherPort);
+    assertThat(vessel.getHomePort()).containsSame(otherPort);
     assertThat(vessel.getWhereabouts()).isEqualTo(new Docked(homePort));
     assertThat(heard).isEmpty();
     verify(vesselField, never()).remove(vessel);
@@ -293,7 +291,7 @@ class VesselWhereaboutsTest {
     stepToTheNextBoundary();
 
     assertThat(vessel.getWhereabouts()).isEqualTo(new AtSea());
-    assertThat(vessel.getHomePort()).isSameAs(otherPort);
+    assertThat(vessel.getHomePort()).containsSame(otherPort);
     assertThat(heard).isEmpty();
     verify(vesselField, never()).remove(vessel);
     verify(vesselField, never()).setCell(vessel, new Cell(1, 0));
@@ -313,6 +311,33 @@ class VesselWhereaboutsTest {
     };
   }
 
+  @Test
+  void anUpdateEqualToTheCurrentStateRebuildsNothing() {
+    final List<Object> built = new ArrayList<>();
+    final Vessel vessel = created(
+      Optional.of(HOME_PORT_CODE),
+      Map.of("generation", "old"),
+      varyingBy(
+        "generation",
+        when("old", scope -> built.add(new Object())),
+        when("new", scope -> built.add(new Object()))
+      )
+    );
+    assertThat(built).hasSize(1);
+
+    vessel.queue(setting(HOME_PORT_CODE));
+    vessel.queue(
+      new AttributeUpdate(
+        ImmutableMap.of("generation", "old"),
+        ImmutableSet.of()
+      )
+    );
+    stepToTheNextBoundary();
+
+    assertThat(built).hasSize(1);
+    assertThat(vessel.getHomePort()).containsSame(homePort);
+  }
+
   @ParameterizedTest
   @ValueSource(booleans = { true, false })
   void whereaboutsEventsReachTheReplacementComponentAfterRebuild(
@@ -321,12 +346,8 @@ class VesselWhereaboutsTest {
     final List<HasVessel> oldEvents = new ArrayList<>();
     final List<HasVessel> newEvents = new ArrayList<>();
     final Vessel vessel = created(
-      Map.of(
-        HOME_PORT,
-        initiallyPresent ? HOME_PORT_CODE : "nowhere",
-        "generation",
-        "old"
-      ),
+      Optional.of(initiallyPresent ? HOME_PORT_CODE : "nowhere"),
+      Map.of("generation", "old"),
       varyingBy(
         "generation",
         when("old", recordingEventsIn(oldEvents)),
@@ -334,14 +355,10 @@ class VesselWhereaboutsTest {
       )
     );
 
+    vessel.queue(setting(initiallyPresent ? "nowhere" : HOME_PORT_CODE));
     vessel.queue(
-      new AttributeChange(
-        ImmutableMap.of(
-          HOME_PORT,
-          initiallyPresent ? "nowhere" : HOME_PORT_CODE,
-          "generation",
-          "new"
-        ),
+      new AttributeUpdate(
+        ImmutableMap.of("generation", "new"),
         ImmutableSet.of()
       )
     );
@@ -397,7 +414,7 @@ class VesselWhereaboutsTest {
 
   @Test
   void anExitWhileAbsentAnnouncesNothingButTheFleetsExit() {
-    final Vessel vessel = created(Map.of());
+    final Vessel vessel = created(Optional.empty(), Map.of());
 
     vessel.queue(new Exit());
     step();

@@ -33,7 +33,6 @@ import static uk.ac.ox.poseidon.fishing.tasks.branches.Factories.sequenceTask;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ import uk.ac.ox.poseidon.core.events.SimpleEventManager;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
-import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
+import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.HomePortUpdate;
 import uk.ac.ox.poseidon.fishing.vessels.values.HomePort;
 import uk.ac.ox.poseidon.fishing.vessels.values.VesselIsDockedAt;
 import uk.ac.ox.poseidon.geography.grids.Cell;
@@ -91,9 +90,7 @@ class VoyageHomeTest {
         scope -> new VoyageHome()
       )
     ),
-    ImmutableMap.of(),
-    "home_port",
-    null
+    ImmutableMap.of()
   );
 
   private static final class IsDockedAtHomePort extends VesselTask {
@@ -119,7 +116,9 @@ class VoyageHomeTest {
     }
 
     private Status depart() {
-      log.add("depart from " + getVessel().getHomePort().getCode());
+      log.add(
+        "depart from " + getVessel().getHomePort().orElseThrow().getCode()
+      );
       return runFor(ofHours(1));
     }
   }
@@ -138,7 +137,7 @@ class VoyageHomeTest {
     }
 
     private Status setOff() {
-      destination = getVessel().getHomePort();
+      destination = getVessel().getHomePort().orElseThrow();
       getVessel().undock(schedule.getDateTime());
       log.add("travel home to " + destination.getCode());
       return runFor(ofHours(3));
@@ -180,15 +179,12 @@ class VoyageHomeTest {
   }
 
   private void changeHomePort(final String code) {
-    fleet.queue(
-      "V1",
-      new AttributeChange(ImmutableMap.of("home_port", code), ImmutableSet.of())
-    );
+    fleet.queue("V1", new HomePortUpdate(Optional.of(code)));
   }
 
   @Test
   void aHomePortChangedDuringAVoyageHomeTakesEffectOnArrivalBeforeTheNextDeparture() {
-    specification.create("V1", Map.of("home_port", "P1"));
+    specification.create("V1", Optional.of("P1"), Map.of());
     stepFor(ofMinutes(30));
     changeHomePort("P2");
     stepFor(ofMinutes(90));

@@ -12,11 +12,13 @@ The model is built around a declarative configuration → runtime object pattern
   allocators, providers…) are expressed as a `Factory` implementation plus a
   plain value/config class, so that scenarios can be built either
   programmatically or deserialized from YAML.
-- Scenario-building code composes `Factory`-returning static helpers only —
-  nested calls all the way down. Never call `.get(scope)`, `.apply(...)`, or
-  `.test(...)` directly in scenario-building code; resolving the graph is the
-  framework's job at simulation-start time, not something scenario code does
-  itself.
+- Scenario-building code composes static helpers only — nested calls all the way
+  down. A helper takes all its arguments and returns a finished scenario part,
+  which may be a factory or a plain node (a variant, a named component);
+  scenario code calls nothing on a helper's result. Never call `.get(scope)`,
+  `.apply(...)`, or `.test(...)` directly in scenario-building code; resolving
+  the graph is the framework's job at simulation-start time, not something
+  scenario code does itself.
 - When creating a new factory, extend `AbstractFactory`
   (`core/.../AbstractFactory.java`) rather than implementing `Factory` directly
   unless you have a specific reason not to.
@@ -92,7 +94,8 @@ The model is built around a declarative configuration → runtime object pattern
   checked-in file, by hand or by script, even when the result would be
   identical.
 - **When building a `Scenario`, use the static helper methods of each package's
-  `Factories` class, not `new SomeFactory(...)` directly.**
+  `Factories` class, not `new SomeFactory(...)` or a node's constructor
+  directly.**
 - **In scenario-building code, write a factory inline where it is used, and give
   it a local variable only when:**
   - **it is used more than once.** This is about identity, not tidiness:

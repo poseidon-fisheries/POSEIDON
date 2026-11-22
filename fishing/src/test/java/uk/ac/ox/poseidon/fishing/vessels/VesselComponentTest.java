@@ -35,6 +35,7 @@ import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.newVessel;
 
 import com.badlogic.gdx.ai.btree.leaf.Success;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.schedule.TemporalSchedule;
@@ -130,7 +131,7 @@ class VesselComponentTest {
       behaviour(scope -> new Success<>()),
       chosen
     );
-    vessel.setAttributes(Map.of("gear", "GNS"));
+    vessel.setStartingState(Optional.empty(), Map.of("gear", "GNS"));
     vessel.buildComponents();
 
     assertThat(chosen.findIn(vessel)).isEmpty();

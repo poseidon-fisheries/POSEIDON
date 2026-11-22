@@ -34,6 +34,7 @@ import static uk.ac.ox.poseidon.fishing.market.MarketGridTest.marketGrid;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.IntStream;
@@ -74,7 +75,7 @@ class HomePortCatchValuationTest {
 
   @BeforeEach
   void setUp() {
-    when(vessel.getHomePort()).thenReturn(homePort);
+    when(vessel.getHomePort()).thenReturn(Optional.of(homePort));
     valuation = valuationOver(market);
   }
 
@@ -161,7 +162,7 @@ class HomePortCatchValuationTest {
     final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
     now = now.plusHours(1);
     assertThat(valuation.by(vessel).applyAsDouble(bucket)).isEqualTo(20.0);
-    when(vessel.getHomePort()).thenReturn(otherPort);
+    when(vessel.getHomePort()).thenReturn(Optional.of(otherPort));
     assertThat(valuation.by(vessel).applyAsDouble(bucket)).isEqualTo(30.0);
   }
 
@@ -178,7 +179,7 @@ class HomePortCatchValuationTest {
     otherMarket.setPrice(category, pricedSpecies, eurosPerKg(3.0), now);
     valuation = valuationOver(market, otherMarket);
     final Vessel otherVessel = mock(Vessel.class);
-    when(otherVessel.getHomePort()).thenReturn(otherPort);
+    when(otherVessel.getHomePort()).thenReturn(Optional.of(otherPort));
     final Bucket bucket = Bucket.of(pricedSpecies, 10.0);
     now = now.plusHours(1);
     assertThat(valuation.by(vessel).applyAsDouble(bucket)).isEqualTo(20.0);
@@ -187,12 +188,12 @@ class HomePortCatchValuationTest {
 
   @Test
   void throwsWithoutAHomePort() {
-    when(vessel.getHomePort()).thenReturn(null);
+    when(vessel.getHomePort()).thenReturn(Optional.empty());
     assertThatThrownBy(() ->
       valuation.by(vessel).applyAsDouble(Bucket.of(pricedSpecies, 10.0))
     )
       .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("has no home port");
+      .hasMessageContaining("has no modelled home port");
   }
 
   @Test

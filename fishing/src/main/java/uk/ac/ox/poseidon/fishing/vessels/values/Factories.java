@@ -162,8 +162,8 @@ public final class Factories {
   /**
    * Reads a value of a vessel off the other vessel, in a test relating the
    * vessel a call is for to another vessel, such as a friendship condition:
-   * {@code condition(other(vesselProperty("homePort")),
-   * equal(vesselProperty("homePort")))} holds when the other vessel's home port
+   * {@code condition(other(homePort()),
+   * equal(homePort()))} holds when the other vessel's home port
    * is the vessel's. A value of a vessel used there without it reads the vessel
    * the call is for.
    *
@@ -216,8 +216,7 @@ public final class Factories {
 
   /**
    * @param propertyPath the dotted path of properties to follow from the
-   *                     vessel, e.g. {@code "homePort.code"} for the code of
-   *                     the vessel's home port
+   *                     vessel, e.g. {@code "id"} for the vessel's id
    * @return a {@link uk.ac.ox.poseidon.core.GlobalScopeFactory} for an
    *         {@link uk.ac.ox.poseidon.core.functions.ObjectProperty} of a vessel
    * @see VesselPropertyFactory

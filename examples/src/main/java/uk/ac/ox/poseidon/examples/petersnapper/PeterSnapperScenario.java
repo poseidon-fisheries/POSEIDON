@@ -84,7 +84,6 @@ import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.homePort;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.other;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselIsActive;
 import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselIsDockedAt;
-import static uk.ac.ox.poseidon.fishing.vessels.values.Factories.vesselProperty;
 import static uk.ac.ox.poseidon.geography.Factories.coordinate;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.filteredAllocator;
 import static uk.ac.ox.poseidon.geography.allocators.Factories.supplierAllocator;
@@ -339,10 +338,7 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       2,
       allOf(
         other(vesselIsActive()),
-        condition(
-          other(vesselProperty("homePort")),
-          equal(vesselProperty("homePort"))
-        )
+        condition(other(homePort()), equal(homePort()))
       )
     );
     final var tripSharer = fishingTripEndSharer(socialNetwork);
@@ -450,15 +446,16 @@ public class PeterSnapperScenario implements Supplier<Scenario> {
       )
     );
 
-    final var vesselSpecification = vesselSpecification(fleet, behaviour)
-      .homePortAttribute("home_port")
-      .component("gear", gear)
-      .component("engine", engine)
-      .component("fuelTank", fuelTank)
-      .component("hold", hold)
-      .component("ownTripRecorder", ownTripRecorder)
-      .component("friendTripRecorder", friendTripRecorder)
-      .build();
+    final var vesselSpecification = vesselSpecification(
+      fleet,
+      behaviour,
+      namedComponent("gear", gear),
+      namedComponent("engine", engine),
+      namedComponent("fuelTank", fuelTank),
+      namedComponent("hold", hold),
+      namedComponent("ownTripRecorder", ownTripRecorder),
+      namedComponent("friendTripRecorder", friendTripRecorder)
+    );
 
     // Benoa's vessels are created first, then Kupang's
     final var vesselIds = prefixedId("V");

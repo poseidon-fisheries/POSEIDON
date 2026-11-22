@@ -86,28 +86,41 @@ public final class Factories {
   }
 
   /**
-   * The specification is built by the returned builder, given the vessel's
-   * other components with {@code component(name, component)}, in the order
-   * they are built, and the attributes that give a vessel's home port, with
-   * {@code homePortAttribute(name)}, and, if vessels have names, its name,
-   * with {@code nameAttribute(name)}.
-   *
-   * @param fleet     the fleet the vessels join
-   * @param behaviour the component that is the behaviour each vessel steps
-   * @return a builder for a {@link SimulationScopeFactory} for a
+   * @param fleet           the fleet the vessels join
+   * @param behaviour       the component that is the behaviour each vessel
+   *                        steps
+   * @param namedComponents the vessel's other components, in the order they
+   *                        are built
+   * @return a {@link SimulationScopeFactory} for a
    *         {@link VesselSpecification}
    * @see VesselSpecification
    */
-  public static VesselSpecificationFactory.VesselSpecificationFactoryBuilder<
-    ?,
-    ?
-  > vesselSpecification(
+  public static VesselSpecificationFactory vesselSpecification(
     final Factory<? super SimulationScope, ? extends Fleet> fleet,
-    final VesselComponent<? extends Task<Vessel>> behaviour
+    final VesselComponent<? extends Task<Vessel>> behaviour,
+    final NamedComponent... namedComponents
   ) {
-    return VesselSpecificationFactory.builder()
+    final var specification = VesselSpecificationFactory.builder()
       .fleet(fleet)
       .behaviour(behaviour);
+    for (final NamedComponent named : namedComponents) {
+      specification.component(named.getName(), named.getComponent());
+    }
+    return specification.build();
+  }
+
+  /**
+   * @param name      the name the component is listed under
+   * @param component the component
+   * @return the component with its name, for
+   *         {@link #vesselSpecification}
+   * @see NamedComponent
+   */
+  public static NamedComponent namedComponent(
+    final String name,
+    final VesselComponent<?> component
+  ) {
+    return new NamedComponent(name, component);
   }
 
   /**
@@ -148,7 +161,8 @@ public final class Factories {
    * the vessel id in {@code cfr}, the event code in {@code event}, the event
    * date in {@code event_start_date}, with {@code event_end_date} left out of
    * the attributes; CEN, CST, IMP and CHA create a vessel, MOD changes it, and
-   * DES, EXP and RET make it exit. Change them on the factory's builder.
+   * DES, EXP and RET make it exit; {@code place_of_registration} gives the home
+   * port.
    *
    * @param data                the vessel register table
    * @param vesselSpecification what the vessels are made of
@@ -171,6 +185,7 @@ public final class Factories {
       "cfr",
       "event",
       "event_start_date",
+      "place_of_registration",
       ImmutableList.of("event_end_date"),
       ImmutableList.of("CEN", "CST", "IMP", "CHA"),
       ImmutableList.of("MOD"),

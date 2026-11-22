@@ -51,8 +51,9 @@ import uk.ac.ox.poseidon.core.ProductStore;
 import uk.ac.ox.poseidon.core.events.EventManager;
 import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.vessels.Fleet.StepScheduler;
-import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
+import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeUpdate;
 import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.Exit;
+import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.HomePortUpdate;
 import uk.ac.ox.poseidon.fishing.vessels.Whereabouts.Absent;
 import uk.ac.ox.poseidon.fishing.vessels.Whereabouts.AtSea;
 import uk.ac.ox.poseidon.fishing.vessels.Whereabouts.Docked;
@@ -73,7 +74,7 @@ import uk.ac.ox.poseidon.geography.ports.PortGrid;
  * tick (once it isn't). It steps its behaviour only while {@link #isActive()}
  * holds.
  * <p>
- * What a source states about it, a change of attributes or its exit, joins
+ * What a source states about it, an update of its attributes or home port, or its exit, joins
  * its queue of statements and takes effect at the start of its next step in
  * which the behaviour is not running, never during a run of the behaviour and
  * never inside the call that made the statement: so a vessel doesn't exit at
@@ -132,7 +133,7 @@ public class Vessel implements Oriented2D, HasAttributes {
   /**
    * What this vessel is made of: among others, the component that is the
    * behaviour it runs, the root task of its tree (a vessel without that
-   * component does not act), and the attributes giving its home port and name.
+   * component does not act).
    */
   @Getter(NONE)
   private final @NonNull VesselSpecification specification;
@@ -219,20 +220,19 @@ public class Vessel implements Oriented2D, HasAttributes {
   private ImmutableMap<String, Object> attributes = ImmutableMap.of();
 
   /**
-   * The port in the port grid whose code the home port attribute gave when the
-   * attributes were last set, or {@code null} if none; looked up then, not on
-   * each read, because it is read on every valuation of a fishing option.
+   * The port in the port grid whose code the vessel was last given as its home
+   * port, or nothing if it has no code or no port has it; looked up when the
+   * code is given, not on each read, because it is read on every valuation of
+   * a fishing option.
    */
-  @Getter(NONE)
-  private Port homePort;
+  private Optional<Port> homePort = Optional.empty();
 
   /**
-   * The cell {@link #homePort} is placed on, or {@code null} if there is no
-   * home port; looked up with it, since ports do not move and the cell is read
-   * on every route to a fishing option.
+   * The cell {@link #homePort} is placed on, or nothing if there is no home
+   * port; looked up with it, since ports do not move and the cell is read on
+   * every route to a fishing option.
    */
-  @Getter(NONE)
-  private Cell homePortCell;
+  private Optional<Cell> homePortCell = Optional.empty();
 
   /** This vessel's running balance, which changes at once, from any call. */
   private final Account account = new Account();
@@ -348,8 +348,12 @@ public class Vessel implements Oriented2D, HasAttributes {
         rebuildVaryingAnew(previousAttributes);
         announceWhereaboutsChange(previousWhereabouts, whereabouts, dateTime);
       }
-      case final AttributeChange change -> {
-        replaceAttributes(change.applyTo(attributes));
+      case final AttributeUpdate update -> {
+        replaceAttributes(update.applyTo(attributes));
+        applyStatementsSince(previousAttributes, previousWhereabouts, dateTime);
+      }
+      case final HomePortUpdate update -> {
+        replaceHomePort(update.getCode());
         applyStatementsSince(previousAttributes, previousWhereabouts, dateTime);
       }
       case final Exit _ -> exit(previousWhereabouts, dateTime);
@@ -363,7 +367,7 @@ public class Vessel implements Oriented2D, HasAttributes {
    * @throws IllegalStateException if the vessel is at sea and has no home port
    */
   private void placeToAgreeWithHomePort() {
-    if (homePort == null) {
+    if (homePort.isEmpty()) {
       checkState(
         !isAtSea(),
         "Vessel %s has no modelled home port, so cannot be absent at sea.",
@@ -371,7 +375,7 @@ public class Vessel implements Oriented2D, HasAttributes {
       );
       placeAt(new Absent());
     } else if (isAbsent()) {
-      placeAt(new Docked(homePort));
+      placeAt(new Docked(homePort.get()));
     }
   }
 
@@ -755,35 +759,7 @@ public class Vessel implements Oriented2D, HasAttributes {
 
   @Override
   public String toString() {
-    return getName()
-      .map(name -> name + " (" + id + ")")
-      .orElse(id);
-  }
-
-  /**
-   * @return this vessel's name, the value of the attribute its specification
-   *         names for it, or nothing if it has none
-   */
-  public Optional<String> getName() {
-    return specification
-      .getNameAttribute()
-      .map(attributes::get)
-      .map(Object::toString);
-  }
-
-  /**
-   * @return this vessel's home port, the port in the port grid whose code was
-   *         the value of the attribute its specification names for it when
-   *         its attributes were last set, or {@code null} if it had no such
-   *         attribute or no port had that code
-   */
-  public Port getHomePort() {
-    return homePort;
-  }
-
-  /** @return the home port's grid cell */
-  public Cell getHomePortCell() {
-    return homePortCell;
+    return id;
   }
 
   /** @return this vessel's current attributes */
@@ -793,36 +769,40 @@ public class Vessel implements Oriented2D, HasAttributes {
   }
 
   /**
-   * Puts {@code attributes} in place of this vessel's attributes, and places
-   * the vessel to agree with its home port: docked at it if the vessel was
+   * Gives this vessel its starting state, its home port and its attributes,
+   * and places it to agree with its home port: docked at it if the vessel was
    * absent, absent if there is none. That is the vessel's initial state, not a
    * docking, so it has no time and broadcasts nothing; the statements a vessel
    * applies later announce their changes in whereabouts instead.
    *
+   * @param homePortCode the code of the home port, or nothing if there is none
+   * @param attributes   the attributes
    * @throws NullPointerException  if {@code attributes} holds a {@code null}
    *                               name or value
    * @throws IllegalStateException if the vessel is at sea and has no home port
    */
-  void setAttributes(final Map<String, ?> attributes) {
+  void setStartingState(
+    final Optional<String> homePortCode,
+    final Map<String, ?> attributes
+  ) {
     replaceAttributes(attributes);
+    replaceHomePort(homePortCode);
     placeToAgreeWithHomePort();
   }
 
-  /**
-   * Puts {@code attributes} in place of this vessel's attributes and looks up
-   * the home port they give, leaving the vessel where it is.
-   */
+  /** Puts {@code attributes} in place of this vessel's attributes. */
   private void replaceAttributes(final Map<String, ?> attributes) {
-    final ImmutableMap<String, Object> newAttributes = ImmutableMap.copyOf(
-      attributes
-    );
-    this.attributes = newAttributes;
-    this.homePort = Optional.ofNullable(
-      newAttributes.get(specification.getHomePortAttribute())
-    )
-      .flatMap(code -> portGrid.getObject(code.toString()))
-      .orElse(null);
-    this.homePortCell = homePort == null ? null : portGrid.getCell(homePort);
+    this.attributes = ImmutableMap.copyOf(attributes);
+  }
+
+  /**
+   * Looks up the port in the port grid with code {@code homePortCode} and makes
+   * it this vessel's home port, or leaves the vessel without one if there is no
+   * code or no such port. The vessel stays where it is.
+   */
+  private void replaceHomePort(final Optional<String> homePortCode) {
+    this.homePort = homePortCode.flatMap(portGrid::getObject);
+    this.homePortCell = homePort.map(portGrid::getCell);
   }
 
   /**

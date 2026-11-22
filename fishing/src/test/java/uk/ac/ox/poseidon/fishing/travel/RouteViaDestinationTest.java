@@ -75,7 +75,7 @@ class RouteViaDestinationTest {
     );
     when(engine.getCruisingSpeedInKph()).thenReturn(10.0);
     when(vessel.getCell()).thenReturn(vesselCell);
-    when(vessel.getHomePortCell()).thenReturn(portCell);
+    when(vessel.getHomePortCell()).thenReturn(Optional.of(portCell));
     when(
       distanceCalculator.distanceInKm(any(Cell.class), any(Cell.class))
     ).thenReturn(5.0);
@@ -102,7 +102,7 @@ class RouteViaDestinationTest {
 
     final Cell otherPortCell = new Cell(3, 3);
     when(vessel.getCell()).thenReturn(destination);
-    when(vessel.getHomePortCell()).thenReturn(otherPortCell);
+    when(vessel.getHomePortCell()).thenReturn(Optional.of(otherPortCell));
     when(engine.getCruisingSpeedInKph()).thenReturn(20.0);
     when(pathFinder.getPath(destination, destination)).thenReturn(
       Optional.of(ImmutableList.of(destination))
@@ -123,7 +123,7 @@ class RouteViaDestinationTest {
     when(otherEngine.getCruisingSpeedInKph()).thenReturn(20.0);
     giveComponent(otherVessel, engineComponent, otherEngine);
     when(otherVessel.getCell()).thenReturn(destination);
-    when(otherVessel.getHomePortCell()).thenReturn(portCell);
+    when(otherVessel.getHomePortCell()).thenReturn(Optional.of(portCell));
     when(pathFinder.getPath(destination, destination)).thenReturn(
       Optional.of(ImmutableList.of(destination))
     );

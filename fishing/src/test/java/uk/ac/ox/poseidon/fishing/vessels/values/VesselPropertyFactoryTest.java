@@ -31,50 +31,31 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ox.poseidon.core.Scenario;
 import uk.ac.ox.poseidon.core.Scope;
 import uk.ac.ox.poseidon.fishing.vessels.Vessel;
-import uk.ac.ox.poseidon.geography.ports.Port;
 import uk.ac.ox.poseidon.io.ScenarioLoader;
 import uk.ac.ox.poseidon.io.ScenarioWriter;
 
 class VesselPropertyFactoryTest {
 
-  private static Vessel vesselWithHomePortCode(final String portCode) {
-    final Port port = mock(Port.class);
-    when(port.getCode()).thenReturn(portCode);
-    final Vessel vessel = mock(Vessel.class);
-    when(vessel.getHomePort()).thenReturn(port);
-    return vessel;
-  }
-
   @Test
   void survivesAYamlRoundTripWithOnlyItsPath() {
     final String written = new ScenarioWriter().write(
-      Scenario.builder()
-        .component("property", vesselProperty("homePort.code"))
-        .build()
+      Scenario.builder().component("property", vesselProperty("id")).build()
     );
     assertThat(written)
-      .contains("propertyPath: homePort.code")
+      .contains("propertyPath: id")
       .doesNotContain("rootClass");
     assertThat(
       new ScenarioLoader().load(written).getComponents().get("property")
-    ).isEqualTo(vesselProperty("homePort.code"));
+    ).isEqualTo(vesselProperty("id"));
   }
 
   @Test
-  void readsTheCodeOfTheVesselsHomePort() {
-    assertThat(
-      vesselProperty("homePort.code")
-        .get(Scope.GLOBAL_SCOPE)
-        .apply(vesselWithHomePortCode("P1"))
-    ).isEqualTo("P1");
-  }
+  void readsThePropertyOfTheVessel() {
+    final Vessel vessel = mock(Vessel.class);
+    when(vessel.getId()).thenReturn("V1");
 
-  @Test
-  void readsNullForAHomePortWithoutCode() {
     assertThat(
-      vesselProperty("homePort.code")
-        .get(Scope.GLOBAL_SCOPE)
-        .apply(vesselWithHomePortCode(null))
-    ).isNull();
+      vesselProperty("id").get(Scope.GLOBAL_SCOPE).apply(vessel)
+    ).isEqualTo("V1");
   }
 }

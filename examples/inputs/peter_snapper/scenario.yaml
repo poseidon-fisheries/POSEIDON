@@ -178,13 +178,11 @@ components:
           }
       - !!uk.ac.ox.poseidon.core.predicates.ConditionFactory
         predicate: !!uk.ac.ox.poseidon.core.predicates.EqualFactory
-          value: !!uk.ac.ox.poseidon.fishing.vessels.values.VesselPropertyFactory {
-            propertyPath: homePort
-          }
+          value: !!uk.ac.ox.poseidon.fishing.vessels.values.HomePortFactory {
+            }
         subject: !!uk.ac.ox.poseidon.fishing.vessels.values.OtherFactory
-          value: !!uk.ac.ox.poseidon.fishing.vessels.values.VesselPropertyFactory {
-            propertyPath: homePort
-          }
+          value: !!uk.ac.ox.poseidon.fishing.vessels.values.HomePortFactory {
+            }
     network: &id010 !!uk.ac.ox.poseidon.fishing.social.SocialNetworkFactory
       fleet: &id028 !!uk.ac.ox.poseidon.fishing.vessels.FleetFactory
         eventManager: !!uk.ac.ox.poseidon.core.EventManagerFactory {
@@ -462,8 +460,6 @@ components:
           eventSharer: *id026
           listener: *id027
     fleet: *id028
-    homePortAttribute: home_port
-    nameAttribute: null
   vesselCreation: !!uk.ac.ox.poseidon.core.schedule.ScheduledOnceAtStartFactory
     ordering: 0
     steppable: !!uk.ac.ox.poseidon.core.schedule.SteppableSequenceFactory

@@ -71,22 +71,6 @@ public class VesselSpecification {
   @NonNull
   private final ImmutableMap<String, VesselComponent<?>> components;
 
-  /** The attribute whose value is the code of a vessel's home port. */
-  @NonNull
-  private final String homePortAttribute;
-
-  /** The attribute whose value is a vessel's name, if vessels have names. */
-  @Getter(NONE)
-  private final String nameAttribute;
-
-  /**
-   * @return the attribute whose value is a vessel's name, or nothing if
-   *         vessels have no names
-   */
-  public Optional<String> getNameAttribute() {
-    return Optional.ofNullable(nameAttribute);
-  }
-
   /**
    * @return the behaviour, then the other components, in the order they are
    *         built
@@ -105,15 +89,23 @@ public class VesselSpecification {
   /**
    * Creates a vessel and schedules its first step, at the current instant.
    *
-   * @param id         the new vessel's id
-   * @param attributes the new vessel's attributes
+   * @param id           the new vessel's id
+   * @param homePortCode the code of the new vessel's home port in its port
+   *                     grid, or nothing if it has none; a code matching no
+   *                     port leaves the vessel without a modelled home port,
+   *                     and so absent
+   * @param attributes   the new vessel's attributes
    * @return the vessel created
    * @throws IllegalStateException if the fleet already has a vessel with that
    *                               id, or had one that exited
    */
-  public Vessel create(final String id, final Map<String, ?> attributes) {
+  public Vessel create(
+    final String id,
+    final Optional<String> homePortCode,
+    final Map<String, ?> attributes
+  ) {
     final Vessel vessel = fleet.createVessel(id, this);
-    vessel.setAttributes(attributes);
+    vessel.setStartingState(homePortCode, attributes);
     vessel.buildComponents();
     fleet.announceEntry(vessel);
     vessel.scheduleFirstStep();

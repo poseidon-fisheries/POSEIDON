@@ -31,7 +31,6 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.poseidon.fishing.vessels.Factories.behaviour;
-import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.HOME_PORT_CODE;
 import static uk.ac.ox.poseidon.fishing.vessels.SpecificationFixtures.newVessel;
 
@@ -54,7 +53,8 @@ import uk.ac.ox.poseidon.fishing.fields.VesselField;
 import uk.ac.ox.poseidon.fishing.market.Sale;
 import uk.ac.ox.poseidon.fishing.regulations.actions.ExtendedFishingAction;
 import uk.ac.ox.poseidon.fishing.tasks.VesselTask;
-import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeChange;
+import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.AttributeUpdate;
+import uk.ac.ox.poseidon.fishing.vessels.VesselStatement.HomePortUpdate;
 import uk.ac.ox.poseidon.fishing.vessels.gears.Gear;
 import uk.ac.ox.poseidon.geography.Coordinate;
 import uk.ac.ox.poseidon.geography.grids.Cell;
@@ -118,7 +118,7 @@ class VesselTest {
       portGrid,
       behaviour
     );
-    vessel.setAttributes(Map.of(HOME_PORT, "P1"));
+    vessel.setStartingState(Optional.of("P1"), Map.of());
     return vessel;
   }
 
@@ -130,18 +130,18 @@ class VesselTest {
     schedule.scheduleRepeating(_ -> {}, 0, 1.0);
   }
 
-  private static AttributeChange setting(
+  private static AttributeUpdate setting(
     final String attribute,
     final Object value
   ) {
-    return new AttributeChange(
+    return new AttributeUpdate(
       ImmutableMap.of(attribute, value),
       ImmutableSet.of()
     );
   }
 
-  private static AttributeChange removing(final String attribute) {
-    return new AttributeChange(ImmutableMap.of(), ImmutableSet.of(attribute));
+  private static AttributeUpdate removing(final String attribute) {
+    return new AttributeUpdate(ImmutableMap.of(), ImmutableSet.of(attribute));
   }
 
   private void stepFor(final Duration duration) {
@@ -155,7 +155,7 @@ class VesselTest {
 
   @Test
   void aVesselWithoutAHomePortIsInactive() {
-    vessel.setAttributes(Map.of());
+    vessel.setStartingState(Optional.empty(), Map.of());
     assertThat(vessel.isActive()).isFalse();
   }
 
@@ -211,11 +211,11 @@ class VesselTest {
 
   @Test
   void aStatementOnAVesselWithNoStepPendingSchedulesOneAtOnce() {
-    vessel.setAttributes(Map.of());
+    vessel.setStartingState(Optional.empty(), Map.of());
     vessel.scheduleFirstStep();
     stepFor(ofSeconds(2));
-    vessel.queue(setting(HOME_PORT, "P1"));
-    assertThat(vessel.getAttributes()).doesNotContainKey(HOME_PORT);
+    vessel.queue(new HomePortUpdate(Optional.of("P1")));
+    assertThat(vessel.getHomePort()).isEmpty();
     stepFor(ofSeconds(2));
     assertThat(behaviour.stepDateTimes).containsExactly(
       START.plusSeconds(2),
@@ -247,9 +247,9 @@ class VesselTest {
   void aVesselThatLosesItsHomePortStopsUntilAStatementGivesItOneBack() {
     vessel.scheduleFirstStep();
     stepFor(ofSeconds(2));
-    vessel.queue(removing(HOME_PORT));
+    vessel.queue(new HomePortUpdate(Optional.empty()));
     stepFor(ofSeconds(3));
-    vessel.queue(setting(HOME_PORT, "P1"));
+    vessel.queue(new HomePortUpdate(Optional.of("P1")));
     stepFor(ofSeconds(2));
     // The task running when the home port goes is finished at 2 seconds
     assertThat(behaviour.stepDateTimes).containsExactly(
@@ -379,7 +379,7 @@ class VesselTest {
     when(vesselField.getCell(vessel)).thenReturn(PORT_CELL);
     when(portGrid.getObject(HOME_PORT_CODE)).thenReturn(Optional.of(port));
     when(portGrid.getCell(port)).thenReturn(PORT_CELL);
-    vessel.setAttributes(Map.of(HOME_PORT, HOME_PORT_CODE));
+    vessel.setStartingState(Optional.of(HOME_PORT_CODE), Map.of());
     return vessel;
   }
 
@@ -396,7 +396,7 @@ class VesselTest {
       behaviour(_ -> behaviour)
     );
 
-    vessel.setAttributes(Map.of(HOME_PORT, "P1"));
+    vessel.setStartingState(Optional.of("P1"), Map.of());
 
     assertThat(vessel.getPortDockedAt()).isSameAs(homePort);
   }
@@ -563,7 +563,7 @@ class VesselTest {
 
   @Test
   void anActionKeepsTheAttributesTheVesselHadWhenItWasMade() {
-    vessel.setAttributes(Map.of("gear", "PS"));
+    vessel.setStartingState(Optional.empty(), Map.of("gear", "PS"));
     final ExtendedFishingAction fishing = new ExtendedFishingAction(
       vessel,
       START,
@@ -572,7 +572,7 @@ class VesselTest {
       mock(Gear.class)
     );
     final Sale sale = new Sale(START, "sale", null, vessel, List.of(), null);
-    vessel.setAttributes(Map.of("gear", "OTB"));
+    vessel.setStartingState(Optional.empty(), Map.of("gear", "OTB"));
     assertThat(fishing.getAttributes()).containsExactly(entry("gear", "PS"));
     assertThat(sale.getAttributes()).containsExactly(entry("gear", "PS"));
     assertThat(vessel.getAttributes()).containsExactly(entry("gear", "OTB"));
@@ -591,7 +591,7 @@ class VesselTest {
       portGrid,
       behaviour(_ -> behaviour)
     );
-    vessel.setAttributes(Map.of(HOME_PORT, HOME_PORT_CODE));
+    vessel.setStartingState(Optional.of(HOME_PORT_CODE), Map.of());
     final Cell destination = new Cell(4, 3);
     when(vesselField.getPoint(vessel)).thenReturn(new Double2D(1, 2));
     when(vesselField.getModelGrid().toPoint(destination)).thenReturn(
@@ -616,14 +616,14 @@ class VesselTest {
       portGrid,
       behaviour(_ -> behaviour)
     );
-    vessel.setAttributes(Map.of(HOME_PORT, "P1"));
+    vessel.setStartingState(Optional.of("P1"), Map.of());
     final Double2D point = new Double2D(1, 2);
     final Coordinate coordinate = new Coordinate(3.5, 40.5);
     when(vesselField.getPoint(vessel)).thenReturn(point);
     when(vesselField.getModelGrid().toCoordinate(point)).thenReturn(coordinate);
 
     assertThat(vessel.getCoordinate()).isEqualTo(coordinate);
-    assertThat(vessel.getHomePortCell()).isEqualTo(PORT_CELL);
+    assertThat(vessel.getHomePortCell()).contains(PORT_CELL);
   }
 
   /** Starts a plain trip for {@code vessel}, at {@link #START}. */
